@@ -41,6 +41,20 @@ enum Versions {
 ```
 
 ```python
+# generated _client.py
+class PetStoreClient(_PetStoreClientOperationsMixin):
+    def __init__(self, endpoint: str, **kwargs: Any) -> None: ...
+
+# generated _operations/_operations.py
+class _PetStoreClientOperationsMixin:
+
+    @distributed_trace
+    def feed(self, **kwargs: Any) -> None:
+
+    @distributed_trace
+    def pet(self, **kwargs: Any) -> None:
+
+#usage sample
 from pet_store import PetStoreClient
 
 client = PetStoreClient()
@@ -79,6 +93,26 @@ client.pet();
 ```
 
 ```java
+// Client builder class
+package petstore;
+
+@ServiceClientBuilder(serviceClients = { PetStoreClient.class, PetStoreAsyncClient.class })
+public final class PetStoreClientBuilder implements HttpTrait<PetStoreClientBuilder>,
+    ConfigurationTrait<PetStoreClientBuilder>, EndpointTrait<PetStoreClientBuilder> {
+
+    public PetStoreClientBuilder();
+
+    public PetStoreClient buildClient();
+}
+
+// Client class
+@ServiceClient(builder = PetStoreClientBuilder.class)
+public final class PetStoreClient {
+    public void feed();
+    public void pet();
+}
+
+// Usage
 PetStoreClient client = new PetStoreClientBuilder().buildClient();
 client.feed();
 client.pet();
@@ -115,6 +149,29 @@ namespace Cats {
 ```
 
 ```python
+# generated _client.py
+class PetStoreClient:
+    def __init__(self, endpoint: str, **kwargs: Any) -> None: ...
+
+# generated operations/_operations.py
+class DogsOperations:
+
+    @distributed_trace
+    def feed(self, **kwargs: Any) -> None:
+
+    @distributed_trace
+    def pet(self, **kwargs: Any) -> None: 
+
+# generated cats/operations/_operations.py
+class CatsOperations:
+
+    @distributed_trace
+    def feed(self, **kwargs: Any) -> None:
+
+    @distributed_trace
+    def pet(self, **kwargs: Any) -> None: 
+
+#usage sample
 from pet_store import PetStoreClient
 
 client = PetStoreClient()
@@ -145,6 +202,34 @@ client.cats.pet();
 ```
 
 ```java
+// Client builder class
+package petstore;
+
+@ServiceClientBuilder(
+    serviceClients = { CatsClient.class, DogsClient.class, CatsAsyncClient.class, DogsAsyncClient.class })
+public final class PetStoreClientBuilder implements HttpTrait<PetStoreClientBuilder>,
+    ConfigurationTrait<PetStoreClientBuilder>, EndpointTrait<PetStoreClientBuilder> {
+
+    public PetStoreClientBuilder();
+
+    public CatsClient buildCatsClient();
+    public DogsClient buildDogsClient();
+}
+
+// Client class
+@ServiceClient(builder = PetStoreClientBuilder.class)
+public final class DogsClient {
+    public void feed();
+    public void pet();
+}
+
+@ServiceClient(builder = PetStoreClientBuilder.class)
+public final class CatsClient {
+    public void feed();
+    public void pet();
+}
+
+// Usage
 PetStoreClientBuilder builder = new PetStoreClientBuilder();
 
 DogsClient dogsClient = builder.buildDogsClient();
@@ -194,6 +279,44 @@ interface Actions {
 ```
 
 ```python
+# generated _client.py
+class PetStoreClient(_PetStoreClientOperationsMixin):
+    def __init__(self, endpoint: str, **kwargs: Any) -> None: ...
+
+# generated operations/_operations.py
+class _PetStoreClientOperationsMixin:
+
+    @distributed_trace
+    def info(self, **kwargs: Any) -> None:
+
+class BillingsOperations:
+
+    @distributed_trace
+    def history(self, **kwargs: Any) -> None:
+
+class ActionsOperations:
+
+    @distributed_trace
+    def open(self, **kwargs: Any) -> None:
+
+    @distributed_trace
+    def close(self, **kwargs: Any) -> None: 
+
+# generated pets/operations/_operations.py
+class PetsOperations:
+
+    @distributed_trace
+    def info(self, **kwargs: Any) -> None:
+
+class PetsActionsOperations:
+
+    @distributed_trace
+    def open(self, **kwargs: Any) -> None:
+
+    @distributed_trace
+    def close(self, **kwargs: Any) -> None: 
+
+#usage sample
 from pet_store import PetStoreClient
 
 client = PetStoreClient()
@@ -233,6 +356,62 @@ client.actions.close();
 ```
 
 ```java
+// Client builder class
+package petstore;
+
+@ServiceClientBuilder(
+    serviceClients = {
+        PetStoreClient.class,
+        PetsClient.class,
+        PetsActionsClient.class,
+        BillingsClient.class,
+        ActionsClient.class,
+        PetStoreAsyncClient.class,
+        PetsAsyncClient.class,
+        PetsActionsAsyncClient.class,
+        BillingsAsyncClient.class,
+        ActionsAsyncClient.class })
+public final class PetStoreClientBuilder implements HttpTrait<PetStoreClientBuilder>,
+    ConfigurationTrait<PetStoreClientBuilder>, EndpointTrait<PetStoreClientBuilder> {
+
+    public PetStoreClientBuilder();
+
+    public PetStoreClient buildClient();
+    public PetsActionsClient buildPetsActionsClient();
+    public PetsClient buildPetsClient();
+    public BillingsClient buildBillingsClient();
+    public ActionsClient buildActionsClient();
+}
+
+// Client class
+@ServiceClient(builder = PetStoreClientBuilder.class)
+public final class PetStoreClient {
+    public void info();
+}
+
+@ServiceClient(builder = PetStoreClientBuilder.class)
+public final class BillingsClient {
+    public void history();
+}
+
+@ServiceClient(builder = PetStoreClientBuilder.class)
+public final class PetsClient {
+    public void info();
+}
+
+@ServiceClient(builder = PetStoreClientBuilder.class)
+public final class PetsActionsClient {
+    public void feed();
+    public void pet();
+}
+
+@ServiceClient(builder = PetStoreClientBuilder.class)
+public final class ActionsClient {
+    public void open();
+    public void close();
+}
+
+// Usage
 PetStoreClientBuilder builder = new PetStoreClientBuilder();
 
 PetStoreClient petStoreClient = builder.buildClient();
@@ -298,12 +477,27 @@ import "./main.tsp";
 import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
+using PetStore;
 
 @@clientLocation(Feeds.feed, PetStore);
 @@clientLocation(Pets.pet, PetStore);
 ```
 
 ```python
+# generated _client.py
+class PetStoreClient(_PetStoreClientOperationsMixin):
+    def __init__(self, endpoint: str, **kwargs: Any) -> None: ...
+
+# generated _operations/_operations.py
+class _PetStoreClientOperationsMixin:
+
+    @distributed_trace
+    def feed(self, **kwargs: Any) -> None:
+
+    @distributed_trace
+    def pet(self, **kwargs: Any) -> None: 
+
+#usage sample
 from pet_store import PetStoreClient
 
 client = PetStoreClient()
@@ -328,6 +522,26 @@ client.pet();
 ```
 
 ```java
+// Client builder class
+package petstore;
+
+@ServiceClientBuilder(serviceClients = { PetStoreClient.class, PetStoreAsyncClient.class })
+public final class PetStoreClientBuilder implements HttpTrait<PetStoreClientBuilder>,
+    ConfigurationTrait<PetStoreClientBuilder>, EndpointTrait<PetStoreClientBuilder> {
+
+    public PetStoreClientBuilder();
+
+    public PetStoreClient buildClient();
+}
+
+// Client class
+@ServiceClient(builder = PetStoreClientBuilder.class)
+public final class PetStoreClient {
+    public void feed();
+    public void pet();
+}
+
+// Usage
 PetStoreClient client = new PetStoreClientBuilder().buildClient();
 client.feed();
 client.pet();
@@ -345,9 +559,9 @@ This can be achieved with the augment decorator: `@clientName` from `typespec-cl
 @service
 namespace PetStore;
 
-@route("/feed") feed(): void;
+@route("/feed") op feed(): void;
 
-@route("/pet") pet(): void;
+@route("/pet") op pet(): void;
 ```
 
 ```typespec title="client.tsp"
@@ -360,6 +574,20 @@ using Azure.ClientGenerator.Core;
 ```
 
 ```python
+# generated _client.py
+class PetStoreClient(_PetStoreClientOperationsMixin):
+    def __init__(self, endpoint: str, **kwargs: Any) -> None: ...
+
+# generated _operations/_operations.py
+class _PetStoreClientOperationsMixin:
+
+    @distributed_trace
+    def feed(self, **kwargs: Any) -> None:
+
+    @distributed_trace
+    def pet(self, **kwargs: Any) -> None: 
+
+#usage sample
 from pet_store import PetStoreGreatClient
 
 client = PetStoreGreatClient()
@@ -384,6 +612,26 @@ client.pet();
 ```
 
 ```java
+// Client builder class
+package petstore;
+
+@ServiceClientBuilder(serviceClients = { PetStoreGreatClient.class, PetStoreGreatAsyncClient.class })
+public final class PetStoreGreatClientBuilder implements HttpTrait<PetStoreGreatClientBuilder>,
+    ConfigurationTrait<PetStoreGreatClientBuilder>, EndpointTrait<PetStoreGreatClientBuilder> {
+
+    public PetStoreGreatClientBuilder();
+
+    public PetStoreGreatClient buildClient();
+}
+
+// Client class
+@ServiceClient(builder = PetStoreGreatClientBuilder.class)
+public final class PetStoreGreatClient {
+    public void feed();
+    public void pet();
+}
+
+// Usage
 PetStoreGreatClient client = new PetStoreGreatClientBuilder().buildClient();
 client.feed();
 client.pet();
@@ -401,9 +649,9 @@ This can be achieved with the augment decorator: `@clientNamespace` from `typesp
 @service
 namespace PetStore;
 
-@route("/feed") feed(): void;
+@route("/feed") op feed(): void;
 
-@route("/pet") pet(): void;
+@route("/pet") op pet(): void;
 ```
 
 ```typespec title="client.tsp"
@@ -416,6 +664,20 @@ using Azure.ClientGenerator.Core;
 ```
 
 ```python
+# generated _client.py
+class PetStoreClient(_PetStoreClientOperationsMixin):
+    def __init__(self, endpoint: str, **kwargs: Any) -> None: ...
+
+# generated _operations/_operations.py
+class _PetStoreClientOperationsMixin:
+
+    @distributed_trace
+    def feed(self, **kwargs: Any) -> None:
+
+    @distributed_trace
+    def pet(self, **kwargs: Any) -> None: 
+
+#usage sample
 from pet_store_renamed import PetStoreClient
 
 client = PetStoreClient()
@@ -440,6 +702,26 @@ client.pet();
 ```
 
 ```java
+// Client builder class
+package petstorerenamed;
+
+@ServiceClientBuilder(serviceClients = { PetStoreClient.class, PetStoreAsyncClient.class })
+public final class PetStoreClientBuilder implements HttpTrait<PetStoreClientBuilder>,
+    ConfigurationTrait<PetStoreClientBuilder>, EndpointTrait<PetStoreClientBuilder> {
+
+    public PetStoreClientBuilder();
+
+    public PetStoreClient buildClient();
+}
+
+// Client class
+@ServiceClient(builder = PetStoreClientBuilder.class)
+public final class PetStoreClient {
+    public void feed();
+    public void pet();
+}
+
+// Usage
 package petstorerenamed;
 
 PetStoreClient client = new PetStoreClientBuilder().buildClient();
@@ -459,12 +741,12 @@ Two clients that separate the operations can be declared using the `@client` dec
 @service
 namespace PetStore;
 
-@route("/feed") feed(): void;
+@route("/feed") op feed(): void;
 
-@route("/pet") pet(): void;
+@route("/pet") op pet(): void;
 ```
 
-```typespec
+```typespec title="client.tsp"
 import "./main.tsp";
 import "@azure-tools/typespec-client-generator-core";
 
@@ -490,6 +772,25 @@ interface Client2 {
 ```
 
 ```python
+# generated _client.py
+class FoodClient(_FoodClientOperationsMixin):
+    def __init__(self, endpoint: str, **kwargs: Any) -> None: ...
+
+class PetActionClient(_PetActionClientOperationsMixin):
+    def __init__(self, endpoint: str, **kwargs: Any) -> None: ...
+
+# generated _operations/_operations.py
+class _FoodClientOperationsMixin:
+
+    @distributed_trace
+    def feed(self, **kwargs: Any) -> None:
+
+class _PetActionClientOperationsMixin
+
+    @distributed_trace
+    def pet(self, **kwargs: Any) -> None: 
+
+#usage sample
 from pet_store_renamed import FoodClient, PetActionClient
 
 client1 = FoodClient()
@@ -519,6 +820,39 @@ client2.feed();
 ```
 
 ```java
+// Client builder class
+package petstorerenamed;
+
+@ServiceClientBuilder(serviceClients = { FoodClient.class, FoodAsyncClient.class })
+public final class FoodClientBuilder
+    implements HttpTrait<FoodClientBuilder>, ConfigurationTrait<FoodClientBuilder>, EndpointTrait<FoodClientBuilder> {
+
+    public FoodClientBuilder();
+
+    public FoodClient buildClient();
+}
+
+@ServiceClientBuilder(serviceClients = { PetActionClient.class, PetActionAsyncClient.class })
+public final class PetActionClientBuilder implements HttpTrait<PetActionClientBuilder>,
+    ConfigurationTrait<PetActionClientBuilder>, EndpointTrait<PetActionClientBuilder> {
+
+    public PetActionClientBuilder();
+
+    public PetActionClient buildClient();
+}
+
+// Client class
+@ServiceClient(builder = FoodClientBuilder.class)
+public final class FoodClient {
+    public void feed();
+}
+
+@ServiceClient(builder = PetActionClientBuilder.class)
+public final class PetActionClient {
+    public void pet();
+}
+
+// Usage
 package petstorerenamed;
 
 FoodClient foodClient = new FoodClientBuilder().buildClient();
@@ -540,9 +874,9 @@ Two clients that separate the operations can be declared using the `@client` dec
 @service
 namespace PetStore;
 
-@route("/feed") feed(): void;
+@route("/feed") op feed(): void;
 
-@route("/pet") pet(): void;
+@route("/pet") op pet(): void;
 ```
 
 ```typespec title="client.tsp"
@@ -569,6 +903,22 @@ interface OpGrp2 {
 ```
 
 ```python
+# generated _client.py
+class PetStoreClient: 
+    def __init__(self, endpoint: str, **kwargs: Any) -> None: ...
+
+# generated operations/_operations.py
+class OpGrp1Operations:
+
+    @distributed_trace
+    def feed(self, **kwargs: Any) -> None:
+
+class OpGrp2Operations:
+
+    @distributed_trace
+    def pet(self, **kwargs: Any) -> None: 
+
+#usage sample
 from pet_store_renamed import PetStoreClient
 
 client = PetStoreClient()
@@ -595,6 +945,31 @@ client.opGrp2.pet();
 ```
 
 ```java
+// Client builder class
+package petstorerenamed;
+
+@ServiceClientBuilder(
+    serviceClients = { OpGrp1Client.class, OpGrp2Client.class, OpGrp1AsyncClient.class, OpGrp2AsyncClient.class })
+public final class PetStoreClientBuilder implements HttpTrait<PetStoreClientBuilder>,
+    ConfigurationTrait<PetStoreClientBuilder>, EndpointTrait<PetStoreClientBuilder> {
+
+    public OpGrp1Client buildOpGrp1Client();
+
+    public OpGrp2Client buildOpGrp2Client();
+}
+
+// Client class
+@ServiceClient(builder = PetStoreClientBuilder.class)
+public final class OpGrp1Client {
+    public void feed();
+}
+
+@ServiceClient(builder = PetStoreClientBuilder.class)
+public final class OpGrp2Client {
+    public void pet();
+}
+
+// Usage
 package petstorerenamed;
 
 PetStoreClientBuilder builder = new PetStoreClientBuilder();
@@ -616,9 +991,9 @@ opGrp2Client.pet();
 @service
 namespace PetStore;
 
-@route("/feed") feed(): void;
+@route("/feed") op feed(): void;
 
-@route("/pet") pet(): void;
+@route("/pet") op pet(): void;
 ```
 
 ```typespec title="client.tsp"
@@ -647,6 +1022,27 @@ namespace PetAction {
 ```
 
 ```python
+# generated food/_client.py
+class FoodClient(_FoodClientOperationsMixin):
+    def __init__(self, endpoint: str, **kwargs: Any) -> None: ...
+
+# generated food/_operations/_operations.py
+class _FoodClientOperationsMixin:
+
+    @distributed_trace
+    def feed(self, **kwargs: Any) -> None:
+
+# generated petaction/_client.py
+class PetActionClient(_PetActionClientOperationsMixin):
+    def __init__(self, endpoint: str, **kwargs: Any) -> None: ...
+
+# generated petaction/_operations/_operations.py
+class _PetActionClientOperationsMixin:
+
+    @distributed_trace
+    def pet(self, **kwargs: Any) -> None: 
+
+#usage sample
 from new_pet_store.food import FoodClient
 from new_pet_store.pet_action import PetActionClient
 
@@ -666,6 +1062,43 @@ NOT_SUPPORTED;
 ```
 
 ```java
+package newstore.food;
+
+// Client builder class
+@ServiceClientBuilder(serviceClients = { FoodClient.class, FoodAsyncClient.class })
+public final class FoodClientBuilder
+    implements HttpTrait<FoodClientBuilder>, ConfigurationTrait<FoodClientBuilder>, EndpointTrait<FoodClientBuilder> {
+
+    public FoodClientBuilder();
+
+    public FoodClient buildClient();
+}
+
+// Client class
+@ServiceClient(builder = FoodClientBuilder.class)
+public final class FoodClient {
+    public void feed();
+}
+
+package newstore.petaction;
+
+// Client builder class
+@ServiceClientBuilder(serviceClients = { PetActionClient.class, PetActionAsyncClient.class })
+public final class PetActionClientBuilder implements HttpTrait<PetActionClientBuilder>,
+    ConfigurationTrait<PetActionClientBuilder>, EndpointTrait<PetActionClientBuilder> {
+
+    public PetActionClientBuilder();
+
+    public PetActionClient buildClient();
+}
+
+// Client class
+@ServiceClient(builder = PetActionClientBuilder.class)
+public final class PetActionClient {
+    public void pet();
+}
+
+// Usage
 import newpetstore.food.FoodClient;
 import newpetstore.food.FoodClientBuilder;
 import newpetstore.petaction.PetActionClient;
@@ -690,9 +1123,9 @@ Two clients that separate the operations can be declared using the `client` deco
 @service
 namespace PetStore;
 
-@route("/feed") feed(): void;
+@route("/feed") op feed(): void;
 
-@route("/pet") pet(): void;
+@route("/pet") op pet(): void;
 ```
 
 ```typespec title="client.tsp"
@@ -722,6 +1155,27 @@ interface Client2 {
 ```
 
 ```python
+# generated _client.py
+class FoodClient(_FoodClientOperationsMixin):
+    def __init__(self, endpoint: str, **kwargs: Any) -> None: ...
+
+# generated _operations/_operations.py
+class _FoodClientOperationsMixin:
+
+    @distributed_trace
+    def feed(self, **kwargs: Any) -> None:
+
+# generated subnamespace/_client.py
+class PetActionClient(_PetActionClientOperationsMixin):
+    def __init__(self, endpoint: str, **kwargs: Any) -> None: ...
+
+# generated subnamespace/_operations/_operations.py
+class _PetActionClientOperationsMixin:
+
+    @distributed_trace
+    def pet(self, **kwargs: Any) -> None:
+
+#usage sample
 from pet_store_renamed import FoodClient
 from pet_store_renamed.sub_namespace import PetActionClient
 
@@ -748,6 +1202,43 @@ NOT_SUPPORTED;
 ```
 
 ```java
+package petstorerenamed;
+
+// Client builder class
+@ServiceClientBuilder(serviceClients = { FoodClient.class, FoodAsyncClient.class })
+public final class FoodClientBuilder
+    implements HttpTrait<FoodClientBuilder>, ConfigurationTrait<FoodClientBuilder>, EndpointTrait<FoodClientBuilder> {
+
+    public FoodClientBuilder();
+
+    public FoodClient buildClient();
+}
+
+// Client class
+@ServiceClient(builder = FoodClientBuilder.class)
+public final class FoodClient {
+    public void feed();
+}
+
+package petstorerenamed.subnamespace;
+
+// Client builder class
+@ServiceClientBuilder(serviceClients = { PetActionClient.class, PetActionAsyncClient.class })
+public final class PetActionClientBuilder implements HttpTrait<PetActionClientBuilder>,
+    ConfigurationTrait<PetActionClientBuilder>, EndpointTrait<PetActionClientBuilder> {
+
+    public PetActionClientBuilder();
+
+    public PetActionClient buildClient();
+}
+
+// Client class
+@ServiceClient(builder = PetActionClientBuilder.class)
+public final class PetActionClient {
+    public void pet();
+}
+
+// Usage
 import petstorerenamed.FoodClient;
 import petstorerenamed.FoodClientBuilder;
 import petstorerenamed.subnamespace.PetActionClient;
@@ -778,8 +1269,8 @@ The generated code will automatically pass in the inputted value from the client
 @service
 namespace Storage;
 
-op upload(@path blobName: string): void;
-op download(@path blobName: string): void;
+@route("/upload") op upload(@path blobName: string): void;
+@route("/download") op download(@path blobName: string): void;
 ```
 
 ```typespec title="client.tsp"
@@ -802,6 +1293,20 @@ model StorageClientOptions {
 ```
 
 ```python
+# generated _client.py
+class StorageClient(_StorageClientOperationsMixin):
+    def __init__(self, endpoint: str, blob_name: str, **kwargs: Any) -> None: ...
+
+# generated _operations/_operations.py
+class _StorageClientOperationsMixin:
+
+    @distributed_trace
+    def upload(self, **kwargs: Any) -> None:
+
+    @distributed_trace
+    def download(self, **kwargs: Any) -> None:
+
+#usage sample
 from storage import StorageClient
 
 client = StorageClient(endpoint="<my-endpoint>", blob_name="myBlobName", ...)
@@ -831,6 +1336,28 @@ client.download();
 ```
 
 ```java
+// Client builder class
+package storage;
+
+@ServiceClientBuilder(serviceClients = { StorageClient.class, StorageAsyncClient.class })
+public final class StorageClientBuilder implements HttpTrait<StorageClientBuilder>,
+    ConfigurationTrait<StorageClientBuilder>, EndpointTrait<StorageClientBuilder> {
+
+    public StorageClientBuilder();
+
+    public StorageClientBuilder blobName(String blobName);
+
+    public StorageClient buildClient();
+}
+
+// Client class
+@ServiceClient(builder = StorageClientBuilder.class)
+public final class StorageClient {
+    public void upload();
+    public void download();
+}
+
+// Usage
 package storage;
 
 StorageClient client = new StorageClient()
@@ -852,8 +1379,8 @@ If you want to rename the parameter name that you elevate to the client level, y
 @service
 namespace Storage;
 
-op upload(@path blobName: string): void;
-op download(@path blobName: string): void;
+@route("/upload") op upload(@path blobName: string): void;
+@route("/download") op download(@path blobName: string): void;
 ```
 
 ```typespec title="client.tsp"
@@ -877,6 +1404,20 @@ model StorageClientOptions {
 ```
 
 ```python
+# generated _client.py
+class StorageClient(_StorageClientOperationsMixin):
+    def __init__(self, endpoint: str, blob: str, **kwargs: Any) -> None: ...
+
+# generated _operations/_operations.py
+class _StorageClientOperationsMixin:
+
+    @distributed_trace
+    def upload(self, **kwargs: Any) -> None:
+
+    @distributed_trace
+    def download(self, **kwargs: Any) -> None:
+
+#usage sample
 from storage import StorageClient
 
 client = StorageClient(endpoint="<my-endpoint>", blob="myBlobName", ...)
@@ -906,6 +1447,28 @@ client.download();
 ```
 
 ```java
+// Client builder class
+package storage;
+
+@ServiceClientBuilder(serviceClients = { StorageClient.class, StorageAsyncClient.class })
+public final class StorageClientBuilder implements HttpTrait<StorageClientBuilder>,
+    ConfigurationTrait<StorageClientBuilder>, EndpointTrait<StorageClientBuilder> {
+
+    public StorageClientBuilder();
+
+    public StorageClientBuilder blob(String blob);
+
+    public StorageClient buildClient();
+}
+
+// Client class
+@ServiceClient(builder = StorageClientBuilder.class)
+public final class StorageClient {
+    public void upload();
+    public void download();
+}
+
+// Usage
 package storage;
 
 StorageClient client = new StorageClient()
