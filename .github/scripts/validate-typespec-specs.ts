@@ -4,11 +4,10 @@
 import { spawn } from "child_process";
 import { readdir, stat } from "fs/promises";
 import { join } from "path";
-
 // Number of parallel TypeSpec compilations to run
 const COMPILATION_CONCURRENCY = 4;
 
-async function findTspConfigDirectories(startDir: string): Promise<string[]> {
+async function findTspProjects(startDir: string): Promise<string[]> {
   const directories: string[] = [];
 
   async function searchDirectory(dir: string): Promise<void> {
@@ -97,7 +96,7 @@ async function main() {
 
   console.log(`Looking for TypeSpec projects in ${azureSpecsDir}...`);
 
-  const tspConfigDirs = await findTspConfigDirectories(join(azureSpecsDir, "specification"));
+  const tspConfigDirs = await findTspProjects(join(azureSpecsDir, "specification"));
 
   if (tspConfigDirs.length === 0) {
     console.log("No tspconfig.yaml files found in specification directory");
@@ -115,24 +114,10 @@ async function main() {
   // Create a processor function that handles the compilation and logging
   const processDirectory = async (dir: string) => {
     const result = await runTspCompile(dir);
+    const status = result.success ? "✅" : "❌";
 
-    // Buffer all output to log as a complete group
-    let groupOutput = "";
-
-    if (result.success) {
-      groupOutput += "✅ Compilation successful\n";
-    } else {
-      groupOutput += "❌ Compilation failed\n";
-    }
-
-    if (result.output.trim()) {
-      groupOutput += "Output:\n";
-      groupOutput += result.output + "\n";
-    }
-
-    // Log the complete group all at once
-    console.log(`::group::Compiling TypeSpec project in ${dir}`);
-    console.log(groupOutput.trim());
+    console.log(`::group::${status} ${dir}`);
+    console.log(result);
     console.log("::endgroup::");
 
     return { dir, result };

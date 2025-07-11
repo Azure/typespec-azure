@@ -60,16 +60,12 @@ jobs:
           echo "Installing dependencies..."
           npm install --no-package-lock
 
+          echo "Reverting package.json changes..."
+          git checkout -- package.json || true
+
       - name: Run TypeSpec validation in azure-rest-api-specs
         id: validation
         run: pnpm tsx ../.github/scripts/validate-typespec-specs.ts .
-        working-directory: azure-rest-api-specs
-        continue-on-error: true
-
-      - name: Revert package.json changes
-        run: |
-          echo "Reverting package.json changes..."
-          git checkout -- package.json || true
         working-directory: azure-rest-api-specs
 
       - name: Check for git changes
