@@ -281,7 +281,6 @@ export function getPagedResult(
           return parentMetadata;
         }
       }
-      console.log("No paged result metadata found for model:", entity.name);
       break;
     case "Operation":
       switch (entity.returnType.kind) {
