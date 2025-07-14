@@ -20,6 +20,7 @@ import {
   Program,
   Type,
 } from "@typespec/compiler";
+import { unsafe_MutatorWithNamespace } from "@typespec/compiler/experimental";
 import {
   HttpAuth,
   HttpOperation,
@@ -76,6 +77,7 @@ export interface TCGCContext {
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
   __packageVersions?: string[]; // the package versions from the service versioning config and api version setting in tspconfig.
   __packageVersionEnum?: Enum; // the enum type that contains all the package versions.
+  __versioningMutator?: unsafe_MutatorWithNamespace;
 
   getMutatedGlobalNamespace(): Namespace;
   getApiVersionsForType(type: Type): string[];

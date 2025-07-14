@@ -760,6 +760,12 @@ importers:
       '@typespec/http':
         specifier: workspace:^
         version: link:../http
+      '@typespec/tspd':
+        specifier: workspace:^
+        version: link:../tspd
+      '@typespec/versioning':
+        specifier: workspace:^
+        version: link:../versioning
       eslint:
         specifier: ^9.23.0
         version: 9.30.1
@@ -3073,6 +3079,9 @@ importers:
 
   packages/typespec-client-generator-core:
     dependencies:
+      '@typespec/http-client':
+        specifier: workspace:^
+        version: link:../../core/packages/http-client
       '@typespec/versioning':
         specifier: workspace:^
         version: link:../../core/packages/versioning

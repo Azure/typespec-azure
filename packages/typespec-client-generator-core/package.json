@@ -69,7 +69,8 @@
     "@typespec/sse": "workspace:^",
     "@typespec/streams": "workspace:^",
     "@typespec/versioning": "workspace:^",
-    "@typespec/xml": "workspace:^"
+    "@typespec/xml": "workspace:^",
+    "@typespec/http-client": "workspace:^"
   },
   "devDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:^",

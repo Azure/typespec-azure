@@ -11,6 +11,7 @@ import {
   Program,
   RekeyableMap,
   Scalar,
+  Service,
   Type,
   Union,
   getDiscriminator,
@@ -20,6 +21,12 @@ import {
   isTemplateDeclaration,
 } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
+import { $ } from "@typespec/compiler/typekit";
+import {
+  $client as $globalClient,
+  $clientLocation as $globalClientLocation,
+  Client,
+} from "@typespec/http-client";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
@@ -69,6 +76,7 @@ import {
   scopeKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
+import { getLibraryName } from "./public-utils.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
@@ -194,6 +202,10 @@ export const $client: ClientDecorator = (
     subOperationGroups: [],
   };
   setScopedDecoratorData(context, $client, clientKey, target, client, scope);
+
+  context.call($globalClient, target, {
+    name: explicitName?.kind === "String" ? explicitName.value : undefined,
+  });
 };
 
 function judgeService(program: Program, type: Namespace): boolean {
@@ -245,7 +257,49 @@ export function getClient(
  * @returns Array of clients
  */
 export function listClients(context: TCGCContext): SdkClient[] {
-  return context.getClients();
+  const sdkClients: SdkClient[] = [];
+  $(context.program)
+    .client.list({ mutators: [context.__versioningMutator!] })
+    .map((client) => {
+      const service = $(context.program).client.getService(client);
+      if (!service) {
+        reportDiagnostic(context.program, {
+          code: "client-service",
+          format: { name: client.name },
+          target: client.type,
+        });
+        return;
+      }
+      sdkClients.push({
+        kind: "SdkClient",
+        name: client.name,
+        service: service.type,
+        type: client.type,
+        crossLanguageDefinitionId: getNamespaceFullName(service.type),
+        subOperationGroups: client.subClients.map((subClient) => {
+          return createOperationGroup(context, subClient, service, client.name);
+        }),
+      });
+    });
+  return sdkClients;
+}
+
+function createOperationGroup(
+  context: TCGCContext,
+  subClient: Client,
+  service: Service,
+  groupPathPrefix: string,
+): SdkOperationGroup {
+  const groupPath = `${groupPathPrefix}.${getLibraryName(context, subClient.type)}`;
+  return {
+    kind: "SdkOperationGroup",
+    service: service.type,
+    type: subClient.type,
+    groupPath,
+    subOperationGroups: subClient.subClients.map((client) => {
+      return createOperationGroup(context, client, service, groupPath);
+    }),
+  };
 }
 
 export const $operationGroup: OperationGroupDecorator = (
@@ -1203,6 +1257,9 @@ export const $clientLocation = (
   scope?: LanguageScopes,
 ) => {
   setScopedDecoratorData(context, $clientLocation, clientLocationKey, source, target, scope);
+  if (typeof target !== "string") {
+    context.call($globalClientLocation, source, target);
+  }
 };
 
 /**

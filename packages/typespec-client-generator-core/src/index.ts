@@ -8,3 +8,5 @@ export * from "./types.js";
 
 /** @internal */
 export { $decorators } from "./tsp-index.js";
+
+import "@typespec/http-client/typekit";
