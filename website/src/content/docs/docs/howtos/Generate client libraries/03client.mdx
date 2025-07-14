@@ -6,8 +6,6 @@ import { ClientTabs, ClientTabItem } from "@components/client-tabs";
 
 This page documents the client behavior as well as how to customize clients.
 
-> **NOTE:** The JS RLC doesn't support client hierarchy customization and will ignore client.tsp. Therefore, the following scenarios won't affect the JS RLC user experience. In this context, the TypeScript part refers to the JS Modular Emitter.
-
 ## Default Behavior
 
 ### Basic Rules
@@ -884,7 +882,13 @@ client2.pet()
 ```
 
 ```typescript
-NOT_SUPPORTED;
+import { FoodClient, PetActionClient } from "@azure/package-name";
+
+const foodClient = new FoodClient();
+const petActionClient = new PetActionClient();
+
+foodClient.feed()
+petActionClient.pet();
 ```
 
 ```java
@@ -1003,7 +1007,13 @@ foodClient.Feed();
 ```
 
 ```typescript
-NOT_SUPPORTED;
+import { FoodClient, PetActionClient } from "@azure/package-name";
+
+const foodClient = new FoodClient();
+const petActionClient = new PetActionClient();
+
+foodClient.feed()
+petActionClient.pet();
 ```
 
 ```java
@@ -1303,7 +1313,12 @@ model StorageClientOptions {
 ```
 
 ```typescript
-// TODO
+import { StorageClient } from "@azure/package-name";
+
+const client = new StorageClient();
+
+client.upload();
+client.download();
 ```
 
 ```java

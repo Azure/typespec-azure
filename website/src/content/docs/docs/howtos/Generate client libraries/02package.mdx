@@ -40,7 +40,14 @@ model Food {
 ```
 
 ```typescript
-// TODO
+import { PetStoreClient,Food } from "@azure/package-name";
+
+const client = new PetStoreClient();
+const food:Food = {
+    name: "food";
+    quantity: 3;
+}
+client.feed(food);
 ```
 
 ```java
