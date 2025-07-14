@@ -41,6 +41,22 @@ it("define a custom paged operation with custom next link", async () => {
   });
 });
 
+it("value is default item name for x-ms-pageable", async () => {
+  const res = await compileOpenAPI(
+    `
+    @list
+    op test(): {
+      @pageItems value: string[];
+      @nextLink next: string;
+    };
+    `,
+  );
+
+  deepStrictEqual(res.paths["/"].get!["x-ms-pageable"], {
+    nextLinkName: "next",
+  });
+});
+
 describe("Legacy define paging operation using Azure.Core decorators", () => {
   it("define a custom paged operation with custom next link", async () => {
     const res = await compileOpenAPI(

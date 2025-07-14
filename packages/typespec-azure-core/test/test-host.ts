@@ -1,6 +1,18 @@
-import { Diagnostic, listServices, Model, Namespace, Program } from "@typespec/compiler";
+import {
+  Diagnostic,
+  listServices,
+  Model,
+  Namespace,
+  Program,
+  resolvePath,
+} from "@typespec/compiler";
 import { unsafe_mutateSubgraphWithNamespace } from "@typespec/compiler/experimental";
-import { BasicTestRunner, createTestHost, createTestWrapper } from "@typespec/compiler/testing";
+import {
+  BasicTestRunner,
+  createTester,
+  createTestHost,
+  createTestWrapper,
+} from "@typespec/compiler/testing";
 import {
   getAllHttpServices,
   HttpOperation,
@@ -15,6 +27,14 @@ import { VersioningTestLibrary } from "@typespec/versioning/testing";
 import { strictEqual } from "assert";
 import { AzureCoreTestLibrary } from "../src/testing/index.js";
 
+export const Tester = createTester(resolvePath(import.meta.dirname, ".."), {
+  libraries: [
+    "@typespec/http",
+    "@typespec/rest",
+    "@typespec/versioning",
+    "@azure-tools/typespec-azure-core",
+  ],
+});
 export async function createAzureCoreTestHost() {
   return createTestHost({
     libraries: [

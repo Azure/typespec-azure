@@ -137,7 +137,6 @@ function setResourceLifecycleOperation(
   target: Operation,
   resourceType: Model,
   kind: ArmLifecycleOperationKind,
-  decoratorName: string,
 ) {
   // Only register methods from non-templated interface types
   if (
@@ -167,7 +166,7 @@ export const $armResourceRead: ArmResourceReadDecorator = (
   resourceType: Model,
 ) => {
   context.call($readsResource, target, resourceType);
-  setResourceLifecycleOperation(context, target, resourceType, "read", "@armResourceRead");
+  setResourceLifecycleOperation(context, target, resourceType, "read");
 };
 
 export const $armResourceCreateOrUpdate: ArmResourceCreateOrUpdateDecorator = (
@@ -176,13 +175,7 @@ export const $armResourceCreateOrUpdate: ArmResourceCreateOrUpdateDecorator = (
   resourceType: Model,
 ) => {
   context.call($createsOrReplacesResource, target, resourceType);
-  setResourceLifecycleOperation(
-    context,
-    target,
-    resourceType,
-    "createOrUpdate",
-    "@armResourceCreateOrUpdate",
-  );
+  setResourceLifecycleOperation(context, target, resourceType, "createOrUpdate");
 };
 
 export const $armResourceUpdate: ArmResourceUpdateDecorator = (
@@ -191,7 +184,7 @@ export const $armResourceUpdate: ArmResourceUpdateDecorator = (
   resourceType: Model,
 ) => {
   context.call($updatesResource, target, resourceType);
-  setResourceLifecycleOperation(context, target, resourceType, "update", "@armResourceUpdate");
+  setResourceLifecycleOperation(context, target, resourceType, "update");
 };
 
 export const $armResourceDelete: ArmResourceDeleteDecorator = (
@@ -200,7 +193,7 @@ export const $armResourceDelete: ArmResourceDeleteDecorator = (
   resourceType: Model,
 ) => {
   context.call($deletesResource, target, resourceType);
-  setResourceLifecycleOperation(context, target, resourceType, "delete", "@armResourceDelete");
+  setResourceLifecycleOperation(context, target, resourceType, "delete");
 };
 
 export const $armResourceList: ArmResourceListDecorator = (

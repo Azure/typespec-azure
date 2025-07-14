@@ -238,8 +238,7 @@ it("normal paged result with encoded name", async () => {
   strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
 });
 
-// skip for current paging implementation does not support nested paging value
-it.skip("normal paged result with nested paging value", async () => {
+it("normal paged result with nested paging value", async () => {
   await runner.compileWithBuiltInService(`
     @list
     op test(): ListTestResult;
@@ -277,6 +276,161 @@ it.skip("normal paged result with nested paging value", async () => {
   strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
   strictEqual(sdkPackage.models[0].properties[0].type.kind, "model");
   strictEqual(response.resultSegments[1], sdkPackage.models[0].properties[0].type.properties[0]);
+  strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
+});
+
+it("normal paged result with deeply nested paging value", async () => {
+  await runner.compileWithBuiltInService(`
+    @list
+    op test(): ListTestResult;
+    model ListTestResult {
+      data: {
+        results: {
+          items: {
+            @pageItems
+            values: Test[];
+          };
+        };
+      };
+      metadata: {
+        pagination: {
+          @TypeSpec.nextLink
+          nextLink: string;
+        };
+      };
+    }
+    model Test {
+      id: string;
+    }
+  `);
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  strictEqual(method.name, "test");
+  strictEqual(method.kind, "paging");
+  strictEqual(method.nextLinkPath, "metadata.pagination.nextLink");
+  strictEqual(method.pagingMetadata.nextLinkSegments?.length, 3);
+  strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
+  strictEqual(sdkPackage.models[0].properties[1].type.kind, "model");
+  strictEqual(
+    method.pagingMetadata.nextLinkSegments[1],
+    sdkPackage.models[0].properties[1].type.properties[0],
+  );
+  strictEqual(sdkPackage.models[0].properties[1].type.properties[0].type.kind, "model");
+  strictEqual(
+    method.pagingMetadata.nextLinkSegments[2],
+    sdkPackage.models[0].properties[1].type.properties[0].type.properties[0],
+  );
+
+  const response = method.response;
+  strictEqual(response.kind, "method");
+  strictEqual(response.resultPath, "data.results.items.values");
+  strictEqual(response.resultSegments?.length, 4);
+  strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
+  strictEqual(sdkPackage.models[0].properties[0].type.kind, "model");
+  strictEqual(response.resultSegments[1], sdkPackage.models[0].properties[0].type.properties[0]);
+  strictEqual(sdkPackage.models[0].properties[0].type.properties[0].type.kind, "model");
+  strictEqual(
+    response.resultSegments[2],
+    sdkPackage.models[0].properties[0].type.properties[0].type.properties[0],
+  );
+  strictEqual(
+    sdkPackage.models[0].properties[0].type.properties[0].type.properties[0].type.kind,
+    "model",
+  );
+  strictEqual(
+    response.resultSegments[3],
+    sdkPackage.models[0].properties[0].type.properties[0].type.properties[0].type.properties[0],
+  );
+  strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
+});
+
+it("normal paged result with nested continuation token", async () => {
+  await runner.compileWithBuiltInService(`
+    @list
+    op test(@continuationToken @query token?: string): ListTestResult;
+    model ListTestResult {
+      data: {
+        @pageItems
+        items: Test[];
+      };
+      pagination: {
+        @continuationToken
+        continuationToken?: string;
+      };
+    }
+    model Test {
+      id: string;
+    }
+  `);
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  strictEqual(method.name, "test");
+  strictEqual(method.kind, "paging");
+  strictEqual(method.pagingMetadata.continuationTokenParameterSegments?.length, 1);
+  strictEqual(method.pagingMetadata.continuationTokenParameterSegments?.[0], method.parameters[0]);
+  strictEqual(method.pagingMetadata.continuationTokenResponseSegments?.length, 2);
+  strictEqual(method.operation.responses[0].type?.kind, "model");
+  strictEqual(
+    method.pagingMetadata.continuationTokenResponseSegments?.[0],
+    method.operation.responses[0].type.properties[1],
+  );
+  strictEqual(method.operation.responses[0].type.properties[1].type.kind, "model");
+  strictEqual(
+    method.pagingMetadata.continuationTokenResponseSegments?.[1],
+    method.operation.responses[0].type.properties[1].type.properties[0],
+  );
+
+  const response = method.response;
+  strictEqual(response.kind, "method");
+  strictEqual(response.resultPath, "data.items");
+  strictEqual(response.resultSegments?.length, 2);
+  strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
+  strictEqual(sdkPackage.models[0].properties[0].type.kind, "model");
+  strictEqual(response.resultSegments[1], sdkPackage.models[0].properties[0].type.properties[0]);
+  strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
+});
+
+it("normal paged result with asymmetric nesting", async () => {
+  await runner.compileWithBuiltInService(`
+    @list
+    op test(): ListTestResult;
+    model ListTestResult {
+      @pageItems
+      items: Test[];
+      metadata: {
+        pagination: {
+          @TypeSpec.nextLink
+          nextLink: string;
+        };
+      };
+    }
+    model Test {
+      id: string;
+    }
+  `);
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  strictEqual(method.name, "test");
+  strictEqual(method.kind, "paging");
+  strictEqual(method.nextLinkPath, "metadata.pagination.nextLink");
+  strictEqual(method.pagingMetadata.nextLinkSegments?.length, 3);
+  strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
+  strictEqual(sdkPackage.models[0].properties[1].type.kind, "model");
+  strictEqual(
+    method.pagingMetadata.nextLinkSegments[1],
+    sdkPackage.models[0].properties[1].type.properties[0],
+  );
+  strictEqual(sdkPackage.models[0].properties[1].type.properties[0].type.kind, "model");
+  strictEqual(
+    method.pagingMetadata.nextLinkSegments[2],
+    sdkPackage.models[0].properties[1].type.properties[0].type.properties[0],
+  );
+
+  const response = method.response;
+  strictEqual(response.kind, "method");
+  strictEqual(response.resultPath, "items");
+  strictEqual(response.resultSegments?.length, 1);
+  strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
   strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
 });
 
