@@ -235,7 +235,6 @@ export function getPagedResult(
   switch (entity.kind) {
     case "Model":
       if (program.stateMap(AzureCoreStateKeys.pagedResult).get(entity)) {
-        console.log("Found paged result metadata for model:", entity.name);
         metadata = { modelType: entity };
         const items = _getItems(program, entity);
         if (items !== undefined) {

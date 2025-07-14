@@ -147,6 +147,8 @@ None
 
 #### `@items`
 
+_Deprecated: Do not use this decorator. Use @pageItems instead._
+
 Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
 
 ```typespec
@@ -306,6 +308,8 @@ Identifies an operation that is linked to the target operation.
 | parameters      | `{}`             | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
 
 #### `@pagedResult`
+
+_Deprecated: Do not use this decorator. Use @list decorator on the operation instead._
 
 Marks a Model as a paged collection.
 
