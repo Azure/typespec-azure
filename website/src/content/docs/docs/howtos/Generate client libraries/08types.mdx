@@ -44,7 +44,9 @@ foo = Foo(prop="hello")
 <ClientTabItem lang="typescript" >
 
 ```typescript
-// TODO
+import { Foo } from "@azure/package-name";
+
+const foo:Foo = "hello";
 ```
 
 </ClientTabItem>
@@ -97,7 +99,9 @@ foo = Foo(prop="hello")
 <ClientTabItem lang="typescript" >
 
 ```typescript
-// TODO
+import { Foo } from "@azure/package-name";
+
+const foo:Foo = "hello";
 ```
 
 </ClientTabItem>
@@ -149,7 +153,9 @@ foo = Foo(prop="hello")
 <ClientTabItem lang="typescript" >
 
 ```typescript
-// TODO
+import { Foo } from "@azure/package-name";
+
+const foo:Foo = "hello";
 ```
 
 </ClientTabItem>
@@ -528,8 +534,13 @@ public partial class Foo : IUtf8JsonSerializable, IJsonModel<Foo>
 <ClientTabItem lang="typescript" >
 
 ```typescript
-// Please note that this feature is not supported right now, and the model will be generated un-flattened.
-// Please comment and follow work status on: https://github.com/Azure/autorest.typescript/issues/2164
+import { Foo } from "@azure/package-name";
+
+const foo:Foo = { 
+  prop: { 
+    name:"hello" 
+  }
+};
 ```
 
 </ClientTabItem>
@@ -619,18 +630,6 @@ public partial class Animal : IJsonModel<Animal> {
 <ClientTabItem lang="typescript" >
 
 ```ts
-// RLC input
-export interface Animal extends Record<string, unknown> {
-  name: string;
-  kind: string;
-}
-
-// RLC output
-export interface AnimalOutput extends Record<string, any> {
-  name: string;
-  kind: string;
-}
-
 // Modular for both legacy and non legacy
 export interface Animal extends Record<string, any> {
   name: string;
@@ -755,26 +754,6 @@ public partial class Animal : IJsonModel<Animal>
 <ClientTabItem lang="typescript" >
 
 ```ts
-// RLC input
-export interface AnimalProperty {
-  category: string;
-  value: unknown;
-}
-export interface Animal extends Record<string, unknown> {
-  name: string;
-  kind: string;
-}
-
-// RLC output
-export interface AnimalProperty {
-  category: string;
-  value: any;
-}
-export interface Animal extends Record<string, any> {
-  name: string;
-  kind: string;
-}
-
 // Modular for legacy clients
 export interface AnimalProperty {
   category: string;
@@ -867,12 +846,6 @@ public partial class Animal : IJsonModel<Animal>
 <ClientTabItem lang="typescript" >
 
 ```ts
-// RLC input and output
-export interface Animal extends Record<string, string | number> {
-  name: string;
-  kind: string;
-}
-
 // Modular for legacy and non-legacy clients
 export interface Animal extends Record<string, string | number> {
   name: string;
@@ -948,12 +921,6 @@ public partial class Animal : IJsonModel<Animal>
 <ClientTabItem lang="typescript" >
 
 ```ts
-// RLC input and output
-export interface Animal extends Record<string, string | null> {
-  name: string;
-  kind: string;
-}
-
 // Modular for legacy and non-legacy clients
 export interface Animal extends Record<string, string | null> {
   name: string;
@@ -1082,32 +1049,6 @@ public partial class Ragdoll : Cat
 <ClientTabItem lang="typescript" >
 
 ```ts
-// RLC input models
-export interface Siamese extends CatParent {
-  kind: "siamese";
-}
-
-export interface Ragdoll extends CatParent {
-  kind: "ragdoll";
-}
-
-export type Cat = CatParent | Siamese | Ragdoll;
-
-// RLC output models
-export interface CatOutputParent {
-  kind: string;
-}
-
-export interface SiameseOutput extends CatOutputParent {
-  kind: "siamese";
-}
-
-export interface RagdollOutput extends CatOutputParent {
-  kind: "ragdoll";
-}
-
-export type CatOutput = CatOutputParent | SiameseOutput | RagdollOutput;
-
 // Modular models
 /** model interface Cat */
 export interface Cat {
