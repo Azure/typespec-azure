@@ -13,11 +13,12 @@ import {
   isTemplateDeclaration,
   Model,
   ModelProperty,
+  Namespace,
   Operation,
   Program,
   Type,
 } from "@typespec/compiler";
-import { isPathParam } from "@typespec/http";
+import { getHttpOperation, isPathParam } from "@typespec/http";
 import { $autoRoute, getParentResource, getSegment } from "@typespec/rest";
 import {
   ArmProviderNameValueDecorator,
@@ -35,35 +36,100 @@ import {
 } from "../generated-defs/Azure.ResourceManager.js";
 import { CustomAzureResourceDecorator } from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { reportDiagnostic } from "./lib.js";
-import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
-import { ArmResourceOperations, resolveResourceOperations } from "./operations.js";
+import {
+  getArmProviderNamespace,
+  isArmLibraryNamespace,
+  resolveProviderNamespace,
+} from "./namespace.js";
+import {
+  ArmResourceOperation,
+  ArmResourceOperations,
+  getArmOperationIdentifier,
+  resolveResourceOperations,
+} from "./operations.js";
 import { getArmResource, listArmResources, registerArmResource } from "./private.decorators.js";
 import { ArmStateKeys } from "./state.js";
 
 export type ArmResourceKind = "Tracked" | "Proxy" | "Extension" | "Virtual" | "Custom";
 
 /**
- * Interface for ARM resource detail base.
+ * The base details for all kinds of resources
  *
  * @interface
  */
 export interface ArmResourceDetailsBase {
+  /**
+   * The name of the resource.
+   */
   name: string;
+  /** The category of resource */
   kind: ArmResourceKind;
+  /** The RP namespace */
   armProviderNamespace: string;
+  /** The name parameter for the resource */
   keyName: string;
+  /** The type name / collection name of the resource */
   collectionName: string;
+  /** A reference to the TypeSpec type */
   typespecType: Model;
 }
 
+/** Details for RP resources */
 export interface ArmResourceDetails extends ArmResourceDetailsBase {
+  /** The set of lifecycle operations and actions for the resource */
   operations: ArmResourceOperations;
+  /** RPaaS-specific value for resource type */
   resourceTypePath?: string;
 }
 
+/** Representation of a resource used but not provided by the RP */
 export interface ArmVirtualResourceDetails {
+  /** The base kind for resources not provided by RPs */
   kind: "Virtual";
+  /** The provider namespace for the provider of this resource */
   provider?: string;
+}
+
+/** New base details for resolved resources */
+export interface ResourceMetadata {
+  /** The model type for the resource */
+  type: Model;
+  /** The kind of resource (extension | tracked | proxy | virtual) */
+  kind: ArmResourceKind;
+  /** The provider namespace */
+  providerNamespace: string;
+}
+
+/** New details for a resolved resource */
+export interface ResolvedResource extends ResourceMetadata {
+  /** The set of resolved operations for a resource.  For most 
+        resources there will be 1 returned record */
+  operations?: ResolvedOperations[];
+}
+
+export interface ResolvedResources {
+  resources?: ResolvedResource[];
+  unassociatedOperations?: ArmResourceOperation[];
+}
+
+/** Resolved operations, including operations for non-arm resources */
+export interface ResolvedOperations {
+  /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
+  resourceType: ResourceType;
+  /** The path to the instance of a resource */
+  resourceInstancePath: string;
+  /** The operations using this resourceInstancePath (or the parent path) */
+  operations: ArmResourceOperations;
+  /** operations associated with this resource */
+  associatedOperations?: { [key: string]: ArmResourceOperation };
+}
+
+/** Description of the resource type */
+export interface ResourceType {
+  /** The provider namespace */
+  provider: string;
+  /** The type of the resource, including all ancestor types (in order) */
+  types: string[];
 }
 
 /**
@@ -279,6 +345,105 @@ export function getArmResources(program: Program): ArmResourceDetails[] {
   }
 
   return resources;
+}
+
+export function resolveArmResources(program: Program): ResolvedResources {
+  const provider = resolveProviderNamespace(program);
+  if (provider === undefined) return {};
+  const resolvedResources = program.stateMap(ArmStateKeys.armResolvedResources).get(provider);
+  if (resolvedResources.size > 0) {
+    // Return the cached resource details
+    return program.stateMap(ArmStateKeys.armResolvedResources) as ResolvedResources;
+  }
+
+  // We haven't generated the full resource details yet
+  const resources: ResolvedResource[] = [];
+  for (const resource of listArmResources(program)) {
+    const operations = resolveArmResourceOperations(program, resource.typespecType);
+    const fullResource: ResolvedResource = {
+      type: resource.typespecType,
+      kind: getArmResourceKind(resource.typespecType) ?? "Tracked",
+      providerNamespace: resource.armProviderNamespace,
+      operations,
+    };
+    resolvedResources.set(resource.typespecType, fullResource);
+    resources.push(fullResource);
+  }
+
+  const resolved = {
+    resources: resources,
+    unassociatedOperations: getUnassociatedOperations(program),
+  };
+
+  program.stateMap(ArmStateKeys.armResolvedResources).set(provider, resolved);
+
+  return resolved;
+}
+
+export function getUnassociatedOperations(program: Program): ArmResourceOperation[] {
+  return getAllOperations(program)
+    .map((op) => getResourceOperation(program, op))
+    .filter((op) => op !== undefined) as ArmResourceOperation[];
+}
+
+function getResourceOperation(
+  program: Program,
+  operation: Operation,
+): ArmResourceOperation | undefined {
+  if (operation.kind !== "Operation") return undefined;
+  if (isTemplateDeclaration(operation)) return undefined;
+  if (operation.interface === undefined || operation.interface.name === undefined) return undefined;
+  const [httpOp, _] = getHttpOperation(program, operation);
+  return {
+    path: httpOp.path,
+    httpOperation: httpOp,
+    name: operation.name,
+    kind: "other",
+    operation: operation,
+    operationGroup: operation.interface.name,
+  };
+}
+
+function isArmResourceOperation(program: Program, operation: Operation): boolean {
+  if (operation.kind !== "Operation") return false;
+  if (isTemplateDeclaration(operation)) return false;
+  return getArmOperationIdentifier(program, operation) !== undefined;
+}
+
+function getAllOperations(
+  program: Program,
+  container?: Namespace | Interface | undefined,
+): Operation[] {
+  container = container || resolveProviderNamespace(program);
+  if (!container) {
+    return [];
+  }
+  const operations: Operation[] = [];
+  for (const op of container.operations.values()) {
+    if (
+      op.kind === "Operation" &&
+      !isTemplateDeclaration(op) &&
+      !isArmResourceOperation(program, op)
+    ) {
+      operations.push(op);
+    }
+  }
+  if (container.kind === "Namespace") {
+    for (const child of container.namespaces.values()) {
+      operations.push(...getAllOperations(program, child));
+    }
+    for (const iface of container.interfaces.values()) {
+      operations.push(...getAllOperations(program, iface));
+    }
+  }
+  return operations;
+}
+
+export function resolveArmResourceOperations(
+  program: Program,
+  resourceType: Model,
+): ResolvedOperations[] {
+  return [];
 }
 
 export { getArmResource } from "./private.decorators.js";

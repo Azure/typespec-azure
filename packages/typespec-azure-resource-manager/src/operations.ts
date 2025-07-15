@@ -44,7 +44,7 @@ import {
 import { ArmStateKeys } from "./state.js";
 
 export type ArmLifecycleOperationKind = "read" | "createOrUpdate" | "update" | "delete";
-export type ArmOperationKind = ArmLifecycleOperationKind | "list" | "action";
+export type ArmOperationKind = ArmLifecycleOperationKind | "list" | "action" | "other";
 
 export interface ArmResourceOperation extends ArmResourceOperationData {
   path: string;
@@ -69,6 +69,14 @@ interface ArmResourceOperationData {
   kind: ArmOperationKind;
   operation: Operation;
   operationGroup: string;
+}
+
+/** Identifying information for an arm  operation */
+interface ArmOperationIdentifier {
+  name: string;
+  kind: ArmOperationKind;
+  operationGroup: string;
+  resource?: Model;
 }
 
 interface ArmLifecycleOperationData {
@@ -158,6 +166,38 @@ function setResourceLifecycleOperation(
   };
 
   operations.lifecycle[kind] = operation as ArmResourceOperation;
+  setArmOperationIdentifier(context.program, target, resourceType, {
+    name: target.name,
+    kind: kind,
+    operation: target,
+    operationGroup: target.interface.name,
+  });
+}
+
+export function setArmOperationIdentifier(
+  program: Program,
+  target: Operation,
+  resourceType: Model,
+  data: ArmResourceOperationData,
+): void {
+  const operationId: ArmOperationIdentifier = {
+    name: data.name,
+    kind: data.kind,
+    operationGroup: data.operationGroup,
+    resource: resourceType,
+  };
+  // Initialize the operations for the resource type if not already done
+  if (!program.stateMap(ArmStateKeys.armOperation).has(target)) {
+    program.stateMap(ArmStateKeys.armOperation).set(target, operationId);
+  }
+}
+
+export function getArmOperationIdentifier(
+  program: Program,
+  target: Operation,
+): ArmOperationIdentifier | undefined {
+  // Initialize the operations for the resource type if not already done
+  return program.stateMap(ArmStateKeys.armOperation).get(target);
 }
 
 export const $armResourceRead: ArmResourceReadDecorator = (
