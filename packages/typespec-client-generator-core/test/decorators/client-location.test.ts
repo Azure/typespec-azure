@@ -582,6 +582,89 @@ describe("Parameter", () => {
     ok(testMethod.operation.parameters.some((p) => p.name === "contentType"));
   });
 
+  it("move parameter from client to specific operation in group", async () => {
+    await runner.compileWithCustomization(
+      `
+      @service
+      namespace MyClient {
+        interface Operations {
+          @route("/test1")
+          op test1(@query data: string): void;
+          
+          @route("/test2")  
+          op test2(@query info: string): void;
+        }
+      }
+      `,
+      `
+      model MyClientOptions {
+        apiKey: string;
+        subscriptionId: string;
+      }
+
+      @@clientInitialization(MyClient, {parameters: MyClientOptions});
+      @@clientLocation(MyClientOptions.apiKey, MyClient.Operations.test1);
+      `,
+    );
+
+    const sdkPackage = runner.context.sdkPackage;
+    const rootClient = sdkPackage.clients.find((c) => c.name === "MyClient");
+    ok(rootClient);
+    const operationsClient = rootClient.children?.find((c) => c.name === "Operations");
+    ok(operationsClient);
+
+    // test1 should have apiKey as method parameter
+    const test1Method = operationsClient.methods.find(
+      (m) => m.name === "test1",
+    ) as SdkServiceMethod<SdkHttpOperation>;
+    ok(test1Method);
+    strictEqual(test1Method.parameters.length, 2); // data + apiKey
+    const test1ApiKeyParam = test1Method.parameters.find((p) => p.name === "apiKey");
+    ok(test1ApiKeyParam);
+    strictEqual(test1ApiKeyParam.onClient, true);
+    ok(test1Method.parameters.some((p) => p.name === "data"));
+
+    // test2 should not have apiKey as method parameter (should use client param)
+    const test2Method = operationsClient.methods.find(
+      (m) => m.name === "test2",
+    ) as SdkServiceMethod<SdkHttpOperation>;
+    ok(test2Method);
+    strictEqual(test2Method.parameters.length, 1); // only info
+    ok(test2Method.parameters.some((p) => p.name === "info"));
+  });
+
+  it("detect parameter name conflict when moving to client", async () => {
+    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+      `
+      @service
+      namespace MyService;
+      model TestParams {
+        @query apiKey: string;
+      }
+
+      @route("/test")
+      op test(...TestParams): void;
+      `,
+      `
+      model MyClientOptions {
+        apiKey: string;
+      }
+
+      @@clientInitialization(MyService, MyClientOptions);
+      @@clientLocation(MyService.TestParams.apiKey, MyService);
+      `,
+    );
+    // not sure why it's showing up twice, there seems to be some compiler stuff going on here
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
+      },
+      {
+        code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
+      },
+    ]);
+  });
+
   it("subId from client to operation", async () => {
     const runnerWithArm = await createSdkTestRunner({
       librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
