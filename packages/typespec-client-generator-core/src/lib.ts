@@ -388,6 +388,9 @@ export const $lib = createTypeSpecLibrary({
       messages: {
         default:
           "When there is `@client` or `@operationGroup` decorator, `@clientLocation` decorator will be ignored.",
+        operationToOperation:
+          "`@clientLocation` cannot be used to move an operation to another operation. Operations can only be moved to interfaces or namespaces.",
+        modelPropertyToClientInitialization: paramMessage`There is already a parameter called '${"parameterName"}' in the client initialization.`,
       },
     },
     "client-location-wrong-type": {
