@@ -803,9 +803,7 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
         ) {
           clientParams.push(sdkMethodParam);
         }
-      } else if (
-        isSubscriptionId(context, param)
-      ) {
+      } else if (isSubscriptionId(context, param)) {
         if (
           !context.__clientParametersCache
             .get(operationLocation)
@@ -814,9 +812,11 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
           clientParams.push(sdkMethodParam);
         }
       } else {
-        if (!context.__clientParametersCache
+        if (
+          !context.__clientParametersCache
             .get(operationLocation)
-            ?.find((x) => x === sdkMethodParam)) {
+            ?.find((x) => x.__raw && x.__raw === sdkMethodParam.__raw)
+        ) {
           clientParams.push(sdkMethodParam);
         }
       }
@@ -824,13 +824,17 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
       methodParameters.push(sdkMethodParam);
     }
   }
-  for (const param of clientParams) {
-    if (param.__raw && getClientLocation(context, param.__raw) === operation) {
-      // if the parameter is on the client, we need to add it to the method parameters
-      if (param.kind === "method") {
-        methodParameters.push(param);
+  let currClient: SdkClientType<TServiceOperation> | undefined = client;
+  while (currClient) {
+    for (const param of currClient.clientInitialization.parameters) {
+      if (param.__raw && getClientLocation(context, param.__raw) === operation) {
+        // if the parameter is on the client, we need to add it to the method parameters
+        if (param.kind === "method") {
+          methodParameters.push(param);
+        }
       }
     }
+    currClient = currClient.parent;
   }
 
   const serviceOperation = diagnostics.pipe(

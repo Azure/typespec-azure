@@ -547,11 +547,12 @@ describe("Parameter", () => {
     const myClient = sdkPackage.clients.find((c) => c.name === "MyClient");
     ok(myClient);
 
-    // apiKey should be removed from client initialization
+    // apiKey should still be in client initialization
     const clientApiKeyParam = myClient.clientInitialization.parameters.find(
       (p) => p.name === "apiKey",
     );
     ok(clientApiKeyParam);
+    ok(clientApiKeyParam.onClient);
 
     // subscriptionId should still be in client initialization
     const clientSubscriptionIdParam = myClient.clientInitialization.parameters.find(
@@ -569,14 +570,16 @@ describe("Parameter", () => {
     ok(testMethod);
 
     // Should have both 'data' and 'apiKey' parameters
-    strictEqual(testMethod.parameters.length, 2);
+    strictEqual(testMethod.parameters.length, 3);
     const methodApiKeyParam = testMethod.parameters.find((p) => p.name === "apiKey");
     ok(methodApiKeyParam);
-    strictEqual(methodApiKeyParam.onClient, false);
+    strictEqual(methodApiKeyParam.onClient, true);
 
     const methodDataParam = testMethod.parameters.find((p) => p.name === "data");
     ok(methodDataParam);
     strictEqual(methodDataParam.onClient, false);
+
+    ok(testMethod.operation.parameters.some((p) => p.name === "contentType"));
   });
 
   it("subId from client to operation", async () => {
