@@ -1,5 +1,20 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.58.0
+
+### Features
+
+- [#2976](https://github.com/Azure/typespec-azure/pull/2976) Introduce `@previewVersion` decorator
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2599](https://github.com/Azure/typespec-azure/pull/2599) Fix old reference to api guidelines in Azure.Core
+
+
 ## 0.57.0
 
 ### Bug Fixes
