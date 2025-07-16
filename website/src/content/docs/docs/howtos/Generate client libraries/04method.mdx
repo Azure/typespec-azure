@@ -382,34 +382,6 @@ public virtual Response Post(User user, CancellationToken cancellationToken = de
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// from user experience perspective
-
-// RLC
-export interface GetUser200Response extends HttpResponse {
-  status: "200";
-  body: User;
-}
-
-export type DemoServiceContext = Client & {
-  path: {
-    /** Resource for '/users' has methods for the following verbs: get */
-    (path: "/users"): {
-      get(
-        options: RequestParameters,
-      ): StreamableMethod<GetUser200Response | GetUserDefaultResponse>;
-    };
-
-    /** Resource for '/users' has methods for the following verbs: post */
-    (path: "/users"): {
-      post(
-        options: {
-          body: User;
-        } & RequestParameters,
-      ): StreamableMethod<PostUserDefaultResponse>;
-    };
-  };
-};
-
 // Modular Api Layer
 export async function get(): Promise<User>;
 export async function post(body: User, options: PostOptionalParams): Promise<void>;
@@ -504,24 +476,6 @@ public virtual Response Upload(string firstName, string lastName, CancellationTo
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// from user experience perspective
-
-export type DemoServiceContext = Client & {
-  path: {
-    /** Resource for '/completions' has methods for the following verbs: post */
-    (path: "/users"): {
-      post(
-        options: {
-          body: {
-            firstName: string;
-            lastName: string;
-          };
-        } & RequestParameters,
-      ): StreamableMethod<PostUserDefaultResponse>;
-    };
-  };
-};
-
 // Modular Api Layer
 export async function upload(
   firstName: string,
@@ -601,27 +555,6 @@ public virtual Response Upload(string id, string firstName, string lastName, Can
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// from user experience perspective
-
-export type DemoServiceContext = Client & {
-  path: {
-    /** Resource for '/completions' has methods for the following verbs: post */
-    (
-      path: "/users/{id}",
-      id,
-    ): {
-      post(
-        options: {
-          body: {
-            firstName: string;
-            lastName: string;
-          };
-        } & RequestParameters,
-      ): StreamableMethod<PostUserDefaultResponse>;
-    };
-  };
-};
-
 // Modular Api Layer
 export async function upload(
   id: string,
@@ -710,24 +643,6 @@ public virtual Response Upload(string firstName, string lastName, CancellationTo
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// from user experience perspective
-
-export type DemoServiceContext = Client & {
-  path: {
-    /** Resource for '/completions' has methods for the following verbs: post */
-    (path: "/users"): {
-      post(
-        options: {
-          body: {
-            firstName: string;
-            lastName: string;
-          };
-        } & RequestParameters,
-      ): StreamableMethod<PostUserDefaultResponse>;
-    };
-  };
-};
-
 // Modular Api Layer
 export async function upload(
   firstName: string,
@@ -816,21 +731,6 @@ public virtual Response Upload(User user, CancellationToken cancellationToken = 
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// from user experience perspective
-
-export type DemoServiceContext = Client & {
-  path: {
-    /** Resource for '/completions' has methods for the following verbs: post */
-    (path: "/users"): {
-      post(
-        options: {
-          body: User;
-        } & RequestParameters,
-      ): StreamableMethod<PostUserDefaultResponse>;
-    };
-  };
-};
-
 // Modular Api Layer
 export async function upload(user: User, options: UploadOptionalParams): Promise<void>;
 
@@ -919,23 +819,6 @@ public virtual Response GetBlobProperties(string name, string testHeader, Reques
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// from user experience perspective
-
-export type DemoServiceContext = Client & {
-  path: {
-    /** Resource for '/completions' has methods for the following verbs: post */
-    (path: "/blob_properties/{name}", name): {
-      post(
-        options: {
-          headers: {
-            "test-header": string;
-          } & RawHttpHeaders
-        } & RequestParameters
-      ): StreamableMethod<PostUserDefaultResponse>;
-    };
-  };
-};
-
 // Modular Options
 export interface GetBlobPropertiesOptionalParams extends OperationOptions {
   requestOptions: {
@@ -1026,26 +909,6 @@ public virtual Response Register(Schema schema, CancellationToken cancellationTo
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// from user experience perspective
-
-export type DemoServiceContext = Client & {
-  path: {
-    /** Resource for '/completions' has methods for the following verbs: post */
-    (path: "/schemaRegister"): {
-      post(
-        options: {
-          headers: {
-            "content-type": "application/json";
-          } & RawHttpHeaders;
-          body: {
-            schema: string;
-          };
-        } & RequestParameters,
-      ): StreamableMethod<PostUserDefaultResponse>;
-    };
-  };
-};
-
 // Modular model
 export interface Schema {
   schema: string;
@@ -1155,28 +1018,6 @@ def scheduleRepairs(self, widget_name: str, problem: str, contact: str, *, conte
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// from user experience perspective
-
-export interface RepairInfo {
-  problem: string;
-  contact: string;
-}
-
-export type WidgetServiceContext = Client & {
-  path: {
-    (
-      path: "/widgets/{widgetName}:scheduleRepairs",
-      widgetName: string,
-    ): {
-      post(
-        options: {
-          body: RepairInfo;
-        } & RequestParameters,
-      ): StreamableMethod<PostUserDefaultResponse>;
-    };
-  };
-};
-
 // Modular api layer
 export async function scheduleRepairs(
   context: Client,
@@ -1322,28 +1163,6 @@ def scheduleRepairs(self, body: [Schema, JSON, IO[bytes]], *, content_type: str 
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// from user experience perspective
-
-export interface RepairInfo {
-  problem: string;
-  contact: string;
-}
-
-export type WidgetServiceContext = Client & {
-  path: {
-    (
-      path: "/widgets/{widgetName}:scheduleRepairs",
-      widgetName: string,
-    ): {
-      post(
-        options: {
-          body: RepairInfo;
-        } & RequestParameters,
-      ): StreamableMethod<PostUserDefaultResponse>;
-    };
-  };
-};
-
 // Modular api layer
 export async function scheduleRepairs(
   context: Client,
@@ -1493,35 +1312,33 @@ namespace Analyze
 ```
 
 ```typescript
-// from user experience perspective
+// Modular api layer
+export async function completions(
+  context: Client,
+  input: CompletionInput,
+  options: CompletionsOptionalParams = { requestOptions: {} },
+): Promise<CompletionResult>; 
 
-export interface CompletionInput {
-  input: string | string[];
+export async function analyze(
+  context: Client,
+  mode: "strict" | "lenient",
+  image: Uint8Array,
+  options: AnalyzeOptionalParams = { requestOptions: {} },
+): Promise<AnalyzeResult>;
+
+// Modular classical client layer
+export class AnalyzeClient {
+  completions(
+    input: __PLACEHOLDER_o48__,
+    options: CompletionsOptionalParams = { requestOptions: {} },
+  ): Promise<__PLACEHOLDER_o49__>;
+
+  analyze(
+    mode: "strict" | "lenient",
+    image: Uint8Array,
+    options: AnalyzeOptionalParams = { requestOptions: {} },
+  ): Promise<__PLACEHOLDER_o50__>;
 }
-
-export type DemoServiceContext = Client & {
-  path: {
-    /** Resource for '/analyze' has methods for the following verbs: post */
-    (path: "/analyze"): {
-      post(
-        options: {
-          body: string;
-          queryParameters: {
-            mode: "strict" | "lenient";
-          };
-        } & RequestParameters,
-      ): StreamableMethod<Analyze200Response | AnalyzeDefaultResponse>;
-    };
-    /** Resource for '/completions' has methods for the following verbs: post */
-    (path: "/completions"): {
-      post(
-        options: {
-          body: CompletionInput;
-        } & RequestParameters,
-      ): StreamableMethod<Completions200Response | CompletionsDefaultResponse>;
-    };
-  };
-};
 ```
 
 ```java
@@ -1579,29 +1396,31 @@ public Response<long> B(string x, Cancellation token);
 ```
 
 ```typescript
-// from user experience perspective
+// Modular api layer
+export async function a(
+  context: Client,
+  x: number,
+  options: AOptionalParams = { requestOptions: {} }
+): Promise<number>;
 
-export type DemoServiceContext = Client & {
-  path: {
-    /** Resource for '/foo' has methods for the following verbs: post */
-    (path: "/foo"): {
-      post(
-        options?: {
-          body?: {
-            x: number;
-          };
-        } & RequestParameters,
-      ): StreamableMethod<A200Response>;
-      post(
-        options?: {
-          body?: {
-            x: string;
-          };
-        } & RequestParameters,
-      ): StreamableMethod<B200Response>;
-    };
-  };
-};
+export async function b(
+  context: Client,
+  x: string,
+  options: BOptionalParams = { requestOptions: {} }
+): Promise<number>
+
+// Modular classical client layer
+export class TestServiceClient {
+  b(
+    x: string,
+    options: BOptionalParams = { requestOptions: {} }
+  ): Promise<number>;
+
+  a(
+    x: number,
+    options: AOptionalParams = { requestOptions: {} }
+  ): Promise<number>;
+}
 ```
 
 ```java
@@ -1709,7 +1528,18 @@ def get(self, *, etag: Optional[str] = None, match_condition: Optional[MatchCond
 ```
 
 ```typescript
-# TODO
+// Modular api layer
+export async function get(
+  context: Client,
+  options: GetOptionalParams = { requestOptions: {} }
+): Promise<Response>;
+
+// Modular classical client layer
+export class TestServiceClient {
+  get(
+    options: GetOptionalParams = { requestOptions: {} }
+  ): Promise<__PLACEHOLDER_o42__>;
+}
 ```
 
 ```java

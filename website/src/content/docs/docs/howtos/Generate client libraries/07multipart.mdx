@@ -50,9 +50,20 @@ def upload(
 ```
 
 ```typescript
-// Not yet implemented. See issues:
-// - RLC: https://github.com/Azure/autorest.typescript/issues/2568
-// - Modular: https://github.com/Azure/autorest.typescript/issues/2422
+// Modular api layer
+export async function upload(
+  context: Client,
+  body: MultipartRequest,
+  options: UploadOptionalParams = { requestOptions: {} },
+): Promise<void>;
+
+// Modular classical client layer
+export class TestServiceClient {
+   upload(
+    body: __PLACEHOLDER_o45__,
+    options: UploadOptionalParams = { requestOptions: {} },
+  ): Promise<void>;
+}
 ```
 
 ```java

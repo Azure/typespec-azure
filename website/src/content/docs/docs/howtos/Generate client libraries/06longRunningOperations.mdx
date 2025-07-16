@@ -49,7 +49,35 @@ def begin_create_or_replace(
 ```
 
 ```typescript
+// Modular api layer
+export function createOrReplace(
+  context: Client,
+  name: string,
+  resource: User,
+  options: CreateOrReplaceOptionalParams = { requestOptions: {} }
+): PollerLike<OperationState<User>, User>;
 
+export async function getOperationStatus(
+  context: Client,
+  name: string,
+  operationId: string,
+  options: GetOperationStatusOptionalParams = { requestOptions: {} }
+): Promise<__PLACEHOLDER_o27__>;
+
+// Modular classical client layer
+export class TestServiceClient {
+  createOrReplace(
+    name: string,
+    resource: __PLACEHOLDER_o45__,
+    options: CreateOrReplaceOptionalParams = { requestOptions: {} }
+  ): PollerLike<OperationState<__PLACEHOLDER_o45__>, __PLACEHOLDER_o45__>；
+
+  getOperationStatus(
+    name: string,
+    operationId: string,
+    options: GetOperationStatusOptionalParams = { requestOptions: {} }
+  ): Promise<__PLACEHOLDER_o46__>;
+}
 ```
 
 ```java
@@ -99,7 +127,33 @@ def begin_delete(self, name: str, **kwargs: Any) -> LROPoller[None]
 ```
 
 ```typescript
+// Modular api layer
+export function $delete(
+  context: Client,
+  name: string,
+  options: DeleteOptionalParams = { requestOptions: {} },
+): PollerLike<OperationState<void>, void>;
 
+export async function getOperationStatus(
+  context: Client,
+  name: string,
+  operationId: string,
+  options: GetOperationStatusOptionalParams = { requestOptions: {} },
+): Promise<__PLACEHOLDER_o25__>;
+
+// Modular classical client layer
+export class TestServiceClient {
+  delete(
+    name: string,
+    options: DeleteOptionalParams = { requestOptions: {} },
+  ): PollerLike<OperationState<void>, void>；
+
+  getOperationStatus(
+    name: string,
+    operationId: string,
+    options: GetOperationStatusOptionalParams = { requestOptions: {} },
+  ): Promise<__PLACEHOLDER_o44__>;
+}
 ```
 
 ```java
@@ -165,7 +219,35 @@ def begin_export(self, name: str, *, format: str, **kwargs: Any) -> LROPoller[Ex
 ```
 
 ```typescript
+// Modular api layer
+export function $export(
+  context: Client,
+  name: string,
+  format: string,
+  options: ExportOptionalParams = { requestOptions: {} },
+): PollerLike<OperationState<ExportedUser>, ExportedUser>;
 
+export async function getExportOperationStatus(
+  context: Client,
+  name: string,
+  operationId: string,
+  options: GetExportOperationStatusOptionalParams = { requestOptions: {} },
+): Promise<__PLACEHOLDER_o27__>;
+
+// Modular classical client layer
+export class TestServiceClient {
+  export(
+    name: string,
+    format: string,
+    options: ExportOptionalParams = { requestOptions: {} },
+  ): PollerLike<OperationState<__PLACEHOLDER_o45__>, __PLACEHOLDER_o45__>；
+
+  getExportOperationStatus(
+    name: string,
+    operationId: string,
+    options: GetExportOperationStatusOptionalParams = { requestOptions: {} },
+  ): Promise<__PLACEHOLDER_o46__>;
+}
 ```
 
 ```java
