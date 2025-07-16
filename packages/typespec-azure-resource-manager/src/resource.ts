@@ -50,7 +50,7 @@ import {
 import { getArmResource, listArmResources, registerArmResource } from "./private.decorators.js";
 import { ArmStateKeys } from "./state.js";
 
-export type ArmResourceKind = "Tracked" | "Proxy" | "Extension" | "Virtual" | "Custom";
+export type ArmResourceKind = "Tracked" | "Proxy" | "Extension" | "Virtual" | "Custom" | "BuiltIn";
 
 /**
  * The base details for all kinds of resources
@@ -94,7 +94,7 @@ export interface ArmVirtualResourceDetails {
 export interface ResourceMetadata {
   /** The model type for the resource */
   type: Model;
-  /** The kind of resource (extension | tracked | proxy | virtual) */
+  /** The kind of resource (extension | tracked | proxy | custom | virtual | built-in) */
   kind: ArmResourceKind;
   /** The provider namespace */
   providerNamespace: string;
@@ -112,16 +112,19 @@ export interface ResolvedResources {
   unassociatedOperations?: ArmResourceOperation[];
 }
 
-/** Resolved operations, including operations for non-arm resources */
-export interface ResolvedOperations {
+export interface ResolvedOperationResourceInfo {
   /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
   resourceType: ResourceType;
   /** The path to the instance of a resource */
   resourceInstancePath: string;
-  /** The operations using this resourceInstancePath (or the parent path) */
+}
+
+/** Resolved operations, including operations for non-arm resources */
+export interface ResolvedOperations extends ResolvedOperationResourceInfo {
+  /** The lifecycle and action operations using this resourceInstancePath (or the parent path) */
   operations: ArmResourceOperations;
-  /** operations associated with this resource */
-  associatedOperations?: { [key: string]: ArmResourceOperation };
+  /** Other operations associated with this resource */
+  associatedOperations?: ArmResourceOperation[];
 }
 
 /** Description of the resource type */
@@ -350,10 +353,12 @@ export function getArmResources(program: Program): ArmResourceDetails[] {
 export function resolveArmResources(program: Program): ResolvedResources {
   const provider = resolveProviderNamespace(program);
   if (provider === undefined) return {};
-  const resolvedResources = program.stateMap(ArmStateKeys.armResolvedResources).get(provider);
-  if (resolvedResources.size > 0) {
+  const resolvedResources = program
+    .stateMap(ArmStateKeys.armResolvedResources)
+    .get(provider) as ResolvedResources;
+  if (resolvedResources.resources !== undefined && resolvedResources.resources.length > 0) {
     // Return the cached resource details
-    return program.stateMap(ArmStateKeys.armResolvedResources) as ResolvedResources;
+    return resolvedResources;
   }
 
   // We haven't generated the full resource details yet
@@ -364,20 +369,248 @@ export function resolveArmResources(program: Program): ResolvedResources {
       type: resource.typespecType,
       kind: getArmResourceKind(resource.typespecType) ?? "Tracked",
       providerNamespace: resource.armProviderNamespace,
-      operations,
+      operations: operations,
     };
-    resolvedResources.set(resource.typespecType, fullResource);
     resources.push(fullResource);
   }
 
+  // Add the unmarked operations
   const resolved = {
     resources: resources,
-    unassociatedOperations: getUnassociatedOperations(program),
+    unassociatedOperations: getUnassociatedOperations(program).filter(
+      (op) => filterResourceOperations(program, resources, op) !== true,
+    ),
   };
 
   program.stateMap(ArmStateKeys.armResolvedResources).set(provider, resolved);
 
   return resolved;
+}
+
+function isVariableSegment(segment: string): boolean {
+  return (segment.startsWith("{") && segment.endsWith("}")) || segment === "default";
+}
+
+function getResourceInfo(
+  program: Program,
+  operation: ArmResourceOperation,
+): ResolvedOperationResourceInfo | undefined {
+  const segments = operation.httpOperation.path.split("/");
+  const providerIndex = segments.findLastIndex((s) => s === "providers");
+  if (providerIndex === -1 || providerIndex <= segments.length - 1) return undefined;
+  const provider = segments[providerIndex + 1];
+  const typeCandidates = segments.slice(providerIndex + 2);
+  const typeSegments: string[] = [];
+  const instanceSegments: string[] = segments.slice(0, providerIndex + 1);
+  for (let i = 0; i < typeCandidates.length; i += 2) {
+    if (
+      !isVariableSegment(typeCandidates[i]) &&
+      (i + 1 === typeCandidates.length || isVariableSegment(typeCandidates[i + 1]))
+    ) {
+      typeSegments.push(typeCandidates[i]);
+      instanceSegments.push(typeCandidates[i], typeCandidates[i + 1]);
+    }
+  }
+  if (provider !== undefined && typeSegments.length > 0) {
+    return {
+      resourceType: {
+        provider: provider,
+        types: typeSegments,
+      },
+      resourceInstancePath: instanceSegments.join("/"),
+    };
+  }
+  return undefined;
+}
+
+function tryAddLifecycleOperation(
+  resourceType: ResourceType,
+  sourceOperation: ArmResourceOperation,
+  targetOperation: ResolvedOperations,
+): boolean {
+  const pathSegments: string[] = sourceOperation.httpOperation.path.split("/");
+  const isInstanceOperation: boolean = !isVariableSegment(pathSegments[pathSegments.length - 1]);
+  const isResourceCollectionOperation: boolean =
+    !isInstanceOperation &&
+    pathSegments[pathSegments.length - 1] === resourceType.types[resourceType.types.length - 1];
+  const operationId = `${sourceOperation.operationGroup}_${sourceOperation.name}`;
+  switch (sourceOperation.httpOperation.verb) {
+    case "get":
+      if (isInstanceOperation) {
+        if (targetOperation.operations.lifecycle.read === undefined) {
+          targetOperation.operations.lifecycle.read = sourceOperation;
+          return true;
+        }
+      }
+      if (!isResourceCollectionOperation) {
+        targetOperation.operations.actions[operationId] = sourceOperation;
+        return true;
+      }
+      if (
+        targetOperation.operations.lists === undefined ||
+        targetOperation.operations.lists[operationId] === undefined
+      ) {
+        targetOperation.operations.lists[operationId] = sourceOperation;
+        return true;
+      }
+      return false;
+    case "put":
+      if (!isInstanceOperation) {
+        return false;
+      }
+      if (targetOperation.operations.lifecycle.createOrUpdate === undefined) {
+        targetOperation.operations.lifecycle.createOrUpdate = sourceOperation;
+        return true;
+      }
+      return false;
+    case "patch":
+      if (!isInstanceOperation) {
+        return false;
+      }
+      if (targetOperation.operations.lifecycle.update === undefined) {
+        targetOperation.operations.lifecycle.update = sourceOperation;
+        return true;
+      }
+      return false;
+    case "delete":
+      if (!isInstanceOperation) {
+        return false;
+      }
+      if (targetOperation.operations.lifecycle.delete === undefined) {
+        targetOperation.operations.lifecycle.delete = sourceOperation;
+        return true;
+      }
+      return false;
+    case "post":
+    case "head":
+      if (isInstanceOperation) {
+        return false;
+      }
+      if (
+        targetOperation.operations.actions === undefined ||
+        targetOperation.operations.actions[operationId] === undefined
+      ) {
+        targetOperation.operations.actions[operationId] = sourceOperation;
+        return true;
+      }
+      return false;
+    default:
+      return false;
+  }
+}
+
+function addAssociatedOperation(
+  sourceOperation: ArmResourceOperation,
+  targetOperation: ResolvedOperations,
+): void {
+  if (!targetOperation.associatedOperations) {
+    targetOperation.associatedOperations = [];
+  }
+  targetOperation.associatedOperations.push(sourceOperation);
+}
+
+function tryAddOperationGroup(
+  resourceType: ResourceType,
+  resourceInstancePath: string,
+  sourceOperation: ArmResourceOperation,
+  targetResource: ResolvedResource,
+): boolean {
+  if (
+    targetResource.operations?.some(
+      (op) =>
+        Object.values(op.operations.actions).some(
+          (a) => a.operationGroup === sourceOperation.operationGroup,
+        ) ||
+        Object.values(op.operations.lists).some(
+          (l) => l.operationGroup === sourceOperation.operationGroup,
+        ) ||
+        op.operations.lifecycle.read?.operationGroup === sourceOperation.operationGroup ||
+        op.operations.lifecycle.createOrUpdate?.operationGroup === sourceOperation.operationGroup ||
+        op.operations.lifecycle.update?.operationGroup === sourceOperation.operationGroup ||
+        op.operations.lifecycle.delete?.operationGroup === sourceOperation.operationGroup,
+    )
+  ) {
+    if (targetResource.operations === undefined) {
+      targetResource.operations = [];
+    }
+    const addedOp: ResolvedOperations = {
+      resourceType: resourceType,
+      resourceInstancePath: resourceInstancePath,
+      operations: {
+        lifecycle: {
+          read: undefined,
+          createOrUpdate: undefined,
+          update: undefined,
+          delete: undefined,
+        },
+        actions: {},
+        lists: {},
+      },
+      associatedOperations: [],
+    };
+    if (!tryAddLifecycleOperation(resourceType, sourceOperation, addedOp)) {
+      addAssociatedOperation(sourceOperation, addedOp);
+    }
+    targetResource.operations.push(addedOp);
+  }
+  return false;
+}
+function tryAddResource(
+  program: Program,
+  sourceOperation: ArmResourceOperation,
+  resources: ResolvedResource[],
+): boolean {
+  return false;
+}
+
+function isResourceOperationMatch(
+  source: ResolvedOperationResourceInfo,
+  target: ResolvedOperationResourceInfo,
+): boolean {
+  if (source.resourceType.provider !== target.resourceType.provider) return false;
+  if (source.resourceType.types.length !== target.resourceType.types.length) return false;
+  for (let i = 0; i < source.resourceType.types.length; i++) {
+    if (source.resourceType.types[i] !== target.resourceType.types[i]) return false;
+  }
+  const sourceSegments = source.resourceInstancePath.split("/");
+  const targetSegments = target.resourceInstancePath.split("/");
+  if (sourceSegments.length !== targetSegments.length) return false;
+  for (let i = 0; i < sourceSegments.length; i++) {
+    if (!isVariableSegment(sourceSegments[i])) {
+      if (isVariableSegment(targetSegments[i])) {
+        return false;
+      }
+      if (sourceSegments[i] !== targetSegments[i]) return false;
+    } else if (!isVariableSegment(targetSegments[i])) return false;
+  }
+  return true;
+}
+
+function filterResourceOperations(
+  program: Program,
+  resources: ResolvedResource[],
+  operation: ArmResourceOperation,
+): boolean {
+  const resourceInfo = getResourceInfo(program, operation);
+  if (resourceInfo === undefined) return false;
+  const { resourceType, resourceInstancePath } = resourceInfo;
+  for (const resource of resources) {
+    if (resource.operations !== undefined) {
+      for (const op of resource.operations) {
+        if (isResourceOperationMatch(resourceInfo, op)) {
+          if (tryAddLifecycleOperation(resourceType, operation, op)) {
+            return true;
+          }
+          addAssociatedOperation(operation, op);
+          return true;
+        }
+      }
+    }
+    if (tryAddOperationGroup(resourceType, resourceInstancePath, operation, resource)) {
+      return true;
+    }
+  }
+  return tryAddResource(program, operation, resources);
 }
 
 export function getUnassociatedOperations(program: Program): ArmResourceOperation[] {
