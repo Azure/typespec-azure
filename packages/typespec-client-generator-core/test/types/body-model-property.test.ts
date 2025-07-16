@@ -2,7 +2,7 @@ import { deepStrictEqual, ok, strictEqual } from "assert";
 import { afterEach, beforeEach, it } from "vitest";
 import { isReadOnly } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-import { getSdkBodyModelPropertyTypeHelper } from "./utils.js";
+import { getSdkModelPropertyTypeHelper } from "./utils.js";
 
 let runner: SdkTestRunner;
 
@@ -25,7 +25,7 @@ it("required", async function () {
       name: string | int32;
     }
   `);
-  const prop = getSdkBodyModelPropertyTypeHelper(runner);
+  const prop = getSdkModelPropertyTypeHelper(runner);
   strictEqual(prop.optional, false);
   strictEqual(isReadOnly(prop), false);
 });
@@ -38,7 +38,7 @@ it("optional", async function () {
     }
   `);
 
-  const prop = getSdkBodyModelPropertyTypeHelper(runner);
+  const prop = getSdkModelPropertyTypeHelper(runner);
   strictEqual(prop.optional, true);
 });
 
@@ -51,7 +51,7 @@ it("readonly", async function () {
     }
   `);
 
-  const prop = getSdkBodyModelPropertyTypeHelper(runner);
+  const prop = getSdkModelPropertyTypeHelper(runner);
   strictEqual(isReadOnly(prop), true);
 });
 
@@ -64,7 +64,7 @@ it("not readonly", async function () {
     }
   `);
 
-  const prop = getSdkBodyModelPropertyTypeHelper(runner);
+  const prop = getSdkModelPropertyTypeHelper(runner);
   strictEqual(isReadOnly(prop), false);
 });
 
@@ -76,7 +76,7 @@ it("union type", async function () {
     }
   `);
 
-  const prop = getSdkBodyModelPropertyTypeHelper(runner);
+  const prop = getSdkModelPropertyTypeHelper(runner);
   strictEqual(prop.kind, "property");
   const sdkType = prop.type;
   strictEqual(sdkType.kind, "union");
