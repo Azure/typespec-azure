@@ -47,6 +47,9 @@ changelog: ["@chronus/github/changelog", { repo: "azure/typespec-azure" }]
 
 ignore:
   - "@typespec/*"
+  - "typespec-vscode"
+  - "tmlanguage-generator"
+  - "typespec-vs"
 
 changedFiles:
   - "!**/*.md"
