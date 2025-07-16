@@ -28,9 +28,10 @@ import {
   HttpVerb,
   Visibility,
 } from "@typespec/http";
-import { SourceKind } from "../../typespec-azure-core/src/lro-info.js";
 
 // Types for TCGC lib
+
+type SourceKind = "RequestParameter" | "RequestBody" | "ResponseBody";
 
 export interface TCGCContext {
   program: Program;
