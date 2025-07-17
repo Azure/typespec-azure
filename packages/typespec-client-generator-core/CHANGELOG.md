@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.58.0
+
+### Bug Fixes
+
+- [#2984](https://github.com/Azure/typespec-azure/pull/2984) Fix wrong API version elevator logic with `@clientLocation`.
+
+
 ## 0.57.3
 
 ### Bump dependencies

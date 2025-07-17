@@ -1,4 +1,4 @@
-import { createDiagnosticCollector, Diagnostic, getSummary } from "@typespec/compiler";
+import { createDiagnosticCollector, Diagnostic, getDoc, getSummary } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { getServers, HttpServer } from "@typespec/http";
 import {
@@ -15,8 +15,6 @@ import {
   SdkEndpointParameter,
   SdkEndpointType,
   SdkHttpOperation,
-  SdkMethodParameter,
-  SdkModelPropertyType,
   SdkOperationGroup,
   SdkPathParameter,
   SdkServiceOperation,
@@ -34,13 +32,9 @@ import {
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
-import { createSdkMethods } from "./methods.js";
+import { createSdkMethods, getSdkMethodParameter } from "./methods.js";
 import { getCrossLanguageDefinitionId } from "./public-utils.js";
-import {
-  getSdkBuiltInType,
-  getSdkCredentialParameter,
-  getSdkModelWithDiagnostics,
-} from "./types.js";
+import { getSdkBuiltInType, getSdkCredentialParameter } from "./types.js";
 
 function getEndpointTypeFromSingleServer<
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
@@ -228,9 +222,7 @@ function addDefaultClientParameters<
     for (const sc of listOperationGroups(context, client.__raw, true)) {
       // if any sub operation groups have an api version param, the top level needs
       // the api version param as well
-      apiVersionParam = sc.type
-        ? context.__clientParametersCache.get(sc)?.find((x) => x.isApiVersionParam)
-        : undefined;
+      apiVersionParam = context.__clientParametersCache.get(sc)?.find((x) => x.isApiVersionParam);
       if (apiVersionParam) break;
     }
   }
@@ -277,22 +269,20 @@ function createSdkClientInitializationType(
   if (client.type) {
     const initializationOptions = getClientInitializationOptions(context, client.type);
     if (initializationOptions?.parameters) {
-      const model = diagnostics.pipe(
-        getSdkModelWithDiagnostics(context, initializationOptions.parameters),
+      result.doc = getDoc(context.program, initializationOptions.parameters);
+      result.summary = getSummary(context.program, initializationOptions.parameters);
+      result.name =
+        initializationOptions.parameters.name === "" ? name : initializationOptions.parameters.name;
+      result.isGeneratedName = initializationOptions.parameters.name === "" ? true : false;
+      result.decorators = diagnostics.pipe(
+        getTypeDecorators(context, initializationOptions.parameters),
       );
-      result.doc = model.doc;
-      result.summary = model.summary;
-      result.name = model.name;
-      result.isGeneratedName = model.isGeneratedName;
-      result.decorators = model.decorators;
-      result.__raw = model.__raw;
-      result.parameters = model.properties.map(
-        (property: SdkModelPropertyType): SdkMethodParameter => {
-          property.onClient = true;
-          property.kind = "method";
-          return property as SdkMethodParameter;
-        },
-      );
+      result.__raw = initializationOptions.parameters;
+      for (const parameter of initializationOptions.parameters.properties.values()) {
+        const clientParameter = diagnostics.pipe(getSdkMethodParameter(context, parameter));
+        clientParameter.onClient = true;
+        result.parameters.push(clientParameter);
+      }
     }
     if (initializationOptions?.initializedBy) {
       if (
@@ -336,7 +326,7 @@ function createSdkClientInitializationType(
         context.__clientParametersCache.set(client, clientParams);
       }
       for (const param of result.parameters) {
-        clientParams.push(param);
+        if (param.kind === "method") clientParams.push(param);
       }
     }
   }
