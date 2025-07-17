@@ -2,7 +2,7 @@
 title: 'Emitter usage'
 ---
 
-## Usage
+## Emitter usage
 
 1. Via the command line
 
@@ -60,6 +60,12 @@ Optional prefix to file names. For example, if you set your file prefix to "zzz*
 
 When true, enables generation of fake servers. The default is false.
 
+### `go-generate`
+
+**Type:** `string`
+
+Path to a post-generation 'go generate' script. The path is relative to the emitter-output-dir.
+
 ### `head-as-boolean`
 
 **Type:** `boolean`
@@ -82,7 +88,7 @@ The name of the Go module written to go.mod. Omit to skip go.mod generation. Whe
 
 **Type:** `string`
 
-Semantic version of the Go module without the leading 'v' written to constants.go. (e.g. 1.2.3). When module-version is specified, module must also be specified.
+Initial semantic version of the Go module without the leading 'v'. (e.g. 1.2.3). Defaults to 0.1.0.
 
 ### `rawjson-as-bytes`
 
