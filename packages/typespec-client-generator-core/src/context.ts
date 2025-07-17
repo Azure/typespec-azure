@@ -28,11 +28,13 @@ import {
   SdkDictionaryType,
   SdkEnumType,
   SdkHttpOperation,
+  SdkMethodParameter,
   SdkModelPropertyType,
   SdkModelType,
   SdkNullableType,
   SdkOperationGroup,
   SdkServiceOperation,
+  SdkServiceResponseHeader,
   SdkUnionType,
   TCGCContext,
 } from "./interfaces.js";
@@ -73,7 +75,9 @@ export function createTCGCContext(
       SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType
     >(),
     __arrayDictionaryCache: new Map<Type, SdkDictionaryType | SdkArrayType>(),
+    __methodParameterCache: new Map<ModelProperty, SdkMethodParameter>(),
     __modelPropertyCache: new Map<ModelProperty, SdkModelPropertyType>(),
+    __responseHeaderCache: new Map<ModelProperty, SdkServiceResponseHeader>(),
     __generatedNames: new Map<Union | Model | TspLiteralType, string>(),
     __httpOperationCache: new Map<Operation, HttpOperation>(),
     __clientParametersCache: new Map(),
