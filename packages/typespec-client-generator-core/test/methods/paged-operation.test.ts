@@ -1,12 +1,8 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { Model, ModelProperty } from "@typespec/compiler";
 import { deepStrictEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkMethodParameter } from "../../src/interfaces.js";
-import {
-  getPropertyPathFromModel,
-  getPropertySegmentsFromModelOrParameters,
-} from "../../src/methods.js";
+import { getPropertySegmentsFromModelOrParameters } from "../../src/methods.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
@@ -42,13 +38,11 @@ it("azure paged result with encoded name", async () => {
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
-  strictEqual(method.nextLinkPath, "nextLink");
   strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
   strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
 
   const response = method.response;
   strictEqual(response.kind, "method");
-  strictEqual(response.resultPath, "values");
   strictEqual(response.resultSegments?.length, 1);
   strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
   strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
@@ -77,13 +71,11 @@ it("azure paged result with next link in header", async () => {
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
-  strictEqual(method.nextLinkPath, "nextLink");
   strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
   strictEqual(method.pagingMetadata.nextLinkSegments[0], method.operation.responses[0].headers[0]);
 
   const response = method.response;
   strictEqual(response.kind, "method");
-  strictEqual(response.resultPath, "values");
   strictEqual(response.resultSegments?.length, 1);
   strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
   strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
@@ -107,13 +99,11 @@ it("normal paged result", async () => {
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
-  strictEqual(method.nextLinkPath, "next");
   strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
   strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
 
   const response = method.response;
   strictEqual(response.kind, "method");
-  strictEqual(response.resultPath, "tests");
   strictEqual(response.resultSegments?.length, 1);
   strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
   strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
@@ -138,13 +128,11 @@ it("normal paged result with next link in header", async () => {
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
-  strictEqual(method.nextLinkPath, "next");
   strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
   strictEqual(method.pagingMetadata.nextLinkSegments[0], method.operation.responses[0].headers[0]);
 
   const response = method.response;
   strictEqual(response.kind, "method");
-  strictEqual(response.resultPath, "tests");
   strictEqual(response.resultSegments?.length, 1);
   strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
   strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
@@ -170,7 +158,6 @@ it("normal paged result in anonymous model with header", async () => {
 
   const response = method.response;
   strictEqual(response.kind, "method");
-  strictEqual(response.resultPath, "tests");
   strictEqual(response.resultSegments?.length, 1);
   strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
   strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
@@ -194,13 +181,11 @@ it("nullable paged result", async () => {
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
-  strictEqual(method.nextLinkPath, "next");
   strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
   strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
 
   const response = method.response;
   strictEqual(response.kind, "method");
-  strictEqual(response.resultPath, "tests");
   strictEqual(response.resultSegments?.length, 1);
   strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
   strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
@@ -226,13 +211,11 @@ it("normal paged result with encoded name", async () => {
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
-  strictEqual(method.nextLinkPath, "nextLink");
   strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
   strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
 
   const response = method.response;
   strictEqual(response.kind, "method");
-  strictEqual(response.resultPath, "values");
   strictEqual(response.resultSegments?.length, 1);
   strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
   strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
@@ -260,7 +243,6 @@ it("normal paged result with nested paging value", async () => {
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
-  strictEqual(method.nextLinkPath, "pagination.nextLink");
   strictEqual(method.pagingMetadata.nextLinkSegments?.length, 2);
   strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
   strictEqual(sdkPackage.models[0].properties[1].type.kind, "model");
@@ -271,7 +253,6 @@ it("normal paged result with nested paging value", async () => {
 
   const response = method.response;
   strictEqual(response.kind, "method");
-  strictEqual(response.resultPath, "results.values");
   strictEqual(response.resultSegments?.length, 2);
   strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
   strictEqual(sdkPackage.models[0].properties[0].type.kind, "model");
@@ -307,7 +288,6 @@ it("normal paged result with deeply nested paging value", async () => {
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
-  strictEqual(method.nextLinkPath, "metadata.pagination.nextLink");
   strictEqual(method.pagingMetadata.nextLinkSegments?.length, 3);
   strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
   strictEqual(sdkPackage.models[0].properties[1].type.kind, "model");
@@ -323,7 +303,6 @@ it("normal paged result with deeply nested paging value", async () => {
 
   const response = method.response;
   strictEqual(response.kind, "method");
-  strictEqual(response.resultPath, "data.results.items.values");
   strictEqual(response.resultSegments?.length, 4);
   strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
   strictEqual(sdkPackage.models[0].properties[0].type.kind, "model");
@@ -382,7 +361,6 @@ it("normal paged result with nested continuation token", async () => {
 
   const response = method.response;
   strictEqual(response.kind, "method");
-  strictEqual(response.resultPath, "data.items");
   strictEqual(response.resultSegments?.length, 2);
   strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
   strictEqual(sdkPackage.models[0].properties[0].type.kind, "model");
@@ -412,7 +390,6 @@ it("normal paged result with asymmetric nesting", async () => {
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
-  strictEqual(method.nextLinkPath, "metadata.pagination.nextLink");
   strictEqual(method.pagingMetadata.nextLinkSegments?.length, 3);
   strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
   strictEqual(sdkPackage.models[0].properties[1].type.kind, "model");
@@ -428,37 +405,9 @@ it("normal paged result with asymmetric nesting", async () => {
 
   const response = method.response;
   strictEqual(response.kind, "method");
-  strictEqual(response.resultPath, "items");
   strictEqual(response.resultSegments?.length, 1);
   strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
   strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
-});
-
-it("getPropertyPathFromModel test for nested case", async () => {
-  const { Test, a, d } = (await runner.compileWithBuiltInService(`
-    op test(): Test;
-    @test
-    model Test {
-      a: {
-        b: {
-          @test
-          a: string;
-        };
-      };
-      b: {
-        @test
-        d: string;
-      };
-    }
-  `)) as { Test: Model; a: ModelProperty; d: ModelProperty };
-  strictEqual(
-    getPropertyPathFromModel(runner.context, Test, (x: any) => x === a),
-    "a.b.a",
-  );
-  strictEqual(
-    getPropertyPathFromModel(runner.context, Test, (x: any) => x === d),
-    "b.d",
-  );
 });
 
 it("azure page result with inheritance", async () => {
@@ -487,13 +436,11 @@ it("azure page result with inheritance", async () => {
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
-  strictEqual(method.nextLinkPath, "nextLink");
   strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
   strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[1].properties[1]);
 
   const response = method.response;
   strictEqual(response.kind, "method");
-  strictEqual(response.resultPath, "values");
   strictEqual(response.resultSegments?.length, 1);
   strictEqual(response.resultSegments[0], sdkPackage.models[1].properties[0]);
   strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
