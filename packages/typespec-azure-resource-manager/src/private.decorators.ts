@@ -18,6 +18,7 @@ import {
 } from "@typespec/compiler";
 
 import { $ } from "@typespec/compiler/typekit";
+import { useStateMap } from "@typespec/compiler/utils";
 import { $bodyRoot, getHttpOperation } from "@typespec/http";
 import { $segment, getSegment } from "@typespec/rest";
 import { camelCase } from "change-case";
@@ -478,18 +479,18 @@ export function registerArmResource(context: DecoratorContext, resourceType: Mod
     },
   };
 
-  program.stateMap(ArmStateKeys.armResources).set(resourceType, armResourceDetails);
+  setArmResource(context.program, resourceType, armResourceDetails);
 }
+
+const [getArmResource, setArmResource, armResourceStateMap] = useStateMap<
+  Model,
+  ArmResourceDetails
+>(ArmStateKeys.armResources);
+
+export { getArmResource };
 
 export function listArmResources(program: Program): ArmResourceDetails[] {
-  return [...program.stateMap(ArmStateKeys.armResources).values()];
-}
-
-export function getArmResource(
-  program: Program,
-  resourceType: Model,
-): ArmResourceDetails | undefined {
-  return program.stateMap(ArmStateKeys.armResources).get(resourceType);
+  return [...armResourceStateMap(program).values()];
 }
 
 function getProperty(model: Model, propertyName: string): ModelProperty | undefined {

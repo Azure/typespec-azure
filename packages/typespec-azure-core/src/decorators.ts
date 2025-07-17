@@ -30,7 +30,7 @@ import {
   walkPropertiesInherited,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
-import { useStateMap } from "@typespec/compiler/utils";
+import { useStateMap, useStateSet } from "@typespec/compiler/utils";
 import {
   getHttpOperation,
   getRoutePath,
@@ -38,6 +38,7 @@ import {
   HttpOperationResponse,
 } from "@typespec/http";
 import { getResourceTypeKey, getSegment, isAutoRoute } from "@typespec/rest";
+import { getVersionForEnumMember } from "@typespec/versioning";
 import { OmitKeyPropertiesDecorator } from "../generated-defs/Azure.Core.Foundations.js";
 import {
   ArmResourceIdentifierConfigDecorator,
@@ -65,6 +66,7 @@ import {
   PollingLocationDecorator,
   PollingOperationDecorator,
   PollingOperationParameterDecorator,
+  PreviewVersionDecorator,
   UseFinalStateViaDecorator,
 } from "../generated-defs/Azure.Core.js";
 import { FinalStateValue, OperationLink } from "./lro-helpers.js";
@@ -82,6 +84,52 @@ import {
 
 export const PollingOperationKey: string = "polling";
 export const FinalOperationKey = "final";
+
+const [isPreviewVersion, markPreviewVersion] = useStateSet<EnumMember>(
+  AzureCoreStateKeys.previewVersion,
+);
+
+export { isPreviewVersion };
+
+export const $previewVersion: PreviewVersionDecorator = (
+  context: DecoratorContext,
+  target: EnumMember,
+) => {
+  markPreviewVersion(context.program, target);
+};
+
+export function checkPreviewVersion(program: Program) {
+  const previewVersions = program.stateSet(
+    AzureCoreStateKeys.previewVersion,
+  ) as Iterable<EnumMember>;
+
+  for (const target of previewVersions) {
+    const resolvedVersion = getVersionForEnumMember(program, target);
+
+    // Validate that the target is a member of a Version enum
+    if (!resolvedVersion) {
+      program.reportDiagnostic(
+        createDiagnostic({
+          code: "preview-version-invalid-enum-member",
+          target,
+        }),
+      );
+      return;
+    }
+
+    // Validate that the target is the last member of the Version enum
+    const totalMembers = resolvedVersion.enumMember.enum.members.size;
+    if (resolvedVersion.index !== totalMembers - 1) {
+      program.reportDiagnostic(
+        createDiagnostic({
+          code: "preview-version-last-member",
+          target,
+        }),
+      );
+      return;
+    }
+  }
+}
 
 // pagedResult
 

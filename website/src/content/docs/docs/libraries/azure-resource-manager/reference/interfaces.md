@@ -1760,7 +1760,7 @@ interface Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, Resour
 A long-running resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateAsync(resource: Resource): Response | OverrideErrortype
+op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateAsync(resource: Resource): Response | OverrideErrorType
 ```
 
 #### `LegacyOperations.CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateSync}
@@ -1768,7 +1768,7 @@ op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateAsync(resource: R
 A synchronous resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateSync(resource: Resource): Response | OverrideErrortype
+op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateSync(resource: Resource): Response | OverrideErrorType
 ```
 
 #### `LegacyOperations.CustomPatchAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchAsync}
@@ -1776,7 +1776,7 @@ op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateSync(resource: Re
 A long-running resource Update (PATCH)
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchAsync(properties: PatchModel): Response | OverrideErrortype
+op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchAsync(properties: PatchModel): Response | OverrideErrorType
 ```
 
 #### `LegacyOperations.CustomPatchSync` {#Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchSync}
@@ -1784,7 +1784,7 @@ op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchAsync(properties: Pa
 A synchronous resource Update (PATCH)
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchSync(properties: PatchModel): Response | OverrideErrortype
+op Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchSync(properties: PatchModel): Response | OverrideErrorType
 ```
 
 #### `LegacyOperations.DeleteWithoutOkAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.DeleteWithoutOkAsync}
@@ -1830,7 +1830,7 @@ op Azure.ResourceManager.Legacy.LegacyOperations.List(): Response | ErrorType
 A synchronous resource action.
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.ActionSync(body: Request): Response | OverrideErrortype
+op Azure.ResourceManager.Legacy.LegacyOperations.ActionSync(body: Request): Response | OverrideErrorType
 ```
 
 #### `LegacyOperations.ActionAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.ActionAsync}
@@ -1838,7 +1838,7 @@ op Azure.ResourceManager.Legacy.LegacyOperations.ActionSync(body: Request): Resp
 A long-running resource action.
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.ActionAsync(body: Request): Response | OverrideErrortype
+op Azure.ResourceManager.Legacy.LegacyOperations.ActionAsync(body: Request): Response | OverrideErrorType
 ```
 
 ### `Operations` {#Azure.ResourceManager.Legacy.Operations}
@@ -1888,7 +1888,7 @@ interface Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, Resour
 A long-running resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations.CreateOrUpdateAsync(resource: Resource): Response | OverrideErrortype
+op Azure.ResourceManager.Legacy.RoutedOperations.CreateOrUpdateAsync(resource: Resource): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -1900,7 +1900,7 @@ op Azure.ResourceManager.Legacy.RoutedOperations.CreateOrUpdateAsync(resource: R
 | Parameters           | Optional. Additional parameters after the path parameters               |
 | Response             | Optional. The success response(s) for the PUT operation                 |
 | OptionalRequestBody  | Optional. Indicates whether the request body is optional                |
-| OverrideErrortype    | Optional. The error response, if non-standard.                          |
+| OverrideErrorType    | Optional. The error response, if non-standard.                          |
 | OverrideRouteOptions | Optional. The route options for the operation.                          |
 
 #### `RoutedOperations.CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.RoutedOperations.CreateOrUpdateSync}
@@ -1908,7 +1908,7 @@ op Azure.ResourceManager.Legacy.RoutedOperations.CreateOrUpdateAsync(resource: R
 A synchronous resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations.CreateOrUpdateSync(resource: Resource): Response | OverrideErrortype
+op Azure.ResourceManager.Legacy.RoutedOperations.CreateOrUpdateSync(resource: Resource): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -1919,7 +1919,7 @@ op Azure.ResourceManager.Legacy.RoutedOperations.CreateOrUpdateSync(resource: Re
 | Parameters           | Optional. Additional parameters after the path parameters |
 | Response             | Optional. The success response(s) for the PUT operation   |
 | OptionalRequestBody  | Optional. Indicates whether the request body is optional  |
-| OverrideErrortype    | Optional. The error response, if non-standard.            |
+| OverrideErrorType    | Optional. The error response, if non-standard.            |
 | OverrideRouteOptions | Optional. The route options for the operation.            |
 
 #### `RoutedOperations.CustomPatchAsync` {#Azure.ResourceManager.Legacy.RoutedOperations.CustomPatchAsync}
@@ -1927,7 +1927,7 @@ op Azure.ResourceManager.Legacy.RoutedOperations.CreateOrUpdateSync(resource: Re
 A long-running resource Update (PATCH)
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations.CustomPatchAsync(properties: PatchModel): Response | OverrideErrortype
+op Azure.ResourceManager.Legacy.RoutedOperations.CustomPatchAsync(properties: PatchModel): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -1940,7 +1940,7 @@ op Azure.ResourceManager.Legacy.RoutedOperations.CustomPatchAsync(properties: Pa
 | Parameters           | Optional. Additional parameters after the path parameters               |
 | Response             | Optional. The success response(s) for the PATCH operation               |
 | OptionalRequestBody  | Optional. Indicates whether the request body is optional                |
-| OverrideErrortype    | Optional. The error response, if non-standard.                          |
+| OverrideErrorType    | Optional. The error response, if non-standard.                          |
 | OverrideRouteOptions | Optional. The route options for the operation.                          |
 
 #### `RoutedOperations.CustomPatchSync` {#Azure.ResourceManager.Legacy.RoutedOperations.CustomPatchSync}
@@ -1948,7 +1948,7 @@ op Azure.ResourceManager.Legacy.RoutedOperations.CustomPatchAsync(properties: Pa
 A synchronous resource Update (PATCH)
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations.CustomPatchSync(properties: PatchModel): Response | OverrideErrortype
+op Azure.ResourceManager.Legacy.RoutedOperations.CustomPatchSync(properties: PatchModel): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -1960,7 +1960,7 @@ op Azure.ResourceManager.Legacy.RoutedOperations.CustomPatchSync(properties: Pat
 | Parameters           | Optional. Additional parameters after the path parameters |
 | Response             | Optional. The success response(s) for the PATCH operation |
 | OptionalRequestBody  | Optional. Indicates whether the request body is optional  |
-| OverrideErrortype    | Optional. The error response, if non-standard.            |
+| OverrideErrorType    | Optional. The error response, if non-standard.            |
 | OverrideRouteOptions | Optional. The route options for the operation.            |
 
 #### `RoutedOperations.DeleteWithoutOkAsync` {#Azure.ResourceManager.Legacy.RoutedOperations.DeleteWithoutOkAsync}
@@ -2057,7 +2057,7 @@ op Azure.ResourceManager.Legacy.RoutedOperations.List(): Response | ErrorType
 A synchronous resource action.
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations.ActionSync(body: Request): Response | OverrideErrortype
+op Azure.ResourceManager.Legacy.RoutedOperations.ActionSync(body: Request): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2069,7 +2069,7 @@ op Azure.ResourceManager.Legacy.RoutedOperations.ActionSync(body: Request): Resp
 | Response             | The response model for the action                         |
 | Parameters           | Optional. Additional parameters after the path parameters |
 | OptionalRequestBody  | Optional. Indicates whether the request body is optional  |
-| OverrideErrortype    | Optional. The error response, if non-standard.            |
+| OverrideErrorType    | Optional. The error response, if non-standard.            |
 | OverrideRouteOptions | Optional. The route options for the operation.            |
 
 #### `RoutedOperations.ActionAsync` {#Azure.ResourceManager.Legacy.RoutedOperations.ActionAsync}
@@ -2077,7 +2077,7 @@ op Azure.ResourceManager.Legacy.RoutedOperations.ActionSync(body: Request): Resp
 A long-running resource action.
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations.ActionAsync(body: Request): Response | OverrideErrortype
+op Azure.ResourceManager.Legacy.RoutedOperations.ActionAsync(body: Request): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2091,7 +2091,7 @@ op Azure.ResourceManager.Legacy.RoutedOperations.ActionAsync(body: Request): Res
 | Parameters           | Optional. Additional parameters after the path parameters                 |
 | Response             | The union of successful responses for the action                          |
 | OptionalRequestBody  | Optional. Indicates whether the request body is optional                  |
-| OverrideErrortype    | Optional. The error response, if non-standard.                            |
+| OverrideErrorType    | Optional. The error response, if non-standard.                            |
 | OverrideRouteOptions | Optional. The route options for the operation.                            |
 
 ### `CustomPatchAsync` {#Azure.ResourceManager.Legacy.CustomPatchAsync}

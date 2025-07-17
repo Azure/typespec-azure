@@ -3,25 +3,101 @@ import {
   BasicTestRunner,
   expectDiagnosticEmpty,
   expectDiagnostics,
+  t,
 } from "@typespec/compiler/testing";
 import assert, { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
-  OperationLinkMetadata,
   getFinalStateOverride,
   getLongRunningStates,
   getOperationLinks,
   getPagedResult,
   getParameterizedNextLinkArguments,
+  isPreviewVersion,
+  OperationLinkMetadata,
 } from "../src/decorators.js";
 import { FinalStateValue } from "../src/lro-helpers.js";
-import { createAzureCoreTestRunner } from "./test-host.js";
+import { createAzureCoreTestRunner, Tester } from "./test-host.js";
 
 describe("typespec-azure-core: decorators", () => {
   let runner: BasicTestRunner;
 
   beforeEach(async () => {
     runner = await createAzureCoreTestRunner();
+  });
+
+  describe("@previewVersion", () => {
+    it("emit diagnostic if use on non enum member", async () => {
+      const diagnostics = await runner.diagnose(`
+        @previewVersion
+        model Foo {}
+      `);
+      expectDiagnostics(diagnostics, {
+        code: "decorator-wrong-target",
+        message:
+          "Cannot apply @previewVersion decorator to Azure.MyService.Foo since it is not assignable to EnumMember",
+      });
+    });
+
+    it("emit diagnostic if use on enum member that is not part of a version enum", async () => {
+      const diagnostics = await runner.diagnose(`
+        enum Foo {
+          @previewVersion
+          v1: "1.0",
+        }
+      `);
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-azure-core/preview-version-invalid-enum-member",
+        message: "@previewVersion can only be applied to members of a Version enum.",
+      });
+    });
+
+    it("emit diagnostic if use on enum member that is not the last member", async () => {
+      const diagnostics = await Tester.diagnose(`
+        import "@typespec/versioning";
+        import "@azure-tools/typespec-azure-core";
+
+        using Versioning;
+
+        @versioned(Versions)
+        @service(#{ title: "Widget Service" })
+        namespace DemoService;
+
+        enum Versions {
+          v1,
+          @Azure.Core.previewVersion
+          v2Preview: "2.0-preview",
+          v2: "2.0",
+        }
+      `);
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-azure-core/preview-version-last-member",
+        message:
+          "@previewVersion can only be applied to the last member of a Version enum. Having it on other members will cause unstable apis to show up in subsequent stable versions.",
+      });
+    });
+
+    it("succeeds to decorate the last enum member", async () => {
+      const { program, v2Preview } = await Tester.compile(t.code`
+        import "@typespec/versioning";
+        import "@azure-tools/typespec-azure-core";
+
+        using Versioning;
+
+        @versioned(Versions)
+        @service(#{ title: "Widget Service" })
+        namespace DemoService;
+
+        enum Versions {
+          v1,
+          @Azure.Core.previewVersion
+          ${t.enumMember("v2Preview")}: "2.0-preview",
+        }
+      `);
+
+      assert(v2Preview.name === "v2Preview");
+      assert(isPreviewVersion(program, v2Preview));
+    });
   });
 
   describe("@pagedResult", () => {

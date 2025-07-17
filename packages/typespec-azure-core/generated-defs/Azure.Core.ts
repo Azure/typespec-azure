@@ -56,6 +56,27 @@ export type ItemsDecorator = (context: DecoratorContext, entity: ModelProperty) 
 export type PagedResultDecorator = (context: DecoratorContext, entity: Model) => void;
 
 /**
+ * Decorator that marks a Version EnumMember as a preview version.
+ * This is used to indicate that the version is not yet stable and may change in future releases.
+ *
+ * @param target The EnumMember that represents the preview version.
+ * @example
+ * ```typespec
+ * @versioned(Versions)
+ * @service(#{ title: "Widget Service" })
+ * namespace DemoService;
+ *
+ * enum Versions {
+ *   v1,
+ *   v2,
+ *   @previewVersion
+ *   v3Preview
+ * }
+ * ```
+ */
+export type PreviewVersionDecorator = (context: DecoratorContext, target: EnumMember) => void;
+
+/**
  * Used for custom StatusMonitor implementation.
  * Identifies an EnumMember as a long-running "Succeeded" terminal state.
  */
@@ -184,6 +205,7 @@ export type AzureCoreDecorators = {
   pollingLocation: PollingLocationDecorator;
   items: ItemsDecorator;
   pagedResult: PagedResultDecorator;
+  previewVersion: PreviewVersionDecorator;
   lroSucceeded: LroSucceededDecorator;
   lroCanceled: LroCanceledDecorator;
   lroFailed: LroFailedDecorator;
