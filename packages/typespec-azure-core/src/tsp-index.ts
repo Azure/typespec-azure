@@ -27,7 +27,6 @@ import {
   $pollingLocation,
   $pollingOperation,
   $pollingOperationParameter,
-  $previewVersion,
   $requestParameter,
   $responseProperty,
   $spreadCustomParameters,
@@ -35,6 +34,7 @@ import {
   $useFinalStateVia,
   parameterizedNextLinkConfigDecorator,
 } from "./decorators.js";
+import { $previewVersion } from "./decorators/preview-version.js";
 import {
   $addTraitProperties,
   $applyTraitOverride,
