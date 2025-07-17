@@ -35,7 +35,8 @@
     "validate-scenarios": "pnpm -r --filter=@azure-tools/azure-http-specs run validate-scenarios",
     "validate-mock-apis": "pnpm -r --filter=@azure-tools/azure-http-specs run validate-mock-apis",
     "generate-scenarios-summary": "pnpm -r --filter=@azure-tools/azure-http-specs run generate-scenarios-summary",
-    "upload-manifest": "pnpm -r --filter=@azure-tools/azure-http-specs run upload-manifest"
+    "upload-manifest": "pnpm -r --filter=@azure-tools/azure-http-specs run upload-manifest",
+    "install-conflict": "git checkout upstream/main -- pnpm-lock.yaml && pnpm install"
   },
   "devDependencies": {
     "@chronus/chronus": "^1.0.1",

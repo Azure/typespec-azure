@@ -67,12 +67,6 @@ export type PollingLocationDecorator = (
 export type PreviewVersionDecorator = (context: DecoratorContext, target: EnumMember) => void;
 
 /**
- * Marks an Enum as being fixed since enums in Azure are
- * assumed to be extensible.
- */
-export type FixedDecorator = (context: DecoratorContext, target: Enum) => void;
-
-/**
  * Marks a Model as a paged collection.
  */
 export type PagedResultDecorator = (context: DecoratorContext, entity: Model) => void;
@@ -210,9 +204,6 @@ export type AzureCoreDecorators = {
   finalLocation: FinalLocationDecorator;
   pollingLocation: PollingLocationDecorator;
   previewVersion: PreviewVersionDecorator;
-  fixed: FixedDecorator;
-  pagedResult: PagedResultDecorator;
-  items: ItemsDecorator;
   lroSucceeded: LroSucceededDecorator;
   lroCanceled: LroCanceledDecorator;
   lroFailed: LroFailedDecorator;
