@@ -1,4 +1,4 @@
-import { Enum, Interface, Model, ModelProperty, Operation } from "@typespec/compiler";
+import { Interface, Model, ModelProperty, Operation } from "@typespec/compiler";
 import {
   BasicTestRunner,
   expectDiagnosticEmpty,
@@ -11,7 +11,6 @@ import {
   getOperationLinks,
   getPagedResult,
   getParameterizedNextLinkArguments,
-  isFixed,
   OperationLinkMetadata,
 } from "../src/decorators.js";
 import { FinalStateValue } from "../src/lro-helpers.js";
@@ -616,22 +615,6 @@ describe("typespec-azure-core: decorators", () => {
       `;
       const diagnostics = await runner.diagnose(code);
       expectDiagnosticEmpty(diagnostics);
-    });
-  });
-
-  describe("@fixed", () => {
-    it("marks `@fixed` enum correctly", async () => {
-      const result = await runner.compile(
-        `
-          @test @fixed enum FixedEnum {
-            A,
-            B,
-            C,
-          }
-          `,
-      );
-
-      ok(isFixed(runner.program, result.FixedEnum as Enum), "Expected fixed enum");
     });
   });
 
