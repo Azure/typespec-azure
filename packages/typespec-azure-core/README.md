@@ -74,7 +74,6 @@ Available ruleSets:
 
 - [`@finalLocation`](#@finallocation)
 - [`@finalOperation`](#@finaloperation)
-- [`@fixed`](#@fixed)
 - [`@items`](#@items)
 - [`@lroCanceled`](#@lrocanceled)
 - [`@lroErrorResult`](#@lroerrorresult)
@@ -127,23 +126,6 @@ Identifies that an operation is the final operation for an LRO.
 | --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
 | linkedOperation | `Operation` | The linked Operation                                                                                                      |
 | parameters      | `{}`        | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
-
-#### `@fixed`
-
-Marks an Enum as being fixed since enums in Azure are
-assumed to be extensible.
-
-```typespec
-@Azure.Core.fixed
-```
-
-##### Target
-
-`Enum`
-
-##### Parameters
-
-None
 
 #### `@items`
 
