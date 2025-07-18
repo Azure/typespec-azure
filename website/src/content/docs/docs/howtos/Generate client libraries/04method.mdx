@@ -218,6 +218,25 @@ public final class PetStoreNamespaceClient {
 }
 ```
 
+```go
+// Unexported types and methods (package-private)
+type internalModel struct {
+    name *string
+    data *string
+}
+
+type clientGetInternalModelOptions struct{}
+
+type clientGetInternalModelResponse struct {
+    internalModel
+}
+
+func (client *Client) getInternalModel(ctx context.Context, name string, options *clientGetInternalModelOptions) (clientGetInternalModelResponse, error) {
+    // implementation
+}
+
+```
+
 </ClientTabs>
 
 #### Decide the usage of a model
