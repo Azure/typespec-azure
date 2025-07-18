@@ -180,6 +180,7 @@ it("verify resolution of private endpoints and private links with v5 version", a
         name: string;
       }
       
+      @@pageItems(Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResultV5.value);
       @armResourceOperations(PrivateEndpointConnectionResource)
       interface PrivateEndpointConnections {
         #suppress "deprecated" "PrivateLinkResourceListResultV5 validation"
@@ -191,6 +192,7 @@ it("verify resolution of private endpoints and private links with v5 version", a
         ...PrivateLinkResourceParameter;
       }
 
+      @@pageItems(Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResultV5.value);
       @armResourceOperations(PrivateLinkResource)
       interface PrivateLinkResources {
         #suppress "deprecated" "PrivateLinkResourceListResultV5 validation"
