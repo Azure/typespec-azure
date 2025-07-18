@@ -12,6 +12,7 @@ The best documentation on how to generate can be found using those links:
 - https://aka.ms/azsdk/dpcodegen/python
 - https://aka.ms/azsdk/dpcodegen/java
 - https://aka.ms/azsdk/rlc/js
+- https://aka.ms/azsdk/dpcodegen/go
 - https://aka.ms/azsdk/dpcodegen/js (do not use unless told to do so by the archboard)
 
 At a glance, add your emitter name to your `package.json`, along with the right options in the `tspconfig.yaml`.
@@ -33,7 +34,8 @@ Modify your `package.json` to include the necessary dependencies for the languag
     "@azure-tools/typespec-python": "latest",
     "@azure-tools/typespec-java": "latest",
     "@azure-tools/typespec-csharp": "latest",
-    "@azure-tools/typespec-ts": "latest"
+    "@azure-tools/typespec-ts": "latest",
+    "@azure-tools/typespec-go": "latest"
   },
   "private": true
 }
@@ -53,6 +55,8 @@ emit:
   - "@azure-tools/typespec-csharp"
   # add "@azure-tools/typespec-ts" to your package.json to generate Typescript code
   - "@azure-tools/typespec-ts"
+  # add "@azure-tools/typespec-go" to your package.json to generate Go code
+  - "@azure-tools/typespec-go"
 options:
   "@azure-tools/typespec-python":
     flavor: azure
@@ -61,6 +65,8 @@ options:
   "@azure-tools/typespec-csharp":
     flavor: azure
   "@azure-tools/typespec-ts":
+    flavor: azure
+  "@azure-tools/typespec-go":
     flavor: azure
 ```
 
