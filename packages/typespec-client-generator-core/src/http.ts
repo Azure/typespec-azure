@@ -1,6 +1,5 @@
 import {
   Diagnostic,
-  Model,
   ModelProperty,
   Operation,
   Type,
@@ -54,7 +53,7 @@ import {
   compareModelProperties,
   getAvailableApiVersions,
   getClientDoc,
-  getHttpBodySpreadModel,
+  getHttpBodyType,
   getHttpOperationResponseHeaders,
   getStreamAsBytes,
   getTypeDecorators,
@@ -210,23 +209,9 @@ function getSdkHttpParameters(
       }
       retval.bodyParam = bodyParam;
     } else if (!isNeverOrVoidType(tspBody.type)) {
-      const spread = isHttpBodySpread(tspBody);
-      let type: SdkType;
-      let optional = false;
-      if (spread) {
-        type = diagnostics.pipe(
-          getClientTypeWithDiagnostics(
-            context,
-            getHttpBodySpreadModel(tspBody.type as Model),
-            httpOperation.operation,
-          ),
-        );
-      } else {
-        type = diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, tspBody.type, httpOperation.operation),
-        );
-        optional = tspBody.property?.optional ?? false;
-      }
+      const type = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, getHttpBodyType(tspBody), httpOperation.operation),
+      );
       const name = camelCase((type as { name: string }).name ?? "body");
       retval.bodyParam = {
         kind: "body",
@@ -241,7 +226,7 @@ function getSdkHttpParameters(
         isApiVersionParam: false,
         apiVersions: getAvailableApiVersions(context, tspBody.type, httpOperation.operation),
         type,
-        optional,
+        optional: isHttpBodySpread(tspBody) ? false : (tspBody.property?.optional ?? false), // optional is always false for spread body
         correspondingMethodParams,
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`,
         decorators: diagnostics.pipe(getTypeDecorators(context, tspBody.type)),

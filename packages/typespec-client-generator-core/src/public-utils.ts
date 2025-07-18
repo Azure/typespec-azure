@@ -56,12 +56,11 @@ import {
 import {
   AllScopes,
   TspLiteralType,
-  getHttpBodySpreadModel,
+  getHttpBodyType,
   getHttpOperationResponseHeaders,
   hasExplicitClientOrOperationGroup,
   hasNoneVisibility,
   isAzureCoreTspModel,
-  isHttpBodySpread,
   listAllUserDefinedNamespaces,
   removeVersionsLargerThanExplicitlySpecified,
   resolveDuplicateGenearatedName,
@@ -392,12 +391,7 @@ function getContextPath(
     if (httpOperation.parameters.body) {
       visited.clear();
       result = [{ name: root.name, type: root }];
-      let bodyType: Type;
-      if (isHttpBodySpread(httpOperation.parameters.body)) {
-        bodyType = getHttpBodySpreadModel(httpOperation.parameters.body.type as Model);
-      } else {
-        bodyType = httpOperation.parameters.body.type;
-      }
+      const bodyType = getHttpBodyType(httpOperation.parameters.body);
       if (dfsModelProperties(typeToFind, bodyType, "Request")) {
         return result;
       }
