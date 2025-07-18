@@ -17,6 +17,7 @@ using Azure.ResourceManager.Private;
  */
 @autoRoute
 @doc("List {name} resources by scope", ExtensionResource)
+@list
 @listsResource(ExtensionResource)
 @segmentOf(ExtensionResource)
 @armResourceList(ExtensionResource)

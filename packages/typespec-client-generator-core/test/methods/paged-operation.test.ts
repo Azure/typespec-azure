@@ -19,8 +19,10 @@ beforeEach(async () => {
 it("azure paged result with encoded name", async () => {
   await runner.compileWithBuiltInService(`
     op test(): ListTestResult;
+    #suppress "deprecated" "Keep for validation purposes."
     @pagedResult
     model ListTestResult {
+      #suppress "deprecated" "Keep for validation purposes."
       @items
       @clientName("values")
       tests: Test[];
@@ -49,8 +51,10 @@ it("azure paged result with encoded name", async () => {
 it("azure paged result with next link in header", async () => {
   await runner.compileWithBuiltInService(`
     op test(): ListTestResult;
+    #suppress "deprecated" "Keep for validation purposes."
     @pagedResult
     model ListTestResult {
+      #suppress "deprecated" "Keep for validation purposes."
       @items
       @clientName("values")
       tests: Test[];
@@ -409,8 +413,10 @@ it("normal paged result with asymmetric nesting", async () => {
 it("azure page result with inheritance", async () => {
   await runner.compileWithBuiltInService(`
     op test(): ExtendedListTestResult;
+    #suppress "deprecated" "Keep for validation purposes."
     @pagedResult
     model ListTestResult {
+      #suppress "deprecated" "Keep for validation purposes."
       @items
       values: Test[];
 
@@ -765,8 +771,10 @@ it("next link with re-injected parameters", async () => {
 
     op test(...TestOptions): ListTestResult;
 
+    #suppress "deprecated" "Keep for validation purposes."
     @pagedResult
     model ListTestResult {
+      #suppress "deprecated" "Keep for validation purposes."
       @items
       values: Test[];
       @nextLink
@@ -810,8 +818,10 @@ it("next link with mix of re-injected parameters and not", async () => {
       id: int32;
     }
 
+    #suppress "deprecated" "Keep for validation purposes."
     @pagedResult
     model ParameterizedNextLinkPagingResult {
+      #suppress "deprecated" "Keep for validation purposes."
       @items
       values: User[];
 

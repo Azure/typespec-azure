@@ -17,8 +17,10 @@ it("normal paged model", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
   await runner.compileWithBuiltInAzureCoreService(`
+    #suppress "deprecated" "Keep for validation purposes."
     @pagedResult
     model TestResult {
+      #suppress "deprecated" "Keep for validation purposes."
       @items
       value: Test[];
 
@@ -52,6 +54,7 @@ it("template paged model", async () => {
       prop: string;
     }
 
+    @list
     op test(): TestResult;
   `);
 
@@ -72,6 +75,7 @@ it("another usage of template paged model", async () => {
       prop: string;
     }
 
+    @list
     op test(): Page<Test>;
   `);
 
@@ -92,6 +96,7 @@ it("paged model use template list", async () => {
       prop: string;
     }
 
+    @list
     op testTemplate<T extends {}>(): Page<T>;
 
     op test is testTemplate<Test>;

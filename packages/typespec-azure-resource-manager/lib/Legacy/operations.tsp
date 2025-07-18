@@ -275,6 +275,7 @@ interface RoutedOperations<
    */
   @doc("List a {name}", Resource)
   @get
+  @list
   @listsResource(Resource)
   @segmentOf(Resource)
   @armOperationRoute(OverrideRouteOptions)
