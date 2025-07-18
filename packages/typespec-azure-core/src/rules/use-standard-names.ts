@@ -2,8 +2,8 @@ import {
   Operation,
   createRule,
   ignoreDiagnostics,
+  isList,
   isTemplateDeclarationOrInstance,
-  isList
 } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 import { isListOperation } from "@typespec/rest";
@@ -34,7 +34,9 @@ export const useStandardNames = createRule({
         const statusCodes = httpOp.responses.map((x) => x.statusCodes.toString());
         // operation is a list if it is decoratored as such (for example, through a template) or returns a paged result
         const isListOp =
-          isListOperation(context.program, op) || getPagedResult(context.program, op) !== undefined || isList(context.program, op);
+          isListOperation(context.program, op) ||
+          getPagedResult(context.program, op) !== undefined ||
+          isList(context.program, op);
         let errorMessage:
           | "list"
           | "get"
