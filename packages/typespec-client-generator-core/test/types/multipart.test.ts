@@ -39,6 +39,7 @@ it("multipart form basic", async function () {
   ok(id);
   strictEqual(id.kind, "property");
   strictEqual(id.type.kind, "string");
+  strictEqual(id.serializationOptions.multipart?.headers.length, 0);
   const profileImage = model.properties.find((x) => x.name === "profileImage");
   ok(profileImage);
   strictEqual(profileImage.kind, "property");
@@ -626,6 +627,7 @@ it("check content-type in multipart with @multipartBody for model", async functi
   deepEqual(stringWithoutContentType.serializationOptions.multipart.defaultContentTypes, [
     "text/plain",
   ]);
+  strictEqual(stringWithoutContentType.serializationOptions.multipart.headers.length, 0);
   strictEqual(
     stringWithoutContentType.multipartOptions,
     stringWithoutContentType.serializationOptions.multipart,
@@ -641,6 +643,7 @@ it("check content-type in multipart with @multipartBody for model", async functi
   deepEqual(stringWithContentType.serializationOptions.multipart.defaultContentTypes, [
     "text/html",
   ]);
+  strictEqual(stringWithContentType.serializationOptions.multipart.headers.length, 0);
   strictEqual(
     stringWithContentType.multipartOptions,
     stringWithContentType.serializationOptions.multipart,
@@ -656,6 +659,7 @@ it("check content-type in multipart with @multipartBody for model", async functi
   deepEqual(bytesWithoutContentType.serializationOptions.multipart.defaultContentTypes, [
     "application/octet-stream",
   ]);
+  strictEqual(bytesWithoutContentType.serializationOptions.multipart.headers.length, 0);
   strictEqual(
     bytesWithoutContentType.multipartOptions,
     bytesWithoutContentType.serializationOptions.multipart,
@@ -669,6 +673,7 @@ it("check content-type in multipart with @multipartBody for model", async functi
   ok(bytesWithContentType.serializationOptions.multipart);
   ok(bytesWithContentType.serializationOptions.multipart.contentType);
   deepEqual(bytesWithContentType.serializationOptions.multipart.defaultContentTypes, ["image/png"]);
+  strictEqual(bytesWithContentType.serializationOptions.multipart.headers.length, 0);
   strictEqual(
     bytesWithContentType.multipartOptions,
     bytesWithContentType.serializationOptions.multipart,
@@ -757,4 +762,26 @@ it("multipart in client customization", async () => {
   strictEqual(property.serializationOptions.multipart.isFilePart, true);
   strictEqual(property.multipartOptions, property.serializationOptions.multipart);
   strictEqual(property.isMultipartFileInput, true);
+});
+
+it("check header in multipart with @multipartBody for model", async function () {
+  await runner.compileWithBuiltInService(`
+    model MultiPartRequest {
+        prop: HttpPart<{@body body: string, @header test: string}>,
+    }
+    @post
+    op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
+  `);
+  const models = runner.context.sdkPackage.models;
+  strictEqual(models.length, 1);
+  const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
+  ok(MultiPartRequest);
+  const prop = MultiPartRequest.properties.find((x) => x.name === "prop") as SdkModelPropertyType;
+  ok(prop);
+  strictEqual(prop.type.kind, "string");
+  ok(prop.serializationOptions.multipart);
+  strictEqual(prop.serializationOptions.multipart.contentType, undefined);
+  deepEqual(prop.serializationOptions.multipart.defaultContentTypes, ["text/plain"]);
+  strictEqual(prop.serializationOptions.multipart.headers.length, 1);
+  strictEqual(prop.multipartOptions, prop.serializationOptions.multipart);
 });
