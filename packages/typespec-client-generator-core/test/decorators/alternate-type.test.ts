@@ -301,3 +301,47 @@ it.each([
   const param = method.parameters[0];
   strictEqual(param.type.kind, shouldReplace ? "string" : "utcDateTime");
 });
+
+it("@alternateType along with @override", async () => {
+  await runner.compile(`
+    @service
+    namespace Test;
+
+    @route("/bar")
+    op bar(@query prop: string): void;
+
+    // This alternate type should also apply for the operation level
+    op baz(@alternateType(int32) @query prop: string): void;
+
+    @@override(bar, baz);
+  `);
+
+  const method = runner.context.sdkPackage.clients[0].methods[0];
+  strictEqual(method.name, "bar");
+  const param = method.parameters[0];
+  strictEqual(param.type.kind, "int32");
+  const operationParam = method.operation.parameters[0];
+  strictEqual(operationParam.type.kind, "int32");
+});
+
+it("@alternateType along with @override with scope", async () => {
+  await runner.compile(`
+    @service
+    namespace Test;
+
+    @route("/bar")
+    op bar(@query prop: string): void;
+
+    // This alternate type should also apply for the operation level
+    op baz(@alternateType(int32, "python") @query prop: string): void;
+
+    @@override(bar, baz, "python");
+  `);
+
+  const method = runner.context.sdkPackage.clients[0].methods[0];
+  strictEqual(method.name, "bar");
+  const param = method.parameters[0];
+  strictEqual(param.type.kind, "int32");
+  const operationParam = method.operation.parameters[0];
+  strictEqual(operationParam.type.kind, "int32");
+});
