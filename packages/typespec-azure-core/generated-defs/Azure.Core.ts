@@ -204,6 +204,8 @@ export type AzureCoreDecorators = {
   finalLocation: FinalLocationDecorator;
   pollingLocation: PollingLocationDecorator;
   previewVersion: PreviewVersionDecorator;
+  pagedResult: PagedResultDecorator;
+  items: ItemsDecorator;
   lroSucceeded: LroSucceededDecorator;
   lroCanceled: LroCanceledDecorator;
   lroFailed: LroFailedDecorator;
