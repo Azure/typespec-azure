@@ -13,7 +13,6 @@ import {
   getOperationLinks,
   getPagedResult,
   getParameterizedNextLinkArguments,
-  isFixed,
   isPreviewVersion,
   OperationLinkMetadata,
 } from "../src/decorators.js";
@@ -939,22 +938,6 @@ describe("typespec-azure-core: decorators", () => {
       `;
       const diagnostics = await runner.diagnose(code);
       expectDiagnosticEmpty(diagnostics);
-    });
-  });
-
-  describe("@fixed", () => {
-    it("marks `@fixed` enum correctly", async () => {
-      const result = await runner.compile(
-        `
-          @test @fixed enum FixedEnum {
-            A,
-            B,
-            C,
-          }
-          `,
-      );
-
-      ok(isFixed(runner.program, result.FixedEnum as Enum), "Expected fixed enum");
     });
   });
 

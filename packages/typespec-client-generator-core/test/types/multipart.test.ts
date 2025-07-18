@@ -1,7 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepEqual, ok, strictEqual } from "assert";
 import { afterEach, beforeEach, it } from "vitest";
-import { SdkBodyModelPropertyType, UsageFlags } from "../../src/interfaces.js";
+import { SdkModelPropertyType, UsageFlags } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
 let runner: SdkTestRunner;
@@ -365,7 +365,7 @@ it("basic multipart with @multipartBody for model", async function () {
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
   ok(MultiPartRequest);
   ok(MultiPartRequest.usage & UsageFlags.MultipartFormData);
-  const id = MultiPartRequest.properties.find((x) => x.name === "id") as SdkBodyModelPropertyType;
+  const id = MultiPartRequest.properties.find((x) => x.name === "id") as SdkModelPropertyType;
   strictEqual(id.optional, true);
   ok(id.serializationOptions.multipart);
   strictEqual(id.serializationOptions.multipart.isFilePart, false);
@@ -373,7 +373,7 @@ it("basic multipart with @multipartBody for model", async function () {
   strictEqual(id.multipartOptions, id.serializationOptions.multipart);
   const profileImage = MultiPartRequest.properties.find(
     (x) => x.name === "profileImage",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   strictEqual(profileImage.optional, false);
   ok(profileImage.serializationOptions.multipart);
   strictEqual(profileImage.serializationOptions.multipart.isFilePart, true);
@@ -385,7 +385,7 @@ it("basic multipart with @multipartBody for model", async function () {
   strictEqual(profileImage.multipartOptions, profileImage.serializationOptions.multipart);
   const address = MultiPartRequest.properties.find(
     (x) => x.name === "address",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   strictEqual(address.optional, false);
   ok(address.serializationOptions.multipart);
   strictEqual(address.serializationOptions.multipart.isFilePart, false);
@@ -393,7 +393,7 @@ it("basic multipart with @multipartBody for model", async function () {
   strictEqual(address.multipartOptions, address.serializationOptions.multipart);
   strictEqual(address.type.kind, "model");
 
-  const city = address.type.properties.find((x) => x.name === "city") as SdkBodyModelPropertyType;
+  const city = address.type.properties.find((x) => x.name === "city") as SdkModelPropertyType;
   ok(city);
   ok(city.serializationOptions.json);
   strictEqual(city.serializationOptions.json.name, "city");
@@ -417,14 +417,14 @@ it("File[] of multipart with @multipartBody for model", async function () {
   // filename property
   const filenameProperty = fileModel.properties.find(
     (x) => x.name === "filename",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   // contentType property
   const contentTypeProperty = fileModel.properties.find(
     (x) => x.name === "contentType",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   const fileArrayOnePart = MultiPartRequest.properties.find(
     (x) => x.name === "fileArrayOnePart",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(fileArrayOnePart);
   ok(fileArrayOnePart.serializationOptions.multipart);
   strictEqual(fileArrayOnePart.type.kind, "array");
@@ -440,7 +440,7 @@ it("File[] of multipart with @multipartBody for model", async function () {
 
   const fileArrayMultiParts = MultiPartRequest.properties.find(
     (x) => x.name === "fileArrayMultiParts",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(fileArrayMultiParts);
   ok(fileArrayMultiParts.serializationOptions.multipart);
   strictEqual(fileArrayMultiParts.type.kind, "array");
@@ -479,7 +479,7 @@ it("File with specific content-type", async function () {
   ok(MultiPartRequest);
   const fileOptionalFileName = MultiPartRequest.properties.find(
     (x) => x.name === "file",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(fileOptionalFileName);
   ok(fileOptionalFileName.serializationOptions.multipart);
   deepEqual(fileOptionalFileName.serializationOptions.multipart.defaultContentTypes, ["image/png"]);
@@ -511,14 +511,14 @@ it("File of multipart with @multipartBody for model", async function () {
   ok(fileModel);
   const fileOptionalFileName = MultiPartRequest.properties.find(
     (x) => x.name === "fileOptionalFileName",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(fileOptionalFileName);
   const filenameProperty = fileModel.properties.find(
     (p) => p.name === "filename",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   const contentTypeProperty = fileModel.properties.find(
     (p) => p.name === "contentType",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(filenameProperty);
   ok(contentTypeProperty);
   strictEqual(fileOptionalFileName.optional, false);
@@ -542,13 +542,13 @@ it("File of multipart with @multipartBody for model", async function () {
   ok(requiredMetaDataModel);
   const fileRequiredFileName = MultiPartRequest.properties.find(
     (x) => x.name === "fileRequiredFileName",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   const requiredFilenameProperty = requiredMetaDataModel.properties.find(
     (p) => p.name === "filename",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   const requiredContentTypeProperty = requiredMetaDataModel.properties.find(
     (p) => p.name === "contentType",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(fileRequiredFileName);
   ok(requiredFilenameProperty);
   ok(requiredContentTypeProperty);
@@ -621,7 +621,7 @@ it("check returned sdkType of multipart with @multipartBody for model", async fu
   ok(MultiPartRequest);
   const stringsOnePart = MultiPartRequest.properties.find(
     (x) => x.name === "stringsOnePart",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(stringsOnePart);
   strictEqual(stringsOnePart.type.kind, "array");
   strictEqual(stringsOnePart.type.valueType.kind, "string");
@@ -630,7 +630,7 @@ it("check returned sdkType of multipart with @multipartBody for model", async fu
   strictEqual(stringsOnePart.multipartOptions, stringsOnePart.serializationOptions.multipart);
   const stringsMultiParts = MultiPartRequest.properties.find(
     (x) => x.name === "stringsMultiParts",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(stringsMultiParts);
   strictEqual(stringsMultiParts.type.kind, "array");
   strictEqual(stringsMultiParts.type.valueType.kind, "string");
@@ -656,7 +656,7 @@ it("check content-type in multipart with @multipartBody for model", async functi
   ok(MultiPartRequest);
   const stringWithoutContentType = MultiPartRequest.properties.find(
     (x) => x.name === "stringWithoutContentType",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(stringWithoutContentType);
   strictEqual(stringWithoutContentType.type.kind, "string");
   ok(stringWithoutContentType.serializationOptions.multipart);
@@ -671,7 +671,7 @@ it("check content-type in multipart with @multipartBody for model", async functi
 
   const stringWithContentType = MultiPartRequest.properties.find(
     (x) => x.name === "stringWithContentType",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(stringWithContentType);
   strictEqual(stringWithContentType.type.kind, "model");
   strictEqual(stringWithContentType.type.name, "MultiPartRequestStringWithContentType");
@@ -687,7 +687,7 @@ it("check content-type in multipart with @multipartBody for model", async functi
 
   const bytesWithoutContentType = MultiPartRequest.properties.find(
     (x) => x.name === "bytesWithoutContentType",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(bytesWithoutContentType);
   strictEqual(bytesWithoutContentType.type.kind, "bytes");
   ok(bytesWithoutContentType.serializationOptions.multipart);
@@ -702,7 +702,7 @@ it("check content-type in multipart with @multipartBody for model", async functi
 
   const bytesWithContentType = MultiPartRequest.properties.find(
     (x) => x.name === "bytesWithContentType",
-  ) as SdkBodyModelPropertyType;
+  ) as SdkModelPropertyType;
   ok(bytesWithContentType);
   strictEqual(bytesWithContentType.type.kind, "model");
   strictEqual(bytesWithContentType.type.name, "MultiPartRequestBytesWithContentType");
@@ -758,7 +758,7 @@ it("check serialized name with @multipartBody for model", async function () {
   ok(nameProperty);
   strictEqual(nameProperty.name, "name");
   strictEqual(nameProperty.kind, "property");
-  strictEqual((nameProperty as SdkBodyModelPropertyType).serializedName, "serializedName");
+  strictEqual((nameProperty as SdkModelPropertyType).serializedName, "serializedName");
   strictEqual(nameProperty.serializationOptions.multipart?.name, "serializedName");
 });
 
