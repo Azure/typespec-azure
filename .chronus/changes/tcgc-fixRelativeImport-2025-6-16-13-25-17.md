@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Fix wrong API version elevator logic with `@clientLocation`.
+Fix relative import from `typespec-azure-core`

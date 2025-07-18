@@ -1,8 +1,8 @@
 ---
 # Change versionKind to one of: internal, fix, dependencies, feature, deprecation, breaking
-changeKind: feature
+changeKind: breaking
 packages:
-  - "@azure-tools/typespec-autorest"
+  - "@azure-tools/typespec-azure-core"
 ---
 
-Support using enum member as type of parameter
+Remove deprecated `@fixed` decorator.

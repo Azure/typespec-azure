@@ -38,13 +38,14 @@ import {
   getVersions,
 } from "@typespec/versioning";
 import { getClientDocExplicit, getClientLocation, getParamAlias } from "./decorators.js";
+import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 import {
   DecoratorInfo,
   SdkBuiltInType,
   SdkClient,
   SdkEnumType,
+  SdkHeaderParameter,
   SdkHttpResponse,
-  SdkModelPropertyType,
   SdkOperationGroup,
   SdkType,
   TCGCContext,
@@ -56,7 +57,7 @@ import {
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
-import { getClientTypeWithDiagnostics, getSdkModelPropertyType } from "./types.js";
+import { getClientTypeWithDiagnostics } from "./types.js";
 
 export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
   "emitter-name"?: string;
@@ -404,11 +405,11 @@ export function isAzureCoreTspModel(t: Type): boolean {
   );
 }
 
-export function isAcceptHeader(param: SdkModelPropertyType): boolean {
+export function isAcceptHeader(param: SdkHeaderParameter): boolean {
   return param.kind === "header" && param.serializedName.toLowerCase() === "accept";
 }
 
-export function isContentTypeHeader(param: SdkModelPropertyType): boolean {
+export function isContentTypeHeader(param: SdkHeaderParameter): boolean {
   return param.kind === "header" && param.serializedName.toLowerCase() === "content-type";
 }
 
@@ -784,23 +785,12 @@ export function compareModelProperties(
   if (!modelPropA || !modelPropB) return false;
   if (modelPropA.name !== modelPropB.name || modelPropA.type !== modelPropB.type) return false;
   if (!context) return true; // if we don't have a context, we can't further compare the types. Assume true.
-  const sdkA = ignoreDiagnostics(getSdkModelPropertyType(context, modelPropA));
-  const sdkB = ignoreDiagnostics(getSdkModelPropertyType(context, modelPropB));
-  if (sdkA.kind === "method" || sdkB.kind === "method") {
-    // if we're comparing method vs service param, we just need to check the name and type
+  // compare serialized names if they are http parameters
+  if (!isSdkHttpParameter(context, modelPropA) || !isSdkHttpParameter(context, modelPropB))
     return true;
-  }
-  switch (sdkA.kind) {
-    case "cookie":
-    case "header":
-    case "query":
-    case "path":
-    case "responseheader":
-    case "body":
-      return sdkA.kind === sdkB.kind && sdkA.serializedName === sdkB.serializedName;
-    default:
-      return sdkA.kind === sdkB.kind;
-  }
+  const sdkA = ignoreDiagnostics(getSdkHttpParameter(context, modelPropA));
+  const sdkB = ignoreDiagnostics(getSdkHttpParameter(context, modelPropB));
+  return sdkA.kind === sdkB.kind && sdkA.serializedName === sdkB.serializedName;
 }
 
 export function* filterMapValuesIterator<V>(

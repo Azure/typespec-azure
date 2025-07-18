@@ -696,13 +696,12 @@ describe("Parameter", () => {
 
     @armResourceOperations
     interface Operations extends Azure.ResourceManager.Operations {
-      get is ArmResourceRead<MyModel>;
       put is ArmResourceCreateOrReplaceAsync<MyModel>;
     }
 
     `,
       `
-    @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, My.Service.Operations.get);
+    @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, My.Service.Operations.put);
     `,
     );
 
