@@ -27,6 +27,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`StatusMonitor has more than one ${"resultType"} property marked with '${"decorator"}'.  Ensure that only one property in the model is marked with this decorator.`,
       },
     },
+    "invalid-polling-operation-parameter": {
+      severity: "error",
+      messages: {
+        default: paramMessage`The @pollingOperationParameter '${"name"}' does not reference a valid parameter in the polling operation.`,
+      },
+    },
     "invalid-final-state": {
       severity: "warning",
       messages: {

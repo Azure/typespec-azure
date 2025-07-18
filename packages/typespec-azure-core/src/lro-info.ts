@@ -138,6 +138,7 @@ export function getLroOperationInfo(
   program: Program,
   sourceOperation: Operation,
   targetOperation: Operation,
+  linkType: string,
   parameters?: Model,
 ): [LroOperationInfo | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
@@ -165,13 +166,15 @@ export function getLroOperationInfo(
   if (sourceParameters.body && sourceParameters.body.type.kind === "Model") {
     for (const [sourceName, sourceProp] of getAllProperties(sourceParameters.body.type)) {
       sourceBodyProperties.set(sourceName, sourceProp);
-      handleExplicitParameterMap(sourceProp, "RequestBody");
+      const result = handleExplicitPollingParameterMap(sourceProp, "RequestBody");
+      result.forEach((d) => diagnostics.add(d));
     }
   }
   const sourceParamProperties = new Map<string, ModelProperty>();
   for (const parameter of sourceParameters.parameters) {
     sourceParamProperties.set(parameter.name, parameter.param);
-    handleExplicitParameterMap(parameter.param, "RequestParameter");
+    const result = handleExplicitPollingParameterMap(parameter.param, "RequestParameter");
+    result.forEach((d) => diagnostics.add(d));
   }
   const sourceResponseProperties = new Map<string, ModelProperty>();
   let pollingLink: OperationLink | undefined = undefined;
@@ -192,7 +195,8 @@ export function getLroOperationInfo(
   for (const response of sourceResponses) {
     visitResponse(program, response, undefined, (name, prop) => {
       sourceResponseProperties.set(name, prop);
-      handleExplicitParameterMap(prop, "ResponseBody");
+      const result = handleExplicitPollingParameterMap(prop, "ResponseBody");
+      result.forEach((d) => diagnostics.add(d));
       const link = extractPollinglink(prop);
       if (link && !pollingLink) {
         pollingLink = link;
@@ -257,18 +261,38 @@ export function getLroOperationInfo(
     return diagnostics.wrap(result);
   }
 
-  function handleExplicitParameterMap(source: ModelProperty, kind: SourceKind): void {
+  function handleExplicitPollingParameterMap(
+    source: ModelProperty,
+    kind: SourceKind,
+  ): readonly Diagnostic[] {
+    if (linkType !== "polling") return [];
     const directMapping = getPollingOperationParameter(program, source);
-    if (directMapping === undefined) return;
-    let targetName: string = directMapping as string;
-    let targetProperty = directMapping as ModelProperty;
-    if (targetName.length > 0 && targetProperties.has(targetName)) {
-      targetProperty = targetProperties.get(targetName)!;
+    if (directMapping === undefined) return [];
+    let targetName: string;
+    let targetProperty: ModelProperty;
+
+    if (typeof directMapping === "string") {
+      targetName = directMapping;
+      const match = targetProperties.get(targetName);
+      if (!match) {
+        return [
+          createDiagnostic({
+            code: "invalid-polling-operation-parameter",
+            target: sourceOperation,
+            format: { name: directMapping },
+          }),
+        ];
+      }
+      targetProperty = match;
+    } else {
+      targetProperty = directMapping;
+      targetName = targetProperty.name;
     }
-    targetName = targetProperty.name;
 
     parameterMap.set(targetName, { source: source, target: targetProperty, sourceKind: kind });
     unmatchedParameters.delete(targetName);
+
+    return [];
   }
 
   function getLroParameterFromProperty(
