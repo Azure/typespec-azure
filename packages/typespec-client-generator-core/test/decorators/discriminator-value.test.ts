@@ -1,5 +1,6 @@
 import { ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
+import { expectDiagnostics } from "../../../../core/packages/compiler/src/testing/expect.js";
 import { SdkModelType } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
@@ -153,22 +154,20 @@ it("discriminator value with scope", async () => {
 });
 
 it("discriminator value on model without discriminator decorator", async () => {
-  await runner.compileWithBuiltInService(`
+  const diagnostics = await runner.diagnose(`
       model BaseModel {
         id: string;
       }
 
-      @discriminatorValue("type") // Should be ignored - no @discriminator on base
+      @discriminatorValue("type")
       @usage(Usage.input)
       model DerivedModel extends BaseModel {
         name: string;
       }
     `);
 
-  const models = runner.context.sdkPackage.models;
-  const derivedModel = models.find((m) => m.name === "DerivedModel") as SdkModelType;
-
-  ok(derivedModel);
-  // Should not have discriminator value since base model doesn't have @discriminator
-  strictEqual(derivedModel.discriminatorValue, undefined);
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/discriminator-value-without-discriminator",
+    message: `@discriminatorValue decorator is applied to model 'DerivedModel' without @discriminator decorator. This will be ignored.`,
+  });
 });
