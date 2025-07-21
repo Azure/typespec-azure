@@ -694,14 +694,12 @@ describe("Parameter", () => {
       name: string;
     }
 
-    @armResourceOperations
-    interface Operations extends Azure.ResourceManager.Operations {
-      get is ArmResourceRead<MyModel>;
-    }
-
+    op get is ArmResourceRead<MyModel>;
+    @@friendlyName(CommonTypes.SubscriptionIdParameter.subscriptionId, "", My.Service.get);
     `,
       `
-    @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, My.Service.Operations.get);
+    // @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, My.Service.Operations.get);
+    // @@friendlyName(CommonTypes.SubscriptionIdParameter.subscriptionId, "", My.Service.get);
     `,
     );
 
