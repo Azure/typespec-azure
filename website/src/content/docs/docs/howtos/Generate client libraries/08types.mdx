@@ -1194,7 +1194,17 @@ TODO
 </ClientTabItem>
 <ClientTabItem lang="typescript" >
 
-TODO
+export interface Foo {
+  basicNullableProperty: string | null;
+  modelNullableProperty: Bar | null;
+  enumNullableProperty: LR | null;
+}
+
+export interface Bar {
+  prop: string;
+}
+
+export type LR = "left" | "right";
 
 </ClientTabItem>
 <ClientTabItem lang="java" >
@@ -1775,7 +1785,12 @@ enum Versions {
 <ClientTabItem lang="typescript" >
 
 ```typescript
-// JS does not generate the enum used for versioning
+export enum KnownVersions {
+  V1 = "v1",
+  V2 = "v2"
+}
+
+export type Versions = string;
 ```
 
 </ClientTabItem>
@@ -1901,7 +1916,9 @@ utf8JsonWriter.WriteStringValue(Prop.ToString());
 <ClientTabItem lang="typescript" >
 
 ```typescript
-TODO;
+export interface Test {
+  prop: Date;
+}
 ```
 
 </ClientTabItem>
