@@ -66,4 +66,16 @@ public final class MultipartRequest {
 public void upload(MultipartRequest body);
 ```
 
+```go
+type MultipartRequest struct {
+    ID                string
+    Address           Address
+    ProfileImage      *os.File
+    PreviousAddresses []Address
+    Pictures          []*os.File
+}
+
+func (c *Client) Upload(ctx context.Context, req MultipartRequest, options *UploadOptions) (UploadResponse, error)
+```
+
 </ClientTabs>

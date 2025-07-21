@@ -56,6 +56,10 @@ def begin_create_or_replace(
 public SyncPoller<PollOperationDetails, User> beginCreateOrReplace(String name, User resource);
 ```
 
+```go
+func (c *Client) BeginCreateOrReplaceUser(ctx context.Context, name string, body User) (*runtime.Poller[User], error)
+```
+
 </ClientTabs>
 
 ## Resource delete
@@ -104,6 +108,10 @@ def begin_delete(self, name: str, **kwargs: Any) -> LROPoller[None]
 
 ```java
 public SyncPoller<PollOperationDetails, Void> beginDelete(String name);
+```
+
+```go
+func (c *Client) BeginDeleteUser(ctx context.Context, name string, options *DeleteUserOptions) (*runtime.Poller[User], error)
 ```
 
 </ClientTabs>
@@ -170,6 +178,10 @@ def begin_export(self, name: str, *, format: str, **kwargs: Any) -> LROPoller[Ex
 
 ```java
 public SyncPoller<PollOperationDetails, ExportedUser> beginExport(String name, String format);
+```
+
+```go
+func (c *Client) BeginExportUser(ctx context.Context, name string, format string, options *ExportUserOptions) (*runtime.Poller[ExportedUser], error)
 ```
 
 </ClientTabs>

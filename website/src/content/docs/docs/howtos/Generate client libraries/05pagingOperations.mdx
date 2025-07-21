@@ -57,6 +57,27 @@ public virtual Pageable<User> ListWithPage(CancellationToken cancellationToken =
 public PagedIterable<User> listWithPage();
 ```
 
+```go
+type User struct {
+    ID   string `json:"id"`
+    Name string `json:"name"`
+}
+
+type UserList struct {
+    Value    []User `json:"value"`
+    NextLink *string `json:"nextLink,omitempty"`
+}
+
+func (c *Client) ListWithPage(ctx context.Context) (UserList, error) {
+    // Implementation to call endpoint and deserialize first page
+}
+
+func (c *Client) ListWithPageNext(ctx context.Context, nextLink string) (UserList, error) {
+    // Implementation to fetch next page from nextLink URL
+}
+
+```
+
 </ClientTabs>
 
 2. Use the `@list` and `@pageItems` decorators from TypeSpec core.
@@ -100,6 +121,25 @@ public virtual Pageable<User> ListWithPage(CancellationToken cancellationToken =
 
 ```java
 public PagedIterable<User> listWithPage();
+```
+
+```go
+type User struct {
+    ID   string `json:"id"`
+    Name string `json:"name"`
+}
+
+type UserList struct {
+    Value    []User  `json:"value"`
+    NextLink *string `json:"nextLink,omitempty"`
+}
+
+// ListWithPage fetches the first page of users
+func (c *Client) ListWithPage(ctx context.Context) (UserList, error)
+
+// ListWithPageNext fetches the next page using a nextLink URL
+func (c *Client) ListWithPageNext(ctx context.Context, nextLink string) (UserList, error)
+
 ```
 
 </ClientTabs>
@@ -153,6 +193,28 @@ def list_with_page(self, **kwargs: Any) -> Iterable["_models.User"]:
 NOT_SUPPORTED
 ```
 
+```go
+type User struct {
+    ID   string `json:"id"`
+    Name string `json:"name"`
+}
+
+type UserList struct {
+    Value              []User  `json:"value"`
+    ContinuationToken *string `json:"continuationToken,omitempty"`
+}
+
+// Fetch first page (continuationToken is nil)
+func (c *Client) ListWithPage(ctx context.Context, continuationToken *string) (UserList, error)
+
+// Fetch next page using continuationToken
+nextToken := userList.ContinuationToken
+if nextToken != nil {
+    userList, err = client.ListWithPage(ctx, nextToken)
+}
+
+```
+
 </ClientTabs>
 
 2. Continuation token in header parameter and response body.
@@ -196,6 +258,10 @@ def list_with_page(self, **kwargs: Any) -> Iterable["_models.User"]:
 
 ```java
 NOT_SUPPORTED
+```
+
+```go
+// TODO
 ```
 
 </ClientTabs>
@@ -242,6 +308,10 @@ def list_with_page(self, **kwargs: Any) -> Iterable["_models.User"]:
 NOT_SUPPORTED
 ```
 
+```go
+// TODO 
+```
+
 </ClientTabs>
 
 4. Continuation token in header parameter and response header.
@@ -284,6 +354,10 @@ def list_with_page(self, **kwargs: Any) -> Iterable["_models.User"]:
 
 ```java
 NOT_SUPPORTED
+```
+
+```go
+// TODO
 ```
 
 </ClientTabs>

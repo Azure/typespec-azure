@@ -85,6 +85,54 @@ public final class PetStoreNamespaceClient {
 }
 ```
 
+```go
+package petstorenamespace
+
+// OutputModel - This is the input I need
+type OutputModel struct {
+    // Name - Id of this object
+    Name string `json:"name"`
+}
+
+// PetStoreNamespaceClient is the client for interacting with Output resources.
+type PetStoreNamespaceClient struct {
+    endpoint string
+    pl       runtime.Pipeline
+}
+
+// NewClient creates a new instance of the PetStoreNamespaceClient.
+func NewClient(endpoint string, cred azcore.TokenCredential, options *ClientOptions) (*PetStoreNamespaceClient, error) {
+    pl := runtime.NewPipeline("petstorenamespace", "v0.1.0", runtime.PipelineOptions{}, &options.ClientOptions)
+    return &PetStoreNamespaceClient{
+        endpoint: endpoint,
+        pl:       pl,
+    }, nil
+}
+
+// GetModel - Read my resource
+func (c *PetStoreNamespaceClient) GetModel(ctx context.Context, name string) (OutputModel, error) {
+    req, err := runtime.NewRequest(ctx, http.MethodGet, c.endpoint+"/outputs/"+name)
+    if err != nil {
+        return OutputModel{}, err
+    }
+
+    resp, err := c.pl.Do(req)
+    if err != nil {
+        return OutputModel{}, err
+    }
+    defer resp.Body.Close()
+
+    if resp.StatusCode != http.StatusOK {
+        return OutputModel{}, runtime.NewResponseError(resp)
+    }
+
+    var result OutputModel
+    err = runtime.UnmarshalAsJSON(resp, &result)
+    return result, err
+}
+
+```
+
 </ClientTabs>
 
 ### Customizations
@@ -146,6 +194,16 @@ public final class PetStoreNamespaceClient {
     // protocol method
     public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
 }
+```
+
+```go
+
+type OutputModel struct {
+    Name string `json:"name"`
+}
+
+func (client *PetStoreNamespaceClient) GetModel(ctx context.Context, name string) (OutputModel, error)
+
 ```
 
 </ClientTabs>
@@ -219,20 +277,8 @@ public final class PetStoreNamespaceClient {
 ```
 
 ```go
-// Unexported types and methods (package-private)
-type internalModel struct {
-    name *string
-    data *string
-}
-
-type clientGetInternalModelOptions struct{}
-
-type clientGetInternalModelResponse struct {
-    internalModel
-}
-
-func (client *Client) getInternalModel(ctx context.Context, name string, options *clientGetInternalModelOptions) (clientGetInternalModelResponse, error) {
-    // implementation
+func (client *PetStoreNamespaceClient) getModel(ctx context.Context, name string) (OutputModel, error) {
+    ...
 }
 
 ```

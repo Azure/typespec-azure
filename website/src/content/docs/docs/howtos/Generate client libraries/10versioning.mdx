@@ -97,6 +97,48 @@ serviceClientClient.stableFunctionality(stableModel);
 ```
 
 ```go
+package myservice
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
+)
+
+type Client struct {
+	endpoint   string
+	httpClient *http.Client
+}
+
+type StableModel struct {
+	StableFeature string `json:"stableFeature"`
+}
+
+func NewClient(endpoint string) *Client {
+	return &Client{
+		endpoint:   endpoint,
+		httpClient: &http.Client{},
+	}
+}
+
+// StableFunctionality calls the stableFunctionality operation.
+func (c *Client) StableFunctionality(ctx context.Context, stableModel StableModel) (*http.Response, error) {
+	url := fmt.Sprintf("%s/stableFunctionality", c.endpoint)
+	body, err := json.Marshal(stableModel)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+
+	return c.httpClient.Do(req)
+}
 
 ```
 
