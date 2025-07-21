@@ -12,12 +12,8 @@ import {
   $finalLocation,
   $finalOperation,
   $items,
-  $lroCanceled,
   $lroErrorResult,
-  $lroFailed,
   $lroResult,
-  $lroStatus,
-  $lroSucceeded,
   $needsRoute,
   $nextPageOperation,
   $omitKeyProperties,
@@ -26,7 +22,6 @@ import {
   $pollingLocation,
   $pollingOperation,
   $pollingOperationParameter,
-  $previewVersion,
   $requestParameter,
   $responseProperty,
   $spreadCustomParameters,
@@ -34,6 +29,11 @@ import {
   $useFinalStateVia,
   parameterizedNextLinkConfigDecorator,
 } from "./decorators.js";
+import { $lroCanceled } from "./decorators/lro-cancelled.js";
+import { $lroFailed } from "./decorators/lro-failed.js";
+import { $lroStatus } from "./decorators/lro-status.js";
+import { $lroSucceeded } from "./decorators/lro-succeeded.js";
+import { $previewVersion } from "./decorators/preview-version.js";
 import {
   $addTraitProperties,
   $applyTraitOverride,

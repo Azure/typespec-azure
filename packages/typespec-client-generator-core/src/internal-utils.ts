@@ -416,11 +416,7 @@ export function isContentTypeHeader(param: SdkHeaderParameter): boolean {
 export function isMultipartOperation(context: TCGCContext, operation?: Operation): boolean {
   if (!operation) return false;
   const httpOperation = getHttpOperationWithCache(context, operation);
-  const httpBody = httpOperation.parameters.body;
-  if (httpBody && httpBody.type.kind === "Model") {
-    return httpBody.contentTypes.some((x) => x.startsWith("multipart/"));
-  }
-  return false;
+  return httpOperation.parameters.body?.bodyKind === "multipart";
 }
 
 export function isHttpOperation(context: TCGCContext, obj: any): obj is HttpOperation {
@@ -549,6 +545,7 @@ export function twoParamsEquivalent(
     param1.name === getParamAlias(context, param2)
   );
 }
+
 /**
  * If body is from spread, then it does not directly from a model property.
  * @param httpBody
@@ -560,26 +557,30 @@ export function isHttpBodySpread(httpBody: HttpPayloadBody): boolean {
 }
 
 /**
- * If body is from simple spread, then we use the original model as body model.
+ * If body is from simple spread, then we use the original model as body model. Else we return the body type directly.
  * @param type
  * @returns
  */
-export function getHttpBodySpreadModel(type: Model): Model {
-  if (type.sourceModels.length === 1 && type.sourceModels[0].usage === "spread") {
-    const innerModel = type.sourceModels[0].model;
-    // for case: `op test(...Model):void;`
-    if (innerModel.name !== "" && innerModel.properties.size === type.properties.size) {
-      return innerModel;
+export function getHttpBodyType(httpBody: HttpPayloadBody): Type {
+  const type = httpBody.type;
+  if (isHttpBodySpread(httpBody) && type.kind === "Model") {
+    if (type.sourceModels.length === 1 && type.sourceModels[0].usage === "spread") {
+      const innerModel = type.sourceModels[0].model;
+      // for case: `op test(...Model):void;`
+      if (innerModel.name !== "" && innerModel.properties.size === type.properties.size) {
+        return innerModel;
+      }
+      // for case: `op test(@header h: string, @query q: string, ...Model): void;`
+      if (
+        innerModel.sourceModels.length === 1 &&
+        innerModel.sourceModels[0].usage === "spread" &&
+        innerModel.sourceModels[0].model.name !== "" &&
+        innerModel.sourceModels[0].model.properties.size === type.properties.size
+      ) {
+        return innerModel.sourceModels[0].model;
+      }
     }
-    // for case: `op test(@header h: string, @query q: string, ...Model): void;`
-    if (
-      innerModel.sourceModels.length === 1 &&
-      innerModel.sourceModels[0].usage === "spread" &&
-      innerModel.sourceModels[0].model.name !== "" &&
-      innerModel.sourceModels[0].model.properties.size === type.properties.size
-    ) {
-      return innerModel.sourceModels[0].model;
-    }
+    return type;
   }
   return type;
 }
