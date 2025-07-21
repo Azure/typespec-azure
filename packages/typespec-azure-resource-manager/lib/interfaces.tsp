@@ -20,7 +20,7 @@ interface Operations {
   @segment("operations")
   @get
   list(
-    ...ApiVersionParameter,
+    ...CommonTypes.ApiVersionParameter,
 
     @path
     @segment("providers")

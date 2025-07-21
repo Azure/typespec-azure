@@ -686,7 +686,7 @@ op checkGlobalNameAvailability<
   Response extends TypeSpec.Reflection.Model = CheckNameAvailabilityResponse,
   AdditionalParams extends TypeSpec.Reflection.Model = {}
 > is checkNameAvailability<
-  SubscriptionIdParameter & DefaultProviderNamespace,
+  CommonTypes.SubscriptionIdParameter & DefaultProviderNamespace,
   Request,
   Response,
   AdditionalParams
@@ -706,7 +706,7 @@ op checkLocalNameAvailability<
   Response extends TypeSpec.Reflection.Model = CheckNameAvailabilityResponse,
   AdditionalParams extends TypeSpec.Reflection.Model = {}
 > is checkNameAvailability<
-  SubscriptionIdParameter & DefaultProviderNamespace & LocationResourceParameter,
+  CommonTypes.SubscriptionIdParameter & DefaultProviderNamespace & LocationResourceParameter,
   Request,
   Response,
   AdditionalParams
