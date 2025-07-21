@@ -1,5 +1,6 @@
 import { Program } from "@typespec/compiler";
-import { checkEnsureVerb, checkPreviewVersion, checkRpcRoutes } from "./decorators.js";
+import { checkEnsureVerb, checkRpcRoutes } from "./decorators.js";
+import { checkPreviewVersion } from "./decorators/preview-version.js";
 
 export function $onValidate(program: Program) {
   checkRpcRoutes(program);
