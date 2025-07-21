@@ -47,6 +47,7 @@ import {
   getAccessOverride,
   getAlternateType,
   getClientNamespace,
+  getDiscriminatorValueRaw,
   getExplicitClientApiVersions,
   getOverriddenClientMethod,
   getUsageOverride,
@@ -727,7 +728,9 @@ function addDiscriminatorToModelType(
                   }
                 }
               }
-              childModelSdkType.discriminatorValue = property.type.value as string;
+              const discriminatorValue = getDiscriminatorValueRaw(context, childModel);
+              childModelSdkType.discriminatorValue =
+                discriminatorValue ?? (property.type.value as string);
               property.discriminator = true;
               if (model.discriminatedSubtypes === undefined) {
                 model.discriminatedSubtypes = {};

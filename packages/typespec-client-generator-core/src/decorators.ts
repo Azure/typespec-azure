@@ -32,6 +32,7 @@ import {
   ClientNamespaceDecorator,
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
+  DiscriminatorValueDecorator,
   FlattenPropertyDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
@@ -1188,6 +1189,31 @@ export function getClientLocation(
     | Interface
     | string
     | undefined;
+}
+
+const discriminatorValueKey = createStateSymbol("discriminatorValue");
+
+export const $discriminatorValue: DiscriminatorValueDecorator = (
+  context: DecoratorContext,
+  entity: Model,
+  propertyName: string,
+  scope?: LanguageScopes,
+) => {
+  setScopedDecoratorData(
+    context,
+    $discriminatorValue,
+    discriminatorValueKey,
+    entity,
+    propertyName,
+    scope,
+  );
+};
+
+export function getDiscriminatorValueRaw(
+  context: TCGCContext,
+  entity: Model,
+): string | undefined {
+  return getScopedDecoratorData(context, discriminatorValueKey, entity);
 }
 
 /**

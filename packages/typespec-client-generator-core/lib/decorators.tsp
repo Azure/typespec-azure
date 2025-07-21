@@ -902,3 +902,35 @@ extern dec clientDoc(
   mode: EnumMember,
   scope?: valueof string
 );
+
+/**
+ * Specify the discriminator property and value for multi-level inheritance hierarchies.
+ * This extends the core `@discriminator` decorator to support complex inheritance chains
+ * where different levels of the hierarchy use different discriminator properties.
+ * 
+ * @param propertyName The property name to use for discrimination at this level
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * @example
+ *
+ * ```typespec
+ * @discriminator("kind")
+ * model Pet {
+ *  kind: string
+ * }
+ * 
+ * @discriminatorValue("dog")
+ * model Dog extends Pet {
+ * }
+ * 
+ * model Puppy extends Dog {
+ *  kind: "puppy";
+ * }
+ * ```
+ */
+extern dec discriminatorValue(
+  entity: Model,
+  propertyName: valueof string,
+  scope?: valueof string,
+);

@@ -12,6 +12,7 @@ import {
   $clientNamespace,
   $convenientAPI,
   $deserializeEmptyStringAsNull,
+  $discriminatorValue,
   $flattenProperty,
   $operationGroup,
   $override,
@@ -51,5 +52,6 @@ export const $decorators = {
     responseAsBool: $responseAsBool,
     clientDoc: $clientDoc,
     clientLocation: $clientLocation,
+    discriminatorValue: $discriminatorValue,
   } as AzureClientGeneratorCoreDecorators,
 };
