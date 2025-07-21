@@ -58,6 +58,19 @@ export interface ArmLifecycleOperations {
   delete?: ArmResourceOperation;
 }
 
+export interface ArmResourceLifecycleOperations {
+  read?: ArmResourceOperation[];
+  createOrUpdate?: ArmResourceOperation[];
+  update?: ArmResourceOperation[];
+  delete?: ArmResourceOperation[];
+}
+
+export interface ArmResolvedOperationsForResource {
+  lifecycle: ArmResourceLifecycleOperations;
+  lists: ArmResourceOperation[];
+  actions: ArmResourceOperation[];
+}
+
 export interface ArmResourceOperations {
   lifecycle: ArmLifecycleOperations;
   lists: { [key: string]: ArmResourceOperation };
@@ -71,11 +84,12 @@ interface ArmResourceOperationData {
   operationGroup: string;
 }
 
-/** Identifying information for an arm  operation */
+/** Identifying information for an arm operation */
 interface ArmOperationIdentifier {
   name: string;
   kind: ArmOperationKind;
   operationGroup: string;
+  operation: Operation;
   resource?: Model;
 }
 
@@ -174,6 +188,36 @@ function setResourceLifecycleOperation(
   });
 }
 
+export function getArmResourceOperationList(
+  program: Program,
+  resourceType: Model,
+): Set<ArmOperationIdentifier> {
+  if (!program.stateMap(ArmStateKeys.resourceOperationList).has(resourceType)) {
+    setArmResourceOperationList(program, resourceType, new Set<ArmOperationIdentifier>());
+  }
+  return program
+    .stateMap(ArmStateKeys.resourceOperationList)
+    .get(resourceType) as Set<ArmOperationIdentifier>;
+}
+
+export function addArmResourceOperation(
+  program: Program,
+  resourceType: Model,
+  operationData: ArmOperationIdentifier,
+): void {
+  const operations = getArmResourceOperationList(program, resourceType);
+  operations.add(operationData);
+  setArmResourceOperationList(program, resourceType, operations);
+}
+
+export function setArmResourceOperationList(
+  program: Program,
+  resourceType: Model,
+  operations: Set<ArmOperationIdentifier>,
+): void {
+  program.stateMap(ArmStateKeys.resourceOperationList).set(resourceType, operations);
+}
+
 export function setArmOperationIdentifier(
   program: Program,
   target: Operation,
@@ -183,13 +227,15 @@ export function setArmOperationIdentifier(
   const operationId: ArmOperationIdentifier = {
     name: data.name,
     kind: data.kind,
+    operation: target,
     operationGroup: data.operationGroup,
     resource: resourceType,
   };
   // Initialize the operations for the resource type if not already done
-  if (!program.stateMap(ArmStateKeys.armOperation).has(target)) {
-    program.stateMap(ArmStateKeys.armOperation).set(target, operationId);
+  if (!program.stateMap(ArmStateKeys.armResourceOperationData).has(target)) {
+    program.stateMap(ArmStateKeys.armResourceOperationData).set(target, operationId);
   }
+  addArmResourceOperation(program, resourceType, operationId);
 }
 
 export function getArmOperationIdentifier(
@@ -197,7 +243,7 @@ export function getArmOperationIdentifier(
   target: Operation,
 ): ArmOperationIdentifier | undefined {
   // Initialize the operations for the resource type if not already done
-  return program.stateMap(ArmStateKeys.armOperation).get(target);
+  return program.stateMap(ArmStateKeys.armResourceOperationData).get(target);
 }
 
 export const $armResourceRead: ArmResourceReadDecorator = (

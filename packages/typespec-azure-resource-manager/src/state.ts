@@ -17,7 +17,8 @@ export const ArmStateKeys = {
   armCommonTypesVersion: azureResourceManagerCreateStateSymbol("armCommonTypesVersion"),
   armIdentifiers: azureResourceManagerCreateStateSymbol("armIdentifiers"),
   externalTypeRef: azureResourceManagerCreateStateSymbol("externalTypeRef"),
-  armOperation: azureResourceManagerCreateStateSymbol("armOperation"),
+  armResourceOperationData: azureResourceManagerCreateStateSymbol("armResourceOperationData"),
+  resourceOperationList: azureResourceManagerCreateStateSymbol("resourceOperationList"),
 
   // resource.ts
   armResolvedResources: azureResourceManagerCreateStateSymbol("armResolvedResources"),
