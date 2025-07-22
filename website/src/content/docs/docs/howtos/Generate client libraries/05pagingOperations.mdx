@@ -194,25 +194,7 @@ NOT_SUPPORTED
 ```
 
 ```go
-type User struct {
-    ID   string `json:"id"`
-    Name string `json:"name"`
-}
-
-type UserList struct {
-    Value              []User  `json:"value"`
-    ContinuationToken *string `json:"continuationToken,omitempty"`
-}
-
-// Fetch first page (continuationToken is nil)
-func (c *Client) ListWithPage(ctx context.Context, continuationToken *string) (UserList, error)
-
-// Fetch next page using continuationToken
-nextToken := userList.ContinuationToken
-if nextToken != nil {
-    userList, err = client.ListWithPage(ctx, nextToken)
-}
-
+NOT_SUPPORTED
 ```
 
 </ClientTabs>
@@ -261,7 +243,7 @@ NOT_SUPPORTED
 ```
 
 ```go
-// TODO
+NOT_SUPPORTED
 ```
 
 </ClientTabs>
@@ -309,7 +291,7 @@ NOT_SUPPORTED
 ```
 
 ```go
-// TODO 
+NOT_SUPPORTED
 ```
 
 </ClientTabs>
@@ -357,7 +339,7 @@ NOT_SUPPORTED
 ```
 
 ```go
-// TODO
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>
