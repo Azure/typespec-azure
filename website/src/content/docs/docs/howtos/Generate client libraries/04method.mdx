@@ -88,19 +88,16 @@ public final class PetStoreNamespaceClient {
 ```go
 package petstorenamespace
 
-// OutputModel - This is the input I need
 type OutputModel struct {
     // Name - Id of this object
     Name string `json:"name"`
 }
 
-// PetStoreNamespaceClient is the client for interacting with Output resources.
 type PetStoreNamespaceClient struct {
     endpoint string
     pl       runtime.Pipeline
 }
 
-// NewClient creates a new instance of the PetStoreNamespaceClient.
 func NewClient(endpoint string, cred azcore.TokenCredential, options *ClientOptions) (*PetStoreNamespaceClient, error) {
     pl := runtime.NewPipeline("petstorenamespace", "v0.1.0", runtime.PipelineOptions{}, &options.ClientOptions)
     return &PetStoreNamespaceClient{
@@ -109,27 +106,7 @@ func NewClient(endpoint string, cred azcore.TokenCredential, options *ClientOpti
     }, nil
 }
 
-// GetModel - Read my resource
-func (c *PetStoreNamespaceClient) GetModel(ctx context.Context, name string) (OutputModel, error) {
-    req, err := runtime.NewRequest(ctx, http.MethodGet, c.endpoint+"/outputs/"+name)
-    if err != nil {
-        return OutputModel{}, err
-    }
-
-    resp, err := c.pl.Do(req)
-    if err != nil {
-        return OutputModel{}, err
-    }
-    defer resp.Body.Close()
-
-    if resp.StatusCode != http.StatusOK {
-        return OutputModel{}, runtime.NewResponseError(resp)
-    }
-
-    var result OutputModel
-    err = runtime.UnmarshalAsJSON(resp, &result)
-    return result, err
-}
+func (c *PetStoreNamespaceClient) GetModel(ctx context.Context, name string) (OutputModel, error) 
 
 ```
 

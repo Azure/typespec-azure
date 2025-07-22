@@ -895,7 +895,7 @@ type Animal struct {
 }
 ```
 
-</ClientTabs>
+</ClientTabItem>
 </ClientTabs>
 
 #### Additional properties of union type
@@ -1073,7 +1073,7 @@ type Animal struct {
     AdditionalProperties map[string]interface{} `json:"-"`
 }
 ```
-</ClientTabs>
+</ClientTabItem>
 </ClientTabs>
 
 ### Discriminator
@@ -1745,7 +1745,7 @@ const (
     // ... other imported states
 )
 ```
-</ClientTabs>
+</ClientTabItem>
 </ClientTabs>
 
 ### Union of other unions of literals with same type
@@ -1832,7 +1832,7 @@ const (
     OrientationDown  Orientation = "down"
 )
 ```
-</ClientTabs>
+</ClientTabItem>
 </ClientTabs>
 
 ### Inline union of other unions of literals with same type
@@ -1929,7 +1929,7 @@ type Widget struct {
     Orientation Orientation `json:"orientation"`
 }
 ```
-</ClientTabs>
+</ClientTabItem>
 </ClientTabs>
 
 ## Enums
@@ -2002,7 +2002,7 @@ const (
     LRRight LR = "right"
 )
 ```
-</ClientTabs>
+</ClientTabItem>
 </ClientTabs>
 
 ### Versioning Enums
@@ -2064,7 +2064,7 @@ const (
     VersionsV2 Versions = "v2"
 )
 ```
-</ClientTabs>
+</ClientTabItem>
 </ClientTabs>
 
 ### Spread
@@ -2167,7 +2167,7 @@ const (
     OrientationDown  Orientation = "down"
 )
 ```
-</ClientTabs>
+</ClientTabItem>
 </ClientTabs>
 
 ## Scalars
@@ -2272,5 +2272,5 @@ type Test struct {
     Prop *time.Time `json:"prop,omitempty"`
 }
 ```
-</ClientTabs>
+</ClientTabItem>
 </ClientTabs>
