@@ -2,6 +2,7 @@ import { AzureCoreStateKeys, createDiagnostic, reportDiagnostic } from "./lib.js
 import { getAllProperties } from "./utils.js";
 
 import {
+  $decorators,
   compilerAssert,
   createDiagnosticCollector,
   DecoratorContext,
@@ -240,6 +241,7 @@ export function getPagedResult(
 }
 
 export const $items: ItemsDecorator = (context: DecoratorContext, entity: ModelProperty) => {
+  context.call($decorators.TypeSpec.pageItems, entity);
   context.program.stateMap(AzureCoreStateKeys.items).set(entity, true);
 };
 
