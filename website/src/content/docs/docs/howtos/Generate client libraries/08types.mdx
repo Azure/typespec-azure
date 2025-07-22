@@ -59,6 +59,17 @@ Foo foo = new Foo("hello");
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+package service
+
+type Foo struct {
+    Prop *string `json:"prop,omitempty"`
+}
+```
+
+</ClientTabItem>
 </ClientTabs>
 
 ### Model in sub namespace
@@ -112,6 +123,16 @@ Foo foo = new Foo("hello");
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="go" >
+```go
+package container
+
+type Foo struct {
+    Prop *string `json:"prop,omitempty"`
+}
+```
+
+</ClientTabItem>
 </ClientTabs>
 
 ### Model in namespace with renaming
@@ -161,6 +182,17 @@ As `flavor=azure`, Java emitter generates the model classes under `models` packa
 import service.container.models.Foo;
 
 Foo foo = new Foo("hello");
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+package container
+
+type Foo struct {
+    Prop *string `json:"prop,omitempty"`
+}
 ```
 
 </ClientTabItem>
@@ -545,6 +577,18 @@ public final class Properties {
     public Properties setName(String name);
 }
 ```
+</ClientTabItem>
+<ClientTabItem lang="go" >
+```go
+type Properties struct {
+    Name *string `json:"name,omitempty"`
+}
+
+type Foo struct {
+    // Flattened from Properties
+    Name *string `json:"name,omitempty"`
+}
+```
 
 </ClientTabItem>
 </ClientTabs>
@@ -653,6 +697,28 @@ public final class Animal implements JsonSerializable<Animal> {
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="java" >
+```go
+// Input: Animal (with known fields + optional unknowns)
+type Animal struct {
+    Name *string `json:"name,omitempty"`
+    Kind *string `json:"kind,omitempty"`
+
+    // Additional properties from Record<string, unknown>
+    AdditionalProperties map[string]interface{} `json:"-"`
+}
+
+// Output: AnimalOutput (same shape, but semantically for responses)
+type AnimalOutput struct {
+    Name *string `json:"name,omitempty"`
+    Kind *string `json:"kind,omitempty"`
+
+    // Additional properties from Record<string, any>
+    AdditionalProperties map[string]interface{} `json:"-"`
+}
+```
+</ClientTabItem>
+
 </ClientTabs>
 
 #### Additional properties of specific type
@@ -813,6 +879,23 @@ public final class Animal implements JsonSerializable<Animal> {
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="go" >
+```go
+type AnimalProperty struct {
+    Category *string     `json:"category,omitempty"`
+    Value    interface{} `json:"value,omitempty"`
+}
+
+type Animal struct {
+    Name *string `json:"name,omitempty"`
+    Kind *string `json:"kind,omitempty"`
+
+    // Additional fields like "speed": {category: "...", value: ...}
+    AdditionalProperties map[string]AnimalProperty `json:"-"`
+}
+```
+
+</ClientTabs>
 </ClientTabs>
 
 #### Additional properties of union type
@@ -978,6 +1061,19 @@ public final class Animal implements JsonSerializable<Animal> {
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="go" >
+```go
+package service
+
+type Animal struct {
+    Name *string `json:"name,omitempty"`
+    Kind *string `json:"kind,omitempty"`
+
+    // AdditionalProperties can hold values of type string or int32
+    AdditionalProperties map[string]interface{} `json:"-"`
+}
+```
+</ClientTabs>
 </ClientTabs>
 
 ### Discriminator
@@ -1261,6 +1357,28 @@ TODO
 TODO
 
 </ClientTabItem>
+<ClientTabItem lang="go" >
+```go
+package service
+
+type Foo struct {
+    BasicNullableProperty *string `json:"basicNullableProperty,omitempty"`
+    ModelNullableProperty *Bar    `json:"modelNullableProperty,omitempty"`
+    EnumNullableProperty  *LR     `json:"enumNullableProperty,omitempty"`
+}
+
+type Bar struct {
+    Prop *string `json:"prop,omitempty"`
+}
+
+type LR string
+
+const (
+    LRLeft  LR = "left"
+    LRRight LR = "right"
+)
+```
+</ClientTabItem>
 </ClientTabs>
 
 ## Unions
@@ -1383,6 +1501,20 @@ public enum WidgetHorizontal {
    LEFT("left"),
    RIGHT("right");
 }
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+package service
+
+type LR string
+
+const (
+    LRLeft  LR = "left"
+    LRRight LR = "right"
+)
 ```
 
 </ClientTabItem>
@@ -1512,6 +1644,18 @@ public final class WidgetColor extends ExpandableStringEnum<Colors> {
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="go" >
+```go
+package service
+
+type Colors string
+
+const (
+    ColorsRed  Colors = "red"
+    ColorsBlue Colors = "blue"
+)
+```
+</ClientTabItem>
 </ClientTabs>
 
 ### Union of other union/enum, basic type and literals of that type
@@ -1585,6 +1729,23 @@ public final class ProvisioningState extends ExpandableStringEnum<ProvisioningSt
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="go" >
+```go
+package service
+
+type ProvisioningState string
+
+const (
+    ProvisioningStateInProgress ProvisioningState = "InProgress"
+
+    // Constants from Azure.ResourceManager.ResourceProvisioningState
+    ResourceProvisioningStateSucceeded ProvisioningState = "Succeeded"
+    ResourceProvisioningStateFailed    ProvisioningState = "Failed"
+    ResourceProvisioningStateCanceled  ProvisioningState = "Canceled"
+    // ... other imported states
+)
+```
+</ClientTabs>
 </ClientTabs>
 
 ### Union of other unions of literals with same type
@@ -1658,6 +1819,20 @@ public enum Orientation {
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="go" >
+```go
+package service
+
+type Orientation string
+
+const (
+    OrientationLeft  Orientation = "left"
+    OrientationRight Orientation = "right"
+    OrientationUp    Orientation = "up"
+    OrientationDown  Orientation = "down"
+)
+```
+</ClientTabs>
 </ClientTabs>
 
 ### Inline union of other unions of literals with same type
@@ -1737,6 +1912,24 @@ public enum WidgetOrientation {
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="go" >
+```go
+package service
+
+type Orientation string
+
+const (
+    OrientationLeft  Orientation = "left"
+    OrientationRight Orientation = "right"
+    OrientationUp    Orientation = "up"
+    OrientationDown  Orientation = "down"
+)
+
+type Widget struct {
+    Orientation Orientation `json:"orientation"`
+}
+```
+</ClientTabs>
 </ClientTabs>
 
 ## Enums
@@ -1798,6 +1991,18 @@ public enum LR {
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="go" >
+```go
+package service
+
+type LR string
+
+const (
+    LRLeft  LR = "left"
+    LRRight LR = "right"
+)
+```
+</ClientTabs>
 </ClientTabs>
 
 ### Versioning Enums
@@ -1848,6 +2053,18 @@ public enum ServiceServiceVersion implements ServiceVersion {
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="go" >
+```go
+package service
+
+type Versions string
+
+const (
+    VersionsV1 Versions = "v1"
+    VersionsV2 Versions = "v2"
+)
+```
+</ClientTabs>
 </ClientTabs>
 
 ### Spread
@@ -1923,6 +2140,34 @@ public enum Orientation {
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="go" >
+```go
+package service
+
+type LR string
+
+const (
+    LRLeft  LR = "left"
+    LRRight LR = "right"
+)
+
+type UD string
+
+const (
+    UDUp   UD = "up"
+    UDDown UD = "down"
+)
+
+type Orientation string
+
+const (
+    OrientationLeft  Orientation = "left"
+    OrientationRight Orientation = "right"
+    OrientationUp    Orientation = "up"
+    OrientationDown  Orientation = "down"
+)
+```
+</ClientTabs>
 </ClientTabs>
 
 ## Scalars
@@ -2017,4 +2262,15 @@ jsonWriter.writeStringField("prop", Objects.toString(this.value, null));
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="go" >
+```go
+package service
+
+import "time"
+
+type Test struct {
+    Prop *time.Time `json:"prop,omitempty"`
+}
+```
+</ClientTabs>
 </ClientTabs>
