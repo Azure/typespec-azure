@@ -1749,10 +1749,14 @@ function updateDiscriminatedSubtypesFromInheritsFrom(
     const inheritsFrom = getInheritsFrom(context, sdkType.__raw as Model);
     // must be done after discriminator is added
     if (inheritsFrom && sdkType.discriminatorValue) {
-      if (!sdkType.baseModel!.discriminatedSubtypes) {
-        sdkType.baseModel!.discriminatedSubtypes = {};
+      let currBaseModel: SdkModelType | undefined = sdkType.baseModel;
+      while (currBaseModel) {
+        if (!currBaseModel.discriminatedSubtypes) {
+          currBaseModel.discriminatedSubtypes = {};
+        }
+        currBaseModel.discriminatedSubtypes[sdkType.discriminatorValue] = sdkType;
+        currBaseModel = currBaseModel.baseModel;
       }
-      sdkType.baseModel!.discriminatedSubtypes[sdkType.discriminatorValue] = sdkType;
     }
   }
   return diagnostics.wrap(undefined);
