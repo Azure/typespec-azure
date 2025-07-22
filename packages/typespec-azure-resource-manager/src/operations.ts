@@ -307,6 +307,19 @@ export const $armResourceList: ArmResourceListDecorator = (
   };
 
   operations.lists[target.name] = operation as ArmResourceOperation;
+  addArmResourceOperation(context.program, resourceType, {
+    name: target.name,
+    kind: "list",
+    operation: target,
+    operationGroup: target.interface.name,
+    resource: resourceType,
+  });
+  setArmOperationIdentifier(context.program, target, resourceType, {
+    name: target.name,
+    kind: "list",
+    operation: target,
+    operationGroup: target.interface.name,
+  });
 };
 
 export function armRenameListByOperationInternal(
@@ -426,6 +439,19 @@ export const $armResourceAction: ArmResourceActionDecorator = (
   };
 
   operations.actions[target.name] = operation as ArmResourceOperation;
+  addArmResourceOperation(program, resourceType, {
+    name: target.name,
+    kind: "action",
+    operation: target,
+    operationGroup: target.interface.name,
+    resource: resourceType,
+  });
+  setArmOperationIdentifier(context.program, target, resourceType, {
+    name: target.name,
+    kind: "action",
+    operation: target,
+    operationGroup: target.interface.name,
+  });
 
   const segment = getSegment(program, target) ?? getActionSegment(program, target);
   if (!segment) {

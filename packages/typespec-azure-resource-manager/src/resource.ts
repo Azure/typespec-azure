@@ -11,6 +11,8 @@ import {
   isGlobalNamespace,
   isNeverType,
   isTemplateDeclaration,
+  isTemplateDeclarationOrInstance,
+  isTemplateInstance,
   Model,
   ModelProperty,
   Namespace,
@@ -359,7 +361,7 @@ export function resolveArmResources(program: Program): ResolvedResources {
   const resolvedResources = program
     .stateMap(ArmStateKeys.armResolvedResources)
     .get(provider) as ResolvedResources;
-  if (resolvedResources.resources !== undefined && resolvedResources.resources.length > 0) {
+  if (resolvedResources?.resources !== undefined && resolvedResources.resources.length > 0) {
     // Return the cached resource details
     return resolvedResources;
   }
@@ -370,7 +372,9 @@ export function resolveArmResources(program: Program): ResolvedResources {
     const operations = resolveArmResourceOperations(program, resource.typespecType);
     const fullResource: ResolvedResource = {
       type: resource.typespecType,
-      kind: getArmResourceKind(resource.typespecType) ?? "Tracked",
+      kind:
+        getArmResourceKind(resource.typespecType) ??
+        (operations.length > 0 ? "Tracked" : "Virtual"),
       providerNamespace: resource.armProviderNamespace,
       operations: operations,
     };
@@ -450,8 +454,10 @@ function tryAddLifecycleOperation(
   sourceOperation: ArmResourceOperation,
   targetOperation: ResolvedOperations,
 ): boolean {
-  const pathSegments: string[] = sourceOperation.httpOperation.path.split("/");
-  const isInstanceOperation: boolean = !isVariableSegment(pathSegments[pathSegments.length - 1]);
+  const pathSegments: string[] = sourceOperation.httpOperation.path
+    .split("/")
+    .filter((s) => s.length > 0);
+  const isInstanceOperation: boolean = isVariableSegment(pathSegments[pathSegments.length - 1]);
   const isResourceCollectionOperation: boolean =
     !isInstanceOperation &&
     pathSegments[pathSegments.length - 1] === resourceType.types[resourceType.types.length - 1];
@@ -461,17 +467,17 @@ function tryAddLifecycleOperation(
         if (targetOperation.operations.lifecycle.read === undefined) {
           targetOperation.operations.lifecycle.read = [];
         }
-        targetOperation.operations.lifecycle.read.push(sourceOperation);
+        addUniqueOperation(sourceOperation, targetOperation.operations.lifecycle.read);
         return true;
       }
       if (!isResourceCollectionOperation) {
-        targetOperation.operations.actions.push(sourceOperation);
+        addUniqueOperation(sourceOperation, targetOperation.operations.actions || []);
         return true;
       }
       if (targetOperation.operations.lists === undefined) {
         targetOperation.operations.lists = [];
       }
-      targetOperation.operations.lists.push(sourceOperation);
+      addUniqueOperation(sourceOperation, targetOperation.operations.lists);
       return true;
     case "put":
       if (!isInstanceOperation) {
@@ -480,7 +486,7 @@ function tryAddLifecycleOperation(
       if (targetOperation.operations.lifecycle.createOrUpdate === undefined) {
         targetOperation.operations.lifecycle.createOrUpdate = [];
       }
-      targetOperation.operations.lifecycle.createOrUpdate.push(sourceOperation);
+      addUniqueOperation(sourceOperation, targetOperation.operations.lifecycle.createOrUpdate);
       return true;
     case "patch":
       if (!isInstanceOperation) {
@@ -489,7 +495,7 @@ function tryAddLifecycleOperation(
       if (targetOperation.operations.lifecycle.update === undefined) {
         targetOperation.operations.lifecycle.update = [];
       }
-      targetOperation.operations.lifecycle.update.push(sourceOperation);
+      addUniqueOperation(sourceOperation, targetOperation.operations.lifecycle.update);
       return true;
     case "delete":
       if (!isInstanceOperation) {
@@ -498,7 +504,7 @@ function tryAddLifecycleOperation(
       if (targetOperation.operations.lifecycle.delete === undefined) {
         targetOperation.operations.lifecycle.delete = [];
       }
-      targetOperation.operations.lifecycle.delete.push(sourceOperation);
+      addUniqueOperation(sourceOperation, targetOperation.operations.lifecycle.delete);
       return true;
     case "post":
     case "head":
@@ -508,7 +514,7 @@ function tryAddLifecycleOperation(
       if (targetOperation.operations.actions === undefined) {
         targetOperation.operations.actions = [];
       }
-      targetOperation.operations.actions.push(sourceOperation);
+      addUniqueOperation(sourceOperation, targetOperation.operations.actions);
       return true;
     default:
       return false;
@@ -522,7 +528,7 @@ function addAssociatedOperation(
   if (!targetOperation.associatedOperations) {
     targetOperation.associatedOperations = [];
   }
-  targetOperation.associatedOperations.push(sourceOperation);
+  addUniqueOperation(sourceOperation, targetOperation.associatedOperations);
 }
 
 export function isResourceOperationMatch(
@@ -561,8 +567,10 @@ function getResourceOperation(
   operation: Operation,
 ): ArmResourceOperation | undefined {
   if (operation.kind !== "Operation") return undefined;
-  if (isTemplateDeclaration(operation)) return undefined;
+  if (isTemplateDeclarationOrInstance(operation) && !isTemplateInstance(operation))
+    return undefined;
   if (operation.interface === undefined || operation.interface.name === undefined) return undefined;
+  if (isTemplateDeclarationOrInstance(operation.interface)) return undefined;
   const [httpOp, _] = getHttpOperation(program, operation);
   return {
     path: httpOp.path,
@@ -609,6 +617,18 @@ function getAllOperations(
   return operations;
 }
 
+function addUniqueOperation(operation: ArmResourceOperation, operations: ArmResourceOperation[]) {
+  if (
+    !operations.some(
+      (op) =>
+        op.name.toLowerCase() === operation.name.toLowerCase() &&
+        op.operationGroup.toLowerCase() === operation.operationGroup.toLowerCase(),
+    )
+  ) {
+    operations.push(operation);
+  }
+}
+
 export function resolveArmResourceOperations(
   program: Program,
   resourceType: Model,
@@ -620,13 +640,17 @@ export function resolveArmResourceOperations(
       program,
       operation.operation,
     );
+
     if (armOperation === undefined) continue;
+    armOperation.kind = operation.kind;
     const resourceInfo = getResourceInfo(program, armOperation);
     if (resourceInfo === undefined) continue;
 
+    let matched = false;
     // Check if we already have an operation for this resource
     for (const resolvedOp of resolvedOperations) {
       if (isResourceOperationMatch(resourceInfo, resolvedOp)) {
+        matched = true;
         if (tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, resolvedOp)) {
           continue;
         }
@@ -635,6 +659,7 @@ export function resolveArmResourceOperations(
       }
     }
 
+    if (matched) continue;
     // If we don't have an operation for this resource, create a new one
     const newOperation: ResolvedOperations = {
       resourceType: resourceInfo.resourceType,
