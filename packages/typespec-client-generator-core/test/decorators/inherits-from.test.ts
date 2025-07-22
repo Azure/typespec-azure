@@ -163,6 +163,92 @@ it("four-level inheritance chain", async () => {
   strictEqual(carModel.discriminatedSubtypes["sports"], sportsCarModel);
 });
 
+it("nested property inheritance", async () => {
+  await runner.compileWithBuiltInService(`
+    @discriminator("kind")
+    model Salmon {
+      properties: {
+      }
+    }
+
+    model KingSalmon extends Salmon {
+      kind: "kingsalmon";
+      properties: {
+        farmed: false;
+        size: int32;
+      }
+    }
+
+    @inheritsFrom(KingSalmon)
+    model SmartKindSalmon extends Salmon {
+      kind: "smartkingsalmon";
+      properties: {
+        farmed: boolean;
+        size: boolean;
+      }
+    }
+
+    @route("/salmon")
+    op getSalmon(): Salmon;
+  `);
+
+  const models = runner.context.sdkPackage.models;
+  strictEqual(models.length, 6);
+  const salmonModel = models.find((m) => m.name === "Salmon");
+  const kingSalmonModel = models.find((m) => m.name === "KingSalmon");
+  const smartKingSalmonModel = models.find((m) => m.name === "SmartKindSalmon");
+  const salmonPropertiesModel = models.find((m) => m.name === "SalmonProperties");
+  const kingSalmonPropertiesModel = models.find((m) => m.name === "KingSalmonProperties");
+  const smartKingSalmonPropertiesModel = models.find((m) => m.name === "SmartKindSalmonProperties");
+
+  ok(salmonModel);
+  ok(kingSalmonModel);
+  ok(smartKingSalmonModel);
+  ok(salmonPropertiesModel);
+  ok(kingSalmonPropertiesModel);
+  ok(smartKingSalmonPropertiesModel);
+
+  // SmartKindSalmon should inherit from KingSalmon instead of Salmon due to @inheritsFrom
+  strictEqual(smartKingSalmonModel.baseModel?.name, "KingSalmon");
+  strictEqual(kingSalmonModel.baseModel?.name, "Salmon");
+
+  // Verify discriminator property is correctly identified
+  strictEqual(salmonModel.discriminatorProperty?.name, "kind");
+  strictEqual(kingSalmonModel.discriminatorValue, "kingsalmon");
+  strictEqual(smartKingSalmonModel.discriminatorValue, "smartkingsalmon");
+
+  // Verify properties are correctly inherited
+  strictEqual(smartKingSalmonModel.properties.length, 2);
+  strictEqual(smartKingSalmonModel.properties[0].name, "kind");
+  strictEqual(smartKingSalmonModel.properties[1].type, smartKingSalmonPropertiesModel);
+  strictEqual(smartKingSalmonPropertiesModel.properties.length, 2);
+  strictEqual(smartKingSalmonPropertiesModel.properties[0].name, "farmed");
+  strictEqual(smartKingSalmonPropertiesModel.properties[0].type.kind, "boolean");
+  strictEqual(smartKingSalmonPropertiesModel.properties[1].name, "size");
+  strictEqual(smartKingSalmonPropertiesModel.properties[1].type.kind, "boolean");
+
+  strictEqual(kingSalmonModel.properties.length, 2);
+  strictEqual(kingSalmonModel.properties[0].name, "kind");
+  strictEqual(kingSalmonModel.properties[1].type, kingSalmonPropertiesModel);
+  strictEqual(kingSalmonPropertiesModel.properties.length, 2);
+  strictEqual(kingSalmonPropertiesModel.properties[0].name, "farmed");
+  strictEqual(kingSalmonPropertiesModel.properties[0].type.kind, "constant");
+  strictEqual(kingSalmonPropertiesModel.properties[0].type.value, false);
+  strictEqual(kingSalmonPropertiesModel.properties[1].name, "size");
+  strictEqual(kingSalmonPropertiesModel.properties[1].type.kind, "int32");
+  strictEqual(salmonModel.properties.length, 2);
+  strictEqual(salmonModel.properties[0].name, "kind");
+  strictEqual(salmonModel.properties[0].type.kind, "string");
+  strictEqual(salmonModel.properties[1].type, salmonPropertiesModel);
+  // Verify .discriminatedSubtypes is correctly populated
+  ok(salmonModel.discriminatedSubtypes);
+  strictEqual(salmonModel.discriminatedSubtypes["kingsalmon"], kingSalmonModel);
+  strictEqual(salmonModel.discriminatedSubtypes["smartkingsalmon"], smartKingSalmonModel);
+  ok(kingSalmonModel.discriminatedSubtypes);
+  strictEqual(kingSalmonModel.discriminatedSubtypes["smartkingsalmon"], smartKingSalmonModel);
+  ok(!smartKingSalmonModel.discriminatedSubtypes);
+});
+
 it("circular inheritance detection", async () => {
   const [_, diagnostics] = await runner.compileAndDiagnose(`
       @service
