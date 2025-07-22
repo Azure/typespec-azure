@@ -1,0 +1,47 @@
+---
+title: 0.58.0
+---
+
+import { LinkCard } from "@astrojs/starlight/components";
+
+<LinkCard
+  title="TypeSpec Core 1.2"
+  description="See changes to the TypeSpec language and core libraries"
+  href="https://typespec.io/docs/release-notes/release-2025-07-15"
+/>
+
+## Breaking Changes
+
+### @azure-tools/typespec-autorest
+
+- [#2927](https://github.com/Azure/typespec-azure/pull/2927) Change operation ID normalization logic to only capitalize the first letter.
+
+## Features
+
+### @azure-tools/typespec-autorest
+
+- [#2968](https://github.com/Azure/typespec-azure/pull/2968) Support using enum member as type of parameter
+
+### @azure-tools/typespec-azure-core
+
+- [#2976](https://github.com/Azure/typespec-azure/pull/2976) Introduce `@previewVersion` decorator
+
+## Bug Fixes
+
+### @azure-tools/typespec-autorest
+
+- [#2970](https://github.com/Azure/typespec-azure/pull/2970) Fix the default pageable item name from `items` to `value` to align with the official AutoRest documentation.
+
+### @azure-tools/typespec-azure-core
+
+- [#2599](https://github.com/Azure/typespec-azure/pull/2599) Fix old reference to api guidelines in Azure.Core
+
+### @azure-tools/typespec-azure-resource-manager
+
+- [#2945](https://github.com/Azure/typespec-azure/pull/2945) Fix inconsistent `OverrideErrorType` parameter name across templates
+- [#2959](https://github.com/Azure/typespec-azure/pull/2959) Improve `no-resource-delete-operation` message
+- [#2820](https://github.com/Azure/typespec-azure/pull/2820) Add the `@items` and `@nextLink` decorators to the common types `PrivateEndpointConnectionListResult` and `PrivateLinkResourceListResult` to support the @`pagedResult` feature.
+
+### @azure-tools/typespec-client-generator-core
+
+- [#2984](https://github.com/Azure/typespec-azure/pull/2984) Fix wrong API version elevator logic with `@clientLocation`.

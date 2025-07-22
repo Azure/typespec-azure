@@ -1,5 +1,16 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.23
+
+### Features
+
+- [#2952](https://github.com/Azure/typespec-azure/pull/2952) Add test case for TCGC override
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+
 ## 0.1.0-alpha.22
 
 ### Bump dependencies

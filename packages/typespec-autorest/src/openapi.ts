@@ -997,15 +997,6 @@ export async function getOpenAPIForService(
       return getSchemaForIntrinsicType(type);
     }
 
-    if (type.kind === "EnumMember") {
-      // Enum members are just the OA representation of their values.
-      if (typeof type.value === "number") {
-        return { type: "number", enum: [type.value] };
-      } else {
-        return { type: "string", enum: [type.value ?? type.name] };
-      }
-    }
-
     if (type.kind === "ModelProperty") {
       return resolveProperty(type, schemaContext);
     }
@@ -1671,6 +1662,8 @@ export async function getOpenAPIForService(
         return getSchemaForScalar(type);
       case "Union":
         return getSchemaForUnion(type, schemaContext);
+      case "EnumMember":
+        return getSchemaForEnumMember(type);
       case "UnionVariant":
         return getSchemaForUnionVariant(type, schemaContext);
       case "Enum":
@@ -1860,6 +1853,15 @@ export async function getOpenAPIForService(
     return armIdentifiers.every((identifier) => identifier === "id" || identifier === "name");
   }
 
+  function getSchemaForEnumMember(member: EnumMember): OpenAPI2Schema {
+    const value = member.value ?? member.name;
+    const type = typeof value === "number" ? "number" : "string";
+    return {
+      type,
+      enum: [value],
+      description: getDoc(program, member),
+    };
+  }
   function getSchemaForUnionVariant(
     variant: UnionVariant,
     schemaContext: SchemaContext,
