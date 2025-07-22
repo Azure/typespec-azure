@@ -1822,7 +1822,7 @@ op Azure.ResourceManager.Legacy.LegacyOperations.CheckExistence(): Response | Ov
 List a resource
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.List(): Response | ErrorType
+op Azure.ResourceManager.Legacy.LegacyOperations.List(): Response | OverrideErrorType
 ```
 
 #### `LegacyOperations.ActionSync` {#Azure.ResourceManager.Legacy.LegacyOperations.ActionSync}
@@ -2039,7 +2039,7 @@ op Azure.ResourceManager.Legacy.RoutedOperations.CheckExistence(): Response | Ov
 List a resource
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations.List(): Response | ErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations.List(): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
