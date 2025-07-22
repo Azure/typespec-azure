@@ -122,6 +122,55 @@ public final class Food implements JsonSerializable<Food> {
 }
 ```
 
+```go
+package petstore
+
+import (
+	"bytes"
+  "context"
+	"encoding/json"
+	"fmt"
+	"net/http"
+)
+
+type Client struct {
+	endpoint string
+	cred     *TokenCredential // or other auth mechanism
+	pipeline *Pipeline        // handles sending requests
+}
+
+type Food struct {
+	Name     string `json:"name"`
+	Quantity int32  `json:"quantity"`
+}
+
+func (c *Client) Feed(ctx context.Context, food Food) (resp *http.Response, err error) {
+	req, err := NewFeedRequest(c.endpoint, food)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.pipeline.Do(req.WithContext(ctx))
+}
+
+func NewFeedRequest(endpoint string, food Food) (*http.Request, error) {
+	url := fmt.Sprintf("%s/feed", endpoint)
+
+	bodyBytes, err := json.Marshal(food)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewReader(bodyBytes))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	return req, nil
+}
+```
+
 </ClientTabs>
 
 ### Customization
@@ -193,6 +242,16 @@ public final class Food implements JsonSerializable<Food> {
     public String getName();
     public int getQuantity();
 }
+```
+
+```go
+package models
+
+type Food struct {
+	Name     string `json:"name"`
+	Quantity int32  `json:"quantity"`
+}
+
 ```
 
 </ClientTabs>
@@ -319,6 +378,12 @@ Generated license comment in Java client code:
 ```
 
 Generated `LICENSE` file for Python client library:
+
+```text
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+```
+
+Generated `LICENSE` file for Go client library:
 
 ```text
 This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
