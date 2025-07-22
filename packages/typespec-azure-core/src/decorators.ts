@@ -2,6 +2,8 @@ import { AzureCoreStateKeys, createDiagnostic, reportDiagnostic } from "./lib.js
 import { getAllProperties } from "./utils.js";
 
 import {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   $decorators,
   compilerAssert,
   createDiagnosticCollector,
