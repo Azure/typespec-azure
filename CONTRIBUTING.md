@@ -221,19 +221,16 @@ Do the following to publish a new release:
    main branch (both typespec-azure and core should point to main).
 
 4. Generate release notes for TypeSpec once the full list of changes are in.
-
    1. In your fork of the core (typespec) repo, run `npx chronus changelog --policy typespec > out.md`.
    2. Create a new entry in `./core/website/src/content/docs/docs/release-notes` for this release and paste the contents of `out.md` into the new file. Reorganize the file to have the following sections in order: _Breaking Changes_, _Deprecations_, _Features_, and _Bug Fixes_. Skip the section if there are no entries in it. Also add a blurb above these sections for any especially notable updates.
       Example PR: https://github.com/microsoft/typespec/pull/4102
 
 5. Generate release notes for TypeSpec Azure once the full list of changes are in.
-
    1. In your fork of the typespec-azure repo, run `npx chronus changelog --policy typespec-azure > out.md`.
    2. Create a new entry in `./website/src/content/docs/docs/release-notes` for this release and paste the contents of `out.md` into the new file. Reorganize the file to have the following sections in order: _Breaking Changes_, _Deprecations_, _Features_, and _Bug Fixes_. Skip the section if there are no entries in it. Also add a blurb above these sections for any especially notable updates.
       Example PR: https://github.com/Azure/typespec-azure/pull/1306
 
 6. Once all PRs are merged, update TypeSpec-Azure core submodule (things will run more smoothly if TypeSpec-Azure core points to HEAD of TypeSpec).
-
    1. Can [trigger](https://github.com/Azure/typespec-azure/network/updates/18647270/jobs) dependabot via `Insights > Dependency graph > Dependabot`.
 
 7. Double-check that typespec-azure and core submodules are both up to date with `upstream/main`.
@@ -241,7 +238,6 @@ Do the following to publish a new release:
 8. Regenerate documentation via `pnpm regen-docs` in TypeSpec-Azure.
 
 9. Run `pnpm prepare-publish` in TypeSpec-Azure repo to stage the publishing changes.
-
    - This creates `publish/xxxxxx` branches for TypeSpec-Azure and TypeSpec repos.
    - If it works you'll get a message like this: `Success! Push publish/kvd01q9v branches and send PRs.`
 

@@ -45,9 +45,6 @@ import {
   ClientInitializationOptions,
   LanguageScopes,
   SdkClient,
-  SdkInitializationType,
-  SdkMethodParameter,
-  SdkModelPropertyType,
   SdkOperationGroup,
   TCGCContext,
   UsageFlags,
@@ -680,6 +677,20 @@ export const $override = (
         continue;
       }
     }
+
+    // Apply the alternate type to the original parameter
+    const overrideParam = overrideParams[index];
+    overrideParam.decorators
+      .filter((d) => d.decorator.name === "$alternateType")
+      .map((d) =>
+        context.call(
+          $alternateType,
+          originalParam,
+          d.args[0].value as Type,
+          d.args[1]?.jsValue as string | undefined,
+        ),
+      );
+
     index++;
   }
 
@@ -812,40 +823,6 @@ export const $clientInitialization: ClientInitializationDecorator = (
     );
   }
 };
-
-/**
- * Get `SdkInitializationType` for namespace or interface. The info is from `@clientInitialization` decorator.
- *
- * @param context
- * @param entity namespace or interface which represents a client
- * @returns
- * @deprecated This function is deprecated. Use `getClientInitializationOptions` instead.
- */
-export function getClientInitialization(
-  context: TCGCContext,
-  entity: Namespace | Interface,
-): SdkInitializationType | undefined {
-  let options = getScopedDecoratorData(context, clientInitializationKey, entity);
-  if (options === undefined) return undefined;
-  // backward compatibility
-  if (options.properties.get("parameters")) {
-    options = options.properties.get("parameters").type;
-  } else if (options.properties.get("initializedBy")) {
-    return undefined;
-  }
-  const sdkModel = getSdkModel(context, options);
-  const initializationProps = sdkModel.properties.map(
-    (property: SdkModelPropertyType): SdkMethodParameter => {
-      property.onClient = true;
-      property.kind = "method";
-      return property as SdkMethodParameter;
-    },
-  );
-  return {
-    ...sdkModel,
-    properties: initializationProps,
-  };
-}
 
 /**
  * Get client initialization options for namespace or interface. The info is from `@clientInitialization` decorator.
