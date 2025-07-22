@@ -86,6 +86,21 @@ public final class PetStoreNamespaceClient {
 }
 ```
 
+```go
+package petstorenamespace
+
+type InputModel struct {
+	Name string `json:"name"`
+}
+
+type Client struct {
+	BaseURL    string
+	HTTPClient *http.Client
+}
+
+func (c *Client) Get(ctx context.Context, name string) (*InputModel, error) 
+```
+
 </ClientTabs>
 
 ## Customizations
@@ -163,6 +178,21 @@ public final class PetStoreNamespaceClient {
 }
 ```
 
+```go
+type InputOptions struct {
+	Name string `json:"name"`
+}
+
+type Client struct {
+	BaseURL    string
+	HTTPClient *http.Client
+}
+
+func (c *Client) GetWithResponse(ctx context.Context, name string, requestOptions map[string]string) (*http.Response, []byte, error) 
+
+func (c *Client) Get(ctx context.Context, name string) (*InputOptions, error)
+```
+
 </ClientTabs>
 
 ### Renaming operations and parameters
@@ -225,6 +255,22 @@ public final class PetStoreNamespaceClient {
     public Response<BinaryData> readModelWithResponse(String name, RequestOptions requestOptions)
     public InputModel readModel(String name)
 }
+```
+
+```go
+type InputModel struct {
+	Name string `json:"name"`
+}
+
+type Client struct {
+	BaseURL    string
+	HTTPClient *http.Client
+}
+
+func (c *Client) ReadModelWithResponse(ctx context.Context, name string) (*http.Response, []byte, error) 
+
+func (c *Client) ReadModel(ctx context.Context, name string) (*InputModel, error) 
+
 ```
 
 </ClientTabs>

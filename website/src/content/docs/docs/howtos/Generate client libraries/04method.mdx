@@ -277,8 +277,12 @@ public final class PetStoreNamespaceClient {
 ```
 
 ```go
-func (client *PetStoreNamespaceClient) getModel(ctx context.Context, name string) (OutputModel, error) {
-    ...
+func (c *petStoreNamespaceClient) GetModelWithResponse(ctx context.Context, name string, options *RequestOptions) (Response[OutputModel], error) {
+    // Low-level call returning Response with HTTP details
+}
+
+func (c *petStoreNamespaceClient) getModel(ctx context.Context, name string) (OutputModel, error) {
+    // Internal use only
 }
 
 ```
@@ -1608,6 +1612,47 @@ public final class AnalyzeClient {
 }
 ```
 
+```go
+// Client is the Analyze service client.
+type Client struct {
+	BaseURL    string
+	HTTPClient *http.Client
+}
+
+// NewClient creates a new Analyze client.
+func NewClient(baseURL string, httpClient *http.Client) *Client {
+	if httpClient == nil {
+		httpClient = http.DefaultClient
+	}
+	return &Client{
+		BaseURL:    baseURL,
+		HTTPClient: httpClient,
+	}
+}
+
+// AnalyzeResult is the response from the analyze operation.
+type AnalyzeResult struct {
+	// TODO: define actual response fields
+	Result string `json:"result,omitempty"`
+}
+
+// CompletionInput is the input model for completions operation.
+// Input supports either string or []string.
+type CompletionInput struct {
+	Input interface{} `json:"input"` // string or []string
+}
+
+// CompletionResult is the response from the completions operation.
+type CompletionResult struct {
+	// TODO: define actual response fields
+	Output string `json:"output,omitempty"`
+}
+func (c *Client) Analyze(ctx context.Context, mode string, image []byte) (*AnalyzeResult, error) 
+
+func (c *Client) Completions(ctx context.Context, input CompletionInput) (*CompletionResult, error) 
+
+```
+
 </ClientTabs>
 
 Using union implies that the entire combination of possible input is valid. If you have a specific set of combination, or connection between input and output,
@@ -1678,6 +1723,27 @@ public final class Client {
 }
 ```
 
+```go
+
+// Client for Foo operations.
+type Client struct {
+    BaseURL    string
+    HTTPClient *http.Client
+}
+
+// NewClient creates a new Foo client.
+func NewClient(baseURL string, httpClient *http.Client) *Client {
+    if httpClient == nil {
+        httpClient = http.DefaultClient
+    }
+    return &Client{BaseURL: baseURL, HTTPClient: httpClient}
+}
+
+func (c *Client) A(ctx context.Context, x int32) (float64, error)
+
+func (c *Client) B(ctx context.Context, x string) (int64, error) 
+```
+
 </ClientTabs>
 
 ### Customizations
@@ -1736,6 +1802,9 @@ JS RLC is not in the business of customization with client.tsp
 
 ```java
 NOT_SUPPORTED
+```
+
+```go
 ```
 
 </ClientTabs>
