@@ -258,7 +258,7 @@ serviceClientClient.stableFunctionality(stableModel);
 ```
 
 ```go
-
+// TODO
 ```
 
 </ClientTabs>
@@ -389,7 +389,7 @@ serviceClientClient.previewFunctionality(previewModel);
 ```
 
 ```go
-
+// TODO
 ```
 
 </ClientTabs>
@@ -511,6 +511,7 @@ ServiceClient client = new ServiceClient(endpoint, options);
 ```
 
 ```go
+// TODO
 
 ```
 
@@ -611,7 +612,26 @@ client.get(); // version parameter is elevated onto the client
 ```
 
 ```go
-// TODO
+type Versions string
+
+const (
+	v2023_11_01 Versions = "2023-11-01"
+	v2024_04_01 Versions = "2024-04-01"
+)
+
+type Client struct {
+	// ...
+}
+
+func (c *Client) Get(ctx context.Context, version Versions, options *RequestOptions) (Response, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "<url>", nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("x-ms-version", string(version))
+	return c.httpClient.Do(req)
+}
+
 ```
 
 </ClientTabs>
