@@ -276,7 +276,7 @@ interface RoutedOperations<
   @doc("List a {name}", Resource)
   @get
   @listsResource(Resource)
-  @segmentOf(Resource)
+  @segmentOf(ResourceTypeParameter)
   @armOperationRoute(OverrideRouteOptions)
   @armResourceList(Resource)
   @Private.armUpdateProviderNamespace
