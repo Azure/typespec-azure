@@ -33,6 +33,7 @@ import {
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
   FlattenPropertyDecorator,
+  InheritsFromDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
@@ -1188,6 +1189,21 @@ export function getClientLocation(
     | Interface
     | string
     | undefined;
+}
+
+const inheritsFromKey = createStateSymbol("inheritsFrom");
+
+export const $inheritsFrom: InheritsFromDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  value: Model,
+  scope?: LanguageScopes,
+) => {
+  setScopedDecoratorData(context, $inheritsFrom, inheritsFromKey, target, value, scope);
+};
+
+export function getInheritsFrom(context: TCGCContext, target: Model): Model | undefined {
+  return getScopedDecoratorData(context, inheritsFromKey, target);
 }
 
 /**

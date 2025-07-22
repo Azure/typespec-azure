@@ -13,6 +13,7 @@ import {
   $convenientAPI,
   $deserializeEmptyStringAsNull,
   $flattenProperty,
+  $inheritsFrom,
   $operationGroup,
   $override,
   $paramAlias,
@@ -51,5 +52,6 @@ export const $decorators = {
     responseAsBool: $responseAsBool,
     clientDoc: $clientDoc,
     clientLocation: $clientLocation,
+    inheritsFrom: $inheritsFrom,
   } as AzureClientGeneratorCoreDecorators,
 };
