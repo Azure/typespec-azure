@@ -37,7 +37,7 @@ import {
   getVersioningMutators,
   getVersions,
 } from "@typespec/versioning";
-import { getClientDocExplicit, getInheritsFrom, getParamAlias } from "./decorators.js";
+import { getClientDocExplicit, getParamAlias } from "./decorators.js";
 import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 import {
   DecoratorInfo,
@@ -790,8 +790,4 @@ export function* filterMapValuesIterator<V>(
       yield value;
     }
   }
-}
-
-export function getBaseModel(context: TCGCContext, model: Model): Model | undefined {
-  return getInheritsFrom(context, model) ?? model.baseModel;
 }

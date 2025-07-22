@@ -1193,12 +1193,35 @@ export function getClientLocation(
 
 const inheritsFromKey = createStateSymbol("inheritsFrom");
 
+function isPropertySuperset(target: Model, value: Model): boolean {
+  // Check if all properties in value exist in target
+  for (const name of value.properties.keys()) {
+    if (!target.properties.has(name)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export const $inheritsFrom: InheritsFromDecorator = (
   context: DecoratorContext,
   target: Model,
   value: Model,
   scope?: LanguageScopes,
 ) => {
+  // Validate that target has all properties from value
+  if (!isPropertySuperset(target, value)) {
+    reportDiagnostic(context.program, {
+      code: "inherits-from-conflict",
+      format: {
+        childModel: target.name,
+        inheritsFromModelName: value.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+
   setScopedDecoratorData(context, $inheritsFrom, inheritsFromKey, target, value, scope);
 };
 

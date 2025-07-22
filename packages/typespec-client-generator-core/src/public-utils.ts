@@ -56,7 +56,6 @@ import {
 import {
   AllScopes,
   TspLiteralType,
-  getBaseModel,
   getHttpBodyType,
   getHttpOperationResponseHeaders,
   hasExplicitClientOrOperationGroup,
@@ -532,7 +531,7 @@ function getContextPath(
         if (result) return true;
       }
       // handle additional properties type: model MyModel extends Record<> {}
-      const baseModel = getBaseModel(context, currentType);
+      const baseModel = currentType.baseModel;
       if (baseModel) {
         if (baseModel.name === "Record") {
           const result = dfsModelProperties(
@@ -545,11 +544,7 @@ function getContextPath(
       }
       result.pop();
       if (baseModel) {
-        const result = dfsModelProperties(
-          expectedType,
-          baseModel,
-          baseModel.name,
-        );
+        const result = dfsModelProperties(expectedType, baseModel, baseModel.name);
         if (result) return true;
       }
       // TODO: come back and see if derived models are needed to change

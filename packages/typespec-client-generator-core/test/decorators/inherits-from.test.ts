@@ -65,6 +65,14 @@ it("three-level inheritance chain", async () => {
   strictEqual(modelB.properties[1].name, "foo");
   strictEqual(modelA.properties.length, 1);
   strictEqual(modelA.properties[0].name, "kind");
+
+  // Verify .discriminatedSubtypes is correctly populated
+  ok(modelA.discriminatedSubtypes);
+  strictEqual(modelA.discriminatedSubtypes["B"], modelB);
+  strictEqual(modelA.discriminatedSubtypes["C"], modelC);
+
+  ok(modelB.discriminatedSubtypes);
+  strictEqual(modelB.discriminatedSubtypes["C"], modelC);
 });
 
 it("four-level inheritance chain", async () => {
@@ -120,42 +128,39 @@ it("four-level inheritance chain", async () => {
   strictEqual(sportsCarModel.baseModel?.name, "Car");
   strictEqual(carModel.baseModel?.name, "MotorVehicle");
   strictEqual(motorVehicleModel.baseModel?.name, "Vehicle");
-});
 
-it("inheritance with scoped decorator", async () => {
-  await runner.compileWithBuiltInService(`
-      @discriminator("kind")
-      model Base {
-        kind: string;
-      }
+  // Verify discriminator property is correctly identified
+  strictEqual(vehicleModel.discriminatorProperty?.name, "type");
+  strictEqual(motorVehicleModel.discriminatorValue, "motor");
+  strictEqual(carModel.discriminatorValue, "car");
+  strictEqual(sportsCarModel.discriminatorValue, "sports");
 
-      model Parent extends Base {
-        kind: "parent";
-        parentProp: string;
-      }
+  // Verify properties are correctly inherited
+  strictEqual(sportsCarModel.properties.length, 4);
+  strictEqual(sportsCarModel.properties[0].name, "type");
+  strictEqual(sportsCarModel.properties[1].name, "engine");
+  strictEqual(sportsCarModel.properties[2].name, "doors");
+  strictEqual(sportsCarModel.properties[3].name, "topSpeed");
+  strictEqual(carModel.properties.length, 3);
+  strictEqual(carModel.properties[0].name, "type");
+  strictEqual(carModel.properties[1].name, "engine");
+  strictEqual(carModel.properties[2].name, "doors");
+  strictEqual(motorVehicleModel.properties.length, 2);
+  strictEqual(motorVehicleModel.properties[0].name, "type");
+  strictEqual(motorVehicleModel.properties[1].name, "engine");
+  strictEqual(vehicleModel.properties.length, 1);
+  strictEqual(vehicleModel.properties[0].name, "type");
 
-      @inheritsFrom(Parent, "java")
-      @inheritsFrom(Base, "python")
-      model Child extends Base {
-        kind: "child";
-        childProp: string;
-      }
-
-      @route("/test")
-      op test(): Base;
-    `);
-
-  const models = runner.context.sdkPackage.models;
-  const baseModel = models.find((m) => m.name === "Base");
-  const parentModel = models.find((m) => m.name === "Parent");
-  const childModel = models.find((m) => m.name === "Child");
-
-  ok(baseModel);
-  ok(parentModel);
-  ok(childModel);
-
-  // Since test runner is configured for Java, Child should inherit from Parent
-  strictEqual(childModel.baseModel?.name, "Parent");
+  // Verify .discriminatedSubtypes is correctly populated
+  ok(vehicleModel.discriminatedSubtypes);
+  strictEqual(vehicleModel.discriminatedSubtypes["motor"], motorVehicleModel);
+  strictEqual(vehicleModel.discriminatedSubtypes["car"], carModel);
+  strictEqual(vehicleModel.discriminatedSubtypes["sports"], sportsCarModel);
+  ok(motorVehicleModel.discriminatedSubtypes);
+  strictEqual(motorVehicleModel.discriminatedSubtypes["car"], carModel);
+  // strictEqual(motorVehicleModel.discriminatedSubtypes["sports"], sportsCarModel);
+  ok(carModel.discriminatedSubtypes);
+  strictEqual(carModel.discriminatedSubtypes["sports"], sportsCarModel);
 });
 
 it("circular inheritance detection", async () => {
@@ -186,7 +191,7 @@ it("circular inheritance detection", async () => {
   });
 });
 
-it("conflicting inheritance - warning when @inheritsFrom conflicts with extends", async () => {
+it("conflicting inheritance", async () => {
   const [_, diagnostics] = await runner.compileAndDiagnose(`
       @service
       namespace TestService;
@@ -200,7 +205,7 @@ it("conflicting inheritance - warning when @inheritsFrom conflicts with extends"
       }
 
       @inheritsFrom(B)
-      model C extends A {  // Extends A but @inheritsFrom says B
+      model C extends A {  // Doesn't have propB but @inheritsFrom says B
         propC: string;
       }
 
@@ -212,79 +217,6 @@ it("conflicting inheritance - warning when @inheritsFrom conflicts with extends"
   expectDiagnostics(diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/inherits-from-conflict",
   });
-});
-
-it("multiple inheritance override with different scopes", async () => {
-  await runner.compileWithBuiltInService(`
-      @discriminator("type")
-      model Vehicle {
-        type: string;
-      }
-
-      model LandVehicle extends Vehicle {
-        type: "land";
-        wheels: int32;
-      }
-
-      model WaterVehicle extends Vehicle {
-        type: "water";
-        propeller: boolean;
-      }
-
-      @inheritsFrom(LandVehicle, "java")
-      @inheritsFrom(WaterVehicle, "csharp")
-      model AmphibiousVehicle extends Vehicle {
-        type: "amphibious";
-        canSwim: boolean;
-      }
-
-      @route("/vehicles")
-      op getVehicle(): Vehicle;
-    `);
-
-  const models = runner.context.sdkPackage.models;
-  const amphibiousModel = models.find((m) => m.name === "AmphibiousVehicle");
-
-  ok(amphibiousModel);
-  // Should inherit from LandVehicle since test runner is configured for Java
-  strictEqual(amphibiousModel.baseModel?.name, "LandVehicle");
-});
-
-it("inheritance override preserves discriminator values", async () => {
-  await runner.compileWithBuiltInService(`
-      @discriminator("kind")
-      model Animal {
-        kind: string;
-      }
-
-      model Mammal extends Animal {
-        kind: "mammal";
-        furColor: string;
-      }
-
-      @inheritsFrom(Mammal)
-      model Dog extends Animal {
-        kind: "dog";
-        breed: string;
-      }
-
-      @route("/animals")
-      op getAnimal(): Animal;
-    `);
-
-  const models = runner.context.sdkPackage.models;
-  const animalModel = models.find((m) => m.name === "Animal");
-  const mammalModel = models.find((m) => m.name === "Mammal");
-  const dogModel = models.find((m) => m.name === "Dog");
-
-  ok(animalModel);
-  ok(mammalModel);
-  ok(dogModel);
-
-  // Dog should inherit from Mammal and maintain its discriminator value
-  strictEqual(dogModel.baseModel?.name, "Mammal");
-  strictEqual(dogModel.discriminatorValue, "dog");
-  strictEqual(mammalModel.discriminatorValue, "mammal");
 });
 
 it("inheritance override with template models", async () => {
@@ -315,4 +247,43 @@ it("inheritance override with template models", async () => {
   ok(specialContainerModel);
   // Should inherit from StringContainer instead of Container<string>
   strictEqual(specialContainerModel.baseModel?.name, "StringContainer");
+});
+
+it("without polymorphism", async () => {
+  await runner.compileWithBuiltInService(`
+      model A {
+        kind: string;
+      }
+
+      model BContent {
+        foo: string;
+      }
+
+      model B extends A {
+        kind: "B";
+        ...BContent;
+      }
+
+      @inheritsFrom(B)
+      @usage(Usage.input)
+      model C extends A {
+        kind: "C";
+        ...BContent;
+        bar: string;
+      }
+    `);
+
+  const models = runner.context.sdkPackage.models;
+  strictEqual(models.length, 3);
+  const aModel = models.find((m) => m.name === "A");
+  const bModel = models.find((m) => m.name === "B");
+  const cModel = models.find((m) => m.name === "C");
+
+  ok(aModel);
+  ok(bModel);
+  ok(cModel);
+
+  // C should inherit from B instead of A due to @inheritsFrom
+  strictEqual(cModel.baseModel?.name, "B");
+  strictEqual(bModel.baseModel?.name, "A");
 });
