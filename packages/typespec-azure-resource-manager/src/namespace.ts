@@ -304,11 +304,11 @@ export function resolveProviderNamespace(
   program: Program,
   ns?: Namespace | undefined,
 ): Namespace | undefined {
-  ns = ns || program.getGlobalNamespaceType();
+  ns = ns ?? program.getGlobalNamespaceType();
   if (program.stateMap(ArmStateKeys.armProviderNamespaces).get(ns)) {
     return ns;
   }
-  for (const [_, child] of ns.namespaces) {
+  for (const child of ns.namespaces.values()) {
     const providerNs = resolveProviderNamespace(program, child);
     if (providerNs) {
       return providerNs;

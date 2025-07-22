@@ -7,6 +7,7 @@ import {
   Operation,
   Program,
 } from "@typespec/compiler";
+import { useStateMap } from "@typespec/compiler/utils";
 import { $route, getHttpOperation, HttpOperation } from "@typespec/http";
 import {
   $actionSegment,
@@ -188,16 +189,21 @@ function setResourceLifecycleOperation(
   });
 }
 
+export const [getArmOperationList, setArmOperationList] = useStateMap<
+  Model,
+  Set<ArmOperationIdentifier>
+>(ArmStateKeys.resourceOperationList);
+
 export function getArmResourceOperationList(
   program: Program,
   resourceType: Model,
 ): Set<ArmOperationIdentifier> {
-  if (!program.stateMap(ArmStateKeys.resourceOperationList).has(resourceType)) {
-    setArmResourceOperationList(program, resourceType, new Set<ArmOperationIdentifier>());
+  let operations = getArmOperationList(program, resourceType);
+  if (operations === undefined) {
+    operations = new Set<ArmOperationIdentifier>();
+    setArmOperationList(program, resourceType, operations);
   }
-  return program
-    .stateMap(ArmStateKeys.resourceOperationList)
-    .get(resourceType) as Set<ArmOperationIdentifier>;
+  return operations;
 }
 
 export function addArmResourceOperation(
@@ -207,16 +213,13 @@ export function addArmResourceOperation(
 ): void {
   const operations = getArmResourceOperationList(program, resourceType);
   operations.add(operationData);
-  setArmResourceOperationList(program, resourceType, operations);
+  setArmOperationList(program, resourceType, operations);
 }
 
-export function setArmResourceOperationList(
-  program: Program,
-  resourceType: Model,
-  operations: Set<ArmOperationIdentifier>,
-): void {
-  program.stateMap(ArmStateKeys.resourceOperationList).set(resourceType, operations);
-}
+export const [getArmResourceOperationData, setArmResourceOperationData] = useStateMap<
+  Operation,
+  ArmResourceOperationData
+>(ArmStateKeys.armResourceOperationData);
 
 export function setArmOperationIdentifier(
   program: Program,
@@ -232,18 +235,10 @@ export function setArmOperationIdentifier(
     resource: resourceType,
   };
   // Initialize the operations for the resource type if not already done
-  if (!program.stateMap(ArmStateKeys.armResourceOperationData).has(target)) {
-    program.stateMap(ArmStateKeys.armResourceOperationData).set(target, operationId);
+  if (!getArmResourceOperationData(program, target)) {
+    setArmResourceOperationData(program, target, operationId);
   }
   addArmResourceOperation(program, resourceType, operationId);
-}
-
-export function getArmOperationIdentifier(
-  program: Program,
-  target: Operation,
-): ArmOperationIdentifier | undefined {
-  // Initialize the operations for the resource type if not already done
-  return program.stateMap(ArmStateKeys.armResourceOperationData).get(target);
 }
 
 export const $armResourceRead: ArmResourceReadDecorator = (

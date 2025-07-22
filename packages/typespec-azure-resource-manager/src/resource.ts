@@ -20,6 +20,7 @@ import {
   Program,
   Type,
 } from "@typespec/compiler";
+import { useStateMap } from "@typespec/compiler/utils";
 import { getHttpOperation, isPathParam } from "@typespec/http";
 import { $autoRoute, getParentResource, getSegment } from "@typespec/rest";
 import {
@@ -48,7 +49,7 @@ import {
   ArmResolvedOperationsForResource,
   ArmResourceOperation,
   ArmResourceOperations,
-  getArmOperationIdentifier,
+  getArmResourceOperationData,
   getArmResourceOperationList,
   resolveResourceOperations,
 } from "./operations.js";
@@ -355,12 +356,15 @@ export function getArmResources(program: Program): ArmResourceDetails[] {
   return resources;
 }
 
+export const [getResolvedResources, setResolvedResources] = useStateMap<
+  Namespace,
+  ResolvedResources
+>(ArmStateKeys.armResolvedResources);
+
 export function resolveArmResources(program: Program): ResolvedResources {
   const provider = resolveProviderNamespace(program);
   if (provider === undefined) return {};
-  const resolvedResources = program
-    .stateMap(ArmStateKeys.armResolvedResources)
-    .get(provider) as ResolvedResources;
+  const resolvedResources = getResolvedResources(program, provider);
   if (resolvedResources?.resources !== undefined && resolvedResources.resources.length > 0) {
     // Return the cached resource details
     return resolvedResources;
@@ -389,8 +393,7 @@ export function resolveArmResources(program: Program): ResolvedResources {
     ),
   };
 
-  program.stateMap(ArmStateKeys.armResolvedResources).set(provider, resolved);
-
+  setResolvedResources(program, provider, resolved);
   return resolved;
 }
 
@@ -567,10 +570,15 @@ function getResourceOperation(
   operation: Operation,
 ): ArmResourceOperation | undefined {
   if (operation.kind !== "Operation") return undefined;
+  if (!operation.isFinished) return undefined;
   if (isTemplateDeclarationOrInstance(operation) && !isTemplateInstance(operation))
     return undefined;
   if (operation.interface === undefined || operation.interface.name === undefined) return undefined;
-  if (isTemplateDeclarationOrInstance(operation.interface)) return undefined;
+  if (
+    isTemplateDeclarationOrInstance(operation.interface) &&
+    !isTemplateInstance(operation.interface)
+  )
+    return undefined;
   const [httpOp, _] = getHttpOperation(program, operation);
   return {
     path: httpOp.path,
@@ -584,8 +592,9 @@ function getResourceOperation(
 
 function isArmResourceOperation(program: Program, operation: Operation): boolean {
   if (operation.kind !== "Operation") return false;
-  if (isTemplateDeclaration(operation)) return false;
-  return getArmOperationIdentifier(program, operation) !== undefined;
+  if (operation.isFinished === false) return false;
+  if (isTemplateDeclarationOrInstance(operation) && !isTemplateInstance(operation)) return false;
+  return getArmResourceOperationData(program, operation) !== undefined;
 }
 
 function getAllOperations(
@@ -600,7 +609,8 @@ function getAllOperations(
   for (const op of container.operations.values()) {
     if (
       op.kind === "Operation" &&
-      !isTemplateDeclaration(op) &&
+      op.isFinished &&
+      (!isTemplateDeclarationOrInstance(op) || isTemplateInstance(op)) &&
       !isArmResourceOperation(program, op)
     ) {
       operations.push(op);
