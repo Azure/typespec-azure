@@ -52,7 +52,7 @@
   },
   "typescript.tsdk": "node_modules/typescript/lib",
   "git.ignoreLimitWarning": true,
-  "vitest.workspaceConfig": "./vitest.workspace.ts",
+  "vitest.workspaceConfig": "./vitest.config.ts",
   "prettier.configPath": ".prettierrc.json",
   "prettier.ignorePath": ".prettierignore",
   "prettier.prettierPath": "./core/packages/compiler/node_modules/prettier/index.cjs",
