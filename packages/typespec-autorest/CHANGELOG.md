@@ -1,5 +1,24 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.58.0
+
+### Breaking Changes
+
+- [#2927](https://github.com/Azure/typespec-azure/pull/2927) Change operation ID normalization logic to only capitalize the first letter.
+
+### Features
+
+- [#2968](https://github.com/Azure/typespec-azure/pull/2968) Support using enum member as type of parameter
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2970](https://github.com/Azure/typespec-azure/pull/2970) Fix the default pageable item name from `items` to `value` to align with the official AutoRest documentation.
+
+
 ## 0.57.1
 
 ### Bug Fixes

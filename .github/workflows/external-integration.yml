@@ -60,19 +60,16 @@ jobs:
           echo "Installing dependencies..."
           npm install --no-package-lock
 
+          echo "Reverting package.json changes..."
+          git checkout -- package.json || true
+
       - name: Run TypeSpec validation in azure-rest-api-specs
         id: validation
         run: pnpm tsx ../.github/scripts/validate-typespec-specs.ts .
         working-directory: azure-rest-api-specs
-        continue-on-error: true
-
-      - name: Revert package.json changes
-        run: |
-          echo "Reverting package.json changes..."
-          git checkout -- package.json || true
-        working-directory: azure-rest-api-specs
 
       - name: Check for git changes
+        if: success() || failure() # Still run this step even if validation fails to ensure as much information as possible
         run: |
           git_changes=$(git status --porcelain)
           if [ -n "$git_changes" ]; then
@@ -84,9 +81,3 @@ jobs:
             echo "✅ No git changes detected"
           fi
         working-directory: azure-rest-api-specs
-
-      - name: Fail job if TypeSpec validation failed
-        if: steps.validation.outcome == 'failure'
-        run: |
-          echo "❌ TypeSpec validation failed. Check the validation step output for details."
-          exit 1

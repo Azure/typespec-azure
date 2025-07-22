@@ -1,104 +1,26 @@
-import { Enum, Interface, Model, ModelProperty, Operation } from "@typespec/compiler";
+import { Interface, Model, ModelProperty, Operation } from "@typespec/compiler";
 import {
   BasicTestRunner,
   expectDiagnosticEmpty,
   expectDiagnostics,
-  t,
 } from "@typespec/compiler/testing";
 import assert, { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import {
   getFinalStateOverride,
-  getLongRunningStates,
   getOperationLinks,
   getPagedResult,
   getParameterizedNextLinkArguments,
-  isFixed,
-  isPreviewVersion,
   OperationLinkMetadata,
 } from "../src/decorators.js";
 import { FinalStateValue } from "../src/lro-helpers.js";
-import { createAzureCoreTestRunner, Tester } from "./test-host.js";
+import { createAzureCoreTestRunner } from "./test-host.js";
 
 describe("typespec-azure-core: decorators", () => {
   let runner: BasicTestRunner;
 
   beforeEach(async () => {
     runner = await createAzureCoreTestRunner();
-  });
-
-  describe("@previewVersion", () => {
-    it("emit diagnostic if use on non enum member", async () => {
-      const diagnostics = await runner.diagnose(`
-        @previewVersion
-        model Foo {}
-      `);
-      expectDiagnostics(diagnostics, {
-        code: "decorator-wrong-target",
-        message:
-          "Cannot apply @previewVersion decorator to Azure.MyService.Foo since it is not assignable to EnumMember",
-      });
-    });
-
-    it("emit diagnostic if use on enum member that is not part of a version enum", async () => {
-      const diagnostics = await runner.diagnose(`
-        enum Foo {
-          @previewVersion
-          v1: "1.0",
-        }
-      `);
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-azure-core/preview-version-invalid-enum-member",
-        message: "@previewVersion can only be applied to members of a Version enum.",
-      });
-    });
-
-    it("emit diagnostic if use on enum member that is not the last member", async () => {
-      const diagnostics = await Tester.diagnose(`
-        import "@typespec/versioning";
-        import "@azure-tools/typespec-azure-core";
-
-        using Versioning;
-
-        @versioned(Versions)
-        @service(#{ title: "Widget Service" })
-        namespace DemoService;
-
-        enum Versions {
-          v1,
-          @Azure.Core.previewVersion
-          v2Preview: "2.0-preview",
-          v2: "2.0",
-        }
-      `);
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-azure-core/preview-version-last-member",
-        message:
-          "@previewVersion can only be applied to the last member of a Version enum. Having it on other members will cause unstable apis to show up in subsequent stable versions.",
-      });
-    });
-
-    it("succeeds to decorate the last enum member", async () => {
-      const { program, v2Preview } = await Tester.compile(t.code`
-        import "@typespec/versioning";
-        import "@azure-tools/typespec-azure-core";
-
-        using Versioning;
-
-        @versioned(Versions)
-        @service(#{ title: "Widget Service" })
-        namespace DemoService;
-
-        enum Versions {
-          v1,
-          @Azure.Core.previewVersion
-          ${t.enumMember("v2Preview")}: "2.0-preview",
-        }
-      `);
-
-      assert(v2Preview.name === "v2Preview");
-      assert(isPreviewVersion(program, v2Preview));
-    });
   });
 
   describe("@pagedResult", () => {
@@ -342,252 +264,6 @@ describe("typespec-azure-core: decorators", () => {
 
       const pagedResult = getPagedResult(runner.program, Foo.operations.get("list")!);
       strictEqual(pagedResult?.nextLinkOperation?.name, "nextPage");
-    });
-  });
-
-  describe("@lroStatus", () => {
-    it("emits diagnostic if used on wrong type", async () => {
-      const diagnostics = await runner.diagnose(`
-        #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is test code."
-        @lroStatus
-        op foo(): Page<{}>;
-
-        @lroStatus
-        interface Foo {
-        }
-      `);
-
-      expectDiagnostics(diagnostics, [
-        {
-          code: "decorator-wrong-target",
-          message:
-            "Cannot apply @lroStatus decorator to Azure.MyService.foo since it is not assignable to Enum | Union | ModelProperty",
-        },
-        {
-          code: "decorator-wrong-target",
-          message:
-            "Cannot apply @lroStatus decorator to Azure.MyService.Foo since it is not assignable to Enum | Union | ModelProperty",
-        },
-      ]);
-    });
-
-    it("emits diagnostic when model property type isn't valid", async () => {
-      const diagnostics = await runner.diagnose(`
-        model BadStatusType {
-          @lroStatus status: int32;
-        }
-
-        model BadUnionType {
-          @lroStatus status: "Succeeded" | int64;
-        }
-      `);
-
-      expectDiagnostics(diagnostics, [
-        {
-          code: "@azure-tools/typespec-azure-core/lro-status-property-invalid-type",
-          message: "Property type must be a union of strings or an enum.",
-        },
-        {
-          code: "@azure-tools/typespec-azure-core/lro-status-union-non-string",
-          message: "Union contains non-string value type Scalar.",
-        },
-        {
-          code: "@azure-tools/typespec-azure-core/lro-status-missing",
-          message: "Terminal long-running operation states are missing: Failed.",
-        },
-      ]);
-    });
-
-    it("emits diagnostic when standard terminal states are missing", async () => {
-      const diagnostics = await runner.diagnose(`
-        model UnionMissingStates {
-          @lroStatus status: "Completed" | "Failed" | "Cancelled" | "Working" | "Extra";
-        }
-
-        @lroStatus
-        enum EnumMissingStates {
-          Succeeded, Error, Cancelled
-        }
-        `);
-
-      expectDiagnostics(diagnostics, [
-        {
-          code: "@azure-tools/typespec-azure-core/lro-status-missing",
-          message: "Terminal long-running operation states are missing: Succeeded.",
-        },
-        {
-          code: "@azure-tools/typespec-azure-core/lro-status-missing",
-          message: "Terminal long-running operation states are missing: Failed.",
-        },
-      ]);
-    });
-
-    it("returns LRO states from a string union", async () => {
-      const { StatusModel } = (await runner.compile(`
-        @test
-        model StatusModel {
-          @lroStatus status: "Succeeded" | "Failed" | "Canceled" | "Working" | "Extra";
-        }
-`)) as { StatusModel: Model };
-
-      deepStrictEqual(getLongRunningStates(runner.program, StatusModel.properties.get("status")!), {
-        succeededState: ["Succeeded"],
-        failedState: ["Failed"],
-        canceledState: ["Canceled"],
-        states: ["Succeeded", "Failed", "Canceled", "Working", "Extra"],
-      });
-    });
-
-    it("returns LRO states from an enum type", async () => {
-      const { DefaultLroStates, CustomLroStates } = (await runner.compile(`
-        @test
-        @lroStatus
-        enum DefaultLroStates {
-          Succeeded,
-          Failed,
-          Canceled,
-          Extra,
-        }
-
-        @test
-        @lroStatus
-        enum CustomLroStates {
-          @lroSucceeded Donezo,
-          @lroFailed Borked,
-          @lroCanceled Chucked,
-          HaveAnother,
-        }
-`)) as { DefaultLroStates: Enum; CustomLroStates: Enum };
-
-      deepStrictEqual(getLongRunningStates(runner.program, DefaultLroStates), {
-        succeededState: ["Succeeded"],
-        failedState: ["Failed"],
-        canceledState: ["Canceled"],
-        states: ["Succeeded", "Failed", "Canceled", "Extra"],
-      });
-
-      deepStrictEqual(getLongRunningStates(runner.program, CustomLroStates), {
-        succeededState: ["Donezo"],
-        failedState: ["Borked"],
-        canceledState: ["Chucked"],
-        states: ["Donezo", "Borked", "Chucked", "HaveAnother"],
-      });
-    });
-
-    it("returns LRO states from an named union type", async () => {
-      const { DefaultLroStates, CustomLroStates } = (await runner.compile(`
-        @test
-        @lroStatus
-        union DefaultLroStates {
-          "Succeeded",
-          "Failed",
-          "Canceled",
-          "Extra",
-        }
-
-        @test
-        @lroStatus
-        union CustomLroStates {
-          @lroSucceeded "Donezo",
-          @lroFailed "Borked",
-          @lroCanceled "Chucked",
-          "HaveAnother",
-        }
-      `)) as { DefaultLroStates: Enum; CustomLroStates: Enum };
-
-      deepStrictEqual(getLongRunningStates(runner.program, DefaultLroStates), {
-        succeededState: ["Succeeded"],
-        failedState: ["Failed"],
-        canceledState: ["Canceled"],
-        states: ["Succeeded", "Failed", "Canceled", "Extra"],
-      });
-
-      deepStrictEqual(getLongRunningStates(runner.program, CustomLroStates), {
-        succeededState: ["Donezo"],
-        failedState: ["Borked"],
-        canceledState: ["Chucked"],
-        states: ["Donezo", "Borked", "Chucked", "HaveAnother"],
-      });
-    });
-
-    it("returns LRO states from an named union type built with enum", async () => {
-      const { DefaultLroStates } = (await runner.compile(`
-        enum CommonStates {
-          Succeeded,
-          Failed,
-          Canceled
-        }
-
-        @test
-        @lroStatus
-        union DefaultLroStates {
-          CommonStates,
-          "Extra",
-        }
-      `)) as { DefaultLroStates: Enum; CustomLroStates: Enum };
-
-      deepStrictEqual(getLongRunningStates(runner.program, DefaultLroStates), {
-        succeededState: ["Succeeded"],
-        failedState: ["Failed"],
-        canceledState: ["Canceled"],
-        states: ["Succeeded", "Failed", "Canceled", "Extra"],
-      });
-    });
-
-    it("returns LRO states from a string type with known values", async () => {
-      const { DefaultLroStates, CustomLroStates } = (await runner.compile(`
-        @test
-        @lroStatus
-        enum DefaultLroStates {
-          Succeeded,
-          Failed,
-          Canceled,
-          Extra,
-        }
-
-        @test
-        @lroStatus
-        enum CustomLroStates {
-          @lroSucceeded Donezo,
-          @lroFailed Borked,
-          @lroCanceled Chucked,
-          HaveAnother,
-        }
-`)) as { DefaultLroStates: Model; CustomLroStates: Model };
-
-      deepStrictEqual(getLongRunningStates(runner.program, DefaultLroStates), {
-        succeededState: ["Succeeded"],
-        failedState: ["Failed"],
-        canceledState: ["Canceled"],
-        states: ["Succeeded", "Failed", "Canceled", "Extra"],
-      });
-
-      deepStrictEqual(getLongRunningStates(runner.program, CustomLroStates), {
-        succeededState: ["Donezo"],
-        failedState: ["Borked"],
-        canceledState: ["Chucked"],
-        states: ["Donezo", "Borked", "Chucked", "HaveAnother"],
-      });
-    });
-
-    it("resolve default state from union variant name", async () => {
-      const { DefaultLroStates } = (await runner.compile(`
-        @test
-        @lroStatus
-        union DefaultLroStates {
-          Succeeded: "uSucceeded",
-          Failed: "uFailed",
-          Canceled: "uCancelled",
-          Extra: "uExtra",
-        }
-      `)) as { DefaultLroStates: Model };
-
-      deepStrictEqual(getLongRunningStates(runner.program, DefaultLroStates), {
-        succeededState: ["Succeeded"],
-        failedState: ["Failed"],
-        canceledState: ["Canceled"],
-        states: ["Succeeded", "Failed", "Canceled", "Extra"],
-      });
     });
   });
 
@@ -939,22 +615,6 @@ describe("typespec-azure-core: decorators", () => {
       `;
       const diagnostics = await runner.diagnose(code);
       expectDiagnosticEmpty(diagnostics);
-    });
-  });
-
-  describe("@fixed", () => {
-    it("marks `@fixed` enum correctly", async () => {
-      const result = await runner.compile(
-        `
-          @test @fixed enum FixedEnum {
-            A,
-            B,
-            C,
-          }
-          `,
-      );
-
-      ok(isFixed(runner.program, result.FixedEnum as Enum), "Expected fixed enum");
     });
   });
 
