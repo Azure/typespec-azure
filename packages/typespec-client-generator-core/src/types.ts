@@ -87,6 +87,7 @@ import {
   createGeneratedName,
   filterApiVersionsInEnum,
   getAvailableApiVersions,
+  getBaseModel,
   getClientDoc,
   getHttpBodyType,
   getHttpOperationResponseHeaders,
@@ -849,13 +850,14 @@ export function getSdkModelWithDiagnostics(
       // handle normal model properties
       diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
     }
-    if (type.baseModel) {
-      sdkType.baseModel = context.__referencedTypeCache.get(type.baseModel) as
+    const rawBaseModel = getBaseModel(context, type);
+    if (rawBaseModel) {
+      sdkType.baseModel = context.__referencedTypeCache.get(rawBaseModel) as
         | SdkModelType
         | undefined;
       if (sdkType.baseModel === undefined) {
         const baseModel = diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, type.baseModel, operation),
+          getClientTypeWithDiagnostics(context, rawBaseModel, operation),
         ) as SdkDictionaryType | SdkModelType;
         if (baseModel.kind === "dict") {
           // model MyModel extends Record<> {} should be model with additional properties
