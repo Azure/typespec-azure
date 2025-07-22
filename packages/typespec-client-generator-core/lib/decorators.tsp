@@ -938,8 +938,4 @@ extern dec clientDoc(
  * }
  * ```
  */
-extern dec inheritsFrom(
-  target: Model,
-  value: Model,
-  scope?: valueof string
-);
+extern dec inheritsFrom(target: Model, value: Model, scope?: valueof string);
