@@ -1228,22 +1228,28 @@ export const $inheritsFrom: InheritsFromDecorator = (
 export function getInheritsFrom(context: TCGCContext, target: Model): Model | undefined {
   // have to check circular inheritance in getter because in the decorator stage, the circularity of the models isn't fully calculated yet
   const value = getScopedDecoratorData(context, inheritsFromKey, target);
-  let circular = false;
-  let current: Model | undefined = value;
-  while (current) {
-    if (current === target) {
-      circular = true;
-      break;
-    }
-    current = current.baseModel;
+  if (context.__typesCheckedForCircularInheritance === undefined) {
+    context.__typesCheckedForCircularInheritance = new Set();
   }
-  if (circular) {
-    reportDiagnostic(context.program, {
-      code: "inherits-from-circular",
-      format: { target: target.name, value: value.name },
-      target: value,
-    });
-    return undefined;
+  if (!context.__typesCheckedForCircularInheritance.has(value)) {
+    let circular = false;
+    let current: Model | undefined = value;
+    while (current) {
+      if (current === target) {
+        circular = true;
+        break;
+      }
+      current = current.baseModel;
+    }
+    context.__typesCheckedForCircularInheritance.add(value);
+    if (circular) {
+      reportDiagnostic(context.program, {
+        code: "inherits-from-circular",
+        format: { target: target.name, value: value.name },
+        target: value,
+      });
+      return undefined;
+    }
   }
   return value;
 }
