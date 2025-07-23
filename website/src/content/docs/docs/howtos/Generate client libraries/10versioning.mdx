@@ -229,8 +229,6 @@ In this example, you can see how this change is made in tspconfig.yaml, and we a
 
 <ClientTabs>
 
-<ClientTabItem lang="typespec">
-
 ```yaml title=tspconfig.yaml
 options:
   "@azure-tools/typespec-python":
@@ -276,7 +274,6 @@ op previewFunctionality(@body previewModel: PreviewModel): void;
 op stableFunctionality(@body stableModel: StableModel): void;
 ```
 
-</ClientTabItem>
 ```python
 import pytest
 from my.service import MyServiceClient, models
