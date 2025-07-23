@@ -47,6 +47,7 @@ import {
   getAccessOverride,
   getAlternateType,
   getClientNamespace,
+  getDiscriminatorValueRaw,
   getExplicitClientApiVersions,
   getOverriddenClientMethod,
   getUsageOverride,
@@ -693,7 +694,9 @@ function addDiscriminatorToModelType(
     }
 
     let discriminatorProperty;
-    for (const childModel of type.derivedModels) {
+    const childModels = [...type.derivedModels]; // Create a copy to avoid mutating the original
+    while (childModels.length > 0) {
+      const childModel = childModels.shift()!; // Use shift() instead of pop() to maintain order
       if (isTemplateDeclaration(childModel)) continue;
       const childModelSdkType = diagnostics.pipe(getSdkModelWithDiagnostics(context, childModel));
       for (const property of childModelSdkType.properties) {
@@ -727,7 +730,9 @@ function addDiscriminatorToModelType(
                   }
                 }
               }
-              childModelSdkType.discriminatorValue = property.type.value as string;
+              const discriminatorValue = getDiscriminatorValueRaw(context, childModel);
+              childModelSdkType.discriminatorValue =
+                discriminatorValue ?? (property.type.value as string);
               property.discriminator = true;
               if (model.discriminatedSubtypes === undefined) {
                 model.discriminatedSubtypes = {};
@@ -737,7 +742,12 @@ function addDiscriminatorToModelType(
             }
           }
         }
+        if (childModelSdkType.discriminatorValue === undefined) {
+          childModelSdkType.discriminatorValue = getDiscriminatorValueRaw(context, childModel);
+        }
       }
+      // Add derived models to the end of the queue to maintain breadth-first order
+      childModels.push(...(childModel.derivedModels || []));
     }
     for (let i = 0; i < model.properties.length; i++) {
       const property = model.properties[i];

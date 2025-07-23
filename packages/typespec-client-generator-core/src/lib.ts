@@ -404,6 +404,12 @@ export const $lib = createTypeSpecLibrary({
           "`@clientLocation`'s target should not duplicate with defined namespace or interface under `@service` namespace.",
       },
     },
+    "discriminator-value-without-discriminator": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@discriminatorValue decorator is applied to model '${"modelName"}' without @discriminator decorator. This will be ignored.`,
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,

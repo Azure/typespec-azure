@@ -861,6 +861,37 @@ export type ClientDocDecorator = (
   scope?: string,
 ) => void;
 
+/**
+ * Specify the discriminator property and value for multi-level inheritance hierarchies.
+ * This extends the core `@discriminator` decorator to support complex inheritance chains
+ * where different levels of the hierarchy use different discriminator properties.
+ *
+ * @param propertyName The property name to use for discrimination at this level
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ * @example
+ * ```typespec
+ * @discriminator("kind")
+ * model Pet {
+ *  kind: string
+ * }
+ *
+ * @discriminatorValue("dog")
+ * model Dog extends Pet {
+ * }
+ *
+ * model Puppy extends Dog {
+ *  kind: "puppy";
+ * }
+ * ```
+ */
+export type DiscriminatorValueDecorator = (
+  context: DecoratorContext,
+  entity: Model,
+  propertyName: string,
+  scope?: string,
+) => void;
+
 export type AzureClientGeneratorCoreDecorators = {
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
@@ -883,4 +914,5 @@ export type AzureClientGeneratorCoreDecorators = {
   responseAsBool: ResponseAsBoolDecorator;
   clientLocation: ClientLocationDecorator;
   clientDoc: ClientDocDecorator;
+  discriminatorValue: DiscriminatorValueDecorator;
 };
