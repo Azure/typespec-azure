@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.58.1
+
+### Bug Fixes
+
+- [#3030](https://github.com/Azure/typespec-azure/pull/3030) Use OverrideErrorType parameter in legacy list operation
+- [#3026](https://github.com/Azure/typespec-azure/pull/3026) Fix #1876 Add ResolveArmOperations method
+
+
 ## 0.58.0
 
 ### Bump dependencies

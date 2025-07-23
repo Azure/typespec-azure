@@ -35,7 +35,6 @@ import {
   ResourceOperation,
 } from "@typespec/rest";
 import {
-  extractLroStates,
   FinalOperationKey,
   getFinalLocationValue,
   getFinalStateOverride,
@@ -52,6 +51,7 @@ import {
   pollingOptionsKind,
   StatusMonitorPollingLocationInfo,
 } from "./decorators.js";
+import { extractLroStates } from "./decorators/lro-status.js";
 import { PropertyMap, StatusMonitorMetadata } from "./lro-info.js";
 
 /**

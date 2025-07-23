@@ -16,10 +16,10 @@
   "dependencies": {
     "@astrojs/check": "^0.9.4",
     "@astrojs/react": "^4.2.1",
-    "@astrojs/starlight": "^0.34.3",
+    "@astrojs/starlight": "^0.35.1",
     "@docsearch/css": "^3.9.0",
     "@docsearch/js": "^3.9.0",
-    "@fluentui/react-components": "~9.66.1",
+    "@fluentui/react-components": "~9.67.0",
     "@typespec/playground": "workspace:^",
     "astro": "^5.5.6",
     "es-module-shims": "~2.6.0",
