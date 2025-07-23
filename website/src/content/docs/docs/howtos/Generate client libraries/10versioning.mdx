@@ -295,7 +295,7 @@ preview_model = models.PreviewModel(preview_functionality="present")
 
 preview_client.preview_functionality(preview_model) # call goes through
 
-```
+````
 
 ```csharp
 // ServiceVersion enum
@@ -316,7 +316,7 @@ Response response = client.PreviewFunctionality(previewModel);
 //call StableFunctionality
 StableModel stableModel = new StableModel("<stableFeature>");
 Response response = client.StableFunctionality(stableModel);
-```
+````
 
 ```typescript
 // there is no apiVersion parameters defined in all operations, TypeScript emitter will ignore it.
@@ -351,7 +351,6 @@ serviceClientClient.previewFunctionality(previewModel);
 ```
 
 </ClientTabs>
-
 
 ## Overriding the Client Api Version Parameter
 
