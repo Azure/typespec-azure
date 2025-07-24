@@ -816,7 +816,7 @@ it("next link with mix of re-injected parameters and not", async () => {
       values: User[];
 
       @nextLink
-      nextLink: Legacy.parameterizedNextLink<[IncludePendingOptions.includePending]>;
+      nextLink: Azure.Core.Legacy.parameterizedNextLink<[IncludePendingOptions.includePending]>;
     }
 
     @doc("List with parameterized next link that re-injects parameters.")
