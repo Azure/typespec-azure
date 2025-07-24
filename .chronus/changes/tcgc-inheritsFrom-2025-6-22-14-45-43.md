@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-add `@inheritsFrom` decorator to allow multi-level discriminator handling
+add `@legacyHierarchyBuilding` decorator for legacy backcompat multi-level discriminator handling

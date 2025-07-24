@@ -33,7 +33,6 @@ import {
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
   FlattenPropertyDecorator,
-  InheritsFromDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
@@ -68,6 +67,7 @@ import {
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
+import { LegacyHierarchyBuildingDecorator } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 
@@ -1191,7 +1191,7 @@ export function getClientLocation(
     | undefined;
 }
 
-const inheritsFromKey = createStateSymbol("inheritsFrom");
+const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
 
 function isPropertySuperset(target: Model, value: Model): boolean {
   // Check if all properties in value exist in target
@@ -1203,7 +1203,7 @@ function isPropertySuperset(target: Model, value: Model): boolean {
   return true;
 }
 
-export const $inheritsFrom: InheritsFromDecorator = (
+export const $legacyHierarchyBuilding: LegacyHierarchyBuildingDecorator = (
   context: DecoratorContext,
   target: Model,
   value: Model,
@@ -1212,22 +1212,22 @@ export const $inheritsFrom: InheritsFromDecorator = (
   // Validate that target has all properties from value
   if (!isPropertySuperset(target, value)) {
     reportDiagnostic(context.program, {
-      code: "inherits-from-conflict",
+      code: "legacy-hierarchy-building-conflict",
       format: {
         childModel: target.name,
-        inheritsFromModelName: value.name,
+        parentModel: value.name,
       },
       target: context.decoratorTarget,
     });
     return;
   }
 
-  setScopedDecoratorData(context, $inheritsFrom, inheritsFromKey, target, value, scope);
+  setScopedDecoratorData(context, $legacyHierarchyBuilding, legacyHierarchyBuildingKey, target, value, scope);
 };
 
-export function getInheritsFrom(context: TCGCContext, target: Model): Model | undefined {
+export function getLegacyHierarchyBuilding(context: TCGCContext, target: Model): Model | undefined {
   // have to check circular inheritance in getter because in the decorator stage, the circularity of the models isn't fully calculated yet
-  const value = getScopedDecoratorData(context, inheritsFromKey, target);
+  const value = getScopedDecoratorData(context, legacyHierarchyBuildingKey, target);
   if (context.__typesCheckedForCircularInheritance === undefined) {
     context.__typesCheckedForCircularInheritance = new Set();
   }
@@ -1244,7 +1244,7 @@ export function getInheritsFrom(context: TCGCContext, target: Model): Model | un
     context.__typesCheckedForCircularInheritance.add(value);
     if (circular) {
       reportDiagnostic(context.program, {
-        code: "inherits-from-circular",
+        code: "legacy-hierarchy-building-circular",
         format: { target: target.name, value: value.name },
         target: value,
       });

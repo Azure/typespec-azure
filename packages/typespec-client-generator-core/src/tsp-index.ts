@@ -1,4 +1,5 @@
 import { AzureClientGeneratorCoreDecorators } from "../generated-defs/Azure.ClientGenerator.Core.js";
+import { AzureClientGeneratorCoreLegacyDecorators } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
   $access,
   $alternateType,
@@ -13,7 +14,7 @@ import {
   $convenientAPI,
   $deserializeEmptyStringAsNull,
   $flattenProperty,
-  $inheritsFrom,
+  $legacyHierarchyBuilding,
   $operationGroup,
   $override,
   $paramAlias,
@@ -52,6 +53,9 @@ export const $decorators = {
     responseAsBool: $responseAsBool,
     clientDoc: $clientDoc,
     clientLocation: $clientLocation,
-    inheritsFrom: $inheritsFrom,
-  } as AzureClientGeneratorCoreDecorators,
+  } satisfies AzureClientGeneratorCoreDecorators,
+
+  "Azure.ClientGenerator.Core.Legacy": {
+    legacyHierarchyBuilding: $legacyHierarchyBuilding,
+  } satisfies AzureClientGeneratorCoreLegacyDecorators,
 };

@@ -48,7 +48,7 @@ import {
   getAlternateType,
   getClientNamespace,
   getExplicitClientApiVersions,
-  getInheritsFrom,
+  getLegacyHierarchyBuilding,
   getOverriddenClientMethod,
   getUsageOverride,
   listClients,
@@ -850,7 +850,7 @@ export function getSdkModelWithDiagnostics(
       // handle normal model properties
       diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
     }
-    const rawBaseModel = getInheritsFrom(context, type) || type.baseModel;
+    const rawBaseModel = getLegacyHierarchyBuilding(context, type) || type.baseModel;
     if (rawBaseModel) {
       sdkType.baseModel = context.__referencedTypeCache.get(rawBaseModel) as
         | SdkModelType
@@ -1739,16 +1739,16 @@ function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
   }
 }
 
-function updateDiscriminatedSubtypesFromInheritsFrom(
+function updateDiscriminatedSubtypesFromLegacyHierarchyBuilding(
   context: TCGCContext,
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   for (const sdkType of context.__referencedTypeCache.values()) {
     if (sdkType.kind !== "model" || !sdkType.baseModel) continue;
-    // if the model has inheritsFrom, then we should update its discriminated subtypes
-    const inheritsFrom = getInheritsFrom(context, sdkType.__raw as Model);
+    // if the model has legacyHierarchyBuilding, then we should update its discriminated subtypes
+    const legacyHierarchyBuilding = getLegacyHierarchyBuilding(context, sdkType.__raw as Model);
     // must be done after discriminator is added
-    if (inheritsFrom && sdkType.discriminatorValue) {
+    if (legacyHierarchyBuilding && sdkType.discriminatorValue) {
       let currBaseModel: SdkModelType | undefined = sdkType.baseModel;
       while (currBaseModel) {
         if (!currBaseModel.discriminatedSubtypes) {
@@ -1908,8 +1908,8 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   diagnostics.pipe(updateUsageOverride(context));
   // update spread model
   updateSpreadModelUsageAndAccess(context);
-  // update discriminated subtypes from @inheritsFrom
-  updateDiscriminatedSubtypesFromInheritsFrom(context);
+  // update discriminated subtypes from @legacyHierarchyBuilding
+  updateDiscriminatedSubtypesFromLegacyHierarchyBuilding(context);
   // update generated name
   resolveConflictGeneratedName(context);
 

@@ -1070,3 +1070,53 @@ model MyModel {
   prop: string;
 }
 ```
+
+## Azure.ClientGenerator.Core.Legacy
+
+### `@legacyHierarchyBuilding` {#@Azure.ClientGenerator.Core.Legacy.legacyHierarchyBuilding}
+
+Adds support for client-level multiple levels of inheritance.
+
+This decorator will update the models returned from TCGC to include the multi-level inheritance information.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.legacyHierarchyBuilding(value: Model, scope?: valueof string)
+```
+
+#### Target
+
+The target type (operation, model, enum, etc.) for which you want to apply client-specific documentation.
+`Model`
+
+#### Parameters
+
+| Name  | Type             | Description                                                                                                                                                                                                                                                |
+| ----- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| value | `Model`          |                                                                                                                                                                                                                                                            |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+
+#### Examples
+
+##### Three-level inheritance
+
+```typespec
+@discriminator("kind")
+model A {
+  kind: string;
+}
+
+model BContent {
+  foo: string;
+}
+
+model B extends A {
+  kind: "B";
+  ...BContent;
+}
+
+@Azure.ClientGenerator.Core.Legacy.legacyHierarchyBuilding(B)
+model C extends A {
+  ...BContent;
+  kind: "C";
+}
+```

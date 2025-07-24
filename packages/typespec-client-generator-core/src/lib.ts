@@ -404,17 +404,17 @@ export const $lib = createTypeSpecLibrary({
           "`@clientLocation`'s target should not duplicate with defined namespace or interface under `@service` namespace.",
       },
     },
-    "inherits-from-circular": {
+    "legacy-hierarchy-building-circular": {
       severity: "warning",
       messages: {
         default:
-          "Circular inheritance detected in @inheritsFrom decorator. We will ignore this decorator",
+          "Circular inheritance detected in @legacyHierarchyBuilding decorator. We will ignore this decorator",
       },
     },
-    "inherits-from-conflict": {
+    "legacy-hierarchy-building-conflict": {
       severity: "warning",
       messages: {
-        default: paramMessage`@inheritsFrom decorator causes conflicts in inherited properties. Please check that the model ${"childModel"} has the same properties as ${"inheritsFromModelName"} in the spec.`,
+        default: paramMessage`@legacyHierarchyBuilding decorator causes conflicts in inherited properties. Please check that the model ${"childModel"} has the same properties as ${"parentModel"} in the spec.`,
       },
     },
   },
