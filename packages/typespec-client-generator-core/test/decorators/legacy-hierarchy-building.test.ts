@@ -1,7 +1,12 @@
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import { AzureCoreTestLibrary, noLegacyUsage } from "@azure-tools/typespec-azure-core/testing";
+import {
+  createLinterRuleTester,
+  expectDiagnostics,
+  LinterRuleTester,
+} from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 
 let runner: SdkTestRunner;
 
@@ -376,7 +381,7 @@ it("verify respectLegacyHierarchyBuilding: false flag", async () => {
   const runnerWithoutLegacyHierarchyBuilding = await createSdkTestRunner({
     emitterName: "@azure-tools/typespec-java",
   });
-   await runnerWithoutLegacyHierarchyBuilding.compileWithBuiltInService(`
+  await runnerWithoutLegacyHierarchyBuilding.compileWithBuiltInService(`
       @discriminator("type")
       model Vehicle {
         type: string;
@@ -406,4 +411,54 @@ it("verify respectLegacyHierarchyBuilding: false flag", async () => {
   // SportsCar should inherit from Vehicle instead of Car
   strictEqual(sportsCarModel.baseModel?.name, "Vehicle");
   strictEqual(carModel.baseModel?.name, "Vehicle");
+});
+
+it("verify diagnostic gets raised for usage", async () => {
+  const runnerWithCore = await createSdkTestRunner({
+    librariesToAdd: [AzureCoreTestLibrary],
+    autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+    emitterName: "@azure-tools/typespec-java",
+  });
+
+  const tester: LinterRuleTester = createLinterRuleTester(
+    runnerWithCore,
+    noLegacyUsage,
+    "@azure-tools/typespec-azure-core",
+  );
+
+  await tester
+    .expect(
+      `        
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+      namespace MyService {
+        @discriminator("kind")
+        model A {
+          kind: string;
+        }
+
+        model BContent {
+          foo: string;
+        }
+
+        model B extends A {
+          kind: "B";
+          ...BContent;
+        }
+
+        @Azure.ClientGenerator.Core.Legacy.legacyHierarchyBuilding(B)
+        model C extends A {
+          kind: "C";
+          ...BContent;
+          bar: string;
+        }
+      }
+      `,
+    )
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-core/no-legacy-usage",
+        message:
+          'Referencing elements inside Legacy namespace "Azure.ClientGenerator.Core.Legacy" is not allowed.',
+      },
+    ]);
 });

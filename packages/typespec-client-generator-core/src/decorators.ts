@@ -1199,6 +1199,11 @@ function isPropertySuperset(target: Model, value: Model): boolean {
     if (!target.properties.has(name)) {
       return false;
     }
+    const targetProperty = target.properties.get(name)!;
+    const valueProperty = value.properties.get(name)!;
+    if (targetProperty.type.kind !== valueProperty.type.kind) {
+      return false;
+    }
   }
   return true;
 }
