@@ -16,6 +16,7 @@ namespace Azure.ResourceManager;
  */
 @autoRoute
 @doc("List {name} resources by subscription ID", Resource)
+@list
 @listsResource(Resource)
 @segmentOf(Resource)
 @armResourceList(Resource)
@@ -40,6 +41,7 @@ op ArmListBySubscription<
  */
 @get
 @autoRoute
+@list
 @listsResource(Resource)
 @segmentOf(Resource)
 @Private.armRenameListByOperation(Resource, ParentName, ParentFriendlyName, false) // This must come before @armResourceList!
@@ -69,6 +71,7 @@ op ArmResourceListByParent<
  */
 @get
 @autoRoute
+@list
 @listsResource(Resource)
 @segmentOf(Resource)
 @Private.armRenameListByOperation(Resource) // This must come before @armResourceList!
