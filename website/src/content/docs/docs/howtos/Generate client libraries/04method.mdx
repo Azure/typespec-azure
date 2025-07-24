@@ -1329,15 +1329,15 @@ export async function analyze(
 // Modular classical client layer
 export class AnalyzeClient {
   completions(
-    input: __PLACEHOLDER_o48__,
+    input: CompletionInput,
     options: CompletionsOptionalParams = { requestOptions: {} },
-  ): Promise<__PLACEHOLDER_o49__>;
+  ): Promise<CompletionResult>;
 
   analyze(
     mode: "strict" | "lenient",
     image: Uint8Array,
     options: AnalyzeOptionalParams = { requestOptions: {} },
-  ): Promise<__PLACEHOLDER_o50__>;
+  ): Promise<AnalyzeResult>;
 }
 ```
 
@@ -1538,7 +1538,7 @@ export async function get(
 export class TestServiceClient {
   get(
     options: GetOptionalParams = { requestOptions: {} }
-  ): Promise<__PLACEHOLDER_o42__>;
+  ): Promise<Response>;
 }
 ```
 

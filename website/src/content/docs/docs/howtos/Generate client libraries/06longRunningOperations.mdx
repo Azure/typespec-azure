@@ -62,21 +62,21 @@ export async function getOperationStatus(
   name: string,
   operationId: string,
   options: GetOperationStatusOptionalParams = { requestOptions: {} }
-): Promise<__PLACEHOLDER_o27__>;
+): Promise<User>;
 
 // Modular classical client layer
 export class TestServiceClient {
   createOrReplace(
     name: string,
-    resource: __PLACEHOLDER_o45__,
+    resource: User,
     options: CreateOrReplaceOptionalParams = { requestOptions: {} }
-  ): PollerLike<OperationState<__PLACEHOLDER_o45__>, __PLACEHOLDER_o45__>；
+  ): PollerLike<OperationState<User>, User>；
 
   getOperationStatus(
     name: string,
     operationId: string,
     options: GetOperationStatusOptionalParams = { requestOptions: {} }
-  ): Promise<__PLACEHOLDER_o46__>;
+  ): Promise<User>;
 }
 ```
 
@@ -139,7 +139,7 @@ export async function getOperationStatus(
   name: string,
   operationId: string,
   options: GetOperationStatusOptionalParams = { requestOptions: {} },
-): Promise<__PLACEHOLDER_o25__>;
+): Promise<void>;
 
 // Modular classical client layer
 export class TestServiceClient {
@@ -152,7 +152,7 @@ export class TestServiceClient {
     name: string,
     operationId: string,
     options: GetOperationStatusOptionalParams = { requestOptions: {} },
-  ): Promise<__PLACEHOLDER_o44__>;
+  ): Promise<void>;
 }
 ```
 
@@ -232,7 +232,7 @@ export async function getExportOperationStatus(
   name: string,
   operationId: string,
   options: GetExportOperationStatusOptionalParams = { requestOptions: {} },
-): Promise<__PLACEHOLDER_o27__>;
+): Promise<ExportedUser>;
 
 // Modular classical client layer
 export class TestServiceClient {
@@ -240,13 +240,13 @@ export class TestServiceClient {
     name: string,
     format: string,
     options: ExportOptionalParams = { requestOptions: {} },
-  ): PollerLike<OperationState<__PLACEHOLDER_o45__>, __PLACEHOLDER_o45__>；
+  ): PollerLike<OperationState<ExportedUser>, ExportedUser>；
 
   getExportOperationStatus(
     name: string,
     operationId: string,
     options: GetExportOperationStatusOptionalParams = { requestOptions: {} },
-  ): Promise<__PLACEHOLDER_o46__>;
+  ): Promise<ExportedUser>;
 }
 ```
 
