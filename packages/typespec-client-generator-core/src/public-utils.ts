@@ -40,12 +40,12 @@ import {
   listOperationsInOperationGroup,
 } from "./decorators.js";
 import {
-  SdkBodyModelPropertyType,
   SdkBodyParameter,
   SdkCookieParameter,
   SdkHeaderParameter,
   SdkHttpOperation,
   SdkHttpOperationExample,
+  SdkMethodParameter,
   SdkModelPropertyType,
   SdkPathParameter,
   SdkQueryParameter,
@@ -56,12 +56,11 @@ import {
 import {
   AllScopes,
   TspLiteralType,
-  getHttpBodySpreadModel,
+  getHttpBodyType,
   getHttpOperationResponseHeaders,
   hasExplicitClientOrOperationGroup,
   hasNoneVisibility,
   isAzureCoreTspModel,
-  isHttpBodySpread,
   listAllUserDefinedNamespaces,
   removeVersionsLargerThanExplicitlySpecified,
   resolveDuplicateGenearatedName,
@@ -392,12 +391,7 @@ function getContextPath(
     if (httpOperation.parameters.body) {
       visited.clear();
       result = [{ name: root.name, type: root }];
-      let bodyType: Type;
-      if (isHttpBodySpread(httpOperation.parameters.body)) {
-        bodyType = getHttpBodySpreadModel(httpOperation.parameters.body.type as Model);
-      } else {
-        bodyType = httpOperation.parameters.body.type;
-      }
+      const bodyType = getHttpBodyType(httpOperation.parameters.body);
       if (dfsModelProperties(typeToFind, bodyType, "Request")) {
         return result;
       }
@@ -683,14 +677,14 @@ export function isPagedResultModel(context: TCGCContext, t: SdkType): boolean {
  */
 export function getHttpOperationParameter(
   method: SdkServiceMethod<SdkHttpOperation>,
-  param: SdkModelPropertyType,
+  param: SdkMethodParameter | SdkModelPropertyType,
 ):
   | SdkPathParameter
   | SdkQueryParameter
   | SdkHeaderParameter
   | SdkCookieParameter
   | SdkBodyParameter
-  | SdkBodyModelPropertyType
+  | SdkModelPropertyType
   | undefined {
   const operation = method.operation;
   // BFS to find the corresponding http parameter.
@@ -710,7 +704,7 @@ export function getHttpOperationParameter(
         if (operation.bodyParam.type.kind === "model" && operation.bodyParam.type !== param.type) {
           return operation.bodyParam.type.properties.find(
             (p) => p.kind === "property" && p.name === param.name,
-          ) as SdkBodyModelPropertyType | undefined;
+          ) as SdkModelPropertyType | undefined;
         }
         return operation.bodyParam;
       }
@@ -790,4 +784,14 @@ export function resolveOperationId(
   }
 
   return `${honorRenaming ? getLibraryName(context, operationNamespace) : operationNamespace.name}_${operationName}`;
+}
+
+/**
+ * Judge whether a model's property is an HTTP metadata.
+ * @param context TCGC context
+ * @param property
+ * @returns
+ */
+export function isHttpMetadata(context: TCGCContext, property: SdkModelPropertyType): boolean {
+  return property.__raw !== undefined && isMetadata(context.program, property.__raw);
 }

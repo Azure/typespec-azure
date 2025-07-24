@@ -77,12 +77,6 @@ export type PagedResultDecorator = (context: DecoratorContext, entity: Model) =>
 export type PreviewVersionDecorator = (context: DecoratorContext, target: EnumMember) => void;
 
 /**
- * Marks an Enum as being fixed since enums in Azure are
- * assumed to be extensible.
- */
-export type FixedDecorator = (context: DecoratorContext, target: Enum) => void;
-
-/**
  * Used for custom StatusMonitor implementation.
  * Identifies an EnumMember as a long-running "Succeeded" terminal state.
  */
@@ -212,7 +206,6 @@ export type AzureCoreDecorators = {
   items: ItemsDecorator;
   pagedResult: PagedResultDecorator;
   previewVersion: PreviewVersionDecorator;
-  fixed: FixedDecorator;
   lroSucceeded: LroSucceededDecorator;
   lroCanceled: LroCanceledDecorator;
   lroFailed: LroFailedDecorator;

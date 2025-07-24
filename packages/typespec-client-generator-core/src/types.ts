@@ -34,12 +34,9 @@ import {
 } from "@typespec/compiler";
 import {
   Authentication,
-  HttpOperationPart,
   Visibility,
   getAuthentication,
-  getHttpPart,
   getServers,
-  isBody,
   isHeader,
   isOrExtendsHttpFile,
   isStatusCode,
@@ -62,7 +59,6 @@ import {
 import {
   AccessFlags,
   SdkArrayType,
-  SdkBodyModelPropertyType,
   SdkBuiltInKinds,
   SdkBuiltInType,
   SdkClient,
@@ -74,7 +70,7 @@ import {
   SdkDurationType,
   SdkEnumType,
   SdkEnumValueType,
-  SdkInitializationType,
+  SdkHeaderParameter,
   SdkModelPropertyType,
   SdkModelPropertyTypeBase,
   SdkModelType,
@@ -92,7 +88,7 @@ import {
   filterApiVersionsInEnum,
   getAvailableApiVersions,
   getClientDoc,
-  getHttpBodySpreadModel,
+  getHttpBodyType,
   getHttpOperationResponseHeaders,
   getNonNullOptions,
   getNullOption,
@@ -106,7 +102,6 @@ import {
   isOnClient,
   listAllUserDefinedNamespaces,
   resolveConflictGeneratedName,
-  twoParamsEquivalent,
   updateWithApiVersionInformation,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
@@ -121,7 +116,7 @@ import {
 
 import { getVersions } from "@typespec/versioning";
 import { getNs, isAttribute, isUnwrapped } from "@typespec/xml";
-import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
+import { getSdkHttpParameter } from "./http.js";
 import { isMediaTypeJson, isMediaTypeTextPlain, isMediaTypeXml } from "./media-types.js";
 
 export function getTypeSpecBuiltInType(
@@ -763,7 +758,7 @@ function addDiscriminatorToModelType(
       discriminatorType = getTypeSpecBuiltInType(context, "string");
     }
     const name = discriminatorProperty ? discriminatorProperty.name : discriminator.propertyName;
-    model.properties.splice(0, 0, {
+    const discriminatorPropertyType: SdkModelPropertyType = {
       kind: "property",
       doc: `Discriminator property for ${model.name}.`,
       optional: false,
@@ -785,8 +780,9 @@ function addDiscriminatorToModelType(
       crossLanguageDefinitionId: `${model.crossLanguageDefinitionId}.${name}`,
       decorators: [],
       access: "public",
-    });
-    model.discriminatorProperty = model.properties[0];
+    };
+    model.properties.splice(0, 0, discriminatorPropertyType);
+    model.discriminatorProperty = discriminatorPropertyType;
   }
   return diagnostics.wrap(undefined);
 }
@@ -797,18 +793,6 @@ export function getSdkModel(
   operation?: Operation,
 ): SdkModelType {
   return ignoreDiagnostics(getSdkModelWithDiagnostics(context, type, operation));
-}
-
-export function getInitializationType(
-  context: TCGCContext,
-  type: Model,
-  operation?: Operation,
-): SdkInitializationType {
-  const model = ignoreDiagnostics(getSdkModelWithDiagnostics(context, type, operation));
-  for (const property of model.properties) {
-    property.kind = "method";
-  }
-  return model as SdkInitializationType;
 }
 
 export function getSdkModelWithDiagnostics(
@@ -850,8 +834,21 @@ export function getSdkModelWithDiagnostics(
         getClientTypeWithDiagnostics(context, type.indexer.value, operation),
       );
     }
-    // propreties should be generated first since base model'sdiscriminator handling is depend on derived model's properties
-    diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
+
+    // properties should be generated first since base model's discriminator handling is depend on derived model's properties
+    if (operation && isMultipartOperation(context, operation)) {
+      const body = getHttpOperationWithCache(context, operation).parameters.body;
+      if (body && getHttpBodyType(body) === type) {
+        // handle multipart body model properties
+        diagnostics.pipe(addMultipartPropertiesToModelType(context, sdkType, operation));
+      } else {
+        // handle normal model properties
+        diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
+      }
+    } else {
+      // handle normal model properties
+      diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
+    }
     if (type.baseModel) {
       sdkType.baseModel = context.__referencedTypeCache.get(type.baseModel) as
         | SdkModelType
@@ -1065,14 +1062,7 @@ export function getClientTypeWithDiagnostics(
     case "Model":
       retval = diagnostics.pipe(getSdkArrayOrDictWithDiagnostics(context, type, operation));
       if (retval === undefined) {
-        const httpPart = getHttpPart(context.program, type);
-        if (httpPart === undefined) {
-          retval = diagnostics.pipe(getSdkModelWithDiagnostics(context, type, operation));
-        } else {
-          retval = diagnostics.pipe(
-            getClientTypeWithDiagnostics(context, httpPart.type, operation),
-          );
-        }
+        retval = diagnostics.pipe(getSdkModelWithDiagnostics(context, type, operation));
       }
       break;
     case "Intrinsic":
@@ -1123,7 +1113,7 @@ export function getClientType(context: TCGCContext, type: Type, operation?: Oper
   return ignoreDiagnostics(getClientTypeWithDiagnostics(context, type, operation));
 }
 
-export function isReadOnly(property: SdkBodyModelPropertyType) {
+export function isReadOnly(property: SdkModelPropertyType) {
   if (
     property.visibility &&
     property.visibility.includes(Visibility.Read) &&
@@ -1255,106 +1245,18 @@ export function getSdkModelPropertyTypeBase(
 
 function isFilePart(context: TCGCContext, type: SdkType): boolean {
   if (type.kind === "array") {
-    // HttpFile<T>[]
+    // HttpFile<T>[] or HttpPart<{@body body: bytes}>[]
     return isFilePart(context, type.valueType);
   } else if (type.kind === "bytes") {
-    // Http<bytes>
+    // Http<bytes> or HttpPart<{@body body: bytes}>
     return true;
   } else if (type.kind === "model") {
     if (type.__raw && isOrExtendsHttpFile(context.program, type.__raw)) {
-      // Http<File>
+      // Http<File> or HttpPart<{@body body: File}>
       return true;
     }
-    // HttpPart<{@body body: bytes}> or HttpPart<{@body body: File}>
-    const body = type.properties.find((x) => x.__raw && isBody(context.program, x.__raw));
-    if (body) {
-      return isFilePart(context, body.type);
-    }
   }
   return false;
-}
-
-function getHttpOperationParts(context: TCGCContext, operation: Operation): HttpOperationPart[] {
-  const body = getHttpOperationWithCache(context, operation).parameters.body;
-  if (body?.bodyKind === "multipart") {
-    return body.parts;
-  }
-  return [];
-}
-
-function hasHttpPart(context: TCGCContext, type: Type): boolean {
-  if (type.kind === "Model") {
-    if (type.indexer) {
-      // HttpPart<T>[]
-      return (
-        type.indexer.key.name === "integer" &&
-        getHttpPart(context.program, type.indexer.value) !== undefined
-      );
-    } else {
-      // HttpPart<T>
-      return getHttpPart(context.program, type) !== undefined;
-    }
-  }
-  return false;
-}
-
-function getHttpOperationPart(
-  context: TCGCContext,
-  type: ModelProperty,
-  operation: Operation,
-): HttpOperationPart | undefined {
-  if (hasHttpPart(context, type.type)) {
-    const httpOperationParts = getHttpOperationParts(context, operation);
-    if (
-      type.model &&
-      httpOperationParts.length > 0 &&
-      httpOperationParts.length === type.model.properties.size
-    ) {
-      const index = Array.from(type.model.properties.values()).findIndex((p) => p === type);
-      if (index !== -1) {
-        return httpOperationParts[index];
-      }
-    }
-  }
-  return undefined;
-}
-
-function updateMultiPartInfo(
-  context: TCGCContext,
-  type: ModelProperty,
-  base: SdkBodyModelPropertyType,
-  operation: Operation,
-): [void, readonly Diagnostic[]] {
-  const httpOperationPart = getHttpOperationPart(context, type, operation);
-  const diagnostics = createDiagnosticCollector();
-  if (httpOperationPart) {
-    // body decorated with @multipartBody
-    base.serializationOptions.multipart = {
-      isFilePart: isFilePart(context, base.type),
-      isMulti: httpOperationPart.multi,
-      filename: httpOperationPart.filename
-        ? diagnostics.pipe(getSdkModelPropertyType(context, httpOperationPart.filename, operation))
-        : undefined,
-      contentType: httpOperationPart.body.contentTypeProperty
-        ? diagnostics.pipe(
-            getSdkModelPropertyType(context, httpOperationPart.body.contentTypeProperty, operation),
-          )
-        : undefined,
-      defaultContentTypes: httpOperationPart.body.contentTypes,
-      name: base.name,
-    };
-    // after https://github.com/microsoft/typespec/issues/3779 fixed, could use httpOperationPart.name directly
-    const httpPart = getHttpPart(context.program, type.type);
-    if (httpPart?.options?.name) {
-      base.serializedName = httpPart?.options?.name; // eslint-disable-line @typescript-eslint/no-deprecated
-      base.serializationOptions.multipart.name = httpPart?.options?.name;
-    }
-  }
-  if (base.serializationOptions.multipart !== undefined) {
-    base.isMultipartFileInput = base.serializationOptions.multipart.isFilePart; // eslint-disable-line @typescript-eslint/no-deprecated
-  }
-
-  return diagnostics.wrap(undefined);
 }
 
 export function getSdkModelPropertyType(
@@ -1367,19 +1269,8 @@ export function getSdkModelPropertyType(
   let property = context.__modelPropertyCache?.get(type);
 
   if (!property) {
-    const clientParams = operation
-      ? context.__clientParametersCache.get(context.getClientForOperation(operation))
-      : undefined;
-    const correspondingClientParams = clientParams?.find((x) =>
-      twoParamsEquivalent(context, x.__raw, type),
-    );
-    if (correspondingClientParams) return diagnostics.wrap(correspondingClientParams);
-    const base = diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation));
-
-    if (isSdkHttpParameter(context, type)) return getSdkHttpParameter(context, type, operation!);
-
     property = {
-      ...base,
+      ...diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation)),
       kind: "property",
       optional: type.optional,
       discriminator: false,
@@ -1388,21 +1279,7 @@ export function getSdkModelPropertyType(
       flatten: shouldFlattenProperty(context, type),
       serializationOptions: {},
     };
-    updateReferencedPropertyMap(context, type, property);
-    if (operation && type.model) {
-      const httpOperation = getHttpOperationWithCache(context, operation);
-      const httpBody = httpOperation.parameters.body;
-      if (httpBody) {
-        const httpBodyType = isHttpBodySpread(httpBody)
-          ? getHttpBodySpreadModel(httpBody.type as Model)
-          : httpBody.type;
-        if (type.model === httpBodyType) {
-          // only try to add multipartOptions for property of body
-          diagnostics.pipe(updateMultiPartInfo(context, type, property, operation));
-          property.multipartOptions = property.serializationOptions.multipart; // eslint-disable-line @typescript-eslint/no-deprecated
-        }
-      }
-    }
+    context.__modelPropertyCache.set(type, property);
   }
   return diagnostics.wrap(property);
 }
@@ -1410,7 +1287,7 @@ export function getSdkModelPropertyType(
 function addPropertiesToModelType(
   context: TCGCContext,
   type: Model,
-  sdkType: SdkType,
+  sdkType: SdkModelType,
   operation?: Operation,
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
@@ -1418,30 +1295,70 @@ function addPropertiesToModelType(
     if (
       isStatusCode(context.program, property) ||
       isNeverOrVoidType(property.type) ||
-      hasNoneVisibility(context, property) ||
-      sdkType.kind !== "model"
+      hasNoneVisibility(context, property)
     ) {
       continue;
     }
     const clientProperty = diagnostics.pipe(getSdkModelPropertyType(context, property, operation));
-    if (sdkType.properties) {
-      sdkType.properties.push(clientProperty);
-    } else {
-      sdkType.properties = [clientProperty];
-    }
+    sdkType.properties.push(clientProperty);
   }
   return diagnostics.wrap(undefined);
 }
 
-function updateReferencedPropertyMap(
+function addMultipartPropertiesToModelType(
   context: TCGCContext,
-  type: ModelProperty,
-  sdkType: SdkModelPropertyType,
-) {
-  if (sdkType.kind !== "property") {
-    return;
+  sdkType: SdkModelType,
+  operation: Operation,
+): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const body = getHttpOperationWithCache(context, operation).parameters.body;
+  if (!body || body.bodyKind !== "multipart") {
+    return diagnostics.wrap(undefined);
   }
-  context.__modelPropertyCache.set(type, sdkType);
+  for (const part of body.parts) {
+    const clientProperty = diagnostics.pipe(
+      getSdkModelPropertyType(context, part.property!, operation),
+    );
+
+    // set the type of the client property based on the part body type
+    const bodyType = getHttpBodyType(part.body);
+    if (clientProperty.type.kind === "array") {
+      clientProperty.type.valueType = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, bodyType, operation),
+      );
+    } else {
+      clientProperty.type = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, bodyType, operation),
+      );
+    }
+
+    clientProperty.serializationOptions.multipart = {
+      isFilePart: isFilePart(context, clientProperty.type),
+      isMulti: part.multi,
+      filename: part.filename
+        ? diagnostics.pipe(getSdkModelPropertyType(context, part.filename, operation))
+        : undefined,
+      contentType: part.body.contentTypeProperty
+        ? diagnostics.pipe(
+            getSdkModelPropertyType(context, part.body.contentTypeProperty, operation),
+          )
+        : undefined,
+      defaultContentTypes: part.body.contentTypes,
+      name: part.name!,
+      headers: part.headers.map((header) => {
+        return diagnostics.pipe(
+          getSdkHttpParameter(context, header.property),
+        ) as SdkHeaderParameter;
+      }),
+    };
+
+    clientProperty.serializedName = clientProperty.serializationOptions.multipart.name; // eslint-disable-line @typescript-eslint/no-deprecated
+    clientProperty.isMultipartFileInput = clientProperty.serializationOptions.multipart.isFilePart; // eslint-disable-line @typescript-eslint/no-deprecated
+    clientProperty.multipartOptions = clientProperty.serializationOptions.multipart; // eslint-disable-line @typescript-eslint/no-deprecated
+
+    sdkType.properties.push(clientProperty);
+  }
+  return diagnostics.wrap(undefined);
 }
 
 function updateReferencedTypeMap(context: TCGCContext, type: Type, sdkType: SdkType) {
@@ -1635,22 +1552,13 @@ function updateTypesFromOperation(
   const httpBody = httpOperation.parameters.body;
   if (httpBody && !isNeverOrVoidType(httpBody.type)) {
     const spread = isHttpBodySpread(httpBody);
-    let sdkType: SdkType;
-    if (spread) {
-      sdkType = diagnostics.pipe(
-        getClientTypeWithDiagnostics(
-          context,
-          getHttpBodySpreadModel(httpBody.type as Model),
-          operation,
-        ),
-      );
-    } else {
-      sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, httpBody.type, operation));
-    }
+    const sdkType = diagnostics.pipe(
+      getClientTypeWithDiagnostics(context, getHttpBodyType(httpBody), operation),
+    );
 
     const multipartOperation = isMultipartOperation(context, operation);
     if (generateConvenient) {
-      if (spread) {
+      if (spread && sdkType.kind === "model") {
         updateUsageOrAccess(context, UsageFlags.Spread, sdkType, { propagation: false });
         updateUsageOrAccess(context, UsageFlags.Input, sdkType, { skipFirst: true });
       } else {
@@ -2056,7 +1964,7 @@ function updateSerializationOptions(
 
 function setSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkBodyModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType,
   contentTypes: string[],
 ) {
   for (const contentType of contentTypes) {
@@ -2094,7 +2002,7 @@ function setSerializationOptions(
 
 function updateJsonSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkBodyModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType,
 ) {
   type.serializationOptions.json = {
     name:
@@ -2106,7 +2014,7 @@ function updateJsonSerializationOptions(
 
 function updateXmlSerializationOptions(
   context: TCGCContext,
-  type: SdkModelType | SdkBodyModelPropertyType,
+  type: SdkModelType | SdkModelPropertyType,
 ) {
   type.serializationOptions.xml = {
     name:
