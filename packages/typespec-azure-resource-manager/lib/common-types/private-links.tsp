@@ -184,6 +184,7 @@ model PrivateLinkResourceParameter<Segment extends valueof string = "privateLink
 model PrivateLinkResourceListResultV5 {
   /** Array of private link resources */
   @OpenAPI.extension("x-ms-identifiers", #["id"])
+  @pageItems
   value?: CommonTypes.PrivateLinkResource[];
 }
 
@@ -227,5 +228,6 @@ model PrivateLinkResourceListResultV5 {
 model PrivateEndpointConnectionListResultV5 {
   /** Array of private endpoint connections. */
   @OpenAPI.extension("x-ms-identifiers", #["id"])
+  @pageItems
   value?: CommonTypes.PrivateEndpointConnection[];
 }
