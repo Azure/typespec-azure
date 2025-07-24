@@ -6,7 +6,10 @@ import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 let runner: SdkTestRunner;
 
 beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+  runner = await createSdkTestRunner(
+    { emitterName: "@azure-tools/typespec-java" },
+    { respectLegacyHierarchyBuilding: true },
+  );
 });
 
 it("three-level inheritance chain", async () => {
@@ -25,7 +28,7 @@ it("three-level inheritance chain", async () => {
         ...BContent;
       }
 
-      @inheritsFrom(B)
+      @Legacy.legacyHierarchyBuilding(B)
       model C extends A {
         kind: "C";
         ...BContent;
@@ -45,7 +48,7 @@ it("three-level inheritance chain", async () => {
   ok(modelB);
   ok(modelC);
 
-  // C should inherit from B instead of A due to @inheritsFrom
+  // C should inherit from B instead of A due to @Legacy.legacyHierarchyBuilding
   strictEqual(modelC.baseModel?.name, "B");
   strictEqual(modelB.baseModel?.name, "A");
 
@@ -94,14 +97,14 @@ it("four-level inheritance chain", async () => {
         doors: int32;
       }
 
-      @inheritsFrom(MotorVehicle)
+      @Legacy.legacyHierarchyBuilding(MotorVehicle)
       model Car extends Vehicle {
         type: "car";
         ...MotorVehicleContent;
         ...CarContent;
       }
 
-      @inheritsFrom(Car)
+      @Legacy.legacyHierarchyBuilding(Car)
       model SportsCar extends Vehicle {
         type: "sports";
         ...MotorVehicleContent;
@@ -124,7 +127,7 @@ it("four-level inheritance chain", async () => {
   ok(carModel);
   ok(sportsCarModel);
 
-  // SportsCar should inherit from Car instead of Vehicle due to @inheritsFrom
+  // SportsCar should inherit from Car instead of Vehicle due to @Legacy.legacyHierarchyBuilding
   strictEqual(sportsCarModel.baseModel?.name, "Car");
   strictEqual(carModel.baseModel?.name, "MotorVehicle");
   strictEqual(motorVehicleModel.baseModel?.name, "Vehicle");
@@ -179,7 +182,7 @@ it("nested property inheritance", async () => {
       }
     }
 
-    @inheritsFrom(KingSalmon)
+    @Legacy.legacyHierarchyBuilding(KingSalmon)
     model SmartKindSalmon extends Salmon {
       kind: "smartkingsalmon";
       properties: {
@@ -208,7 +211,7 @@ it("nested property inheritance", async () => {
   ok(kingSalmonPropertiesModel);
   ok(smartKingSalmonPropertiesModel);
 
-  // SmartKindSalmon should inherit from KingSalmon instead of Salmon due to @inheritsFrom
+  // SmartKindSalmon should inherit from KingSalmon instead of Salmon due to @Legacy.legacyHierarchyBuilding
   strictEqual(smartKingSalmonModel.baseModel?.name, "KingSalmon");
   strictEqual(kingSalmonModel.baseModel?.name, "Salmon");
 
@@ -258,7 +261,7 @@ it("circular inheritance detection", async () => {
         propA: string;
       }
 
-      @inheritsFrom(A)
+      @Legacy.legacyHierarchyBuilding(A)
       model B extends C {
         propB: string;
       }
@@ -273,7 +276,7 @@ it("circular inheritance detection", async () => {
 
   // Should detect circular inheritance and report diagnostic
   expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/inherits-from-circular",
+    code: "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-circular",
   });
 });
 
@@ -290,8 +293,8 @@ it("conflicting inheritance", async () => {
         propB: string;
       }
 
-      @inheritsFrom(B)
-      model C extends A {  // Doesn't have propB but @inheritsFrom says B
+      @Legacy.legacyHierarchyBuilding(B)
+      model C extends A {  // Doesn't have propB but @Legacy.legacyHierarchyBuilding says B
         propC: string;
       }
 
@@ -301,7 +304,7 @@ it("conflicting inheritance", async () => {
 
   // Should warn about conflicting inheritance
   expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/inherits-from-conflict",
+    code: "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
   });
 });
 
@@ -317,7 +320,7 @@ it("inheritance override with template models", async () => {
         type: "string";
       }
 
-      @inheritsFrom(StringContainer)
+      @Legacy.legacyHierarchyBuilding(StringContainer)
       model SpecialContainer extends Container<string> {
         type: "special";
         metadata: Record<string>;
@@ -350,7 +353,7 @@ it("without polymorphism", async () => {
         ...BContent;
       }
 
-      @inheritsFrom(B)
+      @Legacy.legacyHierarchyBuilding(B)
       @usage(Usage.input)
       model C extends A {
         kind: "C";
@@ -369,7 +372,43 @@ it("without polymorphism", async () => {
   ok(bModel);
   ok(cModel);
 
-  // C should inherit from B instead of A due to @inheritsFrom
+  // C should inherit from B instead of A due to @Legacy.legacyHierarchyBuilding
   strictEqual(cModel.baseModel?.name, "B");
   strictEqual(bModel.baseModel?.name, "A");
+});
+
+it("verify respectLegacyHierarchyBuilding: false flag", async () => {
+  const runnerWithoutLegacyHierarchyBuilding = await createSdkTestRunner({
+    emitterName: "@azure-tools/typespec-java",
+  });
+   await runnerWithoutLegacyHierarchyBuilding.compileWithBuiltInService(`
+      @discriminator("type")
+      model Vehicle {
+        type: string;
+      }
+
+      model Car extends Vehicle {
+        type: "car";
+      }
+
+      @Legacy.legacyHierarchyBuilding(Car)
+      model SportsCar extends Vehicle {
+        type: "sports";
+      }
+
+      @route("/vehicles")
+      op getVehicle(): Vehicle;
+    `);
+
+  // Should not apply legacy hierarchy building
+  const models = runnerWithoutLegacyHierarchyBuilding.context.sdkPackage.models;
+  const vehicleModel = models.find((m) => m.name === "Vehicle");
+  const carModel = models.find((m) => m.name === "Car");
+  const sportsCarModel = models.find((m) => m.name === "SportsCar");
+  ok(vehicleModel);
+  ok(carModel);
+  ok(sportsCarModel);
+  // SportsCar should inherit from Vehicle instead of Car
+  strictEqual(sportsCarModel.baseModel?.name, "Vehicle");
+  strictEqual(carModel.baseModel?.name, "Vehicle");
 });

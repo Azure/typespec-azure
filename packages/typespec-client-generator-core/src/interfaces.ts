@@ -56,6 +56,7 @@ export interface TCGCContext {
   previewStringRegex: RegExp;
   disableUsageAccessPropagationToBase: boolean;
   flattenUnionAsEnum?: boolean;
+  respectLegacyHierarchyBuilding?: boolean;
 
   __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   __arrayDictionaryCache: Map<Type, SdkDictionaryType | SdkArrayType>;

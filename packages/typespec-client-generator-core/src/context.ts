@@ -184,6 +184,7 @@ export interface CreateSdkContextOptions {
   disableUsageAccessPropagationToBase?: boolean; // this flag is for some languages that has no need to generate base model, but generate model with composition
   exportTCGCoutput?: boolean; // this flag is for emitter to export TCGC output as yaml file
   flattenUnionAsEnum?: boolean; // this flag is for emitter to decide whether tcgc should flatten union as enum
+  respectLegacyHierarchyBuilding?: boolean; // this flag is for emitter to decide whether tcgc should respect @legacyHierarchyBuilding decorator
 }
 
 export async function createSdkContext<
@@ -217,6 +218,7 @@ export async function createSdkContext<
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
     disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
     flattenUnionAsEnum: options?.flattenUnionAsEnum ?? true,
+    respectLegacyHierarchyBuilding: options?.respectLegacyHierarchyBuilding ?? false,
   };
   sdkContext.sdkPackage = diagnostics.pipe(createSdkPackage(sdkContext));
   for (const client of sdkContext.sdkPackage.clients) {

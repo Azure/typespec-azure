@@ -40,6 +40,7 @@ import {
   ScopeDecorator,
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
+import { LegacyHierarchyBuildingDecorator } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
   AccessFlags,
   ClientInitializationOptions,
@@ -67,7 +68,6 @@ import {
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
-import { LegacyHierarchyBuildingDecorator } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 
 export const namespace = "Azure.ClientGenerator.Core";
 
@@ -1222,10 +1222,19 @@ export const $legacyHierarchyBuilding: LegacyHierarchyBuildingDecorator = (
     return;
   }
 
-  setScopedDecoratorData(context, $legacyHierarchyBuilding, legacyHierarchyBuildingKey, target, value, scope);
+  setScopedDecoratorData(
+    context,
+    $legacyHierarchyBuilding,
+    legacyHierarchyBuildingKey,
+    target,
+    value,
+    scope,
+  );
 };
 
 export function getLegacyHierarchyBuilding(context: TCGCContext, target: Model): Model | undefined {
+  // If legacy hierarchy building is not respected, ignore the decorator completely
+  if (!context.respectLegacyHierarchyBuilding) return undefined;
   // have to check circular inheritance in getter because in the decorator stage, the circularity of the models isn't fully calculated yet
   const value = getScopedDecoratorData(context, legacyHierarchyBuildingKey, target);
   if (context.__typesCheckedForCircularInheritance === undefined) {
