@@ -13,7 +13,7 @@ recommended to test a private of the change before merging.
 
 1. Create a fork of https://github.com/azure/azure-rest-api-specs
    (if you don't already have one)
-2. Create a branch from `main` you will use to create the test PR
+2. Create a branch from `typespec-next`(Or `main` if that change is a hotfix) you will use to create the test PR
 3. A comment from the `pkg-pr-new` bot will include a URL to the preview build of each package. The URL follows this format:
 
    ```http
