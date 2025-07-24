@@ -388,6 +388,7 @@ op ResourceCollectionOperation<
  * @template ErrorResponse The type of the error response. If not provided, the default error response type will be used.
  */
 @listsResource(Resource)
+@list
 @Private.ensureResourceType(Resource)
 op ResourceList<
   Resource extends TypeSpec.Reflection.Model,
