@@ -14,20 +14,18 @@ recommended to test a private of the change before merging.
 1. Create a fork of https://github.com/azure/azure-rest-api-specs
    (if you don't already have one)
 2. Create a branch from `main` you will use to create the test PR
-3. Find the URL of the private build of your test package(s)
-   1. Browse to your PR in repo `microsoft/typespec` or `azure/typespec-azure`
-   2. Select the "Checks" tab, the "Verify PR" pipeline, then click "View more
-      details on Azure Pipelines"
-   3. Click the link "# published" which shows the artifacts published by the
-      build
-   4. Expand "packages", find the package you need to test, click the three
-      vertical dots on the selected line, then "Copy download URL".
+3. A comment from the `pkg-pr-new` bot will include a URL to the preview build of each package. The URL follows this format:
+
+   ```http
+   https://pkg.pr.new/Azure/typespec-azure/<pkg-name>@<pr-number>
+   ```
+
 4. In your branch of `azure-rest-api-specs`, edit the root `package.json`, and
-   replace the version with the URL to your private build, for example:
+   replace the version with the URL to your private build(for both `dependencies` and `overrides`), for example:
 
    ```diff
-   - "@azure-tools/typespec-autorest": "0.36.0",
-   + "@azure-tools/typespec-autorest": "https://.../package.tgz"
+   - "@azure-tools/typespec-autorest": "next",
+   + "@azure-tools/typespec-autorest": "https://pkg.pr.new/Azure/typespec-azure/@azure-tools/typespec-azure-core@<pr-number>"
    ```
 
 5. Also edit `.github/actions/setup-node-npm-ci/action.yaml`, to force install
