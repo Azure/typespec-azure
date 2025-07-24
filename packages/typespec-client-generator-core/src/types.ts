@@ -1739,15 +1739,14 @@ function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
   }
 }
 
-function updateDiscriminatedSubtypesFromLegacyHierarchyBuilding(
-  context: TCGCContext,
-): [void, readonly Diagnostic[]] {
+function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   for (const sdkType of context.__referencedTypeCache.values()) {
     if (sdkType.kind !== "model" || !sdkType.baseModel) continue;
     // if the model has legacyHierarchyBuilding, then we should update its discriminated subtypes
     const legacyHierarchyBuilding = getLegacyHierarchyBuilding(context, sdkType.__raw as Model);
     // must be done after discriminator is added
+    // Populate discriminated subtypes for legacy hierarchy building
     if (legacyHierarchyBuilding && sdkType.discriminatorValue) {
       let currBaseModel: SdkModelType | undefined = sdkType.baseModel;
       while (currBaseModel) {
@@ -1757,6 +1756,15 @@ function updateDiscriminatedSubtypesFromLegacyHierarchyBuilding(
         currBaseModel.discriminatedSubtypes[sdkType.discriminatorValue] = sdkType;
         currBaseModel = currBaseModel.baseModel;
       }
+
+      // Filter out legacy hierarchy building properties
+      sdkType.properties = sdkType.properties.filter((property) => {
+        return !(
+          property.kind === "property" &&
+          !property.discriminator &&
+          legacyHierarchyBuilding.properties.has(property.name)
+        );
+      });
     }
   }
   return diagnostics.wrap(undefined);
@@ -1908,8 +1916,8 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   diagnostics.pipe(updateUsageOverride(context));
   // update spread model
   updateSpreadModelUsageAndAccess(context);
-  // update discriminated subtypes from @legacyHierarchyBuilding
-  updateDiscriminatedSubtypesFromLegacyHierarchyBuilding(context);
+  // update discriminated subtypes and filter out duplicate properties from @legacyHierarchyBuilding
+  handleLegacyHierarchyBuilding(context);
   // update generated name
   resolveConflictGeneratedName(context);
 

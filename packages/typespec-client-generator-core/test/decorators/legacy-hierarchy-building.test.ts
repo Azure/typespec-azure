@@ -59,10 +59,9 @@ it("three-level inheritance chain", async () => {
   strictEqual(modelA.discriminatorValue, undefined);
 
   // Verify properties are correctly inherited
-  strictEqual(modelC.properties.length, 3);
+  strictEqual(modelC.properties.length, 2);
   strictEqual(modelC.properties[0].name, "kind");
-  strictEqual(modelC.properties[1].name, "foo");
-  strictEqual(modelC.properties[2].name, "bar");
+  strictEqual(modelC.properties[1].name, "bar");
   strictEqual(modelB.properties.length, 2);
   strictEqual(modelB.properties[0].name, "kind");
   strictEqual(modelB.properties[1].name, "foo");
@@ -139,15 +138,12 @@ it("four-level inheritance chain", async () => {
   strictEqual(sportsCarModel.discriminatorValue, "sports");
 
   // Verify properties are correctly inherited
-  strictEqual(sportsCarModel.properties.length, 4);
+  strictEqual(sportsCarModel.properties.length, 2);
   strictEqual(sportsCarModel.properties[0].name, "type");
-  strictEqual(sportsCarModel.properties[1].name, "engine");
-  strictEqual(sportsCarModel.properties[2].name, "doors");
-  strictEqual(sportsCarModel.properties[3].name, "topSpeed");
-  strictEqual(carModel.properties.length, 3);
+  strictEqual(sportsCarModel.properties[1].name, "topSpeed");
+  strictEqual(carModel.properties.length, 2);
   strictEqual(carModel.properties[0].name, "type");
-  strictEqual(carModel.properties[1].name, "engine");
-  strictEqual(carModel.properties[2].name, "doors");
+  strictEqual(carModel.properties[1].name, "doors");
   strictEqual(motorVehicleModel.properties.length, 2);
   strictEqual(motorVehicleModel.properties[0].name, "type");
   strictEqual(motorVehicleModel.properties[1].name, "engine");
@@ -221,9 +217,8 @@ it("nested property inheritance", async () => {
   strictEqual(smartKingSalmonModel.discriminatorValue, "smartkingsalmon");
 
   // Verify properties are correctly inherited
-  strictEqual(smartKingSalmonModel.properties.length, 2);
+  strictEqual(smartKingSalmonModel.properties.length, 1);
   strictEqual(smartKingSalmonModel.properties[0].name, "kind");
-  strictEqual(smartKingSalmonModel.properties[1].type, smartKingSalmonPropertiesModel);
   strictEqual(smartKingSalmonPropertiesModel.properties.length, 2);
   strictEqual(smartKingSalmonPropertiesModel.properties[0].name, "farmed");
   strictEqual(smartKingSalmonPropertiesModel.properties[0].type.kind, "boolean");
