@@ -1,8 +1,7 @@
 {
   "extends": "./core/tsconfig.base.json",
   "compilerOptions": {
-    "allowJs": true,
-    "checkJs": false,
+    "allowJs": true
   },
   "include": ["./eng", "./core/eng"],
   "exclude": ["./core/eng/vitest.config.ts"]
