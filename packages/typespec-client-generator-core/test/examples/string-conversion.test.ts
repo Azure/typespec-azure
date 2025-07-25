@@ -208,4 +208,88 @@ describe("String to number/boolean example conversion", () => {
       message: `Value in example file 'invalid-string-to-boolean.json' does not follow its definition:\n"yes"`,
     });
   });
+
+  it("should handle edge cases for string conversions", async () => {
+    await runner.host.addTypeSpecFile(
+      "./examples/edge-cases.json",
+      JSON.stringify({
+        operationId: "edgeCases",
+        title: "Edge cases test",
+        parameters: {
+          scientificNotation: "1e5",
+          negativeFloat: "-123.45",
+          zero: "0",
+          mixedCaseTrue: "True",
+          mixedCaseFalse: "False",
+          emptyString: "",
+          whitespace: "  ",
+          nonNumber: "not-a-number"
+        },
+        responses: {}
+      })
+    );
+
+    await runner.compile(`
+      @service
+      namespace TestClient {
+        op edgeCases(
+          @query scientificNotation: float64,
+          @query negativeFloat: float64,
+          @query zero: int32,
+          @query mixedCaseTrue: boolean,
+          @query mixedCaseFalse: boolean,
+          @query emptyString: int32,
+          @query whitespace: int32,
+          @query nonNumber: float64
+        ): void;
+      }
+    `);
+
+    const operation = (
+      runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+    ).operation;
+    ok(operation);
+    strictEqual(operation.examples?.length, 1);
+    strictEqual(operation.examples[0].kind, "http");
+
+    const parameters = operation.examples[0].parameters;
+    ok(parameters);
+    // Should have 5 valid conversions: scientificNotation, negativeFloat, zero, mixedCaseTrue, mixedCaseFalse
+    strictEqual(parameters.length, 5);
+
+    // Scientific notation conversion
+    strictEqual(parameters[0].value.kind, "number");
+    strictEqual(parameters[0].value.value, 100000);
+
+    // Negative float conversion
+    strictEqual(parameters[1].value.kind, "number");
+    strictEqual(parameters[1].value.value, -123.45);
+
+    // Zero conversion
+    strictEqual(parameters[2].value.kind, "number");
+    strictEqual(parameters[2].value.value, 0);
+
+    // Mixed case boolean conversions
+    strictEqual(parameters[3].value.kind, "boolean");
+    strictEqual(parameters[3].value.value, true);
+
+    strictEqual(parameters[4].value.kind, "boolean");
+    strictEqual(parameters[4].value.value, false);
+
+    // Should have diagnostics for the invalid conversions
+    expectDiagnostics(runner.context.diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
+        message: `Value in example file 'edge-cases.json' does not follow its definition:\n""`,
+      },
+      {
+        code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
+        message: `Value in example file 'edge-cases.json' does not follow its definition:\n"  "`,
+      },
+      {
+        code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
+        message: `Value in example file 'edge-cases.json' does not follow its definition:\n"not-a-number"`,
+      }
+    ]);
+  });
 });

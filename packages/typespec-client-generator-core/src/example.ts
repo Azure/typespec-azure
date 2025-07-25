@@ -508,6 +508,42 @@ function getSdkTypeExample(
   return diagnostics.wrap(undefined);
 }
 
+/**
+ * Attempts to convert a string value to a number.
+ * Returns the converted number if valid, undefined otherwise.
+ */
+function tryConvertStringToNumber(value: string): number | undefined {
+  if (typeof value !== "string" || value.trim() === "") {
+    return undefined;
+  }
+  
+  const num = Number(value.trim());
+  if (isNaN(num) || !isFinite(num)) {
+    return undefined;
+  }
+  
+  return num;
+}
+
+/**
+ * Attempts to convert a string value to a boolean.
+ * Returns the converted boolean if valid, undefined otherwise.
+ */
+function tryConvertStringToBoolean(value: string): boolean | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+  
+  const lowerValue = value.toLowerCase().trim();
+  if (lowerValue === "true") {
+    return true;
+  } else if (lowerValue === "false") {
+    return false;
+  }
+  
+  return undefined;
+}
+
 function getSdkBaseTypeExample(
   kind: "string" | "number" | "boolean",
   type: SdkType,
@@ -515,15 +551,41 @@ function getSdkBaseTypeExample(
   relativePath: string,
 ): [SdkExampleValue | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  
+  // Direct type match - use as is
   if (typeof example === kind) {
     return diagnostics.wrap({
       kind,
       type,
       value: example,
     } as SdkExampleValue);
-  } else {
-    addExampleValueNoMappingDignostic(diagnostics, example, relativePath);
   }
+  
+  // Try string conversion for number and boolean types
+  if (typeof example === "string") {
+    if (kind === "number") {
+      const convertedNumber = tryConvertStringToNumber(example);
+      if (convertedNumber !== undefined) {
+        return diagnostics.wrap({
+          kind,
+          type,
+          value: convertedNumber,
+        } as SdkExampleValue);
+      }
+    } else if (kind === "boolean") {
+      const convertedBoolean = tryConvertStringToBoolean(example);
+      if (convertedBoolean !== undefined) {
+        return diagnostics.wrap({
+          kind,
+          type,
+          value: convertedBoolean,
+        } as SdkExampleValue);
+      }
+    }
+  }
+  
+  // If no conversion was possible, add diagnostic
+  addExampleValueNoMappingDignostic(diagnostics, example, relativePath);
   return diagnostics.wrap(undefined);
 }
 

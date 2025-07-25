@@ -342,7 +342,7 @@ it("SdkNumberExample", async () => {
   expectDiagnostics(runner.context.diagnostics, []);
 });
 
-it("SdkNumberExample diagnostic", async () => {
+it("SdkNumberExample with string conversion", async () => {
   await runner.host.addRealTypeSpecFile(
     "./examples/getNumberDiagnostic.json",
     `${__dirname}/example-types/getNumberDiagnostic.json`,
@@ -361,10 +361,46 @@ it("SdkNumberExample diagnostic", async () => {
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
   ok(response);
+  ok(response.bodyValue);
+  strictEqual(response.bodyValue.kind, "number");
+  strictEqual(response.bodyValue.value, 123);
+  strictEqual(response.bodyValue.type.kind, "float32");
+
+  expectDiagnostics(runner.context.diagnostics, []);
+});
+
+it("SdkNumberExample invalid string diagnostic", async () => {
+  await runner.host.addTypeSpecFile(
+    "./examples/getNumberInvalidDiagnostic.json",
+    JSON.stringify({
+      operationId: "getNumberInvalidDiagnostic",
+      title: "getNumberInvalidDiagnostic",
+      parameters: {},
+      responses: {
+        "200": {
+          body: "invalid"
+        }
+      }
+    })
+  );
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      op getNumberInvalidDiagnostic(): float32;
+    }
+  `);
+
+  const operation = (
+    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+  ).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
   strictEqual(response.bodyValue, undefined);
   expectDiagnostics(runner.context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
-    message: `Value in example file 'getNumberDiagnostic.json' does not follow its definition:\n"123"`,
+    message: `Value in example file 'getNumberInvalidDiagnostic.json' does not follow its definition:\n"invalid"`,
   });
 });
 
