@@ -566,11 +566,6 @@ export async function getOpenAPIForService(
     return isShared;
   }
 
-  function getPathWithoutQuery(path: string): string {
-    // strip everything from the key including and after the ?
-    return path.replace(/\/?\?.*/, "");
-  }
-
   function getFinalStateVia(metadata: LroMetadata): XMSLongRunningFinalState | undefined {
     switch (metadata.finalStateVia) {
       case FinalStateValue.azureAsyncOperation:
@@ -610,36 +605,38 @@ export async function getOpenAPIForService(
     return undefined;
   }
 
-  function emitOperation(operation: HttpOperation) {
-    let { path: fullPath, operation: op, verb, parameters } = operation;
+  /** Initialize the openapi PathItem object where this operation should be added. */
+  function initPathItem(operation: HttpOperation): OpenAPI2PathItem {
+    let { path, operation: op, verb } = operation;
     let pathsObject: Record<string, OpenAPI2PathItem> = root.paths;
 
-    const pathWithoutAnyQuery = getPathWithoutQuery(fullPath);
-
-    if (root.paths[pathWithoutAnyQuery]?.[verb] === undefined) {
-      fullPath = pathWithoutAnyQuery;
+    if (root.paths[path]?.[verb] === undefined && !path.includes("?")) {
       pathsObject = root.paths;
-    } else if (requiresXMsPaths(fullPath, op)) {
-      // if the key already exists in x-ms-paths, append
-      // the operation id.
-      if (fullPath.includes("?")) {
-        if (root["x-ms-paths"]?.[fullPath] !== undefined) {
-          fullPath += `&_overload=${operation.operation.name}`;
+    } else if (requiresXMsPaths(path, op)) {
+      // if the key already exists in x-ms-paths, append the operation id.
+      if (path.includes("?")) {
+        if (root["x-ms-paths"]?.[path] !== undefined) {
+          path += `&_overload=${operation.operation.name}`;
         }
       } else {
-        fullPath += `?_overload=${operation.operation.name}`;
+        path += `?_overload=${operation.operation.name}`;
       }
       pathsObject = root["x-ms-paths"] as any;
     } else {
       // This should not happen because http library should have already validated duplicate path or the routes must have been using shared routes and so goes in previous condition.
-      compilerAssert(false, `Duplicate route "${fullPath}". This is unexpected.`);
+      compilerAssert(false, `Duplicate route "${path}". This is unexpected.`);
     }
 
-    if (!pathsObject[fullPath]) {
-      pathsObject[fullPath] = {};
+    if (!pathsObject[path]) {
+      pathsObject[path] = {};
     }
 
-    const currentPath = pathsObject[fullPath];
+    return pathsObject[path];
+  }
+
+  function emitOperation(operation: HttpOperation) {
+    const { operation: op, verb, parameters } = operation;
+    const currentPath = initPathItem(operation);
     if (!currentPath[verb]) {
       currentPath[verb] = {} as any;
     }
