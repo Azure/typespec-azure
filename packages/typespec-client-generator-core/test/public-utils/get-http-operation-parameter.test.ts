@@ -516,8 +516,12 @@ it("should not add Accept header when success response has no body but error res
   const parameters = method.parameters;
 
   // The operation should not have an accept parameter since success response has no body
-  const acceptParam = parameters.find(p => p.name === "accept");
-  strictEqual(acceptParam, undefined, "Accept parameter should not be present when success response has no body");
+  const acceptParam = parameters.find((p) => p.name === "accept");
+  strictEqual(
+    acceptParam,
+    undefined,
+    "Accept parameter should not be present when success response has no body",
+  );
 });
 
 it("should add Accept header when success response has body", async () => {
@@ -542,9 +546,9 @@ it("should add Accept header when success response has body", async () => {
   const parameters = method.parameters;
 
   // The operation should have an accept parameter since success response has a body
-  const acceptParam = parameters.find(p => p.name === "accept");
+  const acceptParam = parameters.find((p) => p.name === "accept");
   ok(acceptParam, "Accept parameter should be present when success response has a body");
-  
+
   const httpParam = getHttpOperationParameter(method, acceptParam);
   ok(httpParam);
   strictEqual(httpParam.kind, "header");
