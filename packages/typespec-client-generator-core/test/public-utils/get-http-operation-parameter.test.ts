@@ -497,6 +497,7 @@ it("@override impact", async () => {
 
 it("should not add Accept header when success response has no body but error response has body", async () => {
   await runner.compileWithBuiltInService(`
+    @error
     model ErrorModel {
       message: string;
       code: int32;
