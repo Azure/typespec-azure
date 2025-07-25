@@ -121,7 +121,6 @@ export function getSdkHttpOperation(
       });
     }
   }
-  const responsesWithBodies = [...responses.values(), ...exceptions.values()].filter((r) => r.type);
   const successResponsesWithBodies = responses.filter((r) => r.type);
   const parameters = diagnostics.pipe(
     getSdkHttpParameters(context, httpOperation, methodParameters, successResponsesWithBodies[0]),
