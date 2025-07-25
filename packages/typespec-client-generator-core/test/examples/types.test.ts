@@ -665,7 +665,7 @@ it("SdkStringConversionExample invalid diagnostic", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
       message: `Value in example file 'getStringConversionInvalid.json' does not follow its definition:\n"yes"`,
-    }
+    },
   ]);
 });
 

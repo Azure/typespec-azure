@@ -516,12 +516,12 @@ function tryConvertStringToNumber(value: string): number | undefined {
   if (typeof value !== "string" || value.trim() === "") {
     return undefined;
   }
-  
+
   const num = Number(value.trim());
   if (isNaN(num) || !isFinite(num)) {
     return undefined;
   }
-  
+
   return num;
 }
 
@@ -533,14 +533,14 @@ function tryConvertStringToBoolean(value: string): boolean | undefined {
   if (typeof value !== "string") {
     return undefined;
   }
-  
+
   const lowerValue = value.toLowerCase().trim();
   if (lowerValue === "true") {
     return true;
   } else if (lowerValue === "false") {
     return false;
   }
-  
+
   return undefined;
 }
 
@@ -551,7 +551,7 @@ function getSdkBaseTypeExample(
   relativePath: string,
 ): [SdkExampleValue | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  
+
   // Direct type match - use as is
   if (typeof example === kind) {
     return diagnostics.wrap({
@@ -560,7 +560,7 @@ function getSdkBaseTypeExample(
       value: example,
     } as SdkExampleValue);
   }
-  
+
   // Try string conversion for number and boolean types
   if (typeof example === "string") {
     if (kind === "number") {
@@ -583,7 +583,7 @@ function getSdkBaseTypeExample(
       }
     }
   }
-  
+
   // If no conversion was possible, add diagnostic
   addExampleValueNoMappingDignostic(diagnostics, example, relativePath);
   return diagnostics.wrap(undefined);
