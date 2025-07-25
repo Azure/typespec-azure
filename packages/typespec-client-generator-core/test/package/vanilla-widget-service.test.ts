@@ -238,6 +238,7 @@ it("vanilla widget update", async () => {
   strictEqual(operationContentTypeParam.correspondingMethodParams[0], methodContentTypeParam);
   strictEqual(operationAcceptParam.correspondingMethodParams[0], methodAcceptParam);
 });
+
 it("vanilla widget delete", async () => {
   await compileVanillaWidgetService(runner, "@delete delete(@path id: string): void | Error;");
 
@@ -245,7 +246,7 @@ it("vanilla widget delete", async () => {
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "delete");
   strictEqual(method.kind, "basic");
-  strictEqual(method.parameters.length, 2);
+  strictEqual(method.parameters.length, 1);
 
   const methodParam = method.parameters[0];
   strictEqual(methodParam.kind, "method");
