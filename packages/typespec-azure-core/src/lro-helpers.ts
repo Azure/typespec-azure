@@ -38,7 +38,6 @@ import {
   FinalOperationKey,
   getFinalLocationValue,
   getFinalStateOverride,
-  getLroResult,
   getOperationLink,
   getOperationLinks,
   getPollingLocationInfo,
@@ -51,6 +50,7 @@ import {
   pollingOptionsKind,
   StatusMonitorPollingLocationInfo,
 } from "./decorators.js";
+import { getLroResult } from "./decorators/lro-result.js";
 import { extractLroStates } from "./decorators/lro-status.js";
 import { PropertyMap, StatusMonitorMetadata } from "./lro-info.js";
 
@@ -909,19 +909,15 @@ function getTargetModelInformation(
   const finalLinkProps = filterModelProperties(modelOrLink, (prop) =>
     isFinalLocation(program, prop),
   );
-  const resultProps = filterModelProperties(modelOrLink, (prop) => isResultProperty(program, prop));
+  const resultProps = getLroResult(program, modelOrLink)[0];
 
   if (finalLinkProps.length === 1) {
     const result = resolveOperationLocation(program, finalLinkProps[0]);
     if (result !== undefined) return [result, finalLinkProps[0]];
   }
 
-  if (
-    resultProps.length === 1 &&
-    !isNeverType(resultProps[0].type) &&
-    resultProps[0].type.kind === "Model"
-  ) {
-    return [resultProps[0].type, resultProps[0]];
+  if (resultProps && !isNeverType(resultProps.type) && resultProps.type.kind === "Model") {
+    return [resultProps.type, resultProps];
   }
 
   return undefined;
@@ -935,16 +931,6 @@ function isMatchingGetOperation(
   const sourceHttp = getHttpMetadata(program, sourceOperation);
   const targetHttp = getHttpMetadata(program, targetOperation);
   return sourceHttp.path === targetHttp.path && targetHttp.verb === "get";
-}
-
-function isResultProperty(program: Program, property: ModelProperty): boolean {
-  if (property.model !== undefined) {
-    const [lroResult, _] = getLroResult(program, property.model);
-    if (lroResult !== undefined) {
-      return lroResult.name === property.name;
-    }
-  }
-  return property.name === "result";
 }
 
 function processFinalLink(

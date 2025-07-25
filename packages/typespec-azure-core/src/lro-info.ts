@@ -27,12 +27,12 @@ import {
 } from "@typespec/http";
 import {
   LongRunningStates,
-  getLroErrorResult,
-  getLroResult,
   getLroStatusProperty,
   getPollingOperationParameter,
   isPollingLocation,
 } from "./decorators.js";
+import { getLroErrorResult } from "./decorators/lro-error-result.js";
+import { getLroResult } from "./decorators/lro-result.js";
 import { extractLroStates, getLongRunningStates } from "./decorators/lro-status.js";
 import { createDiagnostic } from "./lib.js";
 import { ModelPropertyTerminationStatus, OperationLink } from "./lro-helpers.js";

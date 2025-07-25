@@ -1,4 +1,4 @@
-import { AzureCoreStateKeys, createDiagnostic, reportDiagnostic } from "./lib.js";
+import { AzureCoreStateKeys, reportDiagnostic } from "./lib.js";
 import { getAllProperties } from "./utils.js";
 
 import {
@@ -6,9 +6,7 @@ import {
   // @ts-ignore
   $decorators,
   compilerAssert,
-  createDiagnosticCollector,
   DecoratorContext,
-  Diagnostic,
   getNamespaceFullName,
   getTypeName,
   ignoreDiagnostics,
@@ -25,7 +23,6 @@ import {
   setTypeSpecNamespace,
   Type,
   typespecTypeToJson,
-  walkPropertiesInherited,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { useStateMap } from "@typespec/compiler/utils";
@@ -52,7 +49,6 @@ import {
   FinalLocationDecorator,
   FinalOperationDecorator,
   ItemsDecorator,
-  LroErrorResultDecorator,
   NextPageOperationDecorator,
   OperationLinkDecorator,
   PagedResultDecorator,
@@ -61,6 +57,7 @@ import {
   PollingOperationParameterDecorator,
   UseFinalStateViaDecorator,
 } from "../generated-defs/Azure.Core.js";
+import { getLroResult } from "./decorators/lro-result.js";
 import { extractLroStates } from "./decorators/lro-status.js";
 import { FinalStateValue, OperationLink } from "./lro-helpers.js";
 import {
@@ -318,115 +315,6 @@ export function getLroStatusProperty(program: Program, target: Model): ModelProp
   }
 
   return undefined;
-}
-
-//@lroResult
-
-/**
- * Marks the property in a StatusMonitor that contains the logical result
- * of a successful operation.
- * @param context The decorator execution context.
- * @param entity The model property that contains the logical result.
- */
-export const $lroResult = (context: DecoratorContext, entity: ModelProperty) => {
-  context.program.stateMap(AzureCoreStateKeys.lroResult).set(entity, entity);
-};
-
-/**
- * Gets the logical result property from a StatusMonitor
- * @param program The program to process.
- * @param entity The StatusMonitor model to process.
- * @param useDefault Use the default result property if no other
- * property is marked. (defaults to true)
- */
-export function getLroResult(
-  program: Program,
-  entity: Model,
-  useDefault: boolean = true,
-): [ModelProperty | undefined, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  let count = 0;
-  let resultProperty: ModelProperty | undefined = undefined;
-  let defaultProperty: ModelProperty | undefined = undefined;
-  for (const prop of walkPropertiesInherited(entity)) {
-    const candidateProperty = program.stateMap(AzureCoreStateKeys.lroResult).get(prop);
-    if (candidateProperty !== undefined) {
-      resultProperty = candidateProperty;
-      count++;
-    }
-
-    if (prop.name.toLowerCase() === "result") defaultProperty = prop;
-  }
-
-  if (count > 1) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "lro-status-monitor-invalid-result-property",
-        target: entity,
-        format: { resultType: "result", decorator: "@lroResult" },
-      }),
-    );
-  }
-
-  if (resultProperty === undefined && useDefault) resultProperty = defaultProperty;
-  if (resultProperty && isNeverType(resultProperty.type)) resultProperty = undefined;
-  return diagnostics.wrap(resultProperty);
-}
-
-//@lroErrorResult
-
-/**
- * Marks the property in a StatusMonitor that contains the error result
- * of a failed operation.
- * @param context The decorator execution context.
- * @param entity The model property that contains the error result.
- */
-export const $lroErrorResult: LroErrorResultDecorator = (
-  context: DecoratorContext,
-  entity: ModelProperty,
-) => {
-  const { program } = context;
-  program.stateMap(AzureCoreStateKeys.lroErrorResult).set(entity, entity);
-};
-
-/**
- * Gets the error result property from a StatusMonitor
- * @param program The program to process.
- * @param entity The StatusMonitor model to process.
- * @param useDefault Use the default error property if no other
- * property is marked. (defaults to true)
- */
-export function getLroErrorResult(
-  program: Program,
-  entity: Model,
-  useDefault: boolean = true,
-): [ModelProperty | undefined, readonly Diagnostic[]] {
-  const diagnostics = createDiagnosticCollector();
-  let count = 0;
-  let resultProperty: ModelProperty | undefined = undefined;
-  let defaultProperty: ModelProperty | undefined = undefined;
-  for (const prop of walkPropertiesInherited(entity)) {
-    const candidateProperty = program.stateMap(AzureCoreStateKeys.lroErrorResult).get(prop);
-    if (candidateProperty !== undefined) {
-      resultProperty = candidateProperty;
-      count++;
-    }
-
-    if (prop.name.toLowerCase() === "error") defaultProperty = prop;
-  }
-
-  if (count > 1) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "lro-status-monitor-invalid-result-property",
-        target: entity,
-        format: { resultType: "error", decorator: "@lroErrorResult" },
-      }),
-    );
-  }
-
-  if (resultProperty === undefined && useDefault) resultProperty = defaultProperty;
-  return diagnostics.wrap(resultProperty);
 }
 
 //@pollingOperationParameter
