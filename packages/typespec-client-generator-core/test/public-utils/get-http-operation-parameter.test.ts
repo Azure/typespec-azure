@@ -504,11 +504,10 @@ it("should not add Accept header when success response has no body but error res
     }
     
     @route("/test")
-    @post
     op testOperation(): {
-      @statusCode _: 200;
+      @statusCode statusCode: 200;
     } | {
-      @statusCode _: 400;  
+      @statusCode statusCode: 500;
       @body error: ErrorModel;
     };
   `);

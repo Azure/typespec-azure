@@ -121,27 +121,7 @@ export function getSdkHttpOperation(
       });
     }
   }
-  // Filter only success responses (2xx status codes) that have bodies
-  const successResponsesWithBodies = responses.filter((r) => {
-    // Get status codes - could be a single number or a range like 200-299
-    const statusCodes = Array.isArray(r.statusCodes) ? r.statusCodes : [r.statusCodes];
-    const isSuccess = statusCodes.some(code => {
-      if (typeof code === 'number') {
-        return code >= 200 && code < 300;
-      }
-      if (typeof code === 'string') {
-        // Handle ranges like "200-299" or single codes like "200"
-        const match = code.match(/^(\d+)(?:-(\d+))?$/);
-        if (match) {
-          const start = parseInt(match[1]);
-          const end = match[2] ? parseInt(match[2]) : start;
-          return start >= 200 && start < 300 && end >= 200 && end < 300;
-        }
-      }
-      return false;
-    });
-    return isSuccess && r.type;
-  });
+  const successResponsesWithBodies = responses.filter((r) => r.type);
   const parameters = diagnostics.pipe(
     getSdkHttpParameters(context, httpOperation, methodParameters, successResponsesWithBodies[0]),
   );
