@@ -126,3 +126,25 @@ extern dec armResourcePropertiesOptionality(target: ModelProperty, isOptional: v
 
 /** designates a parameter as an explicit bodyRoot and sets the optionality of the parameter */
 extern dec armBodyRoot(target: ModelProperty, isOptional: valueof boolean);
+
+
+model PropertyValue {
+  property: uint32;
+  value: string | boolean | Scalar;
+}
+
+model ParameterConstraint {
+  condition: Array<uint32>;
+  disallowedValues?: Array<PropertyValue>;
+  requiredValues?: Array<PropertyValue>;
+ }
+
+
+/**
+ * This decorator is used to apply a parameter constraint to a model or interface.
+ * It is used to enforce specific constraints on parameters in operations.
+ *
+ * @param target The model, interface, or operation to which the constraint applies.
+ * @param constraint The parameter constraint to apply.
+ */
+extern dec applyConstraint(target: Model | Interface | Operation, constraints: valueof ParameterConstraint);

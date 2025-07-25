@@ -31,6 +31,34 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
     expectDiagnosticEmpty(diagnostics);
   });
 
+  it("emits a warning if resource is used with segment and key names", async () => {
+    const { diagnostics } = await checkFor(`
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+
+      @doc("Widget resource")
+      model Widget is ProxyResource<WidgetProperties> {
+         ...ResourceNameParameter<Widget, "widgetName", "widgets">;
+         ...ExtendedLocationProperty;
+      }
+
+      @doc("The properties of a widget")
+      model WidgetProperties {
+         size: int32;
+      }
+      
+      @doc("Direct extended resource")
+      model CustomResource extends Foundations.Resource {};
+
+      interface Widgets {
+        create is ArmResourceCreateOrReplaceSync<Widget>;
+        delete is ArmResourceCreateOrReplaceSync<CustomResource>;
+      }
+  `);
+    expectDiagnosticEmpty(diagnostics);
+  });
+
   it("emits error if template param is not extended from Resource", async () => {
     const { diagnostics } = await checkFor(`
       @armProviderNamespace

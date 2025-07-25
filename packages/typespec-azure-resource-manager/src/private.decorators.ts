@@ -6,6 +6,7 @@ import {
   ModelProperty,
   Operation,
   Program,
+  Scalar,
   Tuple,
   Type,
   addVisibilityModifiers,
@@ -14,6 +15,7 @@ import {
   getLifecycleVisibilityEnum,
   getTypeName,
   isKey,
+  isTemplateDeclarationOrInstance,
   sealVisibilityModifiers,
 } from "@typespec/compiler";
 
@@ -30,6 +32,7 @@ import {
   BuiltInSubscriptionResourceDecorator,
 } from "../generated-defs/Azure.ResourceManager.Extension.Private.js";
 import {
+  ApplyConstraintDecorator,
   ArmBodyRootDecorator,
   ArmRenameListByOperationDecorator,
   ArmResourceInternalDecorator,
@@ -44,6 +47,8 @@ import {
   DefaultResourceKeySegmentNameDecorator,
   EnforceConstraintDecorator,
   OmitIfEmptyDecorator,
+  ParameterConstraint,
+  PropertyValue,
   ResourceBaseParametersOfDecorator,
   ResourceParameterBaseForDecorator,
 } from "../generated-defs/Azure.ResourceManager.Private.js";
@@ -613,6 +618,122 @@ const $armBodyRoot: ArmBodyRootDecorator = (
   context.call($bodyRoot, target);
 };
 
+const $applyConstraint: ApplyConstraintDecorator = (
+  context: DecoratorContext,
+  target: Model | Interface | Operation,
+  constraint: ParameterConstraint,
+) => {
+  const program = context.program;
+  const templateArguments = resolveTemplateArguments(target);
+  if (templateArguments === undefined) {
+    return;
+  }
+
+  for (const paramName of constraint.condition) {
+    const resolvedArgument = templateArguments[paramName];
+    if (!resolvedArgument.value) {
+      return;
+    }
+    let values: PropertyValue[] = [];
+    if (constraint.disallowedValues !== undefined) {
+      values = constraint.disallowedValues.filter((prop) => {
+        if (prop.property > templateArguments.length) {
+          return false;
+        }
+        const resolvedArgument = templateArguments[prop.property];
+        return resolvedArgument && resolvedArgument.value !== prop.value;
+      });
+      if (values.length > 0) {
+        reportDiagnostic(program, {
+          code: "exclusion-constraint-violation",
+          target: target,
+          format: {
+            actionMessage: `The set of values '${values.flatMap((v) => v.value).join("', '")}' cannot be provided together when the template parameters '${constraint.condition.join("', '")}' are specified.`,
+          },
+        });
+      }
+    }
+    if (constraint.requiredValues !== undefined) {
+      const requiredProps = constraint.requiredValues.filter((prop) => {
+        if (prop.property > templateArguments.length) {
+          return false;
+        }
+        const resolvedArgument = templateArguments[prop.property];
+        if (resolvedArgument === undefined || resolvedArgument.value !== prop.value) {
+          return true;
+        }
+        return false;
+      });
+      if (constraint.requiredValues.length > 0) {
+        reportDiagnostic(program, {
+          code: "required-constraint-violation",
+          target: target,
+          format: {
+            actionMessage: `At least one of the template parameters '${requiredProps.flatMap((prop) => prop.value).join("', '")}' must be used when the template parameters '${constraint.condition.join("', '")}' are specified.`,
+          },
+        });
+      }
+    }
+  }
+};
+
+interface ResolvedTemplateArgument {
+  position: number;
+  value?: string | boolean | Scalar;
+}
+
+function resolveTemplateArguments(
+  target: Model | Interface | Operation,
+): ResolvedTemplateArgument[] | undefined {
+  function getValueFromType(type: Type): string | boolean | Scalar | undefined {
+    switch (type.kind) {
+      case "Boolean":
+      case "String":
+        return type.value;
+      case "EnumMember":
+        return type.value === undefined ? type.name : (type.value as string);
+      case "UnionVariant":
+        return getValueFromType(type.type);
+      case "Scalar":
+        return type;
+    }
+    return undefined;
+  }
+
+  if (
+    target.templateMapper === undefined ||
+    target.templateMapper.partial === true ||
+    !isTemplateDeclarationOrInstance(target)
+  ) {
+    return undefined;
+  }
+
+  const result: ResolvedTemplateArgument[] = [];
+  let i = 0;
+  for (const parameter of target.templateMapper.args) {
+    let value: string | boolean | Scalar | undefined;
+    switch (parameter.entityKind) {
+      case "Type":
+        value = getValueFromType(parameter);
+        break;
+      case "Value":
+        value =
+          parameter.valueKind === "BooleanValue" || parameter.valueKind === "StringValue"
+            ? parameter.value
+            : undefined;
+        break;
+      case "Indeterminate":
+        value = getValueFromType(parameter.type);
+        break;
+    }
+    result.push({
+      position: i++,
+      value,
+    });
+  }
+  return result;
+}
+
 /** @internal */
 export const $decorators = {
   "Azure.ResourceManager.Private": {
@@ -631,6 +752,7 @@ export const $decorators = {
     armResourcePropertiesOptionality: $armResourcePropertiesOptionality,
     armBodyRoot: $armBodyRoot,
     armResourceWithParameter: $armResourceWithParameter,
+    applyConstraint: $applyConstraint,
   } satisfies AzureResourceManagerPrivateDecorators,
   "Azure.ResourceManager.Extension.Private": {
     builtInResource: $builtInResource,

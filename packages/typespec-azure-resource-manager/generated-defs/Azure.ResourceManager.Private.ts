@@ -1,4 +1,22 @@
-import type { DecoratorContext, Model, ModelProperty, Operation, Type } from "@typespec/compiler";
+import type {
+  DecoratorContext,
+  Interface,
+  Model,
+  ModelProperty,
+  Operation,
+  Type,
+} from "@typespec/compiler";
+
+export interface ParameterConstraint {
+  readonly condition: readonly number[];
+  readonly disallowedValues?: readonly PropertyValue[];
+  readonly requiredValues?: readonly PropertyValue[];
+}
+
+export interface PropertyValue {
+  readonly property: number;
+  readonly value: string | boolean | unknown;
+}
 
 /**
  *
@@ -191,6 +209,19 @@ export type ArmBodyRootDecorator = (
   isOptional: boolean,
 ) => void;
 
+/**
+ * This decorator is used to apply a parameter constraint to a model or interface.
+ * It is used to enforce specific constraints on parameters in operations.
+ *
+ * @param target The model, interface, or operation to which the constraint applies.
+ * @param constraint The parameter constraint to apply.
+ */
+export type ApplyConstraintDecorator = (
+  context: DecoratorContext,
+  target: Model | Interface | Operation,
+  constraints: ParameterConstraint,
+) => void;
+
 export type AzureResourceManagerPrivateDecorators = {
   resourceParameterBaseFor: ResourceParameterBaseForDecorator;
   resourceBaseParametersOf: ResourceBaseParametersOfDecorator;
@@ -207,4 +238,5 @@ export type AzureResourceManagerPrivateDecorators = {
   armRenameListByOperation: ArmRenameListByOperationDecorator;
   armResourcePropertiesOptionality: ArmResourcePropertiesOptionalityDecorator;
   armBodyRoot: ArmBodyRootDecorator;
+  applyConstraint: ApplyConstraintDecorator;
 };
