@@ -1,0 +1,10 @@
+{
+  "operationId": "getBooleanStringConversion",
+  "title": "getBooleanStringConversion",
+  "parameters": {},
+  "responses": {
+    "200": {
+      "body": "true"
+    }
+  }
+}

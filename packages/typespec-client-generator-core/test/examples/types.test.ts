@@ -361,11 +361,12 @@ it("SdkNumberExample diagnostic", async () => {
   strictEqual(operation.examples?.length, 1);
   const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
   ok(response);
-  strictEqual(response.bodyValue, undefined);
-  expectDiagnostics(runner.context.diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
-    message: `Value in example file 'getNumberDiagnostic.json' does not follow its definition:\n"123"`,
-  });
+  ok(response.bodyValue);
+  strictEqual(response.bodyValue.kind, "number");
+  strictEqual(response.bodyValue.value, 123);
+  strictEqual(response.bodyValue.type.kind, "float32");
+
+  expectDiagnostics(runner.context.diagnostics, []);
 });
 
 it("SdkNumberExample from datetime", async () => {
@@ -478,6 +479,194 @@ it("SdkBooleanExample diagnostic", async () => {
     code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
     message: `Value in example file 'getBooleanDiagnostic.json' does not follow its definition:\n123`,
   });
+});
+
+it("SdkNumberExample string conversion", async () => {
+  await runner.host.addRealTypeSpecFile(
+    "./examples/getNumberStringConversion.json",
+    `${__dirname}/example-types/getNumberStringConversion.json`,
+  );
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      op getNumberStringConversion(): float32;
+    }
+  `);
+
+  const operation = (
+    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+  ).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+  ok(response.bodyValue);
+  strictEqual(response.bodyValue.kind, "number");
+  strictEqual(response.bodyValue.value, 123);
+  strictEqual(response.bodyValue.type.kind, "float32");
+
+  expectDiagnostics(runner.context.diagnostics, []);
+});
+
+it("SdkBooleanExample string conversion", async () => {
+  await runner.host.addRealTypeSpecFile(
+    "./examples/getBooleanStringConversion.json",
+    `${__dirname}/example-types/getBooleanStringConversion.json`,
+  );
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      op getBooleanStringConversion(): boolean;
+    }
+  `);
+
+  const operation = (
+    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+  ).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  const response = operation.examples[0].responses.find((x) => x.statusCode === 200);
+  ok(response);
+  ok(response.bodyValue);
+  strictEqual(response.bodyValue.kind, "boolean");
+  strictEqual(response.bodyValue.value, true);
+  strictEqual(response.bodyValue.type.kind, "boolean");
+
+  expectDiagnostics(runner.context.diagnostics, []);
+});
+
+it("SdkNumberExample parameter string conversion", async () => {
+  await runner.host.addRealTypeSpecFile(
+    "./examples/getStringToNumberParameter.json",
+    `${__dirname}/example-types/getStringToNumberParameter.json`,
+  );
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      op getStringToNumberParameter(
+        @query count: int32,
+        @query price: float64,
+        @query negative: int32
+      ): string;
+    }
+  `);
+
+  const operation = (
+    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+  ).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  strictEqual(operation.examples[0].kind, "http");
+
+  const parameters = operation.examples[0].parameters;
+  ok(parameters);
+  strictEqual(parameters.length, 3);
+
+  // Check that string "10" was converted to number 10
+  strictEqual(parameters[0].value.kind, "number");
+  strictEqual(parameters[0].value.value, 10);
+  strictEqual(parameters[0].value.type.kind, "int32");
+
+  // Check that string "99.99" was converted to number 99.99
+  strictEqual(parameters[1].value.kind, "number");
+  strictEqual(parameters[1].value.value, 99.99);
+  strictEqual(parameters[1].value.type.kind, "float64");
+
+  // Check that string "-42" was converted to number -42
+  strictEqual(parameters[2].value.kind, "number");
+  strictEqual(parameters[2].value.value, -42);
+  strictEqual(parameters[2].value.type.kind, "int32");
+
+  expectDiagnostics(runner.context.diagnostics, []);
+});
+
+it("SdkBooleanExample parameter string conversion", async () => {
+  await runner.host.addRealTypeSpecFile(
+    "./examples/getStringToBooleanParameter.json",
+    `${__dirname}/example-types/getStringToBooleanParameter.json`,
+  );
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      op getStringToBooleanParameter(
+        @query enabled: boolean,
+        @query disabled: boolean,
+        @query upperEnabled: boolean,
+        @query mixedEnabled: boolean
+      ): string;
+    }
+  `);
+
+  const operation = (
+    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+  ).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  strictEqual(operation.examples[0].kind, "http");
+
+  const parameters = operation.examples[0].parameters;
+  ok(parameters);
+  strictEqual(parameters.length, 4);
+
+  // Check that string "true" was converted to boolean true
+  strictEqual(parameters[0].value.kind, "boolean");
+  strictEqual(parameters[0].value.value, true);
+  strictEqual(parameters[0].value.type.kind, "boolean");
+
+  // Check that string "false" was converted to boolean false
+  strictEqual(parameters[1].value.kind, "boolean");
+  strictEqual(parameters[1].value.value, false);
+  strictEqual(parameters[1].value.type.kind, "boolean");
+
+  // Check that string "TRUE" was converted to boolean true
+  strictEqual(parameters[2].value.kind, "boolean");
+  strictEqual(parameters[2].value.value, true);
+  strictEqual(parameters[2].value.type.kind, "boolean");
+
+  // Check that string "True" was converted to boolean true
+  strictEqual(parameters[3].value.kind, "boolean");
+  strictEqual(parameters[3].value.value, true);
+  strictEqual(parameters[3].value.type.kind, "boolean");
+
+  expectDiagnostics(runner.context.diagnostics, []);
+});
+
+it("SdkStringConversionExample invalid diagnostic", async () => {
+  await runner.host.addRealTypeSpecFile(
+    "./examples/getStringConversionInvalid.json",
+    `${__dirname}/example-types/getStringConversionInvalid.json`,
+  );
+  await runner.compile(`
+    @service
+    namespace TestClient {
+      op getStringConversionInvalid(
+        @query invalidNumber: int32,
+        @query invalidBoolean: boolean
+      ): string;
+    }
+  `);
+
+  const operation = (
+    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
+  ).operation;
+  ok(operation);
+  strictEqual(operation.examples?.length, 1);
+  strictEqual(operation.examples[0].kind, "http");
+
+  const parameters = operation.examples[0].parameters;
+  ok(parameters);
+  strictEqual(parameters.length, 0); // Should be 0 because both conversions failed
+
+  expectDiagnostics(runner.context.diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
+      message: `Value in example file 'getStringConversionInvalid.json' does not follow its definition:\n"abc"`,
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
+      message: `Value in example file 'getStringConversionInvalid.json' does not follow its definition:\n"yes"`,
+    },
+  ]);
 });
 
 it("SdkNullExample", async () => {
