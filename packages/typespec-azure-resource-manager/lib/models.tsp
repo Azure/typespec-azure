@@ -1,6 +1,5 @@
 using Http;
 using Rest;
-using OpenAPI;
 using Azure.Core;
 using Azure.ResourceManager.Foundations;
 using Azure.ResourceManager.Private;
@@ -32,6 +31,7 @@ namespace Azure.ResourceManager;
  * }
  * ```
  */
+@Private.applyConstraint(#{condition:#[0], disallowedValues:#[#{property:1, value: ""}, #{property:2, value: ""}]}) 
 model ResourceNameParameter<
   Resource extends Foundations.SimpleResource,
   KeyName extends valueof string = "",
@@ -42,6 +42,39 @@ model ResourceNameParameter<
   @doc("The name of the {name}", Resource)
   @pattern(NamePattern)
   @defaultResourceKeySegmentName(Resource, KeyName, SegmentName)
+  @path
+  name: Type;
+}
+
+/**
+ * Spread this model into ARM resource models to specify resource name parameter for its operations.
+ * This is a more generic version of `ResourceNameParameter` that allows you to specify the type of the name.
+ *
+ * @template TypeName The type of the name segment.
+ * @template ParameterName The name of the parameter.
+ * @template NamePattern The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`.
+ * @template Type The type of the name property. Default type is string. However you can pass an union with string values.
+ * @template DocComment The documentation comment for the name property. Default is "The name of the resource."
+ *
+ * @example
+ * ```typespec
+ * model Employee is TrackedResource<EmployeeProperties> {
+ *  ...NameParameter<"employee", "employeeName">;
+ * }
+ * ```
+ */
+@doc("")
+model NameParameterByType<
+  TypeName extends valueof string, 
+  ParameterName extends valueof string, 
+  NamePattern extends valueof string = "^[a-zA-Z0-9-]{3,24}$",
+  Type extends string = string,
+> {
+  @doc("The name of the resource.")
+  @pattern(NamePattern)
+  @segment(TypeName)
+  @key(ParameterName)
+  @visibility(Lifecycle.Read)
   @path
   name: Type;
 }
