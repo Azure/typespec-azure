@@ -849,6 +849,7 @@ export const $operationLink: OperationLinkDecorator = (
     program,
     entity,
     linkedOperation,
+    linkType,
     parameters,
   );
   if (diagnostics.length > 0) {
