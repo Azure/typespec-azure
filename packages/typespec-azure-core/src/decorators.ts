@@ -918,25 +918,3 @@ export function getAsEmbeddingVector(
 ): EmbeddingVectorMetadata | undefined {
   return program.stateMap(AzureCoreStateKeys.embeddingVector).get(model);
 }
-
-export interface ArmResourceIdentifierConfig {
-  readonly allowedResources: readonly ArmResourceIdentifierAllowedResource[];
-}
-
-export type ArmResourceDeploymentScope =
-  | "Tenant"
-  | "Subscription"
-  | "ResourceGroup"
-  | "ManagementGroup"
-  | "Extension";
-
-export interface ArmResourceIdentifierAllowedResource {
-  /** The type of resource that is being referred to. For example Microsoft.Network/virtualNetworks or Microsoft.Network/virtualNetworks/subnets. See Example Types for more examples. */
-  readonly type: string;
-
-  /**
-   * An array of scopes. If not specified, the default scope is ["ResourceGroup"].
-   * See [Allowed Scopes](https://github.com/Azure/autorest/tree/main/docs/extensions#allowed-scopes).
-   */
-  readonly scopes?: ArmResourceDeploymentScope[];
-}
