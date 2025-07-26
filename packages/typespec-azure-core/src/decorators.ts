@@ -25,7 +25,6 @@ import { getHttpOperation, getRoutePath } from "@typespec/http";
 import { getResourceTypeKey, getSegment, isAutoRoute } from "@typespec/rest";
 import { OmitKeyPropertiesDecorator } from "../generated-defs/Azure.Core.Foundations.js";
 import {
-  EmbeddingVectorDecorator,
   EnsureResourceTypeDecorator,
   EnsureVerbDecorator,
   NeedsRouteDecorator,
@@ -888,33 +887,4 @@ export function checkEnsureVerb(program: Program) {
       });
     }
   }
-}
-
-export interface EmbeddingVectorMetadata {
-  elementType: Type;
-}
-
-/** @internal */
-export const $embeddingVector: EmbeddingVectorDecorator = (
-  context: DecoratorContext,
-  entity: Model,
-  elementType: Type,
-) => {
-  const metadata: EmbeddingVectorMetadata = {
-    elementType: elementType,
-  };
-  context.program.stateMap(AzureCoreStateKeys.embeddingVector).set(entity, metadata);
-};
-
-/**
- * If the provided model is an embedding vector, returns the appropriate metadata; otherwise,
- * returns undefined.
- * @param model the model to query
- * @returns `EmbeddingVectorMetadata`, if applicable, or undefined.
- */
-export function getAsEmbeddingVector(
-  program: Program,
-  model: Model,
-): EmbeddingVectorMetadata | undefined {
-  return program.stateMap(AzureCoreStateKeys.embeddingVector).get(model);
 }

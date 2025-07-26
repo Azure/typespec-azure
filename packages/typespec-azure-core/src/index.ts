@@ -9,6 +9,10 @@ export {
   getArmResourceIdentifierConfig,
   type ArmResourceIdentifierConfig,
 } from "./decorators/private/arm-resource-identifier-config.js";
+export {
+  getAsEmbeddingVector,
+  type EmbeddingVectorMetadata,
+} from "./decorators/private/embedding-vector.js";
 export { getParameterizedNextLinkArguments } from "./decorators/private/parameterized-next-link-config.js";
 export { getUnionAsEnum, type UnionEnum } from "./helpers/union-enums.js";
 export * from "./lro-helpers.js";
