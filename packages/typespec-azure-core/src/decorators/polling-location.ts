@@ -12,10 +12,10 @@ import {
 import { $ } from "@typespec/compiler/typekit";
 import { useStateMap, useStateSet } from "@typespec/compiler/utils";
 import type { PollingLocationDecorator } from "../../generated-defs/Azure.Core.js";
-import { getLroStatusProperty } from "../decorators.js";
 import { AzureCoreStateKeys } from "../lib.js";
 import { type StatusMonitorMetadata, extractStatusMonitorInfo } from "../lro-info.js";
 import { getLroResult } from "./lro-result.js";
+import { findLroStatusProperty } from "./lro-status.js";
 
 export const [
   /**
@@ -143,7 +143,7 @@ function extractStatusMonitorLocationInfo(
   }
   if (finalPropertyValue === undefined)
     finalPropertyValue = ignoreDiagnostics(getLroResult(program, baseInfo.pollingModel, true));
-  const statusProperty = getLroStatusProperty(program, baseInfo.pollingModel);
+  const statusProperty = findLroStatusProperty(program, baseInfo.pollingModel);
   if (statusProperty === undefined) return undefined;
   const statusMonitor = ignoreDiagnostics(
     extractStatusMonitorInfo(program, baseInfo.pollingModel, statusProperty),

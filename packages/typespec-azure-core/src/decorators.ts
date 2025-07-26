@@ -1,5 +1,4 @@
 import { AzureCoreStateKeys, reportDiagnostic } from "./lib.js";
-import { getAllProperties } from "./utils.js";
 
 import {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -20,7 +19,6 @@ import {
   PagedResultDecorator,
   PollingOperationDecorator,
 } from "../generated-defs/Azure.Core.js";
-import { extractLroStates } from "./decorators/lro-status.js";
 import { OperationLink } from "./lro-helpers.js";
 import { getLroOperationInfo, PropertyMap, ResultInfo } from "./lro-info.js";
 
@@ -212,65 +210,6 @@ export function getItems(program: Program, entity: Type): boolean | undefined {
  */
 export function getNextLink(program: Program, entity: ModelProperty): boolean | undefined {
   return program.stateSet(Symbol.for(`TypeSpec.nextLink`)).has(entity);
-}
-
-/**
- *  Provides the names of terminal long-running operation states plus any
- *  additional states defined for the operation.
- **/
-export interface LongRunningStates {
-  // The string which represents the "Succeeded" state.
-  succeededState: string[];
-
-  // The string which represents the "Failed" state.
-  failedState: string[];
-
-  // The string which represents the "Canceled" state.
-  canceledState: string[];
-
-  // The full array of long-running operation states.
-  states: string[];
-}
-
-/**
- * Return the property that contains the lro status
- * @param program The program to process
- * @param target The model to check for lro status
- */
-export function getLroStatusProperty(program: Program, target: Model): ModelProperty | undefined {
-  function getProvisioningState(props: Map<string, ModelProperty>): ModelProperty | undefined {
-    let innerProps: Map<string, ModelProperty> | undefined = undefined;
-    let result: ModelProperty | undefined = undefined;
-    const innerProperty = props.get("properties");
-    result = props.get("provisioningState");
-    if (
-      result === undefined &&
-      innerProperty !== undefined &&
-      innerProperty.type?.kind === "Model"
-    ) {
-      innerProps = getAllProperties(innerProperty.type);
-      result = innerProps.get("provisioningState");
-    }
-
-    return result;
-  }
-  const props = getAllProperties(target);
-  for (const [_, prop] of props.entries()) {
-    let values = program.stateMap(AzureCoreStateKeys.lroStatus).get(prop);
-    if (values !== undefined) return prop;
-    if (prop.type.kind === "Enum" || prop.type.kind === "Union") {
-      values = program.stateMap(AzureCoreStateKeys.lroStatus).get(prop.type);
-      if (values !== undefined) return prop;
-    }
-  }
-
-  const statusProp = props.get("status") ?? getProvisioningState(props);
-  if (statusProp) {
-    const [states, _] = extractLroStates(program, statusProp);
-    if (states !== undefined) return statusProp;
-  }
-
-  return undefined;
 }
 
 export interface OperationLinkMetadata {

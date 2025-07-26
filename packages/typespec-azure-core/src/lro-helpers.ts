@@ -38,13 +38,16 @@ import {
   FinalOperationKey,
   getOperationLink,
   getOperationLinks,
-  type LongRunningStates,
   type OperationLinkMetadata,
   PollingOperationKey,
 } from "./decorators.js";
 import { getFinalLocationValue, isFinalLocation } from "./decorators/final-location.js";
 import { getLroResult } from "./decorators/lro-result.js";
-import { extractLroStates } from "./decorators/lro-status.js";
+import {
+  extractLroStates,
+  findLroStatusProperty,
+  LongRunningStates,
+} from "./decorators/lro-status.js";
 import {
   getPollingLocationInfo,
   isPollingLocation,
@@ -690,14 +693,6 @@ function getLroStatusFromHeaderProperty(
   return finalState;
 }
 
-function getLroStatusProperty(program: Program, model: Model): ModelProperty | undefined {
-  const properties = filterModelProperties(
-    model,
-    (prop) => ignoreDiagnostics(extractLroStates(program, prop)) !== undefined,
-  );
-  return properties.length > 0 ? properties[0] : undefined;
-}
-
 function getPollingStep(
   program: Program,
   modelOrOperation: Model | Operation,
@@ -799,7 +794,7 @@ function getStatusMonitorInfo(
     modelOrLink = statusMonitorType;
   }
 
-  const statusProperty = getLroStatusProperty(program, modelOrLink);
+  const statusProperty = findLroStatusProperty(program, modelOrLink);
   if (statusProperty === undefined) return undefined;
   const successInfo = getTargetModelInformation(program, modelOrLink);
   const lroStates = ignoreDiagnostics(extractLroStates(program, statusProperty));
