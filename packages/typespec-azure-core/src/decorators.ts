@@ -1,4 +1,4 @@
-import { AzureCoreStateKeys, reportDiagnostic } from "./lib.js";
+import { AzureCoreStateKeys } from "./lib.js";
 
 import {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -12,22 +12,11 @@ import {
   Type,
 } from "@typespec/compiler";
 import {
-  FinalOperationDecorator,
   ItemsDecorator,
   NextPageOperationDecorator,
-  OperationLinkDecorator,
   PagedResultDecorator,
-  PollingOperationDecorator,
 } from "../generated-defs/Azure.Core.js";
-import { OperationLink } from "./lro-helpers.js";
-import { getLroOperationInfo, PropertyMap, ResultInfo } from "./lro-info.js";
-
-/*
- * Constants for polling and final operation links
- */
-
-export const PollingOperationKey: string = "polling";
-export const FinalOperationKey = "final";
+import { $operationLink, getOperationLink } from "./decorators/operation-link.js";
 
 // pagedResult
 
@@ -211,165 +200,6 @@ export function getItems(program: Program, entity: Type): boolean | undefined {
 export function getNextLink(program: Program, entity: ModelProperty): boolean | undefined {
   return program.stateSet(Symbol.for(`TypeSpec.nextLink`)).has(entity);
 }
-
-export interface OperationLinkMetadata {
-  parameters?: Type;
-  linkedOperation: Operation;
-  linkType: string;
-
-  link?: OperationLink;
-  parameterMap?: Map<string, PropertyMap>;
-  result?: ResultInfo;
-}
-
-export const $operationLink: OperationLinkDecorator = (
-  context: DecoratorContext,
-  entity: Operation,
-  linkedOperation: Operation,
-  linkType: string,
-  parameters?: Type,
-) => {
-  if (parameters && parameters.kind !== "Model") {
-    return;
-  }
-  const { program } = context;
-  const [operationInfo, diagnostics] = getLroOperationInfo(
-    program,
-    entity,
-    linkedOperation,
-    linkType,
-    parameters,
-  );
-  if (diagnostics.length > 0) {
-    program.reportDiagnostics(diagnostics);
-  }
-
-  // An operation may have many operationLinks, so treat them as a collection
-  let items = context.program.stateMap(AzureCoreStateKeys.operationLink).get(entity) as Map<
-    string,
-    OperationLinkMetadata
-  >;
-  if (items === undefined) {
-    items = new Map<string, OperationLinkMetadata>();
-  }
-  items.set(linkType, {
-    parameters: parameters,
-    linkedOperation: linkedOperation,
-    linkType: linkType,
-    link: operationInfo?.getOperationLink(),
-    parameterMap: operationInfo?.getInvocationInfo()?.parameterMap,
-    result: operationInfo?.getResultInfo(),
-  } as OperationLinkMetadata);
-  context.program.stateMap(AzureCoreStateKeys.operationLink).set(entity, items);
-};
-
-/**
- * Returns the `OperationLinkMetadata` for a given operation and link type, or undefined.
- */
-export function getOperationLink(
-  program: Program,
-  entity: Operation,
-  linkType: string,
-): OperationLinkMetadata | undefined {
-  const items = program.stateMap(AzureCoreStateKeys.operationLink).get(entity) as Map<
-    string,
-    OperationLinkMetadata
-  >;
-  if (items !== undefined) {
-    return items.get(linkType);
-  }
-  return items;
-}
-
-/**
- * Returns the collection of `OperationLinkMetadata` for a given operation, if any, or undefined.
- */
-export function getOperationLinks(
-  program: Program,
-  entity: Operation,
-): Map<string, OperationLinkMetadata> | undefined {
-  return program.stateMap(AzureCoreStateKeys.operationLink).get(entity) as Map<
-    string,
-    OperationLinkMetadata
-  >;
-}
-
-export const $pollingOperation: PollingOperationDecorator = (
-  context: DecoratorContext,
-  target: Operation,
-  linkedOperation: Operation,
-  parameters?: Type,
-) => {
-  const { program } = context;
-  const isValidReturnType =
-    target.returnType.kind === "Model" ||
-    (target.returnType.kind === "Union" &&
-      [...target.returnType.variants.values()].every((x) => x.type.kind === "Model"));
-  if (!isValidReturnType) {
-    reportDiagnostic(context.program, {
-      code: "polling-operation-return-model",
-      target: target,
-    });
-    return;
-  }
-  context.call($operationLink, target, linkedOperation, PollingOperationKey, parameters);
-
-  const operationDetails = getOperationLink(program, target, PollingOperationKey);
-  if (operationDetails === undefined || operationDetails.result === undefined) {
-    reportDiagnostic(context.program, {
-      code: "polling-operation-return-model",
-      target: target,
-    });
-    return;
-  }
-
-  if (operationDetails.result.statusMonitor === undefined) {
-    reportDiagnostic(context.program, {
-      code: "polling-operation-no-status-monitor",
-      target: linkedOperation,
-    });
-    return;
-  }
-
-  if (operationDetails.result.statusMonitor.terminationInfo.succeededState.length < 1) {
-    reportDiagnostic(context.program, {
-      code: "polling-operation-no-lro-success",
-      target: operationDetails.result.statusMonitor.monitorType,
-    });
-  }
-
-  if (operationDetails.result.statusMonitor.terminationInfo.failedState.length < 1) {
-    reportDiagnostic(context.program, {
-      code: "polling-operation-no-lro-failure",
-      target: operationDetails.result.statusMonitor.monitorType,
-    });
-  }
-
-  if (operationDetails.parameterMap === undefined && operationDetails.link === undefined) {
-    reportDiagnostic(context.program, {
-      code: "polling-operation-no-ref-or-link",
-      target: target,
-    });
-  }
-};
-
-export const $finalOperation: FinalOperationDecorator = (
-  context: DecoratorContext,
-  entity: Operation,
-  linkedOperation: Operation,
-  parameters?: Type,
-) => {
-  const { program } = context;
-  context.call($operationLink, entity, linkedOperation, FinalOperationKey, parameters);
-
-  const operationDetails = getOperationLink(program, entity, FinalOperationKey);
-  if (operationDetails === undefined || operationDetails.result === undefined) {
-    reportDiagnostic(context.program, {
-      code: "invalid-final-operation",
-      target: entity,
-    });
-  }
-};
 
 export const $nextPageOperation: NextPageOperationDecorator = (
   context: DecoratorContext,

@@ -4,16 +4,14 @@ import type { AzureCoreDecorators } from "../generated-defs/Azure.Core.js";
 import type { AzureCoreTraitsDecorators } from "../generated-defs/Azure.Core.Traits.js";
 import type { AzureCoreTraitsPrivateDecorators } from "../generated-defs/Azure.Core.Traits.Private.js";
 import {
-  $finalOperation,
   $items,
   $nextPageOperation,
-  $operationLink,
   $pagedResult,
-  $pollingOperation,
   $requestParameter,
   $responseProperty,
 } from "./decorators.js";
 import { $finalLocation } from "./decorators/final-location.js";
+import { $finalOperation } from "./decorators/final-operation.js";
 import { $omitKeyProperties } from "./decorators/foundations/omit-key-properties.js";
 import { $lroCanceled } from "./decorators/lro-cancelled.js";
 import { $lroErrorResult } from "./decorators/lro-error-result.js";
@@ -21,8 +19,10 @@ import { $lroFailed } from "./decorators/lro-failed.js";
 import { $lroResult } from "./decorators/lro-result.js";
 import { $lroStatus } from "./decorators/lro-status.js";
 import { $lroSucceeded } from "./decorators/lro-succeeded.js";
+import { $operationLink } from "./decorators/operation-link.js";
 import { $pollingLocation } from "./decorators/polling-location.js";
 import { $pollingOperationParameter } from "./decorators/polling-operation-parameter.js";
+import { $pollingOperation } from "./decorators/polling-operation.js";
 import { $previewVersion } from "./decorators/preview-version.js";
 import { $armResourceIdentifierConfig } from "./decorators/private/arm-resource-identifier-config.js";
 import { $defaultFinalStateVia } from "./decorators/private/default-final-state-via.js";

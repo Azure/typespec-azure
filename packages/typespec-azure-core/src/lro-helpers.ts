@@ -34,14 +34,9 @@ import {
   getResourceOperation,
   type ResourceOperation,
 } from "@typespec/rest";
-import {
-  FinalOperationKey,
-  getOperationLink,
-  getOperationLinks,
-  type OperationLinkMetadata,
-  PollingOperationKey,
-} from "./decorators.js";
+
 import { getFinalLocationValue, isFinalLocation } from "./decorators/final-location.js";
+import { FinalOperationKey } from "./decorators/final-operation.js";
 import { getLroResult } from "./decorators/lro-result.js";
 import {
   extractLroStates,
@@ -49,26 +44,21 @@ import {
   LongRunningStates,
 } from "./decorators/lro-status.js";
 import {
+  getOperationLink,
+  getOperationLinks,
+  type OperationLink,
+  OperationLinkMetadata,
+} from "./decorators/operation-link.js";
+import {
   getPollingLocationInfo,
   isPollingLocation,
   type PollingLocationInfo,
   pollingOptionsKind,
   type StatusMonitorPollingLocationInfo,
 } from "./decorators/polling-location.js";
+import { PollingOperationKey } from "./decorators/polling-operation.js";
 import type { PropertyMap, StatusMonitorMetadata } from "./lro-info.js";
 import { getFinalStateOverride } from "./state/final-state.js";
-
-/**
- * Custom polling
- * Represents a property or header that provides a Uri linking to another operation
- */
-export interface OperationLink {
-  kind: "link";
-  /** Indicates whether the link is in the response header or response body */
-  location: "ResponseHeader" | "ResponseBody" | "Self";
-  /** The property that contains the link */
-  property: ModelProperty;
-}
 
 /**
  * Custom polling

@@ -33,10 +33,11 @@ import {
   getLongRunningStates,
   LongRunningStates,
 } from "./decorators/lro-status.js";
+import { OperationLink } from "./decorators/operation-link.js";
 import { isPollingLocation } from "./decorators/polling-location.js";
 import { getPollingOperationParameter } from "./decorators/polling-operation-parameter.js";
 import { createDiagnostic } from "./lib.js";
-import type { ModelPropertyTerminationStatus, OperationLink } from "./lro-helpers.js";
+import type { ModelPropertyTerminationStatus } from "./lro-helpers.js";
 import { getAllProperties } from "./utils.js";
 
 export interface LroOperationInfo {

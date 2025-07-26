@@ -1,11 +1,11 @@
 import {
   createDiagnosticCollector,
-  Model,
   type DecoratorContext,
   type Diagnostic,
   type DiagnosticCollector,
   type Enum,
   type EnumMember,
+  type Model,
   type ModelProperty,
   type Program,
   type Type,
