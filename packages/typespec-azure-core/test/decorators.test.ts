@@ -1,4 +1,4 @@
-import { Interface, Model, ModelProperty, Operation } from "@typespec/compiler";
+import { Interface, Model, Operation } from "@typespec/compiler";
 import {
   BasicTestRunner,
   expectDiagnosticEmpty,
@@ -12,7 +12,6 @@ import {
   getPagedResult,
   OperationLinkMetadata,
 } from "../src/decorators.js";
-import { getParameterizedNextLinkArguments } from "../src/decorators/private/parameterized-next-link-config.js";
 import { FinalStateValue } from "../src/lro-helpers.js";
 import { createAzureCoreTestRunner } from "./test-host.js";
 
@@ -602,68 +601,6 @@ describe("typespec-azure-core: decorators", () => {
       `;
       const diagnostics = await runner.diagnose(code);
       expectDiagnosticEmpty(diagnostics);
-    });
-  });
-
-  describe("@parameterizedNextLinkConfig", () => {
-    it("single parameter", async () => {
-      const { includePending, nextLink } = (await runner.compile(`
-        model ListCertificateOptions {
-          @test includePending?: string;
-        }
-        model Certificate {}
-        model Page {
-          @pageItems items: Certificate[];
-          @test @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[ListCertificateOptions.includePending]>;
-        }
-`)) as { includePending: ModelProperty; nextLink: ModelProperty };
-      assert.strictEqual(nextLink.type.kind, "Scalar");
-      const templateArgs = getParameterizedNextLinkArguments(runner.program, nextLink.type);
-      assert.strictEqual(templateArgs?.length, 1);
-      assert.strictEqual(templateArgs[0], includePending);
-    });
-    it("multiple parameter", async () => {
-      const { includePending, includeExpired, nextLink } = (await runner.compile(`
-        model ListCertificateOptions {
-          @test includePending?: string;
-          @test includeExpired?: string;
-        }
-        model Certificate {}
-        model Page {
-          @pageItems items: Certificate[];
-          @test @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[
-            ListCertificateOptions.includePending,
-            ListCertificateOptions.includeExpired
-          ]>;
-        }
-`)) as { includePending: ModelProperty; includeExpired: ModelProperty; nextLink: ModelProperty };
-      assert.strictEqual(nextLink.type.kind, "Scalar");
-      const templateArgs = getParameterizedNextLinkArguments(runner.program, nextLink.type);
-      assert.strictEqual(templateArgs?.length, 2);
-      assert.strictEqual(templateArgs[0], includePending);
-      assert.strictEqual(templateArgs[1], includeExpired);
-    });
-    it("no parameter", async () => {
-      const diagnostics = await runner.diagnose(`
-        model Certificate {}
-        model Page {
-          @pageItems items: Certificate[];
-          @test @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink;
-        }
-`);
-      expectDiagnostics(diagnostics, {
-        code: "invalid-template-args",
-        message: "Template argument 'ParameterizedParams' is required and not specified.",
-      });
-    });
-    it("call getParameterizedNextLinkArguments on unrelated type", async () => {
-      const { includePending } = (await runner.compile(`
-        model ListCertificateOptions {
-          @test includePending?: string;
-      }
-`)) as { includePending: ModelProperty };
-      assert.strictEqual(includePending.type.kind, "Scalar");
-      assert.ok(!getParameterizedNextLinkArguments(runner.program, includePending.type));
     });
   });
 });
