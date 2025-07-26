@@ -1,8 +1,8 @@
-import { AzureCoreFoundationsDecorators } from "../generated-defs/Azure.Core.Foundations.js";
-import { AzureCoreFoundationsPrivateDecorators } from "../generated-defs/Azure.Core.Foundations.Private.js";
-import { AzureCoreDecorators } from "../generated-defs/Azure.Core.js";
-import { AzureCoreTraitsDecorators } from "../generated-defs/Azure.Core.Traits.js";
-import { AzureCoreTraitsPrivateDecorators } from "../generated-defs/Azure.Core.Traits.Private.js";
+import type { AzureCoreFoundationsDecorators } from "../generated-defs/Azure.Core.Foundations.js";
+import type { AzureCoreFoundationsPrivateDecorators } from "../generated-defs/Azure.Core.Foundations.Private.js";
+import type { AzureCoreDecorators } from "../generated-defs/Azure.Core.js";
+import type { AzureCoreTraitsDecorators } from "../generated-defs/Azure.Core.Traits.js";
+import type { AzureCoreTraitsPrivateDecorators } from "../generated-defs/Azure.Core.Traits.Private.js";
 import {
   $finalLocation,
   $finalOperation,
@@ -16,8 +16,6 @@ import {
   $pollingOperationParameter,
   $requestParameter,
   $responseProperty,
-  $spreadCustomParameters,
-  $spreadCustomResponseProperties,
 } from "./decorators.js";
 import { $lroCanceled } from "./decorators/lro-cancelled.js";
 import { $lroErrorResult } from "./decorators/lro-error-result.js";
@@ -33,6 +31,8 @@ import { $ensureResourceType } from "./decorators/private/ensure-resource-type.j
 import { $ensureVerb } from "./decorators/private/ensure-verb.js";
 import { $needsRoute } from "./decorators/private/needs-route.js";
 import { parameterizedNextLinkConfigDecorator } from "./decorators/private/parameterized-next-link-config.js";
+import { $spreadCustomParameters } from "./decorators/private/spread-custom-parameters.js";
+import { $spreadCustomResponseProperties } from "./decorators/private/spread-custom-response-properties.js";
 import { $useFinalStateVia } from "./decorators/use-final-state-via.js";
 import {
   $addTraitProperties,

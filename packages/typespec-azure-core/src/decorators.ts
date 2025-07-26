@@ -20,10 +20,6 @@ import {
 import { $ } from "@typespec/compiler/typekit";
 import { OmitKeyPropertiesDecorator } from "../generated-defs/Azure.Core.Foundations.js";
 import {
-  SpreadCustomParametersDecorator,
-  SpreadCustomResponsePropertiesDecorator,
-} from "../generated-defs/Azure.Core.Foundations.Private.js";
-import {
   FinalLocationDecorator,
   FinalOperationDecorator,
   ItemsDecorator,
@@ -713,58 +709,3 @@ export function getResponseProperty(program: Program, entity: ModelProperty): st
     .get(entity.type);
   return parameterName;
 }
-
-export const $spreadCustomParameters: SpreadCustomParametersDecorator = (
-  context: DecoratorContext,
-  entity: Model,
-  customizations: Model,
-) => {
-  const customParameters: Type | undefined = customizations.properties.get("parameters")?.type;
-  if (customParameters) {
-    if (customParameters.kind !== "Model") {
-      // The constraint checker will have complained about this already.
-      return;
-    }
-
-    // Copy all parameters into this model type
-    // TODO: This needs to use the equivalent of Checker.checkSpreadProperty
-    // once a helper method is available
-    for (const [key, value] of customParameters.properties) {
-      entity.properties.set(
-        key,
-        context.program.checker.cloneType(value, {
-          sourceProperty: value,
-          model: entity,
-        }),
-      );
-    }
-  }
-};
-
-export const $spreadCustomResponseProperties: SpreadCustomResponsePropertiesDecorator = (
-  context: DecoratorContext,
-  entity: Model,
-  customizations: Model,
-) => {
-  const customResponseProperties: Type | undefined =
-    customizations.properties.get("response")?.type;
-  if (customResponseProperties) {
-    if (customResponseProperties.kind !== "Model") {
-      // The constraint checker will have complained about this already.
-      return;
-    }
-
-    // Copy all parameters into this model type
-    // TODO: This needs to use the equivalent of Checker.checkSpreadProperty
-    // once a helper method is available
-    for (const [key, value] of customResponseProperties.properties) {
-      entity.properties.set(
-        key,
-        context.program.checker.cloneType(value, {
-          sourceProperty: value,
-          model: entity,
-        }),
-      );
-    }
-  }
-};

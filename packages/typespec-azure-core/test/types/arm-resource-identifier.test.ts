@@ -1,5 +1,5 @@
-import { ModelProperty, Scalar } from "@typespec/compiler";
-import { BasicTestRunner } from "@typespec/compiler/testing";
+import type { ModelProperty, Scalar } from "@typespec/compiler";
+import type { BasicTestRunner } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { beforeEach, describe, expect, it } from "vitest";
 import { getArmResourceIdentifierConfig } from "../../src/decorators/private/arm-resource-identifier-config.js";
