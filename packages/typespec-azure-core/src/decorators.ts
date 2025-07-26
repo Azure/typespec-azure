@@ -8,7 +8,6 @@ import {
   DecoratorContext,
   ignoreDiagnostics,
   IntrinsicType,
-  isKey,
   isNeverType,
   isVoidType,
   Model,
@@ -18,7 +17,6 @@ import {
   Type,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
-import { OmitKeyPropertiesDecorator } from "../generated-defs/Azure.Core.Foundations.js";
 import {
   FinalLocationDecorator,
   FinalOperationDecorator,
@@ -506,18 +504,6 @@ export function getFinalLocationValue(
 ): Model | IntrinsicType | undefined {
   return program.stateMap(AzureCoreStateKeys.finalLocationResults).get(entity);
 }
-
-export const $omitKeyProperties: OmitKeyPropertiesDecorator = (
-  context: DecoratorContext,
-  entity: Model,
-) => {
-  // Delete any key properties from the model
-  for (const [key, prop] of entity.properties) {
-    if (isKey(context.program, prop)) {
-      entity.properties.delete(key);
-    }
-  }
-};
 
 export interface OperationLinkMetadata {
   parameters?: Type;

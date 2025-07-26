@@ -8,7 +8,6 @@ import {
   $finalOperation,
   $items,
   $nextPageOperation,
-  $omitKeyProperties,
   $operationLink,
   $pagedResult,
   $pollingLocation,
@@ -17,6 +16,7 @@ import {
   $requestParameter,
   $responseProperty,
 } from "./decorators.js";
+import { $omitKeyProperties } from "./decorators/foundations/omit-key-properties.js";
 import { $lroCanceled } from "./decorators/lro-cancelled.js";
 import { $lroErrorResult } from "./decorators/lro-error-result.js";
 import { $lroFailed } from "./decorators/lro-failed.js";
