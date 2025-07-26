@@ -5,6 +5,7 @@ import {
   type DiagnosticCollector,
   type Enum,
   type EnumMember,
+  type Model,
   type ModelProperty,
   type Program,
   type Type,
@@ -13,11 +14,29 @@ import {
 } from "@typespec/compiler";
 import { useStateMap } from "@typespec/compiler/utils";
 import type { LroStatusDecorator } from "../../generated-defs/Azure.Core.js";
-import { type LongRunningStates } from "../decorators.js";
 import { AzureCoreStateKeys, createDiagnostic } from "../lib.js";
+import { getAllProperties } from "../utils.js";
 import { isLroCanceledState } from "./lro-cancelled.js";
 import { isLroFailedState } from "./lro-failed.js";
 import { isLroSucceededState } from "./lro-succeeded.js";
+
+/**
+ *  Provides the names of terminal long-running operation states plus any
+ *  additional states defined for the operation.
+ **/
+export interface LongRunningStates {
+  // The string which represents the "Succeeded" state.
+  succeededState: string[];
+
+  // The string which represents the "Failed" state.
+  failedState: string[];
+
+  // The string which represents the "Canceled" state.
+  canceledState: string[];
+
+  // The full array of long-running operation states.
+  states: string[];
+}
 
 const [
   /**
@@ -28,6 +47,7 @@ const [
 ] = useStateMap<Enum | Union | ModelProperty, LongRunningStates>(AzureCoreStateKeys.lroStatus);
 
 export { getLongRunningStates };
+
 export const $lroStatus: LroStatusDecorator = (
   context: DecoratorContext,
   entity: Enum | Union | ModelProperty,
@@ -38,6 +58,47 @@ export const $lroStatus: LroStatusDecorator = (
     setLroStatus(context.program, entity, states);
   }
 };
+
+/**
+ * Return the property that contains the lro status
+ * @param program The program to process
+ * @param target The model to check for lro status
+ */
+export function findLroStatusProperty(program: Program, target: Model): ModelProperty | undefined {
+  function getProvisioningState(props: Map<string, ModelProperty>): ModelProperty | undefined {
+    let innerProps: Map<string, ModelProperty> | undefined = undefined;
+    let result: ModelProperty | undefined = undefined;
+    const innerProperty = props.get("properties");
+    result = props.get("provisioningState");
+    if (
+      result === undefined &&
+      innerProperty !== undefined &&
+      innerProperty.type?.kind === "Model"
+    ) {
+      innerProps = getAllProperties(innerProperty.type);
+      result = innerProps.get("provisioningState");
+    }
+
+    return result;
+  }
+  const props = getAllProperties(target);
+  for (const [_, prop] of props.entries()) {
+    let values = getLongRunningStates(program, prop);
+    if (values !== undefined) return prop;
+    if (prop.type.kind === "Enum" || prop.type.kind === "Union") {
+      values = getLongRunningStates(program, prop.type);
+      if (values !== undefined) return prop;
+    }
+  }
+
+  const statusProp = props.get("status") ?? getProvisioningState(props);
+  if (statusProp) {
+    const [states, _] = extractLroStates(program, statusProp);
+    if (states !== undefined) return statusProp;
+  }
+
+  return undefined;
+}
 
 export function extractLroStates(
   program: Program,

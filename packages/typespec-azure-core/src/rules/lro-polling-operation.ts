@@ -1,6 +1,6 @@
 import { Operation, Program, Type, createRule } from "@typespec/compiler";
 import { getHeaderFieldName, isHeader } from "@typespec/http";
-import { getOperationLink } from "../decorators.js";
+import { getOperationLink } from "../decorators/operation-link.js";
 import {
   isExcludedCoreType,
   isTemplatedInterfaceOperation,

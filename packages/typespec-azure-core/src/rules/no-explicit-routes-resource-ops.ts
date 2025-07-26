@@ -1,6 +1,6 @@
 import { Operation, createRule } from "@typespec/compiler";
 import { getRoutePath } from "@typespec/http";
-import { isResourceOperation } from "../decorators.js";
+import { isResourceOperation } from "../decorators/private/ensure-resource-type.js";
 import { isExcludedCoreType } from "./utils.js";
 
 export const noExplicitRoutesResourceOps = createRule({
