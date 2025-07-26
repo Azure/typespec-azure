@@ -6,13 +6,7 @@ import {
 } from "@typespec/compiler/testing";
 import assert, { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import {
-  getFinalStateOverride,
-  getOperationLinks,
-  getPagedResult,
-  OperationLinkMetadata,
-} from "../src/decorators.js";
-import { FinalStateValue } from "../src/lro-helpers.js";
+import { getOperationLinks, getPagedResult, OperationLinkMetadata } from "../src/decorators.js";
 import { createAzureCoreTestRunner } from "./test-host.js";
 
 describe("typespec-azure-core: decorators", () => {
@@ -464,80 +458,7 @@ describe("typespec-azure-core: decorators", () => {
       expectDiagnosticEmpty(diagnostics);
     });
   });
-  describe("@useFinalStateVia", () => {
-    it("correctly overrides PUT lro final-state-via", async () => {
-      const code = `
-      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is test code."
-      @pollingOperation(bar)
-      @useFinalStateVia("operation-location")
-      @test @put op foo(): {@header("Operation-Location") loc: string};
 
-      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is test code."
-      @route("/polling")
-      @get op bar(): {status: "Succeeded" | "Failed" | "Cancelled"};
-      `;
-      const [{ foo }, diagnostics] = await runner.compileAndDiagnose(code);
-      expectDiagnosticEmpty(diagnostics);
-      const op = foo as Operation;
-
-      assert.ok(op);
-      assert.deepStrictEqual(op.kind, "Operation");
-      const finalState = getFinalStateOverride(runner.program, op);
-      assert.deepStrictEqual(finalState, FinalStateValue.operationLocation);
-    });
-    it("emits diagnostic for invalid PUT override", async () => {
-      const code = `
-      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is test code."
-      @pollingOperation(bar)
-      @useFinalStateVia("operation-location")
-      @test @put op foo(): {loc: string};
-
-      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is test code."
-      @route("/polling")
-      @get op bar(): {status: "Succeeded" | "Failed" | "Cancelled"};
-      `;
-      const diagnostics = await runner.diagnose(code);
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-azure-core/invalid-final-state",
-        message:
-          "There was no header corresponding to the desired final-state-via value 'operation-location'.",
-      });
-    });
-    it("emits error for missing header", async () => {
-      const code = `
-      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is test code."
-      @pollingOperation(bar)
-      @useFinalStateVia("location")
-      @post op foo(): {};
-
-      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is test code."
-      @route("/polling")
-      @get op bar(): {status: "Succeeded" | "Failed" | "Cancelled"};
-      `;
-      const diagnostics = await runner.diagnose(code);
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-azure-core/invalid-final-state",
-        message: `There was no header corresponding to the desired final-state-via value 'location'.`,
-      });
-    });
-    it("emits error for original-uri on non-PUT request", async () => {
-      const code = `
-      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is test code."
-      @pollingOperation(bar)
-      @useFinalStateVia("original-uri")
-      @post op foo(): {};
-
-      #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is test code."
-      @route("/polling")
-      @get op bar(): {status: "Succeeded" | "Failed" | "Cancelled"};
-      `;
-      const diagnostics = await runner.diagnose(code);
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-azure-core/invalid-final-state",
-        message: "The final state value 'original-uri' can only be used in http PUT operations",
-      });
-    });
-  });
   describe("@pollingOperation", () => {
     it("emit error if response of operation is a scalar", async () => {
       const code = `

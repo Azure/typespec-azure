@@ -18,22 +18,13 @@ import {
   ModelProperty,
   Operation,
   Program,
-  Scalar,
   Type,
-  typespecTypeToJson,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
-import {
-  getHttpOperation,
-  getRoutePath,
-  HttpOperation,
-  HttpOperationResponse,
-} from "@typespec/http";
+import { getHttpOperation, getRoutePath } from "@typespec/http";
 import { getResourceTypeKey, getSegment, isAutoRoute } from "@typespec/rest";
 import { OmitKeyPropertiesDecorator } from "../generated-defs/Azure.Core.Foundations.js";
 import {
-  ArmResourceIdentifierConfigDecorator,
-  DefaultFinalStateViaDecorator,
   EmbeddingVectorDecorator,
   EnsureResourceTypeDecorator,
   EnsureVerbDecorator,
@@ -51,11 +42,10 @@ import {
   PollingLocationDecorator,
   PollingOperationDecorator,
   PollingOperationParameterDecorator,
-  UseFinalStateViaDecorator,
 } from "../generated-defs/Azure.Core.js";
 import { getLroResult } from "./decorators/lro-result.js";
 import { extractLroStates } from "./decorators/lro-status.js";
-import { FinalStateValue, OperationLink } from "./lro-helpers.js";
+import { OperationLink } from "./lro-helpers.js";
 import {
   extractStatusMonitorInfo,
   getLroOperationInfo,
@@ -530,172 +520,6 @@ export function getFinalLocationValue(
   return program.stateMap(AzureCoreStateKeys.finalLocationResults).get(entity);
 }
 
-/**
- * overrides the final state for an lro
- * @param context The execution context for the decorator
- * @param entity The decorated operation
- * @param finalState The desired value for final-state-via
- */
-export const $useFinalStateVia: UseFinalStateViaDecorator = (
-  context: DecoratorContext,
-  entity: Operation,
-  finalState: string,
-) => {
-  const { program } = context;
-  let finalStateVia: FinalStateValue;
-  switch (finalState?.toLowerCase()) {
-    case "original-uri":
-      finalStateVia = FinalStateValue.originalUri;
-      break;
-    case "operation-location":
-      finalStateVia = FinalStateValue.operationLocation;
-      break;
-    case "location":
-      finalStateVia = FinalStateValue.location;
-      break;
-    case "azure-async-operation":
-      finalStateVia = FinalStateValue.azureAsyncOperation;
-      break;
-    default:
-      reportDiagnostic(program, {
-        code: "invalid-final-state",
-        target: entity,
-        messageId: "badValue",
-        format: { finalStateValue: finalState },
-      });
-      return;
-  }
-
-  const operation = ignoreDiagnostics(getHttpOperation(program, entity));
-  const storedValue = validateFinalState(program, operation, finalStateVia);
-  if (storedValue !== undefined || operation.verb === "put") {
-    program.stateMap(AzureCoreStateKeys.finalStateOverride).set(entity, finalStateVia);
-  }
-  if (
-    storedValue === undefined &&
-    [
-      FinalStateValue.operationLocation,
-      FinalStateValue.location,
-      FinalStateValue.azureAsyncOperation,
-    ].includes(finalStateVia)
-  ) {
-    reportDiagnostic(program, {
-      code: "invalid-final-state",
-      target: entity,
-      messageId: "noHeader",
-      format: { finalStateValue: finalStateVia },
-    });
-  }
-};
-
-type LroHeader = "azure-asyncoperation" | "location" | "operation-location";
-
-function getLroHeaderName(finalState: FinalStateValue): LroHeader | undefined {
-  switch (finalState) {
-    case FinalStateValue.azureAsyncOperation:
-      return "azure-asyncoperation";
-    case FinalStateValue.location:
-      return "location";
-    case FinalStateValue.operationLocation:
-      return "operation-location";
-    default:
-      return undefined;
-  }
-}
-
-function getLroHeader(propertyName: string): LroHeader | undefined {
-  const name = propertyName.toLowerCase();
-  switch (name) {
-    case "azure-asyncoperation":
-    case "location":
-    case "operation-location":
-      return name;
-    default:
-      return undefined;
-  }
-}
-
-function getLroHeaders(response: HttpOperationResponse): Set<LroHeader> | undefined {
-  const result = new Set<LroHeader>();
-  for (const content of response.responses) {
-    if (content.headers) {
-      for (const candidate of Object.keys(content.headers)) {
-        const headerName = getLroHeader(candidate);
-        if (headerName !== undefined) {
-          result.add(headerName);
-        }
-      }
-    }
-  }
-
-  return result;
-}
-
-function validateFinalState(
-  program: Program,
-  operation: HttpOperation,
-  finalState: FinalStateValue,
-): FinalStateValue | undefined {
-  if (finalState === FinalStateValue.originalUri) {
-    if (operation.verb !== "put") {
-      reportDiagnostic(program, {
-        code: "invalid-final-state",
-        target: operation.operation,
-        messageId: "notPut",
-      });
-      return undefined;
-    }
-
-    return FinalStateValue.originalUri;
-  }
-
-  const header = getLroHeaderName(finalState);
-  if (header === undefined) {
-    reportDiagnostic(program, {
-      code: "invalid-final-state",
-      target: operation.operation,
-      messageId: "badValue",
-      format: { finalStateValue: finalState },
-    });
-    return undefined;
-  }
-
-  for (const response of operation.responses) {
-    const lroHeaders = getLroHeaders(response);
-    if (lroHeaders?.has(header)) {
-      return finalState;
-    }
-  }
-
-  return undefined;
-}
-
-function validateFinalStates(
-  program: Program,
-  operation: Operation,
-  finalStates: FinalStateValue[],
-): FinalStateValue | undefined {
-  const httpOp = ignoreDiagnostics(getHttpOperation(program, operation));
-  for (const state of finalStates) {
-    if (validateFinalState(program, httpOp, state)) return state;
-  }
-
-  return undefined;
-}
-
-/**
- * Get the overridden final state value for this operation, if any
- * @param program The program to process
- * @param operation The operation to check for an override value
- * @returns The FInalStateValue if it exists, otherwise undefined
- */
-export function getFinalStateOverride(
-  program: Program,
-  operation: Operation,
-): FinalStateValue | undefined {
-  return program.stateMap(AzureCoreStateKeys.finalStateOverride).get(operation);
-}
-
 export const $omitKeyProperties: OmitKeyPropertiesDecorator = (
   context: DecoratorContext,
   entity: Model,
@@ -1116,67 +940,3 @@ export interface ArmResourceIdentifierAllowedResource {
    */
   readonly scopes?: ArmResourceDeploymentScope[];
 }
-
-/** @internal */
-export const $armResourceIdentifierConfig: ArmResourceIdentifierConfigDecorator = (
-  context: DecoratorContext,
-  entity: Scalar,
-  config: Type,
-) => {
-  if (config.kind !== "Model") return;
-  const prop = config.properties.get("allowedResources");
-  if (prop === undefined || prop.type.kind !== "Tuple") return;
-  const [data, diagnostics] = typespecTypeToJson<ArmResourceIdentifierConfig>(
-    prop.type,
-    context.getArgumentTarget(0)!,
-  );
-  context.program.reportDiagnostics(diagnostics);
-
-  if (data) {
-    context.program
-      .stateMap(AzureCoreStateKeys.armResourceIdentifierConfig)
-      .set(entity, { allowedResources: data });
-  }
-};
-
-/** Returns the config attached to an armResourceIdentifierScalar */
-export function getArmResourceIdentifierConfig(
-  program: Program,
-  entity: Scalar,
-): ArmResourceIdentifierConfig {
-  return program.stateMap(AzureCoreStateKeys.armResourceIdentifierConfig).get(entity);
-}
-
-export const $defaultFinalStateVia: DefaultFinalStateViaDecorator = (
-  context: DecoratorContext,
-  target: Operation,
-  states: unknown, // TODO: replace with actual type when available
-) => {
-  const { program } = context;
-  const finalStateValues: FinalStateValue[] = [];
-  for (const finalState of states as string[]) {
-    switch (finalState?.toLowerCase()) {
-      case "operation-location":
-        finalStateValues.push(FinalStateValue.operationLocation);
-        break;
-      case "location":
-        finalStateValues.push(FinalStateValue.location);
-        break;
-      case "azure-async-operation":
-        finalStateValues.push(FinalStateValue.azureAsyncOperation);
-        break;
-      default:
-        reportDiagnostic(program, {
-          code: "invalid-final-state",
-          target: target,
-          messageId: "badValue",
-          format: { finalStateValue: finalState },
-        });
-        return;
-    }
-  }
-  const storedValue = validateFinalStates(program, target, finalStateValues);
-  if (storedValue !== undefined) {
-    program.stateMap(AzureCoreStateKeys.finalStateOverride).set(target, storedValue);
-  }
-};

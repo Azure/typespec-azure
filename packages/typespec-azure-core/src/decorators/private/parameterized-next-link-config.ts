@@ -1,6 +1,6 @@
-import { ModelProperty, Scalar, compilerAssert } from "@typespec/compiler";
+import { type ModelProperty, type Scalar, compilerAssert } from "@typespec/compiler";
 import { useStateMap } from "@typespec/compiler/utils";
-import { ParameterizedNextLinkConfigDecorator } from "../../../generated-defs/Azure.Core.Foundations.Private.js";
+import type { ParameterizedNextLinkConfigDecorator } from "../../../generated-defs/Azure.Core.Foundations.Private.js";
 import { AzureCoreStateKeys } from "../../lib.js";
 
 const [getParameterizedNextLinkArguments, markParameterizedNextLinkConfigTemplate] = useStateMap<

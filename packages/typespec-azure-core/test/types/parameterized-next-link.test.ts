@@ -2,10 +2,10 @@ import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { expect, it } from "vitest";
 import { getParameterizedNextLinkArguments } from "../../src/decorators/private/parameterized-next-link-config.js";
-import { Tester } from "../test-host.js";
+import { TesterWithService } from "../test-host.js";
 
 it("single parameter", async () => {
-  const { includePending, nextLink, program } = await Tester.compile(t.code`
+  const { includePending, nextLink, program } = await TesterWithService.compile(t.code`
     model ListCertificateOptions {
       ${t.modelProperty("includePending")}: string;
     }
@@ -22,7 +22,8 @@ it("single parameter", async () => {
 });
 
 it("multiple parameter", async () => {
-  const { includePending, includeExpired, nextLink, program } = await Tester.compile(t.code`
+  const { includePending, includeExpired, nextLink, program } =
+    await TesterWithService.compile(t.code`
     model ListCertificateOptions {
       ${t.modelProperty("includePending")}?: string;
       ${t.modelProperty("includeExpired")}?: string;
@@ -44,7 +45,7 @@ it("multiple parameter", async () => {
 });
 
 it("emit diagnostic if used with no parameter", async () => {
-  const diagnostics = await Tester.diagnose(`
+  const diagnostics = await TesterWithService.diagnose(`
     model Certificate {}
     model Page {
       @pageItems items: Certificate[];
@@ -58,7 +59,7 @@ it("emit diagnostic if used with no parameter", async () => {
 });
 
 it("call getParameterizedNextLinkArguments on unrelated type", async () => {
-  const { includePending, program } = await Tester.compile(t.code`
+  const { includePending, program } = await TesterWithService.compile(t.code`
     model ListCertificateOptions {
       ${t.modelProperty("includePending")}?: string;
   }

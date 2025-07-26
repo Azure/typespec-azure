@@ -37,7 +37,6 @@ import {
 import {
   FinalOperationKey,
   getFinalLocationValue,
-  getFinalStateOverride,
   getOperationLink,
   getOperationLinks,
   getPollingLocationInfo,
@@ -53,6 +52,7 @@ import {
 import { getLroResult } from "./decorators/lro-result.js";
 import { extractLroStates } from "./decorators/lro-status.js";
 import { PropertyMap, StatusMonitorMetadata } from "./lro-info.js";
+import { getFinalStateOverride } from "./state/final-state.js";
 
 /**
  * Custom polling

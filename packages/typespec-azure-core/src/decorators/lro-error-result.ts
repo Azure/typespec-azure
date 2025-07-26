@@ -1,8 +1,8 @@
 import {
-  Diagnostic,
-  Model,
-  ModelProperty,
-  Program,
+  type Diagnostic,
+  type Model,
+  type ModelProperty,
+  type Program,
   createDiagnosticCollector,
   walkPropertiesInherited,
 } from "@typespec/compiler";

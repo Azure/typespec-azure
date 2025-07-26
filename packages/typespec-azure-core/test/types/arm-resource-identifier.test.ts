@@ -2,7 +2,7 @@ import { ModelProperty, Scalar } from "@typespec/compiler";
 import { BasicTestRunner } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { beforeEach, describe, expect, it } from "vitest";
-import { getArmResourceIdentifierConfig } from "../../src/decorators.js";
+import { getArmResourceIdentifierConfig } from "../../src/decorators/private/arm-resource-identifier-config.js";
 import { createAzureCoreTestRunner } from "../test-host.js";
 
 let runner: BasicTestRunner;
