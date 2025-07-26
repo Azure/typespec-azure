@@ -1,7 +1,7 @@
+import { Tester } from "#test/test-host.js";
 import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import assert from "assert";
 import { it } from "vitest";
-import { Tester } from "../../test/test-host.js";
 import { FinalStateValue } from "../lro-helpers.js";
 import { getFinalStateOverride } from "../state/final-state.js";
 
