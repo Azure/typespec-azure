@@ -4,12 +4,9 @@ import { AzureCoreDecorators } from "../generated-defs/Azure.Core.js";
 import { AzureCoreTraitsDecorators } from "../generated-defs/Azure.Core.Traits.js";
 import { AzureCoreTraitsPrivateDecorators } from "../generated-defs/Azure.Core.Traits.Private.js";
 import {
-  $ensureResourceType,
-  $ensureVerb,
   $finalLocation,
   $finalOperation,
   $items,
-  $needsRoute,
   $nextPageOperation,
   $omitKeyProperties,
   $operationLink,
@@ -32,6 +29,9 @@ import { $previewVersion } from "./decorators/preview-version.js";
 import { $armResourceIdentifierConfig } from "./decorators/private/arm-resource-identifier-config.js";
 import { $defaultFinalStateVia } from "./decorators/private/default-final-state-via.js";
 import { $embeddingVector } from "./decorators/private/embedding-vector.js";
+import { $ensureResourceType } from "./decorators/private/ensure-resource-type.js";
+import { $ensureVerb } from "./decorators/private/ensure-verb.js";
+import { $needsRoute } from "./decorators/private/needs-route.js";
 import { parameterizedNextLinkConfigDecorator } from "./decorators/private/parameterized-next-link-config.js";
 import { $useFinalStateVia } from "./decorators/use-final-state-via.js";
 import {

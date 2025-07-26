@@ -6,13 +6,10 @@ import {
   // @ts-ignore
   $decorators,
   DecoratorContext,
-  getNamespaceFullName,
-  getTypeName,
   ignoreDiagnostics,
   IntrinsicType,
   isKey,
   isNeverType,
-  isTemplateDeclarationOrInstance,
   isVoidType,
   Model,
   ModelProperty,
@@ -21,13 +18,8 @@ import {
   Type,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
-import { getHttpOperation, getRoutePath } from "@typespec/http";
-import { getResourceTypeKey, getSegment, isAutoRoute } from "@typespec/rest";
 import { OmitKeyPropertiesDecorator } from "../generated-defs/Azure.Core.Foundations.js";
 import {
-  EnsureResourceTypeDecorator,
-  EnsureVerbDecorator,
-  NeedsRouteDecorator,
   SpreadCustomParametersDecorator,
   SpreadCustomResponsePropertiesDecorator,
 } from "../generated-defs/Azure.Core.Foundations.Private.js";
@@ -776,115 +768,3 @@ export const $spreadCustomResponseProperties: SpreadCustomResponsePropertiesDeco
     }
   }
 };
-
-export const $ensureResourceType: EnsureResourceTypeDecorator = (
-  context: DecoratorContext,
-  entity: Operation,
-  resourceType: Type,
-) => {
-  if (resourceType.kind === "TemplateParameter") {
-    return;
-  }
-
-  // Mark the operation as a resource operation
-  context.program.stateSet(AzureCoreStateKeys.resourceOperation).add(entity);
-
-  if (resourceType.kind !== "Model") {
-    context.program.reportDiagnostic({
-      code: "invalid-argument",
-      message: `This operation expects a Model for its TResource parameter.`,
-      severity: "error",
-      target: entity,
-    });
-
-    return;
-  }
-
-  // If the operation is defined under Azure.Core, ignore these diagnostics.
-  // We're only concerned with user-defined operations.
-  if (entity.namespace && getNamespaceFullName(entity.namespace).startsWith("Azure.Core")) {
-    return;
-  }
-
-  const key = getResourceTypeKey(context.program, resourceType);
-  if (!key) {
-    reportDiagnostic(context.program, {
-      code: "invalid-resource-type",
-      target: entity,
-      messageId: "missingKey",
-      format: {
-        name: getTypeName(resourceType),
-      },
-    });
-
-    return;
-  }
-
-  if (!getSegment(context.program, key.keyProperty)) {
-    reportDiagnostic(context.program, {
-      code: "invalid-resource-type",
-      target: entity,
-      messageId: "missingSegment",
-      format: {
-        name: getTypeName(resourceType),
-      },
-    });
-  }
-};
-
-export function isResourceOperation(program: Program, operation: Operation): boolean {
-  return program.stateSet(AzureCoreStateKeys.resourceOperation).has(operation);
-}
-
-export const $needsRoute: NeedsRouteDecorator = (context: DecoratorContext, entity: Operation) => {
-  // If the operation is not templated, add it to the list of operations to
-  // check later
-  if (entity.node === undefined || entity.node.templateParameters.length === 0) {
-    context.program.stateSet(AzureCoreStateKeys.needsRoute).add(entity);
-  }
-};
-
-export function checkRpcRoutes(program: Program) {
-  (program.stateSet(AzureCoreStateKeys.needsRoute) as Set<Operation>).forEach((op: Operation) => {
-    if (
-      op.node === undefined ||
-      (op.node.templateParameters.length === 0 &&
-        !isAutoRoute(program, op) &&
-        !getRoutePath(program, op))
-    ) {
-      reportDiagnostic(program, {
-        code: "rpc-operation-needs-route",
-        target: op,
-      });
-    }
-  });
-}
-
-export const $ensureVerb: EnsureVerbDecorator = (
-  context: DecoratorContext,
-  entity: Operation,
-  templateName: string,
-  verb: string,
-) => {
-  context.program.stateMap(AzureCoreStateKeys.ensureVerb).set(entity, [templateName, verb]);
-};
-
-export function checkEnsureVerb(program: Program) {
-  const opMap = program.stateMap(AzureCoreStateKeys.ensureVerb) as Map<Operation, string>;
-  for (const [operation, [templateName, requiredVerb]] of opMap.entries()) {
-    if (isTemplateDeclarationOrInstance(operation)) continue;
-    const verb = getHttpOperation(program, operation)[0].verb.toString().toLowerCase();
-    const reqVerb: string = requiredVerb.toLowerCase();
-    if (verb !== reqVerb) {
-      reportDiagnostic(program, {
-        code: "verb-conflict",
-        target: operation,
-        format: {
-          templateName: templateName,
-          verb: verb.toUpperCase(),
-          requiredVerb: reqVerb.toUpperCase(),
-        },
-      });
-    }
-  }
-}
