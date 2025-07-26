@@ -48,6 +48,7 @@ import {
   getAlternateType,
   getClientNamespace,
   getExplicitClientApiVersions,
+  getLegacyHierarchyBuilding,
   getOverriddenClientMethod,
   getUsageOverride,
   listClients,
@@ -849,13 +850,15 @@ export function getSdkModelWithDiagnostics(
       // handle normal model properties
       diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
     }
-    if (type.baseModel) {
-      sdkType.baseModel = context.__referencedTypeCache.get(type.baseModel) as
+    const rawBaseModel = getLegacyHierarchyBuilding(context, type) || type.baseModel;
+    if (rawBaseModel) {
+      sdkType.baseModel = context.__referencedTypeCache.get(rawBaseModel) as
         | SdkModelType
         | undefined;
+
       if (sdkType.baseModel === undefined) {
         const baseModel = diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, type.baseModel, operation),
+          getClientTypeWithDiagnostics(context, rawBaseModel, operation),
         ) as SdkDictionaryType | SdkModelType;
         if (baseModel.kind === "dict") {
           // model MyModel extends Record<> {} should be model with additional properties
@@ -866,7 +869,6 @@ export function getSdkModelWithDiagnostics(
       }
     }
     diagnostics.pipe(addDiscriminatorToModelType(context, type, sdkType));
-
     updateReferencedTypeMap(context, type, sdkType);
   }
   return diagnostics.wrap(sdkType);
@@ -1737,6 +1739,37 @@ function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
   }
 }
 
+function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  for (const sdkType of context.__referencedTypeCache.values()) {
+    if (sdkType.kind !== "model" || !sdkType.baseModel) continue;
+    // if the model has legacyHierarchyBuilding, then we should update its discriminated subtypes
+    const legacyHierarchyBuilding = getLegacyHierarchyBuilding(context, sdkType.__raw as Model);
+    // must be done after discriminator is added
+    // Populate discriminated subtypes for legacy hierarchy building
+    if (legacyHierarchyBuilding && sdkType.discriminatorValue) {
+      let currBaseModel: SdkModelType | undefined = sdkType.baseModel;
+      while (currBaseModel) {
+        if (!currBaseModel.discriminatedSubtypes) {
+          currBaseModel.discriminatedSubtypes = {};
+        }
+        currBaseModel.discriminatedSubtypes[sdkType.discriminatorValue] = sdkType;
+        currBaseModel = currBaseModel.baseModel;
+      }
+
+      // Filter out legacy hierarchy building properties
+      sdkType.properties = sdkType.properties.filter((property) => {
+        return !(
+          property.kind === "property" &&
+          !property.discriminator &&
+          legacyHierarchyBuilding.properties.has(property.name)
+        );
+      });
+    }
+  }
+  return diagnostics.wrap(undefined);
+}
+
 interface UsageFilteringOptions {
   input?: boolean;
   output?: boolean;
@@ -1883,7 +1916,8 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   diagnostics.pipe(updateUsageOverride(context));
   // update spread model
   updateSpreadModelUsageAndAccess(context);
-
+  // update discriminated subtypes and filter out duplicate properties from @legacyHierarchyBuilding
+  handleLegacyHierarchyBuilding(context);
   // update generated name
   resolveConflictGeneratedName(context);
 

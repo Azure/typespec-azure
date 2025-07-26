@@ -531,25 +531,23 @@ function getContextPath(
         if (result) return true;
       }
       // handle additional properties type: model MyModel extends Record<> {}
-      if (currentType.baseModel) {
-        if (currentType.baseModel.name === "Record") {
+      const baseModel = currentType.baseModel;
+      if (baseModel) {
+        if (baseModel.name === "Record") {
           const result = dfsModelProperties(
             expectedType,
-            currentType.baseModel.indexer!.value!,
+            baseModel.indexer!.value!,
             "AdditionalProperty",
           );
           if (result) return true;
         }
       }
       result.pop();
-      if (currentType.baseModel) {
-        const result = dfsModelProperties(
-          expectedType,
-          currentType.baseModel,
-          currentType.baseModel.name,
-        );
+      if (baseModel) {
+        const result = dfsModelProperties(expectedType, baseModel, baseModel.name);
         if (result) return true;
       }
+      // TODO: come back and see if derived models are needed to change
       for (const derivedModel of currentType.derivedModels) {
         const result = dfsModelProperties(expectedType, derivedModel, derivedModel.name);
         if (result) return true;
