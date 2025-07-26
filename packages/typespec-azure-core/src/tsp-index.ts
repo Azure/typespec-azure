@@ -25,7 +25,6 @@ import {
   $spreadCustomParameters,
   $spreadCustomResponseProperties,
   $useFinalStateVia,
-  parameterizedNextLinkConfigDecorator,
 } from "./decorators.js";
 import { $lroCanceled } from "./decorators/lro-cancelled.js";
 import { $lroErrorResult } from "./decorators/lro-error-result.js";
@@ -34,6 +33,7 @@ import { $lroResult } from "./decorators/lro-result.js";
 import { $lroStatus } from "./decorators/lro-status.js";
 import { $lroSucceeded } from "./decorators/lro-succeeded.js";
 import { $previewVersion } from "./decorators/preview-version.js";
+import { parameterizedNextLinkConfigDecorator } from "./decorators/private/parameterized-next-link-config.js";
 import {
   $addTraitProperties,
   $applyTraitOverride,

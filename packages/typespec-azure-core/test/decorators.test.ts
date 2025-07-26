@@ -10,9 +10,9 @@ import {
   getFinalStateOverride,
   getOperationLinks,
   getPagedResult,
-  getParameterizedNextLinkArguments,
   OperationLinkMetadata,
 } from "../src/decorators.js";
+import { getParameterizedNextLinkArguments } from "../src/decorators/private/parameterized-next-link-config.js";
 import { FinalStateValue } from "../src/lro-helpers.js";
 import { createAzureCoreTestRunner } from "./test-host.js";
 

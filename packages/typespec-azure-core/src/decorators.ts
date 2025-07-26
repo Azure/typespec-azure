@@ -5,7 +5,6 @@ import {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   $decorators,
-  compilerAssert,
   DecoratorContext,
   getNamespaceFullName,
   getTypeName,
@@ -20,12 +19,10 @@ import {
   Operation,
   Program,
   Scalar,
-  setTypeSpecNamespace,
   Type,
   typespecTypeToJson,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
-import { useStateMap } from "@typespec/compiler/utils";
 import {
   getHttpOperation,
   getRoutePath,
@@ -41,7 +38,6 @@ import {
   EnsureResourceTypeDecorator,
   EnsureVerbDecorator,
   NeedsRouteDecorator,
-  ParameterizedNextLinkConfigDecorator,
   SpreadCustomParametersDecorator,
   SpreadCustomResponsePropertiesDecorator,
 } from "../generated-defs/Azure.Core.Foundations.Private.js";
@@ -1184,38 +1180,3 @@ export const $defaultFinalStateVia: DefaultFinalStateViaDecorator = (
     program.stateMap(AzureCoreStateKeys.finalStateOverride).set(target, storedValue);
   }
 };
-
-const [getParameterizedNextLinkArguments, markParameterizedNextLinkConfigTemplate] = useStateMap<
-  Scalar,
-  ModelProperty[]
->(AzureCoreStateKeys.parameterizedNextLinkConfig);
-
-const parameterizedNextLinkConfigDecorator: ParameterizedNextLinkConfigDecorator = (
-  context,
-  target,
-  parameters,
-) => {
-  // Workaround as it seems like decorators are called when missing template arguments
-  if (parameters.kind === "Model") return;
-  compilerAssert(
-    parameters.kind === "Tuple",
-    "Using the defined internal scalar parameterizedNextLink will result in a Tuple template argument type",
-  );
-  markParameterizedNextLinkConfigTemplate(context.program, target, parameters.values as any);
-};
-
-export { getParameterizedNextLinkArguments, parameterizedNextLinkConfigDecorator };
-
-setTypeSpecNamespace("Foundations", $omitKeyProperties, $requestParameter, $responseProperty);
-setTypeSpecNamespace(
-  "Foundations.Private",
-  $spreadCustomResponseProperties,
-  $spreadCustomParameters,
-  $ensureResourceType,
-  $needsRoute,
-  $ensureVerb,
-  $embeddingVector,
-  $armResourceIdentifierConfig,
-  $defaultFinalStateVia,
-  parameterizedNextLinkConfigDecorator,
-);
