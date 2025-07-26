@@ -1,12 +1,12 @@
 import {
-  Diagnostic,
-  IntrinsicType,
-  Model,
-  ModelProperty,
-  Operation,
-  Program,
-  Union,
-  UnionVariant,
+  type Diagnostic,
+  type IntrinsicType,
+  type Model,
+  type ModelProperty,
+  type Operation,
+  type Program,
+  type Union,
+  type UnionVariant,
   compilerAssert,
   createDiagnosticCollector,
   getEffectiveModelType,
@@ -16,7 +16,7 @@ import {
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import {
-  HttpOperationResponse,
+  type HttpOperationResponse,
   getHeaderFieldName,
   getHttpOperation,
   getResponsesForOperation,
@@ -25,17 +25,14 @@ import {
   isHeader,
   isMetadata,
 } from "@typespec/http";
-import {
-  LongRunningStates,
-  getLroStatusProperty,
-  getPollingOperationParameter,
-  isPollingLocation,
-} from "./decorators.js";
+import { type LongRunningStates, getLroStatusProperty } from "./decorators.js";
 import { getLroErrorResult } from "./decorators/lro-error-result.js";
 import { getLroResult } from "./decorators/lro-result.js";
 import { extractLroStates, getLongRunningStates } from "./decorators/lro-status.js";
+import { isPollingLocation } from "./decorators/polling-location.js";
+import { getPollingOperationParameter } from "./decorators/polling-operation-parameter.js";
 import { createDiagnostic } from "./lib.js";
-import { ModelPropertyTerminationStatus, OperationLink } from "./lro-helpers.js";
+import type { ModelPropertyTerminationStatus, OperationLink } from "./lro-helpers.js";
 import { getAllProperties } from "./utils.js";
 
 export interface LroOperationInfo {

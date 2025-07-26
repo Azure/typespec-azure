@@ -9,21 +9,21 @@ import {
 import {
   getEffectiveModelType,
   ignoreDiagnostics,
-  IntrinsicType,
+  type IntrinsicType,
   isNeverType,
-  Model,
-  ModelProperty,
-  Operation,
-  Program,
-  Scalar,
-  Type,
+  type Model,
+  type ModelProperty,
+  type Operation,
+  type Program,
+  type Scalar,
+  type Type,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import {
   getHeaderFieldName,
   getHttpOperation,
   getOperationVerb,
-  HttpOperation,
+  type HttpOperation,
   isBody,
   isBodyRoot,
   isHeader,
@@ -32,26 +32,27 @@ import {
   getActionDetails,
   getResourceLocationType,
   getResourceOperation,
-  ResourceOperation,
+  type ResourceOperation,
 } from "@typespec/rest";
 import {
   FinalOperationKey,
-  getFinalLocationValue,
   getOperationLink,
   getOperationLinks,
-  getPollingLocationInfo,
-  isFinalLocation,
-  isPollingLocation,
-  LongRunningStates,
-  OperationLinkMetadata,
-  PollingLocationInfo,
+  type LongRunningStates,
+  type OperationLinkMetadata,
   PollingOperationKey,
-  pollingOptionsKind,
-  StatusMonitorPollingLocationInfo,
 } from "./decorators.js";
+import { getFinalLocationValue, isFinalLocation } from "./decorators/final-location.js";
 import { getLroResult } from "./decorators/lro-result.js";
 import { extractLroStates } from "./decorators/lro-status.js";
-import { PropertyMap, StatusMonitorMetadata } from "./lro-info.js";
+import {
+  getPollingLocationInfo,
+  isPollingLocation,
+  type PollingLocationInfo,
+  pollingOptionsKind,
+  type StatusMonitorPollingLocationInfo,
+} from "./decorators/polling-location.js";
+import type { PropertyMap, StatusMonitorMetadata } from "./lro-info.js";
 import { getFinalStateOverride } from "./state/final-state.js";
 
 /**

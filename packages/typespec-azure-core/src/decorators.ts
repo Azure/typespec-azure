@@ -6,38 +6,23 @@ import {
   // @ts-ignore
   $decorators,
   DecoratorContext,
-  ignoreDiagnostics,
-  IntrinsicType,
-  isNeverType,
-  isVoidType,
   Model,
   ModelProperty,
   Operation,
   Program,
   Type,
 } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/typekit";
 import {
-  FinalLocationDecorator,
   FinalOperationDecorator,
   ItemsDecorator,
   NextPageOperationDecorator,
   OperationLinkDecorator,
   PagedResultDecorator,
-  PollingLocationDecorator,
   PollingOperationDecorator,
-  PollingOperationParameterDecorator,
 } from "../generated-defs/Azure.Core.js";
-import { getLroResult } from "./decorators/lro-result.js";
 import { extractLroStates } from "./decorators/lro-status.js";
 import { OperationLink } from "./lro-helpers.js";
-import {
-  extractStatusMonitorInfo,
-  getLroOperationInfo,
-  PropertyMap,
-  ResultInfo,
-  StatusMonitorMetadata,
-} from "./lro-info.js";
+import { getLroOperationInfo, PropertyMap, ResultInfo } from "./lro-info.js";
 
 /*
  * Constants for polling and final operation links
@@ -286,223 +271,6 @@ export function getLroStatusProperty(program: Program, target: Model): ModelProp
   }
 
   return undefined;
-}
-
-//@pollingOperationParameter
-
-export const $pollingOperationParameter: PollingOperationParameterDecorator = (
-  context: DecoratorContext,
-  entity: ModelProperty,
-  target?: Type,
-) => {
-  const { program } = context;
-  let storedValue: ModelProperty | string | undefined;
-  switch (target?.kind) {
-    case "ModelProperty":
-      storedValue = target;
-      break;
-    case "String":
-      storedValue = target.value;
-      break;
-    default:
-      storedValue = undefined;
-  }
-  program
-    .stateMap(AzureCoreStateKeys.pollingOperationParameter)
-    .set(entity, storedValue ?? entity.name);
-};
-
-export function getPollingOperationParameter(
-  program: Program,
-  entity: ModelProperty,
-): string | ModelProperty | undefined {
-  return program.stateMap(AzureCoreStateKeys.pollingOperationParameter).get(entity);
-}
-
-// @pollingLocation
-
-/** Extra information about polling control stored with a polling link */
-export type PollingLocationInfo = StatusMonitorPollingLocationInfo;
-
-/** The abstract type for polling control information */
-export interface PollingLocationBase {
-  /** The kind of polling being done */
-  kind: pollingOptionsKind;
-  /** The model property containing the polling link */
-  target: ModelProperty;
-  /** The type of the poller */
-  pollingModel?: Model | IntrinsicType;
-  /** The type of the final result after polling completes */
-  finalResult?: Model | IntrinsicType;
-}
-
-/** Collected data for status monitor polling links */
-export interface StatusMonitorPollingLocationInfo extends PollingLocationBase {
-  /** The kind of status monitor */
-  kind: pollingOptionsKind.StatusMonitor;
-  /** The status monitor detailed data for control of polling. */
-  info: StatusMonitorMetadata;
-}
-
-// keys of the pollingOptions type
-const optionsKindKey = "kind";
-const finalPropertyKey = "finalProperty";
-const pollingModelKey = "pollingModel";
-const finalResultKey = "finalResult";
-
-export enum pollingOptionsKind {
-  StatusMonitor = "statusMonitor",
-}
-export const $pollingLocation: PollingLocationDecorator = (
-  context: DecoratorContext,
-  entity: ModelProperty,
-  options?: Type,
-) => {
-  const { program } = context;
-  if (options) {
-    if (isNeverType(options)) return;
-    const info = extractPollingLocationInfo(program, entity, options);
-    if (info) {
-      program.stateMap(AzureCoreStateKeys.pollingLocationInfo).set(entity, info);
-    }
-  }
-
-  program.stateSet(AzureCoreStateKeys.pollingOperationParameter).add(entity);
-};
-
-/**
- * Gets polling information stored with a field that contains a link to an Lro polling endpoint
- * @param program The program to check
- * @param target The ModelProperty to check for polling info
- */
-export function getPollingLocationInfo(
-  program: Program,
-  target: ModelProperty,
-): PollingLocationInfo | undefined {
-  return program.stateMap(AzureCoreStateKeys.pollingLocationInfo).get(target);
-}
-
-function extractUnionVariantValue(type: Type): string | undefined {
-  if (type.kind === "UnionVariant" && type.type.kind === "String") return type.type.value;
-  return undefined;
-}
-
-function extractPollingLocationInfo(
-  program: Program,
-  target: ModelProperty,
-  options: Type,
-): PollingLocationInfo | undefined {
-  if (options.kind !== "Model") return undefined;
-  const kind = options.properties.get(optionsKindKey);
-  if (kind === undefined) return undefined;
-  const kindValue: string | undefined = extractUnionVariantValue(kind.type);
-  if (kindValue === undefined) return undefined;
-  const pollingInfo: {
-    pollingModel?: Model | IntrinsicType;
-    finalResult?: Model | IntrinsicType;
-    target: ModelProperty;
-    useForFinalState?: boolean;
-  } = { target: target };
-  const pollingModel = options.properties.get(pollingModelKey)?.type;
-  if (pollingModel && pollingModel.kind === "Model") pollingInfo.pollingModel = pollingModel;
-  if (pollingModel && isVoidType(pollingModel))
-    pollingInfo.pollingModel = $(program).intrinsic.void;
-  const finalResult = options.properties.get(finalResultKey)?.type;
-  if (finalResult && finalResult.kind === "Model") pollingInfo.finalResult = finalResult;
-  if (finalResult && isVoidType(finalResult)) pollingInfo.finalResult = $(program).intrinsic.void;
-  switch (kindValue) {
-    case pollingOptionsKind.StatusMonitor:
-      return extractStatusMonitorLocationInfo(program, options, pollingInfo);
-    default:
-      return undefined;
-  }
-}
-
-function extractStatusMonitorLocationInfo(
-  program: Program,
-  options: Model,
-  baseInfo: {
-    pollingModel?: Model | IntrinsicType;
-    finalResult?: Model | IntrinsicType;
-    target: ModelProperty;
-    useForFInalState?: boolean;
-  },
-): StatusMonitorPollingLocationInfo | undefined {
-  const kind = options.properties.get(optionsKindKey);
-  if (kind === undefined || extractUnionVariantValue(kind.type) !== "statusMonitor")
-    return undefined;
-  if (baseInfo.pollingModel === undefined || baseInfo.pollingModel.kind === "Intrinsic")
-    return undefined;
-  const finalProperty = options.properties.get(finalPropertyKey)?.type;
-  let finalPropertyValue: ModelProperty | undefined = undefined;
-  if (finalProperty && finalProperty.kind === "ModelProperty") finalPropertyValue = finalProperty;
-  if (
-    finalProperty &&
-    finalProperty.kind === "String" &&
-    baseInfo.pollingModel.properties.has(finalProperty.value)
-  ) {
-    finalPropertyValue = baseInfo.pollingModel.properties.get(finalProperty.value);
-  }
-  if (finalPropertyValue === undefined)
-    finalPropertyValue = ignoreDiagnostics(getLroResult(program, baseInfo.pollingModel, true));
-  const statusProperty = getLroStatusProperty(program, baseInfo.pollingModel);
-  if (statusProperty === undefined) return undefined;
-  const statusMonitor = ignoreDiagnostics(
-    extractStatusMonitorInfo(program, baseInfo.pollingModel, statusProperty),
-  );
-  if (statusMonitor === undefined) return undefined;
-  statusMonitor.successProperty = finalPropertyValue;
-  baseInfo.finalResult =
-    finalPropertyValue?.type?.kind === "Model"
-      ? finalPropertyValue.type
-      : $(program).intrinsic.void;
-  return {
-    kind: pollingOptionsKind.StatusMonitor,
-    info: statusMonitor,
-    ...baseInfo,
-  };
-}
-
-/**
- *  Returns `true` if the property is marked with @pollingLocation.
- */
-export function isPollingLocation(program: Program, entity: ModelProperty): boolean {
-  return program.stateSet(AzureCoreStateKeys.pollingOperationParameter).has(entity);
-}
-
-// @finalLocation
-
-export const $finalLocation: FinalLocationDecorator = (
-  context: DecoratorContext,
-  entity: ModelProperty,
-  finalResult?: Type,
-) => {
-  const { program } = context;
-  if (finalResult !== undefined && isNeverType(finalResult)) return;
-  program.stateSet(AzureCoreStateKeys.finalLocations).add(entity);
-  switch (finalResult?.kind) {
-    case "Model":
-      program.stateMap(AzureCoreStateKeys.finalLocationResults).set(entity, finalResult);
-      break;
-    case "Intrinsic":
-      if (isVoidType(finalResult)) {
-        program.stateMap(AzureCoreStateKeys.finalLocationResults).set(entity, finalResult);
-      }
-  }
-};
-
-/**
- *  Returns `true` if the property is marked with @finalLocation.
- */
-export function isFinalLocation(program: Program, entity: ModelProperty): boolean {
-  return program.stateSet(AzureCoreStateKeys.finalLocations).has(entity);
-}
-
-export function getFinalLocationValue(
-  program: Program,
-  entity: ModelProperty,
-): Model | IntrinsicType | undefined {
-  return program.stateMap(AzureCoreStateKeys.finalLocationResults).get(entity);
 }
 
 export interface OperationLinkMetadata {
