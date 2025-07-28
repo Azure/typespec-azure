@@ -69,15 +69,15 @@
     "@typespec/streams": "workspace:^",
     "@typespec/versioning": "workspace:^",
     "@typespec/xml": "workspace:^",
-    "@vitejs/plugin-react": "~4.4.1",
+    "@vitejs/plugin-react": "~4.7.0",
     "es-module-shims": "~2.6.0",
     "react": "~18.3.1",
     "react-dom": "~18.3.1",
-    "vite": "^6.2.7"
+    "vite": "^7.0.5"
   },
   "devDependencies": {
     "@playwright/test": "^1.51.1",
-    "@types/node": "~24.0.3",
+    "@types/node": "~24.1.0",
     "@types/react-dom": "~18.3.0",
     "@typespec/bundler": "workspace:^",
     "@typespec/playground": "workspace:^",

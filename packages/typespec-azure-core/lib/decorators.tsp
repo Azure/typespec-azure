@@ -26,11 +26,13 @@ namespace Azure.Core {
   /**
    * Marks a Model as a paged collection.
    */
+  #deprecated "Do not use this decorator. Use @list decorator on the operation instead."
   extern dec pagedResult(entity: Model);
 
   /**
    * Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
    */
+  #deprecated "Do not use this decorator. Use @pageItems instead."
   extern dec items(entity: ModelProperty);
 
   /**
