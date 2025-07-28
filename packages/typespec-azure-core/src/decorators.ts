@@ -2,6 +2,9 @@ import { AzureCoreStateKeys, createDiagnostic, reportDiagnostic } from "./lib.js
 import { getAllProperties } from "./utils.js";
 
 import {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  $decorators,
   compilerAssert,
   createDiagnosticCollector,
   DecoratorContext,
@@ -240,6 +243,7 @@ export function getPagedResult(
 }
 
 export const $items: ItemsDecorator = (context: DecoratorContext, entity: ModelProperty) => {
+  context.call($decorators.TypeSpec.pageItems, entity);
   context.program.stateMap(AzureCoreStateKeys.items).set(entity, true);
 };
 
@@ -845,6 +849,7 @@ export const $operationLink: OperationLinkDecorator = (
     program,
     entity,
     linkedOperation,
+    linkType,
     parameters,
   );
   if (diagnostics.length > 0) {
