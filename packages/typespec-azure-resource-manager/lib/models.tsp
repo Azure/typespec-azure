@@ -31,7 +31,12 @@ namespace Azure.ResourceManager;
  * }
  * ```
  */
-@Private.applyResourceNameConstraints(#{modelType: #{name: "Resource", position: 0}, keyName: #{name: "KeyName", position: 1}, segmentName: #{name: "SegmentName", position: 2}, parameterType: #{name: "Type", position: 4}}) 
+@Private.applyResourceNameConstraints(#{
+  modelType: #{ name: "Resource", position: 0 },
+  keyName: #{ name: "KeyName", position: 1 },
+  segmentName: #{ name: "SegmentName", position: 2 },
+  parameterType: #{ name: "Type", position: 4 },
+})
 model ResourceNameParameter<
   Resource extends Foundations.SimpleResource,
   KeyName extends valueof string = "",
@@ -64,12 +69,16 @@ model ResourceNameParameter<
  * ```
  */
 @doc("")
-@Private.applyResourceNameConstraints(#{keyName: #{name: "ParameterName", position: 1}, segmentName: #{name: "TypeName", position: 0}, parameterType: #{name: "Type", position: 3}}) 
+@Private.applyResourceNameConstraints(#{
+  keyName: #{ name: "ParameterName", position: 1 },
+  segmentName: #{ name: "TypeName", position: 0 },
+  parameterType: #{ name: "Type", position: 3 },
+})
 model NameParameterByType<
-  TypeName extends valueof string, 
-  ParameterName extends valueof string, 
+  TypeName extends valueof string,
+  ParameterName extends valueof string,
   NamePattern extends valueof string = "^[a-zA-Z0-9-]{3,24}$",
-  Type extends string = string,
+  Type extends string = string
 > {
   @doc("The name of the resource.")
   @pattern(NamePattern)

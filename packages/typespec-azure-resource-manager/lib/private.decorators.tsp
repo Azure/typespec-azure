@@ -148,4 +148,7 @@ model ResourceNameTemplateParameterInfo {
  * @param target The model, interface, or operation to which the constraint applies.
  * @param parameters The parameters that define the resource name template.
  */
-extern dec applyResourceNameConstraints(target: Model, parameters: valueof ResourceNameTemplateParameterInfo);
+extern dec applyResourceNameConstraints(
+  target: Model,
+  parameters: valueof ResourceNameTemplateParameterInfo
+);
