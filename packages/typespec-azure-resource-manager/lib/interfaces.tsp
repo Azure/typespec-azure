@@ -21,7 +21,7 @@ interface Operations {
   @get
   @list
   list(
-    ...ApiVersionParameter,
+    ...CommonTypes.ApiVersionParameter,
 
     @path
     @segment("providers")
