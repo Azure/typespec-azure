@@ -9,6 +9,7 @@ let runner: SdkTestRunner;
 beforeEach(async () => {
   runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
 });
+
 async function compileVanillaWidgetService(runner: SdkTestRunner, code: string) {
   return await runner.compile(`
     @service(#{
@@ -103,6 +104,7 @@ it("vanilla widget create", async () => {
 
   strictEqual(acceptOperationParam.correspondingMethodParams[0], acceptMethodParam);
 });
+
 it("vanilla widget read", async () => {
   await compileVanillaWidgetService(runner, "@get read(@path id: string): Widget | Error;");
 
@@ -149,6 +151,7 @@ it("vanilla widget read", async () => {
   strictEqual(correspondingMethodParams.length, 1);
   strictEqual(pathParam.name, correspondingMethodParams[0].name);
 });
+
 it("vanilla widget update", async () => {
   await compileVanillaWidgetService(
     runner,
@@ -246,7 +249,7 @@ it("vanilla widget delete", async () => {
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "delete");
   strictEqual(method.kind, "basic");
-  strictEqual(method.parameters.length, 1);
+  strictEqual(method.parameters.length, 2);
 
   const methodParam = method.parameters[0];
   strictEqual(methodParam.kind, "method");
@@ -272,6 +275,7 @@ it("vanilla widget delete", async () => {
   strictEqual(correspondingMethodParams.length, 1);
   strictEqual(pathParam.name, correspondingMethodParams[0].name);
 });
+
 it("vanilla widget list", async () => {
   await compileVanillaWidgetService(runner, "@get list(): Widget[] | Error;");
 
