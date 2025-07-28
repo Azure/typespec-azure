@@ -275,8 +275,9 @@ interface RoutedOperations<
    */
   @doc("List a {name}", Resource)
   @get
+  @list
   @listsResource(Resource)
-  @segmentOf(Resource)
+  @segmentOf(ResourceTypeParameter)
   @armOperationRoute(OverrideRouteOptions)
   @armResourceList(Resource)
   @Private.armUpdateProviderNamespace
@@ -286,7 +287,7 @@ interface RoutedOperations<
     Response extends {} = ArmResponse<ResourceListResult<Resource>>,
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute
-  >(...ParentParameters, ...Parameters): Response | ErrorType;
+  >(...ParentParameters, ...Parameters): Response | OverrideErrorType;
 
   /**
    * A synchronous resource action.

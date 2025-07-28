@@ -5,12 +5,8 @@ export default mergeConfig(
   defaultTypeSpecVitestConfig,
   defineConfig({
     test: {
-      projects: [
-        "packages/*/vitest.config.ts",
-        "core/packages/*/vitest.config.ts",
-        "packages/*/vitest.config.mts",
-        "core/packages/*/vitest.config.mts",
-      ],
+      // Exclude core packages so we can only run test for this repo
+      projects: ["packages/*/vitest.config.ts", "packages/*/vitest.config.mts"],
     },
   }),
 );
