@@ -66,11 +66,15 @@ namespace PetStoreNamespace
 ```
 
 ```typescript
-interface InputModel {
-  name: string;
+export interface InputModel {
+  readonly name: string;
 }
 
-const model: InputModel = await client.path("/petStore/model/{name}").get();
+export async function get(
+  context: Client,
+  name: string,
+  options: GetOptionalParams = { requestOptions: {} }
+): Promise<InputModel>；
 ```
 
 ```java
