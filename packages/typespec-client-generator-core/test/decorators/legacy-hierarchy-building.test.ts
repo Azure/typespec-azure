@@ -462,3 +462,60 @@ it("verify diagnostic gets raised for usage", async () => {
       },
     ]);
 });
+
+it("verify legacy hierarchy building usage with unordered models", async () => {
+  await runner.compileWithBuiltInService(`
+      @discriminator("type")
+      model Vehicle {
+        type: string;
+      }
+      model MotorVehicleContent {
+        engine: string;}
+
+      @Legacy.legacyHierarchyBuilding(Car)
+      model SportsCar extends Vehicle {
+        type: "sports";
+        ...MotorVehicleContent;
+        ...CarContent;
+        topSpeed: int32;
+      }
+
+      model MotorVehicle extends Vehicle {
+        type: "motor";
+        ...MotorVehicleContent;
+      }
+      model CarContent {
+        doors: int32;
+      }
+      @Legacy.legacyHierarchyBuilding(MotorVehicle)
+      model Car extends Vehicle {
+        type: "car";
+        ...MotorVehicleContent;
+        ...CarContent;
+      }
+
+      @route("/vehicles")
+      op getVehicle(): Vehicle;
+    `);
+
+  const models = runner.context.sdkPackage.models;
+  const vehicleModel = models.find((m) => m.name === "Vehicle");
+  const motorVehicleModel = models.find((m) => m.name === "MotorVehicle");
+  const carModel = models.find((m) => m.name === "Car");
+  const sportsCarModel = models.find((m) => m.name === "SportsCar");
+  ok(vehicleModel);
+  ok(motorVehicleModel);
+  ok(carModel);
+  ok(sportsCarModel);
+  strictEqual(vehicleModel.properties.length, 1);
+  strictEqual(vehicleModel.properties[0].name, "type");
+  strictEqual(motorVehicleModel.properties.length, 2);
+  strictEqual(motorVehicleModel.properties[0].name, "type");
+  strictEqual(motorVehicleModel.properties[1].name, "engine");
+  strictEqual(carModel.properties.length, 2);
+  strictEqual(carModel.properties[0].name, "type");
+  strictEqual(carModel.properties[1].name, "doors");
+  strictEqual(sportsCarModel.properties.length, 2);
+  strictEqual(sportsCarModel.properties[0].name, "type");
+  strictEqual(sportsCarModel.properties[1].name, "topSpeed");
+})
