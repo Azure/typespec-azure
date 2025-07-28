@@ -218,7 +218,7 @@ export async function createSdkContext<
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
     disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
     flattenUnionAsEnum: options?.flattenUnionAsEnum ?? true,
-    respectLegacyHierarchyBuilding: options?.respectLegacyHierarchyBuilding ?? false,
+    respectLegacyHierarchyBuilding: options?.respectLegacyHierarchyBuilding ?? true,
   };
   sdkContext.sdkPackage = diagnostics.pipe(createSdkPackage(sdkContext));
   for (const client of sdkContext.sdkPackage.clients) {

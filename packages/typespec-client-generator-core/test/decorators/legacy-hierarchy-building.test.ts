@@ -11,10 +11,7 @@ import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 let runner: SdkTestRunner;
 
 beforeEach(async () => {
-  runner = await createSdkTestRunner(
-    { emitterName: "@azure-tools/typespec-java" },
-    { respectLegacyHierarchyBuilding: true },
-  );
+  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
 });
 
 it("three-level inheritance chain", async () => {
@@ -378,9 +375,12 @@ it("without polymorphism", async () => {
 });
 
 it("verify respectLegacyHierarchyBuilding: false flag", async () => {
-  const runnerWithoutLegacyHierarchyBuilding = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const runnerWithoutLegacyHierarchyBuilding = await createSdkTestRunner(
+    {
+      emitterName: "@azure-tools/typespec-java",
+    },
+    { respectLegacyHierarchyBuilding: false },
+  );
   await runnerWithoutLegacyHierarchyBuilding.compileWithBuiltInService(`
       @discriminator("type")
       model Vehicle {
@@ -518,4 +518,4 @@ it("verify legacy hierarchy building usage with unordered models", async () => {
   strictEqual(sportsCarModel.properties.length, 2);
   strictEqual(sportsCarModel.properties[0].name, "type");
   strictEqual(sportsCarModel.properties[1].name, "topSpeed");
-})
+});
