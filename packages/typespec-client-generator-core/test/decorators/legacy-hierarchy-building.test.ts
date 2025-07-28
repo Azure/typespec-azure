@@ -249,8 +249,8 @@ it("nested property inheritance", async () => {
   ok(!smartKingSalmonModel.discriminatedSubtypes);
 });
 
-it("circular inheritance detection", async () => {
-  const [_, diagnostics] = await runner.compileAndDiagnose(`
+it("circular inheritance", async () => {
+  await runner.compile(`
       @service
       namespace TestService;
 
@@ -263,6 +263,7 @@ it("circular inheritance detection", async () => {
         propB: string;
       }
 
+      @usage(Usage.input)
       model C {
         propC: string;
       }
@@ -271,10 +272,24 @@ it("circular inheritance detection", async () => {
       op test(): A;
     `);
 
-  // Should detect circular inheritance and report diagnostic
-  expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-circular",
-  });
+  const modelA = runner.context.sdkPackage.models.find((m) => m.name === "A");
+  const modelB = runner.context.sdkPackage.models.find((m) => m.name === "B");
+  const modelC = runner.context.sdkPackage.models.find((m) => m.name === "C");
+
+  ok(modelA);
+  ok(modelB);
+  ok(modelC);
+
+  strictEqual(modelA.baseModel?.name, "B");
+  strictEqual(modelB.baseModel?.name, "A");
+  strictEqual(modelC.baseModel, undefined);
+
+  strictEqual(modelA.properties.length, 1);
+  strictEqual(modelA.properties[0].name, "propA");
+  strictEqual(modelB.properties.length, 1);
+  strictEqual(modelB.properties[0].name, "propB");
+  strictEqual(modelC.properties.length, 1);
+  strictEqual(modelC.properties[0].name, "propC");
 });
 
 it("conflicting inheritance", async () => {

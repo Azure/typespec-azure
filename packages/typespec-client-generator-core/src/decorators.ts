@@ -1201,7 +1201,7 @@ function isPropertySuperset(target: Model, value: Model): boolean {
     }
     const targetProperty = target.properties.get(name)!;
     const valueProperty = value.properties.get(name)!;
-    if (targetProperty.type.kind !== valueProperty.type.kind) {
+    if (targetProperty.sourceProperty !== valueProperty.sourceProperty) {
       return false;
     }
   }
@@ -1240,32 +1240,7 @@ export const $legacyHierarchyBuilding: LegacyHierarchyBuildingDecorator = (
 export function getLegacyHierarchyBuilding(context: TCGCContext, target: Model): Model | undefined {
   // If legacy hierarchy building is not respected, ignore the decorator completely
   if (!context.respectLegacyHierarchyBuilding) return undefined;
-  // have to check circular inheritance in getter because in the decorator stage, the circularity of the models isn't fully calculated yet
-  const value = getScopedDecoratorData(context, legacyHierarchyBuildingKey, target);
-  if (context.__typesCheckedForCircularInheritance === undefined) {
-    context.__typesCheckedForCircularInheritance = new Set();
-  }
-  if (!context.__typesCheckedForCircularInheritance.has(value)) {
-    let circular = false;
-    let current: Model | undefined = value;
-    while (current) {
-      if (current === target) {
-        circular = true;
-        break;
-      }
-      current = current.baseModel;
-    }
-    context.__typesCheckedForCircularInheritance.add(value);
-    if (circular) {
-      reportDiagnostic(context.program, {
-        code: "legacy-hierarchy-building-circular",
-        format: { target: target.name, value: value.name },
-        target: value,
-      });
-      return undefined;
-    }
-  }
-  return value;
+  return getScopedDecoratorData(context, legacyHierarchyBuildingKey, target);
 }
 
 /**

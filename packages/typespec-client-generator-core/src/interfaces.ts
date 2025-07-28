@@ -80,7 +80,6 @@ export interface TCGCContext {
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
   __packageVersions?: string[]; // the package versions from the service versioning config and api version setting in tspconfig.
   __packageVersionEnum?: Enum; // the enum type that contains all the package versions.
-  __typesCheckedForCircularInheritance?: Set<Type>; // used to track types that have been checked for circular inheritance to avoid redundant checks
 
   getMutatedGlobalNamespace(): Namespace;
   getApiVersionsForType(type: Type): string[];
