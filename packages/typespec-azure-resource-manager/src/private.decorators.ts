@@ -6,7 +6,6 @@ import {
   ModelProperty,
   Operation,
   Program,
-  Scalar,
   Tuple,
   Type,
   addVisibilityModifiers,
@@ -32,7 +31,7 @@ import {
   BuiltInSubscriptionResourceDecorator,
 } from "../generated-defs/Azure.ResourceManager.Extension.Private.js";
 import {
-  ApplyConstraintDecorator,
+  ApplyResourceNameConstraintsDecorator,
   ArmBodyRootDecorator,
   ArmRenameListByOperationDecorator,
   ArmResourceInternalDecorator,
@@ -47,9 +46,8 @@ import {
   DefaultResourceKeySegmentNameDecorator,
   EnforceConstraintDecorator,
   OmitIfEmptyDecorator,
-  ParameterConstraint,
-  PropertyValue,
   ResourceBaseParametersOfDecorator,
+  ResourceNameTemplateParameterInfo,
   ResourceParameterBaseForDecorator,
 } from "../generated-defs/Azure.ResourceManager.Private.js";
 import { reportDiagnostic } from "./lib.js";
@@ -618,74 +616,79 @@ const $armBodyRoot: ArmBodyRootDecorator = (
   context.call($bodyRoot, target);
 };
 
-const $applyConstraint: ApplyConstraintDecorator = (
+const $applyResourceNameConstraints: ApplyResourceNameConstraintsDecorator = (
   context: DecoratorContext,
   target: Model | Interface | Operation,
-  constraint: ParameterConstraint,
+  parameterInfo: ResourceNameTemplateParameterInfo,
 ) => {
   const program = context.program;
-  const templateArguments = resolveTemplateArguments(target);
+  const templateArguments = resolveResourceNameTemplateArguments(target, parameterInfo);
   if (templateArguments === undefined) {
     return;
   }
 
-  for (const paramName of constraint.condition) {
-    const resolvedArgument = templateArguments[paramName];
-    if (!resolvedArgument.value) {
-      return;
-    }
-    let values: PropertyValue[] = [];
-    if (constraint.disallowedValues !== undefined) {
-      values = constraint.disallowedValues.filter((prop) => {
-        if (prop.property > templateArguments.length) {
-          return false;
-        }
-        const resolvedArgument = templateArguments[prop.property];
-        return resolvedArgument && resolvedArgument.value !== prop.value;
-      });
-      if (values.length > 0) {
-        reportDiagnostic(program, {
-          code: "exclusion-constraint-violation",
-          target: target,
-          format: {
-            actionMessage: `The set of values '${values.flatMap((v) => v.value).join("', '")}' cannot be provided together when the template parameters '${constraint.condition.join("', '")}' are specified.`,
-          },
-        });
-      }
-    }
-    if (constraint.requiredValues !== undefined) {
-      const requiredProps = constraint.requiredValues.filter((prop) => {
-        if (prop.property > templateArguments.length) {
-          return false;
-        }
-        const resolvedArgument = templateArguments[prop.property];
-        if (resolvedArgument === undefined || resolvedArgument.value !== prop.value) {
-          return true;
-        }
-        return false;
-      });
-      if (constraint.requiredValues.length > 0) {
-        reportDiagnostic(program, {
-          code: "required-constraint-violation",
-          target: target,
-          format: {
-            actionMessage: `At least one of the template parameters '${requiredProps.flatMap((prop) => prop.value).join("', '")}' must be used when the template parameters '${constraint.condition.join("', '")}' are specified.`,
-          },
-        });
-      }
-    }
+  if (
+    templateArguments.modelType !== undefined &&
+    templateArguments.keyName?.value !== "" &&
+    templateArguments.segmentName?.value !== ""
+  ) {
+    reportDiagnostic(program, {
+      code: "exclusion-constraint-violation",
+      target: target,
+      format: {
+        actionMessage: `You should not provide the Resource, KeyName, and SegmentName template parameters together. Please either use the default type and parameter names generated from the resource, or use the 'ResourceNameByType' template.`,
+      },
+    });
+    return;
+  }
+
+  if (
+    templateArguments.keyName?.value !== "" &&
+    isLiteralStringEquivalent(program, templateArguments.parameterType?.value)
+  ) {
+    reportDiagnostic(program, {
+      code: "exclusion-constraint-violation",
+      target: target,
+      format: {
+        actionMessage: `You should not provide the KeyName, and Type template parameters together. Please either use the default type and parameter names generated from the resource, or use the 'ResourceNameByType' template.`,
+      },
+    });
+    return;
   }
 };
 
-interface ResolvedTemplateArgument {
-  position: number;
-  value?: string | boolean | Scalar;
+function isLiteralStringEquivalent(
+  program: Program,
+  value: string | boolean | Type | undefined,
+): boolean {
+  if (value === undefined) return false;
+  if (typeof value === "string") return true;
+  if (typeof value === "boolean") return false;
+  if (typeof value === "object") {
+    return $(program).type.isAssignableTo(value, $(program).builtin.string);
+  }
+
+  return false;
 }
 
-function resolveTemplateArguments(
+interface ResolvedTemplateArgument {
+  position: number;
+  value?: string | boolean | Type;
+}
+
+interface ResolvedResourceNameTemplateArgument {
+  modelType?: ResolvedTemplateArgument;
+  keyName?: ResolvedTemplateArgument;
+  segmentName?: ResolvedTemplateArgument;
+  parameterType?: ResolvedTemplateArgument;
+  namePattern?: ResolvedTemplateArgument;
+}
+
+function resolveResourceNameTemplateArguments(
   target: Model | Interface | Operation,
-): ResolvedTemplateArgument[] | undefined {
-  function getValueFromType(type: Type): string | boolean | Scalar | undefined {
+  info: ResourceNameTemplateParameterInfo,
+): ResolvedResourceNameTemplateArgument | undefined {
+  function getValueFromType(type: Type): string | boolean | Type | undefined {
     switch (type.kind) {
       case "Boolean":
       case "String":
@@ -694,6 +697,7 @@ function resolveTemplateArguments(
         return type.value === undefined ? type.name : (type.value as string);
       case "UnionVariant":
         return getValueFromType(type.type);
+      case "Union":
       case "Scalar":
         return type;
     }
@@ -708,10 +712,10 @@ function resolveTemplateArguments(
     return undefined;
   }
 
-  const result: ResolvedTemplateArgument[] = [];
+  const resolvedArgs: ResolvedTemplateArgument[] = [];
   let i = 0;
   for (const parameter of target.templateMapper.args) {
-    let value: string | boolean | Scalar | undefined;
+    let value: string | boolean | Type | undefined;
     switch (parameter.entityKind) {
       case "Type":
         value = getValueFromType(parameter);
@@ -726,12 +730,34 @@ function resolveTemplateArguments(
         value = getValueFromType(parameter.type);
         break;
     }
-    result.push({
+    resolvedArgs.push({
       position: i++,
       value,
     });
   }
-  return result;
+  return {
+    modelType:
+      info.modelType?.position === undefined || info.modelType.position >= resolvedArgs.length
+        ? undefined
+        : resolvedArgs[info.modelType?.position],
+    keyName:
+      info.keyName?.position === undefined || info.keyName.position >= resolvedArgs.length
+        ? undefined
+        : resolvedArgs[info.keyName?.position],
+    segmentName:
+      info.segmentName?.position === undefined || info.segmentName.position >= resolvedArgs.length
+        ? undefined
+        : resolvedArgs[info.segmentName?.position],
+    parameterType:
+      info.parameterType?.position === undefined ||
+      info.parameterType.position >= resolvedArgs.length
+        ? undefined
+        : resolvedArgs[info.parameterType?.position],
+    namePattern:
+      info.namePattern?.position === undefined || info.namePattern.position >= resolvedArgs.length
+        ? undefined
+        : resolvedArgs[info.namePattern?.position],
+  };
 }
 
 /** @internal */
@@ -752,7 +778,7 @@ export const $decorators = {
     armResourcePropertiesOptionality: $armResourcePropertiesOptionality,
     armBodyRoot: $armBodyRoot,
     armResourceWithParameter: $armResourceWithParameter,
-    applyConstraint: $applyConstraint,
+    applyResourceNameConstraints: $applyResourceNameConstraints,
   } satisfies AzureResourceManagerPrivateDecorators,
   "Azure.ResourceManager.Extension.Private": {
     builtInResource: $builtInResource,

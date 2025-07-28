@@ -31,7 +31,7 @@ namespace Azure.ResourceManager;
  * }
  * ```
  */
-@Private.applyConstraint(#{condition:#[0], disallowedValues:#[#{property:1, value: ""}, #{property:2, value: ""}]}) 
+@Private.applyResourceNameConstraints(#{modelType: #{name: "Resource", position: 0}, keyName: #{name: "KeyName", position: 1}, segmentName: #{name: "SegmentName", position: 2}, parameterType: #{name: "Type", position: 4}}) 
 model ResourceNameParameter<
   Resource extends Foundations.SimpleResource,
   KeyName extends valueof string = "",
@@ -64,6 +64,7 @@ model ResourceNameParameter<
  * ```
  */
 @doc("")
+@Private.applyResourceNameConstraints(#{keyName: #{name: "ParameterName", position: 1}, segmentName: #{name: "TypeName", position: 0}, parameterType: #{name: "Type", position: 3}}) 
 model NameParameterByType<
   TypeName extends valueof string, 
   ParameterName extends valueof string, 

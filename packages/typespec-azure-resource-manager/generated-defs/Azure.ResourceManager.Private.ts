@@ -1,21 +1,16 @@
-import type {
-  DecoratorContext,
-  Interface,
-  Model,
-  ModelProperty,
-  Operation,
-  Type,
-} from "@typespec/compiler";
+import type { DecoratorContext, Model, ModelProperty, Operation, Type } from "@typespec/compiler";
 
-export interface ParameterConstraint {
-  readonly condition: readonly number[];
-  readonly disallowedValues?: readonly PropertyValue[];
-  readonly requiredValues?: readonly PropertyValue[];
+export interface ResourceNameTemplateParameterInfo {
+  readonly modelType?: TemplateParameterInfo;
+  readonly keyName?: TemplateParameterInfo;
+  readonly segmentName?: TemplateParameterInfo;
+  readonly namePattern?: TemplateParameterInfo;
+  readonly parameterType?: TemplateParameterInfo;
 }
 
-export interface PropertyValue {
-  readonly property: number;
-  readonly value: string | boolean | unknown;
+export interface TemplateParameterInfo {
+  readonly name: string;
+  readonly position: number;
 }
 
 /**
@@ -210,16 +205,15 @@ export type ArmBodyRootDecorator = (
 ) => void;
 
 /**
- * This decorator is used to apply a parameter constraint to a model or interface.
- * It is used to enforce specific constraints on parameters in operations.
+ * This decorator is specific to the templates that fo
  *
  * @param target The model, interface, or operation to which the constraint applies.
- * @param constraint The parameter constraint to apply.
+ * @param parameters The parameters that define the resource name template.
  */
-export type ApplyConstraintDecorator = (
+export type ApplyResourceNameConstraintsDecorator = (
   context: DecoratorContext,
-  target: Model | Interface | Operation,
-  constraints: ParameterConstraint,
+  target: Model,
+  parameters: ResourceNameTemplateParameterInfo,
 ) => void;
 
 export type AzureResourceManagerPrivateDecorators = {
@@ -238,5 +232,5 @@ export type AzureResourceManagerPrivateDecorators = {
   armRenameListByOperation: ArmRenameListByOperationDecorator;
   armResourcePropertiesOptionality: ArmResourcePropertiesOptionalityDecorator;
   armBodyRoot: ArmBodyRootDecorator;
-  applyConstraint: ApplyConstraintDecorator;
+  applyResourceNameConstraints: ApplyResourceNameConstraintsDecorator;
 };
