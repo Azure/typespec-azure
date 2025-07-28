@@ -1518,6 +1518,20 @@ client.upload()
 client.download()
 ```
 
+```go
+package storage
+
+type Client struct {}
+
+type StorageClientOptions struct {
+	BlobName string
+}
+
+func (c *Client) Upload(ctx context.Context, options StorageClientOptions) (*http.Response, error) 
+
+func (c *Client) Download(ctx context.Context, options StorageClientOptions) (*http.Response, error) 
+```
+
 </ClientTabs>
 
 If you want to rename the parameter name that you elevate to the client level, you can use the `@paramAlias` decorator.
