@@ -255,65 +255,23 @@ catsClient.pet();
 // client.go
 package petstore
 
-import (
-    "context"
-    "fmt"
-    "net/http"
-)
+type Client struct {}
 
-type Client struct {
-    endpoint   string
-    httpClient *http.Client
-}
-
-func NewClient(endpoint string) *Client {
-    return &Client{
-        endpoint:   endpoint,
-        httpClient: &http.Client{},
-    }
-}
-
-func (c *Client) sendRequest(ctx context.Context, method, path string) (*http.Response, error) {
-    req, err := http.NewRequestWithContext(ctx, method, fmt.Sprintf("%s%s", c.endpoint, path), nil)
-    if err != nil {
-        return nil, err
-    }
-    req.Header.Set("Accept", "application/json")
-    return c.httpClient.Do(req)
-}
+func (c *Client) sendRequest(ctx context.Context, method, path string) (*http.Response, error) 
 
 
 // dogs.go
 package petstore
 
-import (
-    "context"
-    "net/http"
-)
+func (c *Client) FeedDog(ctx context.Context) (*http.Response, error) 
 
-func (c *Client) FeedDog(ctx context.Context) (*http.Response, error) {
-    return c.sendRequest(ctx, "GET", "/dogs/feed")
-}
-
-func (c *Client) PetDog(ctx context.Context) (*http.Response, error) {
-    return c.sendRequest(ctx, "GET", "/dogs/pet")
-}
+func (c *Client) PetDog(ctx context.Context) (*http.Response, error) 
 
 // cats.go
 package petstore
 
-import (
-    "context"
-    "net/http"
-)
-
-func (c *Client) FeedCat(ctx context.Context) (*http.Response, error) {
-    return c.sendRequest(ctx, "GET", "/cats/feed")
-}
-
-func (c *Client) PetCat(ctx context.Context) (*http.Response, error) {
-    return c.sendRequest(ctx, "GET", "/cats/pet")
-}
+func (c *Client) FeedCat(ctx context.Context) (*http.Response, error)
+func (c *Client) PetCat(ctx context.Context) (*http.Response, error) 
 
 ```
 
@@ -511,60 +469,23 @@ actionsClient.close();
 ```go
 package petstore
 
-import (
-    "context"
-    "net/http"
-    "fmt"
-)
+type Client struct {}
 
-type Client struct {
-    endpoint   string
-    httpClient *http.Client
-}
+func (c *Client) Info(ctx context.Context) (*http.Response, error) 
 
-func NewClient(endpoint string) *Client {
-    return &Client{
-        endpoint:   endpoint,
-        httpClient: &http.Client{},
-    }
-}
+func (c *Client) BillingHistory(ctx context.Context) (*http.Response, error) 
 
-func (c *Client) Info(ctx context.Context) (*http.Response, error) {
-    return c.sendRequest(ctx, "GET", "/info")
-}
+func (c *Client) PetInfo(ctx context.Context) (*http.Response, error) 
 
-func (c *Client) BillingHistory(ctx context.Context) (*http.Response, error) {
-    return c.sendRequest(ctx, "GET", "/billings/history")
-}
+func (c *Client) FeedPet(ctx context.Context) (*http.Response, error)
 
-func (c *Client) PetInfo(ctx context.Context) (*http.Response, error) {
-    return c.sendRequest(ctx, "GET", "/pets/info")
-}
+func (c *Client) PetPet(ctx context.Context) (*http.Response, error)
 
-func (c *Client) FeedPet(ctx context.Context) (*http.Response, error) {
-    return c.sendRequest(ctx, "GET", "/pets/actions/feed")
-}
+func (c *Client) OpenAction(ctx context.Context) (*http.Response, error) 
 
-func (c *Client) PetPet(ctx context.Context) (*http.Response, error) {
-    return c.sendRequest(ctx, "GET", "/pets/actions/pet")
-}
+func (c *Client) CloseAction(ctx context.Context) (*http.Response, error)
 
-func (c *Client) OpenAction(ctx context.Context) (*http.Response, error) {
-    return c.sendRequest(ctx, "GET", "/actions/open")
-}
-
-func (c *Client) CloseAction(ctx context.Context) (*http.Response, error) {
-    return c.sendRequest(ctx, "GET", "/actions/close")
-}
-
-func (c *Client) sendRequest(ctx context.Context, method, path string) (*http.Response, error) {
-    req, err := http.NewRequestWithContext(ctx, method, fmt.Sprintf("%s%s", c.endpoint, path), nil)
-    if err != nil {
-        return nil, err
-    }
-    req.Header.Set("Accept", "application/json")
-    return c.httpClient.Do(req)
-}
+func (c *Client) sendRequest(ctx context.Context, method, path string) (*http.Response, error) 
 ```
 
 </ClientTabs>
@@ -686,42 +607,13 @@ client.pet();
 // client.go
 package petstore
 
-import (
-    "context"
-    "fmt"
-    "net/http"
-)
+type Client struct {}
 
-type Client struct {
-    endpoint   string
-    httpClient *http.Client
-}
+func (c *Client) sendRequest(ctx context.Context, method, path string) (*http.Response, error) 
 
-func NewClient(endpoint string) *Client {
-    return &Client{
-        endpoint:   endpoint,
-        httpClient: &http.Client{},
-    }
-}
+func (c *Client) Feed(ctx context.Context) (*http.Response, error) 
 
-func (c *Client) sendRequest(ctx context.Context, method, path string) (*http.Response, error) {
-    req, err := http.NewRequestWithContext(ctx, method, fmt.Sprintf("%s%s", c.endpoint, path), nil)
-    if err != nil {
-        return nil, err
-    }
-    req.Header.Set("Accept", "application/json")
-    return c.httpClient.Do(req)
-}
-
-// Feeds.feed operation at root client
-func (c *Client) Feed(ctx context.Context) (*http.Response, error) {
-    return c.sendRequest(ctx, "GET", "/feeds/feed")
-}
-
-// Pets.pet operation at root client
-func (c *Client) Pet(ctx context.Context) (*http.Response, error) {
-    return c.sendRequest(ctx, "GET", "/pets/pet")
-}
+func (c *Client) Pet(ctx context.Context) (*http.Response, error) 
 ```
 
 </ClientTabs>
@@ -817,23 +709,10 @@ client.pet();
 ```go
 package petstore
 
-type PetStoreGreatClient struct {
-    endpoint   string
-    httpClient *http.Client
-}
+type PetStoreGreatClient struct {}
 
-// constructor
-func NewPetStoreGreatClient(endpoint string) *PetStoreGreatClient {
-    return &PetStoreGreatClient{
-        endpoint:   endpoint,
-        httpClient: &http.Client{},
-    }
-}
 
-// methods follow, e.g.:
-func (c *PetStoreGreatClient) Feed(ctx context.Context) (*http.Response, error) {
-    // ...
-}
+func (c *PetStoreGreatClient) Feed(ctx context.Context) (*http.Response, error) 
 ```
 
 </ClientTabs>
@@ -931,19 +810,11 @@ client.pet();
 ```go
 package petstorerenamed
 
-type Client struct {
-    endpoint   string
-    httpClient *http.Client
-}
+type Client struct { ... }
 
-func NewClient(endpoint string) *Client {
-    return &Client{
-        endpoint:   endpoint,
-        httpClient: &http.Client{},
-    }
-}
+func (c *Client) Feed(ctx context.Context) error 
 
-// ... other methods
+func (c *Client) Pet(ctx context.Context) error 
 
 ```
 
@@ -1083,53 +954,13 @@ petActionClient.pet()
 ```go
 package petstorerenamed
 
-import (
-  "context"
-  "net/http"
-  "fmt"
-)
+type FoodClient struct {}
 
-type FoodClient struct {
-  endpoint   string
-  httpClient *http.Client
-}
+func (c *FoodClient) Feed(ctx context.Context) (*http.Response, error) 
 
-func NewFoodClient(endpoint string) *FoodClient {
-  return &FoodClient{
-    endpoint: endpoint,
-    httpClient: &http.Client{},
-  }
-}
+type PetActionClient struct {}
 
-func (c *FoodClient) Feed(ctx context.Context) (*http.Response, error) {
-  req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("%s/feed", c.endpoint), nil)
-  if err != nil {
-    return nil, err
-  }
-  req.Header.Set("Accept", "application/json")
-  return c.httpClient.Do(req)
-}
-
-type PetActionClient struct {
-  endpoint   string
-  httpClient *http.Client
-}
-
-func NewPetActionClient(endpoint string) *PetActionClient {
-  return &PetActionClient{
-    endpoint: endpoint,
-    httpClient: &http.Client{},
-  }
-}
-
-func (c *PetActionClient) Pet(ctx context.Context) (*http.Response, error) {
-  req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("%s/pet", c.endpoint), nil)
-  if err != nil {
-    return nil, err
-  }
-  req.Header.Set("Accept", "application/json")
-  return c.httpClient.Do(req)
-}
+func (c *PetActionClient) Pet(ctx context.Context) (*http.Response, error) 
 
 ```
 
@@ -1259,17 +1090,7 @@ type OutputModel struct {
 	Name string `json:"name"`
 }
 
-type Client struct {
-	endpoint   string
-	httpClient *http.Client
-}
-
-func NewClient(endpoint string) *Client {
-	return &Client{
-		endpoint:   endpoint,
-		httpClient: &http.Client{},
-	}
-}
+type Client struct {}
 
 func (c *Client) GetModel(ctx context.Context, name string) (*OutputModel, *http.Response, error) 
 
@@ -1409,65 +1230,17 @@ petActionClient.pet();
 // food_client.go
 package newpetstore
 
-import (
-	"context"
-	"fmt"
-	"net/http"
-)
+type FoodClient struct {}
 
-type FoodClient struct {
-	endpoint   string
-	httpClient *http.Client
-}
 
-func NewFoodClient(endpoint string) *FoodClient {
-	return &FoodClient{
-		endpoint:   endpoint,
-		httpClient: &http.Client{},
-	}
-}
-
-func (c *FoodClient) Feed(ctx context.Context) (*http.Response, error) {
-	url := fmt.Sprintf("%s/feed", c.endpoint)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Accept", "application/json")
-	return c.httpClient.Do(req)
-}
+func (c *FoodClient) Feed(ctx context.Context) (*http.Response, error) 
 
 // pet_action_client.go
 package newpetstore
 
-import (
-	"context"
-	"fmt"
-	"net/http"
-)
+type PetActionClient struct {}
 
-type PetActionClient struct {
-	endpoint   string
-	httpClient *http.Client
-}
-
-func NewPetActionClient(endpoint string) *PetActionClient {
-	return &PetActionClient{
-		endpoint:   endpoint,
-		httpClient: &http.Client{},
-	}
-}
-
-func (c *PetActionClient) Pet(ctx context.Context) (*http.Response, error) {
-	url := fmt.Sprintf("%s/pet", c.endpoint)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Accept", "application/json")
-	return c.httpClient.Do(req)
-}
-
+func (c *PetActionClient) Pet(ctx context.Context) (*http.Response, error) 
 ```
 
 </ClientTabs>
@@ -1615,66 +1388,16 @@ petActionClient.pet();
 
 package petstorerenamed
 
-import (
-	"context"
-	"fmt"
-	"net/http"
-)
+type FoodClient struct {}
 
-type FoodClient struct {
-	endpoint   string
-	httpClient *http.Client
-}
-
-func NewFoodClient(endpoint string) *FoodClient {
-	return &FoodClient{
-		endpoint:   endpoint,
-		httpClient: &http.Client{},
-	}
-}
-
-func (c *FoodClient) Feed(ctx context.Context) (*http.Response, error) {
-	url := fmt.Sprintf("%s/feed", c.endpoint)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Accept", "application/json")
-	return c.httpClient.Do(req)
-}
+func (c *FoodClient) Feed(ctx context.Context) (*http.Response, error) 
 
 // petstorerenamed/subnamespace/pet_action_client.go
 package subnamespace
 
-import (
-	"context"
-	"fmt"
-	"net/http"
-)
+type PetActionClient struct {}
 
-type PetActionClient struct {
-	endpoint   string
-	httpClient *http.Client
-}
-
-func NewPetActionClient(endpoint string) *PetActionClient {
-	return &PetActionClient{
-		endpoint:   endpoint,
-		httpClient: &http.Client{},
-	}
-}
-
-func (c *PetActionClient) Pet(ctx context.Context) (*http.Response, error) {
-	url := fmt.Sprintf("%s/pet", c.endpoint)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Accept", "application/json")
-	return c.httpClient.Do(req)
-}
-
-
+func (c *PetActionClient) Pet(ctx context.Context) (*http.Response, error) 
 ```
 
 </ClientTabs>
@@ -1907,25 +1630,15 @@ client.download()
 ```
 
 ```go
-package customizations
+package storage
 
-type StorageClientOptions struct {
-	BlobName string
-}
+type Client struct {}
 
-type StorageClient struct {
-	endpoint string
-	blobName string
-	// other fields
-}
+type StorageClientOptions struct {}
 
-func NewStorageClient(endpoint string, options StorageClientOptions) *StorageClient {
-	return &StorageClient{
-		endpoint: endpoint,
-		blobName: options.BlobName,
-	}
-}
+func (c *Client) Upload(ctx context.Context, options StorageClientOptions) (*http.Response, error) 
 
+func (c *Client) Download(ctx context.Context, options StorageClientOptions) (*http.Response, error) 
 ```
 
 </ClientTabs>

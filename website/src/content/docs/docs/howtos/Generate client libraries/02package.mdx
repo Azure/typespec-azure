@@ -125,18 +125,7 @@ public final class Food implements JsonSerializable<Food> {
 ```go
 package petstore
 
-import (
-	"bytes"
-  "context"
-	"encoding/json"
-	"fmt"
-	"net/http"
-)
-
-type Client struct {
-	endpoint string
-	cred     *TokenCredential // or other auth mechanism
-	pipeline *Pipeline        // handles sending requests
+type Client struct { 
 }
 
 type Food struct {
@@ -144,31 +133,7 @@ type Food struct {
 	Quantity int32  `json:"quantity"`
 }
 
-func (c *Client) Feed(ctx context.Context, food Food) (resp *http.Response, err error) {
-	req, err := NewFeedRequest(c.endpoint, food)
-	if err != nil {
-		return nil, err
-	}
-
-	return c.pipeline.Do(req.WithContext(ctx))
-}
-
-func NewFeedRequest(endpoint string, food Food) (*http.Request, error) {
-	url := fmt.Sprintf("%s/feed", endpoint)
-
-	bodyBytes, err := json.Marshal(food)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", url, bytes.NewReader(bodyBytes))
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-	return req, nil
-}
+func (c *Client) Feed(ctx context.Context, food Food) (resp *http.Response, err error) 
 ```
 
 </ClientTabs>
