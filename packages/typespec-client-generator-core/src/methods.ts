@@ -333,7 +333,11 @@ function mapFirstSegmentForResultSegments(
   if (resultSegments.length > 0 && responseModel) {
     const firstSegment = resultSegments[0];
     for (const property of responseModel.properties ?? []) {
-      if (property.__raw && property.__raw?.sourceProperty === firstSegment) {
+      if (
+        property.__raw &&
+        (property.__raw.sourceProperty === firstSegment ||
+          firstSegment.sourceProperty === property.__raw)
+      ) {
         return [property.__raw, ...resultSegments.slice(1)];
       }
     }

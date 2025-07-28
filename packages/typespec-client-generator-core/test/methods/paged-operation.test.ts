@@ -898,3 +898,31 @@ it.skip("next link with reinjected parameters with versioning", async () => {
     method.parameters[0],
   );
 });
+
+it("paged result with intersection", async () => {
+  await runner.compileWithBuiltInService(`
+    @list
+    op test(): ListTestResult & { @header h: string; };
+    model ListTestResult {
+      @pageItems
+      tests: Test[];
+      @TypeSpec.nextLink
+      next: string;
+    }
+    model Test {
+      id: string;
+    }
+  `);
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  strictEqual(method.name, "test");
+  strictEqual(method.kind, "paging");
+  strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
+  strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
+
+  const response = method.response;
+  strictEqual(response.kind, "method");
+  strictEqual(response.resultSegments?.length, 1);
+  strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
+  strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
+});
