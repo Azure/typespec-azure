@@ -1,12 +1,12 @@
 import {
-  Diagnostic,
-  IntrinsicType,
-  Model,
-  ModelProperty,
-  Operation,
-  Program,
-  Union,
-  UnionVariant,
+  type Diagnostic,
+  type IntrinsicType,
+  type Model,
+  type ModelProperty,
+  type Operation,
+  type Program,
+  type Union,
+  type UnionVariant,
   compilerAssert,
   createDiagnosticCollector,
   getEffectiveModelType,
@@ -16,7 +16,7 @@ import {
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import {
-  HttpOperationResponse,
+  type HttpOperationResponse,
   getHeaderFieldName,
   getHttpOperation,
   getResponsesForOperation,
@@ -25,17 +25,19 @@ import {
   isHeader,
   isMetadata,
 } from "@typespec/http";
+import { getLroErrorResult } from "./decorators/lro-error-result.js";
+import { getLroResult } from "./decorators/lro-result.js";
 import {
+  extractLroStates,
+  findLroStatusProperty,
+  getLongRunningStates,
   LongRunningStates,
-  getLroErrorResult,
-  getLroResult,
-  getLroStatusProperty,
-  getPollingOperationParameter,
-  isPollingLocation,
-} from "./decorators.js";
-import { extractLroStates, getLongRunningStates } from "./decorators/lro-status.js";
+} from "./decorators/lro-status.js";
+import { OperationLink } from "./decorators/operation-link.js";
+import { isPollingLocation } from "./decorators/polling-location.js";
+import { getPollingOperationParameter } from "./decorators/polling-operation-parameter.js";
 import { createDiagnostic } from "./lib.js";
-import { ModelPropertyTerminationStatus, OperationLink } from "./lro-helpers.js";
+import type { ModelPropertyTerminationStatus } from "./lro-helpers.js";
 import { getAllProperties } from "./utils.js";
 
 export interface LroOperationInfo {
@@ -245,7 +247,7 @@ export function getLroOperationInfo(
     const diagnostics = createDiagnosticCollector();
     for (const response of targetResponses) {
       visitResponse(program, response, (m) => {
-        const status = getLroStatusProperty(program, m);
+        const status = findLroStatusProperty(program, m);
         if (status !== undefined) {
           result = diagnostics.pipe(extractStatusMonitorInfo(program, m, status));
         }
