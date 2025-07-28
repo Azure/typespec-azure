@@ -89,22 +89,10 @@ public final class PetStoreNamespaceClient {
 package petstorenamespace
 
 type OutputModel struct {
-    // Name - Id of this object
     Name string `json:"name"`
 }
 
-type PetStoreNamespaceClient struct {
-    endpoint string
-    pl       runtime.Pipeline
-}
-
-func NewClient(endpoint string, cred azcore.TokenCredential, options *ClientOptions) (*PetStoreNamespaceClient, error) {
-    pl := runtime.NewPipeline("petstorenamespace", "v0.1.0", runtime.PipelineOptions{}, &options.ClientOptions)
-    return &PetStoreNamespaceClient{
-        endpoint: endpoint,
-        pl:       pl,
-    }, nil
-}
+type PetStoreNamespaceClient struct {}
 
 func (c *PetStoreNamespaceClient) GetModel(ctx context.Context, name string) (OutputModel, error) 
 
@@ -254,13 +242,9 @@ public final class PetStoreNamespaceClient {
 ```
 
 ```go
-func (c *petStoreNamespaceClient) GetModelWithResponse(ctx context.Context, name string, options *RequestOptions) (Response[OutputModel], error) {
-    // Low-level call returning Response with HTTP details
-}
+func (c *petStoreNamespaceClient) GetModelWithResponse(ctx context.Context, name string, options *RequestOptions) (Response[OutputModel], error)
 
-func (c *petStoreNamespaceClient) getModel(ctx context.Context, name string) (OutputModel, error) {
-    // Internal use only
-}
+func (c *petStoreNamespaceClient) getModel(ctx context.Context, name string) (OutputModel, error)
 
 ```
 
@@ -479,19 +463,15 @@ public void post(User user);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientGetOptions struct {
-}
+type ClientGetOptions struct {}
 
-type ClientGetResponse struct {
-}
+type ClientGetResponse struct {}
 
 func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error)
 
-type ClientPostOptions struct {
-}
+type ClientPostOptions struct {}
 
-type ClientPostResponse struct {
-}
+type ClientPostResponse struct {}
 
 func (client *Client) Post(ctx context.Context, user User, options *ClientPostOptions) (ClientPostResponse, error)
 
@@ -592,11 +572,9 @@ public void upload(String firstName, String lastName);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientUploadOptions struct {
-}
+type ClientUploadOptions struct {}
 
-type ClientUploadResponse struct {
-}
+type ClientUploadResponse struct {}
 
 func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
 
@@ -698,11 +676,9 @@ public void upload(String id, String firstName, String lastName);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientUploadOptions struct {
-}
+type ClientUploadOptions struct {}
 
-type ClientUploadResponse struct {
-}
+type ClientUploadResponse struct {}
 
 func (client *Client) Upload(ctx context.Context, id string, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
 ```
@@ -798,11 +774,9 @@ public void upload(String firstName, String lastName);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientUploadOptions struct {
-}
+type ClientUploadOptions struct {}
 
-type ClientUploadResponse struct {
-}
+type ClientUploadResponse struct {}
 
 func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
 ```
@@ -911,11 +885,9 @@ type User struct {
   lastName *string
 }
 
-type ClientUploadOptions struct {
-}
+type ClientUploadOptions struct {}
 
-type ClientUploadResponse struct {
-}
+type ClientUploadResponse struct {}
 
 func (client *Client) Upload(ctx context.Context, user User, options *ClientUploadOptions) (ClientUploadResponse, error)
 ```
@@ -1011,11 +983,9 @@ public void getBlobProperties(String name, String testHeader);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientGetBlobPropertiesOptions struct {
-}
+type ClientGetBlobPropertiesOptions struct {}
 
-type ClientGetBlobPropertiesResponse struct {
-}
+type ClientGetBlobPropertiesResponse struct {}
 
 func (client *Client) GetBlobProperties(ctx context.Context, name string, testHeader string, options *ClientGetBlobPropertiesOptions) (ClientGetBlobPropertiesResponse, error)
 ```
@@ -1128,11 +1098,9 @@ public void register(Schema schema);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientRegisterOptions struct {
-}
+type ClientRegisterOptions struct {}
 
-type ClientRegisterResponse struct {
-}
+type ClientRegisterResponse struct {}
 
 func (client *Client) Register(ctx context.Context, schema []byte, options *ClientRegisterOptions) (ClientRegisterResponse, error)
 ```
@@ -1254,8 +1222,7 @@ public RepairResult scheduleRepairs(String widgetName, String problem, String co
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientScheduleRepairsOptions struct {
-}
+type ClientScheduleRepairsOptions struct {}
 
 type RepairResult struct {
 	reason *string
@@ -1439,8 +1406,7 @@ type RepairInfo struct {
   contact *string
 }
 
-type ClientScheduleRepairsOptions struct {
-}
+type ClientScheduleRepairsOptions struct {}
 
 type RepairResult struct {
 	reason *string
@@ -1590,40 +1556,20 @@ public final class AnalyzeClient {
 ```
 
 ```go
-// Client is the Analyze service client.
-type Client struct {
-	BaseURL    string
-	HTTPClient *http.Client
-}
+type Client struct {}
 
-// NewClient creates a new Analyze client.
-func NewClient(baseURL string, httpClient *http.Client) *Client {
-	if httpClient == nil {
-		httpClient = http.DefaultClient
-	}
-	return &Client{
-		BaseURL:    baseURL,
-		HTTPClient: httpClient,
-	}
-}
-
-// AnalyzeResult is the response from the analyze operation.
 type AnalyzeResult struct {
-	// TODO: define actual response fields
 	Result string `json:"result,omitempty"`
 }
 
-// CompletionInput is the input model for completions operation.
-// Input supports either string or []string.
 type CompletionInput struct {
 	Input interface{} `json:"input"` // string or []string
 }
 
-// CompletionResult is the response from the completions operation.
 type CompletionResult struct {
-	// TODO: define actual response fields
 	Output string `json:"output,omitempty"`
 }
+
 func (c *Client) Analyze(ctx context.Context, mode string, image []byte) (*AnalyzeResult, error) 
 
 func (c *Client) Completions(ctx context.Context, input CompletionInput) (*CompletionResult, error) 
@@ -1782,6 +1728,7 @@ NOT_SUPPORTED
 ```
 
 ```go
+NOT_SUPPORTED
 ```
 
 </ClientTabs>
@@ -1831,10 +1778,7 @@ public Response get(MatchConditions matchConditions);
 
 ```go
 type ClientGetOptions struct {
-	// The request should only proceed if an entity matches this string.
 	IfMatch *string
-
-	// The request should only proceed if no entity matches this string.
 	IfNoneMatch *string
 }
 
