@@ -88,4 +88,3 @@ extends:
               - template: /eng/pipelines/templates/swagger-checks.yml@self
                 parameters:
                   nodeVersion: 20.x
-          - template: /eng/pipelines/jobs/publish-artifacts.yml@self

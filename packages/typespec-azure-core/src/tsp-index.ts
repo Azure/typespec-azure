@@ -1,39 +1,39 @@
-import { AzureCoreFoundationsDecorators } from "../generated-defs/Azure.Core.Foundations.js";
-import { AzureCoreFoundationsPrivateDecorators } from "../generated-defs/Azure.Core.Foundations.Private.js";
-import { AzureCoreDecorators } from "../generated-defs/Azure.Core.js";
-import { AzureCoreTraitsDecorators } from "../generated-defs/Azure.Core.Traits.js";
-import { AzureCoreTraitsPrivateDecorators } from "../generated-defs/Azure.Core.Traits.Private.js";
+import type { AzureCoreFoundationsDecorators } from "../generated-defs/Azure.Core.Foundations.js";
+import type { AzureCoreFoundationsPrivateDecorators } from "../generated-defs/Azure.Core.Foundations.Private.js";
+import type { AzureCoreDecorators } from "../generated-defs/Azure.Core.js";
+import type { AzureCoreTraitsDecorators } from "../generated-defs/Azure.Core.Traits.js";
+import type { AzureCoreTraitsPrivateDecorators } from "../generated-defs/Azure.Core.Traits.Private.js";
 import {
-  $armResourceIdentifierConfig,
-  $defaultFinalStateVia,
-  $embeddingVector,
-  $ensureResourceType,
-  $ensureVerb,
-  $finalLocation,
-  $finalOperation,
   $items,
-  $lroErrorResult,
-  $lroResult,
-  $needsRoute,
   $nextPageOperation,
-  $omitKeyProperties,
-  $operationLink,
   $pagedResult,
-  $pollingLocation,
-  $pollingOperation,
-  $pollingOperationParameter,
   $requestParameter,
   $responseProperty,
-  $spreadCustomParameters,
-  $spreadCustomResponseProperties,
-  $useFinalStateVia,
-  parameterizedNextLinkConfigDecorator,
 } from "./decorators.js";
+import { $finalLocation } from "./decorators/final-location.js";
+import { $finalOperation } from "./decorators/final-operation.js";
+import { $omitKeyProperties } from "./decorators/foundations/omit-key-properties.js";
 import { $lroCanceled } from "./decorators/lro-cancelled.js";
+import { $lroErrorResult } from "./decorators/lro-error-result.js";
 import { $lroFailed } from "./decorators/lro-failed.js";
+import { $lroResult } from "./decorators/lro-result.js";
 import { $lroStatus } from "./decorators/lro-status.js";
 import { $lroSucceeded } from "./decorators/lro-succeeded.js";
+import { $operationLink } from "./decorators/operation-link.js";
+import { $pollingLocation } from "./decorators/polling-location.js";
+import { $pollingOperationParameter } from "./decorators/polling-operation-parameter.js";
+import { $pollingOperation } from "./decorators/polling-operation.js";
 import { $previewVersion } from "./decorators/preview-version.js";
+import { $armResourceIdentifierConfig } from "./decorators/private/arm-resource-identifier-config.js";
+import { $defaultFinalStateVia } from "./decorators/private/default-final-state-via.js";
+import { $embeddingVector } from "./decorators/private/embedding-vector.js";
+import { $ensureResourceType } from "./decorators/private/ensure-resource-type.js";
+import { $ensureVerb } from "./decorators/private/ensure-verb.js";
+import { $needsRoute } from "./decorators/private/needs-route.js";
+import { parameterizedNextLinkConfigDecorator } from "./decorators/private/parameterized-next-link-config.js";
+import { $spreadCustomParameters } from "./decorators/private/spread-custom-parameters.js";
+import { $spreadCustomResponseProperties } from "./decorators/private/spread-custom-response-properties.js";
+import { $useFinalStateVia } from "./decorators/use-final-state-via.js";
 import {
   $addTraitProperties,
   $applyTraitOverride,
