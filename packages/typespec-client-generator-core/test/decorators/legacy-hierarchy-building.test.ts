@@ -17,9 +17,9 @@ it("three-level inheritance chain", async () => {
         kind: string;
       }
 
-      model BContent {
+      alias BContent = {
         foo: string;
-      }
+      };
 
       model B extends A {
         kind: "B";
@@ -82,17 +82,18 @@ it("four-level inheritance chain", async () => {
         type: string;
       }
 
-      model MotorVehicleContent {
-        engine: string;}
+      alias MotorVehicleContent = {
+        engine: string;
+      };
 
       model MotorVehicle extends Vehicle {
         type: "motor";
         ...MotorVehicleContent;
       }
 
-      model CarContent {
+      alias CarContent = {
         doors: int32;
-      }
+      };
 
       @Legacy.legacyHierarchyBuilding(MotorVehicle)
       model Car extends Vehicle {
@@ -352,9 +353,9 @@ it("without polymorphism", async () => {
         kind: string;
       }
 
-      model BContent {
+      alias BContent = {
         foo: string;
-      }
+      };
 
       model B extends A {
         kind: "B";
@@ -440,9 +441,9 @@ it("verify diagnostic gets raised for usage", async () => {
           kind: string;
         }
 
-        model BContent {
+        alias BContent = {
           foo: string;
-        }
+        };
 
         model B extends A {
           kind: "B";
@@ -480,8 +481,9 @@ it("verify legacy hierarchy building usage with unordered models", async () => {
       model Vehicle {
         type: string;
       }
-      model MotorVehicleContent {
-        engine: string;}
+      alias MotorVehicleContent = {
+        engine: string;
+      };
 
       @Legacy.legacyHierarchyBuilding(Car)
       model SportsCar extends Vehicle {
@@ -495,9 +497,10 @@ it("verify legacy hierarchy building usage with unordered models", async () => {
         type: "motor";
         ...MotorVehicleContent;
       }
-      model CarContent {
+      alias CarContent = {
         doors: int32;
-      }
+      };
+
       @Legacy.legacyHierarchyBuilding(MotorVehicle)
       model Car extends Vehicle {
         type: "car";

@@ -21,9 +21,9 @@ namespace Azure.ClientGenerator.Core.Legacy;
  *   kind: string;
  * }
  *
- * model BContent {
+ * alias BContent = {
  *   foo: string;
- * }
+ * };
  *
  * model B extends A{
  *   kind: "B";

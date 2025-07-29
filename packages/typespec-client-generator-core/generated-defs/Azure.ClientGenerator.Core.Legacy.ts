@@ -18,9 +18,9 @@ import type { DecoratorContext, Model } from "@typespec/compiler";
  *   kind: string;
  * }
  *
- * model BContent {
+ * alias BContent = {
  *   foo: string;
- * }
+ * };
  *
  * model B extends A{
  *   kind: "B";
