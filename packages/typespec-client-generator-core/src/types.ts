@@ -1914,7 +1914,7 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   diagnostics.pipe(updateUsageOverride(context));
   // update spread model
   updateSpreadModelUsageAndAccess(context);
-  // update discriminated subtypes and filter out duplicate properties from @legacyHierarchyBuilding
+  // update discriminated subtypes and filter out duplicate properties from `@legacyHierarchyBuilding`
   handleLegacyHierarchyBuilding(context);
   // update generated name
   resolveConflictGeneratedName(context);

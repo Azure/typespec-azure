@@ -1,9 +1,5 @@
-import { AzureCoreTestLibrary, noLegacyUsage } from "@azure-tools/typespec-azure-core/testing";
-import {
-  createLinterRuleTester,
-  expectDiagnostics,
-  LinterRuleTester,
-} from "@typespec/compiler/testing";
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
@@ -435,15 +431,8 @@ it("verify diagnostic gets raised for usage", async () => {
     emitterName: "@azure-tools/typespec-java",
   });
 
-  const tester: LinterRuleTester = createLinterRuleTester(
-    runnerWithCore,
-    noLegacyUsage,
-    "@azure-tools/typespec-azure-core",
-  );
-
-  await tester
-    .expect(
-      `        
+  const result = await runnerWithCore.diagnose(
+    `        
       @useDependency(Azure.Core.Versions.v1_0_Preview_2)
       namespace MyService {
         @discriminator("kind")
@@ -468,14 +457,21 @@ it("verify diagnostic gets raised for usage", async () => {
         }
       }
       `,
-    )
-    .toEmitDiagnostics([
-      {
-        code: "@azure-tools/typespec-azure-core/no-legacy-usage",
-        message:
-          'Referencing elements inside Legacy namespace "Azure.ClientGenerator.Core.Legacy" is not allowed.',
+    {
+      linterRuleSet: {
+        enable: {
+          "@azure-tools/typespec-azure-core/no-legacy-usage": true,
+        },
       },
-    ]);
+    },
+  );
+  expectDiagnostics(result, [
+    {
+      code: "@azure-tools/typespec-azure-core/no-legacy-usage",
+      message:
+        'Referencing elements inside Legacy namespace "Azure.ClientGenerator.Core.Legacy" is not allowed.',
+    },
+  ]);
 });
 
 it("verify legacy hierarchy building usage with unordered models", async () => {
