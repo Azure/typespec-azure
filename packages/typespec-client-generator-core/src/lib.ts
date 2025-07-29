@@ -303,7 +303,7 @@ export const $lib = createTypeSpecLibrary({
     "unexpected-pageable-operation-return-type": {
       severity: "error",
       messages: {
-        default: `Operation is pageable but does not return a correct type.`,
+        default: `The response object for the pageable operation is either not a paging model, or is not correctly decorated with @nextLink and @items.`,
       },
     },
     "invalid-alternate-type": {

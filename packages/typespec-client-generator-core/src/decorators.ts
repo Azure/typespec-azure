@@ -678,6 +678,20 @@ export const $override = (
         continue;
       }
     }
+
+    // Apply the alternate type to the original parameter
+    const overrideParam = overrideParams[index];
+    overrideParam.decorators
+      .filter((d) => d.decorator.name === "$alternateType")
+      .map((d) =>
+        context.call(
+          $alternateType,
+          originalParam,
+          d.args[0].value as Type,
+          d.args[1]?.jsValue as string | undefined,
+        ),
+      );
+
     index++;
   }
 

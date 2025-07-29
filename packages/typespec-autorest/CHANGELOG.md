@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.58.1
+
+### Bug Fixes
+
+- [#3003](https://github.com/Azure/typespec-azure/pull/3003) Preserve explicit query parameters defined in the route by including them in `x-ms-paths`
+
+
 ## 0.58.0
 
 ### Breaking Changes

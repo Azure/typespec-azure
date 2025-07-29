@@ -7,6 +7,7 @@ import {
   Operation,
   Program,
 } from "@typespec/compiler";
+import { useStateMap } from "@typespec/compiler/utils";
 import { $route, getHttpOperation, HttpOperation } from "@typespec/http";
 import {
   $actionSegment,
@@ -44,7 +45,7 @@ import {
 import { ArmStateKeys } from "./state.js";
 
 export type ArmLifecycleOperationKind = "read" | "createOrUpdate" | "update" | "delete";
-export type ArmOperationKind = ArmLifecycleOperationKind | "list" | "action";
+export type ArmOperationKind = ArmLifecycleOperationKind | "list" | "action" | "other";
 
 export interface ArmResourceOperation extends ArmResourceOperationData {
   path: string;
@@ -58,6 +59,19 @@ export interface ArmLifecycleOperations {
   delete?: ArmResourceOperation;
 }
 
+export interface ArmResourceLifecycleOperations {
+  read?: ArmResourceOperation[];
+  createOrUpdate?: ArmResourceOperation[];
+  update?: ArmResourceOperation[];
+  delete?: ArmResourceOperation[];
+}
+
+export interface ArmResolvedOperationsForResource {
+  lifecycle: ArmResourceLifecycleOperations;
+  lists: ArmResourceOperation[];
+  actions: ArmResourceOperation[];
+}
+
 export interface ArmResourceOperations {
   lifecycle: ArmLifecycleOperations;
   lists: { [key: string]: ArmResourceOperation };
@@ -69,6 +83,15 @@ interface ArmResourceOperationData {
   kind: ArmOperationKind;
   operation: Operation;
   operationGroup: string;
+}
+
+/** Identifying information for an arm operation */
+interface ArmOperationIdentifier {
+  name: string;
+  kind: ArmOperationKind;
+  operationGroup: string;
+  operation: Operation;
+  resource?: Model;
 }
 
 interface ArmLifecycleOperationData {
@@ -158,6 +181,64 @@ function setResourceLifecycleOperation(
   };
 
   operations.lifecycle[kind] = operation as ArmResourceOperation;
+  setArmOperationIdentifier(context.program, target, resourceType, {
+    name: target.name,
+    kind: kind,
+    operation: target,
+    operationGroup: target.interface.name,
+  });
+}
+
+export const [getArmOperationList, setArmOperationList] = useStateMap<
+  Model,
+  Set<ArmOperationIdentifier>
+>(ArmStateKeys.resourceOperationList);
+
+export function getArmResourceOperationList(
+  program: Program,
+  resourceType: Model,
+): Set<ArmOperationIdentifier> {
+  let operations = getArmOperationList(program, resourceType);
+  if (operations === undefined) {
+    operations = new Set<ArmOperationIdentifier>();
+    setArmOperationList(program, resourceType, operations);
+  }
+  return operations;
+}
+
+export function addArmResourceOperation(
+  program: Program,
+  resourceType: Model,
+  operationData: ArmOperationIdentifier,
+): void {
+  const operations = getArmResourceOperationList(program, resourceType);
+  operations.add(operationData);
+  setArmOperationList(program, resourceType, operations);
+}
+
+export const [getArmResourceOperationData, setArmResourceOperationData] = useStateMap<
+  Operation,
+  ArmResourceOperationData
+>(ArmStateKeys.armResourceOperationData);
+
+export function setArmOperationIdentifier(
+  program: Program,
+  target: Operation,
+  resourceType: Model,
+  data: ArmResourceOperationData,
+): void {
+  const operationId: ArmOperationIdentifier = {
+    name: data.name,
+    kind: data.kind,
+    operation: target,
+    operationGroup: data.operationGroup,
+    resource: resourceType,
+  };
+  // Initialize the operations for the resource type if not already done
+  if (!getArmResourceOperationData(program, target)) {
+    setArmResourceOperationData(program, target, operationId);
+  }
+  addArmResourceOperation(program, resourceType, operationId);
 }
 
 export const $armResourceRead: ArmResourceReadDecorator = (
@@ -221,6 +302,19 @@ export const $armResourceList: ArmResourceListDecorator = (
   };
 
   operations.lists[target.name] = operation as ArmResourceOperation;
+  addArmResourceOperation(context.program, resourceType, {
+    name: target.name,
+    kind: "list",
+    operation: target,
+    operationGroup: target.interface.name,
+    resource: resourceType,
+  });
+  setArmOperationIdentifier(context.program, target, resourceType, {
+    name: target.name,
+    kind: "list",
+    operation: target,
+    operationGroup: target.interface.name,
+  });
 };
 
 export function armRenameListByOperationInternal(
@@ -340,6 +434,19 @@ export const $armResourceAction: ArmResourceActionDecorator = (
   };
 
   operations.actions[target.name] = operation as ArmResourceOperation;
+  addArmResourceOperation(program, resourceType, {
+    name: target.name,
+    kind: "action",
+    operation: target,
+    operationGroup: target.interface.name,
+    resource: resourceType,
+  });
+  setArmOperationIdentifier(context.program, target, resourceType, {
+    name: target.name,
+    kind: "action",
+    operation: target,
+    operationGroup: target.interface.name,
+  });
 
   const segment = getSegment(program, target) ?? getActionSegment(program, target);
   if (!segment) {
