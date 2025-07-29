@@ -5,11 +5,11 @@ import type { DecoratorContext, Model } from "@typespec/compiler";
  *
  * This decorator will update the models returned from TCGC to include the multi-level inheritance information.
  *
- * @param target The target type (operation, model, enum, etc.) for which you want to apply client-specific documentation.
- * @param documentation The client-specific documentation to apply
- * @param mode Specifies how to apply the documentation (append or replace)
- * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ * This decorator is considered legacy functionality and may be deprecated in future releases.
+ *
+ * @param target The target model that will gain legacy inheritance behavior
+ * @param value The model whose properties should be inherited from
+ * @param scope Optional parameter to specify which language emitters this applies to
  * @example Three-level inheritance
  *
  * ```typespec

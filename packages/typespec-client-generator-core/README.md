@@ -1208,21 +1208,23 @@ Adds support for client-level multiple levels of inheritance.
 
 This decorator will update the models returned from TCGC to include the multi-level inheritance information.
 
+This decorator is considered legacy functionality and may be deprecated in future releases.
+
 ```typespec
 @Azure.ClientGenerator.Core.Legacy.legacyHierarchyBuilding(value: Model, scope?: valueof string)
 ```
 
 ##### Target
 
-The target type (operation, model, enum, etc.) for which you want to apply client-specific documentation.
+The target model that will gain legacy inheritance behavior
 `Model`
 
 ##### Parameters
 
-| Name  | Type             | Description                                                                                                                                                                                                                                                |
-| ----- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| value | `Model`          |                                                                                                                                                                                                                                                            |
-| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| Name  | Type             | Description                                                           |
+| ----- | ---------------- | --------------------------------------------------------------------- |
+| value | `Model`          | The model whose properties should be inherited from                   |
+| scope | `valueof string` | Optional parameter to specify which language emitters this applies to |
 
 ##### Examples
 

@@ -1759,10 +1759,8 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
 
       // Filter out legacy hierarchy building properties
       sdkType.properties = sdkType.properties.filter((property) => {
-        return !(
-          property.kind === "property" &&
-          !property.discriminator &&
-          legacyHierarchyBuilding.properties.has(property.name)
+        return (
+          property.discriminator || !legacyHierarchyBuilding.properties.has(property.__raw!.name)
         );
       });
     }
