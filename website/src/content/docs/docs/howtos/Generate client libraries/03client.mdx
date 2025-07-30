@@ -255,21 +255,24 @@ catsClient.pet();
 // client.go
 package petstore
 
-type Client struct {}
+type Client struct {
+  internal *azcore.Client
+	endpoint string
+}
 
 
 // dogs.go
 package petstore
 
-func (c *Client) FeedDog(ctx context.Context) (*http.Response, error) 
+func (c *Client) FeedDog(ctx context.Context) (*http.Response, error) {}
 
-func (c *Client) PetDog(ctx context.Context) (*http.Response, error) 
+func (c *Client) PetDog(ctx context.Context) (*http.Response, error) {}
 
 // cats.go
 package petstore
 
-func (c *Client) FeedCat(ctx context.Context) (*http.Response, error)
-func (c *Client) PetCat(ctx context.Context) (*http.Response, error) 
+func (c *Client) FeedCat(ctx context.Context) (*http.Response, error) {}
+func (c *Client) PetCat(ctx context.Context) (*http.Response, error) {}
 
 ```
 
@@ -467,23 +470,37 @@ actionsClient.close();
 ```go
 package petstore
 
-type Client struct {}
+type PetStoreClient struct {
+	internal *azcore.Client
+	endpoint string
+}
+func (client *PetStoreClient) Info(ctx context.Context) (*http.Response, error) {}
 
-func (c *Client) Info(ctx context.Context) (*http.Response, error) 
+type PetStoreActionsClient struct {
+	internal *azcore.Client
+	endpoint string
+}
+func (client *PetStoreActionsClient) Close(ctx context.Context) (*http.Response, error) {}
+func (client *PetStoreActionsClient) Open(ctx context.Context) (*http.Response, error) {}
 
-func (c *Client) BillingHistory(ctx context.Context) (*http.Response, error) 
+type PetStoreBillingsClient struct {
+	internal *azcore.Client
+	endpoint string
+}
+func (client *PetStoreBillingsClient) History(ctx context.Context) (*http.Response, error)  {}
 
-func (c *Client) PetInfo(ctx context.Context) (*http.Response, error) 
+type PetStorePetsClient struct {
+	internal *azcore.Client
+	endpoint string
+}
+func (client *PetStorePetsClient) Info(ctx context.Context) (*http.Response, error) {}
 
-func (c *Client) FeedPet(ctx context.Context) (*http.Response, error)
-
-func (c *Client) PetPet(ctx context.Context) (*http.Response, error)
-
-func (c *Client) OpenAction(ctx context.Context) (*http.Response, error) 
-
-func (c *Client) CloseAction(ctx context.Context) (*http.Response, error)
-
-func (c *Client) sendRequest(ctx context.Context, method, path string) (*http.Response, error) 
+type PetStorePetsActionsClient struct {
+	internal *azcore.Client
+	endpoint string
+}
+func (client *PetStorePetsActionsClient) Feed(ctx context.Context) (*http.Response, error) {}
+func (client *PetStorePetsActionsClient) Pet(ctx context.Context) (*http.Response, error) {}
 ```
 
 </ClientTabs>
@@ -605,13 +622,14 @@ client.pet();
 // client.go
 package petstore
 
-type Client struct {}
+type Client struct {
+  internal *azcore.Client
+	endpoint string
+}
 
-func (c *Client) sendRequest(ctx context.Context, method, path string) (*http.Response, error) 
+func (c *Client) Feed(ctx context.Context) (*http.Response, error) {}
 
-func (c *Client) Feed(ctx context.Context) (*http.Response, error) 
-
-func (c *Client) Pet(ctx context.Context) (*http.Response, error) 
+func (c *Client) Pet(ctx context.Context) (*http.Response, error) {}
 ```
 
 </ClientTabs>
@@ -709,8 +727,8 @@ package petstore
 
 type PetStoreGreatClient struct {}
 
-
-func (c *PetStoreGreatClient) Feed(ctx context.Context) (*http.Response, error) 
+func (c *PetStoreGreatClient) Feed(ctx context.Context) (*http.Response, error) {}
+func (c *PetStoreGreatClient) Pet(ctx context.Context) (*http.Response, error) {}
 ```
 
 </ClientTabs>
@@ -808,11 +826,14 @@ client.pet();
 ```go
 package petstorerenamed
 
-type Client struct { ... }
+type Client struct { 
+  internal *azcore.Client
+	endpoint string
+ }
 
-func (c *Client) Feed(ctx context.Context) error 
+func (c *Client) Feed(ctx context.Context) (*http.Response, error)  {}
 
-func (c *Client) Pet(ctx context.Context) error 
+func (c *Client) Pet(ctx context.Context) (*http.Response, error) {}
 
 ```
 
@@ -952,13 +973,19 @@ petActionClient.pet()
 ```go
 package petstorerenamed
 
-type FoodClient struct {}
+type FoodClient struct {
+  internal *azcore.Client
+	endpoint string
+}
 
-func (c *FoodClient) Feed(ctx context.Context) (*http.Response, error) 
+func (c *FoodClient) Feed(ctx context.Context) (*http.Response, error) {}
 
-type PetActionClient struct {}
+type PetActionClient struct {
+  internal *azcore.Client
+	endpoint string
+}
 
-func (c *PetActionClient) Pet(ctx context.Context) (*http.Response, error) 
+func (c *PetActionClient) Pet(ctx context.Context) (*http.Response, error) {}
 
 ```
 
@@ -1084,13 +1111,18 @@ opGrp2Client.pet();
 ```go
 package petstorerenamed
 
-type OutputModel struct {
-	Name string `json:"name"`
+type OpGrp1Client struct {
+  internal *azcore.Client
+	endpoint string
+}
+type OpGrp2Client struct {
+  internal *azcore.Client
+	endpoint string
 }
 
-type Client struct {}
+func (c *OpGrp1Client) Feed(ctx context.Context) (*http.Response, error) {}
+func (c *OpGrp2Client) Pet(ctx context.Context) (*http.Response, error) {}
 
-func (c *Client) GetModel(ctx context.Context, name string) (*OutputModel, *http.Response, error) 
 
 ```
 
@@ -1228,17 +1260,22 @@ petActionClient.pet();
 // food_client.go
 package newpetstore
 
-type FoodClient struct {}
+type FoodClient struct {
+  internal *azcore.Client
+	endpoint string
+}
 
-
-func (c *FoodClient) Feed(ctx context.Context) (*http.Response, error) 
+func (c *FoodClient) Feed(ctx context.Context) (*http.Response, error) {}
 
 // pet_action_client.go
 package newpetstore
 
-type PetActionClient struct {}
+type PetActionClient struct {
+  internal *azcore.Client
+	endpoint string
+}
 
-func (c *PetActionClient) Pet(ctx context.Context) (*http.Response, error) 
+func (c *PetActionClient) Pet(ctx context.Context) (*http.Response, error) {}
 ```
 
 </ClientTabs>
@@ -1386,16 +1423,22 @@ petActionClient.pet();
 
 package petstorerenamed
 
-type FoodClient struct {}
+type FoodClient struct {
+  internal *azcore.Client
+	endpoint string
+}
 
-func (c *FoodClient) Feed(ctx context.Context) (*http.Response, error) 
+func (c *FoodClient) Feed(ctx context.Context) (*http.Response, error) {}
 
 // petstorerenamed/subnamespace/pet_action_client.go
 package subnamespace
 
-type PetActionClient struct {}
+type PetActionClient struct {
+  internal *azcore.Client
+	endpoint string
+}
 
-func (c *PetActionClient) Pet(ctx context.Context) (*http.Response, error) 
+func (c *PetActionClient) Pet(ctx context.Context) (*http.Response, error) {}
 ```
 
 </ClientTabs>
@@ -1519,15 +1562,18 @@ client.download()
 ```go
 package storage
 
-type Client struct {}
+type Client struct {
+  internal *azcore.Client
+	endpoint string
+}
 
 type StorageClientOptions struct {
 	BlobName string
 }
 
-func (c *Client) Upload(ctx context.Context, options StorageClientOptions) (*http.Response, error) 
+func (c *Client) Upload(ctx context.Context, options StorageClientOptions) (*http.Response, error) {}
 
-func (c *Client) Download(ctx context.Context, options StorageClientOptions) (*http.Response, error) 
+func (c *Client) Download(ctx context.Context, options StorageClientOptions) (*http.Response, error) {}
 ```
 
 </ClientTabs>
@@ -1648,9 +1694,9 @@ type Client struct {}
 
 type StorageClientOptions struct {}
 
-func (c *Client) Upload(ctx context.Context, options StorageClientOptions) (*http.Response, error) 
+func (c *Client) Upload(ctx context.Context, options StorageClientOptions) (*http.Response, error) {}
 
-func (c *Client) Download(ctx context.Context, options StorageClientOptions) (*http.Response, error) 
+func (c *Client) Download(ctx context.Context, options StorageClientOptions) (*http.Response, error) {}
 ```
 
 </ClientTabs>
