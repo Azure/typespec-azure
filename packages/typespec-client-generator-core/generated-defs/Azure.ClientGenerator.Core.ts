@@ -814,11 +814,47 @@ export type ResponseAsBoolDecorator = (
  * }
  *
  * ```
+ * @example Move parameter from operation to client
+ * ```typespec
+ * @service
+ * namespace MyClient;
+ *
+ * getHealthStatus(
+ *   @clientLocation(MyClient) // This parameter will be moved to the `.clientInitialization` parameters of `MyClient`. It will not appear on the operation-level.
+ *   clientId: string
+ * ): void;
+ * ```
+ * @example Move parameter from client to operation
+ * ```typespec
+ * // main.tsp
+ * @service
+ * namespace MyClient;
+ *
+ * @get
+ * @route("/health")
+ * getHealthStatus(): void;
+ *
+ *
+ * @put
+ * @route("/health")
+ * putHealthStatus(): void;
+ *
+ * // client.tsp
+ * namespace MyClient.Customizations;
+ * model MyClientOptions {
+ *  subscriptionId: string;
+ * }
+ *
+ * @@clientInitialization(MyClient, MyClientOptions)
+ * // This will move the `subscriptionId` parameter from the client initialization to the operation `getHealthStatus`.
+ * // `subscriptionId` will not appear on the `putHealthStatus` operation, and it will continue to appear in client initialization.
+ * @@clientLocation(MyClientOptions.subscriptionId, MyClient.getHealthStatus)
+ * ```
  */
 export type ClientLocationDecorator = (
   context: DecoratorContext,
-  source: Operation,
-  target: Interface | Namespace | string,
+  source: Operation | ModelProperty,
+  target: Interface | Namespace | Operation | string,
   scope?: string,
 ) => void;
 

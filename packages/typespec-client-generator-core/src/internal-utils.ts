@@ -37,7 +37,7 @@ import {
   getVersioningMutators,
   getVersions,
 } from "@typespec/versioning";
-import { getClientDocExplicit, getParamAlias } from "./decorators.js";
+import { getClientDocExplicit, getClientLocation, getParamAlias } from "./decorators.js";
 import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 import {
   DecoratorInfo,
@@ -592,6 +592,18 @@ export function isOnClient(
   versioning?: boolean,
 ): boolean {
   const client = operation ? context.getClientForOperation(operation) : undefined;
+  const clientLocation = getClientLocation(context, type);
+  let movedToClient = false;
+  if (clientLocation && client) {
+    let currClient = client.type;
+    while (currClient) {
+      if (currClient === clientLocation) {
+        movedToClient = true;
+        break;
+      }
+      currClient = currClient.namespace;
+    }
+  }
   return (
     isSubscriptionId(context, type) ||
     (isApiVersion(context, type) && versioning) ||
@@ -600,7 +612,8 @@ export function isOnClient(
         context.__clientParametersCache
           .get(client)
           ?.find((x) => twoParamsEquivalent(context, x.__raw, type)),
-    )
+    ) ||
+    movedToClient
   );
 }
 
@@ -790,4 +803,34 @@ export function* filterMapValuesIterator<V>(
       yield value;
     }
   }
+}
+
+/**
+ * Find all entries in a scoped decorator state map where the target matches a specific value
+ */
+export function findEntriesWithTarget<TSource extends Type, TTarget>(
+  context: TCGCContext,
+  stateKey: symbol,
+  targetValue: TTarget,
+  sourceKind?: TSource["kind"],
+): TSource[] {
+  const results: TSource[] = [];
+  const stateMap = context.program.stateMap(stateKey);
+
+  for (const [source, scopedData] of stateMap.entries()) {
+    // Filter by source type if specified
+    if (sourceKind && source.kind !== sourceKind) {
+      continue;
+    }
+
+    // Check all scopes for matching target
+    for (const [scope, target] of Object.entries(scopedData)) {
+      if (target === targetValue) {
+        results.push(source as TSource);
+        break; // Found match, no need to check other scopes
+      }
+    }
+  }
+
+  return results;
 }

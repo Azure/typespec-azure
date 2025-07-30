@@ -25,6 +25,7 @@ import { isHeader } from "@typespec/http";
 import { createSdkClientType } from "./clients.js";
 import {
   getAccess,
+  getClientLocation,
   getOverriddenClientMethod,
   getResponseAsBool,
   listOperationGroups,
@@ -692,7 +693,10 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
       const operationLocation = context.getClientForOperation(operation);
       if (sdkMethodParam.isApiVersionParam) {
         if (
-          !context.__clientParametersCache.get(operationLocation)?.find((x) => x.isApiVersionParam)
+          !context.__clientParametersCache
+            .get(operationLocation)
+            ?.find((x) => x.isApiVersionParam) &&
+          getClientLocation(context, param) !== operation
         ) {
           clientParams.push(sdkMethodParam);
         }
@@ -704,10 +708,30 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
         ) {
           clientParams.push(sdkMethodParam);
         }
+      } else {
+        if (
+          !context.__clientParametersCache
+            .get(operationLocation)
+            ?.find((x) => x.__raw && x.__raw === sdkMethodParam.__raw)
+        ) {
+          clientParams.push(sdkMethodParam);
+        }
       }
     } else {
       methodParameters.push(sdkMethodParam);
     }
+  }
+  let currClient: SdkClientType<TServiceOperation> | undefined = client;
+  while (currClient) {
+    for (const param of currClient.clientInitialization.parameters) {
+      if (param.__raw && getClientLocation(context, param.__raw) === operation) {
+        // if the parameter is on the client, we need to add it to the method parameters
+        if (param.kind === "method") {
+          methodParameters.push(param);
+        }
+      }
+    }
+    currClient = currClient.parent;
   }
 
   const serviceOperation = diagnostics.pipe(
