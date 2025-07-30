@@ -1272,6 +1272,7 @@ Legacy multi-level inheritance is NOT a recommended pattern, and you shouldn't u
 The `@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding` decorator enables client-level multiple levels of inheritance for discriminated models. This decorator modifies the inheritance chain in generated client libraries to create deeper hierarchies than what TypeSpec natively supports.
 
 Use `@hierarchyBuilding` when you need to represent complex inheritance hierarchies in discriminated models where:
+
 - You have multiple levels of inheritance (grandparent → parent → child)
 - You need to share common properties across multiple inheritance levels
 - You have permission from SDK architects
@@ -1344,7 +1345,7 @@ public partial class Pet : Animal
     {
         Kind = "pet";
     }
-    
+
     public string Owner { get; set; }
     public bool Vaccinated { get; set; }
 }
@@ -1355,7 +1356,7 @@ public partial class Dog : Pet  // Inherits from Pet, not Animal
     {
         Kind = "dog";
     }
-    
+
     public string Breed { get; set; }
 }
 ```
@@ -1375,7 +1376,8 @@ export interface Pet extends Animal {
   vaccinated: boolean;
 }
 
-export interface Dog extends Pet {  // Inherits from Pet, not Animal
+export interface Dog extends Pet {
+  // Inherits from Pet, not Animal
   kind: "dog";
   breed: string;
 }
@@ -1409,7 +1411,6 @@ public final class Dog extends Pet {  // Inherits from Pet, not Animal
 
 </ClientTabItem>
 </ClientTabs>
-
 
 ## Unions
 
