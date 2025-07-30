@@ -125,7 +125,10 @@ public final class Food implements JsonSerializable<Food> {
 ```go
 # generated client.go
 
-type PetStoreClient struct {}
+type PetStoreClient struct {
+  internal *azcore.Client
+	endpoint string
+}
 
 func (client *PetStoreClient) Feed(ctx context.Context, feedRequest feedRequest, options *PetStoreClientFeedOptions) (PetStoreClientFeedResponse, error) {}
 
