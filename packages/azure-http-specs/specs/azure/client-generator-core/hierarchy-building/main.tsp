@@ -51,17 +51,38 @@ namespace _Specs_.Azure.ClientGenerator.Core.HierarchyBuilding;
     ...DogContent;
   }
 
-@doc("Update an animal")
-@route("/animal")
-@put
-updateAnimal(@body animal: Animal): Animal;
+interface AnimalOperations {
+  @doc("Update an animal as animal")
+  @route("/animal/animal")
+  @put
+  updateAnimalAsAnimal(@body animal: Animal): Animal;
 
-@doc("Update a pet")
-@route("/pet")
-@put
-updatePet(@body pet: Pet): Pet;
+  @doc("Update a pet as animal")
+  @route("/animal/pet")
+  @put
+  updatePetAsAnimal(@body pet: Pet): Animal;
 
-@doc("Update a dog")
-@route("/dog")
-@put
-updateDog(@body dog: Dog): Dog;
+  @doc("Update a dog as animal")
+  @route("/animal/dog")
+  @put
+  updateDogAsAnimal(@body dog: Dog): Animal;
+}
+
+interface PetOperations {
+  @doc("Update a pet as pet")
+  @route("/pet/pet")
+  @put
+  updatePetAsPet(@body pet: Pet): Pet;
+
+  @doc("Update a dog as pet")
+  @route("/pet/dog")
+  @put
+  updateDogAsPet(@body dog: Dog): Pet;
+}
+
+interface DogOperations {
+  @doc("Update a dog as dog")
+  @route("/dog/dog")
+  @put
+  updateDogAsDog(@body dog: Dog): Dog;
+}

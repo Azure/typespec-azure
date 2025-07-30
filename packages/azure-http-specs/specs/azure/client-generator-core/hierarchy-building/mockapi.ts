@@ -22,9 +22,9 @@ const sampleDog = {
 };
 
 Scenarios.Azure_ClientGenerator_Core_HierarchyBuilding = passOnSuccess([
-  // Update operations for the three levels of hierarchy
+  // AnimalOperations interface
   {
-    uri: "/azure/client-generator-core/hierarchy-building/animal",
+    uri: "/azure/client-generator-core/hierarchy-building/animal/animal",
     method: "put",
     request: {
       body: json(sampleAnimal),
@@ -36,7 +36,32 @@ Scenarios.Azure_ClientGenerator_Core_HierarchyBuilding = passOnSuccess([
     kind: "MockApiDefinition",
   },
   {
-    uri: "/azure/client-generator-core/hierarchy-building/pet",
+    uri: "/azure/client-generator-core/hierarchy-building/animal/pet",
+    method: "put",
+    request: {
+      body: json(samplePet),
+    },
+    response: {
+      status: 200,
+      body: json({ kind: samplePet.kind, name: samplePet.name }), // Returns Animal type
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/azure/client-generator-core/hierarchy-building/animal/dog",
+    method: "put",
+    request: {
+      body: json(sampleDog),
+    },
+    response: {
+      status: 200,
+      body: json({ kind: sampleDog.kind, name: sampleDog.name }), // Returns Animal type
+    },
+    kind: "MockApiDefinition",
+  },
+  // PetOperations interface
+  {
+    uri: "/azure/client-generator-core/hierarchy-building/pet/pet",
     method: "put",
     request: {
       body: json(samplePet),
@@ -48,7 +73,20 @@ Scenarios.Azure_ClientGenerator_Core_HierarchyBuilding = passOnSuccess([
     kind: "MockApiDefinition",
   },
   {
-    uri: "/azure/client-generator-core/hierarchy-building/dog",
+    uri: "/azure/client-generator-core/hierarchy-building/pet/dog",
+    method: "put",
+    request: {
+      body: json(sampleDog),
+    },
+    response: {
+      status: 200,
+      body: json({ kind: sampleDog.kind, name: sampleDog.name, trained: sampleDog.trained }), // Returns Pet type
+    },
+    kind: "MockApiDefinition",
+  },
+  // DogOperations interface
+  {
+    uri: "/azure/client-generator-core/hierarchy-building/dog/dog",
     method: "put",
     request: {
       body: json(sampleDog),
