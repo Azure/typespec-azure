@@ -544,8 +544,9 @@ op CreateOperation<
   OptionalRequestBody extends valueof boolean = false
 >(
   ...HttpParameters,
-  @doc("Resource create parameters.") 
-  @armBodyRoot(OptionalRequestBody) 
+
+  @doc("Resource create parameters.")
+  @armBodyRoot(OptionalRequestBody)
   resource: BodyParameter,
 ): Response | ErrorResponse;
 
