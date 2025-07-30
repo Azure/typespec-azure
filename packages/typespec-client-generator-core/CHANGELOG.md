@@ -1,5 +1,23 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.58.1
+
+### Bump dependencies
+
+- [#3029](https://github.com/Azure/typespec-azure/pull/3029) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3051](https://github.com/Azure/typespec-azure/pull/3051) Do not add accept header if only error response has body.
+- [#3053](https://github.com/Azure/typespec-azure/pull/3053) Accept string value examples for number/boolean types
+- [#3004](https://github.com/Azure/typespec-azure/pull/3004) Fix typing inconsistent when using `@alternateType` along with `@override`.
+- [#3012](https://github.com/Azure/typespec-azure/pull/3012) Replace the property type of a multipart model with the real body type for the HTTP part. Put all other info into the property's multipart serialization option with `MultipartOptions` type. Add `headers` property with `SdkHeaderParameter[]` type in `MultipartOptions` interface.
+- [#3063](https://github.com/Azure/typespec-azure/pull/3063) Find the correct first segment before doing page segments mapping.
+- [#2817](https://github.com/Azure/typespec-azure/pull/2817) Removed type alias: `SdkModelPropertyType` and `SdkParameter`. For the place that used these two aliases, changed to more explicit type, e.g., for the property of `SdkModelType`, the type now is `SdkModelPropertyType` only. Since current model property will never be `SdkHttpParameter`, emitter could not filter them out from a model. Use `isHttpMetadata` instead.
+- [#3000](https://github.com/Azure/typespec-azure/pull/3000) Fix relative import from `typespec-azure-core`
+- [#3031](https://github.com/Azure/typespec-azure/pull/3031) Add `@hierarchyBuilding` decorator for legacy backcompat multi-level discriminator handling.
+
+
 ## 0.58.0
 
 ### Bug Fixes
