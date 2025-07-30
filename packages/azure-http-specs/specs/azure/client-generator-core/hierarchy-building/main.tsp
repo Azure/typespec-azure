@@ -10,18 +10,8 @@ using Azure.ClientGenerator.Core;
 @scenarioService("/azure/client-generator-core/hierarchy-building")
 namespace _Specs_.Azure.ClientGenerator.Core.HierarchyBuilding;
 
-@scenario
-@scenarioDoc("""
-  This scenario tests the @hierarchyBuilding decorator with a three-level inheritance chain.
-  The inheritance structure is Animal -> Pet -> Dog, where Dog inherits from Animal but
-  is redirected to inherit from Pet using @hierarchyBuilding(Pet).
-  
-  The test includes three update operations that accept and return models at different levels of the hierarchy.
-  This validates that the @hierarchyBuilding decorator correctly modifies inheritance relationships
-  for polymorphic HTTP API scenarios.
-  """)
-  @discriminator("kind")
-  model Animal {
+@discriminator("kind")
+model Animal {
     @doc("The kind of animal")
     kind: string;
     
@@ -52,16 +42,32 @@ namespace _Specs_.Azure.ClientGenerator.Core.HierarchyBuilding;
   }
 
 interface AnimalOperations {
+  @scenario
+  @scenarioDoc("""
+    Test operation that accepts Animal input and returns Animal output.
+    This validates basic polymorphic behavior in the inheritance hierarchy.
+    """)
   @doc("Update an animal as animal")
   @route("/animal/animal")
   @put
   updateAnimalAsAnimal(@body animal: Animal): Animal;
 
+  @scenario
+  @scenarioDoc("""
+    Test operation that accepts Pet input and returns Animal output.
+    This validates that a derived type can be passed where base type is expected.
+    """)
   @doc("Update a pet as animal")
   @route("/animal/pet")
   @put
   updatePetAsAnimal(@body pet: Pet): Animal;
 
+  @scenario
+  @scenarioDoc("""
+    Test operation that accepts Dog input and returns Animal output.
+    This validates the @hierarchyBuilding decorator when Dog is used as Animal.
+    Due to @hierarchyBuilding(Pet), Dog should inherit from Pet rather than Animal directly.
+    """)
   @doc("Update a dog as animal")
   @route("/animal/dog")
   @put
@@ -69,11 +75,22 @@ interface AnimalOperations {
 }
 
 interface PetOperations {
+  @scenario
+  @scenarioDoc("""
+    Test operation that accepts Pet input and returns Pet output.
+    This validates that Pet type works correctly in the inheritance hierarchy.
+    """)
   @doc("Update a pet as pet")
   @route("/pet/pet")
   @put
   updatePetAsPet(@body pet: Pet): Pet;
 
+  @scenario
+  @scenarioDoc("""
+    Test operation that accepts Dog input and returns Pet output.
+    This validates the @hierarchyBuilding decorator when Dog is used as Pet.
+    Due to @hierarchyBuilding(Pet), Dog should be compatible with Pet operations.
+    """)
   @doc("Update a dog as pet")
   @route("/pet/dog")
   @put
@@ -81,6 +98,12 @@ interface PetOperations {
 }
 
 interface DogOperations {
+  @scenario
+  @scenarioDoc("""
+    Test operation that accepts Dog input and returns Dog output.
+    This validates that Dog type works correctly with the @hierarchyBuilding decorator.
+    The Dog model uses @hierarchyBuilding(Pet) to redirect its inheritance from Animal to Pet.
+    """)
   @doc("Update a dog as dog")
   @route("/dog/dog")
   @put
