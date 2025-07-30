@@ -56,6 +56,6 @@ export const $decorators = {
   } satisfies AzureClientGeneratorCoreDecorators,
 
   "Azure.ClientGenerator.Core.Legacy": {
-    legacyHierarchyBuilding: $legacyHierarchyBuilding,
+    hierarchyBuilding: $legacyHierarchyBuilding,
   } satisfies AzureClientGeneratorCoreLegacyDecorators,
 };

@@ -40,7 +40,7 @@ import {
   ScopeDecorator,
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
-import { LegacyHierarchyBuildingDecorator } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
+import { HierarchyBuildingDecorator } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
   AccessFlags,
   ClientInitializationOptions,
@@ -1222,7 +1222,7 @@ function isPropertySuperset(target: Model, value: Model): boolean {
   return true;
 }
 
-export const $legacyHierarchyBuilding: LegacyHierarchyBuildingDecorator = (
+export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
   context: DecoratorContext,
   target: Model,
   value: Model,
@@ -1253,8 +1253,34 @@ export const $legacyHierarchyBuilding: LegacyHierarchyBuildingDecorator = (
 
 export function getLegacyHierarchyBuilding(context: TCGCContext, target: Model): Model | undefined {
   // If legacy hierarchy building is not respected, ignore the decorator completely
-  if (!context.respectLegacyHierarchyBuilding) return undefined;
-  return getScopedDecoratorData(context, legacyHierarchyBuildingKey, target);
+  if (!context.enableLegacyHierarchyBuilding) return undefined;
+
+  const value = getScopedDecoratorData(context, legacyHierarchyBuildingKey, target);
+
+  // Validate no circular references
+  const visited = new Set<Model>();
+  visited.add(target);
+  let current: Model | undefined = value;
+  while (current) {
+    if (visited.has(current)) {
+      reportDiagnostic(context.program, {
+        code: "legacy-hierarchy-building-circular-reference",
+        target: target,
+      });
+      return;
+    }
+    visited.add(current);
+    const legacyHierarchyBuilding = current.decorators.filter(
+      (d) => d.decorator.name === "$hierarchyBuilding",
+    );
+    if (legacyHierarchyBuilding.length === 0) {
+      current = current.baseModel;
+    } else {
+      current = legacyHierarchyBuilding[0].args[0].value as Model;
+    }
+  }
+
+  return value;
 }
 
 /**
