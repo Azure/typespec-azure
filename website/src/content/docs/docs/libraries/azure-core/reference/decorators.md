@@ -43,24 +43,11 @@ Identifies that an operation is the final operation for an LRO.
 | linkedOperation | `Operation` | The linked Operation                                                                                                      |
 | parameters      | `{}`        | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
 
-### `@fixed` {#@Azure.Core.fixed}
-
-Marks an Enum as being fixed since enums in Azure are
-assumed to be extensible.
-
-```typespec
-@Azure.Core.fixed
-```
-
-#### Target
-
-`Enum`
-
-#### Parameters
-
-None
-
 ### `@items` {#@Azure.Core.items}
+
+:::caution
+**Deprecated**: Do not use this decorator. Use @pageItems instead.
+:::
 
 Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
 
@@ -221,6 +208,10 @@ Identifies an operation that is linked to the target operation.
 | parameters      | `{}`             | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
 
 ### `@pagedResult` {#@Azure.Core.pagedResult}
+
+:::caution
+**Deprecated**: Do not use this decorator. Use @list decorator on the operation instead.
+:::
 
 Marks a Model as a paged collection.
 

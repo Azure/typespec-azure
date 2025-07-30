@@ -34,6 +34,15 @@ export const Tester = createTester(resolvePath(import.meta.dirname, ".."), {
     "@typespec/versioning",
     "@azure-tools/typespec-azure-core",
   ],
+})
+  .importLibraries()
+  .using("Http", "Rest", "Versioning", "Azure.Core");
+
+export const TesterWithService = Tester.wrap((code) => {
+  return `
+    @useDependency(Azure.Core.Versions.v1_0_Preview_2) @service namespace Azure.MyService;
+    ${code}
+  `;
 });
 export async function createAzureCoreTestHost() {
   return createTestHost({

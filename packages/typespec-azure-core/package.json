@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-core",
-  "version": "0.57.0",
+  "version": "0.58.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Azure Core library",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -29,6 +29,9 @@
       "types": "./dist/src/testing/index.d.ts",
       "default": "./dist/src/testing/index.js"
     }
+  },
+  "imports": {
+    "#test/*": "./test/*"
   },
   "type": "module",
   "engines": {
@@ -59,7 +62,7 @@
     "@typespec/rest": "workspace:^"
   },
   "devDependencies": {
-    "@types/node": "~24.0.3",
+    "@types/node": "~24.1.0",
     "@typespec/compiler": "workspace:^",
     "@typespec/http": "workspace:^",
     "@typespec/library-linter": "workspace:^",

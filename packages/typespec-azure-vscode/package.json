@@ -3,7 +3,7 @@
   "displayName": "typespec azure",
   "description": "the extension for azure typespec",
   "publisher": "typespec",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Azure/typespec-azure.git"
@@ -36,8 +36,8 @@
   },
   "devDependencies": {
     "@types/vscode": "~1.100.0",
-    "@types/node": "~24.0.3",
-    "@vscode/vsce": "~3.5.0",
+    "@types/node": "~24.1.0",
+    "@vscode/vsce": "~3.6.0",
     "esbuild": "^0.25.1",
     "typescript": "~5.8.2"
   }

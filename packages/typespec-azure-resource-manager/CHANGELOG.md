@@ -1,5 +1,26 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.58.1
+
+### Bug Fixes
+
+- [#3030](https://github.com/Azure/typespec-azure/pull/3030) Use OverrideErrorType parameter in legacy list operation
+- [#3026](https://github.com/Azure/typespec-azure/pull/3026) Fix #1876 Add ResolveArmOperations method
+
+
+## 0.58.0
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2945](https://github.com/Azure/typespec-azure/pull/2945) Fix inconsistent `OverrideErrorType` parameter name across templates
+- [#2959](https://github.com/Azure/typespec-azure/pull/2959) Improve `no-resource-delete-operation` message
+- [#2820](https://github.com/Azure/typespec-azure/pull/2820) Add the `@items` and `@nextLink` decorators to the common types `PrivateEndpointConnectionListResult` and `PrivateLinkResourceListResult` to support the @`pagedResult` feature.
+
+
 ## 0.57.2
 
 ### Bug Fixes

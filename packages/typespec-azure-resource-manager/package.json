@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-resource-manager",
-  "version": "0.57.2",
+  "version": "0.58.1",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Azure Resource Manager library",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -67,7 +67,7 @@
   },
   "devDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:^",
-    "@types/node": "~24.0.3",
+    "@types/node": "~24.1.0",
     "@types/pluralize": "^0.0.33",
     "@typespec/compiler": "workspace:^",
     "@typespec/http": "workspace:^",

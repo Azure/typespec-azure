@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-portal-core",
-  "version": "0.57.0",
+  "version": "0.58.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Azure Portal Core library",
   "license": "MIT",
@@ -45,7 +45,7 @@
     "@azure-tools/typespec-azure-core": "workspace:^",
     "@azure-tools/typespec-azure-resource-manager": "workspace:^",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
-    "@types/node": "~24.0.3",
+    "@types/node": "~24.1.0",
     "@typespec/compiler": "workspace:^",
     "@typespec/http": "workspace:^",
     "@typespec/library-linter": "workspace:^",

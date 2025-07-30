@@ -38,13 +38,14 @@ import {
   getVersions,
 } from "@typespec/versioning";
 import { getClientDocExplicit, getClientLocation, getParamAlias } from "./decorators.js";
+import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 import {
   DecoratorInfo,
   SdkBuiltInType,
   SdkClient,
   SdkEnumType,
+  SdkHeaderParameter,
   SdkHttpResponse,
-  SdkModelPropertyType,
   SdkOperationGroup,
   SdkType,
   TCGCContext,
@@ -56,7 +57,7 @@ import {
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
-import { getClientTypeWithDiagnostics, getSdkModelPropertyType } from "./types.js";
+import { getClientTypeWithDiagnostics } from "./types.js";
 
 export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
   "emitter-name"?: string;
@@ -404,22 +405,18 @@ export function isAzureCoreTspModel(t: Type): boolean {
   );
 }
 
-export function isAcceptHeader(param: SdkModelPropertyType): boolean {
+export function isAcceptHeader(param: SdkHeaderParameter): boolean {
   return param.kind === "header" && param.serializedName.toLowerCase() === "accept";
 }
 
-export function isContentTypeHeader(param: SdkModelPropertyType): boolean {
+export function isContentTypeHeader(param: SdkHeaderParameter): boolean {
   return param.kind === "header" && param.serializedName.toLowerCase() === "content-type";
 }
 
 export function isMultipartOperation(context: TCGCContext, operation?: Operation): boolean {
   if (!operation) return false;
   const httpOperation = getHttpOperationWithCache(context, operation);
-  const httpBody = httpOperation.parameters.body;
-  if (httpBody && httpBody.type.kind === "Model") {
-    return httpBody.contentTypes.some((x) => x.startsWith("multipart/"));
-  }
-  return false;
+  return httpOperation.parameters.body?.bodyKind === "multipart";
 }
 
 export function isHttpOperation(context: TCGCContext, obj: any): obj is HttpOperation {
@@ -548,6 +545,7 @@ export function twoParamsEquivalent(
     param1.name === getParamAlias(context, param2)
   );
 }
+
 /**
  * If body is from spread, then it does not directly from a model property.
  * @param httpBody
@@ -559,26 +557,30 @@ export function isHttpBodySpread(httpBody: HttpPayloadBody): boolean {
 }
 
 /**
- * If body is from simple spread, then we use the original model as body model.
+ * If body is from simple spread, then we use the original model as body model. Else we return the body type directly.
  * @param type
  * @returns
  */
-export function getHttpBodySpreadModel(type: Model): Model {
-  if (type.sourceModels.length === 1 && type.sourceModels[0].usage === "spread") {
-    const innerModel = type.sourceModels[0].model;
-    // for case: `op test(...Model):void;`
-    if (innerModel.name !== "" && innerModel.properties.size === type.properties.size) {
-      return innerModel;
+export function getHttpBodyType(httpBody: HttpPayloadBody): Type {
+  const type = httpBody.type;
+  if (isHttpBodySpread(httpBody) && type.kind === "Model") {
+    if (type.sourceModels.length === 1 && type.sourceModels[0].usage === "spread") {
+      const innerModel = type.sourceModels[0].model;
+      // for case: `op test(...Model):void;`
+      if (innerModel.name !== "" && innerModel.properties.size === type.properties.size) {
+        return innerModel;
+      }
+      // for case: `op test(@header h: string, @query q: string, ...Model): void;`
+      if (
+        innerModel.sourceModels.length === 1 &&
+        innerModel.sourceModels[0].usage === "spread" &&
+        innerModel.sourceModels[0].model.name !== "" &&
+        innerModel.sourceModels[0].model.properties.size === type.properties.size
+      ) {
+        return innerModel.sourceModels[0].model;
+      }
     }
-    // for case: `op test(@header h: string, @query q: string, ...Model): void;`
-    if (
-      innerModel.sourceModels.length === 1 &&
-      innerModel.sourceModels[0].usage === "spread" &&
-      innerModel.sourceModels[0].model.name !== "" &&
-      innerModel.sourceModels[0].model.properties.size === type.properties.size
-    ) {
-      return innerModel.sourceModels[0].model;
-    }
+    return type;
   }
   return type;
 }
@@ -784,23 +786,12 @@ export function compareModelProperties(
   if (!modelPropA || !modelPropB) return false;
   if (modelPropA.name !== modelPropB.name || modelPropA.type !== modelPropB.type) return false;
   if (!context) return true; // if we don't have a context, we can't further compare the types. Assume true.
-  const sdkA = ignoreDiagnostics(getSdkModelPropertyType(context, modelPropA));
-  const sdkB = ignoreDiagnostics(getSdkModelPropertyType(context, modelPropB));
-  if (sdkA.kind === "method" || sdkB.kind === "method") {
-    // if we're comparing method vs service param, we just need to check the name and type
+  // compare serialized names if they are http parameters
+  if (!isSdkHttpParameter(context, modelPropA) || !isSdkHttpParameter(context, modelPropB))
     return true;
-  }
-  switch (sdkA.kind) {
-    case "cookie":
-    case "header":
-    case "query":
-    case "path":
-    case "responseheader":
-    case "body":
-      return sdkA.kind === sdkB.kind && sdkA.serializedName === sdkB.serializedName;
-    default:
-      return sdkA.kind === sdkB.kind;
-  }
+  const sdkA = ignoreDiagnostics(getSdkHttpParameter(context, modelPropA));
+  const sdkB = ignoreDiagnostics(getSdkHttpParameter(context, modelPropB));
+  return sdkA.kind === sdkB.kind && sdkA.serializedName === sdkB.serializedName;
 }
 
 export function* filterMapValuesIterator<V>(
