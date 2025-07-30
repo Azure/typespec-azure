@@ -24,19 +24,15 @@ namespace Azure.Core {
   extern dec previewVersion(target: TypeSpec.Reflection.EnumMember);
 
   /**
-   * Marks an Enum as being fixed since enums in Azure are
-   * assumed to be extensible.
-   */
-  extern dec fixed(target: Enum);
-
-  /**
    * Marks a Model as a paged collection.
    */
+  #deprecated "Do not use this decorator. Use @list decorator on the operation instead."
   extern dec pagedResult(entity: Model);
 
   /**
    * Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
    */
+  #deprecated "Do not use this decorator. Use @pageItems instead."
   extern dec items(entity: ModelProperty);
 
   /**

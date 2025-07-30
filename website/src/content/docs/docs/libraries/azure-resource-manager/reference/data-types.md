@@ -2989,7 +2989,7 @@ model Azure.ResourceManager.Foundations.DefaultBaseParameters<Resource>
 | ----------------- | ----------- | ---------------------------------------------------------------------- |
 | apiVersion        | `string`    | The API version to use for this operation.                             |
 | subscriptionId    | `Core.uuid` | The ID of the target subscription. The value must be an UUID.          |
-| location          | `string`    | The location name.                                                     |
+| location          | `string`    | The name of Azure region.                                              |
 | resourceGroupName | `string`    | The name of the resource group. The name is case insensitive.          |
 | resourceUri       | `string`    | The fully qualified Azure Resource manager identifier of the resource. |
 
@@ -3126,7 +3126,7 @@ model Azure.ResourceManager.Foundations.ResourceGroupScope<Resource>
 | ----------------- | -------------------------------- | ---------------------------------------------------------------------- |
 | apiVersion        | `string`                         | The API version to use for this operation.                             |
 | subscriptionId    | `Core.uuid`                      | The ID of the target subscription. The value must be an UUID.          |
-| location          | `string`                         | The location name.                                                     |
+| location          | `string`                         | The name of Azure region.                                              |
 | resourceGroupName | `string`                         | The name of the resource group. The name is case insensitive.          |
 | resourceUri       | `string`                         | The fully qualified Azure Resource manager identifier of the resource. |
 | provider          | `"Microsoft.ThisWillBeReplaced"` |                                                                        |

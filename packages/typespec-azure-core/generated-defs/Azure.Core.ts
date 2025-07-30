@@ -46,16 +46,6 @@ export type PollingLocationDecorator = (
 ) => void;
 
 /**
- * Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
- */
-export type ItemsDecorator = (context: DecoratorContext, entity: ModelProperty) => void;
-
-/**
- * Marks a Model as a paged collection.
- */
-export type PagedResultDecorator = (context: DecoratorContext, entity: Model) => void;
-
-/**
  * Decorator that marks a Version EnumMember as a preview version.
  * This is used to indicate that the version is not yet stable and may change in future releases.
  *
@@ -77,10 +67,14 @@ export type PagedResultDecorator = (context: DecoratorContext, entity: Model) =>
 export type PreviewVersionDecorator = (context: DecoratorContext, target: EnumMember) => void;
 
 /**
- * Marks an Enum as being fixed since enums in Azure are
- * assumed to be extensible.
+ * Marks a Model as a paged collection.
  */
-export type FixedDecorator = (context: DecoratorContext, target: Enum) => void;
+export type PagedResultDecorator = (context: DecoratorContext, entity: Model) => void;
+
+/**
+ * Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
+ */
+export type ItemsDecorator = (context: DecoratorContext, entity: ModelProperty) => void;
 
 /**
  * Used for custom StatusMonitor implementation.
@@ -209,10 +203,9 @@ export type AzureCoreDecorators = {
   lroStatus: LroStatusDecorator;
   finalLocation: FinalLocationDecorator;
   pollingLocation: PollingLocationDecorator;
-  items: ItemsDecorator;
-  pagedResult: PagedResultDecorator;
   previewVersion: PreviewVersionDecorator;
-  fixed: FixedDecorator;
+  pagedResult: PagedResultDecorator;
+  items: ItemsDecorator;
   lroSucceeded: LroSucceededDecorator;
   lroCanceled: LroCanceledDecorator;
   lroFailed: LroFailedDecorator;

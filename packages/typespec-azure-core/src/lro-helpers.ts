@@ -9,21 +9,21 @@ import {
 import {
   getEffectiveModelType,
   ignoreDiagnostics,
-  IntrinsicType,
+  type IntrinsicType,
   isNeverType,
-  Model,
-  ModelProperty,
-  Operation,
-  Program,
-  Scalar,
-  Type,
+  type Model,
+  type ModelProperty,
+  type Operation,
+  type Program,
+  type Scalar,
+  type Type,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import {
   getHeaderFieldName,
   getHttpOperation,
   getOperationVerb,
-  HttpOperation,
+  type HttpOperation,
   isBody,
   isBodyRoot,
   isHeader,
@@ -32,39 +32,33 @@ import {
   getActionDetails,
   getResourceLocationType,
   getResourceOperation,
-  ResourceOperation,
+  type ResourceOperation,
 } from "@typespec/rest";
+
+import { getFinalLocationValue, isFinalLocation } from "./decorators/final-location.js";
+import { FinalOperationKey } from "./decorators/final-operation.js";
+import { getLroResult } from "./decorators/lro-result.js";
 import {
   extractLroStates,
-  FinalOperationKey,
-  getFinalLocationValue,
-  getFinalStateOverride,
-  getLroResult,
+  findLroStatusProperty,
+  LongRunningStates,
+} from "./decorators/lro-status.js";
+import {
   getOperationLink,
   getOperationLinks,
-  getPollingLocationInfo,
-  isFinalLocation,
-  isPollingLocation,
-  LongRunningStates,
+  type OperationLink,
   OperationLinkMetadata,
-  PollingLocationInfo,
-  PollingOperationKey,
+} from "./decorators/operation-link.js";
+import {
+  getPollingLocationInfo,
+  isPollingLocation,
+  type PollingLocationInfo,
   pollingOptionsKind,
-  StatusMonitorPollingLocationInfo,
-} from "./decorators.js";
-import { PropertyMap, StatusMonitorMetadata } from "./lro-info.js";
-
-/**
- * Custom polling
- * Represents a property or header that provides a Uri linking to another operation
- */
-export interface OperationLink {
-  kind: "link";
-  /** Indicates whether the link is in the response header or response body */
-  location: "ResponseHeader" | "ResponseBody" | "Self";
-  /** The property that contains the link */
-  property: ModelProperty;
-}
+  type StatusMonitorPollingLocationInfo,
+} from "./decorators/polling-location.js";
+import { PollingOperationKey } from "./decorators/polling-operation.js";
+import type { PropertyMap, StatusMonitorMetadata } from "./lro-info.js";
+import { getFinalStateOverride } from "./state/final-state.js";
 
 /**
  * Custom polling
@@ -689,14 +683,6 @@ function getLroStatusFromHeaderProperty(
   return finalState;
 }
 
-function getLroStatusProperty(program: Program, model: Model): ModelProperty | undefined {
-  const properties = filterModelProperties(
-    model,
-    (prop) => ignoreDiagnostics(extractLroStates(program, prop)) !== undefined,
-  );
-  return properties.length > 0 ? properties[0] : undefined;
-}
-
 function getPollingStep(
   program: Program,
   modelOrOperation: Model | Operation,
@@ -798,7 +784,7 @@ function getStatusMonitorInfo(
     modelOrLink = statusMonitorType;
   }
 
-  const statusProperty = getLroStatusProperty(program, modelOrLink);
+  const statusProperty = findLroStatusProperty(program, modelOrLink);
   if (statusProperty === undefined) return undefined;
   const successInfo = getTargetModelInformation(program, modelOrLink);
   const lroStates = ignoreDiagnostics(extractLroStates(program, statusProperty));
@@ -909,19 +895,15 @@ function getTargetModelInformation(
   const finalLinkProps = filterModelProperties(modelOrLink, (prop) =>
     isFinalLocation(program, prop),
   );
-  const resultProps = filterModelProperties(modelOrLink, (prop) => isResultProperty(program, prop));
+  const resultProps = getLroResult(program, modelOrLink)[0];
 
   if (finalLinkProps.length === 1) {
     const result = resolveOperationLocation(program, finalLinkProps[0]);
     if (result !== undefined) return [result, finalLinkProps[0]];
   }
 
-  if (
-    resultProps.length === 1 &&
-    !isNeverType(resultProps[0].type) &&
-    resultProps[0].type.kind === "Model"
-  ) {
-    return [resultProps[0].type, resultProps[0]];
+  if (resultProps && !isNeverType(resultProps.type) && resultProps.type.kind === "Model") {
+    return [resultProps.type, resultProps];
   }
 
   return undefined;
@@ -935,16 +917,6 @@ function isMatchingGetOperation(
   const sourceHttp = getHttpMetadata(program, sourceOperation);
   const targetHttp = getHttpMetadata(program, targetOperation);
   return sourceHttp.path === targetHttp.path && targetHttp.verb === "get";
-}
-
-function isResultProperty(program: Program, property: ModelProperty): boolean {
-  if (property.model !== undefined) {
-    const [lroResult, _] = getLroResult(program, property.model);
-    if (lroResult !== undefined) {
-      return lroResult.name === property.name;
-    }
-  }
-  return property.name === "result";
 }
 
 function processFinalLink(

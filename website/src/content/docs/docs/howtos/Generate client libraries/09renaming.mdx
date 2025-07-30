@@ -39,7 +39,7 @@ op get is ResourceRead<InputModel>;
 class InputModel:
   name: str = rest_field(readonly=True)
 
-response: InputModel = client.get_model(name="name")
+response: InputModel = client.get(name="name")
 ```
 
 ```csharp
@@ -120,7 +120,7 @@ using Azure.ClientGenerator.Core;
 class InputOptions:
   input_name: str = rest_field(rest_name="name", readonly=True)
 
-response: InputOptions = client.get_computed_model(input_name="name")
+response: InputOptions = client.get(input_name="name")
 ```
 
 ```csharp
@@ -183,8 +183,8 @@ using Azure.ClientGenerator.Core;
 
 ```python
 class InputModel:
-  input_name: str = rest_field(rest_name="name", readonly=True)
-response: InputModel = client.get_computed_model(name="name")
+  name: str = rest_field(readonly=True)
+response: InputModel = client.get_computed(name="name")
 ```
 
 ```csharp
