@@ -1745,6 +1745,30 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
     if (sdkType.kind !== "model" || !sdkType.baseModel) continue;
     // if the model has legacyHierarchyBuilding, then we should update its discriminated subtypes
     const legacyHierarchyBuilding = getLegacyHierarchyBuilding(context, sdkType.__raw as Model);
+
+    // validate no circular references
+    const visited = new Set<Model>();
+    visited.add(sdkType.__raw as Model);
+    let current: Model | undefined = legacyHierarchyBuilding;
+    while (current) {
+      if (visited.has(current)) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "legacy-hierarchy-building-circular-reference",
+            target: sdkType.__raw as Model,
+          }),
+        );
+        return diagnostics.wrap(undefined);
+      }
+      visited.add(current);
+      const changedBase = getLegacyHierarchyBuilding(context, current as Model);
+      if (changedBase === undefined) {
+        current = current.baseModel;
+      } else {
+        current = changedBase;
+      }
+    }
+
     // must be done after discriminator is added
     // Populate discriminated subtypes for legacy hierarchy building
     if (legacyHierarchyBuilding && sdkType.discriminatorValue) {
@@ -1754,6 +1778,7 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
           currBaseModel.discriminatedSubtypes = {};
         }
         currBaseModel.discriminatedSubtypes[sdkType.discriminatorValue] = sdkType;
+        currBaseModel.discriminatorProperty = currBaseModel.properties.find((p) => p.discriminator);
         currBaseModel = currBaseModel.baseModel;
       }
 
@@ -1915,7 +1940,7 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   // update spread model
   updateSpreadModelUsageAndAccess(context);
   // update discriminated subtypes and filter out duplicate properties from `@hierarchyBuilding`
-  handleLegacyHierarchyBuilding(context);
+  diagnostics.pipe(handleLegacyHierarchyBuilding(context));
   // update generated name
   resolveConflictGeneratedName(context);
 

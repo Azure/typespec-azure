@@ -1255,32 +1255,7 @@ export function getLegacyHierarchyBuilding(context: TCGCContext, target: Model):
   // If legacy hierarchy building is not respected, ignore the decorator completely
   if (!context.enableLegacyHierarchyBuilding) return undefined;
 
-  const value = getScopedDecoratorData(context, legacyHierarchyBuildingKey, target);
-
-  // Validate no circular references
-  const visited = new Set<Model>();
-  visited.add(target);
-  let current: Model | undefined = value;
-  while (current) {
-    if (visited.has(current)) {
-      reportDiagnostic(context.program, {
-        code: "legacy-hierarchy-building-circular-reference",
-        target: target,
-      });
-      return;
-    }
-    visited.add(current);
-    const legacyHierarchyBuilding = current.decorators.filter(
-      (d) => d.decorator.name === "$hierarchyBuilding",
-    );
-    if (legacyHierarchyBuilding.length === 0) {
-      current = current.baseModel;
-    } else {
-      current = legacyHierarchyBuilding[0].args[0].value as Model;
-    }
-  }
-
-  return value;
+  return getScopedDecoratorData(context, legacyHierarchyBuildingKey, target);
 }
 
 /**

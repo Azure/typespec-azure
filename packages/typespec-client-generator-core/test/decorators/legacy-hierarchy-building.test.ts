@@ -53,7 +53,9 @@ it("three-level inheritance chain", async () => {
   // Verify discriminator property is correctly identified
   strictEqual(modelA.discriminatorProperty?.name, "kind");
   strictEqual(modelB.discriminatorValue, "B");
+  strictEqual(modelB.discriminatorProperty?.name, "kind");
   strictEqual(modelC.discriminatorValue, "C");
+  strictEqual(modelC.discriminatorProperty, undefined);
   strictEqual(modelA.discriminatorValue, undefined);
 
   // Verify properties are correctly inherited
@@ -133,8 +135,11 @@ it("four-level inheritance chain", async () => {
   // Verify discriminator property is correctly identified
   strictEqual(vehicleModel.discriminatorProperty?.name, "type");
   strictEqual(motorVehicleModel.discriminatorValue, "motor");
+  strictEqual(motorVehicleModel.discriminatorProperty?.name, "type");
   strictEqual(carModel.discriminatorValue, "car");
+  strictEqual(carModel.discriminatorProperty?.name, "type");
   strictEqual(sportsCarModel.discriminatorValue, "sports");
+  strictEqual(sportsCarModel.discriminatorProperty, undefined);
 
   // Verify properties are correctly inherited
   strictEqual(sportsCarModel.properties.length, 2);
@@ -213,7 +218,9 @@ it("nested property inheritance", async () => {
   // Verify discriminator property is correctly identified
   strictEqual(salmonModel.discriminatorProperty?.name, "kind");
   strictEqual(kingSalmonModel.discriminatorValue, "kingsalmon");
+  strictEqual(kingSalmonModel.discriminatorProperty?.name, "kind");
   strictEqual(smartKingSalmonModel.discriminatorValue, "smartkingsalmon");
+  strictEqual(smartKingSalmonModel.discriminatorProperty, undefined);
 
   // Verify properties are correctly inherited
   strictEqual(smartKingSalmonModel.properties.length, 1);
@@ -260,13 +267,34 @@ it("circular inheritance", async () => {
         propB: string;
       }
 
-      @usage(Usage.input)
       model C {
         propC: string;
       }
+    `);
 
-      @route("/test")
-      op test(): A;
+  expectDiagnostics(runner.context.diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-circular-reference",
+    message: "@hierarchyBuilding decorator causes recursive base type reference.",
+  });
+});
+
+it("another circular inheritance", async () => {
+  await runner.compile(`
+      @service
+      namespace TestService;
+
+      model A extends B {
+        propA: string;
+      }
+
+      model B extends C {
+        propB: string;
+      }
+
+      @Legacy.hierarchyBuilding(A)
+      model C {
+        propC: string;
+      }
     `);
 
   expectDiagnostics(runner.context.diagnostics, {
