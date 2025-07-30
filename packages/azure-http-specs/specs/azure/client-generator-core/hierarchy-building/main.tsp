@@ -13,12 +13,13 @@ namespace _Specs_.Azure.ClientGenerator.Core.HierarchyBuilding;
 @scenario
 @scenarioDoc("""
   This scenario tests the @hierarchyBuilding decorator with a three-level inheritance chain.
-  The inheritance structure is Animal -> Pet -> Dog, where Pet inherits from Animal using 
-  @hierarchyBuilding, and Dog inherits from Animal but is redirected to inherit from Pet
-  using @hierarchyBuilding.
+  The inheritance structure is Animal -> Pet -> Dog, where Dog inherits from Animal but
+  is redirected to inherit from Pet using @hierarchyBuilding(Pet).
   
   The test includes three interfaces: AnimalService, PetService, and DogService.
   Each interface has operations that accept and return models at different levels of the hierarchy.
+  This validates that the @hierarchyBuilding decorator correctly modifies inheritance relationships
+  for polymorphic HTTP API scenarios.
   """)
 namespace ThreeLevelInheritance {
   @discriminator("kind")
@@ -45,7 +46,7 @@ namespace ThreeLevelInheritance {
     breed: string;
   };
 
-  @Legacy.hierarchyBuilding(Pet)
+  @global.Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(Pet)
   model Dog extends Animal {
     kind: "dog";
     ...PetContent;
