@@ -123,17 +123,28 @@ public final class Food implements JsonSerializable<Food> {
 ```
 
 ```go
-package petstore
+# generated client.go
 
-type Client struct { 
-}
+type PetStoreClient struct {}
+
+func (client *PetStoreClient) Feed(ctx context.Context, feedRequest feedRequest, options *PetStoreClientFeedOptions) (PetStoreClientFeedResponse, error) {}
+
+# generated model.go
 
 type Food struct {
-	Name     string `json:"name"`
-	Quantity int32  `json:"quantity"`
+// REQUIRED
+	Name *string
+
+// REQUIRED
+	Quantity *int32
 }
 
-func (c *Client) Feed(ctx context.Context, food Food) (resp *http.Response, err error) 
+# generated option.go
+type PetStoreClientFeedOptions struct {}
+
+# generated response.go
+type PetStoreClientFeedResponse struct {}
+
 ```
 
 </ClientTabs>
@@ -210,12 +221,7 @@ public final class Food implements JsonSerializable<Food> {
 ```
 
 ```go
-package models
-
-type Food struct {
-	Name     string `json:"name"`
-	Quantity int32  `json:"quantity"`
-}
+// NOT_SUPPORTED
 
 ```
 
