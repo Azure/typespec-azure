@@ -1,7 +1,7 @@
+import { Tester } from "#test/test-host.js";
 import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { deepStrictEqual } from "assert";
 import { it } from "vitest";
-import { Tester } from "../../test/test-host.js";
 import { getLongRunningStates } from "./lro-status.js";
 
 it("emits diagnostic if used on wrong type", async () => {
