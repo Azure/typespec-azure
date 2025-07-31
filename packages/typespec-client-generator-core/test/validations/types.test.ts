@@ -122,7 +122,7 @@ it("duplicate operation with @clientLocation to existed clients", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
-        'Client name: "a" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        'Client name: "a" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
     },
   ]);
 });
@@ -158,7 +158,7 @@ it("duplicate operation with @clientLocation to existed clients with scope", asy
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
-        'Client name: "a" is defined somewhere causing nameing conflicts in language scope: "go"',
+        'Client name: "a" is defined somewhere causing naming conflicts in language scope: "go"',
     },
   ]);
 });
@@ -186,7 +186,7 @@ it("duplicate operation with @clientLocation to new clients", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
-        'Client name: "a" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        'Client name: "a" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
     },
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
@@ -218,7 +218,7 @@ it("duplicate operation warning for .NET", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
       message:
-        'Client name: "list" is defined somewhere causing nameing conflicts in language scope: "csharp"',
+        'Client name: "list" is defined somewhere causing naming conflicts in language scope: "csharp"',
     },
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
@@ -248,7 +248,7 @@ it("duplicate operation error for other languages", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
-        'Client name: "list" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        'Client name: "list" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
     },
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
