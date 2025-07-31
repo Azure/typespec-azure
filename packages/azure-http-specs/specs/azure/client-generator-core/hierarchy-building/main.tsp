@@ -50,6 +50,7 @@ model Dog extends Animal {
 }
 
 @scenario
+@route("/animal/pet")
 @scenarioDoc("""
   Test operation that accepts Animal input and returns Animal output.
   This operation expects Pet data and validates that Pet type works correctly with the @hierarchyBuilding decorator.
@@ -71,11 +72,11 @@ model Dog extends Animal {
   ```
   """)
 @doc("Update a pet")
-@route("/animal/pet")
 @put
 op updatePet(@body animal: Animal): Animal;
 
 @scenario
+@route("/animal/dog")
 @scenarioDoc("""
   Test operation that accepts Animal input and returns Animal output.
   This operation expects Dog data and validates the @hierarchyBuilding decorator when Dog is used.
@@ -100,6 +101,5 @@ op updatePet(@body animal: Animal): Animal;
   ```
   """)
 @doc("Update a dog")
-@route("/animal/dog")
 @put
 op updateDog(@body animal: Animal): Animal;
