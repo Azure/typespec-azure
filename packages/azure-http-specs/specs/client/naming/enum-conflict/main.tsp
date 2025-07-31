@@ -12,8 +12,8 @@ using Azure.ClientGenerator.Core;
 using Spector;
 
 @doc("Test for enum with same name in different namespace.")
-@scenarioService("/types/enum/name-conflict")
-namespace Types.Enum.NameConflict;
+@scenarioService("/client/naming/enum-conflict")
+namespace Client.Naming.EnumConflict;
 
 namespace FirstNamespace {
   @doc("Status enum in first namespace")
