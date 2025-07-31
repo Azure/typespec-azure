@@ -404,6 +404,18 @@ export const $lib = createTypeSpecLibrary({
           "`@clientLocation`'s target should not duplicate with defined namespace or interface under `@service` namespace.",
       },
     },
+    "legacy-hierarchy-building-conflict": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@hierarchyBuilding decorator causes conflicts in inherited properties. Please check that the model ${"childModel"} has the same properties as ${"parentModel"} in the spec.`,
+      },
+    },
+    "legacy-hierarchy-building-circular-reference": {
+      severity: "error",
+      messages: {
+        default: "@hierarchyBuilding decorator causes recursive base type reference.",
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,
