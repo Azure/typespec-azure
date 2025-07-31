@@ -253,7 +253,14 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: paramMessage`Client name: "${"name"}" is duplicated in language scope: "${"scope"}"`,
-        nonDecorator: paramMessage`Client name: "${"name"}" is defined somewhere causing nameing conflicts in language scope: "${"scope"}"`,
+        nonDecorator: paramMessage`Client name: "${"name"}" is defined somewhere causing naming conflicts in language scope: "${"scope"}"`,
+      },
+    },
+    "duplicate-client-name-warning": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Client name: "${"name"}" is duplicated in language scope: "${"scope"}"`,
+        nonDecorator: paramMessage`Client name: "${"name"}" is defined somewhere causing naming conflicts in language scope: "${"scope"}"`,
       },
     },
     "example-loading": {
@@ -303,7 +310,7 @@ export const $lib = createTypeSpecLibrary({
     "unexpected-pageable-operation-return-type": {
       severity: "error",
       messages: {
-        default: `Operation is pageable but does not return a correct type.`,
+        default: `The response object for the pageable operation is either not a paging model, or is not correctly decorated with @nextLink and @items.`,
       },
     },
     "invalid-alternate-type": {
@@ -405,6 +412,18 @@ export const $lib = createTypeSpecLibrary({
       messages: {
         default:
           "`@clientLocation`'s target should not duplicate with defined namespace or interface under `@service` namespace.",
+      },
+    },
+    "legacy-hierarchy-building-conflict": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@hierarchyBuilding decorator causes conflicts in inherited properties. Please check that the model ${"childModel"} has the same properties as ${"parentModel"} in the spec.`,
+      },
+    },
+    "legacy-hierarchy-building-circular-reference": {
+      severity: "error",
+      messages: {
+        default: "@hierarchyBuilding decorator causes recursive base type reference.",
       },
     },
   },

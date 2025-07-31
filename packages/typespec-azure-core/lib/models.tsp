@@ -11,12 +11,11 @@ namespace Azure.Core;
  * Describes a page of resource object.
  * @template Resource The resource type.
  */
-@pagedResult
 @friendlyName("Paged{name}", Resource)
 @doc("Paged collection of {name} items", Resource)
 model Page<Resource extends TypeSpec.Reflection.Model> {
   @doc("The {name} items on this page", Resource)
-  @items
+  @pageItems
   value: Resource[];
 
   @doc("The link to the next page of items")

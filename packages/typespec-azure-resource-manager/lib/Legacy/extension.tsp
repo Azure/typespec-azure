@@ -250,6 +250,7 @@ interface ExtensionOperations<
   @armOperationRoute(OperationOptions)
   @doc("List a {name}", Resource)
   @get
+  @list
   @listsResource(Resource)
   @armResourceList(Resource)
   List<

@@ -1822,7 +1822,7 @@ op Azure.ResourceManager.Legacy.LegacyOperations.CheckExistence(): Response | Ov
 List a resource
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.List(): Response | ErrorType
+op Azure.ResourceManager.Legacy.LegacyOperations.List(): Response | OverrideErrorType
 ```
 
 #### `LegacyOperations.ActionSync` {#Azure.ResourceManager.Legacy.LegacyOperations.ActionSync}
@@ -2039,7 +2039,7 @@ op Azure.ResourceManager.Legacy.RoutedOperations.CheckExistence(): Response | Ov
 List a resource
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations.List(): Response | ErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations.List(): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2093,6 +2093,63 @@ op Azure.ResourceManager.Legacy.RoutedOperations.ActionAsync(body: Request): Res
 | OptionalRequestBody  | Optional. Indicates whether the request body is optional                  |
 | OverrideErrorType    | Optional. The error response, if non-standard.                            |
 | OverrideRouteOptions | Optional. The route options for the operation.                            |
+
+### `CreateOperation` {#Azure.ResourceManager.Legacy.CreateOperation}
+
+```typespec
+op Azure.ResourceManager.Legacy.CreateOperation(resource: BodyParameter): Response | ErrorResponse
+```
+
+#### Template Parameters
+
+| Name                | Description                                     |
+| ------------------- | ----------------------------------------------- |
+| HttpParameters      | The parameter object for the operation.         |
+| BodyParameter       | The body parameter                              |
+| Response            | The response or union of responses for success. |
+| ErrorResponse       | The error response.                             |
+| OptionalRequestBody |                                                 |
+
+### `CreateOrUpdateAsync` {#Azure.ResourceManager.Legacy.CreateOrUpdateAsync}
+
+A long-running resource CreateOrUpdate (PUT)
+
+```typespec
+op Azure.ResourceManager.Legacy.CreateOrUpdateAsync(provider: "Microsoft.ThisWillBeReplaced", resource: Request): Response | Error
+```
+
+#### Template Parameters
+
+| Name                | Description                                                             |
+| ------------------- | ----------------------------------------------------------------------- |
+| Resource            | the resource being created or updated                                   |
+| Request             | The request body for the operation                                      |
+| BaseParameters      | Optional. Allows overriding the operation parameters                    |
+| LroHeaders          | Optional. Allows overriding the lro headers returned on resource create |
+| Parameters          | Optional. Additional parameters after the path parameters               |
+| Response            | Optional. The success response for the createOrUpdate operation         |
+| Error               | Optional. The error response, if non-standard.                          |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional                |
+
+### `CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.CreateOrUpdateSync}
+
+Synchronous PUT operation for Azure Resource Manager resources
+
+```typespec
+op Azure.ResourceManager.Legacy.CreateOrUpdateSync(provider: "Microsoft.ThisWillBeReplaced", resource: Request): Response | Error
+```
+
+#### Template Parameters
+
+| Name                | Description                                                     |
+| ------------------- | --------------------------------------------------------------- |
+| Resource            | the resource being created or replaced                          |
+| Request             | The request body for the operation                              |
+| BaseParameters      | Optional. Allows overriding the operation parameters            |
+| Parameters          | Optional. Additional parameters after the path parameters       |
+| Response            | Optional. The success response for the createOrUpdate operation |
+| Error               | Optional. The error response, if non-standard.                  |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional        |
 
 ### `CustomPatchAsync` {#Azure.ResourceManager.Legacy.CustomPatchAsync}
 

@@ -1,4 +1,3 @@
-// @ts-check
 import pc from "picocolors";
 import { parseArgs } from "util";
 import { runOrExit } from "../../core/packages/internal-build-utils/dist/src/common.js";

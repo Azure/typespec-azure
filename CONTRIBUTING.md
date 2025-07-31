@@ -13,21 +13,19 @@ recommended to test a private of the change before merging.
 
 1. Create a fork of https://github.com/azure/azure-rest-api-specs
    (if you don't already have one)
-2. Create a branch from `main` you will use to create the test PR
-3. Find the URL of the private build of your test package(s)
-   1. Browse to your PR in repo `microsoft/typespec` or `azure/typespec-azure`
-   2. Select the "Checks" tab, the "Verify PR" pipeline, then click "View more
-      details on Azure Pipelines"
-   3. Click the link "# published" which shows the artifacts published by the
-      build
-   4. Expand "packages", find the package you need to test, click the three
-      vertical dots on the selected line, then "Copy download URL".
+2. Create a branch from `typespec-next`(Or `main` if that change is a hotfix) you will use to create the test PR
+3. A comment from the `pkg-pr-new` bot will include a URL to the preview build of each package. The URL follows this format:
+
+   ```http
+   https://pkg.pr.new/Azure/typespec-azure/<pkg-name>@<pr-number>
+   ```
+
 4. In your branch of `azure-rest-api-specs`, edit the root `package.json`, and
-   replace the version with the URL to your private build, for example:
+   replace the version with the URL to your private build(for both `dependencies` and `overrides`), for example:
 
    ```diff
-   - "@azure-tools/typespec-autorest": "0.36.0",
-   + "@azure-tools/typespec-autorest": "https://.../package.tgz"
+   - "@azure-tools/typespec-autorest": "next",
+   + "@azure-tools/typespec-autorest": "https://pkg.pr.new/Azure/typespec-azure/@azure-tools/typespec-azure-core@<pr-number>"
    ```
 
 5. Also edit `.github/actions/setup-node-npm-ci/action.yaml`, to force install
@@ -221,19 +219,16 @@ Do the following to publish a new release:
    main branch (both typespec-azure and core should point to main).
 
 4. Generate release notes for TypeSpec once the full list of changes are in.
-
    1. In your fork of the core (typespec) repo, run `npx chronus changelog --policy typespec > out.md`.
    2. Create a new entry in `./core/website/src/content/docs/docs/release-notes` for this release and paste the contents of `out.md` into the new file. Reorganize the file to have the following sections in order: _Breaking Changes_, _Deprecations_, _Features_, and _Bug Fixes_. Skip the section if there are no entries in it. Also add a blurb above these sections for any especially notable updates.
       Example PR: https://github.com/microsoft/typespec/pull/4102
 
 5. Generate release notes for TypeSpec Azure once the full list of changes are in.
-
    1. In your fork of the typespec-azure repo, run `npx chronus changelog --policy typespec-azure > out.md`.
    2. Create a new entry in `./website/src/content/docs/docs/release-notes` for this release and paste the contents of `out.md` into the new file. Reorganize the file to have the following sections in order: _Breaking Changes_, _Deprecations_, _Features_, and _Bug Fixes_. Skip the section if there are no entries in it. Also add a blurb above these sections for any especially notable updates.
       Example PR: https://github.com/Azure/typespec-azure/pull/1306
 
 6. Once all PRs are merged, update TypeSpec-Azure core submodule (things will run more smoothly if TypeSpec-Azure core points to HEAD of TypeSpec).
-
    1. Can [trigger](https://github.com/Azure/typespec-azure/network/updates/18647270/jobs) dependabot via `Insights > Dependency graph > Dependabot`.
 
 7. Double-check that typespec-azure and core submodules are both up to date with `upstream/main`.
@@ -241,7 +236,6 @@ Do the following to publish a new release:
 8. Regenerate documentation via `pnpm regen-docs` in TypeSpec-Azure.
 
 9. Run `pnpm prepare-publish` in TypeSpec-Azure repo to stage the publishing changes.
-
    - This creates `publish/xxxxxx` branches for TypeSpec-Azure and TypeSpec repos.
    - If it works you'll get a message like this: `Success! Push publish/kvd01q9v branches and send PRs.`
 

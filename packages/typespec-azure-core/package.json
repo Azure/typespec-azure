@@ -30,6 +30,9 @@
       "default": "./dist/src/testing/index.js"
     }
   },
+  "imports": {
+    "#test/*": "./test/*"
+  },
   "type": "module",
   "engines": {
     "node": ">=20.0.0"
@@ -59,7 +62,7 @@
     "@typespec/rest": "workspace:^"
   },
   "devDependencies": {
-    "@types/node": "~24.0.3",
+    "@types/node": "~24.1.0",
     "@typespec/compiler": "workspace:^",
     "@typespec/http": "workspace:^",
     "@typespec/library-linter": "workspace:^",

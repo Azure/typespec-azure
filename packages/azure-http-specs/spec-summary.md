@@ -180,6 +180,61 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_HierarchyBuilding_updateDog
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/animal/dog`
+
+Test operation that accepts Animal input and returns Animal output.
+This operation expects Dog data and validates the @hierarchyBuilding decorator when Dog is used.
+Due to @hierarchyBuilding(Pet), Dog should inherit from Pet rather than Animal directly.
+Expected request body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+### Azure_ClientGenerator_Core_HierarchyBuilding_updatePet
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/animal/pet`
+
+Test operation that accepts Animal input and returns Animal output.
+This operation expects Pet data and validates that Pet type works correctly with the @hierarchyBuilding decorator.
+Expected request body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy",
+  "trained": true
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy",
+  "trained": true
+}
+```
+
 ### Azure_ClientGenerator_Core_Override_GroupParameters_group
 
 - Endpoint: `get /azure/client-generator-core/override/group`
@@ -242,18 +297,15 @@ client.withBody({ name: "test-name" });  // No need to pass name here
 ### Azure_ClientGeneratorCore_ClientInitialization_MixedParams
 
 - Endpoints:
-
   - `get /azure/client-generator-core/client-initialization/mixed-params/with-query`
   - `get /azure/client-generator-core/client-initialization/mixed-params/with-body`
 
   Client for testing a mix of client-level and method-level parameters.
 
   Parameters elevated to client level:
-
   - name: "test-name-value" (header parameter)
 
   Parameters remaining at method level:
-
   - region: "us-west" (query parameter)
 
   Expected client usage:
@@ -868,12 +920,10 @@ This scenario is to test two operations with two different page item types.
   parameters are maintained in next link URLs.
 
   Expected query parameters on initial request:
-
   - includePending=true
   - select=name
 
   Expected query parameters on next link request. Note: the SDK will need to re-inject this parameter:
-
   - includePending=true (note: the client will need to manually re-inject this parameter into the next link)
   - select=name (note: this is returned in the next link, the client does NOT need to manually re-inject this parameter)
 

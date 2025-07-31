@@ -275,8 +275,9 @@ interface RoutedOperations<
    */
   @doc("List a {name}", Resource)
   @get
+  @list
   @listsResource(Resource)
-  @segmentOf(Resource)
+  @segmentOf(ResourceTypeParameter)
   @armOperationRoute(OverrideRouteOptions)
   @armResourceList(Resource)
   @Private.armUpdateProviderNamespace
@@ -286,7 +287,7 @@ interface RoutedOperations<
     Response extends {} = ArmResponse<ResourceListResult<Resource>>,
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute
-  >(...ParentParameters, ...Parameters): Response | ErrorType;
+  >(...ParentParameters, ...Parameters): Response | OverrideErrorType;
 
   /**
    * A synchronous resource action.
@@ -402,10 +403,10 @@ model ProviderParameter<Resource extends {}> {
 @doc("Update a {name}", Resource)
 @armResourceUpdate(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@patch(#{ implicitOptionality: true })
+@patch(#{ implicitOptionality: false })
 op CustomPatchAsync<
   Resource extends Foundations.SimpleResource,
-  PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
+  PatchModel extends TypeSpec.Reflection.Model | void = TagsUpdateModel<Resource>,
   BaseParameters = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
@@ -442,10 +443,10 @@ op CustomPatchAsync<
 @doc("Update a {name}", Resource)
 @armResourceUpdate(Resource)
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@patch(#{ implicitOptionality: true })
+@patch(#{ implicitOptionality: false })
 op CustomPatchSync<
   Resource extends Foundations.SimpleResource,
-  PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
+  PatchModel extends TypeSpec.Reflection.Model | void = TagsUpdateModel<Resource>,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<Resource>,
@@ -460,6 +461,96 @@ op CustomPatchSync<
 >;
 
 /**
+ * A long-running resource CreateOrUpdate (PUT)
+ * @template Resource the resource being created or updated
+ * @template Request The request body for the operation
+ * @template BaseParameters Optional. Allows overriding the operation parameters
+ * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
+ * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Response Optional. The success response for the createOrUpdate operation
+ * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the request body is optional
+ */
+@autoRoute
+@doc("Create a {name}", Resource)
+@armResourceCreateOrUpdate(Resource)
+@Private.enforceConstraint(Resource, Foundations.Resource)
+@Azure.Core.Foundations.Private.defaultFinalStateVia(#["location", "azure-async-operation"])
+@put
+op CreateOrUpdateAsync<
+  Resource extends Foundations.SimpleResource,
+  Request extends {} | void = Resource,
+  BaseParameters = DefaultBaseParameters<Resource>,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
+    Azure.Core.Foundations.RetryAfterHeader,
+  Parameters extends {} = {},
+  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
+    Resource,
+    LroHeaders
+  >,
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false
+> is CreateOperation<
+  ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
+  Request,
+  Response,
+  Error,
+  OptionalRequestBody
+>;
+
+/**
+ * Synchronous PUT operation for Azure Resource Manager resources
+ * @template Resource the resource being created or replaced
+ * @template Request The request body for the operation
+ * @template BaseParameters Optional. Allows overriding the operation parameters
+ * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Response Optional. The success response for the createOrUpdate operation
+ * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the request body is optional
+ */
+@autoRoute
+@doc("Create a {name}", Resource)
+@armResourceCreateOrUpdate(Resource)
+@Private.enforceConstraint(Resource, Foundations.Resource)
+@put
+op CreateOrUpdateSync<
+  Resource extends Foundations.SimpleResource,
+  Request extends {} | void = Resource,
+  BaseParameters = DefaultBaseParameters<Resource>,
+  Parameters extends {} = {},
+  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false
+> is CreateOperation<
+  ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
+  Request,
+  Response,
+  Error,
+  OptionalRequestBody
+>;
+
+/**
+ * @dev The base template for Azure Resource Manager PUT Operations.
+ * @template HttpParameters The parameter object for the operation.
+ * @template BodyParameter The body parameter
+ * @template Response The response or union of responses for success.
+ * @template ErrorResponse The error response.
+ */
+op CreateOperation<
+  HttpParameters extends {},
+  BodyParameter extends {} | void,
+  Response extends {},
+  ErrorResponse extends {},
+  OptionalRequestBody extends valueof boolean = false
+>(
+  ...HttpParameters,
+
+  @doc("Resource create parameters.")
+  @armBodyRoot(OptionalRequestBody)
+  resource: BodyParameter,
+): Response | ErrorResponse;
+
+/**
  * @dev The base template for Legacy Azure Resource Manager PATCH Operations.
  * @template HttpParameters The parameter object for the operation.
  * @template BodyParameter The body parameter
@@ -469,7 +560,7 @@ op CustomPatchSync<
  */
 op UpdateOperation<
   HttpParameters extends {},
-  BodyParameter extends {},
+  BodyParameter extends {} | void,
   Response extends {},
   ErrorResponse extends {},
   OptionalRequestBody extends valueof boolean = false
