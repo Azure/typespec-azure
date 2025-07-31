@@ -5,7 +5,7 @@ import "./main.tsp";
 
 using Http;
 using Azure.ClientGenerator.Core;
-using Client.EnumNameConflict;
+using Types.Enum.NameConflict;
 using Spector;
 
 namespace Customizations;

@@ -2,8 +2,8 @@ import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
-Scenarios.Client_EnumNameConflict_FirstOperations_first = passOnSuccess({
-  uri: "/client/enum-name-conflict/first",
+Scenarios.Types_Enum_NameConflict_FirstOperations_first = passOnSuccess({
+  uri: "/types/enum/name-conflict/first",
   method: "post",
   request: {
     body: json({ status: "active", name: "test" }),
@@ -15,8 +15,8 @@ Scenarios.Client_EnumNameConflict_FirstOperations_first = passOnSuccess({
   kind: "MockApiDefinition",
 });
 
-Scenarios.Client_EnumNameConflict_SecondOperations_second = passOnSuccess({
-  uri: "/client/enum-name-conflict/second",
+Scenarios.Types_Enum_NameConflict_SecondOperations_second = passOnSuccess({
+  uri: "/types/enum/name-conflict/second",
   method: "post",
   request: {
     body: json({ status: "running", description: "test description" }),
