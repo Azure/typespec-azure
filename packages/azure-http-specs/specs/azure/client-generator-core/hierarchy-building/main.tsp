@@ -9,7 +9,7 @@ using Azure.ClientGenerator.Core;
 @doc("Test for @hierarchyBuilding decorator.")
 @scenarioService("/azure/client-generator-core/hierarchy-building")
 @global.Azure.ClientGenerator.Core.clientNamespace("specs.azure.clientgenerator.core.hierarchybuilding", "python")
-@global.Azure.ClientGenerator.Core.clientNamespace("azure.core.hierarchybuilding", "java")
+@global.Azure.ClientGenerator.Core.clientNamespace("azure.clientgenerator.core.hierarchybuilding", "java")
 namespace _Specs_.Azure.ClientGenerator.Core.HierarchyBuilding;
 
 @discriminator("kind")
