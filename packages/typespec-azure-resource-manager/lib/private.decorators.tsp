@@ -111,3 +111,29 @@ extern dec armResourcePropertiesOptionality(target: ModelProperty, isOptional: v
 
 /** designates a parameter as an explicit bodyRoot and sets the optionality of the parameter */
 extern dec armBodyRoot(target: ModelProperty, isOptional: valueof boolean);
+
+/** Specifies position and name for template parameters */
+model TemplateParameterInfo {
+  name: string;
+  position: uint32;
+}
+
+/** specifies position and name for the parameters of the ResourceName templates */
+model ResourceNameTemplateParameterInfo {
+  modelType?: TemplateParameterInfo;
+  keyName?: TemplateParameterInfo;
+  segmentName?: TemplateParameterInfo;
+  namePattern?: TemplateParameterInfo;
+  parameterType?: TemplateParameterInfo;
+}
+
+/**
+ * This decorator is specific to the templates that fo
+ *
+ * @param target The model, interface, or operation to which the constraint applies.
+ * @param parameters The parameters that define the resource name template.
+ */
+extern dec applyResourceNameConstraints(
+  target: Model,
+  parameters: valueof ResourceNameTemplateParameterInfo
+);

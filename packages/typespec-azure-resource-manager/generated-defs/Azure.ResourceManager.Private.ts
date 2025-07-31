@@ -1,5 +1,18 @@
 import type { DecoratorContext, Model, ModelProperty, Operation, Type } from "@typespec/compiler";
 
+export interface ResourceNameTemplateParameterInfo {
+  readonly modelType?: TemplateParameterInfo;
+  readonly keyName?: TemplateParameterInfo;
+  readonly segmentName?: TemplateParameterInfo;
+  readonly namePattern?: TemplateParameterInfo;
+  readonly parameterType?: TemplateParameterInfo;
+}
+
+export interface TemplateParameterInfo {
+  readonly name: string;
+  readonly position: number;
+}
+
 /**
  *
  *
@@ -174,6 +187,18 @@ export type ArmBodyRootDecorator = (
   isOptional: boolean,
 ) => void;
 
+/**
+ * This decorator is specific to the templates that fo
+ *
+ * @param target The model, interface, or operation to which the constraint applies.
+ * @param parameters The parameters that define the resource name template.
+ */
+export type ApplyResourceNameConstraintsDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  parameters: ResourceNameTemplateParameterInfo,
+) => void;
+
 export type AzureResourceManagerPrivateDecorators = {
   resourceParameterBaseFor: ResourceParameterBaseForDecorator;
   resourceBaseParametersOf: ResourceBaseParametersOfDecorator;
@@ -189,4 +214,5 @@ export type AzureResourceManagerPrivateDecorators = {
   armRenameListByOperation: ArmRenameListByOperationDecorator;
   armResourcePropertiesOptionality: ArmResourcePropertiesOptionalityDecorator;
   armBodyRoot: ArmBodyRootDecorator;
+  applyResourceNameConstraints: ApplyResourceNameConstraintsDecorator;
 };

@@ -30,11 +30,7 @@ describe("typespec-azure-resource-manager: resource name rule", () => {
           namespace Microsoft.Foo;
   
           model FooResource is TrackedResource<{}> {
-            @doc("The name of the all properties resource.")
-            @key("foo")
-            @path
-            @segment("foo")
-            name: string;
+            ...ResourceNamePattern<FooResource, "foo", "foo">;
           }
       `,
         )
