@@ -231,7 +231,7 @@ it("duplicate model client name with a random language scope", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
-        'Client name: "Test" is defined somewhere causing nameing conflicts in language scope: "random"',
+        'Client name: "Test" is defined somewhere causing naming conflicts in language scope: "random"',
     },
   ]);
 });
@@ -258,7 +258,7 @@ it("duplicate model, enum, union client name with all language scopes", async ()
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
-        'Client name: "B" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        'Client name: "B" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
     },
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
@@ -294,7 +294,7 @@ it("duplicate operation with all language scopes", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
-        'Client name: "b" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        'Client name: "b" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
     },
   ]);
 });
@@ -324,7 +324,7 @@ it("duplicate operation in interface with all language scopes", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
-        'Client name: "b" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        'Client name: "b" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
     },
   ]);
 });
@@ -350,7 +350,7 @@ it("duplicate scalar with all language scopes", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
-        'Client name: "b" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        'Client name: "b" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
     },
   ]);
 });
@@ -380,7 +380,7 @@ it("duplicate interface with all language scopes", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
-        'Client name: "B" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        'Client name: "B" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
     },
   ]);
 });
@@ -407,7 +407,7 @@ it("duplicate model property with all language scopes", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
-        'Client name: "prop2" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        'Client name: "prop2" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
     },
   ]);
 });
@@ -434,7 +434,7 @@ it("duplicate enum member with all language scopes", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
-        'Client name: "two" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        'Client name: "two" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
     },
   ]);
 });
@@ -461,7 +461,7 @@ it("duplicate union variant with all language scopes", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
-        'Client name: "b" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        'Client name: "b" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
     },
   ]);
 });
@@ -482,7 +482,7 @@ it("duplicate namespace with all language scopes", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
-        'Client name: "B" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        'Client name: "B" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
     },
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
@@ -515,7 +515,7 @@ it("duplicate enum and model within nested namespace for all language scopes", a
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
-        'Client name: "B" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        'Client name: "B" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
     },
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
@@ -538,7 +538,7 @@ it("duplicate model with model only generation for all language scopes", async (
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
-        'Client name: "Foo" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        'Client name: "Foo" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
     },
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
@@ -574,7 +574,7 @@ it("duplicate model client name with multiple language scopes", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
-        'Client name: "Test" is defined somewhere causing nameing conflicts in language scope: "csharp"',
+        'Client name: "Test" is defined somewhere causing naming conflicts in language scope: "csharp"',
     },
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
@@ -583,7 +583,7 @@ it("duplicate model client name with multiple language scopes", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
-        'Client name: "Test" is defined somewhere causing nameing conflicts in language scope: "python"',
+        'Client name: "Test" is defined somewhere causing naming conflicts in language scope: "python"',
     },
   ]);
 });
