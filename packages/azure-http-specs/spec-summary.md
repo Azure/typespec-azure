@@ -180,6 +180,61 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_HierarchyBuilding_updateDog
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/animal/dog`
+
+Test operation that accepts Animal input and returns Animal output.
+This operation expects Dog data and validates the @hierarchyBuilding decorator when Dog is used.
+Due to @hierarchyBuilding(Pet), Dog should inherit from Pet rather than Animal directly.
+Expected request body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+### Azure_ClientGenerator_Core_HierarchyBuilding_updatePet
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/animal/pet`
+
+Test operation that accepts Animal input and returns Animal output.
+This operation expects Pet data and validates that Pet type works correctly with the @hierarchyBuilding decorator.
+Expected request body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy",
+  "trained": true
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy",
+  "trained": true
+}
+```
+
 ### Azure_ClientGenerator_Core_Override_GroupParameters_group
 
 - Endpoint: `get /azure/client-generator-core/override/group`
