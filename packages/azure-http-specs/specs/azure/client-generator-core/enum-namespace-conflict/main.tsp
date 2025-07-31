@@ -73,8 +73,9 @@ namespace SecondNamespace {
 interface FirstOperations {
   @scenario
   @scenarioDoc("""
-    Test enum with same name in different namespace.
-    This should demonstrate the conflict that can occur when both enums are named 'Status'.
+    Test enum with same name in different namespace - first namespace.
+    This demonstrates the conflict when both FirstNamespace.Status and SecondNamespace.Status 
+    exist without renaming. SDK generators may fail to distinguish between them.
     Expected request body:
     ```json
     {"status": "active", "name": "test"}
@@ -94,8 +95,9 @@ interface FirstOperations {
 interface SecondOperations {
   @scenario
   @scenarioDoc("""
-    Test enum with same name in different namespace.
-    This should demonstrate the conflict that can occur when both enums are named 'Status'.
+    Test enum with same name in different namespace - second namespace.
+    This demonstrates the conflict when both FirstNamespace.Status and SecondNamespace.Status 
+    exist without renaming. The client.tsp file resolves this by renaming SecondNamespace.Status to SecondStatus.
     Expected request body:
     ```json
     {"status": "running", "description": "test description"}

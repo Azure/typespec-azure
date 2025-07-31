@@ -10,7 +10,9 @@ using Spector;
 
 namespace Customizations;
 
-// Rename the second namespace's Status enum to avoid conflicts with the first namespace's Status enum
+// Resolve enum naming conflict: Rename SecondNamespace.Status to SecondStatus
+// This prevents SDK generation issues when both FirstNamespace.Status and SecondNamespace.Status
+// would otherwise generate with the same name, causing conflicts in generated code
 @@clientName(SecondNamespace.Status, "SecondStatus");
 
 // Set client namespace for better organization
