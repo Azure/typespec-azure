@@ -12,23 +12,23 @@ using Azure.ClientGenerator.Core;
 using Spector;
 
 @doc("Test for enum with same name in different namespace.")
-@scenarioService("/azure/client-generator-core/enum-name-conflict")
-namespace _Specs_.Azure.ClientGenerator.Core.EnumNameConflict;
+@scenarioService("/client/enum-name-conflict")
+namespace Client.EnumNameConflict;
 
 namespace FirstNamespace {
   @doc("Status enum in first namespace")
   enum Status {
     @doc("Active status")
     Active: "active",
-    
-    @doc("Inactive status") 
+
+    @doc("Inactive status")
     Inactive: "inactive",
   }
 
   model FirstModel {
     @doc("Status from first namespace")
     status: Status;
-    
+
     @doc("Name of the item")
     name: string;
   }
@@ -39,7 +39,7 @@ namespace SecondNamespace {
   enum Status {
     @doc("Running status")
     Running: "running",
-    
+
     @doc("Stopped status")
     Stopped: "stopped",
   }
@@ -47,7 +47,7 @@ namespace SecondNamespace {
   model SecondModel {
     @doc("Status from second namespace")
     status: Status;
-    
+
     @doc("Description of the item")
     description: string;
   }
@@ -59,8 +59,6 @@ interface FirstOperations {
   @scenario
   @scenarioDoc("""
     Test enum with same name in different namespace - first namespace.
-    This demonstrates the conflict when both FirstNamespace.Status and SecondNamespace.Status 
-    exist without renaming. SDK generators may fail to distinguish between them.
     Expected request body:
     ```json
     {"status": "active", "name": "test"}
@@ -68,21 +66,15 @@ interface FirstOperations {
     """)
   @post
   @doc("Operation using first namespace Status enum")
-  op first(@header contentType: "application/json", @body body: FirstNamespace.FirstModel): {
-    @statusCode _: 200;
-    @header contentType: "application/json";
-    @body body: FirstNamespace.FirstModel;
-  };
+  first(@body body: FirstNamespace.FirstModel): FirstNamespace.FirstModel;
 }
 
-@operationGroup  
+@operationGroup
 @route("/second")
 interface SecondOperations {
   @scenario
   @scenarioDoc("""
     Test enum with same name in different namespace - second namespace.
-    This demonstrates the conflict when both FirstNamespace.Status and SecondNamespace.Status 
-    exist without renaming. The client.tsp file resolves this by renaming SecondNamespace.Status to SecondStatus.
     Expected request body:
     ```json
     {"status": "running", "description": "test description"}
@@ -90,9 +82,5 @@ interface SecondOperations {
     """)
   @post
   @doc("Operation using second namespace Status enum")
-  op second(@header contentType: "application/json", @body body: SecondNamespace.SecondModel): {
-    @statusCode _: 200;
-    @header contentType: "application/json";
-    @body body: SecondNamespace.SecondModel;
-  };
+  second(@body body: SecondNamespace.SecondModel): SecondNamespace.SecondModel;
 }
