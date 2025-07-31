@@ -16,7 +16,7 @@ const sampleDog = {
   breed: "German Shepherd"
 };
 
-Scenarios.Azure_ClientGenerator_Core_HierarchyBuilding = passOnSuccess([
+Scenarios.Azure_ClientGenerator_Core_HierarchyBuilding_HierarchyBuildingOperations = passOnSuccess([
   {
     uri: "/azure/client-generator-core/hierarchy-building/animal/pet",
     method: "put",
