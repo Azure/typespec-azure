@@ -256,6 +256,13 @@ export const $lib = createTypeSpecLibrary({
         nonDecorator: paramMessage`Client name: "${"name"}" is defined somewhere causing nameing conflicts in language scope: "${"scope"}"`,
       },
     },
+    "duplicate-client-name-warning": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Client name: "${"name"}" is duplicated in language scope: "${"scope"}"`,
+        nonDecorator: paramMessage`Client name: "${"name"}" is defined somewhere causing nameing conflicts in language scope: "${"scope"}"`,
+      },
+    },
     "example-loading": {
       severity: "warning",
       messages: {
