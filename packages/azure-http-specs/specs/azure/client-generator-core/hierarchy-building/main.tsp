@@ -46,6 +46,20 @@ interface AnimalOperations {
   @scenarioDoc("""
     Test operation that accepts Animal input and returns Animal output.
     This validates basic polymorphic behavior in the inheritance hierarchy.
+    Expected request body:
+    ```json
+    {
+      "kind": "animal",
+      "name": "Generic Animal"
+    }
+    ```
+    Expected response body:
+    ```json
+    {
+      "kind": "animal",
+      "name": "Generic Animal"
+    }
+    ```
     """)
   @doc("Update an animal as animal")
   @route("/animal/animal")
@@ -56,6 +70,21 @@ interface AnimalOperations {
   @scenarioDoc("""
     Test operation that accepts Pet input and returns Animal output.
     This validates that a derived type can be passed where base type is expected.
+    Expected request body:
+    ```json
+    {
+      "kind": "pet",
+      "name": "Buddy",
+      "trained": true
+    }
+    ```
+    Expected response body:
+    ```json
+    {
+      "kind": "pet",
+      "name": "Buddy"
+    }
+    ```
     """)
   @doc("Update a pet as animal")
   @route("/animal/pet")
@@ -67,6 +96,22 @@ interface AnimalOperations {
     Test operation that accepts Dog input and returns Animal output.
     This validates the @hierarchyBuilding decorator when Dog is used as Animal.
     Due to @hierarchyBuilding(Pet), Dog should inherit from Pet rather than Animal directly.
+    Expected request body:
+    ```json
+    {
+      "kind": "dog",
+      "name": "Rex",
+      "trained": true,
+      "breed": "German Shepherd"
+    }
+    ```
+    Expected response body:
+    ```json
+    {
+      "kind": "dog",
+      "name": "Rex"
+    }
+    ```
     """)
   @doc("Update a dog as animal")
   @route("/animal/dog")
@@ -79,6 +124,22 @@ interface PetOperations {
   @scenarioDoc("""
     Test operation that accepts Pet input and returns Pet output.
     This validates that Pet type works correctly in the inheritance hierarchy.
+    Expected request body:
+    ```json
+    {
+      "kind": "pet",
+      "name": "Buddy",
+      "trained": true
+    }
+    ```
+    Expected response body:
+    ```json
+    {
+      "kind": "pet",
+      "name": "Buddy",
+      "trained": true
+    }
+    ```
     """)
   @doc("Update a pet as pet")
   @route("/pet/pet")
@@ -90,6 +151,23 @@ interface PetOperations {
     Test operation that accepts Dog input and returns Pet output.
     This validates the @hierarchyBuilding decorator when Dog is used as Pet.
     Due to @hierarchyBuilding(Pet), Dog should be compatible with Pet operations.
+    Expected request body:
+    ```json
+    {
+      "kind": "dog",
+      "name": "Rex",
+      "trained": true,
+      "breed": "German Shepherd"
+    }
+    ```
+    Expected response body:
+    ```json
+    {
+      "kind": "dog",
+      "name": "Rex",
+      "trained": true
+    }
+    ```
     """)
   @doc("Update a dog as pet")
   @route("/pet/dog")
@@ -103,6 +181,24 @@ interface DogOperations {
     Test operation that accepts Dog input and returns Dog output.
     This validates that Dog type works correctly with the @hierarchyBuilding decorator.
     The Dog model uses @hierarchyBuilding(Pet) to redirect its inheritance from Animal to Pet.
+    Expected request body:
+    ```json
+    {
+      "kind": "dog",
+      "name": "Rex",
+      "trained": true,
+      "breed": "German Shepherd"
+    }
+    ```
+    Expected response body:
+    ```json
+    {
+      "kind": "dog",
+      "name": "Rex",
+      "trained": true,
+      "breed": "German Shepherd"
+    }
+    ```
     """)
   @doc("Update a dog as dog")
   @route("/dog/dog")
