@@ -2,8 +2,8 @@ import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
-Scenarios.Azure_ClientGenerator_Core_EnumNamespaceConflict_FirstOperations_first = passOnSuccess({
-  uri: "/azure/client-generator-core/enum-namespace-conflict/first",
+Scenarios.Azure_ClientGenerator_Core_EnumNameConflict_FirstOperations_first = passOnSuccess({
+  uri: "/azure/client-generator-core/enum-name-conflict/first",
   method: "post",
   request: {
     body: json({ status: "active", name: "test" }),
@@ -21,8 +21,8 @@ Scenarios.Azure_ClientGenerator_Core_EnumNamespaceConflict_FirstOperations_first
   kind: "MockApiDefinition",
 });
 
-Scenarios.Azure_ClientGenerator_Core_EnumNamespaceConflict_SecondOperations_second = passOnSuccess({
-  uri: "/azure/client-generator-core/enum-namespace-conflict/second",
+Scenarios.Azure_ClientGenerator_Core_EnumNameConflict_SecondOperations_second = passOnSuccess({
+  uri: "/azure/client-generator-core/enum-name-conflict/second",
   method: "post",
   request: {
     body: json({ status: "running", description: "test description" }),

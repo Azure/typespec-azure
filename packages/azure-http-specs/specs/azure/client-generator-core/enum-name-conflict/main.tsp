@@ -6,29 +6,14 @@
 import "@typespec/http";
 import "@typespec/spector";
 import "@azure-tools/typespec-client-generator-core";
-import "@azure-tools/typespec-azure-core";
-import "@typespec/versioning";
 
 using Http;
 using Azure.ClientGenerator.Core;
-using Azure.Core;
-using Versioning;
 using Spector;
 
-@scenarioService(
-  "/azure/client-generator-core/enum-namespace-conflict",
-  {
-    versioned: Versions,
-  }
-)
-namespace _Specs_.Azure.ClientGenerator.Core.EnumNamespaceConflict;
-
-@doc("The version of the API.")
-enum Versions {
-  @doc("The version 2022-12-01-preview.")
-  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-  v2022_12_01_preview: "2022-12-01-preview",
-}
+@doc("Test for enum with same name in different namespace.")
+@scenarioService("/azure/client-generator-core/enum-name-conflict")
+namespace _Specs_.Azure.ClientGenerator.Core.EnumNameConflict;
 
 namespace FirstNamespace {
   @doc("Status enum in first namespace")
