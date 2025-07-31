@@ -414,142 +414,7 @@ If called with `replace`, `@clientDoc` replaces `@doc` completely. If called wit
 
 ## Models
 
-### Flattening
-
-:::caution
-Flattening is NOT a recommended pattern, and you shouldn't use it unless told by SDK architects.
-:::
-
-<ClientTabs>
-<ClientTabItem lang="typespec" >
-
-```typespec
-model Properties {
-  name: string;
-}
-
-model Foo {
-  @flattenProperty
-  prop: Properties;
-}
-```
-
-</ClientTabItem>
-<ClientTabItem lang="python">
-
-Python will do dynamic flattening, exposing the non-flattening syntax, and dynamically accepting the flattened access.
-
-```python
-class Properties(_model_base.Model):
-    name: str = rest_field()
-    """Required."""
-
-class Foo(_model_base.Model):
-    properties: "_models.Properties" = rest_field()
-    """Required."""
-
-    __flattened_items = ["properties"]
-
-print(f.properties.name)  # Non-flattened access is preferred experience
-print(f.name)  # Flattened access is dynamically supported, but not documented
-
-```
-
-</ClientTabItem>
-<ClientTabItem lang="csharp" >
-
-CSharp will generate the model with properties being flattened. During serialization/deserialization, the model will be serialized/deserialized as a non-flattened model.
-
-```csharp
-public partial class Foo
-{
-    public Foo(string name)
-    {
-        Argument.AssertNotNull(name, nameof(name));
-
-        Name = name;
-    }
-
-    public string Name { get; set; }
-}
-
-public partial class Foo : IUtf8JsonSerializable, IJsonModel<Foo>
-{
-    void IJsonModel<Foo>.Write(Utf8JsonWriter writer, ModelReaderWriterOptions options)
-    {
-        var format = options.Format == "W" ? ((IPersistableModel<Foo>)this).GetFormatFromOptions(options) : options.Format;
-        if (format != "J")
-        {
-            throw new FormatException($"The model {nameof(Foo)} does not support writing '{format}' format.");
-        }
-
-        writer.WriteStartObject();
-        writer.WritePropertyName("properties"u8);
-        writer.WriteStartObject();
-        writer.WritePropertyName("name"u8);
-        writer.WriteStringValue(Name);
-        writer.WriteEndObject();
-        writer.WriteEndObject();
-    }
-
-    internal static Foo DeserializeFoo(JsonElement element, ModelReaderWriterOptions options = null)
-    {
-        options ??= ModelSerializationExtensions.WireOptions;
-
-        if (element.ValueKind == JsonValueKind.Null)
-        {
-            return null;
-        }
-        string name = default;
-        foreach (var property in element.EnumerateObject())
-        {
-            if (property.NameEquals("properties"u8))
-            {
-                if (property.Value.ValueKind == JsonValueKind.Null)
-                {
-                    property.ThrowNonNullablePropertyIsNull();
-                    continue;
-                }
-                foreach (var property0 in property.Value.EnumerateObject())
-                {
-                    if (property0.NameEquals("name"u8))
-                    {
-                        name = property0.Value.GetString();
-                    }
-                }
-            }
-        }
-        return new Foo(name);
-    }
-}
-```
-
-</ClientTabItem>
-<ClientTabItem lang="typescript" >
-
-```typescript
-// Please note that this feature is not supported right now, and the model will be generated un-flattened.
-// Please comment and follow work status on: https://github.com/Azure/autorest.typescript/issues/2164
-```
-
-</ClientTabItem>
-<ClientTabItem lang="java" >
-
-In Java, `@flattenProperty` have no effect on generated libraries.
-
-```java
-@Fluent
-public final class Properties {
-    public Properties();
-    public String getName();
-    public Properties setName(String name);
-}
-```
-
-</ClientTabItem>
-</ClientTabs>
-
-### Models with additional properties
+### Models with additional properties of any type
 
 #### Additional properties of any type
 
@@ -1259,6 +1124,290 @@ TODO
 <ClientTabItem lang="java" >
 
 TODO
+
+</ClientTabItem>
+</ClientTabs>
+
+### Flattening
+
+:::caution
+Flattening is NOT a recommended pattern, and you shouldn't use it unless told by SDK architects.
+:::
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+model Properties {
+  name: string;
+}
+
+model Foo {
+  @flattenProperty
+  prop: Properties;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+Python will do dynamic flattening, exposing the non-flattening syntax, and dynamically accepting the flattened access.
+
+```python
+class Properties(_model_base.Model):
+    name: str = rest_field()
+    """Required."""
+
+class Foo(_model_base.Model):
+    properties: "_models.Properties" = rest_field()
+    """Required."""
+
+    __flattened_items = ["properties"]
+
+print(f.properties.name)  # Non-flattened access is preferred experience
+print(f.name)  # Flattened access is dynamically supported, but not documented
+
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+CSharp will generate the model with properties being flattened. During serialization/deserialization, the model will be serialized/deserialized as a non-flattened model.
+
+```csharp
+public partial class Foo
+{
+    public Foo(string name)
+    {
+        Argument.AssertNotNull(name, nameof(name));
+
+        Name = name;
+    }
+
+    public string Name { get; set; }
+}
+
+public partial class Foo : IUtf8JsonSerializable, IJsonModel<Foo>
+{
+    void IJsonModel<Foo>.Write(Utf8JsonWriter writer, ModelReaderWriterOptions options)
+    {
+        var format = options.Format == "W" ? ((IPersistableModel<Foo>)this).GetFormatFromOptions(options) : options.Format;
+        if (format != "J")
+        {
+            throw new FormatException($"The model {nameof(Foo)} does not support writing '{format}' format.");
+        }
+
+        writer.WriteStartObject();
+        writer.WritePropertyName("properties"u8);
+        writer.WriteStartObject();
+        writer.WritePropertyName("name"u8);
+        writer.WriteStringValue(Name);
+        writer.WriteEndObject();
+        writer.WriteEndObject();
+    }
+
+    internal static Foo DeserializeFoo(JsonElement element, ModelReaderWriterOptions options = null)
+    {
+        options ??= ModelSerializationExtensions.WireOptions;
+
+        if (element.ValueKind == JsonValueKind.Null)
+        {
+            return null;
+        }
+        string name = default;
+        foreach (var property in element.EnumerateObject())
+        {
+            if (property.NameEquals("properties"u8))
+            {
+                if (property.Value.ValueKind == JsonValueKind.Null)
+                {
+                    property.ThrowNonNullablePropertyIsNull();
+                    continue;
+                }
+                foreach (var property0 in property.Value.EnumerateObject())
+                {
+                    if (property0.NameEquals("name"u8))
+                    {
+                        name = property0.Value.GetString();
+                    }
+                }
+            }
+        }
+        return new Foo(name);
+    }
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
+
+```typescript
+// Please note that this feature is not supported right now, and the model will be generated un-flattened.
+// Please comment and follow work status on: https://github.com/Azure/autorest.typescript/issues/2164
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+In Java, `@flattenProperty` have no effect on generated libraries.
+
+```java
+@Fluent
+public final class Properties {
+    public Properties();
+    public String getName();
+    public Properties setName(String name);
+}
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+### Multi-Level Inheritance (Legacy)
+
+:::caution
+Legacy multi-level inheritance is NOT a recommended pattern, and you shouldn't use it unless told by SDK architects.
+:::
+
+The `@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding` decorator enables client-level multiple levels of inheritance for discriminated models. This decorator modifies the inheritance chain in generated client libraries to create deeper hierarchies than what TypeSpec natively supports.
+
+Use `@hierarchyBuilding` when you need to represent complex inheritance hierarchies in discriminated models where:
+
+- You have multiple levels of inheritance (grandparent → parent → child)
+- You need to share common properties across multiple inheritance levels
+- You have permission from SDK architects
+
+<ClientTabs>
+<ClientTabItem lang="typespec">
+
+```typespec
+@discriminator("kind")
+model Animal {
+  kind: string;
+  name: string;
+}
+
+alias PetContent = {
+  owner: string;
+  vaccinated: boolean;
+};
+
+model Pet extends Animal {
+  kind: "pet";
+  ...PetContent;
+}
+
+@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(Pet)
+model Dog extends Animal {
+  kind: "dog";
+  ...PetContent;
+  breed: string;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+from enum import Enum
+from typing import Optional, Literal
+from .. import _model_base
+from .._model_base import rest_discriminator, rest_field
+
+class Animal(_model_base.Model):
+    kind: str = rest_discriminator(name="kind")
+    name: str = rest_field()
+
+class Pet(Animal):
+    kind: Literal["pet"] = rest_discriminator(name="kind")
+    owner: str = rest_field()
+    vaccinated: bool = rest_field()
+
+class Dog(Pet):  # Inherits from Pet, not Animal
+    kind: Literal["dog"] = rest_discriminator(name="kind")
+    breed: str = rest_field()
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp">
+
+```csharp
+public abstract partial class Animal
+{
+    protected Animal() { }
+    internal string Kind { get; set; }
+    public string Name { get; set; }
+}
+
+public partial class Pet : Animal
+{
+    public Pet() : base()
+    {
+        Kind = "pet";
+    }
+
+    public string Owner { get; set; }
+    public bool Vaccinated { get; set; }
+}
+
+public partial class Dog : Pet  // Inherits from Pet, not Animal
+{
+    public Dog() : base()
+    {
+        Kind = "dog";
+    }
+
+    public string Breed { get; set; }
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript">
+
+```typescript
+export interface Animal {
+  kind: string;
+  name: string;
+}
+
+export interface Pet extends Animal {
+  kind: "pet";
+  owner: string;
+  vaccinated: boolean;
+}
+
+export interface Dog extends Pet {
+  // Inherits from Pet, not Animal
+  kind: "dog";
+  breed: string;
+}
+
+export type AnimalUnion = Animal | Pet | Dog;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java">
+
+```java
+public class Animal implements JsonSerializable<Animal> {
+    public Animal();
+    public String getKind();
+    public String getName();
+}
+
+public final class Pet extends Animal {
+    public Pet();
+    public String getKind();
+    public String getOwner();
+    public boolean isVaccinated();
+}
+
+public final class Dog extends Pet {  // Inherits from Pet, not Animal
+    public Dog();
+    public String getKind();
+    public String getBreed();
+}
+```
 
 </ClientTabItem>
 </ClientTabs>
