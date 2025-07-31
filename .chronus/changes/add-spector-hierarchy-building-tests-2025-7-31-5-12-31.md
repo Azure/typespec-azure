@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-add spector test cases for @legacy.hierarchyBuilding
+add spector test cases for `@legacy.hierarchyBuilding`
