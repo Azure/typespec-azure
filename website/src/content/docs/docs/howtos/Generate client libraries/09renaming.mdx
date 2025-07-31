@@ -90,15 +90,20 @@ public final class PetStoreNamespaceClient {
 package petstorenamespace
 
 type InputModel struct {
-	Name string `json:"name"`
+	Name string 
 }
 
-type Client struct {
-	BaseURL    string
-	HTTPClient *http.Client
+type PetStoreNamespaceClientGetResponse struct {
+	InputModel
 }
 
-func (c *Client) Get(ctx context.Context, name string) (*InputModel, error) 
+type PetStoreNamespaceClient struct {}
+
+func NewPetStoreNamespaceClient() *PetStoreNamespaceClient {
+  return &PetStoreNamespaceClient{}
+}
+
+func (client *PetStoreNamespaceClient) Get(ctx context.Context, name string, options *PetStoreNamespaceClientGetOptions) (PetStoreNamespaceClientGetResponse, error) {}
 ```
 
 </ClientTabs>
@@ -180,17 +185,21 @@ public final class PetStoreNamespaceClient {
 
 ```go
 type InputOptions struct {
-	Name string `json:"name"`
+	Name string  
 }
 
-type Client struct {
-	BaseURL    string
-	HTTPClient *http.Client
+type PetStoreNamespaceClientGetResponse struct {
+	InputOptions
 }
 
-func (c *Client) GetWithResponse(ctx context.Context, name string, requestOptions map[string]string) (*http.Response, []byte, error) 
+type PetStoreNamespaceClient struct {}
 
-func (c *Client) Get(ctx context.Context, name string) (*InputOptions, error)
+func NewPetStoreNamespaceClient() *PetStoreNamespaceClient {
+  return &PetStoreNamespaceClient{}
+}
+
+func (client *PetStoreNamespaceClient) Get(ctx context.Context, name string, options *PetStoreNamespaceClientGetOptions) (PetStoreNamespaceClientGetResponse, error) {}
+
 ```
 
 </ClientTabs>
@@ -259,17 +268,20 @@ public final class PetStoreNamespaceClient {
 
 ```go
 type InputModel struct {
-	Name string `json:"name"`
+	Name string 
 }
 
-type Client struct {
-	BaseURL    string
-	HTTPClient *http.Client
+type PetStoreNamespaceClient struct {}
+
+func NewPetStoreNamespaceClient() *PetStoreNamespaceClient {
+  return &PetStoreNamespaceClient
 }
 
-func (c *Client) ReadModelWithResponse(ctx context.Context, name string) (*http.Response, []byte, error) 
+type PetStoreNamespaceClientReadResponse struct {
+	InputModel
+}
 
-func (c *Client) ReadModel(ctx context.Context, name string) (*InputModel, error) 
+func (client *PetStoreNamespaceClient) Read(ctx context.Context, name string, options *PetStoreNamespaceClientReadOptions) (PetStoreNamespaceClientReadResponse, error) {}
 
 ```
 

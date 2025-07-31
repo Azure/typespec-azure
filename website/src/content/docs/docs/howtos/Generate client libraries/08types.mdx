@@ -128,7 +128,7 @@ Foo foo = new Foo("hello");
 package container
 
 type Foo struct {
-    Prop *string `json:"prop,omitempty"`
+    Prop *string 
 }
 ```
 
@@ -191,7 +191,7 @@ Foo foo = new Foo("hello");
 package container
 
 type Foo struct {
-    Prop *string `json:"prop,omitempty"`
+    Prop *string 
 }
 ```
 
@@ -420,18 +420,12 @@ public final class Point {
 <ClientTabItem lang="go">
 
 ```go
-// Shape - Base class for all shape objects that can be drawn on a canvas
 type Shape struct {
-	// Position - The x,y coordinates where the shape will be positioned on the canvas
 	Position *Point
 }
 
-// Point - Represents a position in a 2D coordinate system
 type Point struct {
-	// X - The horizontal position (increases moving right)
 	X *float32
-
-	// Y - The vertical position (increases moving down)
 	Y *float32
 }
 ```
@@ -581,12 +575,11 @@ public final class Properties {
 <ClientTabItem lang="go" >
 ```go
 type Properties struct {
-    Name *string `json:"name,omitempty"`
+    Name *string 
 }
 
 type Foo struct {
-    // Flattened from Properties
-    Name *string `json:"name,omitempty"`
+    Name *string 
 }
 ```
 
@@ -702,20 +695,15 @@ public final class Animal implements JsonSerializable<Animal> {
 ```go
 // Input: Animal (with known fields + optional unknowns)
 type Animal struct {
-    Name *string `json:"name,omitempty"`
-    Kind *string `json:"kind,omitempty"`
-
-    // Additional properties from Record<string, unknown>
-    AdditionalProperties map[string]interface{} `json:"-"`
+    Name *string 
+    Kind *string 
+    AdditionalProperties map[string]interface{} 
 }
 
-// Output: AnimalOutput (same shape, but semantically for responses)
 type AnimalOutput struct {
-    Name *string `json:"name,omitempty"`
-    Kind *string `json:"kind,omitempty"`
-
-    // Additional properties from Record<string, any>
-    AdditionalProperties map[string]interface{} `json:"-"`
+    Name *string 
+    Kind *string 
+    AdditionalProperties map[string]interface{} 
 }
 ```
 </ClientTabItem>
@@ -883,16 +871,14 @@ public final class Animal implements JsonSerializable<Animal> {
 <ClientTabItem lang="go" >
 ```go
 type AnimalProperty struct {
-    Category *string     `json:"category,omitempty"`
-    Value    interface{} `json:"value,omitempty"`
+    Category *string    
+    Value    interface{} 
 }
 
 type Animal struct {
-    Name *string `json:"name,omitempty"`
-    Kind *string `json:"kind,omitempty"`
-
-    // Additional fields like "speed": {category: "...", value: ...}
-    AdditionalProperties map[string]AnimalProperty `json:"-"`
+    Name *string 
+    Kind *string 
+    AdditionalProperties map[string]AnimalProperty 
 }
 ```
 
@@ -1067,11 +1053,9 @@ public final class Animal implements JsonSerializable<Animal> {
 package service
 
 type Animal struct {
-    Name *string `json:"name,omitempty"`
-    Kind *string `json:"kind,omitempty"`
-
-    // AdditionalProperties can hold values of type string or int32
-    AdditionalProperties map[string]interface{} `json:"-"`
+    Name *string 
+    Kind *string 
+    AdditionalProperties map[string]interface{} 
 }
 ```
 </ClientTabItem>
@@ -1249,29 +1233,20 @@ public final class Siamese extends Cat {
 <ClientTabItem lang="go">
 
 ```go
-// CatClassification provides polymorphic access to related types.
-// Call the interface's GetCat() method to access the common type.
-// Use a type switch to determine the concrete type.  The possible types are:
-// - *Cat, *Ragdoll, *Siamese
 type CatClassification interface {
-	// GetCat returns the Cat content of the underlying type.
 	GetCat() *Cat
 }
 
 type Cat struct {
-	// REQUIRED
 	Kind *string
 }
 
-// GetCat implements the CatClassification interface for type Cat.
 func (c *Cat) GetCat() *Cat { return c }
 
 type Ragdoll struct {
-	// CONSTANT; undefinedField has constant value "ragdoll", any specified value is ignored.
 	Kind *string
 }
 
-// GetCat implements the CatClassification interface for type Ragdoll.
 func (e *Ragdoll) GetCat() *Cat {
 	return &Cat{
 		Kind:     e.Kind,
@@ -1279,11 +1254,9 @@ func (e *Ragdoll) GetCat() *Cat {
 }
 
 type Siamese struct {
-	// CONSTANT; undefinedField has constant value "siamese", any specified value is ignored.
 	Kind *string
 }
 
-// GetCat implements the CatClassification interface for type Siamese.
 func (e *Siamese) GetCat() *Cat {
 	return &Cat{
 		Kind:     e.Kind,
@@ -1363,13 +1336,13 @@ TODO
 package service
 
 type Foo struct {
-    BasicNullableProperty *string `json:"basicNullableProperty,omitempty"`
-    ModelNullableProperty *Bar    `json:"modelNullableProperty,omitempty"`
-    EnumNullableProperty  *LR     `json:"enumNullableProperty,omitempty"`
+    BasicNullableProperty *string 
+    ModelNullableProperty *Bar    
+    EnumNullableProperty  *LR     
 }
 
 type Bar struct {
-    Prop *string `json:"prop,omitempty"`
+    Prop *string 
 }
 
 type LR string
@@ -1664,6 +1637,29 @@ public final class Dog extends Pet {  // Inherits from Pet, not Animal
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="go">
+```go
+package models
+
+type Animal struct {
+	Kind string 
+	Name string 
+}
+
+type Pet struct {
+	Animal
+	Owner      string 
+	Vaccinated bool   
+}
+
+type Dog struct {
+	Animal
+	Owner      string 
+	Vaccinated bool   
+	Breed      string 
+}
+```
+</ClientTabItem>
 </ClientTabs>
 
 ## Unions
@@ -1790,15 +1786,18 @@ public enum WidgetHorizontal {
 
 </ClientTabItem>
 <ClientTabItem lang="go" >
-
 ```go
-package service
+package models
 
-type LR string
+type Widget struct {
+	Horizontal WidgetHorizontal 
+}
+
+type WidgetHorizontal string
 
 const (
-    LRLeft  LR = "left"
-    LRRight LR = "right"
+	WidgetHorizontalLeft  WidgetHorizontal = "left"
+	WidgetHorizontalRight WidgetHorizontal = "right"
 )
 ```
 
@@ -1931,8 +1930,6 @@ public final class WidgetColor extends ExpandableStringEnum<Colors> {
 </ClientTabItem>
 <ClientTabItem lang="go" >
 ```go
-package service
-
 type Colors string
 
 const (
@@ -2554,7 +2551,7 @@ package service
 import "time"
 
 type Test struct {
-    Prop *time.Time `json:"prop,omitempty"`
+    Prop *time.Time 
 }
 ```
 </ClientTabItem>
