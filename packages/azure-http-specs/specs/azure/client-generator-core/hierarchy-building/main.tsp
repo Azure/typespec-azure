@@ -8,40 +8,46 @@ using Azure.ClientGenerator.Core;
 
 @doc("Test for @hierarchyBuilding decorator.")
 @scenarioService("/azure/client-generator-core/hierarchy-building")
-@global.Azure.ClientGenerator.Core.clientNamespace("specs.azure.clientgenerator.core.hierarchybuilding", "python")
-@global.Azure.ClientGenerator.Core.clientNamespace("azure.clientgenerator.core.hierarchybuilding", "java")
+@global.Azure.ClientGenerator.Core.clientNamespace(
+  "specs.azure.clientgenerator.core.hierarchybuilding",
+  "python"
+)
+@global.Azure.ClientGenerator.Core.clientNamespace(
+  "azure.clientgenerator.core.hierarchybuilding",
+  "java"
+)
 namespace _Specs_.Azure.ClientGenerator.Core.HierarchyBuilding;
 
 @discriminator("kind")
 model Animal {
-    @doc("The kind of animal")
-    kind: string;
-    
-    @doc("Name of the animal")
-    name: string;
-  }
+  @doc("The kind of animal")
+  kind: string;
 
-  alias PetContent = {
-    @doc("Whether the pet is trained")
-    trained: boolean;
-  };
+  @doc("Name of the animal")
+  name: string;
+}
 
-  model Pet extends Animal {
-    kind: "pet";
-    ...PetContent;
-  }
+alias PetContent = {
+  @doc("Whether the pet is trained")
+  trained: boolean;
+};
 
-  alias DogContent = {
-    @doc("The breed of the dog")
-    breed: string;
-  };
+model Pet extends Animal {
+  kind: "pet";
+  ...PetContent;
+}
 
-  @global.Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(Pet)
-  model Dog extends Animal {
-    kind: "dog";
-    ...PetContent;
-    ...DogContent;
-  }
+alias DogContent = {
+  @doc("The breed of the dog")
+  breed: string;
+};
+
+@global.Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(Pet)
+model Dog extends Animal {
+  kind: "dog";
+  ...PetContent;
+  ...DogContent;
+}
 
 @scenario
 @scenarioDoc("""

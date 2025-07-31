@@ -4,19 +4,19 @@ export const Scenarios: Record<string, ScenarioMockApi> = {};
 
 // Sample data for testing
 const samplePet = {
-  kind: "pet", 
+  kind: "pet",
   name: "Buddy",
-  trained: true
+  trained: true,
 };
 
 const sampleDog = {
   kind: "dog",
-  name: "Rex", 
+  name: "Rex",
   trained: true,
-  breed: "German Shepherd"
+  breed: "German Shepherd",
 };
 
-Scenarios.Azure_ClientGenerator_Core_HierarchyBuilding_HierarchyBuildingOperations = passOnSuccess([
+Scenarios.Azure_ClientGenerator_Core_HierarchyBuilding = passOnSuccess([
   {
     uri: "/azure/client-generator-core/hierarchy-building/animal/pet",
     method: "put",
