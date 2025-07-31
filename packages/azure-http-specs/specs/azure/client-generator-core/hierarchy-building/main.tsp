@@ -42,59 +42,57 @@ model Animal {
     ...DogContent;
   }
 
-interface HierarchyBuildingOperations {
-  @scenario
-  @scenarioDoc("""
-    Test operation that accepts Animal input and returns Animal output.
-    This operation expects Pet data and validates that Pet type works correctly with the @hierarchyBuilding decorator.
-    Expected request body:
-    ```json
-    {
-      "kind": "pet",
-      "name": "Buddy",
-      "trained": true
-    }
-    ```
-    Expected response body:
-    ```json
-    {
-      "kind": "pet",
-      "name": "Buddy",
-      "trained": true
-    }
-    ```
-    """)
-  @doc("Update a pet")
-  @route("/animal/pet")
-  @put
-  updatePet(@body animal: Animal): Animal;
+@scenario
+@scenarioDoc("""
+  Test operation that accepts Animal input and returns Animal output.
+  This operation expects Pet data and validates that Pet type works correctly with the @hierarchyBuilding decorator.
+  Expected request body:
+  ```json
+  {
+    "kind": "pet",
+    "name": "Buddy",
+    "trained": true
+  }
+  ```
+  Expected response body:
+  ```json
+  {
+    "kind": "pet",
+    "name": "Buddy",
+    "trained": true
+  }
+  ```
+  """)
+@doc("Update a pet")
+@route("/animal/pet")
+@put
+op updatePet(@body animal: Animal): Animal;
 
-  @scenario
-  @scenarioDoc("""
-    Test operation that accepts Animal input and returns Animal output.
-    This operation expects Dog data and validates the @hierarchyBuilding decorator when Dog is used.
-    Due to @hierarchyBuilding(Pet), Dog should inherit from Pet rather than Animal directly.
-    Expected request body:
-    ```json
-    {
-      "kind": "dog",
-      "name": "Rex",
-      "trained": true,
-      "breed": "German Shepherd"
-    }
-    ```
-    Expected response body:
-    ```json
-    {
-      "kind": "dog",
-      "name": "Rex",
-      "trained": true,
-      "breed": "German Shepherd"
-    }
-    ```
-    """)
-  @doc("Update a dog")
-  @route("/animal/dog")
-  @put
-  updateDog(@body animal: Animal): Animal;
-}
+@scenario
+@scenarioDoc("""
+  Test operation that accepts Animal input and returns Animal output.
+  This operation expects Dog data and validates the @hierarchyBuilding decorator when Dog is used.
+  Due to @hierarchyBuilding(Pet), Dog should inherit from Pet rather than Animal directly.
+  Expected request body:
+  ```json
+  {
+    "kind": "dog",
+    "name": "Rex",
+    "trained": true,
+    "breed": "German Shepherd"
+  }
+  ```
+  Expected response body:
+  ```json
+  {
+    "kind": "dog",
+    "name": "Rex",
+    "trained": true,
+    "breed": "German Shepherd"
+  }
+  ```
+  """)
+@doc("Update a dog")
+@route("/animal/dog")
+@put
+op updateDog(@body animal: Animal): Animal;
