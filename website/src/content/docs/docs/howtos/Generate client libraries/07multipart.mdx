@@ -67,17 +67,31 @@ public void upload(MultipartRequest body);
 ```
 
 ```go
-type Client struct {}
-
-type MultipartRequest struct {
-    ID                string
-    Address           Address
-    ProfileImage      *os.File
-    PreviousAddresses []Address
-    Pictures          []*os.File
+type Address struct {
+	City *string
 }
 
-func (c *Client) Upload(ctx context.Context, req MultipartRequest, options *UploadOptions) (UploadResponse, error)
+type File struct {
+	Contents []byte
+	ContentType *string
+	Filename *string
+}
+
+type MultipartRequest struct {
+	Address Address
+	ID string
+	Pictures []streaming.MultipartContent
+	PreviousAddresses []Address
+	ProfileImage streaming.MultipartContent
+}
+
+type FileUploadServiceClient struct {}
+
+func NewFileUploadServiceClient() *FileUploadServiceClient{
+  return &FileUploadServiceClient{}
+}
+
+func (client *FileUploadServiceClient) Upload(ctx context.Context, body MultipartRequest, options *FileUploadServiceClientUploadOptions) (FileUploadServiceClientUploadResponse, error) {}
 ```
 
 </ClientTabs>

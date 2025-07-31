@@ -64,17 +64,11 @@ type User struct {
 }
 
 type UserList struct {
-    Value    []User `json:"value"`
-    NextLink *string `json:"nextLink,omitempty"`
+    Value    []User 
+    NextLink *string 
 }
 
-func (c *Client) ListWithPage(ctx context.Context) (UserList, error) {
-    // Implementation to call endpoint and deserialize first page
-}
-
-func (c *Client) ListWithPageNext(ctx context.Context, nextLink string) (UserList, error) {
-    // Implementation to fetch next page from nextLink URL
-}
+func (c *Client) ListWithPage(ctx context.Context) (UserList, error) {}
 
 ```
 
@@ -125,20 +119,16 @@ public PagedIterable<User> listWithPage();
 
 ```go
 type User struct {
-    ID   string `json:"id"`
-    Name string `json:"name"`
+    ID   string 
+    Name string 
 }
 
 type UserList struct {
-    Value    []User  `json:"value"`
-    NextLink *string `json:"nextLink,omitempty"`
+    Value    []User  
+    NextLink *string 
 }
 
-// ListWithPage fetches the first page of users
 func (c *Client) ListWithPage(ctx context.Context) (UserList, error)
-
-// ListWithPageNext fetches the next page using a nextLink URL
-func (c *Client) ListWithPageNext(ctx context.Context, nextLink string) (UserList, error)
 
 ```
 
@@ -194,7 +184,7 @@ NOT_SUPPORTED
 ```
 
 ```go
-NOT_SUPPORTED
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>
@@ -243,7 +233,7 @@ NOT_SUPPORTED
 ```
 
 ```go
-NOT_SUPPORTED
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>

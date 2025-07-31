@@ -624,14 +624,7 @@ type Client struct {
 	// ...
 }
 
-func (c *Client) Get(ctx context.Context, version Versions, options *RequestOptions) (Response, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "<url>", nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("x-ms-version", string(version))
-	return c.httpClient.Do(req)
-}
+func (c *Client) Get(ctx context.Context, version Versions, options *RequestOptions) (Response, error) {}
 
 ```
 

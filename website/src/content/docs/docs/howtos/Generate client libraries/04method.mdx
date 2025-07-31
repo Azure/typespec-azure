@@ -94,7 +94,7 @@ type OutputModel struct {
 
 type PetStoreNamespaceClient struct {}
 
-func (c *PetStoreNamespaceClient) GetModel(ctx context.Context, name string) (OutputModel, error) 
+func (c *PetStoreNamespaceClient) GetModel(ctx context.Context, name string) (OutputModel, error) {}
 
 ```
 
@@ -167,7 +167,7 @@ type OutputModel struct {
     Name string `json:"name"`
 }
 
-func (client *PetStoreNamespaceClient) GetModel(ctx context.Context, name string) (OutputModel, error)
+func (client *PetStoreNamespaceClient) GetModel(ctx context.Context, name string) (OutputModel, error){}
 
 ```
 
@@ -242,9 +242,9 @@ public final class PetStoreNamespaceClient {
 ```
 
 ```go
-func (c *petStoreNamespaceClient) GetModelWithResponse(ctx context.Context, name string, options *RequestOptions) (Response[OutputModel], error)
+func (c *petStoreNamespaceClient) GetModelWithResponse(ctx context.Context, name string, options *RequestOptions) (Response[OutputModel], error){}
 
-func (c *petStoreNamespaceClient) getModel(ctx context.Context, name string) (OutputModel, error)
+func (c *petStoreNamespaceClient) getModel(ctx context.Context, name string) (OutputModel, error){}
 
 ```
 
@@ -467,13 +467,13 @@ type ClientGetOptions struct {}
 
 type ClientGetResponse struct {}
 
-func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error)
+func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error){}
 
 type ClientPostOptions struct {}
 
 type ClientPostResponse struct {}
 
-func (client *Client) Post(ctx context.Context, user User, options *ClientPostOptions) (ClientPostResponse, error)
+func (client *Client) Post(ctx context.Context, user User, options *ClientPostOptions) (ClientPostResponse, error){}
 
 ```
 
@@ -576,7 +576,7 @@ type ClientUploadOptions struct {}
 
 type ClientUploadResponse struct {}
 
-func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
+func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error){}
 
 ```
 
@@ -680,7 +680,7 @@ type ClientUploadOptions struct {}
 
 type ClientUploadResponse struct {}
 
-func (client *Client) Upload(ctx context.Context, id string, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
+func (client *Client) Upload(ctx context.Context, id string, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error){}
 ```
 
 </ClientTabItem>
@@ -778,7 +778,7 @@ type ClientUploadOptions struct {}
 
 type ClientUploadResponse struct {}
 
-func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
+func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error){}
 ```
 
 </ClientTabItem>
@@ -889,7 +889,7 @@ type ClientUploadOptions struct {}
 
 type ClientUploadResponse struct {}
 
-func (client *Client) Upload(ctx context.Context, user User, options *ClientUploadOptions) (ClientUploadResponse, error)
+func (client *Client) Upload(ctx context.Context, user User, options *ClientUploadOptions) (ClientUploadResponse, error) {}
 ```
 
 </ClientTabItem>
@@ -987,7 +987,7 @@ type ClientGetBlobPropertiesOptions struct {}
 
 type ClientGetBlobPropertiesResponse struct {}
 
-func (client *Client) GetBlobProperties(ctx context.Context, name string, testHeader string, options *ClientGetBlobPropertiesOptions) (ClientGetBlobPropertiesResponse, error)
+func (client *Client) GetBlobProperties(ctx context.Context, name string, testHeader string, options *ClientGetBlobPropertiesOptions) (ClientGetBlobPropertiesResponse, error) {}
 ```
 
 </ClientTabItem>
@@ -1102,7 +1102,7 @@ type ClientRegisterOptions struct {}
 
 type ClientRegisterResponse struct {}
 
-func (client *Client) Register(ctx context.Context, schema []byte, options *ClientRegisterOptions) (ClientRegisterResponse, error)
+func (client *Client) Register(ctx context.Context, schema []byte, options *ClientRegisterOptions) (ClientRegisterResponse, error) {}
 ```
 
 </ClientTabItem>
@@ -1224,16 +1224,13 @@ public RepairResult scheduleRepairs(String widgetName, String problem, String co
 ```go
 type ClientScheduleRepairsOptions struct {}
 
-type RepairResult struct {
-	reason *string
-  info *string
-}
+type RepairResult struct {}
 
 type ClientScheduleRepairsResponse struct {
   RepairResult
 }
 
-func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, problem string, contact string, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
+func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, problem string, contact string, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error){}
 ```
 
 </ClientTabItem>
@@ -1401,23 +1398,17 @@ public RepairResult scheduleRepairs(String widgetName, RepairInfo body);
 <ClientTabItem lang="go"  >
 
 ```go
-type RepairInfo struct {
-	problem *string
-  contact *string
-}
+type RepairInfo struct {}
 
 type ClientScheduleRepairsOptions struct {}
 
-type RepairResult struct {
-	reason *string
-  info *string
-}
+type RepairResult struct {}
 
 type ClientScheduleRepairsResponse struct {
   RepairResult
 }
 
-func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, body RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
+func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, body RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error){}
 ```
 
 </ClientTabItem>
@@ -1559,20 +1550,20 @@ public final class AnalyzeClient {
 type Client struct {}
 
 type AnalyzeResult struct {
-	Result string `json:"result,omitempty"`
+	Result string 
 }
 
 type CompletionInput struct {
-	Input interface{} `json:"input"` // string or []string
+	Input interface{} 
 }
 
 type CompletionResult struct {
-	Output string `json:"output,omitempty"`
+	Output string  
 }
 
-func (c *Client) Analyze(ctx context.Context, mode string, image []byte) (*AnalyzeResult, error) 
+func (c *Client) Analyze(ctx context.Context, mode string, image []byte) (*AnalyzeResult, error) {}
 
-func (c *Client) Completions(ctx context.Context, input CompletionInput) (*CompletionResult, error) 
+func (c *Client) Completions(ctx context.Context, input CompletionInput) (*CompletionResult, error) {}
 
 ```
 
@@ -1648,23 +1639,15 @@ public final class Client {
 
 ```go
 
-// Client for Foo operations.
-type Client struct {
-    BaseURL    string
-    HTTPClient *http.Client
+type Client struct {}
+
+func NewClient() *Client {
+    return &Client{}
 }
 
-// NewClient creates a new Foo client.
-func NewClient(baseURL string, httpClient *http.Client) *Client {
-    if httpClient == nil {
-        httpClient = http.DefaultClient
-    }
-    return &Client{BaseURL: baseURL, HTTPClient: httpClient}
-}
+func (c *Client) A(ctx context.Context, x int32) (float64, error) {}
 
-func (c *Client) A(ctx context.Context, x int32) (float64, error)
-
-func (c *Client) B(ctx context.Context, x string) (int64, error) 
+func (c *Client) B(ctx context.Context, x string) (int64, error) {}
 ```
 
 </ClientTabs>
@@ -1728,7 +1711,7 @@ NOT_SUPPORTED
 ```
 
 ```go
-NOT_SUPPORTED
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>
@@ -1782,7 +1765,7 @@ type ClientGetOptions struct {
 	IfNoneMatch *string
 }
 
-func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error)
+func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error){}
 ```
 
 </ClientTabs>
