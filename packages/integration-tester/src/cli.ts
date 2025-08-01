@@ -8,7 +8,12 @@ import { projectRoot } from "./utils.js";
 const args = parseArgs({
   args: process.argv.slice(2),
   allowPositionals: true,
-  options: {},
+  options: {
+    clean: {
+      type: "boolean",
+      default: false,
+    },
+  },
 });
 
 const suiteName = args.positionals[0];
@@ -21,4 +26,6 @@ if (suite === undefined) {
 }
 
 const wd = join(projectRoot, "temp", suiteName);
-await runIntegrationTestSuite(wd, suiteName, suite);
+await runIntegrationTestSuite(wd, suiteName, suite, {
+  clean: args.values.clean,
+});

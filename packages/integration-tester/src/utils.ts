@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { execa } from "execa";
 import ora, { type Ora } from "ora";
 import { resolve } from "pathe";
@@ -18,7 +19,6 @@ export async function execWithSpinner(
   // Handle stdout
   subprocess.stdout?.on("data", (data) => {
     spinner.clear();
-    // eslint-disable-next-line no-console
     console.log(data.toString());
     spinner.render();
   });
@@ -27,7 +27,6 @@ export async function execWithSpinner(
   subprocess.stderr?.on("data", (data) => {
     spinner.clear();
     // Ora seems to swallow the stderr output?
-    // eslint-disable-next-line no-console
     console.error(data.toString());
     spinner.render();
   });
@@ -35,20 +34,25 @@ export async function execWithSpinner(
   await subprocess;
 }
 
-export function action<T>(message: string, fn: (spinner: Ora) => Promise<T>): Promise<T> {
+export async function action<T>(message: string, fn: (spinner: Ora) => Promise<T>): Promise<T> {
+  const oldLog = console.log;
+
+  console.log = (...args: any[]) => {
+    spinner.clear();
+    oldLog(...args);
+    spinner.render();
+  };
   const spinner = ora(message).start();
-  return fn(spinner)
-    .then((result) => {
-      spinner.succeed(pc.green(message));
-      return result;
-    })
-    .catch((error) => {
-      spinner.fail(pc.red(message));
-      throw error;
-    });
+  try {
+    const result_2 = await fn(spinner);
+    spinner.succeed(pc.green(message));
+    return result_2;
+  } catch (error) {
+    spinner.fail(pc.red(message));
+    throw error;
+  }
 }
 
 export function log(...args: any[]) {
-  // eslint-disable-next-line no-console
   console.log(...args);
 }
