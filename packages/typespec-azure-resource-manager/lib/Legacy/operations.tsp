@@ -273,11 +273,11 @@ interface RoutedOperations<
    * @template OverrideErrorType Optional. The error response, if non-standard.
    * @template OverrideRouteOptions Optional. The route options for the operation.
    */
+  @segmentOf(ResourceTypeParameter)
   @doc("List a {name}", Resource)
   @get
   @list
   @listsResource(Resource)
-  @segmentOf(ResourceTypeParameter)
   @armOperationRoute(OverrideRouteOptions)
   @armResourceList(Resource)
   @Private.armUpdateProviderNamespace
