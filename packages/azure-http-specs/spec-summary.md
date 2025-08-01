@@ -3135,6 +3135,28 @@ Expected client namespace for models:
 - SecondClientResult: Client.ClientNamespace.Second
 - SecondClientEnumType: Client.ClientNamespace.Second.Sub
 
+### Client_Naming_EnumConflict_FirstOperations_first
+
+- Endpoint: `post /client/naming/enum-conflict/first`
+
+Test enum with same name in different namespace - first namespace.
+Expected request body:
+
+```json
+{ "status": "active", "name": "test" }
+```
+
+### Client_Naming_EnumConflict_SecondOperations_second
+
+- Endpoint: `post /client/naming/enum-conflict/second`
+
+Test enum with same name in different namespace - second namespace.
+Expected request body:
+
+```json
+{ "status": "running", "description": "test description" }
+```
+
 ### Client_Naming_Header_request
 
 - Endpoint: `post /client/naming/header`
