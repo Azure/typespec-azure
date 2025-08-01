@@ -26,7 +26,7 @@ extends:
                 "Node 22.x":
                   nodeVersion: "22.x"
                 "Node 24.x":
-                  nodeVersion: "24.3.0" # Regression in node 24.4 https://github.com/microsoft/typespec/issues/7861
+                  nodeVersion: "24.x"
 
             pool:
               name: $(LINUXPOOL)
@@ -52,7 +52,7 @@ extends:
                 "Node 22.x":
                   nodeVersion: "22.x"
                 "Node 24.x":
-                  nodeVersion: "24.3.0" # Regression in node 24.4 https://github.com/microsoft/typespec/issues/7861
+                  nodeVersion: "24.x"
 
             pool:
               name: $(WINDOWSPOOL)
