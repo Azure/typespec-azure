@@ -1,0 +1,4 @@
+suites:
+  azure-specs:
+    repo: https://github.com/Azure/azure-rest-api-specs
+    branch: typespec-next
