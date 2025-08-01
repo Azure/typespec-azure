@@ -839,28 +839,21 @@ function findPageSizeParameter(
  */
 function hasPageSizeDecorator(context: TCGCContext, property: ModelProperty): boolean {
   try {
-    // Try to access the @pageSize decorator using the compiler's $ API
-    // This follows the same pattern as other decorator checks in TypeSpec
-    const pageSize = $(context.program).type.getPageSize?.(property);
-    return pageSize !== undefined;
-  } catch {
-    // If getPageSize doesn't exist, try using the program's decorator system
-    try {
-      const decorators = context.program.decorators;
-      // Check if the property has a pageSize decorator
-      for (const [decoratorType, decoratorInstances] of decorators) {
-        if (decoratorType.name === "pageSize") {
-          return decoratorInstances.some((instance) => instance.target === property);
-        }
-      }
-    } catch {
-      // Fallback: check if any decorator on the property looks like pageSize
-      if (property.decorators) {
-        return property.decorators.some(
-          (decorator) => decorator.decorator.name === "pageSize"
-        );
-      }
+    // Check if the property has decorators
+    if (!property.decorators || property.decorators.length === 0) {
+      return false;
     }
+    
+    // Look for the pageSize decorator in the property's decorators
+    return property.decorators.some(decorator => {
+      // The decorator could be named "pageSize" or have a full namespace like "TypeSpec.pageSize"
+      const decoratorName = decorator.decorator.name;
+      return decoratorName === "pageSize" || 
+             decoratorName.endsWith(".pageSize") ||
+             decoratorName === "TypeSpec.pageSize";
+    });
+  } catch (error) {
+    // If there's any error accessing decorators, return false to be safe
+    return false;
   }
-  return false;
 }
