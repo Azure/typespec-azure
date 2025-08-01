@@ -194,7 +194,7 @@ op CreateOrReplaceAsync<
 @armResourceUpdate(ExtensionResource)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
-@patch(#{ implicitOptionality: true })
+@patch(#{ implicitOptionality: false })
 op CustomPatchAsync<
   TargetResource extends Foundations.SimpleResource,
   ExtensionResource extends Foundations.SimpleResource,
@@ -232,7 +232,7 @@ op CustomPatchAsync<
 @armResourceUpdate(ExtensionResource)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
-@patch(#{ implicitOptionality: true })
+@patch(#{ implicitOptionality: false })
 op CustomPatchSync<
   TargetResource extends Foundations.SimpleResource,
   ExtensionResource extends Foundations.SimpleResource,
