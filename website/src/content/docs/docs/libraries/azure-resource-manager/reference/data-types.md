@@ -630,6 +630,27 @@ model Employee is TrackedResource<EmployeeProperties> {
 | ----------------- | ---------------------------------------------------------------------------------------- | ----------- |
 | extendedLocation? | [`ExtendedLocation`](./data-types.md#Azure.ResourceManager.CommonTypes.ExtendedLocation) |             |
 
+### `ExtensionActionScope` {#Azure.ResourceManager.ExtensionActionScope}
+
+Template used by ArmProviderAction templates. This produces following action route:
+`/{scope}/providers/Microsoft.SomeRP/someAction`
+
+```typespec
+model Azure.ResourceManager.ExtensionActionScope<StringType>
+```
+
+#### Template Parameters
+
+| Name       | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| StringType | The type of the scope name parameter, defaults to string. |
+
+#### Properties
+
+| Name  | Type         | Description |
+| ----- | ------------ | ----------- |
+| scope | `StringType` |             |
+
 ### `ExtensionResource` {#Azure.ResourceManager.ExtensionResource}
 
 Concrete extension resource types can be created by aliasing this type using a specific property type.
