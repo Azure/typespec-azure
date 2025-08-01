@@ -159,7 +159,9 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       return diagnostics.wrap({
         ...baseServiceMethod,
         kind: "paging",
-        pagingMetadata: {},
+        pagingMetadata: {
+          pageSizeParameter: findPageSizeParameter(context, baseServiceMethod.parameters),
+        },
       });
     }
 
@@ -209,6 +211,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
             context.__modelPropertyCache.get(segment)!,
         ),
         pageItemsSegments: baseServiceMethod.response.resultSegments,
+        pageSizeParameter: findPageSizeParameter(context, baseServiceMethod.parameters),
       },
     });
   }
@@ -234,7 +237,9 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     return diagnostics.wrap({
       ...baseServiceMethod,
       kind: "paging",
-      pagingMetadata: {},
+      pagingMetadata: {
+        pageSizeParameter: findPageSizeParameter(context, baseServiceMethod.parameters),
+      },
     });
   }
 
@@ -313,6 +318,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
         : undefined,
       nextLinkReInjectedParametersSegments,
       pageItemsSegments: baseServiceMethod.response.resultSegments,
+      pageSizeParameter: findPageSizeParameter(context, baseServiceMethod.parameters),
     },
   });
 }
@@ -804,4 +810,54 @@ export function createSdkMethods<TServiceOperation extends SdkServiceOperation>(
     }
   }
   return diagnostics.wrap(retval);
+}
+
+/**
+ * Helper function to find the page size parameter in a list of method parameters.
+ * @param context - The TCGC context
+ * @param parameters - Array of method parameters to search
+ * @returns The parameter marked with @pageSize decorator, or undefined if none found
+ */
+function findPageSizeParameter(
+  context: TCGCContext,
+  parameters: SdkMethodParameter[],
+): SdkMethodParameter | undefined {
+  // Look for a parameter that has the @pageSize decorator
+  for (const param of parameters) {
+    if (param.__raw && hasPageSizeDecorator(context, param.__raw)) {
+      return param;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Check if a ModelProperty has the @pageSize decorator.
+ * @param context - The TCGC context
+ * @param property - The model property to check
+ * @returns True if the property has the @pageSize decorator
+ */
+function hasPageSizeDecorator(context: TCGCContext, property: ModelProperty): boolean {
+  try {
+    // Check if the property has decorators
+    if (!property.decorators || property.decorators.length === 0) {
+      return false;
+    }
+    
+    // Look for the pageSize decorator in the property's decorators
+    return property.decorators.some(decorator => {
+      // Check both decorator.name and definition?.name patterns as seen in the codebase
+      const decoratorName = decorator.decorator.name;
+      const definitionName = decorator.definition?.name;
+      
+      return decoratorName === "pageSize" || 
+             decoratorName.endsWith(".pageSize") ||
+             decoratorName === "TypeSpec.pageSize" ||
+             definitionName === "@pageSize" ||
+             definitionName === "pageSize";
+    });
+  } catch (error) {
+    // If there's any error accessing decorators, return false to be safe
+    return false;
+  }
 }
