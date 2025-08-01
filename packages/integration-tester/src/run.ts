@@ -1,8 +1,9 @@
 import { mkdir, rm } from "fs/promises";
 import pc from "picocolors";
 import type { IntegrationTestSuite } from "./config/types.js";
+import { findPackages, printPackages } from "./find-packages.js";
 import { patchPackageJson } from "./patch-package-json.js";
-import { action, execWithSpinner, log } from "./utils.js";
+import { action, execWithSpinner, log, repoRoot } from "./utils.js";
 
 export async function runIntegrationTestSuite(
   wd: string,
@@ -16,8 +17,13 @@ export async function runIntegrationTestSuite(
   });
   await cloneRepo(config, wd);
 
+  const packages = await action("Resolving local package versions", async () => {
+    const packages = await findPackages({ wsDir: repoRoot });
+    printPackages(packages);
+    return packages;
+  });
   await action("Patching package.json", async () => {
-    await patchPackageJson(wd);
+    await patchPackageJson(wd, packages);
   });
 }
 

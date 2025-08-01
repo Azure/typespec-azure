@@ -2569,6 +2569,9 @@ importers:
 
   packages/integration-tester:
     dependencies:
+      '@pnpm/workspace.find-packages':
+        specifier: ^1000.0.24
+        version: 1000.0.29(@pnpm/logger@1001.0.0)(@pnpm/worker@1000.1.9(@pnpm/logger@1001.0.0)(@types/node@24.1.0))(typanion@3.14.0)
       execa:
         specifier: ^9.5.2
         version: 9.6.0

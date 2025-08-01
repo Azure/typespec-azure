@@ -1,8 +1,9 @@
 import { readFile } from "node:fs/promises";
 import { parseArgs } from "node:util";
-import { join, resolve } from "pathe";
+import { join } from "pathe";
 import { parse } from "yaml";
 import { runIntegrationTestSuite } from "./run.js";
+import { projectRoot } from "./utils.js";
 
 const args = parseArgs({
   args: process.argv.slice(2),
@@ -10,7 +11,6 @@ const args = parseArgs({
   options: {},
 });
 
-const projectRoot = resolve(import.meta.dirname, "..");
 const suiteName = args.positionals[0];
 const config = parse(
   await readFile(join(projectRoot, "config/integration-test-config.yaml"), "utf8"),
