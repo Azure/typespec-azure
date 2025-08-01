@@ -2572,6 +2572,9 @@ importers:
       execa:
         specifier: ^9.5.2
         version: 9.6.0
+      ora:
+        specifier: ^8.1.1
+        version: 8.2.0
       pathe:
         specifier: ^2.0.3
         version: 2.0.3

@@ -1,4 +1,4 @@
-import { readFile, rm } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { parseArgs } from "node:util";
 import { join, resolve } from "pathe";
 import { parse } from "yaml";
@@ -10,7 +10,7 @@ const args = parseArgs({
   options: {},
 });
 
-const projectRoot = resolve(import.meta.dirname, "../..");
+const projectRoot = resolve(import.meta.dirname, "..");
 const suiteName = args.positionals[0];
 const config = parse(
   await readFile(join(projectRoot, "config/integration-test-config.yaml"), "utf8"),
@@ -21,6 +21,4 @@ if (suite === undefined) {
 }
 
 const wd = join(projectRoot, "temp", suiteName);
-
-await rm(wd, { recursive: true, force: true });
-await runIntegrationTestSuite(wd, suiteName, config);
+await runIntegrationTestSuite(wd, suiteName, suite);
