@@ -85,6 +85,21 @@ public final class PetStoreNamespaceClient {
 }
 ```
 
+```go
+package petstorenamespace
+
+type OutputModel struct {
+    Name string `json:"name"`
+}
+type PetStoreNamespaceClient struct {}
+type PetStoreNamespaceClientGetModelOptions struct {}
+type PetStoreNamespaceClientGetModelResponse struct {
+	OutputModel
+}
+func (client *PetStoreNamespaceClient) GetModel(ctx context.Context, name string, options *PetStoreNamespaceClientGetModelOptions) (PetStoreNamespaceClientGetModelResponse, error) {}
+
+```
+
 </ClientTabs>
 
 ### Customizations
@@ -146,6 +161,10 @@ public final class PetStoreNamespaceClient {
     // protocol method
     public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
 }
+```
+
+```go
+// Go do not change behavior based on protocolAPI or convenientAPI
 ```
 
 </ClientTabs>
@@ -216,6 +235,10 @@ public final class PetStoreNamespaceClient {
     // convenient method
     OutputModel getModel(String name)
 }
+```
+
+```go
+// Go do not change behavior based on protocolAPI or convenientAPI
 ```
 
 </ClientTabs>
@@ -311,6 +334,10 @@ public final class ImageGenerations {
     public OffsetDateTime getCreatedAt()
     public List<ImageGenerationData> getData()
 }
+```
+
+```go
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>
@@ -433,21 +460,12 @@ public void post(User user);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientGetOptions struct {
+type User struct {
+	FirstName string 
+	LastName  string 
 }
-
-type ClientGetResponse struct {
-}
-
-func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error)
-
-type ClientPostOptions struct {
-}
-
-type ClientPostResponse struct {
-}
-
-func (client *Client) Post(ctx context.Context, user User, options *ClientPostOptions) (ClientPostResponse, error)
+func GetUser(ctx context.Context) (*User, error) {}
+func (c *Client) PostUser(ctx context.Context, user *User) error {}
 
 ```
 
@@ -546,13 +564,11 @@ public void upload(String firstName, String lastName);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientUploadOptions struct {
-}
+type ClientUploadOptions struct {}
 
-type ClientUploadResponse struct {
-}
+type ClientUploadResponse struct {}
 
-func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
+func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error){}
 
 ```
 
@@ -652,13 +668,12 @@ public void upload(String id, String firstName, String lastName);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientUploadOptions struct {
+type User struct {
+	FirstName string 
+	LastName  string 
 }
+func Upload(ctx context.Context, user *User) error {}
 
-type ClientUploadResponse struct {
-}
-
-func (client *Client) Upload(ctx context.Context, id string, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
 ```
 
 </ClientTabItem>
@@ -752,13 +767,12 @@ public void upload(String firstName, String lastName);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientUploadOptions struct {
+type User struct {
+	FirstName string 
+	LastName  string 
 }
 
-type ClientUploadResponse struct {
-}
-
-func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
+func Upload(ctx context.Context, user *User) error {}
 ```
 
 </ClientTabItem>
@@ -865,13 +879,8 @@ type User struct {
   lastName *string
 }
 
-type ClientUploadOptions struct {
-}
+func Upload(ctx context.Context, user User) error {}
 
-type ClientUploadResponse struct {
-}
-
-func (client *Client) Upload(ctx context.Context, user User, options *ClientUploadOptions) (ClientUploadResponse, error)
 ```
 
 </ClientTabItem>
@@ -965,13 +974,7 @@ public void getBlobProperties(String name, String testHeader);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientGetBlobPropertiesOptions struct {
-}
-
-type ClientGetBlobPropertiesResponse struct {
-}
-
-func (client *Client) GetBlobProperties(ctx context.Context, name string, testHeader string, options *ClientGetBlobPropertiesOptions) (ClientGetBlobPropertiesResponse, error)
+func GetBlobProperties(ctx context.Context, name string, testHeader string) error {}
 ```
 
 </ClientTabItem>
@@ -1082,13 +1085,11 @@ public void register(Schema schema);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientRegisterOptions struct {
+type Schema struct {
+	Schema []byte 
 }
 
-type ClientRegisterResponse struct {
-}
-
-func (client *Client) Register(ctx context.Context, schema []byte, options *ClientRegisterOptions) (ClientRegisterResponse, error)
+func Register(ctx context.Context, schema Schema) error {}
 ```
 
 </ClientTabItem>
@@ -1208,19 +1209,17 @@ public RepairResult scheduleRepairs(String widgetName, String problem, String co
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientScheduleRepairsOptions struct {
+type RepairInfo struct {
+    Problem string 
+    Contact string 
 }
 
 type RepairResult struct {
-	reason *string
-  info *string
+    Reason string 
+    Info   string 
 }
 
-type ClientScheduleRepairsResponse struct {
-  RepairResult
-}
-
-func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, problem string, contact string, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
+func ScheduleRepairs(ctx context.Context, widgetName string, info RepairInfo) (*RepairResult, error) {}
 ```
 
 </ClientTabItem>
@@ -1389,23 +1388,16 @@ public RepairResult scheduleRepairs(String widgetName, RepairInfo body);
 
 ```go
 type RepairInfo struct {
-	problem *string
-  contact *string
-}
-
-type ClientScheduleRepairsOptions struct {
+	Problem string 
+	Contact string 
 }
 
 type RepairResult struct {
-	reason *string
-  info *string
+	Reason string 
+	Info   string 
 }
 
-type ClientScheduleRepairsResponse struct {
-  RepairResult
-}
-
-func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, body RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
+func ScheduleRepairs(ctx context.Context, widgetName string, body RepairInfo) (*RepairResult, error) {}
 ```
 
 </ClientTabItem>
@@ -1543,6 +1535,18 @@ public final class AnalyzeClient {
 }
 ```
 
+```go
+type AnalyzeResult struct {}
+type CompletionInput struct {
+	Input interface{} 
+}
+type CompletionResult struct {}
+
+func Analyze(ctx context.Context, mode string, image []byte) (*AnalyzeResult, error) {}
+func Completions(ctx context.Context, input CompletionInput) (*CompletionResult, error) {}
+
+```
+
 </ClientTabs>
 
 Using union implies that the entire combination of possible input is valid. If you have a specific set of combination, or connection between input and output,
@@ -1613,6 +1617,19 @@ public final class Client {
 }
 ```
 
+```go
+
+type Client struct {}
+
+func NewClient() *Client {
+    return &Client{}
+}
+
+func (c *Client) A(ctx context.Context, x int32) (float64, error) {}
+
+func (c *Client) B(ctx context.Context, x string) (int64, error) {}
+```
+
 </ClientTabs>
 
 ### Customizations
@@ -1673,6 +1690,10 @@ JS RLC is not in the business of customization with client.tsp
 NOT_SUPPORTED
 ```
 
+```go
+// NOT_SUPPORTED
+```
+
 </ClientTabs>
 
 ## Conditional request headers
@@ -1719,15 +1740,11 @@ public Response get(MatchConditions matchConditions);
 ```
 
 ```go
-type ClientGetOptions struct {
-	// The request should only proceed if an entity matches this string.
-	IfMatch *string
-
-	// The request should only proceed if no entity matches this string.
-	IfNoneMatch *string
+type Response struct {
+    Name string 
 }
 
-func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error)
+func Get(ctx context.Context, ifMatch, ifNoneMatch *string) (*Response, error) {}
 ```
 
 </ClientTabs>

@@ -57,6 +57,21 @@ public virtual Pageable<User> ListWithPage(CancellationToken cancellationToken =
 public PagedIterable<User> listWithPage();
 ```
 
+```go
+type User struct {
+    ID   string `json:"id"`
+    Name string `json:"name"`
+}
+
+type UserList struct {
+    Value    []User 
+    NextLink *string 
+}
+
+func (c *Client) ListWithPage(ctx context.Context) (UserList, error) {}
+
+```
+
 </ClientTabs>
 
 2. Use the `@list` and `@pageItems` decorators from TypeSpec core.
@@ -100,6 +115,21 @@ public virtual Pageable<User> ListWithPage(CancellationToken cancellationToken =
 
 ```java
 public PagedIterable<User> listWithPage();
+```
+
+```go
+type User struct {
+    ID   string 
+    Name string 
+}
+
+type UserList struct {
+    Value    []User  
+    NextLink *string 
+}
+
+func (c *Client) ListWithPage(ctx context.Context) (UserList, error)
+
 ```
 
 </ClientTabs>
@@ -153,6 +183,10 @@ def list_with_page(self, **kwargs: Any) -> ItemPaged["_models.User"]:
 NOT_SUPPORTED
 ```
 
+```go
+// NOT_SUPPORTED
+```
+
 </ClientTabs>
 
 2. Continuation token in header parameter and response body.
@@ -196,6 +230,10 @@ def list_with_page(self, **kwargs: Any) -> ItemPaged["_models.User"]:
 
 ```java
 NOT_SUPPORTED
+```
+
+```go
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>
@@ -242,6 +280,10 @@ def list_with_page(self, **kwargs: Any) -> ItemPaged["_models.User"]:
 NOT_SUPPORTED
 ```
 
+```go
+// NOT_SUPPORTED
+```
+
 </ClientTabs>
 
 4. Continuation token in header parameter and response header.
@@ -284,6 +326,10 @@ def list_with_page(self, **kwargs: Any) -> ItemPaged["_models.User"]:
 
 ```java
 NOT_SUPPORTED
+```
+
+```go
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>
