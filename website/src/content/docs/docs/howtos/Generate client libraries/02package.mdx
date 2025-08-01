@@ -123,14 +123,14 @@ public final class Food implements JsonSerializable<Food> {
 ```
 
 ```go
-# generated client.go
+# client.go
 
 func NewPetStoreClient() *PetStoreClient {
 	return &PetStoreClient{}
 }
-func (client *PetStoreClient) Feed(ctx context.Context, feedRequest feedRequest, options *PetStoreClientFeedOptions) (PetStoreClientFeedResponse, error) {}
+func (client *PetStoreClient) Feed(ctx context.Context, food Food, options *PetStoreClientFeedOptions) (PetStoreClientFeedResponse, error) {}
 
-# generated model.go
+# model.go
 
 type Food struct {
 // REQUIRED
@@ -140,9 +140,15 @@ type Food struct {
 	Quantity *int32
 }
 
+# options.go
+type PetStoreClientFeedOptions struct {}
+
+# response.go
+type PetStoreClientFeedResponse struct {}
+
 # Usage Sample
-petStoreClient := NewPetStoreClient(nil, "my-endpoint")
-petStoreClient.Feed()
+petStoreClient := NewPetStoreClient()
+petStoreClient.Feed(context.Background(), Food{Name:to.Ptr("name", Quantity:to.Ptr(1))}, &PetStoreClientFeedOptions{})
 ```
 
 </ClientTabs>
