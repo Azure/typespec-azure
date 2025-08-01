@@ -846,11 +846,15 @@ function hasPageSizeDecorator(context: TCGCContext, property: ModelProperty): bo
     
     // Look for the pageSize decorator in the property's decorators
     return property.decorators.some(decorator => {
-      // The decorator could be named "pageSize" or have a full namespace like "TypeSpec.pageSize"
+      // Check both decorator.name and definition?.name patterns as seen in the codebase
       const decoratorName = decorator.decorator.name;
+      const definitionName = decorator.definition?.name;
+      
       return decoratorName === "pageSize" || 
              decoratorName.endsWith(".pageSize") ||
-             decoratorName === "TypeSpec.pageSize";
+             decoratorName === "TypeSpec.pageSize" ||
+             definitionName === "@pageSize" ||
+             definitionName === "pageSize";
     });
   } catch (error) {
     // If there's any error accessing decorators, return false to be safe
