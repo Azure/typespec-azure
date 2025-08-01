@@ -395,6 +395,19 @@ function getContextPath(
       if (dfsModelProperties(typeToFind, bodyType, "Request")) {
         return result;
       }
+
+      if (httpOperation.parameters.body.bodyKind === "multipart") {
+        for (const part of httpOperation.parameters.body.parts) {
+          visited.clear();
+          result = [{ name: root.name, type: root }];
+          if (
+            part.partKind === "model" &&
+            dfsModelProperties(typeToFind, part.body.type, `Request${pascalCase(part.name)}`)
+          ) {
+            return result;
+          }
+        }
+      }
     }
 
     for (const parameter of Object.values(httpOperation.parameters.parameters)) {
@@ -414,6 +427,19 @@ function getContextPath(
           result = [{ name: root.name, type: root }];
           if (dfsModelProperties(typeToFind, innerResponse.body.type, "Response", true)) {
             return result;
+          }
+
+          if (innerResponse.body?.bodyKind === "multipart") {
+            for (const part of innerResponse.body.parts) {
+              visited.clear();
+              result = [{ name: root.name, type: root }];
+              if (
+                part.partKind === "model" &&
+                dfsModelProperties(typeToFind, part.body.type, `Request${pascalCase(part.name)}`)
+              ) {
+                return result;
+              }
+            }
           }
         }
 

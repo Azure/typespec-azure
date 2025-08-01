@@ -785,3 +785,83 @@ it("check header in multipart with @multipartBody for model", async function () 
   strictEqual(prop.serializationOptions.multipart.headers.length, 1);
   strictEqual(prop.multipartOptions, prop.serializationOptions.multipart);
 });
+
+it("multipart response", async function () {
+  await runner.compileWithBuiltInService(`
+    @route("/downloadFile")
+    @post
+    op downloadFile(): {
+      @header contentType: "multipart/form-data";
+      @multipartBody body: {
+        name: HttpPart<string>;
+        file: HttpPart<bytes>[];
+      };
+    };
+  `);
+
+  const models = runner.context.sdkPackage.models;
+  strictEqual(models.length, 1);
+  const model = models[0];
+  strictEqual(model.kind, "model");
+  ok((model.usage & UsageFlags.MultipartFormData) > 0);
+  strictEqual(model.name, "DownloadFileResponse");
+  strictEqual(model.properties.length, 2);
+  const name = model.properties.find((x) => x.name === "name");
+  ok(name);
+  strictEqual(name.kind, "property");
+  strictEqual(name.type.kind, "string");
+  strictEqual(name.serializationOptions.multipart?.headers.length, 0);
+  const file = model.properties.find((x) => x.name === "file");
+  ok(file);
+  strictEqual(file.kind, "property");
+  ok(file.serializationOptions.multipart);
+  strictEqual(file.serializationOptions.multipart.isFilePart, true);
+  strictEqual(file.isMultipartFileInput, true);
+  strictEqual(file.multipartOptions, file.serializationOptions.multipart);
+});
+
+it("multipart with visibility", async function () {
+  await runner.compileWithBuiltInService(`
+    model TodoItem {
+      @visibility(Lifecycle.Read) @key id: safeint;
+      @maxLength(255)
+      title: string;
+      @visibility(Lifecycle.Read) createdBy: string;
+      assignedTo?: string;
+      description?: string;
+      status: "NotStarted" | "InProgress" | "Completed";
+      @visibility(Lifecycle.Read) createdAt: utcDateTime;
+      @visibility(Lifecycle.Read) updatedAt: utcDateTime;
+      @visibility(Lifecycle.Read) completedAt?: utcDateTime;
+      labels?: string[];
+      @visibility(Lifecycle.Create) dummy?: string;
+    }
+
+    op try(@header contentType: "multipart/form-data",
+        @multipartBody body: {
+      item: HttpPart<TodoItem>;
+    }): void;
+  `);
+
+  const models = runner.context.sdkPackage.models;
+  strictEqual(models.length, 2);
+  const model = models[0];
+  strictEqual(model.kind, "model");
+  ok((model.usage & UsageFlags.MultipartFormData) > 0);
+  strictEqual(model.name, "TryRequest");
+  strictEqual(model.properties.length, 1);
+  const item = model.properties.find((x) => x.name === "item");
+  ok(item);
+  strictEqual(item.kind, "property");
+  strictEqual(item.type.kind, "model");
+  strictEqual(item.serializationOptions.multipart?.headers.length, 0);
+  strictEqual(item.serializationOptions.multipart?.isFilePart, false);
+  strictEqual(item.serializationOptions.multipart?.defaultContentTypes.length, 1);
+  strictEqual(item.serializationOptions.multipart.defaultContentTypes[0], "application/json");
+
+  const todoItem = models[1];
+  ok(todoItem);
+  strictEqual(todoItem.kind, "model");
+  strictEqual(todoItem.name, "TryRequestItem");
+  strictEqual(todoItem.properties.length, 6);
+});
