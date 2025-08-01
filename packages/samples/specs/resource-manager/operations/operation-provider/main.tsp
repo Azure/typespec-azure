@@ -117,4 +117,22 @@ interface ProviderOperations {
     Response = LogAnalyticsCollection,
     Scope = ExtensionResourceActionScope
   >;
+
+  /** Sample operation to generate an extension resource based GET action */
+  @get
+  @list
+  @action
+  getLogAnalyticsByScope is ArmProviderActionSync<
+    Response = LogAnalyticsCollection,
+    Scope = ExtensionActionScope
+  >;
+
+  /** Operation to generate an extension resource based POST action */
+  @post
+  @list
+  @action("append")
+  appendLogAnalyticsByScope is ArmProviderActionAsync<
+    Response = LogAnalyticsCollection,
+    Scope = ExtensionActionScope
+  >;
 }
