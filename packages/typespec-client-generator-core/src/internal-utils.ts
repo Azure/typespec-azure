@@ -413,12 +413,6 @@ export function isContentTypeHeader(param: SdkHeaderParameter): boolean {
   return param.kind === "header" && param.serializedName.toLowerCase() === "content-type";
 }
 
-export function isMultipartOperation(context: TCGCContext, operation?: Operation): boolean {
-  if (!operation) return false;
-  const httpOperation = getHttpOperationWithCache(context, operation);
-  return httpOperation.parameters.body?.bodyKind === "multipart";
-}
-
 export function isHttpOperation(context: TCGCContext, obj: any): obj is HttpOperation {
   return obj?.kind === "Operation" && getHttpOperationWithCache(context, obj) !== undefined;
 }
