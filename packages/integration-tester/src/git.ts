@@ -48,20 +48,16 @@ export async function updateExistingRepo(
   dir: string,
 ): Promise<void> {
   const base = spinner.text;
-  // Reset any local changes
   spinner.text = `${base} - Resetting local changes`;
   await execWithSpinner(spinner, "git", ["-C", dir, "reset", "--hard", "HEAD"]);
   await execWithSpinner(spinner, "git", ["-C", dir, "clean", "-fd"]);
 
-  // Fetch latest changes
   spinner.text = `${base} - Fetching latest changes`;
   await execWithSpinner(spinner, "git", ["-C", dir, "fetch", "origin"]);
 
-  // Checkout branch
   spinner.text = `${base} - Checking out branch ${pc.cyan(branch)}`;
   await execWithSpinner(spinner, "git", ["-C", dir, "checkout", branch]);
 
-  // Pull latest changes
   spinner.text = `${base} - Pulling latest changes`;
   await execWithSpinner(spinner, "git", ["-C", dir, "pull", "origin", branch]);
 }

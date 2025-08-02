@@ -2575,6 +2575,9 @@ importers:
       execa:
         specifier: ^9.5.2
         version: 9.6.0
+      globby:
+        specifier: ~14.1.0
+        version: 14.1.0
       ora:
         specifier: ^8.1.1
         version: 8.2.0

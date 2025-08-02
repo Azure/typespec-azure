@@ -3,7 +3,8 @@ import type { IntegrationTestSuite } from "./config/types.js";
 import { findPackages, printPackages } from "./find-packages.js";
 import { ensureRepoState } from "./git.js";
 import { patchPackageJson } from "./patch-package-json.js";
-import { action, log, repoRoot } from "./utils.js";
+import { action, execWithSpinner, log, repoRoot } from "./utils.js";
+import { validateSpecs } from "./validate.js";
 
 export interface RunIntegrationTestSuiteOptions {
   clean?: boolean;
@@ -24,7 +25,16 @@ export async function runIntegrationTestSuite(
     printPackages(packages);
     return packages;
   });
+
   await action("Patching package.json", async () => {
     await patchPackageJson(wd, packages);
   });
+
+  await action("Installing dependencies", async (spinner) => {
+    await execWithSpinner(spinner, "npm", ["install", "--no-package-lock"], {
+      cwd: wd,
+    });
+  });
+
+  await validateSpecs(wd, config);
 }

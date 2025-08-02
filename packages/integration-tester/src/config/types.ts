@@ -5,4 +5,6 @@ export interface IntegrationTestsConfig {
 export interface IntegrationTestSuite {
   repo: string;
   branch: string;
+  pattern?: string;
+  entrypoints?: string[];
 }

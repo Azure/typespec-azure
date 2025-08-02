@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { execa } from "execa";
+import { execa, type Options } from "execa";
 import ora, { type Ora } from "ora";
 import { resolve } from "pathe";
 import pc from "picocolors";
@@ -11,9 +11,11 @@ export async function execWithSpinner(
   spinner: Ora,
   command: string,
   args: string[],
+  options: Options = {},
 ): Promise<void> {
   const subprocess = execa(command, args, {
     stdio: ["pipe", "pipe", "pipe"],
+    ...options,
   });
 
   // Handle stdout

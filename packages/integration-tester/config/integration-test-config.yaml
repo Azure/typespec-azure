@@ -2,5 +2,7 @@ suites:
   azure-specs:
     repo: https://github.com/Azure/azure-rest-api-specs
     branch: typespec-next
+    pattern: "specification/**/tspconfig.yaml"
+    entrypoints: ["client.tsp", "main.tsp"]
     # repo: https://github.com/Azure/autorest.python
     # branch: main
