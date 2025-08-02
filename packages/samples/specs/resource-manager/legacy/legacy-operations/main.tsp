@@ -24,6 +24,9 @@ enum Versions {
   `2021-10-01-preview`,
 }
 
+/** Standard operation list */
+interface Operations extends Azure.ResourceManager.Operations {}
+
 /** A best practice resource */
 model BestPractice is Azure.ResourceManager.ProxyResource<BestPracticeProperties> {
   ...ResourceNameParameter<
