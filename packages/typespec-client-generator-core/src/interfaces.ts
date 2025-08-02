@@ -489,6 +489,10 @@ export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends 
 export interface SdkModelType extends SdkTypeBase {
   kind: "model";
   properties: SdkModelPropertyType[];
+  /**
+   * Stage of the feature lifecycle: e.g Experimental
+   */
+  featureLifecycle?: string;
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
@@ -549,6 +553,10 @@ export interface SdkEndpointType extends SdkTypeBase {
 
 export interface SdkModelPropertyTypeBase<TType extends SdkTypeBase = SdkType>
   extends DecoratedType {
+  /**
+   * Stage of the feature lifecycle: e.g Experimental
+   */
+  featureLifecycle?: string;
   __raw?: ModelProperty;
   /** Parameter type. */
   type: TType;
@@ -829,6 +837,10 @@ export type SdkServiceOperation = SdkHttpOperation;
 interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
   extends DecoratedType {
   __raw?: Operation;
+  /**
+   * Lifecycle stage of the operation (e.g. Experimental)
+   */
+  featureLifecycle?: string;
   name: string;
   /** Whether the type has public or private accessibility */
   access: AccessFlags;

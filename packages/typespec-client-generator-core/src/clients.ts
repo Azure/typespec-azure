@@ -50,6 +50,7 @@ function getEndpointTypeFromSingleServer<
     serverUrl: "{endpoint}",
     templateArguments: [
       {
+        // no-featurelifecycle
         name: "endpoint",
         isGeneratedName: true,
         doc: "Service host",
@@ -158,6 +159,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
   }
   return diagnostics.wrap({
     kind: "endpoint",
+    // no flc
     type,
     name: "endpoint",
     isGeneratedName: true,

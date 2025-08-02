@@ -861,6 +861,13 @@ export type ClientDocDecorator = (
   scope?: string,
 ) => void;
 
+export type FeatureLifecycleDecorator = (
+  context: DecoratorContext,
+  target: Type,
+  value: EnumMember,
+  scope?: string,
+) => void;
+
 export type AzureClientGeneratorCoreDecorators = {
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
@@ -883,4 +890,5 @@ export type AzureClientGeneratorCoreDecorators = {
   responseAsBool: ResponseAsBoolDecorator;
   clientLocation: ClientLocationDecorator;
   clientDoc: ClientDocDecorator;
+  featureLifecycle: FeatureLifecycleDecorator;
 };

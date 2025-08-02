@@ -213,9 +213,12 @@ function getSdkHttpParameters(
         getClientTypeWithDiagnostics(context, getHttpBodyType(tspBody), httpOperation.operation),
       );
       const name = camelCase((type as { name: string }).name ?? "body");
+      const featureLifecycle = $(context.program).client.getFeatureLifecycle(type.__raw!, {emitterName: context.emitterName});
+
       retval.bodyParam = {
         kind: "body",
         name,
+        featureLifecycle,
         isGeneratedName: true,
         serializedName: "",
         doc: getClientDoc(context, tspBody.type),
@@ -335,9 +338,12 @@ function createContentTypeOrAcceptHeader(
     };
   }
   const optional = bodyObject.kind === "body" ? bodyObject.optional : false;
+  const featureLifecycle = $(context.program).client.getFeatureLifecycle(type.__raw!, {emitterName: context.emitterName});
+
   // No need for clientDefaultValue because it's a constant, it only has one value
   return {
     type,
+    featureLifecycle,
     name,
     isGeneratedName: true,
     apiVersions: bodyObject.apiVersions,
