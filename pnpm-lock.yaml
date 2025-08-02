@@ -760,6 +760,12 @@ importers:
       '@typespec/http':
         specifier: workspace:^
         version: link:../http
+      '@typespec/library-linter':
+        specifier: workspace:^
+        version: link:../library-linter
+      '@typespec/tspd':
+        specifier: workspace:^
+        version: link:../tspd
       eslint:
         specifier: ^9.23.0
         version: 9.31.0
@@ -3110,6 +3116,9 @@ importers:
       '@typespec/http':
         specifier: workspace:^
         version: link:../../core/packages/http
+      '@typespec/http-client':
+        specifier: workspace:^
+        version: link:../../core/packages/http-client
       '@typespec/library-linter':
         specifier: workspace:^
         version: link:../../core/packages/library-linter
