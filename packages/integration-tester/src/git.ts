@@ -4,7 +4,7 @@ import type { Ora } from "ora";
 import { relative } from "pathe";
 import pc from "picocolors";
 import type { IntegrationTestSuite } from "./config/types.js";
-import { action, execWithSpinner } from "./utils.js";
+import { action, execWithSpinner, log } from "./utils.js";
 
 export interface EnsureRepoStateOptions {
   clean?: boolean;
@@ -60,4 +60,19 @@ export async function updateExistingRepo(
 
   spinner.text = `${base} - Pulling latest changes`;
   await execWithSpinner(spinner, "git", ["pull", "origin", branch], { cwd: dir });
+}
+
+export async function validateGitClean(dir: string): Promise<void> {
+  const result = await execa("git", ["status", "--porcelain"], { cwd: dir });
+  const gitChanges = result.stdout.trim();
+
+  if (gitChanges) {
+    log(`${pc.red("x")} Git changes detected after validation:`);
+    log(gitChanges);
+
+    const diffResult = await execa("git", ["diff", "--color=always"], { cwd: dir });
+    log(diffResult.stdout);
+  } else {
+    log(`${pc.green("✔")} No git changes detected`);
+  }
 }

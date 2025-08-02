@@ -22,9 +22,6 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
-      - name: Checkout
-        run: node ./packages/integration-tester/cmd/tsp-integration.js azure-specs --stage checkout
-
       - name: Setup Node.js and pnpm
         uses: ./.github/actions/setup
 
@@ -45,22 +42,18 @@ jobs:
           echo "Created tgz packages:"
           ls -la ./tgz-packages/
 
+          cd packages/integration-tester
+          npm link
+
+      - name: Checkout
+        run: tsp-integration azure-specs --stage checkout
+
       - name: Patch package.json
-        run: node ./packages/integration-tester/cmd/tsp-integration.js azure-specs --stage patch --stage install
+        run: tsp-integration azure-specs --stage patch --stage install
 
       - name: Run TypeSpec validation in azure-rest-api-specs
-        run: node ./packages/integration-tester/cmd/tsp-integration.js azure-specs --stage validate
+        run: tsp-integration azure-specs --stage validate
 
       - name: Check for git changes
         if: success() || failure() # Still run this step even if validation fails to ensure as much information as possible
-        run: |
-          git_changes=$(git status --porcelain)
-          if [ -n "$git_changes" ]; then
-            echo "❌ Git changes detected after validation:"
-            echo "$git_changes"
-            git diff --color=always
-            exit 1
-          else
-            echo "✅ No git changes detected"
-          fi
-        working-directory: azure-rest-api-specs
+        run: tsp-integration azure-specs --stage validate:clean

@@ -1,7 +1,7 @@
 import pc from "picocolors";
 import type { IntegrationTestSuite } from "./config/types.js";
 import { findPackages, printPackages } from "./find-packages.js";
-import { ensureRepoState } from "./git.js";
+import { ensureRepoState, validateGitClean } from "./git.js";
 import { patchPackageJson } from "./patch-package-json.js";
 import { TaskRunner } from "./runner.js";
 import { action, execWithSpinner, log, repoRoot } from "./utils.js";
@@ -12,7 +12,7 @@ export interface RunIntegrationTestSuiteOptions {
   clean?: boolean;
 }
 
-export const Stages = ["checkout", "patch", "install", "validate"] as const;
+export const Stages = ["checkout", "patch", "install", "validate", "validate:clean"] as const;
 export type Stage = (typeof Stages)[number];
 
 export async function runIntegrationTestSuite(
@@ -56,5 +56,9 @@ export async function runIntegrationTestSuite(
 
   await runner.stage("validate", async () => {
     await validateSpecs(runner, wd, config);
+  });
+
+  await runner.stage("validate:clean", async () => {
+    await validateGitClean(wd);
   });
 }
