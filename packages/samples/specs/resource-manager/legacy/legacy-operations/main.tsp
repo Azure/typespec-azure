@@ -46,42 +46,40 @@ model BestPracticeProperties {
 }
 
 #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator" "Resource template"
-interface BestPracticeOps
-  extends Azure.ResourceManager.Legacy.LegacyOperations<
-      {
-        ...ApiVersionParameter,
-        ...Azure.ResourceManager.Legacy.Provider,
-      },
-      {
-        /** The name of the best practice */
-        @segment("bestPractices")
-        @key
-        @path
-        bestPracticeName: string,
-      }
-    > {}
+alias BestPracticeOps = Azure.ResourceManager.Legacy.LegacyOperations<
+  {
+    ...ApiVersionParameter;
+    ...Azure.ResourceManager.Legacy.Provider;
+  },
+  {
+    /** The name of the best practice */
+    @segment("bestPractices")
+    @key
+    @path
+    bestPracticeName: string;
+  }
+>;
 
 #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator" "Resource template"
-interface BestPracticesVersionOps
-  extends Azure.ResourceManager.Legacy.LegacyOperations<
-      {
-        ...ApiVersionParameter,
-        ...Azure.ResourceManager.Legacy.Provider,
+alias BestPracticesVersionOps = Azure.ResourceManager.Legacy.LegacyOperations<
+  {
+    ...ApiVersionParameter;
+    ...Azure.ResourceManager.Legacy.Provider;
 
-        /** The name of the best practice */
-        @segment("bestPractices")
-        @key
-        @path
-        bestPracticeName: string,
-      },
-      {
-        /** The name of the version */
-        @segment("versions")
-        @key
-        @path
-        versionName: string,
-      }
-    > {}
+    /** The name of the best practice */
+    @segment("bestPractices")
+    @key
+    @path
+    bestPracticeName: string;
+  },
+  {
+    /** The name of the version */
+    @segment("versions")
+    @key
+    @path
+    versionName: string;
+  }
+>;
 
 /** Best practice operations */
 @armResourceOperations
