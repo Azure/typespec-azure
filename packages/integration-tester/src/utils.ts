@@ -46,9 +46,9 @@ export async function action<T>(message: string, fn: (spinner: Ora) => Promise<T
   };
   const spinner = ora(message).start();
   try {
-    const result_2 = await fn(spinner);
+    const result = await fn(spinner);
     spinner.succeed(pc.green(message));
-    return result_2;
+    return result;
   } catch (error) {
     spinner.fail(pc.red(message));
     throw error;

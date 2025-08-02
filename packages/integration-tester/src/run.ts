@@ -3,6 +3,7 @@ import type { IntegrationTestSuite } from "./config/types.js";
 import { findPackages, printPackages } from "./find-packages.js";
 import { ensureRepoState } from "./git.js";
 import { patchPackageJson } from "./patch-package-json.js";
+import { TaskRunner } from "./runner.js";
 import { action, execWithSpinner, log, repoRoot } from "./utils.js";
 import { validateSpecs } from "./validate.js";
 
@@ -15,6 +16,7 @@ export async function runIntegrationTestSuite(
   config: IntegrationTestSuite,
   options: RunIntegrationTestSuiteOptions = {},
 ): Promise<void> {
+  const runner = new TaskRunner({ verbose: options.clean });
   log("Running", pc.cyan(suiteName), config);
   await ensureRepoState(config, wd, {
     clean: options.clean,
@@ -36,5 +38,5 @@ export async function runIntegrationTestSuite(
     });
   });
 
-  await validateSpecs(wd, config);
+  await validateSpecs(runner, wd, config);
 }

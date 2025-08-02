@@ -1,15 +1,20 @@
 import { execa } from "execa";
 import { readdir } from "fs/promises";
 import { globby } from "globby";
-import { dirname } from "pathe";
+import { dirname, resolve } from "pathe";
 import pc from "picocolors";
 import type { IntegrationTestSuite } from "./config/types.js";
+import type { TaskRunner } from "./runner.js";
 import { log } from "./utils.js";
 
 // Number of parallel TypeSpec compilations to run
 const COMPILATION_CONCURRENCY = 4;
 
-export async function validateSpecs(dir: string, suite: IntegrationTestSuite): Promise<void> {
+export async function validateSpecs(
+  runner: TaskRunner,
+  dir: string,
+  suite: IntegrationTestSuite,
+): Promise<void> {
   const tspConfigDirs = await findTspProjects(dir, suite.pattern ?? "**/tspconfig.yaml");
 
   if (tspConfigDirs.length === 0) {
@@ -17,21 +22,18 @@ export async function validateSpecs(dir: string, suite: IntegrationTestSuite): P
     return;
   }
 
-  logGroup(
+  runner.group(
     `Found ${pc.yellow(tspConfigDirs.length)} TypeSpec projects`,
-    tspConfigDirs.map((dir) => pc.bold(dir)).join("\n"),
+    tspConfigDirs.map((projectDir) => pc.bold(resolve(dir, projectDir))).join("\n"),
   );
 
   let successCount = 0;
   let failureCount = 0;
   const failedFolders: string[] = []; // Create a processor function that handles the compilation and logging
-  const processProject = async (dir: string) => {
-    const result = await verifyProject(dir);
-    const status = result.success ? pc.green("pass") : pc.red("fail");
-
-    logGroup(`${status} ${dir}`, result.output);
-
-    return { dir, result };
+  const processProject = async (projectDir: string) => {
+    const result = await verifyProject(runner, projectDir);
+    runner.reportTaskWithDetails(result.success ? "pass" : "fail", projectDir, result.output);
+    return { dir: projectDir, result };
   };
 
   // Run compilations in parallel with limited concurrency
@@ -87,7 +89,10 @@ async function findTspEntrypoint(directory: string): Promise<string | null> {
   }
 }
 
-async function verifyProject(dir: string): Promise<{ success: boolean; output: string }> {
+async function verifyProject(
+  runner: TaskRunner,
+  dir: string,
+): Promise<{ success: boolean; output: string }> {
   const entrypoint = await findTspEntrypoint(dir);
 
   if (!entrypoint) {
@@ -95,8 +100,7 @@ async function verifyProject(dir: string): Promise<{ success: boolean; output: s
       success: false,
       output: "No main.tsp or client.tsp file found in directory",
     };
-    const status = pc.red("fail");
-    logGroup(`${status} ${dir}`, result.output);
+    runner.reportTaskWithDetails("fail", dir, result.output);
     return result;
   }
 
@@ -134,22 +138,4 @@ async function runWithConcurrency<T, R>(
   }
 
   return results;
-}
-
-function logGroup(name: string, content: string) {
-  if (process.env.GITHUB_ACTIONS) {
-    // eslint-disable-next-line no-console
-    console.log(`::group::${name}`);
-    // eslint-disable-next-line no-console
-    console.log(content);
-    // eslint-disable-next-line no-console
-    console.log("::endgroup::");
-  } else {
-    // eslint-disable-next-line no-console
-    console.group(name);
-    // eslint-disable-next-line no-console
-    console.log(content);
-    // eslint-disable-next-line no-console
-    console.groupEnd();
-  }
 }
