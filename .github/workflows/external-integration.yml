@@ -49,7 +49,7 @@ jobs:
         run: tsp-integration azure-specs --stage checkout
 
       - name: Patch package.json
-        run: tsp-integration azure-specs --stage patch --stage install
+        run: tsp-integration azure-specs --stage patch --stage install --tgz-dir ./tgz-packages
 
       - name: Run TypeSpec validation in azure-rest-api-specs
         run: tsp-integration azure-specs --stage validate

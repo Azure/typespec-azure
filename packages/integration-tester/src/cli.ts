@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { parseArgs } from "node:util";
-import { join } from "pathe";
+import { join, resolve } from "pathe";
 import { parse } from "yaml";
 import { runIntegrationTestSuite, Stages, type Stage } from "./run.js";
 import { projectRoot } from "./utils.js";
@@ -18,6 +18,9 @@ const args = parseArgs({
     stage: {
       type: "string",
       multiple: true,
+    },
+    tgzDir: {
+      type: "string",
     },
   },
 });
@@ -47,4 +50,5 @@ const wd = join(projectRoot, "temp", suiteName);
 await runIntegrationTestSuite(wd, suiteName, suite, {
   clean: args.values.clean,
   stages,
+  tgzDir: args.values.tgzDir && resolve(process.cwd(), args.values.tgzDir),
 });

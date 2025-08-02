@@ -8,8 +8,12 @@ import { action, execWithSpinner, log, repoRoot } from "./utils.js";
 import { validateSpecs } from "./validate.js";
 
 export interface RunIntegrationTestSuiteOptions {
+  /** Only run specific stages. */
   stages?: Stage[];
+  /** Clean the temp directory. By default tries to reuse the repo by reseting and pulling latest changes. */
   clean?: boolean;
+  /** Directory for .tgz files. If not provided it will get the packages from the repo. */
+  tgzDir?: string;
 }
 
 export const Stages = ["checkout", "patch", "install", "validate", "validate:clean"] as const;
@@ -36,7 +40,9 @@ export async function runIntegrationTestSuite(
 
   await runner.stage("patch", async () => {
     const packages = await action("Resolving local package versions", async () => {
-      const packages = await findPackages({ wsDir: repoRoot });
+      const packages = await findPackages(
+        options.tgzDir ? { tgzDir: options.tgzDir } : { wsDir: repoRoot },
+      );
       printPackages(packages);
       return packages;
     });
