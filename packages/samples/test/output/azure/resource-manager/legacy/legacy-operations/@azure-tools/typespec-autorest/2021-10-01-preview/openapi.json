@@ -40,15 +40,207 @@
   },
   "tags": [
     {
-      "name": "Employees"
+      "name": "BestPractices"
+    },
+    {
+      "name": "BestPracticeVersions"
     }
   ],
   "paths": {
+    "/providers/Microsoft.ContosoProviderHub/bestPractices": {
+      "get": {
+        "operationId": "BestPractices_ListByTenant",
+        "tags": [
+          "BestPractices"
+        ],
+        "description": "List a BestPractice",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/BestPracticeListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/providers/Microsoft.ContosoProviderHub/bestPractices/{bestPracticeName}": {
+      "get": {
+        "operationId": "BestPractices_Get",
+        "tags": [
+          "BestPractices"
+        ],
+        "description": "Get a BestPractice",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "bestPracticeName",
+            "in": "path",
+            "description": "The name of the best practice",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/BestPractice"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "BestPractices_CreateOrUpdate",
+        "tags": [
+          "BestPractices"
+        ],
+        "description": "Create a BestPractice",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "bestPracticeName",
+            "in": "path",
+            "description": "The name of the best practice",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BestPractice"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'BestPractice' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/BestPractice"
+            }
+          },
+          "201": {
+            "description": "Resource 'BestPractice' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/BestPractice"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "BestPractices_Update",
+        "tags": [
+          "BestPractices"
+        ],
+        "description": "Update a BestPractice",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "bestPracticeName",
+            "in": "path",
+            "description": "The name of the best practice",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BestPracticeUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/BestPractice"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "BestPractices_Delete",
+        "tags": [
+          "BestPractices"
+        ],
+        "description": "Delete a BestPractice",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "bestPracticeName",
+            "in": "path",
+            "description": "The name of the best practice",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "204": {
+            "description": "Resource does not exist."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
     "/providers/Microsoft.ContosoProviderHub/bestPractices/{bestPracticeName}/versions": {
       "get": {
-        "operationId": "Employees_ListByTenant",
+        "operationId": "BestPracticeVersions_ListByTenant",
         "tags": [
-          "Employees"
+          "BestPracticeVersions"
         ],
         "description": "List a BestPractice",
         "parameters": [
@@ -81,15 +273,232 @@
           "nextLinkName": "nextLink"
         }
       }
+    },
+    "/providers/Microsoft.ContosoProviderHub/bestPractices/{bestPracticeName}/versions/{versionName}": {
+      "get": {
+        "operationId": "BestPracticeVersions_Get",
+        "tags": [
+          "BestPracticeVersions"
+        ],
+        "description": "Get a BestPractice",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "bestPracticeName",
+            "in": "path",
+            "description": "The name of the best practice",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "versionName",
+            "in": "path",
+            "description": "The name of the version",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/BestPractice"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "BestPracticeVersions_CreateOrUpdate",
+        "tags": [
+          "BestPracticeVersions"
+        ],
+        "description": "Create a BestPractice",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "bestPracticeName",
+            "in": "path",
+            "description": "The name of the best practice",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "versionName",
+            "in": "path",
+            "description": "The name of the version",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BestPractice"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'BestPractice' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/BestPractice"
+            }
+          },
+          "201": {
+            "description": "Resource 'BestPractice' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/BestPractice"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "BestPracticeVersions_Update",
+        "tags": [
+          "BestPracticeVersions"
+        ],
+        "description": "Update a BestPractice",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "bestPracticeName",
+            "in": "path",
+            "description": "The name of the best practice",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "versionName",
+            "in": "path",
+            "description": "The name of the version",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BestPracticeUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/BestPractice"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "BestPracticeVersions_Delete",
+        "tags": [
+          "BestPracticeVersions"
+        ],
+        "description": "Delete a BestPractice",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "bestPracticeName",
+            "in": "path",
+            "description": "The name of the best practice",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "versionName",
+            "in": "path",
+            "description": "The name of the version",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource deleted successfully."
+          },
+          "204": {
+            "description": "Resource does not exist."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
+    "Azure.ResourceManager.ResourceProvisioningState": {
+      "type": "string",
+      "description": "The provisioning state of a resource type.",
+      "enum": [
+        "Succeeded",
+        "Failed",
+        "Canceled"
+      ],
+      "x-ms-enum": {
+        "name": "ResourceProvisioningState",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Succeeded",
+            "value": "Succeeded",
+            "description": "Resource has been created."
+          },
+          {
+            "name": "Failed",
+            "value": "Failed",
+            "description": "Resource creation failed."
+          },
+          {
+            "name": "Canceled",
+            "value": "Canceled",
+            "description": "Resource creation was canceled."
+          }
+        ]
+      },
+      "readOnly": true
+    },
     "BestPractice": {
       "type": "object",
-      "description": "Concrete proxy resource types can be created by aliasing this type using a specific property type.",
+      "description": "A best practice resource",
       "properties": {
         "properties": {
-          "type": "object",
+          "$ref": "#/definitions/BestPracticeProperties",
           "description": "The resource-specific properties for this resource.",
           "x-ms-client-flatten": true
         }
@@ -120,6 +529,45 @@
       "required": [
         "value"
       ]
+    },
+    "BestPracticeProperties": {
+      "type": "object",
+      "description": "Resource-specific properties of a best practice resource",
+      "properties": {
+        "provisioningState": {
+          "$ref": "#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+          "description": "The provisioning state of the resource.",
+          "readOnly": true
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the best practice"
+        }
+      },
+      "required": [
+        "description"
+      ]
+    },
+    "BestPracticeUpdate": {
+      "type": "object",
+      "description": "The type used for update operations of the BestPractice.",
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/BestPracticeUpdateProperties",
+          "description": "The resource-specific properties for this resource.",
+          "x-ms-client-flatten": true
+        }
+      }
+    },
+    "BestPracticeUpdateProperties": {
+      "type": "object",
+      "description": "The updatable properties of the BestPractice.",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "The description of the best practice"
+        }
+      }
     }
   },
   "parameters": {}

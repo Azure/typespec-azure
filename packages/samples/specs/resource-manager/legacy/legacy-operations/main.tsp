@@ -24,9 +24,8 @@ enum Versions {
   `2021-10-01-preview`,
 }
 
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-provisioning-state" ""
-#suppress "@azure-tools/typespec-azure-resource-manager/no-empty-model" ""
-model BestPractice is Azure.ResourceManager.ProxyResource<{}> {
+/** A best practice resource */
+model BestPractice is Azure.ResourceManager.ProxyResource<BestPracticeProperties> {
   ...ResourceNameParameter<
     Resource = BestPractice,
     KeyName = "bestPracticeName",
@@ -35,7 +34,31 @@ model BestPractice is Azure.ResourceManager.ProxyResource<{}> {
   >;
 }
 
-@armResourceOperations
+/** Resource-specific properties of a best practice resource */
+model BestPracticeProperties {
+  ...DefaultProvisioningStateProperty;
+
+  /** The description of the best practice */
+  description: string;
+}
+
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator" "Resource template"
+interface BestPracticeOps
+  extends Azure.ResourceManager.Legacy.LegacyOperations<
+      {
+        ...ApiVersionParameter,
+        ...Azure.ResourceManager.Legacy.Provider,
+      },
+      {
+        /** The name of the best practice */
+        @segment("bestPractices")
+        @key
+        @path
+        bestPracticeName: string,
+      }
+    > {}
+
+#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator" "Resource template"
 interface BestPracticesVersionOps
   extends Azure.ResourceManager.Legacy.LegacyOperations<
       {
@@ -57,7 +80,28 @@ interface BestPracticesVersionOps
       }
     > {}
 
+/** Best practice operations */
 @armResourceOperations
-interface Employees {
+interface BestPractices {
+  get is BestPracticeOps.Read<BestPractice>;
+  createOrUpdate is BestPracticeOps.CreateOrUpdateSync<BestPractice>;
+  update is BestPracticeOps.CustomPatchSync<
+    BestPractice,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<BestPractice, BestPracticeProperties>
+  >;
+  delete is BestPracticeOps.DeleteSync<BestPractice>;
+  listByTenant is BestPracticeOps.List<BestPractice>;
+}
+
+/** Child best practice version operations */
+@armResourceOperations
+interface BestPracticeVersions {
+  get is BestPracticesVersionOps.Read<BestPractice>;
+  createOrUpdate is BestPracticesVersionOps.CreateOrUpdateSync<BestPractice>;
+  update is BestPracticesVersionOps.CustomPatchSync<
+    BestPractice,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<BestPractice, BestPracticeProperties>
+  >;
+  delete is BestPracticesVersionOps.DeleteSync<BestPractice>;
   listByTenant is BestPracticesVersionOps.List<BestPractice>;
 }
