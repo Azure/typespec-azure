@@ -60,7 +60,7 @@ export async function validateSpecs(
 
   if (failureCount > 0) {
     log("\nFailed folders:");
-    failedFolders.forEach((folder) => log(`  - ${folder}`));
+    failedFolders.forEach((x) => log(`  - ${relative(dir, x)}`));
 
     // Exit with failure code to make the GitHub Actions job fail
     process.exit(1);
