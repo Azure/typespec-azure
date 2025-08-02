@@ -31,7 +31,7 @@ export async function validateSpecs(
   let failureCount = 0;
   const failedFolders: string[] = []; // Create a processor function that handles the compilation and logging
   const processProject = async (projectDir: string) => {
-    const result = await verifyProject(runner, projectDir);
+    const result = await verifyProject(runner, projectDir, suite);
     runner.reportTaskWithDetails(
       result.success ? "pass" : "fail",
       relative(dir, projectDir),
@@ -75,16 +75,17 @@ async function findTspProjects(wd: string, pattern: string): Promise<string[]> {
   return result.map((x) => dirname(x));
 }
 
-async function findTspEntrypoint(directory: string): Promise<string | null> {
+async function findTspEntrypoint(
+  directory: string,
+  suite: IntegrationTestSuite,
+): Promise<string | null> {
   try {
     const entries = await readdir(directory);
 
-    // Prefer main.tsp, fall back to client.tsp
-    if (entries.includes("main.tsp")) {
-      return "main.tsp";
-    }
-    if (entries.includes("client.tsp")) {
-      return "client.tsp";
+    for (const entry of suite.entrypoints ?? ["main.tsp"]) {
+      if (entries.includes(entry)) {
+        return entry;
+      }
     }
 
     return null;
@@ -96,8 +97,9 @@ async function findTspEntrypoint(directory: string): Promise<string | null> {
 async function verifyProject(
   runner: TaskRunner,
   dir: string,
+  suite: IntegrationTestSuite,
 ): Promise<{ success: boolean; output: string }> {
-  const entrypoint = await findTspEntrypoint(dir);
+  const entrypoint = await findTspEntrypoint(dir, suite);
 
   if (!entrypoint) {
     const result = {
@@ -115,14 +117,15 @@ async function execTspCompile(
   file: string,
   args: string[] = [],
 ): Promise<{ success: boolean; output: string }> {
-  const { all } = await execa("npx", ["tsp", "compile", file, "--warn-as-error", ...args], {
+  const { failed, all } = await execa("npx", ["tsp", "compile", file, "--warn-as-error", ...args], {
     cwd: directory,
     stdio: "pipe",
     all: true,
+    reject: false,
     env: { FORCE_COLOR: pc.isColorSupported ? "1" : undefined }, // Force color output
   });
   return {
-    success: true,
+    success: !failed,
     output: all,
   };
 }
