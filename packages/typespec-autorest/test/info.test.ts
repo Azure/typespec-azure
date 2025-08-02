@@ -17,7 +17,7 @@ describe("typespec-autorest: info", () => {
     const res = await openApiFor(
       `
       @doc("My service description")
-      @service(#{title: "My Service"})
+      @service(#{title: 2"My Service"})
       namespace Foo {}
       `,
     );
