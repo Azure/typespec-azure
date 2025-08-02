@@ -1,7 +1,7 @@
 import { execa } from "execa";
 import { readdir } from "fs/promises";
 import { globby } from "globby";
-import { dirname, relative, resolve } from "pathe";
+import { dirname, relative } from "pathe";
 import pc from "picocolors";
 import type { IntegrationTestSuite } from "./config/types.js";
 import type { TaskRunner } from "./runner.js";
@@ -24,7 +24,7 @@ export async function validateSpecs(
 
   runner.group(
     `Found ${pc.yellow(tspConfigDirs.length)} TypeSpec projects`,
-    tspConfigDirs.map((projectDir) => pc.bold(resolve(dir, projectDir))).join("\n"),
+    tspConfigDirs.map((projectDir) => pc.bold(relative(dir, projectDir))).join("\n"),
   );
 
   let successCount = 0;
@@ -54,9 +54,9 @@ export async function validateSpecs(
   }
 
   log(`\n=== Summary ===`);
-  log(`Total projects: ${tspConfigDirs.length}`);
-  log(`Successful: ${successCount}`);
-  log(`Failed: ${failureCount}`);
+  const passed = pc.green(`${successCount} passed`);
+  const failed = failureCount > 0 ? pc.red(`${failureCount} failed`) : undefined;
+  log([passed, failed].filter(Boolean).join(pc.gray(" | ")), pc.gray(tspConfigDirs.length));
 
   if (failureCount > 0) {
     log("\nFailed folders:");
