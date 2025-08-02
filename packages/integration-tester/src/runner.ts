@@ -26,7 +26,7 @@ export class TaskRunner<Stages extends string = string> {
     const statusStr = status === "pass" ? pc.green("pass") : pc.red("fail");
     const message = `${statusStr} ${name}`;
     if (this.#verbose || status === "fail") {
-      console.group(message, details);
+      this.group(message, details);
     } else {
       console.log(message);
     }
