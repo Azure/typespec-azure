@@ -5,6 +5,8 @@ import { parse } from "yaml";
 import { runIntegrationTestSuite } from "./run.js";
 import { projectRoot } from "./utils.js";
 
+process.on("SIGINT", () => process.exit(0));
+
 const args = parseArgs({
   args: process.argv.slice(2),
   allowPositionals: true,

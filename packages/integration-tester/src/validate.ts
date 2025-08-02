@@ -1,7 +1,7 @@
 import { execa } from "execa";
 import { readdir } from "fs/promises";
 import { globby } from "globby";
-import { dirname, resolve } from "pathe";
+import { dirname, relative, resolve } from "pathe";
 import pc from "picocolors";
 import type { IntegrationTestSuite } from "./config/types.js";
 import type { TaskRunner } from "./runner.js";
@@ -32,7 +32,11 @@ export async function validateSpecs(
   const failedFolders: string[] = []; // Create a processor function that handles the compilation and logging
   const processProject = async (projectDir: string) => {
     const result = await verifyProject(runner, projectDir);
-    runner.reportTaskWithDetails(result.success ? "pass" : "fail", projectDir, result.output);
+    runner.reportTaskWithDetails(
+      result.success ? "pass" : "fail",
+      relative(dir, projectDir),
+      result.output,
+    );
     return { dir: projectDir, result };
   };
 
