@@ -1,7 +1,9 @@
 /* eslint-disable no-console */
 import { spawn, type SpawnOptions } from "child_process";
+import logSymbols from "log-symbols";
 import ora, { type Ora } from "ora";
 import { resolve } from "pathe";
+import pc from "picocolors";
 
 export const projectRoot = resolve(import.meta.dirname, "..");
 export const repoRoot = resolve(projectRoot, "../..");
@@ -44,6 +46,17 @@ export async function execWithSpinner(
 }
 
 export async function action<T>(message: string, fn: (spinner: Ora) => Promise<T>): Promise<T> {
+  if (process.stderr.isTTY) {
+    return dynamicAction(message, fn);
+  } else {
+    return staticAction(message, fn);
+  }
+}
+
+export async function dynamicAction<T>(
+  message: string,
+  fn: (spinner: Ora) => Promise<T>,
+): Promise<T> {
   const oldLog = console.log;
 
   console.log = (...args: any[]) => {
@@ -61,6 +74,23 @@ export async function action<T>(message: string, fn: (spinner: Ora) => Promise<T
     throw error;
   } finally {
     console.log = oldLog;
+  }
+}
+
+export async function staticAction<T>(
+  message: string,
+  fn: (spinner: Ora) => Promise<T>,
+): Promise<T> {
+  const spinner = ora(message).start();
+  console.log(`- ${message}`);
+  try {
+    const result = await fn(spinner);
+    console.log(`${pc.red(logSymbols.success)} ${message}`);
+
+    return result;
+  } catch (error) {
+    console.log(`${pc.red(logSymbols.error)} ${message}`);
+    throw error;
   }
 }
 
