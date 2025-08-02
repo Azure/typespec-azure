@@ -234,3 +234,11 @@ model ExtensionResourceActionScope {
   @segment("extensionresource")
   name: string;
 }
+
+/**
+ * Template used by ArmProviderAction templates. This produces following action route:
+ * `/{scope}/providers/Microsoft.SomeRP/someAction`
+ * @template StringType The type of the scope name parameter, defaults to string.
+ */
+model ExtensionActionScope<StringType extends string = string>
+  is Extension.ScopeParameter<StringType>;

@@ -737,6 +737,7 @@ op ArmProviderActionSync<
   OptionalRequestBody extends valueof boolean = false
 >(
   ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
+  ...Scope,
   ...ProviderNamespace<Scope>,
   ...Parameters,
 
@@ -773,6 +774,7 @@ op ArmProviderActionAsync<
   OptionalRequestBody extends valueof boolean = false
 >(
   ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
+  ...Scope,
   ...ProviderNamespace<Scope>,
   ...Parameters,
 
