@@ -34,7 +34,6 @@ export async function execWithSpinner(
     });
 
     subprocess.on("close", (code) => {
-      console.log("CLOSE THIS " + command, args);
       if (code !== 0) {
         reject(new Error(`Command failed with exit code ${code}`));
       } else {

@@ -43,7 +43,6 @@ export async function patchPackageJson(dir: string, packages: Packages) {
 
     // Also set in overrides to ensure all nested dependencies use our version
     packageJson.overrides[packageName] = filePath;
-    log(`Set override: ${pc.green(packageName)} -> ${pc.cyan(filePath)}`);
   }
 
   // Write updated package.json
