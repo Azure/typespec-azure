@@ -10,6 +10,7 @@ import {
 import { HttpTestLibrary } from "@typespec/http/testing";
 import { RestTestLibrary } from "@typespec/rest/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
+import {HttpClientTestLibrary} from "@typespec/http-client/testing";
 import { CreateSdkContextOptions, createSdkContext } from "../src/context.js";
 import { SdkContext, SdkHttpOperation, SdkServiceOperation } from "../src/interfaces.js";
 import { BrandedSdkEmitterOptionsInterface } from "../src/internal-utils.js";
@@ -24,7 +25,7 @@ export interface CreateSdkTestRunnerOptions extends BrandedSdkEmitterOptionsInte
 }
 
 export async function createSdkTestHost(options: CreateSdkTestRunnerOptions = {}) {
-  let libraries = [SdkTestLibrary, HttpTestLibrary, RestTestLibrary, VersioningTestLibrary];
+  let libraries = [SdkTestLibrary, HttpTestLibrary, RestTestLibrary, VersioningTestLibrary, HttpClientTestLibrary];
   if (options.librariesToAdd) {
     libraries = libraries.concat(options.librariesToAdd);
   }
@@ -70,7 +71,7 @@ export async function createSdkTestRunner(
     sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
-      sdkContextOption,
+      sdkContextOption
     );
     return result;
   };

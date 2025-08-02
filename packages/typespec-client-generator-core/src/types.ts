@@ -119,6 +119,8 @@ import { getVersions } from "@typespec/versioning";
 import { getNs, isAttribute, isUnwrapped } from "@typespec/xml";
 import { getSdkHttpParameter } from "./http.js";
 import { isMediaTypeJson, isMediaTypeTextPlain, isMediaTypeXml } from "./media-types.js";
+import { $ } from "@typespec/compiler/typekit";
+import "@typespec/http-client/typekit";
 
 export function getTypeSpecBuiltInType(
   context: TCGCContext,
@@ -759,10 +761,13 @@ function addDiscriminatorToModelType(
       discriminatorType = getTypeSpecBuiltInType(context, "string");
     }
     const name = discriminatorProperty ? discriminatorProperty.name : discriminator.propertyName;
+    const featureLifecycle = discriminatorProperty?.__raw ? $(context.program).client.getFeatureLifecycle(discriminatorProperty.__raw, {emitterName: context.emitterName}) : undefined;
+
     const discriminatorPropertyType: SdkModelPropertyType = {
       kind: "property",
       doc: `Discriminator property for ${model.name}.`,
       optional: false,
+      featureLifecycle,
       discriminator: true,
       serializedName: discriminatorProperty
         ? discriminatorProperty.serializedName // eslint-disable-line @typescript-eslint/no-deprecated
@@ -803,12 +808,13 @@ export function getSdkModelWithDiagnostics(
 ): [SdkModelType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   let sdkType = context.__referencedTypeCache.get(type) as SdkModelType | undefined;
-
+  const featureLifecycle = $(context.program).client.getFeatureLifecycle(type, {emitterName: context.emitterName});
   if (!sdkType) {
     const name = getLibraryName(context, type) || getGeneratedName(context, type, operation);
     sdkType = {
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "model")),
       name: name,
+      featureLifecycle,
       isGeneratedName: !type.name,
       namespace: getClientNamespace(context, type),
       doc: getClientDoc(context, type),
@@ -1192,8 +1198,11 @@ export function getSdkCredentialParameter(
 ): SdkCredentialParameter | undefined {
   const auth = getAuthentication(context.program, client.service);
   if (!auth) return undefined;
+  const credentialType = getSdkCredentialType(context, client, auth);
+  const featureLifecycle = $(context.program).client.getFeatureLifecycle(credentialType.__raw!, {emitterName: context.emitterName});
   return {
-    type: getSdkCredentialType(context, client, auth),
+    type: credentialType,
+    featureLifecycle,
     kind: "credential",
     name: "credential",
     isGeneratedName: true,
@@ -1270,9 +1279,13 @@ export function getSdkModelPropertyType(
 
   let property = context.__modelPropertyCache?.get(type);
 
+  const featureLifecycle = property?.__raw ? $(context.program).client.getFeatureLifecycle(property?.__raw, {emitterName: context.emitterName}) : undefined
+
+
   if (!property) {
     property = {
       ...diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation)),
+      featureLifecycle,
       kind: "property",
       optional: type.optional,
       discriminator: false,

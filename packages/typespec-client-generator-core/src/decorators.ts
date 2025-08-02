@@ -19,6 +19,7 @@ import {
   isService,
   isTemplateDeclaration,
 } from "@typespec/compiler";
+import { $decorators } from "@typespec/http-client";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import {
   AccessDecorator,
@@ -32,6 +33,7 @@ import {
   ClientNamespaceDecorator,
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
+  FeatureLifecycleDecorator,
   FlattenPropertyDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
@@ -1282,4 +1284,9 @@ export function isInScope(context: TCGCContext, entity: Operation): boolean {
     return false;
   }
   return true;
+}
+
+
+export const $featureLifecycle: FeatureLifecycleDecorator = (context, target, value, scope) => {
+return $decorators["TypeSpec.HttpClient"].featureLifecycle(context, target, value, {emitterScope: scope})
 }

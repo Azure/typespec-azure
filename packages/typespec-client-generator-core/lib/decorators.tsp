@@ -1,3 +1,4 @@
+import "@typespec/http-client";
 using Reflection;
 
 namespace Azure.ClientGenerator.Core;
@@ -902,3 +903,10 @@ extern dec clientDoc(
   mode: EnumMember,
   scope?: valueof string
 );
+
+
+enum FeatureLifecycle {
+  ...HttpClient.FeatureLifecycle
+}
+
+extern dec featureLifecycle(target: unknown, value: EnumMember, scope?: valueof string);

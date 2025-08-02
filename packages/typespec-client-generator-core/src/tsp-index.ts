@@ -23,6 +23,7 @@ import {
   $scope,
   $usage,
   $useSystemTextJsonConverter,
+  $featureLifecycle
 } from "./decorators.js";
 
 export { $lib } from "./lib.js";
@@ -53,6 +54,7 @@ export const $decorators = {
     responseAsBool: $responseAsBool,
     clientDoc: $clientDoc,
     clientLocation: $clientLocation,
+    featureLifecycle: $featureLifecycle
   } satisfies AzureClientGeneratorCoreDecorators,
 
   "Azure.ClientGenerator.Core.Legacy": {

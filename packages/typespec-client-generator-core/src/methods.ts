@@ -21,6 +21,7 @@ import {
   Operation,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
+import "@typespec/http-client/typekit";
 import { isHeader } from "@typespec/http";
 import { createSdkClientType } from "./clients.js";
 import {
@@ -715,8 +716,10 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
   );
   const response = getSdkMethodResponse(context, operation, serviceOperation, client);
   const name = getLibraryName(context, operation);
+  const featureLifecycle = $(context.program).client.getFeatureLifecycle(operation, {emitterName: context.emitterName})
   return diagnostics.wrap({
     __raw: operation,
+    featureLifecycle,
     kind: "basic",
     name,
     access: getAccess(context, operation) ?? "public",
