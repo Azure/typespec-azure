@@ -51,7 +51,9 @@ export async function runIntegrationTestSuite(
       await execWithSpinner(spinner, "npm", ["install", "--no-package-lock"], {
         cwd: wd,
       });
-    });
+      await execWithSpinner(spinner, "git", ["checkout", "--", "package.json"], {
+        cwd: wd,
+      });
   });
 
   await runner.stage("validate", async () => {
