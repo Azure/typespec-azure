@@ -54,6 +54,7 @@ export async function runIntegrationTestSuite(
       await execWithSpinner(spinner, "git", ["checkout", "--", "package.json"], {
         cwd: wd,
       });
+    });
   });
 
   await runner.stage("validate", async () => {
