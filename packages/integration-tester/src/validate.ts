@@ -47,14 +47,14 @@ export async function validateSpecs(dir: string, suite: IntegrationTestSuite): P
     }
   }
 
-  console.log(`\n=== Summary ===`);
-  console.log(`Total projects: ${tspConfigDirs.length}`);
-  console.log(`Successful: ${successCount}`);
-  console.log(`Failed: ${failureCount}`);
+  log(`\n=== Summary ===`);
+  log(`Total projects: ${tspConfigDirs.length}`);
+  log(`Successful: ${successCount}`);
+  log(`Failed: ${failureCount}`);
 
   if (failureCount > 0) {
-    console.log("\nFailed folders:");
-    failedFolders.forEach((folder) => console.log(`  - ${folder}`));
+    log("\nFailed folders:");
+    failedFolders.forEach((folder) => log(`  - ${folder}`));
 
     // Exit with failure code to make the GitHub Actions job fail
     process.exit(1);
