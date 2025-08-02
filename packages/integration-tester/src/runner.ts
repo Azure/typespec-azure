@@ -1,15 +1,25 @@
 /* eslint-disable no-console */
 import pc from "picocolors";
 
-export interface TaskRunnerOptions {
+export interface TaskRunnerOptions<Stages extends string> {
   readonly verbose?: boolean;
+  readonly stages?: Stages[];
 }
 
-export class TaskRunner {
+export class TaskRunner<Stages extends string = string> {
   #verbose: boolean;
+  #stages: Stages[] | undefined;
 
-  constructor(private readonly options: TaskRunnerOptions = {}) {
+  constructor(options: TaskRunnerOptions<Stages> = {}) {
+    this.#stages = options.stages;
     this.#verbose = options.verbose === undefined ? Boolean(process.env.CI) : options.verbose;
+  }
+
+  async stage(name: Stages, fn: () => Promise<unknown>): Promise<void> {
+    if (this.#stages && !this.#stages.includes(name)) {
+      return;
+    }
+    await fn();
   }
 
   reportTaskWithDetails(status: "pass" | "fail", name: string, details: string) {

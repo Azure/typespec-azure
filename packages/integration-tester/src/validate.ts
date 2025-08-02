@@ -54,9 +54,9 @@ export async function validateSpecs(
   }
 
   log(`\n=== Summary ===`);
-  const passed = pc.green(`${successCount} passed`);
-  const failed = failureCount > 0 ? pc.red(`${failureCount} failed`) : undefined;
-  log([passed, failed].filter(Boolean).join(pc.gray(" | ")), pc.gray(tspConfigDirs.length));
+  const passed = pc.bold(pc.green(`${successCount} passed`));
+  const failed = failureCount > 0 ? pc.bold(pc.red(`${failureCount} failed`)) : undefined;
+  log([passed, failed].filter(Boolean).join(pc.gray(" | ")), pc.gray(`(${tspConfigDirs.length})`));
 
   if (failureCount > 0) {
     log("\nFailed folders:");

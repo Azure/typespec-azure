@@ -22,13 +22,8 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
-      - name: Checkout Azure REST API specs
-        uses: actions/checkout@v4
-        with:
-          repository: Azure/azure-rest-api-specs
-          path: azure-rest-api-specs
-          ref: typespec-next
-          fetch-depth: 1
+      - name: Checkout
+        run: node ./packages/integration-tester/cmd/tsp-integration.js azure-specs --stage checkout
 
       - name: Setup Node.js and pnpm
         uses: ./.github/actions/setup
@@ -50,23 +45,11 @@ jobs:
           echo "Created tgz packages:"
           ls -la ./tgz-packages/
 
-      - name: Update azure-rest-api-specs package.json
-        run: |
-          cd azure-rest-api-specs
-
-          echo "Updating package.json with TypeSpec dependencies..."
-          pnpm tsx ../.github/scripts/update-azure-specs-packages.ts . ../tgz-packages
-
-          echo "Installing dependencies..."
-          npm install --no-package-lock
-
-          echo "Reverting package.json changes..."
-          git checkout -- package.json || true
+      - name: Patch package.json
+        run: node ./packages/integration-tester/cmd/tsp-integration.js azure-specs --stage patch --stage install
 
       - name: Run TypeSpec validation in azure-rest-api-specs
-        id: validation
-        run: pnpm tsx ../.github/scripts/validate-typespec-specs.ts .
-        working-directory: azure-rest-api-specs
+        run: node ./packages/integration-tester/cmd/tsp-integration.js azure-specs --stage validate
 
       - name: Check for git changes
         if: success() || failure() # Still run this step even if validation fails to ensure as much information as possible

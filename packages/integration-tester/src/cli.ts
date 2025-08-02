@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import { parseArgs } from "node:util";
 import { join } from "pathe";
 import { parse } from "yaml";
-import { runIntegrationTestSuite } from "./run.js";
+import { runIntegrationTestSuite, Stages, type Stage } from "./run.js";
 import { projectRoot } from "./utils.js";
 
 process.on("SIGINT", () => process.exit(0));
@@ -14,6 +14,10 @@ const args = parseArgs({
     clean: {
       type: "boolean",
       default: false,
+    },
+    stage: {
+      type: "string",
+      multiple: true,
     },
   },
 });
@@ -27,7 +31,20 @@ if (suite === undefined) {
   throw new Error(`Integration test suite "${suiteName}" not found in config.`);
 }
 
+let stages: Stage[] | undefined = undefined;
+if (args.values.stage) {
+  stages = args.values.stage as Stage[];
+  for (const stage of stages) {
+    if (!Stages.includes(stage)) {
+      throw new Error(
+        `Invalid stage "${stage}" specified. Valid stages are: ${Stages.join(", ")}.`,
+      );
+    }
+  }
+}
+
 const wd = join(projectRoot, "temp", suiteName);
 await runIntegrationTestSuite(wd, suiteName, suite, {
   clean: args.values.clean,
+  stages,
 });

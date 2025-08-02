@@ -8,35 +8,53 @@ import { action, execWithSpinner, log, repoRoot } from "./utils.js";
 import { validateSpecs } from "./validate.js";
 
 export interface RunIntegrationTestSuiteOptions {
+  stages?: Stage[];
   clean?: boolean;
 }
+
+export const Stages = ["checkout", "patch", "install", "validate"] as const;
+export type Stage = (typeof Stages)[number];
+
 export async function runIntegrationTestSuite(
   wd: string,
   suiteName: string,
   config: IntegrationTestSuite,
   options: RunIntegrationTestSuiteOptions = {},
 ): Promise<void> {
-  const runner = new TaskRunner({ verbose: options.clean });
-  log("Running", pc.cyan(suiteName), config);
-  await ensureRepoState(config, wd, {
-    clean: options.clean,
-  });
+  const runner = new TaskRunner<Stage>({ verbose: options.clean, stages: options.stages });
+  log(
+    `Running ${options.stages ? options.stages.map(pc.yellow).join(", ") : "all"} stage${options.stages?.length !== 1 ? "s" : ""}`,
+    pc.cyan(suiteName),
+    config,
+  );
 
-  const packages = await action("Resolving local package versions", async () => {
-    const packages = await findPackages({ wsDir: repoRoot });
-    printPackages(packages);
-    return packages;
-  });
-
-  await action("Patching package.json", async () => {
-    await patchPackageJson(wd, packages);
-  });
-
-  await action("Installing dependencies", async (spinner) => {
-    await execWithSpinner(spinner, "npm", ["install", "--no-package-lock"], {
-      cwd: wd,
+  await runner.stage("checkout", async () => {
+    await ensureRepoState(config, wd, {
+      clean: options.clean,
     });
   });
 
-  await validateSpecs(runner, wd, config);
+  await runner.stage("patch", async () => {
+    const packages = await action("Resolving local package versions", async () => {
+      const packages = await findPackages({ wsDir: repoRoot });
+      printPackages(packages);
+      return packages;
+    });
+
+    await action("Patching package.json", async () => {
+      await patchPackageJson(wd, packages);
+    });
+  });
+
+  await runner.stage("install", async () => {
+    await action("Installing dependencies", async (spinner) => {
+      await execWithSpinner(spinner, "npm", ["install", "--no-package-lock"], {
+        cwd: wd,
+      });
+    });
+  });
+
+  await runner.stage("validate", async () => {
+    await validateSpecs(runner, wd, config);
+  });
 }
