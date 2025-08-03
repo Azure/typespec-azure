@@ -19,7 +19,7 @@ const args = parseArgs({
       type: "string",
       multiple: true,
     },
-    tgzDir: {
+    "tgz-dir": {
       type: "string",
     },
   },
