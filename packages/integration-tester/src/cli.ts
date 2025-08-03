@@ -50,5 +50,5 @@ const wd = join(projectRoot, "temp", suiteName);
 await runIntegrationTestSuite(wd, suiteName, suite, {
   clean: args.values.clean,
   stages,
-  tgzDir: args.values.tgzDir && resolve(process.cwd(), args.values.tgzDir),
+  tgzDir: args.values["tgz-dir"] && resolve(process.cwd(), args.values["tgz-dir"]),
 });
