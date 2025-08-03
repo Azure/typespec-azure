@@ -2,6 +2,7 @@ import { findWorkspacePackagesNoCheck } from "@pnpm/workspace.find-packages";
 import { readdir } from "node:fs/promises";
 import { relative, resolve } from "pathe";
 import pc from "picocolors";
+import * as tar from "tar";
 import { log } from "./utils.js";
 
 /**
@@ -60,8 +61,7 @@ export function printPackages(packages: Packages): void {
  * Discovers packages from a directory containing .tgz artifact files.
  *
  * This function scans a directory for .tgz files and extracts package information
- * from their filenames. It handles the naming conventions used by different package
- * families (@azure-tools/*, @typespec/*, etc.).
+ * by reading the package.json from within each tar file.
  *
  * @param tgzDir - Directory containing .tgz artifact files
  * @returns Promise resolving to discovered packages with paths pointing to .tgz files
@@ -74,52 +74,62 @@ export async function findPackagesFromTgzArtifactDir(tgzDir: string): Promise<Pa
     .filter((item) => item.isFile() && item.name.endsWith(".tgz"))
     .map((item) => item.name);
 
-  for (const tgzFile of tgzFiles) {
-    const fullPath = resolve(tgzDir, tgzFile);
-    const packageName = extractPackageNameFromTgzFilename(tgzFile);
+  // Process tar files in parallel
+  await Promise.all(
+    tgzFiles.map(async (tgzFile) => {
+      const fullPath = resolve(tgzDir, tgzFile);
+      const packageName = await extractPackageNameFromTgzFile(fullPath);
 
-    if (packageName) {
-      packages[packageName] = {
-        name: packageName,
-        path: fullPath,
-      };
-    }
-  }
+      if (packageName) {
+        packages[packageName] = {
+          name: packageName,
+          path: fullPath,
+        };
+      }
+    }),
+  );
 
   return packages;
 }
 
 /**
- * Extracts the package name from a .tgz filename based on naming conventions.
+ * Extracts the package name by reading package.json from a .tgz file.
  *
- * Handles various package naming patterns:
- * - azure-tools-typespec-azure-core-1.0.0.tgz -> @azure-tools/typespec-azure-core
- * - typespec-compiler-1.1.0.tgz -> @typespec/compiler
- * - typespec-azure-vscode-1.0.0.tgz -> typespec-azure-vscode
+ * This function reads the package.json file from the root of the tar archive
+ * to get the accurate package name, which is more reliable than parsing filenames.
  *
- * @param tgzFile - The .tgz filename to extract package name from
- * @returns The extracted package name, or empty string if pattern doesn't match
+ * @param tgzFilePath - Path to the .tgz file
+ * @returns Promise resolving to the package name, or null if not found
  */
-function extractPackageNameFromTgzFilename(tgzFile: string): string {
-  // Remove version suffix (pattern: -X.Y.Z[additional].tgz)
-  const versionPattern = /-\d+\.\d+\.\d+.*\.tgz$/;
+async function extractPackageNameFromTgzFile(tgzFilePath: string): Promise<string | null> {
+  try {
+    let packageJsonContent: string | null = null;
 
-  if (tgzFile.startsWith("azure-tools-")) {
-    // Extract name for azure packages: azure-tools-typespec-azure-core-1.0.0.tgz -> @azure-tools/typespec-azure-core
-    const withoutPrefix = tgzFile.replace("azure-tools-", "");
-    const withoutVersion = withoutPrefix.replace(versionPattern, "");
-    return `@azure-tools/${withoutVersion}`;
-  } else if (tgzFile.startsWith("typespec-") && !tgzFile.startsWith("typespec-azure-vscode-")) {
-    // Extract name for @typespec packages: typespec-compiler-1.1.0.tgz -> @typespec/compiler
-    const withoutPrefix = tgzFile.replace("typespec-", "");
-    const withoutVersion = withoutPrefix.replace(versionPattern, "");
-    return `@typespec/${withoutVersion}`;
-  } else if (tgzFile.startsWith("typespec-azure-vscode-")) {
-    // Handle special case for vscode extension
-    return "typespec-azure-vscode";
+    await tar.t({
+      file: tgzFilePath,
+      // cspell:ignore onentry
+      onentry: (entry) => {
+        if (entry.path === "package/package.json") {
+          entry.on("data", (chunk) => {
+            if (packageJsonContent === null) {
+              packageJsonContent = "";
+            }
+            packageJsonContent += chunk.toString();
+          });
+        }
+      },
+    });
+
+    if (packageJsonContent) {
+      const packageJson = JSON.parse(packageJsonContent);
+      return packageJson.name || null;
+    }
+
+    return null;
+  } catch (error) {
+    log(`Failed to read package.json from ${tgzFilePath}: ${error}`);
+    return null;
   }
-
-  throw new Error(`Unknown .tgz filename format: ${tgzFile}`);
 }
 
 /**
