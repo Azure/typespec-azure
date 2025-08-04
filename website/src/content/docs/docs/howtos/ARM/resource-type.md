@@ -417,6 +417,23 @@ In addition to the resource-specific property bag, a resource may configure on o
 - **ETags**: A standard mechanism for managing concurrent operations over the resource.
 - **ResourceKind**: A standard mechanism for specifying a type of user experience in the portal.
 
+### Billing Data
+
+Billing Data provides a standard description of resource's billing state, including a reference to a product in the Marketplace Catalog. It is strongly recommended for Resource Providers with prepaid billing (where a customer is charged _before_ the product is provisioned/fulfilled) to utilize this pattern, allowing customers to interact with such resources through central experiences.
+
+```typespec
+model EmployeeResource is TrackedResource<EmployeeProperties> {
+  /** The employee name, using 'Firstname Lastname' notation */
+  @segment("employees")
+  @key("employeeName")
+  @visibility(Lifecycle.Read)
+  @path
+  name: string;
+
+  ...BillingDataProperty;
+}
+```
+
 ### Managed Identity
 
 Standard configuration for ARM support of both SystemAssigned and UserAssigned Managed Service Identity (MSI)
