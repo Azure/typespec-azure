@@ -846,7 +846,7 @@ function hasPageSizeDecorator(context: TCGCContext, property: ModelProperty): bo
     
     // Look for the official pageSize decorator from TypeSpec standard library
     return property.decorators.some(decorator => 
-      decorator.decorator.name === "pageSize"
+      decorator.decorator.name === "@pageSize"
     );
   } catch (error) {
     // If there's any error accessing decorators, return false to be safe
