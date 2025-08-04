@@ -127,6 +127,201 @@ List the operations for the provider
 op Azure.ResourceManager.Operations.list(apiVersion: string, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.CommonTypes.OperationListResult> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
+### `PrivateEndpoints` {#Azure.ResourceManager.PrivateEndpoints}
+
+```typespec
+interface Azure.ResourceManager.PrivateEndpoints<>
+```
+
+#### `PrivateEndpoints.ListByParent` {#Azure.ResourceManager.PrivateEndpoints.ListByParent}
+
+```typespec
+op Azure.ResourceManager.PrivateEndpoints.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+```
+
+##### Template Parameters
+
+| Name           | Description                                               |
+| -------------- | --------------------------------------------------------- |
+| ParentResource | the parent resource of the PrivateEndpointConnection      |
+| BaseParameters | Optional. Allows overriding the operation parameters      |
+| Parameters     | Optional. Additional parameters after the path parameters |
+| Response       | Optional. The success response for the list operation     |
+| Error          | Optional. The error response, if non-standard.            |
+
+#### `PrivateEndpoints.Read` {#Azure.ResourceManager.PrivateEndpoints.Read}
+
+```typespec
+op Azure.ResourceManager.PrivateEndpoints.Read(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+```
+
+##### Template Parameters
+
+| Name           | Description                                               |
+| -------------- | --------------------------------------------------------- |
+| ParentResource | the parent resource of the PrivateEndpointConnection      |
+| BaseParameters | Optional. Allows overriding the operation parameters      |
+| Parameters     | Optional. Additional parameters after the path parameters |
+| Response       | Optional. The success response for the read operation     |
+| Error          | Optional. The error response, if non-standard.            |
+
+#### `PrivateEndpoints.CreateOrUpdateAsync` {#Azure.ResourceManager.PrivateEndpoints.CreateOrUpdateAsync}
+
+```typespec
+op Azure.ResourceManager.PrivateEndpoints.CreateOrUpdateAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Azure.ResourceManager.CommonTypes.PrivateEndpointConnection): Response | Error
+```
+
+##### Template Parameters
+
+| Name           | Description                                                             |
+| -------------- | ----------------------------------------------------------------------- |
+| ParentResource | the parent resource of the PrivateEndpointConnection                    |
+| BaseParameters | Optional. Allows overriding the operation parameters                    |
+| LroHeaders     | Optional. Allows overriding the lro headers returned on resource create |
+| Parameters     | Optional. Additional parameters after the path parameters               |
+| Response       | Optional. The success response for the createOrUpdate operation         |
+| Error          | Optional. The error response, if non-standard.                          |
+
+#### `PrivateEndpoints.CreateOrReplaceSync` {#Azure.ResourceManager.PrivateEndpoints.CreateOrReplaceSync}
+
+```typespec
+op Azure.ResourceManager.PrivateEndpoints.CreateOrReplaceSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Azure.ResourceManager.CommonTypes.PrivateEndpointConnection): Response | Error
+```
+
+##### Template Parameters
+
+| Name           | Description                                                     |
+| -------------- | --------------------------------------------------------------- |
+| ParentResource | the parent resource of the PrivateEndpointConnection            |
+| BaseParameters | Optional. Allows overriding the operation parameters            |
+| Parameters     | Optional. Additional parameters after the path parameters       |
+| Response       | Optional. The success response for the createOrUpdate operation |
+| Error          | Optional. The error response, if non-standard.                  |
+
+#### `PrivateEndpoints.CreateOrReplaceAsync` {#Azure.ResourceManager.PrivateEndpoints.CreateOrReplaceAsync}
+
+```typespec
+op Azure.ResourceManager.PrivateEndpoints.CreateOrReplaceAsync(provider: "Microsoft.ThisWillBeReplaced", resource: ParentResource): Response | Error
+```
+
+##### Template Parameters
+
+| Name           | Description                                                             |
+| -------------- | ----------------------------------------------------------------------- |
+| ParentResource | the parent resource of the PrivateEndpointConnection                    |
+| BaseParameters | Optional. Allows overriding the operation parameters                    |
+| LroHeaders     | Optional. Allows overriding the lro headers returned on resource create |
+| Parameters     | Optional. Additional parameters after the path parameters               |
+| Response       | Optional. The success response for the createOrReplace operation        |
+| Error          | Optional. The error response, if non-standard.                          |
+
+#### `PrivateEndpoints.CustomPatchAsync` {#Azure.ResourceManager.PrivateEndpoints.CustomPatchAsync}
+
+A long-running resource update using a custom PATCH payload (Asynchronous)
+
+```typespec
+op Azure.ResourceManager.PrivateEndpoints.CustomPatchAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, properties: PatchModel): Response | Error
+```
+
+##### Template Parameters
+
+| Name           | Description                                                                   |
+| -------------- | ----------------------------------------------------------------------------- |
+| ParentResource | the parent resource of the PrivateEndpointConnection                          |
+| PatchModel     | The input model for the PATCH request                                         |
+| BaseParameters | Optional. Allows overriding the operation parameters                          |
+| LroHeaders     | Optional. Allows overriding the lro headers returned in the Accepted response |
+| Parameters     | Optional. Additional parameters after the path parameters                     |
+| Response       | Optional. The success response for the patch operation                        |
+| Error          | Optional. The error response, if non-standard.                                |
+
+#### `PrivateEndpoints.CustomPatchSync` {#Azure.ResourceManager.PrivateEndpoints.CustomPatchSync}
+
+```typespec
+op Azure.ResourceManager.PrivateEndpoints.CustomPatchSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, properties: PatchModel): Response | Error
+```
+
+##### Template Parameters
+
+| Name           | Description                                               |
+| -------------- | --------------------------------------------------------- |
+| ParentResource | The parent resource of the PrivateEndpointConnection      |
+| PatchModel     | The input model for the PATCH request                     |
+| BaseParameters | Optional. Allows overriding the operation parameters      |
+| Parameters     | Optional. Additional parameters after the path parameters |
+| Response       | Optional. The success response for the patch operation    |
+| Error          | Optional. The error response, if non-standard.            |
+
+#### `PrivateEndpoints.DeleteAsync` {#Azure.ResourceManager.PrivateEndpoints.DeleteAsync}
+
+:::caution
+**Deprecated**: Use 'ArmResourceDeleteWithoutOkAsync' instead
+:::
+
+```typespec
+op Azure.ResourceManager.PrivateEndpoints.DeleteAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+```
+
+##### Template Parameters
+
+| Name           | Description                                                      |
+| -------------- | ---------------------------------------------------------------- |
+| ParentResource | The parent resource of the PrivateEndpointConnection             |
+| BaseParameters | Optional. Allows overriding the parameters for the operation     |
+| LroHeaders     | Optional. Allows overriding the headers in the Accepted response |
+| Parameters     | Optional. Additional parameters after the path parameters        |
+| Response       | Optional. The success response(s) for the delete operation       |
+| Error          | Optional. The error response, if non-standard.                   |
+
+#### `PrivateEndpoints.DeleteWithoutOkAsync` {#Azure.ResourceManager.PrivateEndpoints.DeleteWithoutOkAsync}
+
+```typespec
+op Azure.ResourceManager.PrivateEndpoints.DeleteWithoutOkAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+```
+
+##### Template Parameters
+
+| Name           | Description                                                               |
+| -------------- | ------------------------------------------------------------------------- |
+| ParentResource | The parent resource of the PrivateEndpointConnection                      |
+| BaseParameters | Optional. Allows overriding the parameters for the operation              |
+| LroHeaders     | Optional. Allows overriding the headers returned in the Accepted response |
+| Parameters     | Optional. Additional parameters after the path parameters                 |
+| Response       | Optional. The success response(s) for the delete operation                |
+| Error          | Optional. The error response, if non-standard.                            |
+
+#### `PrivateEndpoints.DeleteSync` {#Azure.ResourceManager.PrivateEndpoints.DeleteSync}
+
+```typespec
+op Azure.ResourceManager.PrivateEndpoints.DeleteSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+```
+
+##### Template Parameters
+
+| Name           | Description                                                  |
+| -------------- | ------------------------------------------------------------ |
+| ParentResource | The parent resource of the PrivateEndpointConnection         |
+| BaseParameters | Optional. Allows overriding the parameters for the operation |
+| Parameters     | Optional. Additional parameters after the path parameters    |
+| Response       | Optional. The success response(s) for the delete operation   |
+| Error          | Optional. The error response, if non-standard.               |
+
+#### `PrivateEndpoints.DeleteAsyncBase` {#Azure.ResourceManager.PrivateEndpoints.DeleteAsyncBase}
+
+```typespec
+op Azure.ResourceManager.PrivateEndpoints.DeleteAsyncBase(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+```
+
+##### Template Parameters
+
+| Name           | Description                                                  |
+| -------------- | ------------------------------------------------------------ |
+| ParentResource |                                                              |
+| Response       | The response type for the operation                          |
+| BaseParameters | Optional. Allows overriding the parameters for the operation |
+| Parameters     | Optional. Additional parameters after the path parameters    |
+| Error          | Optional. The error response, if non-standard.               |
+
 ### `ProxyResourceOperations` {#Azure.ResourceManager.ProxyResourceOperations}
 
 A composite interface for Proxy resources that include `ResourceInstanceOperations<Resource, Properties>`

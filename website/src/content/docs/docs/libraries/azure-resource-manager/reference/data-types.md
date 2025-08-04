@@ -819,6 +819,20 @@ model Azure.ResourceManager.ParentKeysOf<Resource>
 
 None
 
+### `PrivateEndpointConnectionUpdate` {#Azure.ResourceManager.PrivateEndpointConnectionUpdate}
+
+The template for adding optional properties.
+
+```typespec
+model Azure.ResourceManager.PrivateEndpointConnectionUpdate
+```
+
+#### Properties
+
+| Name        | Type                                                                                                                           | Description                                |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
+| properties? | [`PrivateEndpointConnectionProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionProperties) | The private endpoint connection properties |
+
 ### `ProviderNamespace` {#Azure.ResourceManager.ProviderNamespace}
 
 Model describing the provider namespace.
