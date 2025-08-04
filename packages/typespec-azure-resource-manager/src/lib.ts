@@ -116,6 +116,18 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`The template parameter "${"sourceType"}" for "${"entity"}" does not extend the constraint type "${"constraintType"}". ${"actionMessage"}`,
       },
     },
+    "required-constraint-violation": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`${"actionMessage"}.`,
+      },
+    },
+    "exclusion-constraint-violation": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`${"actionMessage"}.`,
+      },
+    },
   },
 });
 
