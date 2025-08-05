@@ -706,14 +706,13 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
   for (const param of params) {
     if (isNeverOrVoidType(param.type)) continue;
     const sdkMethodParam = diagnostics.pipe(getSdkMethodParameter(context, param, operation));
-    if (sdkMethodParam.onClient) {
+    if (sdkMethodParam.onClient && getClientLocation(context, param) !== operation) {
       const operationLocation = context.getClientForOperation(operation);
       if (sdkMethodParam.isApiVersionParam) {
         if (
           !context.__clientParametersCache
             .get(operationLocation)
-            ?.find((x) => x.isApiVersionParam) &&
-          getClientLocation(context, param) !== operation
+            ?.find((x) => x.isApiVersionParam)
         ) {
           clientParams.push(sdkMethodParam);
         }

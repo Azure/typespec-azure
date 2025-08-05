@@ -671,10 +671,10 @@ describe("Parameter", () => {
       autoUsings: ["Azure.ResourceManager", "Azure.Core"],
       emitterName: "@azure-tools/typespec-java",
     });
-    await runnerWithArm.compileWithCustomization(
+    await runnerWithArm.compile(
       `
     @armProviderNamespace("My.Service")
-    @service(#{title: "My.Service"})
+    @service(#{ title: "My.Service" })
     @versioned(Versions)
     @armCommonTypesVersion(CommonTypes.Versions.v5)
     namespace My.Service;
@@ -695,28 +695,119 @@ describe("Parameter", () => {
     }
 
     op get is ArmResourceRead<MyModel>;
-    @@friendlyName(CommonTypes.SubscriptionIdParameter.subscriptionId, "", My.Service.get);
-    `,
-      `
-    // @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, My.Service.Operations.get);
-    // @@friendlyName(CommonTypes.SubscriptionIdParameter.subscriptionId, "", My.Service.get);
+
+    @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, get);
     `,
     );
 
     const sdkPackage = runnerWithArm.context.sdkPackage;
-    const client = sdkPackage.clients[0].children?.[0];
+    const client = sdkPackage.clients[0];
     ok(client);
     for (const p of client.clientInitialization.parameters) {
       ok(p.onClient);
     }
-    ok(client.clientInitialization.parameters.some((p) => p.name === "subscriptionId"));
-    const myInterface = client.children?.find((c) => c.name === "MyInterface");
-    ok(myInterface);
-    strictEqual(myInterface.methods.length, 1);
-    const getOperation = myInterface.methods.find((m) => m.name === "get");
+    // since there's only one operation and the subscription id is moved to the operation, it should not be in the client parameters
+    ok(!client.clientInitialization.parameters.some((p) => p.name === "subscriptionId"));
+    strictEqual(client.methods.length, 1);
+    const getMethod = client.methods.find((m) => m.name === "get");
+    ok(getMethod);
+    strictEqual(getMethod.parameters.length, 3);
+    const subIdMethodParam = getMethod.parameters.find((p) => p.name === "subscriptionId");
+    ok(subIdMethodParam);
+    ok(getMethod.parameters.some((p) => p.name === "extendedZoneName"));
+    ok(getMethod.parameters.some((p) => p.name === "accept"));
+    const getOperation = getMethod.operation;
     ok(getOperation);
-    strictEqual(getOperation.parameters.length, 1);
+    strictEqual(getOperation.parameters.length, 4);
+    const subIdOperationParam = getOperation.parameters.find((p) => p.name === "subscriptionId");
+    ok(subIdOperationParam);
+    strictEqual(subIdOperationParam.correspondingMethodParams.length, 1);
+    strictEqual(subIdOperationParam.correspondingMethodParams[0], subIdMethodParam);
+    ok(getOperation.parameters.some((p) => p.name === "extendedZoneName"));
+    ok(getOperation.parameters.some((p) => p.name === "accept"));
+    ok(getOperation.parameters.some((p) => p.name === "apiVersion"));
+  });
 
-    strictEqual(getOperation.parameters.length, 0);
+  it("subId from client to operation for one method, stays on client for other", async () => {
+    const runnerWithArm = await createSdkTestRunner({
+      librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
+      autoUsings: ["Azure.ResourceManager", "Azure.Core"],
+      emitterName: "@azure-tools/typespec-java",
+    });
+    await runnerWithArm.compile(
+      `
+    @armProviderNamespace("My.Service")
+    @service(#{ title: "My.Service" })
+    @versioned(Versions)
+    @armCommonTypesVersion(CommonTypes.Versions.v5)
+    namespace My.Service;
+
+    /** Api versions */
+    enum Versions {
+      /** 2024-04-01-preview api version */
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      V2024_04_01_PREVIEW: "2024-04-01-preview",
+    }
+
+    @subscriptionResource
+    model MyModel is ProxyResource<{}> {
+      @key("extendedZoneName")
+      @segment("extendedZones")
+      @path
+      name: string;
+    }
+
+    op get is ArmResourceRead<MyModel>;
+    op put is ArmResourceCreateOrReplaceAsync<MyModel>;
+
+    @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, get);
+    `,
+    );
+
+    const sdkPackage = runnerWithArm.context.sdkPackage;
+    const client = sdkPackage.clients[0];
+    ok(client);
+    for (const p of client.clientInitialization.parameters) {
+      ok(p.onClient);
+    }
+    // since there's only one operation and the subscription id is moved to the operation, it should not be in the client parameters
+    const subIdClientParam = client.clientInitialization.parameters.find(
+      (p) => p.name === "subscriptionId",
+    );
+    ok(subIdClientParam);
+    strictEqual(client.methods.length, 2);
+
+    const getMethod = client.methods.find((m) => m.name === "get");
+    ok(getMethod);
+    strictEqual(getMethod.parameters.length, 3);
+    const subIdMethodParam = getMethod.parameters.find((p) => p.name === "subscriptionId");
+    ok(subIdMethodParam);
+    ok(getMethod.parameters.some((p) => p.name === "extendedZoneName"));
+    ok(getMethod.parameters.some((p) => p.name === "accept"));
+    const getOperation = getMethod.operation;
+    ok(getOperation);
+    strictEqual(getOperation.parameters.length, 4);
+    const subIdOperationParam = getOperation.parameters.find((p) => p.name === "subscriptionId");
+    ok(subIdOperationParam);
+    strictEqual(subIdOperationParam.correspondingMethodParams.length, 1);
+    strictEqual(subIdOperationParam.correspondingMethodParams[0], subIdMethodParam);
+    ok(getOperation.parameters.some((p) => p.name === "extendedZoneName"));
+    ok(getOperation.parameters.some((p) => p.name === "accept"));
+    ok(getOperation.parameters.some((p) => p.name === "apiVersion"));
+
+    const putMethod = client.methods.find((m) => m.name === "put");
+    ok(putMethod);
+    strictEqual(putMethod.parameters.length, 4);
+    // The subscriptionId parameter should not be moved to the operation
+    ok(!putMethod.parameters.some((p) => p.name === "subscriptionId"));
+    const putOperation = putMethod.operation;
+    ok(putOperation);
+    strictEqual(putOperation.parameters.length, 5);
+    const putSubIdOperationParam = putOperation.parameters.find(
+      (p) => p.name === "subscriptionId",
+    );
+    ok(putSubIdOperationParam);
+    strictEqual(putSubIdOperationParam.correspondingMethodParams.length, 1);
+    strictEqual(putSubIdOperationParam.correspondingMethodParams[0], subIdClientParam);
   });
 });
