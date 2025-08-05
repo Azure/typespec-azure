@@ -1,5 +1,22 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.24
+
+### Deprecations
+
+- [#2974](https://github.com/Azure/typespec-azure/pull/2974) Deprecate pageable decorators `@Azure.Core.items` and `@Azure.Core.pagedResult`. Use `@TypeSpec.pageItems` and `@TypeSpec.list` instead.
+
+### Features
+
+- [#3083](https://github.com/Azure/typespec-azure/pull/3083) add spector test cases for `@legacy.hierarchyBuilding`
+- [#3090](https://github.com/Azure/typespec-azure/pull/3090) Add test for enum with same name in different namespace.
+- [#3094](https://github.com/Azure/typespec-azure/pull/3094) Add test for overload method in C# client code.
+
+### Bug Fixes
+
+- [#3086](https://github.com/Azure/typespec-azure/pull/3086) Fix missing list decorator
+
+
 ## 0.1.0-alpha.23
 
 ### Features

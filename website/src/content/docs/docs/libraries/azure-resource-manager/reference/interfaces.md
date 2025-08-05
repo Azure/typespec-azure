@@ -2207,3 +2207,87 @@ op Azure.ResourceManager.Legacy.UpdateOperation(properties: BodyParameter): Resp
 | Response            | The response or union of responses for success.          |
 | ErrorResponse       | The error response.                                      |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional |
+
+## Azure.ResourceManager.Legacy.Extension
+
+### `CreateOrReplaceSync` {#Azure.ResourceManager.Legacy.Extension.CreateOrReplaceSync}
+
+Synchronous PUT operation for Azure Resource Manager resources
+
+```typespec
+op Azure.ResourceManager.Legacy.Extension.CreateOrReplaceSync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace", resource: Request): Response | Error
+```
+
+#### Template Parameters
+
+| Name                | Description                                                                                              |
+| ------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource      | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource   | the resource being created or replaced                                                                   |
+| Request             | Optional. The request body for the createOrUpdate operation                                              |
+| Parameters          | Optional. Additional parameters after the path parameters                                                |
+| Response            | Optional. The success response for the createOrUpdate operation                                          |
+| Error               | Optional. The error response, if non-standard.                                                           |
+| OptionalRequestBody | Optional. If true, the request body is optional                                                          |
+
+### `CreateOrUpdateAsync` {#Azure.ResourceManager.Legacy.Extension.CreateOrUpdateAsync}
+
+A long-running resource CreateOrUpdate (PUT)
+
+```typespec
+op Azure.ResourceManager.Legacy.Extension.CreateOrUpdateAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace", resource: Request): Response | Error
+```
+
+#### Template Parameters
+
+| Name                | Description                                                                                              |
+| ------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource      | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource   | the resource being created or updated                                                                    |
+| Request             | Optional. The request body for the createOrUpdate operation                                              |
+| LroHeaders          | Optional. Allows overriding the lro headers returned on resource create                                  |
+| Parameters          | Optional. Additional parameters after the path parameters                                                |
+| Response            | Optional. The success response for the createOrUpdate operation                                          |
+| Error               | Optional. The error response, if non-standard.                                                           |
+| OptionalRequestBody | Optional. If true, the request body is optional                                                          |
+
+### `CustomPatchAsync` {#Azure.ResourceManager.Legacy.Extension.CustomPatchAsync}
+
+A long-running resource update using a custom PATCH payload (Asynchronous)
+
+```typespec
+op Azure.ResourceManager.Legacy.Extension.CustomPatchAsync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace", properties: PatchModel): Response | Error
+```
+
+#### Template Parameters
+
+| Name                | Description                                                                                              |
+| ------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource      | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource   | the resource being patched                                                                               |
+| PatchModel          | The input model for the PATCH request                                                                    |
+| LroHeaders          | Optional. Allows overriding the lro headers returned in the Accepted response                            |
+| Parameters          | Optional. Additional parameters after the path parameters                                                |
+| Response            | Optional. The success response for the patch operation                                                   |
+| Error               | Optional. The error response, if non-standard.                                                           |
+| OptionalRequestBody | Optional. Whether the request body is optional.                                                          |
+
+### `CustomPatchSync` {#Azure.ResourceManager.Legacy.Extension.CustomPatchSync}
+
+A resource update using a custom PATCH payload (synchronous)
+
+```typespec
+op Azure.ResourceManager.Legacy.Extension.CustomPatchSync(apiVersion: string, subscriptionId: Azure.Core.uuid, resourceGroupName: string, provider: "Microsoft.TargetProviderNamespace", extensionProvider: "Microsoft.ExtensionProviderNamespace", properties: PatchModel): Response | Error
+```
+
+#### Template Parameters
+
+| Name                | Description                                                                                              |
+| ------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource      | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource   | the resource being patched                                                                               |
+| PatchModel          | The input model for the PATCH request                                                                    |
+| Parameters          | Optional. Additional parameters after the path parameters                                                |
+| Response            | Optional. The success response for the patch operation                                                   |
+| Error               | Optional. The error response, if non-standard.                                                           |
+| OptionalRequestBody | Optional. Whether the request body is optional.                                                          |
