@@ -3,7 +3,6 @@ import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 
-using Http;
 using Rest;
 using Versioning;
 using Azure.Core;
@@ -68,6 +67,8 @@ union ProvisioningState {
 }
 
 interface Operations extends Azure.ResourceManager.Operations {}
+model MyPrivateEndpointResource is PrivateEndpointConnectionResource;
+alias PrivateEndpointOperations = PrivateEndpoints<MyPrivateEndpointResource>;
 
 @armResourceOperations
 interface Employees {
@@ -86,11 +87,11 @@ interface Employees {
   /** A sample HEAD operation to check resource existence */
   checkExistence is ArmResourceCheckExistence<Employee>;
 
-  getPrivateEndpointConnection is PrivateEndpoints.Read<Employee>;
-  createOrUpdatePrivateEndpointConnection is PrivateEndpoints.CreateOrUpdateAsync<Employee>;
-  updatePrivateEndpointConnection is PrivateEndpoints.CustomPatchAsync<Employee>;
-  deletePrivateEndpointConnection is PrivateEndpoints.DeleteWithoutOkAsync<Employee>;
-  listPrivateEndpointConnections is PrivateEndpoints.ListByParent<Employee>;
+  getPrivateEndpointConnection is PrivateEndpointOperations.Read<Employee>;
+  createOrUpdatePrivateEndpointConnection is PrivateEndpointOperations.CreateOrUpdateAsync<Employee>;
+  updatePrivateEndpointConnection is PrivateEndpointOperations.CustomPatchAsync<Employee>;
+  deletePrivateEndpointConnection is PrivateEndpointOperations.DeleteAsync<Employee>;
+  listPrivateEndpointConnections is PrivateEndpointOperations.ListByParent<Employee>;
 }
 
 /** Employee move request */
@@ -118,13 +119,14 @@ interface Dependents {
   >;
   delete is ArmResourceDeleteSync<Dependent>;
   list is ArmResourceListByParent<Dependent>;
-  getPrivateEndpointConnection is PrivateEndpoints.Read<Dependent>;
-  createOrUpdatePrivateEndpointConnection is PrivateEndpoints.CreateOrUpdateAsync<Dependent>;
-  updatePrivateEndpointConnection is PrivateEndpoints.CustomPatchAsync<Dependent>;
-  deletePrivateEndpointConnection is PrivateEndpoints.DeleteWithoutOkAsync<Dependent>;
-  listPrivateEndpointConnections is PrivateEndpoints.ListByParent<Dependent>;
+  getPrivateEndpointConnection is PrivateEndpointOperations.Read<Dependent>;
+  createOrUpdatePrivateEndpointConnection is PrivateEndpointOperations.CreateOrUpdateAsync<Dependent>;
+  updatePrivateEndpointConnection is PrivateEndpointOperations.CustomPatchAsync<Dependent>;
+  deletePrivateEndpointConnection is PrivateEndpointOperations.DeleteAsync<Dependent>;
+  listPrivateEndpointConnections is PrivateEndpointOperations.ListByParent<Dependent>;
 }
 
+/** An employee dependent */
 @parentResource(Employee)
 model Dependent is ProxyResource<DependentProperties> {
   ...ResourceNameParameter<Dependent>;

@@ -709,7 +709,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/PrivateEndpointConnectionListResult"
+              "$ref": "#/definitions/PrivateEndpointConnectionResourceListResult"
             }
           },
           "default": {
@@ -823,13 +823,13 @@
         ],
         "responses": {
           "200": {
-            "description": "Resource 'PrivateEndpointConnection' update operation succeeded",
+            "description": "Resource 'PrivateEndpointConnectionResource' update operation succeeded",
             "schema": {
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
             }
           },
           "201": {
-            "description": "Resource 'PrivateEndpointConnection' create operation succeeded",
+            "description": "Resource 'PrivateEndpointConnectionResource' create operation succeeded",
             "schema": {
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
             },
@@ -1083,7 +1083,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/PrivateEndpointConnectionListResult"
+              "$ref": "#/definitions/PrivateEndpointConnectionResourceListResult"
             }
           },
           "default": {
@@ -1181,13 +1181,13 @@
         ],
         "responses": {
           "200": {
-            "description": "Resource 'PrivateEndpointConnection' update operation succeeded",
+            "description": "Resource 'PrivateEndpointConnectionResource' update operation succeeded",
             "schema": {
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
             }
           },
           "201": {
-            "description": "Resource 'PrivateEndpointConnection' create operation succeeded",
+            "description": "Resource 'PrivateEndpointConnectionResource' create operation succeeded",
             "schema": {
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
             },
@@ -1348,18 +1348,27 @@
   "definitions": {
     "Azure.ResourceManager.PrivateEndpointConnectionUpdate": {
       "type": "object",
-      "description": "The template for adding optional properties.",
+      "description": "PATCH model for private endpoint connections",
       "properties": {
         "properties": {
-          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnectionProperties",
+          "type": "object",
           "description": "The private endpoint connection properties",
-          "x-ms-client-flatten": true
+          "properties": {
+            "privateEndpoint": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpoint",
+              "description": "The private endpoint resource."
+            },
+            "privateLinkServiceConnectionState": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateLinkServiceConnectionState",
+              "description": "A collection of information about the state of the connection between service consumer and provider."
+            }
+          }
         }
       }
     },
     "Dependent": {
       "type": "object",
-      "description": "Concrete proxy resource types can be created by aliasing this type using a specific property type.",
+      "description": "An employee dependent",
       "properties": {
         "properties": {
           "$ref": "#/definitions/DependentProperties",
@@ -1575,13 +1584,13 @@
         "movingStatus"
       ]
     },
-    "PrivateEndpointConnectionListResult": {
+    "PrivateEndpointConnectionResourceListResult": {
       "type": "object",
-      "description": "The response of a PrivateEndpointConnection list operation.",
+      "description": "The response of a PrivateEndpointConnectionResource list operation.",
       "properties": {
         "value": {
           "type": "array",
-          "description": "The PrivateEndpointConnection items on this page",
+          "description": "The PrivateEndpointConnectionResource items on this page",
           "items": {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
           }

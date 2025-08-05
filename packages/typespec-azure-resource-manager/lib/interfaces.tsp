@@ -13,6 +13,10 @@ namespace Azure.ResourceManager;
  *   GET "/providers/Microsoft.ContosoProviderHub/operations"
  */
 interface Operations {
+  /**
+   * @dev List the operations for the provider.
+  
+   */
   @tag("Operations")
   @autoRoute
   @armUpdateProviderNamespace

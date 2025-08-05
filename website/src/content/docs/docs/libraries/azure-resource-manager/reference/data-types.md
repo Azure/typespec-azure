@@ -840,12 +840,33 @@ model Azure.ResourceManager.ParentKeysOf<Resource>
 
 None
 
-### `PrivateEndpointConnectionUpdate` {#Azure.ResourceManager.PrivateEndpointConnectionUpdate}
+### `PrivateEndpointConnectionResource` {#Azure.ResourceManager.PrivateEndpointConnectionResource}
 
-The template for adding optional properties.
+A private endpoint connection resource.
+Resource providers must declare a private endpoint connection resource type in their provider namespace if
+they support private endpoint connections
 
 ```typespec
-model Azure.ResourceManager.PrivateEndpointConnectionUpdate
+model Azure.ResourceManager.PrivateEndpointConnectionResource<Description>
+```
+
+#### Template Parameters
+
+| Name        | Description                                                                                       |
+| ----------- | ------------------------------------------------------------------------------------------------- |
+| Description | Optional. The documentary description of the private endpoint connection resource name parameter. |
+
+#### Examples
+
+```ts
+namespace Microsoft.Contoso;
+model PrivateEndpointConnection is PrivateEndpointConnectionResource {}
+alias EmployeeConnectionOps is PrivateEndpoints<PrivateEndpointConnection>;
+@armResourceOperations
+interface Employees {
+ @doc("get a private endpoint connection for resource employee")
+ getPrivateEndpointConnection is EmployeeConnectionOps.Read<Employee>;
+}
 ```
 
 #### Properties
@@ -853,6 +874,21 @@ model Azure.ResourceManager.PrivateEndpointConnectionUpdate
 | Name        | Type                                                                                                                           | Description                                |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
 | properties? | [`PrivateEndpointConnectionProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionProperties) | The private endpoint connection properties |
+| name        | `string`                                                                                                                       |                                            |
+
+### `PrivateEndpointConnectionUpdate` {#Azure.ResourceManager.PrivateEndpointConnectionUpdate}
+
+PATCH model for private endpoint connections
+
+```typespec
+model Azure.ResourceManager.PrivateEndpointConnectionUpdate
+```
+
+#### Properties
+
+| Name        | Type                                                                                                        | Description                                |
+| ----------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| properties? | `OptionalProperties<UpdateableProperties<ResourceManager.CommonTypes.PrivateEndpointConnectionProperties>>` | The private endpoint connection properties |
 
 ### `ProviderNamespace` {#Azure.ResourceManager.ProviderNamespace}
 
