@@ -818,7 +818,7 @@ export function findEntriesWithTarget<TSource extends Type, TTarget>(
     }
 
     // Check all scopes for matching target
-    for (const [scope, target] of Object.entries(scopedData)) {
+    for (const target of Object.values(scopedData)) {
       if (target === targetValue) {
         results.push(source as TSource);
         break; // Found match, no need to check other scopes
