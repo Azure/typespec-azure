@@ -12,11 +12,7 @@ import {
   Union,
   UnionVariant,
 } from "@typespec/compiler";
-import {
-  AugmentDecoratorStatementNode,
-  DecoratorExpressionNode,
-  SyntaxKind,
-} from "@typespec/compiler/ast";
+import { AugmentDecoratorStatementNode, DecoratorExpressionNode } from "@typespec/compiler/ast";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import { DuplicateTracker } from "@typespec/compiler/utils";
 import { getClientNameOverride } from "../decorators.js";
@@ -225,7 +221,7 @@ function validateClientNamesCore(
 ) {
   const duplicateTracker = new DuplicateTracker<
     string,
-    Type | DecoratorExpressionNode | AugmentDecoratorStatementNode
+    Type | [Type, DecoratorExpressionNode | AugmentDecoratorStatementNode]
   >();
 
   for (const item of items) {
@@ -233,7 +229,7 @@ function validateClientNamesCore(
     if (clientName !== undefined) {
       const clientNameDecorator = item.decorators.find((x) => x.definition?.name === "@clientName");
       if (clientNameDecorator?.node !== undefined) {
-        duplicateTracker.track(clientName, clientNameDecorator.node);
+        duplicateTracker.track(clientName, [item, clientNameDecorator.node]);
       }
     } else {
       if (item.name !== undefined && typeof item.name === "string") {
@@ -249,30 +245,46 @@ function reportDuplicateClientNames(
   program: Program,
   duplicateTracker: DuplicateTracker<
     string,
-    Type | DecoratorExpressionNode | AugmentDecoratorStatementNode
+    Type | [Type, DecoratorExpressionNode | AugmentDecoratorStatementNode]
   >,
   scope: string | typeof AllScopes,
 ) {
   for (const [name, duplicates] of duplicateTracker.entries()) {
     for (const item of duplicates) {
       const scopeStr = scope === AllScopes ? "AllScopes" : scope;
-      // If the item is a decorator application node
-      if (
-        item.kind === SyntaxKind.DecoratorExpression ||
-        item.kind === SyntaxKind.AugmentDecoratorStatement
-      ) {
-        reportDiagnostic(program, {
-          code: "duplicate-client-name",
-          format: { name, scope: scopeStr },
-          target: item,
-        });
+      if (Array.isArray(item)) {
+        // If the item is a decorator application
+        if (scope === "csharp" && item[0].kind === "Operation") {
+          // .NET support operations with same name with overloads
+          reportDiagnostic(program, {
+            code: "duplicate-client-name-warning",
+            format: { name, scope: scopeStr },
+            target: item[1],
+          });
+        } else {
+          reportDiagnostic(program, {
+            code: "duplicate-client-name",
+            format: { name, scope: scopeStr },
+            target: item[1],
+          });
+        }
       } else {
-        reportDiagnostic(program, {
-          code: "duplicate-client-name",
-          messageId: "nonDecorator",
-          format: { name, scope: scopeStr },
-          target: item,
-        });
+        if (scope === "csharp" && item.kind === "Operation") {
+          // .NET support operations with same name with overloads
+          reportDiagnostic(program, {
+            code: "duplicate-client-name-warning",
+            messageId: "nonDecorator",
+            format: { name, scope: scopeStr },
+            target: item,
+          });
+        } else {
+          reportDiagnostic(program, {
+            code: "duplicate-client-name",
+            messageId: "nonDecorator",
+            format: { name, scope: scopeStr },
+            target: item,
+          });
+        }
       }
     }
   }
