@@ -298,7 +298,7 @@ type PetStoreCatsClientFeedResponse {}
 type PetStoreCatsClientPetResponse {}
 
 # Usage Sample
-petStoreClient := NewPetStoreClient(nil,"my-endpoint")
+petStoreClient := NewPetStoreClient()
 petStoreCatsClient := petStoreClient.NewPetStoreCatsClient()
 petStoreCatsClient.Feed(context.Background(), &PetStoreCatsClientFeedOptions{})
 petStoreCatsClient.Pet(context.Background(), &PetStoreCatsClientPetOptions{})
@@ -917,29 +917,7 @@ client.pet();
 ```
 
 ```go
-# client.go
-package petstorerenamed
-
-type Client struct {}
-func NewClient() *Client{
-  return &Client{}
-}
-func (client *PetStoreClient) Feed(ctx context.Context, options *PetStoreClientFeedOptions) (PetStoreClientFeedResponse, error) {}
-func (client *PetStoreClient) Pet(ctx context.Context, options *PetStoreClientPetOptions) (PetStoreClientPetResponse, error) {}
-
-# options.go
-type PetStoreClientFeedOptions struct {}
-type PetStoreClientPetOptions struct {}
-
-# response.go
-type PetStoreClientFeedResponse struct {}
-type PetStoreClientPetResponse struct {}
-
-# Usage Sample
-client := NewClient()
-client.Feed(context.Background(), &PetStoreClientFeedOptions{})
-client.Pet(context.Background(), &PetStoreClientPetOptions{})
-
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>
@@ -1930,7 +1908,7 @@ NOT_SUPPORTED
 ```
 
 ```go
-// TODO
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>
