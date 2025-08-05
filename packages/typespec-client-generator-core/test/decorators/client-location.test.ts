@@ -803,9 +803,7 @@ describe("Parameter", () => {
     const putOperation = putMethod.operation;
     ok(putOperation);
     strictEqual(putOperation.parameters.length, 5);
-    const putSubIdOperationParam = putOperation.parameters.find(
-      (p) => p.name === "subscriptionId",
-    );
+    const putSubIdOperationParam = putOperation.parameters.find((p) => p.name === "subscriptionId");
     ok(putSubIdOperationParam);
     strictEqual(putSubIdOperationParam.correspondingMethodParams.length, 1);
     strictEqual(putSubIdOperationParam.correspondingMethodParams[0], subIdClientParam);

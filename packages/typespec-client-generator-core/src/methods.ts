@@ -710,9 +710,7 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
       const operationLocation = context.getClientForOperation(operation);
       if (sdkMethodParam.isApiVersionParam) {
         if (
-          !context.__clientParametersCache
-            .get(operationLocation)
-            ?.find((x) => x.isApiVersionParam)
+          !context.__clientParametersCache.get(operationLocation)?.find((x) => x.isApiVersionParam)
         ) {
           clientParams.push(sdkMethodParam);
         }
