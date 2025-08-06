@@ -1,5 +1,17 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.58.2
+
+### Features
+
+- [#3093](https://github.com/Azure/typespec-azure/pull/3093) Report warning for operations with same name when using `@clientName` for .NET.
+
+### Bug Fixes
+
+- [#3107](https://github.com/Azure/typespec-azure/pull/3107) Support multipart response and fix multipart anonymous model naming empty.
+- [#3120](https://github.com/Azure/typespec-azure/pull/3120) Fix next link re-injection segments missing problem after migrating to unbranded pagination.
+
+
 ## 0.58.1
 
 ### Bump dependencies
