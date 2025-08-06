@@ -23,6 +23,7 @@ import {
 } from "@azure-tools/typespec-azure-resource-manager";
 import {
   getClientNameOverride,
+  getLegacyHierarchyBuilding,
   shouldFlattenProperty,
 } from "@azure-tools/typespec-client-generator-core";
 import {
@@ -1910,6 +1911,8 @@ export async function getOpenAPIForService(
       return array;
     }
 
+    const rawBaseModel = getLegacyHierarchyBuilding(context.tcgcSdkContext, model);
+
     const modelSchema: OpenAPI2Schema = {
       type: "object",
       description: getDoc(program, model),
@@ -1958,6 +1961,13 @@ export async function getOpenAPIForService(
     applyExternalDocs(model, modelSchema);
 
     for (const prop of model.properties.values()) {
+      if (rawBaseModel && rawBaseModel.properties.has(prop.name)) {
+        const baseProp = rawBaseModel.properties.get(prop.name);
+        if (baseProp?.name === prop.name && baseProp.type === prop.type) {
+          // If the property is the same as the base model, skip it
+          continue;
+        }
+      }
       if (
         !metadataInfo.isPayloadProperty(
           prop,
@@ -2058,7 +2068,7 @@ export async function getOpenAPIForService(
       const baseSchema = getSchemaForType(model.baseModel, schemaContext);
       Object.assign(modelSchema, baseSchema, { description: modelSchema.description });
     } else if (model.baseModel) {
-      const baseSchema = getSchemaOrRef(model.baseModel, schemaContext);
+      const baseSchema = getSchemaOrRef(rawBaseModel ?? model.baseModel, schemaContext);
       modelSchema.allOf = [baseSchema];
     }
 
