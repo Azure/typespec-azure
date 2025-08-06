@@ -1912,6 +1912,7 @@ export async function getOpenAPIForService(
     }
 
     const tcgcSdkContext = createTCGCContext(program, "@azure-tools/typespec-autorest");
+    tcgcSdkContext.enableLegacyHierarchyBuilding = true;
     const rawBaseModel = getLegacyHierarchyBuilding(tcgcSdkContext, model);
     if (rawBaseModel) {
       model.baseModel = rawBaseModel;
