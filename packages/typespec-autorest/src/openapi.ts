@@ -21,7 +21,9 @@ import {
   isConditionallyFlattened,
 } from "@azure-tools/typespec-azure-resource-manager";
 import {
+  createTCGCContext,
   getClientNameOverride,
+  getLegacyHierarchyBuilding,
   shouldFlattenProperty,
 } from "@azure-tools/typespec-client-generator-core";
 import {
@@ -1907,6 +1909,12 @@ export async function getOpenAPIForService(
     const array = getArrayType(model, schemaContext, namespace);
     if (array) {
       return array;
+    }
+
+    const tcgcSdkContext = createTCGCContext(program, "@azure-tools/typespec-autorest");
+    const rawBaseModel = getLegacyHierarchyBuilding(tcgcSdkContext, model);
+    if (rawBaseModel) {
+      model.baseModel = rawBaseModel;
     }
 
     const modelSchema: OpenAPI2Schema = {
