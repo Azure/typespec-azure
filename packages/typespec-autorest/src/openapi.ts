@@ -21,7 +21,6 @@ import {
   isConditionallyFlattened,
 } from "@azure-tools/typespec-azure-resource-manager";
 import {
-  createTCGCContext,
   getClientNameOverride,
   getLegacyHierarchyBuilding,
   shouldFlattenProperty,
@@ -1911,12 +1910,7 @@ export async function getOpenAPIForService(
       return array;
     }
 
-    const tcgcSdkContext = createTCGCContext(program, "@azure-tools/typespec-autorest");
-    tcgcSdkContext.enableLegacyHierarchyBuilding = true;
-    const rawBaseModel = getLegacyHierarchyBuilding(tcgcSdkContext, model);
-    if (rawBaseModel) {
-      model.baseModel = rawBaseModel;
-    }
+    const rawBaseModel = getLegacyHierarchyBuilding(context.tcgcSdkContext, model);
 
     const modelSchema: OpenAPI2Schema = {
       type: "object",
@@ -1966,6 +1960,13 @@ export async function getOpenAPIForService(
     applyExternalDocs(model, modelSchema);
 
     for (const prop of model.properties.values()) {
+      if (rawBaseModel && rawBaseModel.properties.has(prop.name)) {
+        const baseProp = rawBaseModel.properties.get(prop.name);
+        if (baseProp?.name === prop.name && baseProp.type === prop.type) {
+          // If the property is the same as the base model, skip it
+          continue;
+        }
+      }
       if (
         !metadataInfo.isPayloadProperty(
           prop,
@@ -2066,7 +2067,7 @@ export async function getOpenAPIForService(
       const baseSchema = getSchemaForType(model.baseModel, schemaContext);
       Object.assign(modelSchema, baseSchema, { description: modelSchema.description });
     } else if (model.baseModel) {
-      const baseSchema = getSchemaOrRef(model.baseModel, schemaContext);
+      const baseSchema = getSchemaOrRef(rawBaseModel ?? model.baseModel, schemaContext);
       modelSchema.allOf = [baseSchema];
     }
 

@@ -269,9 +269,7 @@ describe("typespec-autorest: polymorphic model inheritance with discriminator", 
       { preset: "azure" },
     );
     ok(openApi.definitions);
-    ok(openApi.definitions.Pet, "expected definition named Pet");
     ok(openApi.definitions.Cat, "expected definition named Cat");
-    ok(openApi.definitions.Dog, "expected definition named Dog");
     ok(openApi.definitions.Beagle, "expected definition named Beagle");
     ok(openApi.definitions.Poodle, "expected definition named Poodle");
     deepStrictEqual(openApi.definitions.Pet, {
@@ -293,8 +291,16 @@ describe("typespec-autorest: polymorphic model inheritance with discriminator", 
       allOf: [{ $ref: "#/definitions/Pet" }],
       "x-ms-discriminator-value": "dog",
     });
-    deepStrictEqual(openApi.definitions.Beagle.allOf, [{ $ref: "#/definitions/Dog" }]);
-    deepStrictEqual(openApi.definitions.Poodle.allOf, [{ $ref: "#/definitions/Dog" }]);
+    deepStrictEqual(openApi.definitions.Beagle, {
+      type: "object",
+      allOf: [{ $ref: "#/definitions/Dog" }],
+      "x-ms-discriminator-value": "beagle",
+    });
+    deepStrictEqual(openApi.definitions.Poodle, {
+      type: "object",
+      allOf: [{ $ref: "#/definitions/Dog" }],
+      "x-ms-discriminator-value": "poodle",
+    });
   });
 
   it("defines discriminated union with enum", async () => {

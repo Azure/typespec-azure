@@ -120,6 +120,7 @@ export async function getAllServicesAtAllVersions(
   options: ResolvedAutorestEmitterOptions,
 ): Promise<AutorestServiceRecord[]> {
   const tcgcSdkContext = createTCGCContext(program, "@azure-tools/typespec-autorest");
+  tcgcSdkContext.enableLegacyHierarchyBuilding = true;
 
   const services = listServices(program);
   if (services.length === 0) {
