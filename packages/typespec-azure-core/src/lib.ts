@@ -243,6 +243,12 @@ export const $lib = createTypeSpecLibrary({
         default: `@previewVersion can only be applied to the last member of a Version enum. Having it on other members will cause unstable apis to show up in subsequent stable versions.`,
       },
     },
+    "unique-items-invalid-type": {
+      severity: "warning",
+      messages: {
+        default: `@uniqueItems can only be applied to arrays and array-valued model properties.`,
+      },
+    },
   },
 
   state: {
@@ -274,6 +280,7 @@ export const $lib = createTypeSpecLibrary({
     trait: { description: "Data for `@trait` decorator" },
     traitContext: { description: "Data for `@traitContext` decorator" },
     traitLocation: { description: "Data for `@traitLocation` decorator" },
+    uniqueItems: { description: "Data for `@uniqueItems` decorator" },
     parameterizedNextLinkConfig: {
       description: "Data for `@parameterizedNextLinkConfig` decorator",
     },

@@ -9,6 +9,7 @@ import {
   getLroMetadata,
   getPagedResult,
   getUnionAsEnum,
+  hasUniqueItems,
 } from "@azure-tools/typespec-azure-core";
 import {
   getArmCommonTypeOpenAPIRef,
@@ -2238,6 +2239,13 @@ export async function getOpenAPIForService(
     const maxItems = getMaxItems(program, typespecType);
     if (!target.maxItems && maxItems !== undefined) {
       newTarget.maxItems = maxItems;
+    }
+
+    const uniqueItems =
+      (typespecType.kind === "ModelProperty" || typespecType.kind === "Model") &&
+      hasUniqueItems(program, typespecType);
+    if (uniqueItems && !target.uniqueItems) {
+      newTarget.uniqueItems = true;
     }
 
     if (isSecret(program, typespecType)) {
