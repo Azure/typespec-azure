@@ -2,7 +2,7 @@
 title: Change the provider namespace
 ---
 
-If you want to have a different provider namespace than the TypeSpec namespec you'll have to change the following
+If you want to have a different provider namespace than the TypeSpec namespace you'll have to change the following
 
 ## 1. Change the name in the spec
 

@@ -20,7 +20,7 @@ alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
 
 // In the Widgets interface...
 /** Schedule a widget for repairs. */
-scheduleRepairs is Operations.ResourceAction<
+op scheduleRepairs is Operations.ResourceAction<
   Widget,
   WidgetRepairRequest,
   WidgetRepairRequest
@@ -28,7 +28,7 @@ scheduleRepairs is Operations.ResourceAction<
 
 // In the WidgetParts interface...
 /** Reorder all parts for the widget. */
-reorderParts is Operations.ResourceCollectionAction<
+op reorderParts is Operations.ResourceCollectionAction<
   WidgetPart,
   WidgetPartReorderRequest,
   WidgetPartReorderRequest
