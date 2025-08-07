@@ -1,5 +1,12 @@
 # Changelog - @azure-tools/typespec-azure-rulesets
 
+## 0.59.0
+
+### Bump dependencies
+
+- [#3029](https://github.com/Azure/typespec-azure/pull/3029) Upgrade dependencies
+
+
 ## 0.58.0
 
 ### Bump dependencies
