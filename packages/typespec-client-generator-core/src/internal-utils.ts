@@ -598,6 +598,10 @@ export function isOnClient(
       currClient = currClient.namespace;
     }
   }
+  if (operation && getClientLocation(context, type) === operation) {
+    // if the type has explicitly been moved to the operation, it is not on the client
+    return false;
+  }
   return (
     isSubscriptionId(context, type) ||
     (isApiVersion(context, type) && versioning) ||
