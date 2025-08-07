@@ -67,7 +67,7 @@ async function cloneRepo(spinner: Ora, repo: string, branch: string, dir: string
   await mkdir(dir, { recursive: true });
 
   spinner.text = `Cloning repo ${pc.cyan(repo)} at branch ${pc.cyan(branch)} into ${pc.cyan(relativeDir)}`;
-  await simpleGit().clone(repo, dir, { branch, depth: 1 });
+  await simpleGit().clone(repo, dir, { "--branch": branch, "--depth": 1 });
 }
 
 /**
