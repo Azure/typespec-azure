@@ -30,7 +30,7 @@ import {
 } from "@typespec/http";
 import { getStreamMetadata } from "@typespec/http/experimental";
 import { camelCase } from "change-case";
-import { getClientLocation, getParamAlias, getResponseAsBool } from "./decorators.js";
+import { getParamAlias, getResponseAsBool } from "./decorators.js";
 import {
   CollectionFormat,
   SdkBodyParameter,
