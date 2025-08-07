@@ -815,14 +815,14 @@ export function findEntriesWithTarget<TSource extends Type, TTarget>(
   const results: TSource[] = [];
   const stateMap = context.program.stateMap(stateKey);
 
-  for (const [source, scopedData] of stateMap.entries()) {
+  for (const source of stateMap.keys()) {
     // Filter by source type if specified
     if (sourceKind && source.kind !== sourceKind) {
       continue;
     }
 
     // Check all scopes for matching target
-    for (const target of Object.values(scopedData)) {
+    for (const target of listScopedDecoratorData(context, stateKey).values()) {
       if (target === targetValue) {
         results.push(source as TSource);
         break; // Found match, no need to check other scopes
