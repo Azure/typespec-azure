@@ -33,6 +33,7 @@ import { $needsRoute } from "./decorators/private/needs-route.js";
 import { parameterizedNextLinkConfigDecorator } from "./decorators/private/parameterized-next-link-config.js";
 import { $spreadCustomParameters } from "./decorators/private/spread-custom-parameters.js";
 import { $spreadCustomResponseProperties } from "./decorators/private/spread-custom-response-properties.js";
+import { $uniqueItems } from "./decorators/unique-items.js";
 import { $useFinalStateVia } from "./decorators/use-final-state-via.js";
 import {
   $addTraitProperties,
@@ -70,6 +71,7 @@ export const $decorators = {
     finalOperation: $finalOperation,
     useFinalStateVia: $useFinalStateVia,
     nextPageOperation: $nextPageOperation,
+    uniqueItems: $uniqueItems,
   } satisfies AzureCoreDecorators,
 
   "Azure.Core.Foundations": {

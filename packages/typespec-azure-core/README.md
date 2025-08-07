@@ -88,6 +88,7 @@ Available ruleSets:
 - [`@pollingOperation`](#@pollingoperation)
 - [`@pollingOperationParameter`](#@pollingoperationparameter)
 - [`@previewVersion`](#@previewversion)
+- [`@uniqueItems`](#@uniqueitems)
 - [`@useFinalStateVia`](#@usefinalstatevia)
 
 #### `@finalLocation`
@@ -395,6 +396,22 @@ enum Versions {
   v3Preview,
 }
 ```
+
+#### `@uniqueItems`
+
+Specifies that an array model or array-typed property should contain only unique items.
+
+```typespec
+@Azure.Core.uniqueItems
+```
+
+##### Target
+
+`ModelProperty | Model`
+
+##### Parameters
+
+None
 
 #### `@useFinalStateVia`
 
