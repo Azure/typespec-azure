@@ -180,12 +180,36 @@ Expected response body:
 }
 ```
 
-### Azure_ClientGenerator_Core_HierarchyBuilding_updateDog
+### Azure_ClientGenerator_Core_HierarchyBuilding_AnimalOperations_updateAnimalAsAnimal
 
-- Endpoint: `put /azure/client-generator-core/hierarchy-building/animal/dog`
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/animal/as-animal`
 
 Test operation that accepts Animal input and returns Animal output.
-This operation expects Dog data and validates the @hierarchyBuilding decorator when Dog is used.
+This operation expects Animal data and validates basic Animal functionality.
+Expected request body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy"
+}
+```
+
+### Azure_ClientGenerator_Core_HierarchyBuilding_AnimalOperations_updateDogAsAnimal
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/dog/as-animal`
+
+Test operation that accepts Animal input and returns Animal output.
+Service expects Dog data and returns Dog data.
 Due to @hierarchyBuilding(Pet), Dog should inherit from Pet rather than Animal directly.
 Expected request body:
 
@@ -209,12 +233,95 @@ Expected response body:
 }
 ```
 
-### Azure_ClientGenerator_Core_HierarchyBuilding_updatePet
+### Azure_ClientGenerator_Core_HierarchyBuilding_AnimalOperations_updatePetAsAnimal
 
-- Endpoint: `put /azure/client-generator-core/hierarchy-building/animal/pet`
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/pet/as-animal`
 
 Test operation that accepts Animal input and returns Animal output.
-This operation expects Pet data and validates that Pet type works correctly with the @hierarchyBuilding decorator.
+Service expects Pet data and returns Pet data.
+Expected request body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy",
+  "trained": true
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy",
+  "trained": true
+}
+```
+
+### Azure_ClientGenerator_Core_HierarchyBuilding_DogOperations_updateDogAsDog
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/dog/as-dog`
+
+Test operation that accepts Dog input and returns Dog output.
+This operation validates Dog type directly.
+Expected request body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+### Azure_ClientGenerator_Core_HierarchyBuilding_PetOperations_updateDogAsPet
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/dog/as-pet`
+
+Test operation that accepts Pet input and returns Pet output.
+Service expects Dog data and returns Dog data.
+This validates that Dog can be used as Pet due to @hierarchyBuilding decorator.
+Expected request body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+### Azure_ClientGenerator_Core_HierarchyBuilding_PetOperations_updatePetAsPet
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/pet/as-pet`
+
+Test operation that accepts Pet input and returns Pet output.
+This operation validates Pet type directly.
 Expected request body:
 
 ```json

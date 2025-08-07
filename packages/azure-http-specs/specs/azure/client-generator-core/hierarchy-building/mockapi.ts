@@ -3,6 +3,11 @@ import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
 // Sample data for testing
+const sampleAnimal = {
+  kind: "pet",
+  name: "Buddy",
+};
+
 const samplePet = {
   kind: "pet",
   name: "Buddy",
@@ -16,28 +21,92 @@ const sampleDog = {
   breed: "German Shepherd",
 };
 
-Scenarios.Azure_ClientGenerator_Core_HierarchyBuilding_updatePet = passOnSuccess({
-  uri: "/azure/client-generator-core/hierarchy-building/animal/pet",
-  method: "put",
-  request: {
-    body: json(samplePet),
-  },
-  response: {
-    status: 200,
-    body: json(samplePet), // Returns Pet data as Animal
-  },
-  kind: "MockApiDefinition",
-});
+// Animal operations
+Scenarios.Azure_ClientGenerator_Core_HierarchyBuilding_AnimalOperations_updateAnimalAsAnimal =
+  passOnSuccess({
+    uri: "/azure/client-generator-core/hierarchy-building/animal/as-animal",
+    method: "put",
+    request: {
+      body: json(sampleAnimal),
+    },
+    response: {
+      status: 200,
+      body: json(sampleAnimal),
+    },
+    kind: "MockApiDefinition",
+  });
 
-Scenarios.Azure_ClientGenerator_Core_HierarchyBuilding_updateDog = passOnSuccess({
-  uri: "/azure/client-generator-core/hierarchy-building/animal/dog",
-  method: "put",
-  request: {
-    body: json(sampleDog),
+Scenarios.Azure_ClientGenerator_Core_HierarchyBuilding_AnimalOperations_updatePetAsAnimal =
+  passOnSuccess({
+    uri: "/azure/client-generator-core/hierarchy-building/pet/as-animal",
+    method: "put",
+    request: {
+      body: json(samplePet),
+    },
+    response: {
+      status: 200,
+      body: json(samplePet),
+    },
+    kind: "MockApiDefinition",
+  });
+
+Scenarios.Azure_ClientGenerator_Core_HierarchyBuilding_AnimalOperations_updateDogAsAnimal =
+  passOnSuccess({
+    uri: "/azure/client-generator-core/hierarchy-building/dog/as-animal",
+    method: "put",
+    request: {
+      body: json(sampleDog),
+    },
+    response: {
+      status: 200,
+      body: json(sampleDog),
+    },
+    kind: "MockApiDefinition",
+  });
+
+// Pet operations
+Scenarios.Azure_ClientGenerator_Core_HierarchyBuilding_PetOperations_updatePetAsPet = passOnSuccess(
+  {
+    uri: "/azure/client-generator-core/hierarchy-building/pet/as-pet",
+    method: "put",
+    request: {
+      body: json(samplePet),
+    },
+    response: {
+      status: 200,
+      body: json(samplePet),
+    },
+    kind: "MockApiDefinition",
   },
-  response: {
-    status: 200,
-    body: json(sampleDog), // Returns Dog data as Animal
+);
+
+Scenarios.Azure_ClientGenerator_Core_HierarchyBuilding_PetOperations_updateDogAsPet = passOnSuccess(
+  {
+    uri: "/azure/client-generator-core/hierarchy-building/dog/as-pet",
+    method: "put",
+    request: {
+      body: json(sampleDog),
+    },
+    response: {
+      status: 200,
+      body: json(sampleDog),
+    },
+    kind: "MockApiDefinition",
   },
-  kind: "MockApiDefinition",
-});
+);
+
+// Dog operations
+Scenarios.Azure_ClientGenerator_Core_HierarchyBuilding_DogOperations_updateDogAsDog = passOnSuccess(
+  {
+    uri: "/azure/client-generator-core/hierarchy-building/dog/as-dog",
+    method: "put",
+    request: {
+      body: json(sampleDog),
+    },
+    response: {
+      status: 200,
+      body: json(sampleDog),
+    },
+    kind: "MockApiDefinition",
+  },
+);
