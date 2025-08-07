@@ -582,8 +582,7 @@ export function getCorrespondingMethodParams(
 ): [(SdkMethodParameter | SdkModelPropertyType)[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
-  const clientLocation = getClientLocation(context, serviceParam.__raw!);
-  if (clientLocation !== operation) {
+  if (serviceParam.onClient) {
     // 1. To see if the service parameter is a client parameter.
     const client = context.getClientForOperation(operation);
     let clientParams = context.__clientParametersCache.get(client);
