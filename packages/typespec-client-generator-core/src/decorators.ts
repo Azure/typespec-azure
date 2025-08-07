@@ -42,7 +42,6 @@ import {
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
 import { HierarchyBuildingDecorator } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
-import { createTCGCContext } from "./context.js";
 import {
   AccessFlags,
   ClientInitializationOptions,
@@ -838,11 +837,7 @@ export const $clientInitialization: ClientInitializationDecorator = (
 export function getClientInitializationOptions(
   context: TCGCContext,
   entity: Namespace | Interface,
-  inputOptions: {
-    addParametersFromClientLocation?: boolean;
-  } = {},
 ): ClientInitializationOptions | undefined {
-  const { addParametersFromClientLocation = true } = inputOptions;
   const options = getScopedDecoratorData(context, clientInitializationKey, entity);
   if (options === undefined) return undefined;
 
@@ -870,30 +865,28 @@ export function getClientInitializationOptions(
   }
 
   let parametersModel = options.properties.get("parameters")?.type as Model | undefined;
-  if (addParametersFromClientLocation) {
-    const movedParameters = findEntriesWithTarget<ModelProperty, Namespace | Interface>(
-      context,
-      clientLocationKey,
-      entity,
-      "ModelProperty",
-    );
-    const tk = $(context.program);
-    if (movedParameters.length > 0) {
-      if (parametersModel) {
-        // If the parameters model already exists, we will merge the moved parameters into it.
-        for (const movedParameter of movedParameters) {
-          parametersModel.properties.set(movedParameter.name, movedParameter);
-        }
-      } else {
-        parametersModel = tk.model.create({
-          name: "ClientInitializationParameters",
-          properties: {
-            ...Object.fromEntries(
-              movedParameters.map((movedParameter) => [movedParameter.name, movedParameter]),
-            ),
-          },
-        });
+  const movedParameters = findEntriesWithTarget<ModelProperty, Namespace | Interface>(
+    context,
+    clientLocationKey,
+    entity,
+    "ModelProperty",
+  );
+  const tk = $(context.program);
+  if (movedParameters.length > 0) {
+    if (parametersModel) {
+      // If the parameters model already exists, we will merge the moved parameters into it.
+      for (const movedParameter of movedParameters) {
+        parametersModel.properties.set(movedParameter.name, movedParameter);
       }
+    } else {
+      parametersModel = tk.model.create({
+        name: "ClientInitializationParameters",
+        properties: {
+          ...Object.fromEntries(
+            movedParameters.map((movedParameter) => [movedParameter.name, movedParameter]),
+          ),
+        },
+      });
     }
   }
 
@@ -1232,15 +1225,13 @@ export const $clientLocation = (
       typeof target !== "string" &&
       (target.kind === "Interface" || target.kind === "Namespace")
     ) {
-      const tcgcContext = createTCGCContext(
-        context.program,
-        "@azure-tools/typespec-client-generator-core",
-        { mutateNamespace: false },
-      );
-      const clientInitialization = getClientInitializationOptions(tcgcContext, target, {
-        addParametersFromClientLocation: false,
-      });
-      if (clientInitialization?.parameters?.properties.has(source.name)) {
+      const clientInitializationParams = target.decorators
+        .filter((d) => d.decorator.name === "$clientInitialization")
+        .map((d) => d.args[0].value)
+        .filter((a): a is Model => a.entityKind === "Type" && a.kind === "Model")
+        .filter((model) => model.properties.has(source.name))
+        .map((model) => model.properties.get(source.name)!);
+      if (clientInitializationParams.length > 0) {
         reportDiagnostic(context.program, {
           code: "client-location-conflict",
           format: { parameterName: source.name },
