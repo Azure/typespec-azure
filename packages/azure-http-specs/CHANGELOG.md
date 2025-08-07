@@ -1,5 +1,16 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.25
+
+### Deprecations
+
+- [#2974](https://github.com/Azure/typespec-azure/pull/2974) Deprecate pageable decorators `@Azure.Core.items` and `@Azure.Core.pagedResult`. Use `@TypeSpec.pageItems` and `@TypeSpec.list` instead.
+
+### Bump dependencies
+
+- [#3029](https://github.com/Azure/typespec-azure/pull/3029) Upgrade dependencies
+
+
 ## 0.1.0-alpha.24
 
 ### Deprecations
