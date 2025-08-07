@@ -75,12 +75,7 @@ alias MyQueryParams = QueryParametersTrait<
 op getWidget is Operations.ResourceRead<Widget, MyQueryParams>;
 
 // This will not get the `foo` parameter because it doesn't match the contexts
-op deleteWidget is Operations.ResourceDelete<
-  Widget,
-  QueryParametersTrait<{
-    @query foo: string;
-  }>
->;
+op deleteWidget is Operations.ResourceDelete<Widget, MyQueryParams>;
 ```
 
 ### `ListQueryParametersTrait<TParams>`
