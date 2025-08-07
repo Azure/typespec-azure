@@ -1,6 +1,7 @@
 import { execa } from "execa";
 import { readdir } from "fs/promises";
 import { globby } from "globby";
+import { cpus } from "os";
 import { dirname, relative } from "pathe";
 import pc from "picocolors";
 import type { IntegrationTestSuite } from "./config/types.js";
@@ -8,7 +9,7 @@ import type { TaskRunner } from "./runner.js";
 import { log } from "./utils.js";
 
 // Number of parallel TypeSpec compilations to run
-const COMPILATION_CONCURRENCY = 4;
+const COMPILATION_CONCURRENCY = cpus().length;
 
 export async function validateSpecs(
   runner: TaskRunner,
@@ -117,13 +118,17 @@ async function execTspCompile(
   file: string,
   args: string[] = [],
 ): Promise<{ success: boolean; output: string }> {
-  const { failed, all } = await execa("npx", ["tsp", "compile", file, "--warn-as-error", ...args], {
-    cwd: directory,
-    stdio: "pipe",
-    all: true,
-    reject: false,
-    env: { FORCE_COLOR: pc.isColorSupported ? "1" : undefined }, // Force color output
-  });
+  const { failed, all } = await execa(
+    "npm",
+    ["exec", "--no", "--", "tsp", "compile", file, "--warn-as-error", ...args],
+    {
+      cwd: directory,
+      stdio: "pipe",
+      all: true,
+      reject: false,
+      env: { FORCE_COLOR: pc.isColorSupported ? "1" : undefined }, // Force color output
+    },
+  );
   return {
     success: !failed,
     output: all,
@@ -136,13 +141,48 @@ async function runWithConcurrency<T, R>(
   concurrency: number,
   processor: (item: T) => Promise<R>,
 ): Promise<R[]> {
-  const results: R[] = [];
-
-  for (let i = 0; i < items.length; i += concurrency) {
-    const batch = items.slice(i, i + concurrency);
-    const batchResults = await Promise.all(batch.map(processor));
-    results.push(...batchResults);
+  if (items.length === 0) {
+    return [];
   }
 
-  return results;
+  const toRun = [...items];
+  const results: R[] = [];
+  let completed = 0;
+  let running = 0;
+
+  return new Promise((resolve, reject) => {
+    function runNext() {
+      if (toRun.length === 0 || running >= concurrency) {
+        return;
+      }
+
+      const item = toRun.shift();
+      if (!item) {
+        return;
+      }
+
+      running++;
+      processor(item)
+        .then((result) => {
+          results.push(result);
+          completed++;
+          running--;
+
+          if (completed === items.length) {
+            resolve(results);
+            return;
+          }
+
+          runNext();
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    }
+
+    // Start initial batch of tasks up to concurrency limit
+    for (let i = 0; i < Math.min(concurrency, toRun.length); i++) {
+      runNext();
+    }
+  });
 }

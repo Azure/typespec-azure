@@ -3,9 +3,9 @@ import { mkdir, rm } from "fs/promises";
 import type { Ora } from "ora";
 import { relative } from "pathe";
 import pc from "picocolors";
+import { ResetMode, simpleGit } from "simple-git";
 import type { IntegrationTestSuite } from "./config/types.js";
-import { action, execWithSpinner, log } from "./utils.js";
-
+import { action, log } from "./utils.js";
 /**
  * Options for ensuring repository state.
  */
@@ -67,7 +67,7 @@ async function cloneRepo(spinner: Ora, repo: string, branch: string, dir: string
   await mkdir(dir, { recursive: true });
 
   spinner.text = `Cloning repo ${pc.cyan(repo)} at branch ${pc.cyan(branch)} into ${pc.cyan(relativeDir)}`;
-  await execWithSpinner(spinner, "git", ["clone", "-b", branch, "--depth", "1", repo, dir]);
+  await simpleGit().clone(repo, dir, { branch, depth: 1 });
 }
 
 /**
@@ -83,20 +83,21 @@ export async function updateExistingRepo(
   { branch }: Pick<IntegrationTestSuite, "branch">,
   dir: string,
 ): Promise<void> {
+  const git = simpleGit(dir);
   const baseText = spinner.text;
 
   spinner.text = `${baseText} - Resetting local changes`;
-  await execWithSpinner(spinner, "git", ["reset", "--hard", "HEAD"], { cwd: dir });
-  await execWithSpinner(spinner, "git", ["clean", "-fd"], { cwd: dir });
+  await git.reset(ResetMode.HARD, ["HEAD"]);
+  await git.clean("fd");
 
   spinner.text = `${baseText} - Fetching latest changes`;
-  await execWithSpinner(spinner, "git", ["fetch", "origin"], { cwd: dir });
+  await git.fetch("origin");
 
   spinner.text = `${baseText} - Checking out branch ${pc.cyan(branch)}`;
-  await execWithSpinner(spinner, "git", ["checkout", branch], { cwd: dir });
+  await git.checkout(branch);
 
   spinner.text = `${baseText} - Pulling latest changes`;
-  await execWithSpinner(spinner, "git", ["pull", "origin", branch], { cwd: dir });
+  await git.pull("origin", branch);
 }
 
 /**
@@ -106,16 +107,16 @@ export async function updateExistingRepo(
  * @param dir - Directory containing the Git repository to validate
  */
 export async function validateGitClean(dir: string): Promise<void> {
-  const result = await execa("git", ["status", "--porcelain"], { cwd: dir });
-  const gitChanges = result.stdout.trim();
+  const git = simpleGit(dir);
+  const result = await git.status();
 
-  if (gitChanges) {
+  if (result.isClean()) {
+    log(`${pc.green("✔")} No git changes detected`);
+  } else {
     log(`${pc.red("x")} Git changes detected after validation:`);
-    log(gitChanges);
+    log(result);
 
     const diffResult = await execa("git", ["diff", "--color=always"], { cwd: dir });
     log(diffResult.stdout);
-  } else {
-    log(`${pc.green("✔")} No git changes detected`);
   }
 }
