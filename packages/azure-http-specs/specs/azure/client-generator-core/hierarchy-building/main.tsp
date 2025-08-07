@@ -51,30 +51,6 @@ model Dog extends Animal {
 
 interface AnimalOperations {
   @scenario
-  @route("/animal/as-animal")
-  @scenarioDoc("""
-    Test operation that accepts Animal input and returns Animal output.
-    This operation expects Animal data and validates basic Animal functionality.
-    Expected request body:
-    ```json
-    {
-      "kind": "pet",
-      "name": "Buddy"
-    }
-    ```
-    Expected response body:
-    ```json
-    {
-      "kind": "pet", 
-      "name": "Buddy"
-    }
-    ```
-    """)
-  @doc("Update an animal as an animal")
-  @put
-  updateAnimalAsAnimal(@body animal: Animal): Animal;
-
-  @scenario
   @route("/pet/as-animal")
   @scenarioDoc("""
     Test operation that accepts Animal input and returns Animal output.

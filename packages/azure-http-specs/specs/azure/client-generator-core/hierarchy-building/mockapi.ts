@@ -3,11 +3,6 @@ import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
 // Sample data for testing
-const sampleAnimal = {
-  kind: "pet",
-  name: "Buddy",
-};
-
 const samplePet = {
   kind: "pet",
   name: "Buddy",
@@ -22,19 +17,6 @@ const sampleDog = {
 };
 
 // Animal operations
-Scenarios.Azure_ClientGenerator_Core_HierarchyBuilding_AnimalOperations_updateAnimalAsAnimal =
-  passOnSuccess({
-    uri: "/azure/client-generator-core/hierarchy-building/animal/as-animal",
-    method: "put",
-    request: {
-      body: json(sampleAnimal),
-    },
-    response: {
-      status: 200,
-      body: json(sampleAnimal),
-    },
-    kind: "MockApiDefinition",
-  });
 
 Scenarios.Azure_ClientGenerator_Core_HierarchyBuilding_AnimalOperations_updatePetAsAnimal =
   passOnSuccess({

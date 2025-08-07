@@ -180,30 +180,6 @@ Expected response body:
 }
 ```
 
-### Azure_ClientGenerator_Core_HierarchyBuilding_AnimalOperations_updateAnimalAsAnimal
-
-- Endpoint: `put /azure/client-generator-core/hierarchy-building/animal/as-animal`
-
-Test operation that accepts Animal input and returns Animal output.
-This operation expects Animal data and validates basic Animal functionality.
-Expected request body:
-
-```json
-{
-  "kind": "pet",
-  "name": "Buddy"
-}
-```
-
-Expected response body:
-
-```json
-{
-  "kind": "pet",
-  "name": "Buddy"
-}
-```
-
 ### Azure_ClientGenerator_Core_HierarchyBuilding_AnimalOperations_updateDogAsAnimal
 
 - Endpoint: `put /azure/client-generator-core/hierarchy-building/dog/as-animal`
