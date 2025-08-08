@@ -194,7 +194,7 @@ op Azure.ResourceManager.PrivateEndpoints.CreateOrUpdateAsync(provider: "Microso
 #### `PrivateEndpoints.CreateOrReplaceSync` {#Azure.ResourceManager.PrivateEndpoints.CreateOrReplaceSync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints.CreateOrReplaceSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Azure.ResourceManager.CommonTypes.PrivateEndpointConnection): Response | Error
+op Azure.ResourceManager.PrivateEndpoints.CreateOrReplaceSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
 ```
 
 ##### Template Parameters

@@ -874,7 +874,6 @@ interface Employees {
 | Name        | Type                                                                                                                           | Description                                |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
 | properties? | [`PrivateEndpointConnectionProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionProperties) | The private endpoint connection properties |
-| name        | `string`                                                                                                                       |                                            |
 
 ### `PrivateEndpointConnectionUpdate` {#Azure.ResourceManager.PrivateEndpointConnectionUpdate}
 
