@@ -147,6 +147,11 @@ namespace Azure.Core {
    * be passed to the linked operation request.
    */
   extern dec nextPageOperation(entity: Operation, linkedOperation: Operation, parameters?: {});
+
+  /**
+   * Specifies that an array model or array-typed property should contain only unique items.
+   */
+  extern dec uniqueItems(entity: ModelProperty | Model);
 }
 
 namespace Azure.Core.Foundations {

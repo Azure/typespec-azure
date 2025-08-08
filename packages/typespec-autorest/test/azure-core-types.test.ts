@@ -1,4 +1,4 @@
-import { deepStrictEqual } from "assert";
+import { deepStrictEqual, ok } from "assert";
 import { describe, it } from "vitest";
 import { compileOpenAPI } from "./test-host.js";
 
@@ -68,6 +68,54 @@ describe("armResourceIdentifier", () => {
           },
         ],
       },
+    });
+  });
+});
+
+describe("@uniqueItems", () => {
+  it("defines array with uniqueItems inline", async () => {
+    const res = await compileOpenAPI(
+      `
+     ${base}
+      model Pet { @uniqueItems names: string[] };
+      `,
+      { preset: "azure" },
+    );
+
+    ok(res.definitions);
+    ok(res.definitions.Pet);
+    ok(res.definitions.Pet.properties);
+    ok(res.definitions.Pet.properties.names, "expected definition named names");
+    deepStrictEqual(res.definitions.Pet.properties.names, {
+      type: "array",
+      uniqueItems: true,
+      items: { type: "string" },
+    });
+    deepStrictEqual(res.definitions.Pet.properties.names.uniqueItems, true);
+  });
+
+  it("defines a named array with uniqueItems using model is", async () => {
+    const res = await compileOpenAPI(
+      `
+     ${base}
+      @uniqueItems
+      model PetNames is string[] {}
+      model Pet { names: PetNames };
+      `,
+      { preset: "azure" },
+    );
+    ok(res.definitions);
+    ok(res.definitions.Pet);
+    ok(res.definitions.Pet.properties);
+    ok(res.definitions.Pet.properties.names, "expected definition named names");
+    deepStrictEqual(res.definitions.Pet.properties.names, {
+      $ref: "#/definitions/PetNames",
+      uniqueItems: true,
+    });
+    deepStrictEqual(res.definitions.PetNames, {
+      items: { type: "string" },
+      type: "array",
+      uniqueItems: true,
     });
   });
 });
