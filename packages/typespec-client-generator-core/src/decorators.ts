@@ -20,6 +20,7 @@ import {
   isTemplateDeclaration,
 } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
+import { $ } from "@typespec/compiler/typekit";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
@@ -57,6 +58,7 @@ import {
   clientNameKey,
   clientNamespaceKey,
   compareModelProperties,
+  findEntriesWithTarget,
   findRootSourceProperty,
   getScopedDecoratorData,
   hasExplicitClientOrOperationGroup,
@@ -862,8 +864,34 @@ export function getClientInitializationOptions(
     }
   }
 
+  let parametersModel = options.properties.get("parameters")?.type as Model | undefined;
+  const movedParameters = findEntriesWithTarget<ModelProperty, Namespace | Interface>(
+    context,
+    clientLocationKey,
+    entity,
+    "ModelProperty",
+  );
+  const tk = $(context.program);
+  if (movedParameters.length > 0) {
+    if (parametersModel) {
+      // If the parameters model already exists, we will merge the moved parameters into it.
+      for (const movedParameter of movedParameters) {
+        parametersModel.properties.set(movedParameter.name, movedParameter);
+      }
+    } else {
+      parametersModel = tk.model.create({
+        name: "ClientInitializationParameters",
+        properties: {
+          ...Object.fromEntries(
+            movedParameters.map((movedParameter) => [movedParameter.name, movedParameter]),
+          ),
+        },
+      });
+    }
+  }
+
   return {
-    parameters: options.properties.get("parameters")?.type,
+    parameters: parametersModel,
     initializedBy: initializedBy,
   };
 }
@@ -1176,15 +1204,65 @@ export function getClientDocExplicit(
 
 export const $clientLocation = (
   context: DecoratorContext,
-  source: Operation,
-  target: Interface | Namespace | string,
+  source: Operation | ModelProperty,
+  target: Interface | Namespace | Operation | string,
   scope?: LanguageScopes,
 ) => {
+  if (source.kind === "Operation") {
+    // can only move parameters to an operation, not another operation
+    if (typeof target !== "string" && target.kind === "Operation") {
+      reportDiagnostic(context.program, {
+        code: "client-location-conflict",
+        format: { operationName: source.name },
+        target: context.decoratorTarget,
+        messageId: "operationToOperation",
+      });
+      return;
+    }
+  } else if (source.kind === "ModelProperty") {
+    // verify that there isn't a conflict with existing client initialization parameter
+    if (
+      typeof target !== "string" &&
+      (target.kind === "Interface" || target.kind === "Namespace")
+    ) {
+      const clientInitializationParams = target.decorators
+        .filter((d) => d.decorator.name === "$clientInitialization")
+        .map((d) => d.args[0].value)
+        .filter((a): a is Model => a.entityKind === "Type" && a.kind === "Model")
+        .filter((model) => model.properties.has(source.name))
+        .map((model) => model.properties.get(source.name)!);
+      if (clientInitializationParams.length > 0) {
+        reportDiagnostic(context.program, {
+          code: "client-location-conflict",
+          format: { parameterName: source.name },
+          target: context.decoratorTarget,
+          messageId: "modelPropertyToClientInitialization",
+        });
+        return;
+      }
+    }
+  }
   setScopedDecoratorData(context, $clientLocation, clientLocationKey, source, target, scope);
 };
 
 /**
- * Gets the `Namespace`, `Interface` or name of client where an operation change the location to.
+ * Gets the `Namespace`, `Interface` or name of client where an operation changes location to.
+ */
+export function getClientLocation(
+  context: TCGCContext,
+  input: Operation,
+): Namespace | Interface | string | undefined;
+
+/**
+ * Gets the `Namespace`, `Interface`, `Operation` or name of client where a parameter changes location to.
+ */
+export function getClientLocation(
+  context: TCGCContext,
+  input: ModelProperty,
+): Namespace | Interface | Operation | string | undefined;
+
+/**
+ * Gets the `Namespace`, `Interface` or name of client where an operation / parameter change the location to.
  *
  * @param context TCGCContext
  * @param operation Operation to be moved
@@ -1192,17 +1270,13 @@ export const $clientLocation = (
  */
 export function getClientLocation(
   context: TCGCContext,
-  operation: Operation,
-): Namespace | Interface | string | undefined {
+  input: Operation | ModelProperty,
+): Namespace | Interface | Operation | string | undefined {
   // if there is `@client` or `@operationGroup` decorator, `@clientLocation` will be ignored
   if (hasExplicitClientOrOperationGroup(context)) {
     return undefined;
   }
-  return getScopedDecoratorData(context, clientLocationKey, operation) as
-    | Namespace
-    | Interface
-    | string
-    | undefined;
+  return getScopedDecoratorData(context, clientLocationKey, input);
 }
 
 const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
