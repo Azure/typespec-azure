@@ -201,6 +201,7 @@
     },
     "KeyVaultProperties": {
       "type": "object",
+      "description": "",
       "properties": {
         "keyIdentifier": {
           "type": "string",
