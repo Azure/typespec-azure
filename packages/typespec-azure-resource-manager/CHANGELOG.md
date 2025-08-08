@@ -1,5 +1,26 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.59.0
+
+### Deprecations
+
+- [#2974](https://github.com/Azure/typespec-azure/pull/2974) Deprecate pageable decorators `@Azure.Core.items` and `@Azure.Core.pagedResult`. Use `@TypeSpec.pageItems` and `@TypeSpec.list` instead.
+
+### Features
+
+- [#3096](https://github.com/Azure/typespec-azure/pull/3096) Enable void and optional request body for extension put and patch operations
+- [#3098](https://github.com/Azure/typespec-azure/pull/3098) Allow using Scope parameter with Provider Action templates
+- [#3085](https://github.com/Azure/typespec-azure/pull/3085) Add support for optional and missing request body in PUT and PATCH legacy operations
+
+### Bump dependencies
+
+- [#3029](https://github.com/Azure/typespec-azure/pull/3029) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3085](https://github.com/Azure/typespec-azure/pull/3085) Fix implicitOptionality setting in Legacy PATCH operations
+
+
 ## 0.58.1
 
 ### Bug Fixes

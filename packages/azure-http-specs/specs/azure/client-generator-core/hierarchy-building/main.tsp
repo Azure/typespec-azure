@@ -49,57 +49,146 @@ model Dog extends Animal {
   ...DogContent;
 }
 
-@scenario
-@route("/animal/pet")
-@scenarioDoc("""
-  Test operation that accepts Animal input and returns Animal output.
-  This operation expects Pet data and validates that Pet type works correctly with the @hierarchyBuilding decorator.
-  Expected request body:
-  ```json
-  {
-    "kind": "pet",
-    "name": "Buddy",
-    "trained": true
-  }
-  ```
-  Expected response body:
-  ```json
-  {
-    "kind": "pet",
-    "name": "Buddy",
-    "trained": true
-  }
-  ```
-  """)
-@doc("Update a pet")
-@put
-op updatePet(@body animal: Animal): Animal;
+interface AnimalOperations {
+  @scenario
+  @route("/pet/as-animal")
+  @scenarioDoc("""
+    Test operation that accepts Animal input and returns Animal output.
+    Service expects Pet data and returns Pet data.
+    Expected request body:
+    ```json
+    {
+      "kind": "pet",
+      "name": "Buddy",
+      "trained": true
+    }
+    ```
+    Expected response body:
+    ```json
+    {
+      "kind": "pet",
+      "name": "Buddy", 
+      "trained": true
+    }
+    ```
+    """)
+  @doc("Update a pet as an animal")
+  @put
+  updatePetAsAnimal(@body animal: Animal): Animal;
 
-@scenario
-@route("/animal/dog")
-@scenarioDoc("""
-  Test operation that accepts Animal input and returns Animal output.
-  This operation expects Dog data and validates the @hierarchyBuilding decorator when Dog is used.
-  Due to @hierarchyBuilding(Pet), Dog should inherit from Pet rather than Animal directly.
-  Expected request body:
-  ```json
-  {
-    "kind": "dog",
-    "name": "Rex",
-    "trained": true,
-    "breed": "German Shepherd"
-  }
-  ```
-  Expected response body:
-  ```json
-  {
-    "kind": "dog",
-    "name": "Rex",
-    "trained": true,
-    "breed": "German Shepherd"
-  }
-  ```
-  """)
-@doc("Update a dog")
-@put
-op updateDog(@body animal: Animal): Animal;
+  @scenario
+  @route("/dog/as-animal")
+  @scenarioDoc("""
+    Test operation that accepts Animal input and returns Animal output.
+    Service expects Dog data and returns Dog data.
+    Due to @hierarchyBuilding(Pet), Dog should inherit from Pet rather than Animal directly.
+    Expected request body:
+    ```json
+    {
+      "kind": "dog",
+      "name": "Rex",
+      "trained": true,
+      "breed": "German Shepherd"
+    }
+    ```
+    Expected response body:
+    ```json
+    {
+      "kind": "dog",
+      "name": "Rex",
+      "trained": true,
+      "breed": "German Shepherd"
+    }
+    ```
+    """)
+  @doc("Update a dog as an animal")
+  @put
+  updateDogAsAnimal(@body animal: Animal): Animal;
+}
+
+interface PetOperations {
+  @scenario
+  @route("/pet/as-pet")
+  @scenarioDoc("""
+    Test operation that accepts Pet input and returns Pet output.
+    This operation validates Pet type directly.
+    Expected request body:
+    ```json
+    {
+      "kind": "pet",
+      "name": "Buddy",
+      "trained": true
+    }
+    ```
+    Expected response body:
+    ```json
+    {
+      "kind": "pet",
+      "name": "Buddy",
+      "trained": true
+    }
+    ```
+    """)
+  @doc("Update a pet as a pet")
+  @put
+  updatePetAsPet(@body pet: Pet): Pet;
+
+  @scenario
+  @route("/dog/as-pet")
+  @scenarioDoc("""
+    Test operation that accepts Pet input and returns Pet output.
+    Service expects Dog data and returns Dog data.
+    This validates that Dog can be used as Pet due to @hierarchyBuilding decorator.
+    Expected request body:
+    ```json
+    {
+      "kind": "dog",
+      "name": "Rex",
+      "trained": true,
+      "breed": "German Shepherd"
+    }
+    ```
+    Expected response body:
+    ```json
+    {
+      "kind": "dog",
+      "name": "Rex",
+      "trained": true,
+      "breed": "German Shepherd"
+    }
+    ```
+    """)
+  @doc("Update a dog as a pet")
+  @put
+  updateDogAsPet(@body pet: Pet): Pet;
+}
+
+interface DogOperations {
+  @scenario
+  @route("/dog/as-dog")
+  @scenarioDoc("""
+    Test operation that accepts Dog input and returns Dog output.
+    This operation validates Dog type directly.
+    Expected request body:
+    ```json
+    {
+      "kind": "dog",
+      "name": "Rex",
+      "trained": true,
+      "breed": "German Shepherd"
+    }
+    ```
+    Expected response body:
+    ```json
+    {
+      "kind": "dog",
+      "name": "Rex",
+      "trained": true,
+      "breed": "German Shepherd"
+    }
+    ```
+    """)
+  @doc("Update a dog as a dog")
+  @put
+  updateDogAsDog(@body dog: Dog): Dog;
+}
