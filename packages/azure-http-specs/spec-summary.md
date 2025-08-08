@@ -271,6 +271,296 @@ This scenario contains 4 public operations. All should be generated and exported
 'OrphanModel' is not used but specified as 'public' and 'input', so it should be generated in SDK. The 'orphanModelSerializable' operation verifies that the model can be serialized to JSON.
 The other models' usage is additive to roundtrip, so they should be generated and exported as well.
 
+### Azure_ClientGeneratorCore_ClientInitialization_DefaultClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/initialization-default/{resourceName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/initialization-default/{resourceName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/initialization-default/{resourceName}`
+
+Client for testing default initialization behavior (no initializedBy decorator).
+
+This client uses default initialization behavior.
+
+Parameters elevated to client level:
+
+- resourceName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+const client = new DefaultClient.getDefaultClient({
+  resourceName: "test-resource"
+});
+
+// Operations don't need resourceName parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_DefaultNestedClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/nested-default-default/{resourceName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/nested-default-default/{resourceName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/nested-default-default/{resourceName}`
+
+Client for testing default -> default nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client also uses default initialization behavior.
+
+Parameters elevated to client level:
+
+- resourceName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+// via DefaultParentClient
+const client = new DefaultParentClient.getDefaultNestedClient({
+  resourceName: "test-resource"
+});
+
+// Operations don't need resourceName parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_FlexibleNestedClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/nested-default-both/{resourceName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/nested-default-both/{resourceName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/nested-default-both/{resourceName}`
+
+Client for testing default -> both nested initialization.
+
+The parent client uses default initialization behavior,
+and the child client supports both individual and parent initialization.
+
+Parameters elevated to client level:
+
+- resourceName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+// via DefaultParentClient
+const client1 = new DefaultParentClient.getFlexibleNestedClient({
+  resourceName: "test-resource"
+});
+
+// directly
+const client2 = new FlexibleNestedClient({
+  resourceName: "test-resource"
+});
+
+// Operations don't need resourceName parameter
+client1.withQuery(format: "text");
+client2.getStandalone();
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_IndividualNestedClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/nested-default-individual/{resourceName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/nested-default-individual/{resourceName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/nested-default-individual/{resourceName}`
+
+Client for testing default -> individual nested initialization.
+
+The parent client uses default initialization behavior,
+but the child client can only be initialized individually.
+
+Parameters elevated to client level:
+
+- resourceName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+// via DefaultParentClient
+const client1 = new DefaultParentClient.getIndividualNestedClient({
+  resourceName: "test-resource"
+});
+
+// directly
+const client2 = new IndividualNestedClient({
+  resourceName: "test-resource"
+});
+
+// Operations don't need resourceName parameter
+client1.withQuery(format: "text");
+client2.getStandalone();
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_ParentOnlyNestedClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/nested-default-parent/{resourceName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/nested-default-parent/{resourceName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/nested-default-parent/{resourceName}`
+
+Client for testing default -> parent nested initialization.
+
+The parent client uses default initialization behavior,
+but the child client can only be initialized through its parent.
+
+Parameters elevated to client level:
+
+- resourceName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+// via DefaultParentClient only
+const client = new DefaultParentClient.getParentOnlyNestedClient({
+  resourceName: "test-resource"
+});
+
+// Direct initialization should NOT be supported
+// const client = new ParentOnlyNestedClient(...); // This should not work
+
+// Operations don't need resourceName parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_FlexibleParentClient_DefaultNestedClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/nested-both-default/{resourceName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/nested-both-default/{resourceName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/nested-both-default/{resourceName}`
+
+Client for testing both -> default nested initialization.
+
+The parent client supports both individual and parent initialization,
+and the child client uses default initialization behavior.
+
+Parameters elevated to client level:
+
+- resourceName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+// via FlexibleParentClient
+const client = new FlexibleParentClient.getDefaultNestedClient({
+  resourceName: "test-resource"
+});
+
+// Operations don't need resourceName parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_FlexibleParentClient_FlexibleNestedClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/nested-both-both/{resourceName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/nested-both-both/{resourceName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/nested-both-both/{resourceName}`
+
+Client for testing both -> both nested initialization.
+
+Both the parent and child clients support both individual and parent initialization,
+providing maximum flexibility for client initialization.
+
+Parameters elevated to client level:
+
+- resourceName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+// via FlexibleParentClient
+const client1 = new FlexibleParentClient.getFlexibleNestedClient({
+  resourceName: "test-resource"
+});
+
+// directly
+const client2 = new FlexibleNestedClient({
+  resourceName: "test-resource"
+});
+
+// Operations don't need resourceName parameter
+client1.withQuery(format: "text");
+client2.getStandalone();
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_FlexibleParentClient_IndividualNestedClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/nested-both-individual/{resourceName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/nested-both-individual/{resourceName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/nested-both-individual/{resourceName}`
+
+Client for testing both -> individual nested initialization.
+
+The parent client supports both individual and parent initialization,
+but the child client can only be initialized individually.
+
+Parameters elevated to client level:
+
+- resourceName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+// via FlexibleParentClient
+const client1 = new FlexibleParentClient.getIndividualNestedClient({
+  resourceName: "test-resource"
+});
+
+// directly
+const client2 = new IndividualNestedClient({
+  resourceName: "test-resource"
+});
+
+// Operations don't need resourceName parameter
+client1.withQuery(format: "text");
+client2.getStandalone();
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_FlexibleParentClient_ParentOnlyNestedClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/nested-both-parent/{resourceName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/nested-both-parent/{resourceName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/nested-both-parent/{resourceName}`
+
+Client for testing both -> parent nested initialization.
+
+The parent client supports both individual and parent initialization,
+but the child client can only be initialized through its parent.
+
+Parameters elevated to client level:
+
+- resourceName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+// via FlexibleParentClient only
+const client = new FlexibleParentClient.getParentOnlyNestedClient({
+  resourceName: "test-resource"
+});
+
+// Direct initialization should NOT be supported
+// const client = new ParentOnlyNestedClient(...); // This should not work
+
+// Operations don't need resourceName parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
 ### Azure_ClientGeneratorCore_ClientInitialization_HeaderParam
 
 - Endpoints:
@@ -292,6 +582,193 @@ const client = new HeaderParamClient({
 
 client.withQuery(id: "test-id");  // No need to pass name here
 client.withBody({ name: "test-name" });  // No need to pass name here
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_IndividuallyOnlyClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/initialization-individually/{resourceName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/initialization-individually/{resourceName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/initialization-individually/{resourceName}`
+
+Client for testing individually-only initialization.
+
+This client can ONLY be initialized directly, not through a parent client.
+
+Parameters elevated to client level:
+
+- resourceName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+const client = new IndividuallyOnlyClient({
+  resourceName: "test-resource"
+});
+
+// Operations don't need resourceName parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_IndividuallyParentFlexibleClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/initialization-both/{resourceName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/initialization-both/{resourceName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/initialization-both/{resourceName}`
+
+Client for testing both individual and parent initialization.
+
+This client can be initialized both directly and through its parent client.
+
+Parameters elevated to client level:
+
+- resourceName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+// Can be created directly
+const client = new IndividuallyParentFlexibleClient({
+  resourceName: "test-resource"
+});
+
+// Operations don't need resourceName parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_IndividualParentClient_DefaultNestedClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/nested-individual-default/{resourceName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/nested-individual-default/{resourceName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/nested-individual-default/{resourceName}`
+
+Client for testing individual -> default nested initialization.
+
+The parent client can only be initialized individually,
+and the child client uses default initialization behavior.
+
+Parameters elevated to client level:
+
+- resourceName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+// via IndividualParentClient
+const client = new IndividualParentClient.getDefaultNestedClient({
+  resourceName: "test-resource"
+});
+
+// Operations don't need resourceName parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_IndividualParentClient_FlexibleNestedClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/nested-individual-both/{resourceName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/nested-individual-both/{resourceName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/nested-individual-both/{resourceName}`
+
+Client for testing individual -> both nested initialization.
+
+The parent client can only be initialized individually,
+and the child client supports both individual and parent initialization.
+
+Parameters elevated to client level:
+
+- resourceName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+// via IndividualParentClient
+const client1 = new IndividualParentClient.getFlexibleNestedClient({
+  resourceName: "test-resource"
+});
+
+// directly
+const client2 = new FlexibleNestedClient({
+  resourceName: "test-resource"
+});
+
+// Operations don't need resourceName parameter
+client1.withQuery(format: "text");
+client2.getStandalone();
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_IndividualParentClient_IndividualNestedClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/nested-individual-individual/{resourceName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/nested-individual-individual/{resourceName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/nested-individual-individual/{resourceName}`
+
+Client for testing individual -> individual nested initialization.
+
+Both the parent and child clients can only be initialized individually.
+
+Parameters elevated to client level:
+
+- resourceName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+// via IndividualParentClient
+const client1 = new IndividualParentClient.getIndividualNestedClient({
+  resourceName: "test-resource"
+});
+
+// directly
+const client2 = new IndividualNestedClient({
+  resourceName: "test-resource"
+});
+
+// Operations don't need resourceName parameter
+client1.withQuery(format: "text");
+client2.getStandalone();
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_IndividualParentClient_ParentOnlyNestedClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/nested-individual-parent/{resourceName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/nested-individual-parent/{resourceName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/nested-individual-parent/{resourceName}`
+
+Client for testing individual -> parent nested initialization.
+
+The parent client can only be initialized individually,
+but the child client can only be initialized through its parent.
+
+Parameters elevated to client level:
+
+- resourceName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+// via IndividualParentClient only
+const client = new IndividualParentClient.getParentOnlyNestedClient({
+  resourceName: "test-resource"
+});
+
+// Direct initialization should NOT be supported
+// const client = new ParentOnlyNestedClient(...); // This should not work
+
+// Operations don't need resourceName parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
 ```
 
 ### Azure_ClientGeneratorCore_ClientInitialization_MixedParams
@@ -366,35 +843,163 @@ client.withAliasedName();
 client.withOriginalName();
 ```
 
-### Azure_ClientGeneratorCore_ClientInitialization_ParentClient_ChildClient
+### Azure_ClientGeneratorCore_ClientInitialization_ParentOnlyClient
 
 - Endpoints:
-  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}`
+  - `get /azure/client-generator-core/client-initialization/initialization-parent-only/{resourceName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/initialization-parent-only/{resourceName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/initialization-parent-only/{resourceName}`
 
-Client for testing a path parameter (blobName) moved to client level, in child client.
+Client for testing parent-only initialization.
 
-The child client can be initialized individually, or via its parent client.
+This client can ONLY be initialized through its parent client, not directly.
 
 Parameters elevated to client level:
 
-- blobName: "sample-blob" (path parameter)
+- resourceName: "test-resource" (path parameter)
 
 Expected client usage:
 
 ```ts
-// via ParentClient
-const client = new ParentClient.getChildClient({
-  blobName: "sample-blob"
+// Can only be created via parent client
+const client = new ParentOnlyClient.getParentOnlyClient({
+  resourceName: "test-resource"
+});
+
+// Direct initialization should NOT be supported
+// const client = new ParentOnlyClient(...); // This should not work
+
+// Operations don't need resourceName parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_ParentOnlyParentClient_DefaultNestedClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/nested-parent-default/{resourceName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/nested-parent-default/{resourceName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/nested-parent-default/{resourceName}`
+
+Client for testing parent -> default nested initialization.
+
+The parent client can only be initialized through its parent,
+and the child client uses default initialization behavior.
+
+Parameters elevated to client level:
+
+- resourceName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+// via ParentOnlyParentClient
+const client = new ParentOnlyParentClient.getDefaultNestedClient({
+  resourceName: "test-resource"
+});
+
+// Operations don't need resourceName parameter
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_ParentOnlyParentClient_FlexibleNestedClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/nested-parent-both/{resourceName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/nested-parent-both/{resourceName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/nested-parent-both/{resourceName}`
+
+Client for testing parent -> both nested initialization.
+
+The parent client can only be initialized through its parent,
+and the child client supports both individual and parent initialization.
+
+Parameters elevated to client level:
+
+- resourceName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+// via ParentOnlyParentClient
+const client1 = new ParentOnlyParentClient.getFlexibleNestedClient({
+  resourceName: "test-resource"
 });
 
 // directly
-const client = new ChildClient({
-  blobName: "sample-blob"
+const client2 = new FlexibleNestedClient({
+  resourceName: "test-resource"
 });
 
-// No need to pass blobName to any operations
+// Operations don't need resourceName parameter
+client1.withQuery(format: "text");
+client2.getStandalone();
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_ParentOnlyParentClient_IndividualNestedClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/nested-parent-individual/{resourceName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/nested-parent-individual/{resourceName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/nested-parent-individual/{resourceName}`
+
+Client for testing parent -> individual nested initialization.
+
+The parent client can only be initialized through its parent,
+but the child client can only be initialized individually.
+
+Parameters elevated to client level:
+
+- resourceName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+// via ParentOnlyParentClient
+const client1 = new ParentOnlyParentClient.getIndividualNestedClient({
+  resourceName: "test-resource"
+});
+
+// directly
+const client2 = new IndividualNestedClient({
+  resourceName: "test-resource"
+});
+
+// Operations don't need resourceName parameter
+client1.withQuery(format: "text");
+client2.getStandalone();
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_ParentOnlyParentClient_ParentOnlyNestedClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/nested-parent-parent/{resourceName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/nested-parent-parent/{resourceName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/nested-parent-parent/{resourceName}`
+
+Client for testing parent -> parent nested initialization.
+
+Both the parent and child clients can only be initialized through their parents.
+
+Parameters elevated to client level:
+
+- resourceName: "test-resource" (path parameter)
+
+Expected client usage:
+
+```ts
+// via ParentOnlyParentClient only
+const client = new ParentOnlyParentClient.getParentOnlyNestedClient({
+  resourceName: "test-resource"
+});
+
+// Direct initialization should NOT be supported
+// const client = new ParentOnlyNestedClient(...); // This should not work
+
+// Operations don't need resourceName parameter
 client.withQuery(format: "text");
 client.getStandalone();
 client.deleteStandalone();

@@ -26,6 +26,11 @@ model Input {
   name: string;
 }
 
+model DefaultnQueryParam {
+  @query
+  blobName: string;
+}
+
 // Scenario 1: Header parameter moved to client level
 
 @route("/header-param")
@@ -115,10 +120,10 @@ model BlobProperties {
   createdOn: utcDateTime;
 }
 
-// Scenario 6: Client initialization on child client
-@doc("Blob operations with path parameter that should be moved to client level, in child client")
-@route("/child-client")
-interface ChildClient {
+// Nested layer services for first-layer default (no decorator)
+@doc("Operations for nested default -> default")
+@route("/nested-default-default")
+interface NestedDefaultDefaultWithPath {
   @route("/{blobName}/with-query")
   @get
   withQuery(@path blobName: string, @query format?: string): void;
@@ -130,4 +135,72 @@ interface ChildClient {
   @route("/{blobName}")
   @delete
   deleteStandalone(@path blobName: string): void;
+}
+
+// Nested layer services for first-layer default (no decorator) - Query variant
+@doc("Operations for nested default -> default with query parameters")
+@route("/nested-default-default-query")
+interface NestedDefaultDefaultWithQuery {
+  @route("/with-query")
+  @get
+  withQuery(...DefaultnQueryParam): void;
+
+  @route("/get-standalone")
+  @get
+  getStandalone(...DefaultnQueryParam): BlobProperties;
+
+  @route("/delete-resource")
+  @delete
+  deleteStandalone(...DefaultnQueryParam): void;
+}
+
+// Nested layer services for default -> header parameters
+@doc("Operations for nested default -> header parameters")
+@route("/nested-default-header")
+interface NestedDefaultHeader {
+  @route("/with-query")
+  @get
+  withQuery(...NameHeaderParam, @query format?: string): void;
+
+  @route("/get-standalone")
+  @get
+  getStandalone(...NameHeaderParam): void;
+
+  @route("/delete-standalone")
+  @delete
+  deleteStandalone(...NameHeaderParam): void;
+}
+
+// Nested layer services for default -> multiple parameters
+@doc("Operations for nested default -> multiple parameters")
+@route("/nested-default-multiple")
+interface NestedDefaultMultiple {
+  @route("/with-query")
+  @get
+  withQuery(...NameHeaderParam, ...RegionQueryParam, @query format?: string): void;
+
+  @route("/get-standalone")
+  @get
+  getStandalone(...NameHeaderParam, ...RegionQueryParam): void;
+
+  @route("/delete-standalone")
+  @delete
+  deleteStandalone(...NameHeaderParam, ...RegionQueryParam): void;
+}
+
+// Nested layer services for default -> mixed parameters
+@doc("Operations for nested default -> mixed parameters")
+@route("/nested-default-mixed")
+interface NestedDefaultMixed {
+  @route("/with-query")
+  @get
+  withQuery(...NameHeaderParam, ...RegionQueryParam, @query format?: string): void;
+
+  @route("/get-standalone")
+  @get
+  getStandalone(...NameHeaderParam, ...RegionQueryParam): void;
+
+  @route("/delete-standalone")
+  @delete
+  deleteStandalone(...NameHeaderParam, ...RegionQueryParam): void;
 }
