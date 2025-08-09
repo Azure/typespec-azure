@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-Fix missing list decorator
+Update test case for multi layter discriminator

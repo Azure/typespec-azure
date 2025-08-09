@@ -805,6 +805,50 @@ it("next link with re-injected parameters", async () => {
   );
 });
 
+it("unbranded next link with re-injected parameters", async () => {
+  await runner.compileWithBuiltInAzureCoreService(`
+    model TestOptions {
+      @query
+      includePending?: boolean;
+
+      @query
+      includeExpired?: boolean;
+    }
+
+    @list
+    op test(...TestOptions): ListTestResult;
+
+    model ListTestResult {
+      @pageItems
+      values: Test[];
+      @nextLink
+      nextLink: Azure.Core.Legacy.parameterizedNextLink<[TestOptions.includePending, TestOptions.includeExpired]>;
+    }
+
+    model Test {
+      id: string;
+    }
+  `);
+
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  strictEqual(method.name, "test");
+  strictEqual(method.kind, "paging");
+  strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
+  strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
+  strictEqual(method.pagingMetadata.nextLinkReInjectedParametersSegments?.length, 2);
+  strictEqual(method.pagingMetadata.nextLinkReInjectedParametersSegments[0].length, 1);
+  strictEqual(
+    method.pagingMetadata.nextLinkReInjectedParametersSegments[0][0],
+    method.parameters[0],
+  );
+  strictEqual(method.pagingMetadata.nextLinkReInjectedParametersSegments[1].length, 1);
+  strictEqual(
+    method.pagingMetadata.nextLinkReInjectedParametersSegments[1][0],
+    method.parameters[1],
+  );
+});
+
 it("next link with mix of re-injected parameters and not", async () => {
   await runner.compileWithBuiltInAzureCoreService(`
     model IncludePendingOptions {
@@ -851,7 +895,51 @@ it("next link with mix of re-injected parameters and not", async () => {
   );
 });
 
-it.skip("next link with reinjected parameters with versioning", async () => {
+it("unbranded next link with mix of re-injected parameters and not", async () => {
+  await runner.compileWithBuiltInAzureCoreService(`
+    model IncludePendingOptions {
+      @query
+      includePending?: boolean;
+    }
+      
+    model User {
+      @key
+      @visibility(Lifecycle.Read)
+      id: int32;
+    }
+
+    model ParameterizedNextLinkPagingResult {
+      @pageItems
+      values: User[];
+
+      @nextLink
+      nextLink: Azure.Core.Legacy.parameterizedNextLink<[IncludePendingOptions.includePending]>;
+    }
+
+    @doc("List with parameterized next link that re-injects parameters.")
+    @route("/with-parameterized-next-link")
+    @list
+    op test(
+      ...IncludePendingOptions,
+      @query select: string,
+    ): ParameterizedNextLinkPagingResult;
+  `);
+
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  strictEqual(method.name, "test");
+  strictEqual(method.kind, "paging");
+  strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
+  strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
+  strictEqual(method.pagingMetadata.nextLinkReInjectedParametersSegments?.length, 1);
+  strictEqual(method.pagingMetadata.nextLinkReInjectedParametersSegments[0].length, 1);
+  strictEqual(
+    method.pagingMetadata.nextLinkReInjectedParametersSegments[0][0],
+    method.parameters[0],
+  );
+});
+
+it("next link with reinjected parameters with versioning", async () => {
   await runner.compile(`
     @server("http://localhost:3000", "endpoint")
     @service()
@@ -872,9 +960,59 @@ it.skip("next link with reinjected parameters with versioning", async () => {
 
     op test(...TestOptions): ListTestResult;
 
+    #suppress "deprecated" "Keep for validation purposes."
     @pagedResult
     model ListTestResult {
+      #suppress "deprecated" "Keep for validation purposes."
       @items
+      values: Test[];
+      @nextLink
+      nextLink: Azure.Core.Legacy.parameterizedNextLink<[TestOptions.includePending]>;
+    }
+
+    model Test {
+      id: string;
+    }
+  `);
+
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  strictEqual(method.name, "test");
+  strictEqual(method.kind, "paging");
+  strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
+  strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
+  strictEqual(method.pagingMetadata.nextLinkReInjectedParametersSegments?.length, 1);
+  strictEqual(method.pagingMetadata.nextLinkReInjectedParametersSegments[0].length, 1);
+  strictEqual(
+    method.pagingMetadata.nextLinkReInjectedParametersSegments[0][0],
+    method.parameters[0],
+  );
+});
+
+it("unbranded next link with reinjected parameters with versioning", async () => {
+  await runner.compile(`
+    @server("http://localhost:3000", "endpoint")
+    @service()
+    @versioned(Versions)
+    namespace My.Service;
+
+    /** Api versions */
+    enum Versions {
+      /** 2024-04-01-preview api version */
+      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
+      V2024_04_01_PREVIEW: "2024-04-01-preview",
+    }
+
+    model TestOptions {
+      @query
+      includePending?: boolean;
+    }
+
+    @list
+    op test(...TestOptions): ListTestResult;
+
+    model ListTestResult {
+      @pageItems
       values: Test[];
       @nextLink
       nextLink: Azure.Core.Legacy.parameterizedNextLink<[TestOptions.includePending]>;

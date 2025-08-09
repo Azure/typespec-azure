@@ -316,6 +316,22 @@ enum Versions {
 }
 ```
 
+### `@uniqueItems` {#@Azure.Core.uniqueItems}
+
+Specifies that an array model or array-typed property should contain only unique items.
+
+```typespec
+@Azure.Core.uniqueItems
+```
+
+#### Target
+
+`ModelProperty | Model`
+
+#### Parameters
+
+None
+
 ### `@useFinalStateVia` {#@Azure.Core.useFinalStateVia}
 
 Overrides the final state value for an operation
