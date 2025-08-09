@@ -15,7 +15,6 @@ namespace Azure.ResourceManager;
 interface Operations {
   /**
    * @dev List the operations for the provider.
-  
    */
   @tag("Operations")
   @autoRoute
