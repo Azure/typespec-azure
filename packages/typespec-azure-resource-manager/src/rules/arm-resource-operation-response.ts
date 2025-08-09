@@ -52,23 +52,27 @@ function checkArmResourceOperationReturnType(
   if (!isInternalTypeSpec(context.program, operation)) {
     const returnType = operation.returnType;
     if (returnType.kind === "Model") {
-      checkIfArmModel(context, operation, model, returnType);
+      throwIfNotMatchingArmModel(context, operation, model, returnType);
     } else if (returnType.kind === "Union") {
       for (const variant of returnType.variants.values()) {
         if (!isErrorType(variant.type) && variant.type.kind === "Model") {
           const modelCandidate = getEffectiveModelType(context.program, variant.type);
-          checkIfArmModel(context, operation, model, modelCandidate);
+          throwIfNotMatchingArmModel(context, operation, model, modelCandidate);
           if (modelCandidate.templateMapper !== undefined) {
             // ArmResponse<FooResource>
             for (const arg of modelCandidate.templateMapper.args) {
               if (isType(arg) && arg.kind === "Model") {
-                checkIfArmModel(context, operation, model, arg);
+                throwIfNotMatchingArmModel(context, operation, model, arg);
                 if (arg.templateMapper !== undefined) {
-                  // ArmResponse<ResourceListResult<FooResource>>
-                  for (const type of arg.templateMapper.args) {
-                    if (isType(type) && type.kind === "Model") {
-                      checkIfArmModel(context, operation, model, type);
-                    }
+                  const modelArgs = arg.templateMapper.args.filter(
+                    (a) => isType(a) && a.kind === "Model",
+                  );
+                  const resourceArgs = modelArgs.filter(
+                    (a) => getArmResource(context.program, a) !== undefined,
+                  );
+                  // if there is only one ARM resource argument, it must match the expected ARM resource
+                  if (resourceArgs.length === 1) {
+                    throwIfNotMatchingArmModel(context, operation, model, resourceArgs[0]);
                   }
                 }
               }
@@ -78,17 +82,17 @@ function checkArmResourceOperationReturnType(
       }
     }
   }
-}
 
-function checkIfArmModel(
-  context: LinterRuleContext<DiagnosticMessages>,
-  operation: Operation,
-  model: Model,
-  modelCandidate: Model,
-) {
-  if (getArmResource(context.program, modelCandidate) && modelCandidate !== model) {
-    context.reportDiagnostic({
-      target: operation,
-    });
+  function throwIfNotMatchingArmModel(
+    context: LinterRuleContext<DiagnosticMessages>,
+    operation: Operation,
+    model: Model,
+    modelCandidate: Model,
+  ) {
+    if (getArmResource(context.program, modelCandidate) !== undefined && modelCandidate !== model) {
+      context.reportDiagnostic({
+        target: operation,
+      });
+    }
   }
 }

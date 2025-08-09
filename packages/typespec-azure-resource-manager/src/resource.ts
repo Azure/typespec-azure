@@ -906,7 +906,7 @@ export const $identifiers: IdentifiersDecorator = (
 };
 
 /**
- * This function returns identifiers using the @identifiers decorator
+ * This function returns identifiers using the '@identifiers' decorator
  *
  * @param program The program to process.
  * @param entity The array model type to check.
@@ -917,7 +917,7 @@ export function getArmIdentifiers(program: Program, entity: ModelProperty): stri
 }
 
 /**
- * This function returns identifiers using the @key decorator.
+ * This function returns identifiers using the '@key' decorator.
  *
  * @param program The program to process.
  * @param entity The array model type to check.

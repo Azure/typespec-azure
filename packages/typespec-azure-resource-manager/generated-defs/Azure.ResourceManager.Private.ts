@@ -111,6 +111,23 @@ export type ArmResourceInternalDecorator = (
 ) => void;
 
 /**
+ * This decorator identifies Azure Resource Manager resource types that do not define
+ * the name identifier parameter and type
+ *
+ * @param target Azure Resource Manager resource type
+ * @param properties Azure Resource Manager resource properties
+ * @param type The resource type name, e.g. "virtualMachines"
+ * @param nameParameter The name of the resource name parameter, e.g. "virtualMachineName"
+ */
+export type ArmResourceWithParameterDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  properties: Model,
+  type: string,
+  nameParameter: string,
+) => void;
+
+/**
  * Provides default name decoration on resource name property with
  * camelcased and pluralized key and segment name
  */
@@ -184,6 +201,7 @@ export type AzureResourceManagerPrivateDecorators = {
   armUpdateProviderNamespace: ArmUpdateProviderNamespaceDecorator;
   assignUniqueProviderNameValue: AssignUniqueProviderNameValueDecorator;
   armResourceInternal: ArmResourceInternalDecorator;
+  armResourceWithParameter: ArmResourceWithParameterDecorator;
   defaultResourceKeySegmentName: DefaultResourceKeySegmentNameDecorator;
   enforceConstraint: EnforceConstraintDecorator;
   armRenameListByOperation: ArmRenameListByOperationDecorator;

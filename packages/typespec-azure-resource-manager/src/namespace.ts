@@ -26,10 +26,7 @@ import { reportDiagnostic } from "./lib.js";
 import { getArmVirtualResourceDetails, getSingletonResourceKey } from "./resource.js";
 import { ArmStateKeys } from "./state.js";
 
-function getArmCommonTypesVersion(
-  context: DecoratorContext,
-  entity: Namespace | EnumMember,
-): EnumValue | undefined {
+function getArmCommonTypesVersion(entity: Namespace | EnumMember): EnumValue | undefined {
   return entity.decorators.find((x) => x.definition?.name === "@armCommonTypesVersion")?.args[0]
     .jsValue as EnumValue | undefined;
 }
@@ -169,7 +166,7 @@ export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
     }
   }
 
-  const armCommonTypesVersion = getArmCommonTypesVersion(context, entity);
+  const armCommonTypesVersion = getArmCommonTypesVersion(entity);
 
   // If it is versioned namespace, we will check each Version enum member. If no
   // @armCommonTypeVersion decorator, add the one
@@ -177,7 +174,7 @@ export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
   if (versioned) {
     const versionEnum = versioned.args[0].value as Enum;
     versionEnum.members.forEach((v) => {
-      if (!getArmCommonTypesVersion(context, v)) {
+      if (!getArmCommonTypesVersion(v)) {
         context.call($armCommonTypesVersion, v, armCommonTypesVersion ?? "v3");
       }
     });

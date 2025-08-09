@@ -35,6 +35,21 @@ extern dec assignUniqueProviderNameValue(target: ModelProperty, resource: Model)
 extern dec armResourceInternal(target: Model, properties: Model);
 
 /**
+ * This decorator identifies Azure Resource Manager resource types that do not define
+ * the name identifier parameter and type
+ * @param target Azure Resource Manager resource type
+ * @param properties Azure Resource Manager resource properties
+ * @param type The resource type name, e.g. "virtualMachines"
+ * @param nameParameter The name of the resource name parameter, e.g. "virtualMachineName"
+ */
+extern dec armResourceWithParameter(
+  target: Model,
+  properties: Model,
+  type: valueof string,
+  nameParameter: valueof string
+);
+
+/**
  * Omit a property in the target model.
  * @internal
  * @param propertyName Name of the property to omit
