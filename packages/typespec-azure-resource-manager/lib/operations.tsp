@@ -495,7 +495,7 @@ op ArmResourceDeleteSync<
 @post
 op ArmResourceActionAsyncBase<
   Resource extends Foundations.SimpleResource,
-  Request extends Reflection.Model | Reflection.Scalar | void | unknown,
+  Request,
   Response extends {} | void,
   BaseParameters extends TypeSpec.Reflection.Model,
   Parameters extends {} = {},
@@ -525,7 +525,7 @@ op ArmResourceActionAsyncBase<
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceActionAsync<
   Resource extends Foundations.SimpleResource,
-  Request extends Reflection.Model | Reflection.Scalar | void | unknown,
+  Request,
   Response extends {} | void,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
@@ -564,8 +564,8 @@ op ArmResourceActionAsync<
 @returnsDoc("Azure operation completed successfully.")
 op ArmResourceActionSync<
   Resource extends Foundations.SimpleResource,
-  Request extends Reflection.Model | Reflection.Scalar | void | unknown,
-  Response extends Reflection.Model | Reflection.Scalar | void | unknown,
+  Request,
+  Response,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
@@ -625,7 +625,7 @@ op ArmResourceActionNoContentAsync<
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceActionNoResponseContentAsync<
   Resource extends Foundations.SimpleResource,
-  Request extends Reflection.Model | Reflection.Scalar | void | unknown,
+  Request,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
@@ -661,7 +661,7 @@ op ArmResourceActionNoResponseContentAsync<
 @post
 op ArmResourceActionNoContentSync<
   Resource extends Foundations.SimpleResource,
-  Request extends Reflection.Model | Reflection.Scalar | void | unknown,
+  Request,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
