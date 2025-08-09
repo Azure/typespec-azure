@@ -709,7 +709,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/PrivateEndpointConnectionResourceListResult"
+              "$ref": "#/definitions/PrivateEndpointConnectionListResult"
             }
           },
           "default": {
@@ -718,9 +718,6 @@
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
-        },
-        "x-ms-pageable": {
-          "nextLinkName": "nextLink"
         }
       }
     },
@@ -823,13 +820,13 @@
         ],
         "responses": {
           "200": {
-            "description": "Resource 'PrivateEndpointConnectionResource' update operation succeeded",
+            "description": "Resource 'PrivateEndpointConnection' update operation succeeded",
             "schema": {
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
             }
           },
           "201": {
-            "description": "Resource 'PrivateEndpointConnectionResource' create operation succeeded",
+            "description": "Resource 'PrivateEndpointConnection' create operation succeeded",
             "schema": {
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
             },
@@ -1083,7 +1080,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/PrivateEndpointConnectionResourceListResult"
+              "$ref": "#/definitions/PrivateEndpointConnectionListResult"
             }
           },
           "default": {
@@ -1181,13 +1178,13 @@
         ],
         "responses": {
           "200": {
-            "description": "Resource 'PrivateEndpointConnectionResource' update operation succeeded",
+            "description": "Resource 'PrivateEndpointConnection' update operation succeeded",
             "schema": {
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
             }
           },
           "201": {
-            "description": "Resource 'PrivateEndpointConnectionResource' create operation succeeded",
+            "description": "Resource 'PrivateEndpointConnection' create operation succeeded",
             "schema": {
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
             },
@@ -1584,13 +1581,13 @@
         "movingStatus"
       ]
     },
-    "PrivateEndpointConnectionResourceListResult": {
+    "PrivateEndpointConnectionListResult": {
       "type": "object",
-      "description": "The response of a PrivateEndpointConnectionResource list operation.",
+      "description": "The response of a PrivateEndpointConnection list operation.",
       "properties": {
         "value": {
           "type": "array",
-          "description": "The PrivateEndpointConnectionResource items on this page",
+          "description": "The PrivateEndpointConnection items on this page",
           "items": {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
           }

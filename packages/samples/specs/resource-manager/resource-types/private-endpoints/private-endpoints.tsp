@@ -67,8 +67,8 @@ union ProvisioningState {
 }
 
 interface Operations extends Azure.ResourceManager.Operations {}
-model MyPrivateEndpointResource is PrivateEndpointConnectionResource;
-alias PrivateEndpointOperations = PrivateEndpoints<MyPrivateEndpointResource>;
+model PrivateEndpointConnection is PrivateEndpointConnectionResource;
+alias PrivateEndpointOperations = PrivateEndpoints<PrivateEndpointConnection>;
 
 @armResourceOperations
 interface Employees {
@@ -123,7 +123,10 @@ interface Dependents {
   createOrUpdatePrivateEndpointConnection is PrivateEndpointOperations.CreateOrUpdateAsync<Dependent>;
   updatePrivateEndpointConnection is PrivateEndpointOperations.CustomPatchAsync<Dependent>;
   deletePrivateEndpointConnection is PrivateEndpointOperations.DeleteAsync<Dependent>;
-  listPrivateEndpointConnections is PrivateEndpointOperations.ListByParent<Dependent>;
+  listPrivateEndpointConnections is Azure.ResourceManager.Legacy.ListSinglePageByParent<
+    Dependent,
+    PrivateEndpointConnection
+  >;
 }
 
 /** An employee dependent */

@@ -2395,6 +2395,23 @@ op Azure.ResourceManager.Legacy.CustomPatchSync(provider: "Microsoft.ThisWillBeR
 | Error               | Optional. The error response, if non-standard.            |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional  |
 
+### `ListSinglePageByParent` {#Azure.ResourceManager.Legacy.ListSinglePageByParent}
+
+```typespec
+op Azure.ResourceManager.Legacy.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+```
+
+#### Template Parameters
+
+| Name           | Description                                                   |
+| -------------- | ------------------------------------------------------------- |
+| ParentResource | the parent resource of the PrivateEndpointConnection          |
+| Resource       | Optional. The PrivateEndpointConnection resource being listed |
+| BaseParameters | Optional. Allows overriding the operation parameters          |
+| Parameters     | Optional. Additional parameters after the path parameters     |
+| Response       | Optional. The success response for the list operation         |
+| Error          | Optional. The error response, if non-standard.                |
+
 ### `UpdateOperation` {#Azure.ResourceManager.Legacy.UpdateOperation}
 
 ```typespec
