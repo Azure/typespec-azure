@@ -606,6 +606,29 @@ model Foo is TrackedResource<FooProperties> {
 | ----- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | eTag? | `string` | If eTag is provided in the response body, it may also be provided as a header per the normal etag convention. Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19), If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields. |
 
+### `ETagProperty` {#Azure.ResourceManager.ETagProperty}
+
+Model used only to spread in the standard `etag` envelope property for a resource
+
+```typespec
+model Azure.ResourceManager.ETagProperty
+```
+
+#### Examples
+
+```typespec
+model Foo is TrackedResource<FooProperties> {
+  // Only have standard Succeeded, Failed, Cancelled states
+  ...ETagProperty;
+}
+```
+
+#### Properties
+
+| Name  | Type     | Description                                                                                                                                                                                                                                                                                                                                                         |
+| ----- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| etag? | `string` | If etag is provided in the response body, it may also be provided as a header per the normal etag convention. Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19), If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields. |
+
 ### `ExtendedLocationProperty` {#Azure.ResourceManager.ExtendedLocationProperty}
 
 Model representing the standard `extendedLocation` envelope property for a resource.
@@ -3370,6 +3393,21 @@ model Azure.ResourceManager.Legacy.ArmOperationOptions
 | useStaticRoute? | `boolean` | Should a static route be used          |
 | route?          | `string`  | The status route for operations to use |
 
+### `LegacyTrackedResource` {#Azure.ResourceManager.Legacy.LegacyTrackedResource}
+
+A tracked resource with the 'location' property optional
+
+```typespec
+model Azure.ResourceManager.Legacy.LegacyTrackedResource
+```
+
+#### Properties
+
+| Name      | Type             | Description                               |
+| --------- | ---------------- | ----------------------------------------- |
+| tags?     | `Record<string>` | Resource tags.                            |
+| location? | `string`         | The geo-location where the resource lives |
+
 ### `ManagedServiceIdentityV4` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4}
 
 Managed service identity (system assigned and/or user assigned identities)
@@ -3450,6 +3488,38 @@ model Azure.ResourceManager.Legacy.ProviderParameter<Resource>
 | Name     | Type                             | Description |
 | -------- | -------------------------------- | ----------- |
 | provider | `"Microsoft.ThisWillBeReplaced"` |             |
+
+### `TrackedResourceWithOptionalLocation` {#Azure.ResourceManager.Legacy.TrackedResourceWithOptionalLocation}
+
+This type uses an optional location property, only used by legacy APIs.
+Concrete tracked resource types can be created by aliasing this type using a specific property type.
+
+See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+
+```typespec
+model Azure.ResourceManager.Legacy.TrackedResourceWithOptionalLocation<Properties, PropertiesOptional>
+```
+
+#### Template Parameters
+
+| Name               | Description                                                                                                                                    |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Properties         | A model containing the provider-specific properties for this resource                                                                          |
+| PropertiesOptional | A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended. |
+
+#### Examples
+
+```typespec
+model Employee is TrackedResourceWithOptionalLocation<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+```
+
+#### Properties
+
+| Name        | Type         | Description |
+| ----------- | ------------ | ----------- |
+| properties? | `Properties` |             |
 
 ### `ManagedServiceIdentityType` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityType}
 
