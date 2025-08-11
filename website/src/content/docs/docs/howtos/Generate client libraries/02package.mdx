@@ -148,7 +148,7 @@ type PetStoreClientFeedResponse struct {}
 
 # Usage Sample
 petStoreClient := NewPetStoreClient()
-petStoreClient.Feed(context.Background(), Food{Name:to.Ptr("name", Quantity:to.Ptr(1))}, &PetStoreClientFeedOptions{})
+petStoreClient.Feed(context.Background(), Food{Name:to.Ptr("name"), Quantity:to.Ptr(1)}, &PetStoreClientFeedOptions{})
 ```
 
 </ClientTabs>
