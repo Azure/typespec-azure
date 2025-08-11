@@ -128,9 +128,10 @@ Foo foo = new Foo("hello");
 package container
 
 type Foo struct {
-    Prop *string 
+Prop \*string
 }
-```
+
+````
 
 </ClientTabItem>
 </ClientTabs>
@@ -147,7 +148,7 @@ namespace Service;
 model Foo {
   prop: string;
 }
-```
+````
 
 </ClientTabItem>
 
@@ -191,7 +192,7 @@ Foo foo = new Foo("hello");
 package container
 
 type Foo struct {
-    Prop *string 
+    Prop *string
 }
 ```
 
@@ -571,6 +572,7 @@ public final class Properties {
     public Properties setName(String name);
 }
 ```
+
 </ClientTabItem>
 <ClientTabItem lang="go" >
 ```go
@@ -579,9 +581,10 @@ type Properties struct {
 }
 
 type Foo struct {
-    Name *string 
+Name \*string
 }
-```
+
+````
 
 </ClientTabItem>
 </ClientTabs>
@@ -602,7 +605,7 @@ model Animal {
   kind: string;
   ...Record<unknown>;
 }
-```
+````
 
 Other usages:
 
@@ -701,11 +704,12 @@ type Animal struct {
 }
 
 type AnimalOutput struct {
-    Name *string 
-    Kind *string 
-    AdditionalProperties map[string]interface{} 
+Name *string
+Kind *string
+AdditionalProperties map[string]interface{}
 }
-```
+
+````
 </ClientTabItem>
 
 </ClientTabs>
@@ -726,7 +730,7 @@ model Animal {
   kind: string;
   ...Record<AnimalProperty>;
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -876,11 +880,12 @@ type AnimalProperty struct {
 }
 
 type Animal struct {
-    Name *string 
-    Kind *string 
-    AdditionalProperties map[string]AnimalProperty 
+Name *string
+Kind *string
+AdditionalProperties map[string]AnimalProperty
 }
-```
+
+````
 
 </ClientTabItem>
 </ClientTabs>
@@ -897,7 +902,7 @@ model Animal {
   ...Record<string>;
   ...Record<int32>;
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -1053,11 +1058,12 @@ public final class Animal implements JsonSerializable<Animal> {
 package service
 
 type Animal struct {
-    Name *string 
-    Kind *string 
-    AdditionalProperties map[string]interface{} 
+Name *string
+Kind *string
+AdditionalProperties map[string]interface{}
 }
-```
+
+````
 </ClientTabItem>
 </ClientTabs>
 
@@ -1085,7 +1091,7 @@ model Siamese extends Cat {
 model Ragdoll extends Cat {
   kind: "ragdoll";
 }
-```
+````
 
 The type of the discriminator property could be an enum (extensible or fixed):
 
@@ -1336,22 +1342,23 @@ TODO
 package service
 
 type Foo struct {
-    BasicNullableProperty *string 
-    ModelNullableProperty *Bar    
-    EnumNullableProperty  *LR     
+BasicNullableProperty *string
+ModelNullableProperty *Bar  
+ EnumNullableProperty \*LR  
 }
 
 type Bar struct {
-    Prop *string 
+Prop \*string
 }
 
 type LR string
 
 const (
-    LRLeft  LR = "left"
-    LRRight LR = "right"
+LRLeft LR = "left"
+LRRight LR = "right"
 )
-```
+
+````
 </ClientTabItem>
 </ClientTabs>
 
@@ -1373,7 +1380,7 @@ model Foo {
   @flattenProperty
   prop: Properties;
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -1642,23 +1649,24 @@ public final class Dog extends Pet {  // Inherits from Pet, not Animal
 package models
 
 type Animal struct {
-	Kind string 
-	Name string 
+Kind string
+Name string
 }
 
 type Pet struct {
-	Animal
-	Owner      string 
-	Vaccinated bool   
+Animal
+Owner string
+Vaccinated bool  
 }
 
 type Dog struct {
-	Animal
-	Owner      string 
-	Vaccinated bool   
-	Breed      string 
+Animal
+Owner string
+Vaccinated bool  
+ Breed string
 }
-```
+
+````
 </ClientTabItem>
 </ClientTabs>
 
@@ -1676,7 +1684,7 @@ union LR {
   left: "left",
   right: "right",
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -1790,16 +1798,17 @@ public enum WidgetHorizontal {
 package models
 
 type Widget struct {
-	Horizontal WidgetHorizontal 
+Horizontal WidgetHorizontal
 }
 
 type WidgetHorizontal string
 
 const (
-	WidgetHorizontalLeft  WidgetHorizontal = "left"
-	WidgetHorizontalRight WidgetHorizontal = "right"
+WidgetHorizontalLeft WidgetHorizontal = "left"
+WidgetHorizontalRight WidgetHorizontal = "right"
 )
-```
+
+````
 
 </ClientTabItem>
 </ClientTabs>
@@ -1817,7 +1826,7 @@ union Colors {
   red: "red",
   blue: "blue",
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -1933,10 +1942,11 @@ public final class WidgetColor extends ExpandableStringEnum<Colors> {
 type Colors string
 
 const (
-    ColorsRed  Colors = "red"
-    ColorsBlue Colors = "blue"
+ColorsRed Colors = "red"
+ColorsBlue Colors = "blue"
 )
-```
+
+````
 </ClientTabItem>
 </ClientTabs>
 
@@ -1953,7 +1963,7 @@ union ProvisioningState {
   "InProgress",
   Azure.ResourceManager.ResourceProvisioningState,
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -2018,15 +2028,17 @@ package service
 type ProvisioningState string
 
 const (
-    ProvisioningStateInProgress ProvisioningState = "InProgress"
+ProvisioningStateInProgress ProvisioningState = "InProgress"
 
     // Constants from Azure.ResourceManager.ResourceProvisioningState
     ResourceProvisioningStateSucceeded ProvisioningState = "Succeeded"
     ResourceProvisioningStateFailed    ProvisioningState = "Failed"
     ResourceProvisioningStateCanceled  ProvisioningState = "Canceled"
     // ... other imported states
+
 )
-```
+
+````
 </ClientTabItem>
 </ClientTabs>
 
@@ -2050,7 +2062,7 @@ union Orientation {
   LR,
   UD,
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -2108,12 +2120,13 @@ package service
 type Orientation string
 
 const (
-    OrientationLeft  Orientation = "left"
-    OrientationRight Orientation = "right"
-    OrientationUp    Orientation = "up"
-    OrientationDown  Orientation = "down"
+OrientationLeft Orientation = "left"
+OrientationRight Orientation = "right"
+OrientationUp Orientation = "up"
+OrientationDown Orientation = "down"
 )
-```
+
+````
 </ClientTabItem>
 </ClientTabs>
 
@@ -2136,7 +2149,7 @@ union UD {
 model Widget {
   orientation: LR | UD;
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -2201,16 +2214,17 @@ package service
 type Orientation string
 
 const (
-    OrientationLeft  Orientation = "left"
-    OrientationRight Orientation = "right"
-    OrientationUp    Orientation = "up"
-    OrientationDown  Orientation = "down"
+OrientationLeft Orientation = "left"
+OrientationRight Orientation = "right"
+OrientationUp Orientation = "up"
+OrientationDown Orientation = "down"
 )
 
 type Widget struct {
-    Orientation Orientation `json:"orientation"`
+Orientation Orientation `json:"orientation"`
 }
-```
+
+````
 </ClientTabItem>
 </ClientTabs>
 
@@ -2228,7 +2242,7 @@ enum LR {
   left,
   right,
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -2280,10 +2294,11 @@ package service
 type LR string
 
 const (
-    LRLeft  LR = "left"
-    LRRight LR = "right"
+LRLeft LR = "left"
+LRRight LR = "right"
 )
-```
+
+````
 </ClientTabItem>
 </ClientTabs>
 
@@ -2301,7 +2316,7 @@ enum Versions {
   v1,
   v2,
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -2342,10 +2357,11 @@ package service
 type Versions string
 
 const (
-    VersionsV1 Versions = "v1"
-    VersionsV2 Versions = "v2"
+VersionsV1 Versions = "v1"
+VersionsV2 Versions = "v2"
 )
-```
+
+````
 </ClientTabItem>
 </ClientTabs>
 
@@ -2371,7 +2387,7 @@ enum Orientation {
   ...LR,
   ...UD,
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -2429,26 +2445,27 @@ package service
 type LR string
 
 const (
-    LRLeft  LR = "left"
-    LRRight LR = "right"
+LRLeft LR = "left"
+LRRight LR = "right"
 )
 
 type UD string
 
 const (
-    UDUp   UD = "up"
-    UDDown UD = "down"
+UDUp UD = "up"
+UDDown UD = "down"
 )
 
 type Orientation string
 
 const (
-    OrientationLeft  Orientation = "left"
-    OrientationRight Orientation = "right"
-    OrientationUp    Orientation = "up"
-    OrientationDown  Orientation = "down"
+OrientationLeft Orientation = "left"
+OrientationRight Orientation = "right"
+OrientationUp Orientation = "up"
+OrientationDown Orientation = "down"
 )
-```
+
+````
 </ClientTabItem>
 </ClientTabs>
 
@@ -2466,7 +2483,7 @@ model Test {
   @encode(DateTimeKnownEncoding.rfc3339)
   prop: utcDateTime;
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -2548,11 +2565,13 @@ jsonWriter.writeStringField("prop", Objects.toString(this.value, null));
 ```go
 package service
 
-import "time"
+import "time";
 
 type Test struct {
-    Prop *time.Time 
+Prop \*time.Time
 }
+
 ```
 </ClientTabItem>
 </ClientTabs>
+```

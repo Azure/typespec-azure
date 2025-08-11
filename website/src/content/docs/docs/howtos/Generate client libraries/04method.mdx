@@ -459,8 +459,8 @@ public void post(User user);
 
 ```go
 type User struct {
-	FirstName string 
-	LastName  string 
+	FirstName string
+	LastName  string
 }
 func GetUser(ctx context.Context) (*User, error) {}
 func (c *Client) PostUser(ctx context.Context, user *User) error {}
@@ -667,8 +667,8 @@ public void upload(String id, String firstName, String lastName);
 
 ```go
 type User struct {
-	FirstName string 
-	LastName  string 
+	FirstName string
+	LastName  string
 }
 func Upload(ctx context.Context, user *User) error {}
 
@@ -766,8 +766,8 @@ public void upload(String firstName, String lastName);
 
 ```go
 type User struct {
-	FirstName string 
-	LastName  string 
+	FirstName string
+	LastName  string
 }
 
 func Upload(ctx context.Context, user *User) error {}
@@ -1084,7 +1084,7 @@ public void register(Schema schema);
 
 ```go
 type Schema struct {
-	Schema []byte 
+	Schema []byte
 }
 
 func Register(ctx context.Context, schema Schema) error {}
@@ -1208,13 +1208,13 @@ public RepairResult scheduleRepairs(String widgetName, String problem, String co
 
 ```go
 type RepairInfo struct {
-    Problem string 
-    Contact string 
+    Problem string
+    Contact string
 }
 
 type RepairResult struct {
-    Reason string 
-    Info   string 
+    Reason string
+    Info   string
 }
 
 func ScheduleRepairs(ctx context.Context, widgetName string, info RepairInfo) (*RepairResult, error) {}
@@ -1386,13 +1386,13 @@ public RepairResult scheduleRepairs(String widgetName, RepairInfo body);
 
 ```go
 type RepairInfo struct {
-	Problem string 
-	Contact string 
+	Problem string
+	Contact string
 }
 
 type RepairResult struct {
-	Reason string 
-	Info   string 
+	Reason string
+	Info   string
 }
 
 func ScheduleRepairs(ctx context.Context, widgetName string, body RepairInfo) (*RepairResult, error) {}
@@ -1536,7 +1536,7 @@ public final class AnalyzeClient {
 ```go
 type AnalyzeResult struct {}
 type CompletionInput struct {
-	Input interface{} 
+	Input interface{}
 }
 type CompletionResult struct {}
 
@@ -1739,7 +1739,7 @@ public Response get(MatchConditions matchConditions);
 
 ```go
 type Response struct {
-    Name string 
+    Name string
 }
 
 func Get(ctx context.Context, ifMatch, ifNoneMatch *string) (*Response, error) {}

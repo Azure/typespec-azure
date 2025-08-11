@@ -64,8 +64,8 @@ type User struct {
 }
 
 type UserList struct {
-    Value    []User 
-    NextLink *string 
+    Value    []User
+    NextLink *string
 }
 
 func (c *Client) ListWithPage(ctx context.Context) (UserList, error) {}
@@ -119,13 +119,13 @@ public PagedIterable<User> listWithPage();
 
 ```go
 type User struct {
-    ID   string 
-    Name string 
+    ID   string
+    Name string
 }
 
 type UserList struct {
-    Value    []User  
-    NextLink *string 
+    Value    []User
+    NextLink *string
 }
 
 func (c *Client) ListWithPage(ctx context.Context) (UserList, error)
