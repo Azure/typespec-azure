@@ -29,7 +29,7 @@ interface Operations extends Azure.ResourceManager.Operations {}
 @doc("A ContosoProviderHub resource")
 model Employee is Legacy.TrackedResourceWithOptionalLocation<EmployeeProperties> {
   ...ResourceNameParameter<Employee>;
-  ...ETagProperty;
+  ...Legacy.EntityTagProperty;
 }
 
 @doc("The rp-specific properties of the employee")
