@@ -495,8 +495,8 @@ op ArmResourceDeleteSync<
 @post
 op ArmResourceActionAsyncBase<
   Resource extends Foundations.SimpleResource,
-  Request extends TypeSpec.Reflection.Model | void,
-  Response extends TypeSpec.Reflection.Model | void,
+  Request,
+  Response extends {} | void,
   BaseParameters extends TypeSpec.Reflection.Model,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
@@ -525,8 +525,8 @@ op ArmResourceActionAsyncBase<
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceActionAsync<
   Resource extends Foundations.SimpleResource,
-  Request extends TypeSpec.Reflection.Model | void,
-  Response extends TypeSpec.Reflection.Model | void,
+  Request,
+  Response extends {} | void,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
@@ -564,8 +564,8 @@ op ArmResourceActionAsync<
 @returnsDoc("Azure operation completed successfully.")
 op ArmResourceActionSync<
   Resource extends Foundations.SimpleResource,
-  Request extends TypeSpec.Reflection.Model | void,
-  Response extends TypeSpec.Reflection.Model | void,
+  Request,
+  Response,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
@@ -625,7 +625,7 @@ op ArmResourceActionNoContentAsync<
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceActionNoResponseContentAsync<
   Resource extends Foundations.SimpleResource,
-  Request extends TypeSpec.Reflection.Model | void,
+  Request,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
@@ -661,7 +661,7 @@ op ArmResourceActionNoResponseContentAsync<
 @post
 op ArmResourceActionNoContentSync<
   Resource extends Foundations.SimpleResource,
-  Request extends TypeSpec.Reflection.Model | void,
+  Request,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
