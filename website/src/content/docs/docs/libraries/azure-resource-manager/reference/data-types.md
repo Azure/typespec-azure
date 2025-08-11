@@ -606,29 +606,6 @@ model Foo is TrackedResource<FooProperties> {
 | ----- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | eTag? | `string` | If eTag is provided in the response body, it may also be provided as a header per the normal etag convention. Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19), If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields. |
 
-### `ETagProperty` {#Azure.ResourceManager.ETagProperty}
-
-Model used only to spread in the standard `etag` envelope property for a resource
-
-```typespec
-model Azure.ResourceManager.ETagProperty
-```
-
-#### Examples
-
-```typespec
-model Foo is TrackedResource<FooProperties> {
-  // Only have standard Succeeded, Failed, Cancelled states
-  ...ETagProperty;
-}
-```
-
-#### Properties
-
-| Name  | Type     | Description                                                                                                                                                                                                                                                                                                                                                         |
-| ----- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| etag? | `string` | If etag is provided in the response body, it may also be provided as a header per the normal etag convention. Entity tags are used for comparing two or more entities from the same requested resource. HTTP/1.1 uses entity tags in the etag (section 14.19), If-Match (section 14.24), If-None-Match (section 14.26), and If-Range (section 14.27) header fields. |
-
 ### `ExtendedLocationProperty` {#Azure.ResourceManager.ExtendedLocationProperty}
 
 Model representing the standard `extendedLocation` envelope property for a resource.
