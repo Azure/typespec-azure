@@ -2435,10 +2435,10 @@ model Azure.ResourceManager.CommonTypes.TrackedResource
 
 #### Properties
 
-| Name     | Type             | Description                               |
-| -------- | ---------------- | ----------------------------------------- |
-| tags?    | `Record<string>` | Resource tags.                            |
-| location | `string`         | The geo-location where the resource lives |
+| Name     | Type                 | Description                               |
+| -------- | -------------------- | ----------------------------------------- |
+| tags?    | `Record<string>`     | Resource tags.                            |
+| location | `Core.azureLocation` | The geo-location where the resource lives |
 
 ### `UserAssignedIdentities` {#Azure.ResourceManager.CommonTypes.UserAssignedIdentities}
 
