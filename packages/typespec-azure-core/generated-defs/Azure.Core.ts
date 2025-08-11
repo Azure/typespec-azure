@@ -199,6 +199,14 @@ export type NextPageOperationDecorator = (
   parameters?: Type,
 ) => void;
 
+/**
+ * Specifies that an array model or array-typed property should contain only unique items.
+ */
+export type UniqueItemsDecorator = (
+  context: DecoratorContext,
+  entity: ModelProperty | Model,
+) => void;
+
 export type AzureCoreDecorators = {
   lroStatus: LroStatusDecorator;
   finalLocation: FinalLocationDecorator;
@@ -217,4 +225,5 @@ export type AzureCoreDecorators = {
   finalOperation: FinalOperationDecorator;
   useFinalStateVia: UseFinalStateViaDecorator;
   nextPageOperation: NextPageOperationDecorator;
+  uniqueItems: UniqueItemsDecorator;
 };
