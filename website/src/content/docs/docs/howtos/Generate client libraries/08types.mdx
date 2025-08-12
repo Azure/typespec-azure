@@ -581,10 +581,10 @@ type Properties struct {
 }
 
 type Foo struct {
-Name *string
+Name \*string
 }
 
-```
+````
 </ClientTabItem>
 </ClientTabs>
 
@@ -604,7 +604,7 @@ model Animal {
   kind: string;
   ...Record<unknown>;
 }
-```
+````
 
 Other usages:
 
@@ -708,7 +708,7 @@ Kind *string
 AdditionalProperties map[string]interface{}
 }
 
-```
+````
 </ClientTabItem>
 
 </ClientTabs>
@@ -729,7 +729,7 @@ model Animal {
   kind: string;
   ...Record<AnimalProperty>;
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -884,7 +884,7 @@ Kind *string
 AdditionalProperties map[string]AnimalProperty
 }
 
-```
+````
 
 </ClientTabItem>
 </ClientTabs>
@@ -901,7 +901,7 @@ model Animal {
   ...Record<string>;
   ...Record<int32>;
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -1062,7 +1062,7 @@ Kind *string
 AdditionalProperties map[string]interface{}
 }
 
-```
+````
 </ClientTabItem>
 </ClientTabs>
 
@@ -1090,7 +1090,7 @@ model Siamese extends Cat {
 model Ragdoll extends Cat {
   kind: "ragdoll";
 }
-```
+````
 
 The type of the discriminator property could be an enum (extensible or fixed):
 
@@ -1347,11 +1347,11 @@ ModelNullableProperty *Bar
 }
 
 type Bar struct {
- EnumNullableProperty *LR  
+EnumNullableProperty \*LR  
 }
 
 type Bar struct {
-Prop *string
+Prop \*string
 }
 
 type LR string
@@ -1361,7 +1361,7 @@ LRLeft LR = "left"
 LRRight LR = "right"
 )
 
-```
+````
 </ClientTabItem>
 </ClientTabs>
 
@@ -1383,7 +1383,7 @@ model Foo {
   @flattenProperty
   prop: Properties;
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -1669,7 +1669,7 @@ Vaccinated bool
  Breed string
 }
 
-```
+````
 </ClientTabItem>
 </ClientTabs>
 
@@ -1687,7 +1687,7 @@ union LR {
   left: "left",
   right: "right",
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -1811,7 +1811,7 @@ WidgetHorizontalLeft WidgetHorizontal = "left"
 WidgetHorizontalRight WidgetHorizontal = "right"
 )
 
-```
+````
 
 </ClientTabItem>
 </ClientTabs>
@@ -1829,7 +1829,7 @@ union Colors {
   red: "red",
   blue: "blue",
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -1949,7 +1949,7 @@ ColorsRed Colors = "red"
 ColorsBlue Colors = "blue"
 )
 
-```
+````
 </ClientTabItem>
 </ClientTabs>
 
@@ -1966,7 +1966,7 @@ union ProvisioningState {
   "InProgress",
   Azure.ResourceManager.ResourceProvisioningState,
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -2041,7 +2041,7 @@ ProvisioningStateInProgress ProvisioningState = "InProgress"
 
 )
 
-```
+````
 </ClientTabItem>
 </ClientTabs>
 
@@ -2065,7 +2065,7 @@ union Orientation {
   LR,
   UD,
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -2129,7 +2129,7 @@ OrientationUp Orientation = "up"
 OrientationDown Orientation = "down"
 )
 
-```
+````
 </ClientTabItem>
 </ClientTabs>
 
@@ -2152,7 +2152,7 @@ union UD {
 model Widget {
   orientation: LR | UD;
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -2227,7 +2227,7 @@ type Widget struct {
 Orientation Orientation `json:"orientation"`
 }
 
-```
+````
 </ClientTabItem>
 </ClientTabs>
 
@@ -2245,7 +2245,7 @@ enum LR {
   left,
   right,
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -2301,7 +2301,7 @@ LRLeft LR = "left"
 LRRight LR = "right"
 )
 
-```
+````
 </ClientTabItem>
 </ClientTabs>
 
@@ -2319,7 +2319,7 @@ enum Versions {
   v1,
   v2,
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -2364,7 +2364,7 @@ VersionsV1 Versions = "v1"
 VersionsV2 Versions = "v2"
 )
 
-```
+````
 </ClientTabItem>
 </ClientTabs>
 
@@ -2390,7 +2390,7 @@ enum Orientation {
   ...LR,
   ...UD,
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
@@ -2468,7 +2468,7 @@ OrientationUp Orientation = "up"
 OrientationDown Orientation = "down"
 )
 
-```
+````
 </ClientTabItem>
 </ClientTabs>
 
@@ -2486,7 +2486,7 @@ model Test {
   @encode(DateTimeKnownEncoding.rfc3339)
   prop: utcDateTime;
 }
-```
+````
 
 </ClientTabItem>
 <ClientTabItem lang="python">
