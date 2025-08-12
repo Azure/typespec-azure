@@ -1,5 +1,14 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.59.1
+
+### Bug Fixes
+
+- [#3142](https://github.com/Azure/typespec-azure/pull/3142) Relax constraints for Action request and synchronous response parameters
+- [#3143](https://github.com/Azure/typespec-azure/pull/3143) Add templates for optional location and etags
+- [#3141](https://github.com/Azure/typespec-azure/pull/3141) Add operations for Private Endpoints
+
+
 ## 0.59.0
 
 ### Deprecations

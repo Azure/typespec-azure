@@ -535,6 +535,7 @@ op CreateOrUpdateSync<
  * @template BodyParameter The body parameter
  * @template Response The response or union of responses for success.
  * @template ErrorResponse The error response.
+ * @template OptionalRequestBody Optional. Indicates whether the request body is optional
  */
 op CreateOperation<
   HttpParameters extends {},
