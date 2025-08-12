@@ -278,7 +278,7 @@ export { getCustomResourceOptions };
  */
 export function isCustomAzureResource(program: Program, target: Model): boolean {
   const resourceOptions = getCustomResourceOptions(program, target);
-  if (resourceOptions?.isAzureResource) return true;
+  if (resourceOptions) return true;
   if (target.baseModel) return isCustomAzureResource(program, target.baseModel);
   return false;
 }
