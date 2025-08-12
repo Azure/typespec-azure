@@ -124,11 +124,12 @@ Foo foo = new Foo("hello");
 
 </ClientTabItem>
 <ClientTabItem lang="go" >
+
 ```go
 package container
 
 type Foo struct {
-Prop \*string
+  Prop *string
 }
 
 ````
@@ -581,7 +582,7 @@ type Properties struct {
 }
 
 type Foo struct {
-Name \*string
+  Name *string
 }
 
 ````
@@ -2563,12 +2564,8 @@ jsonWriter.writeStringField("prop", Objects.toString(this.value, null));
 </ClientTabItem>
 <ClientTabItem lang="go" >
 ```go
-package service
-
-import "time";
-
 type Test struct {
-Prop \*time.Time
+	Prop int64 `json:"prop"`
 }
 
 ```
