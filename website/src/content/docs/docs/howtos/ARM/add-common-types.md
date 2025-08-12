@@ -47,7 +47,6 @@ Creating a new version of an existing common type mostly involves editing what i
    - Use the `@added(Versions.vX)` decorator in all models to specify in which version the model is added.
 1. Create a new reference file in the [common-types folder](https://github.com/Azure/typespec-azure/tree/main/packages/typespec-azure-resource-manager/lib/common-types) with the common type name and the `-ref` suffix, e.g., `managed-identity-with-delegation-ref.tsp`
 1. Edit the `-ref` file:
-
    - Start by importing the common type TypeSpec file.
      ```typespec
      import "./managed-identity-with-delegation.tsp";

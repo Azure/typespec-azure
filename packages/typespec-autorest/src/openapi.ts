@@ -9,6 +9,7 @@ import {
   getLroMetadata,
   getPagedResult,
   getUnionAsEnum,
+  hasUniqueItems,
 } from "@azure-tools/typespec-azure-core";
 import {
   getArmCommonTypeOpenAPIRef,
@@ -22,6 +23,7 @@ import {
 } from "@azure-tools/typespec-azure-resource-manager";
 import {
   getClientNameOverride,
+  getLegacyHierarchyBuilding,
   shouldFlattenProperty,
 } from "@azure-tools/typespec-client-generator-core";
 import {
@@ -533,7 +535,7 @@ export async function getOpenAPIForService(
       const itemsName = paging.output.pageItems.property.name;
       return {
         nextLinkName: paging.output.nextLink.property.name,
-        itemName: itemsName === "items" ? undefined : itemsName,
+        itemName: itemsName === "value" ? undefined : itemsName,
       };
     }
     return undefined;
@@ -564,11 +566,6 @@ export async function getOpenAPIForService(
       return true;
     }
     return isShared;
-  }
-
-  function getPathWithoutQuery(path: string): string {
-    // strip everything from the key including and after the ?
-    return path.replace(/\/?\?.*/, "");
   }
 
   function getFinalStateVia(metadata: LroMetadata): XMSLongRunningFinalState | undefined {
@@ -610,36 +607,38 @@ export async function getOpenAPIForService(
     return undefined;
   }
 
-  function emitOperation(operation: HttpOperation) {
-    let { path: fullPath, operation: op, verb, parameters } = operation;
+  /** Initialize the openapi PathItem object where this operation should be added. */
+  function initPathItem(operation: HttpOperation): OpenAPI2PathItem {
+    let { path, operation: op, verb } = operation;
     let pathsObject: Record<string, OpenAPI2PathItem> = root.paths;
 
-    const pathWithoutAnyQuery = getPathWithoutQuery(fullPath);
-
-    if (root.paths[pathWithoutAnyQuery]?.[verb] === undefined) {
-      fullPath = pathWithoutAnyQuery;
+    if (root.paths[path]?.[verb] === undefined && !path.includes("?")) {
       pathsObject = root.paths;
-    } else if (requiresXMsPaths(fullPath, op)) {
-      // if the key already exists in x-ms-paths, append
-      // the operation id.
-      if (fullPath.includes("?")) {
-        if (root["x-ms-paths"]?.[fullPath] !== undefined) {
-          fullPath += `&_overload=${operation.operation.name}`;
+    } else if (requiresXMsPaths(path, op)) {
+      // if the key already exists in x-ms-paths, append the operation id.
+      if (path.includes("?")) {
+        if (root["x-ms-paths"]?.[path] !== undefined) {
+          path += `&_overload=${operation.operation.name}`;
         }
       } else {
-        fullPath += `?_overload=${operation.operation.name}`;
+        path += `?_overload=${operation.operation.name}`;
       }
       pathsObject = root["x-ms-paths"] as any;
     } else {
       // This should not happen because http library should have already validated duplicate path or the routes must have been using shared routes and so goes in previous condition.
-      compilerAssert(false, `Duplicate route "${fullPath}". This is unexpected.`);
+      compilerAssert(false, `Duplicate route "${path}". This is unexpected.`);
     }
 
-    if (!pathsObject[fullPath]) {
-      pathsObject[fullPath] = {};
+    if (!pathsObject[path]) {
+      pathsObject[path] = {};
     }
 
-    const currentPath = pathsObject[fullPath];
+    return pathsObject[path];
+  }
+
+  function emitOperation(operation: HttpOperation) {
+    const { operation: op, verb, parameters } = operation;
+    const currentPath = initPathItem(operation);
     if (!currentPath[verb]) {
       currentPath[verb] = {} as any;
     }
@@ -995,15 +994,6 @@ export async function getOpenAPIForService(
 
     if (type.kind === "Intrinsic" && type.name === "unknown") {
       return getSchemaForIntrinsicType(type);
-    }
-
-    if (type.kind === "EnumMember") {
-      // Enum members are just the OA representation of their values.
-      if (typeof type.value === "number") {
-        return { type: "number", enum: [type.value] };
-      } else {
-        return { type: "string", enum: [type.value ?? type.name] };
-      }
     }
 
     if (type.kind === "ModelProperty") {
@@ -1671,6 +1661,8 @@ export async function getOpenAPIForService(
         return getSchemaForScalar(type);
       case "Union":
         return getSchemaForUnion(type, schemaContext);
+      case "EnumMember":
+        return getSchemaForEnumMember(type);
       case "UnionVariant":
         return getSchemaForUnionVariant(type, schemaContext);
       case "Enum":
@@ -1860,6 +1852,15 @@ export async function getOpenAPIForService(
     return armIdentifiers.every((identifier) => identifier === "id" || identifier === "name");
   }
 
+  function getSchemaForEnumMember(member: EnumMember): OpenAPI2Schema {
+    const value = member.value ?? member.name;
+    const type = typeof value === "number" ? "number" : "string";
+    return {
+      type,
+      enum: [value],
+      description: getDoc(program, member),
+    };
+  }
   function getSchemaForUnionVariant(
     variant: UnionVariant,
     schemaContext: SchemaContext,
@@ -1910,6 +1911,8 @@ export async function getOpenAPIForService(
       return array;
     }
 
+    const rawBaseModel = getLegacyHierarchyBuilding(context.tcgcSdkContext, model);
+
     const modelSchema: OpenAPI2Schema = {
       type: "object",
       description: getDoc(program, model),
@@ -1958,6 +1961,13 @@ export async function getOpenAPIForService(
     applyExternalDocs(model, modelSchema);
 
     for (const prop of model.properties.values()) {
+      if (rawBaseModel && rawBaseModel.properties.has(prop.name)) {
+        const baseProp = rawBaseModel.properties.get(prop.name);
+        if (baseProp?.name === prop.name && baseProp.type === prop.type) {
+          // If the property is the same as the base model, skip it
+          continue;
+        }
+      }
       if (
         !metadataInfo.isPayloadProperty(
           prop,
@@ -2058,7 +2068,7 @@ export async function getOpenAPIForService(
       const baseSchema = getSchemaForType(model.baseModel, schemaContext);
       Object.assign(modelSchema, baseSchema, { description: modelSchema.description });
     } else if (model.baseModel) {
-      const baseSchema = getSchemaOrRef(model.baseModel, schemaContext);
+      const baseSchema = getSchemaOrRef(rawBaseModel ?? model.baseModel, schemaContext);
       modelSchema.allOf = [baseSchema];
     }
 
@@ -2239,6 +2249,13 @@ export async function getOpenAPIForService(
     const maxItems = getMaxItems(program, typespecType);
     if (!target.maxItems && maxItems !== undefined) {
       newTarget.maxItems = maxItems;
+    }
+
+    const uniqueItems =
+      (typespecType.kind === "ModelProperty" || typespecType.kind === "Model") &&
+      hasUniqueItems(program, typespecType);
+    if (uniqueItems && !target.uniqueItems) {
+      newTarget.uniqueItems = true;
     }
 
     if (isSecret(program, typespecType)) {

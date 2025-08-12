@@ -104,6 +104,12 @@ export const $lib = createTypeSpecLibrary({
         default: "Resource types must have a property with '@path` and '@segment' decorators.",
       },
     },
+    "resource-without-provider-namespace": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`The resource "${"resourceName"}" does not have a provider namespace.  Please use a resource in a namespace marked with '@armProviderNamespace' or a virtual resource with a specific namespace`,
+      },
+    },
     "template-type-constraint-no-met": {
       severity: "error",
       messages: {

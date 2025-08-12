@@ -64,4 +64,5 @@ model User {
   ```
   """)
 @doc("List users")
+@list
 op list(...MaxPageSizeQueryParameter): Page<User>;

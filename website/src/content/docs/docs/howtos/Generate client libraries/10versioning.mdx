@@ -234,15 +234,15 @@ In this example, you can see how this change is made in tspconfig.yaml, and we a
 ```yaml title=tspconfig.yaml
 options:
   "@azure-tools/typespec-python":
-  api-version: "2023-11-01-preview"
+    api-version: "2023-11-01-preview"
   "@azure-tools/typespec-csharp":
-  api-version: "2023-11-01-preview"
+    api-version: "2023-11-01-preview"
   "@azure-tools/typespec-ts":
-  api-version: "2023-11-01-preview"
+    api-version: "2023-11-01-preview"
   "@azure-tools/typespec-java":
-  api-version: "2023-11-01-preview"
+    api-version: "2023-11-01-preview"
   "@azure-tools/typespec-go":
-  api-version: "2023-11-01-preview"
+    api-version: "2023-11-01-preview"
 ```
 
 ```typespec
@@ -277,6 +277,7 @@ op stableFunctionality(@body stableModel: StableModel): void;
 ```
 
 </ClientTabItem>
+
 ```python
 import pytest
 from my.service import MyServiceClient, models
@@ -295,7 +296,7 @@ preview_model = models.PreviewModel(preview_functionality="present")
 
 preview_client.preview_functionality(preview_model) # call goes through
 
-````
+```
 
 ```csharp
 // ServiceVersion enum
@@ -316,7 +317,7 @@ Response response = client.PreviewFunctionality(previewModel);
 //call StableFunctionality
 StableModel stableModel = new StableModel("<stableFeature>");
 Response response = client.StableFunctionality(stableModel);
-````
+```
 
 ```typescript
 // there is no apiVersion parameters defined in all operations, TypeScript emitter will ignore it.
@@ -344,128 +345,6 @@ serviceClientClient.stableFunctionality(stableModel);
 PreviewModel previewModel = new PreviewModel("present");
 // call goes through
 serviceClientClient.previewFunctionality(previewModel);
-```
-
-```go
-
-```
-
-</ClientTabs>
-
-### Override to return all
-
-You can also override the signature to return the combined api surface area of all of the separate api versions. Different languages have different support for versioning validation.
-
-In the following examples, you can observe how this change is made in `tspconfig.yaml`.
-
-<ClientTabs>
-
-<ClientTabItem lang="typespec">
-
-```yaml title=tspconfig.yaml
-options:
-  "@azure-tools/typespec-python":
-  api-version: "2023-11-01-preview"
-  "@azure-tools/typespec-csharp":
-  api-version: "2023-11-01-preview"
-  "@azure-tools/typespec-ts":
-  api-version: "2023-11-01-preview"
-  "@azure-tools/typespec-java":
-  api-version: "2023-11-01-preview"
-  "@azure-tools/typespec-go":
-  api-version: "2023-11-01-preview"
-```
-
-```typespec
-import "@typespec/versioning";
-import "@typespec/http";
-
-using Versioning;
-using Http;
-
-@versioned(My.Service.Versions)
-@service
-namespace My.Service;
-
-enum Versions {
-  v2023_11_01_preview: "2023-11-01-preview",
-  v2023_11_01: "2023-11-01",
-}
-
-model PreviewModel {
-  betaFeature: string;
-}
-
-model StableModel {
-  stableFeature: string;
-}
-
-@added(Versions.v2023_11_01_preview)
-@removed(Versions.v2023_11_01)
-op previewFunctionality(@body previewModel: PreviewModel): void;
-
-op stableFunctionality(@body stableModel: StableModel): void;
-```
-
-</ClientTabItem>
-
-```python
-import pytest
-from my.service import MyServiceClient, models
-
-client = MyServiceClient(endpoint=..., credential=...)
-# client's api_version will be "2023-11-01"
-
-stable_model = models.StableModel(stable_feature="present")
-print(stable_model)
-client.stable_functionality(stable_model) # call goes through
-
-preview_model = models.PreviewModel(preview_functionality="present")
-# the model is generated as part of the api surface
-
-with pytest.expect(ValueError) as ex:
-  client.preview_functionality(preview_model)
-assert "preview_functionality is not available in api version 2023-11-01" in str(ex)
-
-preview_client = MyServiceClient(endpoint=..., credential=..., api_version="2023-11-01-preview")
-
-preview_client.preview_functionality(preview_model) # call goes through
-```
-
-```csharp
-//ServiceVersion enum
-public enum ServiceVersion
-{
-    /// <summary> Service version "2023-11-01-preview". </summary>
-    V2023_11_01_Preview = 1,
-    /// <summary> Service version "2023-11-01". </summary>
-    V2023_11_01 = 2,
-}
-
-Uri endpoint = new Uri("<https://my-service.azure.com>");
-ServiceClient client = new ServiceClient(endpoint);
-//client's api_version will be "2023-11-01"
-
-//call PreviewFunctionality
-PreviewModel previewModel = new PreviewModel("<betaFeature>");
-Response response = client.PreviewFunctionality(previewModel);
-
-//call StableFunctionality
-StableModel stableModel = new StableModel("<stableFeature>");
-Response response = client.StableFunctionality(stableModel);
-
-Uri endpoint = new Uri("<https://my-service.azure.com>");
-ServiceClientOptions options = new ServiceClientOptions(ServiceVersion.V2023_11_01_Preview);
-ServiceClient client = new ServiceClient(endpoint, options);
-//You can specify the service api-version when create client instance. Now client's api_version will be "2023-11-01-preview"
-```
-
-```typescript
-// there is no apiVersion parameters defined in all operations, TypeScript emitter will ignore it.
-```
-
-```java
-
 ```
 
 ```go

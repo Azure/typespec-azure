@@ -27,6 +27,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`StatusMonitor has more than one ${"resultType"} property marked with '${"decorator"}'.  Ensure that only one property in the model is marked with this decorator.`,
       },
     },
+    "invalid-polling-operation-parameter": {
+      severity: "error",
+      messages: {
+        default: paramMessage`The @pollingOperationParameter '${"name"}' does not reference a valid parameter in the polling operation.`,
+      },
+    },
     "invalid-final-state": {
       severity: "warning",
       messages: {
@@ -225,6 +231,24 @@ export const $lib = createTypeSpecLibrary({
         default: `Union is referencing itself and cannot be resolved as an enum.`,
       },
     },
+    "preview-version-invalid-enum-member": {
+      severity: "error",
+      messages: {
+        default: `@previewVersion can only be applied to members of a Version enum.`,
+      },
+    },
+    "preview-version-last-member": {
+      severity: "warning",
+      messages: {
+        default: `@previewVersion can only be applied to the last member of a Version enum. Having it on other members will cause unstable apis to show up in subsequent stable versions.`,
+      },
+    },
+    "unique-items-invalid-type": {
+      severity: "warning",
+      messages: {
+        default: `@uniqueItems can only be applied to arrays and array-valued model properties.`,
+      },
+    },
   },
 
   state: {
@@ -256,8 +280,12 @@ export const $lib = createTypeSpecLibrary({
     trait: { description: "Data for `@trait` decorator" },
     traitContext: { description: "Data for `@traitContext` decorator" },
     traitLocation: { description: "Data for `@traitLocation` decorator" },
+    uniqueItems: { description: "Data for `@uniqueItems` decorator" },
     parameterizedNextLinkConfig: {
       description: "Data for `@parameterizedNextLinkConfig` decorator",
+    },
+    previewVersion: {
+      description: "Data for `@previewVersion` decorator",
     },
   },
   // AzureCoreStateKeys.traitLocation

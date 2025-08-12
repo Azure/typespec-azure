@@ -1,5 +1,41 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.59.0
+
+### Breaking Changes
+
+- [#2757](https://github.com/Azure/typespec-azure/pull/2757) Remove deprecated `@fixed` decorator.
+
+### Deprecations
+
+- [#2974](https://github.com/Azure/typespec-azure/pull/2974) Deprecate pageable decorators `@Azure.Core.items` and `@Azure.Core.pagedResult`. Use `@TypeSpec.pageItems` and `@TypeSpec.list` instead.
+
+### Features
+
+- [#3028](https://github.com/Azure/typespec-azure/pull/3028) Allow paged models to be used with TypeSpec core paging(`@list` operations)
+- [#3125](https://github.com/Azure/typespec-azure/pull/3125) Add  uniqueItems support to Azure.Core and typespec-autorest
+- [#2979](https://github.com/Azure/typespec-azure/pull/2979) Add validation when `@pollingOperationParameter` is referencing non existent parameter
+
+### Bump dependencies
+
+- [#3029](https://github.com/Azure/typespec-azure/pull/3029) Upgrade dependencies
+
+
+## 0.58.0
+
+### Features
+
+- [#2976](https://github.com/Azure/typespec-azure/pull/2976) Introduce `@previewVersion` decorator
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2599](https://github.com/Azure/typespec-azure/pull/2599) Fix old reference to api guidelines in Azure.Core
+
+
 ## 0.57.0
 
 ### Bug Fixes

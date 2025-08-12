@@ -40,14 +40,12 @@ import {
   ScopeDecorator,
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
+import { HierarchyBuildingDecorator } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
   AccessFlags,
   ClientInitializationOptions,
   LanguageScopes,
   SdkClient,
-  SdkInitializationType,
-  SdkMethodParameter,
-  SdkModelPropertyType,
   SdkOperationGroup,
   TCGCContext,
   UsageFlags,
@@ -680,6 +678,20 @@ export const $override = (
         continue;
       }
     }
+
+    // Apply the alternate type to the original parameter
+    const overrideParam = overrideParams[index];
+    overrideParam.decorators
+      .filter((d) => d.decorator.name === "$alternateType")
+      .map((d) =>
+        context.call(
+          $alternateType,
+          originalParam,
+          d.args[0].value as Type,
+          d.args[1]?.jsValue as string | undefined,
+        ),
+      );
+
     index++;
   }
 
@@ -812,40 +824,6 @@ export const $clientInitialization: ClientInitializationDecorator = (
     );
   }
 };
-
-/**
- * Get `SdkInitializationType` for namespace or interface. The info is from `@clientInitialization` decorator.
- *
- * @param context
- * @param entity namespace or interface which represents a client
- * @returns
- * @deprecated This function is deprecated. Use `getClientInitializationOptions` instead.
- */
-export function getClientInitialization(
-  context: TCGCContext,
-  entity: Namespace | Interface,
-): SdkInitializationType | undefined {
-  let options = getScopedDecoratorData(context, clientInitializationKey, entity);
-  if (options === undefined) return undefined;
-  // backward compatibility
-  if (options.properties.get("parameters")) {
-    options = options.properties.get("parameters").type;
-  } else if (options.properties.get("initializedBy")) {
-    return undefined;
-  }
-  const sdkModel = getSdkModel(context, options);
-  const initializationProps = sdkModel.properties.map(
-    (property: SdkModelPropertyType): SdkMethodParameter => {
-      property.onClient = true;
-      property.kind = "method";
-      return property as SdkMethodParameter;
-    },
-  );
-  return {
-    ...sdkModel,
-    properties: initializationProps,
-  };
-}
 
 /**
  * Get client initialization options for namespace or interface. The info is from `@clientInitialization` decorator.
@@ -1225,6 +1203,59 @@ export function getClientLocation(
     | Interface
     | string
     | undefined;
+}
+
+const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
+
+function isPropertySuperset(target: Model, value: Model): boolean {
+  // Check if all properties in value exist in target
+  for (const name of value.properties.keys()) {
+    if (!target.properties.has(name)) {
+      return false;
+    }
+    const targetProperty = target.properties.get(name)!;
+    const valueProperty = value.properties.get(name)!;
+    if (targetProperty.sourceProperty !== valueProperty.sourceProperty) {
+      return false;
+    }
+  }
+  return true;
+}
+
+export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  value: Model,
+  scope?: LanguageScopes,
+) => {
+  // Validate that target has all properties from value
+  if (!isPropertySuperset(target, value)) {
+    reportDiagnostic(context.program, {
+      code: "legacy-hierarchy-building-conflict",
+      format: {
+        childModel: target.name,
+        parentModel: value.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+
+  setScopedDecoratorData(
+    context,
+    $legacyHierarchyBuilding,
+    legacyHierarchyBuildingKey,
+    target,
+    value,
+    scope,
+  );
+};
+
+export function getLegacyHierarchyBuilding(context: TCGCContext, target: Model): Model | undefined {
+  // If legacy hierarchy building is not respected, ignore the decorator completely
+  if (!context.enableLegacyHierarchyBuilding) return undefined;
+
+  return getScopedDecoratorData(context, legacyHierarchyBuildingKey, target);
 }
 
 /**

@@ -24,7 +24,6 @@ We have created a swagger to TypeSpec conversion tool to help take on the bulk o
 - Go to your `specification/{service-name}` folder in `azure-rest-api-specs`.
 - Create a directory holding TypeSpec files. See details [here](https://github.com/Azure/azure-rest-api-specs/blob/main/documentation/typespec-structure-guidelines.md).
 - Run the tool from the directory.
-
   - Convert a **data-plane** specification:
 
     ```shell
@@ -68,7 +67,6 @@ You will need to compare the Swagger generated from TypeSpec with your original 
   ```
 
 - In the `{outputFolder}`:
-
   - `newNormalizedSwagger.json` is the processed version of your generated Swagger
   - `oldNormalizedSwagger.json` is the processed version of your original Swagger(s)
 

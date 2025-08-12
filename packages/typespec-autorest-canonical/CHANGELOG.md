@@ -1,5 +1,19 @@
 # Changelog - @azure-tools/typespec-autorest-canonical
 
+## 0.20.0
+
+### Bump dependencies
+
+- [#3029](https://github.com/Azure/typespec-azure/pull/3029) Upgrade dependencies
+
+
+## 0.19.0
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+
 ## 0.18.0
 
 No changes, version bump only.

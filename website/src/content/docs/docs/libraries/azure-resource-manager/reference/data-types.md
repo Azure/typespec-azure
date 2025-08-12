@@ -630,6 +630,27 @@ model Employee is TrackedResource<EmployeeProperties> {
 | ----------------- | ---------------------------------------------------------------------------------------- | ----------- |
 | extendedLocation? | [`ExtendedLocation`](./data-types.md#Azure.ResourceManager.CommonTypes.ExtendedLocation) |             |
 
+### `ExtensionActionScope` {#Azure.ResourceManager.ExtensionActionScope}
+
+Template used by ArmProviderAction templates. This produces following action route:
+`/{scope}/providers/Microsoft.SomeRP/someAction`
+
+```typespec
+model Azure.ResourceManager.ExtensionActionScope<StringType>
+```
+
+#### Template Parameters
+
+| Name       | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| StringType | The type of the scope name parameter, defaults to string. |
+
+#### Properties
+
+| Name  | Type         | Description |
+| ----- | ------------ | ----------- |
+| scope | `StringType` |             |
+
 ### `ExtensionResource` {#Azure.ResourceManager.ExtensionResource}
 
 Concrete extension resource types can be created by aliasing this type using a specific property type.
@@ -1029,6 +1050,22 @@ model Employee is TrackedResource<EmployeeProperties> {
 | Name | Type   | Description |
 | ---- | ------ | ----------- |
 | name | `Type` |             |
+
+### `ResourceOperationOptions` {#Azure.ResourceManager.ResourceOperationOptions}
+
+Interface-level operation options
+
+```typespec
+model Azure.ResourceManager.ResourceOperationOptions
+```
+
+#### Properties
+
+| Name               | Type      | Description                                                                                                                                |
+| ------------------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| resourceType?      | `Model`   | The resource type for the operations in the interface                                                                                      |
+| allowStaticRoutes? | `boolean` | If true, turns off autoRoute for the interface, so individual operations can choose static (`@route`) or automatic (`@autoRoute`) routing. |
+| omitTags?          | `boolean` | If true, turns off the default tagging of operations in the interface, so that individual operations must be individually tagged           |
 
 ### `ResourceParentParameters` {#Azure.ResourceManager.ResourceParentParameters}
 
@@ -2444,13 +2481,16 @@ An internal enum to indicate the resource support for various path types
 enum Azure.ResourceManager.CommonTypes.ResourceHome
 ```
 
-| Name          | Value | Description                               |
-| ------------- | ----- | ----------------------------------------- |
-| Tenant        |       | The resource is bound to a tenant         |
-| Subscription  |       | The resource is bound to a subscription   |
-| Location      |       | The resource is bound to a location       |
-| ResourceGroup |       | The resource is bound to a resource group |
-| Extension     |       | The resource is bound to an extension     |
+| Name                 | Value | Description                                        |
+| -------------------- | ----- | -------------------------------------------------- |
+| Tenant               |       | The resource is bound to a tenant                  |
+| Subscription         |       | The resource is bound to a subscription            |
+| Location             |       | The resource is bound to a location                |
+| ResourceGroup        |       | The resource is bound to a resource group          |
+| Extension            |       | The resource is bound to an extension              |
+| BuiltIn              |       | The resource is a built in tenant resource         |
+| BuiltInSubscription  |       | The resource is a built in subscription resource   |
+| BuiltInResourceGroup |       | The resource is a built in resource group resource |
 
 ### `Versions` {#Azure.ResourceManager.CommonTypes.Versions}
 
@@ -2625,6 +2665,312 @@ Type of managed service identity (either system assigned, or none).
 union Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityType
 ```
 
+## Azure.ResourceManager.Extension
+
+### `ExtensionInstanceParameters` {#Azure.ResourceManager.Extension.ExtensionInstanceParameters}
+
+The path parameters for an extension resource at the given target
+
+```typespec
+model Azure.ResourceManager.Extension.ExtensionInstanceParameters<TargetResource, Resource>
+```
+
+#### Template Parameters
+
+| Name           | Description                                                                                                                                                               |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TargetResource | The target of the extension resource (Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or another resource). |
+| Resource       | The extension resource.                                                                                                                                                   |
+
+#### Properties
+
+| Name              | Type                                     | Description                                                   |
+| ----------------- | ---------------------------------------- | ------------------------------------------------------------- |
+| apiVersion        | `string`                                 | The API version to use for this operation.                    |
+| subscriptionId    | `Core.uuid`                              | The ID of the target subscription. The value must be an UUID. |
+| resourceGroupName | `string`                                 | The name of the resource group. The name is case insensitive. |
+| provider          | `"Microsoft.TargetProviderNamespace"`    |                                                               |
+| extensionProvider | `"Microsoft.ExtensionProviderNamespace"` |                                                               |
+
+### `ExtensionParentParameters` {#Azure.ResourceManager.Extension.ExtensionParentParameters}
+
+The path parameters for a collection of extension resources at the given target
+
+```typespec
+model Azure.ResourceManager.Extension.ExtensionParentParameters<TargetResource, ExtensionResource>
+```
+
+#### Template Parameters
+
+| Name              | Description                                                                                                                                                               |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TargetResource    | The target of the extension resource (Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or another resource). |
+| ExtensionResource | The extension resource.                                                                                                                                                   |
+
+#### Properties
+
+| Name              | Type                                     | Description                                                   |
+| ----------------- | ---------------------------------------- | ------------------------------------------------------------- |
+| apiVersion        | `string`                                 | The API version to use for this operation.                    |
+| subscriptionId    | `Core.uuid`                              | The ID of the target subscription. The value must be an UUID. |
+| resourceGroupName | `string`                                 | The name of the resource group. The name is case insensitive. |
+| provider          | `"Microsoft.TargetProviderNamespace"`    |                                                               |
+| extensionProvider | `"Microsoft.ExtensionProviderNamespace"` |                                                               |
+
+### `ExtensionProviderNamespace` {#Azure.ResourceManager.Extension.ExtensionProviderNamespace}
+
+The provider namespace for an extension resource
+
+```typespec
+model Azure.ResourceManager.Extension.ExtensionProviderNamespace<Resource>
+```
+
+#### Template Parameters
+
+| Name     | Description                  |
+| -------- | ---------------------------- |
+| Resource | The extension resource model |
+
+#### Properties
+
+| Name              | Type                                     | Description |
+| ----------------- | ---------------------------------------- | ----------- |
+| extensionProvider | `"Microsoft.ExtensionProviderNamespace"` |             |
+
+### `ExternalChildResource` {#Azure.ResourceManager.Extension.ExternalChildResource}
+
+An external child resource target, used when an extension targets a child resource from another provider namespace
+
+```typespec
+model Azure.ResourceManager.Extension.ExternalChildResource<ParentModel, ResourceType, ResourceParameterName, NamePattern, NameType, Description>
+```
+
+#### Template Parameters
+
+| Name                  | Description                                                                                     |
+| --------------------- | ----------------------------------------------------------------------------------------------- |
+| ParentModel           | The parent of this resource.                                                                    |
+| ResourceType          | The type of this resource.                                                                      |
+| ResourceParameterName | The name of the 'name' parameter of this resource.                                              |
+| NamePattern           | The pattern restriction for the name of this resource (default is none).                        |
+| NameType              | The type of the name parameter of this resource (default is string).                            |
+| Description           | The description of the name parameter of this resource (default is "The name of the resource"). |
+
+#### Examples
+
+```typespec
+alias VirtualMachine = ExternalResource<"Microsoft.Compute", "virtualMachines", "vmName">;
+```
+
+```typespec
+alias Scaleset = Extension.ExternalResource<
+  "Microsoft.Compute",
+  "virtualMachineScaleSets",
+  "scaleSetName"
+>;
+
+alias VirtualMachineScaleSetVm = Extension.ExternalChildResource<
+  Scaleset,
+  "virtualMachineScaleSetVms",
+  "scaleSetVmName"
+>;
+```
+
+#### Properties
+
+| Name | Type       | Description |
+| ---- | ---------- | ----------- |
+| name | `NameType` |             |
+
+### `ExternalResource` {#Azure.ResourceManager.Extension.ExternalResource}
+
+An external resource target, used when an extension targets a resource from another provider namespace
+
+```typespec
+model Azure.ResourceManager.Extension.ExternalResource<TargetNamespace, ResourceType, ResourceParameterName, NamePattern, NameType, Description>
+```
+
+#### Template Parameters
+
+| Name                  | Description                                                                                             |
+| --------------------- | ------------------------------------------------------------------------------------------------------- |
+| TargetNamespace       | The provider namespace for the external resource.                                                       |
+| ResourceType          | The type of the external resource.                                                                      |
+| ResourceParameterName | The name of the 'name' parameter of the external resource.                                              |
+| NamePattern           | The pattern restriction for the name of the external resource (default is none).                        |
+| NameType              | The type of the name parameter of the external resource (default is string).                            |
+| Description           | The description of the name parameter of the external resource (default is "The name of the resource"). |
+
+#### Examples
+
+```typespec
+alias VirtualMachine = ExternalResource<"Microsoft.Compute", "virtualMachines", "vmName">;
+```
+
+```typespec
+alias Scaleset = Extension.ExternalResource<
+  "Microsoft.Compute",
+  "virtualMachineScaleSets",
+  "scaleSetName"
+>;
+```
+
+#### Properties
+
+| Name | Type       | Description |
+| ---- | ---------- | ----------- |
+| name | `NameType` |             |
+
+### `ManagementGroup` {#Azure.ResourceManager.Extension.ManagementGroup}
+
+A management group
+
+```typespec
+model Azure.ResourceManager.Extension.ManagementGroup<ParameterName>
+```
+
+#### Template Parameters
+
+| Name          | Description                                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------------------------ |
+| ParameterName | The name of the 'name' parameter of the management group (usually managementGroupName or managementGroupId). |
+
+#### Properties
+
+| Name | Type     | Description |
+| ---- | -------- | ----------- |
+| name | `string` |             |
+
+### `ResourceGroup` {#Azure.ResourceManager.Extension.ResourceGroup}
+
+A resource group target for an extension resource
+
+```typespec
+model Azure.ResourceManager.Extension.ResourceGroup
+```
+
+#### Properties
+
+None
+
+### `ScopeParameter` {#Azure.ResourceManager.Extension.ScopeParameter}
+
+The default scope parameter for an extension resource.
+
+```typespec
+model Azure.ResourceManager.Extension.ScopeParameter<Type>
+```
+
+#### Template Parameters
+
+| Name | Description                                                                                                                                        |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Type | The type of the scope parameter (default is string). This can be used to specify `Azure.Core.armResourceIdentifier` type or other constrained type |
+
+#### Examples
+
+```typespec
+model Employee {
+  ...ResourceUriParameter;
+}
+```
+
+#### Properties
+
+| Name  | Type   | Description |
+| ----- | ------ | ----------- |
+| scope | `Type` |             |
+
+### `Subscription` {#Azure.ResourceManager.Extension.Subscription}
+
+A subscription target for an extension resource
+
+```typespec
+model Azure.ResourceManager.Extension.Subscription
+```
+
+#### Properties
+
+None
+
+### `TargetBaseParameters` {#Azure.ResourceManager.Extension.TargetBaseParameters}
+
+Base parameters for an extension target.
+
+```typespec
+model Azure.ResourceManager.Extension.TargetBaseParameters<Resource>
+```
+
+#### Template Parameters
+
+| Name     | Description                                                                                                                                                                                 |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or an external resource). |
+
+#### Properties
+
+| Name              | Type                                  | Description                                                   |
+| ----------------- | ------------------------------------- | ------------------------------------------------------------- |
+| apiVersion        | `string`                              | The API version to use for this operation.                    |
+| subscriptionId    | `Core.uuid`                           | The ID of the target subscription. The value must be an UUID. |
+| resourceGroupName | `string`                              | The name of the resource group. The name is case insensitive. |
+| provider          | `"Microsoft.TargetProviderNamespace"` |                                                               |
+
+### `TargetParameters` {#Azure.ResourceManager.Extension.TargetParameters}
+
+The path parameters for a target resource for an extension
+
+```typespec
+model Azure.ResourceManager.Extension.TargetParameters<Resource>
+```
+
+#### Template Parameters
+
+| Name     | Description                                                                                                                                                                                 |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or an external resource). |
+
+#### Properties
+
+| Name              | Type                                  | Description                                                   |
+| ----------------- | ------------------------------------- | ------------------------------------------------------------- |
+| apiVersion        | `string`                              | The API version to use for this operation.                    |
+| subscriptionId    | `Core.uuid`                           | The ID of the target subscription. The value must be an UUID. |
+| resourceGroupName | `string`                              | The name of the resource group. The name is case insensitive. |
+| provider          | `"Microsoft.TargetProviderNamespace"` |                                                               |
+
+### `TargetProviderNamespace` {#Azure.ResourceManager.Extension.TargetProviderNamespace}
+
+The provider namespace (if any) for a target resource for an extension
+
+```typespec
+model Azure.ResourceManager.Extension.TargetProviderNamespace<Resource>
+```
+
+#### Template Parameters
+
+| Name     | Description                                                                                                                                                                                |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Resource | The resource model for an extension target (usually Extension.Tenant, Extension.Subscription, Extension.ResourceGroup, Extension.Scope, Extension.ManagementGroup or an external resource) |
+
+#### Properties
+
+| Name     | Type                                  | Description |
+| -------- | ------------------------------------- | ----------- |
+| provider | `"Microsoft.TargetProviderNamespace"` |             |
+
+### `Tenant` {#Azure.ResourceManager.Extension.Tenant}
+
+A tenant target for the extension resource
+
+```typespec
+model Azure.ResourceManager.Extension.Tenant
+```
+
+#### Properties
+
+None
+
 ## Azure.ResourceManager.Foundations
 
 ### `ArmTagsProperty` {#Azure.ResourceManager.Foundations.ArmTagsProperty}
@@ -2664,7 +3010,7 @@ model Azure.ResourceManager.Foundations.DefaultBaseParameters<Resource>
 | ----------------- | ----------- | ---------------------------------------------------------------------- |
 | apiVersion        | `string`    | The API version to use for this operation.                             |
 | subscriptionId    | `Core.uuid` | The ID of the target subscription. The value must be an UUID.          |
-| location          | `string`    | The location name.                                                     |
+| location          | `string`    | The name of Azure region.                                              |
 | resourceGroupName | `string`    | The name of the resource group. The name is case insensitive.          |
 | resourceUri       | `string`    | The fully qualified Azure Resource manager identifier of the resource. |
 
@@ -2801,7 +3147,7 @@ model Azure.ResourceManager.Foundations.ResourceGroupScope<Resource>
 | ----------------- | -------------------------------- | ---------------------------------------------------------------------- |
 | apiVersion        | `string`                         | The API version to use for this operation.                             |
 | subscriptionId    | `Core.uuid`                      | The ID of the target subscription. The value must be an UUID.          |
-| location          | `string`                         | The location name.                                                     |
+| location          | `string`                         | The name of Azure region.                                              |
 | resourceGroupName | `string`                         | The name of the resource group. The name is case insensitive.          |
 | resourceUri       | `string`                         | The fully qualified Azure Resource manager identifier of the resource. |
 | provider          | `"Microsoft.ThisWillBeReplaced"` |                                                                        |
@@ -2960,6 +3306,21 @@ model Azure.ResourceManager.Foundations.TenantScope<Resource>
 
 ## Azure.ResourceManager.Legacy
 
+### `ArmOperationOptions` {#Azure.ResourceManager.Legacy.ArmOperationOptions}
+
+Route options for an operation
+
+```typespec
+model Azure.ResourceManager.Legacy.ArmOperationOptions
+```
+
+#### Properties
+
+| Name            | Type      | Description                            |
+| --------------- | --------- | -------------------------------------- |
+| useStaticRoute? | `boolean` | Should a static route be used          |
+| route?          | `string`  | The status route for operations to use |
+
 ### `ManagedServiceIdentityV4` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4}
 
 Managed service identity (system assigned and/or user assigned identities)
@@ -3016,6 +3377,24 @@ model Azure.ResourceManager.Legacy.Provider<Resource>
 | Name     | Description                                               |
 | -------- | --------------------------------------------------------- |
 | Resource | Optional. The resource to get the provider namespace for. |
+
+#### Properties
+
+| Name     | Type                             | Description |
+| -------- | -------------------------------- | ----------- |
+| provider | `"Microsoft.ThisWillBeReplaced"` |             |
+
+### `ProviderParameter` {#Azure.ResourceManager.Legacy.ProviderParameter}
+
+```typespec
+model Azure.ResourceManager.Legacy.ProviderParameter<Resource>
+```
+
+#### Template Parameters
+
+| Name     | Description                                     |
+| -------- | ----------------------------------------------- |
+| Resource | The resource to get the provider namespace for. |
 
 #### Properties
 

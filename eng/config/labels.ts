@@ -74,6 +74,10 @@ export default defineConfig({
           color: "7057ff",
           description: "Good for newcomers",
         },
+        "int:azure-specs": {
+          color: "0e8a16",
+          description: "Run integration tests against azure-rest-api-specs",
+        },
       },
     },
     external: {

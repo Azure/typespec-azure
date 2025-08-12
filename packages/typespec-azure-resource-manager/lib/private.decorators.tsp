@@ -15,6 +15,11 @@ extern dec armUpdateProviderNamespace(target: Reflection.Operation);
 extern dec assignProviderNameValue(target: ModelProperty, resource: Model);
 
 /**
+ * @param resource Resource model
+ */
+extern dec assignUniqueProviderNameValue(target: ModelProperty, resource: Model);
+
+/**
  * This decorator is used to identify Azure Resource Manager resource types and extract their
  * metadata.  It is *not* meant to be used directly by a spec author, it instead
  * gets implicitly applied when the spec author defines a model type in this form:

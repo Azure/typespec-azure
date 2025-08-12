@@ -42,7 +42,7 @@ it("basic returning void", async () => {
   strictEqual(errorResponse.type, sdkPackage.models[0]);
 
   strictEqual(method.response.type, undefined);
-  strictEqual(method.response.resultPath, undefined);
+  strictEqual(method.response.resultSegments, undefined);
 });
 
 it("basic returning void and error model has status code", async () => {
@@ -78,7 +78,7 @@ it("basic returning void and error model has status code", async () => {
   strictEqual(errorResponse.type, sdkPackage.models[0]);
 
   strictEqual(method.response.type, undefined);
-  strictEqual(method.response.resultPath, undefined);
+  strictEqual(method.response.resultSegments, undefined);
 });
 
 it("basic returning compiler NotFoundResponse error", async () => {
@@ -150,7 +150,7 @@ it("basic returning model", async () => {
   strictEqual(method.response.kind, "method");
   const methodResponseType = method.response.type;
   strictEqual(methodResponseType, createResponse.type);
-  strictEqual(method.response.resultPath, undefined);
+  strictEqual(method.response.resultSegments, undefined);
 });
 
 it("Headers and body", async () => {
@@ -184,7 +184,7 @@ it("Headers and body", async () => {
   strictEqual(createResponse.headers[0].serializedName, "id");
 
   strictEqual(method.response.kind, "method");
-  strictEqual(method.response.resultPath, undefined);
+  strictEqual(method.response.resultSegments, undefined);
   const methodResponseType = method.response.type;
   ok(methodResponseType);
   strictEqual(
@@ -264,7 +264,7 @@ it("NoContentResponse", async () => {
   strictEqual(voidResponse.contentTypes, undefined);
 
   strictEqual(method.response.type, undefined);
-  strictEqual(method.response.resultPath, undefined);
+  strictEqual(method.response.resultSegments, undefined);
 });
 
 it("binary return type", async () => {

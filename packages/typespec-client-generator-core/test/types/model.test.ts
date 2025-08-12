@@ -1796,7 +1796,7 @@ it("header property on body root model visibility", async function () {
   strictEqual(inputModel.properties.length, 1);
   const nameProperty = inputModel.properties[0];
   strictEqual(nameProperty.name, "name");
-  strictEqual(nameProperty.kind, "header");
+  strictEqual(nameProperty.kind, "property");
   ok(nameProperty.visibility);
   strictEqual(nameProperty.visibility.length, 1);
   strictEqual(nameProperty.visibility[0], Visibility.Read);

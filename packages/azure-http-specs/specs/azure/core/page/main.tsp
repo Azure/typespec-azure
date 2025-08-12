@@ -85,6 +85,7 @@ model UserOrder {
   }
   ```
   """)
+@list
 op listWithPage is global.Azure.Core.Foundations.Operation<{}, global.Azure.Core.Page<User>>;
 
 @doc("The parameters for listing users.")
@@ -136,15 +137,15 @@ model ListItemInputBody {
   ```
   """)
 @post
+@list
 op listWithParameters is global.Azure.Core.Foundations.Operation<
   ListItemInput,
   global.Azure.Core.Page<User>
 >;
 
 @friendlyName("{name}ListResults", T)
-@global.Azure.Core.pagedResult
 model CustomPageModel<T> {
-  @global.Azure.Core.items
+  @pageItems
   @doc("List of items.")
   items: T[];
 
@@ -175,6 +176,7 @@ model CustomPageModel<T> {
   }
   ```
   """)
+@list
 op listWithCustomPageModel is global.Azure.Core.Foundations.Operation<{}, CustomPageModel<User>>;
 
 @doc("First item.")
@@ -199,11 +201,13 @@ interface TwoModelsAsPageItem {
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "For testing global.Azure.Core.Page"
   @doc("Two operations with two different page item types should be successfully generated. Should generate model for FirstItem.")
   @route("/first-item")
+  @list
   listFirstItem is global.Azure.Core.Foundations.Operation<{}, global.Azure.Core.Page<FirstItem>>;
 
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "For testing global.Azure.Core.Page"
   @doc("Two operations with two different page item types should be successfully generated. Should generate model for SecondItem.")
   @route("/second-item")
+  @list
   listSecondItem is global.Azure.Core.Foundations.Operation<{}, global.Azure.Core.Page<SecondItem>>;
 }
 
@@ -212,9 +216,8 @@ model IncludePendingOptions {
   includePending?: boolean;
 }
 
-@global.Azure.Core.pagedResult
 model ParameterizedNextLinkPagingResult {
-  @global.Azure.Core.items
+  @pageItems
   values: User[];
 
   @nextLink
@@ -254,6 +257,7 @@ model ParameterizedNextLinkPagingResult {
     
     Note that the nextLink preserves the original filter and select parameters.
   """)
+@list
 op withParameterizedNextLink(
   ...IncludePendingOptions,
   @query select: string,

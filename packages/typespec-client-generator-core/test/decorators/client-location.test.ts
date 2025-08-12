@@ -424,3 +424,51 @@ it("move an operation to root client with api version", async () => {
     rootClientApiVersionParam,
   );
 });
+
+it("all operations have been moved", async () => {
+  await runner.compile(
+    `
+    @service
+    @versioned(Versions)
+    namespace TestService;
+    enum Versions {
+      v1: "v1",
+      v2: "v2",
+    }
+
+    interface A {
+      @route("/a1")
+      @clientLocation("B")
+      op a1(@query apiVersion: string): void;
+
+      @route("/a2")
+      @clientLocation("C")
+      op a2(@query apiVersion: string): void;
+    }
+  `,
+  );
+
+  const sdkPackage = runner.context.sdkPackage;
+  const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
+  ok(rootClient);
+  const rootClientApiVersionParam = rootClient.clientInitialization.parameters.find(
+    (p) => p.name === "apiVersion",
+  );
+  ok(rootClientApiVersionParam);
+
+  strictEqual(rootClient.children?.length, 2);
+
+  const bClient = rootClient.children.find((c) => c.name === "B");
+  ok(bClient);
+  const bClientApiVersionParam = bClient.clientInitialization.parameters.find(
+    (p) => p.name === "apiVersion",
+  );
+  ok(bClientApiVersionParam);
+
+  const cClient = rootClient.children.find((c) => c.name === "C");
+  ok(cClient);
+  const cClientApiVersionParam = cClient.clientInitialization.parameters.find(
+    (p) => p.name === "apiVersion",
+  );
+  ok(cClientApiVersionParam);
+});

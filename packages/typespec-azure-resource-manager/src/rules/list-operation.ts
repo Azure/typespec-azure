@@ -19,7 +19,7 @@ export const listBySubscriptionRule = createRule({
         for (const armResource of resources) {
           if (armResource && armResource.operations.lists) {
             const baseType = getResourceBaseType(context.program, armResource.typespecType);
-            if (baseType === ResourceBaseType.Extension || baseType === ResourceBaseType.Tenant) {
+            if (baseType === ResourceBaseType.Tenant) {
               for (const listOperationName of Object.keys(armResource.operations.lists)) {
                 const listOperation = armResource.operations.lists[listOperationName];
                 if (listOperation.path.includes("{subscriptionId}")) {

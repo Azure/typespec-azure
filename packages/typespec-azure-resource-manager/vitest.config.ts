@@ -1,5 +1,5 @@
 import { defineConfig, mergeConfig } from "vitest/config";
-import { defaultTypeSpecVitestConfig } from "../../core/vitest.workspace";
+import { defaultTypeSpecVitestConfig } from "../../core/vitest.config";
 
 export default mergeConfig(
   defaultTypeSpecVitestConfig,

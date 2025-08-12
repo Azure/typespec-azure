@@ -1,5 +1,69 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.59.0
+
+### Deprecations
+
+- [#2974](https://github.com/Azure/typespec-azure/pull/2974) Deprecate pageable decorators `@Azure.Core.items` and `@Azure.Core.pagedResult`. Use `@TypeSpec.pageItems` and `@TypeSpec.list` instead.
+
+### Features
+
+- [#3096](https://github.com/Azure/typespec-azure/pull/3096) Enable void and optional request body for extension put and patch operations
+- [#3098](https://github.com/Azure/typespec-azure/pull/3098) Allow using Scope parameter with Provider Action templates
+- [#3085](https://github.com/Azure/typespec-azure/pull/3085) Add support for optional and missing request body in PUT and PATCH legacy operations
+
+### Bump dependencies
+
+- [#3029](https://github.com/Azure/typespec-azure/pull/3029) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3085](https://github.com/Azure/typespec-azure/pull/3085) Fix implicitOptionality setting in Legacy PATCH operations
+
+
+## 0.58.1
+
+### Bug Fixes
+
+- [#3030](https://github.com/Azure/typespec-azure/pull/3030) Use OverrideErrorType parameter in legacy list operation
+- [#3026](https://github.com/Azure/typespec-azure/pull/3026) Fix #1876 Add ResolveArmOperations method
+
+
+## 0.58.0
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2945](https://github.com/Azure/typespec-azure/pull/2945) Fix inconsistent `OverrideErrorType` parameter name across templates
+- [#2959](https://github.com/Azure/typespec-azure/pull/2959) Improve `no-resource-delete-operation` message
+- [#2820](https://github.com/Azure/typespec-azure/pull/2820) Add the `@items` and `@nextLink` decorators to the common types `PrivateEndpointConnectionListResult` and `PrivateLinkResourceListResult` to support the @`pagedResult` feature.
+
+
+## 0.57.2
+
+### Bug Fixes
+
+- [#2772](https://github.com/Azure/typespec-azure/pull/2772) Allow toggling `@autoRoute` in legacy operations
+
+
+## 0.57.1
+
+### Bug Fixes
+
+- [#2896](https://github.com/Azure/typespec-azure/pull/2896) Add a legacy operation template for `Operations_List` that enables customization of both the response and error response types. This provides flexibility to specify custom response or error as needed.
+  
+  For example:
+  ```tsp
+  interface Operations
+    extends Azure.ResourceManager.Legacy.Operations<Response = ArmResponse<Azure.Core.Page<CustomResponse>> {}
+  ```
+- [#2897](https://github.com/Azure/typespec-azure/pull/2897) Added a linter rule to warn when a `@Azure.ResourceManager.Legacy.customAzureResource` does not contain a `@key` property, as this can cause duplicate operations.
+- [#2892](https://github.com/Azure/typespec-azure/pull/2892) Fix #2764 Add advanced extension resource support
+
+
 ## 0.57.0
 
 ### Features

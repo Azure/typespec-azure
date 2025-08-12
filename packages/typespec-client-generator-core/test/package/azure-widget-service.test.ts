@@ -465,7 +465,6 @@ it("poll widget", async () => {
   const methodResponse = createOrUpdate.response;
   strictEqual(methodResponse.kind, "method");
   strictEqual(methodResponse.type, widgetModel);
-  strictEqual(createOrUpdate.response.resultPath, "result");
   strictEqual(createOrUpdate.response.resultSegments?.length, 1);
   strictEqual(
     createOrUpdate.response.resultSegments[0],
@@ -586,11 +585,10 @@ it("paging", async () => {
   strictEqual(nextLinkProperty.type.crossLanguageDefinitionId, "TypeSpec.Rest.ResourceLocation");
   strictEqual(nextLinkProperty.type.baseType?.kind, "url");
   strictEqual(nextLinkProperty.serializedName, "nextLink");
-  strictEqual(nextLinkProperty.serializedName, listManufacturers.nextLinkPath);
 
   const clientRequestIdProperty = pagingModel.properties.find((x) => x.name === "clientRequestId");
   ok(clientRequestIdProperty);
-  strictEqual(clientRequestIdProperty.kind, "header");
+  strictEqual(clientRequestIdProperty.kind, "property");
 });
 
 it("getWidgetAnalytics", async () => {

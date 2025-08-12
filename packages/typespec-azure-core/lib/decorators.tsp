@@ -2,19 +2,37 @@ using Reflection;
 
 namespace Azure.Core {
   /**
-   * Marks an Enum as being fixed since enums in Azure are
-   * assumed to be extensible.
+   * Decorator that marks a Version EnumMember as a preview version.
+   * This is used to indicate that the version is not yet stable and may change in future releases.
+
+   * @param target The EnumMember that represents the preview version.
+   * @example
+   * ```typespec
+   * @versioned(Versions)
+   * @service(#{ title: "Widget Service" })
+   * namespace DemoService;
+   *
+   * enum Versions {
+   *   v1,
+   *   v2,
+   *   @previewVersion
+   *   v3Preview
+   * }
+   * ```
+   * 
    */
-  extern dec fixed(target: Enum);
+  extern dec previewVersion(target: TypeSpec.Reflection.EnumMember);
 
   /**
    * Marks a Model as a paged collection.
    */
+  #deprecated "Do not use this decorator. Use @list decorator on the operation instead."
   extern dec pagedResult(entity: Model);
 
   /**
    * Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
    */
+  #deprecated "Do not use this decorator. Use @pageItems instead."
   extern dec items(entity: ModelProperty);
 
   /**
@@ -129,6 +147,11 @@ namespace Azure.Core {
    * be passed to the linked operation request.
    */
   extern dec nextPageOperation(entity: Operation, linkedOperation: Operation, parameters?: {});
+
+  /**
+   * Specifies that an array model or array-typed property should contain only unique items.
+   */
+  extern dec uniqueItems(entity: ModelProperty | Model);
 }
 
 namespace Azure.Core.Foundations {

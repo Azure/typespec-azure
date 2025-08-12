@@ -362,3 +362,60 @@ model EmployeeProperties {
   city?: string;
 }
 ```
+
+## FAQ
+
+### How do I version a pattern?
+
+I have this model and I would like to change the pattern in v2
+
+```tsp
+model EmployeeProperties {
+  @pattern("^[a-z]+$")
+  state: string;
+}
+```
+
+:::caution
+
+Updating a pattern could be a breaking change:
+
+- A **more restrictive pattern** for input data would break existing clients that send previously valid data
+- A **less restrictive pattern** for output data could break client assumptions and validation logic
+
+:::
+
+The key question is: **Does the pattern change apply to all API versions, or only to the new version?**
+
+#### 1. Pattern changes for all versions
+
+If the pattern change reflects how your service actually behaves across all versions, update the pattern directly. The specification should accurately reflect the current state of your service.
+
+```diff lang=tsp
+model EmployeeProperties {
+-  @pattern("^[a-z]+$")
++  @pattern("^[a-zA-Z]+$")
+   state: string;
+}
+```
+
+:::note
+This will update all openapi specs versions with the new pattern which is the desired behavior.
+:::
+
+#### 2. Different patterns per version (**Very unlikely**)
+
+If older API versions truly enforce a different pattern than newer versions, you need to model this explicitly using versioning decorators:
+
+```tsp
+model EmployeeProperties {
+  @removed(Versions.v2)
+  @pattern("^[a-z]+$")
+  @renamedFrom(Versions.v2, "state")
+  oldState: string;
+
+  @added(Versions.v2)
+  @pattern("^[a-zA-Z]+$")
+  state: string;
+}
+```
