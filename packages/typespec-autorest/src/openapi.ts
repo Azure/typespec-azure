@@ -2132,7 +2132,7 @@ export async function getOpenAPIForService(
     const extensions = getExtensions(program, type);
     if (
       type.kind === "Model" &&
-      (isAzureResource(program, type) || isCustomAzureResource(program, type))
+      (isAzureResource(program, type) || isCustomAzureResource(program, type) === true)
     ) {
       emitObject["x-ms-azure-resource"] = true;
     }
