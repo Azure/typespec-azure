@@ -3370,6 +3370,21 @@ model Azure.ResourceManager.Legacy.ArmOperationOptions
 | useStaticRoute? | `boolean` | Should a static route be used          |
 | route?          | `string`  | The status route for operations to use |
 
+### `LegacyTrackedResource` {#Azure.ResourceManager.Legacy.LegacyTrackedResource}
+
+A tracked resource with the 'location' property optional
+
+```typespec
+model Azure.ResourceManager.Legacy.LegacyTrackedResource
+```
+
+#### Properties
+
+| Name      | Type             | Description                               |
+| --------- | ---------------- | ----------------------------------------- |
+| tags?     | `Record<string>` | Resource tags.                            |
+| location? | `string`         | The geo-location where the resource lives |
+
 ### `ManagedServiceIdentityV4` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4}
 
 Managed service identity (system assigned and/or user assigned identities)
@@ -3450,6 +3465,38 @@ model Azure.ResourceManager.Legacy.ProviderParameter<Resource>
 | Name     | Type                             | Description |
 | -------- | -------------------------------- | ----------- |
 | provider | `"Microsoft.ThisWillBeReplaced"` |             |
+
+### `TrackedResourceWithOptionalLocation` {#Azure.ResourceManager.Legacy.TrackedResourceWithOptionalLocation}
+
+This type uses an optional location property, only used by legacy APIs.
+Concrete tracked resource types can be created by aliasing this type using a specific property type.
+
+See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+
+```typespec
+model Azure.ResourceManager.Legacy.TrackedResourceWithOptionalLocation<Properties, PropertiesOptional>
+```
+
+#### Template Parameters
+
+| Name               | Description                                                                                                                                    |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Properties         | A model containing the provider-specific properties for this resource                                                                          |
+| PropertiesOptional | A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended. |
+
+#### Examples
+
+```typespec
+model Employee is TrackedResourceWithOptionalLocation<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+```
+
+#### Properties
+
+| Name        | Type         | Description |
+| ----------- | ------------ | ----------- |
+| properties? | `Properties` |             |
 
 ### `ManagedServiceIdentityType` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityType}
 
