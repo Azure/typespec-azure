@@ -1339,13 +1339,13 @@ TODO
 package service
 
 type Foo struct {
-BasicNullableProperty *string
-ModelNullableProperty *Bar  
- EnumNullableProperty *LR  
+  BasicNullableProperty *string
+  ModelNullableProperty *Bar  
+  EnumNullableProperty *LR  
 }
 
 type Bar struct {
-Prop \*string
+  Prop *string
 }
 
 type LR string
@@ -1646,21 +1646,21 @@ public final class Dog extends Pet {  // Inherits from Pet, not Animal
 package models
 
 type Animal struct {
-Kind string
-Name string
+  Kind string
+  Name string
 }
 
 type Pet struct {
-Animal
-Owner string
-Vaccinated bool  
+  Animal
+  Owner string
+  Vaccinated bool  
 }
 
 type Dog struct {
-Animal
-Owner string
-Vaccinated bool  
- Breed string
+  Animal
+  Owner string
+  Vaccinated bool  
+  Breed string
 }
 
 ```
