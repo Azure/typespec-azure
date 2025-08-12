@@ -39,8 +39,9 @@ import {
   TenantResourceDecorator,
 } from "../generated-defs/Azure.ResourceManager.js";
 import {
-  ArmExternalResourceDecorator,
+  ArmExternalTypeDecorator,
   CustomAzureResourceDecorator,
+  CustomResourceOptions,
 } from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { reportDiagnostic } from "./lib.js";
 import {
@@ -84,17 +85,17 @@ export interface ArmResourceDetailsBase {
   typespecType: Model;
 }
 
-export const [isArmExternalResource, setArmExternalResource] = useStateMap<Model, boolean>(
-  ArmStateKeys.armExternalResource,
+export const [isArmExternalType, setArmExternalType] = useStateMap<Model, boolean>(
+  ArmStateKeys.armExternalType,
 );
 
-export const $armExternalResource: ArmExternalResourceDecorator = (
+export const $armExternalType: ArmExternalTypeDecorator = (
   context: DecoratorContext,
   entity: Model,
 ) => {
   const { program } = context;
   if (isTemplateDeclaration(entity)) return;
-  setArmExternalResource(program, entity, true);
+  setArmExternalType(program, entity, true);
 };
 
 /** Details for RP resources */
@@ -205,11 +206,12 @@ export const $armVirtualResource: ArmVirtualResourceDecorator = (
 export const $customAzureResource: CustomAzureResourceDecorator = (
   context: DecoratorContext,
   entity: Model,
+  options?: CustomResourceOptions,
 ) => {
   const { program } = context;
+  const optionsValue = options ?? { isAzureResource: false };
   if (isTemplateDeclaration(entity)) return;
-
-  program.stateMap(ArmStateKeys.customAzureResource).set(entity, "Custom");
+  setCustomResource(program, entity, optionsValue);
 };
 
 function getProperty(
@@ -262,6 +264,12 @@ export function getArmVirtualResourceDetails(
   return undefined;
 }
 
+const [getCustomResourceOptions, setCustomResource] = useStateMap<Model, CustomResourceOptions>(
+  ArmStateKeys.customAzureResource,
+);
+
+export { getCustomResourceOptions };
+
 /**
  * Determine if the given model is a custom resource.
  * @param program The program to process.
@@ -269,7 +277,8 @@ export function getArmVirtualResourceDetails(
  * @returns true if the model or any model it extends is marked as a resource, otherwise false.
  */
 export function isCustomAzureResource(program: Program, target: Model): boolean {
-  if (program.stateMap(ArmStateKeys.customAzureResource).has(target)) return true;
+  const resourceOptions = getCustomResourceOptions(program, target);
+  if (resourceOptions?.isAzureResource) return true;
   if (target.baseModel) return isCustomAzureResource(program, target.baseModel);
   return false;
 }

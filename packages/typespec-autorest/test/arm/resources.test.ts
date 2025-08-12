@@ -1,5 +1,5 @@
 import { deepEqual, deepStrictEqual, ok, strictEqual } from "assert";
-import { it } from "vitest";
+import { expect, it } from "vitest";
 import { compileOpenAPI } from "../test-host.js";
 
 it("emits correct paths for tenant resources", async () => {
@@ -338,7 +338,7 @@ it("emits x-ms-azure-resource for resource with @azureResourceBase", async () =>
   ok(openApi.definitions?.Widget["x-ms-azure-resource"]);
 });
 
-it("emits x-ms-external for resource with @armExternalResource", async () => {
+it("emits x-ms-external for resource with @armExternalType", async () => {
   const openApi = await compileOpenAPI(
     `
     @armProviderNamespace
@@ -347,7 +347,7 @@ it("emits x-ms-external for resource with @armExternalResource", async () => {
 
     #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
     @doc("Widget resource")
-    @Azure.ResourceManager.Legacy.armExternalResource
+    @Azure.ResourceManager.Legacy.armExternalType
     model Widget {
        name: string;
     }
@@ -357,7 +357,25 @@ it("emits x-ms-external for resource with @armExternalResource", async () => {
   ok(openApi.definitions?.Widget["x-ms-external"]);
 });
 
-it("emits x-ms-azure-resource for resource with @customAzureResource", async () => {
+it("emits x-ms-azure-resource for resource with @customAzureResource and options", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
+    @doc("Widget resource")
+    @Azure.ResourceManager.Legacy.customAzureResource(#{isAzureResource: true})
+    model Widget {
+       name: string;
+    }
+`,
+    { preset: "azure" },
+  );
+  ok(openApi.definitions?.Widget["x-ms-azure-resource"]);
+});
+it("does not emit x-ms-azure-resource for resource with @customAzureResource", async () => {
   const openApi = await compileOpenAPI(
     `
     @armProviderNamespace
@@ -373,7 +391,7 @@ it("emits x-ms-azure-resource for resource with @customAzureResource", async () 
 `,
     { preset: "azure" },
   );
-  ok(openApi.definitions?.Widget["x-ms-azure-resource"]);
+  expect(openApi.definitions?.Widget["x-ms-azure-resource"]).toBeUndefined();
 });
 
 it("excludes properties marked @invisible from the resource payload", async () => {

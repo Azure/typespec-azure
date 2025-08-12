@@ -1,5 +1,9 @@
 import type { DecoratorContext, Model, ModelProperty, Operation } from "@typespec/compiler";
 
+export interface CustomResourceOptions {
+  readonly isAzureResource?: boolean;
+}
+
 export interface ArmOperationOptions {
   readonly useStaticRoute?: boolean;
   readonly route?: string;
@@ -8,8 +12,14 @@ export interface ArmOperationOptions {
 /**
  * This decorator is used on resources that do not satisfy the definition of a resource
  * but need to be identified as such.
+ *
+ * @param options Options for customizing the behavior of the resource
  */
-export type CustomAzureResourceDecorator = (context: DecoratorContext, target: Model) => void;
+export type CustomAzureResourceDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  options?: CustomResourceOptions,
+) => void;
 
 /**
  * Specify an external reference that should be used when emitting this type.
@@ -40,11 +50,11 @@ export type ArmOperationRouteDecorator = (
  *
  * @param target The model to that is an external resource
  */
-export type ArmExternalResourceDecorator = (context: DecoratorContext, target: Model) => void;
+export type ArmExternalTypeDecorator = (context: DecoratorContext, target: Model) => void;
 
 export type AzureResourceManagerLegacyDecorators = {
   customAzureResource: CustomAzureResourceDecorator;
   externalTypeRef: ExternalTypeRefDecorator;
   armOperationRoute: ArmOperationRouteDecorator;
-  armExternalResource: ArmExternalResourceDecorator;
+  armExternalType: ArmExternalTypeDecorator;
 };

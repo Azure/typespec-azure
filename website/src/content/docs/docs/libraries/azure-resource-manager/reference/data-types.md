@@ -3370,6 +3370,20 @@ model Azure.ResourceManager.Legacy.ArmOperationOptions
 | useStaticRoute? | `boolean` | Should a static route be used          |
 | route?          | `string`  | The status route for operations to use |
 
+### `CustomResourceOptions` {#Azure.ResourceManager.Legacy.CustomResourceOptions}
+
+Options for customizing the behavior of a custom azure resource
+
+```typespec
+model Azure.ResourceManager.Legacy.CustomResourceOptions
+```
+
+#### Properties
+
+| Name             | Type      | Description                                        |
+| ---------------- | --------- | -------------------------------------------------- |
+| isAzureResource? | `boolean` | Should the resource be marked as an Azure resource |
+
 ### `LegacyTrackedResource` {#Azure.ResourceManager.Legacy.LegacyTrackedResource}
 
 A tracked resource with the 'location' property optional
