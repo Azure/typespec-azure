@@ -49,15 +49,25 @@ model YourOwnProxyResourceDefinition {
 }
 ```
 
-## Using Page Model from Azure.Core Library
+## Using Page Model from Library
 
-For all pageable response models, we highly recommend using `Azure.Core.Page` to align with ARM conventions:
+By default, pageable operations use `Azure.ResourceManager.ResourceListResult<YourResource>`, which generates a response model named `{YourResource}ListResult`. This follows ARM conventions and is the recommended approach for most ARM resource operations:
+
+```tsp
+@armResourceOperations
+interface YourResources {
+  @doc("List all resources")
+  list is ArmResourceListByParent<YourResource>;
+}
+```
+
+If your original Swagger response model name doesn't align with the ARM convention, or if you need more control over the pagination structure, you can use `Azure.Core.Page`:
 
 ```tsp
 model YourPageableModel is Azure.Core.Page<YourItemType>;
 ```
 
-This makes the `value` property in `YourPageableModel` required, and the type of the `nextLink` property becomes `url`. If you need to keep the previous shape, define `YourPageableModel` as a regular model.
+Both default `Azure.ResourceManager.ResourceListResult` and `Azure.Core.Page` make the `value` property in `{YourResource}ListResult`/`YourPageableModel` required, and the type of the `nextLink` property becomes `url`. If you need to keep the previous shape, define `YourPageableModel` as a regular model.
 
 ## Handling "readOnly" in Model Schemas
 
