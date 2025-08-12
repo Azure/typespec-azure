@@ -31,3 +31,9 @@ extern dec externalTypeRef(entity: Model | ModelProperty, jsonRef: valueof strin
  * @param route Optional route to associate with the operation
  */
 extern dec armOperationRoute(target: Operation, route?: valueof ArmOperationOptions);
+
+/**
+ * Signifies that a Resource is represented using a library type in generated SDKs.
+ * @param target The model to that is an external resource
+ */
+extern dec armExternalResource(target: Model);

@@ -338,6 +338,25 @@ it("emits x-ms-azure-resource for resource with @azureResourceBase", async () =>
   ok(openApi.definitions?.Widget["x-ms-azure-resource"]);
 });
 
+it("emits x-ms-external for resource with @armExternalResource", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
+    @doc("Widget resource")
+    @Azure.ResourceManager.Legacy.armExternalResource
+    model Widget {
+       name: string;
+    }
+`,
+    { preset: "azure" },
+  );
+  ok(openApi.definitions?.Widget["x-ms-external"]);
+});
+
 it("excludes properties marked @invisible from the resource payload", async () => {
   const openApi = await compileOpenAPI(
     `

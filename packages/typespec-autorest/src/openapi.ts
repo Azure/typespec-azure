@@ -17,6 +17,7 @@ import {
   getArmKeyIdentifiers,
   getExternalTypeRef,
   isArmCommonType,
+  isArmExternalResource,
   isArmProviderNamespace,
   isAzureResource,
   isConditionallyFlattened,
@@ -2133,6 +2134,9 @@ export async function getOpenAPIForService(
     }
     if (getAsEmbeddingVector(program, type as Model) !== undefined) {
       emitObject["x-ms-embedding-vector"] = true;
+    }
+    if (type.kind === "Model" && isArmExternalResource(program, type)) {
+      emitObject["x-ms-external"] = true;
     }
     if (type.kind === "Scalar") {
       const ext = getArmResourceIdentifierConfig(program, type);

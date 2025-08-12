@@ -14,6 +14,7 @@ import {
   $armResourceUpdate,
 } from "./operations.js";
 import {
+  $armExternalResource,
   $armProviderNameValue,
   $armResourceOperations,
   $armVirtualResource,
@@ -60,6 +61,7 @@ export const $decorators = {
     customAzureResource: $customAzureResource,
     externalTypeRef: $externalTypeRef,
     armOperationRoute: $armOperationRoute,
+    armExternalResource: $armExternalResource,
   } satisfies AzureResourceManagerLegacyDecorators,
 };
 

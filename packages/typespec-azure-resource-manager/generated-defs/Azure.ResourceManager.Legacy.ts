@@ -35,8 +35,16 @@ export type ArmOperationRouteDecorator = (
   route?: ArmOperationOptions,
 ) => void;
 
+/**
+ * Signifies that a Resource is represented using a library type in generated SDKs.
+ *
+ * @param target The model to that is an external resource
+ */
+export type ArmExternalResourceDecorator = (context: DecoratorContext, target: Model) => void;
+
 export type AzureResourceManagerLegacyDecorators = {
   customAzureResource: CustomAzureResourceDecorator;
   externalTypeRef: ExternalTypeRefDecorator;
   armOperationRoute: ArmOperationRouteDecorator;
+  armExternalResource: ArmExternalResourceDecorator;
 };

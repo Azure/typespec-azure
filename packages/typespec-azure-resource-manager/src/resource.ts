@@ -23,6 +23,7 @@ import {
 import { useStateMap } from "@typespec/compiler/utils";
 import { getHttpOperation, isPathParam } from "@typespec/http";
 import { $autoRoute, getParentResource, getSegment } from "@typespec/rest";
+
 import {
   ArmProviderNameValueDecorator,
   ArmResourceOperationsDecorator,
@@ -37,7 +38,10 @@ import {
   SubscriptionResourceDecorator,
   TenantResourceDecorator,
 } from "../generated-defs/Azure.ResourceManager.js";
-import { CustomAzureResourceDecorator } from "../generated-defs/Azure.ResourceManager.Legacy.js";
+import {
+  ArmExternalResourceDecorator,
+  CustomAzureResourceDecorator,
+} from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { reportDiagnostic } from "./lib.js";
 import {
   getArmProviderNamespace,
@@ -79,6 +83,19 @@ export interface ArmResourceDetailsBase {
   /** A reference to the TypeSpec type */
   typespecType: Model;
 }
+
+export const [isArmExternalResource, setArmExternalResource] = useStateMap<Model, boolean>(
+  ArmStateKeys.armExternalResource,
+);
+
+export const $armExternalResource: ArmExternalResourceDecorator = (
+  context: DecoratorContext,
+  entity: Model,
+) => {
+  const { program } = context;
+  if (isTemplateDeclaration(entity)) return;
+  setArmExternalResource(program, entity, true);
+};
 
 /** Details for RP resources */
 export interface ArmResourceDetails extends ArmResourceDetailsBase {

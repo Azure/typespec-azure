@@ -541,9 +541,27 @@ This allows sharing Azure Resource Manager resource types across specifications
 
 ### Azure.ResourceManager.Legacy
 
+- [`@armExternalResource`](#@armexternalresource)
 - [`@armOperationRoute`](#@armoperationroute)
 - [`@customAzureResource`](#@customazureresource)
 - [`@externalTypeRef`](#@externaltyperef)
+
+#### `@armExternalResource`
+
+Signifies that a Resource is represented using a library type in generated SDKs.
+
+```typespec
+@Azure.ResourceManager.Legacy.armExternalResource
+```
+
+##### Target
+
+The model to that is an external resource
+`Model`
+
+##### Parameters
+
+None
 
 #### `@armOperationRoute`
 
