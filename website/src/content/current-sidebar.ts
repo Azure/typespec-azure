@@ -58,7 +58,7 @@ const sidebar: SidebarItem[] = [
   },
   {
     label: "Convert Swagger to TypeSpec",
-    items:[
+    items: [
       "migrate-swagger/01-get-started",
       {
         label: "TroubleShooting",
@@ -68,15 +68,15 @@ const sidebar: SidebarItem[] = [
           "migrate-swagger/faq/breakingchange",
           "migrate-swagger/faq/conversionfix",
           "migrate-swagger/faq/frequentquestions",
-        ]
+        ],
       },
       {
         label: "Checklists",
         autogenerate: {
           directory: "migrate-swagger/checklists",
-        }
-      }
-    ]
+        },
+      },
+    ],
   },
   {
     label: "📚 Libraries",
