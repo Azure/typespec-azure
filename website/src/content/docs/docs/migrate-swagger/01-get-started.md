@@ -63,7 +63,7 @@ You will need to compare the Swagger generated from TypeSpec with your original 
 - At the end of the console output, you'll see the next command to sort, merge, and normalize your original Swagger(s) and generated Swagger, making it easier to review changes. Provide an `outputFolder` to store the analysis results:
 
   ```shell
-  npx tsmv {your\original\swagger\folder} {your\generated\swagger\file} {outputFolder}
+  npx tsmv {your\original\swagger\folder} {your\generated\swagger\file} --outputFolder {outputFolder}
   ```
 
 - In the `{outputFolder}`:

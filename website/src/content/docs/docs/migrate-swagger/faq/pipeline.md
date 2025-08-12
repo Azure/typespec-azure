@@ -1,14 +1,112 @@
 ---
-title: Resolving Pipeline failures
+title: Resolving Pipeline Failures
 ---
 
-This document explains how to mitigate pipeline failures in TypeSpec migration PRs.
+This document explains how to resolve pipeline failures in TypeSpec migration PRs.
 
 ## Swagger BreakingChange
 
-This pipeline will fail if you have more than one swagger file in your latest version. See detailed explanation in the description of this [issue](https://github.com/Azure/typespec-azure/issues/2194#issue-2844564216). Therefore, we leverage the "TypeSpec Migration Validation" pipeline to properly identify real breaking changes. Go to this pipeline and check the output from "Run TypeSpec Migration Validation". The output is expected to be exactly the same as this [step](../01-get-started.md#review-and-adjust-the-typespec) in your local machine. Review the changes to see if they are expected.
+### Multiple Swagger Files Before Migration
 
-However, if you have only one swagger file in your latest version, you should use this pipeline to detect breaking changes. Refer to [Resolving Swagger Breaking Change Violations](./faq/breakingchange.md) if it fails.
+This pipeline will fail if you have more than one Swagger file in your latest version. See the detailed explanation in this [issue](https://github.com/Azure/typespec-azure/issues/2194#issue-2844564216). 
+
+To properly identify real breaking changes, use the "TypeSpec Migration Validation" pipeline instead:
+1. Navigate to the TypeSpec Migration Validation pipeline
+2. Check the report on the "Summary" page
+3. The output should match exactly what you see in [this step](../01-get-started.md#review-and-adjust-the-typespec) on your local machine
+4. Review the changes to verify they are expected
+
+### Single Swagger File Before Migration
+
+If you have only one Swagger file in your latest version, use this pipeline to detect breaking changes. If it fails, refer to [Resolving Swagger Breaking Change Violations](./faq/breakingchange.md).
+
+**Known Issues**: The following pipeline failures are false alerts and can be safely ignored if you encounter the same situations:
+
+#### 1017 - ReferenceRedirection
+
+This typically occurs when an inlined anonymous enum becomes a named enum.
+
+**Before:**
+```json
+"SomeModel": {
+  "enumProperty": {
+    "type": "string",
+    "enum": [
+      "If",
+      "Else",
+      "None"
+    ],
+    "x-ms-enum": {
+      "name": "EnumType",
+      "modelAsString": true
+    }
+  }
+}
+```
+
+**After:**
+```json
+"SomeModel": {
+  "enumProperty": {
+    "$ref": "#/definitions/EnumType"
+  }
+},
+"EnumType": {
+  "type": "string",
+  "enum": [
+    "If",
+    "Else",
+    "None"
+  ],
+  "x-ms-enum": {
+    "name": "EnumType",
+    "modelAsString": true
+  }
+}
+```
+
+#### 1023 - TypeFormatChanged
+
+If you see the error message `The new version has a different format 'uri' than the previous one ''.` on the `nextLink` property, this is expected because the [page template defines the `nextLink` as `uri`](./mustread.md#using-page-model-from-azurecore-library).
+
+#### 1047 - XmsEnumChanged
+
+After migration, all models (including enums) will have capitalized names.
+
+**Before:**
+```json
+"SomeModel": {
+  "someProperty": {
+    "type": "string",
+    "enum": [
+      "If"
+    ],
+    "x-ms-enum": {
+      "name": "someName",
+      "modelAsString": true
+    }
+  }
+}
+```
+
+**After:**
+```json
+"SomeModel": {
+  "someProperty": {
+    "$ref": "#/definitions/SomeName"
+  }
+},
+"SomeName": {
+  "type": "string",
+  "enum": [
+    "If"
+  ],
+  "x-ms-enum": {
+    "name": "SomeName",
+    "modelAsString": true
+  }
+}
+```
 
 ## Swagger ModelValidation
 
@@ -16,7 +114,7 @@ Some validation rules may fail because TypeSpec fixes certain legacy patterns. R
 
 ### INVALID_FORMAT: Object didn't pass validation for format uri: {nextlink}
 
-#### Root cause
+#### Root Cause
 
 The response model of a pageable operation uses the Azure.Core.Page template:
 
@@ -24,14 +122,14 @@ The response model of a pageable operation uses the Azure.Core.Page template:
 model ResponseModel is Azure.Core.Page<ItemType>;
 ```
 
-This standardized approach makes the nextLink type `uri` instead of plain `string`. If your previous example's `nextLink` value isn't a valid URI, it will cause a CI error.
+This standardized approach changes the `nextLink` type from plain `string` to `uri`. If your previous example's `nextLink` value isn't a valid URI, it will cause a validation error.
 
-#### Mitigation
+#### Resolution
 
-Either:
+Choose one of the following options:
 
-1. Update your example to include a valid URI value, or
-2. Modify your TypeSpec response model definition to:
+1. **Update your example** to include a valid URI value, or
+2. **Modify your TypeSpec response model** to use a custom definition:
 
 ```typespec
 @pagedResult
@@ -46,10 +144,10 @@ model ResponseModel {
 
 ### INVALID_FORMAT: Object didn't pass validation for format arm-id
 
-#### Root cause
+#### Root Cause
 
-It is possibly because your own defined resource is mapped to the resource defined in common-type. See [this](./breakingchange.md#using-resources-from-common-types) for details. The `id` type for `Resource` in common-types is of format `arm-id`.
+This error typically occurs when your custom resource definition is mapped to a resource defined in common-types. See [this section](./breakingchange.md#using-resources-from-common-types) for details. The `id` property for `Resource` in common-types uses the `arm-id` format.
 
-#### Mitigation
+#### Resolution
 
-Update the value in your example file to meet the format of `arm-id`. 
+Update the value in your example file to meet the `arm-id` format requirements.

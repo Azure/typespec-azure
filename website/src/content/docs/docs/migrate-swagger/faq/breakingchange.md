@@ -27,10 +27,6 @@ move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
 This produces the route:  
 `/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/customizedAction`
 
-### Customizing Scope Parameter Name for Extension Resources
-
-// TO-DO
-
 ### Customizing Request Payload Parameter Names
 
 For operations with request bodies (PUT, POST, PATCH), TypeSpec operation templates provide default names for request parameters. You can use augment decorators to customize these parameter names and other parts of the operation signature.
