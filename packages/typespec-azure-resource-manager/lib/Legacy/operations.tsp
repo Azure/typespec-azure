@@ -290,6 +290,29 @@ interface RoutedOperations<
   >(...ParentParameters, ...Parameters): Response | OverrideErrorType;
 
   /**
+   * List a single page of the resource
+   * @template Resource The resource being listed
+   * @template Parameters Optional. Additional parameters after the path parameters
+   * @template Response Optional. The response returned by the list
+   * @template OverrideErrorType Optional. The error response, if non-standard.
+   * @template OverrideRouteOptions Optional. The route options for the operation.
+   */
+  @segmentOf(ResourceTypeParameter)
+  @doc("List a {name}", Resource)
+  @get
+  @listsResource(Resource)
+  @armOperationRoute(OverrideRouteOptions)
+  @armResourceList(Resource)
+  @Private.armUpdateProviderNamespace
+  ListSinglePage<
+    Resource extends Foundations.SimpleResource,
+    Parameters extends {} = {},
+    Response extends {} = ArmResponse<ResourceListResult<Resource>>,
+    OverrideErrorType extends {} = ErrorType,
+    OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute
+  >(...ParentParameters, ...Parameters): Response | OverrideErrorType;
+
+  /**
    * A synchronous resource action.
    * @template Resource The resource being acted upon
    * @template Request The request model for the action
@@ -308,8 +331,8 @@ interface RoutedOperations<
   @returnsDoc("Azure operation completed successfully.")
   ActionSync<
     Resource extends Foundations.SimpleResource,
-    Request extends TypeSpec.Reflection.Model | void,
-    Response extends TypeSpec.Reflection.Model | void,
+    Request,
+    Response,
     Parameters extends {} = {},
     OptionalRequestBody extends valueof boolean = false,
     OverrideErrorType extends {} = ErrorType,
@@ -346,7 +369,7 @@ interface RoutedOperations<
   @returnsDoc("Azure operation completed successfully.")
   ActionAsync<
     Resource extends Foundations.SimpleResource,
-    Request extends TypeSpec.Reflection.Model | void,
+    Request,
     Result extends TypeSpec.Reflection.Model | void,
     LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
       Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
@@ -461,6 +484,42 @@ op CustomPatchSync<
 >;
 
 /**
+ * DEPRECATED: use CreateOrReplaceAsync instead.
+ * A long-running resource CreateOrUpdate (PUT)
+ * @template Resource the resource being created or updated
+ * @template Request The request body for the operation
+ * @template BaseParameters Optional. Allows overriding the operation parameters
+ * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
+ * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Response Optional. The success response for the createOrUpdate operation
+ * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the request body is optional
+ */
+alias CreateOrUpdateAsync<
+  Resource extends Foundations.SimpleResource,
+  Request extends {} | void = Resource,
+  BaseParameters = DefaultBaseParameters<Resource>,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
+    Azure.Core.Foundations.RetryAfterHeader,
+  Parameters extends {} = {},
+  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
+    Resource,
+    LroHeaders
+  >,
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false
+> = CreateOrReplaceAsync<
+  Resource,
+  Request,
+  BaseParameters,
+  LroHeaders,
+  Parameters,
+  Response,
+  Error,
+  OptionalRequestBody
+>;
+
+/**
  * A long-running resource CreateOrUpdate (PUT)
  * @template Resource the resource being created or updated
  * @template Request The request body for the operation
@@ -477,7 +536,7 @@ op CustomPatchSync<
 @Private.enforceConstraint(Resource, Foundations.Resource)
 @Azure.Core.Foundations.Private.defaultFinalStateVia(#["location", "azure-async-operation"])
 @put
-op CreateOrUpdateAsync<
+op CreateOrReplaceAsync<
   Resource extends Foundations.SimpleResource,
   Request extends {} | void = Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
@@ -499,6 +558,7 @@ op CreateOrUpdateAsync<
 >;
 
 /**
+ * DEPRECATED: use CreateOrReplaceSync instead.
  * Synchronous PUT operation for Azure Resource Manager resources
  * @template Resource the resource being created or replaced
  * @template Request The request body for the operation
@@ -521,12 +581,97 @@ op CreateOrUpdateSync<
   Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false
+> is CreateOrReplaceSync<
+  Resource,
+  Request,
+  BaseParameters,
+  Parameters,
+  Response,
+  Error,
+  OptionalRequestBody
+>;
+
+/**
+ * Synchronous PUT operation for Azure Resource Manager resources
+ * @template Resource the resource being created or replaced
+ * @template Request The request body for the operation
+ * @template BaseParameters Optional. Allows overriding the operation parameters
+ * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Response Optional. The success response for the createOrUpdate operation
+ * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the request body is optional
+ */
+@autoRoute
+@doc("Create a {name}", Resource)
+@armResourceCreateOrUpdate(Resource)
+@Private.enforceConstraint(Resource, Foundations.Resource)
+@put
+op CreateOrReplaceSync<
+  Resource extends Foundations.SimpleResource,
+  Request extends {} | void = Resource,
+  BaseParameters = DefaultBaseParameters<Resource>,
+  Parameters extends {} = {},
+  Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false
 > is CreateOperation<
   ResourceInstanceParameters<Resource, BaseParameters> & Parameters,
   Request,
   Response,
   Error,
   OptionalRequestBody
+>;
+
+/**
+ * A resource list operation, at the subscription scope, that lists only a single page
+ * @template Resource the resource being patched
+ * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Response Optional. The success response for the list operation
+ * @template Error Optional. The error response, if non-standard.
+ */
+@autoRoute
+@doc("List {name} resources by subscription ID", Resource)
+@listsResource(Resource)
+@segmentOf(Resource)
+@armResourceList(Resource)
+@get
+@Private.enforceConstraint(Resource, Foundations.Resource)
+op ArmListSinglePageBySubscription<
+  Resource extends Foundations.SimpleResource,
+  Parameters extends {} = {},
+  Response extends {} = ArmResponse<ResourceListResult<Resource>>,
+  Error extends {} = ErrorResponse
+> is ArmReadOperation<SubscriptionScope<Resource> & Parameters, Response, Error>;
+
+/**
+ * A resource list operation, at the scope of the resource's parent that lists only a single page
+ * @template Resource the resource being patched
+ * @template BaseParameters Optional. Allows overriding the operation parameters
+ * @template ParentName Optional. The name of the parent resource
+ * @template ParentFriendlyName Optional. The friendly name of the parent resource
+ * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Response Optional. The success response for the list operation
+ * @template Error Optional. The error response, if non-standard.
+ */
+@get
+@autoRoute
+@listsResource(Resource)
+@segmentOf(Resource)
+@Private.armRenameListByOperation(Resource, ParentName, ParentFriendlyName, false) // This must come before @armResourceList!
+@armResourceList(Resource)
+@Private.enforceConstraint(Resource, Foundations.Resource)
+op ArmListSinglePageByParent<
+  Resource extends Foundations.SimpleResource,
+  BaseParameters = DefaultBaseParameters<Resource>,
+  ParentName extends valueof string = "",
+  ParentFriendlyName extends valueof string = "",
+  Parameters extends {} = {},
+  Response extends {} = ArmResponse<ResourceListResult<Resource>>,
+  Error extends {} = ErrorResponse
+> is ArmReadOperation<
+  ResourceParentParameters<Resource, BaseParameters> & Parameters,
+  Response,
+  Error
 >;
 
 /**
