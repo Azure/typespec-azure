@@ -224,7 +224,18 @@ serviceClientClient.stableFunctionality(stableModel);
 ```
 
 ```go
-// TODO
+type StableModel struct {
+	StableFeature *string
+}
+
+type ServiceClientStableFunctionalityOptions struct {}
+
+type ServiceClientStableFunctionalityResponse struct {}
+
+type ServiceClient struct {}
+
+func (client *ServiceClient) StableFunctionality(ctx context.Context, stableModel StableModel, options *ServiceClientStableFunctionalityOptions) (ServiceClientStableFunctionalityResponse, error) {}
+
 ```
 
 </ClientTabs>
