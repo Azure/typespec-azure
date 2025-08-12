@@ -409,7 +409,12 @@ export function registerArmResource(
   nameParameter?: string,
 ): void {
   const { program } = context;
-  if (resourceType.namespace && getTypeName(resourceType.namespace) === "Azure.ResourceManager") {
+  const namespaceName = resourceType.namespace ? getTypeName(resourceType.namespace) : undefined;
+  if (
+    namespaceName === undefined ||
+    namespaceName === "Azure.ResourceManager" ||
+    namespaceName === "Azure.ResourceManager.Legacy"
+  ) {
     // The @armResource decorator will be evaluated on instantiations of
     // base templated resource types like TrackedResource<SomeResource>,
     // so ignore in that case.

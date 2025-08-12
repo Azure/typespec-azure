@@ -748,7 +748,10 @@ export function getArmResourceInfo(
 export function getArmResourceKind(resourceType: Model): ArmResourceKind | undefined {
   if (resourceType.baseModel) {
     const coreType = resourceType.baseModel;
-    if (coreType.name.startsWith("TrackedResource")) {
+    if (
+      coreType.name.startsWith("TrackedResource") ||
+      coreType.name.startsWith("LegacyTrackedResource")
+    ) {
       return "Tracked";
     } else if (coreType.name.startsWith("ProxyResource")) {
       return "Proxy";
