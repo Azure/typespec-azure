@@ -67,7 +67,7 @@ const sidebar: SidebarItem[] = [
           "migrate-swagger/faq/pipeline",
           "migrate-swagger/faq/breakingchange",
           "migrate-swagger/faq/conversionfix",
-          "migrate-swagger/faq/frequentQuestions",
+          "migrate-swagger/faq/frequentquestions",
         ]
       },
       {
