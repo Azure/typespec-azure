@@ -21,6 +21,7 @@ import {
   isArmProviderNamespace,
   isAzureResource,
   isConditionallyFlattened,
+  isCustomAzureResource,
 } from "@azure-tools/typespec-azure-resource-manager";
 import {
   getClientNameOverride,
@@ -2129,13 +2130,16 @@ export async function getOpenAPIForService(
   function attachExtensions(type: Type, emitObject: any) {
     // Attach any OpenAPI extensions
     const extensions = getExtensions(program, type);
-    if (isAzureResource(program, type as Model)) {
+    if (
+      type.kind === "Model" &&
+      (isAzureResource(program, type) || isCustomAzureResource(program, type))
+    ) {
       emitObject["x-ms-azure-resource"] = true;
     }
     if (getAsEmbeddingVector(program, type as Model) !== undefined) {
       emitObject["x-ms-embedding-vector"] = true;
     }
-    if (type.kind === "Model" && isArmExternalResource(program, type)) {
+    if (type.kind === "Model" && isArmExternalResource(program, type) === true) {
       emitObject["x-ms-external"] = true;
     }
     if (type.kind === "Scalar") {
