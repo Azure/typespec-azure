@@ -273,11 +273,11 @@ interface RoutedOperations<
    * @template OverrideErrorType Optional. The error response, if non-standard.
    * @template OverrideRouteOptions Optional. The route options for the operation.
    */
+  @segmentOf(ResourceTypeParameter)
   @doc("List a {name}", Resource)
   @get
   @list
   @listsResource(Resource)
-  @segmentOf(ResourceTypeParameter)
   @armOperationRoute(OverrideRouteOptions)
   @armResourceList(Resource)
   @Private.armUpdateProviderNamespace
@@ -535,6 +535,7 @@ op CreateOrUpdateSync<
  * @template BodyParameter The body parameter
  * @template Response The response or union of responses for success.
  * @template ErrorResponse The error response.
+ * @template OptionalRequestBody Optional. Indicates whether the request body is optional
  */
 op CreateOperation<
   HttpParameters extends {},

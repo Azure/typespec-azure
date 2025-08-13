@@ -212,6 +212,23 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
         ),
         pageItemsSegments: baseServiceMethod.response.resultSegments,
         pageSizeParameter: findPageSizeParameter(context, baseServiceMethod.parameters),
+        nextLinkReInjectedParametersSegments:
+          pagingMetadata.output.nextLink?.property.type.kind === "Scalar"
+            ? (
+                getParameterizedNextLinkArguments(
+                  context.program,
+                  pagingMetadata.output.nextLink.property.type,
+                ) ?? []
+              ).map(
+                (t: ModelProperty) =>
+                  getPropertySegmentsFromModelOrParameters(
+                    baseServiceMethod.parameters,
+                    (p) =>
+                      p.__raw?.kind === "ModelProperty" &&
+                      findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
+                  )!,
+              )
+            : undefined,
       },
     });
   }
