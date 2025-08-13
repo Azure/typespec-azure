@@ -15,8 +15,10 @@ import {
   getArmCommonTypeOpenAPIRef,
   getArmIdentifiers,
   getArmKeyIdentifiers,
+  getCustomResourceOptions,
   getExternalTypeRef,
   isArmCommonType,
+  isArmExternalType,
   isArmProviderNamespace,
   isAzureResource,
   isConditionallyFlattened,
@@ -2128,11 +2130,18 @@ export async function getOpenAPIForService(
   function attachExtensions(type: Type, emitObject: any) {
     // Attach any OpenAPI extensions
     const extensions = getExtensions(program, type);
-    if (isAzureResource(program, type as Model)) {
+    if (
+      type.kind === "Model" &&
+      (isAzureResource(program, type) ||
+        getCustomResourceOptions(program, type)?.isAzureResource === true)
+    ) {
       emitObject["x-ms-azure-resource"] = true;
     }
     if (getAsEmbeddingVector(program, type as Model) !== undefined) {
       emitObject["x-ms-embedding-vector"] = true;
+    }
+    if (type.kind === "Model" && isArmExternalType(program, type) === true) {
+      emitObject["x-ms-external"] = true;
     }
     if (type.kind === "Scalar") {
       const ext = getArmResourceIdentifierConfig(program, type);
