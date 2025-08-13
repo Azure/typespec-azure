@@ -535,9 +535,10 @@ export function twoParamsEquivalent(
     return false;
   }
   return (
-    param1.name === param2.name ||
-    getParamAlias(context, param1) === param2.name ||
-    param1.name === getParamAlias(context, param2)
+    param1.type === param2.type &&
+    (param1.name === param2.name ||
+      getParamAlias(context, param1) === param2.name ||
+      param1.name === getParamAlias(context, param2))
   );
 }
 
