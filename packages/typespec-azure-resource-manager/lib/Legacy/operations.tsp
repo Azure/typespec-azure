@@ -644,7 +644,7 @@ op ArmListSinglePageBySubscription<
 > is ArmReadOperation<SubscriptionScope<Resource> & Parameters, Response, Error>;
 
 /**
- * A resource list operation, at the scope of the resource's parent that lists only a single page
+ * A resource list operation, at the scope of the resource's parent that lists only a single
  * @template Resource the resource being patched
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template ParentName Optional. The name of the parent resource
