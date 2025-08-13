@@ -398,6 +398,8 @@ export const $lib = createTypeSpecLibrary({
         operationToOperation:
           "`@clientLocation` cannot be used to move an operation to another operation. Operations can only be moved to interfaces or namespaces.",
         modelPropertyToClientInitialization: paramMessage`There is already a parameter called '${"parameterName"}' in the client initialization.`,
+        modelPropertyToString:
+          "`@clientLocation` can only move model properties to interfaces or namespaces.",
       },
     },
     "client-location-wrong-type": {

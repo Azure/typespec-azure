@@ -839,10 +839,10 @@ export function getClientInitializationOptions(
   entity: Namespace | Interface,
 ): ClientInitializationOptions | undefined {
   const options = getScopedDecoratorData(context, clientInitializationKey, entity);
-  if (options === undefined) return undefined;
 
   // backward compatibility
   if (
+    options &&
     options.properties.get("initializedBy") === undefined &&
     options.properties.get("parameters") === undefined
   ) {
@@ -853,7 +853,7 @@ export function getClientInitializationOptions(
 
   let initializedBy = undefined;
 
-  if (options.properties.get("initializedBy")) {
+  if (options?.properties.get("initializedBy")) {
     if (options.properties.get("initializedBy").type.kind === "EnumMember") {
       initializedBy = options.properties.get("initializedBy").type.value;
     } else if (options.properties.get("initializedBy").type.kind === "Union") {
@@ -864,7 +864,7 @@ export function getClientInitializationOptions(
     }
   }
 
-  let parametersModel = options.properties.get("parameters")?.type as Model | undefined;
+  let parametersModel = options?.properties.get("parameters")?.type as Model | undefined;
   const movedParameters = findEntriesWithTarget<ModelProperty, Namespace | Interface>(
     context,
     clientLocationKey,
@@ -1241,6 +1241,15 @@ export const $clientLocation = (
         return;
       }
     }
+    if (typeof target === "string") {
+      reportDiagnostic(context.program, {
+        code: "client-location-conflict",
+        format: { parameterName: source.name },
+        target: context.decoratorTarget,
+        messageId: "modelPropertyToString",
+      });
+      return;
+    }
   }
   setScopedDecoratorData(context, $clientLocation, clientLocationKey, source, target, scope);
 };
@@ -1254,26 +1263,26 @@ export function getClientLocation(
 ): Namespace | Interface | string | undefined;
 
 /**
- * Gets the `Namespace`, `Interface`, `Operation` or name of client where a parameter changes location to.
+ * Gets the `Namespace`, `Interface`, `Operation` where a parameter changes location to.
  */
 export function getClientLocation(
   context: TCGCContext,
   input: ModelProperty,
-): Namespace | Interface | Operation | string | undefined;
+): Namespace | Interface | Operation | undefined;
 
 /**
- * Gets the `Namespace`, `Interface` or name of client where an operation / parameter change the location to.
+ * Gets the `Namespace`, `Interface`, `Operation` or name of client where an operation / parameter change the location to.
  *
  * @param context TCGCContext
- * @param operation Operation to be moved
- * @returns `Namespace`, `Interface`, `string` target or undefined if no location change.
+ * @param input Operation or parameter to be moved
+ * @returns `Namespace`, `Interface`, `Operation`, `string` target or undefined if no location change.
  */
 export function getClientLocation(
   context: TCGCContext,
   input: Operation | ModelProperty,
 ): Namespace | Interface | Operation | string | undefined {
-  // if there is `@client` or `@operationGroup` decorator, `@clientLocation` will be ignored
-  if (hasExplicitClientOrOperationGroup(context)) {
+  // if there is `@client` or `@operationGroup` decorator, `@clientLocation` on operation will be ignored
+  if (input.kind === "Operation" && hasExplicitClientOrOperationGroup(context)) {
     return undefined;
   }
   return getScopedDecoratorData(context, clientLocationKey, input);

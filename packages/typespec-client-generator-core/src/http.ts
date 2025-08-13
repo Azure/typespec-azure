@@ -30,7 +30,7 @@ import {
 } from "@typespec/http";
 import { getStreamMetadata } from "@typespec/http/experimental";
 import { camelCase } from "change-case";
-import { getParamAlias, getResponseAsBool } from "./decorators.js";
+import { getResponseAsBool } from "./decorators.js";
 import {
   CollectionFormat,
   SdkBodyParameter,
@@ -53,6 +53,7 @@ import {
   compareModelProperties,
   getAvailableApiVersions,
   getClientDoc,
+  getCorrespondingClientParam,
   getHttpBodyType,
   getHttpOperationResponseHeaders,
   getStreamAsBytes,
@@ -584,26 +585,22 @@ export function getCorrespondingMethodParams(
 
   if (serviceParam.onClient) {
     // 1. To see if the service parameter is a client parameter.
-    const client = context.getClientForOperation(operation);
-    let clientParams = context.__clientParametersCache.get(client);
-    if (!clientParams) {
-      clientParams = [];
-      context.__clientParametersCache.set(client, clientParams);
+    if (serviceParam.__raw) {
+      const correspondingClientParam = getCorrespondingClientParam(
+        context,
+        serviceParam.__raw,
+        operation,
+      );
+      if (correspondingClientParam) return diagnostics.wrap([correspondingClientParam]);
     }
 
-    const correspondingClientParams = clientParams.filter(
-      (x) =>
-        compareModelProperties(context, x.__raw, serviceParam.__raw) ||
-        (x.__raw?.kind === "ModelProperty" &&
-          getParamAlias(context, x.__raw) === serviceParam.name),
+    const clientParams = context.__clientParametersCache.get(
+      context.getClientForOperation(operation),
     );
-    if (correspondingClientParams.length > 0) {
-      return diagnostics.wrap(correspondingClientParams);
-    }
 
     // 2. To see if the service parameter is api version parameter that has been elevated to client.
-    if (serviceParam.isApiVersionParam && serviceParam.onClient) {
-      const existingApiVersion = clientParams?.find((x) => isApiVersion(context, x.__raw!));
+    if (clientParams && serviceParam.isApiVersionParam && serviceParam.onClient) {
+      const existingApiVersion = clientParams.find((x) => isApiVersion(context, x.__raw!));
       if (!existingApiVersion) {
         diagnostics.add(
           createDiagnostic({
@@ -621,7 +618,7 @@ export function getCorrespondingMethodParams(
     }
 
     // 3. To see if the service parameter is subscription parameter that has been elevated to client (only for arm service).
-    if (isSubscriptionId(context, serviceParam)) {
+    if (clientParams && isSubscriptionId(context, serviceParam)) {
       const subId = clientParams.find((x) => isSubscriptionId(context, x));
       if (!subId) {
         diagnostics.add(

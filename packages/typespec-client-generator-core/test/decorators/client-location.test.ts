@@ -520,119 +520,6 @@ describe("Parameter", () => {
     strictEqual(httpApiKeyParam.correspondingMethodParams[0], clientApiKeyParam);
   });
 
-  it("move parameter from client to operation", async () => {
-    await runner.compileWithCustomization(
-      `
-      @service
-      namespace MyClient {
-        interface Operations {
-          @route("/test")
-          op test(data: string): void;
-        }
-      }
-      `,
-      `
-      model MyClientOptions {
-        apiKey: string;
-        subscriptionId: string;
-      }
-      
-      @@clientInitialization(MyClient, {parameters: MyClientOptions});
-      @@clientLocation(MyClientOptions.apiKey, MyClient.Operations.test);
-      `,
-    );
-
-    const sdkPackage = runner.context.sdkPackage;
-
-    const myClient = sdkPackage.clients.find((c) => c.name === "MyClient");
-    ok(myClient);
-
-    // apiKey should still be in client initialization
-    const clientApiKeyParam = myClient.clientInitialization.parameters.find(
-      (p) => p.name === "apiKey",
-    );
-    ok(clientApiKeyParam);
-    ok(clientApiKeyParam.onClient);
-
-    // subscriptionId should still be in client initialization
-    const clientSubscriptionIdParam = myClient.clientInitialization.parameters.find(
-      (p) => p.name === "subscriptionId",
-    );
-    ok(clientSubscriptionIdParam);
-    ok(clientSubscriptionIdParam.onClient);
-
-    // Operation should now have apiKey as method parameter
-    const operationsClient = myClient.children?.find((c) => c.name === "Operations");
-    ok(operationsClient);
-    const testMethod = operationsClient.methods.find(
-      (m) => m.name === "test",
-    ) as SdkServiceMethod<SdkHttpOperation>;
-    ok(testMethod);
-
-    // Should have both 'data' and 'apiKey' parameters
-    strictEqual(testMethod.parameters.length, 3);
-    const methodApiKeyParam = testMethod.parameters.find((p) => p.name === "apiKey");
-    ok(methodApiKeyParam);
-    strictEqual(methodApiKeyParam.onClient, true);
-
-    const methodDataParam = testMethod.parameters.find((p) => p.name === "data");
-    ok(methodDataParam);
-    strictEqual(methodDataParam.onClient, false);
-
-    ok(testMethod.operation.parameters.some((p) => p.name === "contentType"));
-  });
-
-  it("move parameter from client to specific operation in group", async () => {
-    await runner.compileWithCustomization(
-      `
-      @service
-      namespace MyClient {
-        interface Operations {
-          @route("/test1")
-          op test1(@query data: string): void;
-          
-          @route("/test2")  
-          op test2(@query info: string): void;
-        }
-      }
-      `,
-      `
-      model MyClientOptions {
-        apiKey: string;
-        subscriptionId: string;
-      }
-
-      @@clientInitialization(MyClient, {parameters: MyClientOptions});
-      @@clientLocation(MyClientOptions.apiKey, MyClient.Operations.test1);
-      `,
-    );
-
-    const sdkPackage = runner.context.sdkPackage;
-    const rootClient = sdkPackage.clients.find((c) => c.name === "MyClient");
-    ok(rootClient);
-    const operationsClient = rootClient.children?.find((c) => c.name === "Operations");
-    ok(operationsClient);
-
-    // test1 should have apiKey as method parameter
-    const test1Method = operationsClient.methods.find(
-      (m) => m.name === "test1",
-    ) as SdkServiceMethod<SdkHttpOperation>;
-    ok(test1Method);
-    strictEqual(test1Method.parameters.length, 2); // data + apiKey
-    const test1ApiKeyParam = test1Method.parameters.find((p) => p.name === "apiKey");
-    ok(test1ApiKeyParam);
-    strictEqual(test1ApiKeyParam.onClient, true);
-    ok(test1Method.parameters.some((p) => p.name === "data"));
-
-    // test2 should not have apiKey as method parameter (should use client param)
-    const test2Method = operationsClient.methods.find(
-      (m) => m.name === "test2",
-    ) as SdkServiceMethod<SdkHttpOperation>;
-    ok(test2Method);
-    strictEqual(test2Method.parameters.length, 1); // only info
-    ok(test2Method.parameters.some((p) => p.name === "info"));
-  });
-
   it("detect parameter name conflict when moving to client", async () => {
     const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
       `
@@ -659,6 +546,22 @@ describe("Parameter", () => {
       {
         code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
       },
+      {
+        code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
+      },
+    ]);
+  });
+
+  it("can not move model properties to string", async () => {
+    const [_, diagnostics] = await runner.compileAndDiagnose(
+      `
+      @service
+      namespace MyService;
+
+      op test(@clientLocation("test") param: string): void;
+      `,
+    );
+    expectDiagnostics(diagnostics, [
       {
         code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
       },

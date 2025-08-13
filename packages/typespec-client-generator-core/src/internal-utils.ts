@@ -46,6 +46,7 @@ import {
   SdkEnumType,
   SdkHeaderParameter,
   SdkHttpResponse,
+  SdkMethodParameter,
   SdkOperationGroup,
   SdkType,
   TCGCContext,
@@ -585,34 +586,40 @@ export function isOnClient(
   operation?: Operation,
   versioning?: boolean,
 ): boolean {
-  const client = operation ? context.getClientForOperation(operation) : undefined;
   const clientLocation = getClientLocation(context, type);
-  let movedToClient = false;
-  if (clientLocation && client) {
-    let currClient = client.type;
-    while (currClient) {
-      if (currClient === clientLocation) {
-        movedToClient = true;
-        break;
-      }
-      currClient = currClient.namespace;
-    }
-  }
-  if (operation && getClientLocation(context, type) === operation) {
+  if (operation && clientLocation === operation) {
     // if the type has explicitly been moved to the operation, it is not on the client
     return false;
   }
   return (
     isSubscriptionId(context, type) ||
     (isApiVersion(context, type) && versioning) ||
-    Boolean(
-      client &&
-        context.__clientParametersCache
-          .get(client)
-          ?.find((x) => twoParamsEquivalent(context, x.__raw, type)),
-    ) ||
-    movedToClient
+    (operation !== undefined && getCorrespondingClientParam(context, type, operation) !== undefined)
   );
+}
+
+export function getCorrespondingClientParam(
+  context: TCGCContext,
+  type: ModelProperty,
+  operation: Operation,
+): SdkMethodParameter | undefined {
+  const clientParams = [];
+  let client: SdkClient | SdkOperationGroup | undefined = context.getClientForOperation(operation);
+  while (client) {
+    const clientParamsForClient = context.__clientParametersCache.get(client);
+    if (clientParamsForClient) {
+      clientParams.push(...clientParamsForClient);
+    }
+    if (client.kind === "SdkClient") {
+      break;
+    }
+    client = client.parent;
+  }
+  const correspondingClientParam = clientParams?.find((x) =>
+    twoParamsEquivalent(context, x.__raw, type),
+  );
+  if (correspondingClientParam) return correspondingClientParam;
+  return undefined;
 }
 
 export function getValueTypeValue(
@@ -813,22 +820,15 @@ export function findEntriesWithTarget<TSource extends Type, TTarget>(
   sourceKind?: TSource["kind"],
 ): TSource[] {
   const results: TSource[] = [];
-  const stateMap = context.program.stateMap(stateKey);
 
-  for (const source of stateMap.keys()) {
-    // Filter by source type if specified
-    if (sourceKind && source.kind !== sourceKind) {
+  for (const [type, target] of listScopedDecoratorData(context, stateKey)) {
+    if (sourceKind && type.kind !== sourceKind) {
       continue;
     }
-
-    // Check all scopes for matching target
-    for (const target of listScopedDecoratorData(context, stateKey).values()) {
-      if (target === targetValue) {
-        results.push(source as TSource);
-        break; // Found match, no need to check other scopes
-      }
+    if (target === targetValue) {
+      results.push(type as TSource);
+      break;
     }
   }
-
   return results;
 }

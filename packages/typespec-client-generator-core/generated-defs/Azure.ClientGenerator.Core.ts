@@ -751,9 +751,8 @@ export type ResponseAsBoolDecorator = (
 ) => void;
 
 /**
- * Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name.
- * This decorator allows you to change the client an operation belongs to in the client SDK.
- * This decorator cannot be used along with `@client` or `@operationGroup` decorators.
+ * Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name. For this usecase, the decorator cannot be used along with `@client` or `@operationGroup` decorators.
+ * Change the parameter location to operation or client. For this usecase, the decorator cannot be used in the parameter defind in  `@clientInitialization` decorator.
  *
  * @param source The operation to change location for.
  * @param target The target `Namespace`, `Interface` or a string which can indicate the client.
@@ -826,29 +825,9 @@ export type ResponseAsBoolDecorator = (
  * ```
  * @example Move parameter from client to operation
  * ```typespec
- * // main.tsp
- * @service
- * namespace MyClient;
- *
- * @get
- * @route("/health")
- * getHealthStatus(): void;
- *
- *
- * @put
- * @route("/health")
- * putHealthStatus(): void;
- *
  * // client.tsp
- * namespace MyClient.Customizations;
- * model MyClientOptions {
- *  subscriptionId: string;
- * }
  *
- * @@clientInitialization(MyClient, MyClientOptions)
- * // This will move the `subscriptionId` parameter from the client initialization to the operation `getHealthStatus`.
- * // `subscriptionId` will not appear on the `putHealthStatus` operation, and it will continue to appear in client initialization.
- * @@clientLocation(MyClientOptions.subscriptionId, MyClient.getHealthStatus)
+ * @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, get); // This will keep the `subscriptionId` parameter on the operation level instead of applying TCGC's default logic of elevating `subscriptionId` to client.
  * ```
  */
 export type ClientLocationDecorator = (
