@@ -581,8 +581,8 @@ model MyServiceClientOptions {
 
 #### `@clientLocation`
 
-Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name. For this usecase, the decorator cannot be used along with `@client` or `@operationGroup` decorators.
-Change the parameter location to operation or client. For this usecase, the decorator cannot be used in the parameter defind in `@clientInitialization` decorator.
+Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name. For this usage, the decorator cannot be used along with `@client` or `@operationGroup` decorators.
+Change the parameter location to operation or client. For this usage, the decorator cannot be used in the parameter defined in `@clientInitialization` decorator.
 
 ```typespec
 @Azure.ClientGenerator.Core.clientLocation(target: Interface | Namespace | Operation | valueof string, scope?: valueof string)

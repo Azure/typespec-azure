@@ -776,8 +776,8 @@ extern dec deserializeEmptyStringAsNull(target: ModelProperty, scope?: valueof s
 extern dec responseAsBool(target: Operation, scope?: valueof string);
 
 /**
- * Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name. For this usecase, the decorator cannot be used along with `@client` or `@operationGroup` decorators.
- * Change the parameter location to operation or client. For this usecase, the decorator cannot be used in the parameter defind in  `@clientInitialization` decorator.
+ * Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name. For this usage, the decorator cannot be used along with `@client` or `@operationGroup` decorators.
+ * Change the parameter location to operation or client. For this usage, the decorator cannot be used in the parameter defined in  `@clientInitialization` decorator.
  * @param source The operation to change location for.
  * @param target The target `Namespace`, `Interface` or a string which can indicate the client.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.

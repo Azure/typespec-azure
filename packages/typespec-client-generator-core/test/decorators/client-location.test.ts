@@ -589,17 +589,17 @@ describe("Parameter", () => {
       V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
 
-    @subscriptionResource
-    model MyModel is ProxyResource<{}> {
-      @key("extendedZoneName")
-      @segment("extendedZones")
-      @path
-      name: string;
-    }
+    @autoRoute
+    @action("test")
+    op test is ArmProviderActionSync<
+      Request = {},
+      Response = {},
+      Scope = SubscriptionActionScope,
+      Parameters = {},
+      OptionalRequestBody = true
+    >;
 
-    op get is ArmResourceRead<MyModel>;
-
-    @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, get);
+    @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, test);
     `,
     );
 
@@ -612,26 +612,24 @@ describe("Parameter", () => {
     // since there's only one operation and the subscription id is moved to the operation, it should not be in the client parameters
     ok(!client.clientInitialization.parameters.some((p) => p.name === "subscriptionId"));
     strictEqual(client.methods.length, 1);
-    const getMethod = client.methods.find((m) => m.name === "get");
-    ok(getMethod);
-    strictEqual(getMethod.parameters.length, 3);
-    const subIdMethodParam = getMethod.parameters.find((p) => p.name === "subscriptionId");
+    const testMethod = client.methods.find((m) => m.name === "test");
+    ok(testMethod);
+    strictEqual(testMethod.parameters.length, 3);
+    const subIdMethodParam = testMethod.parameters.find((p) => p.name === "subscriptionId");
     ok(subIdMethodParam);
-    ok(getMethod.parameters.some((p) => p.name === "extendedZoneName"));
-    ok(getMethod.parameters.some((p) => p.name === "accept"));
-    const getOperation = getMethod.operation;
-    ok(getOperation);
-    strictEqual(getOperation.parameters.length, 4);
-    const subIdOperationParam = getOperation.parameters.find((p) => p.name === "subscriptionId");
+    ok(testMethod.parameters.some((p) => p.name === "contentType"));
+    const testOperation = testMethod.operation;
+    ok(testOperation);
+    strictEqual(testOperation.parameters.length, 3);
+    const subIdOperationParam = testOperation.parameters.find((p) => p.name === "subscriptionId");
     ok(subIdOperationParam);
     strictEqual(subIdOperationParam.correspondingMethodParams.length, 1);
     strictEqual(subIdOperationParam.correspondingMethodParams[0], subIdMethodParam);
-    ok(getOperation.parameters.some((p) => p.name === "extendedZoneName"));
-    ok(getOperation.parameters.some((p) => p.name === "accept"));
-    ok(getOperation.parameters.some((p) => p.name === "apiVersion"));
+    ok(testOperation.parameters.some((p) => p.name === "contentType"));
+    ok(testOperation.parameters.some((p) => p.name === "apiVersion"));
   });
 
-  it("subId from client to operation for one method, stays on client for other", async () => {
+  it("subId from client to operation for two methods, stays on client for others", async () => {
     const runnerWithArm = await createSdkTestRunner({
       librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
       autoUsings: ["Azure.ResourceManager", "Azure.Core"],
@@ -660,10 +658,16 @@ describe("Parameter", () => {
       name: string;
     }
 
-    op get is ArmResourceRead<MyModel>;
-    op put is ArmResourceCreateOrReplaceAsync<MyModel>;
+    // Since we could not locate to the method parameter subscriptionId, we need to define a base parameter model to work around it.
+    model GetBaseParameter is Azure.ResourceManager.Foundations.DefaultBaseParameters<MyModel>{}
+    model PutBaseParameter is Azure.ResourceManager.Foundations.DefaultBaseParameters<MyModel>{}
 
-    @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, get);
+    op get is ArmResourceRead<MyModel, BaseParameters = GetBaseParameter>;
+    op put is ArmResourceCreateOrReplaceAsync<MyModel, BaseParameters = PutBaseParameter>;
+    op delete is ArmResourceDeleteWithoutOkAsync<MyModel>;
+
+    @@clientLocation(GetBaseParameter.subscriptionId, get);
+    @@clientLocation(PutBaseParameter.subscriptionId, put);
     `,
     );
 
@@ -678,12 +682,12 @@ describe("Parameter", () => {
       (p) => p.name === "subscriptionId",
     );
     ok(subIdClientParam);
-    strictEqual(client.methods.length, 2);
+    strictEqual(client.methods.length, 3);
 
     const getMethod = client.methods.find((m) => m.name === "get");
     ok(getMethod);
     strictEqual(getMethod.parameters.length, 3);
-    const subIdMethodParam = getMethod.parameters.find((p) => p.name === "subscriptionId");
+    let subIdMethodParam = getMethod.parameters.find((p) => p.name === "subscriptionId");
     ok(subIdMethodParam);
     ok(getMethod.parameters.some((p) => p.name === "extendedZoneName"));
     ok(getMethod.parameters.some((p) => p.name === "accept"));
@@ -694,21 +698,37 @@ describe("Parameter", () => {
     ok(subIdOperationParam);
     strictEqual(subIdOperationParam.correspondingMethodParams.length, 1);
     strictEqual(subIdOperationParam.correspondingMethodParams[0], subIdMethodParam);
-    ok(getOperation.parameters.some((p) => p.name === "extendedZoneName"));
-    ok(getOperation.parameters.some((p) => p.name === "accept"));
-    ok(getOperation.parameters.some((p) => p.name === "apiVersion"));
 
     const putMethod = client.methods.find((m) => m.name === "put");
     ok(putMethod);
-    strictEqual(putMethod.parameters.length, 4);
-    // The subscriptionId parameter should not be moved to the operation
-    ok(!putMethod.parameters.some((p) => p.name === "subscriptionId"));
+    strictEqual(putMethod.parameters.length, 5);
+    subIdMethodParam = putMethod.parameters.find((p) => p.name === "subscriptionId");
+    ok(putMethod.parameters.some((p) => p.name === "extendedZoneName"));
+    ok(putMethod.parameters.some((p) => p.name === "contentType"));
+    ok(putMethod.parameters.some((p) => p.name === "accept"));
+    ok(putMethod.parameters.some((p) => p.name === "resource"));
+    ok(subIdMethodParam);
     const putOperation = putMethod.operation;
     ok(putOperation);
     strictEqual(putOperation.parameters.length, 5);
     const putSubIdOperationParam = putOperation.parameters.find((p) => p.name === "subscriptionId");
     ok(putSubIdOperationParam);
     strictEqual(putSubIdOperationParam.correspondingMethodParams.length, 1);
-    strictEqual(putSubIdOperationParam.correspondingMethodParams[0], subIdClientParam);
+    strictEqual(putSubIdOperationParam.correspondingMethodParams[0], subIdMethodParam);
+
+    const deleteMethod = client.methods.find((m) => m.name === "delete");
+    ok(deleteMethod);
+    strictEqual(deleteMethod.parameters.length, 1);
+    // The subscriptionId parameter should not be moved to the operation
+    ok(!deleteMethod.parameters.some((p) => p.name === "subscriptionId"));
+    const deleteOperation = deleteMethod.operation;
+    ok(deleteOperation);
+    strictEqual(deleteOperation.parameters.length, 3);
+    const deleteSubIdOperationParam = deleteOperation.parameters.find(
+      (p) => p.name === "subscriptionId",
+    );
+    ok(deleteSubIdOperationParam);
+    strictEqual(deleteSubIdOperationParam.correspondingMethodParams.length, 1);
+    strictEqual(deleteSubIdOperationParam.correspondingMethodParams[0], subIdClientParam);
   });
 });
