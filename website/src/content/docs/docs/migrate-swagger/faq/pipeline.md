@@ -151,7 +151,7 @@ model ResponseModel {
 
 #### Root Cause
 
-This error typically occurs when your custom resource definition is mapped to a resource defined in common-types. See [this section](./breakingchange.md#using-resources-from-common-types) for details. The `id` property for `Resource` in common-types uses the `arm-id` format.
+This error typically occurs when a custom resource definition is mapped to a resource defined in common-types. See [this section](./breakingchange.md#using-resources-from-common-types) for details. The `id` property for `Resource` in common-types may use the `arm-id` format, depending on the version of common-types used.
 
 #### Resolution
 
