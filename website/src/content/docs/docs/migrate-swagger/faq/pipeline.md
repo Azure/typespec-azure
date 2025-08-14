@@ -21,7 +21,7 @@ To properly identify real breaking changes, use the "TypeSpec Migration Validati
 
 If you have only one Swagger file in your latest version, use this pipeline to detect breaking changes. If it fails, refer to [Resolving Swagger Breaking Change Violations](./faq/breakingchange.md).
 
-**Known Issues**: The following pipeline failures are false alerts and can be safely ignored if you encounter the same situations:
+**Known Issues**: The following pipeline failures are false alerts and can be safely ignored:
 
 #### 1017 - ReferenceRedirection
 
