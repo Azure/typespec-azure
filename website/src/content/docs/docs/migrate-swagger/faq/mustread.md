@@ -61,7 +61,7 @@ interface YourResources {
 }
 ```
 
-Both default `Azure.ResourceManager.ResourceListResult` make the `value` property in `{YourResource}ListResult` required, and the type of the `nextLink` property becomes `url`. 
+`Azure.ResourceManager.ResourceListResult` makes the `value` property in `{YourResource}ListResult` required, and the type of the `nextLink` property becomes `url`. 
 
 ## Handling "readOnly" in Model Schemas
 
