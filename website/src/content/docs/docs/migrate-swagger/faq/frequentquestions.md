@@ -14,7 +14,7 @@ options:
 
 ### File Layout for ARM Services
 
-For ARM services, we recommend the following file structure:
+For ARM services, use the following file structure:
 
 - **main.tsp**: Entry point for the TypeSpec specification containing service information
 - **{resource-name}.tsp**: Resource-specific operations for each ARM resource type
