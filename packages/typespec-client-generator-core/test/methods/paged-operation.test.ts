@@ -1101,3 +1101,47 @@ it("paged result with body root", async () => {
   strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
   strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
 });
+
+it("next link with body root and inheritance", async () => {
+  await runner.compileWithBuiltInService(`
+    @list
+    op test(): TestResponse<ListTestResult>;
+
+    model ListMeta{
+      @nextLink
+      nextLink: url;
+    }
+
+    model ListTestResult extends ListMeta {
+      @pageItems
+      tests: Test[];
+
+      @header
+      h: string;
+    }
+    model Test {
+      id: string;
+    }
+    model TestResponse<ResponseBody> {
+      ...OkResponse;
+
+      @bodyRoot
+      body: ResponseBody;
+    }
+  `);
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  strictEqual(method.name, "test");
+  strictEqual(method.kind, "paging");
+  strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
+  strictEqual(
+    method.pagingMetadata.nextLinkSegments[0],
+    sdkPackage.models[0].baseModel?.properties[0],
+  );
+
+  const response = method.response;
+  strictEqual(response.kind, "method");
+  strictEqual(response.resultSegments?.length, 1);
+  strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
+  strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
+});

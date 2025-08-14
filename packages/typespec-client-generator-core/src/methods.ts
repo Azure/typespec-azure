@@ -354,13 +354,17 @@ function mapFirstSegmentForResultSegments(
   if (resultSegments.length > 0 && responseModel) {
     for (let i = 0; i < resultSegments.length; i++) {
       const segment = resultSegments[i];
-      for (const property of responseModel.properties ?? []) {
-        if (
-          property.__raw &&
-          findRootSourceProperty(property.__raw) === findRootSourceProperty(segment)
-        ) {
-          return [property.__raw, ...resultSegments.slice(i + 1)];
+      let current: SdkModelType | undefined = responseModel;
+      while (current) {
+        for (const property of current.properties ?? []) {
+          if (
+            property.__raw &&
+            findRootSourceProperty(property.__raw) === findRootSourceProperty(segment)
+          ) {
+            return [property.__raw, ...resultSegments.slice(i + 1)];
+          }
         }
+        current = current.baseModel;
       }
     }
   }
