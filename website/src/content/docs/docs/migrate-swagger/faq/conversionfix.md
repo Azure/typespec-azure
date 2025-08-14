@@ -4,7 +4,7 @@ title: Fixing Converted TypeSpec
 
 ## Fixing Linter Rules
 
-Ideally, the original Swagger will be converted into equivalent TypeSpec following ARM conventions. However, many Swagger specifications predate current ARM conventions  and are 'grandfathered in' to prevent breaking changes. The  equivalent TypeSpec that represents the original Swagger will violate linter rules, and linter suppressions are added. Check out how to fix linter violations below.
+Ideally, the original Swagger will be converted into equivalent TypeSpec following ARM conventions. However, many Swagger specifications predate current ARM conventions and are 'grandfathered in' to prevent breaking changes. The  equivalent TypeSpec that represents the original Swagger will violate linter rules, and linter suppressions must be added. Check out how to fix linter violations below.
 
 ### @azure-tools/typespec-azure-core/no-openapi
 
