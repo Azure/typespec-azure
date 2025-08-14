@@ -61,19 +61,7 @@ interface YourResources {
 }
 ```
 
-The original swagger response model may use a different name.  The name of this type does not impact the API definition nor does it impact any SDKs, CLI or PowerShell commands, or other artifacts generated from Swagger, customize in this way.
-
-```tsp
-model YourPageableModel is Azure.Core.Page<YourResource>;
-
-@armResourceOperations
-interface YourResources {
-  @doc("List all resources")
-  list is ArmResourceListByParent<YourResource, Response = YourPageableModel>;
-}
-```
-
-Both default `Azure.ResourceManager.ResourceListResult` and `Azure.Core.Page` make the `value` property in `{YourResource}ListResult`/`YourPageableModel` required, and the type of the `nextLink` property becomes `url`. If you need to keep the previous shape, define `YourPageableModel` as a regular model.
+Both default `Azure.ResourceManager.ResourceListResult` make the `value` property in `{YourResource}ListResult` required, and the type of the `nextLink` property becomes `url`. 
 
 ## Handling "readOnly" in Model Schemas
 

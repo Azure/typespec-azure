@@ -14,12 +14,12 @@ To properly identify real breaking changes, use the "TypeSpec Migration Validati
 
 1. Navigate to the TypeSpec Migration Validation pipeline
 2. Check the report on the "Summary" page
-3. The output should match exactly what you see in [this step](../01-get-started.md#review-and-adjust-the-typespec) on your local machine
+3. The output should match exactly what you see in [this step](../01-get-started.md#review-and-adjust-the-typespec) on the local machine
 4. Review the changes to verify they are expected
 
 ### Single Swagger File Before Migration
 
-If you have only one Swagger file in your latest version, use this pipeline to detect breaking changes. If it fails, refer to [Resolving Swagger Breaking Change Violations](./faq/breakingchange.md).
+If you have only one Swagger file in the latest version, use this pipeline to detect breaking changes. If it fails, refer to [Resolving Swagger Breaking Change Violations](./faq/breakingchange.md).
 
 **Known Issues**: The following pipeline failures are false alerts and can be safely ignored:
 
@@ -127,7 +127,7 @@ The response model of a pageable operation uses the Azure.Core.Page template:
 model ResponseModel is Azure.Core.Page<ItemType>;
 ```
 
-This standardized approach changes the `nextLink` type from plain `string` to `uri`. If your previous example's `nextLink` value isn't a valid URI, it will cause a validation error.
+This standardized approach changes the `nextLink` type from plain `string` to `uri`. If previous example's `nextLink` value isn't a valid URI, it will cause a validation error.
 
 #### Resolution
 
@@ -155,4 +155,4 @@ This error typically occurs when a custom resource definition is mapped to a res
 
 #### Resolution
 
-Update the value in your example file to meet the `arm-id` format requirements.
+Update the value in the example file to meet the `arm-id` format requirements.
