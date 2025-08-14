@@ -70,7 +70,7 @@ This typically occurs when an inlined anonymous enum becomes a named enum.
 
 #### 1023 - TypeFormatChanged
 
-If you see the error message `The new version has a different format 'uri' than the previous one ''.` on the `nextLink` property, this is expected because the [page template defines the `nextLink` as `uri`](./mustread.md#using-page-model-from-azurecore-library).
+The error message `The new version has a different format 'uri' than the previous one ''.` on the `nextLink` property is expected because the [page template defines the `nextLink` as `uri`](./mustread.md#using-page-model-from-azurecore-library).
 
 #### 1047 - XmsEnumChanged
 
