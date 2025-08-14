@@ -134,7 +134,7 @@ This standardized approach changes the `nextLink` type from plain `string` to `u
 Choose one of the following options:
 
 1. **Update your example** to include a valid URI value, or
-2. **Modify your TypeSpec response model** to use a custom definition:
+2. **Modify your TypeSpec response model** to use a custom definition if the nextLink returned by the service is not a URI:
 
 ```typespec
 @pagedResult

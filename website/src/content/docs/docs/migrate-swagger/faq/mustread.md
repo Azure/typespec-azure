@@ -2,11 +2,11 @@
 title: Understanding the Swagger Changes
 ---
 
-To fully leverage the benefits of TypeSpec and follow best practices, there are some unavoidable changes you will encounter after migrating from Swagger to TypeSpec.
+To fully leverage the benefits of TypeSpec and follow best practices, there are some unavoidable changes when migrating from Swagger to TypeSpec.
 
 ## Using Resources from Common Types
 
-If your resource definition already extends from a resource type in [common-types](https://github.com/Azure/azure-rest-api-specs/tree/main/specification/common-types/resource-management), you can skip this section. Otherwise, you should understand how we identify resource models and select appropriate base models from the TypeSpec resource manager library.
+If your resource definition already extends from a resource type in [common-types](https://github.com/Azure/azure-rest-api-specs/tree/main/specification/common-types/resource-management), skip this section. This is section explains how resource models are identified and appropriate base models from the TypeSpec resource manager library are selected.
 
 An ARM Resource model should extend one of the typespec common-types Resource models when it meets **all** of the following criteria:
 
@@ -14,7 +14,7 @@ An ARM Resource model should extend one of the typespec common-types Resource mo
 2. At least one operation returns a 200 response containing this model.
 3. The model has properties named `id`, `name`, and `type`.
 
-Once a model is identified as a resource, we represent it by extending an appropriate [resource model](../../howtos/ARM/resource-type.md#modeling-resources-in-typespec) from the TypeSpec library. This results in differences between your original Swagger and generated Swagger like:
+Once a model is identified as a resource, it is represented by extending an appropriate [resource model](../../howtos/ARM/resource-type.md#modeling-resources-in-typespec) from the TypeSpec library. This can result in textual differences between the original Swagger and generated Swagger like:
 
 ```diff
 "YourResource": {
@@ -33,7 +33,7 @@ Once a model is identified as a resource, we represent it by extending an approp
 }
 ```
 
-We recommend accepting this change to align with ARM conventions. However, if you have a strong business justification to keep your original definition, you can use the `@customAzureResource` decorator to mark your model.
+Accept this change to align with ARM conventions. If there is a strong business justification to keep the original definition, use the `@customAzureResource` decorator to mark the model.
 
 ```tsp
 model YourResource extends YourOwnProxyResourceDefinition {
@@ -61,17 +61,23 @@ interface YourResources {
 }
 ```
 
-If your original Swagger response model name doesn't align with the ARM convention, or if you need more control over the pagination structure, you can use `Azure.Core.Page`:
+The original swagger response model may use a different name.  The name of this type does not impact the API definition nor does it impact any SDKs, CLI or PowerShell commands, or other artifacts generated from Swagger, customize in this way.
 
 ```tsp
-model YourPageableModel is Azure.Core.Page<YourItemType>;
+model YourPageableModel is Azure.Core.Page<YourResource>;
+
+@armResourceOperations
+interface YourResources {
+  @doc("List all resources")
+  list is ArmResourceListByParent<YourResource, Response = YourPageableModel>;
+}
 ```
 
 Both default `Azure.ResourceManager.ResourceListResult` and `Azure.Core.Page` make the `value` property in `{YourResource}ListResult`/`YourPageableModel` required, and the type of the `nextLink` property becomes `url`. If you need to keep the previous shape, define `YourPageableModel` as a regular model.
 
 ## Handling "readOnly" in Model Schemas
 
-The `"readOnly": true` property should only be used on properties, not on models. If you mistakenly mark a model as readOnly and have other models refer to it, like:
+The `"readOnly": true` property should only be used on properties, not on models. If a model is mistakenly markedas readOnly and other models refer to it, like this:
 
 ```json
 "ReadOnlyModel": {
@@ -86,7 +92,7 @@ The `"readOnly": true` property should only be used on properties, not on models
 }
 ```
 
-This is equivalent to marking the referring property as read-only in TypeSpec:
+Decorating the property referencing the model with '@visibility(Lifecycle.Read)` is equivalent to marking the model schema as read-only as in the Swagger above.
 
 ```tsp
 model ReadOnlyModel {}
