@@ -190,4 +190,3 @@ You can generally choose an asynchronous operation template that matches your op
 ### Visibility Changes for `nextLink` and `value` Properties
 
 For the `nextLink` and `value` properties of pageable operation response model, some older specifications marked these values as `readOnly`. This has no impact on the API or on SDKs, you can safely ignore this difference in the spec, and any resulting breaking change violation.
-

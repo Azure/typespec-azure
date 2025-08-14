@@ -61,11 +61,11 @@ interface YourResources {
 }
 ```
 
-`Azure.ResourceManager.ResourceListResult` makes the `value` property in `{YourResource}ListResult` required, and the type of the `nextLink` property becomes `url`. 
+`Azure.ResourceManager.ResourceListResult` makes the `value` property in `{YourResource}ListResult` required, and the type of the `nextLink` property becomes `url`.
 
 ## Handling "readOnly" in Model Schemas
 
-The `"readOnly": true` property should only be used on properties, not on models. If a model is mistakenly markedas readOnly and other models refer to it, like this:
+The `"readOnly": true` property should only be used on properties, not on models. If a model is mistakenly marked as readOnly and other models refer to it, like this:
 
 ```json
 "ReadOnlyModel": {
