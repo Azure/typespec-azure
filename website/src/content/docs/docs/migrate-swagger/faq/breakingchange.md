@@ -189,7 +189,7 @@ You can generally choose an asynchronous operation template that matches your op
 
 ### Visibility Changes for `nextLink` and `value` Properties
 
-Some older specifications marked these values as `readOnly`. To fix, simply add the following augment decorator statements to your `main.tsp` file:
+Some older specifications marked these values as `readOnly`. This has no impact on the API or on SDKs, you can safely ignore this difference in the spec, and any resulting braking change violation.
 
 ```tsp
 @@visibility(Azure.Core.Page.value, "read");
