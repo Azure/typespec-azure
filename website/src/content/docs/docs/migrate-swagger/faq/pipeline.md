@@ -8,7 +8,7 @@ This document explains how to resolve pipeline failures in TypeSpec migration PR
 
 ### Multiple Swagger Files Before Migration
 
-This pipeline will fail if you have more than one Swagger file in your latest version. See the detailed explanation in this [issue](https://github.com/Azure/typespec-azure/issues/2194#issue-2844564216).
+This pipeline will fail if there is more than one Swagger file in the latest version. See the detailed explanation in this [issue](https://github.com/Azure/typespec-azure/issues/2194#issue-2844564216).
 
 To properly identify real breaking changes, use the "TypeSpec Migration Validation" pipeline instead:
 
