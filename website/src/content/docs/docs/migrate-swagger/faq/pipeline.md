@@ -8,7 +8,7 @@ This document explains how to resolve pipeline failures in TypeSpec migration PR
 
 ### Multiple Swagger Files Before Migration
 
-This pipeline will fail if you have more than one Swagger file in your latest version. See the detailed explanation in this [issue](https://github.com/Azure/typespec-azure/issues/2194#issue-2844564216).
+This pipeline will fail if there is more than one Swagger file in the latest version. See the detailed explanation in this [issue](https://github.com/Azure/typespec-azure/issues/2194#issue-2844564216).
 
 To properly identify real breaking changes, use the "TypeSpec Migration Validation" pipeline instead:
 
@@ -21,7 +21,7 @@ To properly identify real breaking changes, use the "TypeSpec Migration Validati
 
 If you have only one Swagger file in your latest version, use this pipeline to detect breaking changes. If it fails, refer to [Resolving Swagger Breaking Change Violations](./faq/breakingchange.md).
 
-**Known Issues**: The following pipeline failures are false alerts and can be safely ignored if you encounter the same situations:
+**Known Issues**: The following pipeline failures are false alerts and can be safely ignored:
 
 #### 1017 - ReferenceRedirection
 
@@ -70,7 +70,7 @@ This typically occurs when an inlined anonymous enum becomes a named enum.
 
 #### 1023 - TypeFormatChanged
 
-If you see the error message `The new version has a different format 'uri' than the previous one ''.` on the `nextLink` property, this is expected because the [page template defines the `nextLink` as `uri`](./mustread.md#using-page-model-from-azurecore-library).
+The error message `The new version has a different format 'uri' than the previous one ''.` on the `nextLink` property is expected because the [page template defines the `nextLink` as `uri`](./mustread.md#using-page-model-from-azurecore-library).
 
 #### 1047 - XmsEnumChanged
 
@@ -151,7 +151,7 @@ model ResponseModel {
 
 #### Root Cause
 
-This error typically occurs when your custom resource definition is mapped to a resource defined in common-types. See [this section](./breakingchange.md#using-resources-from-common-types) for details. The `id` property for `Resource` in common-types uses the `arm-id` format.
+This error typically occurs when a custom resource definition is mapped to a resource defined in common-types. See [this section](./breakingchange.md#using-resources-from-common-types) for details. The `id` property for `Resource` in common-types may use the `arm-id` format, depending on the version of common-types used.
 
 #### Resolution
 

@@ -2,9 +2,9 @@
 title: Frequently Asked Questions
 ---
 
-### Can I rename the generated Swagger file?
+### Renaming the generated Swagger file
 
-Yes, you can rename the generated Swagger file by modifying the `output-file` option in your `tspconfig.yaml`:
+Rename the generated Swagger file by modifying the `output-file` option in your `tspconfig.yaml`:
 
 ```yaml
 options:
@@ -12,9 +12,9 @@ options:
     output-file: "your-meaningful-name.json"
 ```
 
-### How should I structure files for ARM services?
+### File Layout for ARM Services
 
-For ARM services, we recommend the following file structure:
+For ARM services, use the following file structure:
 
 - **main.tsp**: Entry point for the TypeSpec specification containing service information
 - **{resource-name}.tsp**: Resource-specific operations for each ARM resource type
@@ -23,4 +23,4 @@ For ARM services, we recommend the following file structure:
 - **(optional) client.tsp**: Client-specific customizations and configurations
 - **(optional) back-compatible.tsp**: Backward compatibility definitions and legacy support
 
-This structure helps maintain clear separation of concerns and makes your TypeSpec specification easier to navigate and maintain.
+This structure helps maintain a clear separation of concerns between the API description and the client SDK and makes the TypeSpec specification easier to navigate and maintain.
