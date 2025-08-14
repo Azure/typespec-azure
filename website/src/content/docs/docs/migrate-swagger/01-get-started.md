@@ -91,7 +91,7 @@ You will need to compare the Swagger generated from TypeSpec with your original 
 
 - In the `readme.md` file, under the latest tag, change the `input-file` to the swagger generated from TypeSpec.
 - If the generated swagger file(s) for the latest version changed name, delete the old swagger file(s) no longer referenced in README.md.
-- Create PR with your TypeSpec files, changed swagger files (examples included) and readme file.
+- Create a PR with the TypeSpec files, changed swagger files (examples included) and readme file.
 - Check CI failures. Refer to [Resolving Pipeline failures](./faq/pipeline.md)
 
 ## How to Get Help
