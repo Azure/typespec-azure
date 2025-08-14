@@ -9,7 +9,7 @@ using Rest;
 using Azure.ResourceManager.Private;
 
 /**
- * DEPRECATED: User CreateOrReplaceAsync instead.
+ * DEPRECATED: Use CreateOrReplaceAsync instead.
  * A long-running resource CreateOrUpdate (PUT)
  * @template TargetResource the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
  * @template ExtensionResource the resource being created or updated

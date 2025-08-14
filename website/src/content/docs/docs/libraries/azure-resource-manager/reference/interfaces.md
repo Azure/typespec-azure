@@ -2325,7 +2325,7 @@ op Azure.ResourceManager.Legacy.RoutedOperations.ActionAsync(body: Request): Res
 
 ### `ArmListSinglePageByParent` {#Azure.ResourceManager.Legacy.ArmListSinglePageByParent}
 
-A resource list operation, at the scope of the resource's parent that lists only a single
+A resource list operation, at the scope of the resource's parent that lists only a single page.
 
 ```typespec
 op Azure.ResourceManager.Legacy.ArmListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
@@ -2403,27 +2403,6 @@ Synchronous PUT operation for Azure Resource Manager resources
 
 ```typespec
 op Azure.ResourceManager.Legacy.CreateOrReplaceSync(provider: "Microsoft.ThisWillBeReplaced", resource: Request): Response | Error
-```
-
-#### Template Parameters
-
-| Name                | Description                                                     |
-| ------------------- | --------------------------------------------------------------- |
-| Resource            | the resource being created or replaced                          |
-| Request             | The request body for the operation                              |
-| BaseParameters      | Optional. Allows overriding the operation parameters            |
-| Parameters          | Optional. Additional parameters after the path parameters       |
-| Response            | Optional. The success response for the createOrUpdate operation |
-| Error               | Optional. The error response, if non-standard.                  |
-| OptionalRequestBody | Optional. Indicates whether the request body is optional        |
-
-### `CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.CreateOrUpdateSync}
-
-DEPRECATED: use CreateOrReplaceSync instead.
-Synchronous PUT operation for Azure Resource Manager resources
-
-```typespec
-op Azure.ResourceManager.Legacy.CreateOrUpdateSync(provider: "Microsoft.ThisWillBeReplaced", resource: Request): Response | Error
 ```
 
 #### Template Parameters

@@ -568,12 +568,7 @@ op CreateOrReplaceAsync<
  * @template Error Optional. The error response, if non-standard.
  * @template OptionalRequestBody Optional. Indicates whether the request body is optional
  */
-@autoRoute
-@doc("Create a {name}", Resource)
-@armResourceCreateOrUpdate(Resource)
-@Private.enforceConstraint(Resource, Foundations.Resource)
-@put
-op CreateOrUpdateSync<
+alias CreateOrUpdateSync<
   Resource extends Foundations.SimpleResource,
   Request extends {} | void = Resource,
   BaseParameters = DefaultBaseParameters<Resource>,
@@ -581,7 +576,7 @@ op CreateOrUpdateSync<
   Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
   Error extends {} = ErrorResponse,
   OptionalRequestBody extends valueof boolean = false
-> is CreateOrReplaceSync<
+> = CreateOrReplaceSync<
   Resource,
   Request,
   BaseParameters,
@@ -644,7 +639,7 @@ op ArmListSinglePageBySubscription<
 > is ArmReadOperation<SubscriptionScope<Resource> & Parameters, Response, Error>;
 
 /**
- * A resource list operation, at the scope of the resource's parent that lists only a single
+ * A resource list operation, at the scope of the resource's parent that lists only a single page.
  * @template Resource the resource being patched
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template ParentName Optional. The name of the parent resource
