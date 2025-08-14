@@ -63,3 +63,30 @@ alias EntityTagProperty = {
   @visibility(Lifecycle.Read)
   etag?: string;
 };
+
+/**
+ * Legacy. Model representing a non-standard `extendedLocation` envelope property with all properties optional.
+ * Spread this model into a Resource Model, if you are converting a BrownField API with extended location that has optional properties
+ *
+ * @example
+ * ```typespec
+ * model Employee is TrackedResource<EmployeeProperties> {
+ * ...ResourceNameParameter<Employee>;
+ * ...ExtendedLocationOptionalProperty;
+ * }
+ * ```
+ */
+model ExtendedLocationOptionalProperty {
+  @visibility(Lifecycle.Read, Lifecycle.Create)
+  extendedLocation?: ExtendedLocationOptional;
+}
+
+/** The complex type of the extended location. */
+@friendlyName("ExtendedLocation")
+model ExtendedLocationOptional {
+  /** The name of the extended location. */
+  name?: string;
+
+  /** The type of the extended location. */
+  type?: Azure.ResourceManager.Foundations.ExtendedLocationType;
+}

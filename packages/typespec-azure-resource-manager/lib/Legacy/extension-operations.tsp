@@ -8,6 +8,42 @@ using Azure.ResourceManager.Foundations;
 using Rest;
 using Azure.ResourceManager.Private;
 
+/**
+ * DEPRECATED: Use CreateOrReplaceAsync instead.
+ * A long-running resource CreateOrUpdate (PUT)
+ * @template TargetResource the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
+ * @template ExtensionResource the resource being created or updated
+ * @template Request Optional. The request body for the createOrUpdate operation
+ * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
+ * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Response Optional. The success response for the createOrUpdate operation
+ * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. If true, the request body is optional
+ */
+alias CreateOrUpdateAsync<
+  TargetResource extends Foundations.SimpleResource,
+  ExtensionResource extends Foundations.SimpleResource,
+  Request extends {} | void = ExtensionResource,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = ExtensionResource> &
+    Azure.Core.Foundations.RetryAfterHeader,
+  Parameters extends {} = {},
+  Response extends {} = ArmResourceUpdatedResponse<ExtensionResource> | ArmResourceCreatedResponse<
+    ExtensionResource,
+    LroHeaders
+  >,
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false
+> = CreateOrReplaceAsync<
+  TargetResource,
+  ExtensionResource,
+  Request,
+  LroHeaders,
+  Parameters,
+  Response,
+  Error,
+  OptionalRequestBody
+>;
+
 /** A long-running resource CreateOrUpdate (PUT)
  * @template TargetResource the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup
  * @template ExtensionResource the resource being created or updated
@@ -25,7 +61,7 @@ using Azure.ResourceManager.Private;
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 @Azure.Core.Foundations.Private.defaultFinalStateVia(#["location", "azure-async-operation"])
 @put
-op CreateOrUpdateAsync<
+op CreateOrReplaceAsync<
   TargetResource extends Foundations.SimpleResource,
   ExtensionResource extends Foundations.SimpleResource,
   Request extends {} | void = ExtensionResource,

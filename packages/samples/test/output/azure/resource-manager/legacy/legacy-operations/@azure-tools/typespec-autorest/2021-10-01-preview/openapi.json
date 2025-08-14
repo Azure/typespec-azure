@@ -496,6 +496,30 @@
     }
   },
   "definitions": {
+    "Azure.ResourceManager.CommonTypes.ExtendedLocationType": {
+      "type": "string",
+      "description": "The supported ExtendedLocation types.",
+      "enum": [
+        "EdgeZone",
+        "CustomLocation"
+      ],
+      "x-ms-enum": {
+        "name": "ExtendedLocationType",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "EdgeZone",
+            "value": "EdgeZone",
+            "description": "Azure Edge Zones location type"
+          },
+          {
+            "name": "CustomLocation",
+            "value": "CustomLocation",
+            "description": "Azure Custom Locations type"
+          }
+        ]
+      }
+    },
     "Azure.ResourceManager.ResourceProvisioningState": {
       "type": "string",
       "description": "The provisioning state of a resource type.",
@@ -535,6 +559,13 @@
           "$ref": "#/definitions/BestPracticeProperties",
           "description": "The resource-specific properties for this resource.",
           "x-ms-client-flatten": true
+        },
+        "extendedLocation": {
+          "$ref": "#/definitions/ExtendedLocation",
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
         }
       },
       "allOf": [
@@ -600,6 +631,20 @@
         "description": {
           "type": "string",
           "description": "The description of the best practice"
+        }
+      }
+    },
+    "ExtendedLocation": {
+      "type": "object",
+      "description": "The complex type of the extended location.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the extended location."
+        },
+        "type": {
+          "$ref": "#/definitions/Azure.ResourceManager.CommonTypes.ExtendedLocationType",
+          "description": "The type of the extended location."
         }
       }
     }
