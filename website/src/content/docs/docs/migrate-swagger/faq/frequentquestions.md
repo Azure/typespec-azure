@@ -12,7 +12,7 @@ options:
     output-file: "your-meaningful-name.json"
 ```
 
-### How should I structure files for ARM services?
+### File Layout for ARM Services
 
 For ARM services, we recommend the following file structure:
 
