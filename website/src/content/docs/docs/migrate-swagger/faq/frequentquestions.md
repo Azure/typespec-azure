@@ -2,7 +2,7 @@
 title: Frequently Asked Questions
 ---
 
-### Can I rename the generated Swagger file?
+### Renaming the generated Swagger file
 
 Yes, you can rename the generated Swagger file by modifying the `output-file` option in your `tspconfig.yaml`:
 
