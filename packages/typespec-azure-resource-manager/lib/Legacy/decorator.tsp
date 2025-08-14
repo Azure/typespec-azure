@@ -12,11 +12,19 @@ model ArmOperationOptions {
   /** The status route for operations to use */
   route?: string;
 }
+
+/** Options for customizing the behavior of a custom azure resource */
+model CustomResourceOptions {
+  /** Should the resource be marked as an Azure resource */
+  isAzureResource?: boolean;
+}
+
 /**
  * This decorator is used on resources that do not satisfy the definition of a resource
  * but need to be identified as such.
+ * @param options Options for customizing the behavior of the resource
  */
-extern dec customAzureResource(target: Model);
+extern dec customAzureResource(target: Model, options?: valueof CustomResourceOptions);
 
 /**
  * Specify an external reference that should be used when emitting this type.
@@ -31,3 +39,9 @@ extern dec externalTypeRef(entity: Model | ModelProperty, jsonRef: valueof strin
  * @param route Optional route to associate with the operation
  */
 extern dec armOperationRoute(target: Operation, route?: valueof ArmOperationOptions);
+
+/**
+ * Signifies that a Resource is represented using a library type in generated SDKs.
+ * @param target The model to that is an external resource
+ */
+extern dec armExternalType(target: Model);
