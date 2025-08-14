@@ -340,9 +340,9 @@ Azure.ResourceManager common types.
 
 ##### Parameters
 
-| Name     | Type             | Description |
-| -------- | ---------------- | ----------- |
-| provider | `valueof string` |             |
+| Name     | Type             | Description                                                         |
+| -------- | ---------------- | ------------------------------------------------------------------- |
+| provider | `valueof string` | Optional. The resource provider namespace for the virtual resource. |
 
 #### `@extensionResource`
 
@@ -429,9 +429,9 @@ This decorator sets the base type of the given resource.
 
 ##### Parameters
 
-| Name       | Type                                                                         | Description |
-| ---------- | ---------------------------------------------------------------------------- | ----------- |
-| baseTypeIt | `"Tenant" \| "Subscription" \| "ResourceGroup" \| "Location" \| "Extension"` |             |
+| Name       | Type                                                                         | Description                                                                                                            |
+| ---------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| baseTypeIt | `"Tenant" \| "Subscription" \| "ResourceGroup" \| "Location" \| "Extension"` | The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension" |
 
 #### `@resourceGroupResource`
 
