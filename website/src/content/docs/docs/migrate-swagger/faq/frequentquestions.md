@@ -23,4 +23,4 @@ For ARM services, use the following file structure:
 - **(optional) client.tsp**: Client-specific customizations and configurations
 - **(optional) back-compatible.tsp**: Backward compatibility definitions and legacy support
 
-This structure helps maintain clear separation of concerns and makes your TypeSpec specification easier to navigate and maintain.
+This structure helps maintain a clear separation of concerns between the API description and the client SDK and makes the TypeSpec specification easier to navigate and maintain.
