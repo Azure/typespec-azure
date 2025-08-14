@@ -17,6 +17,7 @@ import "./decorators.tsp";
 import "./interfaces.tsp";
 import "./responses.tsp";
 import "./parameters.tsp";
+import "./private-endpoints.tsp";
 
 using Http;
 using Rest;
