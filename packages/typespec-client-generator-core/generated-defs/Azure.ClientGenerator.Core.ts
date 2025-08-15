@@ -751,9 +751,8 @@ export type ResponseAsBoolDecorator = (
 ) => void;
 
 /**
- * Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name.
- * This decorator allows you to change the client an operation belongs to in the client SDK.
- * This decorator cannot be used along with `@client` or `@operationGroup` decorators.
+ * Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name. For this usage, the decorator cannot be used along with `@client` or `@operationGroup` decorators.
+ * Change the parameter location to operation or client. For this usage, the decorator cannot be used in the parameter defined in  `@clientInitialization` decorator.
  *
  * @param source The operation to change location for.
  * @param target The target `Namespace`, `Interface` or a string which can indicate the client.
@@ -814,11 +813,27 @@ export type ResponseAsBoolDecorator = (
  * }
  *
  * ```
+ * @example Move parameter from operation to client
+ * ```typespec
+ * @service
+ * namespace MyClient;
+ *
+ * getHealthStatus(
+ *   @clientLocation(MyClient) // This parameter will be moved to the `.clientInitialization` parameters of `MyClient`. It will not appear on the operation-level.
+ *   clientId: string
+ * ): void;
+ * ```
+ * @example Move parameter from client to operation
+ * ```typespec
+ * // client.tsp
+ *
+ * @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, get); // This will keep the `subscriptionId` parameter on the operation level instead of applying TCGC's default logic of elevating `subscriptionId` to client.
+ * ```
  */
 export type ClientLocationDecorator = (
   context: DecoratorContext,
-  source: Operation,
-  target: Interface | Namespace | string,
+  source: Operation | ModelProperty,
+  target: Interface | Namespace | Operation | string,
   scope?: string,
 ) => void;
 

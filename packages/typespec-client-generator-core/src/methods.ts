@@ -68,11 +68,11 @@ import {
   getAllResponseBodiesAndNonBodyExists,
   getAvailableApiVersions,
   getClientDoc,
+  getCorrespondingClientParam,
   getHashForType,
   getTypeDecorators,
   isNeverOrVoidType,
   isSubscriptionId,
-  twoParamsEquivalent,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import {
@@ -706,19 +706,13 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     if (isNeverOrVoidType(param.type)) continue;
     const sdkMethodParam = diagnostics.pipe(getSdkMethodParameter(context, param, operation));
     if (sdkMethodParam.onClient) {
-      const operationLocation = context.getClientForOperation(operation);
+      // add API version and subscription ID parameters to the client parameters
       if (sdkMethodParam.isApiVersionParam) {
-        if (
-          !context.__clientParametersCache.get(operationLocation)?.find((x) => x.isApiVersionParam)
-        ) {
+        if (!clientParams.find((x) => x.isApiVersionParam)) {
           clientParams.push(sdkMethodParam);
         }
       } else if (isSubscriptionId(context, param)) {
-        if (
-          !context.__clientParametersCache
-            .get(operationLocation)
-            ?.find((x) => isSubscriptionId(context, x))
-        ) {
+        if (!clientParams.find((x) => isSubscriptionId(context, x))) {
           clientParams.push(sdkMethodParam);
         }
       }
@@ -778,14 +772,10 @@ export function getSdkMethodParameter(
   let property = context.__methodParameterCache?.get(type);
 
   if (!property) {
+    // for parameter that has elevated to client or parent client, we will use the client parameter directly
     if (operation) {
-      const clientParams = operation
-        ? context.__clientParametersCache.get(context.getClientForOperation(operation))
-        : undefined;
-      const correspondingClientParams = clientParams?.find((x) =>
-        twoParamsEquivalent(context, x.__raw, type),
-      );
-      if (correspondingClientParams) return diagnostics.wrap(correspondingClientParams);
+      const correspondingClientParam = getCorrespondingClientParam(context, type, operation);
+      if (correspondingClientParam) return diagnostics.wrap(correspondingClientParam);
     }
 
     property = {
