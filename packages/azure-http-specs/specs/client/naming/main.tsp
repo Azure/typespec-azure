@@ -144,7 +144,8 @@ namespace Header {
 
 @route("/model")
 @operationGroup
-@clientName("ModelClient")
+@clientName("ModelClient", "csharp")
+@clientName("ClientModel", "!csharp")
 namespace Model {
   @clientName("CSModel", "csharp")
   @clientName("GoModel", "go")
