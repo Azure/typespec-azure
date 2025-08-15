@@ -97,6 +97,14 @@ serviceClientClient.stableFunctionality(stableModel);
 ```
 
 ```go
+type StableModel struct {
+// REQUIRED
+	StableFeature *string
+}
+type ServiceClientStableFunctionalityOptions struct {}
+type ServiceClientStableFunctionalityResponse struct {}
+type ServiceClient struct {}
+func (client *ServiceClient) StableFunctionality(ctx context.Context, stableModel StableModel, options *ServiceClientStableFunctionalityOptions) (ServiceClientStableFunctionalityResponse, error) {}
 
 ```
 
@@ -216,6 +224,17 @@ serviceClientClient.stableFunctionality(stableModel);
 ```
 
 ```go
+type StableModel struct {
+	StableFeature *string
+}
+
+type ServiceClientStableFunctionalityOptions struct {}
+
+type ServiceClientStableFunctionalityResponse struct {}
+
+type ServiceClient struct {}
+
+func (client *ServiceClient) StableFunctionality(ctx context.Context, stableModel StableModel, options *ServiceClientStableFunctionalityOptions) (ServiceClientStableFunctionalityResponse, error) {}
 
 ```
 
@@ -348,7 +367,7 @@ serviceClientClient.previewFunctionality(previewModel);
 ```
 
 ```go
-
+// TODO
 ```
 
 </ClientTabs>
@@ -448,7 +467,19 @@ client.get(); // version parameter is elevated onto the client
 ```
 
 ```go
-// TODO
+type Versions string
+
+const (
+	v2023_11_01 Versions = "2023-11-01"
+	v2024_04_01 Versions = "2024-04-01"
+)
+
+type Client struct {
+	// ...
+}
+
+func (c *Client) Get(ctx context.Context, version Versions, options *RequestOptions) (Response, error) {}
+
 ```
 
 </ClientTabs>
