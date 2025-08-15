@@ -1,0 +1,79 @@
+---
+title: Common Scenarios
+---
+
+import { ClientTabs, ClientTabItem } from "@components/client-tabs";
+
+This page documents different behaviors of various language SDKs for some common scenarios.
+
+## Duplicated Models
+
+TypeSpec allows users to define models with the same name in different namespaces. However, different language SDKs handle this scenario in various ways.
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+namespace Service;
+
+model Foo {
+  prop: string;
+}
+
+namespace SubService {
+  model Foo {
+    name: string;
+  }
+}
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="python">
+
+Python emits all models in the same namespace, so you must rename one of the models to avoid generation conflicts.
+
+To resolve this, use the `@clientName` decorator in your `client.tsp` file:
+
+```python
+# In client.tsp, add:
+# @@clientName(Service.SubService.Foo, "SubFoo", "python");
+
+# Generated Python code:
+# models/_models.py
+
+class Foo():
+    ...
+class SubFoo():
+    ...
+
+# Usage
+from service.models import Foo, SubFoo
+
+foo = Foo(prop="hello")
+subfoo = SubFoo(name="world")
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+```csharp
+// TODO
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
+
+```typescript
+// TODO
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+```java
+// TODO
+```
+
+</ClientTabItem>
+</ClientTabs>
