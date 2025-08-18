@@ -3384,6 +3384,45 @@ model Azure.ResourceManager.Legacy.CustomResourceOptions
 | ---------------- | --------- | -------------------------------------------------- |
 | isAzureResource? | `boolean` | Should the resource be marked as an Azure resource |
 
+### `ExtendedLocationOptional` {#Azure.ResourceManager.Legacy.ExtendedLocationOptional}
+
+The complex type of the extended location.
+
+```typespec
+model Azure.ResourceManager.Legacy.ExtendedLocationOptional
+```
+
+#### Properties
+
+| Name  | Type                                                                                             | Description                        |
+| ----- | ------------------------------------------------------------------------------------------------ | ---------------------------------- |
+| name? | `string`                                                                                         | The name of the extended location. |
+| type? | [`ExtendedLocationType`](./data-types.md#Azure.ResourceManager.CommonTypes.ExtendedLocationType) | The type of the extended location. |
+
+### `ExtendedLocationOptionalProperty` {#Azure.ResourceManager.Legacy.ExtendedLocationOptionalProperty}
+
+Legacy. Model representing a non-standard `extendedLocation` envelope property with all properties optional.
+Spread this model into a Resource Model, if you are converting a BrownField API with extended location that has optional properties
+
+```typespec
+model Azure.ResourceManager.Legacy.ExtendedLocationOptionalProperty
+```
+
+#### Examples
+
+```typespec
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+  ...ExtendedLocationOptionalProperty;
+}
+```
+
+#### Properties
+
+| Name              | Type                                                                                                | Description |
+| ----------------- | --------------------------------------------------------------------------------------------------- | ----------- |
+| extendedLocation? | [`ExtendedLocationOptional`](./data-types.md#Azure.ResourceManager.Legacy.ExtendedLocationOptional) |             |
+
 ### `LegacyTrackedResource` {#Azure.ResourceManager.Legacy.LegacyTrackedResource}
 
 A tracked resource with the 'location' property optional
