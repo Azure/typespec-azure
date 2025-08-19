@@ -45,6 +45,7 @@ model TrackedResource extends Resource {
 
   /** The geo-location where the resource lives */
   @visibility(Lifecycle.Read, Lifecycle.Create)
+  @Legacy.inlineAzureType
   location: string;
 }
 
@@ -519,6 +520,7 @@ model LocationParameter {
   @path
   @minLength(1)
   @segment("locations")
+  @Legacy.inlineAzureType
   location: string;
 }
 

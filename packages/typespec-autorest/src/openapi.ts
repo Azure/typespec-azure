@@ -17,6 +17,7 @@ import {
   getArmKeyIdentifiers,
   getCustomResourceOptions,
   getExternalTypeRef,
+  getInlineAzureType,
   isArmCommonType,
   isArmExternalType,
   isArmProviderNamespace,
@@ -966,10 +967,15 @@ export async function getOpenAPIForService(
     }
     return undefined;
   }
-  function shouldInlineCoreScalar(type: Type): boolean {
-    if (type.kind !== "Scalar" || type.namespace === undefined) return false;
-    const nsName = getNamespaceFullName(type.namespace);
-    return nsName === "Azure.Core" && type.name === "azureLocation";
+  function shouldInlineCoreScalarProperty(type: Type): boolean {
+    if (
+      type.kind !== "ModelProperty" ||
+      type.type.kind !== "Scalar" ||
+      type.type.namespace === undefined
+    )
+      return false;
+    const nsName = getNamespaceFullName(type.type.namespace);
+    return nsName === "Azure.Core" && getInlineAzureType(program, type) === true;
   }
   function getSchemaOrRef(type: Type, schemaContext: SchemaContext, namespace?: Namespace): any {
     let schemaNameOverride: ((name: string, visibility: Visibility) => string) | undefined =
@@ -1011,7 +1017,7 @@ export async function getOpenAPIForService(
     type = metadataInfo.getEffectivePayloadType(type, schemaContext.visibility);
     const name = getOpenAPITypeName(program, type, typeNameOptions);
 
-    if (shouldInline(program, type) || shouldInlineCoreScalar(type)) {
+    if (shouldInline(program, type)) {
       const schema = getSchemaForInlineType(type, name, schemaContext, namespace);
 
       if (schema === undefined && isErrorType(type)) {
@@ -2122,7 +2128,13 @@ export async function getOpenAPIForService(
         propSchema = getSchemaOrRef(prop.type, context);
       }
     } else {
-      propSchema = getSchemaOrRef(prop.type, context);
+      propSchema = shouldInlineCoreScalarProperty(prop)
+        ? getSchemaForInlineType(
+            prop.type,
+            getOpenAPITypeName(program, prop.type, typeNameOptions),
+            context,
+          )
+        : getSchemaOrRef(prop.type, context);
       applyArmIdentifiersDecorator(prop.type, propSchema, prop);
     }
 

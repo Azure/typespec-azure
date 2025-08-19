@@ -36,6 +36,7 @@ model LocationParameter {
   @armCommonParameter("LocationParameter", Azure.ResourceManager.CommonTypes.Versions.v3)
   @armCommonParameter("LocationParameter", Azure.ResourceManager.CommonTypes.Versions.v4)
   @armCommonParameter("LocationParameter", Azure.ResourceManager.CommonTypes.Versions.v5)
+  @Legacy.inlineAzureType
   @resourceParameterBaseFor([ResourceHome.Location])
   location: string;
 }

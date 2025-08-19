@@ -125,7 +125,7 @@ describe("azureLocation", () => {
     const res = await compileOpenAPI(
       `
      ${base}
-      model Pet { location: Azure.Core.azureLocation };
+      model Pet { @Azure.ResourceManager.Legacy.inlineAzureType location: Azure.Core.azureLocation };
       `,
       { preset: "azure" },
     );
@@ -143,7 +143,7 @@ describe("azureLocation", () => {
     const res = await compileOpenAPI(
       `
      ${base}
-      model Pet { /** The azure location */ location: Azure.Core.azureLocation };
+      model Pet { /** The azure location */ @Azure.ResourceManager.Legacy.inlineAzureType location: Azure.Core.azureLocation };
       `,
       { preset: "azure" },
     );
@@ -154,6 +154,24 @@ describe("azureLocation", () => {
     ok(res.definitions.Pet.properties.location, "expected definition named location");
     deepStrictEqual(res.definitions.Pet.properties.location, {
       type: "string",
+      description: "The azure location",
+    });
+  });
+  it("defines property with azureLocation type as ref without decorator", async () => {
+    const res = await compileOpenAPI(
+      `
+     ${base}
+      model Pet { /** The azure location */ location: Azure.Core.azureLocation };
+      `,
+      { preset: "azure" },
+    );
+
+    ok(res.definitions);
+    ok(res.definitions.Pet);
+    ok(res.definitions.Pet.properties);
+    ok(res.definitions.Pet.properties.location, "expected definition named location");
+    deepStrictEqual(res.definitions.Pet.properties.location, {
+      $ref: "#/definitions/Azure.Core.azureLocation",
       description: "The azure location",
     });
   });

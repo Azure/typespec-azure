@@ -52,9 +52,15 @@ export type ArmOperationRouteDecorator = (
  */
 export type ArmExternalTypeDecorator = (context: DecoratorContext, target: Model) => void;
 
+/**
+ * Signifies that a property can be treated as an inline type in emitters
+ */
+export type InlineAzureTypeDecorator = (context: DecoratorContext, target: ModelProperty) => void;
+
 export type AzureResourceManagerLegacyDecorators = {
   customAzureResource: CustomAzureResourceDecorator;
   externalTypeRef: ExternalTypeRefDecorator;
   armOperationRoute: ArmOperationRouteDecorator;
   armExternalType: ArmExternalTypeDecorator;
+  inlineAzureType: InlineAzureTypeDecorator;
 };

@@ -21,6 +21,7 @@ import {
   $customAzureResource,
   $extensionResource,
   $identifiers,
+  $inlineAzureType,
   $locationResource,
   $resourceBaseType,
   $resourceGroupResource,
@@ -62,6 +63,7 @@ export const $decorators = {
     externalTypeRef: $externalTypeRef,
     armOperationRoute: $armOperationRoute,
     armExternalType: $armExternalType,
+    inlineAzureType: $inlineAzureType,
   } satisfies AzureResourceManagerLegacyDecorators,
 };
 
