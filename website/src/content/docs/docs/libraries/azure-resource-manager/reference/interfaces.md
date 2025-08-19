@@ -1735,7 +1735,7 @@ interface Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, Ext
 A long-running resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Legacy.ExtensionOperations.CreateOrUpdateAsync(resource: Resource): Response | ErrorType
+op Azure.ResourceManager.Legacy.ExtensionOperations.CreateOrUpdateAsync(resource: Request): Response | ErrorType
 ```
 
 ##### Template Parameters
@@ -1749,25 +1749,27 @@ op Azure.ResourceManager.Legacy.ExtensionOperations.CreateOrUpdateAsync(resource
 | OptionalRequestBody | Optional. Indicates whether the request body is optional                |
 | ErrorType           | Optional. The error response, if non-standard.                          |
 | OperationOptions    | Optional. The route options for the operation.                          |
+| Request             | Optional. The request body for the createOrUpdate operation.            |
 
 #### `ExtensionOperations.CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.ExtensionOperations.CreateOrUpdateSync}
 
 A synchronous resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Legacy.ExtensionOperations.CreateOrUpdateSync(resource: Resource): Response | ErrorType
+op Azure.ResourceManager.Legacy.ExtensionOperations.CreateOrUpdateSync(resource: Request): Response | ErrorType
 ```
 
 ##### Template Parameters
 
-| Name                | Description                                               |
-| ------------------- | --------------------------------------------------------- |
-| Resource            | the resource being created or updated                     |
-| Parameters          | Optional. Additional parameters after the path parameters |
-| Response            | Optional. The success response(s) for the PUT operation   |
-| OptionalRequestBody | Optional. Indicates whether the request body is optional  |
-| ErrorType           | Optional. The error response, if non-standard.            |
-| OperationOptions    | Optional. The route options for the operation.            |
+| Name                | Description                                                  |
+| ------------------- | ------------------------------------------------------------ |
+| Resource            | the resource being created or updated                        |
+| Parameters          | Optional. Additional parameters after the path parameters    |
+| Response            | Optional. The success response(s) for the PUT operation      |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional     |
+| ErrorType           | Optional. The error response, if non-standard.               |
+| OperationOptions    | Optional. The route options for the operation.               |
+| Request             | Optional. The request body for the createOrUpdate operation. |
 
 #### `ExtensionOperations.CustomPatchAsync` {#Azure.ResourceManager.Legacy.ExtensionOperations.CustomPatchAsync}
 
@@ -1899,6 +1901,24 @@ op Azure.ResourceManager.Legacy.ExtensionOperations.List(): Response | ErrorType
 | ErrorType        | Optional. The error response, if non-standard.            |
 | OperationOptions | Optional. The route options for the operation.            |
 
+#### `ExtensionOperations.ListSinglePage` {#Azure.ResourceManager.Legacy.ExtensionOperations.ListSinglePage}
+
+List a resource, without pagination
+
+```typespec
+op Azure.ResourceManager.Legacy.ExtensionOperations.ListSinglePage(): Response | ErrorType
+```
+
+##### Template Parameters
+
+| Name             | Description                                               |
+| ---------------- | --------------------------------------------------------- |
+| Resource         | The resource being listed                                 |
+| Parameters       | Optional. Additional parameters after the path parameters |
+| Response         | Optional. The response returned by the list               |
+| ErrorType        | Optional. The error response, if non-standard.            |
+| OperationOptions | Optional. The route options for the operation.            |
+
 #### `ExtensionOperations.ActionSync` {#Azure.ResourceManager.Legacy.ExtensionOperations.ActionSync}
 
 A synchronous resource action.
@@ -1963,7 +1983,7 @@ interface Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, Resour
 A long-running resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateAsync(resource: Resource): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateAsync(resource: Request): Response | OverrideErrorType
 ```
 
 #### `LegacyOperations.CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateSync}
@@ -1971,7 +1991,7 @@ op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateAsync(resource: R
 A synchronous resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateSync(resource: Resource): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.LegacyOperations.CreateOrUpdateSync(resource: Request): Response | OverrideErrorType
 ```
 
 #### `LegacyOperations.CustomPatchAsync` {#Azure.ResourceManager.Legacy.LegacyOperations.CustomPatchAsync}
@@ -2099,7 +2119,7 @@ interface Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, Resour
 A long-running resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations.CreateOrUpdateAsync(resource: Resource): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations.CreateOrUpdateAsync(resource: Request): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2113,25 +2133,27 @@ op Azure.ResourceManager.Legacy.RoutedOperations.CreateOrUpdateAsync(resource: R
 | OptionalRequestBody  | Optional. Indicates whether the request body is optional                |
 | OverrideErrorType    | Optional. The error response, if non-standard.                          |
 | OverrideRouteOptions | Optional. The route options for the operation.                          |
+| Request              | Optional. The request body for the createOrUpdate operation.            |
 
 #### `RoutedOperations.CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.RoutedOperations.CreateOrUpdateSync}
 
 A synchronous resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations.CreateOrUpdateSync(resource: Resource): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations.CreateOrUpdateSync(resource: Request): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
 
-| Name                 | Description                                               |
-| -------------------- | --------------------------------------------------------- |
-| Resource             | the resource being created or updated                     |
-| Parameters           | Optional. Additional parameters after the path parameters |
-| Response             | Optional. The success response(s) for the PUT operation   |
-| OptionalRequestBody  | Optional. Indicates whether the request body is optional  |
-| OverrideErrorType    | Optional. The error response, if non-standard.            |
-| OverrideRouteOptions | Optional. The route options for the operation.            |
+| Name                 | Description                                                  |
+| -------------------- | ------------------------------------------------------------ |
+| Resource             | the resource being created or updated                        |
+| Parameters           | Optional. Additional parameters after the path parameters    |
+| Response             | Optional. The success response(s) for the PUT operation      |
+| OptionalRequestBody  | Optional. Indicates whether the request body is optional     |
+| OverrideErrorType    | Optional. The error response, if non-standard.               |
+| OverrideRouteOptions | Optional. The route options for the operation.               |
+| Request              | Optional. The request body for the createOrUpdate operation. |
 
 #### `RoutedOperations.CustomPatchAsync` {#Azure.ResourceManager.Legacy.RoutedOperations.CustomPatchAsync}
 
@@ -2458,23 +2480,6 @@ op Azure.ResourceManager.Legacy.CustomPatchSync(provider: "Microsoft.ThisWillBeR
 | Error               | Optional. The error response, if non-standard.            |
 | OptionalRequestBody | Optional. Indicates whether the request body is optional  |
 
-### `ListSinglePageByParent` {#Azure.ResourceManager.Legacy.ListSinglePageByParent}
-
-```typespec
-op Azure.ResourceManager.Legacy.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
-```
-
-#### Template Parameters
-
-| Name           | Description                                                   |
-| -------------- | ------------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateEndpointConnection          |
-| Resource       | Optional. The PrivateEndpointConnection resource being listed |
-| BaseParameters | Optional. Allows overriding the operation parameters          |
-| Parameters     | Optional. Additional parameters after the path parameters     |
-| Response       | Optional. The success response for the list operation         |
-| Error          | Optional. The error response, if non-standard.                |
-
 ### `UpdateOperation` {#Azure.ResourceManager.Legacy.UpdateOperation}
 
 ```typespec
@@ -2574,3 +2579,102 @@ op Azure.ResourceManager.Legacy.Extension.CustomPatchSync(apiVersion: string, su
 | Response            | Optional. The success response for the patch operation                                                   |
 | Error               | Optional. The error response, if non-standard.                                                           |
 | OptionalRequestBody | Optional. Whether the request body is optional.                                                          |
+
+## Azure.ResourceManager.Legacy.PrivateEndpoints
+
+### `CreateOrReplaceAsync` {#Azure.ResourceManager.Legacy.PrivateEndpoints.CreateOrReplaceAsync}
+
+```typespec
+op Azure.ResourceManager.Legacy.PrivateEndpoints.CreateOrReplaceAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Request): Response | Error
+```
+
+#### Template Parameters
+
+| Name                | Description                                                             |
+| ------------------- | ----------------------------------------------------------------------- |
+| ParentResource      | the parent resource of the PrivateEndpointConnection                    |
+| Resource            | the PrivateEndpointConnection resource being created or updated         |
+| BaseParameters      | Optional. Allows overriding the operation parameters                    |
+| LroHeaders          | Optional. Allows overriding the lro headers returned on resource create |
+| Parameters          | Optional. Additional parameters after the path parameters               |
+| Response            | Optional. The success response for the createOrReplace operation        |
+| Error               | Optional. The error response, if non-standard.                          |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional.               |
+| Request             | Optional. The request body for the operation.                           |
+
+### `CreateOrReplaceSync` {#Azure.ResourceManager.Legacy.PrivateEndpoints.CreateOrReplaceSync}
+
+```typespec
+op Azure.ResourceManager.Legacy.PrivateEndpoints.CreateOrReplaceSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Request): Response | Error
+```
+
+#### Template Parameters
+
+| Name                | Description                                                     |
+| ------------------- | --------------------------------------------------------------- |
+| ParentResource      | the parent resource of the PrivateEndpointConnection            |
+| Resource            | the PrivateEndpointConnection resource being created or updated |
+| BaseParameters      | Optional. Allows overriding the operation parameters            |
+| Parameters          | Optional. Additional parameters after the path parameters       |
+| Response            | Optional. The success response for the createOrUpdate operation |
+| Error               | Optional. The error response, if non-standard.                  |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional.       |
+| Request             | Optional. The request body for the operation.                   |
+
+### `CustomPatchAsync` {#Azure.ResourceManager.Legacy.PrivateEndpoints.CustomPatchAsync}
+
+A long-running resource update using a custom PATCH payload (Asynchronous) to update a PrivateEndpointConnection to a resource.
+
+```typespec
+op Azure.ResourceManager.Legacy.PrivateEndpoints.CustomPatchAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, properties: PatchModel): Response | Error
+```
+
+#### Template Parameters
+
+| Name                | Description                                                                   |
+| ------------------- | ----------------------------------------------------------------------------- |
+| ParentResource      | the parent resource of the PrivateEndpointConnection                          |
+| Resource            | the PrivateEndpointConnection resource being updated                          |
+| PatchModel          | The input model for the PATCH request                                         |
+| BaseParameters      | Optional. Allows overriding the operation parameters                          |
+| LroHeaders          | Optional. Allows overriding the lro headers returned in the Accepted response |
+| Parameters          | Optional. Additional parameters after the path parameters                     |
+| Response            | Optional. The success response for the patch operation                        |
+| Error               | Optional. The error response, if non-standard.                                |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional.                     |
+
+### `CustomPatchSync` {#Azure.ResourceManager.Legacy.PrivateEndpoints.CustomPatchSync}
+
+```typespec
+op Azure.ResourceManager.Legacy.PrivateEndpoints.CustomPatchSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, properties: PatchModel): Response | Error
+```
+
+#### Template Parameters
+
+| Name                | Description                                                    |
+| ------------------- | -------------------------------------------------------------- |
+| ParentResource      | The parent resource of the PrivateEndpointConnection           |
+| Resource            | Optional. The PrivateEndpointConnection resource being patched |
+| PatchModel          | The input model for the PATCH request                          |
+| BaseParameters      | Optional. Allows overriding the operation parameters           |
+| Parameters          | Optional. Additional parameters after the path parameters      |
+| Response            | Optional. The success response for the patch operation         |
+| Error               | Optional. The error response, if non-standard.                 |
+| OptionalRequestBody | Optional. Indicates whether the request body is optional.      |
+
+### `ListSinglePageByParent` {#Azure.ResourceManager.Legacy.PrivateEndpoints.ListSinglePageByParent}
+
+```typespec
+op Azure.ResourceManager.Legacy.PrivateEndpoints.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+```
+
+#### Template Parameters
+
+| Name           | Description                                                   |
+| -------------- | ------------------------------------------------------------- |
+| ParentResource | the parent resource of the PrivateEndpointConnection          |
+| Resource       | Optional. The PrivateEndpointConnection resource being listed |
+| BaseParameters | Optional. Allows overriding the operation parameters          |
+| Parameters     | Optional. Additional parameters after the path parameters     |
+| Response       | Optional. The success response for the list operation         |
+| Error          | Optional. The error response, if non-standard.                |
