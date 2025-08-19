@@ -1,6 +1,5 @@
 using Http;
 using Rest;
-using OpenAPI;
 using Versioning;
 using Azure.Core;
 
@@ -45,6 +44,7 @@ model TrackedResource extends Resource {
 
   /** The geo-location where the resource lives */
   @visibility(Lifecycle.Read, Lifecycle.Create)
+  @Azure.ResourceManager.CommonTypes.Private.inlineAzureType
   location: string;
 }
 
@@ -519,6 +519,7 @@ model LocationParameter {
   @path
   @minLength(1)
   @segment("locations")
+  @Azure.ResourceManager.CommonTypes.Private.inlineAzureType
   location: string;
 }
 
