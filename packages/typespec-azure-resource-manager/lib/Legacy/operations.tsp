@@ -45,6 +45,7 @@ interface RoutedOperations<
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    * @template OverrideErrorType Optional. The error response, if non-standard.
    * @template OverrideRouteOptions Optional. The route options for the operation.
+   * @template Request Optional. The request body for the createOrUpdate operation.
    */
   @doc("Create a {name}", Resource)
   @armOperationRoute(OverrideRouteOptions)
@@ -63,12 +64,13 @@ interface RoutedOperations<
     >,
     OptionalRequestBody extends valueof boolean = false,
     OverrideErrorType extends {} = ErrorType,
-    OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute
+    OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
+    Request extends {} | void = Resource
   >(
     ...ParentParameters,
     ...ResourceTypeParameter,
     ...Parameters,
-    @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) resource: Resource,
+    @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) resource: Request,
   ): Response | OverrideErrorType;
 
   /**
@@ -79,6 +81,7 @@ interface RoutedOperations<
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    * @template OverrideErrorType Optional. The error response, if non-standard.
    * @template OverrideRouteOptions Optional. The route options for the operation.
+   * @template Request Optional. The request body for the createOrUpdate operation.
    */
   #suppress "@azure-tools/typespec-azure-core/no-private-usage"
   @armOperationRoute(OverrideRouteOptions)
@@ -92,12 +95,13 @@ interface RoutedOperations<
     Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
     OptionalRequestBody extends valueof boolean = false,
     OverrideErrorType extends {} = ErrorType,
-    OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute
+    OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
+    Request extends {} | void = Resource
   >(
     ...ParentParameters,
     ...ResourceTypeParameter,
     ...Parameters,
-    @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) resource: Resource,
+    @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) resource: Request,
   ): Response | OverrideErrorType;
 
   /**
@@ -118,7 +122,7 @@ interface RoutedOperations<
   @patch(#{ implicitOptionality: false })
   CustomPatchAsync<
     Resource extends Foundations.SimpleResource,
-    PatchModel extends {} = Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>,
+    PatchModel extends {} | void = Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>,
     LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
       Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
       Resource,
@@ -157,7 +161,7 @@ interface RoutedOperations<
   @patch(#{ implicitOptionality: false })
   CustomPatchSync<
     Resource extends Foundations.SimpleResource,
-    PatchModel extends {} = Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>,
+    PatchModel extends {} | void = Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>,
     Parameters extends {} = {},
     Response extends {} = ArmResponse<Resource>,
     OptionalRequestBody extends valueof boolean = false,
