@@ -7,10 +7,12 @@ import {
   Program,
   Union,
 } from "@typespec/compiler";
+import { useStateMap } from "@typespec/compiler/utils";
 import {
   ArmCommonDefinitionDecorator,
   ArmCommonParameterDecorator,
   ArmCommonTypesVersionsDecorator,
+  InlineAzureTypeDecorator,
 } from "../generated-defs/Azure.ResourceManager.CommonTypes.Private.js";
 import { ArmStateKeys } from "./state.js";
 
@@ -147,4 +149,15 @@ export const $armCommonTypesVersions: ArmCommonTypesVersionsDecorator = (
     type: enumType,
     allVersions: Array.from(enumType.members.values()).reverse(),
   });
+};
+
+export const [getInlineAzureType, setInlineAzureType] = useStateMap<ModelProperty, boolean>(
+  ArmStateKeys.inlineAzureType,
+);
+
+export const $inlineAzureType: InlineAzureTypeDecorator = (
+  context: DecoratorContext,
+  entity: ModelProperty,
+) => {
+  setInlineAzureType(context.program, entity, true);
 };
