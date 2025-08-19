@@ -828,7 +828,6 @@ export function findEntriesWithTarget<TSource extends Type, TTarget>(
     }
     if (target === targetValue) {
       results.push(type as TSource);
-      break;
     }
   }
   return results;
