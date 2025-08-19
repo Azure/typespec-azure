@@ -125,7 +125,7 @@ describe("azureLocation", () => {
     const res = await compileOpenAPI(
       `
      ${base}
-      model Pet { @Azure.ResourceManager.Legacy.inlineAzureType location: Azure.Core.azureLocation };
+      model Pet { @Azure.ResourceManager.CommonTypes.Private.inlineAzureType location: Azure.Core.azureLocation };
       `,
       { preset: "azure" },
     );
@@ -143,7 +143,7 @@ describe("azureLocation", () => {
     const res = await compileOpenAPI(
       `
      ${base}
-      model Pet { /** The azure location */ @Azure.ResourceManager.Legacy.inlineAzureType location: Azure.Core.azureLocation };
+      model Pet { /** The azure location */ @Azure.ResourceManager.CommonTypes.Private.inlineAzureType location: Azure.Core.azureLocation };
       `,
       { preset: "azure" },
     );

@@ -42,7 +42,6 @@ import {
   ArmExternalTypeDecorator,
   CustomAzureResourceDecorator,
   CustomResourceOptions,
-  InlineAzureTypeDecorator,
 } from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { reportDiagnostic } from "./lib.js";
 import {
@@ -1084,14 +1083,3 @@ export function resolveResourceBaseType(type?: string | undefined): ResourceBase
   }
   return resolvedType;
 }
-
-export const [getInlineAzureType, setInlineAzureType] = useStateMap<ModelProperty, boolean>(
-  ArmStateKeys.inlineAzureType,
-);
-
-export const $inlineAzureType: InlineAzureTypeDecorator = (
-  context: DecoratorContext,
-  entity: ModelProperty,
-) => {
-  setInlineAzureType(context.program, entity, true);
-};

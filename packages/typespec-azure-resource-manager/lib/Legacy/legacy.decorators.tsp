@@ -45,8 +45,3 @@ extern dec armOperationRoute(target: Operation, route?: valueof ArmOperationOpti
  * @param target The model to that is an external resource
  */
 extern dec armExternalType(target: Model);
-
-/**
- * Signifies that a property can be treated as an inline type in emitters
- */
-extern dec inlineAzureType(target: ModelProperty);
