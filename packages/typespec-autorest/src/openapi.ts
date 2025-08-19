@@ -70,6 +70,7 @@ import {
   getMinItems,
   getMinLength,
   getMinValue,
+  getNamespaceFullName,
   getPagingOperation,
   getPattern,
   getProperty,
@@ -965,6 +966,11 @@ export async function getOpenAPIForService(
     }
     return undefined;
   }
+  function shouldInlineCoreScalar(type: Type): boolean {
+    if (type.kind !== "Scalar" || type.namespace === undefined) return false;
+    const nsName = getNamespaceFullName(type.namespace);
+    return nsName === "Azure.Core" && type.name === "azureLocation";
+  }
   function getSchemaOrRef(type: Type, schemaContext: SchemaContext, namespace?: Namespace): any {
     let schemaNameOverride: ((name: string, visibility: Visibility) => string) | undefined =
       undefined;
@@ -1005,7 +1011,7 @@ export async function getOpenAPIForService(
     type = metadataInfo.getEffectivePayloadType(type, schemaContext.visibility);
     const name = getOpenAPITypeName(program, type, typeNameOptions);
 
-    if (shouldInline(program, type)) {
+    if (shouldInline(program, type) || shouldInlineCoreScalar(type)) {
       const schema = getSchemaForInlineType(type, name, schemaContext, namespace);
 
       if (schema === undefined && isErrorType(type)) {
