@@ -2063,6 +2063,16 @@ utf8JsonWriter.WriteStringValue(Prop.ToString());
 export interface Test {
   prop: Date;
 }
+
+export function testSerializer(item: Test): any {
+  return { prop: item["prop"].toISOString() };
+}
+
+export function testDeserializer(item: any): Test {
+  return {
+    prop: new Date(item["prop"]),
+  };
+}
 ```
 
 </ClientTabItem>

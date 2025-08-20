@@ -88,8 +88,6 @@ client.feed(Food(name="pork", "quantity="1"))
 ```
 
 ```typescript
-import { PetStoreClient,Food } from "@azure/package-name";
-
 const client = new PetStoreClient();
 const food:Food = {
     name: "food";
@@ -168,7 +166,13 @@ namespace Customization;
 ```
 
 ```typescript
-// TODO
+// model Food is updated to model Models
+const client = new PetStoreClient();
+const food:Models = {
+    name: "food";
+    quantity: 3;
+}
+client.feed(food);
 ```
 
 ```java

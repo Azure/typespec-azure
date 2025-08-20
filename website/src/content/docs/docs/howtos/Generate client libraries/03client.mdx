@@ -1202,6 +1202,23 @@ foodClient.Feed();
 ```
 
 ```typescript
+// Modular api layer
+export async function feed(
+  context: Client,
+  options: FeedOptionalParams = { requestOptions: {} },
+): Promise<void>;
+export async function pet(
+  context: Client,
+  options: PetOptionalParams = { requestOptions: {} },
+): Promise<void>;
+// Modular classical client layer
+export class PetActionClient {
+  pet(options: PetOptionalParams = { requestOptions: {} }): Promise<void>;
+}
+export class FoodClient {
+  feed(options: FeedOptionalParams = { requestOptions: {} }): Promise<void>;
+}
+// sample
 import { FoodClient, PetActionClient } from "@azure/package-name";
 
 const foodClient = new FoodClient();
@@ -1536,12 +1553,15 @@ NOT_SUPPORTED
 ```
 
 ```typescript
-import { StorageClient } from "@azure/package-name";
+export class StorageClient {
+  download(
+    blobName: string,
+    options: DownloadOptionalParams = { requestOptions: {} },
+  ): Promise<void>;
+}
 
 const client = new StorageClient();
-
-client.upload();
-client.download();
+client.download("blobName");
 ```
 
 ```java
