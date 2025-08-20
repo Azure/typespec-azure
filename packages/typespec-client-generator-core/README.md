@@ -581,25 +581,24 @@ model MyServiceClientOptions {
 
 #### `@clientLocation`
 
-Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name.
-This decorator allows you to change the client an operation belongs to in the client SDK.
-This decorator cannot be used along with `@client` or `@operationGroup` decorators.
+Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name. For this usage, the decorator cannot be used along with `@client` or `@operationGroup` decorators.
+Change the parameter location to operation or client. For this usage, the decorator cannot be used in the parameter defined in `@clientInitialization` decorator.
 
 ```typespec
-@Azure.ClientGenerator.Core.clientLocation(target: Interface | Namespace | valueof string, scope?: valueof string)
+@Azure.ClientGenerator.Core.clientLocation(target: Interface | Namespace | Operation | valueof string, scope?: valueof string)
 ```
 
 ##### Target
 
 The operation to change location for.
-`Operation`
+`Operation | ModelProperty`
 
 ##### Parameters
 
-| Name   | Type                                         | Description                                                                                                                                                                                                                                                |
-| ------ | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| target | `Interface \| Namespace` \| `valueof string` | The target `Namespace`, `Interface` or a string which can indicate the client.                                                                                                                                                                             |
-| scope  | `valueof string`                             | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| Name   | Type                                                      | Description                                                                                                                                                                                                                                                |
+| ------ | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| target | `Interface \| Namespace \| Operation` \| `valueof string` | The target `Namespace`, `Interface` or a string which can indicate the client.                                                                                                                                                                             |
+| scope  | `valueof string`                                          | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -661,6 +660,26 @@ interface ResourceOperations {
   @clientLocation(MoveToRootClient)
   getHealthStatus(): void; // This operation will be moved to the root client of MoveToRootClient namespace.
 }
+```
+
+###### Move parameter from operation to client
+
+```typespec
+@service
+namespace MyClient;
+
+getHealthStatus(
+  @clientLocation(MyClient) // This parameter will be moved to the `.clientInitialization` parameters of `MyClient`. It will not appear on the operation-level.
+  clientId: string
+): void;
+```
+
+###### Move parameter from client to operation
+
+```typespec
+// client.tsp
+
+@@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, get); // This will keep the `subscriptionId` parameter on the operation level instead of applying TCGC's default logic of elevating `subscriptionId` to client.
 ```
 
 #### `@clientName`

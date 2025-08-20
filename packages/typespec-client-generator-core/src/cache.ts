@@ -48,7 +48,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     // iterate client's interfaces and namespaces to find operation groups
     if (client.type.kind === "Namespace") {
       for (const subItem of client.type.namespaces.values()) {
-        const og = createOperationGroup(context, subItem, `${client.name}`);
+        const og = createOperationGroup(context, subItem, `${client.name}`, client);
         if (og) {
           groups.push(og);
         }
@@ -58,7 +58,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
           // Skip template interfaces
           continue;
         }
-        const og = createOperationGroup(context, subItem, `${client.name}`);
+        const og = createOperationGroup(context, subItem, `${client.name}`, client);
         if (og) {
           groups.push(og);
         }
@@ -95,6 +95,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         groupPath: `${clients[0].name}.${ogName}`,
         service: clients[0].service,
         subOperationGroups: [],
+        parent: clients[0],
       };
       context.__rawClientsOperationGroupsCache.set(ogName, og);
       clients[0].subOperationGroups!.push(og);
@@ -276,6 +277,7 @@ function createOperationGroup(
   context: TCGCContext,
   type: Namespace | Interface,
   groupPathPrefix: string,
+  parent?: SdkClient | SdkOperationGroup,
 ): SdkOperationGroup | undefined {
   let operationGroup: SdkOperationGroup | undefined;
   const service =
@@ -293,10 +295,16 @@ function createOperationGroup(
       operationGroup.groupPath = `${groupPathPrefix}.${getLibraryName(context, type)}`;
       operationGroup.service = service;
       operationGroup.subOperationGroups = [];
+      operationGroup.parent = parent;
 
       if (type.kind === "Namespace") {
         operationGroup.subOperationGroups =
-          buildHierarchyOfOperationGroups(context, type, operationGroup.groupPath) ?? [];
+          buildHierarchyOfOperationGroups(
+            context,
+            type,
+            operationGroup.groupPath,
+            operationGroup,
+          ) ?? [];
       }
     }
   } else {
@@ -308,12 +316,14 @@ function createOperationGroup(
         groupPath: `${groupPathPrefix}.${getLibraryName(context, type)}`,
         service,
         subOperationGroups: [],
+        parent,
       };
     }
 
     if (operationGroup && type.kind === "Namespace") {
       operationGroup.subOperationGroups =
-        buildHierarchyOfOperationGroups(context, type, operationGroup.groupPath) ?? [];
+        buildHierarchyOfOperationGroups(context, type, operationGroup.groupPath, operationGroup) ??
+        [];
     }
   }
 
@@ -350,17 +360,18 @@ function buildHierarchyOfOperationGroups(
   context: TCGCContext,
   type: Namespace,
   groupPathPrefix: string,
+  parent?: SdkClient | SdkOperationGroup,
 ): SdkOperationGroup[] | undefined {
   // build hierarchy of operation group
   const subOperationGroups: SdkOperationGroup[] = [];
   type.namespaces.forEach((ns) => {
-    const subOperationGroup = createOperationGroup(context, ns, groupPathPrefix);
+    const subOperationGroup = createOperationGroup(context, ns, groupPathPrefix, parent);
     if (subOperationGroup) {
       subOperationGroups.push(subOperationGroup);
     }
   });
   type.interfaces.forEach((i) => {
-    const subOperationGroup = createOperationGroup(context, i, groupPathPrefix);
+    const subOperationGroup = createOperationGroup(context, i, groupPathPrefix, parent);
     if (subOperationGroup) {
       subOperationGroups.push(subOperationGroup);
     }
