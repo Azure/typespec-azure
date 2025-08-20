@@ -54,13 +54,10 @@ def upload(
 export interface MultipartRequest {
   id: string;
   address: Address;
-  profileImage:
-    | FileContents
-    | { contents: FileContents; contentType?: string; filename?: string };
+  profileImage: FileContents | { contents: FileContents; contentType?: string; filename?: string };
   previousAddresses: Address[];
   pictures: Array<
-    | FileContents
-    | { contents: FileContents; contentType?: string; filename?: string }
+    FileContents | { contents: FileContents; contentType?: string; filename?: string }
   >;
 }
 
@@ -73,9 +70,7 @@ export function multipartRequestSerializer(item: MultipartRequest): any {
       name: "previousAddresses",
       body: addressArraySerializer(item["previousAddresses"]),
     },
-    ...item["pictures"].map((x: unknown) =>
-      createFilePartDescriptor("pictures", x),
-    ),
+    ...item["pictures"].map((x: unknown) => createFilePartDescriptor("pictures", x)),
   ];
 }
 
@@ -103,7 +98,7 @@ export async function upload(
 
 // Modular classical client layer
 export class TestServiceClient {
-   upload(
+  upload(
     body: MultipartRequest,
     options: UploadOptionalParams = { requestOptions: {} },
   ): Promise<void>;

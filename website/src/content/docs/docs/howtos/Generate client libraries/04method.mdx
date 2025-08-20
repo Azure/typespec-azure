@@ -1317,7 +1317,7 @@ export async function completions(
   context: Client,
   input: CompletionInput,
   options: CompletionsOptionalParams = { requestOptions: {} },
-): Promise<CompletionResult>; 
+): Promise<CompletionResult>;
 
 export async function analyze(
   context: Client,
@@ -1400,26 +1400,20 @@ public Response<long> B(string x, Cancellation token);
 export async function a(
   context: Client,
   x: number,
-  options: AOptionalParams = { requestOptions: {} }
+  options: AOptionalParams = { requestOptions: {} },
 ): Promise<number>;
 
 export async function b(
   context: Client,
   x: string,
-  options: BOptionalParams = { requestOptions: {} }
-): Promise<number>
+  options: BOptionalParams = { requestOptions: {} },
+): Promise<number>;
 
 // Modular classical client layer
 export class TestServiceClient {
-  b(
-    x: string,
-    options: BOptionalParams = { requestOptions: {} }
-  ): Promise<number>;
+  b(x: string, options: BOptionalParams = { requestOptions: {} }): Promise<number>;
 
-  a(
-    x: number,
-    options: AOptionalParams = { requestOptions: {} }
-  ): Promise<number>;
+  a(x: number, options: AOptionalParams = { requestOptions: {} }): Promise<number>;
 }
 ```
 
@@ -1531,14 +1525,12 @@ def get(self, *, etag: Optional[str] = None, match_condition: Optional[MatchCond
 // Modular api layer
 export async function get(
   context: Client,
-  options: GetOptionalParams = { requestOptions: {} }
+  options: GetOptionalParams = { requestOptions: {} },
 ): Promise<Response>;
 
 // Modular classical client layer
 export class TestServiceClient {
-  get(
-    options: GetOptionalParams = { requestOptions: {} }
-  ): Promise<Response>;
+  get(options: GetOptionalParams = { requestOptions: {} }): Promise<Response>;
 }
 ```
 
