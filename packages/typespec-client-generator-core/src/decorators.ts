@@ -864,7 +864,7 @@ export function getClientInitializationOptions(
     }
   }
 
-  let parametersModel = options?.properties.get("parameters");
+  let parametersModel = options?.properties.get("parameters")?.type;
   const movedParameters = findEntriesWithTarget<ModelProperty, Namespace | Interface>(
     context,
     clientLocationKey,
