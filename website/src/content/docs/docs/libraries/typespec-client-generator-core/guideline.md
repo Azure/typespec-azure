@@ -239,7 +239,6 @@ If a detected client or sub client does not contain any sub client or operation,
 Normally, a client's initialization parameters include:
 
 1. **Endpoint parameter**: Converted from `@server` definition on the service the client belongs to.
-
    - If the server URL is a constant, TCGC returns a templated endpoint with a default value of the constant server URL.
    - When the endpoint has additional template arguments, the type is a union of a completely-overridable endpoint and an endpoint that accepts template arguments.
    - If there are multiple servers, TCGC returns the union of all possibilities.
@@ -247,7 +246,6 @@ Normally, a client's initialization parameters include:
 2. **Credential parameter**: Converted from `@useAuth` definition on the service the client belongs to.
 
 3. **API version parameter**: If the service is versioned, then the API version parameter on method is elevated to client.
-
    - The API version parameter is detected by parameter name (`api-version` or `apiversion`) or parameter type (API version enum type used in `@versioned` decorator).
 
 4. **Subscription ID parameter**: If the service is an ARM service, then the subscription ID parameter on method is elevated to client.
@@ -336,13 +334,11 @@ If there is no `@usage` used in the spec, all types' usage in TCGC is calculated
 `SdkModelType`, `SdkEnumType`, `SdkUnionType`, and `SdkConstantType` always have names. If the original TypeSpec type does not have a name, TCGC creates a name for it. The naming logic follows these steps:
 
 1. **Find the place where the type is used:**
-
    - Find if the type is used in the method's underlying operation: either in parameters, body parameter, response header, or response body.
    - Find if the type is used in the method's parameters.
    - Find if the type is used in orphan types.
 
 2. **With the path of where the type is used:**
-
    - Reversely look up the first path segment whose name is not empty and the segment is a model, union, or method.
    - Create the name with the model, union, or method's name, concatenating with all segments' names starting after that segment.
    - If a segment is an HTTP parameter, the concatenated name is `Request` + parameter name in PascalCase.

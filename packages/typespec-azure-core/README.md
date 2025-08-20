@@ -88,6 +88,7 @@ Available ruleSets:
 - [`@pollingOperation`](#@pollingoperation)
 - [`@pollingOperationParameter`](#@pollingoperationparameter)
 - [`@previewVersion`](#@previewversion)
+- [`@uniqueItems`](#@uniqueitems)
 - [`@useFinalStateVia`](#@usefinalstatevia)
 
 #### `@finalLocation`
@@ -128,6 +129,8 @@ Identifies that an operation is the final operation for an LRO.
 | parameters      | `{}`        | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
 
 #### `@items`
+
+_Deprecated: Do not use this decorator. Use @pageItems instead._
 
 Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
 
@@ -289,6 +292,8 @@ Identifies an operation that is linked to the target operation.
 
 #### `@pagedResult`
 
+_Deprecated: Do not use this decorator. Use @list decorator on the operation instead._
+
 Marks a Model as a paged collection.
 
 ```typespec
@@ -391,6 +396,22 @@ enum Versions {
   v3Preview,
 }
 ```
+
+#### `@uniqueItems`
+
+Specifies that an array model or array-typed property should contain only unique items.
+
+```typespec
+@Azure.Core.uniqueItems
+```
+
+##### Target
+
+`ModelProperty | Model`
+
+##### Parameters
+
+None
 
 #### `@useFinalStateVia`
 

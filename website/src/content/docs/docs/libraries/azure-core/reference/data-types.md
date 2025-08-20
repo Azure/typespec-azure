@@ -1042,7 +1042,7 @@ model Certificate {
   name: string;
 }
 model Page {
-  @items items: Certificate[];
+  @pageItems items: Certificate[];
   @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[
     ListCertificateOptions.includePending
   ]>;

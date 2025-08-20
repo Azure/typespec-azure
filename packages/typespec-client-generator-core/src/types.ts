@@ -34,6 +34,7 @@ import {
 } from "@typespec/compiler";
 import {
   Authentication,
+  HttpOperationMultipartBody,
   Visibility,
   getAuthentication,
   getServers,
@@ -48,6 +49,7 @@ import {
   getAlternateType,
   getClientNamespace,
   getExplicitClientApiVersions,
+  getLegacyHierarchyBuilding,
   getOverriddenClientMethod,
   getUsageOverride,
   listClients,
@@ -97,7 +99,6 @@ import {
   hasNoneVisibility,
   intOrFloat,
   isHttpBodySpread,
-  isMultipartOperation,
   isNeverOrVoidType,
   isOnClient,
   listAllUserDefinedNamespaces,
@@ -703,7 +704,7 @@ function addDiscriminatorToModelType(
               diagnostics.add(
                 createDiagnostic({
                   code: "discriminator-not-constant",
-                  target: type,
+                  target: childModel,
                   format: { discriminator: property.name },
                 }),
               );
@@ -836,11 +837,30 @@ export function getSdkModelWithDiagnostics(
     }
 
     // properties should be generated first since base model's discriminator handling is depend on derived model's properties
-    if (operation && isMultipartOperation(context, operation)) {
-      const body = getHttpOperationWithCache(context, operation).parameters.body;
-      if (body && getHttpBodyType(body) === type) {
-        // handle multipart body model properties
-        diagnostics.pipe(addMultipartPropertiesToModelType(context, sdkType, operation));
+    if (operation) {
+      const requestBody = getHttpOperationWithCache(context, operation).parameters.body;
+      const multipartResponseBodies = getHttpOperationWithCache(context, operation)
+        .responses.map((response) => response.responses.map((r) => r.body))
+        .flatMap((x) => x)
+        .filter((x) => x?.bodyKind === "multipart");
+      if (
+        requestBody &&
+        requestBody.bodyKind === "multipart" &&
+        getHttpBodyType(requestBody) === type
+      ) {
+        // handle multipart request body model properties
+        diagnostics.pipe(
+          addMultipartPropertiesToModelType(context, sdkType, requestBody, operation),
+        );
+      } else if (multipartResponseBodies.length > 0) {
+        // handle multipart response body model properties
+        multipartResponseBodies.map((body) =>
+          getHttpBodyType(body) === type
+            ? diagnostics.pipe(
+                addMultipartPropertiesToModelType(context, sdkType!, body, operation),
+              )
+            : undefined,
+        );
       } else {
         // handle normal model properties
         diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
@@ -849,13 +869,15 @@ export function getSdkModelWithDiagnostics(
       // handle normal model properties
       diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
     }
-    if (type.baseModel) {
-      sdkType.baseModel = context.__referencedTypeCache.get(type.baseModel) as
+    const rawBaseModel = getLegacyHierarchyBuilding(context, type) || type.baseModel;
+    if (rawBaseModel) {
+      sdkType.baseModel = context.__referencedTypeCache.get(rawBaseModel) as
         | SdkModelType
         | undefined;
+
       if (sdkType.baseModel === undefined) {
         const baseModel = diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, type.baseModel, operation),
+          getClientTypeWithDiagnostics(context, rawBaseModel, operation),
         ) as SdkDictionaryType | SdkModelType;
         if (baseModel.kind === "dict") {
           // model MyModel extends Record<> {} should be model with additional properties
@@ -866,7 +888,6 @@ export function getSdkModelWithDiagnostics(
       }
     }
     diagnostics.pipe(addDiscriminatorToModelType(context, type, sdkType));
-
     updateReferencedTypeMap(context, type, sdkType);
   }
   return diagnostics.wrap(sdkType);
@@ -1308,13 +1329,10 @@ function addPropertiesToModelType(
 function addMultipartPropertiesToModelType(
   context: TCGCContext,
   sdkType: SdkModelType,
+  body: HttpOperationMultipartBody,
   operation: Operation,
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const body = getHttpOperationWithCache(context, operation).parameters.body;
-  if (!body || body.bodyKind !== "multipart") {
-    return diagnostics.wrap(undefined);
-  }
   for (const part of body.parts) {
     const clientProperty = diagnostics.pipe(
       getSdkModelPropertyType(context, part.property!, operation),
@@ -1556,7 +1574,7 @@ function updateTypesFromOperation(
       getClientTypeWithDiagnostics(context, getHttpBodyType(httpBody), operation),
     );
 
-    const multipartOperation = isMultipartOperation(context, operation);
+    const multipartRequest = httpBody.bodyKind === "multipart";
     if (generateConvenient) {
       if (spread && sdkType.kind === "model") {
         updateUsageOrAccess(context, UsageFlags.Spread, sdkType, { propagation: false });
@@ -1574,7 +1592,7 @@ function updateTypesFromOperation(
         // will also have Json type
         diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.JsonMergePatch, sdkType));
       }
-      if (multipartOperation) {
+      if (multipartRequest) {
         diagnostics.pipe(
           updateUsageOrAccess(context, UsageFlags.MultipartFormData, sdkType, {
             propagation: false,
@@ -1591,7 +1609,7 @@ function updateTypesFromOperation(
         const isUsedInMultipart = (sdkType.usage & UsageFlags.MultipartFormData) > 0;
         const isUsedInOthers =
           ((sdkType.usage & UsageFlags.Json) | (sdkType.usage & UsageFlags.Xml)) > 0;
-        if ((!multipartOperation && isUsedInMultipart) || (multipartOperation && isUsedInOthers)) {
+        if ((!multipartRequest && isUsedInMultipart) || (multipartRequest && isUsedInOthers)) {
           // This means we have a model that is used both for formdata input and for regular body input
           diagnostics.add(
             createDiagnostic({
@@ -1630,6 +1648,18 @@ function updateTypesFromOperation(
 
           if (innerResponse.body.contentTypes.some((x) => isMediaTypeJson(x))) {
             diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkType));
+          }
+
+          if (innerResponse.body.contentTypes.some((x) => isMediaTypeXml(x))) {
+            diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Xml, sdkType));
+          }
+
+          if (innerResponse.body.bodyKind === "multipart") {
+            diagnostics.pipe(
+              updateUsageOrAccess(context, UsageFlags.MultipartFormData, sdkType, {
+                propagation: false,
+              }),
+            );
           }
 
           // add serialization options to model type
@@ -1735,6 +1765,60 @@ function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
       sdkType.access = "internal";
     }
   }
+}
+
+function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  for (const sdkType of context.__referencedTypeCache.values()) {
+    if (sdkType.kind !== "model" || !sdkType.baseModel) continue;
+    // if the model has legacyHierarchyBuilding, then we should update its discriminated subtypes
+    const legacyHierarchyBuilding = getLegacyHierarchyBuilding(context, sdkType.__raw as Model);
+
+    // validate no circular references
+    const visited = new Set<Model>();
+    visited.add(sdkType.__raw as Model);
+    let current: Model | undefined = legacyHierarchyBuilding;
+    while (current) {
+      if (visited.has(current)) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "legacy-hierarchy-building-circular-reference",
+            target: sdkType.__raw as Model,
+          }),
+        );
+        return diagnostics.wrap(undefined);
+      }
+      visited.add(current);
+      const changedBase = getLegacyHierarchyBuilding(context, current as Model);
+      if (changedBase === undefined) {
+        current = current.baseModel;
+      } else {
+        current = changedBase;
+      }
+    }
+
+    // must be done after discriminator is added
+    // Populate discriminated subtypes for legacy hierarchy building
+    if (legacyHierarchyBuilding && sdkType.discriminatorValue) {
+      let currBaseModel: SdkModelType | undefined = sdkType.baseModel;
+      while (currBaseModel) {
+        if (!currBaseModel.discriminatedSubtypes) {
+          currBaseModel.discriminatedSubtypes = {};
+        }
+        currBaseModel.discriminatedSubtypes[sdkType.discriminatorValue] = sdkType;
+        currBaseModel.discriminatorProperty = currBaseModel.properties.find((p) => p.discriminator);
+        currBaseModel = currBaseModel.baseModel;
+      }
+
+      // Filter out legacy hierarchy building properties
+      sdkType.properties = sdkType.properties.filter((property) => {
+        return (
+          property.discriminator || !legacyHierarchyBuilding.properties.has(property.__raw!.name)
+        );
+      });
+    }
+  }
+  return diagnostics.wrap(undefined);
 }
 
 interface UsageFilteringOptions {
@@ -1883,7 +1967,8 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   diagnostics.pipe(updateUsageOverride(context));
   // update spread model
   updateSpreadModelUsageAndAccess(context);
-
+  // update discriminated subtypes and filter out duplicate properties from `@hierarchyBuilding`
+  diagnostics.pipe(handleLegacyHierarchyBuilding(context));
   // update generated name
   resolveConflictGeneratedName(context);
 

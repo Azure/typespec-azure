@@ -6,7 +6,6 @@
 ## REQUIRED STEPS (ALL MUST BE COMPLETED IN ORDER)
 
 1. **PREPARATION & RESEARCH**
-
    - First, run `pnpm install && pnpm build` to fully set up the repository (both commands must complete successfully)
    - Study existing test files:
      - Examine the `main.tsp` and `client.tsp` files in the [specs repository][spector-tests]
@@ -16,7 +15,6 @@
 > **IMPORTANT:** When researching or implementing a feature, ONLY look at examples within the `packages/azure-http-specs/specs` directory. DO NOT search for or use code from other packages as references for implementation.
 
 2. **IMPLEMENTATION REQUIREMENTS**
-
    - **IMPORTANT:** ONLY modify code in these specific locations:
      - `cspell.yaml` file OR
      - `packages/azure-http-specs/specs` folder
@@ -51,7 +49,6 @@
    - Keep route names consistent with scenario themes
 
 3. **VALIDATION & QUALITY CHECKS** (MUST PERFORM ALL OF THESE CHECKS IN THIS EXACT ORDER)
-
    - After implementation, run these commands from `packages/azure-http-specs` in this exact sequence:
 
      ```bash

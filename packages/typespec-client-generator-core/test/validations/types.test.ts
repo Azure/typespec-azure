@@ -122,7 +122,7 @@ it("duplicate operation with @clientLocation to existed clients", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
-        'Client name: "a" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        'Client name: "a" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
     },
   ]);
 });
@@ -158,7 +158,7 @@ it("duplicate operation with @clientLocation to existed clients with scope", asy
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
-        'Client name: "a" is defined somewhere causing nameing conflicts in language scope: "go"',
+        'Client name: "a" is defined somewhere causing naming conflicts in language scope: "go"',
     },
   ]);
 });
@@ -186,11 +186,73 @@ it("duplicate operation with @clientLocation to new clients", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message:
-        'Client name: "a" is defined somewhere causing nameing conflicts in language scope: "AllScopes"',
+        'Client name: "a" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
     },
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message: 'Client name: "a" is duplicated in language scope: "AllScopes"',
+    },
+  ]);
+});
+
+it("duplicate operation warning for .NET", async () => {
+  const netRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-net" });
+
+  const diagnostics = await netRunner.diagnose(
+    `
+    @service
+    namespace StorageService;
+      
+    interface StorageTasks {
+      @route("/list")
+      op list(): void;
+
+      @clientName("list", "csharp")
+      @route("/listByParent")
+      op listByParent(parent: string): void;
+    }
+    `,
+  );
+
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
+      message:
+        'Client name: "list" is defined somewhere causing naming conflicts in language scope: "csharp"',
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
+      message: 'Client name: "list" is duplicated in language scope: "csharp"',
+    },
+  ]);
+});
+
+it("duplicate operation error for other languages", async () => {
+  const diagnostics = await runner.diagnose(
+    `
+    @service
+    namespace StorageService;
+      
+    interface StorageTasks {
+      @route("/list")
+      op list(): void;
+
+      @clientName("list")
+      @route("/listByParent")
+      op listByParent(parent: string): void;
+    }
+    `,
+  );
+
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message:
+        'Client name: "list" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message: 'Client name: "list" is duplicated in language scope: "AllScopes"',
     },
   ]);
 });

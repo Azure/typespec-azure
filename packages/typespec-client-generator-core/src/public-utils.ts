@@ -395,6 +395,19 @@ function getContextPath(
       if (dfsModelProperties(typeToFind, bodyType, "Request")) {
         return result;
       }
+
+      if (httpOperation.parameters.body.bodyKind === "multipart") {
+        for (const part of httpOperation.parameters.body.parts) {
+          visited.clear();
+          result = [{ name: root.name, type: root }];
+          if (
+            part.partKind === "model" &&
+            dfsModelProperties(typeToFind, part.body.type, `Request${pascalCase(part.name)}`)
+          ) {
+            return result;
+          }
+        }
+      }
     }
 
     for (const parameter of Object.values(httpOperation.parameters.parameters)) {
@@ -414,6 +427,19 @@ function getContextPath(
           result = [{ name: root.name, type: root }];
           if (dfsModelProperties(typeToFind, innerResponse.body.type, "Response", true)) {
             return result;
+          }
+
+          if (innerResponse.body?.bodyKind === "multipart") {
+            for (const part of innerResponse.body.parts) {
+              visited.clear();
+              result = [{ name: root.name, type: root }];
+              if (
+                part.partKind === "model" &&
+                dfsModelProperties(typeToFind, part.body.type, `Request${pascalCase(part.name)}`)
+              ) {
+                return result;
+              }
+            }
           }
         }
 
@@ -531,25 +557,23 @@ function getContextPath(
         if (result) return true;
       }
       // handle additional properties type: model MyModel extends Record<> {}
-      if (currentType.baseModel) {
-        if (currentType.baseModel.name === "Record") {
+      const baseModel = currentType.baseModel;
+      if (baseModel) {
+        if (baseModel.name === "Record") {
           const result = dfsModelProperties(
             expectedType,
-            currentType.baseModel.indexer!.value!,
+            baseModel.indexer!.value!,
             "AdditionalProperty",
           );
           if (result) return true;
         }
       }
       result.pop();
-      if (currentType.baseModel) {
-        const result = dfsModelProperties(
-          expectedType,
-          currentType.baseModel,
-          currentType.baseModel.name,
-        );
+      if (baseModel) {
+        const result = dfsModelProperties(expectedType, baseModel, baseModel.name);
         if (result) return true;
       }
+      // TODO: come back and see if derived models are needed to change
       for (const derivedModel of currentType.derivedModels) {
         const result = dfsModelProperties(expectedType, derivedModel, derivedModel.name);
         if (result) return true;

@@ -1,6 +1,6 @@
+import { Tester } from "#test/test-host.js";
 import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { expect, it } from "vitest";
-import { Tester } from "../../test/test-host.js";
 import { isPreviewVersion } from "./preview-version.js";
 
 it("emit diagnostic if use on non enum member", async () => {

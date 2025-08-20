@@ -1,5 +1,43 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.59.1
+
+### Bug Fixes
+
+- [#3142](https://github.com/Azure/typespec-azure/pull/3142) Relax constraints for Action request and synchronous response parameters
+- [#3143](https://github.com/Azure/typespec-azure/pull/3143) Add templates for optional location and etags
+- [#3141](https://github.com/Azure/typespec-azure/pull/3141) Add operations for Private Endpoints
+
+
+## 0.59.0
+
+### Deprecations
+
+- [#2974](https://github.com/Azure/typespec-azure/pull/2974) Deprecate pageable decorators `@Azure.Core.items` and `@Azure.Core.pagedResult`. Use `@TypeSpec.pageItems` and `@TypeSpec.list` instead.
+
+### Features
+
+- [#3096](https://github.com/Azure/typespec-azure/pull/3096) Enable void and optional request body for extension put and patch operations
+- [#3098](https://github.com/Azure/typespec-azure/pull/3098) Allow using Scope parameter with Provider Action templates
+- [#3085](https://github.com/Azure/typespec-azure/pull/3085) Add support for optional and missing request body in PUT and PATCH legacy operations
+
+### Bump dependencies
+
+- [#3029](https://github.com/Azure/typespec-azure/pull/3029) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3085](https://github.com/Azure/typespec-azure/pull/3085) Fix implicitOptionality setting in Legacy PATCH operations
+
+
+## 0.58.1
+
+### Bug Fixes
+
+- [#3030](https://github.com/Azure/typespec-azure/pull/3030) Use OverrideErrorType parameter in legacy list operation
+- [#3026](https://github.com/Azure/typespec-azure/pull/3026) Fix #1876 Add ResolveArmOperations method
+
+
 ## 0.58.0
 
 ### Bump dependencies

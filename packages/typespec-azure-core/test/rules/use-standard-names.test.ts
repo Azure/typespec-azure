@@ -22,11 +22,10 @@ describe("typespec-azure-core: use-standard-names rule", () => {
         `
         model Foo {};
 
-        @pagedResult
         model FooPage {
           @nextLink
           next: string,
-          @items
+          @pageItems
           value: Foo[];
         }
         
@@ -40,6 +39,7 @@ describe("typespec-azure-core: use-standard-names rule", () => {
         @get op returnFoo(): Foo;
         
         @route("2")
+        @list
         @get op getFoos(): FooPage;
         
         @route("3")
@@ -96,11 +96,10 @@ describe("typespec-azure-core: use-standard-names rule", () => {
         `
       model Foo {};
 
-      @pagedResult
       model FooPage {
         @nextLink
         next: string,
-        @items
+        @pageItems
         value: Foo[];
       }
       
@@ -114,6 +113,7 @@ describe("typespec-azure-core: use-standard-names rule", () => {
       @get op getFoo(): Foo;
       
       @route("2")
+      @list
       @get op listFoos(): FooPage;
       
       @route("3")

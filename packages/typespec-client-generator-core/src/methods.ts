@@ -209,6 +209,23 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
             context.__modelPropertyCache.get(segment)!,
         ),
         pageItemsSegments: baseServiceMethod.response.resultSegments,
+        nextLinkReInjectedParametersSegments:
+          pagingMetadata.output.nextLink?.property.type.kind === "Scalar"
+            ? (
+                getParameterizedNextLinkArguments(
+                  context.program,
+                  pagingMetadata.output.nextLink.property.type,
+                ) ?? []
+              ).map(
+                (t: ModelProperty) =>
+                  getPropertySegmentsFromModelOrParameters(
+                    baseServiceMethod.parameters,
+                    (p) =>
+                      p.__raw?.kind === "ModelProperty" &&
+                      findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
+                  )!,
+              )
+            : undefined,
       },
     });
   }
@@ -323,7 +340,11 @@ function mapFirstSegmentForResultSegments(
 ): ModelProperty[] | undefined {
   if (resultSegments === undefined || response === undefined) return undefined;
   // TCGC use Http response type as the return type
-  // For implicit body response, we need to map the first segment to the derived model property
+  // For implicit body response, we need to locate the first segment in the response type
+  // Several cases:
+  // 1. `op test(): {items, nextLink}`
+  // 2. `op test(): {items, nextLink} & {a, b, c}`
+  // 3. `op test(): {@bodyRoot body: {items, nextLink}}`
   const responseModel =
     response.type?.kind === "model"
       ? response.type
@@ -331,10 +352,15 @@ function mapFirstSegmentForResultSegments(
         ? response.type.type
         : undefined;
   if (resultSegments.length > 0 && responseModel) {
-    const firstSegment = resultSegments[0];
-    for (const property of responseModel.properties ?? []) {
-      if (property.__raw && property.__raw?.sourceProperty === firstSegment) {
-        return [property.__raw, ...resultSegments.slice(1)];
+    for (let i = 0; i < resultSegments.length; i++) {
+      const segment = resultSegments[i];
+      for (const property of responseModel.properties ?? []) {
+        if (
+          property.__raw &&
+          findRootSourceProperty(property.__raw) === findRootSourceProperty(segment)
+        ) {
+          return [property.__raw, ...resultSegments.slice(i + 1)];
+        }
       }
     }
   }

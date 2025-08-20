@@ -1,17 +1,18 @@
-import { Model, StringLiteral } from "@typespec/compiler";
+import type { Model, StringLiteral } from "@typespec/compiler";
 import {
-  BasicTestRunner,
+  type BasicTestRunner,
   expectDiagnosticEmpty,
   expectDiagnostics,
 } from "@typespec/compiler/testing";
-import { HttpOperation } from "@typespec/http";
-import { deepStrictEqual, notStrictEqual, ok, strictEqual } from "assert";
+import type { HttpOperation } from "@typespec/http";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { getPagedResult, isFinalLocation, isPollingLocation } from "../src/decorators.js";
-import { LroMetadata, getLroMetadata } from "../src/lro-helpers.js";
+import { isFinalLocation } from "../src/decorators/final-location.js";
+import { isPollingLocation } from "../src/decorators/polling-location.js";
+import { type LroMetadata, getLroMetadata } from "../src/lro-helpers.js";
 import { getNamespaceName } from "../src/rules/utils.js";
 import {
-  SimpleHttpOperation,
+  type SimpleHttpOperation,
   createAzureCoreTestRunner,
   getOperations,
   getSimplifiedOperations,
@@ -376,15 +377,6 @@ describe("typespec-azure-core: operation templates", () => {
       },
       responseProperties: ["value", "nextLink", "x-ms-response-id"],
     });
-  });
-
-  it("ResourceList works with getPagedResult", async () => {
-    const [operations, _, runner] = await getOperations(
-      `@test op list is Azure.Core.ResourceList<TestModel, Customizations>;`,
-    );
-
-    const pagedResult = getPagedResult(runner.program, operations[0].operation);
-    notStrictEqual(pagedResult, undefined);
   });
 
   it("NonPagedResourceList", async () => {

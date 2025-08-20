@@ -45,6 +45,10 @@ Identifies that an operation is the final operation for an LRO.
 
 ### `@items` {#@Azure.Core.items}
 
+:::caution
+**Deprecated**: Do not use this decorator. Use @pageItems instead.
+:::
+
 Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
 
 ```typespec
@@ -205,6 +209,10 @@ Identifies an operation that is linked to the target operation.
 
 ### `@pagedResult` {#@Azure.Core.pagedResult}
 
+:::caution
+**Deprecated**: Do not use this decorator. Use @list decorator on the operation instead.
+:::
+
 Marks a Model as a paged collection.
 
 ```typespec
@@ -307,6 +315,22 @@ enum Versions {
   v3Preview,
 }
 ```
+
+### `@uniqueItems` {#@Azure.Core.uniqueItems}
+
+Specifies that an array model or array-typed property should contain only unique items.
+
+```typespec
+@Azure.Core.uniqueItems
+```
+
+#### Target
+
+`ModelProperty | Model`
+
+#### Parameters
+
+None
 
 ### `@useFinalStateVia` {#@Azure.Core.useFinalStateVia}
 

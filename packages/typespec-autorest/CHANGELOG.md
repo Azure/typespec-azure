@@ -1,5 +1,24 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.59.0
+
+### Features
+
+- [#3126](https://github.com/Azure/typespec-azure/pull/3126) Add multi-level discriminator support to typespec-autorest
+- [#3125](https://github.com/Azure/typespec-azure/pull/3125) Add  uniqueItems support to Azure.Core and typespec-autorest
+
+### Bump dependencies
+
+- [#3029](https://github.com/Azure/typespec-azure/pull/3029) Upgrade dependencies
+
+
+## 0.58.1
+
+### Bug Fixes
+
+- [#3003](https://github.com/Azure/typespec-azure/pull/3003) Preserve explicit query parameters defined in the route by including them in `x-ms-paths`
+
+
 ## 0.58.0
 
 ### Breaking Changes

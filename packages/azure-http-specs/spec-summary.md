@@ -180,6 +180,144 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_HierarchyBuilding_AnimalOperations_updateDogAsAnimal
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/dog/as-animal`
+
+Test operation that accepts Animal input and returns Animal output.
+Service expects Dog data and returns Dog data.
+Due to @hierarchyBuilding(Pet), Dog should inherit from Pet rather than Animal directly.
+Expected request body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+### Azure_ClientGenerator_Core_HierarchyBuilding_AnimalOperations_updatePetAsAnimal
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/pet/as-animal`
+
+Test operation that accepts Animal input and returns Animal output.
+Service expects Pet data and returns Pet data.
+Expected request body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy",
+  "trained": true
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy",
+  "trained": true
+}
+```
+
+### Azure_ClientGenerator_Core_HierarchyBuilding_DogOperations_updateDogAsDog
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/dog/as-dog`
+
+Test operation that accepts Dog input and returns Dog output.
+This operation validates Dog type directly.
+Expected request body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+### Azure_ClientGenerator_Core_HierarchyBuilding_PetOperations_updateDogAsPet
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/dog/as-pet`
+
+Test operation that accepts Pet input and returns Pet output.
+Service expects Dog data and returns Dog data.
+This validates that Dog can be used as Pet due to @hierarchyBuilding decorator.
+Expected request body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+### Azure_ClientGenerator_Core_HierarchyBuilding_PetOperations_updatePetAsPet
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/pet/as-pet`
+
+Test operation that accepts Pet input and returns Pet output.
+This operation validates Pet type directly.
+Expected request body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy",
+  "trained": true
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy",
+  "trained": true
+}
+```
+
 ### Azure_ClientGenerator_Core_Override_GroupParameters_group
 
 - Endpoint: `get /azure/client-generator-core/override/group`
@@ -242,18 +380,15 @@ client.withBody({ name: "test-name" });  // No need to pass name here
 ### Azure_ClientGeneratorCore_ClientInitialization_MixedParams
 
 - Endpoints:
-
   - `get /azure/client-generator-core/client-initialization/mixed-params/with-query`
   - `get /azure/client-generator-core/client-initialization/mixed-params/with-body`
 
   Client for testing a mix of client-level and method-level parameters.
 
   Parameters elevated to client level:
-
   - name: "test-name-value" (header parameter)
 
   Parameters remaining at method level:
-
   - region: "us-west" (query parameter)
 
   Expected client usage:
@@ -868,12 +1003,10 @@ This scenario is to test two operations with two different page item types.
   parameters are maintained in next link URLs.
 
   Expected query parameters on initial request:
-
   - includePending=true
   - select=name
 
   Expected query parameters on next link request. Note: the SDK will need to re-inject this parameter:
-
   - includePending=true (note: the client will need to manually re-inject this parameter into the next link)
   - select=name (note: this is returned in the next link, the client does NOT need to manually re-inject this parameter)
 
@@ -3085,6 +3218,28 @@ Expected client namespace for models:
 - SecondClientResult: Client.ClientNamespace.Second
 - SecondClientEnumType: Client.ClientNamespace.Second.Sub
 
+### Client_Naming_EnumConflict_FirstOperations_first
+
+- Endpoint: `post /client/naming/enum-conflict/first`
+
+Test enum with same name in different namespace - first namespace.
+Expected request body:
+
+```json
+{ "status": "active", "name": "test" }
+```
+
+### Client_Naming_EnumConflict_SecondOperations_second
+
+- Endpoint: `post /client/naming/enum-conflict/second`
+
+Test enum with same name in different namespace - second namespace.
+Expected request body:
+
+```json
+{ "status": "running", "description": "test description" }
+```
+
 ### Client_Naming_Header_request
 
 - Endpoint: `post /client/naming/header`
@@ -3213,6 +3368,35 @@ Expected request body:
   ```json
   "value1"
   ```
+
+### Client_Overload_list
+
+- Endpoint: `get /client/overload/resources`
+
+List all resources operation.
+
+Expected request: GET /client/overload/resources
+Expected response body:
+
+```json
+[
+  { "id": "1", "name": "foo", "scope": "car" },
+  { "id": "2", "name": "bar", "scope": "bike" }
+]
+```
+
+### Client_Overload_listByScope
+
+- Endpoint: `get /client/overload/resources/{scope}`
+
+List resources by scope operation. This operation uses `@clientName("list", "csharp")` to generate it as an overload method named "list" in C# client code, demonstrating method overloading capabilities.
+
+Expected request: GET /client/overload/resources/car
+Expected response body:
+
+```json
+[{ "id": "1", "name": "foo", "scope": "car" }]
+```
 
 ### Client_Structure_AnotherClientOperationGroup
 
