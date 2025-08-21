@@ -462,8 +462,8 @@ type User struct {
 	FirstName string
 	LastName  string
 }
-func GetUser(ctx context.Context) (*User, error) {}
-func (c *Client) PostUser(ctx context.Context, user *User) error {}
+func Get(ctx context.Context) (*User, error) {}
+func Post(user *User) error {}
 
 ```
 
@@ -667,10 +667,11 @@ public void upload(String id, String firstName, String lastName);
 
 ```go
 type User struct {
+  Id string
 	FirstName string
 	LastName  string
 }
-func Upload(ctx context.Context, user *User) error {}
+func Upload(id string, firstName string, lastName string) error {}
 
 ```
 
