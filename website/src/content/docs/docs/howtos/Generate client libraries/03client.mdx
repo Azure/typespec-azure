@@ -1703,7 +1703,7 @@ type StorageClientUploadResponse struct {}
 
 
 // Usage Sample
-client := NewStorageClient(nil,"<my-endpoint>","myBlobName")
+client := NewStorageClient()
 client.Download(context.Background(), &StorageClientDownloadOptions{})
 client.Upload(context.Background(), &StorageClientUploadOptions{})
 
