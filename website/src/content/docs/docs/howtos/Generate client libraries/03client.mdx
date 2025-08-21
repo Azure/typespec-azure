@@ -1201,24 +1201,26 @@ opGrp2Client.pet();
 ```
 
 ```go
-// petstoreopgrp1_client.go
+// petstore_client.go
 type PetStoreClient struct {}
 func NewPetStoreClient() *PetStoreClient{
   return &PetStoreClient{}
 }
 
-type OpGrp1Client struct {}
 func (client *PetStoreClient)NewOpGrp1Client() *OpGrp1Client{
   return &OpGrp1Client{}
 }
 
+func (client *PetStoreClient)NewOpGrp2Client() *OpGrp2Client{
+  return &OpGrp2Client{}
+}
+
+// petstoreopgrp1_client.go
+type OpGrp1Client struct {}
 func (client *PetStoreOpGrp1Client) Feed(ctx context.Context, options *PetStoreOpGrp1ClientFeedOptions) (PetStoreOpGrp1ClientFeedResponse, error) {}
 
 // petstoreopgrp2_client.go
 type OpGrp2Client struct {}
-func (client *PetStoreClient)NewOpGrp2Client() *OpGrp2Client{
-  return &OpGrp2Client{}
-}
 func (client *PetStoreOpGrp2Client) Pet(ctx context.Context, options *PetStoreOpGrp2ClientPetOptions) (PetStoreOpGrp2ClientPetResponse, error) {}
 
 // options.go
