@@ -512,19 +512,20 @@ function getSdkHttpResponseAndExceptions(
               target: innerResponse.body.type,
               format: {
                 operation: httpOperation.operation.name,
-                response:
-                  innerResponse.body.type.kind === "Model"
-                    ? innerResponse.body.type.name
-                    : innerResponse.body.type.kind,
               },
             }),
           );
+          // Skip processing this response body since we've already found a different one
+          continue;
         }
         contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
-        body =
-          innerResponse.body.type.kind === "Model"
-            ? getEffectivePayloadType(context, innerResponse.body.type, Visibility.Read)
-            : innerResponse.body.type;
+        // Only set body if it hasn't been set yet (keep the first one)
+        if (!body) {
+          body =
+            innerResponse.body.type.kind === "Model"
+              ? getEffectivePayloadType(context, innerResponse.body.type, Visibility.Read)
+              : innerResponse.body.type;
+        }
         if (getStreamMetadata(context.program, innerResponse)) {
           // map stream response body type to bytes
           type = diagnostics.pipe(getStreamAsBytes(context, innerResponse.body.type));

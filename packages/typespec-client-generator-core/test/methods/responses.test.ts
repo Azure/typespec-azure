@@ -413,3 +413,24 @@ it("response body of scalar with encode", async () => {
   strictEqual(serviceResponse.type?.kind, "bytes");
   strictEqual(serviceResponse.type?.encode, "base64url");
 });
+
+it("multiple response types should emit error", async () => {
+  const diagnostics = await runner.diagnose(`
+    @service
+    namespace TestService {
+      model One {
+        name: string;
+      }
+
+      model Two {
+        age: int32;
+      }
+
+      op doStuff(): One | Two;
+    }
+  `);
+  
+  runner.expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/multiple-response-types",
+  });
+});

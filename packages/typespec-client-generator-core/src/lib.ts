@@ -208,9 +208,9 @@ export const $lib = createTypeSpecLibrary({
       },
     },
     "multiple-response-types": {
-      severity: "warning",
+      severity: "error",
       messages: {
-        default: paramMessage`Multiple response types found in operation ${"operation"}. Only one response type is supported, so we will choose the first one ${"response"}`,
+        default: paramMessage`Multiple response types found in operation ${"operation"}. This is not supported as it can lead to runtime errors. Consider using response models with different status codes instead.`,
       },
     },
     "no-corresponding-method-param": {
