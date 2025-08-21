@@ -716,6 +716,10 @@ function findMapping(
     ) {
       return methodParam;
     }
+    // If the service parameter is a body parameter, try to see if we could find a method parameter with same type of the body parameter.
+    if (serviceParam.kind === "body" && serviceParam.type === methodParam.type) {
+      return methodParam;
+    }
     // BFS to find the mapping.
     if (methodParam.type.kind === "model" && !visited.has(methodParam.type)) {
       visited.add(methodParam.type);
