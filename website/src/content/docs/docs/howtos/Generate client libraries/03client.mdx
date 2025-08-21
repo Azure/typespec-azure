@@ -1202,15 +1202,21 @@ opGrp2Client.pet();
 
 ```go
 // petstoreopgrp1_client.go
+type PetStoreClient struct {}
+func NewPetStoreClient() *PetStoreClient{
+  return &PetStoreClient{}
+}
+
 type OpGrp1Client struct {}
-func NewOpGrp1Client() *OpGrp1Client{
+func (client *PetStoreClient)NewOpGrp1Client() *OpGrp1Client{
   return &OpGrp1Client{}
 }
+
 func (client *PetStoreOpGrp1Client) Feed(ctx context.Context, options *PetStoreOpGrp1ClientFeedOptions) (PetStoreOpGrp1ClientFeedResponse, error) {}
 
 // petstoreopgrp2_client.go
 type OpGrp2Client struct {}
-func NewOpGrp2Client() *OpGrp2Client{
+func (client *PetStoreClient)NewOpGrp2Client() *OpGrp2Client{
   return &OpGrp2Client{}
 }
 func (client *PetStoreOpGrp2Client) Pet(ctx context.Context, options *PetStoreOpGrp2ClientPetOptions) (PetStoreOpGrp2ClientPetResponse, error) {}
@@ -1224,9 +1230,10 @@ type PetStoreOpGrp1ClientFeedResponse struct {}
 type PetStoreOpGrp2ClientPetResponse struct {}
 
 // Usage Sample
-opGrp1Client := NewOpGrp1Client()
+petStoreClient := NewPetStoreClient()
+opGrp1Client := petStoreClient.NewOpGrp1Client()
 opGrp1Client.Feed(context.Background(), &PetStoreOpGrp1ClientFeedOptions{})
-opGrp2Client := NewOpGrp2Client()
+opGrp2Client := petStoreClient.NewOpGrp2Client()
 opGrp2Client.Pet(context.Background(),&PetStoreOpGrp2ClientPetOptions{})
 ```
 
