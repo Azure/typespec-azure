@@ -1746,3 +1746,105 @@ func Get(ctx context.Context, ifMatch, ifNoneMatch *string) (*Response, error) {
 ```
 
 </ClientTabs>
+
+## Using `@clientLocation` to control parameter placement
+
+The `@clientLocation` decorator allows you to explicitly move parameters between client and operation levels.
+
+### Moving subscriptionId from client to operation level
+
+In ARM services, `subscriptionId` is automatically elevated to the client level. By applying `@clientLocation` to `subscriptionId` and explicitly moving it to an operation, you can move it back down to the method-level.
+
+In the following case, since all instances of the subscription ID parameter have been explicitly moved onto the method-level, there is no longer a subscription ID parameter to the client.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+@service
+@armProviderNamespace
+@versioned(Versions)
+@armCommonTypesVersion(CommonTypes.Versions.v5)
+namespace Microsoft.ContosoProviderHub;
+
+/** Api versions */
+enum Versions {
+  /** 2024-04-01-preview api version */
+  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+  V2024_04_01_PREVIEW: "2024-04-01-preview",
+}
+
+@subscriptionResource
+model MyModel is ProxyResource<{}> {
+  @key("extendedZoneName")
+  @segment("extendedZones")
+  @path
+  name: string;
+}
+
+op get is ArmResourceRead<MyModel>;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// Move subscription ID from client to operation `get`
+@@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, get);
+```
+
+```python
+# Since all instances of subscription ID in the service have been moved to the operation level,
+# there is no `subscription_id` parameter on the client
+class ContosoProviderHubClient:
+    def __init__(self, credential, **kwargs):
+        ...
+
+    def get(self, subscription_id: str, extended_zone_name: str, **kwargs) -> MyModel:
+        ...
+```
+
+```csharp
+// Main client with subscriptionId as client parameter
+public partial class ContosoProviderHubClient
+{
+    public ContosoProviderHubClient(TokenCredential credential)
+    {
+        ...
+    }
+
+    public virtual Response<MyModel> Get(string subscriptionId, string extendedZoneName, CancellationToken cancellationToken = default)
+    {
+        ...
+    }
+}
+```
+
+```typescript
+export class ContosoProviderHubClient {
+
+  constructor(credential: TokenCredential) {
+    ...
+  }
+
+  async get(subscriptionId: string, extendedZoneName: string): Promise<MyModel> {
+    ...
+  }
+}
+```
+
+```java
+public final class ContosoProviderHubClient {
+
+    public ContosoProviderHubClient(TokenCredential credential) {
+        ...
+    }
+
+    public MyModel get(String subscriptionId, String extendedZoneName) {
+        ...
+    }
+}
+```
+
+</ClientTabs>

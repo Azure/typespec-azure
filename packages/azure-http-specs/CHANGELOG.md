@@ -1,5 +1,12 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.27
+
+### Bug Fixes
+
+- [#3163](https://github.com/Azure/typespec-azure/pull/3163) Avoid conflict in namespace/model names
+
+
 ## 0.1.0-alpha.26
 
 ### Bug Fixes
