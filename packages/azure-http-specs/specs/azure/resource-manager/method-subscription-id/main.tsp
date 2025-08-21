@@ -72,7 +72,7 @@ namespace TwoSubscriptionResourcesMethodLevel {
     description?: string;
   }
 
-  @subscriptionResource  
+  @subscriptionResource
   @resource("subscriptionResource2s")
   model SubscriptionResource2 is ProxyResource<SubscriptionResource2Properties> {
     @key("subscriptionResource2Name")
@@ -94,27 +94,51 @@ namespace TwoSubscriptionResourcesMethodLevel {
   }
 
   // Define base parameter models to enable subscriptionId parameter access
-  model GetSubscriptionResource1BaseParameter is Azure.ResourceManager.Foundations.DefaultBaseParameters<SubscriptionResource1>{}
-  model PutSubscriptionResource1BaseParameter is Azure.ResourceManager.Foundations.DefaultBaseParameters<SubscriptionResource1>{}
-  model DeleteSubscriptionResource1BaseParameter is Azure.ResourceManager.Foundations.DefaultBaseParameters<SubscriptionResource1>{}
-  
-  model GetSubscriptionResource2BaseParameter is Azure.ResourceManager.Foundations.DefaultBaseParameters<SubscriptionResource2>{}  
-  model PutSubscriptionResource2BaseParameter is Azure.ResourceManager.Foundations.DefaultBaseParameters<SubscriptionResource2>{}
-  model DeleteSubscriptionResource2BaseParameter is Azure.ResourceManager.Foundations.DefaultBaseParameters<SubscriptionResource2>{}
+  model GetSubscriptionResource1BaseParameter
+    is Azure.ResourceManager.Foundations.DefaultBaseParameters<SubscriptionResource1>;
+  model PutSubscriptionResource1BaseParameter
+    is Azure.ResourceManager.Foundations.DefaultBaseParameters<SubscriptionResource1>;
+  model DeleteSubscriptionResource1BaseParameter
+    is Azure.ResourceManager.Foundations.DefaultBaseParameters<SubscriptionResource1>;
+
+  model GetSubscriptionResource2BaseParameter
+    is Azure.ResourceManager.Foundations.DefaultBaseParameters<SubscriptionResource2>;
+  model PutSubscriptionResource2BaseParameter
+    is Azure.ResourceManager.Foundations.DefaultBaseParameters<SubscriptionResource2>;
+  model DeleteSubscriptionResource2BaseParameter
+    is Azure.ResourceManager.Foundations.DefaultBaseParameters<SubscriptionResource2>;
 
   @armResourceOperations
   interface SubscriptionResource1Operations {
-    get is ArmResourceRead<SubscriptionResource1, BaseParameters = GetSubscriptionResource1BaseParameter>;
-    put is ArmResourceCreateOrReplaceAsync<SubscriptionResource1, BaseParameters = PutSubscriptionResource1BaseParameter>;
-    delete is ArmResourceDeleteWithoutOkAsync<SubscriptionResource1, BaseParameters = DeleteSubscriptionResource1BaseParameter>;
+    get is ArmResourceRead<
+      SubscriptionResource1,
+      BaseParameters = GetSubscriptionResource1BaseParameter
+    >;
+    put is ArmResourceCreateOrReplaceAsync<
+      SubscriptionResource1,
+      BaseParameters = PutSubscriptionResource1BaseParameter
+    >;
+    delete is ArmResourceDeleteWithoutOkAsync<
+      SubscriptionResource1,
+      BaseParameters = DeleteSubscriptionResource1BaseParameter
+    >;
     list is ArmListBySubscription<SubscriptionResource1>;
   }
 
   @armResourceOperations
   interface SubscriptionResource2Operations {
-    get is ArmResourceRead<SubscriptionResource2, BaseParameters = GetSubscriptionResource2BaseParameter>;
-    put is ArmResourceCreateOrReplaceAsync<SubscriptionResource2, BaseParameters = PutSubscriptionResource2BaseParameter>;
-    delete is ArmResourceDeleteWithoutOkAsync<SubscriptionResource2, BaseParameters = DeleteSubscriptionResource2BaseParameter>;
+    get is ArmResourceRead<
+      SubscriptionResource2,
+      BaseParameters = GetSubscriptionResource2BaseParameter
+    >;
+    put is ArmResourceCreateOrReplaceAsync<
+      SubscriptionResource2,
+      BaseParameters = PutSubscriptionResource2BaseParameter
+    >;
+    delete is ArmResourceDeleteWithoutOkAsync<
+      SubscriptionResource2,
+      BaseParameters = DeleteSubscriptionResource2BaseParameter
+    >;
     list is ArmListBySubscription<SubscriptionResource2>;
   }
 }
@@ -135,7 +159,7 @@ namespace TwoSubscriptionResourcesMethodLevel {
 @scenario
 namespace MixedSubscriptionPlacement {
   @subscriptionResource
-  @resource("subscriptionResources") 
+  @resource("subscriptionResources")
   model SubscriptionResource is ProxyResource<SubscriptionResourceProperties> {
     @key("subscriptionResourceName")
     @path
@@ -176,15 +200,27 @@ namespace MixedSubscriptionPlacement {
   }
 
   // Define base parameter models only for subscription resource to enable subscriptionId parameter access
-  model GetSubscriptionResourceBaseParameter is Azure.ResourceManager.Foundations.DefaultBaseParameters<SubscriptionResource>{}
-  model PutSubscriptionResourceBaseParameter is Azure.ResourceManager.Foundations.DefaultBaseParameters<SubscriptionResource>{}
-  model DeleteSubscriptionResourceBaseParameter is Azure.ResourceManager.Foundations.DefaultBaseParameters<SubscriptionResource>{}
+  model GetSubscriptionResourceBaseParameter
+    is Azure.ResourceManager.Foundations.DefaultBaseParameters<SubscriptionResource>;
+  model PutSubscriptionResourceBaseParameter
+    is Azure.ResourceManager.Foundations.DefaultBaseParameters<SubscriptionResource>;
+  model DeleteSubscriptionResourceBaseParameter
+    is Azure.ResourceManager.Foundations.DefaultBaseParameters<SubscriptionResource>;
 
   @armResourceOperations
   interface SubscriptionResourceOperations {
-    get is ArmResourceRead<SubscriptionResource, BaseParameters = GetSubscriptionResourceBaseParameter>;
-    put is ArmResourceCreateOrReplaceAsync<SubscriptionResource, BaseParameters = PutSubscriptionResourceBaseParameter>;
-    delete is ArmResourceDeleteWithoutOkAsync<SubscriptionResource, BaseParameters = DeleteSubscriptionResourceBaseParameter>;
+    get is ArmResourceRead<
+      SubscriptionResource,
+      BaseParameters = GetSubscriptionResourceBaseParameter
+    >;
+    put is ArmResourceCreateOrReplaceAsync<
+      SubscriptionResource,
+      BaseParameters = PutSubscriptionResourceBaseParameter
+    >;
+    delete is ArmResourceDeleteWithoutOkAsync<
+      SubscriptionResource,
+      BaseParameters = DeleteSubscriptionResourceBaseParameter
+    >;
     list is ArmListBySubscription<SubscriptionResource>;
   }
 
