@@ -65,8 +65,9 @@ Foo foo = new Foo("hello");
 package service
 
 type Foo struct {
-    Prop *string `json:"prop,omitempty"`
+    Prop string `json:"prop"`
 }
+
 ```
 
 </ClientTabItem>
@@ -129,8 +130,9 @@ Foo foo = new Foo("hello");
 package container
 
 type Foo struct {
-  Prop *string
+    Prop string `json:"prop"`
 }
+
 ```
 
 </ClientTabItem>
@@ -702,12 +704,6 @@ type Animal struct {
     AdditionalProperties map[string]interface{} 
 }
 
-type AnimalOutput struct {
-Name *string
-Kind *string
-AdditionalProperties map[string]interface{}
-}
-
 ````
 </ClientTabItem>
 
@@ -968,6 +964,15 @@ public final class Animal implements JsonSerializable<Animal> {
 }
 ```
 
+</ClientTabItem>
+<ClientTabItem lang="go" >
+```go
+type Animal struct {
+	Name string
+	Kind string
+	AdditionalProperties map[string]interface{}
+}
+```
 </ClientTabItem>
 </ClientTabs>
 
