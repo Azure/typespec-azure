@@ -685,8 +685,7 @@ client.pet();
 ```
 
 ```go
-// client.go
-
+// petstore_client.go
 type PetStoreClient struct {}
 func NewPetStorePetsActionsClient() *PetStorePetsActionsClient{
   return &PetStorePetsActionsClient{}
@@ -799,8 +798,7 @@ client.pet();
 ```
 
 ```go
-// client.go
-
+// petstoregreat_client.go
 type PetStoreGreatClient struct {}
 func NewPetStoreGreatClient() *PetStoreGreatClient{
   return &PetStoreGreatClient{}
@@ -1371,7 +1369,6 @@ petActionClient.pet();
 
 ```go
 // food_client.go
-
 type FoodClient struct {}
 func NewFoodClient() *FoodClient{
   return &FoodClient{}
@@ -1544,7 +1541,6 @@ petActionClient.pet();
 
 ```go
 // food_client.go
-
 type FoodClient struct {}
 func NewFoodClient() *FoodClient{
   return &FoodClient{}
@@ -1694,7 +1690,7 @@ client.download()
 ```
 
 ```go
-// generated client.go
+// storage_client.go
 type StorageClient struct {}
 func NewStorageClient() *NewStorageClient{
   return &NewStorageClient{}
@@ -1830,8 +1826,7 @@ client.download()
 ```
 
 ```go
-// client.go
-
+// storage_client.go
 type StorageClient struct {}
 func NewStorageClient(internal *azcore.Client, endpoint string, blobName string) *NewStorageClient{
   return &NewStorageClient{
