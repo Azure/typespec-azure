@@ -1,3 +1,4 @@
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
 import { SdkHttpOperation, SdkMethodResponse, SdkServiceMethod } from "../../src/interfaces.js";
@@ -415,7 +416,7 @@ it("response body of scalar with encode", async () => {
 });
 
 it("multiple response types should emit error", async () => {
-  const diagnostics = await runner.diagnose(`
+  await runner.diagnose(`
     @service
     namespace TestService {
       model One {
@@ -429,8 +430,8 @@ it("multiple response types should emit error", async () => {
       op doStuff(): One | Two;
     }
   `);
-  
-  runner.expectDiagnostics(diagnostics, {
+
+  expectDiagnostics(runner.context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/multiple-response-types",
   });
 });

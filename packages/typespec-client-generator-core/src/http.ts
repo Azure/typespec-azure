@@ -519,13 +519,10 @@ function getSdkHttpResponseAndExceptions(
           continue;
         }
         contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
-        // Only set body if it hasn't been set yet (keep the first one)
-        if (!body) {
-          body =
-            innerResponse.body.type.kind === "Model"
-              ? getEffectivePayloadType(context, innerResponse.body.type, Visibility.Read)
-              : innerResponse.body.type;
-        }
+        body =
+          innerResponse.body.type.kind === "Model"
+            ? getEffectivePayloadType(context, innerResponse.body.type, Visibility.Read)
+            : innerResponse.body.type;
         if (getStreamMetadata(context.program, innerResponse)) {
           // map stream response body type to bytes
           type = diagnostics.pipe(getStreamAsBytes(context, innerResponse.body.type));
