@@ -57,6 +57,23 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_ClientLocation_MoveMethodParameterToClient
+
+- Endpoint: `get /azure/client-generator-core/client-location/blob`
+
+Test moving a method parameter to client.
+
+The parameter `storageAccount` from operation `getBlob` should be moved to the client in the generated code.
+
+Expected request:
+
+- GET /blob?storageAccount=testaccount&container=testcontainer&blob=testblob.txt
+
+Expected response:
+
+- Status: 200
+- Body: {"id": "blob-001", "name": "testblob.txt", "size": 1024, "path": "/testcontainer/testblob.txt"}
+
 ### Azure_ClientGenerator_Core_ClientLocation_MoveToExistingSubClient
 
 - Endpoints:
@@ -1467,6 +1484,55 @@ Expected response body:
   "succeeded": true
 }
 ```
+
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement
+
+- Endpoints:
+  - `get https://management.azure.com`
+  - `get https://management.azure.com`
+  - `get https://management.azure.com`
+  - `get https://management.azure.com`
+  - `get https://management.azure.com`
+  - `get https://management.azure.com`
+  - `get https://management.azure.com`
+  - `get https://management.azure.com`
+  - `get https://management.azure.com`
+
+Test mixed parameter placement: subscription resource with method-level subscriptionId and resource group resource with client-level subscriptionId.
+
+This scenario has:
+
+1. One subscription-level resource (SubscriptionResource) with subscriptionId moved to method level
+2. One resource group-level resource (ResourceGroupResource) with subscriptionId staying at client level
+
+Expected behavior:
+
+- Client should have subscriptionId parameter in initialization (for ResourceGroupResource operations)
+- SubscriptionResource operations should have subscriptionId as method-level parameter
+- ResourceGroupResource operations should not have subscriptionId as method-level parameter (uses client-level)
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel
+
+- Endpoints:
+  - `get https://management.azure.com`
+  - `get https://management.azure.com`
+  - `get https://management.azure.com`
+  - `get https://management.azure.com`
+  - `get https://management.azure.com`
+  - `get https://management.azure.com`
+  - `get https://management.azure.com`
+  - `get https://management.azure.com`
+
+Test that subscriptionId parameter stays at method level for all operations on subscription-scoped resources.
+
+This scenario has two subscription-level resources (SubscriptionResource1 and SubscriptionResource2) where
+the subscriptionId parameter is explicitly moved from client level to method level for all operations
+using @clientLocation decorator.
+
+Expected behavior:
+
+- Client should not have subscriptionId parameter in initialization
+- All operations (get, put, delete) should have subscriptionId as method-level parameter
 
 ### Azure_ResourceManager_NonResource_NonResourceOperations_create
 

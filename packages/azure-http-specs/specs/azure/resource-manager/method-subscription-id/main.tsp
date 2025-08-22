@@ -1,28 +1,25 @@
 import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/spector";
+import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 import "@azure-tools/typespec-client-generator-core";
 
-using Http;
 using Rest;
 using Spector;
-using Azure.Core;
-using Azure.ResourceManager;
-using Azure.ClientGenerator.Core;
-using OpenAPI;
+using Versioning;
+using Azure.ResourceManager.Foundations;
 
-@doc("Test for ARM method level subscription ID parameter placement")
-@scenarioService("/azure/resource-manager/method-subscription-id")
 @armProviderNamespace
 @service
 @versioned(Versions)
-@armCommonTypesVersion(CommonTypes.Versions.v5)
-namespace _Specs_.Azure.ResourceManager.MethodSubscriptionId;
+@doc("Test for ARM method level subscription ID parameter placement")
+namespace Azure.ResourceManager.MethodSubscriptionId;
 
 @doc("Azure API versions.")
 enum Versions {
+  @armCommonTypesVersion(CommonTypes.Versions.v5)
   @useDependency(Azure.Core.Versions.v1_0_Preview_2)
   @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
   @doc("Preview API version 2023-12-01-preview.")
@@ -54,12 +51,7 @@ namespace TwoSubscriptionResourcesMethodLevel {
   @subscriptionResource
   @resource("subscriptionResource1s")
   model SubscriptionResource1 is ProxyResource<SubscriptionResource1Properties> {
-    @key("subscriptionResource1Name")
-    @path
-    @segment("subscriptionResource1s")
-    @doc("Name of the subscription resource 1")
-    @pattern("^[A-Za-z0-9]([A-Za-z0-9-_.]{0,62}[A-Za-z0-9])?$")
-    name: string;
+    ...ResourceNameParameter<SubscriptionResource1>;
   }
 
   @doc("Properties of subscription resource 1.")
@@ -75,12 +67,7 @@ namespace TwoSubscriptionResourcesMethodLevel {
   @subscriptionResource
   @resource("subscriptionResource2s")
   model SubscriptionResource2 is ProxyResource<SubscriptionResource2Properties> {
-    @key("subscriptionResource2Name")
-    @path
-    @segment("subscriptionResource2s")
-    @doc("Name of the subscription resource 2")
-    @pattern("^[A-Za-z0-9]([A-Za-z0-9-_.]{0,62}[A-Za-z0-9])?$")
-    name: string;
+    ...ResourceNameParameter<SubscriptionResource2>;
   }
 
   @doc("Properties of subscription resource 2.")
@@ -161,12 +148,7 @@ namespace MixedSubscriptionPlacement {
   @subscriptionResource
   @resource("subscriptionResources")
   model SubscriptionResource is ProxyResource<SubscriptionResourceProperties> {
-    @key("subscriptionResourceName")
-    @path
-    @segment("subscriptionResources")
-    @doc("Name of the subscription resource")
-    @pattern("^[A-Za-z0-9]([A-Za-z0-9-_.]{0,62}[A-Za-z0-9])?$")
-    name: string;
+    ...ResourceNameParameter<SubscriptionResource>;
   }
 
   @doc("Properties of subscription resource.")
@@ -181,12 +163,7 @@ namespace MixedSubscriptionPlacement {
 
   @resource("resourceGroupResources")
   model ResourceGroupResource is TrackedResource<ResourceGroupResourceProperties> {
-    @key("resourceGroupResourceName")
-    @path
-    @segment("resourceGroupResources")
-    @doc("Name of the resource group resource")
-    @pattern("^[A-Za-z0-9]([A-Za-z0-9-_.]{0,62}[A-Za-z0-9])?$")
-    name: string;
+    ...ResourceNameParameter<ResourceGroupResource>;
   }
 
   @doc("Properties of resource group resource.")
@@ -200,12 +177,9 @@ namespace MixedSubscriptionPlacement {
   }
 
   // Define base parameter models only for subscription resource to enable subscriptionId parameter access
-  model GetSubscriptionResourceBaseParameter
-    is Azure.ResourceManager.Foundations.DefaultBaseParameters<SubscriptionResource>;
-  model PutSubscriptionResourceBaseParameter
-    is Azure.ResourceManager.Foundations.DefaultBaseParameters<SubscriptionResource>;
-  model DeleteSubscriptionResourceBaseParameter
-    is Azure.ResourceManager.Foundations.DefaultBaseParameters<SubscriptionResource>;
+  model GetSubscriptionResourceBaseParameter is DefaultBaseParameters<SubscriptionResource>;
+  model PutSubscriptionResourceBaseParameter is DefaultBaseParameters<SubscriptionResource>;
+  model DeleteSubscriptionResourceBaseParameter is DefaultBaseParameters<SubscriptionResource>;
 
   @armResourceOperations
   interface SubscriptionResourceOperations {
