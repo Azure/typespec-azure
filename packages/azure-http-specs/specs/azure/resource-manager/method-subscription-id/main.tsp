@@ -26,14 +26,6 @@ enum Versions {
   v2023_12_01_preview: "2023-12-01-preview",
 }
 
-union ProvisioningState {
-  ResourceProvisioningState,
-  Provisioning: "Provisioning",
-  Updating: "Updating",
-  Deleting: "Deleting",
-  Accepted: "Accepted",
-}
-
 // Scenario 1: Two subscription level resources with subscriptionId at method level for all operations
 @scenarioDoc("""
   Test that subscriptionId parameter stays at method level for all operations on subscription-scoped resources.
@@ -58,7 +50,7 @@ namespace TwoSubscriptionResourcesMethodLevel {
   model SubscriptionResource1Properties {
     @visibility(Lifecycle.Read)
     @doc("The status of the last operation.")
-    provisioningState?: ProvisioningState;
+    provisioningState?: ResourceProvisioningState;
 
     @doc("The description of the resource.")
     description?: string;
@@ -74,7 +66,7 @@ namespace TwoSubscriptionResourcesMethodLevel {
   model SubscriptionResource2Properties {
     @visibility(Lifecycle.Read)
     @doc("The status of the last operation.")
-    provisioningState?: ProvisioningState;
+    provisioningState?: ResourceProvisioningState;
 
     @doc("The configuration value.")
     configValue?: string;
@@ -155,7 +147,7 @@ namespace MixedSubscriptionPlacement {
   model SubscriptionResourceProperties {
     @visibility(Lifecycle.Read)
     @doc("The status of the last operation.")
-    provisioningState?: ProvisioningState;
+    provisioningState?: ResourceProvisioningState;
 
     @doc("The subscription-scoped setting.")
     subscriptionSetting?: string;
@@ -170,7 +162,7 @@ namespace MixedSubscriptionPlacement {
   model ResourceGroupResourceProperties {
     @visibility(Lifecycle.Read)
     @doc("The status of the last operation.")
-    provisioningState?: ProvisioningState;
+    provisioningState?: ResourceProvisioningState;
 
     @doc("The resource group-scoped setting.")
     resourceGroupSetting?: string;
