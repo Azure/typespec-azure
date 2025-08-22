@@ -368,7 +368,23 @@ serviceClientClient.previewFunctionality(previewModel);
 ```
 
 ```go
-// TODO
+type PreviewModel struct {
+  // REQUIRED
+	BetaFeature *string
+}
+type StableModel struct {
+  // REQUIRED
+	StableFeature *string
+}
+type ClientPreviewFunctionalityResponse struct {}
+type ClientStableFunctionalityResponse struct {}
+type ClientPreviewFunctionalityOptions struct {}
+type ClientStableFunctionalityOptions struct {}
+
+func PreviewFunctionality(ctx context.Context, previewModel PreviewModel, options *ClientPreviewFunctionalityOptions) (ClientPreviewFunctionalityResponse, error) {}
+
+func StableFunctionality(ctx context.Context, stableModel StableModel, options *ClientStableFunctionalityOptions) (ClientStableFunctionalityResponse, error) {}
+
 ```
 
 </ClientTabs>
