@@ -771,6 +771,7 @@ type ClientUploadResponse struct {}
 type ClientUploadOptions struct {}
 
 func Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error) {}
+
 ```
 
 </ClientTabItem>
@@ -1231,6 +1232,7 @@ type ClientScheduleRepairsResponse struct {
 type ClientScheduleRepairsOptions struct {}
 
 func ScheduleRepairs(ctx context.Context, widgetName string, repairInfo RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error) {}
+
 ```
 
 </ClientTabItem>

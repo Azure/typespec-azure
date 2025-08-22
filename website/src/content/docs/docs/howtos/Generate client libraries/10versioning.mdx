@@ -98,12 +98,13 @@ serviceClientClient.stableFunctionality(stableModel);
 
 ```go
 type StableModel struct {
-// REQUIRED
+  // REQUIRED
 	StableFeature *string
 }
 type ServiceClientStableFunctionalityOptions struct {}
 type ServiceClientStableFunctionalityResponse struct {}
 type ServiceClient struct {}
+
 func (client *ServiceClient) StableFunctionality(ctx context.Context, stableModel StableModel, options *ServiceClientStableFunctionalityOptions) (ServiceClientStableFunctionalityResponse, error) {}
 
 ```

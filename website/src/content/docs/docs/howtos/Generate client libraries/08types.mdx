@@ -62,8 +62,6 @@ Foo foo = new Foo("hello");
 <ClientTabItem lang="go" >
 
 ```go
-package service
-
 type Foo struct {
     Prop string `json:"prop"`
 }
@@ -921,8 +919,6 @@ public final class Animal implements JsonSerializable<Animal> {
 <ClientTabItem lang="go" >
 
 ```go
-package service
-
 type Animal struct {
   Name *string
   Kind *string
@@ -1218,8 +1214,6 @@ TODO
 <ClientTabItem lang="go" >
 
 ```go
-package service
-
 type Foo struct {
   BasicNullableProperty *string
   ModelNullableProperty *Bar
@@ -1913,19 +1907,14 @@ public final class ProvisioningState extends ExpandableStringEnum<ProvisioningSt
 <ClientTabItem lang="go" >
 
 ```go
-package service
-
 type ProvisioningState string
-
 const (
-ProvisioningStateInProgress ProvisioningState = "InProgress"
-
-    // Constants from Azure.ResourceManager.ResourceProvisioningState
-    ResourceProvisioningStateSucceeded ProvisioningState = "Succeeded"
-    ResourceProvisioningStateFailed    ProvisioningState = "Failed"
-    ResourceProvisioningStateCanceled  ProvisioningState = "Canceled"
-    // ... other imported states
-
+  ProvisioningStateInProgress ProvisioningState = "InProgress"
+  // Constants from Azure.ResourceManager.ResourceProvisioningState
+  ResourceProvisioningStateSucceeded ProvisioningState = "Succeeded"
+  ResourceProvisioningStateFailed    ProvisioningState = "Failed"
+  ResourceProvisioningStateCanceled  ProvisioningState = "Canceled"
+  // ... other imported states
 )
 
 ```
@@ -2007,8 +1996,6 @@ public enum Orientation {
 <ClientTabItem lang="go" >
 
 ```go
-package service
-
 type Orientation string
 
 const (
@@ -2103,8 +2090,6 @@ public enum WidgetOrientation {
 <ClientTabItem lang="go" >
 
 ```go
-package service
-
 type Orientation string
 
 const (
@@ -2185,8 +2170,6 @@ public enum LR {
 <ClientTabItem lang="go" >
 
 ```go
-package service
-
 type LR string
 
 const (
@@ -2250,8 +2233,6 @@ public enum ServiceServiceVersion implements ServiceVersion {
 <ClientTabItem lang="go" >
 
 ```go
-package service
-
 type Versions string
 
 const (
@@ -2340,8 +2321,6 @@ public enum Orientation {
 <ClientTabItem lang="go" >
 
 ```go
-package service
-
 type LR string
 
 const (
@@ -2464,10 +2443,7 @@ jsonWriter.writeStringField("prop", Objects.toString(this.value, null));
 </ClientTabItem>
 <ClientTabItem lang="go" >
 ```go
-type Test struct {
-	Prop int64 `json:"prop"`
-}
-
+// NOT_SUPPORTED
 ```
 </ClientTabItem>
 </ClientTabs>
