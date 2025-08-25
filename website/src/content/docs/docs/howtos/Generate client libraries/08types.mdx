@@ -44,9 +44,13 @@ foo = Foo(prop="hello")
 <ClientTabItem lang="typescript" >
 
 ```typescript
-import { Foo } from "@azure/package-name";
+export interface Foo {
+  prop: string;
+}
 
-const foo: Foo = "hello";
+export function fooSerializer(item: Foo): any {
+  return { prop: item["prop"] };
+}
 ```
 
 </ClientTabItem>
@@ -99,9 +103,13 @@ foo = Foo(prop="hello")
 <ClientTabItem lang="typescript" >
 
 ```typescript
-import { Foo } from "@azure/package-name";
+export interface Foo {
+  prop: string;
+}
 
-const foo: Foo = "hello";
+export function fooSerializer(item: Foo): any {
+  return { prop: item["prop"] };
+}
 ```
 
 </ClientTabItem>
@@ -153,9 +161,13 @@ foo = Foo(prop="hello")
 <ClientTabItem lang="typescript" >
 
 ```typescript
-import { Foo } from "@azure/package-name";
+export interface Foo {
+  prop: string;
+}
 
-const foo: Foo = "hello";
+export function fooSerializer(item: Foo): any {
+  return { prop: item["prop"] };
+}
 ```
 
 </ClientTabItem>
