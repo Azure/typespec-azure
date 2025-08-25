@@ -37,7 +37,7 @@ import {
   getVersioningMutators,
   getVersions,
 } from "@typespec/versioning";
-import { getClientDocExplicit, getParamAlias } from "./decorators.js";
+import { getClientDocExplicit, getClientLocation, getParamAlias } from "./decorators.js";
 import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 import {
   DecoratorInfo,
@@ -46,6 +46,7 @@ import {
   SdkEnumType,
   SdkHeaderParameter,
   SdkHttpResponse,
+  SdkMethodParameter,
   SdkOperationGroup,
   SdkType,
   TCGCContext,
@@ -534,9 +535,10 @@ export function twoParamsEquivalent(
     return false;
   }
   return (
-    param1.name === param2.name ||
-    getParamAlias(context, param1) === param2.name ||
-    param1.name === getParamAlias(context, param2)
+    param1.type === param2.type &&
+    (param1.name === param2.name ||
+      getParamAlias(context, param1) === param2.name ||
+      param1.name === getParamAlias(context, param2))
   );
 }
 
@@ -585,17 +587,40 @@ export function isOnClient(
   operation?: Operation,
   versioning?: boolean,
 ): boolean {
-  const client = operation ? context.getClientForOperation(operation) : undefined;
+  const clientLocation = getClientLocation(context, type);
+  if (operation && clientLocation === operation) {
+    // if the type has explicitly been moved to the operation, it is not on the client
+    return false;
+  }
   return (
     isSubscriptionId(context, type) ||
     (isApiVersion(context, type) && versioning) ||
-    Boolean(
-      client &&
-        context.__clientParametersCache
-          .get(client)
-          ?.find((x) => twoParamsEquivalent(context, x.__raw, type)),
-    )
+    (operation !== undefined && getCorrespondingClientParam(context, type, operation) !== undefined)
   );
+}
+
+export function getCorrespondingClientParam(
+  context: TCGCContext,
+  type: ModelProperty,
+  operation: Operation,
+): SdkMethodParameter | undefined {
+  const clientParams = [];
+  let client: SdkClient | SdkOperationGroup | undefined = context.getClientForOperation(operation);
+  while (client) {
+    const clientParamsForClient = context.__clientParametersCache.get(client);
+    if (clientParamsForClient) {
+      clientParams.push(...clientParamsForClient);
+    }
+    if (client.kind === "SdkClient") {
+      break;
+    }
+    client = client.parent;
+  }
+  const correspondingClientParam = clientParams?.find((x) =>
+    twoParamsEquivalent(context, x.__raw, type),
+  );
+  if (correspondingClientParam) return correspondingClientParam;
+  return undefined;
 }
 
 export function getValueTypeValue(
@@ -784,4 +809,26 @@ export function* filterMapValuesIterator<V>(
       yield value;
     }
   }
+}
+
+/**
+ * Find all entries in a scoped decorator state map where the target matches a specific value
+ */
+export function findEntriesWithTarget<TSource extends Type, TTarget>(
+  context: TCGCContext,
+  stateKey: symbol,
+  targetValue: TTarget,
+  sourceKind?: TSource["kind"],
+): TSource[] {
+  const results: TSource[] = [];
+
+  for (const [type, target] of listScopedDecoratorData(context, stateKey)) {
+    if (sourceKind && type.kind !== sourceKind) {
+      continue;
+    }
+    if (target === targetValue) {
+      results.push(type as TSource);
+    }
+  }
+  return results;
 }

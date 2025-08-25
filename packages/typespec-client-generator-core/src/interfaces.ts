@@ -118,6 +118,8 @@ export interface SdkOperationGroup {
   subOperationGroups: SdkOperationGroup[];
   groupPath: string;
   service: Namespace;
+  /** Parent operation group or client. */
+  parent?: SdkClient | SdkOperationGroup;
 }
 
 export type AccessFlags = "internal" | "public";
