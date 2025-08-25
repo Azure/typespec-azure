@@ -25,20 +25,19 @@ enum Versions {
   @doc("Preview API version 2023-12-01-preview.")
   v2023_12_01_preview: "2023-12-01-preview",
 }
-
-// Scenario 1: Two subscription level resources with subscriptionId at method level for all operations
-@scenarioDoc("""
-  Test that subscriptionId parameter stays at method level for all operations on subscription-scoped resources.
-  
-  This scenario has two subscription-level resources (SubscriptionResource1 and SubscriptionResource2) where 
-  the subscriptionId parameter is explicitly moved from client level to method level for all operations
-  using @clientLocation decorator.
-  
-  Expected behavior:
-  - Client should not have subscriptionId parameter in initialization
-  - All operations (get, put, delete) should have subscriptionId as method-level parameter
-  """)
-@scenario
+/**
+ * Scenario 1: Two subscription level resources with subscriptionId at method level for all operations
+ *
+ * Test that subscriptionId parameter stays at method level for all operations on subscription-scoped resources.
+ *
+ * This scenario has two subscription-level resources (SubscriptionResource1 and SubscriptionResource2) where
+ * the subscriptionId parameter is explicitly moved from client level to method level for all operations
+ * using @clientLocation decorator.
+ *
+ * Expected behavior:
+ * - Client should not have subscriptionId parameter in initialization
+ * - All operations (get, put, delete) should have subscriptionId as method-level parameter
+ */
 namespace TwoSubscriptionResourcesMethodLevel {
   @subscriptionResource
   @resource("subscriptionResource1s")
@@ -89,53 +88,191 @@ namespace TwoSubscriptionResourcesMethodLevel {
 
   @armResourceOperations
   interface SubscriptionResource1Operations {
+    @scenario
+    @scenarioDoc("""
+      Resource GET operation for SubscriptionResource1 with method-level subscriptionId.
+      Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1
+      Expected query parameter: api-version=2023-12-01-preview
+      
+      Expected response body:
+      ```json
+      {
+        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1",
+        "name": "sub-resource-1",
+        "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s",
+        "properties":{
+          "description": "Valid subscription resource 1",
+          "provisioningState": "Succeeded"
+        },
+        "systemData": {
+          "createdBy": "AzureSDK",
+          "createdByType": "User",
+          "createdAt": "2023-01-01T00:00:00.000Z",
+          "lastModifiedBy": "AzureSDK",
+          "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+          "lastModifiedByType": "User"
+        }
+      }
+      ```
+      """)
     get is ArmResourceRead<
       SubscriptionResource1,
       BaseParameters = GetSubscriptionResource1BaseParameter
     >;
-    put is ArmResourceCreateOrReplaceAsync<
+
+    @scenario
+    @scenarioDoc("""
+      Resource PUT operation for SubscriptionResource1 with method-level subscriptionId.
+      Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1
+      Expected query parameter: api-version=2023-12-01-preview
+      Expected request body:
+      ```json
+      {
+        "properties":{
+          "description": "Valid subscription resource 1"
+        }
+      }
+      ```
+      Expected response body:
+      ```json
+      {
+        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1",
+        "name": "sub-resource-1",
+        "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s",
+        "properties":{
+          "description": "Valid subscription resource 1",
+          "provisioningState": "Succeeded"
+        },
+        "systemData": {
+          "createdBy": "AzureSDK",
+          "createdByType": "User",
+          "createdAt": "2023-01-01T00:00:00.000Z",
+          "lastModifiedBy": "AzureSDK",
+          "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+          "lastModifiedByType": "User"
+        }
+      }
+      ```
+      """)
+    put is ArmResourceCreateOrReplaceSync<
       SubscriptionResource1,
       BaseParameters = PutSubscriptionResource1BaseParameter
     >;
-    delete is ArmResourceDeleteWithoutOkAsync<
+
+    @scenario
+    @scenarioDoc("""
+      Resource DELETE operation for SubscriptionResource1 with method-level subscriptionId.
+      Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1
+      Expected query parameter: api-version=2023-12-01-preview
+      Expected response status code: 204
+      """)
+    delete is ArmResourceDeleteSync<
       SubscriptionResource1,
       BaseParameters = DeleteSubscriptionResource1BaseParameter
     >;
-    list is ArmListBySubscription<SubscriptionResource1>;
   }
 
   @armResourceOperations
   interface SubscriptionResource2Operations {
+    @scenario
+    @scenarioDoc("""
+      Resource GET operation for SubscriptionResource2 with method-level subscriptionId.
+      Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2
+      Expected query parameter: api-version=2023-12-01-preview
+      
+      Expected response body:
+      ```json
+      {
+        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2",
+        "name": "sub-resource-2",
+        "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s",
+        "properties":{
+          "configValue": "test-config",
+          "provisioningState": "Succeeded"
+        },
+        "systemData": {
+          "createdBy": "AzureSDK",
+          "createdByType": "User",
+          "createdAt": "2023-01-01T00:00:00.000Z",
+          "lastModifiedBy": "AzureSDK",
+          "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+          "lastModifiedByType": "User"
+        }
+      }
+      ```
+      """)
     get is ArmResourceRead<
       SubscriptionResource2,
       BaseParameters = GetSubscriptionResource2BaseParameter
     >;
-    put is ArmResourceCreateOrReplaceAsync<
+
+    @scenario
+    @scenarioDoc("""
+      Resource PUT operation for SubscriptionResource2 with method-level subscriptionId.
+      Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2
+      Expected query parameter: api-version=2023-12-01-preview
+      Expected request body:
+      ```json
+      {
+        "properties":{
+          "configValue": "test-config"
+        }
+      }
+      ```
+      Expected response body:
+      ```json
+      {
+        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2",
+        "name": "sub-resource-2",
+        "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s",
+        "properties":{
+          "configValue": "test-config",
+          "provisioningState": "Succeeded"
+        },
+        "systemData": {
+          "createdBy": "AzureSDK",
+          "createdByType": "User",
+          "createdAt": "2023-01-01T00:00:00.000Z",
+          "lastModifiedBy": "AzureSDK",
+          "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+          "lastModifiedByType": "User"
+        }
+      }
+      ```
+      """)
+    put is ArmResourceCreateOrReplaceSync<
       SubscriptionResource2,
       BaseParameters = PutSubscriptionResource2BaseParameter
     >;
-    delete is ArmResourceDeleteWithoutOkAsync<
+
+    @scenario
+    @scenarioDoc("""
+      Resource DELETE operation for SubscriptionResource2 with method-level subscriptionId.
+      Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2
+      Expected query parameter: api-version=2023-12-01-preview
+      Expected response status code: 204
+      """)
+    delete is ArmResourceDeleteSync<
       SubscriptionResource2,
       BaseParameters = DeleteSubscriptionResource2BaseParameter
     >;
-    list is ArmListBySubscription<SubscriptionResource2>;
   }
 }
 
-// Scenario 2: One subscription level resource (method-level subscriptionId) and one resource group level resource (client-level subscriptionId)
-@scenarioDoc("""
-  Test mixed parameter placement: subscription resource with method-level subscriptionId and resource group resource with client-level subscriptionId.
-  
-  This scenario has:
-  1. One subscription-level resource (SubscriptionResource) with subscriptionId moved to method level
-  2. One resource group-level resource (ResourceGroupResource) with subscriptionId staying at client level
-  
-  Expected behavior:
-  - Client should have subscriptionId parameter in initialization (for ResourceGroupResource operations)
-  - SubscriptionResource operations should have subscriptionId as method-level parameter
-  - ResourceGroupResource operations should not have subscriptionId as method-level parameter (uses client-level)
-  """)
-@scenario
+/**
+ * Scenario 2: One subscription level resource (method-level subscriptionId) and one resource group level resource (client-level subscriptionId)
+ *
+ * Test mixed parameter placement: subscription resource with method-level subscriptionId and resource group resource with client-level subscriptionId.
+ *
+ * This scenario has:
+ * 1. One subscription-level resource (SubscriptionResource) with subscriptionId moved to method level
+ * 2. One resource group-level resource (ResourceGroupResource) with subscriptionId staying at client level
+ *
+ * Expected behavior:
+ * - Client should have subscriptionId parameter in initialization (for ResourceGroupResource operations)
+ * - SubscriptionResource operations should have subscriptionId as method-level parameter
+ * - ResourceGroupResource operations should not have subscriptionId as method-level parameter (uses client-level)
+ */
 namespace MixedSubscriptionPlacement {
   @subscriptionResource
   @resource("subscriptionResources")
@@ -175,27 +312,167 @@ namespace MixedSubscriptionPlacement {
 
   @armResourceOperations
   interface SubscriptionResourceOperations {
+    @scenario
+    @scenarioDoc("""
+      Resource GET operation for subscription-scoped resource with method-level subscriptionId in mixed scenario.
+      Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource
+      Expected query parameter: api-version=2023-12-01-preview
+      
+      Expected response body:
+      ```json
+      {
+        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource",
+        "name": "sub-resource",
+        "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResources",
+        "properties":{
+          "subscriptionSetting": "test-sub-setting",
+          "provisioningState": "Succeeded"
+        },
+        "systemData": {
+          "createdBy": "AzureSDK",
+          "createdByType": "User",
+          "createdAt": "2023-01-01T00:00:00.000Z",
+          "lastModifiedBy": "AzureSDK",
+          "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+          "lastModifiedByType": "User"
+        }
+      }
+      ```
+      """)
     get is ArmResourceRead<
       SubscriptionResource,
       BaseParameters = GetSubscriptionResourceBaseParameter
     >;
-    put is ArmResourceCreateOrReplaceAsync<
+
+    @scenario
+    @scenarioDoc("""
+      Resource PUT operation for subscription-scoped resource with method-level subscriptionId in mixed scenario.
+      Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource
+      Expected query parameter: api-version=2023-12-01-preview
+      Expected request body:
+      ```json
+      {
+        "properties":{
+          "subscriptionSetting": "test-sub-setting"
+        }
+      }
+      ```
+      Expected response body:
+      ```json
+      {
+        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource",
+        "name": "sub-resource",
+        "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResources",
+        "properties":{
+          "subscriptionSetting": "test-sub-setting",
+          "provisioningState": "Succeeded"
+        },
+        "systemData": {
+          "createdBy": "AzureSDK",
+          "createdByType": "User",
+          "createdAt": "2023-01-01T00:00:00.000Z",
+          "lastModifiedBy": "AzureSDK",
+          "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+          "lastModifiedByType": "User"
+        }
+      }
+      ```
+      """)
+    put is ArmResourceCreateOrReplaceSync<
       SubscriptionResource,
       BaseParameters = PutSubscriptionResourceBaseParameter
     >;
-    delete is ArmResourceDeleteWithoutOkAsync<
+
+    @scenario
+    @scenarioDoc("""
+      Resource DELETE operation for subscription-scoped resource with method-level subscriptionId in mixed scenario.
+      Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource
+      Expected query parameter: api-version=2023-12-01-preview
+      Expected response status code: 204
+      """)
+    delete is ArmResourceDeleteSync<
       SubscriptionResource,
       BaseParameters = DeleteSubscriptionResourceBaseParameter
     >;
-    list is ArmListBySubscription<SubscriptionResource>;
   }
 
   @armResourceOperations
   interface ResourceGroupResourceOperations {
+    @scenario
+    @scenarioDoc("""
+      Resource GET operation for resource group-scoped resource with client-level subscriptionId in mixed scenario.
+      Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource
+      Expected query parameter: api-version=2023-12-01-preview
+      
+      Expected response body:
+      ```json
+      {
+        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource",
+        "name": "rg-resource",
+        "type": "Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources",
+        "location": "eastus",
+        "properties":{
+          "resourceGroupSetting": "test-setting",
+          "provisioningState": "Succeeded"
+        },
+        "systemData": {
+          "createdBy": "AzureSDK",
+          "createdByType": "User",
+          "createdAt": "2023-01-01T00:00:00.000Z",
+          "lastModifiedBy": "AzureSDK",
+          "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+          "lastModifiedByType": "User"
+        }
+      }
+      ```
+      """)
     get is ArmResourceRead<ResourceGroupResource>;
-    put is ArmResourceCreateOrReplaceAsync<ResourceGroupResource>;
-    delete is ArmResourceDeleteWithoutOkAsync<ResourceGroupResource>;
-    listByResourceGroup is ArmResourceListByParent<ResourceGroupResource>;
-    listBySubscription is ArmListBySubscription<ResourceGroupResource>;
+
+    @scenario
+    @scenarioDoc("""
+      Resource PUT operation for resource group-scoped resource with client-level subscriptionId in mixed scenario.
+      Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource
+      Expected query parameter: api-version=2023-12-01-preview
+      Expected request body:
+      ```json
+      {
+        "location": "eastus",
+        "properties":{
+          "resourceGroupSetting": "test-setting"
+        }
+      }
+      ```
+      Expected response body:
+      ```json
+      {
+        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource",
+        "name": "rg-resource",
+        "type": "Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources",
+        "location": "eastus",
+        "properties":{
+          "resourceGroupSetting": "test-setting",
+          "provisioningState": "Succeeded"
+        },
+        "systemData": {
+          "createdBy": "AzureSDK",
+          "createdByType": "User",
+          "createdAt": "2023-01-01T00:00:00.000Z",
+          "lastModifiedBy": "AzureSDK",
+          "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+          "lastModifiedByType": "User"
+        }
+      }
+      ```
+      """)
+    put is ArmResourceCreateOrReplaceSync<ResourceGroupResource>;
+
+    @scenario
+    @scenarioDoc("""
+      Resource DELETE operation for resource group-scoped resource with client-level subscriptionId in mixed scenario.
+      Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource
+      Expected query parameter: api-version=2023-12-01-preview
+      Expected response status code: 204
+      """)
+    delete is ArmResourceDeleteSync<ResourceGroupResource>;
   }
 }

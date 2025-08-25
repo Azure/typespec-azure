@@ -1485,54 +1485,320 @@ Expected response body:
 }
 ```
 
-### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_ResourceGroupResourceOperations_delete
 
-- Endpoints:
-  - `get https://management.azure.com`
-  - `get https://management.azure.com`
-  - `get https://management.azure.com`
-  - `get https://management.azure.com`
-  - `get https://management.azure.com`
-  - `get https://management.azure.com`
-  - `get https://management.azure.com`
-  - `get https://management.azure.com`
-  - `get https://management.azure.com`
+- Endpoint: `delete https://management.azure.com`
 
-Test mixed parameter placement: subscription resource with method-level subscriptionId and resource group resource with client-level subscriptionId.
+Resource DELETE operation for resource group-scoped resource with client-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
 
-This scenario has:
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_ResourceGroupResourceOperations_get
 
-1. One subscription-level resource (SubscriptionResource) with subscriptionId moved to method level
-2. One resource group-level resource (ResourceGroupResource) with subscriptionId staying at client level
+- Endpoint: `get https://management.azure.com`
 
-Expected behavior:
+Resource GET operation for resource group-scoped resource with client-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource
+Expected query parameter: api-version=2023-12-01-preview
 
-- Client should have subscriptionId parameter in initialization (for ResourceGroupResource operations)
-- SubscriptionResource operations should have subscriptionId as method-level parameter
-- ResourceGroupResource operations should not have subscriptionId as method-level parameter (uses client-level)
+Expected response body:
 
-### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource",
+  "name": "rg-resource",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources",
+  "location": "eastus",
+  "properties": {
+    "resourceGroupSetting": "test-setting",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
 
-- Endpoints:
-  - `get https://management.azure.com`
-  - `get https://management.azure.com`
-  - `get https://management.azure.com`
-  - `get https://management.azure.com`
-  - `get https://management.azure.com`
-  - `get https://management.azure.com`
-  - `get https://management.azure.com`
-  - `get https://management.azure.com`
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_ResourceGroupResourceOperations_put
 
-Test that subscriptionId parameter stays at method level for all operations on subscription-scoped resources.
+- Endpoint: `put https://management.azure.com`
 
-This scenario has two subscription-level resources (SubscriptionResource1 and SubscriptionResource2) where
-the subscriptionId parameter is explicitly moved from client level to method level for all operations
-using @clientLocation decorator.
+Resource PUT operation for resource group-scoped resource with client-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
 
-Expected behavior:
+```json
+{
+  "location": "eastus",
+  "properties": {
+    "resourceGroupSetting": "test-setting"
+  }
+}
+```
 
-- Client should not have subscriptionId parameter in initialization
-- All operations (get, put, delete) should have subscriptionId as method-level parameter
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource",
+  "name": "rg-resource",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources",
+  "location": "eastus",
+  "properties": {
+    "resourceGroupSetting": "test-setting",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_SubscriptionResourceOperations_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation for subscription-scoped resource with method-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_SubscriptionResourceOperations_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation for subscription-scoped resource with method-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource",
+  "name": "sub-resource",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResources",
+  "properties": {
+    "subscriptionSetting": "test-sub-setting",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_SubscriptionResourceOperations_put
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation for subscription-scoped resource with method-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "properties": {
+    "subscriptionSetting": "test-sub-setting"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource",
+  "name": "sub-resource",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResources",
+  "properties": {
+    "subscriptionSetting": "test-sub-setting",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource1Operations_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation for SubscriptionResource1 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource1Operations_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation for SubscriptionResource1 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1",
+  "name": "sub-resource-1",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s",
+  "properties": {
+    "description": "Valid subscription resource 1",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource1Operations_put
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation for SubscriptionResource1 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "properties": {
+    "description": "Valid subscription resource 1"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1",
+  "name": "sub-resource-1",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s",
+  "properties": {
+    "description": "Valid subscription resource 1",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource2Operations_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation for SubscriptionResource2 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource2Operations_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation for SubscriptionResource2 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2",
+  "name": "sub-resource-2",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s",
+  "properties": {
+    "configValue": "test-config",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource2Operations_put
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation for SubscriptionResource2 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "properties": {
+    "configValue": "test-config"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2",
+  "name": "sub-resource-2",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s",
+  "properties": {
+    "configValue": "test-config",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
 
 ### Azure_ResourceManager_NonResource_NonResourceOperations_create
 
