@@ -260,6 +260,7 @@ op ArmResourceCreateOrReplaceAsync<
  * @template LroHeaders Optional.  Allows overriding the lro headers that appear in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
  */
+@patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmTagsPatchAsync<
   Resource extends Foundations.SimpleResource,
@@ -288,6 +289,7 @@ op ArmTagsPatchAsync<
  * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
  */
+@patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourcePatchAsync<
   Resource extends Foundations.SimpleResource,
@@ -315,8 +317,8 @@ op ArmResourcePatchAsync<
 @autoRoute
 @doc("Update a {name}", Resource)
 @armResourceUpdate(Resource)
+@patch(#{ implicitOptionality: false })
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@patch(#{ implicitOptionality: true })
 op ArmCustomPatchAsync<
   Resource extends Foundations.SimpleResource,
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
@@ -346,6 +348,7 @@ op ArmCustomPatchAsync<
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
  */
+@patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmTagsPatchSync<
   Resource extends Foundations.SimpleResource,
@@ -360,6 +363,7 @@ op ArmTagsPatchSync<
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
  */
+@patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourcePatchSync<
   Resource extends Foundations.SimpleResource,
@@ -380,8 +384,8 @@ op ArmResourcePatchSync<
 @autoRoute
 @doc("Update a {name}", Resource)
 @armResourceUpdate(Resource)
+@patch(#{ implicitOptionality: false })
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@patch(#{ implicitOptionality: true })
 op ArmCustomPatchSync<
   Resource extends Foundations.SimpleResource,
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
