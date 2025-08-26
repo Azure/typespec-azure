@@ -88,7 +88,12 @@ client.feed(Food(name="pork", "quantity="1"))
 ```
 
 ```typescript
-// TODO
+const client = new PetStoreClient();
+const food:Food = {
+    name: "food";
+    quantity: 3;
+}
+client.feed(food);
 ```
 
 ```java
@@ -161,7 +166,12 @@ namespace Customization;
 ```
 
 ```typescript
-// TODO
+const client = new PetStoreClient();
+const food: Food = {
+    name: "food";
+    quantity: 3;
+}
+client.feed(food);
 ```
 
 ```java
