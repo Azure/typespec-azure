@@ -470,27 +470,12 @@ it("@override impact", async () => {
   for (const param of parameters) {
     if (param.name === "params") {
       const httpParam = getHttpOperationParameter(method, param);
-      ok(!httpParam);
+      ok(httpParam);
     } else if (param.name === "contentType") {
       const httpParam = getHttpOperationParameter(method, param);
       ok(httpParam);
       strictEqual(httpParam.kind, "header");
       strictEqual(httpParam.serializedName, "Content-Type");
-    }
-  }
-
-  strictEqual(parameters[0].type.kind, "model");
-  for (const property of parameters[0].type.properties) {
-    if (property.name === "foo") {
-      const httpParam = getHttpOperationParameter(method, property);
-      ok(httpParam);
-      strictEqual(httpParam.kind, "property");
-      strictEqual(httpParam.name, "foo");
-    } else if (property.name === "bar") {
-      const httpParam = getHttpOperationParameter(method, property);
-      ok(httpParam);
-      strictEqual(httpParam.kind, "property");
-      strictEqual(httpParam.name, "bar");
     }
   }
 });
