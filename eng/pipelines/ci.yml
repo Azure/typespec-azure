@@ -49,8 +49,8 @@ extends:
               matrix:
                 "Node 20.x":
                   nodeVersion: "20.x"
-                #                "Node 22.x": // remove flaky node22 check on windows: https://github.com/Azure/typespec-azure/issues/3169
-                #                  nodeVersion: "22.x"
+                # "Node 22.x":  # temporarily skip this platform for flaky vitest issue
+                #   nodeVersion: "22.x"
                 "Node 24.x":
                   nodeVersion: "24.3.0" # Regression in node 24.4 https://github.com/microsoft/typespec/issues/7861
 

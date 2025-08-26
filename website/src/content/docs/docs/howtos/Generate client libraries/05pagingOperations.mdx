@@ -50,7 +50,18 @@ public virtual Pageable<User> ListWithPage(CancellationToken cancellationToken =
 ```
 
 ```typescript
-// TODO
+// Modular api layer
+export function listWithPage(
+  context: Client,
+  options: ListWithPageOptionalParams = { requestOptions: {} },
+): PagedAsyncIterableIterator<User>;
+
+// Modular classical client layer
+export class TestServiceClient {
+  listWithPage(
+    options: ListWithPageOptionalParams = { requestOptions: {} },
+  ): PagedAsyncIterableIterator<User>;
+}
 ```
 
 ```java
@@ -110,7 +121,18 @@ public virtual Pageable<User> ListWithPage(CancellationToken cancellationToken =
 ```
 
 ```typescript
-// TODO
+// Modular api layer
+export function listWithPage(
+  context: Client,
+  options: ListWithPageOptionalParams = { requestOptions: {} },
+): PagedAsyncIterableIterator<User>;
+
+// Modular classical client layer
+export class TestServiceClient {
+  listWithPage(
+    options: ListWithPageOptionalParams = { requestOptions: {} },
+  ): PagedAsyncIterableIterator<User>;
+}
 ```
 
 ```java
@@ -176,7 +198,18 @@ def list_with_page(self, **kwargs: Any) -> ItemPaged["_models.User"]:
 ```
 
 ```typescript
-// TODO
+// Modular api layer
+export function listWithPage(
+  context: Client,
+  options: ListWithPageOptionalParams = { requestOptions: {} },
+): PagedAsyncIterableIterator<User>;
+
+// Modular classical client layer
+export class TestServiceClient {
+  listWithPage(
+    options: ListWithPageOptionalParams = { requestOptions: {} },
+  ): PagedAsyncIterableIterator<User>;
+}
 ```
 
 ```java
@@ -273,7 +306,18 @@ def list_with_page(self, **kwargs: Any) -> ItemPaged["_models.User"]:
 ```
 
 ```typescript
-// TODO
+// Modular api layer
+export function listWithPage(
+  context: Client,
+  options: ListWithPageOptionalParams = { requestOptions: {} },
+): PagedAsyncIterableIterator<User>;
+
+// Modular classical client layer
+export class TestServiceClient {
+  listWithPage(
+    options: ListWithPageOptionalParams = { requestOptions: {} },
+  ): PagedAsyncIterableIterator<User>;
+}
 ```
 
 ```java
@@ -321,7 +365,18 @@ def list_with_page(self, **kwargs: Any) -> ItemPaged["_models.User"]:
 ```
 
 ```typescript
-// TODO
+// Modular api layer
+export function listWithPage(
+  context: Client,
+  options: ListWithPageOptionalParams = { requestOptions: {} },
+): PagedAsyncIterableIterator<User>;
+
+// Modular classical client layer
+export class TestServiceClient {
+  listWithPage(
+    options: ListWithPageOptionalParams = { requestOptions: {} },
+  ): PagedAsyncIterableIterator<User>;
+}
 ```
 
 ```java
