@@ -209,6 +209,12 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
             context.__modelPropertyCache.get(segment)!,
         ),
         pageItemsSegments: baseServiceMethod.response.resultSegments,
+        pageSizeParameter: baseServiceMethod.parameters.find(
+          (p) =>
+            p.__raw &&
+            p.__raw.kind === "ModelProperty" &&
+            p.__raw.decorators.find((d) => d.definition?.name === "@pageSize"),
+        ),
         nextLinkReInjectedParametersSegments:
           pagingMetadata.output.nextLink?.property.type.kind === "Scalar"
             ? (

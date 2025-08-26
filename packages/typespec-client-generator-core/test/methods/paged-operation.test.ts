@@ -1,5 +1,5 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { deepStrictEqual, strictEqual } from "assert";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkMethodParameter } from "../../src/interfaces.js";
 import { getPropertySegmentsFromModelOrParameters } from "../../src/methods.js";
@@ -1144,4 +1144,23 @@ it("next link with body root and inheritance", async () => {
   strictEqual(response.resultSegments?.length, 1);
   strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
   strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
+});
+
+it("@pageSize parameter check", async () => {
+  await runner.compileWithBuiltInService(`
+    model Page<T> {
+      @pageItems items: T[];
+    }
+    model Pet {
+      id: string;
+    }
+    @list op listPets(@pageIndex page: int32, @pageSize pageSize: int8): Page<Pet>;
+  `);
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  strictEqual(method.name, "listPets");
+  strictEqual(method.kind, "paging");
+  const pageSizeParameter = method.parameters.find((p) => p.name === "pageSize");
+  ok(pageSizeParameter);
+  strictEqual(method.pagingMetadata.pageSizeParameter, pageSizeParameter);
 });
