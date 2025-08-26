@@ -89,12 +89,16 @@ public final class PetStoreNamespaceClient {
 type OutputModel struct {
     Name string `json:"name"`
 }
+
 type PetStoreNamespaceClient struct {}
+
 type PetStoreNamespaceClientGetModelOptions struct {}
+
 type PetStoreNamespaceClientGetModelResponse struct {
 	OutputModel
 }
-func (client *PetStoreNamespaceClient) GetModel(ctx context.Context, name string, options *PetStoreNamespaceClientGetModelOptions) (PetStoreNamespaceClientGetModelResponse, error) {}
+
+func (client *PetStoreNamespaceClient) GetModel(ctx context.Context, name string, options *PetStoreNamespaceClientGetModelOptions) (PetStoreNamespaceClientGetModelResponse, error)
 
 ```
 
@@ -459,15 +463,18 @@ public void post(User user);
 
 ```go
 type ClientGetOptions struct {}
+
 type ClientPostOptions struct {}
+
 type ClientGetResponse struct {
 	User
 }
+
 type ClientPostResponse struct {}
 
-func Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error) {}
+func Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error) 
 
-func Post(ctx context.Context, body User, options *ClientPostOptions) (ClientPostResponse, error) {}
+func Post(ctx context.Context, body User, options *ClientPostOptions) (ClientPostResponse, error) 
 ```
 
 </ClientTabItem>
@@ -569,7 +576,7 @@ type ClientUploadOptions struct {}
 
 type ClientUploadResponse struct {}
 
-func Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error){}
+func Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
 
 ```
 
@@ -672,7 +679,7 @@ public void upload(String id, String firstName, String lastName);
 type ClientUploadOptions struct {}
 type ClientUploadResponse struct {}
 
-func  Upload(ctx context.Context, id string, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error) {}
+func  Upload(ctx context.Context, id string, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error) 
 
 ```
 
@@ -768,9 +775,10 @@ public void upload(String firstName, String lastName);
 
 ```go
 type ClientUploadResponse struct {}
+
 type ClientUploadOptions struct {}
 
-func Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error) {}
+func Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error) 
 
 ```
 
@@ -880,7 +888,9 @@ type User struct {
   // REQUIRED
 	LastName *string
 }
+
 type ClientUploadOptions struct {}
+
 type ClientUploadResponse struct {}
 
 func Upload(ctx context.Context, userParam User, options *ClientUploadOptions) (ClientUploadResponse, error)
@@ -984,7 +994,8 @@ type ClientRegisterOptions struct {
 type ClientRegisterResponse struct {
 }
 
-func (client *Client) Register(ctx context.Context, schema []byte, options *ClientRegisterOptions) (ClientRegisterResponse, error){}
+func (client *Client) Register(ctx context.Context, schema []byte, options *ClientRegisterOptions) (ClientRegisterResponse, error)
+
 ```
 
 </ClientTabItem>
@@ -1096,9 +1107,11 @@ public void register(Schema schema);
 
 ```go
 type ClientRegisterResponse struct {}
+
 type ClientRegisterOptions struct {}
 
-func Register(ctx context.Context, schema []byte, options *ClientRegisterOptions) (ClientRegisterResponse, error) {}
+func Register(ctx context.Context, schema []byte, options *ClientRegisterOptions) (ClientRegisterResponse, error) 
+
 ```
 
 </ClientTabItem>
@@ -1225,6 +1238,7 @@ type RepairInfo struct {
 // REQUIRED
 	Problem *string
 }
+
 type RepairResult struct {
 // REQUIRED
 	Info *string
@@ -1232,12 +1246,14 @@ type RepairResult struct {
 // REQUIRED
 	Reason *string
 }
+
 type ClientScheduleRepairsResponse struct {
 	RepairResult
 }
+
 type ClientScheduleRepairsOptions struct {}
 
-func ScheduleRepairs(ctx context.Context, widgetName string, repairInfo RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error) {}
+func ScheduleRepairs(ctx context.Context, widgetName string, repairInfo RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
 
 ```
 
@@ -1421,12 +1437,14 @@ type RepairResult struct {
 // REQUIRED
 	Reason *string
 }
+
 type ServiceClientScheduleRepairsOptions struct {}
+
 type ServiceClientScheduleRepairsResponse struct {
 	RepairResult
 }
 
-func ScheduleRepairs(ctx context.Context, widgetName string, repairInfo RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error) {}
+func ScheduleRepairs(ctx context.Context, widgetName string, repairInfo RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
 ```
 
 </ClientTabItem>
@@ -1585,23 +1603,29 @@ type CompletionResult struct {
 // REQUIRED
 	Tokens *int32
 }
+
 type AnalyzeClientAnalyzeOptions struct {}
+
 type AnalyzeClientCompletionsOptions struct {}
+
 type AnalyzeClientAnalyzeResponse struct {
 	AnalyzeResult
 }
+
 type AnalyzeClientCompletionsResponse struct {
 	CompletionResult
 }
+
 type AnalyzeRequestMode string
+
 const (
 	AnalyzeRequestModeLenient AnalyzeRequestMode = "lenient"
 	AnalyzeRequestModeStrict AnalyzeRequestMode = "strict"
 )
 
-func Analyze(ctx context.Context, mode AnalyzeRequestMode, imageParam io.ReadSeekCloser, options *AnalyzeClientAnalyzeOptions) (AnalyzeClientAnalyzeResponse, error) {}
+func Analyze(ctx context.Context, mode AnalyzeRequestMode, imageParam io.ReadSeekCloser, options *AnalyzeClientAnalyzeOptions) (AnalyzeClientAnalyzeResponse, error)
 
-func Completions(ctx context.Context, input CompletionInput, options *AnalyzeClientCompletionsOptions) (AnalyzeClientCompletionsResponse, error) {}
+func Completions(ctx context.Context, input CompletionInput, options *AnalyzeClientCompletionsOptions) (AnalyzeClientCompletionsResponse, error)
 
 ```
 
@@ -1677,17 +1701,20 @@ public final class Client {
 
 ```go
 type ClientAOptions struct {}
+
 type ClientBOptions struct {}
+
 type ClientAResponse struct {
 	Value *float32
 }
+
 type ClientBResponse struct {
 	Value *int64
 }
 
-func A(ctx context.Context, x int32, options *ClientAOptions) (ClientAResponse, error) {}
+func A(ctx context.Context, x int32, options *ClientAOptions) (ClientAResponse, error)
 
-func B(ctx context.Context, x string, options *ClientBOptions) (ClientBResponse, error) {}
+func B(ctx context.Context, x string, options *ClientBOptions) (ClientBResponse, error)
 ```
 
 </ClientTabs>
@@ -1803,6 +1830,7 @@ public Response get(MatchConditions matchConditions);
 type Response struct {
     Name string
 }
+
 type ClientGetOptions struct {
 // The request should only proceed if an entity matches this string.
 	IfMatch *string
@@ -1811,7 +1839,8 @@ type ClientGetOptions struct {
 	IfNoneMatch *string
 }
 
-func Get(ctx context.Context, options *ClientGetOptions) (*Response, error) {}
+func Get(ctx context.Context, options *ClientGetOptions) (*Response, error)
+
 ```
 
 </ClientTabs>
@@ -1956,12 +1985,14 @@ type SystemData struct {
   // The type of identity that last modified the resource.
 	LastModifiedByType *CreatedByType
 }
+
 type ContosoProviderHubClientGetOptions struct {}
+
 type ContosoProviderHubClientGetResponse struct {
 	MyModel
 }
 
-func Get(ctx context.Context, extendedZoneName string, options *ContosoProviderHubClientGetOptions) (ContosoProviderHubClientGetResponse, error) {}
+func Get(ctx context.Context, extendedZoneName string, options *ContosoProviderHubClientGetOptions) (ContosoProviderHubClientGetResponse, error)
 
 ```
 

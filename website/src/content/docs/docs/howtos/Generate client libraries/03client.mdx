@@ -121,11 +121,13 @@ client.pet();
 ```go
 // generated petstore_client.go
 type PetStoreClient struct {}
+
 func NewPetStoreClient() *PetStoreClient {
 	return &PetStoreClient{}
 }
 
 func (client *PetStoreClient) Feed(ctx context.Context, options *PetStoreClientFeedOptions) (PetStoreClientFeedResponse, error) {}
+
 func (client *PetStoreClient) Pet(ctx context.Context, options *PetStoreClientPetOptions) (PetStoreClientPetResponse, error) {}
 
 // generated options.go
@@ -268,21 +270,27 @@ catsClient.pet();
 ```go
 // generated petstore_client.go
 type PetStoreClient struct {}
+
 func (client *PetStoreClient) NewPetStoreCatsClient() *PetStoreCatsClient {
 	return &PetStoreCatsClient{}
 }
+
 func (client *PetStoreClient) NewPetStoreDogsClient() *PetStoreDogsClient {
 	return &PetStoreDogsClient{}
 }
 
 // generated petstoredogs_client.go
 type PetStoreDogsClient struct {}
+
 func (client *PetStoreDogsClient) Feed(ctx context.Context, options *PetStoreDogsClientFeedOptions) (PetStoreDogsClientFeedResponse, error) {}
+
 func (client *PetStoreDogsClient) Pet(ctx context.Context, options *PetStoreDogsClientPetOptions) (PetStoreDogsClientPetResponse, error) {}
 
 // generated petstorecats_client.go
 type PetStoreCatsClient struct {}
+
 func (client *PetStoreCatsClient) Feed(ctx context.Context, options *PetStoreCatsClientFeedOptions) (PetStoreCatsClientFeedResponse, error) {}
+
 func (client *PetStoreCatsClient) Pet(ctx context.Context, options *PetStoreCatsClientPetOptions) (PetStoreCatsClientPetResponse, error) {}
 
 // generated options.go
@@ -501,39 +509,51 @@ actionsClient.close();
 ```go
 // generated petstore_client.go
 type PetStoreClient struct {}
+
 func NewPetStoreClient() *PetStoreClient {
   return &PetStoreClient{}
 }
+
 func (client *PetStoreClient) Info(ctx context.Context, options *PetStoreClientInfoOptions) (PetStoreClientInfoResponse, error) {}
 
 // generated petstoreactions_client.go
 type PetStoreActionsClient struct {}
+
 func NewPetStoreActionsClient() *PetStoreActionsClient {
   return &PetStoreActionsClient{}
 }
+
 func (client *PetStoreActionsClient) Close(ctx context.Context, options *PetStoreActionsClientCloseOptions) (PetStoreActionsClientCloseResponse, error) {}
+
 func (client *PetStoreActionsClient) Open(ctx context.Context, options *PetStoreActionsClientOpenOptions) (PetStoreActionsClientOpenResponse, error) {}
 
 // generated petstorebillings_client.go
 type PetStoreBillingsClient struct {}
+
 func NewPetStoreBillingsClient() *PetStoreBillingsClient {
   return &PetStoreBillingsClient{}
 }
+
 func (client *PetStoreBillingsClient) History(ctx context.Context, options *PetStoreBillingsClientHistoryOptions) (PetStoreBillingsClientHistoryResponse, error) {}
 
 // generated petstorepets_client.go
 type PetStorePetsClient struct {}
+
 func NewPetStorePetsClient() *PetStorePetsClient {
   return &PetStorePetsClient{}
 }
+
 func (client *PetStorePetsClient) Info(ctx context.Context, options *PetStorePetsClientInfoOptions) (PetStorePetsClientInfoResponse, error) {}
 
 // generated petstorepetsactions_client.go
 type PetStorePetsActionsClient struct {}
+
 func NewPetStorePetsActionsClient() *PetStorePetsActionsClient {
   return &PetStorePetsActionsClient{}
 }
+
 func (client *PetStorePetsActionsClient) Feed(ctx context.Context, options *PetStorePetsActionsClientFeedOptions) (PetStorePetsActionsClientFeedResponse, error) {}
+
 func (client *PetStorePetsActionsClient) Pet(ctx context.Context, options *PetStorePetsActionsClientPetOptions) (PetStorePetsActionsClientPetResponse, error) {}
 
 // generated options.go
@@ -687,10 +707,13 @@ client.pet();
 ```go
 // generated petstore_client.go
 type PetStoreClient struct {}
+
 func NewPetStorePetsActionsClient() *PetStorePetsActionsClient{
   return &PetStorePetsActionsClient{}
 }
+
 func (client *PetStoreClient) Feed(ctx context.Context, options *PetStoreClientFeedOptions) (PetStoreClientFeedResponse, error) {}
+
 func (client *PetStoreClient) Pet(ctx context.Context, options *PetStoreClientPetOptions) (PetStoreClientPetResponse, error) {}
 
 // generated options.go
@@ -800,10 +823,13 @@ client.pet();
 ```go
 // petstoregreat_client.go
 type PetStoreGreatClient struct {}
+
 func NewPetStoreGreatClient() *PetStoreGreatClient{
   return &PetStoreGreatClient{}
 }
+
 func (client *PetStoreGreatClient) Feed(ctx context.Context, options *PetStoreGreatClientFeedOptions) (PetStoreGreatClientFeedResponse, error) {}
+
 func (client *PetStoreGreatClient) Pet(ctx context.Context, options *PetStoreGreatClientPetOptions) (PetStoreGreatClientPetResponse, error) {}
 
 // options.go
@@ -1052,16 +1078,20 @@ petActionClient.pet()
 ```go
 // generated food_client.go
 type FoodClient struct {}
+
 func NewFoodClient() *FoodClient{
   return &FoodClient{}
 }
+
 func (client *FoodClient) Feed(ctx context.Context, options *FoodClientFeedOptions) (FoodClientFeedResponse, error) {}
 
 // generated petaction_client.go
 type PetActionClient struct {}
+
 func NewPetActionClient() *PetActionClient{
   return &PetActionClient{}
 }
+
 func (client *PetActionClient) Pet(ctx context.Context, options *PetActionClientPetOptions) (PetActionClientPetResponse, error) {}
 
 // generated options.go
@@ -1201,6 +1231,7 @@ opGrp2Client.pet();
 ```go
 // generated petstore_client.go
 type PetStoreClient struct {}
+
 func NewPetStoreClient() *PetStoreClient{
   return &PetStoreClient{}
 }
@@ -1215,10 +1246,12 @@ func (client *PetStoreClient)NewOpGrp2Client() *OpGrp2Client{
 
 // generated petstoreopgrp1_client.go
 type OpGrp1Client struct {}
+
 func (client *PetStoreOpGrp1Client) Feed(ctx context.Context, options *PetStoreOpGrp1ClientFeedOptions) (PetStoreOpGrp1ClientFeedResponse, error) {}
 
 // generated petstoreopgrp2_client.go
 type OpGrp2Client struct {}
+
 func (client *PetStoreOpGrp2Client) Pet(ctx context.Context, options *PetStoreOpGrp2ClientPetOptions) (PetStoreOpGrp2ClientPetResponse, error) {}
 
 // generated options.go
@@ -1370,18 +1403,22 @@ petActionClient.pet();
 ```go
 // generated food_client.go
 type FoodClient struct {}
+
 func NewFoodClient() *FoodClient{
   return &FoodClient{}
 }
+
 func (client *FoodClient) Feed(ctx context.Context, options *FoodClientFeedOptions) (FoodClientFeedResponse, error) {}
 
 // generated pet_action_client.go
 package newpetstore
 
 type PetActionClient struct {}
+
 func NewPetActionClient() *PetActionClient{
   return &PetActionClient{}
 }
+
 func (client *PetActionClient) Pet(ctx context.Context, options *PetActionClientPetOptions) (PetActionClientPetResponse, error) {}
 
 // generated options.go
@@ -1542,18 +1579,22 @@ petActionClient.pet();
 ```go
 // generated food_client.go
 type FoodClient struct {}
+
 func NewFoodClient() *FoodClient{
   return &FoodClient{}
 }
+
 func (client *FoodClient) Feed(ctx context.Context, options *FoodClientFeedOptions) (FoodClientFeedResponse, error) {}
 
 // generated pet_action_client.go
 package petstorerenamed
 
 type PetActionClient struct {}
+
 func NewPetActionClient() *PetActionClient{
   return &PetActionClient{}
 }
+
 func (client *PetActionClient) Pet(ctx context.Context, options *PetActionClientPetOptions) (PetActionClientPetResponse, error) {}
 
 // generated options.go
@@ -1692,10 +1733,13 @@ client.download()
 ```go
 // generated storage_client.go
 type StorageClient struct {}
+
 func NewStorageClient() *NewStorageClient{
   return &NewStorageClient{}
 }
+
 func (client *StorageClient) Download(ctx context.Context, options *StorageClientDownloadOptions) (StorageClientDownloadResponse, error) {}
+
 func (client *StorageClient) Upload(ctx context.Context, options *StorageClientUploadOptions) (StorageClientUploadResponse, error) {}
 
 // generated options.go
@@ -1828,6 +1872,7 @@ client.download()
 ```go
 // generated storage_client.go
 type StorageClient struct {}
+
 func NewStorageClient(internal *azcore.Client, endpoint string, blobName string) *NewStorageClient{
   return &NewStorageClient{
     internal : internal,
@@ -1835,7 +1880,9 @@ func NewStorageClient(internal *azcore.Client, endpoint string, blobName string)
     blobName:blobName
   }
 }
+
 func (client *StorageClient) Upload(ctx context.Context, options *StorageClientUploadOptions) (StorageClientUploadResponse, error) {}
+
 func (client *StorageClient) Download(ctx context.Context, options *StorageClientDownloadOptions) (StorageClientDownloadResponse, error) {}
 
 // generated options.go
