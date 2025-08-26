@@ -988,13 +988,13 @@ public void getBlobProperties(String name, String testHeader);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientRegisterOptions struct {
+type ClientGetBlobPropertiesOptions struct {
 }
 
-type ClientRegisterResponse struct {
+type ClientGetBlobPropertiesResponse struct {
 }
 
-func (client *Client) Register(ctx context.Context, schema []byte, options *ClientRegisterOptions) (ClientRegisterResponse, error)
+func (client *Client) GetBlobProperties(ctx context.Context, name string, testHeader string, options *ClientGetBlobPropertiesOptions) (ClientGetBlobPropertiesResponse, error)
 
 ```
 
