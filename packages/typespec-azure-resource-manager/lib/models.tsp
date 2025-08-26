@@ -45,7 +45,7 @@ model ResourceNameParameter<
   Type extends string = string
 > {
   @doc("The name of the {name}", Resource)
-  @pattern(NamePattern)
+  @armPattern(NamePattern)
   @defaultResourceKeySegmentName(Resource, KeyName, SegmentName)
   @path
   name: Type;
@@ -81,7 +81,7 @@ model NameParameterByType<
   Type extends string = string
 > {
   @doc("The name of the resource.")
-  @pattern(NamePattern)
+  @armPattern(NamePattern)
   @segment(TypeName)
   @key(ParameterName)
   @visibility(Lifecycle.Read)

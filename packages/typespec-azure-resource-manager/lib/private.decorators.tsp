@@ -153,3 +153,10 @@ extern dec applyResourceNameConstraints(
   target: Model,
   parameters: valueof ResourceNameTemplateParameterInfo
 );
+
+/**
+ * Apply a pattern to a model Property, if it uses the correct type (the string scalar or a string union)
+ * @param target The model property to which the pattern should be applied
+ * @param pattern The pattern to apply
+ */
+extern dec armPattern(target: ModelProperty, pattern: valueof string);

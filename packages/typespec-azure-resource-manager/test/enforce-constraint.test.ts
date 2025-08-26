@@ -208,3 +208,63 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
     ]);
   });
 });
+
+describe("typespec-azure-resource-manager: ResourceNameParameter constraints", () => {
+  it("emits a warning when type, segment, and parameter name are provided ", async () => {
+    const { diagnostics } = await checkFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    model WidgetProperties {
+      @doc("The item color")
+      color: string;
+    }
+
+    model Widget is ProxyResource<WidgetProperties> {
+       ...ResourceNameParameter<Widget, "widgets", "widgetName">;
+    }
+  `);
+    expectDiagnostics(diagnostics, [
+      { code: "@azure-tools/typespec-azure-resource-manager/exclusion-constraint-violation" },
+    ]);
+  });
+  it("emits a warning when keyName, parameter type are provided ", async () => {
+    const { diagnostics } = await checkFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    model WidgetProperties {
+      @doc("The item color")
+      color: string;
+    }
+
+    model Widget is ProxyResource<WidgetProperties> {
+       ...ResourceNameParameter<Widget, KeyName = "widgetName", Type = "default">;
+    }
+  `);
+    expectDiagnostics(diagnostics, [
+      { code: "@azure-tools/typespec-azure-resource-manager/exclusion-constraint-violation" },
+    ]);
+  });
+  it("emits a warning when keyName, parameter type are provided  in ResourceNameParameterByType ", async () => {
+    const { diagnostics } = await checkFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    model WidgetProperties {
+      @doc("The item color")
+      color: string;
+    }
+
+    model Widget is ProxyResource<WidgetProperties> {
+       ...NameParameterByType<TypeName = "widget", ParameterName = "widgetName", Type = "default">;
+    }
+  `);
+    expectDiagnostics(diagnostics, [
+      { code: "@azure-tools/typespec-azure-resource-manager/exclusion-constraint-violation" },
+    ]);
+  });
+});

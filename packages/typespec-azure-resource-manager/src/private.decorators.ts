@@ -1,5 +1,6 @@
 import {
   $key,
+  $pattern,
   DecoratorContext,
   Interface,
   Model,
@@ -33,6 +34,7 @@ import {
 import {
   ApplyResourceNameConstraintsDecorator,
   ArmBodyRootDecorator,
+  ArmPatternDecorator,
   ArmRenameListByOperationDecorator,
   ArmResourceInternalDecorator,
   ArmResourcePropertiesOptionalityDecorator,
@@ -650,10 +652,24 @@ const $applyResourceNameConstraints: ApplyResourceNameConstraintsDecorator = (
       code: "exclusion-constraint-violation",
       target: target,
       format: {
-        actionMessage: `You should not provide the KeyName, and Type template parameters together. Please either use the default type and parameter names generated from the resource, or use the 'ResourceNameByType' template.`,
+        actionMessage: `You should not provide the KeyName and Type template parameters together. Please either use the default type and parameter names generated from the resource, or use the 'ResourceNameByType' template.`,
       },
     });
     return;
+  }
+};
+
+const $armPattern: ArmPatternDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  pattern: string,
+) => {
+  const { program } = context;
+  if (
+    target.type.kind !== "String" &&
+    $(program).type.isAssignableTo(target.type, $(program).builtin.string)
+  ) {
+    context.call($pattern, target, pattern);
   }
 };
 
@@ -779,6 +795,7 @@ export const $decorators = {
     armBodyRoot: $armBodyRoot,
     armResourceWithParameter: $armResourceWithParameter,
     applyResourceNameConstraints: $applyResourceNameConstraints,
+    armPattern: $armPattern,
   } satisfies AzureResourceManagerPrivateDecorators,
   "Azure.ResourceManager.Extension.Private": {
     builtInResource: $builtInResource,

@@ -217,6 +217,18 @@ export type ApplyResourceNameConstraintsDecorator = (
   parameters: ResourceNameTemplateParameterInfo,
 ) => void;
 
+/**
+ * Apply a pattern to a model Property, if it uses the correct type (the string scalar or a string union)
+ *
+ * @param target The model property to which the pattern should be applied
+ * @param pattern The pattern to apply
+ */
+export type ArmPatternDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  pattern: string,
+) => void;
+
 export type AzureResourceManagerPrivateDecorators = {
   resourceParameterBaseFor: ResourceParameterBaseForDecorator;
   resourceBaseParametersOf: ResourceBaseParametersOfDecorator;
@@ -234,4 +246,5 @@ export type AzureResourceManagerPrivateDecorators = {
   armResourcePropertiesOptionality: ArmResourcePropertiesOptionalityDecorator;
   armBodyRoot: ArmBodyRootDecorator;
   applyResourceNameConstraints: ApplyResourceNameConstraintsDecorator;
+  armPattern: ArmPatternDecorator;
 };
