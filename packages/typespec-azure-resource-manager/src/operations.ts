@@ -8,7 +8,7 @@ import {
   Program,
 } from "@typespec/compiler";
 import { useStateMap } from "@typespec/compiler/utils";
-import { $route, getHttpOperation, HttpOperation } from "@typespec/http";
+import { $route, getHttpOperation, HttpOperation, isPathParam } from "@typespec/http";
 import {
   $actionSegment,
   $autoRoute,
@@ -32,6 +32,7 @@ import {
 import {
   ArmOperationOptions,
   ArmOperationRouteDecorator,
+  RenamePathParameterDecorator,
 } from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { reportDiagnostic } from "./lib.js";
 import { isArmLibraryNamespace } from "./namespace.js";
@@ -513,3 +514,28 @@ export function getRouteOptions(program: Program, target: Operation): ArmOperati
     useStaticRoute: false,
   };
 }
+
+/**
+ * Renames a path parameter in an Azure Resource Manager operation.
+ * @param context The decorator context.
+ * @param target The operation to modify.
+ * @param sourceParameterName The name of the parameter to rename.
+ * @param targetParameterName The new name for the parameter.
+ * @returns
+ */
+export const $renamePathParameter: RenamePathParameterDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  sourceParameterName: string,
+  targetParameterName: string,
+) => {
+  if (target.parameters.properties.has(targetParameterName)) {
+    return;
+  }
+  const param = target.parameters.properties.get(sourceParameterName);
+  if (param !== undefined && isPathParam(context.program, param)) {
+    param.name = targetParameterName;
+    target.parameters.properties.delete(sourceParameterName);
+    target.parameters.properties.set(targetParameterName, param);
+  }
+};
