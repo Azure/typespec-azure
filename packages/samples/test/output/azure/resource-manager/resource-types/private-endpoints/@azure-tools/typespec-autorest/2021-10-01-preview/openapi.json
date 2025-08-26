@@ -812,7 +812,7 @@
             "name": "resource",
             "in": "body",
             "description": "Resource create parameters.",
-            "required": true,
+            "required": false,
             "schema": {
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
             }
@@ -888,15 +888,6 @@
           },
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/parameters/PrivateEndpointConnectionName"
-          },
-          {
-            "name": "properties",
-            "in": "body",
-            "description": "The resource properties to be updated.",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Azure.ResourceManager.PrivateEndpointConnectionUpdate"
-            }
           }
         ],
         "responses": {

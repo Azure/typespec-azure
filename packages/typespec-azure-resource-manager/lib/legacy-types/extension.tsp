@@ -28,6 +28,7 @@ interface ExtensionOperations<
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    * @template ErrorType Optional. The error response, if non-standard.
    * @template OperationOptions Optional. The route options for the operation.
+   * @template Request Optional. The request body for the createOrUpdate operation.
    */
   @armOperationRoute(OperationOptions)
   @doc("Create a {name}", Resource)
@@ -45,12 +46,13 @@ interface ExtensionOperations<
     >,
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
-    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
+    Request extends {} | void = Resource
   >(
     ...TargetParameters,
     ...ExtensionInstanceParameters,
     ...Parameters,
-    @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) resource: Resource,
+    @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) resource: Request,
   ): Response | ErrorType;
 
   /**
@@ -61,6 +63,7 @@ interface ExtensionOperations<
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    * @template ErrorType Optional. The error response, if non-standard.
    * @template OperationOptions Optional. The route options for the operation.
+   * @template Request Optional. The request body for the createOrUpdate operation.
    */
   #suppress "@azure-tools/typespec-azure-core/no-private-usage"
   @armOperationRoute(OperationOptions)
@@ -73,12 +76,13 @@ interface ExtensionOperations<
     Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
-    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
+    Request extends {} | void = Resource
   >(
     ...TargetParameters,
     ...ExtensionInstanceParameters,
     ...Parameters,
-    @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) resource: Resource,
+    @doc("Resource create parameters.") @armBodyRoot(OptionalRequestBody) resource: Request,
   ): Response | ErrorType;
 
   /**
@@ -98,7 +102,7 @@ interface ExtensionOperations<
   @patch(#{ implicitOptionality: false })
   CustomPatchAsync<
     Resource extends Foundations.SimpleResource,
-    PatchModel extends {} = Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>,
+    PatchModel extends {} | void = Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>,
     LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
       Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
       Resource,
@@ -136,7 +140,7 @@ interface ExtensionOperations<
   @patch(#{ implicitOptionality: false })
   CustomPatchSync<
     Resource extends Foundations.SimpleResource,
-    PatchModel extends {} = Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>,
+    PatchModel extends {} | void = Azure.ResourceManager.Foundations.TagsUpdateModel<Resource>,
     Parameters extends {} = {},
     Response extends {} = ArmResponse<Resource>,
     OptionalRequestBody extends valueof boolean = false,
@@ -262,6 +266,27 @@ interface ExtensionOperations<
   >(...TargetParameters, ...ExtensionParentParameters, ...Parameters): Response | ErrorType;
 
   /**
+   * List a resource, without pagination
+   * @template Resource The resource being listed
+   * @template Parameters Optional. Additional parameters after the path parameters
+   * @template Response Optional. The response returned by the list
+   * @template ErrorType Optional. The error response, if non-standard.
+   * @template OperationOptions Optional. The route options for the operation.
+   */
+  @armOperationRoute(OperationOptions)
+  @doc("List a {name}", Resource)
+  @get
+  @listsResource(Resource)
+  @armResourceList(Resource)
+  ListSinglePage<
+    Resource extends Foundations.SimpleResource,
+    Parameters extends {} = {},
+    Response extends {} = ArmResponse<ResourceListResult<Resource>>,
+    ErrorType extends {} = ErrorResponse,
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
+  >(...TargetParameters, ...ExtensionParentParameters, ...Parameters): Response | ErrorType;
+
+  /**
    * A synchronous resource action.
    * @template Resource The resource being acted upon
    * @template Request The request model for the action
@@ -279,7 +304,7 @@ interface ExtensionOperations<
   @returnsDoc("Azure operation completed successfully.")
   ActionSync<
     Resource extends Foundations.SimpleResource,
-    Request extends TypeSpec.Reflection.Model | void,
+    Request,
     Response extends TypeSpec.Reflection.Model | void,
     Parameters extends {} = {},
     OptionalRequestBody extends valueof boolean = false,
@@ -316,7 +341,7 @@ interface ExtensionOperations<
   @returnsDoc("Azure operation completed successfully.")
   ActionAsync<
     Resource extends Foundations.SimpleResource,
-    Request extends TypeSpec.Reflection.Model | void,
+    Request,
     Result extends TypeSpec.Reflection.Model | void,
     LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
       Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,

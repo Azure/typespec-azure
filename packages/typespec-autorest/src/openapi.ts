@@ -15,8 +15,11 @@ import {
   getArmCommonTypeOpenAPIRef,
   getArmIdentifiers,
   getArmKeyIdentifiers,
+  getCustomResourceOptions,
   getExternalTypeRef,
+  getInlineAzureType,
   isArmCommonType,
+  isArmExternalType,
   isArmProviderNamespace,
   isAzureResource,
   isConditionallyFlattened,
@@ -68,6 +71,7 @@ import {
   getMinItems,
   getMinLength,
   getMinValue,
+  getNamespaceFullName,
   getPagingOperation,
   getPattern,
   getProperty,
@@ -962,6 +966,16 @@ export async function getOpenAPIForService(
       }
     }
     return undefined;
+  }
+  function shouldInlineCoreScalarProperty(type: Type): boolean {
+    if (
+      type.kind !== "ModelProperty" ||
+      type.type.kind !== "Scalar" ||
+      type.type.namespace === undefined
+    )
+      return false;
+    const nsName = getNamespaceFullName(type.type.namespace);
+    return nsName === "Azure.Core" && getInlineAzureType(program, type) === true;
   }
   function getSchemaOrRef(type: Type, schemaContext: SchemaContext, namespace?: Namespace): any {
     let schemaNameOverride: ((name: string, visibility: Visibility) => string) | undefined =
@@ -2114,7 +2128,13 @@ export async function getOpenAPIForService(
         propSchema = getSchemaOrRef(prop.type, context);
       }
     } else {
-      propSchema = getSchemaOrRef(prop.type, context);
+      propSchema = shouldInlineCoreScalarProperty(prop)
+        ? getSchemaForInlineType(
+            prop.type,
+            getOpenAPITypeName(program, prop.type, typeNameOptions),
+            context,
+          )
+        : getSchemaOrRef(prop.type, context);
       applyArmIdentifiersDecorator(prop.type, propSchema, prop);
     }
 
@@ -2128,11 +2148,18 @@ export async function getOpenAPIForService(
   function attachExtensions(type: Type, emitObject: any) {
     // Attach any OpenAPI extensions
     const extensions = getExtensions(program, type);
-    if (isAzureResource(program, type as Model)) {
+    if (
+      type.kind === "Model" &&
+      (isAzureResource(program, type) ||
+        getCustomResourceOptions(program, type)?.isAzureResource === true)
+    ) {
       emitObject["x-ms-azure-resource"] = true;
     }
     if (getAsEmbeddingVector(program, type as Model) !== undefined) {
       emitObject["x-ms-embedding-vector"] = true;
+    }
+    if (type.kind === "Model" && isArmExternalType(program, type) === true) {
+      emitObject["x-ms-external"] = true;
     }
     if (type.kind === "Scalar") {
       const ext = getArmResourceIdentifierConfig(program, type);

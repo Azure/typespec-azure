@@ -41,3 +41,8 @@ extern dec armCommonParameter(
  * Marks an enum as representing the valid `common-types` versions.
  */
 extern dec armCommonTypesVersions(target: Enum);
+
+/**
+ * Signifies that a property can be treated as an inline type in emitters
+ */
+extern dec inlineAzureType(target: ModelProperty);

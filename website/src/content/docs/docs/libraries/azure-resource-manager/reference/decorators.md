@@ -458,6 +458,23 @@ This allows sharing Azure Resource Manager resource types across specifications
 
 ## Azure.ResourceManager.Legacy
 
+### `@armExternalType` {#@Azure.ResourceManager.Legacy.armExternalType}
+
+Signifies that a Resource is represented using a library type in generated SDKs.
+
+```typespec
+@Azure.ResourceManager.Legacy.armExternalType
+```
+
+#### Target
+
+The model to that is an external resource
+`Model`
+
+#### Parameters
+
+None
+
 ### `@armOperationRoute` {#@Azure.ResourceManager.Legacy.armOperationRoute}
 
 Signifies that an operation is an Azure Resource Manager operation
@@ -484,7 +501,7 @@ This decorator is used on resources that do not satisfy the definition of a reso
 but need to be identified as such.
 
 ```typespec
-@Azure.ResourceManager.Legacy.customAzureResource
+@Azure.ResourceManager.Legacy.customAzureResource(options?: valueof Azure.ResourceManager.Legacy.CustomResourceOptions)
 ```
 
 #### Target
@@ -493,7 +510,9 @@ but need to be identified as such.
 
 #### Parameters
 
-None
+| Name    | Type                                                                                                  | Description                                          |
+| ------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| options | [valueof `CustomResourceOptions`](./data-types.md#Azure.ResourceManager.Legacy.CustomResourceOptions) | Options for customizing the behavior of the resource |
 
 ### `@externalTypeRef` {#@Azure.ResourceManager.Legacy.externalTypeRef}
 

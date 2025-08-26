@@ -314,6 +314,7 @@ npm install --save-peer @azure-tools/typespec-azure-resource-manager
 
 ### Decorators
 
+- [`@armExternalType`](./decorators.md#@Azure.ResourceManager.Legacy.armExternalType)
 - [`@armOperationRoute`](./decorators.md#@Azure.ResourceManager.Legacy.armOperationRoute)
 - [`@customAzureResource`](./decorators.md#@Azure.ResourceManager.Legacy.customAzureResource)
 - [`@externalTypeRef`](./decorators.md#@Azure.ResourceManager.Legacy.externalTypeRef)
@@ -327,17 +328,21 @@ npm install --save-peer @azure-tools/typespec-azure-resource-manager
 
 ### Operations
 
+- [`ArmListSinglePageByParent`](./interfaces.md#Azure.ResourceManager.Legacy.ArmListSinglePageByParent)
+- [`ArmListSinglePageBySubscription`](./interfaces.md#Azure.ResourceManager.Legacy.ArmListSinglePageBySubscription)
 - [`CreateOperation`](./interfaces.md#Azure.ResourceManager.Legacy.CreateOperation)
-- [`CreateOrUpdateAsync`](./interfaces.md#Azure.ResourceManager.Legacy.CreateOrUpdateAsync)
-- [`CreateOrUpdateSync`](./interfaces.md#Azure.ResourceManager.Legacy.CreateOrUpdateSync)
+- [`CreateOrReplaceAsync`](./interfaces.md#Azure.ResourceManager.Legacy.CreateOrReplaceAsync)
+- [`CreateOrReplaceSync`](./interfaces.md#Azure.ResourceManager.Legacy.CreateOrReplaceSync)
 - [`CustomPatchAsync`](./interfaces.md#Azure.ResourceManager.Legacy.CustomPatchAsync)
 - [`CustomPatchSync`](./interfaces.md#Azure.ResourceManager.Legacy.CustomPatchSync)
-- [`ListSinglePageByParent`](./interfaces.md#Azure.ResourceManager.Legacy.ListSinglePageByParent)
 - [`UpdateOperation`](./interfaces.md#Azure.ResourceManager.Legacy.UpdateOperation)
 
 ### Models
 
 - [`ArmOperationOptions`](./data-types.md#Azure.ResourceManager.Legacy.ArmOperationOptions)
+- [`CustomResourceOptions`](./data-types.md#Azure.ResourceManager.Legacy.CustomResourceOptions)
+- [`ExtendedLocationOptional`](./data-types.md#Azure.ResourceManager.Legacy.ExtendedLocationOptional)
+- [`ExtendedLocationOptionalProperty`](./data-types.md#Azure.ResourceManager.Legacy.ExtendedLocationOptionalProperty)
 - [`LegacyTrackedResource`](./data-types.md#Azure.ResourceManager.Legacy.LegacyTrackedResource)
 - [`ManagedServiceIdentityV4`](./data-types.md#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4)
 - [`ManagedServiceIdentityV4Property`](./data-types.md#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4Property)
@@ -349,7 +354,17 @@ npm install --save-peer @azure-tools/typespec-azure-resource-manager
 
 ### Operations
 
+- [`CreateOrReplaceAsync`](./interfaces.md#Azure.ResourceManager.Legacy.Extension.CreateOrReplaceAsync)
 - [`CreateOrReplaceSync`](./interfaces.md#Azure.ResourceManager.Legacy.Extension.CreateOrReplaceSync)
-- [`CreateOrUpdateAsync`](./interfaces.md#Azure.ResourceManager.Legacy.Extension.CreateOrUpdateAsync)
 - [`CustomPatchAsync`](./interfaces.md#Azure.ResourceManager.Legacy.Extension.CustomPatchAsync)
 - [`CustomPatchSync`](./interfaces.md#Azure.ResourceManager.Legacy.Extension.CustomPatchSync)
+
+## Azure.ResourceManager.Legacy.PrivateEndpoints
+
+### Operations
+
+- [`CreateOrReplaceAsync`](./interfaces.md#Azure.ResourceManager.Legacy.PrivateEndpoints.CreateOrReplaceAsync)
+- [`CreateOrReplaceSync`](./interfaces.md#Azure.ResourceManager.Legacy.PrivateEndpoints.CreateOrReplaceSync)
+- [`CustomPatchAsync`](./interfaces.md#Azure.ResourceManager.Legacy.PrivateEndpoints.CustomPatchAsync)
+- [`CustomPatchSync`](./interfaces.md#Azure.ResourceManager.Legacy.PrivateEndpoints.CustomPatchSync)
+- [`ListSinglePageByParent`](./interfaces.md#Azure.ResourceManager.Legacy.PrivateEndpoints.ListSinglePageByParent)

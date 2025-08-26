@@ -1,5 +1,14 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.59.2
+
+### Bug Fixes
+
+- [#3147](https://github.com/Azure/typespec-azure/pull/3147) Add support for x-ms-external through armExternalResource decorator
+- [#3154](https://github.com/Azure/typespec-azure/pull/3154) Add single page list and correct put template names
+- [#3172](https://github.com/Azure/typespec-azure/pull/3172) Add single page list and legacy put and patch operations
+
+
 ## 0.59.1
 
 ### Bug Fixes
