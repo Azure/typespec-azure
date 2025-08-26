@@ -472,9 +472,9 @@ type ClientGetResponse struct {
 
 type ClientPostResponse struct {}
 
-func Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error) 
+func Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error)
 
-func Post(ctx context.Context, body User, options *ClientPostOptions) (ClientPostResponse, error) 
+func Post(ctx context.Context, body User, options *ClientPostOptions) (ClientPostResponse, error)
 ```
 
 </ClientTabItem>
@@ -679,7 +679,7 @@ public void upload(String id, String firstName, String lastName);
 type ClientUploadOptions struct {}
 type ClientUploadResponse struct {}
 
-func  Upload(ctx context.Context, id string, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error) 
+func  Upload(ctx context.Context, id string, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
 
 ```
 
@@ -778,7 +778,7 @@ type ClientUploadResponse struct {}
 
 type ClientUploadOptions struct {}
 
-func Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error) 
+func Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
 
 ```
 
@@ -1110,7 +1110,7 @@ type ClientRegisterResponse struct {}
 
 type ClientRegisterOptions struct {}
 
-func Register(ctx context.Context, schema []byte, options *ClientRegisterOptions) (ClientRegisterResponse, error) 
+func Register(ctx context.Context, schema []byte, options *ClientRegisterOptions) (ClientRegisterResponse, error)
 
 ```
 
