@@ -41,6 +41,7 @@ import {
 } from "./decorators.js";
 import {
   SdkBodyParameter,
+  SdkClientType,
   SdkCookieParameter,
   SdkHeaderParameter,
   SdkHttpOperation,
@@ -735,6 +736,34 @@ export function getHttpOperationParameter(
     }
   }
   return undefined;
+}
+
+/**
+ * Find corresponding http parameter list for a client initialization parameter.
+ *
+ * @param method
+ * @param param
+ * @returns
+ */
+export function getHttpOperationParametersForClientParameter(
+  client: SdkClientType<SdkHttpOperation>,
+  param: SdkMethodParameter | SdkModelPropertyType,
+): (
+  | SdkPathParameter
+  | SdkQueryParameter
+  | SdkHeaderParameter
+  | SdkCookieParameter
+  | SdkBodyParameter
+  | SdkModelPropertyType
+)[] {
+  const result = [];
+  for (const method of client.methods) {
+    const httpParam = getHttpOperationParameter(method, param);
+    if (httpParam) {
+      result.push(httpParam);
+    }
+  }
+  return result;
 }
 
 /**
