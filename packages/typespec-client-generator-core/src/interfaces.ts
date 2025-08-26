@@ -894,7 +894,7 @@ export interface SdkPagingServiceMetadata<TServiceOperation extends SdkServiceOp
   /** Segments to indicate how to get page items from response. */
   pageItemsSegments?: SdkModelPropertyType[];
   /** Denotes which parameter is the page size parameter */
-  pageSizeParameter?: SdkModelPropertyType;
+  pageSizeParameter?: SdkMethodParameter;
 }
 
 /**
