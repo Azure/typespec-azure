@@ -143,7 +143,8 @@ model ResourceNameTemplateParameterInfo {
 }
 
 /**
- * This decorator is specific to the templates that fo
+ * This decorator is specific to the templates that define resource names for
+ * ARM resources.
  *
  * @param target The model, interface, or operation to which the constraint applies.
  * @param parameters The parameters that define the resource name template.
