@@ -119,3 +119,60 @@ describe("@uniqueItems", () => {
     });
   });
 });
+
+describe("azureLocation", () => {
+  it("defines property with azureLocation type inline", async () => {
+    const res = await compileOpenAPI(
+      `
+     ${base}
+      model Pet { @Azure.ResourceManager.CommonTypes.Private.inlineAzureType location: Azure.Core.azureLocation };
+      `,
+      { preset: "azure" },
+    );
+
+    ok(res.definitions);
+    ok(res.definitions.Pet);
+    ok(res.definitions.Pet.properties);
+    ok(res.definitions.Pet.properties.location, "expected definition named location");
+    deepStrictEqual(res.definitions.Pet.properties.location, {
+      type: "string",
+      description: "Represents an Azure geography region where supported resource providers live.",
+    });
+  });
+  it("defines property with azureLocation type inline but does not override description", async () => {
+    const res = await compileOpenAPI(
+      `
+     ${base}
+      model Pet { /** The azure location */ @Azure.ResourceManager.CommonTypes.Private.inlineAzureType location: Azure.Core.azureLocation };
+      `,
+      { preset: "azure" },
+    );
+
+    ok(res.definitions);
+    ok(res.definitions.Pet);
+    ok(res.definitions.Pet.properties);
+    ok(res.definitions.Pet.properties.location, "expected definition named location");
+    deepStrictEqual(res.definitions.Pet.properties.location, {
+      type: "string",
+      description: "The azure location",
+    });
+  });
+  it("defines property with azureLocation type as ref without decorator", async () => {
+    const res = await compileOpenAPI(
+      `
+     ${base}
+      model Pet { /** The azure location */ location: Azure.Core.azureLocation };
+      `,
+      { preset: "azure" },
+    );
+
+    ok(res.definitions);
+    ok(res.definitions.Pet);
+    ok(res.definitions.Pet.properties);
+    ok(res.definitions.Pet.properties.location, "expected definition named location");
+    deepStrictEqual(res.definitions.Pet.properties.location, {
+      $ref: "#/definitions/Azure.Core.azureLocation",
+      description: "The azure location",
+    });
+  });
+});

@@ -1,5 +1,5 @@
 import "./managed-identity.tsp";
-import "./decorator.tsp";
+import "./legacy.decorators.tsp";
 import "./operations.tsp";
 import "./interfaces.tsp";
 import "./extension.tsp";

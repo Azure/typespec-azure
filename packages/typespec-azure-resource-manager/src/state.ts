@@ -37,4 +37,6 @@ export const ArmStateKeys = {
   armCommonParameters: azureResourceManagerCreateStateSymbol("armCommonParameters"),
   armCommonTypesVersions: azureResourceManagerCreateStateSymbol("armCommonTypesVersions"),
   armResourceRoute: azureResourceManagerCreateStateSymbol("armResourceRoute"),
+  armExternalType: azureResourceManagerCreateStateSymbol("armExternalType"),
+  inlineAzureType: azureResourceManagerCreateStateSymbol("inlineAzureType"),
 };

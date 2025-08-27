@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.59.1
+
+### Bug Fixes
+
+- [#3160](https://github.com/Azure/typespec-azure/pull/3160) Consider inheritance when mapping first segment for paging result.
+
+
 ## 0.59.0
 
 No changes, version bump only.

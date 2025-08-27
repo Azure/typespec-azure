@@ -120,10 +120,18 @@ interface Dependents {
   delete is ArmResourceDeleteSync<Dependent>;
   list is ArmResourceListByParent<Dependent>;
   getPrivateEndpointConnection is PrivateEndpointOperations.Read<Dependent>;
-  createOrUpdatePrivateEndpointConnection is PrivateEndpointOperations.CreateOrUpdateAsync<Dependent>;
-  updatePrivateEndpointConnection is PrivateEndpointOperations.CustomPatchAsync<Dependent>;
+  createOrUpdatePrivateEndpointConnection is Azure.ResourceManager.Legacy.PrivateEndpoints.CreateOrReplaceAsync<
+    Dependent,
+    PrivateEndpointConnection,
+    OptionalRequestBody = true
+  >;
+  updatePrivateEndpointConnection is Azure.ResourceManager.Legacy.PrivateEndpoints.CustomPatchAsync<
+    Dependent,
+    PrivateEndpointConnection,
+    PatchModel = void
+  >;
   deletePrivateEndpointConnection is PrivateEndpointOperations.DeleteAsync<Dependent>;
-  listPrivateEndpointConnections is Azure.ResourceManager.Legacy.ListSinglePageByParent<
+  listPrivateEndpointConnections is Azure.ResourceManager.Legacy.PrivateEndpoints.ListSinglePageByParent<
     Dependent,
     PrivateEndpointConnection
   >;

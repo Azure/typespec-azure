@@ -35,6 +35,11 @@ export type ArmCommonParameterDecorator = (
 ) => void;
 
 /**
+ * Signifies that a property can be treated as an inline type in emitters
+ */
+export type InlineAzureTypeDecorator = (context: DecoratorContext, target: ModelProperty) => void;
+
+/**
  *
  *
  *
@@ -59,5 +64,6 @@ export type ArmCommonDefinitionDecorator = (
 export type AzureResourceManagerCommonTypesPrivateDecorators = {
   armCommonTypesVersions: ArmCommonTypesVersionsDecorator;
   armCommonParameter: ArmCommonParameterDecorator;
+  inlineAzureType: InlineAzureTypeDecorator;
   armCommonDefinition: ArmCommonDefinitionDecorator;
 };

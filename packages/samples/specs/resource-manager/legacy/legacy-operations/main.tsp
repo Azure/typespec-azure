@@ -35,6 +35,7 @@ model BestPractice is Azure.ResourceManager.ProxyResource<BestPracticeProperties
     SegmentName = "bestPractices",
     NamePattern = ""
   >;
+  ...Legacy.ExtendedLocationOptionalProperty;
 }
 
 /** Resource-specific properties of a best practice resource */
