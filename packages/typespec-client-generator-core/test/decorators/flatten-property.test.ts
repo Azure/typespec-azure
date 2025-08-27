@@ -1,9 +1,9 @@
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
 import { getAllModels } from "../../src/types.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 
 let runner: SdkTestRunner;
 
