@@ -1162,5 +1162,35 @@ it("@pageSize parameter check", async () => {
   strictEqual(method.kind, "paging");
   const pageSizeParameter = method.parameters.find((p) => p.name === "pageSize");
   ok(pageSizeParameter);
-  strictEqual(method.pagingMetadata.pageSizeParameter, pageSizeParameter);
+  strictEqual(method.pagingMetadata.pageSizeParameterSegments?.length, 1);
+  strictEqual(method.pagingMetadata.pageSizeParameterSegments[0], pageSizeParameter);
+});
+
+it("@pageSize nested parameter check", async () => {
+  await runner.compileWithBuiltInService(`
+    model PaginationSection {
+      @pageSize pageSize: int8;
+      @pageIndex pageIndex: int32;
+    }
+    model Page<T> {
+      @pageItems items: T[];
+    }
+    model Pet {
+      id: string;
+    }
+    @list op listPets(pagination: PaginationSection): Page<Pet>;
+  `);
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  strictEqual(method.name, "listPets");
+  strictEqual(method.kind, "paging");
+  const methodParam = method.parameters.find((p) => p.name === "pagination");
+  strictEqual(methodParam?.type.kind, "model");
+  const pageSizeParameter = methodParam?.type.properties.find((p) => p.name === "pageSize");
+  ok(pageSizeParameter);
+  const pageSizeParameterSegments = method.pagingMetadata.pageSizeParameterSegments;
+  ok(pageSizeParameterSegments);
+  strictEqual(pageSizeParameterSegments.length, 2);
+  strictEqual(pageSizeParameterSegments[0], methodParam);
+  strictEqual(pageSizeParameterSegments[1], pageSizeParameter);
 });

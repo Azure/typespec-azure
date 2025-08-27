@@ -122,6 +122,37 @@ function getSdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperat
   });
 }
 
+function getPageSizeParameterSegments<TServiceOperation extends SdkServiceOperation>(
+  baseServiceMethod: SdkServiceMethod<TServiceOperation>,
+): (SdkModelPropertyType | SdkMethodParameter)[] {
+  function recurseToFindPageSizeParameterInModel(
+    param: SdkMethodParameter,
+    model: SdkModelType,
+  ): (SdkModelPropertyType | SdkMethodParameter)[] {
+    for (const prop of model.properties) {
+      if (prop.__raw && prop.__raw.decorators.find((d) => d.definition?.name === "@pageSize")) {
+        return [param, prop];
+      }
+      if (prop.type.kind === "model") {
+        const nested = recurseToFindPageSizeParameterInModel(param, prop.type);
+        if (nested.length > 0) {
+          return nested;
+        }
+      }
+    }
+    return [];
+  }
+  for (const p of baseServiceMethod.parameters) {
+    if (p.__raw && p.__raw.decorators.find((d) => d.definition?.name === "@pageSize")) {
+      return [p];
+    }
+    if (p.type.kind === "model") {
+      return recurseToFindPageSizeParameterInModel(p, p.type);
+    }
+  }
+  return [];
+}
+
 function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
@@ -209,12 +240,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
             context.__modelPropertyCache.get(segment)!,
         ),
         pageItemsSegments: baseServiceMethod.response.resultSegments,
-        pageSizeParameter: baseServiceMethod.parameters.find(
-          (p) =>
-            p.__raw &&
-            p.__raw.kind === "ModelProperty" &&
-            p.__raw.decorators.find((d) => d.definition?.name === "@pageSize"),
-        ),
+        pageSizeParameterSegments: getPageSizeParameterSegments(baseServiceMethod),
         nextLinkReInjectedParametersSegments:
           pagingMetadata.output.nextLink?.property.type.kind === "Scalar"
             ? (

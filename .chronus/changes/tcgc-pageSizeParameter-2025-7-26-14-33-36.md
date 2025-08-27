@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Add `.pageSizeParameter` to `.pagingMetadata` on paging methods to find the parameter that is the page size parameter
+Add `.pageSizeParameterSegments` to `.pagingMetadata` on paging methods to return the path to the page size parameter
