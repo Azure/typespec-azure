@@ -7,7 +7,7 @@ it("applies x-ms-client-flatten for property marked with @flattenProperty", asyn
     `
     model Widget {
       #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "for test"
-      @flattenProperty
+      @Azure.ClientGenerator.Core.Legacy.flattenProperty
       properties?: WidgetProperties;
     }
 
