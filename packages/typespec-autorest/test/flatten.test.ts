@@ -6,7 +6,7 @@ it("applies x-ms-client-flatten for property marked with @flattenProperty", asyn
   const res = await compileOpenAPI(
     `
     model Widget {
-      #suppress "deprecated" "for test"
+      #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "for test"
       @flattenProperty
       properties?: WidgetProperties;
     }
