@@ -173,6 +173,33 @@ const resourceGroupResourceOps = createResourceOperations(
   true,
 );
 
+// Operations scenario
+Scenarios.Azure_ResourceManager_MethodSubscriptionId_Operations = passOnSuccess({
+  uri: "/providers/Azure.ResourceManager.MethodSubscriptionId/operations",
+  method: "get" as const,
+  request: {
+    query: { "api-version": API_VERSION },
+  },
+  response: {
+    status: 200,
+    body: json({
+      value: [
+        {
+          name: "Azure.ResourceManager.MethodSubscriptionId/services/read",
+          isDataAction: false,
+          display: {
+            provider: "Azure.ResourceManager.MethodSubscriptionId",
+            resource: "services",
+            operation: "Lists services",
+            description: "Lists registered services",
+          },
+        },
+      ],
+    }),
+  },
+  kind: "MockApiDefinition" as const,
+});
+
 // Scenario assignments
 Scenarios.Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource1Operations_get =
   passOnSuccess(subscriptionResource1Ops.get);

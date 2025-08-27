@@ -25,6 +25,32 @@ enum Versions {
   @doc("Preview API version 2023-12-01-preview.")
   v2023_12_01_preview: "2023-12-01-preview",
 }
+
+@scenario
+@scenarioDoc("""
+  Operations list GET operation for Azure.ResourceManager.MethodSubscriptionId.
+  Expected path: /providers/Azure.ResourceManager.MethodSubscriptionId/operations
+  Expected query parameter: api-version=2023-12-01-preview
+  Expected response body:
+  ```json
+  {
+    "value": [
+      {
+        "name": "Azure.ResourceManager.MethodSubscriptionId/services/read",
+        "isDataAction": false,
+        "display": {
+          "provider": "Azure.ResourceManager.MethodSubscriptionId",
+          "resource": "services",
+          "operation": "Lists services",
+          "description": "Lists registered services"
+        }
+      }
+    ]
+  }
+  ```
+  """)
+interface Operations extends Azure.ResourceManager.Operations {}
+
 /**
  * Scenario 1: Two subscription level resources with subscriptionId at method level for all operations
  *
