@@ -31,6 +31,34 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
     expectDiagnosticEmpty(diagnostics);
   });
 
+  it("emits a warning if resource is used with segment and key names", async () => {
+    const { diagnostics } = await checkFor(`
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+
+      @doc("Widget resource")
+      model Widget is ProxyResource<WidgetProperties> {
+         ...ResourceNameParameter<Widget, "widgetName", "widgets">;
+         ...ExtendedLocationProperty;
+      }
+
+      @doc("The properties of a widget")
+      model WidgetProperties {
+         size: int32;
+      }
+      
+      @doc("Direct extended resource")
+      model CustomResource extends Foundations.Resource {};
+
+      interface Widgets {
+        create is ArmResourceCreateOrReplaceSync<Widget>;
+        delete is ArmResourceCreateOrReplaceSync<CustomResource>;
+      }
+  `);
+    expectDiagnosticEmpty(diagnostics);
+  });
+
   it("emits error if template param is not extended from Resource", async () => {
     const { diagnostics } = await checkFor(`
       @armProviderNamespace
@@ -177,6 +205,66 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
     expectDiagnostics(diagnostics, [
       { code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met" },
       { code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met" },
+    ]);
+  });
+});
+
+describe("typespec-azure-resource-manager: ResourceNameParameter constraints", () => {
+  it("emits a warning when type, segment, and parameter name are provided ", async () => {
+    const { diagnostics } = await checkFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    model WidgetProperties {
+      @doc("The item color")
+      color: string;
+    }
+
+    model Widget is ProxyResource<WidgetProperties> {
+       ...ResourceNameParameter<Widget, "widgets", "widgetName">;
+    }
+  `);
+    expectDiagnostics(diagnostics, [
+      { code: "@azure-tools/typespec-azure-resource-manager/exclusion-constraint-violation" },
+    ]);
+  });
+  it("emits a warning when keyName, parameter type are provided ", async () => {
+    const { diagnostics } = await checkFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    model WidgetProperties {
+      @doc("The item color")
+      color: string;
+    }
+
+    model Widget is ProxyResource<WidgetProperties> {
+       ...ResourceNameParameter<Widget, KeyName = "widgetName", Type = "default">;
+    }
+  `);
+    expectDiagnostics(diagnostics, [
+      { code: "@azure-tools/typespec-azure-resource-manager/exclusion-constraint-violation" },
+    ]);
+  });
+  it("emits a warning when keyName, parameter type are provided  in ResourceNameParameterByType ", async () => {
+    const { diagnostics } = await checkFor(`
+    @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    model WidgetProperties {
+      @doc("The item color")
+      color: string;
+    }
+
+    model Widget is ProxyResource<WidgetProperties> {
+       ...NameParameterByType<TypeName = "widget", ParameterName = "widgetName", Type = "default">;
+    }
+  `);
+    expectDiagnostics(diagnostics, [
+      { code: "@azure-tools/typespec-azure-resource-manager/exclusion-constraint-violation" },
     ]);
   });
 });

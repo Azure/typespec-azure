@@ -822,6 +822,38 @@ model Foo is TrackedResource<FooProperties> {
 | --------- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------- |
 | identity? | [`SystemAssignedServiceIdentity`](./data-types.md#Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentity) | The managed service identities assigned to this resource. |
 
+### `NameParameterByType` {#Azure.ResourceManager.NameParameterByType}
+
+Spread this model into ARM resource models to specify resource name parameter for its operations.
+This is a more generic version of `ResourceNameParameter` that allows you to specify the type of the name.
+
+```typespec
+model Azure.ResourceManager.NameParameterByType<TypeName, ParameterName, NamePattern, Type>
+```
+
+#### Template Parameters
+
+| Name          | Description                                                                                              |
+| ------------- | -------------------------------------------------------------------------------------------------------- |
+| TypeName      | The type of the name segment.                                                                            |
+| ParameterName | The name of the parameter.                                                                               |
+| NamePattern   | The RegEx pattern of the name. Default is `^[a-zA-Z0-9-]{3,24}$`.                                        |
+| Type          | The type of the name property. Default type is string. However you can pass an union with string values. |
+
+#### Examples
+
+```typespec
+model Employee is TrackedResource<EmployeeProperties> {
+  ...NameParameter<"employee", "employeeName">;
+}
+```
+
+#### Properties
+
+| Name | Type   | Description |
+| ---- | ------ | ----------- |
+| name | `Type` |             |
+
 ### `ParentKeysOf` {#Azure.ResourceManager.ParentKeysOf}
 
 Extracts the key (path) parameters from the parent(s) of the given resource

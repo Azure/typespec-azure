@@ -29,12 +29,7 @@ interface Operations extends Azure.ResourceManager.Operations {}
 
 /** A best practice resource */
 model BestPractice is Azure.ResourceManager.ProxyResource<BestPracticeProperties> {
-  ...ResourceNameParameter<
-    Resource = BestPractice,
-    KeyName = "bestPracticeName",
-    SegmentName = "bestPractices",
-    NamePattern = ""
-  >;
+  ...ResourceNameParameter<Resource = BestPractice, NamePattern = "">;
   ...Legacy.ExtendedLocationOptionalProperty;
 }
 

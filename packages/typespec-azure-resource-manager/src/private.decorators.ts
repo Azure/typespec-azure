@@ -1,5 +1,6 @@
 import {
   $key,
+  $pattern,
   DecoratorContext,
   Interface,
   Model,
@@ -14,6 +15,7 @@ import {
   getLifecycleVisibilityEnum,
   getTypeName,
   isKey,
+  isTemplateDeclarationOrInstance,
   sealVisibilityModifiers,
 } from "@typespec/compiler";
 
@@ -30,7 +32,9 @@ import {
   BuiltInSubscriptionResourceDecorator,
 } from "../generated-defs/Azure.ResourceManager.Extension.Private.js";
 import {
+  ApplyResourceNameConstraintsDecorator,
   ArmBodyRootDecorator,
+  ArmPatternDecorator,
   ArmRenameListByOperationDecorator,
   ArmResourceInternalDecorator,
   ArmResourcePropertiesOptionalityDecorator,
@@ -45,6 +49,7 @@ import {
   EnforceConstraintDecorator,
   OmitIfEmptyDecorator,
   ResourceBaseParametersOfDecorator,
+  ResourceNameTemplateParameterInfo,
   ResourceParameterBaseForDecorator,
 } from "../generated-defs/Azure.ResourceManager.Private.js";
 import { reportDiagnostic } from "./lib.js";
@@ -613,6 +618,164 @@ const $armBodyRoot: ArmBodyRootDecorator = (
   context.call($bodyRoot, target);
 };
 
+const $applyResourceNameConstraints: ApplyResourceNameConstraintsDecorator = (
+  context: DecoratorContext,
+  target: Model | Interface | Operation,
+  parameterInfo: ResourceNameTemplateParameterInfo,
+) => {
+  const program = context.program;
+  const templateArguments = resolveResourceNameTemplateArguments(target, parameterInfo);
+  if (templateArguments === undefined) {
+    return;
+  }
+
+  if (
+    templateArguments.modelType !== undefined &&
+    templateArguments.keyName?.value !== "" &&
+    templateArguments.segmentName?.value !== ""
+  ) {
+    reportDiagnostic(program, {
+      code: "exclusion-constraint-violation",
+      target: target,
+      format: {
+        actionMessage: `You should not provide the Resource, KeyName, and SegmentName template parameters together. Please either use the default type and parameter names generated from the resource, or use the 'ResourceNameByType' template.`,
+      },
+    });
+    return;
+  }
+
+  if (
+    templateArguments.keyName?.value !== "" &&
+    isLiteralStringEquivalent(program, templateArguments.parameterType?.value)
+  ) {
+    reportDiagnostic(program, {
+      code: "exclusion-constraint-violation",
+      target: target,
+      format: {
+        actionMessage: `You should not provide the KeyName and Type template parameters together. Please either use the default type and parameter names generated from the resource, or use the 'ResourceNameByType' template.`,
+      },
+    });
+    return;
+  }
+};
+
+const $armPattern: ArmPatternDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  pattern: string,
+) => {
+  const { program } = context;
+  if (
+    target.type.kind !== "String" &&
+    $(program).type.isAssignableTo(target.type, $(program).builtin.string)
+  ) {
+    context.call($pattern, target, pattern);
+  }
+};
+
+function isLiteralStringEquivalent(
+  program: Program,
+  value: string | boolean | Type | undefined,
+): boolean {
+  if (value === undefined) return false;
+  if (typeof value === "string") return true;
+  if (typeof value === "boolean") return false;
+  if (typeof value === "object") {
+    return $(program).type.isAssignableTo(value, $(program).builtin.string);
+  }
+
+  return false;
+}
+
+interface ResolvedTemplateArgument {
+  position: number;
+  value?: string | boolean | Type;
+}
+
+interface ResolvedResourceNameTemplateArgument {
+  modelType?: ResolvedTemplateArgument;
+  keyName?: ResolvedTemplateArgument;
+  segmentName?: ResolvedTemplateArgument;
+  parameterType?: ResolvedTemplateArgument;
+  namePattern?: ResolvedTemplateArgument;
+}
+
+function resolveResourceNameTemplateArguments(
+  target: Model | Interface | Operation,
+  info: ResourceNameTemplateParameterInfo,
+): ResolvedResourceNameTemplateArgument | undefined {
+  function getValueFromType(type: Type): string | boolean | Type | undefined {
+    switch (type.kind) {
+      case "Boolean":
+      case "String":
+        return type.value;
+      case "EnumMember":
+        return type.value === undefined ? type.name : (type.value as string);
+      case "UnionVariant":
+        return getValueFromType(type.type);
+      case "Union":
+      case "Scalar":
+        return type;
+    }
+    return undefined;
+  }
+
+  if (
+    target.templateMapper === undefined ||
+    target.templateMapper.partial === true ||
+    !isTemplateDeclarationOrInstance(target)
+  ) {
+    return undefined;
+  }
+
+  const resolvedArgs: ResolvedTemplateArgument[] = [];
+  let i = 0;
+  for (const parameter of target.templateMapper.args) {
+    let value: string | boolean | Type | undefined;
+    switch (parameter.entityKind) {
+      case "Type":
+        value = getValueFromType(parameter);
+        break;
+      case "Value":
+        value =
+          parameter.valueKind === "BooleanValue" || parameter.valueKind === "StringValue"
+            ? parameter.value
+            : undefined;
+        break;
+      case "Indeterminate":
+        value = getValueFromType(parameter.type);
+        break;
+    }
+    resolvedArgs.push({
+      position: i++,
+      value,
+    });
+  }
+  return {
+    modelType:
+      info.modelType?.position === undefined || info.modelType.position >= resolvedArgs.length
+        ? undefined
+        : resolvedArgs[info.modelType?.position],
+    keyName:
+      info.keyName?.position === undefined || info.keyName.position >= resolvedArgs.length
+        ? undefined
+        : resolvedArgs[info.keyName?.position],
+    segmentName:
+      info.segmentName?.position === undefined || info.segmentName.position >= resolvedArgs.length
+        ? undefined
+        : resolvedArgs[info.segmentName?.position],
+    parameterType:
+      info.parameterType?.position === undefined ||
+      info.parameterType.position >= resolvedArgs.length
+        ? undefined
+        : resolvedArgs[info.parameterType?.position],
+    namePattern:
+      info.namePattern?.position === undefined || info.namePattern.position >= resolvedArgs.length
+        ? undefined
+        : resolvedArgs[info.namePattern?.position],
+  };
+}
+
 /** @internal */
 export const $decorators = {
   "Azure.ResourceManager.Private": {
@@ -631,6 +794,8 @@ export const $decorators = {
     armResourcePropertiesOptionality: $armResourcePropertiesOptionality,
     armBodyRoot: $armBodyRoot,
     armResourceWithParameter: $armResourceWithParameter,
+    applyResourceNameConstraints: $applyResourceNameConstraints,
+    armPattern: $armPattern,
   } satisfies AzureResourceManagerPrivateDecorators,
   "Azure.ResourceManager.Extension.Private": {
     builtInResource: $builtInResource,
