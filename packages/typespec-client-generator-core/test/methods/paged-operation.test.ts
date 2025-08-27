@@ -1154,13 +1154,13 @@ it("@pageSize parameter check", async () => {
     model Pet {
       id: string;
     }
-    @list op listPets(@pageIndex page: int32, @pageSize pageSize: int8): Page<Pet>;
+    @list op listPets(@pageIndex page: int32, @pageSize size: int8): Page<Pet>;
   `);
   const sdkPackage = runner.context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "listPets");
   strictEqual(method.kind, "paging");
-  const pageSizeParameter = method.parameters.find((p) => p.name === "pageSize");
+  const pageSizeParameter = method.parameters.find((p) => p.name === "size");
   ok(pageSizeParameter);
   strictEqual(method.pagingMetadata.pageSizeParameterSegments?.length, 1);
   strictEqual(method.pagingMetadata.pageSizeParameterSegments[0], pageSizeParameter);
