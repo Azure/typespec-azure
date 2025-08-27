@@ -1644,6 +1644,32 @@ Expected response body:
 }
 ```
 
+### Azure_ResourceManager_MethodSubscriptionId_Operations
+
+- Endpoint: `get https://management.azure.com`
+
+Operations list GET operation for Azure.ResourceManager.MethodSubscriptionId.
+Expected path: /providers/Azure.ResourceManager.MethodSubscriptionId/operations
+Expected query parameter: api-version=2023-12-01-preview
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "name": "Azure.ResourceManager.MethodSubscriptionId/services/read",
+      "isDataAction": false,
+      "display": {
+        "provider": "Azure.ResourceManager.MethodSubscriptionId",
+        "resource": "services",
+        "operation": "Lists services",
+        "description": "Lists registered services"
+      }
+    }
+  ]
+}
+```
+
 ### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource1Operations_delete
 
 - Endpoint: `delete https://management.azure.com`
