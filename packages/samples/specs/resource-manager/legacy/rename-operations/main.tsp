@@ -39,6 +39,7 @@ interface Widgets {
   get is ArmResourceRead<Widget>;
   /** No renaming: last path parameter should be 'widgetName' */
   #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" ""
+  #suppress "@azure-tools/typespec-azure-resource-manager/invalid-parameter-rename"
   @Azure.ResourceManager.Legacy.renamePathParameter("non-existent-name", "widgetsName")
   createOrReplace is ArmResourceCreateOrReplaceAsync<Widget>;
   /** Renaming: last path parameter should be 'widgetsName' */
@@ -51,6 +52,7 @@ interface Widgets {
   >;
   /** No renaming: last path parameter should be 'widgetName' */
   #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" ""
+  #suppress "@azure-tools/typespec-azure-resource-manager/invalid-parameter-rename"
   @Azure.ResourceManager.Legacy.renamePathParameter("widgetName", "resourceGroupName")
   delete is ArmResourceDeleteWithoutOkAsync<Widget>;
   list is ArmResourceListByParent<Widget>;

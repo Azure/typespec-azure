@@ -2,11 +2,18 @@ import {
   $doc,
   DecoratorContext,
   getFriendlyName,
+  getNamespaceFullName,
   ignoreDiagnostics,
   Model,
   Operation,
   Program,
 } from "@typespec/compiler";
+import {
+  unsafe_mutateSubgraph as mutateSubgraph,
+  unsafe_Mutator as Mutator,
+  unsafe_MutatorFlow as MutatorFlow,
+} from "@typespec/compiler/experimental";
+import { $ } from "@typespec/compiler/typekit";
 import { useStateMap } from "@typespec/compiler/utils";
 import { $route, getHttpOperation, HttpOperation, isPathParam } from "@typespec/http";
 import {
@@ -515,6 +522,56 @@ export function getRouteOptions(program: Program, target: Operation): ArmOperati
   };
 }
 
+function storeRenamePathParameters(
+  program: Program,
+  target: Operation,
+  sourceName: string,
+  targetName: string,
+): void {
+  const opId = getOperationName(target);
+  const literal = $(program).literal.createString(
+    `${opId.namespace}/${opId.interface}/${opId.operation}`,
+  );
+  program.stateMap(ArmStateKeys.renamePathParameters).set(literal, new Map<string, string>());
+  let renameMap = program.stateMap(ArmStateKeys.renamePathParameters).get(literal);
+  if (renameMap === undefined) {
+    renameMap = new Map<string, string>();
+  }
+  renameMap.set(sourceName, targetName);
+  program.stateMap(ArmStateKeys.renamePathParameters).set(literal, renameMap);
+}
+
+function getRenamePathParameter(
+  program: Program,
+  target: Operation,
+  sourceName: string,
+  targetName: string,
+): boolean {
+  const opId = getOperationName(target);
+  const literal = $(program).literal.createString(
+    `${opId.namespace}/${opId.interface}/${opId.operation}`,
+  );
+  const renameMap = program.stateMap(ArmStateKeys.renamePathParameters).get(literal);
+  if (renameMap === undefined) {
+    program.stateMap(ArmStateKeys.renamePathParameters).set(literal, new Map<string, string>());
+    return false;
+  }
+  return renameMap.get(sourceName) === targetName;
+}
+
+interface OperationId {
+  namespace?: string;
+  interface?: string;
+  operation: string;
+}
+
+function getOperationName(operation: Operation): OperationId {
+  const result: OperationId = { operation: operation.name };
+  if (operation.namespace) result.namespace = getNamespaceFullName(operation.namespace);
+  if (operation.interface) result.interface = operation.interface.name;
+  return result;
+}
+
 /**
  * Renames a path parameter in an Azure Resource Manager operation.
  * @param context The decorator context.
@@ -529,13 +586,73 @@ export const $renamePathParameter: RenamePathParameterDecorator = (
   sourceParameterName: string,
   targetParameterName: string,
 ) => {
-  if (target.parameters.properties.has(targetParameterName)) {
+  const { program } = context;
+  if (getRenamePathParameter(program, target, sourceParameterName, targetParameterName)) {
     return;
   }
-  const param = target.parameters.properties.get(sourceParameterName);
-  if (param !== undefined && isPathParam(context.program, param)) {
-    param.name = targetParameterName;
-    target.parameters.properties.delete(sourceParameterName);
-    target.parameters.properties.set(targetParameterName, param);
+  storeRenamePathParameters(program, target, sourceParameterName, targetParameterName);
+
+  const toMutate = target.parameters;
+  const existingTarget = toMutate.properties.get(targetParameterName);
+  const existingSource = toMutate.properties.get(sourceParameterName);
+  if (existingTarget !== undefined) {
+    reportDiagnostic(context.program, {
+      code: "invalid-parameter-rename",
+      messageId: "overwrite",
+      format: { oldName: sourceParameterName, newName: targetParameterName },
+      target: context.decoratorTarget,
+    });
+    return;
   }
+  if (existingSource === undefined) {
+    reportDiagnostic(context.program, {
+      code: "invalid-parameter-rename",
+      messageId: "missing",
+      format: { oldName: sourceParameterName },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+  if (!isPathParam(program, existingSource)) {
+    reportDiagnostic(context.program, {
+      code: "invalid-parameter-rename",
+      messageId: "notpath",
+      format: { oldName: sourceParameterName },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+
+  const mutated = mutateSubgraph(
+    program,
+    [createParamMutator(sourceParameterName, targetParameterName)],
+    toMutate,
+  );
+  target.parameters = mutated.type as Model;
 };
+
+function createParamMutator(sourceParameterName: string, targetParameterName: string): Mutator {
+  return {
+    name: "RenameMutator",
+    Model: {
+      filter: (m, prog) => {
+        const param = m.properties.get(sourceParameterName);
+        if (
+          m.properties.has(targetParameterName) ||
+          param === undefined ||
+          !isPathParam(prog, param)
+        ) {
+          return MutatorFlow.DoNotMutate;
+        }
+        return MutatorFlow.DoNotRecur;
+      },
+      mutate: (_, clone) => {
+        const param = clone.properties.get(sourceParameterName);
+        param!.name = targetParameterName;
+        clone.properties.delete(sourceParameterName);
+        clone.properties.set(targetParameterName, param!);
+        return MutatorFlow.DoNotRecur;
+      },
+    },
+  };
+}
