@@ -1768,54 +1768,7 @@ public final class ContosoProviderHubClient {
 ```
 
 ```go
-type MyModel struct {
-  // The resource-specific properties for this resource.
-	Properties *MyModelProperties
-
-  // READ-ONLY
-	Name *string
-
-  // READ-ONLY; Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
-	ID *string
-
-  // READ-ONLY; Azure Resource Manager metadata containing createdBy and modifiedBy information.
-	SystemData *SystemData
-
-  // READ-ONLY; The type of the resource. E.g. "Microsoft.Compute/virtualMachines" or "Microsoft.Storage/storageAccounts"
-	Type *string
-}
-
-type MyModelProperties struct {
-}
-
-type SystemData struct {
-  // The timestamp of resource creation (UTC).
-	CreatedAt *time.Time
-
-  // The identity that created the resource.
-	CreatedBy *string
-
-  // The type of identity that created the resource.
-	CreatedByType *CreatedByType
-
-  // The timestamp of resource last modification (UTC)
-	LastModifiedAt *time.Time
-
-  // The identity that last modified the resource.
-	LastModifiedBy *string
-
-  // The type of identity that last modified the resource.
-	LastModifiedByType *CreatedByType
-}
-
-type ContosoProviderHubClientGetOptions struct {}
-
-type ContosoProviderHubClientGetResponse struct {
-	MyModel
-}
-
-func Get(ctx context.Context, extendedZoneName string, options *ContosoProviderHubClientGetOptions) (ContosoProviderHubClientGetResponse, error)
-
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>
