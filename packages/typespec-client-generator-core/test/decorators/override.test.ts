@@ -50,9 +50,8 @@ it("basic", async () => {
   strictEqual(paramsModel, paramsParam.type);
 
   ok(method.operation.bodyParam);
-  strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 2);
-  strictEqual(method.operation.bodyParam.correspondingMethodParams[0], paramsModel.properties[0]);
-  strictEqual(method.operation.bodyParam.correspondingMethodParams[1], paramsModel.properties[1]);
+  strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 1);
+  strictEqual(method.operation.bodyParam.correspondingMethodParams[0], paramsParam);
 });
 
 it("basic with scope", async () => {
@@ -135,9 +134,8 @@ it("basic with scope", async () => {
     contentTypeParamWithCsharp,
   );
   ok(httpOpWithCsharp.bodyParam);
-  strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams.length, 2);
-  strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams[0], paramModel.properties[0]);
-  strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams[1], paramModel.properties[1]);
+  strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams.length, 1);
+  strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams[0], paramsParamWithCsharp);
 });
 
 it("regrouping", async () => {
@@ -409,9 +407,8 @@ it("recursive params", async () => {
   strictEqual(paramsModel, inputParam.type);
 
   ok(method.operation.bodyParam);
-  strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 2);
-  strictEqual(method.operation.bodyParam.correspondingMethodParams[0], paramsModel.properties[0]);
-  strictEqual(method.operation.bodyParam.correspondingMethodParams[1], paramsModel.properties[1]);
+  strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 1);
+  strictEqual(method.operation.bodyParam.correspondingMethodParams[0], inputParam);
 });
 
 it("core template", async () => {
