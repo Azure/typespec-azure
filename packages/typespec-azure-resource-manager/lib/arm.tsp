@@ -34,10 +34,10 @@ namespace Azure.ResourceManager;
  * @example
  * ```typespec
  * enum Versions {
- * * *  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+ *  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
  *  v2021_10_01_preview: "2021-10-01-preview",
  *
- * * *  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+ *  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
  *  v2021_11_01: "2021-11-01",
  * }
  * ```
