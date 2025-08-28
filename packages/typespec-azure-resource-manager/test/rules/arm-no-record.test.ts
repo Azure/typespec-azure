@@ -111,8 +111,7 @@ it("emits diagnostic when Record is used outside an ARM namespace", async () => 
       model Props is Record<unknown>;
 
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Arm {
+          namespace Arm {
         model WidgetProperties {};
       }
     }
@@ -133,8 +132,7 @@ it("emits diagnostic if an ARM Resource references a model that uses Record type
       model Properties is Record<string>;
 
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Arm {
+          namespace Arm {
         ${resource}
   
         model WidgetProperties {
@@ -156,8 +154,7 @@ it("emits diagnostic if an ARM Resource references a subnamespace model that use
     .expect(
       `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Arm {
+      namespace Arm {
       ${resource}
 
       model WidgetProperties {

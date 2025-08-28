@@ -26,8 +26,7 @@ describe("typespec-azure-resource-manager: arm resource action no segment rule",
       .expect(
         `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @Azure.ResourceManager.tenantResource
     model Widget is ProxyResource<WidgetProperties> {

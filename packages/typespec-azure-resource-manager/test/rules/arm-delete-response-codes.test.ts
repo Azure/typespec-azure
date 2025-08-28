@@ -24,8 +24,7 @@ it("Emits a warning for synchronous delete operation that does not contain the a
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Contoso;
+          namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<EmployeeProperties> {
         @doc("Name of employee")
@@ -60,8 +59,7 @@ it("Does not emit a warning for synchronous delete operation that contains the a
     .expect(
       `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
     
     model Employee is ProxyResource<EmployeeProperties> {
       @doc("Name of employee")
@@ -94,8 +92,7 @@ it("Does not emit a warning for synchronous delete operation that uses the `ArmR
     .expect(
       `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
     
     model Employee is ProxyResource<EmployeeProperties> {
       @doc("Name of employee")
@@ -121,8 +118,7 @@ it("Emits a warning for long-running delete operation that does not contain the 
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Contoso;
+          namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<EmployeeProperties> {
         @doc("Name of employee")
@@ -154,8 +150,7 @@ it("Does not emit a warning for long-running delete operation that uses the `Arm
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Contoso;
+          namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<EmployeeProperties> {
         @doc("Name of employee")
