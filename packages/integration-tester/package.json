@@ -37,7 +37,7 @@
     "yaml": "~2.8.0"
   },
   "devDependencies": {
-    "typescript": "~5.8.2",
+    "typescript": "~5.9.2",
     "vitest": "^3.1.2"
   },
   "bugs": "https://github.com/microsoft/typespec/issues"
