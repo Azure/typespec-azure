@@ -52,9 +52,24 @@ export type ArmOperationRouteDecorator = (
  */
 export type ArmExternalTypeDecorator = (context: DecoratorContext, target: Model) => void;
 
+/**
+ * Renames a path parameter in an Azure Resource Manager operation.
+ *
+ * @param target The operation or interface to modify
+ * @param sourceParameterName The name of the parameter to rename
+ * @param targetParameterName The new name for the parameter
+ */
+export type RenamePathParameterDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  sourceParameterName: string,
+  targetParameterName: string,
+) => void;
+
 export type AzureResourceManagerLegacyDecorators = {
   customAzureResource: CustomAzureResourceDecorator;
   externalTypeRef: ExternalTypeRefDecorator;
   armOperationRoute: ArmOperationRouteDecorator;
   armExternalType: ArmExternalTypeDecorator;
+  renamePathParameter: RenamePathParameterDecorator;
 };

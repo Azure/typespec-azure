@@ -45,3 +45,15 @@ extern dec armOperationRoute(target: Operation, route?: valueof ArmOperationOpti
  * @param target The model to that is an external resource
  */
 extern dec armExternalType(target: Model);
+
+/**
+ * Renames a path parameter in an Azure Resource Manager operation.
+ * @param target The operation or interface to modify
+ * @param sourceParameterName The name of the parameter to rename
+ * @param targetParameterName The new name for the parameter
+ */
+extern dec renamePathParameter(
+  target: Operation,
+  sourceParameterName: valueof string,
+  targetParameterName: valueof string
+);
