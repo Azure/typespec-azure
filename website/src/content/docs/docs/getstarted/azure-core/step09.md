@@ -217,7 +217,6 @@ namespace Contoso.WidgetManager;
 
 enum Versions {
   v2022_08_31: "v20220831",
-
   v2022_11_30: "v20221130",
 }
 
