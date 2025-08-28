@@ -1,4 +1,4 @@
-import type { DecoratorContext, Model } from "@typespec/compiler";
+import type { DecoratorContext, Model, ModelProperty } from "@typespec/compiler";
 
 /**
  * Adds support for client-level multiple levels of inheritance.
@@ -47,6 +47,30 @@ export type HierarchyBuildingDecorator = (
   scope?: string,
 ) => void;
 
+/**
+ * Set whether a model property should be flattened or not.
+ * This decorator is not recommended to use for green field services.
+ *
+ * @param target The target model property that you want to flatten.
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ * @example
+ * ```typespec
+ * model Foo {
+ *    @flattenProperty
+ *    prop: Bar;
+ * }
+ * model Bar {
+ * }
+ * ```
+ */
+export type FlattenPropertyDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: string,
+) => void;
+
 export type AzureClientGeneratorCoreLegacyDecorators = {
   hierarchyBuilding: HierarchyBuildingDecorator;
+  flattenProperty: FlattenPropertyDecorator;
 };
