@@ -503,12 +503,6 @@ importers:
       '@typespec/compiler':
         specifier: workspace:^
         version: link:../compiler
-      '@typespec/http':
-        specifier: workspace:^
-        version: link:../http
-      '@typespec/rest':
-        specifier: workspace:^
-        version: link:../rest
       concurrently:
         specifier: ^9.1.2
         version: 9.2.0
@@ -2566,6 +2560,46 @@ importers:
       typescript:
         specifier: ~5.8.2
         version: 5.8.3
+
+  packages/integration-tester:
+    dependencies:
+      '@pnpm/workspace.find-packages':
+        specifier: ^1000.0.24
+        version: 1000.0.29(@pnpm/logger@1001.0.0)(@pnpm/worker@1000.1.9(@pnpm/logger@1001.0.0)(@types/node@24.1.0))(typanion@3.14.0)
+      execa:
+        specifier: ^9.5.2
+        version: 9.6.0
+      globby:
+        specifier: ~14.1.0
+        version: 14.1.0
+      log-symbols:
+        specifier: ^7.0.1
+        version: 7.0.1
+      ora:
+        specifier: ^8.1.1
+        version: 8.2.0
+      pathe:
+        specifier: ^2.0.3
+        version: 2.0.3
+      picocolors:
+        specifier: ~1.1.1
+        version: 1.1.1
+      simple-git:
+        specifier: ^3.28.0
+        version: 3.28.0
+      tar:
+        specifier: ^7.4.3
+        version: 7.4.3
+      yaml:
+        specifier: ~2.8.0
+        version: 2.8.0
+    devDependencies:
+      typescript:
+        specifier: ~5.8.2
+        version: 5.8.3
+      vitest:
+        specifier: ^3.1.2
+        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.1.0)(@vitest/ui@3.2.4)(happy-dom@18.0.1)(jsdom@25.0.1)(tsx@4.20.3)(yaml@2.8.0)
 
   packages/samples:
     dependencies:
@@ -5335,6 +5369,12 @@ packages:
   '@koa/router@13.1.1':
     resolution: {integrity: sha512-JQEuMANYRVHs7lm7KY9PCIjkgJk73h4m4J+g2mkw2Vo1ugPZ17UJVqEH8F+HeAdjKz5do1OaLe7ArDz+z308gw==}
     engines: {node: '>= 18'}
+
+  '@kwsites/file-exists@1.1.1':
+    resolution: {integrity: sha512-m9/5YGR18lIwxSFDwfE3oA7bWuq9kdau6ugN4H2rJeyhFQZcG9AgSHkQtSD15a8WvTgfz9aikZMrKPHvbpqFiw==}
+
+  '@kwsites/promise-deferred@1.1.1':
+    resolution: {integrity: sha512-GaHYm+c0O9MjZRu0ongGBRbinu8gVAMd2UZjji6jVmqKtZluZnptXGWhz1E8j8D2HJ3f/yMxKAUC0b+57wncIw==}
 
   '@mdx-js/mdx@3.1.0':
     resolution: {integrity: sha512-/QxEhPAvGwbQmy1Px8F899L5Uc2KZ6JtXwlCgJmjSTBedwOZkByYcBG4GceIGPXRDsmfxhHazuS+hlOShRLeDw==}
@@ -10170,6 +10210,10 @@ packages:
     resolution: {integrity: sha512-i24m8rpwhmPIS4zscNzK6MSEhk0DUWa/8iYQWxhffV8jkI4Phvs3F+quL5xvS0gdQR0FyTCMMH33Y78dDTzzIw==}
     engines: {node: '>=18'}
 
+  log-symbols@7.0.1:
+    resolution: {integrity: sha512-ja1E3yCr9i/0hmBVaM0bfwDjnGy8I/s6PP4DFp+yP+a+mrHO4Rm7DtmnqROTUkHIkqffC84YY7AeqX6oFk0WFg==}
+    engines: {node: '>=18'}
+
   longest-streak@3.1.0:
     resolution: {integrity: sha512-9Ri+o0JYgehTaVBBDoMqIl8GXtbWg711O3srftcHhZ0dqnETqLaoIK0x17fUw9rFSlK/0NlsKe0Ahhyl5pXE2g==}
 
@@ -12034,6 +12078,9 @@ packages:
 
   simple-get@4.0.1:
     resolution: {integrity: sha512-brv7p5WgH0jmQJr1ZDDfKDOSeWWg+OVypG99A/5vYGPqJ6pxiaHLy8nxtFjBA7oMa01ebA9gfh1uMCFqOuXxvA==}
+
+  simple-git@3.28.0:
+    resolution: {integrity: sha512-Rs/vQRwsn1ILH1oBUy8NucJlXmnnLeLCfcvbSehkPzbv3wwoFWIdtfd6Ndo6ZPhlPsCZ60CPI4rxurnwAa+a2w==}
 
   simple-swizzle@0.2.2:
     resolution: {integrity: sha512-JA//kQgZtbuY83m+xT+tXJkmJncGMTFT+C+g2h2R9uxkYIrE2yy9sgmcLhCnw57/WSD+Eh3J97FPEDFnbXnDUg==}
@@ -16589,6 +16636,14 @@ snapshots:
       path-to-regexp: 6.3.0
     transitivePeerDependencies:
       - supports-color
+
+  '@kwsites/file-exists@1.1.1':
+    dependencies:
+      debug: 4.4.1(supports-color@8.1.1)
+    transitivePeerDependencies:
+      - supports-color
+
+  '@kwsites/promise-deferred@1.1.1': {}
 
   '@mdx-js/mdx@3.1.0(acorn@8.15.0)':
     dependencies:
@@ -23036,6 +23091,11 @@ snapshots:
       chalk: 5.4.1
       is-unicode-supported: 1.3.0
 
+  log-symbols@7.0.1:
+    dependencies:
+      is-unicode-supported: 2.1.0
+      yoctocolors: 2.1.1
+
   longest-streak@3.1.0: {}
 
   loose-envify@1.4.0:
@@ -25518,6 +25578,14 @@ snapshots:
       once: 1.4.0
       simple-concat: 1.0.1
     optional: true
+
+  simple-git@3.28.0:
+    dependencies:
+      '@kwsites/file-exists': 1.1.1
+      '@kwsites/promise-deferred': 1.1.1
+      debug: 4.4.1(supports-color@8.1.1)
+    transitivePeerDependencies:
+      - supports-color
 
   simple-swizzle@0.2.2:
     dependencies:

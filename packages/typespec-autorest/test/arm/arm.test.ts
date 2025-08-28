@@ -415,6 +415,7 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
       interface AllProperties {
         get is ArmResourceRead<AllPropertiesResource>;
         put is ArmResourceCreateOrReplaceAsync<AllPropertiesResource>;
+         @patch(#{ implicitOptionality: true })
         update is ArmCustomPatchAsync<AllPropertiesResource, AllPropertiesResource>;
         delete is ArmResourceDeleteWithoutOkAsync<AllPropertiesResource>;
       }
@@ -422,6 +423,7 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
       interface AssignedOperations {
         get is ArmResourceRead<SystemAssignedResource>;
         put is ArmResourceCreateOrReplaceAsync<SystemAssignedResource>;
+        @patch(#{ implicitOptionality: true })
         update is ArmCustomPatchAsync<SystemAssignedResource, SystemAssignedResource>;
         delete is ArmResourceDeleteWithoutOkAsync<SystemAssignedResource>;
       }

@@ -630,6 +630,27 @@ model Employee is TrackedResource<EmployeeProperties> {
 | ----------------- | ---------------------------------------------------------------------------------------- | ----------- |
 | extendedLocation? | [`ExtendedLocation`](./data-types.md#Azure.ResourceManager.CommonTypes.ExtendedLocation) |             |
 
+### `ExtensionActionScope` {#Azure.ResourceManager.ExtensionActionScope}
+
+Template used by ArmProviderAction templates. This produces following action route:
+`/{scope}/providers/Microsoft.SomeRP/someAction`
+
+```typespec
+model Azure.ResourceManager.ExtensionActionScope<StringType>
+```
+
+#### Template Parameters
+
+| Name       | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| StringType | The type of the scope name parameter, defaults to string. |
+
+#### Properties
+
+| Name  | Type         | Description |
+| ----- | ------------ | ----------- |
+| scope | `StringType` |             |
+
 ### `ExtensionResource` {#Azure.ResourceManager.ExtensionResource}
 
 Concrete extension resource types can be created by aliasing this type using a specific property type.
@@ -818,6 +839,55 @@ model Azure.ResourceManager.ParentKeysOf<Resource>
 #### Properties
 
 None
+
+### `PrivateEndpointConnectionResource` {#Azure.ResourceManager.PrivateEndpointConnectionResource}
+
+A private endpoint connection resource.
+Resource providers must declare a private endpoint connection resource type in their provider namespace if
+they support private endpoint connections
+
+```typespec
+model Azure.ResourceManager.PrivateEndpointConnectionResource<Description>
+```
+
+#### Template Parameters
+
+| Name        | Description                                                                                       |
+| ----------- | ------------------------------------------------------------------------------------------------- |
+| Description | Optional. The documentary description of the private endpoint connection resource name parameter. |
+
+#### Examples
+
+```ts
+namespace Microsoft.Contoso;
+model PrivateEndpointConnection is PrivateEndpointConnectionResource {}
+alias EmployeeConnectionOps is PrivateEndpoints<PrivateEndpointConnection>;
+@armResourceOperations
+interface Employees {
+ @doc("get a private endpoint connection for resource employee")
+ getPrivateEndpointConnection is EmployeeConnectionOps.Read<Employee>;
+}
+```
+
+#### Properties
+
+| Name        | Type                                                                                                                           | Description                                |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
+| properties? | [`PrivateEndpointConnectionProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionProperties) | The private endpoint connection properties |
+
+### `PrivateEndpointConnectionUpdate` {#Azure.ResourceManager.PrivateEndpointConnectionUpdate}
+
+PATCH model for private endpoint connections
+
+```typespec
+model Azure.ResourceManager.PrivateEndpointConnectionUpdate
+```
+
+#### Properties
+
+| Name        | Type                                                                                                        | Description                                |
+| ----------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| properties? | `OptionalProperties<UpdateableProperties<ResourceManager.CommonTypes.PrivateEndpointConnectionProperties>>` | The private endpoint connection properties |
 
 ### `ProviderNamespace` {#Azure.ResourceManager.ProviderNamespace}
 
@@ -2414,10 +2484,10 @@ model Azure.ResourceManager.CommonTypes.TrackedResource
 
 #### Properties
 
-| Name     | Type             | Description                               |
-| -------- | ---------------- | ----------------------------------------- |
-| tags?    | `Record<string>` | Resource tags.                            |
-| location | `string`         | The geo-location where the resource lives |
+| Name     | Type                 | Description                               |
+| -------- | -------------------- | ----------------------------------------- |
+| tags?    | `Record<string>`     | Resource tags.                            |
+| location | `Core.azureLocation` | The geo-location where the resource lives |
 
 ### `UserAssignedIdentities` {#Azure.ResourceManager.CommonTypes.UserAssignedIdentities}
 
@@ -3300,6 +3370,74 @@ model Azure.ResourceManager.Legacy.ArmOperationOptions
 | useStaticRoute? | `boolean` | Should a static route be used          |
 | route?          | `string`  | The status route for operations to use |
 
+### `CustomResourceOptions` {#Azure.ResourceManager.Legacy.CustomResourceOptions}
+
+Options for customizing the behavior of a custom azure resource
+
+```typespec
+model Azure.ResourceManager.Legacy.CustomResourceOptions
+```
+
+#### Properties
+
+| Name             | Type      | Description                                        |
+| ---------------- | --------- | -------------------------------------------------- |
+| isAzureResource? | `boolean` | Should the resource be marked as an Azure resource |
+
+### `ExtendedLocationOptional` {#Azure.ResourceManager.Legacy.ExtendedLocationOptional}
+
+The complex type of the extended location.
+
+```typespec
+model Azure.ResourceManager.Legacy.ExtendedLocationOptional
+```
+
+#### Properties
+
+| Name  | Type                                                                                             | Description                        |
+| ----- | ------------------------------------------------------------------------------------------------ | ---------------------------------- |
+| name? | `string`                                                                                         | The name of the extended location. |
+| type? | [`ExtendedLocationType`](./data-types.md#Azure.ResourceManager.CommonTypes.ExtendedLocationType) | The type of the extended location. |
+
+### `ExtendedLocationOptionalProperty` {#Azure.ResourceManager.Legacy.ExtendedLocationOptionalProperty}
+
+Legacy. Model representing a non-standard `extendedLocation` envelope property with all properties optional.
+Spread this model into a Resource Model, if you are converting a BrownField API with extended location that has optional properties
+
+```typespec
+model Azure.ResourceManager.Legacy.ExtendedLocationOptionalProperty
+```
+
+#### Examples
+
+```typespec
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+  ...ExtendedLocationOptionalProperty;
+}
+```
+
+#### Properties
+
+| Name              | Type                                                                                                | Description |
+| ----------------- | --------------------------------------------------------------------------------------------------- | ----------- |
+| extendedLocation? | [`ExtendedLocationOptional`](./data-types.md#Azure.ResourceManager.Legacy.ExtendedLocationOptional) |             |
+
+### `LegacyTrackedResource` {#Azure.ResourceManager.Legacy.LegacyTrackedResource}
+
+A tracked resource with the 'location' property optional
+
+```typespec
+model Azure.ResourceManager.Legacy.LegacyTrackedResource
+```
+
+#### Properties
+
+| Name      | Type             | Description                               |
+| --------- | ---------------- | ----------------------------------------- |
+| tags?     | `Record<string>` | Resource tags.                            |
+| location? | `string`         | The geo-location where the resource lives |
+
 ### `ManagedServiceIdentityV4` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4}
 
 Managed service identity (system assigned and/or user assigned identities)
@@ -3380,6 +3518,38 @@ model Azure.ResourceManager.Legacy.ProviderParameter<Resource>
 | Name     | Type                             | Description |
 | -------- | -------------------------------- | ----------- |
 | provider | `"Microsoft.ThisWillBeReplaced"` |             |
+
+### `TrackedResourceWithOptionalLocation` {#Azure.ResourceManager.Legacy.TrackedResourceWithOptionalLocation}
+
+This type uses an optional location property, only used by legacy APIs.
+Concrete tracked resource types can be created by aliasing this type using a specific property type.
+
+See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+
+```typespec
+model Azure.ResourceManager.Legacy.TrackedResourceWithOptionalLocation<Properties, PropertiesOptional>
+```
+
+#### Template Parameters
+
+| Name               | Description                                                                                                                                    |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Properties         | A model containing the provider-specific properties for this resource                                                                          |
+| PropertiesOptional | A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended. |
+
+#### Examples
+
+```typespec
+model Employee is TrackedResourceWithOptionalLocation<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+```
+
+#### Properties
+
+| Name        | Type         | Description |
+| ----------- | ------------ | ----------- |
+| properties? | `Properties` |             |
 
 ### `ManagedServiceIdentityType` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityType}
 

@@ -9,19 +9,24 @@ import {
   getLroMetadata,
   getPagedResult,
   getUnionAsEnum,
+  hasUniqueItems,
 } from "@azure-tools/typespec-azure-core";
 import {
   getArmCommonTypeOpenAPIRef,
   getArmIdentifiers,
   getArmKeyIdentifiers,
+  getCustomResourceOptions,
   getExternalTypeRef,
+  getInlineAzureType,
   isArmCommonType,
+  isArmExternalType,
   isArmProviderNamespace,
   isAzureResource,
   isConditionallyFlattened,
 } from "@azure-tools/typespec-azure-resource-manager";
 import {
   getClientNameOverride,
+  getLegacyHierarchyBuilding,
   shouldFlattenProperty,
 } from "@azure-tools/typespec-client-generator-core";
 import {
@@ -66,6 +71,7 @@ import {
   getMinItems,
   getMinLength,
   getMinValue,
+  getNamespaceFullName,
   getPagingOperation,
   getPattern,
   getProperty,
@@ -960,6 +966,16 @@ export async function getOpenAPIForService(
       }
     }
     return undefined;
+  }
+  function shouldInlineCoreScalarProperty(type: Type): boolean {
+    if (
+      type.kind !== "ModelProperty" ||
+      type.type.kind !== "Scalar" ||
+      type.type.namespace === undefined
+    )
+      return false;
+    const nsName = getNamespaceFullName(type.type.namespace);
+    return nsName === "Azure.Core" && getInlineAzureType(program, type) === true;
   }
   function getSchemaOrRef(type: Type, schemaContext: SchemaContext, namespace?: Namespace): any {
     let schemaNameOverride: ((name: string, visibility: Visibility) => string) | undefined =
@@ -1909,6 +1925,8 @@ export async function getOpenAPIForService(
       return array;
     }
 
+    const rawBaseModel = getLegacyHierarchyBuilding(context.tcgcSdkContext, model);
+
     const modelSchema: OpenAPI2Schema = {
       type: "object",
       description: getDoc(program, model),
@@ -1957,6 +1975,13 @@ export async function getOpenAPIForService(
     applyExternalDocs(model, modelSchema);
 
     for (const prop of model.properties.values()) {
+      if (rawBaseModel && rawBaseModel.properties.has(prop.name)) {
+        const baseProp = rawBaseModel.properties.get(prop.name);
+        if (baseProp?.name === prop.name && baseProp.type === prop.type) {
+          // If the property is the same as the base model, skip it
+          continue;
+        }
+      }
       if (
         !metadataInfo.isPayloadProperty(
           prop,
@@ -2057,7 +2082,7 @@ export async function getOpenAPIForService(
       const baseSchema = getSchemaForType(model.baseModel, schemaContext);
       Object.assign(modelSchema, baseSchema, { description: modelSchema.description });
     } else if (model.baseModel) {
-      const baseSchema = getSchemaOrRef(model.baseModel, schemaContext);
+      const baseSchema = getSchemaOrRef(rawBaseModel ?? model.baseModel, schemaContext);
       modelSchema.allOf = [baseSchema];
     }
 
@@ -2103,7 +2128,13 @@ export async function getOpenAPIForService(
         propSchema = getSchemaOrRef(prop.type, context);
       }
     } else {
-      propSchema = getSchemaOrRef(prop.type, context);
+      propSchema = shouldInlineCoreScalarProperty(prop)
+        ? getSchemaForInlineType(
+            prop.type,
+            getOpenAPITypeName(program, prop.type, typeNameOptions),
+            context,
+          )
+        : getSchemaOrRef(prop.type, context);
       applyArmIdentifiersDecorator(prop.type, propSchema, prop);
     }
 
@@ -2117,11 +2148,18 @@ export async function getOpenAPIForService(
   function attachExtensions(type: Type, emitObject: any) {
     // Attach any OpenAPI extensions
     const extensions = getExtensions(program, type);
-    if (isAzureResource(program, type as Model)) {
+    if (
+      type.kind === "Model" &&
+      (isAzureResource(program, type) ||
+        getCustomResourceOptions(program, type)?.isAzureResource === true)
+    ) {
       emitObject["x-ms-azure-resource"] = true;
     }
     if (getAsEmbeddingVector(program, type as Model) !== undefined) {
       emitObject["x-ms-embedding-vector"] = true;
+    }
+    if (type.kind === "Model" && isArmExternalType(program, type) === true) {
+      emitObject["x-ms-external"] = true;
     }
     if (type.kind === "Scalar") {
       const ext = getArmResourceIdentifierConfig(program, type);
@@ -2238,6 +2276,13 @@ export async function getOpenAPIForService(
     const maxItems = getMaxItems(program, typespecType);
     if (!target.maxItems && maxItems !== undefined) {
       newTarget.maxItems = maxItems;
+    }
+
+    const uniqueItems =
+      (typespecType.kind === "ModelProperty" || typespecType.kind === "Model") &&
+      hasUniqueItems(program, typespecType);
+    if (uniqueItems && !target.uniqueItems) {
+      newTarget.uniqueItems = true;
     }
 
     if (isSecret(program, typespecType)) {

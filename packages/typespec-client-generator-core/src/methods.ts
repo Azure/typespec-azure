@@ -68,11 +68,11 @@ import {
   getAllResponseBodiesAndNonBodyExists,
   getAvailableApiVersions,
   getClientDoc,
+  getCorrespondingClientParam,
   getHashForType,
   getTypeDecorators,
   isNeverOrVoidType,
   isSubscriptionId,
-  twoParamsEquivalent,
 } from "./internal-utils.js";
 import { createDiagnostic } from "./lib.js";
 import {
@@ -120,6 +120,37 @@ function getSdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperat
     ...diagnostics.pipe(getSdkPagingServiceMethod<TServiceOperation>(context, operation, client)),
     kind: "lropaging",
   });
+}
+
+function getPageSizeParameterSegments<TServiceOperation extends SdkServiceOperation>(
+  baseServiceMethod: SdkServiceMethod<TServiceOperation>,
+): (SdkModelPropertyType | SdkMethodParameter)[] {
+  function recurseToFindPageSizeParameterInModel(
+    param: SdkMethodParameter,
+    model: SdkModelType,
+  ): (SdkModelPropertyType | SdkMethodParameter)[] {
+    for (const prop of model.properties) {
+      if (prop.__raw && prop.__raw.decorators.find((d) => d.definition?.name === "@pageSize")) {
+        return [param, prop];
+      }
+      if (prop.type.kind === "model") {
+        const nested = recurseToFindPageSizeParameterInModel(param, prop.type);
+        if (nested.length > 0) {
+          return nested;
+        }
+      }
+    }
+    return [];
+  }
+  for (const p of baseServiceMethod.parameters) {
+    if (p.__raw && p.__raw.decorators.find((d) => d.definition?.name === "@pageSize")) {
+      return [p];
+    }
+    if (p.type.kind === "model") {
+      return recurseToFindPageSizeParameterInModel(p, p.type);
+    }
+  }
+  return [];
 }
 
 function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>(
@@ -209,6 +240,24 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
             context.__modelPropertyCache.get(segment)!,
         ),
         pageItemsSegments: baseServiceMethod.response.resultSegments,
+        pageSizeParameterSegments: getPageSizeParameterSegments(baseServiceMethod),
+        nextLinkReInjectedParametersSegments:
+          pagingMetadata.output.nextLink?.property.type.kind === "Scalar"
+            ? (
+                getParameterizedNextLinkArguments(
+                  context.program,
+                  pagingMetadata.output.nextLink.property.type,
+                ) ?? []
+              ).map(
+                (t: ModelProperty) =>
+                  getPropertySegmentsFromModelOrParameters(
+                    baseServiceMethod.parameters,
+                    (p) =>
+                      p.__raw?.kind === "ModelProperty" &&
+                      findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
+                  )!,
+              )
+            : undefined,
       },
     });
   }
@@ -337,13 +386,17 @@ function mapFirstSegmentForResultSegments(
   if (resultSegments.length > 0 && responseModel) {
     for (let i = 0; i < resultSegments.length; i++) {
       const segment = resultSegments[i];
-      for (const property of responseModel.properties ?? []) {
-        if (
-          property.__raw &&
-          findRootSourceProperty(property.__raw) === findRootSourceProperty(segment)
-        ) {
-          return [property.__raw, ...resultSegments.slice(i + 1)];
+      let current: SdkModelType | undefined = responseModel;
+      while (current) {
+        for (const property of current.properties ?? []) {
+          if (
+            property.__raw &&
+            findRootSourceProperty(property.__raw) === findRootSourceProperty(segment)
+          ) {
+            return [property.__raw, ...resultSegments.slice(i + 1)];
+          }
         }
+        current = current.baseModel;
       }
     }
   }
@@ -689,19 +742,13 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     if (isNeverOrVoidType(param.type)) continue;
     const sdkMethodParam = diagnostics.pipe(getSdkMethodParameter(context, param, operation));
     if (sdkMethodParam.onClient) {
-      const operationLocation = context.getClientForOperation(operation);
+      // add API version and subscription ID parameters to the client parameters
       if (sdkMethodParam.isApiVersionParam) {
-        if (
-          !context.__clientParametersCache.get(operationLocation)?.find((x) => x.isApiVersionParam)
-        ) {
+        if (!clientParams.find((x) => x.isApiVersionParam)) {
           clientParams.push(sdkMethodParam);
         }
       } else if (isSubscriptionId(context, param)) {
-        if (
-          !context.__clientParametersCache
-            .get(operationLocation)
-            ?.find((x) => isSubscriptionId(context, x))
-        ) {
+        if (!clientParams.find((x) => isSubscriptionId(context, x))) {
           clientParams.push(sdkMethodParam);
         }
       }
@@ -761,14 +808,10 @@ export function getSdkMethodParameter(
   let property = context.__methodParameterCache?.get(type);
 
   if (!property) {
+    // for parameter that has elevated to client or parent client, we will use the client parameter directly
     if (operation) {
-      const clientParams = operation
-        ? context.__clientParametersCache.get(context.getClientForOperation(operation))
-        : undefined;
-      const correspondingClientParams = clientParams?.find((x) =>
-        twoParamsEquivalent(context, x.__raw, type),
-      );
-      if (correspondingClientParams) return diagnostics.wrap(correspondingClientParams);
+      const correspondingClientParam = getCorrespondingClientParam(context, type, operation);
+      if (correspondingClientParam) return diagnostics.wrap(correspondingClientParam);
     }
 
     property = {

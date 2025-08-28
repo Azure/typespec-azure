@@ -6,8 +6,6 @@ import { ClientTabs, ClientTabItem } from "@components/client-tabs";
 
 This page documents the client behavior as well as how to customize clients.
 
-> **NOTE:** The JS RLC doesn't support client hierarchy customization and will ignore client.tsp. Therefore, the following scenarios won't affect the JS RLC user experience. In this context, the TypeScript part refers to the JS Modular Emitter.
-
 ## Default Behavior
 
 ### Basic Rules
@@ -1058,7 +1056,13 @@ client2.pet()
 ```
 
 ```typescript
-NOT_SUPPORTED;
+import { FoodClient, PetActionClient } from "@azure/package-name";
+
+const foodClient = new FoodClient();
+const petActionClient = new PetActionClient();
+
+foodClient.feed();
+petActionClient.pet();
 ```
 
 ```java
@@ -1198,7 +1202,34 @@ foodClient.Feed();
 ```
 
 ```typescript
-NOT_SUPPORTED;
+// Modular api layer
+export async function feed(
+  context: Client,
+  options: FeedOptionalParams = { requestOptions: {} },
+): Promise<void>;
+
+export async function pet(
+  context: Client,
+  options: PetOptionalParams = { requestOptions: {} },
+): Promise<void>;
+
+// Modular classical client layer
+export class PetActionClient {
+  pet(options: PetOptionalParams = { requestOptions: {} }): Promise<void>;
+}
+
+export class FoodClient {
+  feed(options: FeedOptionalParams = { requestOptions: {} }): Promise<void>;
+}
+
+// sample
+import { FoodClient, PetActionClient } from "@azure/package-name";
+
+const foodClient = new FoodClient();
+const petActionClient = new PetActionClient();
+
+foodClient.feed();
+petActionClient.pet();
 ```
 
 ```java
@@ -1526,7 +1557,15 @@ NOT_SUPPORTED
 ```
 
 ```typescript
-// TODO
+export class StorageClient {
+  download(
+    blobName: string,
+    options: DownloadOptionalParams = { requestOptions: {} },
+  ): Promise<void>;
+}
+
+const client = new StorageClient();
+client.download("blobName");
 ```
 
 ```java

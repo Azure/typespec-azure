@@ -253,7 +253,14 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: paramMessage`Client name: "${"name"}" is duplicated in language scope: "${"scope"}"`,
-        nonDecorator: paramMessage`Client name: "${"name"}" is defined somewhere causing nameing conflicts in language scope: "${"scope"}"`,
+        nonDecorator: paramMessage`Client name: "${"name"}" is defined somewhere causing naming conflicts in language scope: "${"scope"}"`,
+      },
+    },
+    "duplicate-client-name-warning": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Client name: "${"name"}" is duplicated in language scope: "${"scope"}"`,
+        nonDecorator: paramMessage`Client name: "${"name"}" is defined somewhere causing naming conflicts in language scope: "${"scope"}"`,
       },
     },
     "example-loading": {
@@ -388,6 +395,11 @@ export const $lib = createTypeSpecLibrary({
       messages: {
         default:
           "When there is `@client` or `@operationGroup` decorator, `@clientLocation` decorator will be ignored.",
+        operationToOperation:
+          "`@clientLocation` cannot be used to move an operation to another operation. Operations can only be moved to interfaces or namespaces.",
+        modelPropertyToClientInitialization: paramMessage`There is already a parameter called '${"parameterName"}' in the client initialization.`,
+        modelPropertyToString:
+          "`@clientLocation` can only move model properties to interfaces or namespaces.",
       },
     },
     "client-location-wrong-type": {

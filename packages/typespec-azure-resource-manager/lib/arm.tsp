@@ -6,7 +6,7 @@ import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 
 import "./foundations/arm.foundations.tsp";
-import "./Legacy/arm.legacy.tsp";
+import "./legacy-types/arm.legacy.tsp";
 import "./common-types/common-types.tsp";
 import "./extension/extension.tsp";
 import "./backcompat.tsp";
@@ -17,6 +17,7 @@ import "./decorators.tsp";
 import "./interfaces.tsp";
 import "./responses.tsp";
 import "./parameters.tsp";
+import "./private-endpoints.tsp";
 
 using Http;
 using Rest;

@@ -118,6 +118,8 @@ export interface SdkOperationGroup {
   subOperationGroups: SdkOperationGroup[];
   groupPath: string;
   service: Namespace;
+  /** Parent operation group or client. */
+  parent?: SdkClient | SdkOperationGroup;
 }
 
 export type AccessFlags = "internal" | "public";
@@ -891,6 +893,8 @@ export interface SdkPagingServiceMetadata<TServiceOperation extends SdkServiceOp
   continuationTokenResponseSegments?: (SdkServiceResponseHeader | SdkModelPropertyType)[];
   /** Segments to indicate how to get page items from response. */
   pageItemsSegments?: SdkModelPropertyType[];
+  /** Denotes which parameter is the page size parameter */
+  pageSizeParameterSegments?: (SdkMethodParameter | SdkModelPropertyType)[];
 }
 
 /**
