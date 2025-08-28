@@ -2,9 +2,9 @@
 title: Frequently Asked Questions
 ---
 
-### Renaming the generated Swagger file
+### Renaming the generated OpenAPI file
 
-Rename the generated Swagger file by modifying the `output-file` option in the `tspconfig.yaml`:
+Rename the generated OpenAPI file by modifying the `output-file` option in the `tspconfig.yaml`:
 
 ```yaml
 options:
