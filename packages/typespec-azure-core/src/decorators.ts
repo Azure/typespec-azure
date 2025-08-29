@@ -11,10 +11,7 @@ import {
   Program,
   Type,
 } from "@typespec/compiler";
-import {
-  ItemsDecorator,
-  PagedResultDecorator,
-} from "../generated-defs/Azure.Core.js";
+import { ItemsDecorator, PagedResultDecorator } from "../generated-defs/Azure.Core.js";
 import { getOperationLink } from "./decorators/operation-link.js";
 import { getUniqueItems } from "./decorators/unique-items.js";
 
