@@ -210,7 +210,7 @@ export const $lib = createTypeSpecLibrary({
     "multiple-response-types": {
       severity: "warning",
       messages: {
-        default: paramMessage`Multiple response types found in operation ${"operation"}. Only one response type is supported, so we will choose the first one ${"response"}`,
+        default: paramMessage`Multiple response types found in operation ${"operation"}. Some emitters might not support returning all of these response types`,
       },
     },
     "no-corresponding-method-param": {

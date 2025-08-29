@@ -480,6 +480,7 @@ function getSdkHttpResponseAndExceptions(
   },
   readonly Diagnostic[],
 ] {
+  const tk = $(context.program);
   const diagnostics = createDiagnosticCollector();
   const responses: SdkHttpResponse[] = [];
   const exceptions: SdkHttpErrorResponse[] = [];
@@ -512,19 +513,16 @@ function getSdkHttpResponseAndExceptions(
               target: innerResponse.body.type,
               format: {
                 operation: httpOperation.operation.name,
-                response:
-                  innerResponse.body.type.kind === "Model"
-                    ? innerResponse.body.type.name
-                    : innerResponse.body.type.kind,
               },
             }),
           );
+          body = tk.union.create([body, innerResponse.body.type]);
+        } else if (!body) {
+          body = innerResponse.body.type;
         }
         contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
         body =
-          innerResponse.body.type.kind === "Model"
-            ? getEffectivePayloadType(context, innerResponse.body.type, Visibility.Read)
-            : innerResponse.body.type;
+          body.kind === "Model" ? getEffectivePayloadType(context, body, Visibility.Read) : body;
         if (getStreamMetadata(context.program, innerResponse)) {
           // map stream response body type to bytes
           type = diagnostics.pipe(getStreamAsBytes(context, innerResponse.body.type));
