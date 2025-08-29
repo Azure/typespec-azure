@@ -186,20 +186,6 @@ export type UseFinalStateViaDecorator = (
 ) => void;
 
 /**
- * Identifies that an operation is used to retrieve the next page for paged operations.
- *
- * @param linkedOperation The linked Operation
- * @param parameters Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will
- * be passed to the linked operation request.
- */
-export type NextPageOperationDecorator = (
-  context: DecoratorContext,
-  entity: Operation,
-  linkedOperation: Operation,
-  parameters?: Type,
-) => void;
-
-/**
  * Specifies that an array model or array-typed property should contain only unique items.
  */
 export type UniqueItemsDecorator = (
@@ -224,6 +210,5 @@ export type AzureCoreDecorators = {
   pollingOperation: PollingOperationDecorator;
   finalOperation: FinalOperationDecorator;
   useFinalStateVia: UseFinalStateViaDecorator;
-  nextPageOperation: NextPageOperationDecorator;
   uniqueItems: UniqueItemsDecorator;
 };

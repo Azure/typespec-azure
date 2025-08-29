@@ -141,14 +141,6 @@ namespace Azure.Core {
   );
 
   /**
-   * Identifies that an operation is used to retrieve the next page for paged operations.
-   * @param linkedOperation The linked Operation
-   * @param parameters Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will
-   * be passed to the linked operation request.
-   */
-  extern dec nextPageOperation(entity: Operation, linkedOperation: Operation, parameters?: {});
-
-  /**
    * Specifies that an array model or array-typed property should contain only unique items.
    */
   extern dec uniqueItems(entity: ModelProperty | Model);
