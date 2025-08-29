@@ -81,7 +81,6 @@ Available ruleSets:
 - [`@lroResult`](#@lroresult)
 - [`@lroStatus`](#@lrostatus)
 - [`@lroSucceeded`](#@lrosucceeded)
-- [`@nextPageOperation`](#@nextpageoperation)
 - [`@operationLink`](#@operationlink)
 - [`@pagedResult`](#@pagedresult)
 - [`@pollingLocation`](#@pollinglocation)
@@ -250,25 +249,6 @@ Identifies an EnumMember as a long-running "Succeeded" terminal state.
 ##### Parameters
 
 None
-
-#### `@nextPageOperation`
-
-Identifies that an operation is used to retrieve the next page for paged operations.
-
-```typespec
-@Azure.Core.nextPageOperation(linkedOperation: Operation, parameters?: {})
-```
-
-##### Target
-
-`Operation`
-
-##### Parameters
-
-| Name            | Type        | Description                                                                                                               |
-| --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
-| linkedOperation | `Operation` | The linked Operation                                                                                                      |
-| parameters      | `{}`        | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
 
 #### `@operationLink`
 

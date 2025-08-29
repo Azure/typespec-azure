@@ -5,7 +5,6 @@ import type { AzureCoreTraitsDecorators } from "../generated-defs/Azure.Core.Tra
 import type { AzureCoreTraitsPrivateDecorators } from "../generated-defs/Azure.Core.Traits.Private.js";
 import {
   $items,
-  $nextPageOperation,
   $pagedResult,
   $requestParameter,
   $responseProperty,
@@ -70,7 +69,6 @@ export const $decorators = {
     previewVersion: $previewVersion,
     finalOperation: $finalOperation,
     useFinalStateVia: $useFinalStateVia,
-    nextPageOperation: $nextPageOperation,
     uniqueItems: $uniqueItems,
   } satisfies AzureCoreDecorators,
 
