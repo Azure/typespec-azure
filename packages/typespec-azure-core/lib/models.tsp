@@ -23,7 +23,6 @@ model Page<Resource extends TypeSpec.Reflection.Model> {
   nextLink?: ResourceLocation<Resource>;
 }
 
-
 /**
  * @dev Provides the status of a resource operation.
  * @template Resource The resource type.
