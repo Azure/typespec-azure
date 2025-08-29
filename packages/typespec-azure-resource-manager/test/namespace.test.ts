@@ -8,8 +8,7 @@ import { compileAndDiagnose } from "./test-host.js";
 it("singleton resource route check", async () => {
   const { program, types, diagnostics } = await compileAndDiagnose(`
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Test {
+      namespace Microsoft.Test {
       @doc("The state of the resource")
       enum ResourceState {
       @doc(".") Succeeded,

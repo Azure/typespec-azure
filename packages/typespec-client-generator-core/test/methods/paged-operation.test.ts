@@ -949,8 +949,7 @@ it("next link with reinjected parameters with versioning", async () => {
     /** Api versions */
     enum Versions {
       /** 2024-04-01-preview api version */
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      V2024_04_01_PREVIEW: "2024-04-01-preview",
+          V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
 
     model TestOptions {
@@ -999,8 +998,7 @@ it("unbranded next link with reinjected parameters with versioning", async () =>
     /** Api versions */
     enum Versions {
       /** 2024-04-01-preview api version */
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      V2024_04_01_PREVIEW: "2024-04-01-preview",
+          V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
 
     model TestOptions {

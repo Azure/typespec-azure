@@ -81,8 +81,7 @@ it("endpoint's crossLanguageDefinitionId", async () => {
     namespace Contoso.WidgetManager;
 
     enum Versions {
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      "2022-08-30",
+          "2022-08-30",
     }
 
     op test(): void;

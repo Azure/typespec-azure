@@ -291,9 +291,7 @@ op test(): void;
   describe("'emit-lro-options' option", () => {
     const lroCode = `
       @armProviderNamespace
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+              namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -388,9 +386,7 @@ op test(): void;
     const commonTypesPath = "../common-types/resource-management/v3/types.json";
     const commonCode = `
       @armProviderNamespace
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+              namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 

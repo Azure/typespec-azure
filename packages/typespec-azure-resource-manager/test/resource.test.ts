@@ -27,8 +27,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     it("gathers metadata about TrackedResources", async () => {
       const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -84,8 +83,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
       @armProviderNamespace
       @service(#{title: "Microsoft.Test"})
       
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test {
+          namespace Microsoft.Test {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -132,8 +130,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
       @armProviderNamespace
       @service(#{title: "Microsoft.Test"})
       
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -207,8 +204,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     it("gathers metadata about ExtensionResources", async () => {
       const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -262,8 +258,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     it("gathers metadata about singleton resources", async () => {
       const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -339,8 +334,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     it("gathers metadata when overriding lifecycle operation", async () => {
       const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -394,8 +388,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     it("resources with intrinsic types", async () => {
       const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -512,9 +505,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     it("resources with armResourceIdentifier property types", async () => {
       const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      namespace Microsoft.Test;
+              namespace Microsoft.Test;
 
       enum ResourceState {
         Succeeded,
@@ -565,8 +556,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
       it("when armResourceInternal is used on a non-resource type", async () => {
         const { diagnostics } = await checkFor(`
         @armProviderNamespace
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        namespace Microsoft.Test;
+              namespace Microsoft.Test;
 
         model FooResourceProperties {}
 
@@ -590,8 +580,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
       it("when name property doesn't have a @key decorator", async () => {
         const { diagnostics } = await checkFor(`
         @armProviderNamespace
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        namespace Microsoft.Test;
+              namespace Microsoft.Test;
 
         model FooResourceProperties {}
 
@@ -612,8 +601,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
       it("when name property doesn't have a @segment decorator", async () => {
         const { diagnostics } = await checkFor(`
         @armProviderNamespace
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        namespace Microsoft.Test;
+              namespace Microsoft.Test;
 
         model FooResourceProperties {}
 
@@ -634,8 +622,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
   it("emits correct extended location for resource", async () => {
     const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Contoso;
+          namespace Microsoft.Contoso;
 
       @doc("Widget resource")
       model Widget is ProxyResource<WidgetProperties> {
@@ -657,8 +644,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
   it("emits correct fixed union name parameter for resource", async () => {
     const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Contoso;
+          namespace Microsoft.Contoso;
 
       @doc("Widget resource")
       model Widget is ProxyResource<WidgetProperties> {
@@ -691,8 +677,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
   it("emits a scalar string with decorator parameter for resource", async () => {
     const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Contoso;
+          namespace Microsoft.Contoso;
 
       @doc("Widget resource")
       model Widget is ProxyResource<WidgetProperties> {
@@ -1400,8 +1385,7 @@ interface Employees {
   it("emits diagnostics for non ARM resources", async () => {
     const { diagnostics } = await checkFor(`
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Contoso {
+          namespace Microsoft.Contoso {
        @parentResource(Microsoft.Person.Contoso.Person)
         model Employee is TrackedResource<EmployeeProperties> {
           ...ResourceNameParameter<Employee>;
@@ -1472,8 +1456,7 @@ interface Employees {
 it("emits default optional properties for resource", async () => {
   const { program, diagnostics } = await checkFor(`
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Widget resource")
     model Widget is TrackedResource<WidgetProperties> {
@@ -1494,8 +1477,7 @@ it("emits default optional properties for resource", async () => {
 it("emits required properties for resource with @armResourcePropertiesOptionality override ", async () => {
   const { program, diagnostics } = await checkFor(`
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Widget resource")
     model Widget is ProxyResource<WidgetProperties, false> {
@@ -1516,8 +1498,7 @@ it("emits required properties for resource with @armResourcePropertiesOptionalit
 it("recognizes resource with customResource identifier", async () => {
   const { diagnostics } = await checkFor(`
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso {
+      namespace Microsoft.Contoso {
      @parentResource(Microsoft.Person.Contoso.Person)
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
@@ -1568,8 +1549,7 @@ describe("typespec-azure-resource-manager: identifiers decorator", () => {
   it("allows multiple model properties in identifiers decorator", async () => {
     const { diagnostics } = await checkFor(`
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     model Dog {
       name: string;
@@ -1589,8 +1569,7 @@ describe("typespec-azure-resource-manager: identifiers decorator", () => {
   it("allows inner model properties in identifiers decorator", async () => {
     const { diagnostics } = await checkFor(`
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     model Dog {
       breed: Breed;
@@ -1613,8 +1592,7 @@ describe("typespec-azure-resource-manager: identifiers decorator", () => {
   it("emits diagnostic when identifiers is not of a model property object array", async () => {
     const { diagnostics } = await checkFor(`
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     model Dog {
       name: string;

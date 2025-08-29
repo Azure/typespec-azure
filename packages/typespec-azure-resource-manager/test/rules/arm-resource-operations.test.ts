@@ -25,8 +25,7 @@ describe("typespec-azure-resource-manager: arm resource operations rule", () => 
     await tester
       .expect(
         `
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        @armProviderNamespace
+              @armProviderNamespace
         namespace Microsoft.Foo;
 
         model FooResource is TrackedResource<{}> {
@@ -57,8 +56,7 @@ describe("typespec-azure-resource-manager: arm resource operations rule", () => 
     await tester
       .expect(
         `
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        @armProviderNamespace
+              @armProviderNamespace
         namespace Microsoft.Foo;
 
         model FooResource is TrackedResource<{}> {
@@ -87,8 +85,7 @@ describe("typespec-azure-resource-manager: arm resource operations rule", () => 
     await tester
       .expect(
         `
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        @armProviderNamespace
+              @armProviderNamespace
         namespace Microsoft.Foo;
         
         model FooResource is TrackedResource<{}> {

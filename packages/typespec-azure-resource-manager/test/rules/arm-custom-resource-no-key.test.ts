@@ -18,8 +18,7 @@ it("emits diagnostic when missing @key on custom resource", async () => {
     .expect(
       `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
     
     @Azure.ResourceManager.Legacy.customAzureResource
     model CustomResource {
@@ -37,8 +36,7 @@ it("allows custom resource with @key", async () => {
     .expect(
       `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
     
     @Azure.ResourceManager.Legacy.customAzureResource
     model CustomResource {

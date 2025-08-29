@@ -35,8 +35,7 @@ export function getServiceWithDefaultApiVersion(op: string) {
     /**
      * The version 2022-12-01-preview.
      */
-    @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-    v2022_12_01_preview: "2022-12-01-preview",
+      v2022_12_01_preview: "2022-12-01-preview",
   }
 
   ${op}

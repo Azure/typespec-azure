@@ -23,8 +23,7 @@ it("is valid if arm resource has a delete operation", async () => {
   await tester
     .expect(
       `
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        @armProviderNamespace
+              @armProviderNamespace
         namespace Microsoft.Foo;
 
         model Foo is TrackedResource<{}> {
@@ -45,8 +44,7 @@ it("emit warnings if TrackedResource is missing a delete operation", async () =>
   await tester
     .expect(
       `
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @armProviderNamespace
+          @armProviderNamespace
       namespace Microsoft.Foo;
 
       model Foo is TrackedResource<{}> {
@@ -69,8 +67,7 @@ it("emit warnings if the delete operation is for another resource", async () => 
   await tester
     .expect(
       `
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @armProviderNamespace
+          @armProviderNamespace
       namespace Microsoft.Foo;
 
       model Foo is TrackedResource<{}> {

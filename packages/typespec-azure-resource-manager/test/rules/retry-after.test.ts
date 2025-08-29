@@ -32,9 +32,7 @@ describe("typespec-azure-resource-manager: retry-after rule", () => {
         /** Contoso API versions */
         enum Versions {
           /** 2021-10-01-preview version */
-          @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-          @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-          @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
+                          @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
           "2021-10-01-preview",
         }
         
@@ -66,8 +64,7 @@ describe("typespec-azure-resource-manager: retry-after rule", () => {
     await tester
       .expect(
         `
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        @armProviderNamespace
+              @armProviderNamespace
         namespace Microsoft.Foo;
    
         model FooResource is TrackedResource<{}> {

@@ -1393,8 +1393,7 @@ describe("client hierarchy", () => {
       namespace Storage.Blob {
         enum StorageVersions {
           @doc("The 2025-01-05 version of the Azure.Storage.Blob service.")
-          @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-          v2025_01_05: "2025-01-05",
+                  v2025_01_05: "2025-01-05",
         }
 
         op ServiceOperation<

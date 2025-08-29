@@ -216,10 +216,7 @@ using Versioning;
 namespace Contoso.WidgetManager;
 
 enum Versions {
-  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
   v2022_08_31: "v20220831",
-
-  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
   v2022_11_30: "v20221130",
 }
 

@@ -26,10 +26,8 @@ describe("data plane LRO templates", () => {
         @versioned(Versions)
         namespace TestClient;
         enum Versions {
-          @useDependency(Azure.Core.Versions.v1_0_Preview_1)
           v1: "v1",
-          @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-          v2: "v2",
+                  v2: "v2",
         }
       
         alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalRequests &
@@ -577,10 +575,8 @@ describe("data plane LRO templates", () => {
       @versioned(Versions)
       namespace TestClient {
         enum Versions {
-          @useDependency(Azure.Core.Versions.v1_0_Preview_1)
           v1: "v1",
-          @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-          v2: "v2",
+                  v2: "v2",
         }
       
         alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalRequests &
@@ -838,8 +834,7 @@ describe("Arm LRO templates", () => {
         @versioned(Versions)
         namespace TestClient;
         enum Versions {
-          @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-          @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+                  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
           v1: "v1",
         }
         ${code}`,
@@ -1098,8 +1093,7 @@ describe("getLroMetadata", () => {
     @doc("The API version.")
     enum Versions {
       @doc("The 2022-12-01-preview version.")
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      v2022_12_01_preview: "2022-12-01-preview",
+          v2022_12_01_preview: "2022-12-01-preview",
     }
 
     @resource("users")

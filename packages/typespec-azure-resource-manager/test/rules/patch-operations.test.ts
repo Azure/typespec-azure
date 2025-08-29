@@ -32,12 +32,10 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
       @doc(".")
       enum Versions {
         @doc(".")
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v3)
+              @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v3)
         v2021_09_21: "2022-09-21-preview",
         @doc(".")
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
+              @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
         v2022_01_10: "2022-01-10-alpha.1"
       }
 
@@ -107,12 +105,10 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
       @doc(".")
       enum Versions {
         @doc(".")
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v3)
+              @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v3)
         v2021_09_21: "2022-09-21-preview",
         @doc(".")
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
+              @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
         v2022_01_10: "2022-01-10-alpha.1"
       }
 
@@ -177,8 +173,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
     await tester
       .expect(
         `
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @armProviderNamespace
+          @armProviderNamespace
       namespace Microsoft.Foo;
 
       interface Operations extends Azure.ResourceManager.Operations {}

@@ -24,8 +24,7 @@ it("emits diagnostic when using @Azure.ResourceManager.Legacy.customAzureResourc
     .expect(
       `
         @armProviderNamespace
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        namespace Microsoft.Contoso;
+              namespace Microsoft.Contoso;
         
         @Azure.ResourceManager.Legacy.customAzureResource
         model Person {

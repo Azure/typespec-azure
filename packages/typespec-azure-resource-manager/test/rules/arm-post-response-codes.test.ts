@@ -24,8 +24,7 @@ it("Emits a warning for a synchronous post operation that does not contain the a
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Contoso;
+          namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
@@ -58,8 +57,7 @@ it("Emits a warning for a synchronous post operation that does not contain the a
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Contoso;
+          namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
@@ -93,8 +91,7 @@ it("Does not emit a warning for a synchronous post operation that contains the 2
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Contoso;
+          namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
@@ -123,8 +120,7 @@ it("Does not emit a warning for a synchronous post operation that contains 204 a
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Contoso;
+          namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
@@ -155,8 +151,6 @@ it("Does not emit a warning for a long-running post operation that satisfies the
       using Azure.Core;
 
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @useDependency(Azure.Core.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
       model PollingStatus {
@@ -201,8 +195,6 @@ it("Emits a warning for a long-running post operation that has a 202 response wi
       using Azure.Core;
 
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @useDependency(Azure.Core.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
       model PollingStatus {
@@ -248,8 +240,6 @@ it("Emits a warning for a long-running post operation that has a 200 response wi
       using Azure.Core;
 
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @useDependency(Azure.Core.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
       model PollingStatus {
@@ -297,8 +287,6 @@ it("Emits a warning for a long-running post operation that has invalid response 
       using Azure.Core;
 
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @useDependency(Azure.Core.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
       model PollingStatus {

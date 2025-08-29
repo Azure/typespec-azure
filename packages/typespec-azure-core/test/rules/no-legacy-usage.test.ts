@@ -19,8 +19,7 @@ it("emits a warning diagnostic if using type from Azure.Core.Legacy", async () =
   await tester
     .expect(
       `        
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      namespace MyService {
+          namespace MyService {
         model Input {
           input: string;
         }

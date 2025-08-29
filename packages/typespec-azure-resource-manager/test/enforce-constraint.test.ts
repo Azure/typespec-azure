@@ -6,8 +6,7 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
   it("emits no error when template param extends from Resource", async () => {
     const { diagnostics } = await checkFor(`
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Contoso;
+          namespace Microsoft.Contoso;
 
       @doc("Widget resource")
       model Widget is ProxyResource<WidgetProperties> {
@@ -34,8 +33,7 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
   it("emits error if template param is not extended from Resource", async () => {
     const { diagnostics } = await checkFor(`
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Contoso;
+          namespace Microsoft.Contoso;
  
       @doc("Widget resource")
       model Widget {
@@ -98,8 +96,7 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
   it("emits no error when template extends from a `@Azure.ResourceManager.Legacy.customAzureResource` Resource", async () => {
     const { diagnostics } = await checkFor(`
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Custom Mix in resource")
     model CustomResource is CustomAzureResource;
@@ -120,8 +117,7 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
   it("emits no error when template extends from a `@Azure.ResourceManager.Legacy.customAzureResource` Resource when using Legacy Operations", async () => {
     const { diagnostics } = await checkFor(`
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Custom Mix in resource")
     model CustomResource is CustomAzureResource;
@@ -160,8 +156,7 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
   it("emits error when template is extended from Resource or from a `@Azure.ResourceManager.Legacy.customAzureResource` Resource", async () => {
     const { diagnostics } = await checkFor(`
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Custom Mix in resource")
     model CustomResource is CustomAzureResource;
