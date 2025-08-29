@@ -7,8 +7,6 @@ import {
   $items,
   $nextPageOperation,
   $pagedResult,
-  $requestParameter,
-  $responseProperty,
 } from "./decorators.js";
 import { $finalLocation } from "./decorators/final-location.js";
 import { $finalOperation } from "./decorators/final-operation.js";
@@ -76,8 +74,6 @@ export const $decorators = {
 
   "Azure.Core.Foundations": {
     omitKeyProperties: $omitKeyProperties,
-    requestParameter: $requestParameter,
-    responseProperty: $responseProperty,
   } satisfies AzureCoreFoundationsDecorators,
   "Azure.Core.Foundations.Private": {
     spreadCustomParameters: $spreadCustomParameters,
