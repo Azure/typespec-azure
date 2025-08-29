@@ -6,9 +6,9 @@ This document explains how to resolve pipeline failures in TypeSpec migration PR
 
 ## Swagger BreakingChange
 
-### Multiple Swagger Files Before Migration
+### Multiple OpenAPI Files Before Migration
 
-This pipeline will fail if there is more than one Swagger file in the latest version. See the detailed explanation in this [issue](https://github.com/Azure/typespec-azure/issues/2194#issue-2844564216).
+This pipeline will fail if there is more than one OpenAPI file in the latest version. See the detailed explanation in this [issue](https://github.com/Azure/typespec-azure/issues/2194#issue-2844564216).
 
 To properly identify real breaking changes, use the "TypeSpec Migration Validation" pipeline instead:
 
@@ -17,9 +17,9 @@ To properly identify real breaking changes, use the "TypeSpec Migration Validati
 3. The output should match exactly what you see in [this step](../01-get-started.md#review-and-adjust-the-typespec) on the local machine
 4. Review the changes to verify they are expected
 
-### Single Swagger File Before Migration
+### Single OpenAPI File Before Migration
 
-If you have only one Swagger file in the latest version, use this pipeline to detect breaking changes. If it fails, refer to [Resolving Swagger Breaking Change Violations](./faq/breakingchange.md).
+If you have only one OpenAPI file in the latest version, use this pipeline to detect breaking changes. If it fails, refer to [Resolving OpenAPI Breaking Change Violations](./faq/breakingchange.md).
 
 **Known Issues**: The following pipeline failures are false alerts and can be safely ignored:
 
