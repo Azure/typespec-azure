@@ -1,5 +1,8 @@
 ---
 title: 3. Defining the Resources
+llmstxt:
+  title: ARM getting started 03
+  description: Defining ARM resources
 ---
 
 An ARM resource provider is composed of resources. The TypeSpec Azure Resource Manager library makes it much easier to define the structure and endpoints of such resources.

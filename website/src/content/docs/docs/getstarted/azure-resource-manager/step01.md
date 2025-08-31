@@ -1,5 +1,8 @@
 ---
 title: 2. Defining the Service
+llmstxt:
+  title: ARM getting started 02
+  description: Defining the ARM service
 ---
 
 To define an Azure Resource Manager service, the first thing you will need to do is define the service namespace and decorate it with the `service` and `armProviderNamespace` decorators:

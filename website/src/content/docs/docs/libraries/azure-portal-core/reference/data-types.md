@@ -1,5 +1,8 @@
 ---
 title: "Data types"
+llmstxt:
+  title: "@azure-tools/typespec-azure-portal-core - Data types"
+  description: "Data types exported by @azure-tools/typespec-azure-portal-core"
 ---
 
 ## Azure.Portal

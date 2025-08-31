@@ -1,5 +1,7 @@
 ---
 title: ARM Resource Types
+llmstxt:
+  description: Choosing and modeling ARM resources
 ---
 
 ## Introductions

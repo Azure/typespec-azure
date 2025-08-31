@@ -1,5 +1,8 @@
 ---
 title: "Data types"
+llmstxt:
+  title: "@azure-tools/typespec-client-generator-core - Data types"
+  description: "Data types exported by @azure-tools/typespec-client-generator-core"
 ---
 
 ## Azure.ClientGenerator.Core

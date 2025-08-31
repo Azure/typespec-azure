@@ -1,5 +1,8 @@
 ---
 title: 6. Defining long-running resource operations
+llmstxt:
+  title: Data-plane getting started 06
+  description: Defining long-running resource operations
 ---
 
 If your service uses any long-running operations (LROs; see [our guidelines](https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#long-running-operations--jobs) for specifics), you will need to define a "status monitor" operation which can report the status of the operation.

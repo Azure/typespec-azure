@@ -1,5 +1,8 @@
 ---
 title: 1. Installing Tools
+llmstxt:
+  title: ARM getting started 01
+  description: Creating an ARM service
 ---
 
 ## Installing IDE Tools

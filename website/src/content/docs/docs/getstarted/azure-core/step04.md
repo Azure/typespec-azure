@@ -1,5 +1,8 @@
 ---
 title: 4. Defining your first resource
+llmstxt:
+  title: Data-plane getting started 04
+  description: Defining data-plane resources
 ---
 
 In the context of your service, a "resource" is a fundamental entity that your service manages. For our `WidgetService`, the most basic entity we need is a `Widget`.
