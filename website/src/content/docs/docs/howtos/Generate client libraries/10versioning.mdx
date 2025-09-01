@@ -71,7 +71,54 @@ ServiceClient client = new ServiceClient(endpoint, options);
 ```
 
 ```typescript
-// there's no apiVersion defined in the all the operations, TypeScript emitter will ignore it.
+// update typespec operation to `op stableFunctionality(@header apiVersion: Versions, @body stableModel: StableModel): void;`
+export interface StableModel {
+  stableFeature: string;
+}
+export function stableModelSerializer(item: StableModel): any {
+  return { stableFeature: item["stableFeature"] };
+}
+export type Versions = "2023-11-01";
+
+export function _stableFunctionalitySend(
+  context: Client,
+  stableModel: StableModel,
+  options: StableFunctionalityOptionalParams = { requestOptions: {} },
+): StreamableMethod {
+  context.pipeline.removePolicy({ name: "ClientApiVersionPolicy" });
+  return context
+    .path("/")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: {
+        "api-version": context.apiVersion,
+        ...options.requestOptions?.headers,
+      },
+      body: stableModelSerializer(stableModel),
+    });
+}
+
+export async function _stableFunctionalityDeserialize(
+  result: PathUncheckedResponse,
+): Promise<void> {
+  const expectedStatuses = ["204"];
+  if (!expectedStatuses.includes(result.status)) {
+    throw createRestError(result);
+  }
+
+  return;
+}
+
+export async function stableFunctionality(
+  context: Client,
+  stableModel: StableModel,
+  options: StableFunctionalityOptionalParams = { requestOptions: {} },
+): Promise<void> {
+  const result = await _stableFunctionalitySend(context, stableModel, options);
+  return _stableFunctionalityDeserialize(result);
+}
+
 ```
 
 ```java
@@ -190,7 +237,59 @@ Response response = client.StableFunctionality(stableModel);
 ```
 
 ```typescript
-// there is no apiVersion parameters defined in all operations, TypeScript emitter will ignore it.
+// update typespec operation to 
+// @route("/preview")
+// op previewFunctionality(@header apiVersion: Versions, @body previewModel: PreviewModel): void;
+// @route("/stable")
+// op stableFunctionality(@header apiVersion: Versions, @body stableModel: StableModel): void;`
+export interface StableModel {
+  stableFeature: string;
+}
+
+export function stableModelSerializer(item: StableModel): any {
+  return { stableFeature: item["stableFeature"] };
+}
+
+export type Versions = "2023-11-01";
+
+export function _stableFunctionalitySend(
+  context: Client,
+  stableModel: StableModel,
+  options: StableFunctionalityOptionalParams = { requestOptions: {} },
+): StreamableMethod {
+  context.pipeline.removePolicy({ name: "ClientApiVersionPolicy" });
+  return context
+    .path("/get")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      headers: {
+        "api-version": context.apiVersion,
+        ...options.requestOptions?.headers,
+      },
+      body: stableModelSerializer(stableModel),
+    });
+}
+
+export async function _stableFunctionalityDeserialize(
+  result: PathUncheckedResponse,
+): Promise<void> {
+  const expectedStatuses = ["204"];
+  if (!expectedStatuses.includes(result.status)) {
+    throw createRestError(result);
+  }
+
+  return;
+}
+
+export async function stableFunctionality(
+  context: Client,
+  stableModel: StableModel,
+  options: StableFunctionalityOptionalParams = { requestOptions: {} },
+): Promise<void> {
+  const result = await _stableFunctionalitySend(context, stableModel, options);
+  return _stableFunctionalityDeserialize(result);
+}
 ```
 
 ```java
@@ -320,7 +419,102 @@ Response response = client.StableFunctionality(stableModel);
 ```
 
 ```typescript
-// there is no apiVersion parameters defined in all operations, TypeScript emitter will ignore it.
+// update typespec operation to 
+// @route("/preview")
+// op previewFunctionality(@header apiVersion: Versions, @body previewModel: PreviewModel): void;
+// @route("/stable")
+// op stableFunctionality(@header apiVersion: Versions, @body stableModel: StableModel): void;`
+export interface PreviewModel {
+  betaFeature: string;
+}
+
+export function previewModelSerializer(item: PreviewModel): any {
+  return { betaFeature: item["betaFeature"] };
+}
+
+export interface StableModel {
+  stableFeature: string;
+}
+
+export function stableModelSerializer(item: StableModel): any {
+  return { stableFeature: item["stableFeature"] };
+}
+
+export enum KnownVersions {
+  V20231101Preview = "2023-11-01-preview",
+}
+
+export function _stableFunctionalitySend(
+  context: Client,
+  stableModel: StableModel,
+  options: StableFunctionalityOptionalParams = { requestOptions: {} },
+): StreamableMethod {
+  return context
+    .path("/stable")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: stableModelSerializer(stableModel),
+    });
+}
+
+export async function _stableFunctionalityDeserialize(
+  result: PathUncheckedResponse,
+): Promise<void> {
+  const expectedStatuses = ["204"];
+  if (!expectedStatuses.includes(result.status)) {
+    throw createRestError(result);
+  }
+
+  return;
+}
+
+export async function stableFunctionality(
+  context: Client,
+  stableModel: StableModel,
+  options: StableFunctionalityOptionalParams = { requestOptions: {} },
+): Promise<void> {
+  const result = await _stableFunctionalitySend(context, stableModel, options);
+  return _stableFunctionalityDeserialize(result);
+}
+
+export function _previewFunctionalitySend(
+  context: Client,
+  previewModel: PreviewModel,
+  options: PreviewFunctionalityOptionalParams = { requestOptions: {} },
+): StreamableMethod {
+  return context
+    .path("/preview")
+    .post({
+      ...operationOptionsToRequestParameters(options),
+      contentType: "application/json",
+      body: previewModelSerializer(previewModel),
+    });
+}
+
+export async function _previewFunctionalityDeserialize(
+  result: PathUncheckedResponse,
+): Promise<void> {
+  const expectedStatuses = ["204"];
+  if (!expectedStatuses.includes(result.status)) {
+    throw createRestError(result);
+  }
+
+  return;
+}
+
+export async function previewFunctionality(
+  context: Client,
+  previewModel: PreviewModel,
+  options: PreviewFunctionalityOptionalParams = { requestOptions: {} },
+): Promise<void> {
+  const result = await _previewFunctionalitySend(
+    context,
+    previewModel,
+    options,
+  );
+  return _previewFunctionalityDeserialize(result);
+}
 ```
 
 ```java
@@ -448,7 +642,7 @@ client.get(); // version parameter is elevated onto the client
 ```
 
 ```go
-// TODO
+// Not found decorator @isApiVersion in @azure-tools/typespec-client-generator-core
 ```
 
 </ClientTabs>
