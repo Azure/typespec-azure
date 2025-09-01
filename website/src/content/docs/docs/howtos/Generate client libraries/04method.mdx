@@ -87,7 +87,7 @@ public final class PetStoreNamespaceClient {
 
 ```go
 type OutputModel struct {
-    Name string `json:"name"`
+  Name string `json:"name"`
 }
 
 type PetStoreNamespaceClient struct {}
@@ -610,6 +610,7 @@ public void upload(String id, String firstName, String lastName);
 
 ```go
 type ClientUploadOptions struct {}
+
 type ClientUploadResponse struct {}
 
 func  Upload(ctx context.Context, id string, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
@@ -1073,18 +1074,18 @@ public RepairResult scheduleRepairs(String widgetName, String problem, String co
 
 ```go
 type RepairInfo struct {
-// REQUIRED
+  // REQUIRED
 	Contact *string
 
-// REQUIRED
+  // REQUIRED
 	Problem *string
 }
 
 type RepairResult struct {
-// REQUIRED
+  // REQUIRED
 	Info *string
 
-// REQUIRED
+  // REQUIRED
 	Reason *string
 }
 
@@ -1242,18 +1243,18 @@ public RepairResult scheduleRepairs(String widgetName, RepairInfo body);
 
 ```go
 type RepairInfo struct {
-// REQUIRED
+  // REQUIRED
 	Contact *string
 
-// REQUIRED
+  // REQUIRED
 	Problem *string
 }
 
 type RepairResult struct {
-// REQUIRED
+  // REQUIRED
 	Info *string
 
-// REQUIRED
+  // REQUIRED
 	Reason *string
 }
 
@@ -1401,23 +1402,23 @@ public final class AnalyzeClient {
 
 ```go
 type AnalyzeResult struct {
-// REQUIRED
+  // REQUIRED
 	Confidence *float32
 
-// REQUIRED
+  // REQUIRED
 	Result *string
 }
 
 type CompletionInput struct {
-// REQUIRED
+  // REQUIRED
 	Input []*string
 }
 
 type CompletionResult struct {
-// REQUIRED
+  // REQUIRED
 	Text *string
 
-// REQUIRED
+  // REQUIRED
 	Tokens *int32
 }
 
@@ -1650,7 +1651,7 @@ public Response get(MatchConditions matchConditions);
 
 ```go
 type Response struct {
-    Name string
+  Name string
 }
 
 type ClientGetOptions struct {

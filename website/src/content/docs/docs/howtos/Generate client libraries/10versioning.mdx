@@ -235,7 +235,7 @@ type ServiceClientStableFunctionalityResponse struct {}
 
 type ServiceClient struct {}
 
-func (client *ServiceClient) StableFunctionality(ctx context.Context, stableModel StableModel, options *ServiceClientStableFunctionalityOptions) (ServiceClientStableFunctionalityResponse, error) {}
+func (client *ServiceClient) StableFunctionality(ctx context.Context, stableModel StableModel, options *ServiceClientStableFunctionalityOptions) (ServiceClientStableFunctionalityResponse, error)
 
 ```
 
@@ -381,9 +381,9 @@ type ClientStableFunctionalityResponse struct {}
 type ClientPreviewFunctionalityOptions struct {}
 type ClientStableFunctionalityOptions struct {}
 
-func PreviewFunctionality(ctx context.Context, previewModel PreviewModel, options *ClientPreviewFunctionalityOptions) (ClientPreviewFunctionalityResponse, error) {}
+func PreviewFunctionality(ctx context.Context, previewModel PreviewModel, options *ClientPreviewFunctionalityOptions) (ClientPreviewFunctionalityResponse, error)
 
-func StableFunctionality(ctx context.Context, stableModel StableModel, options *ClientStableFunctionalityOptions) (ClientStableFunctionalityResponse, error) {}
+func StableFunctionality(ctx context.Context, stableModel StableModel, options *ClientStableFunctionalityOptions) (ClientStableFunctionalityResponse, error)
 
 ```
 
@@ -495,7 +495,7 @@ type Client struct {
 	// ...
 }
 
-func (c *Client) Get(ctx context.Context, version Versions, options *RequestOptions) (Response, error) {}
+func (c *Client) Get(ctx context.Context, version Versions, options *RequestOptions) (Response, error)
 
 ```
 
