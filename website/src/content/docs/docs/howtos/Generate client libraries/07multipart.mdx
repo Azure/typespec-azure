@@ -135,16 +135,11 @@ type MultipartRequest struct {
 	ProfileImage streaming.MultipartContent
 }
 
-type FileUploadServiceClient struct {}
-
-func NewFileUploadServiceClient() *FileUploadServiceClient{
-  return &FileUploadServiceClient{}
-}
-
 type FileUploadServiceClientUploadOptions struct {}
+
 type FileUploadServiceClientUploadResponse struct {}
 
-func (client *FileUploadServiceClient) Upload(ctx context.Context, body MultipartRequest, options *FileUploadServiceClientUploadOptions) (FileUploadServiceClientUploadResponse, error) {}
+func Upload(ctx context.Context, body MultipartRequest, options *FileUploadServiceClientUploadOptions) (FileUploadServiceClientUploadResponse, error)
 ```
 
 </ClientTabs>
