@@ -86,17 +86,15 @@ export function _stableFunctionalitySend(
   options: StableFunctionalityOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
   context.pipeline.removePolicy({ name: "ClientApiVersionPolicy" });
-  return context
-    .path("/")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: {
-        "api-version": context.apiVersion,
-        ...options.requestOptions?.headers,
-      },
-      body: stableModelSerializer(stableModel),
-    });
+  return context.path("/").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: {
+      "api-version": context.apiVersion,
+      ...options.requestOptions?.headers,
+    },
+    body: stableModelSerializer(stableModel),
+  });
 }
 
 export async function _stableFunctionalityDeserialize(
@@ -118,7 +116,6 @@ export async function stableFunctionality(
   const result = await _stableFunctionalitySend(context, stableModel, options);
   return _stableFunctionalityDeserialize(result);
 }
-
 ```
 
 ```java
@@ -237,7 +234,7 @@ Response response = client.StableFunctionality(stableModel);
 ```
 
 ```typescript
-// update typespec operation to 
+// update typespec operation to
 // @route("/preview")
 // op previewFunctionality(@header apiVersion: Versions, @body previewModel: PreviewModel): void;
 // @route("/stable")
@@ -258,17 +255,15 @@ export function _stableFunctionalitySend(
   options: StableFunctionalityOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
   context.pipeline.removePolicy({ name: "ClientApiVersionPolicy" });
-  return context
-    .path("/get")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      headers: {
-        "api-version": context.apiVersion,
-        ...options.requestOptions?.headers,
-      },
-      body: stableModelSerializer(stableModel),
-    });
+  return context.path("/get").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    headers: {
+      "api-version": context.apiVersion,
+      ...options.requestOptions?.headers,
+    },
+    body: stableModelSerializer(stableModel),
+  });
 }
 
 export async function _stableFunctionalityDeserialize(
@@ -419,7 +414,7 @@ Response response = client.StableFunctionality(stableModel);
 ```
 
 ```typescript
-// update typespec operation to 
+// update typespec operation to
 // @route("/preview")
 // op previewFunctionality(@header apiVersion: Versions, @body previewModel: PreviewModel): void;
 // @route("/stable")
@@ -449,13 +444,11 @@ export function _stableFunctionalitySend(
   stableModel: StableModel,
   options: StableFunctionalityOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/stable")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      body: stableModelSerializer(stableModel),
-    });
+  return context.path("/stable").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    body: stableModelSerializer(stableModel),
+  });
 }
 
 export async function _stableFunctionalityDeserialize(
@@ -483,13 +476,11 @@ export function _previewFunctionalitySend(
   previewModel: PreviewModel,
   options: PreviewFunctionalityOptionalParams = { requestOptions: {} },
 ): StreamableMethod {
-  return context
-    .path("/preview")
-    .post({
-      ...operationOptionsToRequestParameters(options),
-      contentType: "application/json",
-      body: previewModelSerializer(previewModel),
-    });
+  return context.path("/preview").post({
+    ...operationOptionsToRequestParameters(options),
+    contentType: "application/json",
+    body: previewModelSerializer(previewModel),
+  });
 }
 
 export async function _previewFunctionalityDeserialize(
@@ -508,11 +499,7 @@ export async function previewFunctionality(
   previewModel: PreviewModel,
   options: PreviewFunctionalityOptionalParams = { requestOptions: {} },
 ): Promise<void> {
-  const result = await _previewFunctionalitySend(
-    context,
-    previewModel,
-    options,
-  );
+  const result = await _previewFunctionalitySend(context, previewModel, options);
   return _previewFunctionalityDeserialize(result);
 }
 ```
