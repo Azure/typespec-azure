@@ -1055,12 +1055,12 @@ public final class Siamese extends Cat {
 // Use a type switch to determine the concrete type.  The possible types are:
 // - *Cat, *Ragdoll, *Siamese
 type CatClassification interface {
-   // GetCat returns the Cat content of the underlying type.
+	// GetCat returns the Cat content of the underlying type.
 	GetCat() *Cat
 }
 
 type Cat struct {
-   // REQUIRED
+	// REQUIRED
 	Kind *string
 }
 
@@ -1068,7 +1068,7 @@ type Cat struct {
 func (c *Cat) GetCat() *Cat { return c }
 
 type Ragdoll struct {
-   // CONSTANT; undefinedField has constant value "ragdoll", any specified value is ignored.
+	// CONSTANT; undefinedField has constant value "ragdoll", any specified value is ignored.
 	Kind *string
 }
 
@@ -1080,7 +1080,7 @@ func (e *Ragdoll) GetCat() *Cat {
 }
 
 type Siamese struct {
-   // CONSTANT; undefinedField has constant value "siamese", any specified value is ignored.
+	// CONSTANT; undefinedField has constant value "siamese", any specified value is ignored.
 	Kind *string
 }
 
