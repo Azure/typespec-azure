@@ -69,7 +69,7 @@ Foo foo = new Foo("hello");
 
 ```go
 type Foo struct {
-    Prop string `json:"prop"`
+  Prop string `json:"prop"`
 }
 
 ```
@@ -140,7 +140,7 @@ Foo foo = new Foo("hello");
 package container
 
 type Foo struct {
-    Prop string `json:"prop"`
+  Prop string `json:"prop"`
 }
 
 ```
@@ -210,7 +210,7 @@ Foo foo = new Foo("hello");
 package container
 
 type Foo struct {
-    Prop *string
+  Prop *string
 }
 ```
 
@@ -562,9 +562,9 @@ public final class Animal implements JsonSerializable<Animal> {
 ```go
 // Input: Animal (with known fields + optional unknowns)
 type Animal struct {
-    Name *string
-    Kind *string
-    AdditionalProperties map[string]interface{}
+  Name *string
+  Kind *string
+  AdditionalProperties map[string]interface{}
 }
 
 ```
@@ -715,8 +715,8 @@ public final class Animal implements JsonSerializable<Animal> {
 
 ```go
 type AnimalProperty struct {
-    Category *string
-    Value    interface{}
+  Category *string
+  Value    interface{}
 }
 
 type Animal struct {
@@ -1633,7 +1633,7 @@ public enum WidgetHorizontal {
 package models
 
 type Widget struct {
-Horizontal WidgetHorizontal
+  Horizontal WidgetHorizontal
 }
 
 type WidgetHorizontal string
