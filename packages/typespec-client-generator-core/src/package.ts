@@ -16,7 +16,7 @@ import {
 } from "./interfaces.js";
 import { filterApiVersionsWithDecorators, getTypeDecorators } from "./internal-utils.js";
 import { getLicenseInfo } from "./license.js";
-import { getCrossLanguagePackageId } from "./public-utils.js";
+import { getCrossLanguagePackageId, getNamespaceFromType } from "./public-utils.js";
 import { getAllReferencedTypes, handleAllTypes } from "./types.js";
 
 export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
@@ -88,8 +88,7 @@ function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
       (ns) => ns.name === segment,
     );
     if (ns === undefined) {
-      const rawNamespace =
-        type.__raw && "namespace" in type.__raw ? type.__raw.namespace : undefined;
+      const rawNamespace = getNamespaceFromType(type.__raw);
       const newNs = {
         __raw: rawNamespace,
         name: segment,
