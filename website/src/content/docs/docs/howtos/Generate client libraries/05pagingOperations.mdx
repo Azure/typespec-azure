@@ -68,6 +68,21 @@ export class TestServiceClient {
 public PagedIterable<User> listWithPage();
 ```
 
+```go
+type User struct {
+  ID   string `json:"id"`
+  Name string `json:"name"`
+}
+
+type UserList struct {
+  Value    []User
+  NextLink *string
+}
+
+func (c *Client) ListWithPage(ctx context.Context) (UserList, error)
+
+```
+
 </ClientTabs>
 
 2. Use the `@list` and `@pageItems` decorators from TypeSpec core.
@@ -122,6 +137,21 @@ export class TestServiceClient {
 
 ```java
 public PagedIterable<User> listWithPage();
+```
+
+```go
+type User struct {
+  ID   string
+  Name string
+}
+
+type UserList struct {
+  Value    []User
+  NextLink *string
+}
+
+func (c *Client) ListWithPage(ctx context.Context) (UserList, error)
+
 ```
 
 </ClientTabs>
@@ -186,6 +216,10 @@ export class TestServiceClient {
 NOT_SUPPORTED
 ```
 
+```go
+// NOT_SUPPORTED
+```
+
 </ClientTabs>
 
 2. Continuation token in header parameter and response body.
@@ -229,6 +263,10 @@ def list_with_page(self, **kwargs: Any) -> ItemPaged["_models.User"]:
 
 ```java
 NOT_SUPPORTED
+```
+
+```go
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>
@@ -286,6 +324,10 @@ export class TestServiceClient {
 NOT_SUPPORTED
 ```
 
+```go
+// NOT_SUPPORTED
+```
+
 </ClientTabs>
 
 4. Continuation token in header parameter and response header.
@@ -339,6 +381,10 @@ export class TestServiceClient {
 
 ```java
 NOT_SUPPORTED
+```
+
+```go
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>

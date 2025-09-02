@@ -90,6 +90,24 @@ public final class PetStoreNamespaceClient {
 }
 ```
 
+```go
+type InputModel struct {
+	Name string
+}
+
+type PetStoreNamespaceClientGetResponse struct {
+	InputModel
+}
+
+type PetStoreNamespaceClient struct {}
+
+func NewPetStoreNamespaceClient() *PetStoreNamespaceClient {
+  return &PetStoreNamespaceClient{}
+}
+
+func (client *PetStoreNamespaceClient) Get(ctx context.Context, name string, options *PetStoreNamespaceClientGetOptions) (PetStoreNamespaceClientGetResponse, error)
+```
+
 </ClientTabs>
 
 ## Customizations
@@ -167,6 +185,25 @@ public final class PetStoreNamespaceClient {
 }
 ```
 
+```go
+type InputOptions struct {
+	Name string
+}
+
+type PetStoreNamespaceClientGetResponse struct {
+	InputOptions
+}
+
+type PetStoreNamespaceClient struct {}
+
+func NewPetStoreNamespaceClient() *PetStoreNamespaceClient {
+  return &PetStoreNamespaceClient{}
+}
+
+func (client *PetStoreNamespaceClient) Get(ctx context.Context, name string, options *PetStoreNamespaceClientGetOptions) (PetStoreNamespaceClientGetResponse, error)
+
+```
+
 </ClientTabs>
 
 ### Renaming operations and parameters
@@ -229,6 +266,25 @@ public final class PetStoreNamespaceClient {
     public Response<BinaryData> readModelWithResponse(String name, RequestOptions requestOptions)
     public InputModel readModel(String name)
 }
+```
+
+```go
+type InputModel struct {
+	Name string
+}
+
+type PetStoreNamespaceClient struct {}
+
+func NewPetStoreNamespaceClient() *PetStoreNamespaceClient {
+  return &PetStoreNamespaceClient{}
+}
+
+type PetStoreNamespaceClientReadResponse struct {
+	InputModel
+}
+
+func (client *PetStoreNamespaceClient) Read(ctx context.Context, name string, options *PetStoreNamespaceClientReadOptions) (PetStoreNamespaceClientReadResponse, error)
+
 ```
 
 </ClientTabs>

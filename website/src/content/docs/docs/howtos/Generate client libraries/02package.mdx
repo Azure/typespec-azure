@@ -127,6 +127,32 @@ public final class Food implements JsonSerializable<Food> {
 }
 ```
 
+```go
+// generated petstore_client.go
+
+func NewPetStoreClient() *PetStoreClient {
+	return &PetStoreClient{}
+}
+
+func (client *PetStoreClient) Feed(ctx context.Context, food Food, options *PetStoreClientFeedOptions) (PetStoreClientFeedResponse, error) {}
+
+// generated model.go
+type Food struct {
+	Name *string
+	Quantity *int32
+}
+
+// generated options.go
+type PetStoreClientFeedOptions struct {}
+
+// generated response.go
+type PetStoreClientFeedResponse struct {}
+
+// Usage Sample
+petStoreClient := NewPetStoreClient()
+petStoreClient.Feed(context.Background(), Food{Name:to.Ptr("name"), Quantity:to.Ptr(1)}, &PetStoreClientFeedOptions{})
+```
+
 </ClientTabs>
 
 ### Customization
@@ -203,6 +229,11 @@ public final class Food implements JsonSerializable<Food> {
     public String getName();
     public int getQuantity();
 }
+```
+
+```go
+// NOT_SUPPORTED
+
 ```
 
 </ClientTabs>
