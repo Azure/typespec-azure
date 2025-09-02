@@ -444,9 +444,9 @@ type ClientGetResponse struct {
 
 type ClientPostResponse struct {}
 
-func Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error)
+func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error)
 
-func Post(ctx context.Context, body User, options *ClientPostOptions) (ClientPostResponse, error)
+func (client *Client) Post(ctx context.Context, body User, options *ClientPostOptions) (ClientPostResponse, error)
 ```
 
 </ClientTabItem>
@@ -530,7 +530,7 @@ type ClientUploadOptions struct {}
 
 type ClientUploadResponse struct {}
 
-func Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
+func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
 
 ```
 
@@ -613,7 +613,7 @@ type ClientUploadOptions struct {}
 
 type ClientUploadResponse struct {}
 
-func  Upload(ctx context.Context, id string, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
+func (client *Client) Upload(ctx context.Context, id string, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
 
 ```
 
@@ -694,7 +694,7 @@ type ClientUploadResponse struct {}
 
 type ClientUploadOptions struct {}
 
-func Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
+func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
 
 ```
 
@@ -783,18 +783,15 @@ public void upload(User user);
 
 ```go
 type User struct {
-  // REQUIRED
-	FirstName *string
-
-  // REQUIRED
-	LastName *string
+  FirstName *string
+  LastName *string
 }
 
 type ClientUploadOptions struct {}
 
 type ClientUploadResponse struct {}
 
-func Upload(ctx context.Context, userParam User, options *ClientUploadOptions) (ClientUploadResponse, error)
+func (client *Client) Upload(ctx context.Context, user User, options *ClientUploadOptions) (ClientUploadResponse, error)
 
 ```
 
@@ -974,7 +971,7 @@ type ClientRegisterResponse struct {}
 
 type ClientRegisterOptions struct {}
 
-func Register(ctx context.Context, schema []byte, options *ClientRegisterOptions) (ClientRegisterResponse, error)
+func (client *Client) Register(ctx context.Context, schema []byte, options *ClientRegisterOptions) (ClientRegisterResponse, error)
 
 ```
 
@@ -1074,19 +1071,13 @@ public RepairResult scheduleRepairs(String widgetName, String problem, String co
 
 ```go
 type RepairInfo struct {
-  // REQUIRED
 	Contact *string
-
-  // REQUIRED
 	Problem *string
 }
 
 type RepairResult struct {
-  // REQUIRED
-	Info *string
-
-  // REQUIRED
-	Reason *string
+	Info    *string
+	Reason  *string
 }
 
 type ClientScheduleRepairsResponse struct {
@@ -1095,7 +1086,7 @@ type ClientScheduleRepairsResponse struct {
 
 type ClientScheduleRepairsOptions struct {}
 
-func ScheduleRepairs(ctx context.Context, widgetName string, repairInfo RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
+func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, repairInfo RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
 
 ```
 
@@ -1243,19 +1234,13 @@ public RepairResult scheduleRepairs(String widgetName, RepairInfo body);
 
 ```go
 type RepairInfo struct {
-  // REQUIRED
 	Contact *string
-
-  // REQUIRED
 	Problem *string
 }
 
 type RepairResult struct {
-  // REQUIRED
-	Info *string
-
-  // REQUIRED
-	Reason *string
+	Info    *string
+	Reason  *string
 }
 
 type ServiceClientScheduleRepairsOptions struct {}
@@ -1264,7 +1249,7 @@ type ServiceClientScheduleRepairsResponse struct {
 	RepairResult
 }
 
-func ScheduleRepairs(ctx context.Context, widgetName string, repairInfo RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
+func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, repairInfo RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
 ```
 
 </ClientTabItem>
@@ -1402,23 +1387,16 @@ public final class AnalyzeClient {
 
 ```go
 type AnalyzeResult struct {
-  // REQUIRED
 	Confidence *float32
-
-  // REQUIRED
-	Result *string
+	Result     *string
 }
 
 type CompletionInput struct {
-  // REQUIRED
 	Input []*string
 }
 
 type CompletionResult struct {
-  // REQUIRED
-	Text *string
-
-  // REQUIRED
+	Text   *string
 	Tokens *int32
 }
 
@@ -1441,9 +1419,9 @@ const (
 	AnalyzeRequestModeStrict AnalyzeRequestMode = "strict"
 )
 
-func Analyze(ctx context.Context, mode AnalyzeRequestMode, imageParam io.ReadSeekCloser, options *AnalyzeClientAnalyzeOptions) (AnalyzeClientAnalyzeResponse, error)
+func (client *AnalyzeClient) Analyze(ctx context.Context, mode AnalyzeRequestMode, imageParam io.ReadSeekCloser, options *AnalyzeClientAnalyzeOptions) (AnalyzeClientAnalyzeResponse, error)
 
-func Completions(ctx context.Context, input CompletionInput, options *AnalyzeClientCompletionsOptions) (AnalyzeClientCompletionsResponse, error)
+func (client *AnalyzeClient) Completions(ctx context.Context, input CompletionInput, options *AnalyzeClientCompletionsOptions) (AnalyzeClientCompletionsResponse, error)
 
 ```
 
@@ -1526,9 +1504,9 @@ type ClientBResponse struct {
 	Value *int64
 }
 
-func A(ctx context.Context, x int32, options *ClientAOptions) (ClientAResponse, error)
+func (client *Client) A(ctx context.Context, x int32, options *ClientAOptions) (ClientAResponse, error)
 
-func B(ctx context.Context, x string, options *ClientBOptions) (ClientBResponse, error)
+func (client *Client) B(ctx context.Context, x string, options *ClientBOptions) (ClientBResponse, error)
 ```
 
 </ClientTabs>
@@ -1662,7 +1640,7 @@ type ClientGetOptions struct {
 	IfNoneMatch *string
 }
 
-func Get(ctx context.Context, options *ClientGetOptions) (*Response, error)
+func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (*Response, error)
 
 ```
 

@@ -139,7 +139,7 @@ type FileUploadServiceClientUploadOptions struct {}
 
 type FileUploadServiceClientUploadResponse struct {}
 
-func Upload(ctx context.Context, body MultipartRequest, options *FileUploadServiceClientUploadOptions) (FileUploadServiceClientUploadResponse, error)
+func (client *FileUploadServiceClient) Upload(ctx context.Context, body MultipartRequest, options *FileUploadServiceClientUploadOptions) (FileUploadServiceClientUploadResponse, error)
 ```
 
 </ClientTabs>

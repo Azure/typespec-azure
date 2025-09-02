@@ -98,7 +98,6 @@ serviceClientClient.stableFunctionality(stableModel);
 
 ```go
 type StableModel struct {
-  // REQUIRED
 	StableFeature *string
 }
 type ServiceClientStableFunctionalityOptions struct {}
@@ -369,21 +368,26 @@ serviceClientClient.previewFunctionality(previewModel);
 
 ```go
 type PreviewModel struct {
-  // REQUIRED
 	BetaFeature *string
 }
+
 type StableModel struct {
-  // REQUIRED
 	StableFeature *string
 }
+
 type ClientPreviewFunctionalityResponse struct {}
+
 type ClientStableFunctionalityResponse struct {}
+
 type ClientPreviewFunctionalityOptions struct {}
+
 type ClientStableFunctionalityOptions struct {}
 
-func PreviewFunctionality(ctx context.Context, previewModel PreviewModel, options *ClientPreviewFunctionalityOptions) (ClientPreviewFunctionalityResponse, error)
+type ServiceClient struct {}
 
-func StableFunctionality(ctx context.Context, stableModel StableModel, options *ClientStableFunctionalityOptions) (ClientStableFunctionalityResponse, error)
+func (client *ServiceClient) PreviewFunctionality(ctx context.Context, previewModel PreviewModel, options *ClientPreviewFunctionalityOptions) (ClientPreviewFunctionalityResponse, error)
+
+func (client *ServiceClient) StableFunctionality(ctx context.Context, stableModel StableModel, options *ClientStableFunctionalityOptions) (ClientStableFunctionalityResponse, error)
 
 ```
 
@@ -491,11 +495,9 @@ const (
 	v2024_04_01 Versions = "2024-04-01"
 )
 
-type Client struct {
-	// ...
-}
+type ServiceClient struct {}
 
-func (c *Client) Get(ctx context.Context, version Versions, options *RequestOptions) (Response, error)
+func (client *ServiceClient) Get(ctx context.Context, version Versions, options *RequestOptions) (Response, error)
 
 ```
 
