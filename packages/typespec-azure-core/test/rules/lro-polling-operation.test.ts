@@ -24,8 +24,7 @@ describe("typespec-azure-core: long-running-polling-operation-required rule", ()
     await tester
       .expect(
         `
-        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-        namespace Test;
+              namespace Test;
 
         op read(): Foundations.LongRunningStatusLocation;
         op readWithError(): Foundations.LongRunningStatusLocation | { error: string };
@@ -58,8 +57,7 @@ describe("typespec-azure-core: long-running-polling-operation-required rule", ()
     await tester
       .expect(
         `
-        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-        namespace Test;
+              namespace Test;
 
         op getOperationStatus is Foundations.GetOperationStatus;
 

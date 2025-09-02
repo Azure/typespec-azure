@@ -24,7 +24,6 @@ namespace Azure.Contoso;
 
 @doc("The Azure.Contoso service versions.")
 enum Versions {
-  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
   @doc("The 2022-11-01-preview version of the Azure.Contoso service.")
   `2022-11-01-preview`,
 }
