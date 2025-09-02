@@ -1140,6 +1140,7 @@ export interface LicenseInfo {
  * Represents a namespace in the package, containing all clients, operations, and types.
  */
 export interface SdkNamespace<TServiceOperation extends SdkServiceOperation> extends DecoratedType {
+  __raw?: Namespace;
   /** Namespace name. */
   name: string;
   /** Namespace full qualified name. */

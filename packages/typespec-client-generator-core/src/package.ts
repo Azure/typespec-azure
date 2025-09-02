@@ -1,18 +1,20 @@
-import { createDiagnosticCollector, Diagnostic } from "@typespec/compiler";
+import { createDiagnosticCollector, Diagnostic, ignoreDiagnostics } from "@typespec/compiler";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { createSdkClientType } from "./clients.js";
 import { listClients } from "./decorators.js";
 import {
+  SdkClientType,
   SdkEnumType,
   SdkModelType,
   SdkNamespace,
   SdkNullableType,
   SdkPackage,
   SdkServiceOperation,
+  SdkType,
   SdkUnionType,
   TCGCContext,
 } from "./interfaces.js";
-import { filterApiVersionsWithDecorators } from "./internal-utils.js";
+import { filterApiVersionsWithDecorators, getTypeDecorators } from "./internal-utils.js";
 import { getLicenseInfo } from "./license.js";
 import { getCrossLanguagePackageId } from "./public-utils.js";
 import { getAllReferencedTypes, handleAllTypes } from "./types.js";
@@ -40,36 +42,43 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
       apiVersion: context.apiVersion === "all" ? "all" : versions[versions.length - 1],
     },
   };
-  organizeNamespaces(sdkPackage);
+  organizeNamespaces(context, sdkPackage);
   return diagnostics.wrap(sdkPackage);
 }
 
 function organizeNamespaces<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
   sdkPackage: SdkPackage<TServiceOperation>,
 ) {
   const clients = [...sdkPackage.clients];
   while (clients.length > 0) {
     const client = clients.shift()!;
-    getSdkNamespace(sdkPackage, client.namespace).clients.push(client);
+    getSdkNamespace(context, sdkPackage, client).clients.push(client);
     if (client.children && client.children.length > 0) {
       clients.push(...client.children);
     }
   }
   for (const model of sdkPackage.models) {
-    getSdkNamespace(sdkPackage, model.namespace).models.push(model);
+    getSdkNamespace(context, sdkPackage, model).models.push(model);
   }
   for (const enumType of sdkPackage.enums) {
-    getSdkNamespace(sdkPackage, enumType.namespace).enums.push(enumType);
+    getSdkNamespace(context, sdkPackage, enumType).enums.push(enumType);
   }
   for (const unionType of sdkPackage.unions) {
-    getSdkNamespace(sdkPackage, unionType.namespace).unions.push(unionType);
+    getSdkNamespace(context, sdkPackage, unionType).unions.push(unionType);
   }
 }
 
 function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
   sdkPackage: SdkPackage<TServiceOperation>,
-  namespace: string,
+  type: SdkType | SdkClientType<TServiceOperation>,
 ) {
+  if (!("namespace" in type)) {
+    return sdkPackage;
+  }
+
+  const namespace = type.namespace;
   const segments = namespace.split(".");
   let current: SdkPackage<TServiceOperation> | SdkNamespace<TServiceOperation> = sdkPackage;
   let fullName = "";
@@ -79,7 +88,10 @@ function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
       (ns) => ns.name === segment,
     );
     if (ns === undefined) {
+      const rawNamespace =
+        type.__raw && "namespace" in type.__raw ? type.__raw.namespace : undefined;
       const newNs = {
+        __raw: rawNamespace,
         name: segment,
         fullName,
         clients: [],
@@ -87,6 +99,7 @@ function getSdkNamespace<TServiceOperation extends SdkServiceOperation>(
         enums: [],
         unions: [],
         namespaces: [],
+        decorators: rawNamespace ? ignoreDiagnostics(getTypeDecorators(context, rawNamespace)) : [],
       };
       current.namespaces.push(newNs);
       current = newNs;
