@@ -41,12 +41,14 @@ import {
 } from "./decorators.js";
 import {
   SdkBodyParameter,
+  SdkClient,
   SdkCookieParameter,
   SdkHeaderParameter,
   SdkHttpOperation,
   SdkHttpOperationExample,
   SdkMethodParameter,
   SdkModelPropertyType,
+  SdkOperationGroup,
   SdkPathParameter,
   SdkQueryParameter,
   SdkServiceMethod,
@@ -818,4 +820,26 @@ export function resolveOperationId(
  */
 export function isHttpMetadata(context: TCGCContext, property: SdkModelPropertyType): boolean {
   return property.__raw !== undefined && isMetadata(context.program, property.__raw);
+}
+
+export function getNamespaceFromType(
+  type: Type | SdkClient | SdkOperationGroup | undefined,
+): Namespace | undefined {
+  if (type === undefined) {
+    return undefined;
+  }
+  if (type.kind === "SdkOperationGroup" || type.kind === "SdkClient") {
+    const rawType = type.type;
+    if (rawType === undefined) {
+      return undefined;
+    }
+    if (rawType.kind === "Namespace") {
+      return rawType;
+    }
+    return rawType.namespace;
+  }
+  if ("namespace" in type) {
+    return type.namespace;
+  }
+  return undefined;
 }
