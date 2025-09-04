@@ -345,3 +345,284 @@ it("@alternateType along with @override with scope", async () => {
   const operationParam = method.operation.parameters[0];
   strictEqual(operationParam.type.kind, "int32");
 });
+
+describe("external types", () => {
+  it("should support external type for union (DFE case)", async () => {
+    const csharpRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
+    await csharpRunner.compile(`
+      @service
+      namespace MyService {
+        @alternateType({
+          fullyQualifiedName: "Azure.Core.Expressions.DataFactoryExpression",
+        }, "csharp")
+        union Dfe<T> {
+          T,
+          DfeExpression
+        }
+
+        model DfeExpression {
+          kind: "expression";
+          value: string;
+        }
+
+        model Pipeline {
+          description: string,
+          runDimensions: Dimension,
+        }
+
+        model Dimension {
+           ...Record<Dfe<string>>;
+        }
+
+        @route("/test")
+        op test(@body body: Pipeline): void;
+      };
+    `);
+
+    const models = getAllModels(csharpRunner.context);
+    const pipeline = models.find((m) => m.name === "Pipeline");
+    strictEqual(pipeline?.kind, "model");
+
+    const runDimensionsProperty = pipeline.properties.find((p) => p.name === "runDimensions");
+    strictEqual(runDimensionsProperty?.type.kind, "model");
+
+    const dimension = runDimensionsProperty.type;
+    strictEqual(dimension.additionalProperties?.kind, "union");
+    strictEqual(
+      dimension.additionalProperties.external?.fullyQualifiedName,
+      "Azure.Core.Expressions.DataFactoryExpression",
+    );
+  });
+
+  it("should support external type with package information (PySTAC case)", async () => {
+    await runner.compile(`
+      @service
+      namespace MyService {
+        @alternateType({
+          fullyQualifiedName: "pystac.Collection",
+          package: "pystac",
+          version: "1.13.0",
+        }, "python")
+        model ItemCollection {
+          /**
+           * GeoJSON FeatureCollection type.
+           */
+          type: ItemCollectionType;
+
+          /**
+           * Array of STAC Items in the collection.
+           */
+          features: StacItem[];
+
+          /**
+           * Bounding box of all items in format [west, south, east, north].
+           */
+          bbox?: float64[];
+
+          /**
+           * Stac Version
+           */
+          @minLength(1)
+          @encodedName("application/json", "stac_version")
+          stacVersion?: string = "1.0.0";
+
+          /**
+           * Links to related resources and endpoints.
+           */
+          links?: Link[];
+
+          /**
+           * Context information for the search response.
+           */
+          context?: ContextExtension;
+        }
+
+        model ItemCollectionType {
+          value: string;
+        }
+
+        model StacItem {
+          id: string;
+        }
+
+        model Link {
+          href: string;
+        }
+
+        model ContextExtension {
+          page: int32;
+        }
+
+        @route("/test")
+        op test(@body body: ItemCollection): void;
+      };
+    `);
+
+    const models = getAllModels(runner.context);
+    const itemCollection = models.find((m) => m.name === "ItemCollection");
+    strictEqual(itemCollection?.kind, "model");
+    strictEqual(itemCollection.external?.fullyQualifiedName, "pystac.Collection");
+    strictEqual(itemCollection.external?.package, "pystac");
+    strictEqual(itemCollection.external?.version, "1.13.0");
+  });
+
+  it("should support external type for scalar", async () => {
+    await runner.compile(`
+      @service
+      namespace MyService {
+        @alternateType({
+          fullyQualifiedName: "System.DateOnly",
+          package: "System.Runtime",
+        }, "python")
+        scalar CustomDate extends string;
+
+        model TestModel {
+          date: CustomDate;
+        }
+
+        @route("/test")
+        op test(@body body: TestModel): void;
+      };
+    `);
+
+    const models = getAllModels(runner.context);
+    const testModel = models.find((m) => m.name === "TestModel");
+    strictEqual(testModel?.kind, "model");
+
+    const dateProperty = testModel.properties.find((p) => p.name === "date");
+    strictEqual(dateProperty?.type.external?.fullyQualifiedName, "System.DateOnly");
+    strictEqual(dateProperty?.type.external?.package, "System.Runtime");
+    strictEqual(dateProperty?.type.external?.version, undefined);
+  });
+
+  it("should support external type for enum", async () => {
+    await runner.compile(`
+      @service
+      namespace MyService {
+        @alternateType({
+          fullyQualifiedName: "MyLibrary.Status",
+          package: "my-enum-lib",
+          version: "1.5.0",
+        }, "python")
+        enum StatusEnum {
+          Active,
+          Inactive,
+          Pending,
+        }
+
+        model TestModel {
+          status: StatusEnum;
+        }
+
+        @route("/test")
+        op test(@body body: TestModel): void;
+      };
+    `);
+
+    const models = getAllModels(runner.context);
+    const testModel = models.find((m) => m.name === "TestModel");
+    strictEqual(testModel?.kind, "model");
+
+    const statusProperty = testModel.properties.find((p) => p.name === "status");
+    strictEqual(statusProperty?.type.kind, "enum");
+    strictEqual(statusProperty?.type.external?.fullyQualifiedName, "MyLibrary.Status");
+    strictEqual(statusProperty?.type.external?.package, "my-enum-lib");
+    strictEqual(statusProperty?.type.external?.version, "1.5.0");
+  });
+
+  it("should support external type with minimal information", async () => {
+    await runner.compile(`
+      @service
+      namespace MyService {
+        @alternateType({
+          fullyQualifiedName: "ExternalType",
+        }, "python")
+        model SimpleModel {
+          value: string;
+        }
+
+        @route("/test")
+        op test(@body body: SimpleModel): void;
+      };
+    `);
+
+    const models = getAllModels(runner.context);
+    const simpleModel = models.find((m) => m.name === "SimpleModel");
+    strictEqual(simpleModel?.kind, "model");
+    strictEqual(simpleModel.external?.fullyQualifiedName, "ExternalType");
+    strictEqual(simpleModel.external?.package, undefined);
+    strictEqual(simpleModel.external?.version, undefined);
+  });
+
+  it("should support scoped external types", async () => {
+    const pythonRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
+    const csharpRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
+
+    const spec = `
+      @service
+      namespace MyService {
+        @alternateType({
+          fullyQualifiedName: "python_module.PythonType",
+          package: "python-package",
+        }, "python")
+        @alternateType({
+          fullyQualifiedName: "CSharp.Namespace.CSharpType",
+          package: "CSharp.Package",
+        }, "csharp")
+        model CrossLanguageModel {
+          value: string;
+        }
+
+        @route("/test")
+        op test(@body body: CrossLanguageModel): void;
+      };
+    `;
+
+    await pythonRunner.compile(spec);
+    await csharpRunner.compile(spec);
+
+    const pythonModels = getAllModels(pythonRunner.context);
+    const pythonModel = pythonModels.find((m) => m.name === "CrossLanguageModel");
+    strictEqual(pythonModel?.external?.fullyQualifiedName, "python_module.PythonType");
+    strictEqual(pythonModel?.external?.package, "python-package");
+
+    const csharpModels = getAllModels(csharpRunner.context);
+    const csharpModel = csharpModels.find((m) => m.name === "CrossLanguageModel");
+    strictEqual(csharpModel?.external?.fullyQualifiedName, "CSharp.Namespace.CSharpType");
+    strictEqual(csharpModel?.external?.package, "CSharp.Package");
+  });
+
+  it("should support array type with external elements", async () => {
+    await runner.compile(`
+      @service
+      namespace MyService {
+        @alternateType({
+          fullyQualifiedName: "CustomList",
+          package: "collections-lib",
+        }, "python")
+        model StringArray {
+          items: string[];
+        }
+
+        model TestModel {
+          arrays: StringArray[];
+        }
+
+        @route("/test")
+        op test(@body body: TestModel): void;
+      };
+    `);
+
+    const models = getAllModels(runner.context);
+    const testModel = models.find((m) => m.name === "TestModel");
+    strictEqual(testModel?.kind, "model");
+
+    const arraysProperty = testModel.properties.find((p) => p.name === "arrays");
+    strictEqual(arraysProperty?.type.kind, "array");
+
+    const arrayElementType = (arraysProperty?.type as SdkArrayType).valueType;
+    strictEqual(arrayElementType.kind, "model");
+    strictEqual(arrayElementType.external?.fullyQualifiedName, "CustomList");
+    strictEqual(arrayElementType.external?.package, "collections-lib");
+  });
+});

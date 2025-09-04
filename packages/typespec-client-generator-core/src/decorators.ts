@@ -740,11 +740,49 @@ const alternateTypeKey = createStateSymbol("alternateType");
 export const $alternateType: AlternateTypeDecorator = (
   context: DecoratorContext,
   source: ModelProperty | Scalar | Model | Enum | Union,
-  alternate: Type | ExternalTypeInfo,
+  alternate: Type,
   scope?: LanguageScopes,
 ) => {
-  if ("kind" in alternate) {
-    // This means that alternate is of type Type
+  let alternateInput: Type | ExternalTypeInfo = alternate;
+  if (alternate.kind === "Model" && alternate.indexer === undefined) {
+    // This means we're dealing with external type
+    if (!scope) {
+      reportDiagnostic(context.program, {
+        code: "missing-scope",
+        format: {
+          decoratorName: "@alternateType",
+        },
+        target: source,
+      });
+    }
+
+    const alternatePropertyValues = [...alternate.properties.values()];
+    // Get fullyQualifiedName if needed
+    const fullyQualifiedName = alternatePropertyValues
+      .filter((x) => x.name === "fullyQualifiedName")
+      .map((x) => x.type)
+      .filter((x) => x.kind === "String")
+      .map((x) => x.value)[0];
+
+    const packageName = alternatePropertyValues
+      .filter((x) => x.name === "package")
+      .map((x) => x.type)
+      .filter((x) => x.kind === "String")
+      .map((x) => x.value)[0];
+
+    const version = alternatePropertyValues
+      .filter((x) => x.name === "version")
+      .map((x) => x.type)
+      .filter((x) => x.kind === "String")
+      .map((x) => x.value)[0];
+
+    alternateInput = {
+      fullyQualifiedName,
+      package: packageName,
+      version,
+    };
+  } else {
+    // Not external type
     if (source.kind === "Scalar" && alternate.kind !== "Scalar") {
       reportDiagnostic(context.program, {
         code: "invalid-alternate-type",
@@ -755,18 +793,8 @@ export const $alternateType: AlternateTypeDecorator = (
       });
       return;
     }
-  } else {
-    if (!scope) {
-      reportDiagnostic(context.program, {
-        code: "missing-scope",
-        format: {
-          decoratorName: "@alternateType",
-        },
-        target: source,
-      });
-    }
   }
-  setScopedDecoratorData(context, $alternateType, alternateTypeKey, source, alternate, scope);
+  setScopedDecoratorData(context, $alternateType, alternateTypeKey, source, alternateInput, scope);
 };
 
 export function getAlternateType(
@@ -777,6 +805,7 @@ export function getAlternateType(
   context: TCGCContext,
   source: ModelProperty | Scalar | Model | Enum | Union,
 ): ExternalTypeInfo | undefined;
+
 /**
  * Get the alternate type for a source type in a specific scope.
  *

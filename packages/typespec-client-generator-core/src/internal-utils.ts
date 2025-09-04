@@ -329,7 +329,7 @@ export function getSdkTypeBaseHelper<TKind>(
     type.kind === "Union"
   ) {
     const external = getAlternateType(context, type);
-    if (external && "external" in external) {
+    if (external) {
       base.external = external;
     }
   }
