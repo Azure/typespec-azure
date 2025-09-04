@@ -533,7 +533,7 @@ describe("@clientName", () => {
     strictEqual(method.name, "listSecretProperties");
   });
   it("override method", async () => {
-    await runner.compileWithCustomization(
+    const diagnostics = await runner.compileAndDiagnoseWithCustomization(
       `
       @service
       namespace KeyVault;
@@ -546,10 +546,15 @@ describe("@clientName", () => {
       @@clientName(getSecretOverride, "listSecretProperties");
       `,
     );
+    expectDiagnostics(diagnostics[1], {
+      code: "@azure-tools/typespec-client-generator-core/client-name-ineffective",
+      message:
+        'Application of @clientName decorator to listSecretProperties is not effective because it is applied to the override method. Please apply it on the original method definition "getSecret" instead.',
+    });
     const sdkPackage = runner.context.sdkPackage;
     const method = sdkPackage.clients[0].methods[0];
     strictEqual(method.parameters.length, 1);
-    strictEqual(method.name, "listSecretProperties");
+    strictEqual(method.name, "getSecret");
   });
 
   it("override parameter", async () => {
