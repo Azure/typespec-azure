@@ -45,6 +45,7 @@ import { HierarchyBuildingDecorator } from "../generated-defs/Azure.ClientGenera
 import {
   AccessFlags,
   ClientInitializationOptions,
+  ExternalTypeInfo,
   LanguageScopes,
   SdkClient,
   SdkOperationGroup,
@@ -733,28 +734,49 @@ const alternateTypeKey = createStateSymbol("alternateType");
  *
  * @param context the decorator context
  * @param source source type to be replaced
- * @param alternate target type to replace the source type
+ * @param alternate target type to replace the source type or ExternalType object
  * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
  */
 export const $alternateType: AlternateTypeDecorator = (
   context: DecoratorContext,
-  source: ModelProperty | Scalar,
-  alternate: Type,
+  source: ModelProperty | Scalar | Model | Enum | Union,
+  alternate: Type | ExternalTypeInfo,
   scope?: LanguageScopes,
 ) => {
-  if (source.kind === "Scalar" && alternate.kind !== "Scalar") {
-    reportDiagnostic(context.program, {
-      code: "invalid-alternate-type",
-      format: {
-        kindName: alternate.kind,
-      },
-      target: alternate,
-    });
-    return;
+  if ("kind" in alternate) {
+    // This means that alternate is of type Type
+    if (source.kind === "Scalar" && alternate.kind !== "Scalar") {
+      reportDiagnostic(context.program, {
+        code: "invalid-alternate-type",
+        format: {
+          kindName: alternate.kind,
+        },
+        target: alternate,
+      });
+      return;
+    }
+  } else {
+    if (!scope) {
+      reportDiagnostic(context.program, {
+        code: "missing-scope",
+        format: {
+          decoratorName: "@alternateType",
+        },
+        target: source,
+      });
+    }
   }
   setScopedDecoratorData(context, $alternateType, alternateTypeKey, source, alternate, scope);
 };
 
+export function getAlternateType(
+  context: TCGCContext,
+  source: ModelProperty | Scalar,
+): Scalar | undefined;
+export function getAlternateType(
+  context: TCGCContext,
+  source: ModelProperty | Scalar | Model | Enum | Union,
+): ExternalTypeInfo | undefined;
 /**
  * Get the alternate type for a source type in a specific scope.
  *
@@ -764,8 +786,8 @@ export const $alternateType: AlternateTypeDecorator = (
  */
 export function getAlternateType(
   context: TCGCContext,
-  source: ModelProperty | Scalar,
-): Scalar | undefined {
+  source: ModelProperty | Scalar | Model | Enum | Union,
+): Type | ExternalTypeInfo | undefined {
   return getScopedDecoratorData(context, alternateTypeKey, source);
 }
 

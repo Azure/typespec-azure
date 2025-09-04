@@ -34,6 +34,20 @@ model Azure.ClientGenerator.Core.ClientOptions
 | service? | `Namespace` | The service that this client is generated for. If not specified, TCGC will look up the first parent namespace decorated with `@service` for the target.<br />The namespace should be decorated with `@service`. |
 | name?    | `string`    | The name of the client. If not specified, the default name will be `<Name of the target>Client`.                                                                                                                |
 
+### `ExternalType` {#Azure.ClientGenerator.Core.ExternalType}
+
+```typespec
+model Azure.ClientGenerator.Core.ExternalType
+```
+
+#### Properties
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| fullyQualifiedName | `string` |             |
+| package?           | `string` |             |
+| version?           | `string` |             |
+
 ### `Access` {#Azure.ClientGenerator.Core.Access}
 
 Access value.

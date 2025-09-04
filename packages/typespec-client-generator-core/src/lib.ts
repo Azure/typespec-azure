@@ -428,6 +428,12 @@ export const $lib = createTypeSpecLibrary({
         default: "@hierarchyBuilding decorator causes recursive base type reference.",
       },
     },
+    "missing-scope": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@scope decorator should be applied with ${"decoratorName"} since it is highly likely this is language-specific`,
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,

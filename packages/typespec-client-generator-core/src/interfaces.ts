@@ -225,7 +225,17 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   children?: SdkClientType<TServiceOperation>[];
 }
 
-interface SdkTypeBase extends DecoratedType {
+interface ExternalType {
+  external?: ExternalTypeInfo;
+}
+
+export interface ExternalTypeInfo {
+  fullyQualifiedName: string;
+  package?: string;
+  version?: string;
+}
+
+interface SdkTypeBase extends DecoratedType, ExternalType {
   __raw?: Type;
   kind: string;
   /** Whether the type is deprecated. */
