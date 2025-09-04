@@ -467,13 +467,14 @@ describe("external types", () => {
   });
 
   it("should support external type for scalar", async () => {
-    await runner.compile(`
+    const runnerWithJava = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+    await runnerWithJava.compile(`
       @service
       namespace MyService {
         @alternateType({
           fullyQualifiedName: "System.DateOnly",
           package: "System.Runtime",
-        }, "python")
+        }, "java")
         scalar CustomDate extends string;
 
         model TestModel {
@@ -485,7 +486,7 @@ describe("external types", () => {
       };
     `);
 
-    const models = getAllModels(runner.context);
+    const models = getAllModels(runnerWithJava.context);
     const testModel = models.find((m) => m.name === "TestModel");
     strictEqual(testModel?.kind, "model");
 
@@ -624,5 +625,31 @@ describe("external types", () => {
     strictEqual(arrayElementType.kind, "model");
     strictEqual(arrayElementType.external?.fullyQualifiedName, "CustomList");
     strictEqual(arrayElementType.external?.package, "collections-lib");
+  });
+
+  it("using without scope should raise warning", async () => {
+    const diagnostics = (
+      await runner.compileAndDiagnose(`
+      @service
+      namespace MyService {
+        @alternateType({
+          fullyQualifiedName: "CustomList",
+          package: "collections-lib",
+        })
+        model StringArray {
+          items: string[];
+        }
+
+        model TestModel {
+          arrays: StringArray[];
+        }
+
+        @route("/test")
+        op test(@body body: TestModel): void;
+      };
+    `)
+    )[1];
+    strictEqual(diagnostics.length, 1);
+    strictEqual(diagnostics[0].code, "@azure-tools/typespec-client-generator-core/missing-scope");
   });
 });
