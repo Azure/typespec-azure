@@ -417,7 +417,7 @@ describe("external types", () => {
           /**
            * Bounding box of all items in format [west, south, east, north].
            */
-          bbox?: float64[];
+          boundingBox?: float64[];
 
           /**
            * Stac Version
