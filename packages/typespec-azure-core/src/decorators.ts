@@ -211,30 +211,6 @@ export const $nextPageOperation: NextPageOperationDecorator = (
   context.call($operationLink, entity, linkedOperation, "nextPage", parameters);
 };
 
-export const $requestParameter = (context: DecoratorContext, entity: Model, name: string) => {
-  context.program.stateMap(AzureCoreStateKeys.requestParameter).set(entity, name);
-};
-
-export function getRequestParameter(program: Program, entity: ModelProperty): string | undefined {
-  if (entity.type.kind !== "Model") return undefined;
-  const parameterName: string | undefined = program
-    .stateMap(AzureCoreStateKeys.requestParameter)
-    .get(entity.type);
-  return parameterName;
-}
-
-export const $responseProperty = (context: DecoratorContext, entity: Model, name: string) => {
-  context.program.stateMap(AzureCoreStateKeys.responseParameter).set(entity, name);
-};
-
-export function getResponseProperty(program: Program, entity: ModelProperty): string | undefined {
-  if (entity.type.kind !== "Model") return undefined;
-  const parameterName: string | undefined = program
-    .stateMap(AzureCoreStateKeys.responseParameter)
-    .get(entity.type);
-  return parameterName;
-}
-
 /**
  * Checks if an array model or array-valued model property has unique items.
  * @param program The program context.
