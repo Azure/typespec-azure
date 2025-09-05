@@ -1090,8 +1090,12 @@ export function getClientTypeWithDiagnostics(
       retval = getSdkTypeForIntrinsic(context, type);
       break;
     case "Scalar":
+      const scalarAlternateType = getAlternateType(context, type);
       retval = diagnostics.pipe(
-        getSdkDateTimeOrDurationOrBuiltInType(context, getAlternateType(context, type) ?? type),
+        getSdkDateTimeOrDurationOrBuiltInType(
+          context,
+          scalarAlternateType && scalarAlternateType.kind === "Scalar" ? scalarAlternateType : type,
+        ),
       );
       break;
     case "Enum":

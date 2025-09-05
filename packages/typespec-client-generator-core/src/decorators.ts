@@ -45,6 +45,7 @@ import { HierarchyBuildingDecorator } from "../generated-defs/Azure.ClientGenera
 import {
   AccessFlags,
   ClientInitializationOptions,
+  ExternalTypeInfo,
   LanguageScopes,
   SdkClient,
   SdkOperationGroup,
@@ -732,27 +733,77 @@ const alternateTypeKey = createStateSymbol("alternateType");
  *
  * @param context the decorator context
  * @param source source type to be replaced
- * @param alternate target type to replace the source type
+ * @param alternate target type to replace the source type or ExternalType object
  * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
  */
 export const $alternateType: AlternateTypeDecorator = (
   context: DecoratorContext,
-  source: ModelProperty | Scalar,
+  source: ModelProperty | Scalar | Model | Enum | Union,
   alternate: Type,
   scope?: LanguageScopes,
 ) => {
-  if (source.kind === "Scalar" && alternate.kind !== "Scalar") {
-    reportDiagnostic(context.program, {
-      code: "invalid-alternate-type",
-      format: {
-        kindName: alternate.kind,
-      },
-      target: alternate,
-    });
-    return;
+  let alternateInput: Type | ExternalTypeInfo = alternate;
+  if (alternate.kind === "Model" && alternate.indexer === undefined) {
+    // This means we're dealing with external type
+    if (!scope) {
+      reportDiagnostic(context.program, {
+        code: "missing-scope",
+        format: {
+          decoratorName: "@alternateType",
+        },
+        target: source,
+      });
+    }
+
+    const alternatePropertyValues = [...alternate.properties.values()];
+    // Get fullyQualifiedName if needed
+    const fullyQualifiedName = alternatePropertyValues
+      .filter((x) => x.name === "fullyQualifiedName")
+      .map((x) => x.type)
+      .filter((x) => x.kind === "String")
+      .map((x) => x.value)[0];
+
+    const packageName = alternatePropertyValues
+      .filter((x) => x.name === "package")
+      .map((x) => x.type)
+      .filter((x) => x.kind === "String")
+      .map((x) => x.value)[0];
+
+    const version = alternatePropertyValues
+      .filter((x) => x.name === "version")
+      .map((x) => x.type)
+      .filter((x) => x.kind === "String")
+      .map((x) => x.value)[0];
+
+    alternateInput = {
+      fullyQualifiedName,
+      package: packageName,
+      version,
+    };
+  } else {
+    // Not external type
+    if (source.kind === "Scalar" && alternate.kind !== "Scalar") {
+      reportDiagnostic(context.program, {
+        code: "invalid-alternate-type",
+        format: {
+          kindName: alternate.kind,
+        },
+        target: alternate,
+      });
+      return;
+    }
   }
-  setScopedDecoratorData(context, $alternateType, alternateTypeKey, source, alternate, scope);
+  setScopedDecoratorData(context, $alternateType, alternateTypeKey, source, alternateInput, scope);
 };
+
+export function getAlternateType(
+  context: TCGCContext,
+  source: ModelProperty | Scalar,
+): Scalar | undefined;
+export function getAlternateType(
+  context: TCGCContext,
+  source: ModelProperty | Scalar | Model | Enum | Union,
+): ExternalTypeInfo | undefined;
 
 /**
  * Get the alternate type for a source type in a specific scope.
@@ -763,9 +814,36 @@ export const $alternateType: AlternateTypeDecorator = (
  */
 export function getAlternateType(
   context: TCGCContext,
-  source: ModelProperty | Scalar,
-): Scalar | undefined {
-  return getScopedDecoratorData(context, alternateTypeKey, source);
+  source: ModelProperty | Scalar | Model | Enum | Union,
+): Type | ExternalTypeInfo | undefined {
+  const retval: Type | ExternalTypeInfo | undefined = getScopedDecoratorData(
+    context,
+    alternateTypeKey,
+    source,
+  );
+  if (retval !== undefined && "fullyQualifiedName" in retval) {
+    if (!context.__externalPackageToVersions) {
+      context.__externalPackageToVersions = new Map();
+    }
+    const externalPackage = retval.package;
+    const externalVersion = retval.version;
+    if (externalPackage && externalVersion) {
+      const existingVersion = context.__externalPackageToVersions.get(externalPackage);
+      if (existingVersion && existingVersion !== externalVersion) {
+        reportDiagnostic(context.program, {
+          code: "external-library-version-mismatch",
+          format: {
+            libraryName: externalPackage,
+            versionA: existingVersion,
+            versionB: externalVersion,
+          },
+          target: source,
+        });
+      }
+      context.__externalPackageToVersions.set(externalPackage, externalVersion);
+    }
+  }
+  return retval;
 }
 
 export const $useSystemTextJsonConverter: DecoratorFunction = (

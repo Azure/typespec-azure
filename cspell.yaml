@@ -69,6 +69,7 @@ words:
   - PAYG
   - prismjs
   - psscriptanalyzer
+  - pystac
   - pytest
   - qnas
   - regionality
@@ -78,6 +79,7 @@ words:
   - rpass
   - SERVICERP
   - seti
+  - stac
   - tcgc
   - tsmv
   - userrp
