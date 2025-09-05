@@ -545,6 +545,7 @@ This allows sharing Azure Resource Manager resource types across specifications
 - [`@armOperationRoute`](#@armoperationroute)
 - [`@customAzureResource`](#@customazureresource)
 - [`@externalTypeRef`](#@externaltyperef)
+- [`@renamePathParameter`](#@renamepathparameter)
 
 #### `@armExternalType`
 
@@ -619,3 +620,23 @@ Specify an external reference that should be used when emitting this type.
 | Name    | Type             | Description                                                   |
 | ------- | ---------------- | ------------------------------------------------------------- |
 | jsonRef | `valueof string` | External reference(e.g. "../../common.json#/definitions/Foo") |
+
+#### `@renamePathParameter`
+
+Renames a path parameter in an Azure Resource Manager operation.
+
+```typespec
+@Azure.ResourceManager.Legacy.renamePathParameter(sourceParameterName: valueof string, targetParameterName: valueof string)
+```
+
+##### Target
+
+The operation or interface to modify
+`Operation`
+
+##### Parameters
+
+| Name                | Type             | Description                         |
+| ------------------- | ---------------- | ----------------------------------- |
+| sourceParameterName | `valueof string` | The name of the parameter to rename |
+| targetParameterName | `valueof string` | The new name for the parameter      |
