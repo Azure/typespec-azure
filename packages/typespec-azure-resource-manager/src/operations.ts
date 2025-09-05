@@ -2,7 +2,6 @@ import {
   $doc,
   DecoratorContext,
   getFriendlyName,
-  getNamespaceFullName,
   ignoreDiagnostics,
   Model,
   Operation,
@@ -13,7 +12,6 @@ import {
   unsafe_Mutator as Mutator,
   unsafe_MutatorFlow as MutatorFlow,
 } from "@typespec/compiler/experimental";
-import { $ } from "@typespec/compiler/typekit";
 import { useStateMap } from "@typespec/compiler/utils";
 import { $route, getHttpOperation, HttpOperation, isPathParam } from "@typespec/http";
 import {
@@ -528,17 +526,12 @@ function storeRenamePathParameters(
   sourceName: string,
   targetName: string,
 ): void {
-  const opId = getOperationName(target);
-  const literal = $(program).literal.createString(
-    `${opId.namespace}/${opId.interface}/${opId.operation}`,
-  );
-  program.stateMap(ArmStateKeys.renamePathParameters).set(literal, new Map<string, string>());
-  let renameMap = program.stateMap(ArmStateKeys.renamePathParameters).get(literal);
+  let renameMap = program.stateMap(ArmStateKeys.renamePathParameters).get(target);
   if (renameMap === undefined) {
     renameMap = new Map<string, string>();
   }
   renameMap.set(sourceName, targetName);
-  program.stateMap(ArmStateKeys.renamePathParameters).set(literal, renameMap);
+  program.stateMap(ArmStateKeys.renamePathParameters).set(target, renameMap);
 }
 
 function getRenamePathParameter(
@@ -547,29 +540,12 @@ function getRenamePathParameter(
   sourceName: string,
   targetName: string,
 ): boolean {
-  const opId = getOperationName(target);
-  const literal = $(program).literal.createString(
-    `${opId.namespace}/${opId.interface}/${opId.operation}`,
-  );
-  const renameMap = program.stateMap(ArmStateKeys.renamePathParameters).get(literal);
+  const renameMap = program.stateMap(ArmStateKeys.renamePathParameters).get(target);
   if (renameMap === undefined) {
-    program.stateMap(ArmStateKeys.renamePathParameters).set(literal, new Map<string, string>());
+    program.stateMap(ArmStateKeys.renamePathParameters).set(target, new Map<string, string>());
     return false;
   }
   return renameMap.get(sourceName) === targetName;
-}
-
-interface OperationId {
-  namespace?: string;
-  interface?: string;
-  operation: string;
-}
-
-function getOperationName(operation: Operation): OperationId {
-  const result: OperationId = { operation: operation.name };
-  if (operation.namespace) result.namespace = getNamespaceFullName(operation.namespace);
-  if (operation.interface) result.interface = operation.interface.name;
-  return result;
 }
 
 /**
@@ -590,11 +566,11 @@ export const $renamePathParameter: RenamePathParameterDecorator = (
   if (getRenamePathParameter(program, target, sourceParameterName, targetParameterName)) {
     return;
   }
-  storeRenamePathParameters(program, target, sourceParameterName, targetParameterName);
 
   const toMutate = target.parameters;
   const existingTarget = toMutate.properties.get(targetParameterName);
   const existingSource = toMutate.properties.get(sourceParameterName);
+  if (existingSource === undefined && existingTarget !== undefined) return;
   if (existingTarget !== undefined) {
     reportDiagnostic(context.program, {
       code: "invalid-parameter-rename",
@@ -629,6 +605,7 @@ export const $renamePathParameter: RenamePathParameterDecorator = (
     toMutate,
   );
   target.parameters = mutated.type as Model;
+  storeRenamePathParameters(program, target, sourceParameterName, targetParameterName);
 };
 
 function createParamMutator(sourceParameterName: string, targetParameterName: string): Mutator {
