@@ -652,4 +652,47 @@ describe("external types", () => {
     strictEqual(diagnostics.length, 1);
     strictEqual(diagnostics[0].code, "@azure-tools/typespec-client-generator-core/missing-scope");
   });
+
+  it("mismatching external versions", async () => {
+    const diagnostics = (
+      await runner.compileAndDiagnose(`
+      @service
+      namespace MyService {
+        @alternateType({
+          fullyQualifiedName: "collections.StringList",
+          package: "collections-lib",
+          version: "1.0.0"
+        }, "python")
+        model StringArray {
+          items: string[];
+        }
+
+        @alternateType({
+          fullyQualifiedName: "collections.BytesList",
+          package: "collections-lib",
+          version: "1.0.1"
+        }, "python")
+        model BytesArray {
+          items: bytes[];
+        }
+
+        model TestModel {
+          arrays: (StringArray | BytesArray)[];
+        }
+
+        @route("/test")
+        op test(@body body: TestModel): void;
+      };
+    `)
+    )[1];
+    strictEqual(diagnostics.length, 1);
+    strictEqual(
+      diagnostics[0].code,
+      "@azure-tools/typespec-client-generator-core/external-library-version-mismatch",
+    );
+    strictEqual(
+      diagnostics[0].message,
+      "External library version mismatch. There are multiple versions of collections-lib: 1.0.0 and 1.0.1. Please unify the versions.",
+    );
+  });
 });

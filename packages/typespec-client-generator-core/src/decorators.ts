@@ -817,7 +817,34 @@ export function getAlternateType(
   context: TCGCContext,
   source: ModelProperty | Scalar | Model | Enum | Union,
 ): Type | ExternalTypeInfo | undefined {
-  return getScopedDecoratorData(context, alternateTypeKey, source);
+  const retval: Type | ExternalTypeInfo | undefined = getScopedDecoratorData(
+    context,
+    alternateTypeKey,
+    source,
+  );
+  if (retval !== undefined && "fullyQualifiedName" in retval) {
+    if (!context.__externalPackageToVersions) {
+      context.__externalPackageToVersions = new Map();
+    }
+    const externalPackage = retval.package;
+    const externalVersion = retval.version;
+    if (externalPackage && externalVersion) {
+      const existingVersion = context.__externalPackageToVersions.get(externalPackage);
+      if (existingVersion && existingVersion !== externalVersion) {
+        reportDiagnostic(context.program, {
+          code: "external-library-version-mismatch",
+          format: {
+            libraryName: externalPackage,
+            versionA: existingVersion,
+            versionB: externalVersion,
+          },
+          target: source,
+        });
+      }
+      context.__externalPackageToVersions.set(externalPackage, externalVersion);
+    }
+  }
+  return retval;
 }
 
 export const $useSystemTextJsonConverter: DecoratorFunction = (
