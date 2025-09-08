@@ -1,0 +1,525 @@
+---
+title: Multi-Layer Discriminator Hierarchy Building
+---
+
+import { ClientTabs, ClientTabItem } from "@components/client-tabs";
+
+This document explains how to use the `@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding` decorator to create multi-layer inheritance hierarchies in discriminated models.
+
+:::caution
+Legacy hierarchy building is NOT a recommended pattern and should only be used when specifically requested by SDK architects.
+:::
+
+## Overview
+
+The `@hierarchyBuilding` decorator enables client-level multiple levels of inheritance for discriminated models. This decorator modifies the inheritance chain in generated client libraries to create deeper hierarchies than what TypeSpec natively supports.
+
+Use `@hierarchyBuilding` when you need to represent complex inheritance hierarchies in discriminated models where:
+
+- You have multiple levels of inheritance (grandparent → parent → child)
+- You need to share common properties across multiple inheritance levels
+- You have explicit permission from SDK architects
+
+## Basic Three-Level Hierarchy
+
+This example demonstrates a simple three-level inheritance chain: Animal → Pet → Dog.
+
+<ClientTabs>
+<ClientTabItem lang="typespec">
+
+```typespec
+@discriminator("kind")
+model Animal {
+  @doc("The kind of animal")
+  kind: string;
+
+  @doc("Name of the animal")
+  name: string;
+}
+
+alias PetContent = {
+  @doc("Whether the pet is trained")
+  trained: boolean;
+};
+
+model Pet extends Animal {
+  kind: "pet";
+  ...PetContent;
+}
+
+alias DogContent = {
+  @doc("The breed of the dog")
+  breed: string;
+};
+
+@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(Pet)
+model Dog extends Animal {
+  kind: "dog";
+  ...PetContent;
+  ...DogContent;
+}
+```
+
+Without `@hierarchyBuilding`, Dog would extend Animal directly. With the decorator, Dog extends Pet instead, creating the hierarchy: Animal → Pet → Dog.
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+from typing import Literal
+from .. import _model_base
+from .._model_base import rest_discriminator, rest_field
+
+class Animal(_model_base.Model):
+    kind: str = rest_discriminator(name="kind")
+    name: str = rest_field()
+
+class Pet(Animal):
+    kind: Literal["pet"] = rest_discriminator(name="kind")
+    trained: bool = rest_field()
+
+class Dog(Pet):  # Inherits from Pet, not Animal directly
+    kind: Literal["dog"] = rest_discriminator(name="kind")
+    breed: str = rest_field()
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp">
+
+```csharp
+public abstract partial class Animal
+{
+    protected Animal() { }
+    internal string Kind { get; set; }
+    public string Name { get; set; }
+}
+
+public partial class Pet : Animal
+{
+    public Pet() : base()
+    {
+        Kind = "pet";
+    }
+
+    public bool Trained { get; set; }
+}
+
+public partial class Dog : Pet  // Inherits from Pet, not Animal
+{
+    public Dog() : base()
+    {
+        Kind = "dog";
+    }
+
+    public string Breed { get; set; }
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript">
+
+```typescript
+export interface Animal {
+  kind: string;
+  name: string;
+}
+
+export interface Pet extends Animal {
+  kind: "pet";
+  trained: boolean;
+}
+
+export interface Dog extends Pet {
+  // Inherits from Pet, not Animal directly
+  kind: "dog";
+  breed: string;
+}
+
+export type AnimalUnion = Animal | Pet | Dog;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java">
+
+```java
+public class Animal implements JsonSerializable<Animal> {
+    public Animal();
+    public String getKind();
+    public String getName();
+    public Animal setName(String name);
+}
+
+public final class Pet extends Animal {
+    public Pet();
+    public String getKind();
+    public boolean isTrained();
+    public Pet setTrained(boolean trained);
+}
+
+public final class Dog extends Pet {  // Inherits from Pet, not Animal
+    public Dog();
+    public String getKind();
+    public String getBreed();
+    public Dog setBreed(String breed);
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go">
+
+```go
+package models
+
+type Animal struct {
+    Kind string `json:"kind"`
+    Name string `json:"name"`
+}
+
+type Pet struct {
+    Animal
+    Trained bool `json:"trained"`
+}
+
+type Dog struct {
+    Animal
+    Trained bool `json:"trained"`
+    Breed   string `json:"breed"`
+}
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+## Four-Level Hierarchy
+
+This example shows a more complex four-level inheritance chain: Vehicle → MotorVehicle → Car → SportsCar.
+
+<ClientTabs>
+<ClientTabItem lang="typespec">
+
+```typespec
+@discriminator("type")
+model Vehicle {
+  @doc("The type of vehicle")
+  type: string;
+}
+
+alias MotorVehicleContent = {
+  @doc("Engine specification")
+  engine: string;
+};
+
+model MotorVehicle extends Vehicle {
+  type: "motor";
+  ...MotorVehicleContent;
+}
+
+alias CarContent = {
+  @doc("Number of doors")
+  doors: int32;
+};
+
+@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(MotorVehicle)
+model Car extends Vehicle {
+  type: "car";
+  ...MotorVehicleContent;
+  ...CarContent;
+}
+
+@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(Car)
+model SportsCar extends Vehicle {
+  type: "sports";
+  ...MotorVehicleContent;
+  ...CarContent;
+  
+  @doc("Maximum speed in mph")
+  topSpeed: int32;
+}
+```
+
+This creates the hierarchy: Vehicle → MotorVehicle → Car → SportsCar, where:
+- Car inherits from MotorVehicle (due to `@hierarchyBuilding(MotorVehicle)`)
+- SportsCar inherits from Car (due to `@hierarchyBuilding(Car)`)
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+from typing import Literal
+from .. import _model_base
+from .._model_base import rest_discriminator, rest_field
+
+class Vehicle(_model_base.Model):
+    type: str = rest_discriminator(name="type")
+
+class MotorVehicle(Vehicle):
+    type: Literal["motor"] = rest_discriminator(name="type")
+    engine: str = rest_field()
+
+class Car(MotorVehicle):  # Inherits from MotorVehicle
+    type: Literal["car"] = rest_discriminator(name="type")
+    doors: int = rest_field()
+
+class SportsCar(Car):  # Inherits from Car
+    type: Literal["sports"] = rest_discriminator(name="type")
+    top_speed: int = rest_field(name="topSpeed")
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp">
+
+```csharp
+public abstract partial class Vehicle
+{
+    protected Vehicle() { }
+    internal string Type { get; set; }
+}
+
+public partial class MotorVehicle : Vehicle
+{
+    public MotorVehicle() : base()
+    {
+        Type = "motor";
+    }
+
+    public string Engine { get; set; }
+}
+
+public partial class Car : MotorVehicle  // Inherits from MotorVehicle
+{
+    public Car() : base()
+    {
+        Type = "car";
+    }
+
+    public int Doors { get; set; }
+}
+
+public partial class SportsCar : Car  // Inherits from Car
+{
+    public SportsCar() : base()
+    {
+        Type = "sports";
+    }
+
+    public int TopSpeed { get; set; }
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript">
+
+```typescript
+export interface Vehicle {
+  type: string;
+}
+
+export interface MotorVehicle extends Vehicle {
+  type: "motor";
+  engine: string;
+}
+
+export interface Car extends MotorVehicle {
+  // Inherits from MotorVehicle, not Vehicle
+  type: "car";
+  doors: number;
+}
+
+export interface SportsCar extends Car {
+  // Inherits from Car, not Vehicle
+  type: "sports";
+  topSpeed: number;
+}
+
+export type VehicleUnion = Vehicle | MotorVehicle | Car | SportsCar;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java">
+
+```java
+public class Vehicle implements JsonSerializable<Vehicle> {
+    public Vehicle();
+    public String getType();
+}
+
+public final class MotorVehicle extends Vehicle {
+    public MotorVehicle();
+    public String getType();
+    public String getEngine();
+    public MotorVehicle setEngine(String engine);
+}
+
+public final class Car extends MotorVehicle {  // Inherits from MotorVehicle
+    public Car();
+    public String getType();
+    public int getDoors();
+    public Car setDoors(int doors);
+}
+
+public final class SportsCar extends Car {  // Inherits from Car
+    public SportsCar();
+    public String getType();
+    public int getTopSpeed();
+    public SportsCar setTopSpeed(int topSpeed);
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go">
+
+```go
+package models
+
+type Vehicle struct {
+    Type string `json:"type"`
+}
+
+type MotorVehicle struct {
+    Vehicle
+    Engine string `json:"engine"`
+}
+
+type Car struct {
+    Vehicle
+    Engine string `json:"engine"`
+    Doors  int32  `json:"doors"`
+}
+
+type SportsCar struct {
+    Vehicle
+    Engine   string `json:"engine"`
+    Doors    int32  `json:"doors"`
+    TopSpeed int32  `json:"topSpeed"`
+}
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+## Usage in Operations
+
+When using models with hierarchy building in operations, the discriminator field enables polymorphic behavior:
+
+<ClientTabs>
+<ClientTabItem lang="typespec">
+
+```typespec
+interface AnimalOperations {
+  @doc("Update a pet as an animal")
+  @put
+  @route("/pet/as-animal")
+  updatePetAsAnimal(@body animal: Animal): Animal;
+
+  @doc("Update a dog as an animal")
+  @put
+  @route("/dog/as-animal")
+  updateDogAsAnimal(@body animal: Animal): Animal;
+
+  @doc("Update a dog as a pet")
+  @put
+  @route("/dog/as-pet")
+  updateDogAsPet(@body pet: Pet): Pet;
+
+  @doc("Update a dog as a dog")
+  @put
+  @route("/dog/as-dog")
+  updateDogAsDog(@body dog: Dog): Dog;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+# All operations accept the appropriate discriminated types
+def update_pet_as_animal(self, animal: Animal) -> Animal:
+    # Can accept Pet or Dog instances
+    pass
+
+def update_dog_as_animal(self, animal: Animal) -> Animal:
+    # Can accept Animal, Pet, or Dog instances
+    pass
+
+def update_dog_as_pet(self, pet: Pet) -> Pet:
+    # Can accept Pet or Dog instances
+    pass
+
+def update_dog_as_dog(self, dog: Dog) -> Dog:
+    # Only accepts Dog instances
+    pass
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp">
+
+```csharp
+public class AnimalOperations
+{
+    public Animal UpdatePetAsAnimal(Animal animal);
+    public Animal UpdateDogAsAnimal(Animal animal);
+    public Pet UpdateDogAsPet(Pet pet);
+    public Dog UpdateDogAsDog(Dog dog);
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript">
+
+```typescript
+export interface AnimalOperations {
+  updatePetAsAnimal(animal: Animal): Promise<Animal>;
+  updateDogAsAnimal(animal: Animal): Promise<Animal>;
+  updateDogAsPet(pet: Pet): Promise<Pet>;
+  updateDogAsDog(dog: Dog): Promise<Dog>;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java">
+
+```java
+public class AnimalOperations {
+    public Animal updatePetAsAnimal(Animal animal);
+    public Animal updateDogAsAnimal(Animal animal);
+    public Pet updateDogAsPet(Pet pet);
+    public Dog updateDogAsDog(Dog dog);
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go">
+
+```go
+type AnimalOperations interface {
+    UpdatePetAsAnimal(ctx context.Context, animal Animal) (Animal, error)
+    UpdateDogAsAnimal(ctx context.Context, animal Animal) (Animal, error)
+    UpdateDogAsPet(ctx context.Context, pet Pet) (Pet, error)
+    UpdateDogAsDog(ctx context.Context, dog Dog) (Dog, error)
+}
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+## Key Benefits
+
+1. **Property Inheritance**: Child models automatically inherit all properties from their hierarchy chain
+2. **Polymorphic Operations**: Operations can accept base types and automatically handle derived types
+3. **Type Safety**: Client libraries maintain proper type relationships and validation
+4. **Code Reuse**: Common properties and behaviors are shared across the inheritance hierarchy
+
+## Best Practices
+
+1. **Get Approval**: Only use `@hierarchyBuilding` when explicitly requested by SDK architects
+2. **Document Hierarchy**: Clearly document the intended inheritance chain in comments
+3. **Use Aliases**: Define property groups as aliases to make inheritance patterns clear
+4. **Test Thoroughly**: Ensure all inheritance levels work correctly in your target languages
+5. **Consider Alternatives**: Explore composition patterns before resorting to multi-level inheritance
+
+## Limitations
+
+- This is a legacy pattern that may be deprecated in future releases
+- Not all client generators may support complex inheritance hierarchies
+- Can make the type system more complex and harder to understand
+- May have performance implications in some languages
