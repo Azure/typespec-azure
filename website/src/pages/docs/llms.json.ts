@@ -1,10 +1,16 @@
+import { generateLlmsJson } from "@typespec/astro-utils/llmstxt";
 import type { APIRoute } from "astro";
-import { processDocsForTypeSpecLlmsTxt } from "../../utils/process-docs-llms-txt";
+import { collectLlmsDocs, generateLlmsTopics } from "../../utils/llmstxt";
 
 export const GET: APIRoute = async ({ site }) => {
-  const llmsData = await processDocsForTypeSpecLlmsTxt(site);
+  const siteHref = site?.href ?? "";
+  const { libraryNames } = await collectLlmsDocs();
 
-  return new Response(JSON.stringify(llmsData), {
+  const topicsDetails = generateLlmsTopics({ libraryNames, skipPopulateDocs: true });
+
+  const llmsJson = generateLlmsJson(topicsDetails, siteHref);
+
+  return new Response(JSON.stringify(llmsJson, null, 2), {
     headers: {
       "Content-Type": "application/json; charset=utf-8",
     },

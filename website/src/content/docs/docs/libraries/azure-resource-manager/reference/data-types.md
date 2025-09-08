@@ -1,8 +1,6 @@
 ---
 title: "Data types"
-llmstxt:
-  title: "@azure-tools/typespec-azure-resource-manager - Data types"
-  description: "Data types exported by @azure-tools/typespec-azure-resource-manager"
+description: "Data types exported by @azure-tools/typespec-azure-resource-manager"
 ---
 
 ## Azure.ResourceManager

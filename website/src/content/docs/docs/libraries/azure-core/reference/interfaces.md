@@ -1,5 +1,6 @@
 ---
 title: "Interfaces and Operations"
+description: "Interfaces and Operations exported by @azure-tools/typespec-azure-core"
 ---
 
 ## Azure.Core

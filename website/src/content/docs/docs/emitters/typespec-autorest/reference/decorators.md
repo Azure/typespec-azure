@@ -1,10 +1,8 @@
 ---
 title: "Decorators"
+description: "Decorators exported by @azure-tools/typespec-autorest"
 toc_min_heading_level: 2
 toc_max_heading_level: 3
-llmstxt:
-  title: "@azure-tools/typespec-autorest - Decorators"
-  description: "Decorators exported by @azure-tools/typespec-autorest"
 ---
 
 ## Autorest

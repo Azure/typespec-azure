@@ -1,8 +1,6 @@
 ---
 title: "Data types"
-llmstxt:
-  title: "@azure-tools/typespec-azure-core - Data types"
-  description: "Data types exported by @azure-tools/typespec-azure-core"
+description: "Data types exported by @azure-tools/typespec-azure-core"
 ---
 
 ## Azure.Core
