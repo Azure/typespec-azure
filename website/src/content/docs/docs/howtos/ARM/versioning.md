@@ -1,7 +1,7 @@
 ---
 title: Versioning
-llmstxt:
-  description: Managing versioning for ARM services
+description: Managing versioning for ARM services
+llmstxt: true
 ---
 
 This document explains how to manage versioning in TypeSpec projects, including how to add, remove, or modify resources, operations, and properties across API versions.

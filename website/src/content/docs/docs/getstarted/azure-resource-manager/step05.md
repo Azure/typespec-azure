@@ -1,8 +1,7 @@
 ---
 title: 6. Complete Example and Generate OpenApi 2.0 spec
-llmstxt:
-  title: ARM getting started 06
-  description: Complete ARM example
+description: Complete ARM example
+llmstxt: true
 ---
 
 To generate an OpenAPI v2 (Swagger) specification from the service definition, run the following command inside of the project folder:

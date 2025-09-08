@@ -1,8 +1,7 @@
 ---
 title: 2. Create the service namespace
-llmstxt:
-  title: Data-plane getting started 02
-  description: Describing a data-plane service
+description: Describing a data-plane service
+llmstxt: true
 ---
 
 To describe a service, you first need to define a "blockless" (file-level, no curly braces) namespace and use the `@service` decorator to mark it as the service namespace:

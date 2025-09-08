@@ -1,5 +1,7 @@
 ---
 title: ARM Resource Operations
+description: Recommended and required operations
+llmstxt: true
 ---
 
 ## Recommended and Required Operations

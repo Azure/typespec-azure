@@ -1,8 +1,7 @@
 ---
 title: Advanced Topics
-llmstxt:
-  title: Data-plane advanced topics
-  description: Defining singleton resources
+description: Defining singleton resources
+llmstxt: true
 ---
 
 Once you have written your first service with `Azure.Core`, you might be interested to try the following features:

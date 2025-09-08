@@ -1,8 +1,7 @@
 ---
 title: 5. Defining Custom Actions
-llmstxt:
-  title: ARM getting started 05
-  description: Defining custom actions on ARM resources
+description: Defining custom actions on ARM resources
+llmstxt: true
 ---
 
 Some resources will provide more than the standard CRUD operations and will need to define a custom action endpoint. Additional resource operations can be added to the `interface` where you defined standard resource operations, using the `ArmResourceAction` templates.

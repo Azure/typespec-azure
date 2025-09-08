@@ -1,8 +1,7 @@
 ---
 title: 1. Writing Your First Service
-llmstxt:
-  title: Data-plane getting started 01
-  description: Creating a data-plane service
+description: Creating a data-plane service
+llmstxt: true
 ---
 
 The Azure Data Plane Service template will create a very basic TypeSpec file in `main.tsp`:

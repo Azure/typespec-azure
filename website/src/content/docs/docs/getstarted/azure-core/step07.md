@@ -1,8 +1,7 @@
 ---
-title: 7. Defining child resources
-llmstxt:
-  title: Data-plane getting started 07
-  description: Defining child resources
+title: 7. Defining child resources\
+description: Defining child resources
+llmstxt: true
 ---
 
 Sometimes your resource types will need to have child resources that relate to their parent types. You can identify that a resource type is the child of another resource by using the `@parentResource` decorator.

@@ -67,7 +67,7 @@ export function generateLlmsTopics({
       pathPrefix: "docs/getstarted/azure-resource-manager/",
     },
     {
-      title: "Getting Started - Azure Core",
+      title: "Getting Started - Azure Data Plane",
       id: "typespec-azure-data-plane-getting-started",
       description: "Overview of writing Azure Data Plane services in TypeSpec",
       pathPrefix: "docs/getstarted/azure-core/",

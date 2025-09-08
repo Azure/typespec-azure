@@ -1,8 +1,7 @@
 ---
 title: 10. Versioning
-llmstxt:
-  title: Data-plane getting started 10
-  description: Versioning your data-plane service
+description: Versioning your data-plane service
+llmstxt: true
 ---
 
 ## Versioning your service
