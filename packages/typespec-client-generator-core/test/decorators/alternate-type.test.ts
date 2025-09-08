@@ -401,7 +401,7 @@ describe("external types", () => {
         @alternateType({
           identity: "pystac.Collection",
           package: "pystac",
-          version: "1.13.0",
+          minVersion: "1.13.0",
         }, "python")
         model ItemCollection {
           /**
