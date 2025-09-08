@@ -233,7 +233,7 @@ interface ExternalType {
 export interface ExternalTypeInfo {
   identity: string;
   package?: string;
-  version?: string;
+  minVersion?: string;
 }
 
 interface SdkTypeBase extends DecoratedType, ExternalType {

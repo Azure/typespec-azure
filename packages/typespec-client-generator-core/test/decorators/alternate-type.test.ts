@@ -463,7 +463,7 @@ describe("external types", () => {
     strictEqual(itemCollection?.kind, "model");
     strictEqual(itemCollection.external?.identity, "pystac.Collection");
     strictEqual(itemCollection.external?.package, "pystac");
-    strictEqual(itemCollection.external?.version, "1.13.0");
+    strictEqual(itemCollection.external?.minVersion, "1.13.0");
   });
 
   it("should support external type for scalar", async () => {
@@ -493,7 +493,7 @@ describe("external types", () => {
     const dateProperty = testModel.properties.find((p) => p.name === "date");
     strictEqual(dateProperty?.type.external?.identity, "System.DateOnly");
     strictEqual(dateProperty?.type.external?.package, "System.Runtime");
-    strictEqual(dateProperty?.type.external?.version, undefined);
+    strictEqual(dateProperty?.type.external?.minVersion, undefined);
   });
 
   it("should support external type for enum", async () => {
@@ -503,7 +503,7 @@ describe("external types", () => {
         @alternateType({
           identity: "MyLibrary.Status",
           package: "my-enum-lib",
-          version: "1.5.0",
+          minVersion: "1.5.0",
         }, "python")
         enum StatusEnum {
           Active,
@@ -528,7 +528,7 @@ describe("external types", () => {
     strictEqual(statusProperty?.type.kind, "enum");
     strictEqual(statusProperty?.type.external?.identity, "MyLibrary.Status");
     strictEqual(statusProperty?.type.external?.package, "my-enum-lib");
-    strictEqual(statusProperty?.type.external?.version, "1.5.0");
+    strictEqual(statusProperty?.type.external?.minVersion, "1.5.0");
   });
 
   it("should support external type with minimal information", async () => {
@@ -552,7 +552,7 @@ describe("external types", () => {
     strictEqual(simpleModel?.kind, "model");
     strictEqual(simpleModel.external?.identity, "ExternalType");
     strictEqual(simpleModel.external?.package, undefined);
-    strictEqual(simpleModel.external?.version, undefined);
+    strictEqual(simpleModel.external?.minVersion, undefined);
   });
 
   it("should support scoped external types", async () => {
@@ -661,7 +661,7 @@ describe("external types", () => {
         @alternateType({
           identity: "collections.StringList",
           package: "collections-lib",
-          version: "1.0.0"
+          minVersion: "1.0.0"
         }, "python")
         model StringArray {
           items: string[];
@@ -670,7 +670,7 @@ describe("external types", () => {
         @alternateType({
           identity: "collections.BytesList",
           package: "collections-lib",
-          version: "1.0.1"
+          minVersion: "1.0.1"
         }, "python")
         model BytesArray {
           items: bytes[];

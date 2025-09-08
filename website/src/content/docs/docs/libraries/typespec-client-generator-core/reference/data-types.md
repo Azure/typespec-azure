@@ -42,11 +42,11 @@ model Azure.ClientGenerator.Core.ExternalType
 
 #### Properties
 
-| Name     | Type     | Description |
-| -------- | -------- | ----------- |
-| identity | `string` |             |
-| package? | `string` |             |
-| version? | `string` |             |
+| Name        | Type     | Description |
+| ----------- | -------- | ----------- |
+| identity    | `string` |             |
+| package?    | `string` |             |
+| minVersion? | `string` |             |
 
 ### `Access` {#Azure.ClientGenerator.Core.Access}
 

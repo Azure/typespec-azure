@@ -615,7 +615,7 @@ extern dec clientNamespace(
 model ExternalType {
   identity: string;
   package?: string;
-  version?: string;
+  minVersion?: string;
 }
 
 /**
@@ -672,7 +672,7 @@ model ExternalType {
  * @alternateType({
  *   identity: "pystac.Collection",
  *   package: "pystac",
- *   version: "1.13.0",
+ *   minVersion: "1.13.0",
  * }, "python")
  * model ItemCollection {
  *   // ... properties

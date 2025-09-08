@@ -358,7 +358,7 @@ union Dfe<T> {
   {
     identity: "pystac.Collection",
     package: "pystac",
-    version: "1.13.0",
+    minVersion: "1.13.0",
   },
   "python"
 )

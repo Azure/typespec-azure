@@ -769,8 +769,8 @@ export const $alternateType: AlternateTypeDecorator = (
       .filter((x) => x.kind === "String")
       .map((x) => x.value)[0];
 
-    const version = alternatePropertyValues
-      .filter((x) => x.name === "version")
+    const minVersion = alternatePropertyValues
+      .filter((x) => x.name === "minVersion")
       .map((x) => x.type)
       .filter((x) => x.kind === "String")
       .map((x) => x.value)[0];
@@ -778,7 +778,7 @@ export const $alternateType: AlternateTypeDecorator = (
     alternateInput = {
       identity,
       package: packageName,
-      version,
+      minVersion,
     };
   } else {
     // Not external type
@@ -826,21 +826,21 @@ export function getAlternateType(
       context.__externalPackageToVersions = new Map();
     }
     const externalPackage = retval.package;
-    const externalVersion = retval.version;
-    if (externalPackage && externalVersion) {
+    const externalMinVersion = retval.minVersion;
+    if (externalPackage && externalMinVersion) {
       const existingVersion = context.__externalPackageToVersions.get(externalPackage);
-      if (existingVersion && existingVersion !== externalVersion) {
+      if (existingVersion && existingVersion !== externalMinVersion) {
         reportDiagnostic(context.program, {
           code: "external-library-version-mismatch",
           format: {
             libraryName: externalPackage,
             versionA: existingVersion,
-            versionB: externalVersion,
+            versionB: externalMinVersion,
           },
           target: source,
         });
       }
-      context.__externalPackageToVersions.set(externalPackage, externalVersion);
+      context.__externalPackageToVersions.set(externalPackage, externalMinVersion);
     }
   }
   return retval;
