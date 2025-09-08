@@ -620,10 +620,12 @@ model ExternalType {
    * The identity of the external type. For example, `pystac.Collection`
    */
   identity: string;
+
   /**
    * The package that exports the external type. For example, `pystac`
    */
   package?: string;
+
   /**
    * The minimum version of the package to use for your external type. For example, `1.13.0`
    */
