@@ -756,9 +756,9 @@ export const $alternateType: AlternateTypeDecorator = (
     }
 
     const alternatePropertyValues = [...alternate.properties.values()];
-    // Get fullyQualifiedName if needed
-    const fullyQualifiedName = alternatePropertyValues
-      .filter((x) => x.name === "fullyQualifiedName")
+    // Get identity if needed
+    const identity = alternatePropertyValues
+      .filter((x) => x.name === "identity")
       .map((x) => x.type)
       .filter((x) => x.kind === "String")
       .map((x) => x.value)[0];
@@ -776,7 +776,7 @@ export const $alternateType: AlternateTypeDecorator = (
       .map((x) => x.value)[0];
 
     alternateInput = {
-      fullyQualifiedName,
+      identity,
       package: packageName,
       version,
     };
@@ -821,7 +821,7 @@ export function getAlternateType(
     alternateTypeKey,
     source,
   );
-  if (retval !== undefined && "fullyQualifiedName" in retval) {
+  if (retval !== undefined && "identity" in retval) {
     if (!context.__externalPackageToVersions) {
       context.__externalPackageToVersions = new Map();
     }

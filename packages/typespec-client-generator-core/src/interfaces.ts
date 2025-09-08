@@ -231,7 +231,7 @@ interface ExternalType {
 }
 
 export interface ExternalTypeInfo {
-  fullyQualifiedName: string;
+  identity: string;
   package?: string;
   version?: string;
 }

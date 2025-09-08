@@ -353,7 +353,7 @@ describe("external types", () => {
       @service
       namespace MyService {
         @alternateType({
-          fullyQualifiedName: "Azure.Core.Expressions.DataFactoryExpression",
+          identity: "Azure.Core.Expressions.DataFactoryExpression",
         }, "csharp")
         union Dfe<T> {
           T,
@@ -389,7 +389,7 @@ describe("external types", () => {
     const dimension = runDimensionsProperty.type;
     strictEqual(dimension.additionalProperties?.kind, "union");
     strictEqual(
-      dimension.additionalProperties.external?.fullyQualifiedName,
+      dimension.additionalProperties.external?.identity,
       "Azure.Core.Expressions.DataFactoryExpression",
     );
   });
@@ -399,7 +399,7 @@ describe("external types", () => {
       @service
       namespace MyService {
         @alternateType({
-          fullyQualifiedName: "pystac.Collection",
+          identity: "pystac.Collection",
           package: "pystac",
           version: "1.13.0",
         }, "python")
@@ -461,7 +461,7 @@ describe("external types", () => {
     const models = getAllModels(runner.context);
     const itemCollection = models.find((m) => m.name === "ItemCollection");
     strictEqual(itemCollection?.kind, "model");
-    strictEqual(itemCollection.external?.fullyQualifiedName, "pystac.Collection");
+    strictEqual(itemCollection.external?.identity, "pystac.Collection");
     strictEqual(itemCollection.external?.package, "pystac");
     strictEqual(itemCollection.external?.version, "1.13.0");
   });
@@ -472,7 +472,7 @@ describe("external types", () => {
       @service
       namespace MyService {
         @alternateType({
-          fullyQualifiedName: "System.DateOnly",
+          identity: "System.DateOnly",
           package: "System.Runtime",
         }, "java")
         scalar CustomDate extends string;
@@ -491,7 +491,7 @@ describe("external types", () => {
     strictEqual(testModel?.kind, "model");
 
     const dateProperty = testModel.properties.find((p) => p.name === "date");
-    strictEqual(dateProperty?.type.external?.fullyQualifiedName, "System.DateOnly");
+    strictEqual(dateProperty?.type.external?.identity, "System.DateOnly");
     strictEqual(dateProperty?.type.external?.package, "System.Runtime");
     strictEqual(dateProperty?.type.external?.version, undefined);
   });
@@ -501,7 +501,7 @@ describe("external types", () => {
       @service
       namespace MyService {
         @alternateType({
-          fullyQualifiedName: "MyLibrary.Status",
+          identity: "MyLibrary.Status",
           package: "my-enum-lib",
           version: "1.5.0",
         }, "python")
@@ -526,7 +526,7 @@ describe("external types", () => {
 
     const statusProperty = testModel.properties.find((p) => p.name === "status");
     strictEqual(statusProperty?.type.kind, "enum");
-    strictEqual(statusProperty?.type.external?.fullyQualifiedName, "MyLibrary.Status");
+    strictEqual(statusProperty?.type.external?.identity, "MyLibrary.Status");
     strictEqual(statusProperty?.type.external?.package, "my-enum-lib");
     strictEqual(statusProperty?.type.external?.version, "1.5.0");
   });
@@ -536,7 +536,7 @@ describe("external types", () => {
       @service
       namespace MyService {
         @alternateType({
-          fullyQualifiedName: "ExternalType",
+          identity: "ExternalType",
         }, "python")
         model SimpleModel {
           value: string;
@@ -550,7 +550,7 @@ describe("external types", () => {
     const models = getAllModels(runner.context);
     const simpleModel = models.find((m) => m.name === "SimpleModel");
     strictEqual(simpleModel?.kind, "model");
-    strictEqual(simpleModel.external?.fullyQualifiedName, "ExternalType");
+    strictEqual(simpleModel.external?.identity, "ExternalType");
     strictEqual(simpleModel.external?.package, undefined);
     strictEqual(simpleModel.external?.version, undefined);
   });
@@ -563,11 +563,11 @@ describe("external types", () => {
       @service
       namespace MyService {
         @alternateType({
-          fullyQualifiedName: "python_module.PythonType",
+          identity: "python_module.PythonType",
           package: "python-package",
         }, "python")
         @alternateType({
-          fullyQualifiedName: "CSharp.Namespace.CSharpType",
+          identity: "CSharp.Namespace.CSharpType",
           package: "CSharp.Package",
         }, "csharp")
         model CrossLanguageModel {
@@ -584,12 +584,12 @@ describe("external types", () => {
 
     const pythonModels = getAllModels(pythonRunner.context);
     const pythonModel = pythonModels.find((m) => m.name === "CrossLanguageModel");
-    strictEqual(pythonModel?.external?.fullyQualifiedName, "python_module.PythonType");
+    strictEqual(pythonModel?.external?.identity, "python_module.PythonType");
     strictEqual(pythonModel?.external?.package, "python-package");
 
     const csharpModels = getAllModels(csharpRunner.context);
     const csharpModel = csharpModels.find((m) => m.name === "CrossLanguageModel");
-    strictEqual(csharpModel?.external?.fullyQualifiedName, "CSharp.Namespace.CSharpType");
+    strictEqual(csharpModel?.external?.identity, "CSharp.Namespace.CSharpType");
     strictEqual(csharpModel?.external?.package, "CSharp.Package");
   });
 
@@ -598,7 +598,7 @@ describe("external types", () => {
       @service
       namespace MyService {
         @alternateType({
-          fullyQualifiedName: "CustomList",
+          identity: "CustomList",
           package: "collections-lib",
         }, "python")
         model StringArray {
@@ -623,7 +623,7 @@ describe("external types", () => {
 
     const arrayElementType = (arraysProperty?.type as SdkArrayType).valueType;
     strictEqual(arrayElementType.kind, "model");
-    strictEqual(arrayElementType.external?.fullyQualifiedName, "CustomList");
+    strictEqual(arrayElementType.external?.identity, "CustomList");
     strictEqual(arrayElementType.external?.package, "collections-lib");
   });
 
@@ -633,7 +633,7 @@ describe("external types", () => {
       @service
       namespace MyService {
         @alternateType({
-          fullyQualifiedName: "CustomList",
+          identity: "CustomList",
           package: "collections-lib",
         })
         model StringArray {
@@ -659,7 +659,7 @@ describe("external types", () => {
       @service
       namespace MyService {
         @alternateType({
-          fullyQualifiedName: "collections.StringList",
+          identity: "collections.StringList",
           package: "collections-lib",
           version: "1.0.0"
         }, "python")
@@ -668,7 +668,7 @@ describe("external types", () => {
         }
 
         @alternateType({
-          fullyQualifiedName: "collections.BytesList",
+          identity: "collections.BytesList",
           package: "collections-lib",
           version: "1.0.1"
         }, "python")

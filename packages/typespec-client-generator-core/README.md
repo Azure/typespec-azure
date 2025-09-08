@@ -341,7 +341,7 @@ model Test {
 ```typespec
 @alternateType(
   {
-    fullyQualifiedName: "Azure.Core.Expressions.DataFactoryExpression",
+    identity: "Azure.Core.Expressions.DataFactoryExpression",
   },
   "csharp"
 )
@@ -356,7 +356,7 @@ union Dfe<T> {
 ```typespec
 @alternateType(
   {
-    fullyQualifiedName: "pystac.Collection",
+    identity: "pystac.Collection",
     package: "pystac",
     version: "1.13.0",
   },
