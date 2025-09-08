@@ -263,6 +263,13 @@ export const $lib = createTypeSpecLibrary({
         nonDecorator: paramMessage`Client name: "${"name"}" is defined somewhere causing naming conflicts in language scope: "${"scope"}"`,
       },
     },
+    "client-name-ineffective": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Application of @clientName decorator to ${"name"} is not effective`,
+        override: paramMessage`Application of @clientName decorator to ${"name"} is not effective because it is applied to the override method. Please apply it on the original method definition "${"originalMethodName"}" instead.`,
+      },
+    },
     "example-loading": {
       severity: "warning",
       messages: {

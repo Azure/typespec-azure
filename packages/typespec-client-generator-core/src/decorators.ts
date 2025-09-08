@@ -67,6 +67,7 @@ import {
   negationScopesKey,
   omitOperation,
   operationGroupKey,
+  overrideKey,
   scopeKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
@@ -622,8 +623,6 @@ export function getClientNameOverride(
 ): string | undefined {
   return getScopedDecoratorData(context, clientNameKey, entity, languageScope);
 }
-
-const overrideKey = createStateSymbol("override");
 
 // Recursive function to collect parameter names
 function collectParams(
