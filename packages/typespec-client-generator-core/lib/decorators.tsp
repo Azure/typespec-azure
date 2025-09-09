@@ -403,26 +403,6 @@ extern dec access(
 );
 
 /**
- * Set whether a model property should be flattened or not.
- * This decorator is not recommended to use for green field services.
- * @param target The target model property that you want to flatten.
- * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
- *
- * @example
- * ```typespec
- * model Foo {
- *    @flattenProperty
- *    prop: Bar;
- * }
- * model Bar {
- * }
- * ```
- */
-#deprecated "@flattenProperty decorator is not recommended to use."
-extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
-
-/**
  * Customize a method's signature in the generated client SDK.
  * Currently, only parameter signature customization is supported.
  * This decorator allows you to specify a different method signature for the client SDK than the original definition.
