@@ -323,7 +323,6 @@ export async function getOpenAPIForService(
     "x-ms-paths": {},
     definitions: {},
     parameters: {},
-    "x-custom-test": "Abc",
   };
 
   let currentEndpoint: OpenAPI2Operation;
