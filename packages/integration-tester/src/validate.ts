@@ -6,7 +6,7 @@ import { dirname, relative } from "pathe";
 import pc from "picocolors";
 import type { IntegrationTestSuite } from "./config/types.js";
 import type { TaskRunner } from "./runner.js";
-import { log } from "./utils.js";
+import { log, ValidationFailedError } from "./utils.js";
 
 // Number of parallel TypeSpec compilations to run
 const COMPILATION_CONCURRENCY = cpus().length;
@@ -63,8 +63,7 @@ export async function validateSpecs(
     log("\nFailed folders:");
     failedFolders.forEach((x) => log(`  - ${relative(dir, x)}`));
 
-    // Exit with failure code to make the GitHub Actions job fail
-    process.exit(1);
+    throw new ValidationFailedError();
   }
 }
 
