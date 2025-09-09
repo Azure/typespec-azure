@@ -44,3 +44,22 @@ namespace Azure.ClientGenerator.Core.Legacy;
  * ```
  */
 extern dec hierarchyBuilding(target: Model, value: Model, scope?: valueof string);
+
+/**
+ * Set whether a model property should be flattened or not.
+ * This decorator is not recommended to use for green field services.
+ * @param target The target model property that you want to flatten.
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * @example
+ * ```typespec
+ * model Foo {
+ *    @flattenProperty
+ *    prop: Bar;
+ * }
+ * model Bar {
+ * }
+ * ```
+ */
+extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
