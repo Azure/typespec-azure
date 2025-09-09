@@ -2082,15 +2082,16 @@ Azure Resource Manager service. It implements
 GET "/providers/{provider-namespace}/operations"
 
 ```typespec
-interface Azure.ResourceManager.Legacy.Operations<Response, Error>
+interface Azure.ResourceManager.Legacy.Operations<Response, Error, Parameters>
 ```
 
 #### Template Parameters
 
-| Name     | Description                                        |
-| -------- | -------------------------------------------------- |
-| Response | The response returned by the operation list.       |
-| Error    | the error response returned by the operation list. |
+| Name       | Description                                           |
+| ---------- | ----------------------------------------------------- |
+| Response   | The response returned by the operation list.          |
+| Error      | the error response returned by the operation list.    |
+| Parameters | Additional request parameters for the list operation. |
 
 #### `Operations.list` {#Azure.ResourceManager.Legacy.Operations.list}
 

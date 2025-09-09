@@ -16,10 +16,12 @@ using Rest;
  *
  * @template Response The response returned by the operation list.
  * @template Error the error response returned by the operation list.
+ * @template Parameters Additional request parameters for the list operation.
  */
 interface Operations<
   Response extends {} = ArmResponse<OperationListResult>,
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  Parameters extends {} = {}
 > {
   @tag("Operations")
   @autoRoute
@@ -35,5 +37,7 @@ interface Operations<
     @segment("providers")
     @doc("The provider namespace (this parameter will not show up in operations).")
     provider: "Microsoft.ThisWillBeReplaced",
+
+    ...Parameters,
   ): Response | Error;
 }
