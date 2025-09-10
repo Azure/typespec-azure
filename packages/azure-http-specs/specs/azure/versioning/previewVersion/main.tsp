@@ -1,50 +1,43 @@
-import "@typespec/spector";
-import "@azure-tools/typespec-azure-core";
-import "@azure-tools/typespec-client-generator-core";
+/**
+ * Test for @previewVersion decorator functionality
+ * This verifies that emitters correctly handle preview versions
+ */
 import "@typespec/http";
-import "@typespec/rest";
 import "@typespec/versioning";
+import "@azure-tools/typespec-azure-core";
+import "@typespec/spector";
+import "@azure-tools/typespec-client-generator-core";
 
+using Http;
+using Versioning;
 using Azure.Core;
-using global.Azure.Core.Traits;
-using global.Azure.Core.Foundations;
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
+using Azure.ClientGenerator.Core;
 using Spector;
 
-#suppress "@azure-tools/typespec-azure-core/casing-style" "For spec"
-@doc("Testing @previewVersion decorator with Azure Core versioning")
 @scenarioService(
   "/azure/versioning/previewVersion",
   {
     versioned: ApiVersions,
   }
 )
-namespace _Specs_.Azure.Versioning.PreviewVersion;
+namespace Azure.Versioning.PreviewVersion;
 
 @doc("Supported api versions including preview.")
 enum ApiVersions {
   @doc("Api version 2024-01-01.")
-  @useDependency(global.Azure.Core.Versions.v1_0_Preview_2)
   v2024_01_01: "2024-01-01",
   
   @doc("Api version 2024-06-01.")
-  @useDependency(global.Azure.Core.Versions.v1_0_Preview_2)
   v2024_06_01: "2024-06-01",
   
   @doc("Preview api version 2024-12-01-preview.")
-  @useDependency(global.Azure.Core.Versions.v1_0_Preview_2)
   @Azure.Core.previewVersion
   v2024_12_01_preview: "2024-12-01-preview",
 }
 
-@resource("widgets")
 @doc("A simple model for testing.")
 model Widget {
-  @key
   @doc("Widget identifier.")
-  @visibility(Lifecycle.Read)
   id: string;
   
   @doc("Widget name.")
@@ -53,13 +46,7 @@ model Widget {
   @doc("Widget color, only available in preview version.")
   @added(ApiVersions.v2024_12_01_preview)
   color?: string;
-
-  ...global.Azure.Core.EtagProperty;
 }
-
-alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalRequests &
-  NoRepeatableRequests &
-  NoClientRequestId>;
 
 @scenario
 @scenarioDoc("""
@@ -79,7 +66,9 @@ alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalReq
   ```
   """)
 @doc("Get widget by id (available in all versions)")
-op getWidget is ResourceOperations.ResourceRead<Widget>;
+@get
+@route("/widgets/{id}")
+op getWidget(@path id: string): Widget | NotFoundResponse;
 
 @doc("Update widget color request.")
 model UpdateWidgetColorRequest {
@@ -112,8 +101,13 @@ model UpdateWidgetColorRequest {
   ```
   """)
 @doc("Update widget color (preview only)")
+@patch
+@route("/widgets/{id}/color")
 @added(ApiVersions.v2024_12_01_preview)
-op updateWidgetColor is ResourceOperations.ResourceAction<Widget, UpdateWidgetColorRequest, Widget>;
+op updateWidgetColor(
+  @path id: string,
+  @body colorUpdate: UpdateWidgetColorRequest
+): Widget | NotFoundResponse;
 
 @scenario
 @scenarioDoc("""
@@ -126,7 +120,7 @@ op updateWidgetColor is ResourceOperations.ResourceAction<Widget, UpdateWidgetCo
   Expected response body:
   ```json
   {
-    "value": [
+    "widgets": [
       {
         "id": "widget-1",
         "name": "test",
@@ -137,16 +131,11 @@ op updateWidgetColor is ResourceOperations.ResourceAction<Widget, UpdateWidgetCo
   ```
   """)
 @doc("List widgets with optional color filtering")
-op listWidgets is ResourceOperations.ResourceList<
-  Widget,
-  ListQueryParametersTrait<{
-    @doc("Filter by widget name")
-    @query 
-    name?: string;
-    
-    @doc("Filter by widget color (preview only)")
-    @query
-    @added(ApiVersions.v2024_12_01_preview)
-    color?: string;
-  }>
->;
+@get
+@route("/widgets")
+op listWidgets(
+  @query name?: string,
+  @query @added(ApiVersions.v2024_12_01_preview) color?: string
+): {
+  widgets: Widget[];
+};

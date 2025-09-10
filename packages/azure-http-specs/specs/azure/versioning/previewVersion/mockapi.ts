@@ -2,20 +2,6 @@ import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
-const validWidget = { 
-  id: "widget-123", 
-  name: "Sample Widget", 
-  etag: "11bdc430-65e8-45ad-81d9-8ffa60d55b59",
-  color: "blue"
-};
-
-const validWidgetUpdated = { 
-  id: "widget-123", 
-  name: "Sample Widget", 
-  etag: "22bdc430-65e8-45ad-81d9-8ffa60d55b5a",
-  color: "red"
-};
-
 // Test @previewVersion with stable operations - should work across all versions
 Scenarios.Azure_Versioning_PreviewVersion_getWidget = passOnSuccess({
   uri: "/azure/versioning/previewVersion/widgets/:id",
@@ -30,7 +16,11 @@ Scenarios.Azure_Versioning_PreviewVersion_getWidget = passOnSuccess({
   },
   response: {
     status: 200,
-    body: json(validWidget),
+    body: json({
+      id: "widget-123",
+      name: "Sample Widget",
+      color: "blue",
+    }),
   },
   kind: "MockApiDefinition",
 });
@@ -38,7 +28,7 @@ Scenarios.Azure_Versioning_PreviewVersion_getWidget = passOnSuccess({
 // Test @previewVersion with preview-only operations - only available in preview version
 Scenarios.Azure_Versioning_PreviewVersion_updateWidgetColor = passOnSuccess({
   uri: "/azure/versioning/previewVersion/widgets/:id/color",
-  method: "post",
+  method: "patch",
   request: {
     pathParams: {
       id: "widget-123",
@@ -52,7 +42,11 @@ Scenarios.Azure_Versioning_PreviewVersion_updateWidgetColor = passOnSuccess({
   },
   response: {
     status: 200,
-    body: json(validWidgetUpdated),
+    body: json({
+      id: "widget-123",
+      name: "Sample Widget",
+      color: "red",
+    }),
   },
   kind: "MockApiDefinition",
 });
@@ -71,11 +65,10 @@ Scenarios.Azure_Versioning_PreviewVersion_listWidgets = passOnSuccess({
   response: {
     status: 200,
     body: json({
-      value: [
+      widgets: [
         {
           id: "widget-1",
           name: "test",
-          etag: "33bdc430-65e8-45ad-81d9-8ffa60d55b5c",
           color: "blue",
         },
       ],
