@@ -54,6 +54,7 @@ Scenarios.Azure_Versioning_PreviewVersion_updateWidgetColor = passOnSuccess({
 });
 
 // Test @previewVersion with version-specific query parameters
+// api-version "2024-06-01" is stable, so color is not expected in the response
 Scenarios.Azure_Versioning_PreviewVersion_listWidgets = passOnSuccess({
   uri: "/azure/versioning/previewVersion/widgets",
   method: "get",
