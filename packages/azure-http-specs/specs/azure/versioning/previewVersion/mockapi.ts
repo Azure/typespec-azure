@@ -3,6 +3,7 @@ import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
 // Test @previewVersion with stable operations - should work across all versions
+// Color is expected in the response because we are passing api-version "2024-12-01-preview"
 Scenarios.Azure_Versioning_PreviewVersion_getWidget = passOnSuccess({
   uri: "/azure/versioning/previewVersion/widgets/:id",
   method: "get",
@@ -26,6 +27,7 @@ Scenarios.Azure_Versioning_PreviewVersion_getWidget = passOnSuccess({
 });
 
 // Test @previewVersion with preview-only operations - only available in preview version
+// This operation can be called because the request uses api-version "2024-12-01-preview"
 Scenarios.Azure_Versioning_PreviewVersion_updateWidgetColor = passOnSuccess({
   uri: "/azure/versioning/previewVersion/widgets/:id/color",
   method: "patch",
@@ -57,9 +59,8 @@ Scenarios.Azure_Versioning_PreviewVersion_listWidgets = passOnSuccess({
   method: "get",
   request: {
     query: {
-      "api-version": "2024-12-01-preview",
+      "api-version": "2024-06-01",
       name: "test",
-      color: "blue",
     },
   },
   response: {
@@ -69,7 +70,6 @@ Scenarios.Azure_Versioning_PreviewVersion_listWidgets = passOnSuccess({
         {
           id: "widget-1",
           name: "test",
-          color: "blue",
         },
       ],
     }),

@@ -9,9 +9,7 @@ import "@typespec/spector";
 import "@azure-tools/typespec-client-generator-core";
 
 using Http;
-using Versioning;
-using Azure.Core;
-using Azure.ClientGenerator.Core;
+using TypeSpec.Versioning;
 using Spector;
 
 @scenarioService(
@@ -20,7 +18,7 @@ using Spector;
     versioned: ApiVersions,
   }
 )
-namespace Azure.Versioning.PreviewVersion;
+namespace _Specs_.Azure.Versioning.PreviewVersion;
 
 @doc("Supported api versions including preview.")
 enum ApiVersions {
@@ -101,7 +99,7 @@ model UpdateWidgetColorRequest {
   ```
   """)
 @doc("Update widget color (preview only)")
-@patch
+@patch(#{implicitOptionality: true})
 @route("/widgets/{id}/color")
 @added(ApiVersions.v2024_12_01_preview)
 op updateWidgetColor(
@@ -114,8 +112,8 @@ op updateWidgetColor(
   Test @previewVersion decorator with version-specific query parameters.
   Should handle optional preview features gracefully.
   
-  Expected query parameter: api-version=2024-12-01-preview
-  Expected query parameter: name=test&color=blue (color only in preview)
+  Expected query parameter: api-version=2024-06-01
+  Expected query parameter: name=test (color not available in stable version)
   
   Expected response body:
   ```json
@@ -123,8 +121,7 @@ op updateWidgetColor(
     "widgets": [
       {
         "id": "widget-1",
-        "name": "test",
-        "color": "blue"
+        "name": "test"
       }
     ]
   }
