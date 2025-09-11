@@ -38,6 +38,9 @@ Scenarios.Azure_Versioning_PreviewVersion_updateWidgetColor = passOnSuccess({
     query: {
       "api-version": "2024-12-01-preview",
     },
+    headers: {
+      "Content-Type": "application/merge-patch+json",
+    },
     body: json({
       color: "red",
     }),

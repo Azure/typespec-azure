@@ -105,6 +105,7 @@ model UpdateWidgetColorRequest {
 @added(ApiVersions.v2024_12_01_preview)
 op updateWidgetColor(
   @path id: string,
+  @header("Content-Type") contentType: "application/merge-patch+json",
   @body colorUpdate: UpdateWidgetColorRequest,
 ): Widget | NotFoundResponse;
 
