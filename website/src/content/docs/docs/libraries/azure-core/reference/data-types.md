@@ -469,19 +469,6 @@ model Azure.Core.TopQueryParameter
 | ---- | ------- | ------------------------------------- |
 | top? | `int32` | The number of result items to return. |
 
-### `Versions` {#Azure.Core.Versions}
-
-Supported versions of Azure.Core TypeSpec building blocks.
-
-```typespec
-enum Azure.Core.Versions
-```
-
-| Name           | Value             | Description           |
-| -------------- | ----------------- | --------------------- |
-| v1_0_Preview_1 | `"1.0-preview.1"` | Version 1.0-preview.1 |
-| v1_0_Preview_2 | `"1.0-preview.2"` | Version 1.0-preview.2 |
-
 ### `ArmResourceDeploymentScope` {#Azure.Core.ArmResourceDeploymentScope}
 
 ```typespec

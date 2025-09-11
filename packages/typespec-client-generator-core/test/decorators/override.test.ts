@@ -419,7 +419,6 @@ it("core template", async () => {
   });
   await runnerWithCore.compileWithCustomization(
     `
-    @useDependency(Versions.v1_0_Preview_2)
     @server("http://localhost:3000", "endpoint")
     @service()
     namespace My.Service;

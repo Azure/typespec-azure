@@ -118,7 +118,6 @@ export async function createSdkTestRunner(
   sdkTestRunner.compileWithBuiltInAzureCoreService = async (code) => {
     const result = await baseCompile(
       `
-      @useDependency(Versions.v1_0_Preview_2)
       @server("http://localhost:3000", "endpoint")
       @service()
       namespace My.Service;
