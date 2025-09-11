@@ -1,5 +1,20 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.28
+
+### Features
+
+- [#3187](https://github.com/Azure/typespec-azure/pull/3187) Add tests for `@clientLocation`'s new usage to move parameter location.
+
+### Bump dependencies
+
+- [#3207](https://github.com/Azure/typespec-azure/pull/3207) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3202](https://github.com/Azure/typespec-azure/pull/3202) Switch to the `@flattenProperty` decorator from the `Azure.ClientGenerator.Core.Legacy` namespace
+
+
 ## 0.1.0-alpha.27
 
 ### Bug Fixes

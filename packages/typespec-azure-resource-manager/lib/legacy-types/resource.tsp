@@ -26,18 +26,12 @@ using Azure.ResourceManager.Private;
 model TrackedResourceWithOptionalLocation<
   Properties extends {},
   PropertiesOptional extends valueof boolean = true
-> extends LegacyTrackedResource {
-  @doc("The resource-specific properties for this resource.")
+> extends CommonTypes.Resource {
+  @doc("The RP-specific properties for this resource.")
   @conditionalClientFlatten
   @armResourcePropertiesOptionality(PropertiesOptional)
   properties?: Properties;
-}
 
-/**
- * A tracked resource with the 'location' property optional
- */
-@friendlyName("TrackedResource")
-model LegacyTrackedResource extends CommonTypes.Resource {
   /** Resource tags. */
   tags?: Record<string>;
 
@@ -90,3 +84,9 @@ model ExtendedLocationOptional {
   /** The type of the extended location. */
   type?: Azure.ResourceManager.Foundations.ExtendedLocationType;
 }
+
+/**
+ * Template that allows a model to include a path parameter property without adding the property to a request body
+ */
+@Http.Private.includeInapplicableMetadataInPayload(false)
+model ResourceWithPathParameter {}

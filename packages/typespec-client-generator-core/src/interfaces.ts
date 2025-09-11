@@ -893,6 +893,8 @@ export interface SdkPagingServiceMetadata<TServiceOperation extends SdkServiceOp
   continuationTokenResponseSegments?: (SdkServiceResponseHeader | SdkModelPropertyType)[];
   /** Segments to indicate how to get page items from response. */
   pageItemsSegments?: SdkModelPropertyType[];
+  /** Denotes which parameter is the page size parameter */
+  pageSizeParameterSegments?: (SdkMethodParameter | SdkModelPropertyType)[];
 }
 
 /**
@@ -1137,7 +1139,8 @@ export interface LicenseInfo {
 /**
  * Represents a namespace in the package, containing all clients, operations, and types.
  */
-export interface SdkNamespace<TServiceOperation extends SdkServiceOperation> {
+export interface SdkNamespace<TServiceOperation extends SdkServiceOperation> extends DecoratedType {
+  __raw?: Namespace;
   /** Namespace name. */
   name: string;
   /** Namespace full qualified name. */

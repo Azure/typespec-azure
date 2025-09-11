@@ -25,8 +25,7 @@ describe("typespec-azure-resource-manager: resource name rule", () => {
       await tester
         .expect(
           `
-          @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-          @armProviderNamespace
+                  @armProviderNamespace
           namespace Microsoft.Foo;
   
           model FooResource is TrackedResource<{}> {
@@ -45,8 +44,7 @@ describe("typespec-azure-resource-manager: resource name rule", () => {
       await tester
         .expect(
           `
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        @armProviderNamespace
+              @armProviderNamespace
         namespace Microsoft.Foo;
 
         model FooResource is TrackedResource<{}> {
@@ -73,8 +71,7 @@ describe("typespec-azure-resource-manager: resource name rule", () => {
         .expect(
           `
         @armProviderNamespace
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        namespace Microsoft.Foo;
+              namespace Microsoft.Foo;
 
         model Foo_Resource is TrackedResource<{}> {
           @key("foo") @segment("foo") @path

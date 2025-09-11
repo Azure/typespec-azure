@@ -1,5 +1,5 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { deepStrictEqual, strictEqual } from "assert";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkMethodParameter } from "../../src/interfaces.js";
 import { getPropertySegmentsFromModelOrParameters } from "../../src/methods.js";
@@ -949,8 +949,7 @@ it("next link with reinjected parameters with versioning", async () => {
     /** Api versions */
     enum Versions {
       /** 2024-04-01-preview api version */
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      V2024_04_01_PREVIEW: "2024-04-01-preview",
+          V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
 
     model TestOptions {
@@ -999,8 +998,7 @@ it("unbranded next link with reinjected parameters with versioning", async () =>
     /** Api versions */
     enum Versions {
       /** 2024-04-01-preview api version */
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      V2024_04_01_PREVIEW: "2024-04-01-preview",
+          V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
 
     model TestOptions {
@@ -1144,4 +1142,53 @@ it("next link with body root and inheritance", async () => {
   strictEqual(response.resultSegments?.length, 1);
   strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
   strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
+});
+
+it("@pageSize parameter check", async () => {
+  await runner.compileWithBuiltInService(`
+    model Page<T> {
+      @pageItems items: T[];
+    }
+    model Pet {
+      id: string;
+    }
+    @list op listPets(@pageIndex page: int32, @pageSize size: int8): Page<Pet>;
+  `);
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  strictEqual(method.name, "listPets");
+  strictEqual(method.kind, "paging");
+  const pageSizeParameter = method.parameters.find((p) => p.name === "size");
+  ok(pageSizeParameter);
+  strictEqual(method.pagingMetadata.pageSizeParameterSegments?.length, 1);
+  strictEqual(method.pagingMetadata.pageSizeParameterSegments[0], pageSizeParameter);
+});
+
+it("@pageSize nested parameter check", async () => {
+  await runner.compileWithBuiltInService(`
+    model PaginationSection {
+      @pageSize pageSize: int8;
+      @pageIndex pageIndex: int32;
+    }
+    model Page<T> {
+      @pageItems items: T[];
+    }
+    model Pet {
+      id: string;
+    }
+    @list op listPets(pagination: PaginationSection): Page<Pet>;
+  `);
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  strictEqual(method.name, "listPets");
+  strictEqual(method.kind, "paging");
+  const methodParam = method.parameters.find((p) => p.name === "pagination");
+  strictEqual(methodParam?.type.kind, "model");
+  const pageSizeParameter = methodParam?.type.properties.find((p) => p.name === "pageSize");
+  ok(pageSizeParameter);
+  const pageSizeParameterSegments = method.pagingMetadata.pageSizeParameterSegments;
+  ok(pageSizeParameterSegments);
+  strictEqual(pageSizeParameterSegments.length, 2);
+  strictEqual(pageSizeParameterSegments[0], methodParam);
+  strictEqual(pageSizeParameterSegments[1], pageSizeParameter);
 });

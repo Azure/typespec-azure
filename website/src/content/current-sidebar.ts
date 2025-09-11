@@ -57,7 +57,7 @@ const sidebar: SidebarItem[] = [
     ],
   },
   {
-    label: "Convert Swagger to TypeSpec",
+    label: "Convert OpenAPI to TypeSpec",
     items: [
       "migrate-swagger/01-get-started",
       {

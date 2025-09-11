@@ -19,8 +19,7 @@ it("emits a warning diagnostic if using type from Azure.Core.Foundations.Private
   await tester
     .expect(
       `        
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      namespace MyService {
+          namespace MyService {
         model Foo {
           bar: Azure.Core.Foundations.Private.ArmResourceIdentifierConfigOptions
         }
@@ -40,8 +39,7 @@ it("emits a warning diagnostic if using decorators from Azure.Core.Foundations.P
   await tester
     .expect(
       `
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      namespace MyService {
+          namespace MyService {
         @Azure.Core.Foundations.Private.embeddingVector(string)
         model Foo {}
       }

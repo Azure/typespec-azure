@@ -376,8 +376,23 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/EmployeeProperties",
-          "description": "The resource-specific properties for this resource.",
+          "description": "The RP-specific properties for this resource.",
           "x-ms-client-flatten": true
+        },
+        "tags": {
+          "type": "object",
+          "description": "Resource tags.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "location": {
+          "type": "string",
+          "description": "The geo-location where the resource lives",
+          "x-ms-mutability": [
+            "read",
+            "create"
+          ]
         },
         "etag": {
           "type": "string",
@@ -387,7 +402,7 @@
       },
       "allOf": [
         {
-          "$ref": "#/definitions/TrackedResource"
+          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/Resource"
         }
       ]
     },
@@ -529,32 +544,6 @@
         ]
       },
       "readOnly": true
-    },
-    "TrackedResource": {
-      "type": "object",
-      "description": "A tracked resource with the 'location' property optional",
-      "properties": {
-        "tags": {
-          "type": "object",
-          "description": "Resource tags.",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "location": {
-          "type": "string",
-          "description": "The geo-location where the resource lives",
-          "x-ms-mutability": [
-            "read",
-            "create"
-          ]
-        }
-      },
-      "allOf": [
-        {
-          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/Resource"
-        }
-      ]
     }
   },
   "parameters": {}

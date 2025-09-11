@@ -25,8 +25,7 @@ describe("typespec-azure-core: api-version-parameter rule", () => {
         namespace Test;
         
         enum Versions {
-          @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-          v1_0: "v1.0";
+                  v1_0: "v1.0";
         }
 
         @route("/test")
@@ -61,8 +60,7 @@ describe("typespec-azure-core: api-version-parameter rule", () => {
         namespace Test;
         
         enum Versions {
-          @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-          v1_0: "v1.0";
+                  v1_0: "v1.0";
         }
 
         op test(...Azure.Core.Foundations.ApiVersionParameter): string;
@@ -80,8 +78,7 @@ describe("typespec-azure-core: api-version-parameter rule", () => {
         namespace Test;
         
         enum Versions {
-          @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-          v1_0: "v1.0";
+                  v1_0: "v1.0";
         }
 
         op test(): string;

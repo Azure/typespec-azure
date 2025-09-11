@@ -1,7 +1,9 @@
 ---
 title: "Decorators"
+description: "Decorators exported by @azure-tools/typespec-client-generator-core"
 toc_min_heading_level: 2
 toc_max_heading_level: 3
+llmstxt: true
 ---
 
 ## Azure.ClientGenerator.Core
@@ -716,40 +718,6 @@ model MyModel {
 }
 ```
 
-### `@flattenProperty` {#@Azure.ClientGenerator.Core.flattenProperty}
-
-:::caution
-**Deprecated**: @flattenProperty decorator is not recommended to use.
-:::
-
-Set whether a model property should be flattened or not.
-This decorator is not recommended to use for green field services.
-
-```typespec
-@Azure.ClientGenerator.Core.flattenProperty(scope?: valueof string)
-```
-
-#### Target
-
-The target model property that you want to flatten.
-`ModelProperty`
-
-#### Parameters
-
-| Name  | Type             | Description                                                                                                                                                                                                                                                |
-| ----- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
-
-#### Examples
-
-```typespec
-model Foo {
-  @flattenProperty
-  prop: Bar;
-}
-model Bar {}
-```
-
 ### `@operationGroup` {#@Azure.ClientGenerator.Core.operationGroup}
 
 Define the sub client generated in the client SDK.
@@ -1091,6 +1059,36 @@ model MyModel {
 ```
 
 ## Azure.ClientGenerator.Core.Legacy
+
+### `@flattenProperty` {#@Azure.ClientGenerator.Core.Legacy.flattenProperty}
+
+Set whether a model property should be flattened or not.
+This decorator is not recommended to use for green field services.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.flattenProperty(scope?: valueof string)
+```
+
+#### Target
+
+The target model property that you want to flatten.
+`ModelProperty`
+
+#### Parameters
+
+| Name  | Type             | Description                                                                                                                                                                                                                                                |
+| ----- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+
+#### Examples
+
+```typespec
+model Foo {
+  @flattenProperty
+  prop: Bar;
+}
+model Bar {}
+```
 
 ### `@hierarchyBuilding` {#@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding}
 

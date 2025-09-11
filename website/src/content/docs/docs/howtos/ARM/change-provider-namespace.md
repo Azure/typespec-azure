@@ -1,5 +1,7 @@
 ---
 title: Change the provider namespace
+description: Using a different ARM provider namespace than TypeSpec namespace
+llmstxt: true
 ---
 
 If you want to have a different provider namespace than the TypeSpec namespec you'll have to change the following

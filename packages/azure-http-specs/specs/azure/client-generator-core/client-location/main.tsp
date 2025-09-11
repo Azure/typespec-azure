@@ -93,3 +93,32 @@ namespace MoveToRootClient {
     getHealthStatus(): void;
   }
 }
+
+// Scenario 4: Move method parameter to client
+@scenarioDoc("""
+  Test moving a method parameter to client.
+  
+  The parameter `storageAccount` from operation `getBlob` should be moved to the client in the generated code.
+  
+  Expected request:
+  - GET /blob?storageAccount=testaccount&container=testcontainer&blob=testblob.txt
+  
+  Expected response:
+  - Status: 200
+  - Body: {"id": "blob-001", "name": "testblob.txt", "size": 1024, "path": "/testcontainer/testblob.txt"}
+  """)
+@scenario
+namespace MoveMethodParameterToClient {
+  model Blob {
+    id: string;
+    name: string;
+    size: int32;
+    path: string;
+  }
+
+  interface BlobOperations {
+    @route("/blob")
+    @get
+    getBlob(@query storageAccount: string, @query container: string, @query blob: string): Blob;
+  }
+}

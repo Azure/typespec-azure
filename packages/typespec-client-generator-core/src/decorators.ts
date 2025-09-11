@@ -33,7 +33,6 @@ import {
   ClientNamespaceDecorator,
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
-  FlattenPropertyDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
@@ -41,7 +40,10 @@ import {
   ScopeDecorator,
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
-import { HierarchyBuildingDecorator } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
+import {
+  FlattenPropertyDecorator,
+  HierarchyBuildingDecorator,
+} from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
   AccessFlags,
   ClientInitializationOptions,
@@ -66,6 +68,7 @@ import {
   negationScopesKey,
   omitOperation,
   operationGroupKey,
+  overrideKey,
   scopeKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
@@ -540,14 +543,13 @@ export function getAccess(
   }
 }
 
-const flattenPropertyKey = createStateSymbol("flattenPropertyKey");
+const flattenPropertyKey = createStateSymbol("flattenProperty");
 /**
  * Whether a model property should be flattened.
  *
  * @param context DecoratorContext
  * @param target ModelProperty to mark as flattened
  * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
- * @deprecated This decorator is not recommended to use.
  */
 export const $flattenProperty: FlattenPropertyDecorator = (
   context: DecoratorContext,
@@ -562,7 +564,7 @@ export const $flattenProperty: FlattenPropertyDecorator = (
     });
     return;
   }
-  setScopedDecoratorData(context, $flattenProperty, flattenPropertyKey, target, true, scope); // eslint-disable-line @typescript-eslint/no-deprecated
+  setScopedDecoratorData(context, $flattenProperty, flattenPropertyKey, target, true, scope);
 };
 
 /**
@@ -621,8 +623,6 @@ export function getClientNameOverride(
 ): string | undefined {
   return getScopedDecoratorData(context, clientNameKey, entity, languageScope);
 }
-
-const overrideKey = createStateSymbol("override");
 
 // Recursive function to collect parameter names
 function collectParams(

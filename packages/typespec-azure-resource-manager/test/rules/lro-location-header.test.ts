@@ -24,8 +24,7 @@ it("Emits a warning for LRO 202 response that does not contain a Location header
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Contoso;
+          namespace Microsoft.Contoso;
       model Employee is ProxyResource<EmployeeProperties> {
         @doc("Name of employee")
         @pattern("^[a-zA-Z0-9-]{3,24}$")
@@ -53,8 +52,7 @@ it("Emits a warning for custom 202 response that does not contain a Location hea
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Contoso;
+          namespace Microsoft.Contoso;
       model Employee is ProxyResource<EmployeeProperties> {
         @doc("Name of employee")
         @pattern("^[a-zA-Z0-9-]{3,24}$")
@@ -81,8 +79,7 @@ it("Does not emit a warning for LRO 202 response that contains the Location resp
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Contoso;
+          namespace Microsoft.Contoso;
       model Employee is ProxyResource<EmployeeProperties> {
         @doc("Name of employee")
         @pattern("^[a-zA-Z0-9-]{3,24}$")

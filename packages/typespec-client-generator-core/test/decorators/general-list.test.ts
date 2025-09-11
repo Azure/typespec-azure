@@ -136,6 +136,31 @@ it("multiple same decorators", async function () {
   expectDiagnostics(runner.context.diagnostics, []);
 });
 
+it("decorators on a namespace", async function () {
+  runner = await createSdkTestRunner({}, { additionalDecorators: ["TypeSpec\\.@service"] });
+
+  await runner.compileWithBuiltInService(`
+    op test(): void;
+  `);
+  const sdkPackage = runner.context.sdkPackage;
+  const namespace = sdkPackage.namespaces[0];
+  ok(namespace);
+  strictEqual(namespace.name, "TestService");
+  strictEqual(namespace.__raw?.kind, "Namespace");
+  strictEqual(namespace.decorators.length, 1);
+  deepStrictEqual(namespace.decorators, [
+    {
+      name: "TypeSpec.@service",
+      arguments: {
+        options: {
+          title: "Test Service",
+        },
+      },
+    },
+  ]);
+  expectDiagnostics(runner.context.diagnostics, []);
+});
+
 describe("xml scenario", () => {
   it("@attribute", async function () {
     runner = await createSdkTestRunner({

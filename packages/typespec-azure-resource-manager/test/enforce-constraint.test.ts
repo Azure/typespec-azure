@@ -6,8 +6,7 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
   it("emits no error when template param extends from Resource", async () => {
     const { diagnostics } = await checkFor(`
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Contoso;
+          namespace Microsoft.Contoso;
 
       @doc("Widget resource")
       model Widget is ProxyResource<WidgetProperties> {
@@ -34,8 +33,7 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
   it("emits error if template param is not extended from Resource", async () => {
     const { diagnostics } = await checkFor(`
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Contoso;
+          namespace Microsoft.Contoso;
  
       @doc("Widget resource")
       model Widget {
@@ -98,8 +96,7 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
   it("emits no error when template extends from a `@Azure.ResourceManager.Legacy.customAzureResource` Resource", async () => {
     const { diagnostics } = await checkFor(`
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Custom Mix in resource")
     model CustomResource is CustomAzureResource;
@@ -120,8 +117,7 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
   it("emits no error when template extends from a `@Azure.ResourceManager.Legacy.customAzureResource` Resource when using Legacy Operations", async () => {
     const { diagnostics } = await checkFor(`
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Custom Mix in resource")
     model CustomResource is CustomAzureResource;
@@ -160,13 +156,14 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
   it("emits error when template is extended from Resource or from a `@Azure.ResourceManager.Legacy.customAzureResource` Resource", async () => {
     const { diagnostics } = await checkFor(`
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Custom Mix in resource")
-    model CustomResource is CustomAzureResource;
+    model CustomResource extends CustomBase {
+       ...ResourceNameParameter<CustomResource>;
+    };
 
-    model CustomAzureResource {
+    model CustomBase {
       name: string;
     }
 
@@ -178,5 +175,131 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
       { code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met" },
       { code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met" },
     ]);
+  });
+});
+describe("typespec-azure-resource-manager: rename parameter tests", () => {
+  it("emits error when renaming a parameter to an existing parameter name", async () => {
+    const { diagnostics } = await checkFor(`
+      @armProviderNamespace
+    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    namespace Microsoft.Contoso;
+
+    @doc("Custom Mix in resource")
+    model CustomResource is ProxyResource<CustomProperties> {
+       ...ResourceNameParameter<CustomResource>;
+    };
+
+    model CustomProperties {
+      flavor: string;
+    }
+
+    interface Widgets {
+      @Azure.ResourceManager.Legacy.renamePathParameter("subscriptionId", "customResourceName")
+      delete is ArmResourceCreateOrReplaceSync<CustomResource>;
+    }
+    `);
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/invalid-parameter-rename",
+      },
+    ]);
+  });
+
+  it("emits warning when renaming a non-existent parameter", async () => {
+    const { diagnostics } = await checkFor(`
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+
+       @doc("Custom Mix in resource")
+       model CustomResource is ProxyResource<CustomProperties> {
+         ...ResourceNameParameter<CustomResource>;
+       };
+
+      model CustomProperties {
+        flavor: string;
+      }
+
+      interface Widgets {
+        @Azure.ResourceManager.Legacy.renamePathParameter("foo", "fooName")
+        create is ArmResourceCreateOrReplaceSync<CustomResource>;
+      }
+    `);
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/invalid-parameter-rename",
+      },
+    ]);
+  });
+  it("emits a warning when renaming a non-path parameter", async () => {
+    const { diagnostics } = await checkFor(`
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+
+       @doc("Custom Mix in resource")
+       model CustomResource is ProxyResource<CustomProperties> {
+         ...ResourceNameParameter<CustomResource>;
+       };
+
+      model CustomProperties {
+        flavor: string;
+      }
+
+      interface Widgets {
+        @Azure.ResourceManager.Legacy.renamePathParameter("resource", "fooName")
+        create is ArmResourceCreateOrReplaceSync<CustomResource>;
+      }
+    `);
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/invalid-parameter-rename",
+      },
+    ]);
+  });
+  it("emits no warning when renaming a parameter twice", async () => {
+    const { diagnostics } = await checkFor(`
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+
+       @doc("Custom Mix in resource")
+       model CustomResource is ProxyResource<CustomProperties> {
+         ...ResourceNameParameter<CustomResource>;
+       };
+
+      model CustomProperties {
+        flavor: string;
+      }
+
+      interface Widgets {
+        @Azure.ResourceManager.Legacy.renamePathParameter("customResourceName", "customName")
+        @Azure.ResourceManager.Legacy.renamePathParameter("customResourceName", "customName")
+        create is ArmResourceCreateOrReplaceSync<CustomResource>;
+      }
+    `);
+    expectDiagnosticEmpty(diagnostics);
+  });
+  it("emits no warning when renaming a parameter", async () => {
+    const { diagnostics } = await checkFor(`
+      @armProviderNamespace
+      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      namespace Microsoft.Contoso;
+
+       @doc("Custom Mix in resource")
+       model CustomResource is ProxyResource<CustomProperties> {
+         ...ResourceNameParameter<CustomResource>;
+       };
+
+      model CustomProperties {
+        flavor: string;
+      }
+
+      interface Widgets {
+        @Azure.ResourceManager.Legacy.renamePathParameter("customResourceName", "customResourcesName")
+        create is ArmResourceCreateOrReplaceSync<CustomResource>;
+      }
+    `);
+    expectDiagnosticEmpty(diagnostics);
   });
 });
