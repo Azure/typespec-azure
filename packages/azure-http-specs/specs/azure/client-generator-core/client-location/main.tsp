@@ -98,7 +98,7 @@ namespace MoveToRootClient {
 @scenarioDoc("""
   Test moving a method parameter to client.
   
-  The parameter `storageAccount` from operation `getBlob` should be moved to the client in the generated code.
+  The parameter `storageAccount` from operation `getBlob` should be moved to the `MoveMethodParameterToClient` in the generated code.
   
   Expected request:
   - GET /blob?storageAccount=testaccount&container=testcontainer&blob=testblob.txt
@@ -119,6 +119,13 @@ namespace MoveMethodParameterToClient {
   interface BlobOperations {
     @route("/blob")
     @get
-    getBlob(@query storageAccount: string, @query container: string, @query blob: string): Blob;
+    getBlob(
+      @query
+      @global.Azure.ClientGenerator.Core.clientLocation(MoveMethodParameterToClient)
+      storageAccount: string,
+
+      @query container: string,
+      @query blob: string,
+    ): Blob;
   }
 }
