@@ -7,3 +7,5 @@ packages:
   - "!core/packages/http-client-csharp/**"
   - "!core/packages/http-client-java/**"
   - "!core/packages/http-client-python/**"
+overrides:
+  rollup: 4.49.0 # Regression in 4.50.0 https://github.com/rollup/rollup/issues/6099
