@@ -62,13 +62,9 @@ const sidebar: SidebarItem[] = [
       "migrate-swagger/01-get-started",
       {
         label: "TroubleShooting",
-        items: [
-          "migrate-swagger/faq/mustread",
-          "migrate-swagger/faq/pipeline",
-          "migrate-swagger/faq/breakingchange",
-          "migrate-swagger/faq/conversionfix",
-          "migrate-swagger/faq/frequentquestions",
-        ],
+        autogenerate: {
+          directory: "migrate-swagger/faq",
+        },
       },
       {
         label: "Checklists",
