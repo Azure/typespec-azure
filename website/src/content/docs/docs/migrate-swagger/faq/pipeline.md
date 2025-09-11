@@ -137,7 +137,6 @@ Choose one of the following options:
 2. **Modify your TypeSpec response model** to use a custom definition if the nextLink returned by the service is not a URI:
 
 ```typespec
-@pagedResult
 model ResponseModel {
   @items
   value: ItemType[];

@@ -1,13 +1,11 @@
 import {
   FinalStateValue,
   LroMetadata,
-  PagedResultMetadata,
   UnionEnum,
   extractLroStates,
   getArmResourceIdentifierConfig,
   getAsEmbeddingVector,
   getLroMetadata,
-  getPagedResult,
   getUnionAsEnum,
   hasUniqueItems,
 } from "@azure-tools/typespec-azure-core";
@@ -488,50 +486,12 @@ export async function getOpenAPIForService(
     };
   }
 
-  function getLastSegment(segments: string[] | undefined): string | undefined {
-    if (segments) {
-      return segments[segments.length - 1];
-    }
-    return undefined;
-  }
-
-  function extractPagedMetadataNested(
-    program: Program,
-    type: Model,
-  ): PagedResultMetadata | undefined {
-    // This only works for `is Page<T>` not `extends Page<T>`.
-    let paged = getPagedResult(program, type);
-    if (paged) {
-      return paged;
-    }
-    if (type.baseModel) {
-      paged = getPagedResult(program, type.baseModel);
-    }
-    if (paged) {
-      return paged;
-    }
-    const templateArguments = type.templateMapper;
-    if (templateArguments) {
-      for (const argument of templateArguments.args) {
-        const modelArgument = argument as Model;
-        if (modelArgument) {
-          paged = extractPagedMetadataNested(program, modelArgument);
-          if (paged) {
-            return paged;
-          }
-        }
-      }
-    }
-    return paged;
-  }
-
   function resolveXmsPageable(program: Program, operation: HttpOperation): XmsPageable | undefined {
     if (isList(program, operation.operation)) {
       const pagedInfo = ignoreDiagnostics(getPagingOperation(program, operation.operation));
       return pagedInfo && getXmsPageableForPagingOperation(pagedInfo);
-    } else {
-      return extractAzureCorePagedMetadata(program, operation);
     }
+    return undefined;
   }
 
   function getXmsPageableForPagingOperation(paging: PagingOperation): XmsPageable | undefined {
@@ -541,25 +501,6 @@ export async function getOpenAPIForService(
         nextLinkName: paging.output.nextLink.property.name,
         itemName: itemsName === "value" ? undefined : itemsName,
       };
-    }
-    return undefined;
-  }
-
-  function extractAzureCorePagedMetadata(program: Program, operation: HttpOperation) {
-    for (const response of operation.responses) {
-      const paged = extractPagedMetadataNested(program, response.type as Model);
-      if (paged) {
-        const nextLinkName = getLastSegment(paged.nextLinkSegments);
-        const itemName = getLastSegment(paged.itemsSegments);
-        if (nextLinkName) {
-          return {
-            nextLinkName,
-            itemName: itemName !== "value" ? itemName : undefined,
-          };
-        }
-        // Once we find paged metadata, we don't need to processes any further.
-        return undefined;
-      }
     }
     return undefined;
   }
