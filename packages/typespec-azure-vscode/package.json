@@ -9,7 +9,7 @@
     "url": "git+https://github.com/Azure/typespec-azure.git"
   },
   "engines": {
-    "vscode": "^1.103.0"
+    "vscode": "^1.104.0"
   },
   "extensionDependencies": [
     "typespec.typespec-vscode"
