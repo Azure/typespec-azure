@@ -279,24 +279,25 @@ op func8(@body body: Test5): void;
 
 #### `@alternateType`
 
-Set an alternate type for a model property, Scalar, or function parameter. Note that `@encode` will be overridden by the one defined in the alternate type.
+Set an alternate type for a model property, Scalar, Model, Enum, Union, or function parameter. Note that `@encode` will be overridden by the one defined in the alternate type.
 When the source type is `Scalar`, the alternate type must be `Scalar`.
+The replaced type could be a type defined in the TypeSpec or an external type declared by type identity, package that export the type and package version.
 
 ```typespec
-@Azure.ClientGenerator.Core.alternateType(alternate: unknown, scope?: valueof string)
+@Azure.ClientGenerator.Core.alternateType(alternate: unknown | Azure.ClientGenerator.Core.ExternalType, scope?: valueof string)
 ```
 
 ##### Target
 
 The source type to which the alternate type will be applied.
-`ModelProperty | Scalar`
+`ModelProperty | Scalar | Model | Enum | Union`
 
 ##### Parameters
 
-| Name      | Type             | Description                                                                                                                                                                                                                                                |
-| --------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| alternate | `unknown`        | The alternate type to apply to the target.                                                                                                                                                                                                                 |
-| scope     | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| Name      | Type                                           | Description                                                                                                                                                                                                                                                |
+| --------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| alternate | `unknown \| ClientGenerator.Core.ExternalType` | The alternate type to apply to the target. Can be a TypeSpec type or an ExternalType.                                                                                                                                                                      |
+| scope     | `valueof string`                               | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
@@ -331,6 +332,37 @@ model Test {
 
   @alternateType(AzureLocation[], "csharp")
   locations: string[];
+}
+```
+
+###### Use external type for DFE case
+
+```typespec
+@alternateType(
+  {
+    identity: "Azure.Core.Expressions.DataFactoryExpression",
+  },
+  "csharp"
+)
+union Dfe<T> {
+  T,
+  DfeExpression,
+}
+```
+
+###### Use external type with package information
+
+```typespec
+@alternateType(
+  {
+    identity: "pystac.Collection",
+    package: "pystac",
+    minVersion: "1.13.0",
+  },
+  "python"
+)
+model ItemCollection {
+  // ... properties
 }
 ```
 
