@@ -35,7 +35,7 @@
     "lint:fix": "eslint . --fix "
   },
   "devDependencies": {
-    "@types/vscode": "~1.103.0",
+    "@types/vscode": "~1.104.0",
     "@types/node": "~24.3.0",
     "@vscode/vsce": "~3.6.0",
     "esbuild": "^0.25.1",
