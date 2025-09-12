@@ -120,7 +120,10 @@ export async function createSdkTestRunner(
       `
       @server("http://localhost:3000", "endpoint")
       @service()
+      @versioned(Versions)
       namespace My.Service;
+      enum Versions {v1}
+      
       ${code}`,
       {
         noEmit: true,
