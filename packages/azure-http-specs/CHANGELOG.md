@@ -1,5 +1,12 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.29
+
+### Bug Fixes
+
+- [#3258](https://github.com/Azure/typespec-azure/pull/3258) Fix missing decorator for the test case of moving method parameter to client.
+
+
 ## 0.1.0-alpha.28
 
 ### Features
