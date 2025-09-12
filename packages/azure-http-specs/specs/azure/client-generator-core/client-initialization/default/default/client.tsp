@@ -47,6 +47,12 @@ model ParamAliasClientOptions {
   blobName: string;
 }
 
+// Models for initialization scenarios
+model DefaultQueryParamClientOptions {
+  @doc("The name of the resource. This parameter is used as a path parameter in all operations.")
+  blobName: string;
+}
+
 // Scenario 1: Header parameter moved to client level
 @scenarioDoc("""
   Client for testing header parameter moved to client level.
@@ -200,33 +206,31 @@ interface ParamAlias {
   withOriginalName is Service.ParamAlias.withOriginalName;
 }
 
+
 @global.Azure.ClientGenerator.Core.client({
-  name: "ParentClient",
+  name: "DefaultParentClient",
   service: Service,
 })
-namespace ParentClient {
+namespace DefaultParentClient {
+  // Scenario 6: Default -> Default initialization with path parameter
   @scenarioDoc("""
-    Client for testing a path parameter (blobName) moved to client level, in child client.
+    Client for testing default -> default nested initialization.
     
-    The child client can be initialized individually, or via its parent client.
+    The parent client uses default initialization behavior,
+    and the child client also uses default initialization behavior.
     
     Parameters elevated to client level:
-    - blobName: "sample-blob" (path parameter)
+    - resourceName: "test-resource" (path parameter)
     
     Expected client usage:
     ```ts
-    // via ParentClient
-    const client = new ParentClient.getChildClient({
-      blobName: "sample-blob"
+    // via DefaultParentClient
+    const client = new DefaultParentClient.getDefaultNestedClient({
+      resourceName: "test-resource"
     });
     
-    // directly
-    const client = new ChildClient({
-      blobName: "sample-blob"
-    });
-    
-    // No need to pass blobName to any operations
-    client.withQuery(format: "text");  
+    // Operations don't need resourceName parameter
+    client.withQuery(format: "text");
     client.getStandalone();
     client.deleteStandalone();
     ```
@@ -235,12 +239,156 @@ namespace ParentClient {
   @global.Azure.ClientGenerator.Core.operationGroup
   @global.Azure.ClientGenerator.Core.clientInitialization({
     parameters: PathParamClientOptions,
-    initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
   })
-  @route("/child-client")
-  interface ChildClient {
-    withQuery is Service.ChildClient.withQuery;
-    getStandalone is Service.ChildClient.getStandalone;
-    deleteStandalone is Service.ChildClient.deleteStandalone;
+  @route("/nested-default-default")
+  interface DefaultNestedWithPathClient {
+    withQuery is Service.NestedDefaultDefaultWithPath.withQuery;
+    getStandalone is Service.NestedDefaultDefaultWithPath.getStandalone;
+    deleteStandalone is Service.NestedDefaultDefaultWithPath.deleteStandalone;
+  }
+
+    // Scenario 7: Default -> Default initialization with query parameter
+    @scenarioDoc("""
+    Client for testing default -> default nested initialization.
+    
+    The parent client uses default initialization behavior,
+    and the child client also uses default initialization behavior.
+    
+    Parameters elevated to client level:
+    - resourceName: "test-resource" (path parameter)
+    
+    Expected client usage:
+    ```ts
+    // via DefaultParentClient
+    const client = new DefaultParentClient.getDefaultNestedClient({
+      resourceName: "test-resource"
+    });
+    
+    // Operations don't need resourceName parameter
+    client.withQuery(format: "text");
+    client.getStandalone();
+    client.deleteStandalone();
+    ```
+    """)
+  @scenario
+  @global.Azure.ClientGenerator.Core.operationGroup
+  @global.Azure.ClientGenerator.Core.clientInitialization({
+    parameters: DefaultQueryParamClientOptions,
+  })
+  @route("/nested-default-default")
+  interface DefaultNestedWithQueryClient {
+    withQuery is Service.NestedDefaultDefaultWithQuery.withQuery;
+    getStandalone is Service.NestedDefaultDefaultWithQuery.getStandalone;
+    deleteStandalone is Service.NestedDefaultDefaultWithQuery.deleteStandalone;
+  }
+
+    // Scenario 8: Default -> Default initialization with Header parameter
+    @scenarioDoc("""
+    Client for testing default -> header parameter nested initialization.
+    
+    The parent client uses default initialization behavior,
+    and the child client moves header parameters to client level.
+    
+    Parameters elevated to client level:
+    - name: "test-name-value" (header parameter)
+    
+    Expected client usage:
+    ```ts
+    // via DefaultParentClient
+    const client = new DefaultParentClient.getHeaderNestedClient({
+      name: "test-name-value"
+    });
+    
+    // Operations don't need name header parameter
+    client.withQuery(format: "text");
+    client.getStandalone();
+    client.deleteStandalone();
+    ```
+    """)
+  @scenario
+  @global.Azure.ClientGenerator.Core.operationGroup
+  @global.Azure.ClientGenerator.Core.clientInitialization({
+    parameters: HeaderParamClientOptions,
+  })
+  @route("/nested-default-header")
+  interface DefaultNestedWithHeaderClient {
+    withQuery is Service.NestedDefaultHeader.withQuery;
+    getStandalone is Service.NestedDefaultHeader.getStandalone;
+    deleteStandalone is Service.NestedDefaultHeader.deleteStandalone;
+  }
+
+  // Scenario 15: Default -> Multiple parameters client
+  @scenarioDoc("""
+    Client for testing default -> multiple parameters nested initialization.
+    
+    The parent client uses default initialization behavior,
+    and the child client moves multiple parameters (header and query) to client level.
+    
+    Parameters elevated to client level:
+    - name: "test-name-value" (header parameter)
+    - region: "us-west" (query parameter)
+    
+    Expected client usage:
+    ```ts
+    // via DefaultParentClient
+    const client = new DefaultParentClient.getMultipleNestedClient({
+      name: "test-name-value",
+      region: "us-west"
+    });
+    
+    // Operations don't need name or region parameters
+    client.withQuery(format: "text");
+    client.getStandalone();
+    client.deleteStandalone();
+    ```
+    """)
+  @scenario
+  @global.Azure.ClientGenerator.Core.operationGroup
+  @global.Azure.ClientGenerator.Core.clientInitialization({
+    parameters: MultipleParamsClientOptions,
+  })
+  @route("/nested-default-multiple")
+  interface DefaultNestedWithMultipleClient {
+    withQuery is Service.NestedDefaultMultiple.withQuery;
+    getStandalone is Service.NestedDefaultMultiple.getStandalone;
+    deleteStandalone is Service.NestedDefaultMultiple.deleteStandalone;
+  }
+
+  // Scenario 16: Default -> Mixed parameters client
+  @scenarioDoc("""
+    Client for testing default -> mixed parameters nested initialization.
+    
+    The parent client uses default initialization behavior,
+    and the child client moves some parameters to client level while keeping others at method level.
+    
+    Parameters elevated to client level:
+    - name: "test-name-value" (header parameter)
+    
+    Parameters remaining at method level:
+    - region: "us-west" (query parameter)
+    
+    Expected client usage:
+    ```ts
+    // via DefaultParentClient
+    const client = new DefaultParentClient.getMixedNestedClient({
+      name: "test-name-value"
+    });
+    
+    // Operations still need region parameter
+    client.withQuery(region: "us-west", format: "text");
+    client.getStandalone(region: "us-west");
+    client.deleteStandalone(region: "us-west");
+    ```
+    """)
+  @scenario
+  @global.Azure.ClientGenerator.Core.operationGroup
+  @global.Azure.ClientGenerator.Core.clientInitialization({
+    parameters: MixedParamsClientOptions,
+  })
+  @route("/nested-default-mixed")
+  interface DefaultNestedWithMixedClient {
+    withQuery is Service.NestedDefaultMixed.withQuery;
+    getStandalone is Service.NestedDefaultMixed.getStandalone;
+    deleteStandalone is Service.NestedDefaultMixed.deleteStandalone;
   }
 }
