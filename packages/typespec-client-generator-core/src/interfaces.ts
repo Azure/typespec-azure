@@ -1,9 +1,4 @@
-import {
-  FinalStateValue,
-  LroMetadata,
-  PagedResultMetadata,
-  ParameterSource,
-} from "@azure-tools/typespec-azure-core";
+import { FinalStateValue, LroMetadata, ParameterSource } from "@azure-tools/typespec-azure-core";
 import {
   DateTimeKnownEncoding,
   Diagnostic,
@@ -890,7 +885,7 @@ interface SdkPagingServiceMethodOptions<TServiceOperation extends SdkServiceOper
  */
 export interface SdkPagingServiceMetadata<TServiceOperation extends SdkServiceOperation> {
   /** Paging metadata from TypeSpec core library. */
-  __raw?: PagedResultMetadata | PagingOperation;
+  __raw?: PagingOperation;
 
   /** Segments to indicate how to get next page link value from response. */
   nextLinkSegments?: (SdkServiceResponseHeader | SdkModelPropertyType)[];
