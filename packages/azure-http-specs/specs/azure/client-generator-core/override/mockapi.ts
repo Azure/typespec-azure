@@ -37,3 +37,19 @@ Scenarios.Azure_ClientGenerator_Core_Override_GroupParameters_group = passOnSucc
     kind: "MockApiDefinition",
   },
 ]);
+
+// Test parameter requirement with @override decorator
+// Verifies that optional parameters can be made required via @override
+// Expected path: /azure/client-generator-core/override/require/{param1}/{param2}
+// Where param1="param1" and param2="param2"
+Scenarios.Azure_ClientGenerator_Core_Override_RequireParameters_require = passOnSuccess([
+  {
+    uri: "/azure/client-generator-core/override/require/param1/param2",
+    method: "get",
+    request: {},
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+]);
