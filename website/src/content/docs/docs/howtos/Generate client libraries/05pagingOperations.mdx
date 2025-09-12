@@ -28,7 +28,7 @@ model User {
 }
 
 model UserList {
-  @items
+  @pageItems
   value: User[];
 
   @nextLink
@@ -409,7 +409,7 @@ model Certificate {
   name: string;
 }
 model Page {
-  @items items: Certificate[];
+  @pageItems items: Certificate[];
   @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[
     ListCertificateOptions.includePending
   ]>;

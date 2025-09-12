@@ -20,7 +20,7 @@ it("azure paged result with encoded name", async () => {
   await runner.compileWithBuiltInService(`
     @list op test(): ListTestResult;
     model ListTestResult {
-      @items
+      @pageItems
       @clientName("values")
       tests: Test[];
       @nextLink
@@ -49,7 +49,7 @@ it("azure paged result with next link in header", async () => {
   await runner.compileWithBuiltInService(`
     @list op test(): ListTestResult;
     model ListTestResult {
-      @items
+      @pageItems
       @clientName("values")
       tests: Test[];
       @nextLink
@@ -408,7 +408,7 @@ it("azure page result with inheritance", async () => {
   await runner.compileWithBuiltInService(`
     @list op test(): ExtendedListTestResult;
     model ListTestResult {
-      @items
+      @pageItems
       values: Test[];
 
       @nextLink
@@ -763,8 +763,7 @@ it("next link with re-injected parameters", async () => {
     @list op test(...TestOptions): ListTestResult;
 
     model ListTestResult {
-      #suppress "deprecated" "Keep for validation purposes."
-      @items
+      @pageItems
       values: Test[];
       @nextLink
       nextLink: Azure.Core.Legacy.parameterizedNextLink<[TestOptions.includePending, TestOptions.includeExpired]>;
@@ -852,7 +851,7 @@ it("next link with mix of re-injected parameters and not", async () => {
     }
 
     model ParameterizedNextLinkPagingResult {
-      @items
+      @pageItems
       values: User[];
 
       @nextLink
@@ -946,8 +945,7 @@ it("next link with reinjected parameters with versioning", async () => {
     @list op test(...TestOptions): ListTestResult;
 
     model ListTestResult {
-      #suppress "deprecated" "Keep for validation purposes."
-      @items
+      @pageItems
       values: Test[];
       @nextLink
       nextLink: Azure.Core.Legacy.parameterizedNextLink<[TestOptions.includePending]>;

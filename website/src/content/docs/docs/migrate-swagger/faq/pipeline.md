@@ -138,7 +138,7 @@ Choose one of the following options:
 
 ```typespec
 model ResponseModel {
-  @items
+  @pageItems
   value: ItemType[];
 
   @nextLink
