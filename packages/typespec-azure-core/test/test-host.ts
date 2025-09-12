@@ -40,7 +40,7 @@ export const Tester = createTester(resolvePath(import.meta.dirname, ".."), {
 
 export const TesterWithService = Tester.wrap((code) => {
   return `
-    @useDependency(Azure.Core.Versions.v1_0_Preview_2) @service namespace Azure.MyService;
+    @service namespace Azure.MyService;
     ${code}
   `;
 });
@@ -77,7 +77,7 @@ export async function createAzureCoreTestRunner(
   const host = await createAzureCoreTestHost();
   const serviceNamespace = options.omitServiceNamespace
     ? ""
-    : `@useDependency(Azure.Core.Versions.v1_0_Preview_2) @service namespace Azure.MyService;\n`;
+    : `@service namespace Azure.MyService;\n`;
   return createTestWrapper(host, {
     autoImports: [],
     wrapper: (code) => `${CommonCode}${serviceNamespace}${code}`,

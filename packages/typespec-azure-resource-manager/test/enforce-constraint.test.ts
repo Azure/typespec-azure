@@ -180,8 +180,7 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
 describe("typespec-azure-resource-manager: rename parameter tests", () => {
   it("emits error when renaming a parameter to an existing parameter name", async () => {
     const { diagnostics } = await checkFor(`
-      @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    @armProviderNamespace
     namespace Microsoft.Contoso;
 
     @doc("Custom Mix in resource")
@@ -208,7 +207,7 @@ describe("typespec-azure-resource-manager: rename parameter tests", () => {
   it("emits warning when renaming a non-existent parameter", async () => {
     const { diagnostics } = await checkFor(`
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      
       namespace Microsoft.Contoso;
 
        @doc("Custom Mix in resource")
@@ -234,7 +233,7 @@ describe("typespec-azure-resource-manager: rename parameter tests", () => {
   it("emits a warning when renaming a non-path parameter", async () => {
     const { diagnostics } = await checkFor(`
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      
       namespace Microsoft.Contoso;
 
        @doc("Custom Mix in resource")
@@ -260,7 +259,7 @@ describe("typespec-azure-resource-manager: rename parameter tests", () => {
   it("emits no warning when renaming a parameter twice", async () => {
     const { diagnostics } = await checkFor(`
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      
       namespace Microsoft.Contoso;
 
        @doc("Custom Mix in resource")
@@ -283,7 +282,7 @@ describe("typespec-azure-resource-manager: rename parameter tests", () => {
   it("emits no warning when renaming a parameter", async () => {
     const { diagnostics } = await checkFor(`
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+      
       namespace Microsoft.Contoso;
 
        @doc("Custom Mix in resource")

@@ -59,7 +59,6 @@ model OperationStatus<StatusResult = never, StatusError = Foundations.Error> {
  * Conveys the resource instance to an operation as a request body.
  * @template Resource The type of the resource instance.
  */
-@added(Azure.Core.Versions.v1_0_Preview_2)
 @doc("Conveys the resource instance to an operation as a request body.")
 model ResourceBody<Resource> {
   @doc("The resource instance.")

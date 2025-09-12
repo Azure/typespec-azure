@@ -118,7 +118,6 @@ it("verify diagnostic gets raised for usage", async () => {
 
   const result = await runnerWithCore.diagnose(
     `        
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
       namespace MyService {
         model Model1{
           @Azure.ClientGenerator.Core.Legacy.flattenProperty
