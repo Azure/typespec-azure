@@ -30,4 +30,6 @@ op groupCustomized(options: GroupParametersOptions): void;
 
 op requireCustomized(@path param1: string, @path param2: string): void;
 
-@@override(_Specs_.Azure.ClientGenerator.Core.Override.RequireParameters.require, requireCustomized);
+@@override(_Specs_.Azure.ClientGenerator.Core.Override.RequireParameters.require,
+  requireCustomized
+);
