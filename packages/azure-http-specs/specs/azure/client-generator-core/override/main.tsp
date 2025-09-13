@@ -40,3 +40,19 @@ interface GroupParameters {
   @get
   group(@query param1: string, @query param2: string): void;
 }
+
+interface RequireParameters {
+  @scenario
+  @scenarioDoc("""
+    Verify that after `@override` an optional parameter can be made required in the client method signature.
+    
+    Expected path parameter:
+    param1: param1
+    param2: param2
+    
+    Expected response: 204 No Content
+    """)
+  @route("/require/{param1}/{param2}")
+  @get
+  require(@path param1: string, @path param2?: string): void;
+}
