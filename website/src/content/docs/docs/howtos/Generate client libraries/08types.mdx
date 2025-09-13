@@ -464,6 +464,39 @@ The `@clientDoc` decorator can be used on everything that the `@doc` decorator c
 When both `@doc` and `@clientDoc` are present, the generated code outputs the final documentation depending on the mode that you called `@clientDoc` with.
 If called with `replace`, `@clientDoc` replaces `@doc` completely. If called with `append`, `@clientDoc` is appended onto `@doc`.
 
+## Using `@alternateType` to Reference External Types
+
+The `@alternateType` decorator allows you to override the emitted type for a model, union, or enum in generated client libraries. With recent updates, you can now reference types defined in external namespaces or imported libraries.
+
+### Example: Referencing an External Type
+
+Suppose you want your generated client library to use a type from an external package instead of the default emitted type.
+
+```typespec
+@alternateType(
+  {
+    fullyQualifiedName: "externallib.ExternalModel",
+    package: "externallib",
+  },
+  "python"
+)
+model MyModel {
+  prop: string;
+}
+```
+
+In this example, instead of generating `MyModel` in the Python sdk, the emitter will reference `ExternalModel` from `externallib` instead.
+
+### Use Cases
+
+- Integrating with shared types from other services or libraries.
+- Ensuring consistency across multiple SDKs by reusing common models.
+- Reducing duplication when types are already defined elsewhere.
+
+### Notes
+
+- The referenced type should be compatible with the intended usage in the generated client library.
+
 ## Models
 
 ### Models with additional properties of any type
