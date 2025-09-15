@@ -90,6 +90,33 @@ it("nullable with more types", async function () {
   deepStrictEqual(runner.context.sdkPackage.unions[0], nullableType);
 });
 
+it("nullable doc", async function () {
+  await runner.compileWithBuiltInService(`
+    @usage(Usage.input | Usage.output)
+    model TestModel {
+      prop: TestNullable;
+    }
+    
+    @doc("nullable doc")
+    union TestNullable {
+      null,
+      {
+        prop: string;
+      }
+    }
+  `);
+
+  const nullableUnion = getSdkTypeHelper(runner);
+  strictEqual(nullableUnion.kind, "nullable");
+  strictEqual(nullableUnion.name, "TestNullable");
+  strictEqual(nullableUnion.isGeneratedName, false);
+  strictEqual(nullableUnion.doc, "nullable doc");
+
+  strictEqual(nullableUnion.type.kind, "model");
+  strictEqual(nullableUnion.type.name, "TestModelProp");
+  strictEqual(nullableUnion.type.isGeneratedName, true);
+});
+
 it("record with nullable", async function () {
   await runner.compileWithBuiltInService(`
     @usage(Usage.input | Usage.output)
