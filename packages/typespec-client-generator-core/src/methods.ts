@@ -1,7 +1,6 @@
 import {
   FinalOperationStep,
   getLroMetadata,
-  getPagedResult,
   getParameterizedNextLinkArguments,
   NextOperationLink,
   NextOperationReference,
@@ -11,6 +10,7 @@ import {
   TerminationStatus,
 } from "@azure-tools/typespec-azure-core";
 import {
+  compilerAssert,
   createDiagnosticCollector,
   Diagnostic,
   getSummary,
@@ -21,7 +21,6 @@ import {
   Operation,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
-import { isHeader } from "@typespec/http";
 import { createSdkClientType } from "./clients.js";
 import {
   getAccess,
@@ -56,7 +55,6 @@ import {
   SdkPropertyMap,
   SdkServiceMethod,
   SdkServiceOperation,
-  SdkServiceResponseHeader,
   SdkTerminationStatus,
   SdkType,
   TCGCContext,
@@ -260,110 +258,9 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
             : undefined,
       },
     });
+  } else {
+    compilerAssert(false, "Unexpected operation should be paged if calling this function");
   }
-
-  // azure core paging
-  const pagedMetadata = getPagedResult(context.program, operation)!;
-
-  if (
-    responseType?.__raw?.kind !== "Model" ||
-    responseType.kind !== "model" ||
-    !pagedMetadata.itemsProperty
-  ) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "unexpected-pageable-operation-return-type",
-        target: operation,
-        format: {
-          operationName: operation.name,
-        },
-      }),
-    );
-    // return as page method with no paging info
-    return diagnostics.wrap({
-      ...baseServiceMethod,
-      kind: "paging",
-      pagingMetadata: {},
-    });
-  }
-
-  context.__pagedResultSet.add(responseType);
-
-  // tcgc will let all paging method return a list of items
-  baseServiceMethod.response.type = diagnostics.pipe(
-    getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type),
-  );
-
-  baseServiceMethod.response.resultSegments = getPropertySegmentsFromModelOrParameters(
-    responseType,
-    (p) => p.__raw === pagedMetadata.itemsProperty,
-  ) as SdkModelPropertyType[] | undefined;
-
-  let nextLinkSegments: (SdkServiceResponseHeader | SdkModelPropertyType)[] | undefined = undefined;
-  let nextLinkReInjectedParametersSegments = undefined;
-  if (pagedMetadata.nextLinkProperty) {
-    if (isHeader(context.program, pagedMetadata.nextLinkProperty)) {
-      nextLinkSegments = baseServiceMethod.operation.responses
-        .map((r) => r.headers)
-        .flat()
-        .filter(
-          (h) =>
-            h.__raw?.kind === "ModelProperty" &&
-            findRootSourceProperty(h.__raw) ===
-              findRootSourceProperty(pagedMetadata.nextLinkProperty!),
-        );
-    } else {
-      nextLinkSegments = getPropertySegmentsFromModelOrParameters(
-        responseType,
-        (p) => p.__raw === pagedMetadata.nextLinkProperty,
-      ) as SdkModelPropertyType[];
-    }
-
-    if (pagedMetadata.nextLinkProperty.type.kind === "Scalar") {
-      nextLinkReInjectedParametersSegments = (
-        getParameterizedNextLinkArguments(context.program, pagedMetadata.nextLinkProperty.type) ??
-        []
-      ).map(
-        (t: ModelProperty) =>
-          getPropertySegmentsFromModelOrParameters(
-            baseServiceMethod.parameters,
-            (p) =>
-              p.__raw?.kind === "ModelProperty" &&
-              findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
-          )!,
-      );
-    }
-  }
-
-  return diagnostics.wrap({
-    ...baseServiceMethod,
-    __raw_paged_metadata: pagedMetadata,
-    kind: "paging",
-    nextLinkOperation: pagedMetadata?.nextLinkOperation
-      ? diagnostics.pipe(
-          getSdkServiceOperation<TServiceOperation>(
-            context,
-            pagedMetadata.nextLinkOperation,
-            baseServiceMethod.parameters,
-          ),
-        )
-      : undefined,
-    pagingMetadata: {
-      __raw: pagedMetadata,
-      nextLinkSegments,
-      nextLinkOperation: pagedMetadata?.nextLinkOperation
-        ? diagnostics.pipe(
-            getSdkServiceMethod<TServiceOperation>(
-              context,
-              pagedMetadata.nextLinkOperation,
-              client,
-            ),
-          )
-        : undefined,
-      nextLinkReInjectedParametersSegments,
-      pageItemsSegments: baseServiceMethod.response.resultSegments,
-    },
-  });
 }
 
 function mapFirstSegmentForResultSegments(
@@ -787,7 +684,7 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   client: SdkClientType<TServiceOperation>,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const lro = getLroMetadata(context.program, operation);
-  const paging = getPagedResult(context.program, operation) || isList(context.program, operation);
+  const paging = isList(context.program, operation);
   if (lro && paging) {
     return getSdkLroPagingServiceMethod<TServiceOperation>(context, operation, client);
   } else if (paging) {

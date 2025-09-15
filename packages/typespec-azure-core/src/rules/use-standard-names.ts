@@ -7,7 +7,6 @@ import {
 } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 import { isListOperation } from "@typespec/rest";
-import { getPagedResult } from "../decorators.js";
 
 export const useStandardNames = createRule({
   name: "use-standard-names",
@@ -33,10 +32,7 @@ export const useStandardNames = createRule({
         const name = op.name;
         const statusCodes = httpOp.responses.map((x) => x.statusCodes.toString());
         // operation is a list if it is decoratored as such (for example, through a template) or returns a paged result
-        const isListOp =
-          isListOperation(context.program, op) ||
-          getPagedResult(context.program, op) !== undefined ||
-          isList(context.program, op);
+        const isListOp = isListOperation(context.program, op) || isList(context.program, op);
         let errorMessage:
           | "list"
           | "get"

@@ -62,10 +62,6 @@ The `@azure-tools/typespec-azure-core` library defines the following decorators:
 
 | Declarator         | Scope                      | Usage                                                                                                   |
 | ------------------ | -------------------------- | ------------------------------------------------------------------------------------------------------- |
-| @pagedResult       | models                     | indicates model describes a paged result.                                                               |
-| @items             | model properties           | indicates model property that stores the items within a paged result.                                   |
-| @nextLink          | model properties           | indicates model property that contains the continuation information for the next page.                  |
-| @nextPageOperation | operations                 | indicates operation that will be called for subsequent page requests.                                   |
 | @lroStatus         | enums and model properties | indicates model or model property that represents long-running operation status.                        |
 | @lroSucceeded      | enum members               | indicates enum member that corresponds to the long-running operation succeeded status.                  |
 | @lroCanceled       | enum members               | indicates enum member that corresponds to the long-running operation canceled status.                   |

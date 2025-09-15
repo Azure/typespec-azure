@@ -18,12 +18,9 @@ beforeEach(async () => {
 
 it("azure paged result with encoded name", async () => {
   await runner.compileWithBuiltInService(`
-    op test(): ListTestResult;
-    #suppress "deprecated" "Keep for validation purposes."
-    @pagedResult
+    @list op test(): ListTestResult;
     model ListTestResult {
-      #suppress "deprecated" "Keep for validation purposes."
-      @items
+      @pageItems
       @clientName("values")
       tests: Test[];
       @nextLink
@@ -50,12 +47,9 @@ it("azure paged result with encoded name", async () => {
 
 it("azure paged result with next link in header", async () => {
   await runner.compileWithBuiltInService(`
-    op test(): ListTestResult;
-    #suppress "deprecated" "Keep for validation purposes."
-    @pagedResult
+    @list op test(): ListTestResult;
     model ListTestResult {
-      #suppress "deprecated" "Keep for validation purposes."
-      @items
+      @pageItems
       @clientName("values")
       tests: Test[];
       @nextLink
@@ -412,12 +406,9 @@ it("normal paged result with asymmetric nesting", async () => {
 
 it("azure page result with inheritance", async () => {
   await runner.compileWithBuiltInService(`
-    op test(): ExtendedListTestResult;
-    #suppress "deprecated" "Keep for validation purposes."
-    @pagedResult
+    @list op test(): ExtendedListTestResult;
     model ListTestResult {
-      #suppress "deprecated" "Keep for validation purposes."
-      @items
+      @pageItems
       values: Test[];
 
       @nextLink
@@ -769,13 +760,10 @@ it("next link with re-injected parameters", async () => {
       includeExpired?: boolean;
     }
 
-    op test(...TestOptions): ListTestResult;
+    @list op test(...TestOptions): ListTestResult;
 
-    #suppress "deprecated" "Keep for validation purposes."
-    @pagedResult
     model ListTestResult {
-      #suppress "deprecated" "Keep for validation purposes."
-      @items
+      @pageItems
       values: Test[];
       @nextLink
       nextLink: Azure.Core.Legacy.parameterizedNextLink<[TestOptions.includePending, TestOptions.includeExpired]>;
@@ -862,11 +850,8 @@ it("next link with mix of re-injected parameters and not", async () => {
       id: int32;
     }
 
-    #suppress "deprecated" "Keep for validation purposes."
-    @pagedResult
     model ParameterizedNextLinkPagingResult {
-      #suppress "deprecated" "Keep for validation purposes."
-      @items
+      @pageItems
       values: User[];
 
       @nextLink
@@ -875,7 +860,7 @@ it("next link with mix of re-injected parameters and not", async () => {
 
     @doc("List with parameterized next link that re-injects parameters.")
     @route("/with-parameterized-next-link")
-    op test(
+    @list op test(
       ...IncludePendingOptions,
       @query select: string,
     ): ParameterizedNextLinkPagingResult;
@@ -957,13 +942,10 @@ it("next link with reinjected parameters with versioning", async () => {
       includePending?: boolean;
     }
 
-    op test(...TestOptions): ListTestResult;
+    @list op test(...TestOptions): ListTestResult;
 
-    #suppress "deprecated" "Keep for validation purposes."
-    @pagedResult
     model ListTestResult {
-      #suppress "deprecated" "Keep for validation purposes."
-      @items
+      @pageItems
       values: Test[];
       @nextLink
       nextLink: Azure.Core.Legacy.parameterizedNextLink<[TestOptions.includePending]>;
