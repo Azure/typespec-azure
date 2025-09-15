@@ -2,6 +2,10 @@
 
 ## 0.1.0-alpha.29
 
+### Features
+
+- [#3255](https://github.com/Azure/typespec-azure/pull/3255) Add spector test cases for @previewVersion decorator
+
 ### Bug Fixes
 
 - [#3258](https://github.com/Azure/typespec-azure/pull/3258) Fix missing decorator for the test case of moving method parameter to client.
