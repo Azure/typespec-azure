@@ -1,3 +1,4 @@
+import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   Diagnostic,
   ModelProperty,
@@ -15,6 +16,8 @@ import {
   HttpOperationParameter,
   HttpOperationPathParameter,
   HttpOperationQueryParameter,
+  HttpOperationResponse,
+  HttpOperationResponseContent,
   Visibility,
   getCookieParamOptions,
   getHeaderFieldName,
@@ -35,6 +38,7 @@ import {
   CollectionFormat,
   SdkBodyParameter,
   SdkCookieParameter,
+  SdkEnumType,
   SdkHeaderParameter,
   SdkHttpErrorResponse,
   SdkHttpOperation,
@@ -56,6 +60,7 @@ import {
   getCorrespondingClientParam,
   getHttpBodyType,
   getHttpOperationResponseHeaders,
+  getSdkTypeBaseHelper,
   getStreamAsBytes,
   getTypeDecorators,
   isAcceptHeader,
@@ -69,11 +74,13 @@ import { isMediaTypeJson, isMediaTypeOctetStream, isMediaTypeTextPlain } from ".
 import {
   getCrossLanguageDefinitionId,
   getEffectivePayloadType,
+  getGeneratedName,
   getWireName,
   isApiVersion,
 } from "./public-utils.js";
 import {
   addEncodeInfo,
+  getClientType,
   getClientTypeWithDiagnostics,
   getSdkConstant,
   getSdkModelPropertyTypeBase,
@@ -470,6 +477,25 @@ export function getSdkHttpParameter(
   });
 }
 
+function divideBetweenUnionEnumAndOtherResponses(
+  context: TCGCContext,
+  httpOperation: HttpOperation,
+  httpOperationResponse: HttpOperationResponse,
+): { unionEnumResponse: SdkEnumType | undefined; otherResponses: HttpOperationResponseContent[] } {
+  const operation = httpOperation.operation;
+  let unionEnumResponse: SdkEnumType | undefined;
+  let otherResponses = httpOperationResponse.responses;
+  const methodReturnType = operation.returnType;
+  if (methodReturnType.kind === "Union" && getUnionAsEnum(methodReturnType)) {
+    unionEnumResponse = getClientType(context, methodReturnType) as SdkEnumType;
+    const unionEnumValues = [...methodReturnType.variants.values()].map((x) => x.type);
+    otherResponses = otherResponses.filter(
+      (r) => !(r.body && unionEnumValues.includes(r.body?.type)),
+    );
+  }
+  return { unionEnumResponse, otherResponses };
+}
+
 function getSdkHttpResponseAndExceptions(
   context: TCGCContext,
   httpOperation: HttpOperation,
@@ -489,53 +515,79 @@ function getSdkHttpResponseAndExceptions(
     let body: Type | undefined;
     let type: SdkType | undefined;
     let contentTypes: string[] = [];
-    for (const innerResponse of response.responses) {
-      const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
-        ? "application/json"
-        : innerResponse.body?.contentTypes[0];
-      for (const header of getHttpOperationResponseHeaders(innerResponse)) {
-        if (isNeverOrVoidType(header.type)) continue;
-        headers.push({
-          ...diagnostics.pipe(
-            getSdkModelPropertyTypeBase(context, header, httpOperation.operation),
-          ),
-          __raw: header,
-          kind: "responseheader",
-          serializedName: getHeaderFieldName(context.program, header),
-        });
-        context.__responseHeaderCache.set(header, headers[headers.length - 1]);
-      }
-      if (innerResponse.body && !isNeverOrVoidType(innerResponse.body.type)) {
-        if (body && body !== innerResponse.body.type) {
-          diagnostics.add(
-            createDiagnostic({
-              code: "multiple-response-types",
-              target: innerResponse.body.type,
-              format: {
-                operation: httpOperation.operation.name,
-              },
-            }),
-          );
-          body = tk.union.create([body, innerResponse.body.type]);
-        } else if (!body) {
-          body = innerResponse.body.type;
+    const { unionEnumResponse, otherResponses } = divideBetweenUnionEnumAndOtherResponses(
+      context,
+      httpOperation,
+      response,
+    );
+
+    if (unionEnumResponse && otherResponses.length === 0) {
+      // Only union enum response, no other responses
+      type = unionEnumResponse;
+    } else {
+      // Process all other responses (both union enum + others and no union enum cases)
+      for (const innerResponse of otherResponses) {
+        const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
+          ? "application/json"
+          : innerResponse.body?.contentTypes[0];
+        for (const header of getHttpOperationResponseHeaders(innerResponse)) {
+          if (isNeverOrVoidType(header.type)) continue;
+          headers.push({
+            ...diagnostics.pipe(
+              getSdkModelPropertyTypeBase(context, header, httpOperation.operation),
+            ),
+            __raw: header,
+            kind: "responseheader",
+            serializedName: getHeaderFieldName(context.program, header),
+          });
+          context.__responseHeaderCache.set(header, headers[headers.length - 1]);
         }
-        contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
-        body =
-          body.kind === "Model" ? getEffectivePayloadType(context, body, Visibility.Read) : body;
-        if (getStreamMetadata(context.program, innerResponse)) {
-          // map stream response body type to bytes
-          type = diagnostics.pipe(getStreamAsBytes(context, innerResponse.body.type));
-        } else {
-          type = diagnostics.pipe(
-            getClientTypeWithDiagnostics(context, body, httpOperation.operation),
-          );
-          if (innerResponse.body.property) {
-            addEncodeInfo(context, innerResponse.body.property, type, defaultContentType);
+        if (innerResponse.body && !isNeverOrVoidType(innerResponse.body.type)) {
+          if (body && body !== innerResponse.body.type) {
+            diagnostics.add(
+              createDiagnostic({
+                code: "multiple-response-types",
+                target: innerResponse.body.type,
+                format: {
+                  operation: httpOperation.operation.name,
+                },
+              }),
+            );
+            body = tk.union.create([body, innerResponse.body.type]);
+          } else if (!body) {
+            body = innerResponse.body.type;
+          }
+          contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
+          body =
+            body.kind === "Model" ? getEffectivePayloadType(context, body, Visibility.Read) : body;
+          if (getStreamMetadata(context.program, innerResponse)) {
+            // map stream response body type to bytes
+            type = diagnostics.pipe(getStreamAsBytes(context, body));
+          } else {
+            type = diagnostics.pipe(
+              getClientTypeWithDiagnostics(context, body, httpOperation.operation),
+            );
+            if (innerResponse.body.property) {
+              addEncodeInfo(context, innerResponse.body.property, type, defaultContentType);
+            }
           }
         }
       }
+      // If we have a union enum response, create union with processed type
+      if (unionEnumResponse) {
+        if (type) {
+          type = {
+            ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "union")),
+            name: getGeneratedName(context, httpOperation.operation.returnType, httpOperation.operation),
+            isGeneratedName: true,
+            variantTypes: [unionEnumResponse, type],
+          } as SdkType;
+        } else {
+          type = unionEnumResponse;
+        }
+      }
     }
+
     const sdkResponse = {
       __raw: response,
       type,

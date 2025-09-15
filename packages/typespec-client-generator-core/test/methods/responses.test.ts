@@ -500,3 +500,63 @@ it("multiple response types for one status code plus additional model for other 
   ok(stringServiceResponseType);
   strictEqual(stringServiceResponseType.kind, "string");
 });
+
+it("extensible enum union response type", async() => {
+  await runner.compileWithBuiltInService(
+    `
+    union DaysOfWeekExtensibleEnum {
+        string,
+        Monday: "Monday",
+        Tuesday: "Tuesday",
+        Wednesday: "Wednesday",
+        Thursday: "Thursday",
+        Friday: "Friday",
+        Saturday: "Saturday",
+        Sunday: "Sunday",
+    }
+    @get
+    @route("/unknown-value")
+    @doc("get extensible enum")
+    op getUnknownValue(): DaysOfWeekExtensibleEnum;
+    `
+  )
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  strictEqual(method.name, "getUnknownValue");
+  const responseType = method.response.type;
+  ok(responseType);
+  strictEqual(responseType.kind, "enum");
+  strictEqual(responseType.name, "DaysOfWeekExtensibleEnum");
+  strictEqual(responseType.isFixed, false);
+  strictEqual(responseType.values.length, 7);
+})
+
+it("extensible enum union response type unioned with other element", async() => {
+  await runner.compileWithBuiltInService(
+    `
+    union DaysOfWeekExtensibleEnum {
+        string,
+        Monday: "Monday",
+        Tuesday: "Tuesday",
+        Wednesday: "Wednesday",
+        Thursday: "Thursday",
+        Friday: "Friday",
+        Saturday: "Saturday",
+        Sunday: "Sunday",
+    }
+    @get
+    @route("/unknown-value")
+    @doc("get extensible enum")
+    op getUnknownValue(): DaysOfWeekExtensibleEnum | "unknown";
+    `
+  )
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  strictEqual(method.name, "getUnknownValue");
+  const responseType = method.response.type;
+  ok(responseType);
+  strictEqual(responseType.kind, "enum");
+  strictEqual(responseType.name, "DaysOfWeekExtensibleEnum");
+  strictEqual(responseType.isFixed, false);
+  strictEqual(responseType.values.length, 7);
+})
