@@ -2,8 +2,11 @@ import { ignoreDiagnostics } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 import type { UseFinalStateViaDecorator } from "../../generated-defs/Azure.Core.js";
 import { reportDiagnostic } from "../lib.js";
-import { FinalStateValue } from "../lro-helpers.js";
-import { setFinalStateOverride, validateFinalState } from "../state/final-state.js";
+import {
+  FinalStateValue,
+  setFinalStateOverride,
+  validateFinalState,
+} from "../state/final-state.js";
 
 /**
  * overrides the final state for an lro
