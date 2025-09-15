@@ -88,25 +88,26 @@ export function getDefaultApiVersion(
   }
 }
 
-function isModelProperty(type: any): type is ModelProperty {
-  return type && typeof type === "object" && "kind" in type && type.kind === "ModelProperty";
-}
-
 /**
  * Return whether a parameter is the Api Version parameter of a client
  * @param program
  * @param parameter
  * @returns
  */
-export function isApiVersion(context: TCGCContext, type: { name: string }): boolean {
-  if (isModelProperty(type)) {
-    const override = getIsApiVersion(context, type);
-    if (override !== undefined) {
-      return override;
-    }
+export function isApiVersion(context: TCGCContext, type: ModelProperty): boolean {
+  // author's customization is the highest priority
+  const override = getIsApiVersion(context, type);
+  if (override !== undefined) {
+    return override;
   }
+  // if the service is not versioning, then no api version parameter
+  const versionEnum = context.getPackageVersionEnum();
+  if (!versionEnum) {
+    return false;
+  }
+  // if the parameter type is the version enum or named as "apiVersion" or "api-version", then it is api version
   return (
-    (isModelProperty(type) && type.type === context.getPackageVersionEnum()) ||
+    type.type === versionEnum ||
     type.name.toLowerCase().includes("apiversion") ||
     type.name.toLowerCase().includes("api-version")
   );
