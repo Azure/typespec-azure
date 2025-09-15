@@ -110,7 +110,10 @@ export type JsonType = "array" | "boolean" | "integer" | "number" | "object" | "
  * Autorest allows a few properties to be next to $ref of a property.
  */
 export type OpenAPI2SchemaRefProperty = Ref<OpenAPI2Schema> &
-  Pick<OpenAPI2Schema, "readOnly" | "description" | "default" | "x-ms-mutability" | "title"> & {
+  Pick<
+    OpenAPI2Schema,
+    "readOnly" | "description" | "default" | "x-ms-mutability" | "title" | "xml"
+  > & {
     /**
      * Provide a different name to be used in the client.
      */
@@ -283,7 +286,35 @@ export type OpenAPI2Schema = Extensions & {
   minProperties?: number;
 
   "x-ms-mutability"?: string[];
+
+  /**
+   * XML metadata for the schema, if applicable.
+   */
+  xml?: XmlObject;
 };
+
+export interface XmlObject {
+  /**
+   * Overrides the XML element name for this schema or property.
+   */
+  name?: string;
+  /**
+   * XML namespace URI to use for the element/property.
+   */
+  namespace?: string;
+  /**
+   * XML namespace prefix to apply.
+   */
+  prefix?: string;
+  /**
+   * If true, the item is serialized as an XML attribute of its parent, not as a child element.
+   */
+  attribute?: boolean;
+  /**
+   * Controls whether array items are wrapped inside a container element. Useful when serializing arrays to XML.
+   */
+  wrapped?: boolean;
+}
 
 export type OpenAPI2FileSchema = {
   type: "file";

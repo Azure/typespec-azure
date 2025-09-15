@@ -89,10 +89,10 @@ describe("typespec-autorest: produces/consumes", () => {
       },
     ]);
 
-    strictEqual(result.globalConsumes[0], "application/json");
+    deepStrictEqual(result.globalConsumes, ["application/json"]);
     deepStrictEqual(result.operations.get("/in")?.produces, undefined);
     deepStrictEqual(result.operations.get("/in")?.consumes, undefined);
-    strictEqual(result.operations.get("/out")!.produces![0], "text/json");
+    deepStrictEqual(result.operations.get("/out")?.produces, ["text/json"]);
     strictEqual(result.operations.get("/out")?.consumes, undefined);
   });
 });

@@ -147,6 +147,7 @@ import {
   shouldInline,
 } from "@typespec/openapi";
 import { getVersionsForEnum } from "@typespec/versioning";
+import { getXmlName } from "@typespec/xml";
 import { AutorestOpenAPISchema } from "./autorest-openapi-schema.js";
 import { getExamples, getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
@@ -172,10 +173,12 @@ import {
   PrimitiveItems,
   Refable,
   XMSLongRunningFinalState,
+  XmlObject,
   XmsPageable,
 } from "./openapi2-document.js";
 import type { AutorestEmitterResult, LoadedExample } from "./types.js";
 import { AutorestEmitterContext, getClientName, resolveOperationId } from "./utils.js";
+import { resolveXmlModule } from "./xml.js";
 
 interface SchemaContext {
   readonly visibility: Visibility;
@@ -303,6 +306,8 @@ export async function getOpenAPIForService(
   const info = resolveInfo(program, service.type);
   const auth = processAuth(service.type);
 
+  const xml = await resolveXmlModule();
+
   const root: OpenAPI2Document = {
     swagger: "2.0",
     info: {
@@ -358,10 +363,6 @@ export async function getOpenAPIForService(
   // De-dupe the per-endpoint tags that will be added into the #/tags
   const tags: Set<string> = new Set();
 
-  // The set of produces/consumes values found in all operations
-  const globalProduces = new Set<string>(["application/json"]);
-  const globalConsumes = new Set<string>(["application/json"]);
-
   const operationIdsWithExample = new Set<string>();
 
   const [exampleMap, diagnostics] = await loadExamples(program, options, context.version);
@@ -370,6 +371,34 @@ export async function getOpenAPIForService(
   const httpService = ignoreDiagnostics(getHttpService(program, service.type));
   const routes = httpService.operations;
   reportIfNoRoutes(program, routes);
+
+  // The set of produces/consumes values found in all operations
+  let allResponseContentTypes = routes
+    .flatMap((route) => route.responses)
+    .flatMap((res) => res.responses)
+    .flatMap((res) => res.body?.contentTypes)
+    .filter(
+      (ct) =>
+        // XML and JSON are privileged to be the only content types that can live at the top level and inform global
+        // serializer/naming behavior.
+        ct === "application/json" || ct === "application/xml",
+    );
+  if (allResponseContentTypes.length === 0) allResponseContentTypes = ["application/json"];
+  const globalProduces = new Set<string>(allResponseContentTypes);
+
+  let allRequestContentTypes = routes
+    .flatMap((route) => route.parameters)
+    .flatMap((param) => param.body?.contentTypes ?? [])
+    .filter((ct) => ct === "application/json" || ct === "application/xml");
+  if (allRequestContentTypes.length === 0) allRequestContentTypes = ["application/json"];
+  const globalConsumes = new Set<string>(allRequestContentTypes);
+
+  const specHasXml = globalProduces.has("application/xml") || globalConsumes.has("application/xml");
+  const specIsOnlyXml =
+    globalProduces.size === 1 &&
+    globalProduces.has("application/xml") &&
+    globalConsumes.size === 1 &&
+    globalConsumes.has("application/xml");
 
   routes.forEach(emitOperation);
 
@@ -1099,11 +1128,6 @@ export async function getOpenAPIForService(
     return placeholder;
   }
 
-  function getJsonName(type: Type & { name: string }): string {
-    const encodedName = resolveEncodedName(program, type, "application/json");
-    return encodedName === type.name ? type.name : encodedName;
-  }
-
   function emitEndpointParameters(methodParams: HttpOperationParameters, visibility: Visibility) {
     const consumes: string[] = methodParams.body?.contentTypes ?? [];
 
@@ -1184,7 +1208,13 @@ export async function getOpenAPIForService(
 
     if (body.property) {
       const prop = body.property;
-      emitParameter(prop, () => getOpenAPI2BodyParameter(prop, getJsonName(prop), schema));
+      emitParameter(prop, () =>
+        getOpenAPI2BodyParameter(
+          prop,
+          resolveEncodedName(program, prop, "application/json"),
+          schema,
+        ),
+      );
     } else {
       currentEndpoint.parameters.push({
         name: "body",
@@ -1354,7 +1384,7 @@ export async function getOpenAPIForService(
       schema: bodySchema,
     };
 
-    const jsonName = getJsonName(param);
+    const jsonName = resolveEncodedName(program, param, "application/json");
     if (jsonName !== param.name) {
       // Special case to be able to keep pre-existing cases where you have both the body parameter name and x-ms-client-name
       reportDeprecated(
@@ -1579,6 +1609,12 @@ export async function getOpenAPIForService(
         checkDuplicateTypeName(program, processed.type, name, root.definitions!);
         processed.ref.value = "#/definitions/" + encodeURIComponent(name);
         if (processed.schema) {
+          if (specHasXml)
+            attachXml(
+              processed.type,
+              name,
+              processed as ProcessedSchema & { schema: OpenAPI2Schema },
+            );
           root.definitions![name] = processed.schema;
         }
       }
@@ -1997,14 +2033,16 @@ export async function getOpenAPIForService(
         continue;
       }
 
-      const jsonName = getJsonName(prop);
+      const propertySchemaName = specIsOnlyXml
+        ? resolveEncodedName(program, prop, "application/xml")
+        : resolveEncodedName(program, prop, "application/json");
       const clientName = getClientName(context, prop);
 
       const description = getDoc(program, prop);
       // if this property is a discriminator property, remove it to keep autorest validation happy
       if (model.baseModel) {
         const { propertyName } = getDiscriminator(program, model.baseModel) || {};
-        if (jsonName === propertyName) {
+        if (propertySchemaName === propertyName) {
           continue;
         }
       }
@@ -2016,15 +2054,25 @@ export async function getOpenAPIForService(
         if (!modelSchema.required) {
           modelSchema.required = [];
         }
-        modelSchema.required.push(jsonName);
+        modelSchema.required.push(propertySchemaName);
       }
 
       // Apply decorators on the property to the type's schema
-      properties[jsonName] = resolveProperty(prop, schemaContext);
-      const property: OpenAPI2SchemaProperty = properties[jsonName];
-      if (jsonName !== clientName) {
+      properties[propertySchemaName] = resolveProperty(prop, schemaContext);
+      const property: OpenAPI2SchemaProperty = properties[propertySchemaName];
+      if (propertySchemaName !== clientName) {
         property["x-ms-client-name"] = clientName;
       }
+
+      if (specHasXml && xml.available) {
+        const xmlName = resolveEncodedName(program, prop, "application/xml");
+
+        if (xmlName !== propertySchemaName) {
+          property.xml ??= {};
+          property.xml.name = xmlName;
+        }
+      }
+
       if (description) {
         property.description = description;
       }
@@ -2092,6 +2140,7 @@ export async function getOpenAPIForService(
 
     // Attach any OpenAPI extensions
     attachExtensions(model, modelSchema);
+
     return modelSchema;
   }
 
@@ -2138,6 +2187,13 @@ export async function getOpenAPIForService(
       applyArmIdentifiersDecorator(prop.type, propSchema, prop);
     }
 
+    if (specHasXml && xml.available) {
+      if (xml.module.isAttribute(program, prop)) {
+        propSchema.xml ??= {};
+        propSchema.xml.attribute = true;
+      }
+    }
+
     if (options.armResourceFlattening && isConditionallyFlattened(program, prop)) {
       return { ...applyIntrinsicDecorators(prop, propSchema), "x-ms-client-flatten": true };
     } else {
@@ -2171,6 +2227,31 @@ export async function getOpenAPIForService(
       for (const key of extensions.keys()) {
         emitObject[key] = extensions.get(key);
       }
+    }
+  }
+
+  function attachXml(
+    type: Type,
+    schemaName: string,
+    processed: ProcessedSchema & { schema: OpenAPI2Schema },
+  ) {
+    if (!xml.available) return;
+
+    const ns = xml.module.getNs(program, type);
+
+    if ("name" in type && type.name !== undefined && typeof type.name === "string") {
+      const xmlName = getXmlName(program, type);
+      if (xmlName && xmlName !== schemaName) setXmlField("name", xmlName);
+    }
+
+    if (ns) {
+      if (ns.namespace) setXmlField("namespace", ns.namespace);
+      if (ns.prefix) setXmlField("prefix", ns.prefix);
+    }
+
+    function setXmlField<K extends keyof XmlObject>(key: K, value: XmlObject[K]) {
+      processed.schema.xml ??= {};
+      processed.schema.xml[key] = value;
     }
   }
 
