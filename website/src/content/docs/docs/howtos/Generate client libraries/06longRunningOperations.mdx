@@ -1,5 +1,6 @@
 ---
 title: Long-Running Operations
+llmstxt: true
 ---
 
 import { ClientTabs, ClientTabItem } from "@components/client-tabs";
@@ -84,6 +85,10 @@ export class TestServiceClient {
 public SyncPoller<PollOperationDetails, User> beginCreateOrReplace(String name, User resource);
 ```
 
+```go
+func (c *Client) BeginCreateOrReplaceUser(ctx context.Context, name string, body User) (*runtime.Poller[User], error)
+```
+
 </ClientTabs>
 
 ## Resource delete
@@ -158,6 +163,10 @@ export class TestServiceClient {
 
 ```java
 public SyncPoller<PollOperationDetails, Void> beginDelete(String name);
+```
+
+```go
+func (c *Client) BeginDeleteUser(ctx context.Context, name string, options *DeleteUserOptions) (*runtime.Poller[User], error)
 ```
 
 </ClientTabs>
@@ -252,6 +261,10 @@ export class TestServiceClient {
 
 ```java
 public SyncPoller<PollOperationDetails, ExportedUser> beginExport(String name, String format);
+```
+
+```go
+func (c *Client) BeginExportUser(ctx context.Context, name string, format string, options *ExportUserOptions) (*runtime.Poller[ExportedUser], error)
 ```
 
 </ClientTabs>

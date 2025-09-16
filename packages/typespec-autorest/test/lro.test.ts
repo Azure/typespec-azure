@@ -32,8 +32,7 @@ describe("typespec-autorest: Long-running Operations", () => {
           endpoint: string,
         }
       )
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      namespace Test;
+          namespace Test;
 
       alias ServiceTraits = SupportsRepeatableRequests & SupportsConditionalRequests & SupportsClientRequestId;
 
@@ -81,9 +80,7 @@ describe("typespec-autorest: Long-running Operations", () => {
 
   const armCode = paramMessage`
       @armProviderNamespace
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+              namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 

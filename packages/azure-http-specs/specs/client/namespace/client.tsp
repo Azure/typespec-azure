@@ -13,32 +13,19 @@ namespace ClientNameSpaceClient;
   name: "ClientNamespaceFirstClient",
   service: Client.ClientNamespace,
 })
-@clientNamespace("client.clientnamespace", "java")
-@clientNamespace("client.clientnamespace", "python")
-@clientNamespace("client.clientnamespace", "javascript")
+@clientNamespace("client.clientnamespace")
 interface ClientNamespaceFirstClient {
   getFirst is First.getFirst;
 }
-@@clientNamespace(FirstModel, "client.clientnamespace.first", "java");
-@@clientNamespace(FirstModel, "client.clientnamespace.first", "python");
-@@clientNamespace(FirstModel, "client.clientnamespace.first", "javascript");
+@@clientNamespace(FirstModel, "client.clientnamespace.first");
 
 @client({
   name: "ClientNamespaceSecondClient",
   service: Client.ClientNamespace,
 })
-@clientNamespace("client.clientnamespace.second", "java")
-@clientNamespace("client.clientnamespace.second", "python")
-@clientNamespace("client.clientnamespace.second", "javascript")
+@clientNamespace("client.clientnamespace.second")
 namespace ClientNamespaceSecondClient {
   op getSecond is Second.getSecond;
 }
-@@clientNamespace(Second.Model, "client.clientnamespace.second", "java");
-@@clientNamespace(Second.Model, "client.clientnamespace.second", "python");
-@@clientNamespace(Second.Model, "client.clientnamespace.second", "javascript");
-@@clientNamespace(Second.Model.SecondClientEnumType, "client.clientnamespace.second.sub", "java");
-@@clientNamespace(Second.Model.SecondClientEnumType, "client.clientnamespace.second.sub", "python");
-@@clientNamespace(Second.Model.SecondClientEnumType,
-  "client.clientnamespace.second.sub",
-  "javascript"
-);
+@@clientNamespace(Second.Model, "client.clientnamespace.second");
+@@clientNamespace(Second.Model.SecondClientEnumType, "client.clientnamespace.second.sub");

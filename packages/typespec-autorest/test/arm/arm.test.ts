@@ -5,8 +5,7 @@ import { compileOpenAPI } from "../test-host.js";
 it("can share types with a library namespace", async () => {
   const openapi: any = await compileOpenAPI(
     `
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @armLibraryNamespace
+          @armLibraryNamespace
       namespace Microsoft.Library {
         model TestTrackedResource is TrackedResource<TestTrackedProperties> {
           @key("trackedResourceName")
@@ -31,8 +30,7 @@ it("can share types with a library namespace", async () => {
 
       @useLibraryNamespace(Microsoft.Library)
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test {
+          namespace Microsoft.Test {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -415,6 +413,7 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
       interface AllProperties {
         get is ArmResourceRead<AllPropertiesResource>;
         put is ArmResourceCreateOrReplaceAsync<AllPropertiesResource>;
+         @patch(#{ implicitOptionality: true })
         update is ArmCustomPatchAsync<AllPropertiesResource, AllPropertiesResource>;
         delete is ArmResourceDeleteWithoutOkAsync<AllPropertiesResource>;
       }
@@ -422,6 +421,7 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
       interface AssignedOperations {
         get is ArmResourceRead<SystemAssignedResource>;
         put is ArmResourceCreateOrReplaceAsync<SystemAssignedResource>;
+        @patch(#{ implicitOptionality: true })
         update is ArmCustomPatchAsync<SystemAssignedResource, SystemAssignedResource>;
         delete is ArmResourceDeleteWithoutOkAsync<SystemAssignedResource>;
       }

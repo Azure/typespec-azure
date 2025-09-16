@@ -1,8 +1,8 @@
 ---
-title: Resolving Swagger Breaking Change Violations
+title: Resolving OpenAPI Breaking Change Violations
 ---
 
-The Swagger Converter cannot perfectly represent every aspect of every API in TypeSpec. This document outlines common changes you may need to make to a converted TypeSpec to ensure compatibility with your existing service API and to pass check-in validations.
+The OpenAPI Converter cannot perfectly represent every aspect of every API in TypeSpec. This document outlines common changes you may need to make to a converted TypeSpec to ensure compatibility with your existing service API and to pass check-in validations.
 
 ## Migrating ARM Specifications
 

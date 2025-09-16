@@ -25,8 +25,7 @@ describe("typespec-azure-resource-manager: envelope properties rule", () => {
     await tester
       .expect(
         `
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @armProviderNamespace
+          @armProviderNamespace
       namespace Microsoft.Foo;
       model FooResource is ProxyResource<FooResourceProperties> {
         @key("foo") @segment("foo") @path @visibility(Lifecycle.Read)

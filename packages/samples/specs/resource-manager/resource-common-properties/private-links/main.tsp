@@ -16,12 +16,10 @@ namespace Microsoft.PrivateLinkTest;
 
 @doc("The PrivateLinkTest service versions.")
 enum Versions {
-  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
   @doc("The 2023-08-01-preview version.")
   `2023-08-01-preview`,
 
-  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   @doc("The 2023-11-01-preview version.")
   `2023-11-01-preview`,

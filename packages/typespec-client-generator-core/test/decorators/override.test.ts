@@ -1,7 +1,7 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 import { UsageFlags } from "../../src/interfaces.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 
@@ -50,9 +50,8 @@ it("basic", async () => {
   strictEqual(paramsModel, paramsParam.type);
 
   ok(method.operation.bodyParam);
-  strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 2);
-  strictEqual(method.operation.bodyParam.correspondingMethodParams[0], paramsModel.properties[0]);
-  strictEqual(method.operation.bodyParam.correspondingMethodParams[1], paramsModel.properties[1]);
+  strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 1);
+  strictEqual(method.operation.bodyParam.correspondingMethodParams[0], paramsParam);
 });
 
 it("basic with scope", async () => {
@@ -135,9 +134,8 @@ it("basic with scope", async () => {
     contentTypeParamWithCsharp,
   );
   ok(httpOpWithCsharp.bodyParam);
-  strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams.length, 2);
-  strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams[0], paramModel.properties[0]);
-  strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams[1], paramModel.properties[1]);
+  strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams.length, 1);
+  strictEqual(httpOpWithCsharp.bodyParam.correspondingMethodParams[0], paramsParamWithCsharp);
 });
 
 it("regrouping", async () => {
@@ -409,9 +407,8 @@ it("recursive params", async () => {
   strictEqual(paramsModel, inputParam.type);
 
   ok(method.operation.bodyParam);
-  strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 2);
-  strictEqual(method.operation.bodyParam.correspondingMethodParams[0], paramsModel.properties[0]);
-  strictEqual(method.operation.bodyParam.correspondingMethodParams[1], paramsModel.properties[1]);
+  strictEqual(method.operation.bodyParam.correspondingMethodParams.length, 1);
+  strictEqual(method.operation.bodyParam.correspondingMethodParams[0], inputParam);
 });
 
 it("core template", async () => {
@@ -513,4 +510,74 @@ it("remove optional query param and add secret name", async () => {
   ok(maxResultsParam);
   strictEqual(maxResultsParam.correspondingMethodParams.length, 0);
   strictEqual(maxResultsParam.name, "maxresults");
+});
+
+describe("@clientName", () => {
+  it("original method", async () => {
+    await runner.compileWithCustomization(
+      `
+      @service
+      namespace KeyVault;
+
+      op getSecret(@query("secret-name") secretName: string): void;
+      `,
+      `
+      op getSecretOverride(@query("secret-name") secretName: string): void;
+      @@override(KeyVault.getSecret, getSecretOverride);
+      @@clientName(KeyVault.getSecret, "listSecretProperties");
+      `,
+    );
+    const sdkPackage = runner.context.sdkPackage;
+    const method = sdkPackage.clients[0].methods[0];
+    strictEqual(method.parameters.length, 1);
+    strictEqual(method.name, "listSecretProperties");
+  });
+  it("override method", async () => {
+    const diagnostics = await runner.compileAndDiagnoseWithCustomization(
+      `
+      @service
+      namespace KeyVault;
+
+      op getSecret(@query("secret-name") secretName: string): void;
+      `,
+      `
+      op getSecretOverride(@query("secret-name") secretName: string): void;
+      @@override(KeyVault.getSecret, getSecretOverride);
+      @@clientName(getSecretOverride, "listSecretProperties");
+      `,
+    );
+    expectDiagnostics(diagnostics[1], {
+      code: "@azure-tools/typespec-client-generator-core/client-name-ineffective",
+      message:
+        'Application of @clientName decorator to listSecretProperties is not effective because it is applied to the override method. Please apply it on the original method definition "getSecret" instead.',
+    });
+    const sdkPackage = runner.context.sdkPackage;
+    const method = sdkPackage.clients[0].methods[0];
+    strictEqual(method.parameters.length, 1);
+    strictEqual(method.name, "getSecret");
+  });
+
+  it("override parameter", async () => {
+    await runner.compileWithCustomization(
+      `
+      @service
+      namespace KeyVault;
+
+      op getSecret(@query("secret-name") secretName: string): void;
+      `,
+      `
+      alias OverrideParameters = {
+        @query("secret-name") secretName: string,
+      };
+      
+      op getSecretOverride(...OverrideParameters): void;
+      @@override(KeyVault.getSecret, getSecretOverride);
+      @@clientName(OverrideParameters.secretName, "secretNameOverride");
+      `,
+    );
+    const sdkPackage = runner.context.sdkPackage;
+    const method = sdkPackage.clients[0].methods[0];
+    strictEqual(method.parameters.length, 1);
+    strictEqual(method.parameters[0].name, "secretNameOverride");
+  });
 });

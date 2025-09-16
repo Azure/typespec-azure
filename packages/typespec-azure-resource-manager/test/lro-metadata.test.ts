@@ -30,8 +30,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
     const [metadata, _diag, _runner] = await getLroMetadataFor(
       `
   @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -83,8 +82,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
     const [metadata, _diag, _runner] = await getLroMetadataFor(
       `
   @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -144,8 +142,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
     const [metadata, _diag, _runner] = await getLroMetadataFor(
       `
   @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -196,8 +193,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
     const [metadata, _diag, _runner] = await getLroMetadataFor(
       `
   @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -248,8 +244,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
     const [metadata, _diag, _runner] = await getLroMetadataFor(
       `
   @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -313,8 +308,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
     const [metadata, _diag, _runner] = await getLroMetadataFor(
       `
   @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -379,8 +373,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
     const [metadata, _diag, _runner] = await getLroMetadataFor(
       `
   @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -433,8 +426,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
     const [metadata, _diag, _runner] = await getLroMetadataFor(
       `
   @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -494,8 +486,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
     const [metadata, _diag, _runner] = await getLroMetadataFor(
       `
   @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -548,8 +539,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
     const [metadata, _diag, _runner] = await getLroMetadataFor(
       `
   @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -602,8 +592,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
     const [metadata, _diag, _runner] = await getLroMetadataFor(
       `
   @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -654,8 +643,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
     const [metadata, _diag, _runner] = await getLroMetadataFor(
       `
   @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -706,8 +694,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
     const [metadata, _diag, _runner] = await getLroMetadataFor(
       `
   @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -772,8 +759,6 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
     const [metadata, _diag, _runner] = await getLroMetadataFor(
       `
   @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @useDependency(Azure.Core.Versions.v1_0_Preview_1)
       namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}

@@ -1,5 +1,6 @@
 ---
 title: Multipart Operations
+llmstxt: true
 ---
 
 import { ClientTabs, ClientTabItem } from "@components/client-tabs";
@@ -114,6 +115,32 @@ public final class MultipartRequest {
 
 // Client API
 public void upload(MultipartRequest body);
+```
+
+```go
+type Address struct {
+	City *string
+}
+
+type File struct {
+	Contents []byte
+	ContentType *string
+	Filename *string
+}
+
+type MultipartRequest struct {
+	Address Address
+	ID string
+	Pictures []streaming.MultipartContent
+	PreviousAddresses []Address
+	ProfileImage streaming.MultipartContent
+}
+
+type FileUploadServiceClientUploadOptions struct {}
+
+type FileUploadServiceClientUploadResponse struct {}
+
+func (client *FileUploadServiceClient) Upload(ctx context.Context, body MultipartRequest, options *FileUploadServiceClientUploadOptions) (FileUploadServiceClientUploadResponse, error)
 ```
 
 </ClientTabs>

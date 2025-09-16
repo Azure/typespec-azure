@@ -95,8 +95,7 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
     await tester
       .expect(
         `
-          @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-          @armProviderNamespace
+                  @armProviderNamespace
           namespace Microsoft.Foo;
           
           model Employee is TrackedResource<{}> {
@@ -117,8 +116,7 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
     await tester
       .expect(
         `
-          @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-          @armProviderNamespace
+                  @armProviderNamespace
           namespace Microsoft.Foo;
           
           model Employee is TrackedResource<{}> {
@@ -141,8 +139,7 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
     await tester
       .expect(
         `
-          @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-          @armProviderNamespace
+                  @armProviderNamespace
           namespace Microsoft.Foo;
           
           @armResourceOperations
@@ -159,8 +156,7 @@ describe("typespec-azure-resource-manager: no response body rule", () => {
       .expect(
         `
           @armProviderNamespace
-          @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-          namespace Microsoft.ContosoProviderHub;
+                  namespace Microsoft.ContosoProviderHub;
 
           op SampleTemplate<
             Resource extends Foundations.Resource,

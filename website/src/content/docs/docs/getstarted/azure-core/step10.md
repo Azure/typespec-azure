@@ -1,5 +1,7 @@
 ---
 title: 10. Versioning
+description: Versioning your data-plane service
+llmstxt: true
 ---
 
 ## Versioning your service
@@ -14,7 +16,6 @@ Here is an example for the `WidgetManager` service:
 namespace Contoso.WidgetManager;
 
 enum Versions {
-  @useDependency(Azure.Core.Versions.v1_0_Preview_1)
   v2022_08_31: "2022-08-31",
 }
 ```
@@ -29,9 +30,7 @@ Imagine that it's 3 months later and you want to release a new version of your s
 
 ```typespec
 enum Versions {
-  @useDependency(Azure.Core.Versions.v1_0_Preview_1)
   v2022_08_31: "2022-08-31",
-
   v2022_11_30: "2022-11-30",
 }
 ```
@@ -40,10 +39,7 @@ You will also need to add the `@useDependency` decorator:
 
 ```typespec
 enum Versions {
-  @useDependency(Azure.Core.Versions.v1_0_Preview_1)
   v2022_08_31: "2022-08-31",
-
-  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
   v2022_11_30: "2022-11-30",
 }
 ```
@@ -91,10 +87,7 @@ If your spec has [multiple versions](#versioning-your-service), you will need to
 namespace Contoso.WidgetManager;
 
 enum Versions {
-  @useDependency(Azure.Core.Versions.v1_0_Preview_1)
   v2022_08_31: "v20220831",
-
-  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
   v2022_11_30: "v20221130",
 }
 ```

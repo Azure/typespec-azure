@@ -1,5 +1,7 @@
 ---
 title: "Interfaces and Operations"
+description: "Interfaces and Operations exported by @azure-tools/typespec-azure-core"
+llmstxt: true
 ---
 
 ## Azure.Core

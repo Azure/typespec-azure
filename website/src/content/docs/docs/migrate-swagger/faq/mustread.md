@@ -1,8 +1,8 @@
 ---
-title: Understanding the Swagger Changes
+title: Understanding the OpenAPI Changes
 ---
 
-To fully leverage the benefits of TypeSpec and follow best practices, there are some unavoidable changes when migrating from Swagger to TypeSpec.
+To fully leverage the benefits of TypeSpec and follow best practices, there are some unavoidable changes when migrating from OpenAPI to TypeSpec.
 
 ## Using Resources from Common Types
 
@@ -14,7 +14,7 @@ An ARM Resource model should extend one of the typespec common-types Resource mo
 2. At least one operation returns a 200 response containing this model.
 3. The model has properties named `id`, `name`, and `type`.
 
-Once a model is identified as a resource, it is represented by extending an appropriate [resource model](../../howtos/ARM/resource-type.md#modeling-resources-in-typespec) from the TypeSpec library. This can result in textual differences between the original Swagger and generated Swagger like:
+Once a model is identified as a resource, it is represented by extending an appropriate [resource model](../../howtos/ARM/resource-type.md#modeling-resources-in-typespec) from the TypeSpec library. This can result in textual differences between the original OpenAPI file and generated OpenAPI file like:
 
 ```diff
 "YourResource": {
@@ -80,7 +80,7 @@ The `"readOnly": true` property should only be used on properties, not on models
 }
 ```
 
-Decorating the property referencing the model with '@visibility(Lifecycle.Read)` is equivalent to marking the model schema as read-only as in the Swagger above.
+Decorating the property referencing the model with '@visibility(Lifecycle.Read)` is equivalent to marking the model schema as read-only as in the OpenAPI above.
 
 ```tsp
 model ReadOnlyModel {}

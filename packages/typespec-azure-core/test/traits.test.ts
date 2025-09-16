@@ -16,9 +16,7 @@ describe("typespec-azure-core: service traits", () => {
     namespace Microsoft.Test;
 
     enum Versions {
-      @useDependency(Azure.Core.Versions.v1_0_Preview_1)
       v1,
-      @useDependency(Azure.Core.Versions.v1_0_Preview_1)
       v2
     }
 
