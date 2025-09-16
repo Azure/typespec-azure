@@ -1177,3 +1177,44 @@ model SportsCar extends Vehicle {
 }
 
 ```
+
+### `@markAsLro` {#@Azure.ClientGenerator.Core.Legacy.markAsLro}
+
+Forces an operation to be treated as a Long Running Operation (LRO) by the SDK generators,
+even when the operation is not long-running on the service side.
+
+When applied, TCGC will treat the operation as an LRO and SDK generators should:
+
+- Generate polling mechanisms (pollers)
+- Return appropriate LRO-specific return types
+- Handle the operation as an asynchronous long-running process
+
+This decorator is considered legacy functionality and should only be used when
+standard TypeSpec LRO patterns are not feasible.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.markAsLro(value: valueof boolean, scope?: valueof string)
+```
+
+#### Target
+
+The operation that should be treated as a Long Running Operation
+`Operation`
+
+#### Parameters
+
+| Name  | Type              | Description                                                                                                                                                                                                                                                     |
+| ----- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| value | `valueof boolean` |                                                                                                                                                                                                                                                                 |
+| scope | `valueof string`  | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+
+#### Examples
+
+##### Force a regular operation to be treated as LRO for backward compatibility
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.markAsLro
+@route("/deployments/{deploymentId}")
+@post
+op startDeployment(@path deploymentId: string): DeploymentResult | ErrorResponse;
+```

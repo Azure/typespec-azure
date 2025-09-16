@@ -43,6 +43,7 @@ import {
 import {
   FlattenPropertyDecorator,
   HierarchyBuildingDecorator,
+  MarkAsLroDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
   AccessFlags,
@@ -1417,6 +1418,21 @@ export function getLegacyHierarchyBuilding(context: TCGCContext, target: Model):
   if (!context.enableLegacyHierarchyBuilding) return undefined;
 
   return getScopedDecoratorData(context, legacyHierarchyBuildingKey, target);
+}
+
+const markAsLroKey = createStateSymbol("markAsLro");
+
+export const $markAsLro: MarkAsLroDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  value?: boolean,
+  scope?: LanguageScopes,
+) => {
+  setScopedDecoratorData(context, $markAsLro, markAsLroKey, target, value, scope);
+};
+
+export function getMarkAsLro(context: TCGCContext, entity: Operation): boolean {
+  return getScopedDecoratorData(context, markAsLroKey, entity) ?? false;
 }
 
 /**

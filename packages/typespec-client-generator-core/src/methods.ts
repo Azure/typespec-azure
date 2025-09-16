@@ -70,6 +70,7 @@ import {
   getClientDoc,
   getCorrespondingClientParam,
   getHashForType,
+  getTcgcLroMetadata,
   getTypeDecorators,
   isNeverOrVoidType,
   isSubscriptionId,
@@ -474,7 +475,7 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
 ): SdkLroServiceMetadata | undefined {
-  const rawMetadata = getLroMetadata(context.program, operation);
+  const rawMetadata = getTcgcLroMetadata(context, operation);
   if (rawMetadata === undefined) {
     return undefined;
   }
@@ -786,7 +787,7 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
-  const lro = getLroMetadata(context.program, operation);
+  const lro = getTcgcLroMetadata(context, operation);
   const paging = getPagedResult(context.program, operation) || isList(context.program, operation);
   if (lro && paging) {
     return getSdkLroPagingServiceMethod<TServiceOperation>(context, operation, client);
