@@ -1323,7 +1323,7 @@ This decorator is considered legacy functionality and should only be used when
 standard TypeSpec LRO patterns are not feasible.
 
 ```typespec
-@Azure.ClientGenerator.Core.Legacy.markAsLro(value: valueof boolean, scope?: valueof string)
+@Azure.ClientGenerator.Core.Legacy.markAsLro(scope?: valueof string)
 ```
 
 ##### Target
@@ -1333,10 +1333,9 @@ The operation that should be treated as a Long Running Operation
 
 ##### Parameters
 
-| Name  | Type              | Description                                                                                                                                                                                                                                                     |
-| ----- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| value | `valueof boolean` |                                                                                                                                                                                                                                                                 |
-| scope | `valueof string`  | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| Name  | Type             | Description                                                                                                                                                                                                                                                     |
+| ----- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 ##### Examples
 
