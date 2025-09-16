@@ -892,6 +892,8 @@ export function getTcgcLroMetadata(
         },
       },
       envelopeResult: returnType,
+      finalEnvelopeResult: returnType,
+      finalResult: returnType,
     };
   }
   return undefined;

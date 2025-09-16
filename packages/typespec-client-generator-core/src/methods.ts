@@ -1,6 +1,5 @@
 import {
   FinalOperationStep,
-  getLroMetadata,
   getPagedResult,
   getParameterizedNextLinkArguments,
   NextOperationLink,
