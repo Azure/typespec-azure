@@ -1428,6 +1428,16 @@ export const $markAsLro: MarkAsLroDecorator = (
   value?: boolean,
   scope?: LanguageScopes,
 ) => {
+  if (target.returnType.kind !== "Model") {
+    reportDiagnostic(context.program, {
+      code: "invalid-mark-as-lro-target",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
   setScopedDecoratorData(context, $markAsLro, markAsLroKey, target, value, scope);
 };
 

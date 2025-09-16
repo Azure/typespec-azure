@@ -1,3 +1,4 @@
+import { FinalStateValue, getLroMetadata, LroMetadata } from "@azure-tools/typespec-azure-core";
 import {
   BooleanLiteral,
   compilerAssert,
@@ -41,6 +42,7 @@ import {
   getAlternateType,
   getClientDocExplicit,
   getClientLocation,
+  getMarkAsLro,
   getParamAlias,
 } from "./decorators.js";
 import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
@@ -65,7 +67,6 @@ import {
   isApiVersion,
 } from "./public-utils.js";
 import { getClientTypeWithDiagnostics } from "./types.js";
-import { getLroMetadata, LroMetadata } from "@azure-tools/typespec-azure-core";
 
 export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
   "emitter-name"?: string;
@@ -858,7 +859,7 @@ export function findEntriesWithTarget<TSource extends Type, TTarget>(
 
 /**
  * Retrieves Long Running Operation (LRO) metadata for a given operation.
- * 
+ *
  * This function serves as a wrapper that:
  * 1. First tries to get LRO metadata using the `getLroMetadata` function from the Azure Core library
  * 2. If unavailable or undefined, it would check for the existence of a `getMarkAsLro` function
@@ -868,6 +869,30 @@ export function findEntriesWithTarget<TSource extends Type, TTarget>(
  * @param operation - The TypeSpec operation to check for LRO metadata
  * @returns The LRO metadata for the operation if available, otherwise undefined
  */
-export function getTcgcLroMetadata(context: TCGCContext, operation: Operation): LroMetadata | undefined {
-  return getLroMetadata(context.program, operation);
+export function getTcgcLroMetadata(
+  context: TCGCContext,
+  operation: Operation,
+): LroMetadata | undefined {
+  const lroMetaData = getLroMetadata(context.program, operation);
+  if (lroMetaData) {
+    return lroMetaData;
+  }
+  if (getMarkAsLro(context, operation)) {
+    // we guard against this in the setting of `@markAsLro`
+    const returnType = operation.returnType as Model;
+    return {
+      operation,
+      logicalResult: returnType,
+      finalStateVia: FinalStateValue.azureAsyncOperation, // assume arm, but since this isn't really an lro, it doesn't really matter
+      pollingInfo: {
+        kind: "pollingOperationStep",
+        responseModel: returnType,
+        terminationStatus: {
+          kind: "status-code",
+        },
+      },
+      envelopeResult: returnType,
+    };
+  }
+  return undefined;
 }
