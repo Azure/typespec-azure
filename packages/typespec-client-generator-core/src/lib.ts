@@ -435,6 +435,18 @@ export const $lib = createTypeSpecLibrary({
         default: "@hierarchyBuilding decorator causes recursive base type reference.",
       },
     },
+    "missing-scope": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@scope decorator should be applied with ${"decoratorName"} since it is highly likely this is language-specific`,
+      },
+    },
+    "external-library-version-mismatch": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`External library version mismatch. There are multiple versions of ${"libraryName"}: ${"versionA"} and ${"versionB"}. Please unify the versions.`,
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,

@@ -593,10 +593,31 @@ extern dec clientNamespace(
 );
 
 /**
- * Set an alternate type for a model property, Scalar, or function parameter. Note that `@encode` will be overridden by the one defined in the alternate type.
+ * Represents an external type that can be used in alternate type definitions.
+ */
+model ExternalType {
+  /**
+   * The identity of the external type. For example, `pystac.Collection`
+   */
+  identity: string;
+
+  /**
+   * The package that exports the external type. For example, `pystac`
+   */
+  package?: string;
+
+  /**
+   * The minimum version of the package to use for your external type. For example, `1.13.0`
+   */
+  minVersion?: string;
+}
+
+/**
+ * Set an alternate type for a model property, Scalar, Model, Enum, Union, or function parameter. Note that `@encode` will be overridden by the one defined in the alternate type.
  * When the source type is `Scalar`, the alternate type must be `Scalar`.
+ * The replaced type could be a type defined in the TypeSpec or an external type declared by type identity, package that export the type and package version.
  * @param target The source type to which the alternate type will be applied.
- * @param alternate The alternate type to apply to the target.
+ * @param alternate The alternate type to apply to the target. Can be a TypeSpec type or an ExternalType.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Change a model property to a different type
@@ -628,10 +649,33 @@ extern dec clientNamespace(
  *   locations: string[];
  * }
  * ```
+ *
+ * @example Use external type for DFE case
+ * ```typespec
+ * @alternateType({
+ *   identity: "Azure.Core.Expressions.DataFactoryExpression",
+ * }, "csharp")
+ * union Dfe<T> {
+ *   T,
+ *   DfeExpression
+ * }
+ * ```
+ *
+ * @example Use external type with package information
+ * ```typespec
+ * @alternateType({
+ *   identity: "pystac.Collection",
+ *   package: "pystac",
+ *   minVersion: "1.13.0",
+ * }, "python")
+ * model ItemCollection {
+ *   // ... properties
+ * }
+ * ```
  */
 extern dec alternateType(
-  target: ModelProperty | Scalar,
-  alternate: unknown,
+  target: ModelProperty | Scalar | Model | Enum | Union,
+  alternate: unknown | ExternalType,
   scope?: valueof string
 );
 
