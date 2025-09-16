@@ -1,3 +1,4 @@
+import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
   DecoratorContext,
   DecoratorFunction,
@@ -1425,7 +1426,6 @@ const markAsLroKey = createStateSymbol("markAsLro");
 export const $markAsLro: MarkAsLroDecorator = (
   context: DecoratorContext,
   target: Operation,
-  value?: boolean,
   scope?: LanguageScopes,
 ) => {
   if (target.returnType.kind !== "Model") {
@@ -1438,7 +1438,17 @@ export const $markAsLro: MarkAsLroDecorator = (
     });
     return;
   }
-  setScopedDecoratorData(context, $markAsLro, markAsLroKey, target, value, scope);
+  if (getLroMetadata(context.program, target)) {
+    reportDiagnostic(context.program, {
+      code: "mark-as-lro-ineffective",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+  setScopedDecoratorData(context, $markAsLro, markAsLroKey, target, true, scope);
 };
 
 export function getMarkAsLro(context: TCGCContext, entity: Operation): boolean {

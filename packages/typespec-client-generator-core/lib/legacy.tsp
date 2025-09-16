@@ -92,4 +92,4 @@ extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
  * ```
  *
  */
-extern dec markAsLro(target: Operation, value: valueof boolean, scope?: valueof string);
+extern dec markAsLro(target: Operation, scope?: valueof string);

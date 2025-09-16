@@ -99,7 +99,6 @@ export type FlattenPropertyDecorator = (
 export type MarkAsLroDecorator = (
   context: DecoratorContext,
   target: Operation,
-  value: boolean,
   scope?: string,
 ) => void;
 
