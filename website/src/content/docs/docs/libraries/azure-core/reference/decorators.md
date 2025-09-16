@@ -1,7 +1,9 @@
 ---
 title: "Decorators"
+description: "Decorators exported by @azure-tools/typespec-azure-core"
 toc_min_heading_level: 2
 toc_max_heading_level: 3
+llmstxt: true
 ---
 
 ## Azure.Core
@@ -167,25 +169,6 @@ Identifies an EnumMember as a long-running "Succeeded" terminal state.
 #### Parameters
 
 None
-
-### `@nextPageOperation` {#@Azure.Core.nextPageOperation}
-
-Identifies that an operation is used to retrieve the next page for paged operations.
-
-```typespec
-@Azure.Core.nextPageOperation(linkedOperation: Operation, parameters?: {})
-```
-
-#### Target
-
-`Operation`
-
-#### Parameters
-
-| Name            | Type        | Description                                                                                                               |
-| --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
-| linkedOperation | `Operation` | The linked Operation                                                                                                      |
-| parameters      | `{}`        | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
 
 ### `@operationLink` {#@Azure.Core.operationLink}
 

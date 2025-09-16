@@ -149,8 +149,7 @@ export async function createSdkTestRunner(
     /** Api versions */
     enum Versions {
       /** 2024-04-01-preview api version */
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      V2024_04_01_PREVIEW: "2024-04-01-preview",
+          V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
     ${code}`,
       {

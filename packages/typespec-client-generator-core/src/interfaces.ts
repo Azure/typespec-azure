@@ -80,6 +80,7 @@ export interface TCGCContext {
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
   __packageVersions?: string[]; // the package versions from the service versioning config and api version setting in tspconfig.
   __packageVersionEnum?: Enum; // the enum type that contains all the package versions.
+  __externalPackageToVersions?: Map<string, string>;
 
   getMutatedGlobalNamespace(): Namespace;
   getApiVersionsForType(type: Type): string[];
@@ -225,7 +226,17 @@ export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
   children?: SdkClientType<TServiceOperation>[];
 }
 
-interface SdkTypeBase extends DecoratedType {
+interface ExternalType {
+  external?: ExternalTypeInfo;
+}
+
+export interface ExternalTypeInfo {
+  identity: string;
+  package?: string;
+  minVersion?: string;
+}
+
+interface SdkTypeBase extends DecoratedType, ExternalType {
   __raw?: Type;
   kind: string;
   /** Whether the type is deprecated. */
@@ -1139,7 +1150,8 @@ export interface LicenseInfo {
 /**
  * Represents a namespace in the package, containing all clients, operations, and types.
  */
-export interface SdkNamespace<TServiceOperation extends SdkServiceOperation> {
+export interface SdkNamespace<TServiceOperation extends SdkServiceOperation> extends DecoratedType {
+  __raw?: Namespace;
   /** Namespace name. */
   name: string;
   /** Namespace full qualified name. */

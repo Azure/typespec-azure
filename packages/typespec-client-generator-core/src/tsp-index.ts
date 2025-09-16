@@ -38,8 +38,6 @@ export const $decorators = {
     operationGroup: $operationGroup,
     usage: $usage,
     access: $access,
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    flattenProperty: $flattenProperty,
     override: $override,
     useSystemTextJsonConverter: $useSystemTextJsonConverter,
     clientInitialization: $clientInitialization,
@@ -57,5 +55,6 @@ export const $decorators = {
 
   "Azure.ClientGenerator.Core.Legacy": {
     hierarchyBuilding: $legacyHierarchyBuilding,
+    flattenProperty: $flattenProperty,
   } satisfies AzureClientGeneratorCoreLegacyDecorators,
 };

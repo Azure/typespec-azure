@@ -25,8 +25,7 @@ describe("typespec-azure-resource-manager: model nesting rule", () => {
       .expect(
         `
         @Azure.ResourceManager.armProviderNamespace
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        namespace MyService;
+              namespace MyService;
 
         model A is TrackedResource<{}> {
           @key("a") @segment("as") @path
@@ -54,8 +53,7 @@ describe("typespec-azure-resource-manager: model nesting rule", () => {
       .expect(
         `
         @Azure.ResourceManager.armProviderNamespace
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        namespace MyService;
+              namespace MyService;
 
         model A is TrackedResource<{}> {
           @key("a") @segment("as") @path

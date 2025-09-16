@@ -1,5 +1,6 @@
 ---
 title: Versioning
+llmstxt: true
 ---
 
 import { ClientTabs, ClientTabItem } from "@components/client-tabs";
@@ -71,7 +72,24 @@ ServiceClient client = new ServiceClient(endpoint, options);
 ```
 
 ```typescript
-// there's no apiVersion defined in the all the operations, TypeScript emitter will ignore it.
+export interface StableModel {
+  stableFeature: string;
+}
+
+export function stableModelSerializer(item: StableModel): any {
+  return { stableFeature: item["stableFeature"] };
+}
+
+/** Known values of {@link Versions} that the service accepts. */
+export enum KnownVersions {
+  V20231101 = "2023-11-01",
+}
+
+export async function stableFunctionality(
+  context: Client,
+  stableModel: StableModel,
+  options: StableFunctionalityOptionalParams = { requestOptions: {} },
+): Promise<void>;
 ```
 
 ```java
@@ -97,6 +115,14 @@ serviceClientClient.stableFunctionality(stableModel);
 ```
 
 ```go
+type StableModel struct {
+	StableFeature *string
+}
+type ServiceClientStableFunctionalityOptions struct {}
+type ServiceClientStableFunctionalityResponse struct {}
+type ServiceClient struct {}
+
+func (client *ServiceClient) StableFunctionality(ctx context.Context, stableModel StableModel, options *ServiceClientStableFunctionalityOptions) (ServiceClientStableFunctionalityResponse, error) {}
 
 ```
 
@@ -133,7 +159,7 @@ namespace My.Service;
 
 enum Versions {
   v2023_11_01_preview: "2023-11-01-preview",
-  v2023_11_01: "2023-11-01",
+  v2023_11_02: "2023-11-02",
 }
 
 model PreviewModel {
@@ -145,9 +171,11 @@ model StableModel {
 }
 
 @added(Versions.v2023_11_01_preview)
-@removed(Versions.v2023_11_01)
+@removed(Versions.v2023_11_02)
+@route("/preview")
 op previewFunctionality(@body previewModel: PreviewModel): void;
 
+@route("/stable")
 op stableFunctionality(@body stableModel: StableModel): void;
 ```
 
@@ -156,7 +184,7 @@ import pytest
 from my.service import MyServiceClient, models
 
 client = MyServiceClient(endpoint=..., credential=...)
-# client's api_version will be "2023-11-01"
+# client's api_version will be "2023-11-02"
 
 stable_model = models.StableModel(stable_feature="present")
 print(stable_model)
@@ -175,13 +203,13 @@ public enum ServiceVersion
 {
     /// <summary> Service version "2023-11-01-preview". </summary>
     V2023_11_01_Preview = 1,
-    /// <summary> Service version "2023-11-01". </summary>
-    V2023_11_01 = 2,
+    /// <summary> Service version "2023-11-02". </summary>
+    V2023_11_02 = 2,
 }
 
 Uri endpoint = new Uri("<https://my-service.azure.com>");
 ServiceClient client = new ServiceClient(endpoint);
-//client's api-version will be "2023-11-01"
+//client's api-version will be "2023-11-02"
 
 StableModel stableModel = new StableModel("<stableFeature>");
 Response response = client.StableFunctionality(stableModel);
@@ -190,13 +218,30 @@ Response response = client.StableFunctionality(stableModel);
 ```
 
 ```typescript
-// there is no apiVersion parameters defined in all operations, TypeScript emitter will ignore it.
+export interface StableModel {
+  stableFeature: string;
+}
+
+export function stableModelSerializer(item: StableModel): any {
+  return { stableFeature: item["stableFeature"] };
+}
+
+/** Known values of {@link Versions} that the service accepts. */
+export enum KnownVersions {
+  V20231102 = "2023-11-02",
+}
+
+export async function stableFunctionality(
+  context: Client,
+  stableModel: StableModel,
+  options: StableFunctionalityOptionalParams = { requestOptions: {} },
+): Promise<void>;
 ```
 
 ```java
 // ServiceVersion enum
 public enum ServiceServiceVersion implements ServiceVersion {
-    V2023_11_01("2023-11-01");
+    V2023_11_01("2023-11-02");
 
     public static ServiceServiceVersion getLatest() {} // V2023_11_01
 }
@@ -205,7 +250,7 @@ public enum ServiceServiceVersion implements ServiceVersion {
 ServiceClientClient serviceClientClient = new ServiceClientClientBuilder()
     // other configurations
     .buildClient();
-// client's api-version will be 2023-11-01
+// client's api-version will be 2023-11-02
 
 StableModel stableModel = new StableModel("present");
 
@@ -216,6 +261,17 @@ serviceClientClient.stableFunctionality(stableModel);
 ```
 
 ```go
+type StableModel struct {
+	StableFeature *string
+}
+
+type ServiceClientStableFunctionalityOptions struct {}
+
+type ServiceClientStableFunctionalityResponse struct {}
+
+type ServiceClient struct {}
+
+func (client *ServiceClient) StableFunctionality(ctx context.Context, stableModel StableModel, options *ServiceClientStableFunctionalityOptions) (ServiceClientStableFunctionalityResponse, error)
 
 ```
 
@@ -271,8 +327,10 @@ model StableModel {
 
 @added(Versions.v2023_11_01_preview)
 @removed(Versions.v2023_11_01)
+@route("/preview")
 op previewFunctionality(@body previewModel: PreviewModel): void;
 
+@route("/stable")
 op stableFunctionality(@body stableModel: StableModel): void;
 ```
 
@@ -320,7 +378,39 @@ Response response = client.StableFunctionality(stableModel);
 ```
 
 ```typescript
-// there is no apiVersion parameters defined in all operations, TypeScript emitter will ignore it.
+export interface PreviewModel {
+  betaFeature: string;
+}
+
+export function previewModelSerializer(item: PreviewModel): any {
+  return { betaFeature: item["betaFeature"] };
+}
+
+/** model interface StableModel */
+export interface StableModel {
+  stableFeature: string;
+}
+
+export function stableModelSerializer(item: StableModel): any {
+  return { stableFeature: item["stableFeature"] };
+}
+
+/** Known values of {@link Versions} that the service accepts. */
+export enum KnownVersions {
+  V20231101Preview = "2023-11-01-preview",
+}
+
+export async function stableFunctionality(
+  context: Client,
+  stableModel: StableModel,
+  options: StableFunctionalityOptionalParams = { requestOptions: {} },
+): Promise<void>;
+
+export async function previewFunctionality(
+  context: Client,
+  previewModel: PreviewModel,
+  options: PreviewFunctionalityOptionalParams = { requestOptions: {} },
+): Promise<void>;
 ```
 
 ```java
@@ -348,6 +438,27 @@ serviceClientClient.previewFunctionality(previewModel);
 ```
 
 ```go
+type PreviewModel struct {
+	BetaFeature *string
+}
+
+type StableModel struct {
+	StableFeature *string
+}
+
+type ClientPreviewFunctionalityResponse struct {}
+
+type ClientStableFunctionalityResponse struct {}
+
+type ClientPreviewFunctionalityOptions struct {}
+
+type ClientStableFunctionalityOptions struct {}
+
+type ServiceClient struct {}
+
+func (client *ServiceClient) PreviewFunctionality(ctx context.Context, previewModel PreviewModel, options *ClientPreviewFunctionalityOptions) (ClientPreviewFunctionalityResponse, error)
+
+func (client *ServiceClient) StableFunctionality(ctx context.Context, stableModel StableModel, options *ClientStableFunctionalityOptions) (ClientStableFunctionalityResponse, error)
 
 ```
 
@@ -361,7 +472,7 @@ By default, we find api version parameters in specs based off of names. There is
 2. We auto-add api version information to next links when paging
 3. We set the client default for these parameters to be the default api version for your service.
 
-There are cases where you have an api-versioning parameter without the explicit name `api-version`. In these cases, you can use the `@isApiVersion` decorator to override and explicitly say whether that parameter is an api version param or not.
+There are cases where you have an api-versioning parameter without the explicit name `api-version`. In these cases, you can use the `@apiVersion` decorator to override and explicitly say whether that parameter is an api version param or not.
 
 <ClientTabs>
 
@@ -380,7 +491,7 @@ enum Versions {
   v2024_04_01: "2024-04-01",
 }
 op get(
-  @isApiVersion
+  @apiVersion
   @header("x-ms-version")
   version: string,
 ): void;
@@ -419,7 +530,15 @@ Response response = client.get(); // version parameter is elevated onto the clie
 ```
 
 ```typescript
-// TODO
+export enum KnownVersions {
+  V20231101 = "2023-11-01",
+  V20240401 = "2024-04-01",
+}
+
+export async function get(
+  context: Client,
+  options: GetOptionalParams = { requestOptions: {} },
+): Promise<void>;
 ```
 
 ```java
@@ -448,7 +567,17 @@ client.get(); // version parameter is elevated onto the client
 ```
 
 ```go
-// TODO
+type Versions string
+
+const (
+	v2023_11_01 Versions = "2023-11-01"
+	v2024_04_01 Versions = "2024-04-01"
+)
+
+type ServiceClient struct {}
+
+func (client *ServiceClient) Get(ctx context.Context, version Versions, options *RequestOptions) (Response, error)
+
 ```
 
 </ClientTabs>

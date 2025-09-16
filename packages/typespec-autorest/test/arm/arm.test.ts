@@ -5,8 +5,7 @@ import { compileOpenAPI } from "../test-host.js";
 it("can share types with a library namespace", async () => {
   const openapi: any = await compileOpenAPI(
     `
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @armLibraryNamespace
+          @armLibraryNamespace
       namespace Microsoft.Library {
         model TestTrackedResource is TrackedResource<TestTrackedProperties> {
           @key("trackedResourceName")
@@ -31,8 +30,7 @@ it("can share types with a library namespace", async () => {
 
       @useLibraryNamespace(Microsoft.Library)
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test {
+          namespace Microsoft.Test {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 

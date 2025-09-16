@@ -40,8 +40,7 @@ describe("typespec-azure-resource-manager: patch identity should be present in t
       "FooResource",
       "identity, managedBy, plan, sku, tags",
       `
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @armProviderNamespace
+          @armProviderNamespace
       namespace Microsoft.Foo;
 
       interface Operations extends Azure.ResourceManager.Operations {}
@@ -109,8 +108,7 @@ describe("typespec-azure-resource-manager: patch identity should be present in t
       "FooResource",
       "identity, managedBy, plan, sku, tags",
       `
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @armProviderNamespace
+          @armProviderNamespace
       namespace Microsoft.Foo;
 
       interface Operations extends Azure.ResourceManager.Operations {}

@@ -449,8 +449,7 @@ it("verify diagnostic gets raised for usage", async () => {
 
   const result = await runnerWithCore.diagnose(
     `        
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      namespace MyService {
+          namespace MyService {
         @discriminator("kind")
         model A {
           kind: string;

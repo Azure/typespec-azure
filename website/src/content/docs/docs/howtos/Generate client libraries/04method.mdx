@@ -1,5 +1,6 @@
 ---
 title: Basic methods
+llmstxt: true
 ---
 
 import { ClientTabs, ClientTabItem } from "@components/client-tabs";
@@ -85,6 +86,23 @@ public final class PetStoreNamespaceClient {
 }
 ```
 
+```go
+type OutputModel struct {
+  Name string `json:"name"`
+}
+
+type PetStoreNamespaceClient struct {}
+
+type PetStoreNamespaceClientGetModelOptions struct {}
+
+type PetStoreNamespaceClientGetModelResponse struct {
+	OutputModel
+}
+
+func (client *PetStoreNamespaceClient) GetModel(ctx context.Context, name string, options *PetStoreNamespaceClientGetModelOptions) (PetStoreNamespaceClientGetModelResponse, error)
+
+```
+
 </ClientTabs>
 
 ### Customizations
@@ -146,6 +164,10 @@ public final class PetStoreNamespaceClient {
     // protocol method
     public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
 }
+```
+
+```go
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>
@@ -216,6 +238,10 @@ public final class PetStoreNamespaceClient {
     // convenient method
     OutputModel getModel(String name)
 }
+```
+
+```go
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>
@@ -313,6 +339,10 @@ public final class ImageGenerations {
 }
 ```
 
+```go
+// NOT_SUPPORTED
+```
+
 </ClientTabs>
 
 ## Basic method signature
@@ -405,22 +435,19 @@ public void post(User user);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientGetOptions struct {
-}
+type ClientGetOptions struct {}
+
+type ClientPostOptions struct {}
 
 type ClientGetResponse struct {
+	User
 }
+
+type ClientPostResponse struct {}
 
 func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error)
 
-type ClientPostOptions struct {
-}
-
-type ClientPostResponse struct {
-}
-
-func (client *Client) Post(ctx context.Context, user User, options *ClientPostOptions) (ClientPostResponse, error)
-
+func (client *Client) Post(ctx context.Context, body User, options *ClientPostOptions) (ClientPostResponse, error)
 ```
 
 </ClientTabItem>
@@ -500,11 +527,9 @@ public void upload(String firstName, String lastName);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientUploadOptions struct {
-}
+type ClientUploadOptions struct {}
 
-type ClientUploadResponse struct {
-}
+type ClientUploadResponse struct {}
 
 func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
 
@@ -585,13 +610,12 @@ public void upload(String id, String firstName, String lastName);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientUploadOptions struct {
-}
+type ClientUploadOptions struct {}
 
-type ClientUploadResponse struct {
-}
+type ClientUploadResponse struct {}
 
 func (client *Client) Upload(ctx context.Context, id string, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
+
 ```
 
 </ClientTabItem>
@@ -667,13 +691,12 @@ public void upload(String firstName, String lastName);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientUploadOptions struct {
-}
+type ClientUploadResponse struct {}
 
-type ClientUploadResponse struct {
-}
+type ClientUploadOptions struct {}
 
 func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
+
 ```
 
 </ClientTabItem>
@@ -761,17 +784,16 @@ public void upload(User user);
 
 ```go
 type User struct {
-	firstName *string
-  lastName *string
+  FirstName *string
+  LastName *string
 }
 
-type ClientUploadOptions struct {
-}
+type ClientUploadOptions struct {}
 
-type ClientUploadResponse struct {
-}
+type ClientUploadResponse struct {}
 
 func (client *Client) Upload(ctx context.Context, user User, options *ClientUploadOptions) (ClientUploadResponse, error)
+
 ```
 
 </ClientTabItem>
@@ -855,6 +877,7 @@ type ClientGetBlobPropertiesResponse struct {
 }
 
 func (client *Client) GetBlobProperties(ctx context.Context, name string, testHeader string, options *ClientGetBlobPropertiesOptions) (ClientGetBlobPropertiesResponse, error)
+
 ```
 
 </ClientTabItem>
@@ -945,13 +968,12 @@ public void register(Schema schema);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientRegisterOptions struct {
-}
+type ClientRegisterResponse struct {}
 
-type ClientRegisterResponse struct {
-}
+type ClientRegisterOptions struct {}
 
 func (client *Client) Register(ctx context.Context, schema []byte, options *ClientRegisterOptions) (ClientRegisterResponse, error)
+
 ```
 
 </ClientTabItem>
@@ -1049,19 +1071,24 @@ public RepairResult scheduleRepairs(String widgetName, String problem, String co
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientScheduleRepairsOptions struct {
+type RepairInfo struct {
+	Contact *string
+	Problem *string
 }
 
 type RepairResult struct {
-	reason *string
-  info *string
+	Info    *string
+	Reason  *string
 }
 
 type ClientScheduleRepairsResponse struct {
-  RepairResult
+	RepairResult
 }
 
-func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, problem string, contact string, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
+type ClientScheduleRepairsOptions struct {}
+
+func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, repairInfo RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
+
 ```
 
 </ClientTabItem>
@@ -1208,23 +1235,22 @@ public RepairResult scheduleRepairs(String widgetName, RepairInfo body);
 
 ```go
 type RepairInfo struct {
-	problem *string
-  contact *string
-}
-
-type ClientScheduleRepairsOptions struct {
+	Contact *string
+	Problem *string
 }
 
 type RepairResult struct {
-	reason *string
-  info *string
+	Info    *string
+	Reason  *string
 }
 
-type ClientScheduleRepairsResponse struct {
-  RepairResult
+type ServiceClientScheduleRepairsOptions struct {}
+
+type ServiceClientScheduleRepairsResponse struct {
+	RepairResult
 }
 
-func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, body RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
+func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, repairInfo RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
 ```
 
 </ClientTabItem>
@@ -1360,6 +1386,46 @@ public final class AnalyzeClient {
 }
 ```
 
+```go
+type AnalyzeResult struct {
+	Confidence *float32
+	Result     *string
+}
+
+type CompletionInput struct {
+	Input []*string
+}
+
+type CompletionResult struct {
+	Text   *string
+	Tokens *int32
+}
+
+type AnalyzeClientAnalyzeOptions struct {}
+
+type AnalyzeClientCompletionsOptions struct {}
+
+type AnalyzeClientAnalyzeResponse struct {
+	AnalyzeResult
+}
+
+type AnalyzeClientCompletionsResponse struct {
+	CompletionResult
+}
+
+type AnalyzeRequestMode string
+
+const (
+	AnalyzeRequestModeLenient AnalyzeRequestMode = "lenient"
+	AnalyzeRequestModeStrict AnalyzeRequestMode = "strict"
+)
+
+func (client *AnalyzeClient) Analyze(ctx context.Context, mode AnalyzeRequestMode, imageParam io.ReadSeekCloser, options *AnalyzeClientAnalyzeOptions) (AnalyzeClientAnalyzeResponse, error)
+
+func (client *AnalyzeClient) Completions(ctx context.Context, input CompletionInput, options *AnalyzeClientCompletionsOptions) (AnalyzeClientCompletionsResponse, error)
+
+```
+
 </ClientTabs>
 
 Using union implies that the entire combination of possible input is valid. If you have a specific set of combination, or connection between input and output,
@@ -1426,6 +1492,24 @@ public final class Client {
 }
 ```
 
+```go
+type ClientAOptions struct {}
+
+type ClientBOptions struct {}
+
+type ClientAResponse struct {
+	Value *float32
+}
+
+type ClientBResponse struct {
+	Value *int64
+}
+
+func (client *Client) A(ctx context.Context, x int32, options *ClientAOptions) (ClientAResponse, error)
+
+func (client *Client) B(ctx context.Context, x string, options *ClientBOptions) (ClientBResponse, error)
+```
+
 </ClientTabs>
 
 ### Customizations
@@ -1486,6 +1570,10 @@ JS RLC is not in the business of customization with client.tsp
 NOT_SUPPORTED
 ```
 
+```go
+// NOT_SUPPORTED
+```
+
 </ClientTabs>
 
 ## Conditional request headers
@@ -1541,15 +1629,20 @@ public Response get(MatchConditions matchConditions);
 ```
 
 ```go
+type Response struct {
+  Name string
+}
+
 type ClientGetOptions struct {
-	// The request should only proceed if an entity matches this string.
+// The request should only proceed if an entity matches this string.
 	IfMatch *string
 
-	// The request should only proceed if no entity matches this string.
+// The request should only proceed if no entity matches this string.
 	IfNoneMatch *string
 }
 
-func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error)
+func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (*Response, error)
+
 ```
 
 </ClientTabs>
@@ -1576,7 +1669,6 @@ namespace Microsoft.ContosoProviderHub;
 /** Api versions */
 enum Versions {
   /** 2024-04-01-preview api version */
-  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
   V2024_04_01_PREVIEW: "2024-04-01-preview",
 }
 
@@ -1652,6 +1744,10 @@ public final class ContosoProviderHubClient {
         ...
     }
 }
+```
+
+```go
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>

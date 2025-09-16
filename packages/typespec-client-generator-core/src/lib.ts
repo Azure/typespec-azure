@@ -210,7 +210,7 @@ export const $lib = createTypeSpecLibrary({
     "multiple-response-types": {
       severity: "warning",
       messages: {
-        default: paramMessage`Multiple response types found in operation ${"operation"}. Only one response type is supported, so we will choose the first one ${"response"}`,
+        default: paramMessage`Multiple response types found in operation ${"operation"}. Some emitters might not support returning all of these response types`,
       },
     },
     "no-corresponding-method-param": {
@@ -261,6 +261,13 @@ export const $lib = createTypeSpecLibrary({
       messages: {
         default: paramMessage`Client name: "${"name"}" is duplicated in language scope: "${"scope"}"`,
         nonDecorator: paramMessage`Client name: "${"name"}" is defined somewhere causing naming conflicts in language scope: "${"scope"}"`,
+      },
+    },
+    "client-name-ineffective": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Application of @clientName decorator to ${"name"} is not effective`,
+        override: paramMessage`Application of @clientName decorator to ${"name"} is not effective because it is applied to the override method. Please apply it on the original method definition "${"originalMethodName"}" instead.`,
       },
     },
     "example-loading": {
@@ -426,6 +433,18 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: "@hierarchyBuilding decorator causes recursive base type reference.",
+      },
+    },
+    "missing-scope": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@scope decorator should be applied with ${"decoratorName"} since it is highly likely this is language-specific`,
+      },
+    },
+    "external-library-version-mismatch": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`External library version mismatch. There are multiple versions of ${"libraryName"}: ${"versionA"} and ${"versionB"}. Please unify the versions.`,
       },
     },
   },

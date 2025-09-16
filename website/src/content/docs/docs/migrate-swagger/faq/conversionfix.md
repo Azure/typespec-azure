@@ -4,11 +4,11 @@ title: Fixing Converted TypeSpec
 
 ## Fixing Linter Rules
 
-Ideally, the original Swagger will be converted into equivalent TypeSpec following ARM conventions. However, many Swagger specifications predate current ARM conventions and are 'grandfathered in' to prevent breaking changes. The equivalent TypeSpec that represents the original Swagger will violate linter rules, and linter suppressions must be added. Check out how to fix linter violations below.
+Ideally, the original OpenAPI file will be converted into equivalent TypeSpec following ARM conventions. However, many OpenAPI specifications predate current ARM conventions and are 'grandfathered in' to prevent breaking changes. The equivalent TypeSpec that represents the original OpenAPI file will violate linter rules, and linter suppressions must be added. Check out how to fix linter violations below.
 
 ### @azure-tools/typespec-azure-core/no-openapi
 
-The `operationId` in Swagger is usually formatted as `OperationGroup_OperationName`. Use [`@clientLocation`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/reference/decorators/#@Azure.ClientGenerator.Core.clientLocation) to specify the operation group and [`@clientName`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/reference/decorators/#@Azure.ClientGenerator.Core.clientName) to change the operation name if needed.
+The `operationId` in OpenAPI file is usually formatted as `OperationGroup_OperationName`. Use [`@clientLocation`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/reference/decorators/#@Azure.ClientGenerator.Core.clientLocation) to specify the operation group and [`@clientName`](https://azure.github.io/typespec-azure/docs/libraries/typespec-client-generator-core/reference/decorators/#@Azure.ClientGenerator.Core.clientName) to change the operation name if needed.
 
 **Before:**
 
