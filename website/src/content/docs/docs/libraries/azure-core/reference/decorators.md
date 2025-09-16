@@ -170,25 +170,6 @@ Identifies an EnumMember as a long-running "Succeeded" terminal state.
 
 None
 
-### `@nextPageOperation` {#@Azure.Core.nextPageOperation}
-
-Identifies that an operation is used to retrieve the next page for paged operations.
-
-```typespec
-@Azure.Core.nextPageOperation(linkedOperation: Operation, parameters?: {})
-```
-
-#### Target
-
-`Operation`
-
-#### Parameters
-
-| Name            | Type        | Description                                                                                                               |
-| --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
-| linkedOperation | `Operation` | The linked Operation                                                                                                      |
-| parameters      | `{}`        | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
-
 ### `@operationLink` {#@Azure.Core.operationLink}
 
 Identifies an operation that is linked to the target operation.

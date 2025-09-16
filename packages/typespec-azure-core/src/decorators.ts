@@ -11,12 +11,8 @@ import {
   Program,
   Type,
 } from "@typespec/compiler";
-import {
-  ItemsDecorator,
-  NextPageOperationDecorator,
-  PagedResultDecorator,
-} from "../generated-defs/Azure.Core.js";
-import { $operationLink, getOperationLink } from "./decorators/operation-link.js";
+import { ItemsDecorator, PagedResultDecorator } from "../generated-defs/Azure.Core.js";
+import { getOperationLink } from "./decorators/operation-link.js";
 import { getUniqueItems } from "./decorators/unique-items.js";
 
 // pagedResult
@@ -201,15 +197,6 @@ export function getItems(program: Program, entity: Type): boolean | undefined {
 export function getNextLink(program: Program, entity: ModelProperty): boolean | undefined {
   return program.stateSet(Symbol.for(`TypeSpec.nextLink`)).has(entity);
 }
-
-export const $nextPageOperation: NextPageOperationDecorator = (
-  context: DecoratorContext,
-  entity: Operation,
-  linkedOperation: Operation,
-  parameters?: Type,
-) => {
-  context.call($operationLink, entity, linkedOperation, "nextPage", parameters);
-};
 
 export const $requestParameter = (context: DecoratorContext, entity: Model, name: string) => {
   context.program.stateMap(AzureCoreStateKeys.requestParameter).set(entity, name);
