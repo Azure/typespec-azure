@@ -2219,6 +2219,15 @@ export async function getOpenAPIForService(
           propSchema.xml["x-ms-text"] = true;
         }
       }
+
+      const xmlNs = xml.module.getNs(program, prop);
+
+      if (xmlNs) {
+        propSchema.xml ??= {};
+        propSchema.xml.namespace = xmlNs.namespace;
+
+        if (xmlNs.prefix) propSchema.xml.prefix = xmlNs.prefix;
+      }
     }
 
     if (options.armResourceFlattening && isConditionallyFlattened(program, prop)) {
