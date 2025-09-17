@@ -30,6 +30,7 @@ model HeaderParamClientOptions {
 model MultipleParamsClientOptions {
   @doc("The name to use for operations")
   name: string;
+
   @doc("The region to use for operations")
   region: string;
 }
@@ -85,8 +86,8 @@ namespace DefaultParentClient {
     deleteStandalone is Service.NestedDefaultIndividuallyParentWithPath.deleteStandalone;
   }
 
-    // Scenario 7: Default -> Individually and Parent initialization with query parameter
-    @scenarioDoc("""
+  // Scenario 7: Default -> Individually and Parent initialization with query parameter
+  @scenarioDoc("""
     Client for testing default -> individually and parent nested initialization.
     
     The parent client uses default initialization behavior,
@@ -126,8 +127,8 @@ namespace DefaultParentClient {
     deleteStandalone is Service.NestedDefaultIndividuallyParentWithQuery.deleteStandalone;
   }
 
-    // Scenario 8: Default -> Individually and Parent initialization with Header parameter
-    @scenarioDoc("""
+  // Scenario 8: Default -> Individually and Parent initialization with Header parameter
+  @scenarioDoc("""
     Client for testing default -> individually and parent header parameter nested initialization.
     
     The parent client uses default initialization behavior,

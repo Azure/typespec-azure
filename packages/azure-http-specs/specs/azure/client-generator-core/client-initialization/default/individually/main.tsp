@@ -26,7 +26,7 @@ model Input {
   name: string;
 }
 
-model DefaultnQueryParam {
+model DefaultQueryParam {
   @query
   blobName: string;
 }
@@ -54,15 +54,15 @@ interface NestedDefaultIndividuallyWithPath {
 interface NestedDefaultIndividuallyWithQuery {
   @route("/with-query")
   @get
-  withQuery(...DefaultnQueryParam): void;
+  withQuery(...DefaultQueryParam): void;
 
   @route("/get-standalone")
   @get
-  getStandalone(...DefaultnQueryParam): BlobProperties;
+  getStandalone(...DefaultQueryParam): BlobProperties;
 
   @route("/delete-resource")
   @delete
-  deleteStandalone(...DefaultnQueryParam): void;
+  deleteStandalone(...DefaultQueryParam): void;
 }
 
 // Nested layer services for default -> header parameters

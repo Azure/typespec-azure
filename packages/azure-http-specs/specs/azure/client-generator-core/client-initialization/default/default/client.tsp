@@ -206,7 +206,6 @@ interface ParamAlias {
   withOriginalName is Service.ParamAlias.withOriginalName;
 }
 
-
 @global.Azure.ClientGenerator.Core.client({
   name: "DefaultParentClient",
   service: Service,
@@ -247,8 +246,8 @@ namespace DefaultParentClient {
     deleteStandalone is Service.NestedDefaultDefaultWithPath.deleteStandalone;
   }
 
-    // Scenario 7: Default -> Default initialization with query parameter
-    @scenarioDoc("""
+  // Scenario 7: Default -> Default initialization with query parameter
+  @scenarioDoc("""
     Client for testing default -> default nested initialization.
     
     The parent client uses default initialization behavior,
@@ -282,8 +281,8 @@ namespace DefaultParentClient {
     deleteStandalone is Service.NestedDefaultDefaultWithQuery.deleteStandalone;
   }
 
-    // Scenario 8: Default -> Default initialization with Header parameter
-    @scenarioDoc("""
+  // Scenario 8: Default -> Default initialization with Header parameter
+  @scenarioDoc("""
     Client for testing default -> header parameter nested initialization.
     
     The parent client uses default initialization behavior,

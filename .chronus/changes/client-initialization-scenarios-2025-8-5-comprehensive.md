@@ -1,5 +1,5 @@
 ---
-kind: feature
+changeKind: feature
 packages:
   - "@azure-tools/azure-http-specs"
 ---
