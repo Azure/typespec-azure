@@ -4,9 +4,6 @@ import { openApiFor } from "./test-host.js";
 
 it("chooses XML as the default consumes/produces when an API has only XML payloads", async () => {
   const openapi = await openApiFor(`
-      @service(#{title: "My Service"})
-      namespace Foo;
-
       model Payload {}
 
       @get op getXml(
@@ -27,9 +24,6 @@ it("chooses XML as the default consumes/produces when an API has only XML payloa
 
 it("chooses JSON and XML as the default consumes/produces when an API has JSON and XML payloads", async () => {
   const openapi = await openApiFor(`
-      @service(#{title: "My Service"})
-      namespace Foo;
-
       model JsonPayload {}
       model XmlPayload {}
 
@@ -63,9 +57,6 @@ it("chooses JSON and XML as the default consumes/produces when an API has JSON a
 
 it("applies XML name, namespace, and prefix to a model", async () => {
   const openapi = await openApiFor(`
-      @service(#{title: "My Service"})
-      namespace Foo;
-
       @Xml.name("CustomName")
       @Xml.ns("http://example.com/ns", "ex")
       model Payload {
@@ -96,9 +87,6 @@ it("applies XML name, namespace, and prefix to a model", async () => {
 
 it("treats XMl name as secondary in property schemas when the spec is not only XML", async () => {
   const openapi = await openApiFor(`
-      @service(#{title: "My Service"})
-      namespace Foo;
-
       model Payload {
         @Xml.name("RenamedProperty")
         property: string;
@@ -130,9 +118,6 @@ it("treats XMl name as secondary in property schemas when the spec is not only X
 
 it("wraps XML arrays by default", async () => {
   const openapi = await openApiFor(`
-      @service(#{title: "My Service"})
-      namespace Foo;
-
       model Payload {
         items: string[];
       }
@@ -153,9 +138,6 @@ it("wraps XML arrays by default", async () => {
 
 it("can unwrap XML arrays", async () => {
   const openapi = await openApiFor(`
-      @service(#{title: "My Service"})
-      namespace Foo;
-
       model Payload {
         @Xml.unwrapped
         items: string[];
@@ -177,9 +159,6 @@ it("can unwrap XML arrays", async () => {
 
 it("can mark a property as XML text using x-ms-text", async () => {
   const openapi = await openApiFor(`
-      @service(#{title: "My Service"})
-      namespace Foo;
-
       model Payload {
         @Xml.unwrapped
         content?: string;

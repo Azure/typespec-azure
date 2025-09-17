@@ -2187,47 +2187,7 @@ export async function getOpenAPIForService(
     }
 
     if (specHasXml && xml.available) {
-      if (xml.module.isAttribute(program, prop)) {
-        propSchema.xml ??= {};
-        propSchema.xml.attribute = true;
-      }
-
-      if (prop.type.kind === "Model" && isArrayModelType(program, prop.type)) {
-        const wrapped = !xml.module.isUnwrapped(program, prop);
-
-        propSchema.xml ??= {};
-        propSchema.xml.wrapped = wrapped;
-      }
-
-      let encode = getEncode(program, prop);
-
-      let resolvedEncodeType = encode?.type ?? prop.type;
-
-      while (
-        resolvedEncodeType.kind === "Scalar" &&
-        (encode = getEncode(program, resolvedEncodeType))
-      ) {
-        resolvedEncodeType = encode.type;
-      }
-
-      if (
-        resolvedEncodeType.kind === "Scalar" &&
-        $(program).scalar.extendsString(resolvedEncodeType)
-      ) {
-        if (xml.module.isUnwrapped(program, prop)) {
-          propSchema.xml ??= {};
-          propSchema.xml["x-ms-text"] = true;
-        }
-      }
-
-      const xmlNs = xml.module.getNs(program, prop);
-
-      if (xmlNs) {
-        propSchema.xml ??= {};
-        propSchema.xml.namespace = xmlNs.namespace;
-
-        if (xmlNs.prefix) propSchema.xml.prefix = xmlNs.prefix;
-      }
+      attachPropertyXml(prop, propSchema);
     }
 
     if (options.armResourceFlattening && isConditionallyFlattened(program, prop)) {
@@ -2292,6 +2252,53 @@ export async function getOpenAPIForService(
     function setXmlField<K extends keyof XmlObject>(key: K, value: XmlObject[K]) {
       processed.schema.xml ??= {};
       processed.schema.xml[key] = value;
+    }
+  }
+
+  function attachPropertyXml(prop: ModelProperty, propSchema: OpenAPI2SchemaProperty) {
+    if (!xml.available) return;
+
+    if (xml.module.isAttribute(program, prop)) {
+      setXmlField("attribute", true);
+    }
+
+    if (prop.type.kind === "Model" && isArrayModelType(program, prop.type)) {
+      const wrapped = !xml.module.isUnwrapped(program, prop);
+
+      setXmlField("wrapped", wrapped);
+    }
+
+    let encode = getEncode(program, prop);
+
+    let resolvedEncodeType = encode?.type ?? prop.type;
+
+    while (
+      resolvedEncodeType.kind === "Scalar" &&
+      (encode = getEncode(program, resolvedEncodeType))
+    ) {
+      resolvedEncodeType = encode.type;
+    }
+
+    if (
+      resolvedEncodeType.kind === "Scalar" &&
+      $(program).scalar.extendsString(resolvedEncodeType)
+    ) {
+      if (xml.module.isUnwrapped(program, prop)) {
+        setXmlField("x-ms-text", true);
+      }
+    }
+
+    const xmlNs = xml.module.getNs(program, prop);
+
+    if (xmlNs) {
+      setXmlField("namespace", xmlNs.namespace);
+
+      if (xmlNs.prefix) setXmlField("prefix", xmlNs.prefix);
+    }
+
+    function setXmlField<K extends keyof XmlObject>(key: K, value: XmlObject[K]) {
+      propSchema.xml ??= {};
+      propSchema.xml[key] = value;
     }
   }
 

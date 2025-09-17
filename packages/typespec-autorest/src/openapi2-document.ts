@@ -314,6 +314,11 @@ export interface XmlObject {
    * Controls whether array items are wrapped inside a container element. Useful when serializing arrays to XML.
    */
   wrapped?: boolean;
+
+  /**
+   * Microsoft extension that marks a property as the text content of an XML element.
+   */
+  "x-ms-text"?: boolean;
 }
 
 export type OpenAPI2FileSchema = {
