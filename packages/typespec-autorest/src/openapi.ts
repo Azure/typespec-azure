@@ -147,7 +147,6 @@ import {
   shouldInline,
 } from "@typespec/openapi";
 import { getVersionsForEnum } from "@typespec/versioning";
-import { getXmlName } from "@typespec/xml";
 import { AutorestOpenAPISchema } from "./autorest-openapi-schema.js";
 import { getExamples, getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
@@ -2192,6 +2191,34 @@ export async function getOpenAPIForService(
         propSchema.xml ??= {};
         propSchema.xml.attribute = true;
       }
+
+      if (prop.type.kind === "Model" && isArrayModelType(program, prop.type)) {
+        const wrapped = !xml.module.isUnwrapped(program, prop);
+
+        propSchema.xml ??= {};
+        propSchema.xml.wrapped = wrapped;
+      }
+
+      let encode = getEncode(program, prop);
+
+      let resolvedEncodeType = encode?.type ?? prop.type;
+
+      while (
+        resolvedEncodeType.kind === "Scalar" &&
+        (encode = getEncode(program, resolvedEncodeType))
+      ) {
+        resolvedEncodeType = encode.type;
+      }
+
+      if (
+        resolvedEncodeType.kind === "Scalar" &&
+        $(program).scalar.extendsString(resolvedEncodeType)
+      ) {
+        if (xml.module.isUnwrapped(program, prop)) {
+          propSchema.xml ??= {};
+          propSchema.xml["x-ms-text"] = true;
+        }
+      }
     }
 
     if (options.armResourceFlattening && isConditionallyFlattened(program, prop)) {
@@ -2240,7 +2267,11 @@ export async function getOpenAPIForService(
     const ns = xml.module.getNs(program, type);
 
     if ("name" in type && type.name !== undefined && typeof type.name === "string") {
-      const xmlName = getXmlName(program, type);
+      const xmlName = resolveEncodedName(
+        program,
+        type as Type & { name: string },
+        "application/xml",
+      );
       if (xmlName && xmlName !== schemaName) setXmlField("name", xmlName);
     }
 

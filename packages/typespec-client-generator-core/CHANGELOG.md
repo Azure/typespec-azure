@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.60.1
+
+### Bug Fixes
+
+- [#3293](https://github.com/Azure/typespec-azure/pull/3293) Allow `@alternateType` to reference external types as well
+
+
 ## 0.60.0
 
 ### Breaking Changes

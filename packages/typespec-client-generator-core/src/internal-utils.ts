@@ -7,6 +7,7 @@ import {
   getDoc,
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
+  getSummary,
   getVisibilityForClass,
   ignoreDiagnostics,
   isNeverType,
@@ -303,6 +304,8 @@ interface DefaultSdkTypeBase<TKind> {
   kind: TKind;
   decorators: DecoratorInfo[];
   external?: ExternalTypeInfo;
+  doc?: string;
+  summary?: string;
 }
 
 /**
@@ -321,6 +324,8 @@ export function getSdkTypeBaseHelper<TKind>(
     deprecation: getDeprecationDetails(context.program, type)?.message,
     kind,
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
+    doc: getClientDoc(context, type),
+    summary: getSummary(context.program, type),
   };
   if (
     type.kind === "ModelProperty" ||
