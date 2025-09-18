@@ -883,7 +883,7 @@ export function getTcgcLroMetadata(
     return {
       operation,
       logicalResult: returnType,
-      finalStateVia: FinalStateValue.azureAsyncOperation, // assume arm, but since this isn't really an lro, it doesn't really matter
+      finalStateVia: FinalStateValue.originalUri, // doesn't really matter, but for get LRO
       pollingInfo: {
         kind: "pollingOperationStep",
         responseModel: returnType,
