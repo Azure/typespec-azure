@@ -19,6 +19,7 @@ using global.Azure.Core;
     versioned: ApiVersions,
   }
 )
+@global.Azure.ClientGenerator.Core.clientNamespace("azure.versioning.previewversion", "java")
 namespace _Specs_.Azure.Versioning.PreviewVersion;
 
 @doc("Supported api versions including preview.")
