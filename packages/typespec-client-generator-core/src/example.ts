@@ -182,9 +182,9 @@ export async function handleClientExamples(
       clientQueue.push(...client.children);
     }
     for (const method of client.methods) {
-      // since operation could have customization in client.tsp, we need to handle all the original operation (exclude the templated operation)
+      // since operation could have customization in client.tsp, we need to handle all the original operation
       let operation = method.__raw;
-      while (operation && operation.templateMapper === undefined) {
+      while (operation) {
         // try operation id with renaming
         let operationId = resolveOperationId(context, operation, true).toLowerCase();
         if (examples.has(operationId)) {
