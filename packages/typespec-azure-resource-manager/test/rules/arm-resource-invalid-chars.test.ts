@@ -24,7 +24,7 @@ describe("typespec-azure-resource-manager: arm resource invalid chars in path ru
     await tester
       .expect(
         `
-        @armProviderNamespace @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1) namespace MyService;
+        @armProviderNamespace namespace MyService;
 
         model FooResource is TrackedResource<{}> {
           @visibility(Lifecycle.Read)
@@ -42,7 +42,7 @@ describe("typespec-azure-resource-manager: arm resource invalid chars in path ru
     await tester
       .expect(
         `
-        @armProviderNamespace @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1) namespace MyService;
+        @armProviderNamespace namespace MyService;
 
         model FooResource is TrackedResource<{}> {
           @visibility(Lifecycle.Read)

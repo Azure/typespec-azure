@@ -594,7 +594,7 @@ describe("data plane LRO templates", () => {
         op longRunning(): AcceptedResponse;
       }
 
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2, TestClient.Versions.v2)
+      @useDependency(TestClient.Versions.v2)
       namespace NonService {
         @route("/poll")
         @get
@@ -635,9 +635,8 @@ describe("data plane LRO templates", () => {
     });
     await runnerWithCore.compileWithCustomization(
       `
-      @useDependency(Versions.v1_0_Preview_2)
       @server("http://localhost:3000", "endpoint")
-      @service()
+      @service
       namespace DocumentIntelligence;
         @lroStatus
         @doc("Operation status.")
@@ -1046,7 +1045,6 @@ it("customized lro delete", async () => {
     namespace My.Service;
 
     enum MyVersions {
-      @useDependency(Versions.v1_0_Preview_2)
       v1: "v1",
     }
 

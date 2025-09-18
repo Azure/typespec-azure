@@ -9,7 +9,7 @@ import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
 const armDef = `
 @armProviderNamespace
-@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+
 namespace Microsoft.Contoso;
 `;
 

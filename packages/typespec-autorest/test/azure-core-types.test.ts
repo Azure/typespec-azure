@@ -4,7 +4,6 @@ import { compileOpenAPI } from "./test-host.js";
 
 const base = `
 @service
-@useDependency(Azure.Core.Versions.v1_0_Preview_2)
 namespace MyService;
 `;
 

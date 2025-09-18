@@ -22,7 +22,7 @@ describe("typespec-azure-resource-manager: arm resource properties rule", () => 
     await tester
       .expect(
         `
-        @armProviderNamespace @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1) namespace MyService;
+        @armProviderNamespace namespace MyService;
 
         model FooResource is TrackedResource<{}> {
           @key @segment("foo") name: string;
@@ -37,7 +37,7 @@ describe("typespec-azure-resource-manager: arm resource properties rule", () => 
     await tester
       .expect(
         `
-        @armProviderNamespace @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1) namespace MyService;
+        @armProviderNamespace namespace MyService;
 
         model FooResource is TrackedResource<FooProperties> {
           @key @segment("foo") name: string;

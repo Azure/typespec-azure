@@ -75,7 +75,6 @@ Simple TypeSpec specs need only pass the desired `Azure.Core` version into the `
 
 ```typespec
 @service(#{ title: "Contoso Widget Manager" })
-@useDependency(Azure.Core.Versions.v1_0_Preview_2)
 namespace Contoso.WidgetManager;
 ```
 

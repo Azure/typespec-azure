@@ -1329,30 +1329,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 | ----------- | ------------ | ----------- |
 | properties? | `Properties` |             |
 
-### `Versions` {#Azure.ResourceManager.Versions}
-
-Supported versions of Azure.ResourceManager building blocks.
-
-```typespec
-enum Azure.ResourceManager.Versions
-```
-
-| Name           | Value             | Description           |
-| -------------- | ----------------- | --------------------- |
-| v1_0_Preview_1 | `"1.0-preview.1"` | Version 1.0-preview.1 |
-
-#### Examples
-
-```typespec
-enum Versions {
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  v2021_10_01_preview: "2021-10-01-preview",
-
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  v2021_11_01: "2021-11-01",
-}
-```
-
 ### `ResourceProvisioningState` {#Azure.ResourceManager.ResourceProvisioningState}
 
 Standard terminal provisioning state of resource type. You can include in your

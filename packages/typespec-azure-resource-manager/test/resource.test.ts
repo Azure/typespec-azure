@@ -708,7 +708,6 @@ using Azure.Core;
 /** Contoso Resource Provider management API. */
 @armProviderNamespace
 @service(#{ title: "ContosoProviderHubClient" })
-@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 
 namespace Microsoft.ContosoProviderHub;
@@ -843,7 +842,7 @@ using Azure.Core;
 /** Contoso Resource Provider management API. */
 @armProviderNamespace
 @service(#{ title: "ContosoProviderHubClient" })
-@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 namespace Microsoft.ContosoProviderHub;
 
@@ -982,7 +981,7 @@ using Azure.Core;
 @armProviderNamespace
 @service(#{ title: "ContosoProviderHubClient" })
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+
 namespace Microsoft.ContosoProviderHub;
 
 /** A ContosoProviderHub resource */
@@ -1087,7 +1086,7 @@ using Azure.Core;
 @armProviderNamespace
 @service(#{ title: "ContosoProviderHubClient" })
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+
 namespace Microsoft.ContosoProviderHub;
 
 /** A ContosoProviderHub resource */
@@ -1190,7 +1189,7 @@ using Azure.Core;
 @armProviderNamespace
 @service(#{ title: "ContosoProviderHubClient" })
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+
 namespace Microsoft.ContosoProviderHub;
 
 /** A ContosoProviderHub resource */
@@ -1298,7 +1297,7 @@ using Azure.Core;
 @armProviderNamespace
 @service(#{ title: "ContosoProviderHubClient" })
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+
 namespace Microsoft.ContosoProviderHub;
 
 /** A ContosoProviderHub resource */
@@ -1622,7 +1621,7 @@ describe("typespec-azure-resource-manager: identifiers decorator", () => {
 /** Contoso Resource Provider management API. */
 @armProviderNamespace
 @service(#{ title: "ContosoProviderHubClient" })
-@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 namespace Microsoft.ContosoProviderHub {
 

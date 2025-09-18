@@ -9,7 +9,7 @@ import { createAzureResourceManagerTestRunner } from "./test-host.js";
 
 function boilerplate(version: string | undefined) {
   // const versions = useVersionEnum ? ["v1", "v2"] : undefined;
-  const decorators = `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1) ${
+  const decorators = ` ${
     version ? `@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.${version})` : ""
   }`;
   const nsDecorators = decorators;
