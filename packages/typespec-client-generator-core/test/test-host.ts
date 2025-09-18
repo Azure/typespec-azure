@@ -118,10 +118,12 @@ export async function createSdkTestRunner(
   sdkTestRunner.compileWithBuiltInAzureCoreService = async (code) => {
     const result = await baseCompile(
       `
-      @useDependency(Versions.v1_0_Preview_2)
       @server("http://localhost:3000", "endpoint")
-      @service()
+      @service
+      @versioned(Versions)
       namespace My.Service;
+      enum Versions {@useDependency(Azure.Core.Versions.v1_0_Preview_2) v1}
+
       ${code}`,
       {
         noEmit: true,
