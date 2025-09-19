@@ -49,7 +49,8 @@
     "@typespec/openapi": "workspace:^",
     "@typespec/openapi3": "workspace:^",
     "@typespec/rest": "workspace:^",
-    "@typespec/versioning": "workspace:^"
+    "@typespec/versioning": "workspace:^",
+    "@typespec/xml": "workspace:^"
   },
   "devDependencies": {
     "@types/node": "~24.3.0",
