@@ -76,7 +76,9 @@ it("should apply @markAsLro with language scope", async () => {
     `);
 
   strictEqual(basicRunner.context.sdkPackage.models.length, 2);
-  const processingResponse = basicRunner.context.sdkPackage.models.find((m) => m.name === "ProcessingResponse");
+  const processingResponse = basicRunner.context.sdkPackage.models.find(
+    (m) => m.name === "ProcessingResponse",
+  );
   ok(processingResponse);
 
   const methods = basicRunner.context.sdkPackage.clients[0].methods;

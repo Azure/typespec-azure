@@ -67,7 +67,7 @@ extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
 /**
  * Forces an operation to be treated as a Long Running Operation (LRO) by the SDK generators,
  * even when the operation is not long-running on the service side.
- * 
+ *
  * NOTE: When used, you will need to verify the operatio and add tests for the generated code
  * to make sure the end-to-end works for library users, since there is a risk that forcing
  * this operation to be LRO will result in errors.
