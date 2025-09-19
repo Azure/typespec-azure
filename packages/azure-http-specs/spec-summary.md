@@ -63,7 +63,7 @@ Expected response body:
 
 Test moving a method parameter to client.
 
-The parameter `storageAccount` from operation `getBlob` should be moved to the client in the generated code.
+The parameter `storageAccount` from operation `getBlob` should be moved to the `MoveMethodParameterToClient` in the generated code.
 
 Expected request:
 
@@ -352,6 +352,18 @@ Expected response: 204 No Content
 - Endpoint: `get /azure/client-generator-core/override/reorder/{param2}/{param1}`
 
 Verify that after `@override` the parameters are reordered correctly in the client method signature.
+
+Expected path parameter:
+param1: param1
+param2: param2
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_Override_RequireParameters_require
+
+- Endpoint: `get /azure/client-generator-core/override/require/{param1}/{param2}`
+
+Verify that after `@override` an optional parameter can be made required in the client method signature.
 
 Expected path parameter:
 param1: param1
