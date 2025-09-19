@@ -41,10 +41,10 @@ model MixedParamsClientOptions {
 }
 
 @global.Azure.ClientGenerator.Core.client({
-  name: "DefaultParentClient",
+  name: "ParentClient",
   service: Service,
 })
-namespace DefaultParentClient {
+namespace ParentClient {
   // Scenario 6: Default -> Parent initialization with path parameter
   @scenarioDoc("""
     Client for testing default -> parent nested initialization.
@@ -57,8 +57,8 @@ namespace DefaultParentClient {
     
     Expected client usage:
     ```ts
-    // via DefaultParentClient (parent initialization)
-    const client = new DefaultParentClient.getDefaultNestedWithPathClient({
+    // via ParentClient (parent initialization)
+    const client = new ParentClient.getDefaultNestedWithPathClient({
       resourceName: "test-resource"
     });
     
@@ -93,8 +93,8 @@ namespace DefaultParentClient {
     
     Expected client usage:
     ```ts
-    // via DefaultParentClient (parent initialization)
-    const client = new DefaultParentClient.getDefaultNestedWithQueryClient({
+    // via ParentClient (parent initialization)
+    const client = new ParentClient.getDefaultNestedWithQueryClient({
       blobName: "test-blob"
     });
     
@@ -129,8 +129,8 @@ namespace DefaultParentClient {
     
     Expected client usage:
     ```ts
-    // via DefaultParentClient (parent initialization)
-    const client = new DefaultParentClient.getDefaultNestedWithHeaderClient({
+    // via ParentClient (parent initialization)
+    const client = new ParentClient.getDefaultNestedWithHeaderClient({
       name: "test-name-value"
     });
     
@@ -166,8 +166,8 @@ namespace DefaultParentClient {
     
     Expected client usage:
     ```ts
-    // via DefaultParentClient (parent initialization)
-    const client = new DefaultParentClient.getDefaultNestedWithMultipleClient({
+    // via ParentClient (parent initialization)
+    const client = new ParentClient.getDefaultNestedWithMultipleClient({
       name: "test-name-value",
       region: "us-west"
     });
@@ -229,4 +229,123 @@ namespace DefaultParentClient {
     getStandalone is Service.NestedDefaultParentMixed.getStandalone;
     deleteStandalone is Service.NestedDefaultParentMixed.deleteStandalone;
   }
+}
+
+// Additional standalone clients for multi-client architecture
+// Scenario: Parent path parameter client
+@scenarioDoc("""
+  Standalone client for testing parent initialization with path parameter.
+  
+  Parameters elevated to client level:
+  - blobName: "sample-blob" (path parameter)
+  
+  Expected client usage:
+  ```ts
+  const client = new ParentPathParamClient({
+    blobName: "sample-blob"
+  });
+  
+  client.withQuery(format: "text");
+  client.getStandalone();
+  client.deleteStandalone();
+  ```
+  """)
+@scenario
+@global.Azure.ClientGenerator.Core.client({
+  name: "ParentPathParamClient",
+  service: Service,
+})
+@global.Azure.ClientGenerator.Core.clientInitialization({
+  parameters: PathParamClientOptions,
+  initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.parent,
+})
+@route("/parent-path")
+interface ParentPathParam {
+  @route("/{blobName}/with-query")
+  @get
+  withQuery(@path blobName: string, @query format?: string): void;
+
+  @route("/{blobName}/get-standalone")
+  @get
+  getStandalone(@path blobName: string): Service.BlobProperties;
+
+  @route("/{blobName}")
+  @delete
+  deleteStandalone(@path blobName: string): void;
+}
+
+// Scenario: Parent header parameter client
+@scenarioDoc("""
+  Standalone client for testing parent initialization with header parameter.
+  
+  Parameters elevated to client level:
+  - name: "test-name-value" (header parameter)
+  
+  Expected client usage:
+  ```ts
+  const client = new ParentHeaderParamClient({
+    name: "test-name-value"
+  });
+  
+  client.withQuery(id: "test-id");
+  client.withBody({ name: "test-name" });
+  ```
+  """)
+@scenario
+@global.Azure.ClientGenerator.Core.client({
+  name: "ParentHeaderParamClient",
+  service: Service,
+})
+@global.Azure.ClientGenerator.Core.clientInitialization({
+  parameters: HeaderParamClientOptions,
+  initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.parent,
+})
+@route("/parent-header")
+interface ParentHeaderParam {
+  @route("/with-query")
+  @get
+  withQuery(@header name: string, @query id?: string): void;
+
+  @route("/with-body")
+  @post
+  withBody(@header name: string, @body input: Service.Input): void;
+}
+
+// Scenario: Parent multiple parameters client
+@scenarioDoc("""
+  Standalone client for testing parent initialization with multiple parameters.
+  
+  Parameters elevated to client level:
+  - name: "test-name-value" (header parameter)
+  - region: "us-west" (query parameter)
+  
+  Expected client usage:
+  ```ts
+  const client = new ParentMultipleParamsClient({
+    name: "test-name-value",
+    region: "us-west"
+  });
+  
+  client.withQuery(id: "test-id");
+  client.withBody({ name: "test-name" });
+  ```
+  """)
+@scenario
+@global.Azure.ClientGenerator.Core.client({
+  name: "ParentMultipleParamsClient",
+  service: Service,
+})
+@global.Azure.ClientGenerator.Core.clientInitialization({
+  parameters: MultipleParamsClientOptions,
+  initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.parent,
+})
+@route("/parent-multiple")
+interface ParentMultipleParams {
+  @route("/with-query")
+  @get
+  withQuery(@header name: string, @query region: string, @query id?: string): void;
+
+  @route("/with-body")
+  @post
+  withBody(@header name: string, @query region: string, @body input: Service.Input): void;
 }

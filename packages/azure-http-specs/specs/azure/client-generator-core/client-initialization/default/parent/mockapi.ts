@@ -248,3 +248,120 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_Par
       kind: "MockApiDefinition",
     },
   ]);
+
+// Mock responses for ParentPathParam scenario  
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParentPathParam = passOnSuccess([
+  {
+    uri: "/azure/client-generator-core/client-initialization/parent-path/sample-blob/with-query",
+    method: "get",
+    request: {
+      query: {
+        format: "text",
+      },
+    },
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/azure/client-generator-core/client-initialization/parent-path/sample-blob/get-standalone",
+    method: "get",
+    request: {},
+    response: {
+      status: 200,
+      body: json({
+        name: "sample-blob",
+        size: 1024,
+        contentType: "application/octet-stream",
+        createdOn: "2023-01-01T00:00:00Z",
+      }),
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/azure/client-generator-core/client-initialization/parent-path/sample-blob",
+    method: "delete",
+    request: {},
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+]);
+
+// Mock responses for ParentHeaderParam scenario
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParentHeaderParam = passOnSuccess([
+  {
+    uri: "/azure/client-generator-core/client-initialization/parent-header/with-query",
+    method: "get",
+    request: {
+      query: {
+        id: "test-id",
+      },
+      headers: {
+        name: "test-name-value",
+      },
+    },
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/azure/client-generator-core/client-initialization/parent-header/with-body",
+    method: "post",
+    request: {
+      body: json({
+        name: "test-name",
+      }),
+      headers: {
+        name: "test-name-value",
+      },
+    },
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+]);
+
+// Mock responses for ParentMultipleParams scenario
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParentMultipleParams = passOnSuccess([
+  {
+    uri: "/azure/client-generator-core/client-initialization/parent-multiple/with-query",
+    method: "get",
+    request: {
+      query: {
+        region: "us-west",
+        id: "test-id",
+      },
+      headers: {
+        name: "test-name-value",
+      },
+    },
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/azure/client-generator-core/client-initialization/parent-multiple/with-body",
+    method: "post",
+    request: {
+      body: json({
+        name: "test-name",
+      }),
+      query: {
+        region: "us-west",
+      },
+      headers: {
+        name: "test-name-value",
+      },
+    },
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+]);
