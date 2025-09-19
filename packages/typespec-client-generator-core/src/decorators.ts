@@ -1,3 +1,4 @@
+import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
   DecoratorContext,
   DecoratorFunction,
@@ -43,6 +44,7 @@ import {
 import {
   FlattenPropertyDecorator,
   HierarchyBuildingDecorator,
+  MarkAsLroDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
   AccessFlags,
@@ -1417,6 +1419,40 @@ export function getLegacyHierarchyBuilding(context: TCGCContext, target: Model):
   if (!context.enableLegacyHierarchyBuilding) return undefined;
 
   return getScopedDecoratorData(context, legacyHierarchyBuildingKey, target);
+}
+
+const markAsLroKey = createStateSymbol("markAsLro");
+
+export const $markAsLro: MarkAsLroDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: LanguageScopes,
+) => {
+  if (target.returnType.kind !== "Model") {
+    reportDiagnostic(context.program, {
+      code: "invalid-mark-as-lro-target",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+  if (getLroMetadata(context.program, target)) {
+    reportDiagnostic(context.program, {
+      code: "mark-as-lro-ineffective",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+  setScopedDecoratorData(context, $markAsLro, markAsLroKey, target, true, scope);
+};
+
+export function getMarkAsLro(context: TCGCContext, entity: Operation): boolean {
+  return getScopedDecoratorData(context, markAsLroKey, entity) ?? false;
 }
 
 /**
