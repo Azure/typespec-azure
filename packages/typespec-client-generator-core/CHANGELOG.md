@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.60.2
+
+### Bug Fixes
+
+- [#3300](https://github.com/Azure/typespec-azure/pull/3300) add `@Azure.ClientGenerator.Core.Legacy.markAsLro` for legacy brownfield services that need to mark non-lro methods as lro
+
+
 ## 0.60.1
 
 ### Bug Fixes
