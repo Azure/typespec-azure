@@ -104,7 +104,7 @@ This option is used for special Key Auth, when the key has a shared prefix and t
 
 **Type:** `boolean`
 
-      Whether to generate metadata files which includes package.json, README.md and tsconfig.json etc. Defaults to `undefined`. If there's not a package.json under package-dir, defaults to `true`. but if you'd like to disable this feature you could set it as `false`.
+      Whether to generate metadata files which includes package.json, README.md and tsconfig.json etc. Defaults to `undefined`. If there's not a package.json under emitter-output-dir, defaults to `true`. but if you'd like to disable this feature you could set it as `false`.
 
 
 ### `generate-test`
@@ -114,8 +114,8 @@ This option is used for special Key Auth, when the key has a shared prefix and t
       Whether to generate test files, for basic testing of your generated sdks. Defaults to `undefined`.
       other cases:
       - If azure-sdk-for-js is `false`. Defaults to `false`.
-      - If azure-sdk-for-js is `true` but there's a test folder under package-dir. Defaults to `false`.
-      - If azure-sdk-for-js is `true` but there's not a test folder under package-dir. Defaults to `true`.
+      - If azure-sdk-for-js is `true` but there's a test folder under emitter-output-dir. Defaults to `false`.
+      - If azure-sdk-for-js is `true` but there's not a test folder under emitter-output-dir. Defaults to `true`.
 
 
 ### `generate-sample`

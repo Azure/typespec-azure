@@ -1,5 +1,7 @@
 ---
 title: "Data types"
+description: "Data types exported by @azure-tools/typespec-azure-resource-manager"
+llmstxt: true
 ---
 
 ## Azure.ResourceManager
@@ -3419,21 +3421,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 | ----------------- | --------------------------------------------------------------------------------------------------- | ----------- |
 | extendedLocation? | [`ExtendedLocationOptional`](./data-types.md#Azure.ResourceManager.Legacy.ExtendedLocationOptional) |             |
 
-### `LegacyTrackedResource` {#Azure.ResourceManager.Legacy.LegacyTrackedResource}
-
-A tracked resource with the 'location' property optional
-
-```typespec
-model Azure.ResourceManager.Legacy.LegacyTrackedResource
-```
-
-#### Properties
-
-| Name      | Type             | Description                               |
-| --------- | ---------------- | ----------------------------------------- |
-| tags?     | `Record<string>` | Resource tags.                            |
-| location? | `string`         | The geo-location where the resource lives |
-
 ### `ManagedServiceIdentityV4` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4}
 
 Managed service identity (system assigned and/or user assigned identities)
@@ -3515,6 +3502,18 @@ model Azure.ResourceManager.Legacy.ProviderParameter<Resource>
 | -------- | -------------------------------- | ----------- |
 | provider | `"Microsoft.ThisWillBeReplaced"` |             |
 
+### `ResourceWithPathParameter` {#Azure.ResourceManager.Legacy.ResourceWithPathParameter}
+
+Template that allows a model to include a path parameter property without adding the property to a request body
+
+```typespec
+model Azure.ResourceManager.Legacy.ResourceWithPathParameter
+```
+
+#### Properties
+
+None
+
 ### `TrackedResourceWithOptionalLocation` {#Azure.ResourceManager.Legacy.TrackedResourceWithOptionalLocation}
 
 This type uses an optional location property, only used by legacy APIs.
@@ -3543,9 +3542,11 @@ model Employee is TrackedResourceWithOptionalLocation<EmployeeProperties> {
 
 #### Properties
 
-| Name        | Type         | Description |
-| ----------- | ------------ | ----------- |
-| properties? | `Properties` |             |
+| Name        | Type             | Description                               |
+| ----------- | ---------------- | ----------------------------------------- |
+| properties? | `Properties`     |                                           |
+| tags?       | `Record<string>` | Resource tags.                            |
+| location?   | `string`         | The geo-location where the resource lives |
 
 ### `ManagedServiceIdentityType` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityType}
 

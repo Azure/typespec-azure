@@ -5,6 +5,7 @@ import {
   getProperty as compilerGetProperty,
   DecoratorContext,
   getKeyName,
+  getNamespaceFullName,
   getTags,
   Interface,
   isArrayModelType,
@@ -757,9 +758,13 @@ export function getArmResourceInfo(
 export function getArmResourceKind(resourceType: Model): ArmResourceKind | undefined {
   if (resourceType.baseModel) {
     const coreType = resourceType.baseModel;
+    const coreTypeNamespace = coreType.namespace ? getNamespaceFullName(coreType.namespace) : "";
     if (
       coreType.name.startsWith("TrackedResource") ||
-      coreType.name.startsWith("LegacyTrackedResource")
+      coreType.name.startsWith("LegacyTrackedResource") ||
+      (coreTypeNamespace.startsWith("Azure.ResourceManager") &&
+        resourceType.properties.has("location") &&
+        resourceType.properties.has("tags"))
     ) {
       return "Tracked";
     } else if (coreType.name.startsWith("ProxyResource")) {

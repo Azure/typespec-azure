@@ -1,5 +1,31 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.29
+
+### Features
+
+- [#3291](https://github.com/Azure/typespec-azure/pull/3291) Add spector test cases for @previewVersion decorator
+
+### Bug Fixes
+
+- [#3291](https://github.com/Azure/typespec-azure/pull/3291) Fix missing decorator for the test case of moving method parameter to client.
+
+
+## 0.1.0-alpha.28
+
+### Features
+
+- [#3187](https://github.com/Azure/typespec-azure/pull/3187) Add tests for `@clientLocation`'s new usage to move parameter location.
+
+### Bump dependencies
+
+- [#3207](https://github.com/Azure/typespec-azure/pull/3207) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3202](https://github.com/Azure/typespec-azure/pull/3202) Switch to the `@flattenProperty` decorator from the `Azure.ClientGenerator.Core.Legacy` namespace
+
+
 ## 0.1.0-alpha.27
 
 ### Bug Fixes

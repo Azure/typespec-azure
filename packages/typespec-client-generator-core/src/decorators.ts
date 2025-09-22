@@ -33,7 +33,6 @@ import {
   ClientNamespaceDecorator,
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
-  FlattenPropertyDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
@@ -41,10 +40,14 @@ import {
   ScopeDecorator,
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
-import { HierarchyBuildingDecorator } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
+import {
+  FlattenPropertyDecorator,
+  HierarchyBuildingDecorator,
+} from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
   AccessFlags,
   ClientInitializationOptions,
+  ExternalTypeInfo,
   LanguageScopes,
   SdkClient,
   SdkOperationGroup,
@@ -541,14 +544,13 @@ export function getAccess(
   }
 }
 
-const flattenPropertyKey = createStateSymbol("flattenPropertyKey");
+const flattenPropertyKey = createStateSymbol("flattenProperty");
 /**
  * Whether a model property should be flattened.
  *
  * @param context DecoratorContext
  * @param target ModelProperty to mark as flattened
  * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
- * @deprecated This decorator is not recommended to use.
  */
 export const $flattenProperty: FlattenPropertyDecorator = (
   context: DecoratorContext,
@@ -563,7 +565,7 @@ export const $flattenProperty: FlattenPropertyDecorator = (
     });
     return;
   }
-  setScopedDecoratorData(context, $flattenProperty, flattenPropertyKey, target, true, scope); // eslint-disable-line @typescript-eslint/no-deprecated
+  setScopedDecoratorData(context, $flattenProperty, flattenPropertyKey, target, true, scope);
 };
 
 /**
@@ -732,27 +734,77 @@ const alternateTypeKey = createStateSymbol("alternateType");
  *
  * @param context the decorator context
  * @param source source type to be replaced
- * @param alternate target type to replace the source type
+ * @param alternate target type to replace the source type or ExternalType object
  * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
  */
 export const $alternateType: AlternateTypeDecorator = (
   context: DecoratorContext,
-  source: ModelProperty | Scalar,
+  source: ModelProperty | Scalar | Model | Enum | Union,
   alternate: Type,
   scope?: LanguageScopes,
 ) => {
-  if (source.kind === "Scalar" && alternate.kind !== "Scalar") {
-    reportDiagnostic(context.program, {
-      code: "invalid-alternate-type",
-      format: {
-        kindName: alternate.kind,
-      },
-      target: alternate,
-    });
-    return;
+  let alternateInput: Type | ExternalTypeInfo = alternate;
+  if (alternate.kind === "Model" && alternate.indexer === undefined) {
+    // This means we're dealing with external type
+    if (!scope) {
+      reportDiagnostic(context.program, {
+        code: "missing-scope",
+        format: {
+          decoratorName: "@alternateType",
+        },
+        target: source,
+      });
+    }
+
+    const alternatePropertyValues = [...alternate.properties.values()];
+    // Get identity if needed
+    const identity = alternatePropertyValues
+      .filter((x) => x.name === "identity")
+      .map((x) => x.type)
+      .filter((x) => x.kind === "String")
+      .map((x) => x.value)[0];
+
+    const packageName = alternatePropertyValues
+      .filter((x) => x.name === "package")
+      .map((x) => x.type)
+      .filter((x) => x.kind === "String")
+      .map((x) => x.value)[0];
+
+    const minVersion = alternatePropertyValues
+      .filter((x) => x.name === "minVersion")
+      .map((x) => x.type)
+      .filter((x) => x.kind === "String")
+      .map((x) => x.value)[0];
+
+    alternateInput = {
+      identity,
+      package: packageName,
+      minVersion,
+    };
+  } else {
+    // Not external type
+    if (source.kind === "Scalar" && alternate.kind !== "Scalar") {
+      reportDiagnostic(context.program, {
+        code: "invalid-alternate-type",
+        format: {
+          kindName: alternate.kind,
+        },
+        target: alternate,
+      });
+      return;
+    }
   }
-  setScopedDecoratorData(context, $alternateType, alternateTypeKey, source, alternate, scope);
+  setScopedDecoratorData(context, $alternateType, alternateTypeKey, source, alternateInput, scope);
 };
+
+export function getAlternateType(
+  context: TCGCContext,
+  source: ModelProperty | Scalar,
+): Scalar | undefined;
+export function getAlternateType(
+  context: TCGCContext,
+  source: ModelProperty | Scalar | Model | Enum | Union,
+): ExternalTypeInfo | undefined;
 
 /**
  * Get the alternate type for a source type in a specific scope.
@@ -763,9 +815,36 @@ export const $alternateType: AlternateTypeDecorator = (
  */
 export function getAlternateType(
   context: TCGCContext,
-  source: ModelProperty | Scalar,
-): Scalar | undefined {
-  return getScopedDecoratorData(context, alternateTypeKey, source);
+  source: ModelProperty | Scalar | Model | Enum | Union,
+): Type | ExternalTypeInfo | undefined {
+  const retval: Type | ExternalTypeInfo | undefined = getScopedDecoratorData(
+    context,
+    alternateTypeKey,
+    source,
+  );
+  if (retval !== undefined && "identity" in retval) {
+    if (!context.__externalPackageToVersions) {
+      context.__externalPackageToVersions = new Map();
+    }
+    const externalPackage = retval.package;
+    const externalMinVersion = retval.minVersion;
+    if (externalPackage && externalMinVersion) {
+      const existingVersion = context.__externalPackageToVersions.get(externalPackage);
+      if (existingVersion && existingVersion !== externalMinVersion) {
+        reportDiagnostic(context.program, {
+          code: "external-library-version-mismatch",
+          format: {
+            libraryName: externalPackage,
+            versionA: existingVersion,
+            versionB: externalMinVersion,
+          },
+          target: source,
+        });
+      }
+      context.__externalPackageToVersions.set(externalPackage, externalMinVersion);
+    }
+  }
+  return retval;
 }
 
 export const $useSystemTextJsonConverter: DecoratorFunction = (
