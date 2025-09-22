@@ -1,0 +1,132 @@
+---
+title: Multi-Layer Discriminator Hierarchy Building
+---
+
+import { ClientTabs, ClientTabItem } from "@components/client-tabs";
+
+This document explains how to use the `@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding` decorator to create multi-layer inheritance hierarchies in discriminated models.
+
+:::caution
+Legacy hierarchy building is NOT a recommended pattern and should only be used when specifically requested by SDK architects.
+:::
+
+## Overview
+
+The `@hierarchyBuilding` decorator enables client-level multiple levels of inheritance for discriminated models. This decorator modifies the inheritance chain in generated client libraries to create deeper hierarchies than what TypeSpec natively supports.
+
+Use `@hierarchyBuilding` when you need to represent complex inheritance hierarchies in discriminated models where:
+
+- You have multiple levels of inheritance (grandparent → parent → child)
+- You need to share common properties across multiple inheritance levels
+- You have explicit permission from SDK architects
+
+## Basic Three-Level Hierarchy
+
+This example demonstrates a simple three-level inheritance chain: Animal → Pet → Dog.
+
+<ClientTabs>
+<ClientTabItem lang="typespec">
+
+```typespec
+@discriminator("kind")
+model Animal {
+  @doc("The kind of animal")
+  kind: string;
+
+  @doc("Name of the animal")
+  name: string;
+}
+
+alias PetContent = {
+  @doc("Whether the pet is trained")
+  trained: boolean;
+};
+
+model Pet extends Animal {
+  kind: "pet";
+  ...PetContent;
+}
+
+alias DogContent = {
+  @doc("The breed of the dog")
+  breed: string;
+};
+
+@Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(Pet)
+model Dog extends Animal {
+  kind: "dog";
+  ...PetContent;
+  ...DogContent;
+}
+```
+
+Without `@hierarchyBuilding`, Dog would extend Animal directly. With the decorator, Dog extends Pet instead, creating the hierarchy: Animal → Pet → Dog.
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+# _models.py
+from typing import Literal
+from .. import _model_base
+from .._model_base import rest_discriminator, rest_field
+
+class Animal(_model_base.Model):
+    kind: str = rest_discriminator(name="kind")
+    name: str = rest_field()
+
+class Pet(Animal, discriminator="pet"):
+    kind: Literal["pet"] = rest_discriminator(name="kind")
+    trained: bool = rest_field()
+
+class Dog(Pet, discriminator="dog"):  # Inherits from Pet, not Animal directly
+    kind: Literal["dog"] = rest_discriminator(name="kind")
+    breed: str = rest_field()
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp">
+
+```csharp
+//TODO
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript">
+
+```typescript
+//TODO
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java">
+
+```java
+@Immutable
+public class Animal implements JsonSerializable<Animal> {
+    public String getKind();
+    public String getName();
+}
+
+@Immutable
+public class Pet extends Animal {
+    public String getKind();
+    public boolean isTrained();
+}
+
+@Immutable
+public final class Dog extends Pet {
+    public String getKind();
+    public String getBreed();
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go">
+
+```go
+//TODO
+```
+
+</ClientTabItem>
+</ClientTabs>
