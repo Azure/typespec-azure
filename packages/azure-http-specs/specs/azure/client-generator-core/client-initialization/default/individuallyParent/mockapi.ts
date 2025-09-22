@@ -2,8 +2,8 @@ import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
-// Mock responses for FlexibleNestedWithPathClient scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_FlexibleParentClient_FlexibleNestedWithPathClient =
+// Mock responses for IndividuallyParentNestedWithPathClient scenario
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_IndividuallyParentNestedWithPathClient =
   passOnSuccess([
     {
       uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent/test-resource/with-query",
@@ -44,8 +44,8 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_FlexibleParentClient_Fl
     },
   ]);
 
-// Mock responses for FlexibleNestedWithQueryClient scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_FlexibleParentClient_FlexibleNestedWithQueryClient =
+// Mock responses for IndividuallyParentNestedWithQueryClient scenario
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_IndividuallyParentNestedWithQueryClient =
   passOnSuccess([
     {
       uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-query/with-query",
@@ -94,8 +94,8 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_FlexibleParentClient_Fl
     },
   ]);
 
-// Mock responses for FlexibleNestedWithHeaderClient scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_FlexibleParentClient_FlexibleNestedWithHeaderClient =
+// Mock responses for IndividuallyParentNestedWithHeaderClient scenario
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_IndividuallyParentNestedWithHeaderClient =
   passOnSuccess([
     {
       uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-header/with-query",
@@ -141,8 +141,8 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_FlexibleParentClient_Fl
     },
   ]);
 
-// Mock responses for FlexibleNestedWithMultipleClient scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_FlexibleParentClient_FlexibleNestedWithMultipleClient =
+// Mock responses for IndividuallyParentNestedWithMultipleClient scenario
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_IndividuallyParentNestedWithMultipleClient =
   passOnSuccess([
     {
       uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-multiple/with-query",
@@ -195,8 +195,8 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_FlexibleParentClient_Fl
     },
   ]);
 
-// Mock responses for FlexibleNestedWithMixedClient scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_FlexibleParentClient_FlexibleNestedWithMixedClient =
+// Mock responses for IndividuallyParentNestedWithMixedClient scenario
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_IndividuallyParentNestedWithMixedClient =
   passOnSuccess([
     {
       uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-mixed/with-query",

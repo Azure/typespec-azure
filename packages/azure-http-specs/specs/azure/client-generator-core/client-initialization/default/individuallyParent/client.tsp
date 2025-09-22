@@ -41,10 +41,10 @@ model MixedParamsClientOptions {
 }
 
 @global.Azure.ClientGenerator.Core.client({
-  name: "FlexibleParentClient",
+  name: "IndividuallyParentClient",
   service: Service,
 })
-namespace FlexibleParentClient {
+namespace IndividuallyParentClient {
   // Scenario 6: Default -> Individually and Parent initialization with path parameter
   @scenarioDoc("""
     Client for testing default -> individually and parent nested initialization.
@@ -57,8 +57,8 @@ namespace FlexibleParentClient {
     
     Expected client usage:
     ```ts
-    // via FlexibleParentClient (individually | parent initialization)
-    const client = new FlexibleParentClient.getDefaultNestedWithPathClient({
+    // via IndividuallyParentClient (individually | parent initialization)
+    const client = new IndividuallyParentClient.getDefaultNestedWithPathClient({
       resourceName: "test-resource"
     });
     
@@ -80,7 +80,7 @@ namespace FlexibleParentClient {
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
   })
   @route("/nested-default-individually-parent")
-  interface FlexibleNestedWithPathClient {
+  interface IndividuallyParentNestedWithPathClient {
     withQuery is Service.NestedDefaultIndividuallyParentWithPath.withQuery;
     getStandalone is Service.NestedDefaultIndividuallyParentWithPath.getStandalone;
     deleteStandalone is Service.NestedDefaultIndividuallyParentWithPath.deleteStandalone;
@@ -98,8 +98,8 @@ namespace FlexibleParentClient {
     
     Expected client usage:
     ```ts
-    // via FlexibleParentClient (individually | parent initialization)
-    const client = new FlexibleParentClient.getDefaultNestedWithQueryClient({
+    // via IndividuallyParentClient (individually | parent initialization)
+    const client = new IndividuallyParentClient.getDefaultNestedWithQueryClient({
       blobName: "test-blob"
     });
     
@@ -121,7 +121,7 @@ namespace FlexibleParentClient {
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
   })
   @route("/nested-default-individually-parent-query")
-  interface FlexibleNestedWithQueryClient {
+  interface IndividuallyParentNestedWithQueryClient {
     withQuery is Service.NestedDefaultIndividuallyParentWithQuery.withQuery;
     getStandalone is Service.NestedDefaultIndividuallyParentWithQuery.getStandalone;
     deleteStandalone is Service.NestedDefaultIndividuallyParentWithQuery.deleteStandalone;
@@ -139,8 +139,8 @@ namespace FlexibleParentClient {
     
     Expected client usage:
     ```ts
-    // via FlexibleParentClient (individually | parent initialization)
-    const client = new FlexibleParentClient.getDefaultNestedWithHeaderClient({
+    // via IndividuallyParentClient (individually | parent initialization)
+    const client = new IndividuallyParentClient.getDefaultNestedWithHeaderClient({
       name: "test-name-value"
     });
     
@@ -162,7 +162,7 @@ namespace FlexibleParentClient {
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
   })
   @route("/nested-default-individually-parent-header")
-  interface FlexibleNestedWithHeaderClient {
+  interface IndividuallyParentNestedWithHeaderClient {
     withQuery is Service.NestedDefaultIndividuallyParentHeader.withQuery;
     getStandalone is Service.NestedDefaultIndividuallyParentHeader.getStandalone;
     deleteStandalone is Service.NestedDefaultIndividuallyParentHeader.deleteStandalone;
@@ -181,8 +181,8 @@ namespace FlexibleParentClient {
     
     Expected client usage:
     ```ts
-    // via FlexibleParentClient (individually | parent initialization)
-    const client = new FlexibleParentClient.getDefaultNestedWithMultipleClient({
+    // via IndividuallyParentClient (individually | parent initialization)
+    const client = new IndividuallyParentClient.getDefaultNestedWithMultipleClient({
       name: "test-name-value",
       region: "us-west"
     });
@@ -206,7 +206,7 @@ namespace FlexibleParentClient {
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
   })
   @route("/nested-default-individually-parent-multiple")
-  interface FlexibleNestedWithMultipleClient {
+  interface IndividuallyParentNestedWithMultipleClient {
     withQuery is Service.NestedDefaultIndividuallyParentMultiple.withQuery;
     getStandalone is Service.NestedDefaultIndividuallyParentMultiple.getStandalone;
     deleteStandalone is Service.NestedDefaultIndividuallyParentMultiple.deleteStandalone;
@@ -227,8 +227,8 @@ namespace FlexibleParentClient {
     
     Expected client usage:
     ```ts
-    // via FlexibleParentClient (individually | parent initialization)
-    const client = new FlexibleParentClient.getDefaultNestedWithMixedClient({
+    // via IndividuallyParentClient (individually | parent initialization)
+    const client = new IndividuallyParentClient.getDefaultNestedWithMixedClient({
       name: "test-name-value"
     });
     
@@ -250,7 +250,7 @@ namespace FlexibleParentClient {
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
   })
   @route("/nested-default-individually-parent-mixed")
-  interface FlexibleNestedWithMixedClient {
+  interface IndividuallyParentNestedWithMixedClient {
     withQuery is Service.NestedDefaultIndividuallyParentMixed.withQuery;
     getStandalone is Service.NestedDefaultIndividuallyParentMixed.getStandalone;
     deleteStandalone is Service.NestedDefaultIndividuallyParentMixed.deleteStandalone;
