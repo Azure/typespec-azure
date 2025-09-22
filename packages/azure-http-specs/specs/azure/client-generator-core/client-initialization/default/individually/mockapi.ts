@@ -249,7 +249,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_Ind
     },
   ]);
 
-// Mock responses for IndividuallyPathParam scenario  
+// Mock responses for IndividuallyPathParam scenario
 Scenarios.Azure_ClientGeneratorCore_ClientInitialization_IndividuallyPathParam = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-initialization/individually-path/sample-blob/with-query",
@@ -327,41 +327,43 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_IndividuallyHeaderParam
 ]);
 
 // Mock responses for IndividuallyMultipleParams scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_IndividuallyMultipleParams = passOnSuccess([
-  {
-    uri: "/azure/client-generator-core/client-initialization/individually-multiple/with-query",
-    method: "get",
-    request: {
-      query: {
-        region: "us-west",
-        id: "test-id",
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_IndividuallyMultipleParams = passOnSuccess(
+  [
+    {
+      uri: "/azure/client-generator-core/client-initialization/individually-multiple/with-query",
+      method: "get",
+      request: {
+        query: {
+          region: "us-west",
+          id: "test-id",
+        },
+        headers: {
+          name: "test-name-value",
+        },
       },
-      headers: {
-        name: "test-name-value",
+      response: {
+        status: 204,
       },
+      kind: "MockApiDefinition",
     },
-    response: {
-      status: 204,
-    },
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: "/azure/client-generator-core/client-initialization/individually-multiple/with-body",
-    method: "post",
-    request: {
-      body: json({
-        name: "test-name",
-      }),
-      query: {
-        region: "us-west",
+    {
+      uri: "/azure/client-generator-core/client-initialization/individually-multiple/with-body",
+      method: "post",
+      request: {
+        body: json({
+          name: "test-name",
+        }),
+        query: {
+          region: "us-west",
+        },
+        headers: {
+          name: "test-name-value",
+        },
       },
-      headers: {
-        name: "test-name-value",
+      response: {
+        status: 204,
       },
+      kind: "MockApiDefinition",
     },
-    response: {
-      status: 204,
-    },
-    kind: "MockApiDefinition",
-  },
-]);
+  ],
+);

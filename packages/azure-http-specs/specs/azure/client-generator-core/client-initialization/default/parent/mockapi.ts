@@ -249,7 +249,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_Par
     },
   ]);
 
-// Mock responses for ParentPathParam scenario  
+// Mock responses for ParentPathParam scenario
 Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParentPathParam = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-initialization/parent-path/sample-blob/with-query",
