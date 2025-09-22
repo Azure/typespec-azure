@@ -102,7 +102,23 @@ class Dog(Pet, discriminator="dog"):  # Inherits from Pet, not Animal directly
 <ClientTabItem lang="java">
 
 ```java
-//TODO
+@Immutable
+public class Animal implements JsonSerializable<Animal> {
+    public String getKind();
+    public String getName();
+}
+
+@Immutable
+public class Pet extends Animal {
+    public String getKind();
+    public boolean isTrained();
+}
+
+@Immutable
+public final class Dog extends Pet {
+    public String getKind();
+    public String getBreed();
+}
 ```
 
 </ClientTabItem>
