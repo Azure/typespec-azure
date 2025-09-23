@@ -64,7 +64,7 @@ interface RemoveOptionalParameter {
     
     Expected path parameter:
     param1: param1
-
+    
     Expected query parameter:
     param2: param2
     
@@ -72,5 +72,10 @@ interface RemoveOptionalParameter {
     """)
   @route("/remove-optional/{param1}")
   @get
-  removeOptional(@path param1: string, @query param2?: string, @query param3?: string, @header param4?: string): void;
+  removeOptional(
+    @path param1: string,
+    @query param2?: string,
+    @query param3?: string,
+    @header param4?: string,
+  ): void;
 }
