@@ -1,4 +1,5 @@
 import { Interface } from "@typespec/compiler";
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
 import {
@@ -1228,7 +1229,13 @@ it("multiple operation groups", async () => {
 });
 
 it("filter preview versions with @previewVersion decorator", async () => {
-  await runner.compile(
+  const runnerWithCore = await createSdkTestRunner({
+    librariesToAdd: [AzureCoreTestLibrary],
+    autoUsings: ["Azure.Core"],
+    emitterName: "@azure-tools/typespec-python",
+  });
+
+  await runnerWithCore.compile(
     `
     @service
     @versioned(Versions)
@@ -1256,7 +1263,7 @@ it("filter preview versions with @previewVersion decorator", async () => {
     }
     `,
   );
-  const sdkVersionsEnum = runner.context.sdkPackage.enums[0];
+  const sdkVersionsEnum = runnerWithCore.context.sdkPackage.enums[0];
   strictEqual(sdkVersionsEnum.name, "Versions");
   strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
   // Should filter out the preview version marked with @previewVersion
@@ -1266,7 +1273,13 @@ it("filter preview versions with @previewVersion decorator", async () => {
 });
 
 it("filter preview versions with both @previewVersion decorator and regex", async () => {
-  await runner.compile(
+  const runnerWithCore = await createSdkTestRunner({
+    librariesToAdd: [AzureCoreTestLibrary],
+    autoUsings: ["Azure.Core"],
+    emitterName: "@azure-tools/typespec-python",
+  });
+
+  await runnerWithCore.compile(
     `
     @service
     @versioned(Versions)
@@ -1295,11 +1308,56 @@ it("filter preview versions with both @previewVersion decorator and regex", asyn
     }
     `,
   );
-  const sdkVersionsEnum = runner.context.sdkPackage.enums[0];
+  const sdkVersionsEnum = runnerWithCore.context.sdkPackage.enums[0];
   strictEqual(sdkVersionsEnum.name, "Versions");
   strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
   // Should filter out both preview versions (one by decorator, one by regex)
   strictEqual(sdkVersionsEnum.values.length, 2);
   strictEqual(sdkVersionsEnum.values[0].value, "2022-10-01");
   strictEqual(sdkVersionsEnum.values[1].value, "2024-10-01");
+});
+
+it("do not filter preview versions when default API version is preview", async () => {
+  const runnerWithCore = await createSdkTestRunner({
+    librariesToAdd: [AzureCoreTestLibrary],
+    autoUsings: ["Azure.Core"],
+    emitterName: "@azure-tools/typespec-python",
+  });
+
+  await runnerWithCore.compile(
+    `
+    @service
+    @versioned(Versions)
+    @server(
+      "{endpoint}",
+      "Testserver endpoint",
+      {
+        endpoint: url,
+      }
+    )
+    namespace Versioning;
+    enum Versions {
+      v2022_10_01: "2022-10-01",
+      v2022_11_01_preview: "2022-11-01-preview",
+      @previewVersion
+      v2024_12_01_preview: "2024-12-01-preview",
+    }
+    op test(): void;
+
+    @route("/interface-v2")
+    interface InterfaceV2 {
+      @post
+      @route("/v2")
+      test2(): void;
+    }
+    `,
+  );
+  const sdkVersionsEnum = runnerWithCore.context.sdkPackage.enums[0];
+  strictEqual(sdkVersionsEnum.name, "Versions");
+  strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
+  // Should not filter anything since default API version is preview
+  strictEqual(sdkVersionsEnum.values.length, 3);
+  strictEqual(sdkVersionsEnum.values[0].value, "2022-10-01");
+  strictEqual(sdkVersionsEnum.values[1].value, "2022-11-01-preview");
+  strictEqual(sdkVersionsEnum.values[2].value, "2024-12-01-preview");
 });
