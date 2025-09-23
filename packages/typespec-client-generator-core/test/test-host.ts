@@ -119,7 +119,7 @@ export async function createSdkTestRunner(
     const result = await baseCompile(
       `
       @server("http://localhost:3000", "endpoint")
-      @service()
+      @service
       @versioned(Versions)
       namespace My.Service;
       enum Versions {v1}

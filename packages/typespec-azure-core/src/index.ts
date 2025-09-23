@@ -23,6 +23,7 @@ export { getUnionAsEnum, type UnionEnum } from "./helpers/union-enums.js";
 export * from "./lro-helpers.js";
 export * from "./rules/prevent-rest-library.js";
 export * from "./rules/use-standard-operations.js";
+export { FinalStateValue } from "./state/final-state.js";
 export * from "./traits.js";
 export * from "./utils.js";
 /** @internal */

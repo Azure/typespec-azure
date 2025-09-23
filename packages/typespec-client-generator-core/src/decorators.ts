@@ -663,11 +663,13 @@ export const $override = (
 
   // Check if the sorted parameter names arrays are equal, omit optional parameters
   let parametersMatch = true;
+  let checkParameter: ModelProperty | undefined = undefined;
   let index = 0;
   for (const originalParam of originalParams) {
     if (index > overrideParams.length - 1) {
       if (!originalParam.optional) {
         parametersMatch = false;
+        checkParameter = originalParam;
         break;
       } else {
         continue;
@@ -676,6 +678,7 @@ export const $override = (
     if (!compareModelProperties(undefined, originalParam, overrideParams[index])) {
       if (!originalParam.optional) {
         parametersMatch = false;
+        checkParameter = originalParam;
         break;
       } else {
         continue;
@@ -704,8 +707,7 @@ export const $override = (
       target: context.decoratorTarget,
       format: {
         methodName: original.name,
-        originalParameters: originalParams.map((x) => x.name).join(`", "`),
-        overrideParameters: overrideParams.map((x) => x.name).join(`", "`),
+        checkParameter: checkParameter?.name ?? "",
       },
     });
   }
