@@ -54,11 +54,12 @@ import {
   isPollingLocation,
   type PollingLocationInfo,
   pollingOptionsKind,
+  type StatusMonitorMetadata,
   type StatusMonitorPollingLocationInfo,
 } from "./decorators/polling-location.js";
 import { PollingOperationKey } from "./decorators/polling-operation.js";
-import type { PropertyMap, StatusMonitorMetadata } from "./lro-info.js";
-import { getFinalStateOverride } from "./state/final-state.js";
+import type { PropertyMap } from "./lro-info.js";
+import { FinalStateValue, getFinalStateOverride } from "./state/final-state.js";
 
 /**
  * Custom polling
@@ -229,25 +230,6 @@ export interface PollingSuccessNoResult extends LogicalOperationStep {
   kind: "pollingSuccessNoResult";
   /** There is no target */
   target: null;
-}
-
-/**
- * Azure SDK polling information: provides data contained in the
- * long-running-operation-options.final-state-via field
- */
-export enum FinalStateValue {
-  /** Poll the Azure-AsyncOperation header */
-  azureAsyncOperation = "azure-async-operation",
-  /** Poll the location header */
-  location = "location",
-  /** poll the Operation-Location header */
-  operationLocation = "operation-location",
-  /** poll (GET) the same uri as the original operation */
-  originalUri = "original-uri",
-  /** Poll on a header or field other than those above */
-  customLink = "custom-link",
-  /** Call a polling operation using the data in LroMetadata */
-  customOperationReference = "custom-operation-reference",
 }
 
 /**

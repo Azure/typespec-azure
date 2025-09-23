@@ -2,7 +2,25 @@ import type { Operation, Program } from "@typespec/compiler";
 import { useStateMap } from "@typespec/compiler/utils";
 import type { HttpOperation, HttpOperationResponse } from "@typespec/http";
 import { AzureCoreStateKeys, reportDiagnostic } from "../lib.js";
-import { FinalStateValue } from "../lro-helpers.js";
+
+/**
+ * Azure SDK polling information: provides data contained in the
+ * long-running-operation-options.final-state-via field
+ */
+export enum FinalStateValue {
+  /** Poll the Azure-AsyncOperation header */
+  azureAsyncOperation = "azure-async-operation",
+  /** Poll the location header */
+  location = "location",
+  /** poll the Operation-Location header */
+  operationLocation = "operation-location",
+  /** poll (GET) the same uri as the original operation */
+  originalUri = "original-uri",
+  /** Poll on a header or field other than those above */
+  customLink = "custom-link",
+  /** Call a polling operation using the data in LroMetadata */
+  customOperationReference = "custom-operation-reference",
+}
 
 export const [
   /**

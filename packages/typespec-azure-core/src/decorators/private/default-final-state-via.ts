@@ -2,8 +2,11 @@ import { type Operation, type Program, ignoreDiagnostics } from "@typespec/compi
 import { getHttpOperation } from "@typespec/http";
 import { type DefaultFinalStateViaDecorator } from "../../../generated-defs/Azure.Core.Foundations.Private.js";
 import { reportDiagnostic } from "../../lib.js";
-import { FinalStateValue } from "../../lro-helpers.js";
-import { setFinalStateOverride, validateFinalState } from "../../state/final-state.js";
+import {
+  FinalStateValue,
+  setFinalStateOverride,
+  validateFinalState,
+} from "../../state/final-state.js";
 
 export const $defaultFinalStateVia: DefaultFinalStateViaDecorator = (context, target, states) => {
   const { program } = context;
