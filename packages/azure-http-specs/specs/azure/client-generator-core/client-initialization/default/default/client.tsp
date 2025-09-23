@@ -236,9 +236,7 @@ namespace DefaultParentClient {
     """)
   @scenario
   @global.Azure.ClientGenerator.Core.operationGroup
-  @global.Azure.ClientGenerator.Core.clientInitialization({
-    parameters: PathParamClientOptions,
-  })
+  @global.Azure.ClientGenerator.Core.clientInitialization(PathParamClientOptions)
   @route("/nested-default-default")
   interface DefaultNestedWithPathClient {
     withQuery is Service.NestedDefaultDefaultWithPath.withQuery;
@@ -271,9 +269,7 @@ namespace DefaultParentClient {
     """)
   @scenario
   @global.Azure.ClientGenerator.Core.operationGroup
-  @global.Azure.ClientGenerator.Core.clientInitialization({
-    parameters: DefaultQueryParamClientOptions,
-  })
+  @global.Azure.ClientGenerator.Core.clientInitialization(DefaultQueryParamClientOptions)
   @route("/nested-default-default")
   interface DefaultNestedWithQueryClient {
     withQuery is Service.NestedDefaultDefaultWithQuery.withQuery;
@@ -306,9 +302,7 @@ namespace DefaultParentClient {
     """)
   @scenario
   @global.Azure.ClientGenerator.Core.operationGroup
-  @global.Azure.ClientGenerator.Core.clientInitialization({
-    parameters: HeaderParamClientOptions,
-  })
+  @global.Azure.ClientGenerator.Core.clientInitialization(HeaderParamClientOptions)
   @route("/nested-default-header")
   interface DefaultNestedWithHeaderClient {
     withQuery is Service.NestedDefaultHeader.withQuery;
@@ -343,9 +337,7 @@ namespace DefaultParentClient {
     """)
   @scenario
   @global.Azure.ClientGenerator.Core.operationGroup
-  @global.Azure.ClientGenerator.Core.clientInitialization({
-    parameters: MultipleParamsClientOptions,
-  })
+  @global.Azure.ClientGenerator.Core.clientInitialization(MultipleParamsClientOptions)
   @route("/nested-default-multiple")
   interface DefaultNestedWithMultipleClient {
     withQuery is Service.NestedDefaultMultiple.withQuery;
@@ -381,9 +373,7 @@ namespace DefaultParentClient {
     """)
   @scenario
   @global.Azure.ClientGenerator.Core.operationGroup
-  @global.Azure.ClientGenerator.Core.clientInitialization({
-    parameters: MixedParamsClientOptions,
-  })
+  @global.Azure.ClientGenerator.Core.clientInitialization(MixedParamsClientOptions)
   @route("/nested-default-mixed")
   interface DefaultNestedWithMixedClient {
     withQuery is Service.NestedDefaultMixed.withQuery;
