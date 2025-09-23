@@ -3,6 +3,7 @@ import {
   compilerAssert,
   createDiagnosticCollector,
   Diagnostic,
+  EnumMember,
   getDeprecationDetails,
   getDoc,
   getLifecycleVisibilityEnum,
@@ -32,6 +33,7 @@ import {
 } from "@typespec/compiler/experimental";
 import { $ } from "@typespec/compiler/typekit";
 import { HttpOperation, HttpOperationResponseContent, HttpPayloadBody } from "@typespec/http";
+import { isPreviewVersion } from "@azure-tools/typespec-azure-core";
 import {
   getAddedOnVersions,
   getRemovedOnVersions,
@@ -547,9 +549,22 @@ export function filterApiVersionsInEnum(
   removeVersionsLargerThanExplicitlySpecified(context, sdkVersionsEnum.values);
   const defaultApiVersion = getDefaultApiVersion(context, client.service);
   if (!context.previewStringRegex.test(defaultApiVersion?.value || "")) {
-    sdkVersionsEnum.values = sdkVersionsEnum.values.filter(
-      (v) => typeof v.value === "string" && !context.previewStringRegex.test(v.value),
-    );
+    sdkVersionsEnum.values = sdkVersionsEnum.values.filter((v) => {
+      if (typeof v.value !== "string") {
+        return true;
+      }
+      
+      // Check if the version has @previewVersion decorator
+      if (v.__raw && v.__raw.kind === "EnumMember") {
+        const enumMember = v.__raw as EnumMember;
+        if (isPreviewVersion(context.program, enumMember)) {
+          return false; // Filter out versions with @previewVersion decorator
+        }
+      }
+      
+      // Fall back to regex check for backward compatibility
+      return !context.previewStringRegex.test(v.value);
+    });
   }
 }
 

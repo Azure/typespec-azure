@@ -1226,3 +1226,80 @@ it("multiple operation groups", async () => {
   a = aOps.find((x) => x.name === "a");
   ok(a);
 });
+
+it("filter preview versions with @previewVersion decorator", async () => {
+  await runner.compile(
+    `
+    @service
+    @versioned(Versions)
+    @server(
+      "{endpoint}",
+      "Testserver endpoint",
+      {
+        endpoint: url,
+      }
+    )
+    namespace Versioning;
+    enum Versions {
+      v2022_10_01: "2022-10-01",
+      @previewVersion
+      v2022_11_01_preview: "2022-11-01-preview",
+      v2024_10_01: "2024-10-01",
+    }
+    op test(): void;
+
+    @route("/interface-v2")
+    interface InterfaceV2 {
+      @post
+      @route("/v2")
+      test2(): void;
+    }
+    `,
+  );
+  const sdkVersionsEnum = runner.context.sdkPackage.enums[0];
+  strictEqual(sdkVersionsEnum.name, "Versions");
+  strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
+  // Should filter out the preview version marked with @previewVersion
+  strictEqual(sdkVersionsEnum.values.length, 2);
+  strictEqual(sdkVersionsEnum.values[0].value, "2022-10-01");
+  strictEqual(sdkVersionsEnum.values[1].value, "2024-10-01");
+});
+
+it("filter preview versions with both @previewVersion decorator and regex", async () => {
+  await runner.compile(
+    `
+    @service
+    @versioned(Versions)
+    @server(
+      "{endpoint}",
+      "Testserver endpoint",
+      {
+        endpoint: url,
+      }
+    )
+    namespace Versioning;
+    enum Versions {
+      v2022_10_01: "2022-10-01",
+      @previewVersion
+      v2022_11_01_preview: "2022-11-01-preview",
+      v2023_01_01_preview: "2023-01-01-preview", // This should be filtered by regex
+      v2024_10_01: "2024-10-01",
+    }
+    op test(): void;
+
+    @route("/interface-v2")
+    interface InterfaceV2 {
+      @post
+      @route("/v2")
+      test2(): void;
+    }
+    `,
+  );
+  const sdkVersionsEnum = runner.context.sdkPackage.enums[0];
+  strictEqual(sdkVersionsEnum.name, "Versions");
+  strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
+  // Should filter out both preview versions (one by decorator, one by regex)
+  strictEqual(sdkVersionsEnum.values.length, 2);
+  strictEqual(sdkVersionsEnum.values[0].value, "2022-10-01");
+  strictEqual(sdkVersionsEnum.values[1].value, "2024-10-01");
+});
