@@ -554,11 +554,11 @@ export function filterApiVersionsInEnum(
         return true;
       }
       
-      // Check if the version has @previewVersion decorator
+      // Check if the version has `@previewVersion` decorator
       if (v.__raw && v.__raw.kind === "EnumMember") {
-        const enumMember = v.__raw as EnumMember;
+        const enumMember = v.__raw;
         if (isPreviewVersion(context.program, enumMember)) {
-          return false; // Filter out versions with @previewVersion decorator
+          return false;
         }
       }
       
