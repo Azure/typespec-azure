@@ -612,7 +612,11 @@ it("basic all version", async () => {
 });
 
 it("define own api version param", async () => {
-  await runner.compileWithBuiltInService(`
+  await runner.compile(`
+    @service
+    @versioned(Versions)
+    namespace Test;
+
     model ApiVersionParam {
       @header apiVersion: Versions;
     }
@@ -630,7 +634,7 @@ it("define own api version param", async () => {
   strictEqual(apiVersionParam.kind, "header");
   strictEqual(apiVersionParam.serializedName, "api-version");
   strictEqual(apiVersionParam.name, "apiVersion");
-  strictEqual(apiVersionParam.onClient, false);
+  strictEqual(apiVersionParam.onClient, true);
   strictEqual(apiVersionParam.isApiVersionParam, true);
 });
 

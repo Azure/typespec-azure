@@ -246,7 +246,7 @@ export const $lib = createTypeSpecLibrary({
     "override-parameters-mismatch": {
       severity: "error",
       messages: {
-        default: paramMessage`Method "${"methodName"}" is not directly referencing the same parameters as in the original operation. The original method has parameters "${"originalParameters"}", while the override method has parameters "${"overrideParameters"}".`,
+        default: paramMessage`Method "${"methodName"}" has different parameters definition from the override operation. Please check the parameter defined in the override operation: "${"checkParameter"}".`,
       },
     },
     "duplicate-client-name": {
