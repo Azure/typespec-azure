@@ -3,7 +3,7 @@ import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
 // Mock responses for ParentNestedWithPathClient scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_ParentNestedWithPathClient =
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultClient_ParentNestedWithPathClient =
   passOnSuccess([
     {
       uri: "/azure/client-generator-core/client-initialization/nested-default-parent/test-resource/with-query",
@@ -45,7 +45,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_Par
   ]);
 
 // Mock responses for ParentNestedWithQueryClient scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_ParentNestedWithQueryClient =
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultClient_ParentNestedWithQueryClient =
   passOnSuccess([
     {
       uri: "/azure/client-generator-core/client-initialization/nested-default-parent-query/with-query",
@@ -95,7 +95,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_Par
   ]);
 
 // Mock responses for ParentNestedWithHeaderClient scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_ParentNestedWithHeaderClient =
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultClient_ParentNestedWithHeaderClient =
   passOnSuccess([
     {
       uri: "/azure/client-generator-core/client-initialization/nested-default-parent-header/with-query",
@@ -142,7 +142,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_Par
   ]);
 
 // Mock responses for ParentNestedWithMultipleClient scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_ParentNestedWithMultipleClient =
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultClient_ParentNestedWithMultipleClient =
   passOnSuccess([
     {
       uri: "/azure/client-generator-core/client-initialization/nested-default-parent-multiple/with-query",
@@ -196,7 +196,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_Par
   ]);
 
 // Mock responses for ParentNestedWithMixedClient scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_ParentNestedWithMixedClient =
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultClient_ParentNestedWithMixedClient =
   passOnSuccess([
     {
       uri: "/azure/client-generator-core/client-initialization/nested-default-parent-mixed/with-query",
@@ -248,123 +248,6 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_Par
       kind: "MockApiDefinition",
     },
   ]);
-
-// Mock responses for ParentPathParam scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParentPathParam = passOnSuccess([
-  {
-    uri: "/azure/client-generator-core/client-initialization/parent-path/sample-blob/with-query",
-    method: "get",
-    request: {
-      query: {
-        format: "text",
-      },
-    },
-    response: {
-      status: 204,
-    },
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: "/azure/client-generator-core/client-initialization/parent-path/sample-blob/get-standalone",
-    method: "get",
-    request: {},
-    response: {
-      status: 200,
-      body: json({
-        name: "sample-blob",
-        size: 1024,
-        contentType: "application/octet-stream",
-        createdOn: "2023-01-01T00:00:00Z",
-      }),
-    },
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: "/azure/client-generator-core/client-initialization/parent-path/sample-blob",
-    method: "delete",
-    request: {},
-    response: {
-      status: 204,
-    },
-    kind: "MockApiDefinition",
-  },
-]);
-
-// Mock responses for ParentHeaderParam scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParentHeaderParam = passOnSuccess([
-  {
-    uri: "/azure/client-generator-core/client-initialization/parent-header/with-query",
-    method: "get",
-    request: {
-      query: {
-        id: "test-id",
-      },
-      headers: {
-        name: "test-name-value",
-      },
-    },
-    response: {
-      status: 204,
-    },
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: "/azure/client-generator-core/client-initialization/parent-header/with-body",
-    method: "post",
-    request: {
-      body: json({
-        name: "test-name",
-      }),
-      headers: {
-        name: "test-name-value",
-      },
-    },
-    response: {
-      status: 204,
-    },
-    kind: "MockApiDefinition",
-  },
-]);
-
-// Mock responses for ParentMultipleParams scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParentMultipleParams = passOnSuccess([
-  {
-    uri: "/azure/client-generator-core/client-initialization/parent-multiple/with-query",
-    method: "get",
-    request: {
-      query: {
-        region: "us-west",
-        id: "test-id",
-      },
-      headers: {
-        name: "test-name-value",
-      },
-    },
-    response: {
-      status: 204,
-    },
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: "/azure/client-generator-core/client-initialization/parent-multiple/with-body",
-    method: "post",
-    request: {
-      body: json({
-        name: "test-name",
-      }),
-      query: {
-        region: "us-west",
-      },
-      headers: {
-        name: "test-name-value",
-      },
-    },
-    response: {
-      status: 204,
-    },
-    kind: "MockApiDefinition",
-  },
-]);
 
 // Additional mock responses for ParentClient scenarios
 Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParentClient_ParentNestedWithPathClient =

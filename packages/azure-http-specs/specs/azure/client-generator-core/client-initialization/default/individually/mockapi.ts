@@ -3,7 +3,7 @@ import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
 // Mock responses for IndividuallyNestedWithPathClient scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_IndividuallyNestedWithPathClient =
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultClient_IndividuallyNestedWithPathClient =
   passOnSuccess([
     {
       uri: "/azure/client-generator-core/client-initialization/nested-default-individually/test-resource/with-query",
@@ -45,7 +45,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_Ind
   ]);
 
 // Mock responses for IndividuallyNestedWithQueryClient scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_IndividuallyNestedWithQueryClient =
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultClient_IndividuallyNestedWithQueryClient =
   passOnSuccess([
     {
       uri: "/azure/client-generator-core/client-initialization/nested-default-individually-query/with-query",
@@ -95,7 +95,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_Ind
   ]);
 
 // Mock responses for IndividuallyNestedWithHeaderClient scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_IndividuallyNestedWithHeaderClient =
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultClient_IndividuallyNestedWithHeaderClient =
   passOnSuccess([
     {
       uri: "/azure/client-generator-core/client-initialization/nested-default-individually-header/with-query",
@@ -142,7 +142,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_Ind
   ]);
 
 // Mock responses for IndividuallyNestedWithMultipleClient scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_IndividuallyNestedWithMultipleClient =
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultClient_IndividuallyNestedWithMultipleClient =
   passOnSuccess([
     {
       uri: "/azure/client-generator-core/client-initialization/nested-default-individually-multiple/with-query",
@@ -196,7 +196,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_Ind
   ]);
 
 // Mock responses for IndividuallyNestedWithMixedClient scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_IndividuallyNestedWithMixedClient =
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultClient_IndividuallyNestedWithMixedClient =
   passOnSuccess([
     {
       uri: "/azure/client-generator-core/client-initialization/nested-default-individually-mixed/with-query",
@@ -248,125 +248,6 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_Ind
       kind: "MockApiDefinition",
     },
   ]);
-
-// Mock responses for IndividuallyPathParam scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_IndividuallyPathParam = passOnSuccess([
-  {
-    uri: "/azure/client-generator-core/client-initialization/individually-path/sample-blob/with-query",
-    method: "get",
-    request: {
-      query: {
-        format: "text",
-      },
-    },
-    response: {
-      status: 204,
-    },
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: "/azure/client-generator-core/client-initialization/individually-path/sample-blob/get-standalone",
-    method: "get",
-    request: {},
-    response: {
-      status: 200,
-      body: json({
-        name: "sample-blob",
-        size: 1024,
-        contentType: "application/octet-stream",
-        createdOn: "2023-01-01T00:00:00Z",
-      }),
-    },
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: "/azure/client-generator-core/client-initialization/individually-path/sample-blob",
-    method: "delete",
-    request: {},
-    response: {
-      status: 204,
-    },
-    kind: "MockApiDefinition",
-  },
-]);
-
-// Mock responses for IndividuallyHeaderParam scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_IndividuallyHeaderParam = passOnSuccess([
-  {
-    uri: "/azure/client-generator-core/client-initialization/individually-header/with-query",
-    method: "get",
-    request: {
-      query: {
-        id: "test-id",
-      },
-      headers: {
-        name: "test-name-value",
-      },
-    },
-    response: {
-      status: 204,
-    },
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: "/azure/client-generator-core/client-initialization/individually-header/with-body",
-    method: "post",
-    request: {
-      body: json({
-        name: "test-name",
-      }),
-      headers: {
-        name: "test-name-value",
-      },
-    },
-    response: {
-      status: 204,
-    },
-    kind: "MockApiDefinition",
-  },
-]);
-
-// Mock responses for IndividuallyMultipleParams scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_IndividuallyMultipleParams = passOnSuccess(
-  [
-    {
-      uri: "/azure/client-generator-core/client-initialization/individually-multiple/with-query",
-      method: "get",
-      request: {
-        query: {
-          region: "us-west",
-          id: "test-id",
-        },
-        headers: {
-          name: "test-name-value",
-        },
-      },
-      response: {
-        status: 204,
-      },
-      kind: "MockApiDefinition",
-    },
-    {
-      uri: "/azure/client-generator-core/client-initialization/individually-multiple/with-body",
-      method: "post",
-      request: {
-        body: json({
-          name: "test-name",
-        }),
-        query: {
-          region: "us-west",
-        },
-        headers: {
-          name: "test-name-value",
-        },
-      },
-      response: {
-        status: 204,
-      },
-      kind: "MockApiDefinition",
-    },
-  ],
-);
 
 // Additional mock responses for IndividuallyClient scenarios
 Scenarios.Azure_ClientGeneratorCore_ClientInitialization_IndividuallyClient_IndividuallyNestedWithPathClient =

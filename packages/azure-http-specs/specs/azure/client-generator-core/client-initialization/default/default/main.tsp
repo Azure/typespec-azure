@@ -155,9 +155,9 @@ interface NestedDefaultDefaultWithQuery {
 }
 
 // Nested layer services for default -> header parameters
-@doc("Operations for nested default -> header parameters")
-@route("/nested-default-header")
-interface NestedDefaultHeader {
+@doc("Operations for nested default -> default header parameters")
+@route("/nested-default-default-header")
+interface NestedDefaultDefaultHeader {
   @route("/with-query")
   @get
   withQuery(...NameHeaderParam, @query format?: string): void;
@@ -172,9 +172,9 @@ interface NestedDefaultHeader {
 }
 
 // Nested layer services for default -> multiple parameters
-@doc("Operations for nested default -> multiple parameters")
-@route("/nested-default-multiple")
-interface NestedDefaultMultiple {
+@doc("Operations for nested default -> default multiple parameters")
+@route("/nested-default-default-multiple")
+interface NestedDefaultDefaultMultiple {
   @route("/with-query")
   @get
   withQuery(...NameHeaderParam, ...RegionQueryParam, @query format?: string): void;
@@ -189,9 +189,9 @@ interface NestedDefaultMultiple {
 }
 
 // Nested layer services for default -> mixed parameters
-@doc("Operations for nested default -> mixed parameters")
-@route("/nested-default-mixed")
-interface NestedDefaultMixed {
+@doc("Operations for nested default -> default mixed parameters")
+@route("/nested-default-default-mixed")
+interface NestedDefaultDefaultMixed {
   @route("/with-query")
   @get
   withQuery(...NameHeaderParam, ...RegionQueryParam, @query format?: string): void;
