@@ -371,7 +371,7 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
 ): SdkLroServiceMetadata | undefined {
-  const rawMetadata = getTcgcLroMetadata(context, operation);
+  const rawMetadata = getTcgcLroMetadata(context, operation, client);
   if (rawMetadata === undefined) {
     return undefined;
   }
@@ -611,7 +611,7 @@ function getSdkMethodResponse(
   };
 }
 
-function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>(
+export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
@@ -683,7 +683,7 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
-  const lro = getTcgcLroMetadata(context, operation);
+  const lro = getTcgcLroMetadata(context, operation, client);
   const paging = isList(context.program, operation);
   if (lro && paging) {
     return getSdkLroPagingServiceMethod<TServiceOperation>(context, operation, client);

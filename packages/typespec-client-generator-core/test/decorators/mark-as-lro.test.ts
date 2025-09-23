@@ -1,4 +1,7 @@
 import { FinalStateValue } from "@azure-tools/typespec-azure-core";
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
+import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
@@ -161,4 +164,40 @@ it("should work with complex model return types", async () => {
   ok(responseType);
   strictEqual(responseType.kind, "model");
   strictEqual(responseType.name, "ComplexResult");
+});
+
+it("should work with ArmResourceRead", async () => {
+  const armRunner = await createSdkTestRunner({
+    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
+    autoUsings: ["Azure.ResourceManager", "Azure.Core"],
+    emitterName: "@azure-tools/typespec-python",
+  });
+  await armRunner.compileWithBuiltInAzureResourceManagerService(`
+      model Employee is TrackedResource<EmployeeProperties> {
+        ...ResourceNameParameter<Employee>;
+      }
+      model EmployeeProperties {
+        name: string;
+      }
+      @Azure.ClientGenerator.Core.Legacy.markAsLro
+      op getProductionSiteDeploymentStatus is ArmResourceRead<
+      Employee
+    >;
+    `);
+
+  const methods = armRunner.context.sdkPackage.clients[0].methods;
+  strictEqual(methods.length, 1);
+  const method = methods[0];
+  strictEqual(method.kind, "lro");
+  strictEqual(method.name, "getProductionSiteDeploymentStatus");
+
+  const metadata = method.lroMetadata;
+  ok(metadata);
+  strictEqual(metadata.finalStateVia, FinalStateValue.originalUri);
+  strictEqual(method.response.type?.kind, "model");
+  strictEqual(method.response.type?.name, "Employee");
+  strictEqual(metadata.envelopeResult?.name, "Employee");
+  strictEqual(metadata.finalResponse?.envelopeResult?.name, "Employee");
+  strictEqual(metadata.finalResponse?.result?.name, "Employee");
+  ok(!metadata.finalResponse?.resultSegments);
 });
