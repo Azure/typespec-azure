@@ -17,11 +17,13 @@ import {
   getDiscriminator,
   getNamespaceFullName,
   ignoreDiagnostics,
+  isErrorModel,
   isService,
   isTemplateDeclaration,
 } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
+import { getHttpOperation } from "@typespec/http";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
@@ -1428,7 +1430,12 @@ export const $markAsLro: MarkAsLroDecorator = (
   target: Operation,
   scope?: LanguageScopes,
 ) => {
-  if (target.returnType.kind !== "Model") {
+  const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, target));
+  const hasModelResponse = httpOperation.responses.filter(
+    (r) =>
+      r.type?.kind === "Model" && !(r.statusCodes === "*" || isErrorModel(context.program, r.type)),
+  )[0];
+  if (!hasModelResponse) {
     reportDiagnostic(context.program, {
       code: "invalid-mark-as-lro-target",
       format: {

@@ -51,15 +51,18 @@ import {
   ExternalTypeInfo,
   SdkBuiltInType,
   SdkClient,
+  SdkClientType,
   SdkEnumType,
   SdkHeaderParameter,
   SdkHttpResponse,
   SdkMethodParameter,
   SdkOperationGroup,
+  SdkServiceOperation,
   SdkType,
   TCGCContext,
 } from "./interfaces.js";
 import { createDiagnostic, createStateSymbol } from "./lib.js";
+import { getSdkBasicServiceMethod } from "./methods.js";
 import {
   getCrossLanguageDefinitionId,
   getDefaultApiVersion,
@@ -869,9 +872,10 @@ export function findEntriesWithTarget<TSource extends Type, TTarget>(
  * @param operation - The TypeSpec operation to check for LRO metadata
  * @returns The LRO metadata for the operation if available, otherwise undefined
  */
-export function getTcgcLroMetadata(
+export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
+  client: SdkClientType<TServiceOperation>,
 ): LroMetadata | undefined {
   const lroMetaData = getLroMetadata(context.program, operation);
   if (lroMetaData) {
@@ -879,7 +883,8 @@ export function getTcgcLroMetadata(
   }
   if (getMarkAsLro(context, operation)) {
     // we guard against this in the setting of `@markAsLro`
-    const returnType = operation.returnType as Model;
+    const sdkMethod = ignoreDiagnostics(getSdkBasicServiceMethod(context, operation, client));
+    const returnType = sdkMethod.response.type!.__raw! as Model;
     return {
       operation,
       logicalResult: returnType,
