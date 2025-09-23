@@ -66,7 +66,7 @@ interface RemoveOptionalParameter {
     param1: param1
 
     Expected query parameter:
-    param1: param1
+    param2: param2
     
     Expected response: 204 No Content
     """)

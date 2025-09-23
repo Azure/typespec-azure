@@ -30,12 +30,12 @@ op groupCustomized(options: GroupParametersOptions): void;
 
 op requireOptionalCustomized(@path param1: string, @path param2: string): void;
 
-@@override(_Specs_.Azure.ClientGenerator.Core.Override.RequireParameters.requireOptional,
+@@override(_Specs_.Azure.ClientGenerator.Core.Override.RequireOptionalParameter.requireOptional,
   requireOptionalCustomized
 );
 
 op removeOptionalCustomized(@path param1: string, @query param2?: string): void;
 
-@@override(_Specs_.Azure.ClientGenerator.Core.Override.RemoveOptionalParameters.removeOptional,
+@@override(_Specs_.Azure.ClientGenerator.Core.Override.RemoveOptionalParameter.removeOptional,
   removeOptionalCustomized
 );
