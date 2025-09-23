@@ -365,6 +365,8 @@ it("remove required parameter", async () => {
   )[1];
   expectDiagnostics(diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/override-parameters-mismatch",
+    message:
+      'Method "func" has different parameters definition from the override operation. Please check the parameter defined in the override operation: "bar".',
   });
 });
 
