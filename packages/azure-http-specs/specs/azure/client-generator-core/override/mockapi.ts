@@ -40,13 +40,29 @@ Scenarios.Azure_ClientGenerator_Core_Override_GroupParameters_group = passOnSucc
 
 // Test parameter requirement with @override decorator
 // Verifies that optional parameters can be made required via @override
-// Expected path: /azure/client-generator-core/override/require/{param1}/{param2}
-// Where param1="param1" and param2="param2"
-Scenarios.Azure_ClientGenerator_Core_Override_RequireParameters_require = passOnSuccess([
+Scenarios.Azure_ClientGenerator_Core_Override_RequireOptionalParameter_requireOptional = passOnSuccess([
   {
-    uri: "/azure/client-generator-core/override/require/param1/param2",
+    uri: "/azure/client-generator-core/override/require-optional/param1/param2",
     method: "get",
     request: {},
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+]);
+
+// Test parameter requirement with @override decorator
+// Verifies that optional parameters can be removed via @override
+Scenarios.Azure_ClientGenerator_Core_Override_RemoveOptionalParameter_removeOptional = passOnSuccess([
+  {
+    uri: "/azure/client-generator-core/override/remove-optional/param1",
+    method: "get",
+    request: {
+      query: {
+        param2: "param2",
+      },
+    },
     response: {
       status: 204,
     },
