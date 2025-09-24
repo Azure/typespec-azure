@@ -32,10 +32,16 @@ export const Tester = createTester(resolvePath(import.meta.dirname, ".."), {
     "@typespec/http",
     "@typespec/rest",
     "@typespec/versioning",
+    "@typespec/openapi",
     "@azure-tools/typespec-azure-core",
   ],
 })
-  .importLibraries()
+  .import(
+    "@typespec/http",
+    "@typespec/rest",
+    "@typespec/versioning",
+    "@azure-tools/typespec-azure-core",
+  )
   .using("Http", "Rest", "Versioning", "Azure.Core");
 
 export const TesterWithService = Tester.wrap((code) => {

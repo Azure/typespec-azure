@@ -1,6 +1,5 @@
 import { Operation, createRule, paramMessage } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
-import { isAzureSubNamespace, isExcludedCoreType } from "./utils.js";
 
 export const rpcOperationRequestBodyRule = createRule({
   name: "rpc-operation-request-body",
@@ -13,9 +12,7 @@ export const rpcOperationRequestBodyRule = createRule({
   create(context) {
     return {
       operation: (operation: Operation) => {
-        if (isExcludedCoreType(context.program, operation)) return;
         if (operation.node?.templateParameters.length !== 0) return;
-        if (!isAzureSubNamespace(context.program, operation.namespace)) return;
 
         const originalOperation = operation;
         while (operation.sourceOperation) {
