@@ -15,21 +15,20 @@ Next link should be annotated in the response model with `@nextLink`.
 
 There are two ways to indicate a paging operation with `@nextLink`:
 
-1. Use `@pagedResult` and `@items` in `Azure.Core` lib.
+1. Use `@list`, `@nextLink` and `@items`
 
 <ClientTabs>
 
 ```typespec
-op listWithPage(): UserList;
+@list op listWithPage(): UserList;
 
 model User {
   id: string;
   name: string;
 }
 
-@pagedResult
 model UserList {
-  @items
+  @pageItems
   value: User[];
 
   @nextLink
@@ -410,7 +409,7 @@ model Certificate {
   name: string;
 }
 model Page {
-  @items items: Certificate[];
+  @pageItems items: Certificate[];
   @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[
     ListCertificateOptions.includePending
   ]>;
