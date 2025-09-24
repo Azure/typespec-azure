@@ -45,26 +45,6 @@ Identifies that an operation is the final operation for an LRO.
 | linkedOperation | `Operation` | The linked Operation                                                                                                      |
 | parameters      | `{}`        | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
 
-### `@items` {#@Azure.Core.items}
-
-:::caution
-**Deprecated**: Do not use this decorator. Use @pageItems instead.
-:::
-
-Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
-
-```typespec
-@Azure.Core.items
-```
-
-#### Target
-
-`ModelProperty`
-
-#### Parameters
-
-None
-
 ### `@lroCanceled` {#@Azure.Core.lroCanceled}
 
 Used for custom StatusMonitor implementation.
@@ -189,26 +169,6 @@ Identifies an operation that is linked to the target operation.
 | linkedOperation | `Operation`      | The linked Operation                                                                                                      |
 | linkType        | `valueof string` | A string indicating the role of the linked operation                                                                      |
 | parameters      | `{}`             | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
-
-### `@pagedResult` {#@Azure.Core.pagedResult}
-
-:::caution
-**Deprecated**: Do not use this decorator. Use @list decorator on the operation instead.
-:::
-
-Marks a Model as a paged collection.
-
-```typespec
-@Azure.Core.pagedResult
-```
-
-#### Target
-
-`Model`
-
-#### Parameters
-
-None
 
 ### `@pollingLocation` {#@Azure.Core.pollingLocation}
 

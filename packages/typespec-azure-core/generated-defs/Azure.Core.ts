@@ -67,16 +67,6 @@ export type PollingLocationDecorator = (
 export type PreviewVersionDecorator = (context: DecoratorContext, target: EnumMember) => void;
 
 /**
- * Marks a Model as a paged collection.
- */
-export type PagedResultDecorator = (context: DecoratorContext, entity: Model) => void;
-
-/**
- * Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
- */
-export type ItemsDecorator = (context: DecoratorContext, entity: ModelProperty) => void;
-
-/**
  * Used for custom StatusMonitor implementation.
  * Identifies an EnumMember as a long-running "Succeeded" terminal state.
  */
@@ -198,8 +188,6 @@ export type AzureCoreDecorators = {
   finalLocation: FinalLocationDecorator;
   pollingLocation: PollingLocationDecorator;
   previewVersion: PreviewVersionDecorator;
-  pagedResult: PagedResultDecorator;
-  items: ItemsDecorator;
   lroSucceeded: LroSucceededDecorator;
   lroCanceled: LroCanceledDecorator;
   lroFailed: LroFailedDecorator;
