@@ -122,8 +122,8 @@ export async function createSdkTestRunner(
       @service
       @versioned(Versions)
       namespace My.Service;
-      enum Versions {@useDependency(Azure.Core.Versions.v1_0_Preview_2) v1}
-
+      enum Versions {v1}
+      
       ${code}`,
       {
         noEmit: true,

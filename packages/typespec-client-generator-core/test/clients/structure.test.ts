@@ -440,7 +440,6 @@ it("single with core", async () => {
     @doc("The version of the API.")
     enum MyVersions {
       @doc("The version 2022-12-01-preview.")
-      @useDependency(Versions.v1_0_Preview_2)
       v2022_12_01_preview: "2022-12-01-preview",
     }
 
@@ -514,10 +513,8 @@ it("multiple with core", async () => {
     @doc("The version of the API.")
     enum MyVersions {
       @doc("The version 2022-12-01-preview.")
-      @useDependency(Versions.v1_0_Preview_2)
       v2022_12_01_preview: "2022-12-01-preview",
       @doc("The version 2022-12-01.")
-      @useDependency(Versions.v1_0_Preview_2)
       v2022_12_01: "2022-12-01",
     }
 

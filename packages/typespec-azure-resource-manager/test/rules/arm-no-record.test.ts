@@ -21,7 +21,6 @@ beforeEach(async () => {
 
 const nsDef = `
 @armProviderNamespace
-@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 namespace Microsoft.Contoso;
 `;
 

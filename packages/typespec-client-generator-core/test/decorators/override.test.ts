@@ -426,15 +426,12 @@ it("core template", async () => {
     @versioned(Versions)
     namespace My.Service;
 
-    enum Versions {
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      v1
-    }
+    enum Versions { v1  }
 
     model Params {
       foo: string;
       params: Params[];
-}
+    }
 
     @route("/template")
     op templateOp is Azure.Core.RpcOperation<
