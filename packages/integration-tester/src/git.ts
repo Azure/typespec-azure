@@ -5,7 +5,7 @@ import { relative } from "pathe";
 import pc from "picocolors";
 import { ResetMode, simpleGit } from "simple-git";
 import type { IntegrationTestSuite } from "./config/types.js";
-import { action, log } from "./utils.js";
+import { action, log, ValidationFailedError } from "./utils.js";
 /**
  * Options for ensuring repository state.
  */
@@ -118,5 +118,6 @@ export async function validateGitClean(dir: string): Promise<void> {
 
     const diffResult = await execa("git", ["diff", "--color=always"], { cwd: dir });
     log(diffResult.stdout);
+    throw new ValidationFailedError();
   }
 }
