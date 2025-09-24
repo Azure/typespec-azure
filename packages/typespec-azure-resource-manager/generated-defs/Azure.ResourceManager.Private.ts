@@ -1,4 +1,12 @@
-import type { DecoratorContext, Model, ModelProperty, Operation, Type } from "@typespec/compiler";
+import type {
+  DecoratorContext,
+  Interface,
+  Model,
+  ModelProperty,
+  Operation,
+  Scalar,
+  Type,
+} from "@typespec/compiler";
 
 /**
  *
@@ -191,6 +199,14 @@ export type ArmBodyRootDecorator = (
   isOptional: boolean,
 ) => void;
 
+/**
+ * designates a type as a legacy type and emits a warning diagnostic when used
+ */
+export type LegacyTypeDecorator = (
+  context: DecoratorContext,
+  target: Model | Operation | Interface | Scalar,
+) => void;
+
 export type AzureResourceManagerPrivateDecorators = {
   resourceParameterBaseFor: ResourceParameterBaseForDecorator;
   resourceBaseParametersOf: ResourceBaseParametersOfDecorator;
@@ -207,4 +223,5 @@ export type AzureResourceManagerPrivateDecorators = {
   armRenameListByOperation: ArmRenameListByOperationDecorator;
   armResourcePropertiesOptionality: ArmResourcePropertiesOptionalityDecorator;
   armBodyRoot: ArmBodyRootDecorator;
+  legacyType: LegacyTypeDecorator;
 };

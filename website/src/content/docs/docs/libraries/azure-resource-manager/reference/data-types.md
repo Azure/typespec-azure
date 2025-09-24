@@ -891,6 +891,41 @@ model Azure.ResourceManager.PrivateEndpointConnectionUpdate
 | ----------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
 | properties? | `OptionalProperties<UpdateableProperties<ResourceManager.CommonTypes.PrivateEndpointConnectionProperties>>` | The private endpoint connection properties |
 
+### `PrivateLink` {#Azure.ResourceManager.PrivateLink}
+
+A private link resource.
+Resource providers must declare a private link resource type in their provider namespace if
+they support private link resources
+
+```typespec
+model Azure.ResourceManager.PrivateLink<Description>
+```
+
+#### Template Parameters
+
+| Name        | Description                                                                        |
+| ----------- | ---------------------------------------------------------------------------------- |
+| Description | Optional. The documentary description of the private link resource name parameter. |
+
+#### Examples
+
+```ts
+namespace Microsoft.Contoso;
+model PrivateLink is PrivateLinkResource {}
+alias EmployeeConnectionOps is PrivateLinks<PrivateLink>;
+@armResourceOperations
+interface Employees {
+ @doc("get a private endpoint connection for resource employee")
+ getPrivateEndpointConnection is EmployeeConnectionOps.Read<Employee>;
+}
+```
+
+#### Properties
+
+| Name        | Type                                                                                                               | Description          |
+| ----------- | ------------------------------------------------------------------------------------------------------------------ | -------------------- |
+| properties? | [`PrivateLinkResourceProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.PrivateLinkResourceProperties) | Resource properties. |
+
 ### `ProviderNamespace` {#Azure.ResourceManager.ProviderNamespace}
 
 Model describing the provider namespace.
