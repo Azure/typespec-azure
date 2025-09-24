@@ -1,5 +1,5 @@
-import { Interface } from "@typespec/compiler";
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { Interface } from "@typespec/compiler";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
 import {
@@ -1246,11 +1246,12 @@ it("filter preview versions with @previewVersion decorator", async () => {
         endpoint: url,
       }
     )
-    namespace Versioning;
+    namespace Test;
     enum Versions {
       v2022_10_01: "2022-10-01",
+      #suppress "@azure-tools/typespec-azure-core/preview-version-last-member" "for test"
       @previewVersion
-      v2022_11_01_preview: "2022-11-01-preview",
+      v2022_11_01: "2022-11-01",
       v2024_10_01: "2024-10-01",
     }
     op test(): void;
@@ -1290,11 +1291,12 @@ it("filter preview versions with both @previewVersion decorator and regex", asyn
         endpoint: url,
       }
     )
-    namespace Versioning;
+    namespace Test;
     enum Versions {
       v2022_10_01: "2022-10-01",
+      #suppress "@azure-tools/typespec-azure-core/preview-version-last-member" "for test"
       @previewVersion
-      v2022_11_01_preview: "2022-11-01-preview",
+      v2022_11_01: "2022-11-01",
       v2023_01_01_preview: "2023-01-01-preview", // This should be filtered by regex
       v2024_10_01: "2024-10-01",
     }
@@ -1335,7 +1337,7 @@ it("do not filter preview versions when default API version is preview", async (
         endpoint: url,
       }
     )
-    namespace Versioning;
+    namespace Test;
     enum Versions {
       v2022_10_01: "2022-10-01",
       v2022_11_01_preview: "2022-11-01-preview",
