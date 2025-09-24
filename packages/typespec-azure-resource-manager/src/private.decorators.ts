@@ -49,6 +49,7 @@ import {
   OmitIfEmptyDecorator,
   ResourceBaseParametersOfDecorator,
   ResourceParameterBaseForDecorator,
+  ResourceParentTypeDecorator,
 } from "../generated-defs/Azure.ResourceManager.Private.js";
 import { reportDiagnostic } from "./lib.js";
 import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
@@ -630,6 +631,15 @@ const $legacyType: LegacyTypeDecorator = (
   reportDiagnostic(program, { code: "legacy-type-usage", target });
 };
 
+const $resourceParentType: ResourceParentTypeDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  parentType: "Subscription" | "ResourceGroup" | "Tenant" | "Extension",
+) => {
+  const { program } = context;
+  setResourceBaseType(program, target, parentType);
+};
+
 /** @internal */
 export const $decorators = {
   "Azure.ResourceManager.Private": {
@@ -649,6 +659,7 @@ export const $decorators = {
     armBodyRoot: $armBodyRoot,
     armResourceWithParameter: $armResourceWithParameter,
     legacyType: $legacyType,
+    resourceParentType: $resourceParentType,
   } satisfies AzureResourceManagerPrivateDecorators,
   "Azure.ResourceManager.Extension.Private": {
     builtInResource: $builtInResource,
