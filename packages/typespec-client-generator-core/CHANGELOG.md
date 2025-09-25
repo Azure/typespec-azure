@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.60.3
+
+### Bug Fixes
+
+- [#3328](https://github.com/Azure/typespec-azure/pull/3328) Fix propagation of client initialization parameters set on parent clients
+- [#3327](https://github.com/Azure/typespec-azure/pull/3327) Allow `@markAsLro` to work with union return types
+
+
 ## 0.60.2
 
 ### Bug Fixes
