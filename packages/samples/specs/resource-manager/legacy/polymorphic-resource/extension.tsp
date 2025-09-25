@@ -8,14 +8,14 @@ using Azure.ResourceManager;
 
 namespace Microsoft.ContosoProviderHub;
 
-@doc("A ContosoProviderHub resource")
+/** A ContosoProviderHub resource */
 model Cost is Azure.ResourceManager.Legacy.DiscriminatedExtensionResource {
   ...ResourceNameParameter<Cost>;
 }
 
-@doc("The rp-specific properties of the cost")
+/** The rp-specific properties of the cost */
 model CapitalProperties {
-  @doc("The amount of capital")
+  /** The amount of capital */
   amount?: float64;
 
   ...DefaultProvisioningStateProperty;
@@ -23,10 +23,10 @@ model CapitalProperties {
 
 /** The properties of an expense */
 model ExpenseProperties {
-  @doc("The amount of the expense")
+  /** The amount of the expense */
   amount?: float64;
 
-  @doc("The duration of the expense")
+  /** The duration of the expense */
   duration?: duration;
 
   ...DefaultProvisioningStateProperty;

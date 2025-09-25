@@ -8,18 +8,18 @@ using Azure.ResourceManager;
 
 namespace Microsoft.ContosoProviderHub;
 
+/** A ContosoProviderHub resource */
 @subscriptionResource
-@doc("A ContosoProviderHub resource")
 model Room is Azure.ResourceManager.Legacy.DiscriminatedProxyResource {
   ...ResourceNameParameter<Room>;
 }
 
 @doc("The rp-specific properties of the room")
 model ConferenceRoomProperties {
-  @doc("The number of occupants")
+  /** The number of occupants */
   capacity?: int32;
 
-  @doc("The city of current residence")
+  /** The city of current residence */
   city?: string;
 
   ...DefaultProvisioningStateProperty;
@@ -27,10 +27,10 @@ model ConferenceRoomProperties {
 
 /** The properties of an office */
 model OfficeProperties {
-  @doc("The number of desks in the office")
+  /** The number of desks in the office */
   desks?: int32;
 
-  @doc("The city of current residence")
+  /** The city of current residence */
   city?: string;
 
   ...DefaultProvisioningStateProperty;
