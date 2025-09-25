@@ -307,6 +307,7 @@ alias ResourceKind = ResourceKindProperty;
 /**
  * Model representing the standard `kind` envelope property for a resource.
  * Spread this model into a resource model if the resource support ARM `kind`.
+ * @template Type The type of the kind property. Default is string. However you can pass a union with string values.
  *
  * @example
  *
@@ -318,11 +319,11 @@ alias ResourceKind = ResourceKindProperty;
  * ```
  */
 @doc("The resource kind property envelope.")
-model ResourceKindProperty {
+model ResourceKindProperty<Type extends string = string> {
   @doc("Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type.  If supported, the resource provider must validate and persist this value.")
   @pattern("^[-\\w\\._,\\(\\\\\\)]+$")
   @visibility(Lifecycle.Read, Lifecycle.Create)
-  kind?: string;
+  kind?: Type;
 }
 
 /**

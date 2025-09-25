@@ -1026,8 +1026,14 @@ Model representing the standard `kind` envelope property for a resource.
 Spread this model into a resource model if the resource support ARM `kind`.
 
 ```typespec
-model Azure.ResourceManager.ResourceKindProperty
+model Azure.ResourceManager.ResourceKindProperty<Type>
 ```
+
+#### Template Parameters
+
+| Name | Description                                                                                        |
+| ---- | -------------------------------------------------------------------------------------------------- |
+| Type | The type of the kind property. Default is string. However you can pass a union with string values. |
 
 #### Examples
 
@@ -1040,9 +1046,9 @@ model Foo is TrackedResource<FooProperties> {
 
 #### Properties
 
-| Name  | Type     | Description                                                                                                                                                                                                                           |
-| ----- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| kind? | `string` | Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type. If supported, the resource provider must validate and persist this value. |
+| Name  | Type   | Description |
+| ----- | ------ | ----------- |
+| kind? | `Type` |             |
 
 ### `ResourceListCustomResult` {#Azure.ResourceManager.ResourceListCustomResult}
 
@@ -3417,6 +3423,108 @@ model Azure.ResourceManager.Legacy.CustomResourceOptions
 | Name             | Type      | Description                                        |
 | ---------------- | --------- | -------------------------------------------------- |
 | isAzureResource? | `boolean` | Should the resource be marked as an Azure resource |
+
+### `DiscriminatedExtensionResource` {#Azure.ResourceManager.Legacy.DiscriminatedExtensionResource}
+
+Polymorphic extension resources can be instantiated using this type, using 'kind' as the discriminator property.
+
+See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+
+```typespec
+model Azure.ResourceManager.Legacy.DiscriminatedExtensionResource<KindType, Description>
+```
+
+#### Template Parameters
+
+| Name        | Description                                                       |
+| ----------- | ----------------------------------------------------------------- |
+| KindType    | The type of the discriminator property `kind`. Default is string. |
+| Description | A description of the resource                                     |
+
+#### Examples
+
+```typespec
+model Pet is DiscriminatedExtensionResource;
+
+model Dog extends Pet {
+  kind: "dog";
+  properties: DogProperties;
+}
+```
+
+#### Properties
+
+| Name  | Type       | Description |
+| ----- | ---------- | ----------- |
+| kind? | `KindType` |             |
+
+### `DiscriminatedProxyResource` {#Azure.ResourceManager.Legacy.DiscriminatedProxyResource}
+
+Discriminated proxy resource types can be created by instantiating using this type, with 'kind' as the discriminator property.
+
+See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+
+```typespec
+model Azure.ResourceManager.Legacy.DiscriminatedProxyResource<KindType, Description>
+```
+
+#### Template Parameters
+
+| Name        | Description                                                       |
+| ----------- | ----------------------------------------------------------------- |
+| KindType    | The type of the discriminator property `kind`. Default is string. |
+| Description | A description of the resource                                     |
+
+#### Examples
+
+```typespec
+model Pet is DiscriminatedProxyResource;
+
+model Dog extends Pet {
+  kind: "dog";
+  properties: DogProperties;
+}
+```
+
+#### Properties
+
+| Name  | Type       | Description |
+| ----- | ---------- | ----------- |
+| kind? | `KindType` |             |
+
+### `DiscriminatedTrackedResource` {#Azure.ResourceManager.Legacy.DiscriminatedTrackedResource}
+
+Discriminated tracked resource types can be created by instantiating this type, with 'kind' as the discriminator property.
+
+See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+
+```typespec
+model Azure.ResourceManager.Legacy.DiscriminatedTrackedResource<KindType, Description>
+```
+
+#### Template Parameters
+
+| Name        | Description                                                       |
+| ----------- | ----------------------------------------------------------------- |
+| KindType    | The type of the discriminator property `kind`. Default is string. |
+| Description | A description of the resource                                     |
+
+#### Examples
+
+```typespec
+model Pet is DiscriminatedTrackedResource;
+
+model Dog extends Pet {
+  kind: "dog";
+  properties: DogProperties;
+}
+```
+
+#### Properties
+
+| Name  | Type       | Description |
+| ----- | ---------- | ----------- |
+| kind? | `KindType` |             |
 
 ### `ExtendedLocationOptional` {#Azure.ResourceManager.Legacy.ExtendedLocationOptional}
 
