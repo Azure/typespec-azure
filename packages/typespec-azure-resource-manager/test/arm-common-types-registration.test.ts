@@ -1,11 +1,12 @@
-import type { Diagnostic, Model, ModelProperty, Namespace } from "@typespec/compiler";
+import type { Diagnostic, ModelProperty, Namespace } from "@typespec/compiler";
 import { getService } from "@typespec/compiler";
-import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
+import { expectDiagnosticEmpty, expectDiagnostics, t } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
 import { findArmCommonTypeRecord, getExternalTypeRef } from "../src/common-types.js";
 import type { ArmCommonTypeRecord } from "../src/commontypes.private.decorators.js";
 import { createAzureResourceManagerTestRunner } from "./test-host.js";
+import { Tester } from "./tester.js";
 
 function boilerplate(version: string | undefined) {
   // const versions = useVersionEnum ? ["v1", "v2"] : undefined;
@@ -28,16 +29,14 @@ describe("common definition", () => {
     decorators: string,
     commonTypesVersion: string,
   ): Promise<[ArmCommonTypeRecord | undefined, readonly Diagnostic[]]> {
-    const runner = await createAzureResourceManagerTestRunner();
-    const { Foo, Service } = (await runner.compile(`
+    const { Foo, Service, program } = await Tester.compile(t.code`
     ${boilerplate(commonTypesVersion)}
 
     ${decorators}
-    @test
-    model Foo {}
-  `)) as { Foo: Model; Service: Namespace };
-    return findArmCommonTypeRecord(runner.program, Foo, {
-      service: getService(runner.program, Service)!,
+    model ${t.model("Foo")} {}
+  `);
+    return findArmCommonTypeRecord(program, Foo, {
+      service: getService(program, Service as Namespace)!,
     });
   }
 

@@ -5,7 +5,8 @@ import { ok, strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
 import { ArmLifecycleOperationKind } from "../src/operations.js";
 import { ArmResourceDetails, getArmResources } from "../src/resource.js";
-import { checkFor, compileAndDiagnose } from "./test-host.js";
+import { compileAndDiagnose } from "./test-host.js";
+import { Tester } from "./tester.js";
 
 function assertLifecycleOperation(
   resource: ArmResourceDetails,
@@ -22,13 +23,11 @@ function getResourcePropertyProperties(resource: ArmResourceDetails, propertyNam
   return propertyType.properties.get(propertyName);
 }
 
-describe("typespec-azure-resource-manager: ARM resource model", () => {
-  describe("ARM resource model:", () => {
-    it("gathers metadata about TrackedResources", async () => {
-      const { program, diagnostics } = await checkFor(`
+describe("ARM resource model:", () => {
+  it("gathers metadata about TrackedResources", async () => {
+    const { program } = await Tester.compile(`
       @armProviderNamespace
       namespace Microsoft.Test;
-
 
       enum ResourceState {
        Succeeded,
@@ -53,26 +52,25 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
       }
     `);
 
-      const resources = getArmResources(program);
-      expectDiagnosticEmpty(diagnostics);
-      strictEqual(resources.length, 1);
+    const resources = getArmResources(program);
+    strictEqual(resources.length, 1);
 
-      const foo = resources[0];
-      strictEqual(foo.name, "FooResource");
-      strictEqual(foo.kind, "Tracked");
-      strictEqual(foo.collectionName, "foos");
-      strictEqual(foo.keyName, "fooName");
-      strictEqual(foo.armProviderNamespace, "Microsoft.Test");
+    const foo = resources[0];
+    strictEqual(foo.name, "FooResource");
+    strictEqual(foo.kind, "Tracked");
+    strictEqual(foo.collectionName, "foos");
+    strictEqual(foo.keyName, "fooName");
+    strictEqual(foo.armProviderNamespace, "Microsoft.Test");
 
-      // Check operations
-      assertLifecycleOperation(foo, "read", "Foos");
-      assertLifecycleOperation(foo, "createOrUpdate", "Foos");
-      assertLifecycleOperation(foo, "update", "Foos");
-      assertLifecycleOperation(foo, "delete", "Foos");
-    });
+    // Check operations
+    assertLifecycleOperation(foo, "read", "Foos");
+    assertLifecycleOperation(foo, "createOrUpdate", "Foos");
+    assertLifecycleOperation(foo, "update", "Foos");
+    assertLifecycleOperation(foo, "delete", "Foos");
+  });
 
-    it("allows overriding armProviderNamespace", async () => {
-      const { program, diagnostics } = await checkFor(`
+  it("allows overriding armProviderNamespace", async () => {
+    const { program } = await Tester.compile(`
       @armProviderNamespace
       @service
       
@@ -107,16 +105,14 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     }
     `);
 
-      expectDiagnosticEmpty(diagnostics);
-      const resources = getArmResources(program);
-      const foo = resources[0];
-      strictEqual(foo.armProviderNamespace, "Private.Test");
-    });
-    it("gathers metadata about ProxyResources", async () => {
-      const { program, diagnostics } = await checkFor(`
+    const resources = getArmResources(program);
+    const foo = resources[0];
+    strictEqual(foo.armProviderNamespace, "Private.Test");
+  });
+  it("gathers metadata about ProxyResources", async () => {
+    const { program } = await Tester.compile(`
       @armProviderNamespace
       namespace Microsoft.Test;
-
 
       enum ResourceState {
        Succeeded,
@@ -157,29 +153,26 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
       }
     `);
 
-      const resources = getArmResources(program);
-      expectDiagnosticEmpty(diagnostics);
-      strictEqual(resources.length, 2);
+    const resources = getArmResources(program);
+    strictEqual(resources.length, 2);
 
-      const bar = resources[1];
-      strictEqual(bar.name, "BarResource");
-      strictEqual(bar.kind, "Proxy");
-      strictEqual(bar.collectionName, "bars");
-      strictEqual(bar.keyName, "barName");
-      strictEqual(bar.armProviderNamespace, "Microsoft.Test");
+    const bar = resources[1];
+    strictEqual(bar.name, "BarResource");
+    strictEqual(bar.kind, "Proxy");
+    strictEqual(bar.collectionName, "bars");
+    strictEqual(bar.keyName, "barName");
+    strictEqual(bar.armProviderNamespace, "Microsoft.Test");
 
-      // Check operations
-      assertLifecycleOperation(bar, "read", "Bars");
-      assertLifecycleOperation(bar, "createOrUpdate", "Bars");
-      assertLifecycleOperation(bar, "delete", "Bars");
-    });
+    // Check operations
+    assertLifecycleOperation(bar, "read", "Bars");
+    assertLifecycleOperation(bar, "createOrUpdate", "Bars");
+    assertLifecycleOperation(bar, "delete", "Bars");
+  });
 
-    it("gathers metadata about ExtensionResources", async () => {
-      const { program, diagnostics } = await checkFor(`
+  it("gathers metadata about ExtensionResources", async () => {
+    const { program } = await Tester.compile(`
       @armProviderNamespace
-          namespace Microsoft.Test;
-
-      interface Operations extends Azure.ResourceManager.Operations {}
+      namespace Microsoft.Test;
 
       enum ResourceState {
        Succeeded,
@@ -204,28 +197,27 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
       }
     `);
 
-      const resources = getArmResources(program);
-      expectDiagnosticEmpty(diagnostics);
-      strictEqual(resources.length, 1);
+    const resources = getArmResources(program);
+    strictEqual(resources.length, 1);
 
-      const baz = resources[0];
-      strictEqual(baz.name, "BazResource");
-      strictEqual(baz.kind, "Extension");
-      strictEqual(baz.collectionName, "bazs");
-      strictEqual(baz.keyName, "bazName");
-      strictEqual(baz.armProviderNamespace, "Microsoft.Test");
+    const baz = resources[0];
+    strictEqual(baz.name, "BazResource");
+    strictEqual(baz.kind, "Extension");
+    strictEqual(baz.collectionName, "bazs");
+    strictEqual(baz.keyName, "bazName");
+    strictEqual(baz.armProviderNamespace, "Microsoft.Test");
 
-      // Check operations
-      assertLifecycleOperation(baz, "read", "Bazs");
-      assertLifecycleOperation(baz, "createOrUpdate", "Bazs");
-      assertLifecycleOperation(baz, "update", "Bazs");
-      assertLifecycleOperation(baz, "delete", "Bazs");
-    });
+    // Check operations
+    assertLifecycleOperation(baz, "read", "Bazs");
+    assertLifecycleOperation(baz, "createOrUpdate", "Bazs");
+    assertLifecycleOperation(baz, "update", "Bazs");
+    assertLifecycleOperation(baz, "delete", "Bazs");
+  });
 
-    it("gathers metadata about singleton resources", async () => {
-      const { program, diagnostics } = await checkFor(`
+  it("gathers metadata about singleton resources", async () => {
+    const { program } = await Tester.compile(`
       @armProviderNamespace
-          namespace Microsoft.Test;
+      namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -270,27 +262,26 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
       }
     `);
 
-      const resources = getArmResources(program);
-      expectDiagnosticEmpty(diagnostics);
-      strictEqual(resources.length, 2);
+    const resources = getArmResources(program);
+    strictEqual(resources.length, 2);
 
-      const bar = resources[1];
-      strictEqual(bar.name, "BarResource");
-      strictEqual(bar.kind, "Proxy");
-      strictEqual(bar.collectionName, "bars");
-      strictEqual(bar.keyName, "barName");
-      strictEqual(bar.armProviderNamespace, "Microsoft.Test");
+    const bar = resources[1];
+    strictEqual(bar.name, "BarResource");
+    strictEqual(bar.kind, "Proxy");
+    strictEqual(bar.collectionName, "bars");
+    strictEqual(bar.keyName, "barName");
+    strictEqual(bar.armProviderNamespace, "Microsoft.Test");
 
-      // Check operations
-      assertLifecycleOperation(bar, "read", "Bars");
-      assertLifecycleOperation(bar, "createOrUpdate", "Bars");
-      assertLifecycleOperation(bar, "delete", "Bars");
-    });
+    // Check operations
+    assertLifecycleOperation(bar, "read", "Bars");
+    assertLifecycleOperation(bar, "createOrUpdate", "Bars");
+    assertLifecycleOperation(bar, "delete", "Bars");
+  });
 
-    it("gathers metadata when overriding lifecycle operation", async () => {
-      const { program, diagnostics } = await checkFor(`
+  it("gathers metadata when overriding lifecycle operation", async () => {
+    const { program } = await Tester.compile(`
       @armProviderNamespace
-          namespace Microsoft.Test;
+      namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -318,27 +309,26 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
       }
     `);
 
-      const resources = getArmResources(program);
-      expectDiagnosticEmpty(diagnostics);
-      strictEqual(resources.length, 1);
+    const resources = getArmResources(program);
+    strictEqual(resources.length, 1);
 
-      const foo = resources[0];
-      strictEqual(foo.name, "FooResource");
-      strictEqual(foo.kind, "Tracked");
-      strictEqual(foo.collectionName, "foos");
-      strictEqual(foo.keyName, "fooName");
-      strictEqual(foo.armProviderNamespace, "Microsoft.Test");
+    const foo = resources[0];
+    strictEqual(foo.name, "FooResource");
+    strictEqual(foo.kind, "Tracked");
+    strictEqual(foo.collectionName, "foos");
+    strictEqual(foo.keyName, "fooName");
+    strictEqual(foo.armProviderNamespace, "Microsoft.Test");
 
-      // Check operations
-      assertLifecycleOperation(foo, "read", "Foos");
-      assertLifecycleOperation(foo, "createOrUpdate", "Foos");
-      assertLifecycleOperation(foo, "update", "Foos");
-      assertLifecycleOperation(foo, "delete", "Foos");
-    });
-    it("resources with intrinsic types", async () => {
-      const { program, diagnostics } = await checkFor(`
+    // Check operations
+    assertLifecycleOperation(foo, "read", "Foos");
+    assertLifecycleOperation(foo, "createOrUpdate", "Foos");
+    assertLifecycleOperation(foo, "update", "Foos");
+    assertLifecycleOperation(foo, "delete", "Foos");
+  });
+  it("resources with intrinsic types", async () => {
+    const { program } = await Tester.compile(`
       @armProviderNamespace
-          namespace Microsoft.Test;
+      namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -411,20 +401,18 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
       }
     `);
 
-      const resources = getArmResources(program);
-      expectDiagnosticEmpty(diagnostics);
-      strictEqual(resources.length, 1);
+    const resources = getArmResources(program);
+    strictEqual(resources.length, 1);
+    const foo = resources[0];
+    strictEqual(foo.name, "FooResource");
+    strictEqual(foo.kind, "Tracked");
+    strictEqual(foo.collectionName, "foos");
+    strictEqual(foo.keyName, "fooName");
+    strictEqual(foo.armProviderNamespace, "Microsoft.Test");
+  });
 
-      const foo = resources[0];
-      strictEqual(foo.name, "FooResource");
-      strictEqual(foo.kind, "Tracked");
-      strictEqual(foo.collectionName, "foos");
-      strictEqual(foo.keyName, "fooName");
-      strictEqual(foo.armProviderNamespace, "Microsoft.Test");
-    });
-
-    it("resources with armResourceIdentifier property types", async () => {
-      const { program, diagnostics } = await checkFor(`
+  it("resources with armResourceIdentifier property types", async () => {
+    const { program } = await Tester.compile(`
       @armProviderNamespace
               namespace Microsoft.Test;
 
@@ -450,32 +438,31 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
       }
     `);
 
-      const resources = getArmResources(program);
-      expectDiagnosticEmpty(diagnostics);
-      strictEqual(resources.length, 1);
+    const resources = getArmResources(program);
+    strictEqual(resources.length, 1);
 
-      const foo = resources[0];
-      strictEqual(foo.name, "FooResource");
-      strictEqual(foo.kind, "Tracked");
-      strictEqual(foo.collectionName, "foos");
-      strictEqual(foo.keyName, "fooName");
-      strictEqual(foo.armProviderNamespace, "Microsoft.Test");
+    const foo = resources[0];
+    strictEqual(foo.name, "FooResource");
+    strictEqual(foo.kind, "Tracked");
+    strictEqual(foo.collectionName, "foos");
+    strictEqual(foo.keyName, "fooName");
+    strictEqual(foo.armProviderNamespace, "Microsoft.Test");
 
-      const armIds = [
-        "simpleArmId",
-        "armIdWithType",
-        "armIdWithTypeAndScope",
-        "armIdWithMultipleTypeAndScope",
-      ];
-      armIds.forEach(function (id) {
-        const armIdProp = getResourcePropertyProperties(foo, id);
-        strictEqual((armIdProp?.type as Model).name, "armResourceIdentifier");
-      });
+    const armIds = [
+      "simpleArmId",
+      "armIdWithType",
+      "armIdWithTypeAndScope",
+      "armIdWithMultipleTypeAndScope",
+    ];
+    armIds.forEach(function (id) {
+      const armIdProp = getResourcePropertyProperties(foo, id);
+      strictEqual((armIdProp?.type as Model).name, "armResourceIdentifier");
     });
+  });
 
-    describe("raises diagnostics", () => {
-      it("when armResourceInternal is used on a non-resource type", async () => {
-        const { diagnostics } = await checkFor(`
+  describe("raises diagnostics", () => {
+    it("when armResourceInternal is used on a non-resource type", async () => {
+      const diagnostics = await Tester.diagnose(`
         @armProviderNamespace
               namespace Microsoft.Test;
 
@@ -491,13 +478,13 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
         }
       `);
 
-        expectDiagnostics(diagnostics, {
-          code: "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-base-type",
-        });
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-base-type",
       });
+    });
 
-      it("when name property doesn't have a @key decorator", async () => {
-        const { diagnostics } = await checkFor(`
+    it("when name property doesn't have a @key decorator", async () => {
+      const diagnostics = await Tester.diagnose(`
         @armProviderNamespace
               namespace Microsoft.Test;
 
@@ -510,13 +497,13 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
         }
       `);
 
-        expectDiagnostics(diagnostics, {
-          code: "@azure-tools/typespec-azure-resource-manager/arm-resource-missing-name-key-decorator",
-        });
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-missing-name-key-decorator",
       });
+    });
 
-      it("when name property doesn't have a @segment decorator", async () => {
-        const { diagnostics } = await checkFor(`
+    it("when name property doesn't have a @segment decorator", async () => {
+      const diagnostics = await Tester.diagnose(`
         @armProviderNamespace
               namespace Microsoft.Test;
 
@@ -529,17 +516,17 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
         }
       `);
 
-        expectDiagnostics(diagnostics, {
-          code: "@azure-tools/typespec-azure-resource-manager/arm-resource-missing-name-segment-decorator",
-        });
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-missing-name-segment-decorator",
       });
     });
   });
+});
 
-  it("emits correct extended location for resource", async () => {
-    const { program, diagnostics } = await checkFor(`
+it("emits correct extended location for resource", async () => {
+  const { program } = await Tester.compile(`
       @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
 
       model Widget is ProxyResource<WidgetProperties> {
          ...ResourceNameParameter<Widget>;
@@ -550,16 +537,15 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
          size: int32;
       }
   `);
-    const resources = getArmResources(program);
-    expectDiagnosticEmpty(diagnostics);
-    strictEqual(resources.length, 1);
-    ok(resources[0].typespecType.properties.has("extendedLocation"));
-  });
+  const resources = getArmResources(program);
+  strictEqual(resources.length, 1);
+  ok(resources[0].typespecType.properties.has("extendedLocation"));
+});
 
-  it("emits correct fixed union name parameter for resource", async () => {
-    const { program, diagnostics } = await checkFor(`
+it("emits correct fixed union name parameter for resource", async () => {
+  const { program } = await Tester.compile(`
       @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
 
       model Widget is ProxyResource<WidgetProperties> {
          ...ResourceNameParameter<Widget, Type=WidgetNameType>;
@@ -578,19 +564,18 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
         Large: "Large"
       }
   `);
-    const resources = getArmResources(program);
-    expectDiagnosticEmpty(diagnostics);
-    strictEqual(resources.length, 1);
-    ok(resources[0].typespecType.properties.has("name"));
-    const nameProperty = resources[0].typespecType.properties.get("name");
-    strictEqual(nameProperty?.type.kind, "Union");
-    strictEqual(nameProperty?.type.name, "WidgetNameType");
-  });
+  const resources = getArmResources(program);
+  strictEqual(resources.length, 1);
+  ok(resources[0].typespecType.properties.has("name"));
+  const nameProperty = resources[0].typespecType.properties.get("name");
+  strictEqual(nameProperty?.type.kind, "Union");
+  strictEqual(nameProperty?.type.name, "WidgetNameType");
+});
 
-  it("emits a scalar string with decorator parameter for resource", async () => {
-    const { program, diagnostics } = await checkFor(`
+it("emits a scalar string with decorator parameter for resource", async () => {
+  const { program } = await Tester.compile(`
       @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
 
       model Widget is ProxyResource<WidgetProperties> {
          ...ResourceNameParameter<Widget, Type=WidgetNameType>;
@@ -605,20 +590,19 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
       @pattern("xxxxxx")
       scalar WidgetNameType extends string;
   `);
-    const resources = getArmResources(program);
-    expectDiagnosticEmpty(diagnostics);
-    strictEqual(resources.length, 1);
-    ok(resources[0].typespecType.properties.has("name"));
-    const nameProperty = resources[0].typespecType.properties.get("name");
-    strictEqual(nameProperty?.type.kind, "Scalar");
-    strictEqual(nameProperty?.type.name, "WidgetNameType");
-  });
-  it("allows foreign resources as parent resources", async () => {
-    const { program, diagnostics } = await checkFor(`
+  const resources = getArmResources(program);
+  strictEqual(resources.length, 1);
+  ok(resources[0].typespecType.properties.has("name"));
+  const nameProperty = resources[0].typespecType.properties.get("name");
+  strictEqual(nameProperty?.type.kind, "Scalar");
+  strictEqual(nameProperty?.type.name, "WidgetNameType");
+});
+it("allows foreign resources as parent resources", async () => {
+  const { program } = await Tester.compile(`
 using Azure.Core;
 /** Contoso Resource Provider management API. */
 @armProviderNamespace
-@service(#{ title: "ContosoProviderHubClient" })
+@service
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 
 namespace Microsoft.ContosoProviderHub;
@@ -734,25 +718,23 @@ interface RestorePointOperations {
 
     `);
 
-    const resources = getArmResources(program);
-    expectDiagnosticEmpty(diagnostics);
-    expect(resources.length).toBe(3);
-    const restorePoint = resources.find((r) => r.name === "RestorePoint");
-    expect(restorePoint).toBeDefined();
-    expect(restorePoint?.operations.actions.moveR).toBeDefined();
-    const restorePointCollection = resources.find((r) => r.name === "RestorePointCollection");
-    expect(restorePointCollection).toBeDefined();
-    const diskRestorePoint = resources.find((r) => r.name === "DiskRestorePoint");
-    expect(diskRestorePoint).toBeDefined();
-  });
+  const resources = getArmResources(program);
+  expect(resources.length).toBe(3);
+  const restorePoint = resources.find((r) => r.name === "RestorePoint");
+  expect(restorePoint).toBeDefined();
+  expect(restorePoint?.operations.actions.moveR).toBeDefined();
+  const restorePointCollection = resources.find((r) => r.name === "RestorePointCollection");
+  expect(restorePointCollection).toBeDefined();
+  const diskRestorePoint = resources.find((r) => r.name === "DiskRestorePoint");
+  expect(diskRestorePoint).toBeDefined();
+});
 
-  it("allows extension of foreign resources", async () => {
-    const { program, types, diagnostics } = await compileAndDiagnose(`
+it("allows extension of foreign resources", async () => {
+  const { program, types, diagnostics } = await compileAndDiagnose(`
 using Azure.Core;
 
-/** Contoso Resource Provider management API. */
 @armProviderNamespace
-@service(#{ title: "ContosoProviderHubClient" })
+@service
 
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 namespace Microsoft.ContosoProviderHub;
@@ -853,44 +835,44 @@ model MoveResponse {
 
     `);
 
-    expectDiagnosticEmpty(diagnostics);
-    const { Employees, ManagementGroups, VirtualMachines } = types as {
-      Employees: Interface;
-      ManagementGroups: Interface;
-      VirtualMachines: Interface;
-    };
-    const employeesGet: Operation | undefined = Employees?.operations?.get("get");
-    ok(employeesGet);
-    expect(employeesGet?.kind).toBe("Operation");
-    const [employeeGetHttp, _e] = getHttpOperation(program, employeesGet);
-    expect(employeeGetHttp.path).toBe(
-      "/{scope}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
-    );
-    const managementGet: Operation | undefined = ManagementGroups?.operations?.get("get");
-    ok(managementGet);
-    expect(managementGet?.kind).toBe("Operation");
-    const [managementGetHttp, _m] = getHttpOperation(program, managementGet);
-    expect(managementGetHttp.path).toBe(
-      "/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
-    );
-    const virtualMachinesGet: Operation | undefined = VirtualMachines?.operations?.get("get");
-    ok(virtualMachinesGet);
-    expect(virtualMachinesGet?.kind).toBe("Operation");
-    const [vmGetHttp, _v] = getHttpOperation(program, virtualMachinesGet);
-    expect(vmGetHttp.path).toBe(
-      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
-    );
-  });
+  expectDiagnosticEmpty(diagnostics);
+  const { Employees, ManagementGroups, VirtualMachines } = types as {
+    Employees: Interface;
+    ManagementGroups: Interface;
+    VirtualMachines: Interface;
+  };
+  const employeesGet: Operation | undefined = Employees?.operations?.get("get");
+  ok(employeesGet);
+  expect(employeesGet?.kind).toBe("Operation");
+  const [employeeGetHttp, _e] = getHttpOperation(program, employeesGet);
+  expect(employeeGetHttp.path).toBe(
+    "/{scope}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+  );
+  const managementGet: Operation | undefined = ManagementGroups?.operations?.get("get");
+  ok(managementGet);
+  expect(managementGet?.kind).toBe("Operation");
+  const [managementGetHttp, _m] = getHttpOperation(program, managementGet);
+  expect(managementGetHttp.path).toBe(
+    "/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+  );
+  const virtualMachinesGet: Operation | undefined = VirtualMachines?.operations?.get("get");
+  ok(virtualMachinesGet);
+  expect(virtualMachinesGet?.kind).toBe("Operation");
+  const [vmGetHttp, _v] = getHttpOperation(program, virtualMachinesGet);
+  expect(vmGetHttp.path).toBe(
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+  );
+});
 
-  it("overrides provider namespace in mixed legacy and resource operations", async () => {
-    const { program, types, diagnostics } = await compileAndDiagnose(`
+it("overrides provider namespace in mixed legacy and resource operations", async () => {
+  const { program, types, diagnostics } = await compileAndDiagnose(`
 using Azure.Core;
 
 #suppress "@azure-tools/typespec-azure-core/require-versioned"
 #suppress "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint"
 /** Contoso Resource Provider management API. */
 @armProviderNamespace
-@service(#{ title: "ContosoProviderHubClient" })
+@service
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 
 namespace Microsoft.ContosoProviderHub;
@@ -967,35 +949,35 @@ interface Employees {
 }
     `);
 
-    expectDiagnosticEmpty(diagnostics);
-    const { get, checkExistence } = types as {
-      get: Operation;
-      checkExistence: Operation;
-    };
-    ok(get);
-    expect(get?.kind).toBe("Operation");
-    const [employeeGetHttp, _e] = getHttpOperation(program, get);
-    expect(employeeGetHttp.path).toBe(
-      "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
-    );
+  expectDiagnosticEmpty(diagnostics);
+  const { get, checkExistence } = types as {
+    get: Operation;
+    checkExistence: Operation;
+  };
+  ok(get);
+  expect(get?.kind).toBe("Operation");
+  const [employeeGetHttp, _e] = getHttpOperation(program, get);
+  expect(employeeGetHttp.path).toBe(
+    "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+  );
 
-    ok(checkExistence);
-    expect(checkExistence?.kind).toBe("Operation");
-    const [existenceHttp, _m] = getHttpOperation(program, checkExistence);
-    expect(existenceHttp.path).toBe(
-      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
-    );
-  });
+  ok(checkExistence);
+  expect(checkExistence?.kind).toBe("Operation");
+  const [existenceHttp, _m] = getHttpOperation(program, checkExistence);
+  expect(existenceHttp.path).toBe(
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+  );
+});
 
-  it("uses route override in routed operations", async () => {
-    const { program, types, diagnostics } = await compileAndDiagnose(`
+it("uses route override in routed operations", async () => {
+  const { program, types, diagnostics } = await compileAndDiagnose(`
 using Azure.Core;
 
 #suppress "@azure-tools/typespec-azure-core/require-versioned"
 #suppress "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint"
 /** Contoso Resource Provider management API. */
 @armProviderNamespace
-@service(#{ title: "ContosoProviderHubClient" })
+@service
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 
 namespace Microsoft.ContosoProviderHub;
@@ -1070,35 +1052,35 @@ interface Employees {
 }
     `);
 
-    expectDiagnosticEmpty(diagnostics);
-    const { get, checkExistence } = types as {
-      get: Operation;
-      checkExistence: Operation;
-    };
-    ok(get);
-    expect(get?.kind).toBe("Operation");
-    const [employeeGetHttp, _e] = getHttpOperation(program, get);
-    expect(employeeGetHttp.path).toBe(
-      "/subscriptions/{subscriptionId}/providers/Microsoft.Overridden/employees/{employeeName}",
-    );
+  expectDiagnosticEmpty(diagnostics);
+  const { get, checkExistence } = types as {
+    get: Operation;
+    checkExistence: Operation;
+  };
+  ok(get);
+  expect(get?.kind).toBe("Operation");
+  const [employeeGetHttp, _e] = getHttpOperation(program, get);
+  expect(employeeGetHttp.path).toBe(
+    "/subscriptions/{subscriptionId}/providers/Microsoft.Overridden/employees/{employeeName}",
+  );
 
-    ok(checkExistence);
-    expect(checkExistence?.kind).toBe("Operation");
-    const [existenceHttp, _m] = getHttpOperation(program, checkExistence);
-    expect(existenceHttp.path).toBe(
-      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
-    );
-  });
+  ok(checkExistence);
+  expect(checkExistence?.kind).toBe("Operation");
+  const [existenceHttp, _m] = getHttpOperation(program, checkExistence);
+  expect(existenceHttp.path).toBe(
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+  );
+});
 
-  it("overrides provider namespace in custom operations", async () => {
-    const { program, types, diagnostics } = await compileAndDiagnose(`
+it("overrides provider namespace in custom operations", async () => {
+  const { program, types, diagnostics } = await compileAndDiagnose(`
 using Azure.Core;
 
 #suppress "@azure-tools/typespec-azure-core/require-versioned"
 #suppress "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint"
 /** Contoso Resource Provider management API. */
 @armProviderNamespace
-@service(#{ title: "ContosoProviderHubClient" })
+@service
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 
 namespace Microsoft.ContosoProviderHub;
@@ -1177,28 +1159,28 @@ interface Employees {
 }
     `);
 
-    expectDiagnosticEmpty(diagnostics);
-    const { get, checkExistence } = types as {
-      get: Operation;
-      checkExistence: Operation;
-    };
-    ok(get);
-    expect(get?.kind).toBe("Operation");
-    const [employeeGetHttp, _e] = getHttpOperation(program, get);
-    expect(employeeGetHttp.path).toBe(
-      "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
-    );
+  expectDiagnosticEmpty(diagnostics);
+  const { get, checkExistence } = types as {
+    get: Operation;
+    checkExistence: Operation;
+  };
+  ok(get);
+  expect(get?.kind).toBe("Operation");
+  const [employeeGetHttp, _e] = getHttpOperation(program, get);
+  expect(employeeGetHttp.path).toBe(
+    "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+  );
 
-    ok(checkExistence);
-    expect(checkExistence?.kind).toBe("Operation");
-    const [existenceHttp, _m] = getHttpOperation(program, checkExistence);
-    expect(existenceHttp.path).toBe(
-      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
-    );
-  });
+  ok(checkExistence);
+  expect(checkExistence?.kind).toBe("Operation");
+  const [existenceHttp, _m] = getHttpOperation(program, checkExistence);
+  expect(existenceHttp.path).toBe(
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+  );
+});
 
-  it("overrides provider namespace in legacy operations", async () => {
-    const { program, types, diagnostics } = await compileAndDiagnose(`
+it("overrides provider namespace in legacy operations", async () => {
+  const { program, types, diagnostics } = await compileAndDiagnose(`
 using Azure.Core;
 
 
@@ -1206,7 +1188,7 @@ using Azure.Core;
 #suppress "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint"
 /** Contoso Resource Provider management API. */
 @armProviderNamespace
-@service(#{ title: "ContosoProviderHubClient" })
+@service
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 
 namespace Microsoft.ContosoProviderHub;
@@ -1279,21 +1261,21 @@ interface Employees {
 }
     `);
 
-    expectDiagnosticEmpty(diagnostics);
-    const { get } = types as {
-      get: Operation;
-      checkExistence: Operation;
-    };
-    ok(get);
-    expect(get?.kind).toBe("Operation");
-    const [employeeGetHttp, _] = getHttpOperation(program, get);
-    expect(employeeGetHttp.path).toBe(
-      "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
-    );
-  });
+  expectDiagnosticEmpty(diagnostics);
+  const { get } = types as {
+    get: Operation;
+    checkExistence: Operation;
+  };
+  ok(get);
+  expect(get?.kind).toBe("Operation");
+  const [employeeGetHttp, _] = getHttpOperation(program, get);
+  expect(employeeGetHttp.path).toBe(
+    "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+  );
+});
 
-  it("emits diagnostics for non ARM resources", async () => {
-    const { diagnostics } = await checkFor(`
+it("emits diagnostics for non ARM resources", async () => {
+  const diagnostics = await Tester.diagnose(`
       @armProviderNamespace
           namespace Microsoft.Contoso {
        @parentResource(Microsoft.Person.Contoso.Person)
@@ -1342,31 +1324,30 @@ interface Employees {
         }
       }
 `);
-    expectDiagnostics(diagnostics, [
-      {
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-missing",
-        message: "No @armResource registration found for type Person",
-      },
-      {
-        code: "@azure-tools/typespec-azure-resource-manager/parent-type",
-        message: "Parent type Person of Employee is not registered as an ARM resource type.",
-      },
-      {
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-missing",
-        message: "No @armResource registration found for type Person",
-      },
-      {
-        code: "@azure-tools/typespec-azure-resource-manager/parent-type",
-        message: "Parent type Person of Employee is not registered as an ARM resource type.",
-      },
-    ]);
-  });
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-missing",
+      message: "No @armResource registration found for type Person",
+    },
+    {
+      code: "@azure-tools/typespec-azure-resource-manager/parent-type",
+      message: "Parent type Person of Employee is not registered as an ARM resource type.",
+    },
+    {
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-missing",
+      message: "No @armResource registration found for type Person",
+    },
+    {
+      code: "@azure-tools/typespec-azure-resource-manager/parent-type",
+      message: "Parent type Person of Employee is not registered as an ARM resource type.",
+    },
+  ]);
 });
 
 it("emits default optional properties for resource", async () => {
-  const { program, diagnostics } = await checkFor(`
+  const { program } = await Tester.compile(`
     @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
 
     model Widget is TrackedResource<WidgetProperties> {
        ...ResourceNameParameter<Widget>;
@@ -1377,15 +1358,14 @@ it("emits default optional properties for resource", async () => {
     }
 `);
   const resources = getArmResources(program);
-  expectDiagnosticEmpty(diagnostics);
   strictEqual(resources.length, 1);
   strictEqual(resources[0].typespecType.properties.get("properties")?.optional, true);
 });
 
 it("emits required properties for resource with @armResourcePropertiesOptionality override ", async () => {
-  const { program, diagnostics } = await checkFor(`
+  const { program } = await Tester.compile(`
     @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
 
     model Widget is ProxyResource<WidgetProperties, false> {
        ...ResourceNameParameter<Widget>;
@@ -1396,13 +1376,12 @@ it("emits required properties for resource with @armResourcePropertiesOptionalit
     }
 `);
   const resources = getArmResources(program);
-  expectDiagnosticEmpty(diagnostics);
   strictEqual(resources.length, 1);
   strictEqual(resources[0].typespecType.properties.get("properties")?.optional, false);
 });
 
 it("recognizes resource with customResource identifier", async () => {
-  const { diagnostics } = await checkFor(`
+  const diagnostics = await Tester.diagnose(`
     @armProviderNamespace
       namespace Microsoft.Contoso {
      @parentResource(Microsoft.Person.Contoso.Person)
@@ -1453,9 +1432,9 @@ it("recognizes resource with customResource identifier", async () => {
 
 describe("typespec-azure-resource-manager: identifiers decorator", () => {
   it("allows multiple model properties in identifiers decorator", async () => {
-    const { diagnostics } = await checkFor(`
+    const diagnostics = await Tester.diagnose(`
     @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
 
     model Dog {
       name: string;
@@ -1473,9 +1452,9 @@ describe("typespec-azure-resource-manager: identifiers decorator", () => {
   });
 
   it("allows inner model properties in identifiers decorator", async () => {
-    const { diagnostics } = await checkFor(`
+    const diagnostics = await Tester.diagnose(`
     @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
 
     model Dog {
       breed: Breed;
@@ -1496,9 +1475,9 @@ describe("typespec-azure-resource-manager: identifiers decorator", () => {
   });
 
   it("emits diagnostic when identifiers is not of a model property object array", async () => {
-    const { diagnostics } = await checkFor(`
+    const diagnostics = await Tester.diagnose(`
     @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
 
     model Dog {
       name: string;
@@ -1521,14 +1500,11 @@ describe("typespec-azure-resource-manager: identifiers decorator", () => {
   });
 
   it("emits diagnostics when a provider cannot be updated", async () => {
-    const { diagnostics } = await checkFor(`
+    const diagnostics = await Tester.diagnose(`
     using Azure.Core;
-#suppress "@azure-tools/typespec-azure-core/require-versioned"
-#suppress "@azure-tools/typespec-azure-resource-manager/missing-operations-endpoint"
 /** Contoso Resource Provider management API. */
 @armProviderNamespace
-@service(#{ title: "ContosoProviderHubClient" })
-
+@service
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 namespace Microsoft.ContosoProviderHub {
 

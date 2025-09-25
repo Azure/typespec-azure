@@ -1,12 +1,12 @@
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { describe, it } from "vitest";
-import { checkFor } from "./test-host.js";
+import { Tester } from "./tester.js";
 
 describe("typespec-azure-resource-manager: @enforceConstraint", () => {
   it("emits no error when template param extends from Resource", async () => {
-    const { diagnostics } = await checkFor(`
+    const diagnostics = await Tester.diagnose(`
       @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
 
       model Widget is ProxyResource<WidgetProperties> {
          ...ResourceNameParameter<Widget>;
@@ -28,9 +28,9 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
   });
 
   it("emits error if template param is not extended from Resource", async () => {
-    const { diagnostics } = await checkFor(`
+    const diagnostics = await Tester.diagnose(`
       @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
  
       model Widget {
         @visibility(Lifecycle.Read)
@@ -84,9 +84,9 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
   });
 
   it("emits no error when template extends from a `@Azure.ResourceManager.Legacy.customAzureResource` Resource", async () => {
-    const { diagnostics } = await checkFor(`
+    const diagnostics = await Tester.diagnose(`
     @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
 
     model CustomResource is CustomAzureResource;
 
@@ -104,9 +104,9 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
   });
 
   it("emits no error when template extends from a `@Azure.ResourceManager.Legacy.customAzureResource` Resource when using Legacy Operations", async () => {
-    const { diagnostics } = await checkFor(`
+    const diagnostics = await Tester.diagnose(`
     @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
 
     model CustomResource is CustomAzureResource;
 
@@ -142,9 +142,9 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
   });
 
   it("emits error when template is extended from Resource or from a `@Azure.ResourceManager.Legacy.customAzureResource` Resource", async () => {
-    const { diagnostics } = await checkFor(`
+    const diagnostics = await Tester.diagnose(`
     @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
 
     model CustomResource extends CustomBase {
        ...ResourceNameParameter<CustomResource>;
@@ -166,7 +166,7 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
 });
 describe("typespec-azure-resource-manager: rename parameter tests", () => {
   it("emits error when renaming a parameter to an existing parameter name", async () => {
-    const { diagnostics } = await checkFor(`
+    const diagnostics = await Tester.diagnose(`
     @armProviderNamespace
     namespace Microsoft.Contoso;
 
@@ -191,7 +191,7 @@ describe("typespec-azure-resource-manager: rename parameter tests", () => {
   });
 
   it("emits warning when renaming a non-existent parameter", async () => {
-    const { diagnostics } = await checkFor(`
+    const diagnostics = await Tester.diagnose(`
       @armProviderNamespace
       
       namespace Microsoft.Contoso;
@@ -216,7 +216,7 @@ describe("typespec-azure-resource-manager: rename parameter tests", () => {
     ]);
   });
   it("emits a warning when renaming a non-path parameter", async () => {
-    const { diagnostics } = await checkFor(`
+    const diagnostics = await Tester.diagnose(`
       @armProviderNamespace
       
       namespace Microsoft.Contoso;
@@ -241,7 +241,7 @@ describe("typespec-azure-resource-manager: rename parameter tests", () => {
     ]);
   });
   it("emits no warning when renaming a parameter twice", async () => {
-    const { diagnostics } = await checkFor(`
+    const diagnostics = await Tester.diagnose(`
       @armProviderNamespace
       
       namespace Microsoft.Contoso;
@@ -263,7 +263,7 @@ describe("typespec-azure-resource-manager: rename parameter tests", () => {
     expectDiagnosticEmpty(diagnostics);
   });
   it("emits no warning when renaming a parameter", async () => {
-    const { diagnostics } = await checkFor(`
+    const diagnostics = await Tester.diagnose(`
       @armProviderNamespace
       
       namespace Microsoft.Contoso;

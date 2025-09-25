@@ -25,7 +25,7 @@ it("Emits a warning for a synchronous post operation that does not contain the a
     .expect(
       `
       @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
@@ -58,7 +58,7 @@ it("Emits a warning for a synchronous post operation that does not contain the a
     .expect(
       `
       @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
@@ -92,7 +92,7 @@ it("Does not emit a warning for a synchronous post operation that contains the 2
     .expect(
       `
       @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
@@ -121,7 +121,7 @@ it("Does not emit a warning for a synchronous post operation that contains 204 a
     .expect(
       `
       @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
@@ -152,7 +152,7 @@ it("Does not emit a warning for a long-running post operation that satisfies the
       using Azure.Core;
 
       @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
       
       model PollingStatus {
         @Azure.Core.lroStatus
@@ -195,7 +195,7 @@ it("Emits a warning for a long-running post operation that has a 202 response wi
       using Azure.Core;
 
       @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
       
       model PollingStatus {
         @Azure.Core.lroStatus
@@ -239,7 +239,7 @@ it("Emits a warning for a long-running post operation that has a 200 response wi
       using Azure.Core;
 
       @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
       
       model PollingStatus {
         @Azure.Core.lroStatus
@@ -285,7 +285,7 @@ it("Emits a warning for a long-running post operation that has invalid response 
       using Azure.Core;
 
       @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
       
       model PollingStatus {
         @Azure.Core.lroStatus

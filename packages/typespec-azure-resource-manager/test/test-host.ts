@@ -36,14 +36,6 @@ export async function compileAndDiagnose(
   return { program: runner.program, types, diagnostics };
 }
 
-export async function checkFor(
-  code: string,
-): Promise<{ program: Program; diagnostics: readonly Diagnostic[] }> {
-  const runner = await createAzureResourceManagerTestRunner();
-  const diagnostics = await runner.diagnose(code);
-  return { program: runner.program, diagnostics };
-}
-
 export function getDiagnostic(code: keyof typeof $lib.diagnostics, diagnostics: Diagnostic[]) {
   return diagnostics.filter((diag) => diag.code === `${$lib.name}/${code}`);
 }

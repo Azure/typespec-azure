@@ -25,7 +25,7 @@ it("Emits a warning for armResourceAction that uses an outdated pattern with `@s
     .expect(
       `
     @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
 
     @Azure.ResourceManager.tenantResource
     model Widget is ProxyResource<WidgetProperties> {
