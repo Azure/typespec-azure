@@ -12,6 +12,7 @@ import {
   createTester,
   createTestHost,
   createTestWrapper,
+  TesterInstance,
 } from "@typespec/compiler/testing";
 import {
   getAllHttpServices,
@@ -95,11 +96,11 @@ export async function createAzureCoreTestRunner(
 
 export async function getOperations(
   code: string,
-): Promise<[HttpOperation[], readonly Diagnostic[], BasicTestRunner]> {
-  const runner = await createAzureCoreTestRunner();
-  await runner.compileAndDiagnose(code, { noEmit: true });
-  const [services] = getAllHttpServices(runner.program);
-  return [services[0].operations, runner.program.diagnostics, runner];
+): Promise<[HttpOperation[], readonly Diagnostic[], TesterInstance]> {
+  const tester = await TesterWithService.createInstance();
+  const [{ program }] = await tester.compileAndDiagnose(code);
+  const [services] = getAllHttpServices(program);
+  return [services[0].operations, program.diagnostics, tester];
 }
 
 export interface SimpleHttpOperation {
