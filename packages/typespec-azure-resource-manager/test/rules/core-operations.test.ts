@@ -260,7 +260,6 @@ describe("Provider operations", () => {
         `,
       ` 
         model MoveResponseParameter {
-          /** The name of Azure region. */
           @path
           @minLength(1)
           @segment("moves")

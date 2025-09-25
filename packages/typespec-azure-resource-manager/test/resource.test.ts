@@ -555,10 +555,8 @@ it("emits correct fixed union name parameter for resource", async () => {
          size: int32;
       }
 
-      /** different type of widget used on resource path */
       union WidgetNameType {
         string,
-        /** small widget */
         Small: "Small",
         /** large widget */        
         Large: "Large"
@@ -631,17 +629,13 @@ model DiskRestorePoint is TrackedResource<DiskRestorePointProperties> {
 
 /** Employee properties */
 model DiskRestorePointProperties {
-  /** Age of employee */
   age?: int32;
 
-  /** City of employee */
   city?: string;
 
-  /** Profile of employee */
   @encode("base64url")
   profile?: bytes;
 
-  /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
@@ -651,40 +645,30 @@ model DiskRestorePointProperties {
 union ProvisioningState {
   string,
 
-  /** The resource create request has been accepted */
   Accepted: "Accepted",
 
-  /** The resource is being provisioned */
   Provisioning: "Provisioning",
 
-  /** The resource is updating */
   Updating: "Updating",
 
-  /** Resource has been created. */
   Succeeded: "Succeeded",
 
-  /** Resource creation failed. */
   Failed: "Failed",
 
-  /** Resource creation was canceled. */
   Canceled: "Canceled",
 
-  /** The resource is being deleted */
   Deleting: "Deleting",
 }
 
 /** Employee move request */
 model MoveRequest {
-  /** The moving from location */
   from: string;
 
-  /** The moving to location */
   to: string;
 }
 
 /** Employee move response */
 model MoveResponse {
-  /** The status of the move */
   movingStatus: string;
 }
 
@@ -704,10 +688,8 @@ interface DiskRestorePoints {
   delete is ArmResourceDeleteWithoutOkAsync<DiskRestorePoint>;
   list is ArmResourceListByParent<DiskRestorePoint>;
 
-  /** A sample resource action that move employee to different location */
   move is ArmResourceActionSync<DiskRestorePoint, MoveRequest, MoveResponse>;
 
-  /** A sample HEAD operation to check resource existence */
   checkExistence is ArmResourceCheckExistence<DiskRestorePoint>;
 }
 
@@ -746,17 +728,13 @@ model Employee is ExtensionResource<EmployeeProperties> {
 
 /** Employee properties */
 model EmployeeProperties {
-  /** Age of employee */
   age?: int32;
 
-  /** City of employee */
   city?: string;
 
-  /** Profile of employee */
   @encode("base64url")
   profile?: bytes;
 
-  /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
@@ -766,16 +744,12 @@ model EmployeeProperties {
 union ProvisioningState {
   ResourceProvisioningState,
 
-  /** The resource is being provisioned */
   Provisioning: "Provisioning",
 
-  /** The resource is updating */
   Updating: "Updating",
 
-  /** The resource is being deleted */
   Deleting: "Deleting",
 
-  /** The resource create request has been accepted */
   Accepted: "Accepted",
 
   string,
@@ -820,16 +794,13 @@ interface VirtualMachines extends EmplOps<VirtualMachine> {}
 
 /** Employee move request */
 model MoveRequest {
-  /** The moving from location */
   from: string;
 
-  /** The moving to location */
   to: string;
 }
 
 /** Employee move response */
 model MoveResponse {
-  /** The status of the move */
   movingStatus: string;
 }
 
@@ -884,17 +855,13 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 /** Employee properties */
 model EmployeeProperties {
-  /** Age of employee */
   age?: int32;
 
-  /** City of employee */
   city?: string;
 
-  /** Profile of employee */
   @encode("base64url")
   profile?: bytes;
 
-  /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
@@ -904,25 +871,18 @@ model EmployeeProperties {
 union ProvisioningState {
   string,
 
-  /** The resource create request has been accepted */
   Accepted: "Accepted",
 
-  /** The resource is being provisioned */
   Provisioning: "Provisioning",
 
-  /** The resource is updating */
   Updating: "Updating",
 
-  /** Resource has been created. */
   Succeeded: "Succeeded",
 
-  /** Resource creation failed. */
   Failed: "Failed",
 
-  /** Resource creation was canceled. */
   Canceled: "Canceled",
 
-  /** The resource is being deleted */
   Deleting: "Deleting",
 }
 
@@ -943,7 +903,6 @@ interface Employees {
   @test
   get is EmplOps.Read<Employee>;
   
-  /** A sample HEAD operation to check resource existence */
   @test
   checkExistence is Azure.ResourceManager.ArmResourceCheckExistence<Employee>;
 }
@@ -989,17 +948,13 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 /** Employee properties */
 model EmployeeProperties {
-  /** Age of employee */
   age?: int32;
 
-  /** City of employee */
   city?: string;
 
-  /** Profile of employee */
   @encode("base64url")
   profile?: bytes;
 
-  /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
@@ -1009,25 +964,18 @@ model EmployeeProperties {
 union ProvisioningState {
   string,
 
-  /** The resource create request has been accepted */
   Accepted: "Accepted",
 
-  /** The resource is being provisioned */
   Provisioning: "Provisioning",
 
-  /** The resource is updating */
   Updating: "Updating",
 
-  /** Resource has been created. */
   Succeeded: "Succeeded",
 
-  /** Resource creation failed. */
   Failed: "Failed",
 
-  /** Resource creation was canceled. */
   Canceled: "Canceled",
 
-  /** The resource is being deleted */
   Deleting: "Deleting",
 }
 
@@ -1046,7 +994,6 @@ interface Employees {
   @test
   get is EmplOps.Read<Employee>;
   
-  /** A sample HEAD operation to check resource existence */
   @test
   checkExistence is Azure.ResourceManager.ArmResourceCheckExistence<Employee>;
 }
@@ -1092,17 +1039,13 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 /** Employee properties */
 model EmployeeProperties {
-  /** Age of employee */
   age?: int32;
 
-  /** City of employee */
   city?: string;
 
-  /** Profile of employee */
   @encode("base64url")
   profile?: bytes;
 
-  /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
@@ -1112,25 +1055,18 @@ model EmployeeProperties {
 union ProvisioningState {
   string,
 
-  /** The resource create request has been accepted */
   Accepted: "Accepted",
 
-  /** The resource is being provisioned */
   Provisioning: "Provisioning",
 
-  /** The resource is updating */
   Updating: "Updating",
 
-  /** Resource has been created. */
   Succeeded: "Succeeded",
 
-  /** Resource creation failed. */
   Failed: "Failed",
 
-  /** Resource creation was canceled. */
   Canceled: "Canceled",
 
-  /** The resource is being deleted */
   Deleting: "Deleting",
 }
 
@@ -1149,11 +1085,9 @@ alias BaseParams = {
 @armResourceOperations
 interface Employees {
   @test
-  /** a simple get */
   @armResourceRead(Employee)
   @get op get(...BaseParams, ...KeysOf<Employee>): Employee;
   
-  /** A sample HEAD operation to check resource existence */
   @test
   checkExistence is Azure.ResourceManager.ArmResourceCheckExistence<Employee>;
 }
@@ -1200,17 +1134,13 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 /** Employee properties */
 model EmployeeProperties {
-  /** Age of employee */
   age?: int32;
 
-  /** City of employee */
   city?: string;
 
-  /** Profile of employee */
   @encode("base64url")
   profile?: bytes;
 
-  /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
@@ -1220,25 +1150,18 @@ model EmployeeProperties {
 union ProvisioningState {
   string,
 
-  /** The resource create request has been accepted */
   Accepted: "Accepted",
 
-  /** The resource is being provisioned */
   Provisioning: "Provisioning",
 
-  /** The resource is updating */
   Updating: "Updating",
 
-  /** Resource has been created. */
   Succeeded: "Succeeded",
 
-  /** Resource creation failed. */
   Failed: "Failed",
 
-  /** Resource creation was canceled. */
   Canceled: "Canceled",
 
-  /** The resource is being deleted */
   Deleting: "Deleting",
 }
 
@@ -1283,24 +1206,18 @@ it("emits diagnostics for non ARM resources", async () => {
           ...ResourceNameParameter<Employee>;
         }
       
-        /** Employee properties */
         model EmployeeProperties {
-          /** The status of the last operation. */
           @visibility(Lifecycle.Read)
           provisioningState?: ProvisioningState;
         }
       
-        /** The provisioning state of a resource. */
         union ProvisioningState {
           string,
       
-          /** Resource has been created. */
           Succeeded: "Succeeded",
       
-          /** Resource creation failed. */
           Failed: "Failed",
       
-          /** Resource creation was canceled. */
           Canceled: "Canceled",
         }
       
@@ -1313,9 +1230,7 @@ it("emits diagnostics for non ARM resources", async () => {
       }
         
       namespace Microsoft.Person.Contoso {
-        /** Person parent */
         model Person {
-          /** The parent name */
           @path
           @visibility(Lifecycle.Read)
           @segment("parents")
@@ -1389,24 +1304,18 @@ it("recognizes resource with customResource identifier", async () => {
         ...ResourceNameParameter<Employee>;
       }
     
-      /** Employee properties */
       model EmployeeProperties {
-        /** The status of the last operation. */
         @visibility(Lifecycle.Read)
         provisioningState?: ProvisioningState;
       }
     
-      /** The provisioning state of a resource. */
       union ProvisioningState {
         string,
     
-        /** Resource has been created. */
         Succeeded: "Succeeded",
     
-        /** Resource creation failed. */
         Failed: "Failed",
     
-        /** Resource creation was canceled. */
         Canceled: "Canceled",
       }
     
@@ -1419,10 +1328,8 @@ it("recognizes resource with customResource identifier", async () => {
     }
     
     namespace Microsoft.Person.Contoso {
-      /** Person parent */
       @Azure.ResourceManager.Legacy.customAzureResource
       model Person {
-        /** The parent name */
         name: string;
       }
     }
@@ -1521,7 +1428,6 @@ namespace Microsoft.ContosoProviderHub {
 
 namespace Azure.ResourceManager.Extension {
   model VirtualMachine {
-    /** The vm Name */
    @visibility(Lifecycle.Read) @path @key @segment("virtualMachines") vmName: string;
   }
 }

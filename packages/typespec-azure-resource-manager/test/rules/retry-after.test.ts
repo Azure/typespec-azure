@@ -29,9 +29,7 @@ it("is valid if there is an interface called Operations extending Azure.Resource
         @versioned(Versions)
         namespace Microsoft.Foo;
         
-        /** Contoso API versions */
         enum Versions {
-          /** 2021-10-01-preview version */
                           @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
           "2021-10-01-preview",
         }

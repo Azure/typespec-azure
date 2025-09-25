@@ -492,7 +492,6 @@ namespace Microsoft.ContosoProviderHub;
 
 /** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2021_10_01_preview: "2021-10-01-preview",
 }
@@ -504,17 +503,13 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 /** Employee properties */
 model EmployeeProperties {
-  /** Age of employee */
   age?: int32;
 
-  /** City of employee */
   city?: string;
 
-  /** Profile of employee */
   @encode("base64url")
   profile?: bytes;
 
-  /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
@@ -524,40 +519,30 @@ model EmployeeProperties {
 union ProvisioningState {
   string,
 
-  /** The resource create request has been accepted */
   Accepted: "Accepted",
 
-  /** The resource is being provisioned */
   Provisioning: "Provisioning",
 
-  /** The resource is updating */
   Updating: "Updating",
 
-  /** Resource has been created. */
   Succeeded: "Succeeded",
 
-  /** Resource creation failed. */
   Failed: "Failed",
 
-  /** Resource creation was canceled. */
   Canceled: "Canceled",
 
-  /** The resource is being deleted */
   Deleting: "Deleting",
 }
 
 /** Employee move request */
 model MoveRequest {
-  /** The moving from location */
   from: string;
 
-  /** The moving to location */
   to: string;
 }
 
 /** Employee move response */
 model MoveResponse {
-  /** The status of the move */
   movingStatus: string;
 }
 
@@ -575,10 +560,8 @@ interface Employees {
   listByResourceGroup is ArmResourceListByParent<Employee>;
   listBySubscription is ArmListBySubscription<Employee>;
 
-  /** A sample resource action that move employee to different location */
   move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
 
-  /** A sample HEAD operation to check resource existence */
   checkExistence is ArmResourceCheckExistence<Employee>;
 }
 `);
@@ -652,7 +635,6 @@ namespace Microsoft.ContosoProviderHub;
 
 /** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2020_10_01_preview: "2021-10-01-preview",
 }
@@ -664,17 +646,13 @@ model Employee is ExtensionResource<EmployeeProperties> {
 
 /** Employee properties */
 model EmployeeProperties {
-  /** Age of employee */
   age?: int32;
 
-  /** City of employee */
   city?: string;
 
-  /** Profile of employee */
   @encode("base64url")
   profile?: bytes;
 
-  /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
@@ -684,16 +662,12 @@ model EmployeeProperties {
 union ProvisioningState {
   ResourceProvisioningState,
 
-  /** The resource is being provisioned */
   Provisioning: "Provisioning",
 
-  /** The resource is updating */
   Updating: "Updating",
 
-  /** The resource is being deleted */
   Deleting: "Deleting",
 
-  /** The resource create request has been accepted */
   Accepted: "Accepted",
 
   string,
@@ -759,16 +733,13 @@ interface ScaleSetVms extends EmplOps<VirtualMachineScaleSetVm> {}
 
 /** Employee move request */
 model MoveRequest {
-  /** The moving from location */
   from: string;
 
-  /** The moving to location */
   to: string;
 }
 
 /** Employee move response */
 model MoveResponse {
-  /** The status of the move */
   movingStatus: string;
 }
 
@@ -777,22 +748,17 @@ alias GenericResourceParameters = {
   ...SubscriptionIdParameter;
   ...ResourceGroupParameter;
 
-  /** the provider namespace */
   @path
   @segment("providers")
   @key
   providerNamespace: string;
 
-  /** the resource type of the parent */
   @path @key parentType: string;
 
-  /** the name of the parent resource */
   @path @key parentName: string;
 
-  /** the resource type of the target resource */
   @path @key resourceType: string;
 
-  /** the name of the target resource */
   @path @key resourceName: string;
 };
 
@@ -1061,7 +1027,6 @@ namespace Microsoft.ContosoProviderHub;
 
 /** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2021_20_01_preview: "2021-10-01-preview",
 }
@@ -1075,17 +1040,13 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 /** Employee properties */
 model EmployeeProperties {
-  /** Age of employee */
   age?: int32;
 
-  /** City of employee */
   city?: string;
 
-  /** Profile of employee */
   @encode("base64url")
   profile?: bytes;
 
-  /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
@@ -1095,16 +1056,12 @@ model EmployeeProperties {
 union ProvisioningState {
   ResourceProvisioningState,
 
-  /** The resource is being provisioned */
   Provisioning: "Provisioning",
 
-  /** The resource is updating */
   Updating: "Updating",
 
-  /** The resource is being deleted */
   Deleting: "Deleting",
 
-  /** The resource create request has been accepted */
   Accepted: "Accepted",
 
   string,
@@ -1126,10 +1083,8 @@ interface Employees {
   delete is ArmResourceDeleteSync<Employee>;
   listByResourceGroup is ArmResourceListByParent<Employee>;
   listBySubscription is ArmListBySubscription<Employee>;
-  /** A sample resource action that move employee to different location */
   move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
 
-  /** A sample HEAD operation to check resource existence */
   checkExistence is ArmResourceCheckExistence<Employee>;
 
   getPrivateEndpointConnection is PrivateEndpointOperations.Read<Employee>;
@@ -1141,16 +1096,13 @@ interface Employees {
 
 /** Employee move request */
 model MoveRequest {
-  /** The moving from location */
   from: string;
 
-  /** The moving to location */
   to: string;
 }
 
 /** Employee move response */
 model MoveResponse {
-  /** The status of the move */
   movingStatus: string;
 }
 
@@ -1179,13 +1131,10 @@ model Dependent is ProxyResource<DependentProperties> {
 
 /** Dependent properties */
 model DependentProperties {
-  /** Age of dependent */
   age: int32;
 
-  /** Gender of dependent */
   gender: string;
 
-  /** The status of the last operation. */
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
