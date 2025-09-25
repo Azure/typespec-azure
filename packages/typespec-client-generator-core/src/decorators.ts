@@ -949,29 +949,33 @@ export function getClientInitializationOptions(
   }
 
   let parametersModel = options?.properties.get("parameters")?.type;
-  const movedParameters = findEntriesWithTarget<ModelProperty, Namespace | Interface>(
-    context,
-    clientLocationKey,
-    entity,
-    "ModelProperty",
-  );
-  const tk = $(context.program);
-  if (movedParameters.length > 0) {
-    if (parametersModel) {
-      // If the parameters model already exists, we will merge the moved parameters into it.
-      for (const movedParameter of movedParameters) {
-        parametersModel.properties.set(movedParameter.name, movedParameter);
+  let currEntity: Namespace | Interface | undefined = entity;
+  while (currEntity) {
+    const movedParameters = findEntriesWithTarget<ModelProperty, Namespace | Interface>(
+      context,
+      clientLocationKey,
+      currEntity,
+      "ModelProperty",
+    );
+    const tk = $(context.program);
+    if (movedParameters.length > 0) {
+      if (parametersModel) {
+        // If the parameters model already exists, we will merge the moved parameters into it.
+        for (const movedParameter of movedParameters) {
+          parametersModel.properties.set(movedParameter.name, movedParameter);
+        }
+      } else {
+        parametersModel = tk.model.create({
+          name: "ClientInitializationParameters",
+          properties: {
+            ...Object.fromEntries(
+              movedParameters.map((movedParameter) => [movedParameter.name, movedParameter]),
+            ),
+          },
+        });
       }
-    } else {
-      parametersModel = tk.model.create({
-        name: "ClientInitializationParameters",
-        properties: {
-          ...Object.fromEntries(
-            movedParameters.map((movedParameter) => [movedParameter.name, movedParameter]),
-          ),
-        },
-      });
     }
+    currEntity = currEntity.namespace;
   }
 
   return {
