@@ -143,9 +143,9 @@ it("Detects operations outside interfaces", async () => {
     
             @doc("The state of the resource")
             enum ResourceState {
-             @doc(".") Succeeded,
-             @doc(".") Canceled,
-             @doc(".") Failed
+             Succeeded,
+             Canceled,
+             Failed
            }
     
            @doc("The foo properties.")
@@ -216,9 +216,9 @@ it("Detects missing api-version parameters", async () => {
     
             @doc("The state of the resource")
             enum ResourceState {
-             @doc(".") Succeeded,
-             @doc(".") Canceled,
-             @doc(".") Failed
+             Succeeded,
+             Canceled,
+             Failed
            }
     
            @doc("Foo resource")
@@ -261,9 +261,9 @@ describe("Provider operations", () => {
   
       union ProvisioningState {
         string,
-        @doc(".") Succeeded: "Succeeded",
-        @doc(".") Failed: "Failed",
-        @doc(".") Canceled: "Canceled",
+        Succeeded: "Succeeded",
+        Failed: "Failed",
+        Canceled: "Canceled",
       }
 
       op ComputeProviderActionAsync<

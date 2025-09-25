@@ -24,45 +24,35 @@ it("Emits a warning if a tenant or extension resource lists by subscription", as
   await tester
     .expect(
       `
-    @service(#{title: "Microsoft.Foo"})
-    
-    @armProviderNamespace
-    namespace Microsoft.Foo;
+      @service
+      @armProviderNamespace
+      namespace Microsoft.Foo;
 
-
-    interface Operations extends Azure.ResourceManager.Operations {}
-
-    @doc("Foo resource")
-    @tenantResource
-    model FooResource is ProxyResource<FooProperties> {
-      @visibility(Lifecycle.Read)
-      @doc("The name of the all properties resource.")
-      @key("foo")
-      @segment("foo")
-      @path
-      name: string;
-    }
-
-    @armResourceOperations(FooResource)
-    interface FooResources extends ResourceRead<FooResource> {
-      op listBySubscription is ArmListBySubscription<FooResource>;
-    }
-
-      @doc("The state of the resource")
-      enum ResourceState {
-        @doc(".") Succeeded,
-        @doc(".") Canceled,
-        @doc(".") Failed
+      @tenantResource
+      model FooResource is ProxyResource<FooProperties> {
+        @visibility(Lifecycle.Read)
+        @key("foo")
+        @segment("foo")
+        @path
+        name: string;
       }
 
-      @doc("Foo resource")
+      @armResourceOperations(FooResource)
+      interface FooResources extends ResourceRead<FooResource> {
+        op listBySubscription is ArmListBySubscription<FooResource>;
+      }
+
+      enum ResourceState {
+        Succeeded,
+        Canceled,
+        Failed
+      }
+
       model FooProperties {
-        @doc("Name of the resource")
         displayName?: string = "default";
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
-    `,
+  `,
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/improper-subscription-list-operation",

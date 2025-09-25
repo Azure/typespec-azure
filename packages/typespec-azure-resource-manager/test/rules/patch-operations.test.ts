@@ -71,9 +71,9 @@ it("Requires PATCH to be a proper subset of resource for model references", asyn
 
         @doc("The state of the resource")
         enum ResourceState {
-         @doc(".") Succeeded,
-         @doc(".") Canceled,
-         @doc(".") Failed
+         Succeeded,
+         Canceled,
+         Failed
        }
 
        @doc("Foo resource")
@@ -147,9 +147,9 @@ it("Requires PATCH to be a proper subset of resource for model spread", async ()
 
         @doc("The state of the resource")
         enum ResourceState {
-         @doc(".") Succeeded,
-         @doc(".") Canceled,
-         @doc(".") Failed
+         Succeeded,
+         Canceled,
+         Failed
        }
 
        @doc("Foo resource")
@@ -210,9 +210,9 @@ it("emit diagnostic when there is no request body", async () => {
 
       @doc("The state of the resource")
         enum ResourceState {
-         @doc(".") Succeeded,
-         @doc(".") Canceled,
-         @doc(".") Failed
+         Succeeded,
+         Canceled,
+         Failed
        }
 
        @doc("Foo properties")

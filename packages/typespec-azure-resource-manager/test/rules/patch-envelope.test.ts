@@ -80,9 +80,9 @@ it("emit diagnostic if identity property is missing", async () => {
 
       @doc("The state of the resource")
         enum ResourceState {
-         @doc(".") Succeeded,
-         @doc(".") Canceled,
-         @doc(".") Failed
+         Succeeded,
+         Canceled,
+         Failed
        }
 
        @doc("Foo properties")
@@ -147,9 +147,9 @@ it("emit diagnostic when there is no request body", async () => {
 
       @doc("The state of the resource")
         enum ResourceState {
-         @doc(".") Succeeded,
-         @doc(".") Canceled,
-         @doc(".") Failed
+         Succeeded,
+         Canceled,
+         Failed
        }
 
        @doc("Foo properties")

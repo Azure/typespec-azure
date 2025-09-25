@@ -57,9 +57,9 @@ it("Detects interfaces without @armResourceOperations", async () => {
 
         @doc("The state of the resource")
         enum ResourceState {
-         @doc(".") Succeeded,
-         @doc(".") Canceled,
-         @doc(".") Failed
+         Succeeded,
+         Canceled,
+         Failed
        }
 
        @doc("Foo resource")
