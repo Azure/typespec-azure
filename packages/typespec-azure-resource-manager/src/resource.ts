@@ -115,29 +115,25 @@ export interface ArmVirtualResourceDetails {
   provider?: string;
 }
 
-/** New base details for resolved resources */
-export interface ResourceMetadata {
+/** New details for a resolved resource */
+export interface ResolvedResourceModel {
   /** The model type for the resource */
   type: Model;
   /** The kind of resource (extension | tracked | proxy | custom | virtual | built-in) */
   kind: ArmResourceKind;
   /** The provider namespace */
   providerNamespace: string;
-}
-
-/** New details for a resolved resource */
-export interface ResolvedResource extends ResourceMetadata {
   /** The set of resolved operations for a resource.  For most 
         resources there will be 1 returned record */
-  operations?: ResolvedOperations[];
+  resourceOperations?: ResolvedResourceOperations[];
 }
 
 export interface ResolvedResources {
-  resources?: ResolvedResource[];
+  resourceModels?: ResolvedResourceModel[];
   unassociatedOperations?: ArmResourceOperation[];
 }
 
-export interface ResolvedOperationResourceInfo {
+interface ResolvedOperationResourceInfo {
   /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
   resourceType: ResourceType;
   /** The path to the instance of a resource */
@@ -145,7 +141,7 @@ export interface ResolvedOperationResourceInfo {
 }
 
 /** Resolved operations, including operations for non-arm resources */
-export interface ResolvedOperations extends ResolvedOperationResourceInfo {
+export interface ResolvedResourceOperations extends ResolvedOperationResourceInfo {
   /** The lifecycle and action operations using this resourceInstancePath (or the parent path) */
   operations: ArmResolvedOperationsForResource;
   /** Other operations associated with this resource */
@@ -392,22 +388,22 @@ export function resolveArmResources(program: Program): ResolvedResources {
   const provider = resolveProviderNamespace(program);
   if (provider === undefined) return {};
   const resolvedResources = getResolvedResources(program, provider);
-  if (resolvedResources?.resources !== undefined && resolvedResources.resources.length > 0) {
+  if (resolvedResources?.resourceModels !== undefined && resolvedResources.resourceModels.length > 0) {
     // Return the cached resource details
     return resolvedResources;
   }
 
   // We haven't generated the full resource details yet
-  const resources: ResolvedResource[] = [];
+  const resources: ResolvedResourceModel[] = [];
   for (const resource of listArmResources(program)) {
     const operations = resolveArmResourceOperations(program, resource.typespecType);
-    const fullResource: ResolvedResource = {
+    const fullResource: ResolvedResourceModel = {
       type: resource.typespecType,
       kind:
         getArmResourceKind(resource.typespecType) ??
         (operations.length > 0 ? "Tracked" : "Virtual"),
       providerNamespace: resource.armProviderNamespace,
-      operations: operations,
+      resourceOperations: operations,
     };
     resources.push(fullResource);
   }
@@ -482,7 +478,7 @@ export function getResourcePathElements(
 function tryAddLifecycleOperation(
   resourceType: ResourceType,
   sourceOperation: ArmResourceOperation,
-  targetOperation: ResolvedOperations,
+  targetOperation: ResolvedResourceOperations,
 ): boolean {
   const pathSegments: string[] = sourceOperation.httpOperation.path
     .split("/")
@@ -553,7 +549,7 @@ function tryAddLifecycleOperation(
 
 function addAssociatedOperation(
   sourceOperation: ArmResourceOperation,
-  targetOperation: ResolvedOperations,
+  targetOperation: ResolvedResourceOperations,
 ): void {
   if (!targetOperation.associatedOperations) {
     targetOperation.associatedOperations = [];
@@ -669,8 +665,8 @@ function addUniqueOperation(operation: ArmResourceOperation, operations: ArmReso
 export function resolveArmResourceOperations(
   program: Program,
   resourceType: Model,
-): ResolvedOperations[] {
-  const resolvedOperations: Set<ResolvedOperations> = new Set<ResolvedOperations>();
+): ResolvedResourceOperations[] {
+  const resolvedOperations: Set<ResolvedResourceOperations> = new Set<ResolvedResourceOperations>();
   const operations = getArmResourceOperationList(program, resourceType);
   for (const operation of operations) {
     const armOperation: ArmResourceOperation | undefined = getResourceOperation(
@@ -698,7 +694,7 @@ export function resolveArmResourceOperations(
 
     if (matched) continue;
     // If we don't have an operation for this resource, create a new one
-    const newOperation: ResolvedOperations = {
+    const newOperation: ResolvedResourceOperations = {
       resourceType: resourceInfo.resourceType,
       resourceInstancePath: resourceInfo.resourceInstancePath,
       operations: {
