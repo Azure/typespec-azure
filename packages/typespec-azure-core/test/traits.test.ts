@@ -1,4 +1,3 @@
-import { ModelProperty } from "@typespec/compiler";
 import {
   expectDiagnosticEmpty,
   expectDiagnostics,
@@ -140,21 +139,21 @@ describe("@trait", () => {
   });
 
   it("marks the trait envelope property with the trait name", async () => {
-    const [{ unnamedTrait, namedTrait }, diagnostics] = await runner.compileAndDiagnose(`
+    const [{ unnamedTrait, namedTrait }, diagnostics] = await runner.compileAndDiagnose(t.code`
       @Traits.trait
       model UnnamedTrait {
-        unnamedTrait: {};
+        ${t.modelProperty("unnamedTrait")}: {};
       }
 
       @Traits.trait("Named")
       model NamedTrait {
-        namedTrait: {};
+        ${t.modelProperty("namedTrait")}: {};
       }
       `);
 
     expectDiagnosticEmpty(diagnostics);
-    strictEqual(getSourceTraitName(runner.program, unnamedTrait as ModelProperty), "UnnamedTrait");
-    strictEqual(getSourceTraitName(runner.program, namedTrait as ModelProperty), "Named");
+    strictEqual(getSourceTraitName(runner.program, unnamedTrait), "UnnamedTrait");
+    strictEqual(getSourceTraitName(runner.program, namedTrait), "Named");
   });
 });
 
