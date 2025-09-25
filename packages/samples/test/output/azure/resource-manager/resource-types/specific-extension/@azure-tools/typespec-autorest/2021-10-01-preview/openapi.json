@@ -58,6 +58,9 @@
       "name": "ManagementGroups"
     },
     {
+      "name": "ServiceGroups"
+    },
+    {
       "name": "VirtualMachines"
     },
     {
@@ -964,6 +967,322 @@
             "required": true,
             "type": "string",
             "minLength": 1
+          },
+          {
+            "name": "employeeName",
+            "in": "path",
+            "description": "The name of the Employee",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "The content of the action request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MoveRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/MoveResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.ContosoProviderHub/employees": {
+      "get": {
+        "operationId": "ServiceGroups_List",
+        "tags": [
+          "ServiceGroups"
+        ],
+        "description": "List Employee resources by scope",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "serviceGroupName",
+            "in": "path",
+            "description": "The name of the service fabric cluster",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/EmployeeListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}": {
+      "get": {
+        "operationId": "ServiceGroups_Get",
+        "tags": [
+          "ServiceGroups"
+        ],
+        "description": "Get a Employee",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "serviceGroupName",
+            "in": "path",
+            "description": "The name of the service fabric cluster",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
+          },
+          {
+            "name": "employeeName",
+            "in": "path",
+            "description": "The name of the Employee",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/Employee"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "ServiceGroups_Create",
+        "tags": [
+          "ServiceGroups"
+        ],
+        "description": "Create a Employee",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "serviceGroupName",
+            "in": "path",
+            "description": "The name of the service fabric cluster",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
+          },
+          {
+            "name": "employeeName",
+            "in": "path",
+            "description": "The name of the Employee",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Employee"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'Employee' update operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/Employee"
+            }
+          },
+          "201": {
+            "description": "Resource 'Employee' create operation succeeded",
+            "schema": {
+              "$ref": "#/definitions/Employee"
+            },
+            "headers": {
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "patch": {
+        "operationId": "ServiceGroups_Update",
+        "tags": [
+          "ServiceGroups"
+        ],
+        "description": "Update a Employee",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "serviceGroupName",
+            "in": "path",
+            "description": "The name of the service fabric cluster",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
+          },
+          {
+            "name": "employeeName",
+            "in": "path",
+            "description": "The name of the Employee",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/EmployeeUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/Employee"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "ServiceGroups_Delete",
+        "tags": [
+          "ServiceGroups"
+        ],
+        "description": "Delete a Employee",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "serviceGroupName",
+            "in": "path",
+            "description": "The name of the service fabric cluster",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
+          },
+          {
+            "name": "employeeName",
+            "in": "path",
+            "description": "The name of the Employee",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource does not exist."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
+    "/providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/move": {
+      "post": {
+        "operationId": "ServiceGroups_Move",
+        "tags": [
+          "ServiceGroups"
+        ],
+        "description": "A synchronous resource action.",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "serviceGroupName",
+            "in": "path",
+            "description": "The name of the service fabric cluster",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$"
           },
           {
             "name": "employeeName",

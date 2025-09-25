@@ -2845,19 +2845,20 @@ alias VirtualMachineScaleSetVm = Extension.ExternalChildResource<
 An external resource target, used when an extension targets a resource from another provider namespace
 
 ```typespec
-model Azure.ResourceManager.Extension.ExternalResource<TargetNamespace, ResourceType, ResourceParameterName, NamePattern, NameType, Description>
+model Azure.ResourceManager.Extension.ExternalResource<TargetNamespace, ResourceType, ResourceParameterName, NamePattern, NameType, Description, ParentType>
 ```
 
 #### Template Parameters
 
-| Name                  | Description                                                                                             |
-| --------------------- | ------------------------------------------------------------------------------------------------------- |
-| TargetNamespace       | The provider namespace for the external resource.                                                       |
-| ResourceType          | The type of the external resource.                                                                      |
-| ResourceParameterName | The name of the 'name' parameter of the external resource.                                              |
-| NamePattern           | The pattern restriction for the name of the external resource (default is none).                        |
-| NameType              | The type of the name parameter of the external resource (default is string).                            |
-| Description           | The description of the name parameter of the external resource (default is "The name of the resource"). |
+| Name                  | Description                                                                                                           |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| TargetNamespace       | The provider namespace for the external resource.                                                                     |
+| ResourceType          | The type of the external resource.                                                                                    |
+| ResourceParameterName | The name of the 'name' parameter of the external resource.                                                            |
+| NamePattern           | The pattern restriction for the name of the external resource (default is none).                                      |
+| NameType              | The type of the name parameter of the external resource (default is string).                                          |
+| Description           | The description of the name parameter of the external resource (default is "The name of the resource").               |
+| ParentType            | The parent type of the external resource (default is "ResourceGroup", other options are "Tenant" and "Subscription"). |
 
 #### Examples
 
