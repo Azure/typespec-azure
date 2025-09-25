@@ -90,3 +90,88 @@ model ExtendedLocationOptional {
  */
 @Http.Private.includeInapplicableMetadataInPayload(false)
 model ResourceWithPathParameter {}
+
+/**
+ * Discriminated tracked resource types can be created by instantiating this type, with 'kind' as the discriminator property.
+ *
+ * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+ * @template KindType The type of the discriminator property `kind`. Default is string.
+ * @template Description A description of the resource
+ *
+ * @example
+ * ```typespec
+ * model Pet is DiscriminatedTrackedResource {}
+ *
+ * model Dog extends Pet {
+ *  kind: "dog";
+ *  properties: DogProperties;
+ * }
+ * ```
+ */
+@doc(Description)
+@armResourceInternal({})
+@discriminator("kind")
+@Http.Private.includeInapplicableMetadataInPayload(false)
+model DiscriminatedTrackedResource<
+  KindType extends string = string,
+  Description extends valueof string = "Polymorphic Tracked resource types can be created by instantiating this type, with 'kind' as the discriminator."
+> extends Foundations.TrackedResource {
+  ...ResourceKindProperty<KindType>;
+}
+
+/**
+ * Discriminated proxy resource types can be created by instantiating using this type, with 'kind' as the discriminator property.
+ *
+ * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+ * @template KindType The type of the discriminator property `kind`. Default is string.
+ * @template Description A description of the resource
+ *
+ * @example
+ * ```typespec
+ * model Pet is DiscriminatedProxyResource {}
+ *
+ * model Dog extends Pet {
+ *  kind: "dog";
+ *  properties: DogProperties;
+ * }
+ * ```
+ */
+@doc(Description)
+@armResourceInternal({})
+@discriminator("kind")
+@Http.Private.includeInapplicableMetadataInPayload(false)
+model DiscriminatedProxyResource<
+  KindType extends string = string,
+  Description extends valueof string = "Polymorphic proxy resource types can be created by instantiating this type, using 'kind' as the discriminator property."
+> extends Foundations.ProxyResource {
+  ...ResourceKindProperty<KindType>;
+}
+
+/**
+ * Polymorphic extension resources can be instantiated using this type, using 'kind' as the discriminator property.
+ *
+ * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+ * @template KindType The type of the discriminator property `kind`. Default is string.
+ * @template Description A description of the resource
+ *
+ * @example
+ * ```typespec
+ * model Pet is DiscriminatedExtensionResource {}
+ *
+ * model Dog extends Pet {
+ *  kind: "dog";
+ *  properties: DogProperties;
+ * }
+ * ```
+ */
+@extensionResource
+@doc(Description)
+@armResourceInternal({})
+@discriminator("kind")
+@Http.Private.includeInapplicableMetadataInPayload(false)
+model DiscriminatedExtensionResource<
+  KindType extends string = string,
+  Description extends valueof string = "Polymorphic extension resource types can be created by aliasing this type using a specific property type."
+> extends Foundations.ExtensionResource {
+  ...ResourceKindProperty<KindType>;
+}
