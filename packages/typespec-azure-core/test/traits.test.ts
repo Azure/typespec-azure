@@ -1,7 +1,8 @@
-import { Model, ModelProperty } from "@typespec/compiler";
+import { ModelProperty } from "@typespec/compiler";
 import {
   expectDiagnosticEmpty,
   expectDiagnostics,
+  t,
   TesterInstance,
 } from "@typespec/compiler/testing";
 import { deepStrictEqual, strictEqual } from "assert";
@@ -142,13 +143,11 @@ describe("@trait", () => {
     const [{ unnamedTrait, namedTrait }, diagnostics] = await runner.compileAndDiagnose(`
       @Traits.trait
       model UnnamedTrait {
-        @test
         unnamedTrait: {};
       }
 
       @Traits.trait("Named")
       model NamedTrait {
-        @test
         namedTrait: {};
       }
       `);
@@ -198,22 +197,16 @@ describe("@traitContext", () => {
 
 describe("@applyTraitProperties", () => {
   it("includes properties from all traits matching the desired location and context", async () => {
-    const [{ NoContext, WithContext }, diagnostics] = await runner.compileAndDiagnose(`
+    const { NoContext, WithContext } = await runner.compile(t.code`
       ${traitServiceCode}
 
-      @test
-      model NoContext is WithTraits<ContextTrait & NoContextTrait>;
+      model ${t.model("NoContext")} is WithTraits<ContextTrait & NoContextTrait>;
 
-      @test
-      model WithContext is WithTraits<ContextTrait & NoContextTrait, TraitContext.Bork>;
+      model ${t.model("WithContext")} is WithTraits<ContextTrait & NoContextTrait, TraitContext.Bork>;
     `);
 
-    expectDiagnosticEmpty(diagnostics);
-    deepStrictEqual(Array.from((NoContext as Model).properties.keys()), [
-      "noContextFoo",
-      "noContextBar",
-    ]);
-    deepStrictEqual(Array.from((WithContext as Model).properties.keys()), [
+    deepStrictEqual(Array.from(NoContext.properties.keys()), ["noContextFoo", "noContextBar"]);
+    deepStrictEqual(Array.from(WithContext.properties.keys()), [
       "contextFoo",
       "noContextFoo",
       "contextBar",
