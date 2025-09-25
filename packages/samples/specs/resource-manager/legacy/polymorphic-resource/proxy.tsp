@@ -22,9 +22,7 @@ model ConferenceRoomProperties {
   @doc("The city of current residence")
   city?: string;
 
-  @visibility(Lifecycle.Read)
-  @doc("The status of the last operation.")
-  provisioningState?: ProvisioningState;
+  ...DefaultProvisioningStateProperty;
 }
 
 /** The properties of an office */
@@ -35,9 +33,7 @@ model OfficeProperties {
   @doc("The city of current residence")
   city?: string;
 
-  @visibility(Lifecycle.Read)
-  @doc("The status of the last operation.")
-  provisioningState?: ProvisioningState;
+  ...DefaultProvisioningStateProperty;
 }
 
 /** Salaried employee */

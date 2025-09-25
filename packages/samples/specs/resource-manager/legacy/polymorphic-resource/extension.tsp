@@ -18,9 +18,7 @@ model CapitalProperties {
   @doc("The amount of capital")
   amount?: float64;
 
-  @visibility(Lifecycle.Read)
-  @doc("The status of the last operation.")
-  provisioningState?: ProvisioningState;
+  ...DefaultProvisioningStateProperty;
 }
 
 /** The properties of an expense */
@@ -31,9 +29,7 @@ model ExpenseProperties {
   @doc("The duration of the expense")
   duration?: duration;
 
-  @visibility(Lifecycle.Read)
-  @doc("The status of the last operation.")
-  provisioningState?: ProvisioningState;
+  ...DefaultProvisioningStateProperty;
 }
 
 /** Salaried employee */
