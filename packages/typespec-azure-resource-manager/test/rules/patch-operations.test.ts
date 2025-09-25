@@ -1,30 +1,29 @@
+import { Tester } from "#test/tester.js";
 import {
-  BasicTestRunner,
   LinterRuleTester,
+  TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
-import { beforeEach, describe, it } from "vitest";
-import { createAzureResourceManagerTestRunner } from "../test-host.js";
+import { beforeEach, it } from "vitest";
 
 import { patchOperationsRule } from "../../src/rules/arm-resource-patch.js";
 
-describe("typespec-azure-resource-manager: core operations rule", () => {
-  let runner: BasicTestRunner;
-  let tester: LinterRuleTester;
+let runner: TesterInstance;
+let tester: LinterRuleTester;
 
-  beforeEach(async () => {
-    runner = await createAzureResourceManagerTestRunner();
-    tester = createLinterRuleTester(
-      runner,
-      patchOperationsRule,
-      "@azure-tools/typespec-azure-resource-manager",
-    );
-  });
+beforeEach(async () => {
+  runner = await Tester.createInstance();
+  tester = createLinterRuleTester(
+    runner,
+    patchOperationsRule,
+    "@azure-tools/typespec-azure-resource-manager",
+  );
+});
 
-  it("Requires PATCH to be a proper subset of resource for model references", async () => {
-    await tester
-      .expect(
-        `
+it("Requires PATCH to be a proper subset of resource for model references", async () => {
+  await tester
+    .expect(
+      `
     @service(#{title: "Microsoft.Foo"})
     @versioned(Versions)
     @armProviderNamespace
@@ -85,18 +84,18 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
          provisioningState: ResourceState;
        }
     `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
-        message:
-          "Resource PATCH models must be a subset of the resource type. The following properties: [blah, blahdeeblah] do not exist in resource Model 'FooResource'.",
-      });
-  });
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+      message:
+        "Resource PATCH models must be a subset of the resource type. The following properties: [blah, blahdeeblah] do not exist in resource Model 'FooResource'.",
+    });
+});
 
-  it("Requires PATCH to be a proper subset of resource for model spread", async () => {
-    await tester
-      .expect(
-        `
+it("Requires PATCH to be a proper subset of resource for model spread", async () => {
+  await tester
+    .expect(
+      `
     @service(#{title: "Microsoft.Foo"})
     @versioned(Versions)
     @armProviderNamespace
@@ -161,18 +160,18 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
          provisioningState: ResourceState;
        }
     `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
-        message:
-          "Resource PATCH models must be a subset of the resource type. The following properties: [blah, blahdeeblah] do not exist in resource Model 'FooResource'.",
-      });
-  });
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+      message:
+        "Resource PATCH models must be a subset of the resource type. The following properties: [blah, blahdeeblah] do not exist in resource Model 'FooResource'.",
+    });
+});
 
-  it("emit diagnostic when there is no request body", async () => {
-    await tester
-      .expect(
-        `
+it("emit diagnostic when there is no request body", async () => {
+  await tester
+    .expect(
+      `
           @armProviderNamespace
       namespace Microsoft.Foo;
 
@@ -231,10 +230,9 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
       }
 
     `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
-        message: "The request body of a PATCH must be a model with a subset of resource properties",
-      });
-  });
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-patch",
+      message: "The request body of a PATCH must be a model with a subset of resource properties",
+    });
 });

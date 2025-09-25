@@ -1,29 +1,29 @@
+import { Tester } from "#test/tester.js";
 import {
-  BasicTestRunner,
   LinterRuleTester,
+  TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
-import { beforeEach, describe, it } from "vitest";
+import { beforeEach, it } from "vitest";
+
 import { interfacesRule } from "../../src/rules/arm-resource-interfaces.js";
-import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
-describe("typespec-azure-resource-manager: detect non-post actions", () => {
-  let runner: BasicTestRunner;
-  let tester: LinterRuleTester;
+let runner: TesterInstance;
+let tester: LinterRuleTester;
 
-  beforeEach(async () => {
-    runner = await createAzureResourceManagerTestRunner();
-    tester = createLinterRuleTester(
-      runner,
-      interfacesRule,
-      "@azure-tools/typespec-azure-resource-manager",
-    );
-  });
+beforeEach(async () => {
+  runner = await Tester.createInstance();
+  tester = createLinterRuleTester(
+    runner,
+    interfacesRule,
+    "@azure-tools/typespec-azure-resource-manager",
+  );
+});
 
-  it("Detects interfaces without @armResourceOperations", async () => {
-    await tester
-      .expect(
-        `
+it("Detects interfaces without @armResourceOperations", async () => {
+  await tester
+    .expect(
+      `
     @service(#{title: "Microsoft.Foo"})
     @versioned(Versions)
     @armProviderNamespace
@@ -70,10 +70,9 @@ describe("typespec-azure-resource-manager: detect non-post actions", () => {
          provisioningState: ResourceState;
        }
     `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator",
-        message: "Each resource interface must have an @armResourceOperations decorator.",
-      });
-  });
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator",
+      message: "Each resource interface must have an @armResourceOperations decorator.",
+    });
 });

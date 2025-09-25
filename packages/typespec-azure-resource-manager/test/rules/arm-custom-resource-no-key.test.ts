@@ -1,5 +1,6 @@
 import { createLinterRuleTester, LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
+
 import { armCustomResourceNoKey } from "../../src/rules/arm-custom-resource-no-key.js";
 import { createAzureResourceManagerTestRunner } from "../test-host.js";
 

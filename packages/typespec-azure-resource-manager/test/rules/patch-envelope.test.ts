@@ -1,45 +1,45 @@
+import { Tester } from "#test/tester.js";
 import { paramMessage } from "@typespec/compiler";
 import {
-  BasicTestRunner,
   LinterRuleTester,
+  TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
-import { beforeEach, describe, it } from "vitest";
+import { beforeEach, it } from "vitest";
+
 import { patchEnvelopePropertiesRules } from "../../src/rules/patch-envelope-properties.js";
-import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
-describe("typespec-azure-resource-manager: patch identity should be present in the update request body", () => {
-  let runner: BasicTestRunner;
-  let tester: LinterRuleTester;
+let runner: TesterInstance;
+let tester: LinterRuleTester;
 
-  beforeEach(async () => {
-    runner = await createAzureResourceManagerTestRunner();
-    tester = createLinterRuleTester(
-      runner,
-      patchEnvelopePropertiesRules,
-      "@azure-tools/typespec-azure-resource-manager",
-    );
+beforeEach(async () => {
+  runner = await Tester.createInstance();
+  tester = createLinterRuleTester(
+    runner,
+    patchEnvelopePropertiesRules,
+    "@azure-tools/typespec-azure-resource-manager",
+  );
+});
+
+async function expectUpdateEnvelopePropertiesResult(
+  resourceName: string,
+  propertyName: string,
+  code: string,
+) {
+  await tester.expect(code).toEmitDiagnostics({
+    code: "@azure-tools/typespec-azure-resource-manager/patch-envelope",
+    message:
+      paramMessage`The Resource PATCH request for resource '${"resourceName"}' is missing envelope properties:  [${"propertyName"}]. Since these properties are supported in the resource, they must also be updatable via PATCH.`(
+        { resourceName: resourceName, propertyName: propertyName },
+      ),
   });
+}
 
-  async function expectUpdateEnvelopePropertiesResult(
-    resourceName: string,
-    propertyName: string,
-    code: string,
-  ) {
-    await tester.expect(code).toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/patch-envelope",
-      message:
-        paramMessage`The Resource PATCH request for resource '${"resourceName"}' is missing envelope properties:  [${"propertyName"}]. Since these properties are supported in the resource, they must also be updatable via PATCH.`(
-          { resourceName: resourceName, propertyName: propertyName },
-        ),
-    });
-  }
-
-  it("emit diagnostic if identity property is missing", async () => {
-    await expectUpdateEnvelopePropertiesResult(
-      "FooResource",
-      "identity, managedBy, plan, sku, tags",
-      `
+it("emit diagnostic if identity property is missing", async () => {
+  await expectUpdateEnvelopePropertiesResult(
+    "FooResource",
+    "identity, managedBy, plan, sku, tags",
+    `
           @armProviderNamespace
       namespace Microsoft.Foo;
 
@@ -100,14 +100,14 @@ describe("typespec-azure-resource-manager: patch identity should be present in t
       }
 
     `,
-    );
-  });
+  );
+});
 
-  it("emit diagnostic when there is no request body", async () => {
-    await expectUpdateEnvelopePropertiesResult(
-      "FooResource",
-      "identity, managedBy, plan, sku, tags",
-      `
+it("emit diagnostic when there is no request body", async () => {
+  await expectUpdateEnvelopePropertiesResult(
+    "FooResource",
+    "identity, managedBy, plan, sku, tags",
+    `
           @armProviderNamespace
       namespace Microsoft.Foo;
 
@@ -167,6 +167,5 @@ describe("typespec-azure-resource-manager: patch identity should be present in t
       }
 
     `,
-    );
-  });
+  );
 });

@@ -1,30 +1,29 @@
+import { Tester } from "#test/tester.js";
 import {
-  BasicTestRunner,
   LinterRuleTester,
+  TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
-import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
 import { coreOperationsRule } from "../../src/rules/core-operations.js";
 
-describe("typespec-azure-resource-manager: core operations rule", () => {
-  let runner: BasicTestRunner;
-  let tester: LinterRuleTester;
+let runner: TesterInstance;
+let tester: LinterRuleTester;
 
-  beforeEach(async () => {
-    runner = await createAzureResourceManagerTestRunner();
-    tester = createLinterRuleTester(
-      runner,
-      coreOperationsRule,
-      "@azure-tools/typespec-azure-resource-manager",
-    );
-  });
+beforeEach(async () => {
+  runner = await Tester.createInstance();
+  tester = createLinterRuleTester(
+    runner,
+    coreOperationsRule,
+    "@azure-tools/typespec-azure-resource-manager",
+  );
+});
 
-  it("emits diagnostics if missing armResourceOperation decorators.", async () => {
-    await tester
-      .expect(
-        `
+it("emits diagnostics if missing armResourceOperation decorators.", async () => {
+  await tester
+    .expect(
+      `
               @armProviderNamespace
         namespace Microsoft.Foo;
         
@@ -42,37 +41,37 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
           @post action(...ResourceInstanceParameters<FooResource>) : ArmResponse<FooResource> | ErrorResponse;
         }
       `,
-      )
-      .toEmitDiagnostics([
-        {
-          code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
-          message: "Resource PUT operation must be decorated with @armResourceCreateOrUpdate.",
-        },
-        {
-          code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
-          message:
-            "Resource GET operation must be decorated with @armResourceRead or @armResourceList.",
-        },
-        {
-          code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
-          message: "Resource PATCH operation must be decorated with @armResourceUpdate.",
-        },
-        {
-          code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
-          message: "Resource DELETE operation must be decorated with @armResourceDelete.",
-        },
-        {
-          code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
-          message:
-            "Resource POST operation must be decorated with @armResourceAction or @armResourceCollectionAction.",
-        },
-      ]);
-  });
+    )
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+        message: "Resource PUT operation must be decorated with @armResourceCreateOrUpdate.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+        message:
+          "Resource GET operation must be decorated with @armResourceRead or @armResourceList.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+        message: "Resource PATCH operation must be decorated with @armResourceUpdate.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+        message: "Resource DELETE operation must be decorated with @armResourceDelete.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+        message:
+          "Resource POST operation must be decorated with @armResourceAction or @armResourceCollectionAction.",
+      },
+    ]);
+});
 
-  it("doesn't emit diagnostic for internal operations", async () => {
-    await tester
-      .expect(
-        `
+it("doesn't emit diagnostic for internal operations", async () => {
+  await tester
+    .expect(
+      `
     @armProviderNamespace
     @service(#{title: "Microsoft.Foo"})
     @versioned(Versions)
@@ -96,14 +95,14 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
         getVmsSizes is ArmProviderActionSync<void, VmSize, SubscriptionActionScope>;
       }
     `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it("Detects operations outside interfaces", async () => {
-    await tester
-      .expect(
-        `
+it("Detects operations outside interfaces", async () => {
+  await tester
+    .expect(
+      `
           @service(#{title: "Microsoft.Foo"})
           @versioned(Versions)
           @armProviderNamespace
@@ -157,17 +156,17 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
              provisioningState: ResourceState;
            }
         `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
-        message: "All operations must be inside an interface declaration.",
-      });
-  });
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+      message: "All operations must be inside an interface declaration.",
+    });
+});
 
-  it("Detects missing api-version parameters", async () => {
-    await tester
-      .expect(
-        `
+it("Detects missing api-version parameters", async () => {
+  await tester
+    .expect(
+      `
         @service(#{title: "Microsoft.Foo"})
         @versioned(Versions)
         @armProviderNamespace
@@ -230,17 +229,17 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
              provisioningState: ResourceState;
            }
         `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
-        message:
-          "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models.",
-      });
-  });
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+      message:
+        "All Resource operations must use an api-version parameter. Please include Azure.ResourceManager.ApiVersionParameter in the operation parameter list using the spread (...ApiVersionParameter) operator, or using one of the common resource parameter models.",
+    });
+});
 
-  describe("Provider operations", () => {
-    function providerOperationSetup(operation: string = "", content: string = ""): string {
-      return `
+describe("Provider operations", () => {
+  function providerOperationSetup(operation: string = "", content: string = ""): string {
+    return `
       @armProviderNamespace
       @service(#{title: "Microsoft.Foo"})
       @versioned(Versions)
@@ -282,35 +281,35 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
         ${operation}
       }
     `;
-    }
+  }
 
-    it("doesn't emit a diagnostic for provider operations", async () => {
-      const content = providerOperationSetup(
-        `
+  it("doesn't emit a diagnostic for provider operations", async () => {
+    const content = providerOperationSetup(
+      `
         @autoRoute
         @get
         @action("virtualMachines")
         listByLocation is ComputeProviderActionAsync<Response = ResourceListResult<Employee>>;
         `,
-      );
-      await tester.expect(content).toBeValid();
-    });
+    );
+    await tester.expect(content).toBeValid();
+  });
 
-    it("doesn't emit a diagnostic for provider operations with location", async () => {
-      const content = providerOperationSetup(
-        `
+  it("doesn't emit a diagnostic for provider operations with location", async () => {
+    const content = providerOperationSetup(
+      `
         @autoRoute
         @get
         @action("virtualMachinesGet")
         get is ComputeProviderActionAsync<Response = ResourceListResult<Employee>, Parameters = LocationParameter>;
         `,
-      );
-      await tester.expect(content).toBeValid();
-    });
+    );
+    await tester.expect(content).toBeValid();
+  });
 
-    it("emit diagnostic for provider operations if it has dynamic segments", async () => {
-      const content = providerOperationSetup(
-        `
+  it("emit diagnostic for provider operations if it has dynamic segments", async () => {
+    const content = providerOperationSetup(
+      `
         @autoRoute
         @get
         @action("virtualMachines")
@@ -319,7 +318,7 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
           Parameters = LocationParameter & MoveResponseParameter
         >; 
         `,
-        ` 
+      ` 
         model MoveResponseParameter {
           /** The name of Azure region. */
           @path
@@ -328,13 +327,12 @@ describe("typespec-azure-resource-manager: core operations rule", () => {
           move: string;
         }
         `,
-      );
+    );
 
-      await tester.expect(content).toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
-        message:
-          "Resource GET operation must be decorated with @armResourceRead or @armResourceList.",
-      });
+    await tester.expect(content).toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
+      message:
+        "Resource GET operation must be decorated with @armResourceRead or @armResourceList.",
     });
   });
 });
