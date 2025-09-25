@@ -207,6 +207,17 @@ export type LegacyTypeDecorator = (
   target: Model | Operation | Interface | Scalar,
 ) => void;
 
+/**
+ * Determines the built-in parent of a base resource
+ *
+ * @param parentType The parent type of the resource (Subscription, ResourceGroup, Tenant, Extension)
+ */
+export type ResourceParentTypeDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  parentType: "Subscription" | "ResourceGroup" | "Tenant" | "Extension",
+) => void;
+
 export type AzureResourceManagerPrivateDecorators = {
   resourceParameterBaseFor: ResourceParameterBaseForDecorator;
   resourceBaseParametersOf: ResourceBaseParametersOfDecorator;
@@ -224,4 +235,5 @@ export type AzureResourceManagerPrivateDecorators = {
   armResourcePropertiesOptionality: ArmResourcePropertiesOptionalityDecorator;
   armBodyRoot: ArmBodyRootDecorator;
   legacyType: LegacyTypeDecorator;
+  resourceParentType: ResourceParentTypeDecorator;
 };

@@ -129,3 +129,11 @@ extern dec armBodyRoot(target: ModelProperty, isOptional: valueof boolean);
 
 /** designates a type as a legacy type and emits a warning diagnostic when used */
 extern dec legacyType(target: Model | Operation | Interface | Scalar);
+
+/** Determines the built-in parent of a base resource
+ * @param parentType The parent type of the resource (Subscription, ResourceGroup, Tenant, Extension)
+ */
+extern dec resourceParentType(
+  target: Model,
+  parentType: valueof "Subscription" | "ResourceGroup" | "Tenant" | "Extension"
+);
