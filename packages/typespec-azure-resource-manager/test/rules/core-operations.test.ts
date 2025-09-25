@@ -24,7 +24,7 @@ it("emits diagnostics if missing armResourceOperation decorators.", async () => 
   await tester
     .expect(
       `
-              @armProviderNamespace
+        @armProviderNamespace
         namespace Microsoft.Foo;
         
         model FooResource is TrackedResource<{}> {
@@ -73,27 +73,17 @@ it("doesn't emit diagnostic for internal operations", async () => {
     .expect(
       `
     @armProviderNamespace
-    @service(#{title: "Microsoft.Foo"})
-    @versioned(Versions)
     namespace Microsoft.Foo;
-    enum Versions {
-              @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-        "2021-10-01-preview",
-      }
 
-      interface Operations extends Azure.ResourceManager.Operations {}
+    model VmSize {
+      cpus: int32;
+    }
 
-      @doc("The VM Size")
-      model VmSize {
-        @doc("number of cpus ")
-        cpus: int32;
-      }
-
-      @armResourceOperations
-      interface ProviderOperations {
-        @get
-        getVmsSizes is ArmProviderActionSync<void, VmSize, SubscriptionActionScope>;
-      }
+    @armResourceOperations
+    interface ProviderOperations {
+      @get
+      getVmsSizes is ArmProviderActionSync<void, VmSize, SubscriptionActionScope>;
+    }
     `,
     )
     .toBeValid();
@@ -103,32 +93,15 @@ it("Detects operations outside interfaces", async () => {
   await tester
     .expect(
       `
-          @service(#{title: "Microsoft.Foo"})
-          @versioned(Versions)
           @armProviderNamespace
           namespace Microsoft.Foo;
     
-          @doc(".")
-          enum Versions {
-            @doc(".")
-                      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v3)
-            v2021_09_21: "2022-09-21-preview",
-            @doc(".")
-                      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
-            v2022_01_10: "2022-01-10-alpha.1"
-          }
-    
-          interface Operations extends Azure.ResourceManager.Operations {}
-    
           @route("/foo")
-          @doc("get all the foos")
           @armResourceRead(FooResource)
           @get op getFoos(...ApiVersionParameter) : FooResource;
     
-          @doc("Foo resource")
           model FooResource is TrackedResource<FooProperties> {
             @visibility(Lifecycle.Read)
-            @doc("The name of the all properties resource.")
             @key("foo")
             @segment("foo")
             @path
@@ -141,18 +114,14 @@ it("Detects operations outside interfaces", async () => {
             extends TrackedResourceOperations<FooResource, FooProperties> {
             }
     
-            @doc("The state of the resource")
             enum ResourceState {
              Succeeded,
              Canceled,
              Failed
            }
     
-           @doc("The foo properties.")
            model FooProperties {
-             @doc("Name of the resource")
              displayName?: string = "default";
-             @doc("The provisioning State")
              provisioningState: ResourceState;
            }
         `,
@@ -167,68 +136,47 @@ it("Detects missing api-version parameters", async () => {
   await tester
     .expect(
       `
-        @service(#{title: "Microsoft.Foo"})
-        @versioned(Versions)
         @armProviderNamespace
         namespace Microsoft.Foo;
-    
-          @doc(".")
-          enum Versions {
-            @doc(".")
-            @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v3)
-            v2021_09_21: "2022-09-21-preview",
-            @doc(".")
-            @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
-            v2022_01_10: "2022-01-10-alpha.1"
+  
+        model FooResource is TrackedResource<FooProperties> {
+          @visibility(Lifecycle.Read)
+          @key("foo")
+          @segment("foo")
+          @path
+          name: string;
+          ...ManagedServiceIdentityProperty;
+        }
+        model MyResourceCommonParameters<TResource extends {}> {
+          ...SubscriptionIdParameter;
+          ...ResourceGroupParameter;
+          ...ProviderNamespace<TResource>;
+        }
+  
+        model MyResourceInstanceParameters<TResource extends {}> {
+          ...MyResourceCommonParameters<TResource>;
+          ...KeysOf<TResource>;
+        }
+  
+        @armResourceOperations
+        #suppress "deprecated" "test"
+        interface FooResources
+          extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
+            @armResourceAction(FooResource)
+            @action @post myFooAction(...MyResourceInstanceParameters<FooResource>) : ArmResponse<FooResource> | ErrorResponse;
           }
-    
-          interface Operations extends Azure.ResourceManager.Operations {}
-    
-          @doc("Foo resource")
-          model FooResource is TrackedResource<FooProperties> {
-            @visibility(Lifecycle.Read)
-            @doc("The name of the all properties resource.")
-            @key("foo")
-            @segment("foo")
-            @path
-            name: string;
-            ...ManagedServiceIdentityProperty;
-          }
-          model MyResourceCommonParameters<TResource extends {}> {
-            ...SubscriptionIdParameter;
-            ...ResourceGroupParameter;
-            ...ProviderNamespace<TResource>;
-          }
-    
-          model MyResourceInstanceParameters<TResource extends {}> {
-            ...MyResourceCommonParameters<TResource>;
-            ...KeysOf<TResource>;
-          }
-    
-          @armResourceOperations
-          #suppress "deprecated" "test"
-          interface FooResources
-            extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
-              @doc("Posts my Foos")
-              @armResourceAction(FooResource)
-              @action @post myFooAction(...MyResourceInstanceParameters<FooResource>) : ArmResponse<FooResource> | ErrorResponse;
-            }
-    
-            @doc("The state of the resource")
-            enum ResourceState {
-             Succeeded,
-             Canceled,
-             Failed
-           }
-    
-           @doc("Foo resource")
-           model FooProperties {
-             @doc("Name of the resource")
-             displayName?: string = "default";
-             @doc("The provisioning State")
-             provisioningState: ResourceState;
-           }
-        `,
+  
+        enum ResourceState {
+          Succeeded,
+          Canceled,
+          Failed
+        }
+
+        model FooProperties {
+          displayName?: string = "default";
+          provisioningState: ResourceState;
+        }
+      `,
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation",
@@ -241,14 +189,7 @@ describe("Provider operations", () => {
   function providerOperationSetup(operation: string = "", content: string = ""): string {
     return `
       @armProviderNamespace
-      @service(#{title: "Microsoft.Foo"})
-      @versioned(Versions)
       namespace Microsoft.Foo;
-  
-      enum Versions {
-              @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-        "2021-10-01-preview",
-      }
   
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
@@ -276,7 +217,6 @@ describe("Provider operations", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator"
       interface VirtualMachinesOperations {
         ${operation}
       }

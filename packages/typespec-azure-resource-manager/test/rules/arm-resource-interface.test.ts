@@ -24,26 +24,11 @@ it("Detects interfaces without @armResourceOperations", async () => {
   await tester
     .expect(
       `
-    @service(#{title: "Microsoft.Foo"})
-    @versioned(Versions)
-    @armProviderNamespace
-    namespace Microsoft.Foo;
-      @doc(".")
-      enum Versions {
-        @doc(".")
-              @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v3)
-        v2021_09_21: "2022-09-21-preview",
-        @doc(".")
-              @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
-        v2022_01_10: "2022-01-10-alpha.1"
-      }
+      @armProviderNamespace
+      namespace Microsoft.Foo;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      @doc("Foo resource")
       model FooResource is TrackedResource<FooProperties> {
         @visibility(Lifecycle.Read)
-        @doc("The name of the all properties resource.")
         @key("foo")
         @segment("foo")
         @path
@@ -51,24 +36,18 @@ it("Detects interfaces without @armResourceOperations", async () => {
         ...ManagedServiceIdentityProperty;
       }
 
-      interface FooResources
-        extends TrackedResourceOperations<FooResource, FooProperties> {
-        }
+      interface FooResources extends TrackedResourceOperations<FooResource, FooProperties> {}
 
-        @doc("The state of the resource")
-        enum ResourceState {
-         Succeeded,
-         Canceled,
-         Failed
-       }
+      enum ResourceState {
+        Succeeded,
+        Canceled,
+        Failed
+      }
 
-       @doc("Foo resource")
-       model FooProperties {
-         @doc("Name of the resource")
-         displayName?: string = "default";
-         @doc("The provisioning State")
-         provisioningState: ResourceState;
-       }
+      model FooProperties {
+        displayName?: string = "default";
+        provisioningState: ResourceState;
+      }
     `,
     )
     .toEmitDiagnostics({
