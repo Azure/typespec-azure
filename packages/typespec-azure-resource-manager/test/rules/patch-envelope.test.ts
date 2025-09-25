@@ -40,14 +40,11 @@ it("emit diagnostic if identity property is missing", async () => {
     "FooResource",
     "identity, managedBy, plan, sku, tags",
     `
-          @armProviderNamespace
+      @armProviderNamespace
       namespace Microsoft.Foo;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("Foo resource")
       model FooResource is TrackedResource<FooProperties> {
-        @doc("The name of the all properties resource.")
         @key("foo")
         @segment("foo")
         @path
@@ -58,9 +55,7 @@ it("emit diagnostic if identity property is missing", async () => {
         ...ResourcePlanProperty;
       }
 
-      @doc("Patch model")
       model MyPatchModel {
-        @doc("The properties")
         properties: FooUpdateProperties;
       }
 
@@ -69,33 +64,25 @@ it("emit diagnostic if identity property is missing", async () => {
       interface FooResources
         extends ResourceRead<FooResource>,ResourceCreate<FooResource> ,ResourceDelete<FooResource>{
           @autoRoute
-          @doc("Update a {name}", FooResource)
           @armResourceUpdate(FooResource)
           @patch(#{implicitOptionality: true}) 
           op update(...ResourceInstanceParameters<FooResource>,  
-          @doc("The resource properties to be updated.")
           @bodyRoot 
           properties: MyPatchModel):TrackedResource<FooResource> | ErrorResponse;
       }
 
-      @doc("The state of the resource")
-        enum ResourceState {
+      enum ResourceState {
          Succeeded,
          Canceled,
          Failed
        }
 
-       @doc("Foo properties")
        model FooProperties {
-         @doc("Name of the resource")
          displayName?: string = "default";
-         @doc("The provisioning State")
          provisioningState: ResourceState;
        }
 
-      @doc("Foo update properties")
       model FooUpdateProperties {
-        @doc("Name of the resource")
         extra?: string ;
       }
 
@@ -108,14 +95,10 @@ it("emit diagnostic when there is no request body", async () => {
     "FooResource",
     "identity, managedBy, plan, sku, tags",
     `
-          @armProviderNamespace
+      @armProviderNamespace
       namespace Microsoft.Foo;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
-
-      @doc("Foo resource")
       model FooResource is TrackedResource<FooProperties> {
-        @doc("The name of the all properties resource.")
         @key("foo")
         @segment("foo")
         @path
@@ -126,9 +109,7 @@ it("emit diagnostic when there is no request body", async () => {
         ...ResourcePlanProperty;
       }
 
-      @doc("Patch model")
       model MyPatchModel {
-        @doc("The properties")
         properties: FooUpdateProperties;
       }
 
@@ -138,34 +119,26 @@ it("emit diagnostic when there is no request body", async () => {
         extends ResourceRead<FooResource>,ResourceCreate<FooResource> ,ResourceDelete<FooResource>{
           #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-patch-model" "Test"
           @autoRoute
-          @doc("Update a {name}", FooResource)
           @armResourceUpdate(FooResource)
           @patch(#{implicitOptionality: true}) 
           op update(...ResourceInstanceParameters<FooResource>
           ):TrackedResource<FooResource> | ErrorResponse;
       }
 
-      @doc("The state of the resource")
         enum ResourceState {
          Succeeded,
          Canceled,
          Failed
        }
 
-       @doc("Foo properties")
        model FooProperties {
-         @doc("Name of the resource")
          displayName?: string = "default";
-         @doc("The provisioning State")
          provisioningState: ResourceState;
        }
 
-      @doc("Foo update properties")
       model FooUpdateProperties {
-        @doc("Name of the resource")
         extra?: string ;
       }
-
     `,
   );
 });

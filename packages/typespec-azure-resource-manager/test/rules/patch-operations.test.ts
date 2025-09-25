@@ -46,7 +46,7 @@ it("Requires PATCH to be a proper subset of resource for model references", asyn
       interface FooResources
         extends ResourceRead<FooResource>, ResourceCreate<FooResource>, ResourceDelete<FooResource> {
          @armResourceUpdate(FooResource)
-         @patch(#{implicitOptionality: true}) myFooUpdate(...ResourceInstanceParameters<FooResource>, @doc("The body") @bodyRoot body: MyBadPatch) : ArmResponse<FooResource> | ErrorResponse;
+         @patch(#{implicitOptionality: true}) myFooUpdate(...ResourceInstanceParameters<FooResource>, @bodyRoot body: MyBadPatch) : ArmResponse<FooResource> | ErrorResponse;
         }
 
         enum ResourceState {

@@ -27,28 +27,21 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     it("gathers metadata about TrackedResources", async () => {
       const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-          namespace Microsoft.Test;
+      namespace Microsoft.Test;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
       enum ResourceState {
-       @doc(".") Succeeded,
-       @doc(".") Canceled,
-       @doc(".") Failed
+       Succeeded,
+       Canceled,
+       Failed
      }
 
-      @doc("Resource properties")
       model FooResourceProperties {
-        @doc("I am foo")
         iAmFoo: string;
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model FooResource is TrackedResource<FooResourceProperties> {
-        @doc("Foo name")
         @key("fooName")
         @segment("foos")
         @path
@@ -81,30 +74,24 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     it("allows overriding armProviderNamespace", async () => {
       const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-      @service(#{title: "Microsoft.Test"})
+      @service
       
           namespace Microsoft.Test {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
       enum ResourceState {
-       @doc(".") Succeeded,
-       @doc(".") Canceled,
-       @doc(".") Failed
+       Succeeded,
+       Canceled,
+       Failed
      }
 
-     @doc("Foo properties")
      model FooResourceProperties {
-       @doc("Name of the resource")
        displayName?: string = "default";
-       @doc("The provisioning State")
        provisioningState: ResourceState;
      }
 
-      @doc("Foo resource")
       model FooResource is TrackedResource<FooResourceProperties> {
-        @doc("Foo name")
         @key("fooName")
         @segment("foos")
         @path
@@ -128,30 +115,21 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
     it("gathers metadata about ProxyResources", async () => {
       const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-      @service(#{title: "Microsoft.Test"})
-      
-          namespace Microsoft.Test;
+      namespace Microsoft.Test;
 
-      interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
       enum ResourceState {
-       @doc(".") Succeeded,
-       @doc(".") Canceled,
-       @doc(".") Failed
+       Succeeded,
+       Canceled,
+       Failed
      }
 
-     @doc("Foo properties")
      model FooResourceProperties {
-       @doc("Name of the resource")
        displayName?: string = "default";
-       @doc("The provisioning State")
        provisioningState: ResourceState;
      }
 
-      @doc("Foo resource")
       model FooResource is TrackedResource<FooResourceProperties> {
-        @doc("Foo name")
         @key("fooName")
         @segment("foos")
         @path
@@ -161,18 +139,13 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
       interface Foos extends TrackedResourceOperations<FooResource,FooResourceProperties> {
       }
 
-      @doc("Bar properties")
       model BarResourceProperties {
-        @doc("I am Bar")
         iAmBar: string;
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Bar resource")
       @parentResource(FooResource)
       model BarResource is ProxyResource<BarResourceProperties> {
-        @doc("Bar name")
         @key("barName")
         @segment("bars")
         @path
@@ -208,24 +181,18 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
       enum ResourceState {
-       @doc(".") Succeeded,
-       @doc(".") Canceled,
-       @doc(".") Failed
+       Succeeded,
+       Canceled,
+       Failed
      }
 
-     @doc("Baz properties")
      model BazResourceProperties {
-       @doc("Name of the resource")
        displayName?: string = "default";
-       @doc("The provisioning State")
        provisioningState: ResourceState;
      }
 
-      @doc("Baz resource")
       model BazResource is ExtensionResource<BazResourceProperties> {
-        @doc("Baz name")
         @key("bazName")
         @segment("bazs")
         @path
@@ -262,24 +229,18 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
       enum ResourceState {
-       @doc(".") Succeeded,
-       @doc(".") Canceled,
-       @doc(".") Failed
+       Succeeded,
+       Canceled,
+       Failed
      }
 
-     @doc("Foo properties")
      model FooResourceProperties {
-       @doc("Name of the resource")
        displayName?: string = "default";
-       @doc("The provisioning State")
        provisioningState: ResourceState;
      }
 
-      @doc("Foo resource")
       model FooResource is TrackedResource<FooResourceProperties> {
-        @doc("foo name")
         @key("fooName")
         @segment("foos")
         @path
@@ -290,19 +251,14 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
       #suppress "deprecated" "test"
       interface Foos extends ResourceCreate<FooResource>,ResourceRead<FooResource>,ResourceDelete<FooResource> {}
 
-      @doc("Bar properties")
       model BarResourceProperties {
-        @doc("I am bar")
         iAmBar: string;
-        @doc("The provisioning State")
        provisioningState: ResourceState;
       }
 
-      @doc("Bar resource")
       @singleton
       @parentResource(FooResource)
       model BarResource is ProxyResource<BarResourceProperties> {
-        @doc("Bar name")
         @key("barName")
         @segment("bars")
         @path
@@ -338,24 +294,18 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
       enum ResourceState {
-       @doc(".") Succeeded,
-       @doc(".") Canceled,
-       @doc(".") Failed
+       Succeeded,
+       Canceled,
+       Failed
      }
 
-      @doc("Resource properties")
       model FooResourceProperties {
-        @doc("I am foo")
         iAmFoo: string;
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model FooResource is TrackedResource<FooResourceProperties> {
-        @doc("Foo name")
         @key("fooName")
         @segment("foos")
         @path
@@ -392,93 +342,64 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
       enum ResourceState {
-       @doc(".") Succeeded,
-       @doc(".") Canceled,
-       @doc(".") Failed
+       Succeeded,
+       Canceled,
+       Failed
      }
 
-      @doc("Base resource properties")
       model BaseResourceProperties {
-        @doc("Common type")
         commonType: string;
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo properties")
       model FooResourceProperties extends BaseResourceProperties {
-        @doc("I am Foo")
         iAmFoo: string;
 
-        @doc("Int prop")
         int32Prop: int32;
 
-        @doc("Another int prop")
         int64Prop: int64;
 
-        @doc("Safe int prop")
         safeIntProp: safeint;
 
-        @doc("Float 32 prop")
         f32Prop: float32;
 
-        @doc("Float 64 prop")
         f64Prop: float64;
 
-        @doc("Bool prop")
         boolProp: boolean;
 
-        @doc("Date prop")
         dateProp: plainDate;
 
-        @doc("Time prop")
         timeProp: plainTime;
 
-        @doc("Zoned date prop")
         utcDateTimeProp: utcDateTime;
 
-        @doc("Duration prop")
         durationProp: duration;
 
-        @doc("Map prop")
         mapProp: Record<string>;
 
-        @doc("Arr 32 prop")
         arrint32Prop: int32[];
 
-        @doc("Arr 64 prop")
         arrint64Prop: int64[];
 
-        @doc("Arr safe prop")
         arrsafeIntProp: safeint[];
 
-        @doc("Arr F32 prop")
         arrayF32Prop: float32[];
 
-        @doc("Arr F64 prop")
         arrayF64Prop: float64[];
 
-        @doc("Arr Bool prop")
         arrayBoolProp: boolean[];
 
-        @doc("Arr Date prop")
         arrdateProp: plainDate[];
 
-        @doc("Arr time prop")
         arrtimeProp: plainTime[];
 
-        @doc("Arr zoned prop")
         arrutcDateTimeProp: utcDateTime[];
 
-        @doc("Arr duration prop")
         arrdurationProp: duration[];
       }
 
-      @doc("Foo resource")
       model FooResource is TrackedResource<FooResourceProperties> {
-        @doc("Foo name")
         @key("fooName")
         @segment("foos")
         @path
@@ -561,10 +482,8 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
         model FooResourceProperties {}
 
         // NOTE: No spec author should actually use this directly
-        @doc("Foo resource")
         @Azure.ResourceManager.Private.armResourceInternal(FooResourceProperties)
         model FooResource {
-          @doc("Foo name")
           @key("fooName")
           @segment("foos")
           @path
@@ -584,9 +503,7 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
 
         model FooResourceProperties {}
 
-        @doc("Foo resource")
         model FooResource is TrackedResource<FooResourceProperties> {
-          @doc("Foo name")
           @segment("foos")
           @path
           name: string;
@@ -622,15 +539,13 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
   it("emits correct extended location for resource", async () => {
     const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-          namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
-      @doc("Widget resource")
       model Widget is ProxyResource<WidgetProperties> {
          ...ResourceNameParameter<Widget>;
          ...ExtendedLocationProperty;
       }
 
-      @doc("The properties of a widget")
       model WidgetProperties {
          size: int32;
       }
@@ -644,14 +559,12 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
   it("emits correct fixed union name parameter for resource", async () => {
     const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-          namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
-      @doc("Widget resource")
       model Widget is ProxyResource<WidgetProperties> {
          ...ResourceNameParameter<Widget, Type=WidgetNameType>;
       }
 
-      @doc("The properties of a widget")
       model WidgetProperties {
          size: int32;
       }
@@ -677,14 +590,12 @@ describe("typespec-azure-resource-manager: ARM resource model", () => {
   it("emits a scalar string with decorator parameter for resource", async () => {
     const { program, diagnostics } = await checkFor(`
       @armProviderNamespace
-          namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
-      @doc("Widget resource")
       model Widget is ProxyResource<WidgetProperties> {
          ...ResourceNameParameter<Widget, Type=WidgetNameType>;
       }
 
-      @doc("The properties of a widget")
       model WidgetProperties {
          size: int32;
       }
@@ -1457,12 +1368,10 @@ it("emits default optional properties for resource", async () => {
     @armProviderNamespace
       namespace Microsoft.Contoso;
 
-    @doc("Widget resource")
     model Widget is TrackedResource<WidgetProperties> {
        ...ResourceNameParameter<Widget>;
     }
 
-    @doc("The properties of a widget")
     model WidgetProperties {
        size: int32;
     }
@@ -1478,12 +1387,10 @@ it("emits required properties for resource with @armResourcePropertiesOptionalit
     @armProviderNamespace
       namespace Microsoft.Contoso;
 
-    @doc("Widget resource")
     model Widget is ProxyResource<WidgetProperties, false> {
        ...ResourceNameParameter<Widget>;
     }
 
-    @doc("The properties of a widget")
     model WidgetProperties {
        size: int32;
     }

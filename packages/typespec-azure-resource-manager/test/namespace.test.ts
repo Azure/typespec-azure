@@ -9,25 +9,19 @@ it("singleton resource route check", async () => {
   const { program, types, diagnostics } = await compileAndDiagnose(`
     @armProviderNamespace
       namespace Microsoft.Test {
-      @doc("The state of the resource")
       enum ResourceState {
-      @doc(".") Succeeded,
-      @doc(".") Canceled,
-      @doc(".") Failed
+      Succeeded,
+      Canceled,
+      Failed
       }
 
-      @doc("Foo properties")
       model FooResourceProperties {
-        @doc("Name of the resource")
         displayName?: string = "default";
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       @singleton
       model FooResource is TrackedResource<FooResourceProperties> {
-        @doc("foo name")
         @key("fooName")
         @segment("foos")
         @path

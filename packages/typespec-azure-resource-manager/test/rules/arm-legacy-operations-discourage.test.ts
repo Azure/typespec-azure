@@ -106,7 +106,6 @@ it("emits diagnostic when using @Azure.ResourceManager.Legacy.LegacyOperations",
 
   /** Experiments with scope */
   alias InstanceScope = {
-    @doc("The employee name")
     @path
     @segment("employees")
     employeeName: string;
@@ -116,7 +115,6 @@ it("emits diagnostic when using @Azure.ResourceManager.Legacy.LegacyOperations",
   alias ParentScope = {
     ...BaseScope;
     ...ParentKeysOf<{
-      @doc("The employee name")
       @path
       @segment("employees")
       @key

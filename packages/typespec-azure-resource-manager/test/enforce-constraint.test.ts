@@ -6,20 +6,17 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
   it("emits no error when template param extends from Resource", async () => {
     const { diagnostics } = await checkFor(`
       @armProviderNamespace
-          namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
-      @doc("Widget resource")
       model Widget is ProxyResource<WidgetProperties> {
          ...ResourceNameParameter<Widget>;
          ...ExtendedLocationProperty;
       }
 
-      @doc("The properties of a widget")
       model WidgetProperties {
          size: int32;
       }
       
-      @doc("Direct extended resource")
       model CustomResource extends Foundations.Resource {};
 
       interface Widgets {
@@ -33,35 +30,28 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
   it("emits error if template param is not extended from Resource", async () => {
     const { diagnostics } = await checkFor(`
       @armProviderNamespace
-          namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
  
-      @doc("Widget resource")
       model Widget {
-        @doc("Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}")
         @visibility(Lifecycle.Read)
         id?: string;
       
-        @doc("The name of the resource")
         @visibility(Lifecycle.Read)
         name?: string;
       
-        @doc("The type of the resource.")
         @visibility(Lifecycle.Read)
         type?: string;
       
-        @doc("Azure Resource Manager metadata containing createdBy and modifiedBy information.")
         @visibility(Lifecycle.Read)
         systemData?: Foundations.SystemData;
 
         properties? : WidgetProperties;
       }
 
-      @doc("The properties of a widget")
       model WidgetProperties {
          size: int32;
       }
 
-      @doc("Custom Mix in resource")
       model CustomResource is Foundations.Resource {};
 
       interface Widgets {
@@ -98,7 +88,6 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
     @armProviderNamespace
       namespace Microsoft.Contoso;
 
-    @doc("Custom Mix in resource")
     model CustomResource is CustomAzureResource;
 
     @Azure.ResourceManager.Legacy.customAzureResource
@@ -119,7 +108,6 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
     @armProviderNamespace
       namespace Microsoft.Contoso;
 
-    @doc("Custom Mix in resource")
     model CustomResource is CustomAzureResource;
 
     @Azure.ResourceManager.Legacy.customAzureResource
@@ -158,7 +146,6 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
     @armProviderNamespace
       namespace Microsoft.Contoso;
 
-    @doc("Custom Mix in resource")
     model CustomResource extends CustomBase {
        ...ResourceNameParameter<CustomResource>;
     };
@@ -183,7 +170,6 @@ describe("typespec-azure-resource-manager: rename parameter tests", () => {
     @armProviderNamespace
     namespace Microsoft.Contoso;
 
-    @doc("Custom Mix in resource")
     model CustomResource is ProxyResource<CustomProperties> {
        ...ResourceNameParameter<CustomResource>;
     };
@@ -210,7 +196,6 @@ describe("typespec-azure-resource-manager: rename parameter tests", () => {
       
       namespace Microsoft.Contoso;
 
-       @doc("Custom Mix in resource")
        model CustomResource is ProxyResource<CustomProperties> {
          ...ResourceNameParameter<CustomResource>;
        };
@@ -236,7 +221,6 @@ describe("typespec-azure-resource-manager: rename parameter tests", () => {
       
       namespace Microsoft.Contoso;
 
-       @doc("Custom Mix in resource")
        model CustomResource is ProxyResource<CustomProperties> {
          ...ResourceNameParameter<CustomResource>;
        };
@@ -262,7 +246,6 @@ describe("typespec-azure-resource-manager: rename parameter tests", () => {
       
       namespace Microsoft.Contoso;
 
-       @doc("Custom Mix in resource")
        model CustomResource is ProxyResource<CustomProperties> {
          ...ResourceNameParameter<CustomResource>;
        };
@@ -285,7 +268,6 @@ describe("typespec-azure-resource-manager: rename parameter tests", () => {
       
       namespace Microsoft.Contoso;
 
-       @doc("Custom Mix in resource")
        model CustomResource is ProxyResource<CustomProperties> {
          ...ResourceNameParameter<CustomResource>;
        };

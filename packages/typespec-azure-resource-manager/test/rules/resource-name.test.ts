@@ -25,11 +25,10 @@ describe("resource name filed should be marked with 'read' visibility and an @pa
     await tester
       .expect(
         `
-                  @armProviderNamespace
+          @armProviderNamespace
           namespace Microsoft.Foo;
   
           model FooResource is TrackedResource<{}> {
-            @doc("The name of the all properties resource.")
             @key("foo")
             @path
             @segment("foo")
@@ -44,7 +43,7 @@ describe("resource name filed should be marked with 'read' visibility and an @pa
     await tester
       .expect(
         `
-              @armProviderNamespace
+        @armProviderNamespace
         namespace Microsoft.Foo;
 
         model FooResource is TrackedResource<{}> {
@@ -71,7 +70,7 @@ describe("resource name must not use invalid char", () => {
       .expect(
         `
         @armProviderNamespace
-              namespace Microsoft.Foo;
+        namespace Microsoft.Foo;
 
         model Foo_Resource is TrackedResource<{}> {
           @key("foo") @segment("foo") @path

@@ -25,10 +25,9 @@ it("Emits a warning for synchronous delete operation that does not contain the a
     .expect(
       `
       @armProviderNamespace
-          namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<EmployeeProperties> {
-        @doc("Name of employee")
         @pattern("^[a-zA-Z0-9-]{3,24}$")
         @key("employeeName")
         @path
@@ -63,7 +62,6 @@ it("Does not emit a warning for synchronous delete operation that contains the a
       namespace Microsoft.Contoso;
     
     model Employee is ProxyResource<EmployeeProperties> {
-      @doc("Name of employee")
       @pattern("^[a-zA-Z0-9-]{3,24}$")
       @key("employeeName")
       @path
@@ -96,7 +94,6 @@ it("Does not emit a warning for synchronous delete operation that uses the `ArmR
       namespace Microsoft.Contoso;
     
     model Employee is ProxyResource<EmployeeProperties> {
-      @doc("Name of employee")
       @pattern("^[a-zA-Z0-9-]{3,24}$")
       @key("employeeName")
       @path
@@ -119,10 +116,9 @@ it("Emits a warning for long-running delete operation that does not contain the 
     .expect(
       `
       @armProviderNamespace
-          namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<EmployeeProperties> {
-        @doc("Name of employee")
         @pattern("^[a-zA-Z0-9-]{3,24}$")
         @key("employeeName")
         @path
@@ -151,10 +147,9 @@ it("Does not emit a warning for long-running delete operation that uses the `Arm
     .expect(
       `
       @armProviderNamespace
-          namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<EmployeeProperties> {
-        @doc("Name of employee")
         @pattern("^[a-zA-Z0-9-]{3,24}$")
         @key("employeeName")
         @path

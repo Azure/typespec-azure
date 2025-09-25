@@ -34,25 +34,19 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
       enum ResourceState {
        Succeeded,
        Canceled,
        Failed
      }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
         simpleArmId: ResourceIdentifier;
 
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -86,25 +80,19 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
       enum ResourceState {
        Succeeded,
        Canceled,
        Failed
      }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
         simpleArmId: ResourceIdentifier;
 
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -146,25 +134,19 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
       enum ResourceState {
        Succeeded,
        Canceled,
        Failed
      }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
         simpleArmId: ResourceIdentifier;
 
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -197,25 +179,19 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
       enum ResourceState {
        Succeeded,
        Canceled,
        Failed
      }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
         simpleArmId: ResourceIdentifier;
 
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -248,37 +224,27 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
       enum ResourceState {
        Succeeded,
        Canceled,
        Failed
      }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
         simpleArmId: ResourceIdentifier;
 
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("The result of the post request")
       model ResultModel {
-        @doc("The result message")
         message: string;
       }
 
-      @doc("The request of the post request")
       model RequestModel {
-        @doc("The request message")
         message: string;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -312,37 +278,27 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
       enum ResourceState {
        Succeeded,
        Canceled,
        Failed
      }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
         simpleArmId: ResourceIdentifier;
 
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("The result of the post request")
       model ResultModel {
-        @doc("The result message")
         message: string;
       }
 
-      @doc("The request of the post request")
       model RequestModel {
-        @doc("The request message")
         message: string;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -377,7 +333,6 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
       union ResourceState {
        Succeeded: "Succeeded",
        Canceled: "Canceled",
@@ -385,18 +340,13 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
        string
      }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
         simpleArmId: ResourceIdentifier;
 
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -430,25 +380,19 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
       union ResourceState {
         Succeeded: "Succeeded",
         Canceled: "Canceled",
         Failed: "Failed"
       }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
         simpleArmId: ResourceIdentifier;
 
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -490,25 +434,19 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
       union ResourceState {
         Succeeded: "Succeeded",
         Canceled: "Canceled",
         Failed: "Failed"
       }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
         simpleArmId: ResourceIdentifier;
 
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -543,25 +481,19 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
       union ResourceState {
         Succeeded: "Succeeded",
         Canceled: "Canceled",
         Failed: "Failed"
       }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
         simpleArmId: ResourceIdentifier;
 
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -596,25 +528,19 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
       union ResourceState {
         Succeeded: "Succeeded",
         Canceled: "Canceled",
         Failed: "Failed"
       }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
         simpleArmId: ResourceIdentifier;
 
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -647,25 +573,19 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
       union ResourceState {
         Succeeded: "Succeeded",
         Canceled: "Canceled",
         Failed: "Failed"
       }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
         simpleArmId: ResourceIdentifier;
 
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -698,37 +618,27 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
       union ResourceState {
         Succeeded: "Succeeded",
         Canceled: "Canceled",
         Failed: "Failed"
       }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("I am a simple Resource Identifier")
         simpleArmId: ResourceIdentifier;
 
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("The result of the post request")
       model ResultModel {
-        @doc("The result message")
         message: string;
       }
 
-      @doc("The request of the post request")
       model RequestModel {
-        @doc("The request message")
         message: string;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -763,7 +673,6 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
-      @doc("The state of the resource")
       union BaseState {
         Succeeded: "Succeeded",
       }
@@ -772,7 +681,6 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         Failed,
       }
 
-      @doc("The state of the resource")
       @Azure.Core.lroStatus
       union ResourceState {
         BaseState,
@@ -780,15 +688,11 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         Canceled: "Canceled",
       }
 
-      @doc("The widget properties")
       model WidgetProperties {
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       model Widget is TrackedResource<WidgetProperties> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path

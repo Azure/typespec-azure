@@ -29,7 +29,6 @@ it("Emits a warning for armResourceAction that uses an outdated pattern with `@s
 
     @Azure.ResourceManager.tenantResource
     model Widget is ProxyResource<WidgetProperties> {
-      @doc("The name of the widget")
       @key("widgetName")
       @segment("widgets")
       @path
@@ -37,9 +36,7 @@ it("Emits a warning for armResourceAction that uses an outdated pattern with `@s
       name: string;
     }
 
-    @doc("The properties of a widget")
     model WidgetProperties {
-      @doc("The color of the widget")
       color: string;
     }
 
@@ -47,7 +44,6 @@ it("Emits a warning for armResourceAction that uses an outdated pattern with `@s
     interface Widgets extends TenantResourceOperations<Widget, WidgetProperties> {
       @test
       @autoRoute
-      @doc("Flip to the opposite of the current spin")
       @segment("wrongPattern")
       @post
       @armResourceAction(Widget)
