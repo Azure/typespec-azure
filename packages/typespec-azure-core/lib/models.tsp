@@ -161,7 +161,7 @@ model EtagResponseEnvelope {
   @header("ETag")
   @visibility(Lifecycle.Read)
   @doc("The entity tag for the response.")
-  etagHeader?: string;
+  etagHeader?: eTag;
 }
 
 // https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#repeatability-of-requests
