@@ -1,3 +1,4 @@
+import { isPreviewVersion } from "@azure-tools/typespec-azure-core";
 import {
   BooleanLiteral,
   compilerAssert,
@@ -547,9 +548,22 @@ export function filterApiVersionsInEnum(
   removeVersionsLargerThanExplicitlySpecified(context, sdkVersionsEnum.values);
   const defaultApiVersion = getDefaultApiVersion(context, client.service);
   if (!context.previewStringRegex.test(defaultApiVersion?.value || "")) {
-    sdkVersionsEnum.values = sdkVersionsEnum.values.filter(
-      (v) => typeof v.value === "string" && !context.previewStringRegex.test(v.value),
-    );
+    sdkVersionsEnum.values = sdkVersionsEnum.values.filter((v) => {
+      if (typeof v.value !== "string") {
+        return true;
+      }
+
+      // Check if the version has `@previewVersion` decorator
+      if (v.__raw && v.__raw.kind === "EnumMember") {
+        const enumMember = v.__raw;
+        if (isPreviewVersion(context.program, enumMember)) {
+          return false;
+        }
+      }
+
+      // Fall back to regex check for backward compatibility
+      return !context.previewStringRegex.test(v.value);
+    });
   }
 }
 
