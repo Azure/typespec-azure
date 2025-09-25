@@ -7,26 +7,15 @@ import {
   resolvePath,
 } from "@typespec/compiler";
 import { unsafe_mutateSubgraphWithNamespace } from "@typespec/compiler/experimental";
-import {
-  BasicTestRunner,
-  createTester,
-  createTestHost,
-  createTestWrapper,
-  TesterInstance,
-} from "@typespec/compiler/testing";
+import { createTester, TesterInstance } from "@typespec/compiler/testing";
 import {
   getAllHttpServices,
   HttpOperation,
   HttpOperationParameter,
   HttpVerb,
 } from "@typespec/http";
-import { HttpTestLibrary } from "@typespec/http/testing";
-import { OpenAPITestLibrary } from "@typespec/openapi/testing";
-import { RestTestLibrary } from "@typespec/rest/testing";
 import { getVersioningMutators } from "@typespec/versioning";
-import { VersioningTestLibrary } from "@typespec/versioning/testing";
 import { strictEqual } from "assert";
-import { AzureCoreTestLibrary } from "../src/testing/index.js";
 
 export const Tester = createTester(resolvePath(import.meta.dirname, ".."), {
   libraries: [
@@ -51,48 +40,6 @@ export const TesterWithService = Tester.wrap((code) => {
     ${code}
   `;
 });
-export async function createAzureCoreTestHost() {
-  return createTestHost({
-    libraries: [
-      AzureCoreTestLibrary,
-      HttpTestLibrary,
-      RestTestLibrary,
-      VersioningTestLibrary,
-      OpenAPITestLibrary,
-    ],
-  });
-}
-const CommonCode = `
-  import "${AzureCoreTestLibrary.name}";
-  import "${HttpTestLibrary.name}";
-  import "${RestTestLibrary.name}";
-  import "${VersioningTestLibrary.name}";
-  import "${OpenAPITestLibrary.name}";
-  using Http;
-  using Rest;
-  using Versioning;
-  using Azure.Core;\n`;
-
-export function getRunnerPosOffset(pos: number): number {
-  return CommonCode.length + pos;
-}
-export async function createAzureCoreTestRunner(
-  options: {
-    omitServiceNamespace?: boolean;
-  } = {},
-): Promise<BasicTestRunner> {
-  const host = await createAzureCoreTestHost();
-  const serviceNamespace = options.omitServiceNamespace
-    ? ""
-    : `@service namespace Azure.MyService;\n`;
-  return createTestWrapper(host, {
-    autoImports: [],
-    wrapper: (code) => `${CommonCode}${serviceNamespace}${code}`,
-    compilerOptions: {
-      miscOptions: { "disable-linter": true },
-    },
-  });
-}
 
 export async function getOperations(
   code: string,

@@ -1,13 +1,13 @@
 import { Model, ModelProperty } from "@typespec/compiler";
 import {
-  BasicTestRunner,
   expectDiagnosticEmpty,
   expectDiagnostics,
+  TesterInstance,
 } from "@typespec/compiler/testing";
 import { deepStrictEqual, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { getSourceTraitName } from "../src/traits.js";
-import { createAzureCoreTestRunner, getServiceForVersion } from "./test-host.js";
+import { getServiceForVersion, Tester } from "./test-host.js";
 
 describe("typespec-azure-core: service traits", () => {
   const traitServiceCode = `
@@ -60,9 +60,9 @@ describe("typespec-azure-core: service traits", () => {
     }
 `;
 
-  let runner: BasicTestRunner;
+  let runner: TesterInstance;
   beforeEach(async () => {
-    runner = await createAzureCoreTestRunner({ omitServiceNamespace: true });
+    runner = await Tester.createInstance();
   });
 
   describe("@trait", () => {
