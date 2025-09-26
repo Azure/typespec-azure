@@ -1,14 +1,14 @@
 import { createLinterRuleTester, LinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 
+import { Tester } from "#test/tester.js";
 import { armCustomResourceNoKey } from "../../src/rules/arm-custom-resource-no-key.js";
-import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
   tester = createLinterRuleTester(
-    await createAzureResourceManagerTestRunner(),
+    await Tester.createInstance(),
     armCustomResourceNoKey,
     "@azure-tools/typespec-azure-resource-manager",
   );

@@ -1,15 +1,13 @@
-import type { Diagnostic, ModelProperty, Namespace } from "@typespec/compiler";
+import type { Diagnostic, Namespace } from "@typespec/compiler";
 import { getService } from "@typespec/compiler";
 import { expectDiagnosticEmpty, expectDiagnostics, t } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
 import { findArmCommonTypeRecord, getExternalTypeRef } from "../src/common-types.js";
 import type { ArmCommonTypeRecord } from "../src/commontypes.private.decorators.js";
-import { createAzureResourceManagerTestRunner } from "./test-host.js";
 import { Tester } from "./tester.js";
 
 function boilerplate(version: string | undefined) {
-  // const versions = useVersionEnum ? ["v1", "v2"] : undefined;
   const decorators = ` ${
     version ? `@armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.${version})` : ""
   }`;
@@ -118,18 +116,16 @@ describe("common parameters", () => {
     decorators: string,
     commonTypesVersion: string,
   ): Promise<[ArmCommonTypeRecord | undefined, readonly Diagnostic[]]> {
-    const runner = await createAzureResourceManagerTestRunner();
-    const { foo, Service } = (await runner.compile(`
+    const { foo, Service, program } = await Tester.compile(t.code`
     ${boilerplate(commonTypesVersion)}
 
-    
     model Foo {
-      @test ${decorators}
-      foo: string;
+      ${decorators}
+      ${t.modelProperty("foo")}: string;
     }
-  `)) as { foo: ModelProperty; Service: Namespace };
-    return findArmCommonTypeRecord(runner.program, foo, {
-      service: getService(runner.program, Service)!,
+  `);
+    return findArmCommonTypeRecord(program, foo, {
+      service: getService(program, Service as Namespace)!,
     });
   }
 
@@ -208,13 +204,11 @@ describe("common parameters", () => {
 
 describe("common types ref", () => {
   it("set external reference", async () => {
-    const runner = await createAzureResourceManagerTestRunner();
-    const [{ Foo }, diagnostics] = await runner.compileAndDiagnose(`
-        @test @Azure.ResourceManager.Legacy.externalTypeRef("../common.json#/definitions/Foo")
-        model Foo {}
+    const { Foo, program } = await Tester.compile(t.code`
+        @Azure.ResourceManager.Legacy.externalTypeRef("../common.json#/definitions/Foo")
+        model ${t.model("Foo")} {}
       `);
 
-    expectDiagnosticEmpty(diagnostics);
-    strictEqual(getExternalTypeRef(runner.program, Foo), "../common.json#/definitions/Foo");
+    strictEqual(getExternalTypeRef(program, Foo), "../common.json#/definitions/Foo");
   });
 });

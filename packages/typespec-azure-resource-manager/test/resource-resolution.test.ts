@@ -1,4 +1,3 @@
-import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
 import { ok } from "assert";
 import { describe, expect, it } from "vitest";
 import { ArmOperationKind, ArmResourceOperation } from "../src/operations.js";
@@ -10,7 +9,7 @@ import {
   ResolvedOperations,
   ResourceType,
 } from "../src/resource.js";
-import { compileAndDiagnose } from "./test-host.js";
+import { Tester } from "./tester.js";
 
 interface ArmOperationCheck {
   operationGroup: string;
@@ -481,68 +480,42 @@ describe("unit tests for resource manager helpers", () => {
 });
 describe("end-to-end tests for resource manager helpers", () => {
   it("collects operation information for tracked resources", async () => {
-    const { program, diagnostics } = await compileAndDiagnose(`
-
+    const { program } = await Tester.compile(`
 using Azure.Core;
-/** Contoso Resource Provider management API. */
+
 @armProviderNamespace
-@service(#{ title: "ContosoProviderHubClient" })
-@versioned(Versions)
 namespace Microsoft.ContosoProviderHub;
 
-/** Contoso API versions */
-enum Versions {
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  v2021_10_01_preview: "2021-10-01-preview",
-}
+interface Operations extends Azure.ResourceManager.Operations {}
 
-/** A ContosoProviderHub resource */
 model Employee is TrackedResource<EmployeeProperties> {
   ...ResourceNameParameter<Employee>;
 }
 
-/** Employee properties */
 model EmployeeProperties {
   age?: int32;
-
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
 
-/** The provisioning state of a resource. */
 @lroStatus
 union ProvisioningState {
   string,
-
-  Accepted: "Accepted",
-
-  Provisioning: "Provisioning",
-
-  Updating: "Updating",
-
   Succeeded: "Succeeded",
-
   Failed: "Failed",
-
   Canceled: "Canceled",
-
-  Deleting: "Deleting",
 }
 
-/** Employee move request */
 model MoveRequest {
   from: string;
 
   to: string;
 }
 
-/** Employee move response */
 model MoveResponse {
   movingStatus: string;
 }
-
-interface Operations extends Azure.ResourceManager.Operations {}
 
 @armResourceOperations
 interface Employees {
@@ -561,7 +534,6 @@ interface Employees {
   checkExistence is ArmResourceCheckExistence<Employee>;
 }
 `);
-    expectDiagnosticEmpty(diagnostics);
     const resources = resolveArmResources(program);
     expect(resources).toBeDefined();
     expect(resources.resources).toBeDefined();
@@ -620,27 +592,18 @@ interface Employees {
     ]);
   });
   it("collects operation information for extension resources", async () => {
-    const { program, diagnostics } = await compileAndDiagnose(`
+    const { program } = await Tester.compile(`
       using Azure.Core;
 
-/** Contoso Resource Provider management API. */
 @armProviderNamespace
-@service(#{ title: "ContosoProviderHubClient" })
-@versioned(Versions)
 namespace Microsoft.ContosoProviderHub;
 
-/** Contoso API versions */
-enum Versions {
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  v2020_10_01_preview: "2021-10-01-preview",
-}
+interface Operations extends Azure.ResourceManager.Operations {}
 
-/** A ContosoProviderHub resource */
 model Employee is ExtensionResource<EmployeeProperties> {
   ...ResourceNameParameter<Employee>;
 }
 
-/** Employee properties */
 model EmployeeProperties {
   age?: int32;
 
@@ -649,23 +612,11 @@ model EmployeeProperties {
   provisioningState?: ProvisioningState;
 }
 
-/** The provisioning state of a resource. */
 @lroStatus
 union ProvisioningState {
   ResourceProvisioningState,
-
-  Provisioning: "Provisioning",
-
-  Updating: "Updating",
-
-  Deleting: "Deleting",
-
-  Accepted: "Accepted",
-
   string,
 }
-
-interface Operations extends Azure.ResourceManager.Operations {}
 
 interface EmplOps<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
   get is Extension.Read<Scope, Employee>;
@@ -681,7 +632,6 @@ interface EmplOps<Scope extends Azure.ResourceManager.Foundations.SimpleResource
   move is Extension.ActionSync<Scope, Employee, MoveRequest, MoveResponse>;
 }
 
-/** Virtual resource for a virtual machine */
 alias VirtualMachine = Extension.ExternalResource<
   "Microsoft.Compute",
   "virtualMachines",
@@ -723,14 +673,11 @@ interface VirtualMachines extends EmplOps<VirtualMachine> {}
 @armResourceOperations
 interface ScaleSetVms extends EmplOps<VirtualMachineScaleSetVm> {}
 
-/** Employee move request */
 model MoveRequest {
   from: string;
-
   to: string;
 }
 
-/** Employee move response */
 model MoveResponse {
   movingStatus: string;
 }
@@ -746,11 +693,8 @@ alias GenericResourceParameters = {
   providerNamespace: string;
 
   @path @key parentType: string;
-
   @path @key parentName: string;
-
   @path @key resourceType: string;
-
   @path @key resourceName: string;
 };
 
@@ -759,7 +703,6 @@ alias ParentParameters = {
   ...ParentKeysOf<Employee>;
 };
 
-#suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-interface-requires-decorator"
 interface GenericOps
   extends Azure.ResourceManager.Legacy.ExtensionOperations<
       GenericResourceParameters,
@@ -783,7 +726,6 @@ interface GenericResources {
 }
 
       `);
-    expectDiagnosticEmpty(diagnostics);
     const resources = resolveArmResources(program);
     expect(resources).toMatchObject({
       resources: expect.any(Array),
@@ -1007,30 +949,21 @@ interface GenericResources {
   });
 
   it("collects operation information for private endpoints", async () => {
-    const { program, diagnostics } = await compileAndDiagnose(`
+    const { program } = await Tester.compile(`
 
 using Azure.Core;
 
-/** Contoso Resource Provider management API. */
 @armProviderNamespace
-@service(#{ title: "ContosoProviderHubClient" })
-@versioned(Versions)
 namespace Microsoft.ContosoProviderHub;
 
-/** Contoso API versions */
-enum Versions {
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  v2021_20_01_preview: "2021-10-01-preview",
-}
+interface Operations extends Azure.ResourceManager.Operations {}
 
 // For more information about the proxy vs tracked,
 // see https://armwiki.azurewebsites.net/rp_onboarding/tracked_vs_proxy_resources.html?q=proxy%20resource
-/** A ContosoProviderHub resource */
 model Employee is TrackedResource<EmployeeProperties> {
   ...ResourceNameParameter<Employee>;
 }
 
-/** Employee properties */
 model EmployeeProperties {
   age?: int32;
 
@@ -1039,7 +972,6 @@ model EmployeeProperties {
   provisioningState?: ProvisioningState;
 }
 
-/** The provisioning state of a resource. */
 @lroStatus
 union ProvisioningState {
   ResourceProvisioningState,
@@ -1054,8 +986,6 @@ union ProvisioningState {
 
   string,
 }
-
-interface Operations extends Azure.ResourceManager.Operations {}
 
 model PrivateEndpointConnection is PrivateEndpointConnectionResource;
 alias PrivateEndpointOperations = PrivateEndpoints<PrivateEndpointConnection>;
@@ -1082,14 +1012,12 @@ interface Employees {
   listPrivateEndpointConnections is PrivateEndpointOperations.ListByParent<Employee>;
 }
 
-/** Employee move request */
 model MoveRequest {
   from: string;
 
   to: string;
 }
 
-/** Employee move response */
 model MoveResponse {
   movingStatus: string;
 }
@@ -1111,23 +1039,19 @@ interface Dependents {
   listPrivateEndpointConnections is PrivateEndpointOperations.ListByParent<Dependent>;
 }
 
-/** An employee dependent */
 @parentResource(Employee)
 model Dependent is ProxyResource<DependentProperties> {
   ...ResourceNameParameter<Dependent>;
 }
 
-/** Dependent properties */
 model DependentProperties {
   age: int32;
-
   gender: string;
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
 }
 `);
-    expectDiagnosticEmpty(diagnostics);
     const resources = resolveArmResources(program);
     expect(resources).toBeDefined();
     expect(resources.resources).toBeDefined();

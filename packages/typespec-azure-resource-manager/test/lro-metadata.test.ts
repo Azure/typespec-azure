@@ -1,38 +1,31 @@
 import { LroMetadata, getLroMetadata } from "@azure-tools/typespec-azure-core";
-import { Diagnostic, Model } from "@typespec/compiler";
-import { BasicTestRunner, expectDiagnosticEmpty } from "@typespec/compiler/testing";
+import { Model, Program } from "@typespec/compiler";
 import { HttpOperation, getAllHttpServices } from "@typespec/http";
 import { deepStrictEqual, ok } from "assert";
-import { describe, it } from "vitest";
-import { createAzureResourceManagerTestRunner } from "./test-host.js";
+import { it } from "vitest";
+import { Tester } from "./tester.js";
 
-async function getOperations(
-  code: string,
-): Promise<[HttpOperation[], readonly Diagnostic[], BasicTestRunner]> {
-  const runner = await createAzureResourceManagerTestRunner();
-  await runner.compileAndDiagnose(code, { noEmit: true });
-  const [services] = getAllHttpServices(runner.program);
-  return [services[0].operations, runner.program.diagnostics, runner];
+async function getOperations(code: string): Promise<[HttpOperation[], Program]> {
+  const { program } = await Tester.compile(code);
+  const [services] = getAllHttpServices(program);
+  return [services[0].operations, program];
 }
 
 async function getLroMetadataFor(
   code: string,
   operationName: string,
-): Promise<[LroMetadata | undefined, readonly Diagnostic[], BasicTestRunner]> {
-  const [operations, diagnostics, runner] = await getOperations(code);
+): Promise<LroMetadata | undefined> {
+  const [operations, program] = await getOperations(code);
   const filteredOperations = operations.filter((o) => o.operation.name === operationName);
   ok(filteredOperations?.length > 0);
   const outOperation = filteredOperations[0];
-  return [getLroMetadata(runner.program, outOperation.operation), diagnostics, runner];
+  return getLroMetadata(program, outOperation.operation);
 }
-describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
-  it("Returns correct metadata for Async CreateOrUpdate", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
+it("Returns correct metadata for Async CreateOrUpdate", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
-
-      interface Operations extends Azure.ResourceManager.Operations {}
 
       enum ResourceState {
        Succeeded,
@@ -41,7 +34,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
      }
 
       model WidgetProperties {
-        simpleArmId: ResourceIdentifier;
+        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -63,22 +56,20 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
       
       `,
-      "createOrUpdate",
-    );
-    ok(metadata);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
-  });
+    "createOrUpdate",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
+});
 
-  it("Returns correct metadata for Async CreateOrUpdate with final location", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
+it("Returns correct metadata for Async CreateOrUpdate with final location", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
-
-      interface Operations extends Azure.ResourceManager.Operations {}
 
       enum ResourceState {
        Succeeded,
@@ -87,7 +78,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
      }
 
       model WidgetProperties {
-        simpleArmId: ResourceIdentifier;
+        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -117,22 +108,20 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
       
       `,
-      "createOrUpdate",
-    );
-    ok(metadata);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "location");
-  });
+    "createOrUpdate",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "location");
+});
 
-  it("Returns correct metadata for Async Update", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
+it("Returns correct metadata for Async Update", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
-
-      interface Operations extends Azure.ResourceManager.Operations {}
 
       enum ResourceState {
        Succeeded,
@@ -141,7 +130,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
      }
 
       model WidgetProperties {
-        simpleArmId: ResourceIdentifier;
+        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -162,22 +151,20 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         listBySubscription is ArmListBySubscription<Widget>;
       }
       `,
-      "update",
-    );
-    ok(metadata);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "location");
-  });
+    "update",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "location");
+});
 
-  it("Returns correct metadata for Async Delete", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
+it("Returns correct metadata for Async Delete", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
-
-      interface Operations extends Azure.ResourceManager.Operations {}
 
       enum ResourceState {
        Succeeded,
@@ -186,8 +173,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
      }
 
       model WidgetProperties {
-        simpleArmId: ResourceIdentifier;
-
+        simpleArmId: Azure.Core.armResourceIdentifier;
         provisioningState: ResourceState;
       }
 
@@ -202,27 +188,26 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
+        #suppress "deprecated" "test"
         delete is ArmResourceDeleteAsync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
         listBySubscription is ArmListBySubscription<Widget>;
       }
       `,
-      "delete",
-    );
-    ok(metadata);
-    deepStrictEqual(metadata.finalResult, "void");
-    deepStrictEqual(metadata.finalEnvelopeResult, "void");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "location");
-  });
+    "delete",
+  );
+  ok(metadata);
+  deepStrictEqual(metadata.finalResult, "void");
+  deepStrictEqual(metadata.finalEnvelopeResult, "void");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "location");
+});
 
-  it("Returns correct metadata for Async action", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
+it("Returns correct metadata for Async action", async () => {
+  const metadata = await getLroMetadataFor(
+    `
   @armProviderNamespace
       namespace Microsoft.Test;
-
-      interface Operations extends Azure.ResourceManager.Operations {}
 
       enum ResourceState {
        Succeeded,
@@ -231,7 +216,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
      }
 
       model WidgetProperties {
-        simpleArmId: ResourceIdentifier;
+        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -262,21 +247,19 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         listBySubscription is ArmListBySubscription<Widget>;
       }
       `,
-      "doStuff",
-    );
-    ok(metadata);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "ResultModel");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "ResultModel");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "location");
-  });
-  it("Returns correct metadata for Async action with void return type", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
+    "doStuff",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "ResultModel");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "ResultModel");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "location");
+});
+it("Returns correct metadata for Async action with void return type", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
-
-      interface Operations extends Azure.ResourceManager.Operations {}
 
       enum ResourceState {
        Succeeded,
@@ -285,7 +268,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
      }
 
       model WidgetProperties {
-        simpleArmId: ResourceIdentifier;
+        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -316,22 +299,20 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         listBySubscription is ArmListBySubscription<Widget>;
       }
       `,
-      "doStuff",
-    );
-    ok(metadata);
-    deepStrictEqual(metadata.finalResult, "void");
-    deepStrictEqual(metadata.finalEnvelopeResult, "void");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
-  });
+    "doStuff",
+  );
+  ok(metadata);
+  deepStrictEqual(metadata.finalResult, "void");
+  deepStrictEqual(metadata.finalEnvelopeResult, "void");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
+});
 
-  it("Returns correct metadata for Async CreateOrUpdate with union type ProvisioningState", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
+it("Returns correct metadata for Async CreateOrUpdate with union type ProvisioningState", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
-
-      interface Operations extends Azure.ResourceManager.Operations {}
 
       union ResourceState {
        Succeeded: "Succeeded",
@@ -341,7 +322,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
      }
 
       model WidgetProperties {
-        simpleArmId: ResourceIdentifier;
+        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -363,22 +344,20 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
       
       `,
-      "createOrUpdate",
-    );
-    ok(metadata);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
-  });
+    "createOrUpdate",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
+});
 
-  it("Returns correct metadata for Async CreateOrUpdate with final location, with union type ProvisioningState", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
+it("Returns correct metadata for Async CreateOrUpdate with final location, with union type ProvisioningState", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
-
-      interface Operations extends Azure.ResourceManager.Operations {}
 
       union ResourceState {
         Succeeded: "Succeeded",
@@ -387,7 +366,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
 
       model WidgetProperties {
-        simpleArmId: ResourceIdentifier;
+        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -417,22 +396,20 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
       
       `,
-      "createOrUpdate",
-    );
-    ok(metadata);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "location");
-  });
+    "createOrUpdate",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "location");
+});
 
-  it("Returns correct metadata for Async CreateOrUpdate with final operation, with union type ProvisioningState", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
+it("Returns correct metadata for Async CreateOrUpdate with final operation, with union type ProvisioningState", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
-
-      interface Operations extends Azure.ResourceManager.Operations {}
 
       union ResourceState {
         Succeeded: "Succeeded",
@@ -441,7 +418,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
 
       model WidgetProperties {
-        simpleArmId: ResourceIdentifier;
+        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -464,22 +441,20 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
       
       `,
-      "createOrUpdate",
-    );
-    ok(metadata);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
-  });
+    "createOrUpdate",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "azure-async-operation");
+});
 
-  it("Returns correct metadata for Async Update with final operation, with union type ProvisioningState", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
+it("Returns correct metadata for Async Update with final operation, with union type ProvisioningState", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
-
-      interface Operations extends Azure.ResourceManager.Operations {}
 
       union ResourceState {
         Succeeded: "Succeeded",
@@ -488,7 +463,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
 
       model WidgetProperties {
-        simpleArmId: ResourceIdentifier;
+        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -511,22 +486,20 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
       
       `,
-      "update",
-    );
-    ok(metadata);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "original-uri");
-  });
+    "update",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "original-uri");
+});
 
-  it("Returns correct metadata for Async Update with union type ProvisioningState", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
+it("Returns correct metadata for Async Update with union type ProvisioningState", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
-
-      interface Operations extends Azure.ResourceManager.Operations {}
 
       union ResourceState {
         Succeeded: "Succeeded",
@@ -535,7 +508,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
 
       model WidgetProperties {
-        simpleArmId: ResourceIdentifier;
+        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -556,22 +529,20 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         listBySubscription is ArmListBySubscription<Widget>;
       }
       `,
-      "update",
-    );
-    ok(metadata);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "location");
-  });
+    "update",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "location");
+});
 
-  it("Returns correct metadata for Async Delete with union type ProvisioningState", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
+it("Returns correct metadata for Async Delete with union type ProvisioningState", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
-
-      interface Operations extends Azure.ResourceManager.Operations {}
 
       union ResourceState {
         Succeeded: "Succeeded",
@@ -580,7 +551,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
 
       model WidgetProperties {
-        simpleArmId: ResourceIdentifier;
+        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -596,27 +567,26 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
         update is ArmResourcePatchSync<Widget, WidgetProperties>;
+        #suppress "deprecated" "test"
         delete is ArmResourceDeleteAsync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
         listBySubscription is ArmListBySubscription<Widget>;
       }
       `,
-      "delete",
-    );
-    ok(metadata);
-    deepStrictEqual(metadata.finalResult, "void");
-    deepStrictEqual(metadata.finalEnvelopeResult, "void");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "location");
-  });
+    "delete",
+  );
+  ok(metadata);
+  deepStrictEqual(metadata.finalResult, "void");
+  deepStrictEqual(metadata.finalEnvelopeResult, "void");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "location");
+});
 
-  it("Returns correct metadata for Async action with union type ProvisioningState", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
+it("Returns correct metadata for Async action with union type ProvisioningState", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
-
-      interface Operations extends Azure.ResourceManager.Operations {}
 
       union ResourceState {
         Succeeded: "Succeeded",
@@ -625,7 +595,7 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
 
       model WidgetProperties {
-        simpleArmId: ResourceIdentifier;
+        simpleArmId: Azure.Core.armResourceIdentifier;
 
         provisioningState: ResourceState;
       }
@@ -656,22 +626,20 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
         listBySubscription is ArmListBySubscription<Widget>;
       }
       `,
-      "doStuff",
-    );
-    ok(metadata);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "ResultModel");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "ResultModel");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "location");
-  });
+    "doStuff",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "ResultModel");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "ResultModel");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "location");
+});
 
-  it("Returns correct metadata for Async CreateOrUpdate with final location, with mixed union type ProvisioningState", async () => {
-    const [metadata, _diag, _runner] = await getLroMetadataFor(
-      `
-  @armProviderNamespace
+it("Returns correct metadata for Async CreateOrUpdate with final location, with mixed union type ProvisioningState", async () => {
+  const metadata = await getLroMetadataFor(
+    `
+      @armProviderNamespace
       namespace Microsoft.Test;
-
-      interface Operations extends Azure.ResourceManager.Operations {}
 
       union BaseState {
         Succeeded: "Succeeded",
@@ -712,13 +680,11 @@ describe("typespec-azure-resource-manager: ARM LRO Tests", () => {
       }
       
       `,
-      "createOrUpdate",
-    );
-    ok(metadata);
-    expectDiagnosticEmpty(_diag);
-    deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
-    deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
-    deepStrictEqual(metadata.finalResultPath, undefined);
-    deepStrictEqual(metadata.finalStateVia, "location");
-  });
+    "createOrUpdate",
+  );
+  ok(metadata);
+  deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
+  deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
+  deepStrictEqual(metadata.finalResultPath, undefined);
+  deepStrictEqual(metadata.finalStateVia, "location");
 });
