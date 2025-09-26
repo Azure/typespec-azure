@@ -1,11 +1,9 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { Diagnostic, Program, Type } from "@typespec/compiler";
 import { createTestHost, createTestWrapper } from "@typespec/compiler/testing";
 import { HttpTestLibrary } from "@typespec/http/testing";
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { RestTestLibrary } from "@typespec/rest/testing";
 import { VersioningTestLibrary } from "@typespec/versioning/testing";
-import { $lib } from "../src/lib.js";
 import { AzureResourceManagerTestLibrary } from "../src/testing/index.js";
 
 export async function createAzureResourceManagerTestHost() {
@@ -26,16 +24,4 @@ export async function createAzureResourceManagerTestRunner() {
   return createTestWrapper(host, {
     autoUsings: [`Azure.ResourceManager`, `TypeSpec.Http`, `TypeSpec.Rest`, `TypeSpec.Versioning`],
   });
-}
-
-export async function compileAndDiagnose(
-  code: string,
-): Promise<{ program: Program; types: Record<string, Type>; diagnostics: readonly Diagnostic[] }> {
-  const runner = await createAzureResourceManagerTestRunner();
-  const [types, diagnostics] = await runner.compileAndDiagnose(code);
-  return { program: runner.program, types, diagnostics };
-}
-
-export function getDiagnostic(code: keyof typeof $lib.diagnostics, diagnostics: Diagnostic[]) {
-  return diagnostics.filter((diag) => diag.code === `${$lib.name}/${code}`);
 }

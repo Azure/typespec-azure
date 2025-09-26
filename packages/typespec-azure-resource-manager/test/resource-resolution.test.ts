@@ -505,10 +505,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 model EmployeeProperties {
   age?: int32;
 
-  city?: string;
-
-  @encode("base64url")
-  profile?: bytes;
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -648,10 +644,6 @@ model Employee is ExtensionResource<EmployeeProperties> {
 model EmployeeProperties {
   age?: int32;
 
-  city?: string;
-
-  @encode("base64url")
-  profile?: bytes;
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
@@ -1042,10 +1034,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 model EmployeeProperties {
   age?: int32;
 
-  city?: string;
-
-  @encode("base64url")
-  profile?: bytes;
 
   @visibility(Lifecycle.Read)
   provisioningState?: ProvisioningState;
