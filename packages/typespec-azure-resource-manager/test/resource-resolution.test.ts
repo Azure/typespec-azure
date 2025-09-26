@@ -5,8 +5,8 @@ import {
   getResourcePathElements,
   isResourceOperationMatch,
   resolveArmResources,
-  ResolvedOperationResourceInfo,
-  ResolvedOperations,
+  ResolvedResource,
+  ResolvedResourceInfo,
   ResourceType,
 } from "../src/resource.js";
 import { Tester } from "./tester.js";
@@ -55,7 +55,7 @@ function checkArmOperationsHas(
   }
 }
 
-function checkResolvedOperations(operations: ResolvedOperations, check: ResolvedOperationsCheck) {
+function checkResolvedOperations(operations: ResolvedResource, check: ResolvedOperationsCheck) {
   expect(operations.resourceType).toEqual(check.resourceType);
   expect(operations.resourceInstancePath).toEqual(check.resourceInstancePath);
   if (check.operations.actions) {
@@ -109,7 +109,7 @@ describe("unit tests for resource manager helpers", () => {
       title: string;
       path: string;
       kind: ArmOperationKind;
-      expected: ResolvedOperationResourceInfo;
+      expected: ResolvedResourceInfo;
     }[] = [
       {
         title: "tracked resource path",
@@ -534,19 +534,19 @@ interface Employees {
 `);
     const resources = resolveArmResources(program);
     expect(resources).toBeDefined();
-    expect(resources.resources).toBeDefined();
-    expect(resources.resources).toHaveLength(1);
-    ok(resources.resources);
-    const employee = resources.resources[0];
+    expect(resources.resourceModels).toBeDefined();
+    expect(resources.resourceModels).toHaveLength(1);
+    ok(resources.resourceModels);
+    const employee = resources.resourceModels[0];
     ok(employee);
     expect(employee).toMatchObject({
       kind: "Tracked",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
-      operations: expect.any(Array),
+      resources: expect.any(Array),
     });
-    ok(employee.operations);
-    const subscriptionScope = employee.operations[0];
+    ok(employee.resources);
+    const subscriptionScope = employee.resources[0];
     ok(subscriptionScope);
     checkResolvedOperations(subscriptionScope, {
       operations: {
@@ -561,7 +561,7 @@ interface Employees {
         "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{name}",
     });
 
-    const mainScope = employee.operations[1];
+    const mainScope = employee.resources[1];
     ok(mainScope);
     checkResolvedOperations(mainScope, {
       operations: {
@@ -584,7 +584,7 @@ interface Employees {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    checkArmOperationsHas(resources.unassociatedOperations, [
+    checkArmOperationsHas(resources.providerOperations, [
       { operationGroup: "Employees", name: "checkExistence", kind: "other" },
       { operationGroup: "Operations", name: "list", kind: "other" },
     ]);
@@ -726,20 +726,20 @@ interface GenericResources {
       `);
     const resources = resolveArmResources(program);
     expect(resources).toMatchObject({
-      resources: expect.any(Array),
-      unassociatedOperations: expect.any(Array),
+      resourceModels: expect.any(Array),
+      providerOperations: expect.any(Array),
     });
-    ok(resources.resources);
-    const employee = resources.resources[0];
+    ok(resources.resourceModels);
+    const employee = resources.resourceModels[0];
     ok(employee);
     expect(employee).toMatchObject({
       kind: "Extension",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
-      operations: expect.any(Array),
+      resources: expect.any(Array),
     });
-    ok(employee.operations);
-    const tenant = employee.operations[0];
+    ok(employee.resources);
+    const tenant = employee.resources[0];
     ok(tenant);
     checkResolvedOperations(tenant, {
       operations: {
@@ -759,7 +759,7 @@ interface GenericResources {
       resourceInstancePath: "/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const scope = employee.operations[1];
+    const scope = employee.resources[1];
     ok(scope);
     checkResolvedOperations(scope, {
       operations: {
@@ -780,7 +780,7 @@ interface GenericResources {
         "/{scope}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const subscription = employee.operations[2];
+    const subscription = employee.resources[2];
     ok(subscription);
     checkResolvedOperations(subscription, {
       operations: {
@@ -803,7 +803,7 @@ interface GenericResources {
         "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const managementGroups = employee.operations[3];
+    const managementGroups = employee.resources[3];
     ok(managementGroups);
     checkResolvedOperations(managementGroups, {
       operations: {
@@ -826,7 +826,7 @@ interface GenericResources {
         "/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const resourceGroup = employee.operations[4];
+    const resourceGroup = employee.resources[4];
     ok(resourceGroup);
     checkResolvedOperations(resourceGroup, {
       operations: {
@@ -849,7 +849,7 @@ interface GenericResources {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const vms = employee.operations[5];
+    const vms = employee.resources[5];
     ok(vms);
     checkResolvedOperations(vms, {
       operations: {
@@ -872,7 +872,7 @@ interface GenericResources {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const scaleSets = employee.operations[6];
+    const scaleSets = employee.resources[6];
     ok(scaleSets);
     checkResolvedOperations(scaleSets, {
       operations: {
@@ -895,7 +895,7 @@ interface GenericResources {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{scaleSetName}/virtualMachineScaleSetVms/{scaleSetVmName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const generics = employee.operations[7];
+    const generics = employee.resources[7];
     ok(generics);
     checkResolvedOperations(generics, {
       operations: {
@@ -917,31 +917,31 @@ interface GenericResources {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerNamespace}/{parentType}/{parentName}/{resourceType}/{resourceName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const externalVm = resources.resources[1];
+    const externalVm = resources.resourceModels[1];
     expect(externalVm).toMatchObject({
       kind: "Virtual",
       providerNamespace: "Microsoft.Compute",
       type: expect.anything(),
-      operations: [],
+      resources: [],
     });
 
-    const externalScaleSet = resources.resources[2];
+    const externalScaleSet = resources.resourceModels[2];
     expect(externalScaleSet).toMatchObject({
       kind: "Virtual",
       providerNamespace: "Microsoft.Compute",
       type: expect.anything(),
-      operations: [],
+      resources: [],
     });
 
-    const externalManagementGroup = resources.resources[3];
+    const externalManagementGroup = resources.resourceModels[3];
     expect(externalManagementGroup).toMatchObject({
       kind: "Virtual",
       providerNamespace: "Microsoft.Management",
       type: expect.anything(),
-      operations: [],
+      resources: [],
     });
 
-    checkArmOperationsHas(resources.unassociatedOperations, [
+    checkArmOperationsHas(resources.providerOperations, [
       { operationGroup: "Operations", name: "list", kind: "other" },
     ]);
   });
@@ -1052,19 +1052,19 @@ model DependentProperties {
 `);
     const resources = resolveArmResources(program);
     expect(resources).toBeDefined();
-    expect(resources.resources).toBeDefined();
-    expect(resources.resources).toHaveLength(3);
-    ok(resources.resources);
-    const employee = resources.resources[0];
+    expect(resources.resourceModels).toBeDefined();
+    expect(resources.resourceModels).toHaveLength(3);
+    ok(resources.resourceModels);
+    const employee = resources.resourceModels[0];
     ok(employee);
     expect(employee).toMatchObject({
       kind: "Tracked",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
-      operations: expect.any(Array),
+      resources: expect.any(Array),
     });
-    ok(employee.operations);
-    const subscriptionScope = employee.operations[0];
+    ok(employee.resources);
+    const subscriptionScope = employee.resources[0];
     ok(subscriptionScope);
     checkResolvedOperations(subscriptionScope, {
       operations: {
@@ -1079,7 +1079,7 @@ model DependentProperties {
         "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{name}",
     });
 
-    const mainScope = employee.operations[1];
+    const mainScope = employee.resources[1];
     ok(mainScope);
     checkResolvedOperations(mainScope, {
       operations: {
@@ -1102,17 +1102,17 @@ model DependentProperties {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const dependent = resources.resources[2];
+    const dependent = resources.resourceModels[2];
     ok(dependent);
     expect(dependent).toMatchObject({
       kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
-      operations: expect.any(Array),
+      resources: expect.any(Array),
     });
-    ok(dependent.operations);
-    expect(dependent.operations).toHaveLength(1);
-    const instanceScope = dependent.operations[0];
+    ok(dependent.resources);
+    expect(dependent.resources).toHaveLength(1);
+    const instanceScope = dependent.resources[0];
     ok(instanceScope);
     checkResolvedOperations(instanceScope, {
       operations: {
@@ -1134,11 +1134,11 @@ model DependentProperties {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}",
     });
 
-    const privateEndpointConnection = resources.resources[1];
+    const privateEndpointConnection = resources.resourceModels[1];
     ok(privateEndpointConnection);
-    ok(privateEndpointConnection.operations);
-    expect(privateEndpointConnection.operations).toHaveLength(2);
-    const privateForEmplInstance = privateEndpointConnection.operations[0];
+    ok(privateEndpointConnection.resources);
+    expect(privateEndpointConnection.resources).toHaveLength(2);
+    const privateForEmplInstance = privateEndpointConnection.resources[0];
     ok(privateForEmplInstance);
     checkResolvedOperations(privateForEmplInstance, {
       operations: {
@@ -1180,7 +1180,7 @@ model DependentProperties {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/privateEndpointConnections/{privateEndpointConnectionName}",
     });
 
-    const privateForDepInstance = privateEndpointConnection.operations[1];
+    const privateForDepInstance = privateEndpointConnection.resources[1];
     ok(privateForDepInstance);
 
     checkResolvedOperations(privateForDepInstance, {
@@ -1223,9 +1223,238 @@ model DependentProperties {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}/privateEndpointConnections/{privateEndpointConnectionName}",
     });
 
-    checkArmOperationsHas(resources.unassociatedOperations, [
+    checkArmOperationsHas(resources.providerOperations, [
       { operationGroup: "Employees", name: "checkExistence", kind: "other" },
       { operationGroup: "Operations", name: "list", kind: "other" },
     ]);
+  });
+
+  it("collects operation information for legacy endpoints", async () => {
+    const { program, diagnostics } = await compileAndDiagnose(`
+
+using Azure.Core;
+
+/** Contoso Resource Provider management API. */
+@armProviderNamespace
+@service(#{ title: "ContosoProviderHubClient" })
+@versioned(Versions)
+namespace Microsoft.ContosoProviderHub;
+
+/** Contoso API versions */
+enum Versions {
+  /** 2021-10-01-preview version */
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v2021_20_01_preview: "2021-10-01-preview",
+}
+
+// For more information about the proxy vs tracked,
+// see https://armwiki.azurewebsites.net/rp_onboarding/tracked_vs_proxy_resources.html?q=proxy%20resource
+/** A ContosoProviderHub resource */
+model Employee is ProxyResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+/** Employee properties */
+model EmployeeProperties {
+  /** Age of employee */
+  age?: int32;
+
+  /** City of employee */
+  city?: string;
+
+  /** Profile of employee */
+  @encode("base64url")
+  profile?: bytes;
+
+  /** The status of the last operation. */
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+/** The provisioning state of a resource. */
+@lroStatus
+union ProvisioningState {
+  ResourceProvisioningState,
+
+  /** The resource is being provisioned */
+  Provisioning: "Provisioning",
+
+  /** The resource is updating */
+  Updating: "Updating",
+
+  /** The resource is being deleted */
+  Deleting: "Deleting",
+
+  /** The resource create request has been accepted */
+  Accepted: "Accepted",
+
+  string,
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+alias EmployeeRoomOps = Azure.ResourceManager.Legacy.LegacyOperations<
+  {
+    ...ApiVersionParameter;
+    ...SubscriptionIdParameter;
+    ...ResourceGroupParameter;
+    ...Azure.ResourceManager.Legacy.Provider;
+
+    /** The name of the API Management service. */
+    @path
+    @segment("buildings")
+    @key
+    @pattern("^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$")
+    buildingName: string;
+
+    /** API identifier. Must be unique in the current API Management service instance. */
+    @path
+    @segment("rooms")
+    @key
+    roomId: string;
+  },
+  {
+    /** Diagnostic identifier. Must be unique in the current API Management service instance. */
+    @path
+    @segment("employeeResources")
+    @key
+    @pattern("^[^*#&+:<>?]+$")
+    employeeId: string;
+  }
+>;
+
+alias EmployeeBuildingOps = Azure.ResourceManager.Legacy.LegacyOperations<
+  {
+    ...ApiVersionParameter;
+    ...SubscriptionIdParameter;
+    ...ResourceGroupParameter;
+    ...Azure.ResourceManager.Legacy.Provider;
+
+    /** The name of the API Management service. */
+    @path
+    @segment("buildings")
+    @key
+    @pattern("^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$")
+    buildingName: string;
+  },
+  {
+    /** Diagnostic identifier. Must be unique in the current API Management service instance. */
+    @path
+    @segment("employeeResources")
+    @key
+    @pattern("^[^*#&+:<>?]+$")
+    employeeId: string;
+  }
+>;
+
+@armResourceOperations
+interface EmployeesByBuilding {
+  get is EmployeeBuildingOps.Read<Employee>;
+  createOrUpdate is EmployeeBuildingOps.CreateOrUpdateAsync<Employee>;
+  update is EmployeeBuildingOps.CustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+  delete is EmployeeBuildingOps.DeleteSync<Employee>;
+  list is EmployeeBuildingOps.List<Employee>;
+  /** A sample resource action that move employee to different location */
+  move is EmployeeBuildingOps.ActionSync<Employee, MoveRequest, MoveResponse>;
+}
+
+@armResourceOperations
+interface EmployeesByRoom {
+  get is EmployeeRoomOps.Read<Employee>;
+  createOrUpdate is EmployeeRoomOps.CreateOrUpdateAsync<Employee>;
+  update is EmployeeRoomOps.CustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+  delete is EmployeeRoomOps.DeleteSync<Employee>;
+  list is EmployeeRoomOps.List<Employee>;
+  /** A sample resource action that move employee to different location */
+  move is EmployeeRoomOps.ActionSync<Employee, MoveRequest, MoveResponse>;
+}
+
+/** Employee move request */
+model MoveRequest {
+  /** The moving from location */
+  from: string;
+
+  /** The moving to location */
+  to: string;
+}
+
+/** Employee move response */
+model MoveResponse {
+  /** The status of the move */
+  movingStatus: string;
+}
+`);
+    expectDiagnosticEmpty(diagnostics);
+    const resources = resolveArmResources(program);
+    expect(resources).toBeDefined();
+    expect(resources.resourceModels).toBeDefined();
+    expect(resources.resourceModels).toHaveLength(1);
+    ok(resources.resourceModels);
+    const employee = resources.resourceModels[0];
+    ok(employee);
+    expect(employee).toMatchObject({
+      kind: "Proxy",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      resources: expect.any(Array),
+    });
+    ok(employee.resources);
+    const buildingScope = employee.resources[0];
+
+    ok(buildingScope);
+    checkResolvedOperations(buildingScope, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            {
+              operationGroup: "EmployeesByBuilding",
+              name: "createOrUpdate",
+              kind: "createOrUpdate",
+            },
+          ],
+          delete: [{ operationGroup: "EmployeesByBuilding", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "EmployeesByBuilding", name: "get", kind: "read" }],
+          update: [{ operationGroup: "EmployeesByBuilding", name: "update", kind: "update" }],
+        },
+        actions: [{ operationGroup: "EmployeesByBuilding", name: "move", kind: "action" }],
+        lists: [{ operationGroup: "EmployeesByBuilding", name: "list", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["buildings", "employeeResources"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/employeeResources/{employeeId}",
+    });
+
+    const roomScope = employee.resources[1];
+
+    ok(roomScope);
+    checkResolvedOperations(roomScope, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            { operationGroup: "EmployeesByRoom", name: "createOrUpdate", kind: "createOrUpdate" },
+          ],
+          delete: [{ operationGroup: "EmployeesByRoom", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "EmployeesByRoom", name: "get", kind: "read" }],
+          update: [{ operationGroup: "EmployeesByRoom", name: "update", kind: "update" }],
+        },
+        actions: [{ operationGroup: "EmployeesByRoom", name: "move", kind: "action" }],
+        lists: [{ operationGroup: "EmployeesByRoom", name: "list", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["buildings", "rooms", "employeeResources"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/rooms/{roomId}/employeeResources/{employeeId}",
+    });
   });
 });

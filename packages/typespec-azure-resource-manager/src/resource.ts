@@ -116,7 +116,7 @@ export interface ArmVirtualResourceDetails {
 }
 
 /** New base details for resolved resources */
-export interface ResourceMetadata {
+export interface ResourceModelMetadata {
   /** The model type for the resource */
   type: Model;
   /** The kind of resource (extension | tracked | proxy | custom | virtual | built-in) */
@@ -126,18 +126,18 @@ export interface ResourceMetadata {
 }
 
 /** New details for a resolved resource */
-export interface ResolvedResource extends ResourceMetadata {
+export interface ResourceModel extends ResourceModelMetadata {
   /** The set of resolved operations for a resource.  For most 
         resources there will be 1 returned record */
-  operations?: ResolvedOperations[];
-}
-
-export interface ResolvedResources {
   resources?: ResolvedResource[];
-  unassociatedOperations?: ArmResourceOperation[];
 }
 
-export interface ResolvedOperationResourceInfo {
+export interface Provider {
+  resourceModels?: ResourceModel[];
+  providerOperations?: ArmResourceOperation[];
+}
+
+export interface ResolvedResourceInfo {
   /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
   resourceType: ResourceType;
   /** The path to the instance of a resource */
@@ -145,7 +145,7 @@ export interface ResolvedOperationResourceInfo {
 }
 
 /** Resolved operations, including operations for non-arm resources */
-export interface ResolvedOperations extends ResolvedOperationResourceInfo {
+export interface ResolvedResource extends ResolvedResourceInfo {
   /** The lifecycle and action operations using this resourceInstancePath (or the parent path) */
   operations: ArmResolvedOperationsForResource;
   /** Other operations associated with this resource */
@@ -383,39 +383,41 @@ export function getArmResources(program: Program): ArmResourceDetails[] {
   return resources;
 }
 
-export const [getResolvedResources, setResolvedResources] = useStateMap<
-  Namespace,
-  ResolvedResources
->(ArmStateKeys.armResolvedResources);
+export const [getResolvedResources, setResolvedResources] = useStateMap<Namespace, Provider>(
+  ArmStateKeys.armResolvedResources,
+);
 
-export function resolveArmResources(program: Program): ResolvedResources {
+export function resolveArmResources(program: Program): Provider {
   const provider = resolveProviderNamespace(program);
   if (provider === undefined) return {};
   const resolvedResources = getResolvedResources(program, provider);
-  if (resolvedResources?.resources !== undefined && resolvedResources.resources.length > 0) {
+  if (
+    resolvedResources?.resourceModels !== undefined &&
+    resolvedResources.resourceModels.length > 0
+  ) {
     // Return the cached resource details
     return resolvedResources;
   }
 
   // We haven't generated the full resource details yet
-  const resources: ResolvedResource[] = [];
+  const resources: ResourceModel[] = [];
   for (const resource of listArmResources(program)) {
     const operations = resolveArmResourceOperations(program, resource.typespecType);
-    const fullResource: ResolvedResource = {
+    const fullResource: ResourceModel = {
       type: resource.typespecType,
       kind:
         getArmResourceKind(resource.typespecType) ??
         (operations.length > 0 ? "Tracked" : "Virtual"),
       providerNamespace: resource.armProviderNamespace,
-      operations: operations,
+      resources: operations,
     };
     resources.push(fullResource);
   }
 
   // Add the unmarked operations
-  const resolved = {
-    resources: resources,
-    unassociatedOperations: getUnassociatedOperations(program).filter(
+  const resolved: Provider = {
+    resourceModels: resources,
+    providerOperations: getUnassociatedOperations(program).filter(
       (op) => !isArmResourceOperation(program, op.operation),
     ),
   };
@@ -431,14 +433,14 @@ function isVariableSegment(segment: string): boolean {
 function getResourceInfo(
   program: Program,
   operation: ArmResourceOperation,
-): ResolvedOperationResourceInfo | undefined {
+): ResolvedResourceInfo | undefined {
   return getResourcePathElements(operation.httpOperation.path, operation.kind);
 }
 
 export function getResourcePathElements(
   path: string,
   kind: ArmOperationKind,
-): ResolvedOperationResourceInfo | undefined {
+): ResolvedResourceInfo | undefined {
   const segments = path.split("/").filter((s) => s.length > 0);
   const providerIndex = segments.findLastIndex((s) => s === "providers");
   if (providerIndex === -1 || providerIndex === segments.length - 1) return undefined;
@@ -482,7 +484,7 @@ export function getResourcePathElements(
 function tryAddLifecycleOperation(
   resourceType: ResourceType,
   sourceOperation: ArmResourceOperation,
-  targetOperation: ResolvedOperations,
+  targetOperation: ResolvedResource,
 ): boolean {
   const pathSegments: string[] = sourceOperation.httpOperation.path
     .split("/")
@@ -553,7 +555,7 @@ function tryAddLifecycleOperation(
 
 function addAssociatedOperation(
   sourceOperation: ArmResourceOperation,
-  targetOperation: ResolvedOperations,
+  targetOperation: ResolvedResource,
 ): void {
   if (!targetOperation.associatedOperations) {
     targetOperation.associatedOperations = [];
@@ -669,8 +671,8 @@ function addUniqueOperation(operation: ArmResourceOperation, operations: ArmReso
 export function resolveArmResourceOperations(
   program: Program,
   resourceType: Model,
-): ResolvedOperations[] {
-  const resolvedOperations: Set<ResolvedOperations> = new Set<ResolvedOperations>();
+): ResolvedResource[] {
+  const resolvedOperations: Set<ResolvedResource> = new Set<ResolvedResource>();
   const operations = getArmResourceOperationList(program, resourceType);
   for (const operation of operations) {
     const armOperation: ArmResourceOperation | undefined = getResourceOperation(
@@ -698,7 +700,7 @@ export function resolveArmResourceOperations(
 
     if (matched) continue;
     // If we don't have an operation for this resource, create a new one
-    const newOperation: ResolvedOperations = {
+    const newOperation: ResolvedResource = {
       resourceType: resourceInfo.resourceType,
       resourceInstancePath: resourceInfo.resourceInstancePath,
       operations: {
