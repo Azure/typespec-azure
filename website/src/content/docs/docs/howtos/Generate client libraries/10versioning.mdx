@@ -464,6 +464,66 @@ func (client *ServiceClient) StableFunctionality(ctx context.Context, stableMode
 
 </ClientTabs>
 
+### Add api version validation for elements
+
+The `@added` decorator in TypeSpec serves as a versioning validation that indicates when a specific API element was first introduced. When applied to models, operations, or parameters, `@added` marks the version at which these elements became available.
+
+Note: current python emitter only add validation for operation and parameters and don't handle versioning for models.
+
+In this example, `stableFunctionality` is marked with `@added(Versions.v2023_11_02)`, meaning this operation only becomes available starting from the `2023-11-02` version. Elements without the `@added` decorator, like `previewFunctionality`, are available across all defined versions.
+
+<ClientTabs>
+
+<ClientTabItem lang="typespec">
+
+```typespec
+import "@typespec/versioning";
+import "@typespec/http";
+
+using Versioning;
+using Http;
+
+@versioned(Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v2023_11_01_preview: "2023-11-01-preview",
+  v2023_11_02: "2023-11-02",
+}
+
+model PreviewModel {
+  betaFeature: string;
+}
+
+model StableModel {
+  stableFeature: string;
+}
+
+@route("/preview")
+op previewFunctionality(@body previewModel: PreviewModel): void;
+
+@added(Versions.v2023_11_02)
+@route("/stable")
+op stableFunctionality(@body stableModel: StableModel): void;
+```
+
+</ClientTabItem>
+
+```python
+@api_version_validation(
+    method_added_on="2023-11-02",
+    params_added_on={"2023-11-02": ["content_type"]},
+    api_versions_list=["2023-11-02"],
+)
+def stable_functionality(
+    self, stable_model: Union[_models.StableModel, JSON, IO[bytes]], **kwargs: Any
+) -> None:
+...
+```
+
+</ClientTabs>
+
 ## Overriding the Client Api Version Parameter
 
 By default, we find api version parameters in specs based off of names. There is special logic we do with api version parameters:
