@@ -25,7 +25,7 @@ it("Emits a warning for put operation that does not contain the appropriate resp
     .expect(
       `
       @armProviderNamespace
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
@@ -56,7 +56,7 @@ it("Emits a warning for put action that does not contain the appropriate respons
     .expect(
       `
       @armProviderNamespace
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
@@ -87,7 +87,7 @@ it("Does not emit a warning for put operation that contains the appropriate resp
     .expect(
       `
       @armProviderNamespace
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
@@ -119,7 +119,7 @@ it("Does not emit a warning for operation that uses the 'ArmResourceCreateOrUpda
     .expect(
       `
       @armProviderNamespace
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
@@ -143,7 +143,7 @@ it("Does not emit a warning for operation that uses the 'ArmResourceCreateOrRepl
     .expect(
       `
       @armProviderNamespace
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
@@ -167,7 +167,7 @@ it("Does not emit a warning for operation that uses the 'ArmResourceCreateOrRepl
     .expect(
       `
       @armProviderNamespace
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
@@ -191,7 +191,7 @@ it("Does not emit a warning for put action that contains the appropriate respons
     .expect(
       `
       @armProviderNamespace
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")

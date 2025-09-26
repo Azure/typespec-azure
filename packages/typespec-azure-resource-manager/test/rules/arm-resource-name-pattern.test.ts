@@ -25,7 +25,7 @@ it("Emits a warning for an ARM resource that doesn't specify `@pattern` on the n
     .expect(
       `
       @armProviderNamespace
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @key("employeeName")
@@ -59,7 +59,7 @@ it("Allows codefix when ARM resource name is missing pattern.", async () => {
     .expect(
       `
       @armProviderNamespace
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @key("employeeName")
@@ -71,7 +71,7 @@ it("Allows codefix when ARM resource name is missing pattern.", async () => {
     )
     .applyCodeFix("add-pattern-decorator").toEqual(`
       @armProviderNamespace
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")

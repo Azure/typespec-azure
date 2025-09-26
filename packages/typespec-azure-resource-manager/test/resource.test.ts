@@ -526,7 +526,7 @@ describe("ARM resource model:", () => {
 it("emits correct extended location for resource", async () => {
   const { program } = await Tester.compile(`
       @armProviderNamespace
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
       model Widget is ProxyResource<WidgetProperties> {
          ...ResourceNameParameter<Widget>;
@@ -545,7 +545,7 @@ it("emits correct extended location for resource", async () => {
 it("emits correct fixed union name parameter for resource", async () => {
   const { program } = await Tester.compile(`
       @armProviderNamespace
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
       model Widget is ProxyResource<WidgetProperties> {
          ...ResourceNameParameter<Widget, Type=WidgetNameType>;
@@ -572,7 +572,7 @@ it("emits correct fixed union name parameter for resource", async () => {
 it("emits a scalar string with decorator parameter for resource", async () => {
   const { program } = await Tester.compile(`
       @armProviderNamespace
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
       model Widget is ProxyResource<WidgetProperties> {
          ...ResourceNameParameter<Widget, Type=WidgetNameType>;
@@ -632,9 +632,7 @@ model DiskRestorePointProperties {
 @lroStatus
 union ProvisioningState {
   string,
-  Succeeded: "Succeeded",
-  Failed: "Failed",
-  Canceled: "Canceled",
+  ResourceProvisioningState,
 }
 
 model MoveRequest {
@@ -799,9 +797,7 @@ model EmployeeProperties {
 @lroStatus
 union ProvisioningState {
   string,
-  Succeeded: "Succeeded",
-  Failed: "Failed",
-  Canceled: "Canceled",
+  ResourceProvisioningState,
 }
 
 interface EmplOps extends Azure.ResourceManager.Legacy.LegacyOperations<
@@ -856,9 +852,7 @@ model EmployeeProperties {
 @lroStatus
 union ProvisioningState {
   string,
-  Succeeded: "Succeeded",
-  Failed: "Failed",
-  Canceled: "Canceled",
+  ResourceProvisioningState,
 }
 
 interface EmplOps extends Azure.ResourceManager.Legacy.RoutedOperations<
@@ -910,9 +904,7 @@ model EmployeeProperties {
 @lroStatus
 union ProvisioningState {
   string,
-  Succeeded: "Succeeded",
-  Failed: "Failed",
-  Canceled: "Canceled",
+  ResourceProvisioningState,
 }
 
 interface EmplOps extends Azure.ResourceManager.Legacy.LegacyOperations<
@@ -968,9 +960,7 @@ model EmployeeProperties {
 @lroStatus
 union ProvisioningState {
   string,
-  Succeeded: "Succeeded",
-  Failed: "Failed",
-  Canceled: "Canceled",
+  ResourceProvisioningState,
 }
 
 interface EmplOps extends Azure.ResourceManager.Legacy.LegacyOperations<
@@ -1007,14 +997,7 @@ it("emits diagnostics for non ARM resources", async () => {
       
         model EmployeeProperties {
           @visibility(Lifecycle.Read)
-          provisioningState?: ProvisioningState;
-        }
-      
-        union ProvisioningState {
-          string,
-          Succeeded: "Succeeded",
-          Failed: "Failed",
-          Canceled: "Canceled",
+          provisioningState?: ResourceProvisioningState;
         }
       
         @armResourceOperations

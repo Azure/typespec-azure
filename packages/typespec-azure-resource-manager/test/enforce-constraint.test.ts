@@ -5,7 +5,7 @@ import { Tester } from "./tester.js";
 it("emits no error when template param extends from Resource", async () => {
   const diagnostics = await Tester.diagnose(`
       @armProviderNamespace
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
       model Widget is ProxyResource<WidgetProperties> {
          ...ResourceNameParameter<Widget>;
@@ -29,7 +29,7 @@ it("emits no error when template param extends from Resource", async () => {
 it("emits error if template param is not extended from Resource", async () => {
   const diagnostics = await Tester.diagnose(`
       @armProviderNamespace
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
  
       model Widget {
         @visibility(Lifecycle.Read)

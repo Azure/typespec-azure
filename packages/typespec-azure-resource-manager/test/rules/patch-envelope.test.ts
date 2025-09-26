@@ -117,7 +117,6 @@ it("emit diagnostic when there is no request body", async () => {
       #suppress "deprecated" "test"
       interface FooResources
         extends ResourceRead<FooResource>,ResourceCreate<FooResource> ,ResourceDelete<FooResource>{
-          #suppress "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-patch-model" "Test"
           @autoRoute
           @armResourceUpdate(FooResource)
           @patch(#{implicitOptionality: true}) 

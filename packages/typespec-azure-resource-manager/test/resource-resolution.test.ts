@@ -502,9 +502,7 @@ model EmployeeProperties {
 @lroStatus
 union ProvisioningState {
   string,
-  Succeeded: "Succeeded",
-  Failed: "Failed",
-  Canceled: "Canceled",
+  ResourceProvisioningState,
 }
 
 model MoveRequest {
