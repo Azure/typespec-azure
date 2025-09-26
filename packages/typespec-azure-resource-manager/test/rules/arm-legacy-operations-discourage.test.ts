@@ -36,31 +36,13 @@ it("emits diagnostic when using @Azure.ResourceManager.Legacy.LegacyOperations",
   model EmployeeProperties {
     age?: int32;
 
-    city?: string;
-
-    @encode("base64url")
-    profile?: bytes;
-
     @visibility(Lifecycle.Read)
     provisioningState?: ProvisioningState;
   }
 
   union ProvisioningState {
     string,
-
-    Accepted: "Accepted",
-
-    Provisioning: "Provisioning",
-
-    Updating: "Updating",
-
-    Succeeded: "Succeeded",
-
-    Failed: "Failed",
-
-    Canceled: "Canceled",
-
-    Deleting: "Deleting",
+    ResourceProvisioningState,
   }
 
   interface Operations extends Azure.ResourceManager.Operations {}
@@ -68,7 +50,6 @@ it("emits diagnostic when using @Azure.ResourceManager.Legacy.LegacyOperations",
   @error
   model MyErrorType {
     code: string;
-
     message: string;
   }
 

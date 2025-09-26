@@ -1,10 +1,9 @@
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
-import { describe, it } from "vitest";
+import { it } from "vitest";
 import { Tester } from "./tester.js";
 
-describe("typespec-azure-resource-manager: @enforceConstraint", () => {
-  it("emits no error when template param extends from Resource", async () => {
-    const diagnostics = await Tester.diagnose(`
+it("emits no error when template param extends from Resource", async () => {
+  const diagnostics = await Tester.diagnose(`
       @armProviderNamespace
     namespace Microsoft.Contoso;
 
@@ -24,11 +23,11 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
         delete is ArmResourceCreateOrReplaceSync<CustomResource>;
       }
   `);
-    expectDiagnosticEmpty(diagnostics);
-  });
+  expectDiagnosticEmpty(diagnostics);
+});
 
-  it("emits error if template param is not extended from Resource", async () => {
-    const diagnostics = await Tester.diagnose(`
+it("emits error if template param is not extended from Resource", async () => {
+  const diagnostics = await Tester.diagnose(`
       @armProviderNamespace
     namespace Microsoft.Contoso;
  
@@ -59,32 +58,32 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
         delete is ArmResourceCreateOrReplaceSync<CustomResource>;
       }
   `);
-    expectDiagnostics(diagnostics, [
-      {
-        code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met",
-        message:
-          'The template parameter "Widget" for "ArmResourceCreateOrReplaceSync" does not extend the constraint type "Resource". Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.',
-      },
-      {
-        code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met",
-        message:
-          'The template parameter "Widget" for "create" does not extend the constraint type "Resource". Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.',
-      },
-      {
-        code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met",
-        message:
-          'The template parameter "CustomResource" for "ArmResourceCreateOrReplaceSync" does not extend the constraint type "Resource". Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.',
-      },
-      {
-        code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met",
-        message:
-          'The template parameter "CustomResource" for "delete" does not extend the constraint type "Resource". Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.',
-      },
-    ]);
-  });
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met",
+      message:
+        'The template parameter "Widget" for "ArmResourceCreateOrReplaceSync" does not extend the constraint type "Resource". Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.',
+    },
+    {
+      code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met",
+      message:
+        'The template parameter "Widget" for "create" does not extend the constraint type "Resource". Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.',
+    },
+    {
+      code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met",
+      message:
+        'The template parameter "CustomResource" for "ArmResourceCreateOrReplaceSync" does not extend the constraint type "Resource". Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.',
+    },
+    {
+      code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met",
+      message:
+        'The template parameter "CustomResource" for "delete" does not extend the constraint type "Resource". Please use the "TrackedResource", "ProxyResource", or "ExtensionResource" template to define the resource.',
+    },
+  ]);
+});
 
-  it("emits no error when template extends from a `@Azure.ResourceManager.Legacy.customAzureResource` Resource", async () => {
-    const diagnostics = await Tester.diagnose(`
+it("emits no error when template extends from a `@Azure.ResourceManager.Legacy.customAzureResource` Resource", async () => {
+  const diagnostics = await Tester.diagnose(`
     @armProviderNamespace
     namespace Microsoft.Contoso;
 
@@ -100,11 +99,11 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
       delete is ArmResourceCreateOrReplaceSync<CustomResource>;
     }
   `);
-    expectDiagnosticEmpty(diagnostics);
-  });
+  expectDiagnosticEmpty(diagnostics);
+});
 
-  it("emits no error when template extends from a `@Azure.ResourceManager.Legacy.customAzureResource` Resource when using Legacy Operations", async () => {
-    const diagnostics = await Tester.diagnose(`
+it("emits no error when template extends from a `@Azure.ResourceManager.Legacy.customAzureResource` Resource when using Legacy Operations", async () => {
+  const diagnostics = await Tester.diagnose(`
     @armProviderNamespace
     namespace Microsoft.Contoso;
 
@@ -138,11 +137,11 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
       create is WidgetOps.CreateOrUpdateAsync<CustomResource>;
     }
   `);
-    expectDiagnosticEmpty(diagnostics);
-  });
+  expectDiagnosticEmpty(diagnostics);
+});
 
-  it("emits error when template is extended from Resource or from a `@Azure.ResourceManager.Legacy.customAzureResource` Resource", async () => {
-    const diagnostics = await Tester.diagnose(`
+it("emits error when template is extended from Resource or from a `@Azure.ResourceManager.Legacy.customAzureResource` Resource", async () => {
+  const diagnostics = await Tester.diagnose(`
     @armProviderNamespace
     namespace Microsoft.Contoso;
 
@@ -158,15 +157,13 @@ describe("typespec-azure-resource-manager: @enforceConstraint", () => {
       delete is ArmResourceCreateOrReplaceSync<CustomResource>;
     }
   `);
-    expectDiagnostics(diagnostics, [
-      { code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met" },
-      { code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met" },
-    ]);
-  });
+  expectDiagnostics(diagnostics, [
+    { code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met" },
+    { code: "@azure-tools/typespec-azure-resource-manager/template-type-constraint-no-met" },
+  ]);
 });
-describe("typespec-azure-resource-manager: rename parameter tests", () => {
-  it("emits error when renaming a parameter to an existing parameter name", async () => {
-    const diagnostics = await Tester.diagnose(`
+it("emits error when renaming a parameter to an existing parameter name", async () => {
+  const diagnostics = await Tester.diagnose(`
     @armProviderNamespace
     namespace Microsoft.Contoso;
 
@@ -183,15 +180,15 @@ describe("typespec-azure-resource-manager: rename parameter tests", () => {
       delete is ArmResourceCreateOrReplaceSync<CustomResource>;
     }
     `);
-    expectDiagnostics(diagnostics, [
-      {
-        code: "@azure-tools/typespec-azure-resource-manager/invalid-parameter-rename",
-      },
-    ]);
-  });
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-azure-resource-manager/invalid-parameter-rename",
+    },
+  ]);
+});
 
-  it("emits warning when renaming a non-existent parameter", async () => {
-    const diagnostics = await Tester.diagnose(`
+it("emits warning when renaming a non-existent parameter", async () => {
+  const diagnostics = await Tester.diagnose(`
       @armProviderNamespace
       
       namespace Microsoft.Contoso;
@@ -209,14 +206,14 @@ describe("typespec-azure-resource-manager: rename parameter tests", () => {
         create is ArmResourceCreateOrReplaceSync<CustomResource>;
       }
     `);
-    expectDiagnostics(diagnostics, [
-      {
-        code: "@azure-tools/typespec-azure-resource-manager/invalid-parameter-rename",
-      },
-    ]);
-  });
-  it("emits a warning when renaming a non-path parameter", async () => {
-    const diagnostics = await Tester.diagnose(`
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-azure-resource-manager/invalid-parameter-rename",
+    },
+  ]);
+});
+it("emits a warning when renaming a non-path parameter", async () => {
+  const diagnostics = await Tester.diagnose(`
       @armProviderNamespace
       
       namespace Microsoft.Contoso;
@@ -234,14 +231,14 @@ describe("typespec-azure-resource-manager: rename parameter tests", () => {
         create is ArmResourceCreateOrReplaceSync<CustomResource>;
       }
     `);
-    expectDiagnostics(diagnostics, [
-      {
-        code: "@azure-tools/typespec-azure-resource-manager/invalid-parameter-rename",
-      },
-    ]);
-  });
-  it("emits no warning when renaming a parameter twice", async () => {
-    const diagnostics = await Tester.diagnose(`
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-azure-resource-manager/invalid-parameter-rename",
+    },
+  ]);
+});
+it("emits no warning when renaming a parameter twice", async () => {
+  const diagnostics = await Tester.diagnose(`
       @armProviderNamespace
       
       namespace Microsoft.Contoso;
@@ -260,10 +257,10 @@ describe("typespec-azure-resource-manager: rename parameter tests", () => {
         create is ArmResourceCreateOrReplaceSync<CustomResource>;
       }
     `);
-    expectDiagnosticEmpty(diagnostics);
-  });
-  it("emits no warning when renaming a parameter", async () => {
-    const diagnostics = await Tester.diagnose(`
+  expectDiagnosticEmpty(diagnostics);
+});
+it("emits no warning when renaming a parameter", async () => {
+  const diagnostics = await Tester.diagnose(`
       @armProviderNamespace
       
       namespace Microsoft.Contoso;
@@ -281,6 +278,5 @@ describe("typespec-azure-resource-manager: rename parameter tests", () => {
         create is ArmResourceCreateOrReplaceSync<CustomResource>;
       }
     `);
-    expectDiagnosticEmpty(diagnostics);
-  });
+  expectDiagnosticEmpty(diagnostics);
 });
