@@ -1,11 +1,12 @@
+import { Tester } from "#test/tester.js";
 import {
-  BasicTestRunner,
   LinterRuleTester,
+  TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
+
 import { noEmptyModel } from "../../src/rules/no-empty-model.js";
-import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
 const armDef = `
 @armProviderNamespace
@@ -13,11 +14,11 @@ const armDef = `
 namespace Microsoft.Contoso;
 `;
 
-let runner: BasicTestRunner;
+let runner: TesterInstance;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await createAzureResourceManagerTestRunner();
+  runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
     noEmptyModel,

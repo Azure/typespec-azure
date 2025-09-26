@@ -1,26 +1,25 @@
-import type { Namespace, Operation } from "@typespec/compiler";
-import { getService } from "@typespec/compiler";
+import { getService, Namespace } from "@typespec/compiler";
+import { t } from "@typespec/compiler/testing";
 import { ok } from "assert";
 import { expect, it } from "vitest";
 import { getArmCommonTypeOpenAPIRef } from "../src/common-types.js";
-import { createAzureResourceManagerTestRunner } from "./test-host.js";
+import { Tester } from "./tester.js";
 
 async function computeCommonTypeRefs<T extends string>(
   code: string,
   versions: T[],
 ): Promise<Record<T, string | undefined>> {
-  const runner = await createAzureResourceManagerTestRunner();
-  const { Service, test } = (await runner.compile(`
-      ${code}
-      @test op test(...SubscriptionIdParameter): void;
-    `)) as { test: Operation; Service: Namespace };
+  const { Service, test, program } = await Tester.compile(t.code`
+    ${code}
+      op ${t.op("test")}(...SubscriptionIdParameter): void;
+  `);
 
   const prop = test.parameters.properties.get("subscriptionId");
   ok(prop);
   const result: Record<string, string | undefined> = {};
   for (const version of versions) {
-    result[version] = getArmCommonTypeOpenAPIRef(runner.program, prop, {
-      service: getService(runner.program, Service)!,
+    result[version] = getArmCommonTypeOpenAPIRef(program, prop, {
+      service: getService(program, Service as Namespace)!,
       version,
     });
   }

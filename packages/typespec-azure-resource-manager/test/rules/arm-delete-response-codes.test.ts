@@ -1,17 +1,18 @@
+import { Tester } from "#test/tester.js";
 import {
-  BasicTestRunner,
   LinterRuleTester,
+  TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { armDeleteResponseCodesRule } from "../../src/rules/arm-delete-response-codes.js";
-import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
-let runner: BasicTestRunner;
+import { armDeleteResponseCodesRule } from "../../src/rules/arm-delete-response-codes.js";
+
+let runner: TesterInstance;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await createAzureResourceManagerTestRunner();
+  runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
     armDeleteResponseCodesRule,
@@ -24,10 +25,9 @@ it("Emits a warning for synchronous delete operation that does not contain the a
     .expect(
       `
       @armProviderNamespace
-          namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<EmployeeProperties> {
-        @doc("Name of employee")
         @pattern("^[a-zA-Z0-9-]{3,24}$")
         @key("employeeName")
         @path
@@ -59,10 +59,9 @@ it("Does not emit a warning for synchronous delete operation that contains the a
     .expect(
       `
     @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
     
     model Employee is ProxyResource<EmployeeProperties> {
-      @doc("Name of employee")
       @pattern("^[a-zA-Z0-9-]{3,24}$")
       @key("employeeName")
       @path
@@ -92,10 +91,9 @@ it("Does not emit a warning for synchronous delete operation that uses the `ArmR
     .expect(
       `
     @armProviderNamespace
-      namespace Microsoft.Contoso;
+    namespace Microsoft.Contoso;
     
     model Employee is ProxyResource<EmployeeProperties> {
-      @doc("Name of employee")
       @pattern("^[a-zA-Z0-9-]{3,24}$")
       @key("employeeName")
       @path
@@ -118,10 +116,9 @@ it("Emits a warning for long-running delete operation that does not contain the 
     .expect(
       `
       @armProviderNamespace
-          namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<EmployeeProperties> {
-        @doc("Name of employee")
         @pattern("^[a-zA-Z0-9-]{3,24}$")
         @key("employeeName")
         @path
@@ -150,10 +147,9 @@ it("Does not emit a warning for long-running delete operation that uses the `Arm
     .expect(
       `
       @armProviderNamespace
-          namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<EmployeeProperties> {
-        @doc("Name of employee")
         @pattern("^[a-zA-Z0-9-]{3,24}$")
         @key("employeeName")
         @path
