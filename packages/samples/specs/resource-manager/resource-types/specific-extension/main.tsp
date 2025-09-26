@@ -105,6 +105,15 @@ alias VirtualMachineScaleSetVm = Extension.ExternalChildResource<
   Description = "The name of the virtual machine scale set VM"
 >;
 
+alias ServiceGroup = Extension.ExternalResource<
+  "Microsoft.Management",
+  "serviceGroups",
+  "serviceGroupName",
+  NamePattern = "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$",
+  Description = "The name of the service fabric cluster",
+  ParentType = "Tenant"
+>;
+
 @armResourceOperations
 interface Employees extends EmplOps<Extension.ScopeParameter> {}
 @armResourceOperations
@@ -115,6 +124,8 @@ interface Subscriptions extends EmplOps<Extension.Subscription> {}
 interface ResourceGroups extends EmplOps<Extension.ResourceGroup> {}
 @armResourceOperations
 interface ManagementGroups extends EmplOps<Extension.ManagementGroup> {}
+@armResourceOperations
+interface ServiceGroups extends EmplOps<ServiceGroup> {}
 
 @armResourceOperations
 interface VirtualMachines extends EmplOps<VirtualMachine> {}

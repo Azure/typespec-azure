@@ -63,3 +63,37 @@ extern dec hierarchyBuilding(target: Model, value: Model, scope?: valueof string
  * ```
  */
 extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
+
+/**
+ * Forces an operation to be treated as a Long Running Operation (LRO) by the SDK generators,
+ * even when the operation is not long-running on the service side.
+ *
+ * NOTE: When used, you will need to verify the operatio and add tests for the generated code
+ * to make sure the end-to-end works for library users, since there is a risk that forcing
+ * this operation to be LRO will result in errors.
+ *
+ * When applied, TCGC will treat the operation as an LRO and SDK generators should:
+ * - Generate polling mechanisms (pollers)
+ * - Return appropriate LRO-specific return types
+ * - Handle the operation as an asynchronous long-running process
+ *
+ * This decorator is considered legacy functionality and should only be used when
+ * standard TypeSpec LRO patterns are not feasible.
+ *
+ * @param target The operation that should be treated as a Long Running Operation
+ * @param scope Specifies the target language emitters that the decorator should apply.
+ * If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * @example Force a regular operation to be treated as LRO for backward compatibility
+ * ```typespec
+ * @Azure.ClientGenerator.Core.Legacy.markAsLro
+ * @route("/deployments/{deploymentId}")
+ * @post
+ * op startDeployment(
+ *   @path deploymentId: string,
+ * ): DeploymentResult | ErrorResponse;
+ * ```
+ *
+ */
+extern dec markAsLro(target: Operation, scope?: valueof string);

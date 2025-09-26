@@ -128,6 +128,7 @@ model ManagementGroup<ParameterName extends valueof string = "managementGroupNam
  * @template NamePattern The pattern restriction for the name of the external resource (default is none).
  * @template NameType The type of the name parameter of the external resource (default is string).
  * @template Description The description of the name parameter of the external resource (default is "The name of the resource").
+ * @template ParentType The parent type of the external resource (default is "ResourceGroup", other options are "Tenant" and "Subscription").
  *
  * @example
  * ```typespec
@@ -147,6 +148,7 @@ model ManagementGroup<ParameterName extends valueof string = "managementGroupNam
  */
 @doc("")
 @armVirtualResource(TargetNamespace)
+@Azure.ResourceManager.Private.resourceParentType(ParentType)
 @Http.Private.includeInapplicableMetadataInPayload(false)
 model ExternalResource<
   TargetNamespace extends valueof string,
@@ -154,7 +156,8 @@ model ExternalResource<
   ResourceParameterName extends valueof string,
   NamePattern extends valueof string = "",
   NameType extends string = string,
-  Description extends valueof string = "The name of the resource"
+  Description extends valueof string = "The name of the resource",
+  ParentType extends valueof "Tenant" | "Subscription" | "ResourceGroup" = "ResourceGroup"
 > {
   @doc(Description)
   @visibility(Lifecycle.Read)

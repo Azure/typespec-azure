@@ -447,6 +447,18 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`External library version mismatch. There are multiple versions of ${"libraryName"}: ${"versionA"} and ${"versionB"}. Please unify the versions.`,
       },
     },
+    "invalid-mark-as-lro-target": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@markAsLro decorator can only be applied to operations that return a model. We will ignore this decorator.`,
+      },
+    },
+    "mark-as-lro-ineffective": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@markAsLro decorator is ineffective since this operation already returns real LRO metadata. Please remove the @markAsLro decorator.`,
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,

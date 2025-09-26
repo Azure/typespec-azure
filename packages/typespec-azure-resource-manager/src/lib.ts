@@ -124,6 +124,13 @@ export const $lib = createTypeSpecLibrary({
         notpath: paramMessage`The parameter "${"oldName"}" is not a path parameter and so cannot be renamed.`,
       },
     },
+    "legacy-type-usage": {
+      severity: "warning",
+      messages: {
+        default:
+          "This type is meant for conversion of legacy service APIs.  This type should not be used in new service APIs.",
+      },
+    },
   },
 });
 

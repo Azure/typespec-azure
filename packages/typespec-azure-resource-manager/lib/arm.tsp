@@ -18,6 +18,7 @@ import "./interfaces.tsp";
 import "./responses.tsp";
 import "./parameters.tsp";
 import "./private-endpoints.tsp";
+import "./private-links.tsp";
 
 using Http;
 using Rest;
