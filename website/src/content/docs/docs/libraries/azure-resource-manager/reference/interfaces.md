@@ -346,10 +346,10 @@ interface Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------- |
 | PrivateLinkResourceModel | The type of the private link resource. You must declare a private link resource type in your provider namespace. |
 
-#### `PrivateLinks.ListByParent` {#Azure.ResourceManager.PrivateLinks.ListByParent}
+#### `PrivateLinks.ListByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.ListByParent}
 
 ```typespec
-op Azure.ResourceManager.PrivateLinks.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
@@ -363,10 +363,10 @@ op Azure.ResourceManager.PrivateLinks.ListByParent(provider: "Microsoft.ThisWill
 | Response       | Optional. The success response for the list operation     |
 | Error          | Optional. The error response, if non-standard.            |
 
-#### `PrivateLinks.ListSinglePageByParent` {#Azure.ResourceManager.PrivateLinks.ListSinglePageByParent}
+#### `PrivateLinks.ListSinglePageByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.ListSinglePageByParent}
 
 ```typespec
-op Azure.ResourceManager.PrivateLinks.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
@@ -380,10 +380,10 @@ op Azure.ResourceManager.PrivateLinks.ListSinglePageByParent(provider: "Microsof
 | Response       | Optional. The success response for the list operation     |
 | Error          | Optional. The error response, if non-standard.            |
 
-#### `PrivateLinks.Read` {#Azure.ResourceManager.PrivateLinks.Read}
+#### `PrivateLinks.Read` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.Read}
 
 ```typespec
-op Azure.ResourceManager.PrivateLinks.Read(provider: "Microsoft.ThisWillBeReplaced", privateLinkResourceName: string): Response | Error
+op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.Read(provider: "Microsoft.ThisWillBeReplaced", privateLinkResourceName: string): Response | Error
 ```
 
 ##### Template Parameters
