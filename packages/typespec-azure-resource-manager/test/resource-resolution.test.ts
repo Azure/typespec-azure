@@ -1457,4 +1457,243 @@ model MoveResponse {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/rooms/{roomId}/employeeResources/{employeeId}",
     });
   });
+  it("collects operation information for routed endpoints", async () => {
+    const { program, diagnostics } = await compileAndDiagnose(`
+
+using Azure.Core;
+
+/** Contoso Resource Provider management API. */
+@armProviderNamespace
+@service(#{ title: "ContosoProviderHubClient" })
+@versioned(Versions)
+namespace Microsoft.ContosoProviderHub;
+
+/** Contoso API versions */
+enum Versions {
+  /** 2021-10-01-preview version */
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v2021_20_01_preview: "2021-10-01-preview",
+}
+
+// For more information about the proxy vs tracked,
+// see https://armwiki.azurewebsites.net/rp_onboarding/tracked_vs_proxy_resources.html?q=proxy%20resource
+/** A ContosoProviderHub resource */
+model Employee is ProxyResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+/** Employee properties */
+model EmployeeProperties {
+  /** Age of employee */
+  age?: int32;
+
+  /** City of employee */
+  city?: string;
+
+  /** Profile of employee */
+  @encode("base64url")
+  profile?: bytes;
+
+  /** The status of the last operation. */
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+/** The provisioning state of a resource. */
+@lroStatus
+union ProvisioningState {
+  ResourceProvisioningState,
+
+  /** The resource is being provisioned */
+  Provisioning: "Provisioning",
+
+  /** The resource is updating */
+  Updating: "Updating",
+
+  /** The resource is being deleted */
+  Deleting: "Deleting",
+
+  /** The resource create request has been accepted */
+  Accepted: "Accepted",
+
+  string,
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+alias BuildingParams = {
+  ...ApiVersionParameter;
+  ...SubscriptionIdParameter;
+  ...ResourceGroupParameter;
+
+  /** The name of the API Management service. */
+  @path
+  @segment("buildings")
+  @key
+  @pattern("^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$")
+  buildingName: string;
+};
+
+alias EmployeeParams = {
+  /** Diagnostic identifier. Must be unique in the current API Management service instance. */
+  @path
+  @segment("employeeResources")
+  @key
+  @pattern("^[^*#&+:<>?]+$")
+  employeeId: string;
+};
+
+alias EmployeeRoomOps = Azure.ResourceManager.Legacy.RoutedOperations<
+  {
+    ...BuildingParams;
+
+    /** API identifier. Must be unique in the current API Management service instance. */
+    @path
+    @segment("rooms")
+    @key
+    roomId: string;
+  },
+  EmployeeParams,
+  ResourceRoute = #{
+    route: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/rooms/{roomId}/employeeResources",
+  }
+>;
+
+alias EmployeeBuildingOps = Azure.ResourceManager.Legacy.RoutedOperations<
+  BuildingParams,
+  EmployeeParams,
+  ResourceRoute = #{
+    route: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/employeeResources",
+  }
+>;
+
+@armResourceOperations(#{ allowStaticRoutes: true })
+interface EmployeesByBuilding {
+  get is EmployeeBuildingOps.Read<Employee>;
+  createOrUpdate is EmployeeBuildingOps.CreateOrUpdateAsync<Employee>;
+  update is EmployeeBuildingOps.CustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<
+      Employee,
+      EmployeeProperties
+    >
+  >;
+  delete is EmployeeBuildingOps.DeleteSync<Employee>;
+  list is EmployeeBuildingOps.List<Employee>;
+  /** A sample resource action that move employee to different location */
+  @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/employeeResources/{employeeId}/otherResource/thirdResource/{addedId}/move")
+  @get move is EmployeeBuildingOps.ActionSync<
+    Employee,
+    MoveRequest,
+    MoveResponse,
+    Parameters = {
+      @doc("an additional parameter")
+      @path
+      @key
+      addedId: string;
+    }
+  >;
+}
+
+@armResourceOperations(#{ allowStaticRoutes: true })
+interface EmployeesByRoom {
+  get is EmployeeRoomOps.Read<Employee>;
+  createOrUpdate is EmployeeRoomOps.CreateOrUpdateAsync<Employee>;
+  update is EmployeeRoomOps.CustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<
+      Employee,
+      EmployeeProperties
+    >
+  >;
+  delete is EmployeeRoomOps.DeleteSync<Employee>;
+  list is EmployeeRoomOps.List<Employee>;
+  /** A sample resource action that move employee to different location */
+  @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/rooms/{roomId}/employeeResources/{employeeId}/move")
+  move is EmployeeRoomOps.ActionSync<Employee, MoveRequest, MoveResponse>;
+}
+
+/** Employee move request */
+model MoveRequest {
+  /** The moving from location */
+  from: string;
+
+  /** The moving to location */
+  to: string;
+}
+
+/** Employee move response */
+model MoveResponse {
+  /** The status of the move */
+  movingStatus: string;
+}
+
+`);
+    expectDiagnosticEmpty(diagnostics);
+    const resources = resolveArmResources(program);
+    expect(resources).toBeDefined();
+    expect(resources.resourceModels).toBeDefined();
+    expect(resources.resourceModels).toHaveLength(1);
+    ok(resources.resourceModels);
+    const employee = resources.resourceModels[0];
+    ok(employee);
+    expect(employee).toMatchObject({
+      kind: "Proxy",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      resources: expect.any(Array),
+    });
+    ok(employee.resources);
+    const buildingScope = employee.resources[0];
+
+    ok(buildingScope);
+    checkResolvedOperations(buildingScope, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            {
+              operationGroup: "EmployeesByBuilding",
+              name: "createOrUpdate",
+              kind: "createOrUpdate",
+            },
+          ],
+          delete: [{ operationGroup: "EmployeesByBuilding", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "EmployeesByBuilding", name: "get", kind: "read" }],
+          update: [{ operationGroup: "EmployeesByBuilding", name: "update", kind: "update" }],
+        },
+        actions: [{ operationGroup: "EmployeesByBuilding", name: "move", kind: "action" }],
+        lists: [{ operationGroup: "EmployeesByBuilding", name: "list", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["buildings", "employeeResources"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/employeeResources/{employeeId}",
+    });
+
+    const roomScope = employee.resources[1];
+
+    ok(roomScope);
+    checkResolvedOperations(roomScope, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            { operationGroup: "EmployeesByRoom", name: "createOrUpdate", kind: "createOrUpdate" },
+          ],
+          delete: [{ operationGroup: "EmployeesByRoom", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "EmployeesByRoom", name: "get", kind: "read" }],
+          update: [{ operationGroup: "EmployeesByRoom", name: "update", kind: "update" }],
+        },
+        actions: [{ operationGroup: "EmployeesByRoom", name: "move", kind: "action" }],
+        lists: [{ operationGroup: "EmployeesByRoom", name: "list", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["buildings", "rooms", "employeeResources"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/rooms/{roomId}/employeeResources/{employeeId}",
+    });
+  });
 });
