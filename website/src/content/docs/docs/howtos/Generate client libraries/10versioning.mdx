@@ -464,12 +464,12 @@ func (client *ServiceClient) StableFunctionality(ctx context.Context, stableMode
 
 </ClientTabs>
 
-### Introduce features in new Api Versions
+### New model/operation added in new api verison
 
 You can use `@added` decorator to indicate when a specific Api feature was first introduced. 
 When applied to models, operations, or parameters, `@added` marks the Api Version at which these elements became available. This prevents confusing error messages for customers using older version clients.
 
-#### Add operation in new Api Version
+#### New operation added in new api version
 
 In this example, `stableFunctionality` is marked with `@added(Versions.v2023_11_02)`, meaning this operation only becomes available starting from the `2023-11-02` version. Elements without the `@added` decorator, like `previewFunctionality`, are available across all defined versions.
 
@@ -523,6 +523,15 @@ def stable_functionality(
     self, stable_model: Union[_models.StableModel, JSON, IO[bytes]], **kwargs: Any
 ) -> None:
 ...
+
+# change does not infect generated model
+class StableModel(_Model):
+
+    stable_feature: str = rest_field(name="stableFeature", visibility=["read", "create", "update", "delete", "query"])
+    stable_detail: "_models.StableDetail" = rest_field(
+        name="stableDetail", visibility=["read", "create", "update", "delete", "query"]
+    )
+...
 ```
 
 ```csharp
@@ -543,9 +552,9 @@ def stable_functionality(
 
 </ClientTabs>
 
-#### Add model property in new Api Verison
+#### New model property added in new api version
 
-In this example, the `stableDetail` model is marked with `@added(Versions.v2023_11_02)`, meaning this model as well as the property `stableDetail` of `StableModel` only becomes available starting from the `2023-11-02` version, while other parameters of `StableModel`, are available across all defined versions.
+In this example, the `StableDetail` model is marked with `@added(Versions.v2023_11_02)`, meaning this model as well as the property `stableDetail` of `StableModel` only becomes available starting from the `2023-11-02` version, while other parameters of `StableModel`, are available across all defined versions.
 
 <ClientTabs>
 
@@ -575,11 +584,11 @@ model StableModel {
   stableFeature: string;
 
   @added(Versions.v2023_11_02)
-  stableDetail: stableDetail;
+  stableDetail: StableDetail;
 }
 
 @added(Versions.v2023_11_02)
-model stableDetail {
+model StableDetail {
   stableDetail: string;
 }
 
@@ -594,21 +603,18 @@ op stableFunctionality(@body stableModel: StableModel): void;
 
 ```python
 # current python emitter only add validation for operation and parameters and don't handle versioning for models.
-class StableModel(_Model):
-    """StableModel.
+@distributed_trace
+def stable_functionality(
+    self, stable_model: Union[_models.StableModel, JSON, IO[bytes]], **kwargs: Any
+) -> None:
+...
 
-    :ivar stable_feature: Required.
-    :vartype stable_feature: str
-    :ivar stable_detail: Required.
-    :vartype stable_detail: ~my.service.models.StableDetail
-    """
+class StableModel(_Model):
 
     stable_feature: str = rest_field(name="stableFeature", visibility=["read", "create", "update", "delete", "query"])
-    """Required."""
     stable_detail: "_models.StableDetail" = rest_field(
         name="stableDetail", visibility=["read", "create", "update", "delete", "query"]
     )
-    """Required."""
 ...
 ```
 
