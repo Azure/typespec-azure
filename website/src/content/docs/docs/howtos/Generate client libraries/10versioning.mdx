@@ -464,9 +464,12 @@ func (client *ServiceClient) StableFunctionality(ctx context.Context, stableMode
 
 </ClientTabs>
 
-### Add api version validation for elements
+### Introduce features in new Api Versions
 
-You can use `@added` decorator to indicate when a specific API element was first introduced. When applied to models, operations, or parameters, `@added` marks the version at which these elements became available.
+You can use `@added` decorator to indicate when a specific Api feature was first introduced. 
+When applied to models, operations, or parameters, `@added` marks the Api Version at which these elements became available. This prevents confusing error messages for customers using older version clients.
+
+#### Add operation in new Api Version
 
 In this example, `stableFunctionality` is marked with `@added(Versions.v2023_11_02)`, meaning this operation only becomes available starting from the `2023-11-02` version. Elements without the `@added` decorator, like `previewFunctionality`, are available across all defined versions.
 
@@ -509,6 +512,7 @@ op stableFunctionality(@body stableModel: StableModel): void;
 </ClientTabItem>
 
 ```python
+# operation was first intruduced from Api Version 2023-11-02, and is unreachable to client with Api Version 2023_11_01_preview
 @distributed_trace
 @api_version_validation(
     method_added_on="2023-11-02",
@@ -539,7 +543,9 @@ def stable_functionality(
 
 </ClientTabs>
 
-**Note**: current python emitter only add validation for operation and parameters and don't handle versioning for models.
+#### Add model property in new Api Verison
+
+In this example, the `stableDetail` model is marked with `@added(Versions.v2023_11_02)`, meaning this model as well as the property `stableDetail` of `StableModel` only becomes available starting from the `2023-11-02` version, while other parameters of `StableModel`, are available across all defined versions.
 
 <ClientTabs>
 
@@ -582,33 +588,47 @@ op previewFunctionality(@body previewModel: PreviewModel): void;
 
 @route("/stable")
 op stableFunctionality(@body stableModel: StableModel): void;
-
-@route("/new_stable")
-op paramFunctionality(
-  @added(Versions.v2023_11_02) @query param?: string
-): void;
 ```
 
 </ClientTabItem>
 
 ```python
-@distributed_trace
-def stable_functionality(
-    self, stable_model: Union[_models.StableModel, JSON, IO[bytes]], **kwargs: Any
-) -> None:
+# current python emitter only add validation for operation and parameters and don't handle versioning for models.
+class StableModel(_Model):
+    """StableModel.
+
+    :ivar stable_feature: Required.
+    :vartype stable_feature: str
+    :ivar stable_detail: Required.
+    :vartype stable_detail: ~my.service.models.StableDetail
+    """
+
+    stable_feature: str = rest_field(name="stableFeature", visibility=["read", "create", "update", "delete", "query"])
+    """Required."""
+    stable_detail: "_models.StableDetail" = rest_field(
+        name="stableDetail", visibility=["read", "create", "update", "delete", "query"]
+    )
+    """Required."""
 ...
 ```
-```python
-@distributed_trace
-@api_version_validation(
-    params_added_on={"2023-11-02": ["param"]},
-    api_versions_list=["2023-11-01-preview", "2023-11-02"],
-)
-def param_functionality(
-    self, *, param: Optional[str] = None, **kwargs: Any
-) -> None:
-...
+
+```csharp
+// TODO
 ```
+
+```typescript
+// TODO
+```
+
+```java
+// TODO
+```
+
+```go
+// TODO
+```
+
+</ClientTabs>
 
 ## Overriding the Client Api Version Parameter
 
