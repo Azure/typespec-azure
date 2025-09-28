@@ -466,7 +466,7 @@ func (client *ServiceClient) StableFunctionality(ctx context.Context, stableMode
 
 ### Add api version validation for elements
 
-The `@added` decorator in TypeSpec serves as a versioning validation that indicates when a specific API element was first introduced. When applied to models, operations, or parameters, `@added` marks the version at which these elements became available.
+You can use `@added` decorator to indicate when a specific API element was first introduced. When applied to models, operations, or parameters, `@added` marks the version at which these elements became available.
 
 In this example, `stableFunctionality` is marked with `@added(Versions.v2023_11_02)`, meaning this operation only becomes available starting from the `2023-11-02` version. Elements without the `@added` decorator, like `previewFunctionality`, are available across all defined versions.
 
