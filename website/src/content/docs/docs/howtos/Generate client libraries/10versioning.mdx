@@ -509,6 +509,7 @@ op stableFunctionality(@body stableModel: StableModel): void;
 </ClientTabItem>
 
 ```python
+@distributed_trace
 @api_version_validation(
     method_added_on="2023-11-02",
     params_added_on={"2023-11-02": ["content_type"]},
@@ -548,19 +549,23 @@ model PreviewModel {
   betaFeature: string;
 }
 
-@added(Versions.v2023_11_02)
 model StableModel {
-  name: string;
+  stableFeature: string;
+
+  @added(Versions.v2023_11_02)
+  stableDetail: stableDetail;
+}
+
+@added(Versions.v2023_11_02)
+model stableDetail {
+  stableDetail: string;
 }
 
 @route("/preview")
 op previewFunctionality(@body previewModel: PreviewModel): void;
 
-@added(Versions.v2023_11_02)
 @route("/stable")
-op stableFunctionality(
-  @body stableModel: StableModel,
-): void;
+op stableFunctionality(@body stableModel: StableModel): void;
 
 @route("/new_stable")
 op paramFunctionality(
@@ -571,17 +576,14 @@ op paramFunctionality(
 </ClientTabItem>
 
 ```python
-@api_version_validation(
-    method_added_on="2023-11-02",
-    params_added_on={"2023-11-02": ["content_type"]},
-    api_versions_list=["2023-11-02"],
-)
+@distributed_trace
 def stable_functionality(
     self, stable_model: Union[_models.StableModel, JSON, IO[bytes]], **kwargs: Any
 ) -> None:
 ...
 ```
 ```python
+@distributed_trace
 @api_version_validation(
     params_added_on={"2023-11-02": ["param"]},
     api_versions_list=["2023-11-01-preview", "2023-11-02"],
