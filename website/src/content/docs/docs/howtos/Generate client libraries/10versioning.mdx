@@ -464,7 +464,7 @@ func (client *ServiceClient) StableFunctionality(ctx context.Context, stableMode
 
 </ClientTabs>
 
-### New model/operation added in new api verison
+### New model/operation added in new api version
 
 You can use `@added` decorator to indicate when a specific Api feature was first introduced. 
 When applied to models, operations, or parameters, `@added` marks the Api Version at which these elements became available. This prevents confusing error messages for customers using older version clients.
@@ -512,7 +512,7 @@ op stableFunctionality(@body stableModel: StableModel): void;
 </ClientTabItem>
 
 ```python
-# operation was first intruduced from Api Version 2023-11-02, and is unreachable to client with Api Version 2023_11_01_preview
+# operation was first introduced from Api Version 2023-11-02, and is unreachable to client with Api Version 2023_11_01_preview
 @distributed_trace
 @api_version_validation(
     method_added_on="2023-11-02",
