@@ -512,6 +512,15 @@ op stableFunctionality(@body stableModel: StableModel): void;
 </ClientTabItem>
 
 ```python
+# change does not infect generated model
+class StableModel(_Model):
+
+    stable_feature: str = rest_field(name="stableFeature", visibility=["read", "create", "update", "delete", "query"])
+    stable_detail: "_models.StableDetail" = rest_field(
+        name="stableDetail", visibility=["read", "create", "update", "delete", "query"]
+    )
+...
+
 # operation was first introduced from Api Version 2023-11-02, and is unreachable to client with Api Version 2023_11_01_preview
 @distributed_trace
 @api_version_validation(
@@ -522,15 +531,6 @@ op stableFunctionality(@body stableModel: StableModel): void;
 def stable_functionality(
     self, stable_model: Union[_models.StableModel, JSON, IO[bytes]], **kwargs: Any
 ) -> None:
-...
-
-# change does not infect generated model
-class StableModel(_Model):
-
-    stable_feature: str = rest_field(name="stableFeature", visibility=["read", "create", "update", "delete", "query"])
-    stable_detail: "_models.StableDetail" = rest_field(
-        name="stableDetail", visibility=["read", "create", "update", "delete", "query"]
-    )
 ...
 ```
 
@@ -603,18 +603,18 @@ op stableFunctionality(@body stableModel: StableModel): void;
 
 ```python
 # current python emitter only add validation for operation and parameters and don't handle versioning for models.
-@distributed_trace
-def stable_functionality(
-    self, stable_model: Union[_models.StableModel, JSON, IO[bytes]], **kwargs: Any
-) -> None:
-...
-
 class StableModel(_Model):
 
     stable_feature: str = rest_field(name="stableFeature", visibility=["read", "create", "update", "delete", "query"])
     stable_detail: "_models.StableDetail" = rest_field(
         name="stableDetail", visibility=["read", "create", "update", "delete", "query"]
     )
+...
+
+@distributed_trace
+def stable_functionality(
+    self, stable_model: Union[_models.StableModel, JSON, IO[bytes]], **kwargs: Any
+) -> None:
 ...
 ```
 
