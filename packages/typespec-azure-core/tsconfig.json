@@ -3,7 +3,7 @@
   "composite": true,
   "references": [
     { "path": "../../core/packages/compiler/tsconfig.json" },
-    { "path": "../../core/packages/rest/tsconfig.json" },
+    { "path": "../../core/packages/rest/tsconfig.json" }
   ],
   "compilerOptions": {
     "outDir": "dist",
