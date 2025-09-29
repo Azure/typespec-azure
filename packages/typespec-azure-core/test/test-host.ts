@@ -21,6 +21,7 @@ export const Tester = createTester(resolvePath(import.meta.dirname, ".."), {
   libraries: [
     "@typespec/http",
     "@typespec/rest",
+    "@typespec/openapi",
     "@typespec/versioning",
     "@azure-tools/typespec-azure-core",
   ],
