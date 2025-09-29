@@ -5,7 +5,7 @@ import { getInterface } from "./utils.js";
 /**
  * verify tenant and extension resources do not define list by subscription
  */
-export const listBySubscriptionRule = createRule({
+export const improperSubscriptionListOperationRule = createRule({
   name: "improper-subscription-list-operation",
   severity: "warning",
   description: `Tenant and Extension resources should not define a list by subscription operation.`,

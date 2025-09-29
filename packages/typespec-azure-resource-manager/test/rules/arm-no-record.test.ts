@@ -1,17 +1,18 @@
+import { Tester } from "#test/tester.js";
 import {
-  BasicTestRunner,
   LinterRuleTester,
+  TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { armNoRecordRule } from "../../src/rules/arm-no-record.js";
-import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
-let runner: BasicTestRunner;
+import { armNoRecordRule } from "../../src/rules/arm-no-record.js";
+
+let runner: TesterInstance;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await createAzureResourceManagerTestRunner();
+  runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
     armNoRecordRule,
