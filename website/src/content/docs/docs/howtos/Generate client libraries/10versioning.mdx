@@ -471,7 +471,7 @@ When applied to models, operations, or parameters, `@added` marks the Api Versio
 
 #### New operation added in new api version
 
-In this example, `stableFunctionality` is marked with `@added(Versions.v2023_11_02)`, meaning this operation only becomes available starting from the `2023-11-02` version. Elements without the `@added` decorator, like `previewFunctionality`, are available across all defined versions.
+In this example, `createUserProfile` is marked with `@added(Versions.v2024_02_01)`, meaning this operation only becomes available starting from the `2024-02-01` version. Elements without the `@added` decorator, like `getUserInfo`, are available across all defined versions.
 
 <ClientTabs>
 
@@ -489,47 +489,46 @@ using Http;
 namespace My.Service;
 
 enum Versions {
-  v2023_11_01_preview: "2023-11-01-preview",
-  v2023_11_02: "2023-11-02",
+  v2024_01_01: "2024-01-01",
+  v2024_02_01: "2024-02-01",
 }
 
-model PreviewModel {
-  betaFeature: string;
+model UserInfo {
+  username: string;
 }
 
-model StableModel {
-  stableFeature: string;
+model UserProfile {
+  profileName: string;
 }
 
-@route("/preview")
-op previewFunctionality(@body previewModel: PreviewModel): void;
+@route("/users/info")
+op getUserInfo(@body userInfo: UserInfo): void;
 
-@added(Versions.v2023_11_02)
-@route("/stable")
-op stableFunctionality(@body stableModel: StableModel): void;
+@added(Versions.v2024_02_01)
+@route("/users/profile")
+op createUserProfile(@body userProfile: UserProfile): void;
 ```
 
 </ClientTabItem>
 
 ```python
 # change does not infect generated model
-class StableModel(_Model):
+class UserProfile(_Model):
 
-    stable_feature: str = rest_field(name="stableFeature", visibility=["read", "create", "update", "delete", "query"])
-    stable_detail: "_models.StableDetail" = rest_field(
-        name="stableDetail", visibility=["read", "create", "update", "delete", "query"]
+    profile_name: str = rest_field(name="profileName", visibility=["read", "create", "update", "delete", "query"])
+    profile_details: "_models.ProfileDetails" = rest_field(
+        name="profileDetails", visibility=["read", "create", "update", "delete", "query"]
     )
 ...
 
-# operation was first introduced from Api Version 2023-11-02, and is unreachable to client with Api Version 2023_11_01_preview
+# operation was first introduced from Api Version 2024-02-01, and is unreachable to client with Api Version 2024_01_01
 @distributed_trace
 @api_version_validation(
-    method_added_on="2023-11-02",
-    params_added_on={"2023-11-02": ["content_type"]},
-    api_versions_list=["2023-11-02"],
+    method_added_on="2024-02-01",
+    api_versions_list=["2024-02-01"],
 )
-def stable_functionality(
-    self, stable_model: Union[_models.StableModel, JSON, IO[bytes]], **kwargs: Any
+def create_user_profile(
+    self, user_profile: Union[_models.UserProfile, JSON, IO[bytes]], **kwargs: Any
 ) -> None:
 ...
 ```
@@ -554,7 +553,7 @@ def stable_functionality(
 
 #### New model property added in new api version
 
-In this example, the `StableDetail` model is marked with `@added(Versions.v2023_11_02)`, meaning this model as well as the property `stableDetail` of `StableModel` only becomes available starting from the `2023-11-02` version, while other parameters of `StableModel`, are available across all defined versions.
+In this example, the `ProfileDetails` model is marked with `@added(Versions.v2024_02_01)`, meaning this model as well as the property `profileDetails` of `UserProfile` only becomes available starting from the `2024-02-01` version, while other parameters of `UserProfile`, are available across all defined versions.
 
 <ClientTabs>
 
@@ -572,48 +571,48 @@ using Http;
 namespace My.Service;
 
 enum Versions {
-  v2023_11_01_preview: "2023-11-01-preview",
-  v2023_11_02: "2023-11-02",
+  v2024_01_01: "2024-01-01",
+  v2024_02_01: "2024-02-01",
 }
 
-model PreviewModel {
-  betaFeature: string;
+model UserInfo {
+  username: string;
 }
 
-model StableModel {
-  stableFeature: string;
+model UserProfile {
+  profileName: string;
 
-  @added(Versions.v2023_11_02)
-  stableDetail: StableDetail;
+  @added(Versions.v2024_02_01)
+  profileDetails: ProfileDetails;
 }
 
-@added(Versions.v2023_11_02)
-model StableDetail {
-  stableDetail: string;
+@added(Versions.v2024_02_01)
+model ProfileDetails {
+  detailDescription: string;
 }
 
-@route("/preview")
-op previewFunctionality(@body previewModel: PreviewModel): void;
+@route("/users/info")
+op getUserInfo(@body userInfo: UserInfo): void;
 
-@route("/stable")
-op stableFunctionality(@body stableModel: StableModel): void;
+@route("/users/profile")
+op createUserProfile(@body userProfile: UserProfile): void;
 ```
 
 </ClientTabItem>
 
 ```python
 # current python emitter only add validation for operation and parameters and don't handle versioning for models.
-class StableModel(_Model):
+class UserProfile(_Model):
 
-    stable_feature: str = rest_field(name="stableFeature", visibility=["read", "create", "update", "delete", "query"])
-    stable_detail: "_models.StableDetail" = rest_field(
-        name="stableDetail", visibility=["read", "create", "update", "delete", "query"]
+    profile_name: str = rest_field(name="profileName", visibility=["read", "create", "update", "delete", "query"])
+    profile_details: "_models.ProfileDetails" = rest_field(
+        name="profileDetails", visibility=["read", "create", "update", "delete", "query"]
     )
 ...
 
 @distributed_trace
-def stable_functionality(
-    self, stable_model: Union[_models.StableModel, JSON, IO[bytes]], **kwargs: Any
+def create_user_profile(
+    self, user_profile: Union[_models.UserProfile, JSON, IO[bytes]], **kwargs: Any
 ) -> None:
 ...
 ```
