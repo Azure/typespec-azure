@@ -64,7 +64,6 @@
     "@azure-tools/typespec-azure-core": "workspace:^",
     "@typespec/compiler": "workspace:^",
     "@typespec/http": "workspace:^",
-    "@typespec/openapi": "workspace:^",
     "@typespec/rest": "workspace:^",
     "@typespec/versioning": "workspace:^"
   },
@@ -75,7 +74,6 @@
     "@typespec/compiler": "workspace:^",
     "@typespec/http": "workspace:^",
     "@typespec/library-linter": "workspace:^",
-    "@typespec/openapi": "workspace:^",
     "@typespec/rest": "workspace:^",
     "@typespec/tspd": "workspace:^",
     "@typespec/versioning": "workspace:^",

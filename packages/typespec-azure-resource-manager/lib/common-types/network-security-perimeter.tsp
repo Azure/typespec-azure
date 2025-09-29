@@ -157,7 +157,7 @@ model NetworkSecurityPerimeterConfigurationProperties {
 
   /** List of provisioning issues, if any */
   @visibility(Lifecycle.Read)
-  @OpenAPI.extension("x-ms-identifiers", #[])
+  @identifiers(#[])
   provisioningIssues?: ProvisioningIssue[];
 
   networkSecurityPerimeter?: NetworkSecurityPerimeter;
@@ -197,7 +197,7 @@ model ProvisioningIssueProperties {
 
   /** Access rules that can be added to the network security profile (NSP) to remediate the issue. */
   @visibility(Lifecycle.Read)
-  @OpenAPI.extension("x-ms-identifiers", #[])
+  @identifiers(#[])
   suggestedAccessRules?: AccessRule[];
 }
 
@@ -220,7 +220,7 @@ model NetworkSecurityProfile {
   accessRulesVersion?: int32;
 
   /** List of Access Rules */
-  @OpenAPI.extension("x-ms-identifiers", #["name"])
+  @identifiers(#["name"])
   accessRules?: AccessRule[];
 
   /** Current diagnostic settings version */
