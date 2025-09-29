@@ -72,7 +72,7 @@ describe("path parameters", () => {
   });
 
   it("report unsupported-param-type diagnostic on the parameter when using unsupported types", async () => {
-    const offset = 223; // hard coding, need better solution in new tester
+    const offset = 258; // hard coding, need better solution in new tester
 
     const { pos, end, source } = extractSquiggles(
       `op test(~~~@path myParam: Record<string>~~~): void;`,
@@ -88,7 +88,7 @@ describe("path parameters", () => {
   });
 
   it("report unsupported-optional-path-param diagnostic on the parameter when using optional path parameters", async () => {
-    const offset = 223; // hard coding, need better solution in new tester
+    const offset = 258; // hard coding, need better solution in new tester
     const { pos, end, source } = extractSquiggles(`op test(~~~@path myParam?: string~~~): void;`);
     const runner = await Tester.createInstance();
     const diagnostics = await runner.diagnose(source);
