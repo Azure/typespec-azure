@@ -246,7 +246,7 @@ export const $lib = createTypeSpecLibrary({
     "override-parameters-mismatch": {
       severity: "error",
       messages: {
-        default: paramMessage`Method "${"methodName"}" is not directly referencing the same parameters as in the original operation. The original method has parameters "${"originalParameters"}", while the override method has parameters "${"overrideParameters"}".`,
+        default: paramMessage`Method "${"methodName"}" has different parameters definition from the override operation. Please check the parameter defined in the override operation: "${"checkParameter"}".`,
       },
     },
     "duplicate-client-name": {
@@ -317,7 +317,7 @@ export const $lib = createTypeSpecLibrary({
     "unexpected-pageable-operation-return-type": {
       severity: "error",
       messages: {
-        default: `The response object for the pageable operation is either not a paging model, or is not correctly decorated with @nextLink and @items.`,
+        default: `The response object for the pageable operation is either not a paging model, or is not correctly decorated with @nextLink and @pageItems.`,
       },
     },
     "invalid-alternate-type": {
@@ -445,6 +445,18 @@ export const $lib = createTypeSpecLibrary({
       severity: "warning",
       messages: {
         default: paramMessage`External library version mismatch. There are multiple versions of ${"libraryName"}: ${"versionA"} and ${"versionB"}. Please unify the versions.`,
+      },
+    },
+    "invalid-mark-as-lro-target": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@markAsLro decorator can only be applied to operations that return a model. We will ignore this decorator.`,
+      },
+    },
+    "mark-as-lro-ineffective": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@markAsLro decorator is ineffective since this operation already returns real LRO metadata. Please remove the @markAsLro decorator.`,
       },
     },
   },

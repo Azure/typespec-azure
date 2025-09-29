@@ -1,5 +1,27 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.60.3
+
+### Bug Fixes
+
+- [#3328](https://github.com/Azure/typespec-azure/pull/3328) Fix propagation of client initialization parameters set on parent clients
+- [#3327](https://github.com/Azure/typespec-azure/pull/3327) Allow `@markAsLro` to work with union return types
+
+
+## 0.60.2
+
+### Bug Fixes
+
+- [#3300](https://github.com/Azure/typespec-azure/pull/3300) add `@Azure.ClientGenerator.Core.Legacy.markAsLro` for legacy brownfield services that need to mark non-lro methods as lro
+
+
+## 0.60.1
+
+### Bug Fixes
+
+- [#3293](https://github.com/Azure/typespec-azure/pull/3293) Allow `@alternateType` to reference external types as well
+
+
 ## 0.60.0
 
 ### Breaking Changes

@@ -10,6 +10,7 @@ export {
   type OperationLink,
   type OperationLinkMetadata,
 } from "./decorators/operation-link.js";
+export { isPreviewVersion } from "./decorators/preview-version.js";
 export {
   getArmResourceIdentifierConfig,
   type ArmResourceIdentifierConfig,

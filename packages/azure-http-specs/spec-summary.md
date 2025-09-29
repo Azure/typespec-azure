@@ -451,11 +451,37 @@ param2: param2
 
 Expected response: 204 No Content
 
+### Azure_ClientGenerator_Core_Override_RemoveOptionalParameter_removeOptional
+
+- Endpoint: `get /azure/client-generator-core/override/remove-optional/{param1}`
+
+Verify that after `@override`, optional parameters can be removed from the client method signature.
+
+Expected path parameter:
+param1: param1
+
+Expected query parameter:
+param2: param2
+
+Expected response: 204 No Content
+
 ### Azure_ClientGenerator_Core_Override_ReorderParameters_reorder
 
 - Endpoint: `get /azure/client-generator-core/override/reorder/{param2}/{param1}`
 
 Verify that after `@override` the parameters are reordered correctly in the client method signature.
+
+Expected path parameter:
+param1: param1
+param2: param2
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_Override_RequireOptionalParameter_requireOptional
+
+- Endpoint: `get /azure/client-generator-core/override/require-optional/{param1}/{param2}`
+
+Verify that after `@override` an optional parameter can be made required in the client method signature.
 
 Expected path parameter:
 param1: param1

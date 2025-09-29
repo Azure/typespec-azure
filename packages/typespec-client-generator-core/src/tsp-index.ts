@@ -15,6 +15,7 @@ import {
   $deserializeEmptyStringAsNull,
   $flattenProperty,
   $legacyHierarchyBuilding,
+  $markAsLro,
   $operationGroup,
   $override,
   $paramAlias,
@@ -56,5 +57,6 @@ export const $decorators = {
   "Azure.ClientGenerator.Core.Legacy": {
     hierarchyBuilding: $legacyHierarchyBuilding,
     flattenProperty: $flattenProperty,
+    markAsLro: $markAsLro,
   } satisfies AzureClientGeneratorCoreLegacyDecorators,
 };

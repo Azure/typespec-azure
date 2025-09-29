@@ -1,3 +1,4 @@
+import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
   DecoratorContext,
   DecoratorFunction,
@@ -16,11 +17,13 @@ import {
   getDiscriminator,
   getNamespaceFullName,
   ignoreDiagnostics,
+  isErrorModel,
   isService,
   isTemplateDeclaration,
 } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
+import { getHttpOperation } from "@typespec/http";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
@@ -43,6 +46,7 @@ import {
 import {
   FlattenPropertyDecorator,
   HierarchyBuildingDecorator,
+  MarkAsLroDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
   AccessFlags,
@@ -663,11 +667,13 @@ export const $override = (
 
   // Check if the sorted parameter names arrays are equal, omit optional parameters
   let parametersMatch = true;
+  let checkParameter: ModelProperty | undefined = undefined;
   let index = 0;
   for (const originalParam of originalParams) {
     if (index > overrideParams.length - 1) {
       if (!originalParam.optional) {
         parametersMatch = false;
+        checkParameter = originalParam;
         break;
       } else {
         continue;
@@ -676,6 +682,7 @@ export const $override = (
     if (!compareModelProperties(undefined, originalParam, overrideParams[index])) {
       if (!originalParam.optional) {
         parametersMatch = false;
+        checkParameter = originalParam;
         break;
       } else {
         continue;
@@ -704,8 +711,7 @@ export const $override = (
       target: context.decoratorTarget,
       format: {
         methodName: original.name,
-        originalParameters: originalParams.map((x) => x.name).join(`", "`),
-        overrideParameters: overrideParams.map((x) => x.name).join(`", "`),
+        checkParameter: checkParameter?.name ?? "",
       },
     });
   }
@@ -943,29 +949,33 @@ export function getClientInitializationOptions(
   }
 
   let parametersModel = options?.properties.get("parameters")?.type;
-  const movedParameters = findEntriesWithTarget<ModelProperty, Namespace | Interface>(
-    context,
-    clientLocationKey,
-    entity,
-    "ModelProperty",
-  );
-  const tk = $(context.program);
-  if (movedParameters.length > 0) {
-    if (parametersModel) {
-      // If the parameters model already exists, we will merge the moved parameters into it.
-      for (const movedParameter of movedParameters) {
-        parametersModel.properties.set(movedParameter.name, movedParameter);
+  let currEntity: Namespace | Interface | undefined = entity;
+  while (currEntity) {
+    const movedParameters = findEntriesWithTarget<ModelProperty, Namespace | Interface>(
+      context,
+      clientLocationKey,
+      currEntity,
+      "ModelProperty",
+    );
+    const tk = $(context.program);
+    if (movedParameters.length > 0) {
+      if (parametersModel) {
+        // If the parameters model already exists, we will merge the moved parameters into it.
+        for (const movedParameter of movedParameters) {
+          parametersModel.properties.set(movedParameter.name, movedParameter);
+        }
+      } else {
+        parametersModel = tk.model.create({
+          name: "ClientInitializationParameters",
+          properties: {
+            ...Object.fromEntries(
+              movedParameters.map((movedParameter) => [movedParameter.name, movedParameter]),
+            ),
+          },
+        });
       }
-    } else {
-      parametersModel = tk.model.create({
-        name: "ClientInitializationParameters",
-        properties: {
-          ...Object.fromEntries(
-            movedParameters.map((movedParameter) => [movedParameter.name, movedParameter]),
-          ),
-        },
-      });
     }
+    currEntity = currEntity.namespace;
   }
 
   return {
@@ -1417,6 +1427,45 @@ export function getLegacyHierarchyBuilding(context: TCGCContext, target: Model):
   if (!context.enableLegacyHierarchyBuilding) return undefined;
 
   return getScopedDecoratorData(context, legacyHierarchyBuildingKey, target);
+}
+
+const markAsLroKey = createStateSymbol("markAsLro");
+
+export const $markAsLro: MarkAsLroDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: LanguageScopes,
+) => {
+  const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, target));
+  const hasModelResponse = httpOperation.responses.filter(
+    (r) =>
+      r.type?.kind === "Model" && !(r.statusCodes === "*" || isErrorModel(context.program, r.type)),
+  )[0];
+  if (!hasModelResponse) {
+    reportDiagnostic(context.program, {
+      code: "invalid-mark-as-lro-target",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+  if (getLroMetadata(context.program, target)) {
+    reportDiagnostic(context.program, {
+      code: "mark-as-lro-ineffective",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+  setScopedDecoratorData(context, $markAsLro, markAsLroKey, target, true, scope);
+};
+
+export function getMarkAsLro(context: TCGCContext, entity: Operation): boolean {
+  return getScopedDecoratorData(context, markAsLroKey, entity) ?? false;
 }
 
 /**

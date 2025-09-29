@@ -1,8 +1,5 @@
-import {
-  BasicTestRunner,
-  LinterRuleTester,
-  createLinterRuleTester,
-} from "@typespec/compiler/testing";
+import { Tester } from "#test/test-host.js";
+import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import assert from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { casingRule } from "../../src/rules/casing-style.js";
@@ -11,14 +8,12 @@ import {
   isPascalCaseNoAcronyms,
   isPascalCaseWithAcceptedAcronyms,
 } from "../../src/rules/utils.js";
-import { createAzureCoreTestRunner } from "../test-host.js";
 
 describe("typespec-azure-core: casing rule", () => {
-  let runner: BasicTestRunner;
   let tester: LinterRuleTester;
 
   beforeEach(async () => {
-    runner = await createAzureCoreTestRunner();
+    const runner = await Tester.createInstance();
     tester = createLinterRuleTester(runner, casingRule, "@azure-tools/typespec-azure-core");
   });
 

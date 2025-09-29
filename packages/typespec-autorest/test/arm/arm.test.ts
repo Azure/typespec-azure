@@ -67,7 +67,7 @@ it("can share types with a library namespace", async () => {
 
 it("can use private links with common-types references", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
       @armProviderNamespace
       namespace Microsoft.PrivateLinkTest;
@@ -121,7 +121,7 @@ it("can use private links with common-types references", async () => {
 
 it("can use private endpoints with common-types references", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PrivateLinkTest;
@@ -163,7 +163,7 @@ it("can use private endpoints with common-types references", async () => {
 
 it("verify resolution of private endpoints and private links with v5 version", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PrivateLinkTest;
@@ -216,7 +216,7 @@ it("verify resolution of private endpoints and private links with v5 version", a
 
 it("can use ResourceNameParameter for custom name parameter definition", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PrivateLinkTest;
@@ -257,7 +257,7 @@ it("can use ResourceNameParameter for custom name parameter definition", async (
 
 it("can use ResourceNameParameter for default name parameter definition", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PrivateLinkTest;
@@ -300,7 +300,7 @@ it("can use ResourceNameParameter for default name parameter definition", async 
 
 it("can emit x-ms-client-flatten with optional configuration", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.Contoso;
@@ -331,7 +331,7 @@ it("can emit x-ms-client-flatten with optional configuration", async () => {
 
 it("no x-ms-client-flatten emitted with default configuration", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.Contoso;
@@ -367,7 +367,7 @@ it("no x-ms-client-flatten emitted with default configuration", async () => {
 });
 it("generates PATCH bodies for custom patch of common resource envelope mixins", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PatchTest;
@@ -463,7 +463,7 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
 });
 it("generates PATCH bodies for resource patch of common resource envelope mixins", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PatchTest;

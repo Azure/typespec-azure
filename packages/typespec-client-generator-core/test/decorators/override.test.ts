@@ -365,6 +365,8 @@ it("remove required parameter", async () => {
   )[1];
   expectDiagnostics(diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/override-parameters-mismatch",
+    message:
+      'Method "func" has different parameters definition from the override operation. Please check the parameter defined in the override operation: "bar".',
   });
 });
 
@@ -419,15 +421,17 @@ it("core template", async () => {
   });
   await runnerWithCore.compileWithCustomization(
     `
-    @useDependency(Versions.v1_0_Preview_2)
     @server("http://localhost:3000", "endpoint")
-    @service()
+    @service
+    @versioned(Versions)
     namespace My.Service;
+
+    enum Versions { v1  }
 
     model Params {
       foo: string;
       params: Params[];
-}
+    }
 
     @route("/template")
     op templateOp is Azure.Core.RpcOperation<
