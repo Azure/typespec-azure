@@ -22,7 +22,6 @@ export const Tester = createTester(resolvePath(import.meta.dirname, ".."), {
     "@typespec/http",
     "@typespec/rest",
     "@typespec/versioning",
-    "@typespec/openapi",
     "@azure-tools/typespec-azure-core",
   ],
 })
