@@ -14,9 +14,9 @@ using Azure.ClientGenerator.Core;
 
 @@alternateType(_Specs_.Azure.ClientGenerator.Core.AlternateType.ExternalType.Feature,
   {
-    identity: "com.bedatadriven.jackson.datatype.geo.Feature",
-    package: "com.bedatadriven.jackson.datatype.geo",
-    minVersion: "1.0.0",
+    identity: "com.azure.core.models.GeoObject", // cSpell:ignore GeoObject
+    package: "com.azure.core",
+    minVersion: "1.14.0",
   },
   "java"
 );
