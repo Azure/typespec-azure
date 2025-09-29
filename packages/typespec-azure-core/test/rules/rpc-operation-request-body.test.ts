@@ -30,6 +30,18 @@ it("allow RPCOperation with `@get` and empty body", async () => {
     .toBeValid();
 });
 
+it("with @bodyIgnore properties", async () => {
+  await tester
+    .expect(
+      `
+        @get
+        @route ("/")
+        op get is RpcOperation<{ @bodyIgnore options: { @query foo: string }}, {}>;
+      `,
+    )
+    .toBeValid();
+});
+
 it("allow RPCOperation with `@delete` and empty body", async () => {
   await tester
     .expect(

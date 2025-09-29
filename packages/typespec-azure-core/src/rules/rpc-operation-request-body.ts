@@ -1,5 +1,5 @@
 import { Operation, createRule, paramMessage } from "@typespec/compiler";
-import { getHttpOperation } from "@typespec/http";
+import { getHttpOperation, isBodyIgnore } from "@typespec/http";
 
 export const rpcOperationRequestBodyRule = createRule({
   name: "rpc-operation-request-body",
@@ -23,7 +23,12 @@ export const rpcOperationRequestBodyRule = createRule({
             operation.namespace?.namespace?.name === "Azure"
           ) {
             const httpOperation = getHttpOperation(context.program, originalOperation)[0];
-            const bodyParam = httpOperation.parameters.body;
+            const bodyParam = httpOperation.parameters.properties.find(
+              (p) =>
+                p.kind === "body" ||
+                p.kind === "bodyRoot" ||
+                (p.kind === "bodyProperty" && isBodyIgnore(context.program, p.property) === false),
+            );
             const verb = httpOperation.verb.toLowerCase();
             if ((verb === "get" || verb === "delete") && bodyParam !== undefined) {
               context.reportDiagnostic({
