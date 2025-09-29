@@ -33,6 +33,25 @@ export type ArmResourceCollectionActionDecorator = (
 export type ArmProviderNameValueDecorator = (context: DecoratorContext, target: Operation) => void;
 
 /**
+ * This decorator is used to indicate the identifying properties of objects in the array, e.g. size
+ * The properties that are used as identifiers for the object needs to be provided as a list of strings.
+ *
+ * @param properties The list of properties that are used as identifiers for the object. This needs to be provided as a list of strings.
+ * @example
+ * ```typespec
+ * model Pet {
+ *  @identifiers(#["size"])
+ *  dog: Dog;
+ * }
+ * ```
+ */
+export type IdentifiersDecorator = (
+  context: DecoratorContext,
+  entity: ModelProperty,
+  properties: readonly string[],
+) => void;
+
+/**
  * `@armProviderNamespace` sets the Azure Resource Manager provider name. It will default to use the
  * Namespace element value unless an override value is specified.
  *
@@ -281,28 +300,10 @@ export type ResourceBaseTypeDecorator = (
   baseTypeIt: Type,
 ) => void;
 
-/**
- * This decorator is used to indicate the identifying properties of objects in the array, e.g. size
- * The properties that are used as identifiers for the object needs to be provided as a list of strings.
- *
- * @param properties The list of properties that are used as identifiers for the object. This needs to be provided as a list of strings.
- * @example
- * ```typespec
- * model Pet {
- *  @identifiers(#["size"])
- *  dog: Dog;
- * }
- * ```
- */
-export type IdentifiersDecorator = (
-  context: DecoratorContext,
-  entity: ModelProperty,
-  properties: readonly string[],
-) => void;
-
 export type AzureResourceManagerDecorators = {
   armResourceCollectionAction: ArmResourceCollectionActionDecorator;
   armProviderNameValue: ArmProviderNameValueDecorator;
+  identifiers: IdentifiersDecorator;
   armProviderNamespace: ArmProviderNamespaceDecorator;
   useLibraryNamespace: UseLibraryNamespaceDecorator;
   armLibraryNamespace: ArmLibraryNamespaceDecorator;
@@ -322,5 +323,4 @@ export type AzureResourceManagerDecorators = {
   armCommonTypesVersion: ArmCommonTypesVersionDecorator;
   armVirtualResource: ArmVirtualResourceDecorator;
   resourceBaseType: ResourceBaseTypeDecorator;
-  identifiers: IdentifiersDecorator;
 };
