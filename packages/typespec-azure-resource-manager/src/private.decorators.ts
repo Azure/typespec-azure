@@ -6,12 +6,14 @@ import {
   ModelProperty,
   Operation,
   Program,
+  Scalar,
   Tuple,
   Type,
   addVisibilityModifiers,
   clearVisibilityModifiersForClass,
   getKeyName,
   getLifecycleVisibilityEnum,
+  getNamespaceFullName,
   getTypeName,
   isKey,
   sealVisibilityModifiers,
@@ -43,9 +45,11 @@ import {
   ConditionalClientFlattenDecorator,
   DefaultResourceKeySegmentNameDecorator,
   EnforceConstraintDecorator,
+  LegacyTypeDecorator,
   OmitIfEmptyDecorator,
   ResourceBaseParametersOfDecorator,
   ResourceParameterBaseForDecorator,
+  ResourceParentTypeDecorator,
 } from "../generated-defs/Azure.ResourceManager.Private.js";
 import { reportDiagnostic } from "./lib.js";
 import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
@@ -613,6 +617,29 @@ const $armBodyRoot: ArmBodyRootDecorator = (
   context.call($bodyRoot, target);
 };
 
+const $legacyType: LegacyTypeDecorator = (
+  context: DecoratorContext,
+  target: Model | Operation | Interface | Scalar,
+) => {
+  const { program } = context;
+  if (
+    target.namespace &&
+    getNamespaceFullName(target.namespace).startsWith("Azure.ResourceManager")
+  ) {
+    return;
+  }
+  reportDiagnostic(program, { code: "legacy-type-usage", target });
+};
+
+const $resourceParentType: ResourceParentTypeDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  parentType: "Subscription" | "ResourceGroup" | "Tenant" | "Extension",
+) => {
+  const { program } = context;
+  setResourceBaseType(program, target, parentType);
+};
+
 /** @internal */
 export const $decorators = {
   "Azure.ResourceManager.Private": {
@@ -631,6 +658,8 @@ export const $decorators = {
     armResourcePropertiesOptionality: $armResourcePropertiesOptionality,
     armBodyRoot: $armBodyRoot,
     armResourceWithParameter: $armResourceWithParameter,
+    legacyType: $legacyType,
+    resourceParentType: $resourceParentType,
   } satisfies AzureResourceManagerPrivateDecorators,
   "Azure.ResourceManager.Extension.Private": {
     builtInResource: $builtInResource,
