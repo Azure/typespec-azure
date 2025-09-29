@@ -542,7 +542,20 @@ def create_user_profile(
 ```
 
 ```java
-// TODO
+// ServiceVersion class
+public enum ServiceServiceVersion implements ServiceVersion {
+    V2024_01_01("2024-01-01"),
+    V2024_02_01("2024-02-01");
+
+    public String getVersion();
+}
+
+// Client class
+@ServiceClient(builder = ServiceClientClientBuilder.class)
+public final class ServiceClientClient {
+    public void getUserInfo(UserInfo userInfo);
+    public void createUserProfile(UserProfile userProfile);
+}
 ```
 
 ```go
@@ -626,7 +639,35 @@ def create_user_profile(
 ```
 
 ```java
-// TODO
+// ServiceVersion class
+public enum ServiceServiceVersion implements ServiceVersion {
+    V2024_01_01("2024-01-01"),
+    V2024_02_01("2024-02-01");
+
+    public String getVersion();
+}
+
+// Client class
+@ServiceClient(builder = ServiceClientClientBuilder.class)
+public final class ServiceClientClient {
+    public void getUserInfo(UserInfo userInfo);
+    public void createUserProfile(UserProfile userProfile);
+}
+
+// Model class
+@Fluent
+public final class UserProfile implements JsonSerializable<UserProfile> {
+    public UserProfile(String profileName);
+    public UserProfile setProfileDetails(ProfileDetails profileDetails);
+    public String getProfileName();
+    public ProfileDetails getProfileDetails();
+}
+
+@Immutable
+public final class ProfileDetails implements JsonSerializable<ProfileDetails> {
+    public ProfileDetails(String detailDescription);
+    public String getDetailDescription();
+}
 ```
 
 ```go
