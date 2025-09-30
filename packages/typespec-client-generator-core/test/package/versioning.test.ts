@@ -1,5 +1,6 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { Interface } from "@typespec/compiler";
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
 import {
@@ -1362,4 +1363,111 @@ it("do not filter preview versions when default API version is preview", async (
   strictEqual(sdkVersionsEnum.values[0].value, "2022-10-01");
   strictEqual(sdkVersionsEnum.values[1].value, "2022-11-01-preview");
   strictEqual(sdkVersionsEnum.values[2].value, "2024-12-01-preview");
+});
+
+it("version not exist", async () => {
+  const runnerWithVersion = await createSdkTestRunner({
+    "api-version": "v4",
+    emitterName: "@azure-tools/typespec-python",
+  });
+
+  const [_, diagnostics] = await runnerWithVersion.compileAndDiagnose(`
+    @service(#{
+      title: "Contoso Widget Manager",
+    })
+    @versioned(Contoso.WidgetManager.Versions)
+    namespace Contoso.WidgetManager;
+    
+    enum Versions {
+      v1,
+      v2,
+      v3,
+    }
+    
+    @error
+    model Error {
+      code: string;
+      message?: string;
+    }
+    
+    model Widget {
+      @key
+      @typeChangedFrom(Versions.v3, string)
+      id: int32;
+    
+      @renamedFrom(Versions.v3, "name")
+      @madeOptional(Versions.v3)
+      description?: string;
+    }
+
+    @added(Versions.v2)
+    @removed(Versions.v3)
+    model Test {
+      prop1: string;
+    }
+
+    @route("/test")
+    @added(Versions.v2)
+    @returnTypeChangedFrom(Versions.v3, Test)
+    op test(): void | Error;
+
+    op list(@query apiVersion: string): Widget[] | Error;
+    
+    @added(Versions.v2)
+    @route("/widget/{id}")
+    op get(...Resource.KeysOf<Widget>): Widget | Error;
+  `);
+
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/api-version-not-exist",
+    message:
+      'The API version specified in the config: "v4" is not defined in service versioning list. Fall back to the latest version.',
+    severity: "warning",
+  });
+
+  const sdkPackage = runnerWithVersion.context.sdkPackage;
+  strictEqual(sdkPackage.metadata.apiVersion, "v3");
+  deepStrictEqual(runnerWithVersion.context.getPackageVersions(), ["v1", "v2", "v3"]);
+  strictEqual(sdkPackage.clients.length, 1);
+
+  const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
+    (x) => x.isApiVersionParam,
+  );
+  ok(apiVersionParam);
+  strictEqual(apiVersionParam.clientDefaultValue, "v3");
+
+  strictEqual(sdkPackage.clients[0].methods.length, 3);
+  const list = sdkPackage.clients[0].methods.find((x) => x.name === "list");
+  ok(list);
+  deepStrictEqual(list.apiVersions, ["v1", "v2", "v3"]);
+  const get = sdkPackage.clients[0].methods.find((x) => x.name === "get");
+  ok(get);
+  deepStrictEqual(get.apiVersions, ["v2", "v3"]);
+  const test = sdkPackage.clients[0].methods.find((x) => x.name === "test");
+  ok(test);
+  deepStrictEqual(test.apiVersions, ["v2", "v3"]);
+  const returnValue = test.response;
+  ok(returnValue);
+  strictEqual((returnValue as SdkMethodResponse).type, undefined);
+  strictEqual(sdkPackage.models.length, 2);
+  const widget = sdkPackage.models.find((x) => x.name === "Widget");
+  ok(widget);
+  deepStrictEqual(widget.apiVersions, ["v1", "v2", "v3"]);
+  strictEqual(widget?.properties.length, 2);
+  const id = widget?.properties.find((x) => x.name === "id");
+  ok(id);
+  deepStrictEqual(id.apiVersions, ["v1", "v2", "v3"]);
+  const description = widget?.properties.find((x) => x.name === "description");
+  ok(description);
+  deepStrictEqual(description.apiVersions, ["v1", "v2", "v3"]); // rename or change type will not change the apiVersions
+  strictEqual(description.optional, true);
+  const error = sdkPackage.models.find((x) => x.name === "Error");
+  ok(error);
+  deepStrictEqual(error.apiVersions, ["v1", "v2", "v3"]);
+  const versions = sdkPackage.enums.find((x) => x.name === "Versions");
+  ok(versions);
+  deepStrictEqual(
+    versions.values.map((v) => v.value),
+    ["v1", "v2", "v3"],
+  );
 });

@@ -46,6 +46,7 @@ import {
   TCGCEmitterOptions,
   TspLiteralType,
 } from "./internal-utils.js";
+import { reportDiagnostic } from "./lib.js";
 import { createSdkPackage } from "./package.js";
 import { listAllServiceNamespaces } from "./public-utils.js";
 
@@ -131,6 +132,20 @@ export function createTCGCContext(
       removeVersionsLargerThanExplicitlySpecified(this, versions);
 
       this.__packageVersions = versions.map((version) => version.value);
+
+      if (
+        this.apiVersion !== undefined &&
+        this.apiVersion !== "latest" &&
+        this.apiVersion !== "all" &&
+        !this.__packageVersions.includes(this.apiVersion)
+      ) {
+        reportDiagnostic(this.program, {
+          code: "api-version-not-exist",
+          format: { version: this.apiVersion },
+          target: service.type,
+        });
+        this.apiVersion = this.__packageVersions[this.__packageVersions.length - 1];
+      }
       return this.__packageVersions;
     },
     getPackageVersionEnum(): Enum | undefined {
