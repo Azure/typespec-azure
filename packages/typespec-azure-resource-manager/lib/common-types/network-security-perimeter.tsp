@@ -1,6 +1,7 @@
 using Http;
 using Versioning;
 using Azure.Core;
+using Azure.ResourceManager;
 
 @server(
   "https://management.azure.com",
