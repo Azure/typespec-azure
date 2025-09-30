@@ -56,6 +56,7 @@ export type ArmOperationKind = ArmLifecycleOperationKind | "list" | "action" | "
 export interface ArmResourceOperation extends ArmResourceOperationData {
   path: string;
   httpOperation: HttpOperation;
+  resourceName?: string;
 }
 
 export interface ArmLifecycleOperations {
@@ -89,6 +90,7 @@ interface ArmResourceOperationData {
   kind: ArmOperationKind;
   operation: Operation;
   operationGroup: string;
+  resourceName?: string;
 }
 
 /** Identifying information for an arm operation */
@@ -98,6 +100,7 @@ interface ArmOperationIdentifier {
   operationGroup: string;
   operation: Operation;
   resource?: Model;
+  resourceName?: string;
 }
 
 interface ArmLifecycleOperationData {
@@ -139,6 +142,7 @@ function resolveHttpOperations<T extends Record<string, ArmResourceOperationData
       ...item,
       path: httpOperation.path,
       httpOperation: httpOperation,
+      resourceName: getResourceNameForOperation(program, item.operation),
     };
   }
   return result as any;
@@ -166,6 +170,7 @@ function setResourceLifecycleOperation(
   target: Operation,
   resourceType: Model,
   kind: ArmLifecycleOperationKind,
+  resourceName?: string,
 ) {
   // Only register methods from non-templated interface types
   if (
@@ -179,11 +184,13 @@ function setResourceLifecycleOperation(
   // We can't resolve the operation path yet so treat the operation as a partial
   // type so that we can fill in the missing details later
   const operations = getArmResourceOperations(context.program, resourceType);
+  const resolvedResourceName: string = resourceName ?? resourceType.name;
   const operation: Partial<ArmResourceOperation> = {
     name: target.name,
     kind,
     operation: target,
     operationGroup: target.interface.name,
+    resourceName: resolvedResourceName,
   };
 
   operations.lifecycle[kind] = operation as ArmResourceOperation;
@@ -192,6 +199,7 @@ function setResourceLifecycleOperation(
     kind: kind,
     operation: target,
     operationGroup: target.interface.name,
+    resourceName: resolvedResourceName,
   });
 }
 
@@ -239,6 +247,7 @@ export function setArmOperationIdentifier(
     operation: target,
     operationGroup: data.operationGroup,
     resource: resourceType,
+    resourceName: data.resourceName,
   };
   // Initialize the operations for the resource type if not already done
   if (!getArmResourceOperationData(program, target)) {
@@ -287,6 +296,7 @@ export const $armResourceList: ArmResourceListDecorator = (
   context: DecoratorContext,
   target: Operation,
   resourceType: Model,
+  resourceName?: string,
 ) => {
   // Only register methods from non-templated interface types
   if (
@@ -305,22 +315,20 @@ export const $armResourceList: ArmResourceListDecorator = (
     kind: "list",
     operation: target,
     operationGroup: target.interface.name,
+    resourceName: resourceName ?? resourceType.name,
   };
 
   operations.lists[target.name] = operation as ArmResourceOperation;
-  addArmResourceOperation(context.program, resourceType, {
+  const opId: ArmOperationIdentifier = {
     name: target.name,
     kind: "list",
     operation: target,
     operationGroup: target.interface.name,
     resource: resourceType,
-  });
-  setArmOperationIdentifier(context.program, target, resourceType, {
-    name: target.name,
-    kind: "list",
-    operation: target,
-    operationGroup: target.interface.name,
-  });
+    resourceName: operation.resourceName,
+  };
+  addArmResourceOperation(context.program, resourceType, opId);
+  setArmOperationIdentifier(context.program, target, resourceType, opId);
 };
 
 export function armRenameListByOperationInternal(
@@ -417,6 +425,7 @@ export const $armResourceAction: ArmResourceActionDecorator = (
   context: DecoratorContext,
   target: Operation,
   resourceType: Model,
+  resourceName?: string,
 ) => {
   const { program } = context;
 
@@ -432,27 +441,26 @@ export const $armResourceAction: ArmResourceActionDecorator = (
   // We can't resolve the operation path yet so treat the operation as a partial
   // type so that we can fill in the missing details later
   const operations = getArmResourceOperations(program, resourceType);
+  const resolvedResourceName: string = resourceName ?? resourceType.name;
   const operation: Partial<ArmResourceOperation> = {
     name: target.name,
     kind: "action",
     operation: target,
     operationGroup: target.interface.name,
+    resourceName: resolvedResourceName,
   };
 
   operations.actions[target.name] = operation as ArmResourceOperation;
-  addArmResourceOperation(program, resourceType, {
+  const opId: ArmOperationIdentifier = {
     name: target.name,
     kind: "action",
     operation: target,
     operationGroup: target.interface.name,
     resource: resourceType,
-  });
-  setArmOperationIdentifier(context.program, target, resourceType, {
-    name: target.name,
-    kind: "action",
-    operation: target,
-    operationGroup: target.interface.name,
-  });
+    resourceName: resolvedResourceName,
+  };
+  addArmResourceOperation(program, resourceType, opId);
+  setArmOperationIdentifier(context.program, target, resourceType, opId);
 
   const segment = getSegment(program, target) ?? getActionSegment(program, target);
   if (!segment) {
@@ -632,4 +640,7 @@ function createParamMutator(sourceParameterName: string, targetParameterName: st
       },
     },
   };
+}
+function getResourceNameForOperation(program: Program, operation: Operation): string | undefined {
+  throw new Error("Function not implemented.");
 }

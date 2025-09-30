@@ -25,6 +25,7 @@ import { useStateMap } from "@typespec/compiler/utils";
 import { getHttpOperation, isPathParam } from "@typespec/http";
 import { $autoRoute, getParentResource, getSegment } from "@typespec/rest";
 
+import { pascalCase } from "change-case";
 import {
   ArmProviderNameValueDecorator,
   ArmResourceOperationsDecorator,
@@ -137,11 +138,16 @@ export interface Provider {
   providerOperations?: ArmResourceOperation[];
 }
 
-export interface ResolvedResourceInfo {
+export interface ResourcePathInfo {
   /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
   resourceType: ResourceType;
   /** The path to the instance of a resource */
   resourceInstancePath: string;
+}
+
+export interface ResolvedResourceInfo extends ResourcePathInfo {
+  /** The name of the resource at this instance path  */
+  resourceName: string;
 }
 
 /** Resolved operations, including operations for non-arm resources */
@@ -434,13 +440,18 @@ function getResourceInfo(
   program: Program,
   operation: ArmResourceOperation,
 ): ResolvedResourceInfo | undefined {
-  return getResourcePathElements(operation.httpOperation.path, operation.kind);
+  const pathInfo = getResourcePathElements(operation.httpOperation.path, operation.kind);
+  if (pathInfo === undefined) return undefined;
+  return {
+    ...pathInfo,
+    resourceName: operation.resourceName ?? operation.operationGroup,
+  };
 }
 
 export function getResourcePathElements(
   path: string,
   kind: ArmOperationKind,
-): ResolvedResourceInfo | undefined {
+): ResourcePathInfo | undefined {
   const segments = path.split("/").filter((s) => s.length > 0);
   const providerIndex = segments.findLastIndex((s) => s === "providers");
   if (providerIndex === -1 || providerIndex === segments.length - 1) return undefined;
@@ -479,6 +490,32 @@ export function getResourcePathElements(
     };
   }
   return undefined;
+}
+
+export function getDefaultLegacyExtensionResourceName(
+  path: string,
+  resource: Model,
+  operationKind: ArmOperationKind,
+): string {
+  const providerIndex = path.lastIndexOf("/providers");
+  if (providerIndex > -1 && providerIndex < path.length - 1) {
+    const targetPath = path.slice(0, providerIndex);
+    const extensionPath = path.slice(providerIndex);
+    const extensionInfo = getResourcePathElements(extensionPath, operationKind);
+    if (!extensionInfo) return resource.name;
+    const extensionName = extensionInfo.resourceType.types.flatMap((t) => pascalCase(t)).join("");
+    if (targetPath.length === 0) {
+      return extensionName;
+    }
+    if (targetPath.length === 1) {
+      return `${pascalCase(targetPath[0].replaceAll("{", "").replaceAll("}", ""))}${extensionName}`;
+    }
+    const targetInfo = getResourcePathElements(targetPath, "read");
+    if (!targetInfo || targetInfo.resourceType.types.length === 0) return resource.name;
+    const types = targetInfo.resourceType.types;
+    return `${pascalCase(types[types.length - 1])}${extensionName}`;
+  }
+  return resource.name;
 }
 
 function tryAddLifecycleOperation(
@@ -594,20 +631,15 @@ export function getUnassociatedOperations(program: Program): ArmResourceOperatio
     .filter((op) => op !== undefined) as ArmResourceOperation[];
 }
 
-function getResourceOperation(
+export function getResourceOperation(
   program: Program,
   operation: Operation,
 ): ArmResourceOperation | undefined {
   if (operation.kind !== "Operation") return undefined;
-  if (!operation.isFinished) return undefined;
+  if (operation.isFinished === false) return undefined;
   if (isTemplateDeclarationOrInstance(operation) && !isTemplateInstance(operation))
     return undefined;
   if (operation.interface === undefined || operation.interface.name === undefined) return undefined;
-  if (
-    isTemplateDeclarationOrInstance(operation.interface) &&
-    !isTemplateInstance(operation.interface)
-  )
-    return undefined;
   const [httpOp, _] = getHttpOperation(program, operation);
   return {
     path: httpOp.path,
@@ -684,6 +716,8 @@ export function resolveArmResourceOperations(
     armOperation.kind = operation.kind;
     const resourceInfo = getResourceInfo(program, armOperation);
     if (resourceInfo === undefined) continue;
+    resourceInfo.resourceName =
+      operation.resourceName ?? operation.resource?.name ?? operation.operationGroup;
 
     let matched = false;
     // Check if we already have an operation for this resource
@@ -703,6 +737,7 @@ export function resolveArmResourceOperations(
     const newOperation: ResolvedResource = {
       resourceType: resourceInfo.resourceType,
       resourceInstancePath: resourceInfo.resourceInstancePath,
+      resourceName: resourceInfo.resourceName,
       operations: {
         lifecycle: {
           read: undefined,

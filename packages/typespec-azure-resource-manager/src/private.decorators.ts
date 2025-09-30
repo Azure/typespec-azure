@@ -23,7 +23,7 @@ import { $ } from "@typespec/compiler/typekit";
 import { useStateMap } from "@typespec/compiler/utils";
 import { $bodyRoot, getHttpOperation } from "@typespec/http";
 import { $segment, getSegment } from "@typespec/rest";
-import { camelCase } from "change-case";
+import { camelCase, pascalCase } from "change-case";
 import pluralize from "pluralize";
 import {
   AzureResourceManagerExtensionPrivateDecorators,
@@ -46,6 +46,9 @@ import {
   DefaultResourceKeySegmentNameDecorator,
   EnforceConstraintDecorator,
   LegacyTypeDecorator,
+  ExtensionResourceOperationDecorator,
+  LegacyExtensionResourceOperationDecorator,
+  LegacyResourceOperationDecorator,
   OmitIfEmptyDecorator,
   ResourceBaseParametersOfDecorator,
   ResourceParameterBaseForDecorator,
@@ -53,14 +56,25 @@ import {
 } from "../generated-defs/Azure.ResourceManager.Private.js";
 import { reportDiagnostic } from "./lib.js";
 import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
-import { armRenameListByOperationInternal } from "./operations.js";
+import {
+  $armResourceAction,
+  $armResourceCreateOrUpdate,
+  $armResourceDelete,
+  $armResourceList,
+  $armResourceRead,
+  $armResourceUpdate,
+  armRenameListByOperationInternal,
+} from "./operations.js";
 import {
   ArmResourceDetails,
   ArmResourceKind,
   ResourceBaseType,
   getArmResourceKind,
   getArmVirtualResourceDetails,
+  getDefaultLegacyExtensionResourceName,
   getResourceBaseType,
+  getResourceOperation,
+  getResourcePathElements,
   isArmVirtualResource,
   isCustomAzureResource,
   resolveResourceBaseType,
@@ -638,6 +652,95 @@ const $resourceParentType: ResourceParentTypeDecorator = (
 ) => {
   const { program } = context;
   setResourceBaseType(program, target, parentType);
+function callOperationDecorator(
+  context: DecoratorContext,
+  target: Operation,
+  resourceType: Model,
+  resourceName: string,
+  operationType: "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
+): void {
+  switch (operationType) {
+    case "read":
+      context.call($armResourceRead, target, resourceType, resourceName);
+      break;
+    case "createOrUpdate":
+      context.call($armResourceCreateOrUpdate, target, resourceType, resourceName);
+      break;
+    case "update":
+      context.call($armResourceUpdate, target, resourceType, resourceName);
+      break;
+    case "delete":
+      context.call($armResourceDelete, target, resourceType, resourceName);
+      break;
+    case "list":
+      context.call($armResourceList, target, resourceType, resourceName);
+      break;
+    case "action":
+      context.call($armResourceAction, target, resourceType, resourceName);
+      break;
+  }
+}
+
+const $extensionResourceOperation: ExtensionResourceOperationDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  targetResourceType: Model,
+  extensionResourceType: Model,
+  operationType: "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
+  resourceName?: string,
+) => {
+  const resolvedResourceName =
+    resourceName === undefined || resourceName.length === 0
+      ? `${targetResourceType.name}${extensionResourceType.name}`
+      : resourceName;
+  callOperationDecorator(
+    context,
+    target,
+    extensionResourceType,
+    resolvedResourceName,
+    operationType,
+  );
+};
+
+const $legacyResourceOperation: LegacyResourceOperationDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  resourceType: Model,
+  operationType: "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
+  resourceName?: string,
+) => {
+  let resolvedResourceName = resourceName;
+  if (resolvedResourceName === undefined || resolvedResourceName.length === 0) {
+    const armOp = getResourceOperation(context.program, target);
+    if (!armOp) return;
+    const pathInfo = getResourcePathElements(armOp.path, operationType);
+    if (pathInfo !== undefined) {
+      resolvedResourceName = pathInfo.resourceType.types.flatMap((t) => pascalCase(t)).join("");
+    } else {
+      resolvedResourceName = resourceType.name;
+    }
+  }
+  callOperationDecorator(context, target, resourceType, resolvedResourceName, operationType);
+};
+
+const $legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  resourceType: Model,
+  operationType: "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
+  resourceName?: string,
+) => {
+  let resolvedResourceName = resourceName;
+  if (resolvedResourceName === undefined || resolvedResourceName.length === 0) {
+    const armOp = getResourceOperation(context.program, target);
+    if (!armOp) return;
+    resolvedResourceName = getDefaultLegacyExtensionResourceName(
+      armOp.path,
+      resourceType,
+      operationType,
+    );
+  }
+  callOperationDecorator(context, target, resourceType, resolvedResourceName, operationType);
 };
 
 /** @internal */
@@ -660,6 +763,9 @@ export const $decorators = {
     armResourceWithParameter: $armResourceWithParameter,
     legacyType: $legacyType,
     resourceParentType: $resourceParentType,
+    extensionResourceOperation: $extensionResourceOperation,
+    legacyExtensionResourceOperation: $legacyExtensionResourceOperation,
+    legacyResourceOperation: $legacyResourceOperation,
   } satisfies AzureResourceManagerPrivateDecorators,
   "Azure.ResourceManager.Extension.Private": {
     builtInResource: $builtInResource,

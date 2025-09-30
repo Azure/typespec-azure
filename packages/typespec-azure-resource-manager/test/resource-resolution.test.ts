@@ -122,6 +122,7 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}",
+          resourceName: "Foo",
         },
       },
       {
@@ -135,6 +136,7 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}",
+          resourceName: "Foo",
         },
       },
       {
@@ -148,6 +150,7 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{name}",
+          resourceName: "Foo",
         },
       },
       {
@@ -160,6 +163,7 @@ describe("unit tests for resource manager helpers", () => {
             types: ["foos"],
           },
           resourceInstancePath: "/providers/Microsoft.Test/foos/{name}",
+          resourceName: "Foo",
         },
       },
       {
@@ -173,6 +177,7 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}/providers/Microsoft.Bar/bars/{barName}",
+          resourceName: "Bar",
         },
       },
       {
@@ -186,6 +191,7 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}/providers/Microsoft.Bar/bars/{barName}/basses/{name}",
+          resourceName: "Bass",
         },
       },
       {
@@ -199,6 +205,7 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}/providers/Microsoft.Bar/bars/{barName}/basses/{baseName}",
+          resourceName: "Bass",
         },
       },
       {
@@ -212,6 +219,7 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/{name}",
+          resourceName: "Bass",
         },
       },
       {
@@ -225,6 +233,7 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/{name}",
+          resourceName: "Bass",
         },
       },
       {
@@ -238,6 +247,7 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}",
+          resourceName: "Bar",
         },
       },
       {
@@ -251,6 +261,7 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default",
+          resourceName: "Bass",
         },
       },
       {
@@ -264,6 +275,7 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default",
+          resourceName: "Bass",
         },
       },
       {
@@ -277,6 +289,7 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default",
+          resourceName: "Bass",
         },
       },
     ];
@@ -1609,7 +1622,7 @@ interface EmployeesByRoom {
   delete is EmployeeRoomOps.DeleteSync<Employee>;
   list is EmployeeRoomOps.List<Employee>;
   /** A sample resource action that move employee to different location */
-  @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/rooms/{roomId}/employeeResources/{employeeId}/move")
+  @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/rooms/{roomId}/employeeResources/{employeeId}/roomMove/move")
   move is EmployeeRoomOps.ActionSync<Employee, MoveRequest, MoveResponse>;
 }
 
