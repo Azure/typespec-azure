@@ -459,7 +459,7 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`@markAsLro decorator is ineffective since this operation already returns real LRO metadata. Please remove the @markAsLro decorator.`,
       },
     },
-    "api-version-not-exist": {
+    "api-version-undefined": {
       severity: "warning",
       messages: {
         default: paramMessage`The API version specified in the config: "${"version"}" is not defined in service versioning list. Fall back to the latest version.`,

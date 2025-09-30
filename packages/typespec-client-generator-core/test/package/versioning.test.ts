@@ -1419,7 +1419,7 @@ it("version not exist", async () => {
   `);
 
   expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/api-version-not-exist",
+    code: "@azure-tools/typespec-client-generator-core/api-version-undefined",
     message:
       'The API version specified in the config: "v4" is not defined in service versioning list. Fall back to the latest version.',
     severity: "warning",

@@ -140,7 +140,7 @@ export function createTCGCContext(
         !this.__packageVersions.includes(this.apiVersion)
       ) {
         reportDiagnostic(this.program, {
-          code: "api-version-not-exist",
+          code: "api-version-undefined",
           format: { version: this.apiVersion },
           target: service.type,
         });
