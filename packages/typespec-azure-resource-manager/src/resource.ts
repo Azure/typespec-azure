@@ -917,12 +917,11 @@ export const $armProviderNameValue: ArmProviderNameValueDecorator = (
 
 export const $identifiers: IdentifiersDecorator = (
   context: DecoratorContext,
-  entity: ModelProperty,
+  entity: ModelProperty | Type,
   properties: readonly string[],
 ) => {
   const { program } = context;
-  const { type } = entity;
-
+  const type = entity.kind === "ModelProperty" ? entity.type : entity;
   if (
     type.kind !== "Model" ||
     !isArrayModelType(program, type) ||
@@ -946,7 +945,10 @@ export const $identifiers: IdentifiersDecorator = (
  * @param entity The array model type to check.
  * @returns returns list of arm identifiers for the given array model type if any or undefined.
  */
-export function getArmIdentifiers(program: Program, entity: ModelProperty): string[] | undefined {
+export function getArmIdentifiers(
+  program: Program,
+  entity: ModelProperty | Model,
+): string[] | undefined {
   return program.stateMap(ArmStateKeys.armIdentifiers).get(entity);
 }
 
