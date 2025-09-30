@@ -42,7 +42,7 @@ describe("@extension", () => {
   });
 
   // https://github.com/Azure/typespec-azure/issues/687
-  it("exclude x-ms-identifiers key", async () => {
+  it("include x-ms-identifiers key", async () => {
     await tester
       .expect(
         `model foo {
@@ -51,7 +51,9 @@ describe("@extension", () => {
         }
         model Bar { prop: string;}`,
       )
-      .toBeValid();
+      .toEmitDiagnostics({
+        code: "@azure-tools/typespec-azure-core/no-openapi",
+      });
   });
 });
 
