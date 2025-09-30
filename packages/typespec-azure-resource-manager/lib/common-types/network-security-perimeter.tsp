@@ -1,7 +1,6 @@
 using Http;
 using Versioning;
 using Azure.Core;
-using Azure.ResourceManager;
 
 @server(
   "https://management.azure.com",
@@ -158,7 +157,7 @@ model NetworkSecurityPerimeterConfigurationProperties {
 
   /** List of provisioning issues, if any */
   @visibility(Lifecycle.Read)
-  @identifiers(#[])
+  @Azure.ResourceManager.identifiers(#[])
   provisioningIssues?: ProvisioningIssue[];
 
   networkSecurityPerimeter?: NetworkSecurityPerimeter;
@@ -198,7 +197,7 @@ model ProvisioningIssueProperties {
 
   /** Access rules that can be added to the network security profile (NSP) to remediate the issue. */
   @visibility(Lifecycle.Read)
-  @identifiers(#[])
+  @Azure.ResourceManager.identifiers(#[])
   suggestedAccessRules?: AccessRule[];
 }
 
@@ -221,7 +220,7 @@ model NetworkSecurityProfile {
   accessRulesVersion?: int32;
 
   /** List of Access Rules */
-  @identifiers(#["name"])
+  @Azure.ResourceManager.identifiers(#["name"])
   accessRules?: AccessRule[];
 
   /** Current diagnostic settings version */
