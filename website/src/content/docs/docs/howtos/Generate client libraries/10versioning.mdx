@@ -559,7 +559,38 @@ public final class ServiceClientClient {
 ```
 
 ```go
-// TODO
+
+// UserInfo - User information model containing basic user details
+type UserInfo struct {
+// REQUIRED; The unique username for the user
+	Username *string
+}
+
+// UserProfile - User profile model containing profile-specific information
+type UserProfile struct {
+// REQUIRED; The display name for the user's profile
+	ProfileName *string
+}
+
+type ServiceUserOperationsClientCreateUserProfileOptions struct {
+}
+
+type ServiceUserOperationsClientGetUserInfoOptions struct {
+}
+
+type ServiceUserOperationsClientCreateUserProfileResponse struct {
+}
+
+type ServiceUserOperationsClientGetUserInfoResponse struct {
+}
+
+type ServiceUserOperationsClient struct {
+}
+
+func (client *ServiceUserOperationsClient) GetUserInfo(ctx context.Context, userInfo UserInfo, options *ServiceUserOperationsClientGetUserInfoOptions) (ServiceUserOperationsClientGetUserInfoResponse, error)
+
+func (client *ServiceUserOperationsClient) CreateUserProfile(ctx context.Context, userProfile UserProfile, options *ServiceUserOperationsClientCreateUserProfileOptions) (ServiceUserOperationsClientCreateUserProfileResponse, error)
+
 ```
 
 </ClientTabs>
@@ -671,7 +702,44 @@ public final class ProfileDetails implements JsonSerializable<ProfileDetails> {
 ```
 
 ```go
-// TODO
+
+type ProfileDetails struct {
+// REQUIRED
+	DetailDescription *string
+}
+
+type UserInfo struct {
+// REQUIRED
+	Username *string
+}
+
+type UserProfile struct {
+// REQUIRED
+	ProfileDetails *ProfileDetails
+
+// REQUIRED
+	ProfileName *string
+}
+
+type ServiceClientCreateUserProfileResponse struct {
+}
+
+type ServiceClientGetUserInfoResponse struct {
+}
+
+type ServiceClientCreateUserProfileOptions struct {
+}
+
+type ServiceClientGetUserInfoOptions struct {
+}
+
+type ServiceClient struct {
+}
+
+func (client *ServiceClient) CreateUserProfile(ctx context.Context, userProfile UserProfile, options *ServiceClientCreateUserProfileOptions) (ServiceClientCreateUserProfileResponse, error)
+
+func (client *ServiceClient) GetUserInfo(ctx context.Context, userInfo UserInfo, options *ServiceClientGetUserInfoOptions) (ServiceClientGetUserInfoResponse, error)
+
 ```
 
 </ClientTabs>
