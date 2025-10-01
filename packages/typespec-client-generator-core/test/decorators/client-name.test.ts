@@ -236,6 +236,21 @@ it("apply with @operationGroup decorator to interface client", async () => {
   strictEqual(myOperationGroup.name, "MyOperationGroup");
 });
 
+it("overrides client name from @client definition", async () => {
+  await runner.compile(`
+    @service
+    namespace MyService;
+
+    @client({"name": "DontUseThisName"})
+    @clientName("MyInterfaceClient")
+    interface MyInterface {
+      op test(): void;
+    }
+  `);
+
+  strictEqual(runner.context.sdkPackage.clients[0].name, "MyInterfaceClient");
+});
+
 it("empty client name", async () => {
   const diagnostics = await runner.diagnose(`
     @service
