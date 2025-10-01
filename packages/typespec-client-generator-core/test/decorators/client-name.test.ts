@@ -241,7 +241,7 @@ it("overrides client name from @client definition", async () => {
     @service
     namespace MyService;
 
-    @client({"name": "DontUseThisName"})
+    @client({"name": "DoNotUseThisName"})
     @clientName("MyInterfaceClient")
     interface MyInterface {
       op test(): void;
