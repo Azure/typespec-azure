@@ -25,6 +25,7 @@ import {
 import {
   getClientNameOverride,
   getLegacyHierarchyBuilding,
+  getMarkAsLro,
   shouldFlattenProperty,
 } from "@azure-tools/typespec-client-generator-core";
 import {
@@ -662,6 +663,9 @@ export async function getOpenAPIForService(
           currentEndpoint["x-ms-long-running-operation-options"] = lroOptions;
         }
       }
+    }
+    if (getMarkAsLro(context.tcgcSdkContext, op) === true) {
+      currentEndpoint["x-ms-long-running-operation"] = true;
     }
 
     // Extract paged metadata from Azure.Core.Page
@@ -1908,6 +1912,8 @@ export async function getOpenAPIForService(
       description: getDoc(program, model),
     };
 
+    applyIntrinsicDecorators(model, modelSchema);
+
     if (model.baseModel) {
       const discriminatorValue = getDiscriminatorValue(model);
       if (discriminatorValue) {
@@ -2153,6 +2159,9 @@ export async function getOpenAPIForService(
     }
     if (type.kind === "Model" && isArmExternalType(program, type) === true) {
       emitObject["x-ms-external"] = true;
+    }
+    if (type.kind === "Model" && isSecret(program, type) === true) {
+      emitObject["x-ms-secret"] = true;
     }
     if (type.kind === "Scalar") {
       const ext = getArmResourceIdentifierConfig(program, type);
