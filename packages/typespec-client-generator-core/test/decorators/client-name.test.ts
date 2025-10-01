@@ -198,7 +198,7 @@ it("apply with @client decorator to namespace client", async () => {
   `);
 
   strictEqual(runner.context.sdkPackage.clients[0].name, "MyServiceClient");
-})
+});
 
 it("apply with @client decorator to interface client", async () => {
   await runner.compile(`
@@ -213,7 +213,7 @@ it("apply with @client decorator to interface client", async () => {
   `);
 
   strictEqual(runner.context.sdkPackage.clients[0].name, "MyInterfaceClient");
-})
+});
 
 it("apply with @operationGroup decorator to interface client", async () => {
   await runner.compile(`
@@ -234,8 +234,7 @@ it("apply with @operationGroup decorator to interface client", async () => {
   strictEqual(myServiceClient.children.length, 1);
   const myOperationGroup = myServiceClient.children[0];
   strictEqual(myOperationGroup.name, "MyOperationGroup");
-})
-
+});
 
 it("empty client name", async () => {
   const diagnostics = await runner.diagnose(`
