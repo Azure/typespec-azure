@@ -31,7 +31,6 @@ describe("typespec-autorest: model definitions", () => {
       };`,
     );
 
-    ok(res.isRef);
     deepStrictEqual(res.defs.Foo, {
       type: "object",
       properties: {

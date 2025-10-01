@@ -83,43 +83,20 @@ describe("typespec-autorest: Long-running Operations", () => {
       `
       using Azure.Core.Traits;
 
-      @useAuth(
-        ApiKeyAuth<ApiKeyLocation.header, "api-key"> | OAuth2Auth<[
-          {
-            type: OAuth2FlowType.implicit,
-            authorizationUrl: "https://login.contoso.com/common/oauth2/v2.0/authorize",
-            scopes: ["https://widget.contoso.com/.default"],
-          }
-        ]>
-      )
       @service(#{
         title: "Contoso Widget Manager",
       })
-      @server(
-        "{endpoint}/widget",
-        "Contoso Widget APIs",
-        {
-          @doc("""
-      Supported Widget Services endpoints (protocol and hostname, for example:
-      https://westus.api.widget.contoso.com).
-      """)
-          endpoint: string,
-        }
-      )
-          namespace Test;
+      namespace Test;
 
       alias ServiceTraits = SupportsRepeatableRequests & SupportsConditionalRequests & SupportsClientRequestId;
 
       alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
 
       @resource("widgets")
-      @doc(".")
       model Widget {
         @key("widgetName")
-        @doc(".")
         @visibility(Lifecycle.Read)
         name: string;
-        @doc(".")
         manufacturerId: string;
       
       ...EtagProperty;
