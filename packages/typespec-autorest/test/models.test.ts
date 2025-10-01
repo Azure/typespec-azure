@@ -22,6 +22,26 @@ describe("typespec-autorest: model definitions", () => {
     });
   });
 
+  it("allows secrets on models", async () => {
+    const res = await oapiForModel(
+      "Foo",
+      `@secret
+       model Foo {
+        x: int32;
+      };`,
+    );
+
+    ok(res.isRef);
+    deepStrictEqual(res.defs.Foo, {
+      type: "object",
+      properties: {
+        x: { type: "integer", format: "int32" },
+      },
+      required: ["x"],
+      "x-ms-secret": true,
+    });
+  });
+
   it("change definition name with @clientName", async () => {
     const res = await compileOpenAPI(`@clientName("ClientFoo") model Foo {};`, { preset: "azure" });
     expect(res.definitions).toHaveProperty("ClientFoo");

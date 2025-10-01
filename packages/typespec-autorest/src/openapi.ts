@@ -1908,6 +1908,8 @@ export async function getOpenAPIForService(
       description: getDoc(program, model),
     };
 
+    applyIntrinsicDecorators(model, modelSchema);
+
     if (model.baseModel) {
       const discriminatorValue = getDiscriminatorValue(model);
       if (discriminatorValue) {
@@ -2153,6 +2155,9 @@ export async function getOpenAPIForService(
     }
     if (type.kind === "Model" && isArmExternalType(program, type) === true) {
       emitObject["x-ms-external"] = true;
+    }
+    if (type.kind === "Model" && isSecret(program, type) === true) {
+      emitObject["x-ms-secret"] = true;
     }
     if (type.kind === "Scalar") {
       const ext = getArmResourceIdentifierConfig(program, type);
