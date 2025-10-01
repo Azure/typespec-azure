@@ -25,6 +25,7 @@ import {
 import {
   getClientNameOverride,
   getLegacyHierarchyBuilding,
+  getMarkAsLro,
   shouldFlattenProperty,
 } from "@azure-tools/typespec-client-generator-core";
 import {
@@ -662,6 +663,9 @@ export async function getOpenAPIForService(
           currentEndpoint["x-ms-long-running-operation-options"] = lroOptions;
         }
       }
+    }
+    if (getMarkAsLro(context.tcgcSdkContext, op) === true) {
+      currentEndpoint["x-ms-long-running-operation"] = true;
     }
 
     // Extract paged metadata from Azure.Core.Page

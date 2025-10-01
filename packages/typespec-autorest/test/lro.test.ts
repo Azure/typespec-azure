@@ -78,6 +78,70 @@ describe("typespec-autorest: Long-running Operations", () => {
     );
   });
 
+  it("includes x-ms-long-running-operation for lro get", async () => {
+    const openapi = await compileOpenAPI(
+      `
+      using Azure.Core.Traits;
+
+      @useAuth(
+        ApiKeyAuth<ApiKeyLocation.header, "api-key"> | OAuth2Auth<[
+          {
+            type: OAuth2FlowType.implicit,
+            authorizationUrl: "https://login.contoso.com/common/oauth2/v2.0/authorize",
+            scopes: ["https://widget.contoso.com/.default"],
+          }
+        ]>
+      )
+      @service(#{
+        title: "Contoso Widget Manager",
+      })
+      @server(
+        "{endpoint}/widget",
+        "Contoso Widget APIs",
+        {
+          @doc("""
+      Supported Widget Services endpoints (protocol and hostname, for example:
+      https://westus.api.widget.contoso.com).
+      """)
+          endpoint: string,
+        }
+      )
+          namespace Test;
+
+      alias ServiceTraits = SupportsRepeatableRequests & SupportsConditionalRequests & SupportsClientRequestId;
+
+      alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
+
+      @resource("widgets")
+      @doc(".")
+      model Widget {
+        @key("widgetName")
+        @doc(".")
+        @visibility(Lifecycle.Read)
+        name: string;
+        @doc(".")
+        manufacturerId: string;
+      
+      ...EtagProperty;
+      }
+
+      @Azure.ClientGenerator.Core.Legacy.markAsLro
+      op getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget>;
+    
+      @pollingOperation(getWidgetOperationStatus)
+      op createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
+      `,
+      { preset: "azure", options: { "emit-lro-options": "all" } },
+    );
+
+    deepStrictEqual(
+      openapi.paths["/widgets/{widgetName}/operations/{operationId}"].get?.[
+        "x-ms-long-running-operation"
+      ],
+      true,
+    );
+  });
+
   const armCode = paramMessage`
       @armProviderNamespace
               namespace Microsoft.Test;
