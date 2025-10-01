@@ -25,7 +25,6 @@ import { useStateMap } from "@typespec/compiler/utils";
 import { getHttpOperation, isPathParam } from "@typespec/http";
 import { $autoRoute, getParentResource, getSegment } from "@typespec/rest";
 
-import { pascalCase } from "change-case";
 import {
   ArmProviderNameValueDecorator,
   ArmResourceOperationsDecorator,
@@ -58,6 +57,7 @@ import {
   ArmResourceOperations,
   getArmResourceOperationData,
   getArmResourceOperationList,
+  getResourceNameForOperation,
   resolveResourceOperations,
 } from "./operations.js";
 import { getArmResource, listArmResources, registerArmResource } from "./private.decorators.js";
@@ -492,118 +492,68 @@ export function getResourcePathElements(
   return undefined;
 }
 
-export function getDefaultLegacyExtensionResourceName(
-  path: string,
-  resource: Model,
-  operationKind: ArmOperationKind,
-): string {
-  const providerIndex = path.lastIndexOf("/providers");
-  if (providerIndex > -1 && providerIndex < path.length - 1) {
-    const targetPath = path.slice(0, providerIndex);
-    const extensionPath = path.slice(providerIndex);
-    const extensionInfo = getResourcePathElements(extensionPath, operationKind);
-    if (!extensionInfo) return resource.name;
-    const extensionName = extensionInfo.resourceType.types.flatMap((t) => pascalCase(t)).join("");
-    if (targetPath.length === 0) {
-      return extensionName;
-    }
-    if (targetPath.length === 1) {
-      return `${pascalCase(targetPath[0].replaceAll("{", "").replaceAll("}", ""))}${extensionName}`;
-    }
-    const targetInfo = getResourcePathElements(targetPath, "read");
-    if (!targetInfo || targetInfo.resourceType.types.length === 0) return resource.name;
-    const types = targetInfo.resourceType.types;
-    return `${pascalCase(types[types.length - 1])}${extensionName}`;
-  }
-  return resource.name;
-}
-
 function tryAddLifecycleOperation(
   resourceType: ResourceType,
   sourceOperation: ArmResourceOperation,
-  targetOperation: ResolvedResource,
+  targetResource: ResolvedResource,
 ): boolean {
-  const pathSegments: string[] = sourceOperation.httpOperation.path
-    .split("/")
-    .filter((s) => s.length > 0);
-  const isInstanceOperation: boolean = isVariableSegment(pathSegments[pathSegments.length - 1]);
-  const isResourceCollectionOperation: boolean =
-    !isInstanceOperation &&
-    pathSegments[pathSegments.length - 1] === resourceType.types[resourceType.types.length - 1];
-  switch (sourceOperation.httpOperation.verb) {
-    case "get":
-      if (isInstanceOperation) {
-        if (targetOperation.operations.lifecycle.read === undefined) {
-          targetOperation.operations.lifecycle.read = [];
-        }
-        addUniqueOperation(sourceOperation, targetOperation.operations.lifecycle.read);
-        return true;
-      }
-      if (!isResourceCollectionOperation) {
-        addUniqueOperation(sourceOperation, targetOperation.operations.actions || []);
-        return true;
-      }
-      if (targetOperation.operations.lists === undefined) {
-        targetOperation.operations.lists = [];
-      }
-      addUniqueOperation(sourceOperation, targetOperation.operations.lists);
+  const opType = sourceOperation.kind;
+  const operations = targetResource.operations;
+  switch (opType) {
+    case "read":
+      operations.lifecycle.read ??= [];
+      addUniqueOperation(sourceOperation, operations.lifecycle.read);
       return true;
-    case "put":
-      if (!isInstanceOperation) {
-        return false;
-      }
-      if (targetOperation.operations.lifecycle.createOrUpdate === undefined) {
-        targetOperation.operations.lifecycle.createOrUpdate = [];
-      }
-      addUniqueOperation(sourceOperation, targetOperation.operations.lifecycle.createOrUpdate);
+    case "createOrUpdate":
+      operations.lifecycle.createOrUpdate ??= [];
+      addUniqueOperation(sourceOperation, operations.lifecycle.createOrUpdate);
       return true;
-    case "patch":
-      if (!isInstanceOperation) {
-        return false;
-      }
-      if (targetOperation.operations.lifecycle.update === undefined) {
-        targetOperation.operations.lifecycle.update = [];
-      }
-      addUniqueOperation(sourceOperation, targetOperation.operations.lifecycle.update);
+    case "update":
+      operations.lifecycle.update ??= [];
+      addUniqueOperation(sourceOperation, operations.lifecycle.update);
       return true;
     case "delete":
-      if (!isInstanceOperation) {
-        return false;
-      }
-      if (targetOperation.operations.lifecycle.delete === undefined) {
-        targetOperation.operations.lifecycle.delete = [];
-      }
-      addUniqueOperation(sourceOperation, targetOperation.operations.lifecycle.delete);
+      operations.lifecycle.delete ??= [];
+      addUniqueOperation(sourceOperation, operations.lifecycle.delete);
       return true;
-    case "post":
-    case "head":
-      if (isInstanceOperation) {
-        return false;
-      }
-      if (targetOperation.operations.actions === undefined) {
-        targetOperation.operations.actions = [];
-      }
-      addUniqueOperation(sourceOperation, targetOperation.operations.actions);
+    case "list":
+      operations.lists ??= [];
+      addUniqueOperation(sourceOperation, operations.lists);
       return true;
-    default:
-      return false;
+    case "action":
+      operations.actions ??= [];
+      addUniqueOperation(sourceOperation, operations.actions);
+      return true;
+    case "other":
+      targetResource.associatedOperations ??= [];
+      addUniqueOperation(sourceOperation, targetResource.associatedOperations);
+      return true;
   }
+  return false;
 }
 
 function addAssociatedOperation(
   sourceOperation: ArmResourceOperation,
   targetOperation: ResolvedResource,
 ): void {
-  if (!targetOperation.associatedOperations) {
-    targetOperation.associatedOperations = [];
-  }
+  targetOperation.associatedOperations ??= [];
   addUniqueOperation(sourceOperation, targetOperation.associatedOperations);
 }
 
 export function isResourceOperationMatch(
-  source: { resourceType: ResourceType; resourceInstancePath: string },
-  target: { resourceType: ResourceType; resourceInstancePath: string },
+  source: {
+    resourceType: ResourceType;
+    resourceInstancePath: string;
+    resourceName?: string;
+  },
+  target: {
+    resourceType: ResourceType;
+    resourceInstancePath: string;
+    resourceName?: string;
+  },
 ): boolean {
+  if (source.resourceName && target.resourceName)
+    return source.resourceName.toLowerCase() === target.resourceName.toLowerCase();
   if (source.resourceType.provider.toLowerCase() !== target.resourceType.provider.toLowerCase())
     return false;
   if (source.resourceType.types.length !== target.resourceType.types.length) return false;
@@ -648,6 +598,7 @@ export function getResourceOperation(
     kind: "other",
     operation: operation,
     operationGroup: operation.interface.name,
+    resourceModelName: "",
   };
 }
 
@@ -714,10 +665,17 @@ export function resolveArmResourceOperations(
 
     if (armOperation === undefined) continue;
     armOperation.kind = operation.kind;
+
+    armOperation.resourceModelName = operation.resource?.name ?? resourceType.name;
     const resourceInfo = getResourceInfo(program, armOperation);
     if (resourceInfo === undefined) continue;
+    armOperation.name = operation.name;
+    armOperation.resourceKind = operation.resourceKind;
     resourceInfo.resourceName =
-      operation.resourceName ?? operation.resource?.name ?? operation.operationGroup;
+      operation.resourceName ??
+      getResourceNameForOperation(program, armOperation, resourceInfo.resourceInstancePath) ??
+      armOperation.resourceModelName;
+    armOperation.resourceName = resourceInfo.resourceName;
 
     let matched = false;
     // Check if we already have an operation for this resource
@@ -734,7 +692,7 @@ export function resolveArmResourceOperations(
 
     if (matched) continue;
     // If we don't have an operation for this resource, create a new one
-    const newOperation: ResolvedResource = {
+    const newResource: ResolvedResource = {
       resourceType: resourceInfo.resourceType,
       resourceInstancePath: resourceInfo.resourceInstancePath,
       resourceName: resourceInfo.resourceName,
@@ -750,10 +708,10 @@ export function resolveArmResourceOperations(
       },
       associatedOperations: [],
     };
-    if (!tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, newOperation)) {
-      addAssociatedOperation(armOperation, newOperation);
+    if (!tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, newResource)) {
+      addAssociatedOperation(armOperation, newResource);
     }
-    resolvedOperations.add(newOperation);
+    resolvedOperations.add(newResource);
   }
   return [...resolvedOperations.values()].toSorted((a, b) => {
     // Sort by provider, type, then instance path

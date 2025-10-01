@@ -1595,7 +1595,7 @@ interface EmployeesByBuilding {
   list is EmployeeBuildingOps.List<Employee>;
   /** A sample resource action that move employee to different location */
   @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/employeeResources/{employeeId}/otherResource/thirdResource/{addedId}/move")
-  @get move is EmployeeBuildingOps.ActionSync<
+  move is EmployeeBuildingOps.ActionSync<
     Employee,
     MoveRequest,
     MoveResponse,

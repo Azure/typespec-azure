@@ -1,29 +1,29 @@
 import {
   $key,
+  addVisibilityModifiers,
+  clearVisibilityModifiersForClass,
   DecoratorContext,
+  getKeyName,
+  getLifecycleVisibilityEnum,
+  getNamespaceFullName,
+  getTypeName,
   Interface,
+  isKey,
   Model,
   ModelProperty,
   Operation,
   Program,
   Scalar,
+  sealVisibilityModifiers,
   Tuple,
   Type,
-  addVisibilityModifiers,
-  clearVisibilityModifiersForClass,
-  getKeyName,
-  getLifecycleVisibilityEnum,
-  getNamespaceFullName,
-  getTypeName,
-  isKey,
-  sealVisibilityModifiers,
 } from "@typespec/compiler";
 
 import { $ } from "@typespec/compiler/typekit";
 import { useStateMap } from "@typespec/compiler/utils";
 import { $bodyRoot, getHttpOperation } from "@typespec/http";
 import { $segment, getSegment } from "@typespec/rest";
-import { camelCase, pascalCase } from "change-case";
+import { camelCase } from "change-case";
 import pluralize from "pluralize";
 import {
   AzureResourceManagerExtensionPrivateDecorators,
@@ -45,10 +45,10 @@ import {
   ConditionalClientFlattenDecorator,
   DefaultResourceKeySegmentNameDecorator,
   EnforceConstraintDecorator,
-  LegacyTypeDecorator,
   ExtensionResourceOperationDecorator,
   LegacyExtensionResourceOperationDecorator,
   LegacyResourceOperationDecorator,
+  LegacyTypeDecorator,
   OmitIfEmptyDecorator,
   ResourceBaseParametersOfDecorator,
   ResourceParameterBaseForDecorator,
@@ -63,21 +63,23 @@ import {
   $armResourceList,
   $armResourceRead,
   $armResourceUpdate,
+  addArmResourceOperation,
+  ArmOperationIdentifier,
   armRenameListByOperationInternal,
+  ArmResourceOperation,
+  getArmResourceOperations,
+  setArmOperationIdentifier,
 } from "./operations.js";
 import {
   ArmResourceDetails,
   ArmResourceKind,
-  ResourceBaseType,
   getArmResourceKind,
   getArmVirtualResourceDetails,
-  getDefaultLegacyExtensionResourceName,
   getResourceBaseType,
-  getResourceOperation,
-  getResourcePathElements,
   isArmVirtualResource,
   isCustomAzureResource,
   resolveResourceBaseType,
+  ResourceBaseType,
   setResourceBaseType,
 } from "./resource.js";
 import { ArmStateKeys } from "./state.js";
@@ -412,6 +414,7 @@ const $armResourceWithParameter: ArmResourceWithParameterDecorator = (
 ) => {
   registerArmResource(context, target, type, nameParameter);
 };
+
 function getPrimaryKeyProperty(program: Program, resource: Model): ModelProperty | undefined {
   const nameProperty = resource.properties.get("name");
   if (nameProperty !== undefined) return nameProperty;
@@ -652,6 +655,7 @@ const $resourceParentType: ResourceParentTypeDecorator = (
 ) => {
   const { program } = context;
   setResourceBaseType(program, target, parentType);
+};
 function callOperationDecorator(
   context: DecoratorContext,
   target: Operation,
@@ -709,18 +713,48 @@ const $legacyResourceOperation: LegacyResourceOperationDecorator = (
   operationType: "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
   resourceName?: string,
 ) => {
-  let resolvedResourceName = resourceName;
-  if (resolvedResourceName === undefined || resolvedResourceName.length === 0) {
-    const armOp = getResourceOperation(context.program, target);
-    if (!armOp) return;
-    const pathInfo = getResourcePathElements(armOp.path, operationType);
-    if (pathInfo !== undefined) {
-      resolvedResourceName = pathInfo.resourceType.types.flatMap((t) => pascalCase(t)).join("");
-    } else {
-      resolvedResourceName = resourceType.name;
-    }
+  if (
+    target.interface === undefined ||
+    target.interface.node === undefined ||
+    target.interface.node.templateParameters.length > 0
+  ) {
+    return;
   }
-  callOperationDecorator(context, target, resourceType, resolvedResourceName, operationType);
+  const resolvedResourceName =
+    resourceName !== undefined && resourceName.length > 0 ? resourceName : undefined;
+  // We can't resolve the operation path yet so treat the operation as a partial
+  // type so that we can fill in the missing details later
+  const operations = getArmResourceOperations(context.program, resourceType);
+  const operation: Partial<ArmResourceOperation> = {
+    name: target.name,
+    kind: operationType,
+    operation: target,
+    operationGroup: target.interface.name,
+    resourceName: resolvedResourceName,
+    resourceModelName: resourceType.name,
+    resourceKind: "legacy",
+  };
+
+  operations.lists[target.name] = operation as ArmResourceOperation;
+  const opId: ArmOperationIdentifier = {
+    name: target.name,
+    kind: operationType,
+    operation: target,
+    operationGroup: target.interface.name,
+    resource: resourceType,
+    resourceName: resolvedResourceName,
+    resourceKind: "legacy",
+  };
+  addArmResourceOperation(context.program, resourceType, opId);
+  setArmOperationIdentifier(context.program, target, resourceType, {
+    kind: operationType,
+    name: target.name,
+    operation: target,
+    operationGroup: target.interface.name,
+    resourceModelName: resourceType.name,
+    resourceName: resolvedResourceName,
+    resourceKind: "legacy",
+  });
 };
 
 const $legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorator = (
@@ -730,17 +764,48 @@ const $legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorat
   operationType: "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
   resourceName?: string,
 ) => {
-  let resolvedResourceName = resourceName;
-  if (resolvedResourceName === undefined || resolvedResourceName.length === 0) {
-    const armOp = getResourceOperation(context.program, target);
-    if (!armOp) return;
-    resolvedResourceName = getDefaultLegacyExtensionResourceName(
-      armOp.path,
-      resourceType,
-      operationType,
-    );
+  if (
+    target.interface === undefined ||
+    target.interface.node === undefined ||
+    target.interface.node.templateParameters.length > 0
+  ) {
+    return;
   }
-  callOperationDecorator(context, target, resourceType, resolvedResourceName, operationType);
+  const resolvedResourceName =
+    resourceName !== undefined && resourceName.length > 0 ? resourceName : undefined;
+  // We can't resolve the operation path yet so treat the operation as a partial
+  // type so that we can fill in the missing details later
+  const operations = getArmResourceOperations(context.program, resourceType);
+  const operation: Partial<ArmResourceOperation> = {
+    name: target.name,
+    kind: operationType,
+    operation: target,
+    operationGroup: target.interface.name,
+    resourceName: resolvedResourceName,
+    resourceModelName: resourceType.name,
+    resourceKind: "legacy-extension",
+  };
+
+  operations.lists[target.name] = operation as ArmResourceOperation;
+  const opId: ArmOperationIdentifier = {
+    name: target.name,
+    kind: operationType,
+    operation: target,
+    operationGroup: target.interface.name,
+    resource: resourceType,
+    resourceName: resolvedResourceName,
+    resourceKind: "legacy-extension",
+  };
+  addArmResourceOperation(context.program, resourceType, opId);
+  setArmOperationIdentifier(context.program, target, resourceType, {
+    kind: operationType,
+    name: target.name,
+    operation: target,
+    operationGroup: target.interface.name,
+    resourceModelName: resourceType.name,
+    resourceName: resolvedResourceName,
+    resourceKind: "legacy-extension",
+  });
 };
 
 /** @internal */

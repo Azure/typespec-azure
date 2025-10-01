@@ -25,6 +25,7 @@ import {
   getParentResource,
   getSegment,
 } from "@typespec/rest";
+import { pascalCase } from "change-case";
 import {
   ArmResourceActionDecorator,
   ArmResourceCollectionActionDecorator,
@@ -44,6 +45,7 @@ import { isArmLibraryNamespace } from "./namespace.js";
 import {
   getArmResourceInfo,
   getResourceBaseType,
+  getResourcePathElements,
   isArmVirtualResource,
   isCustomAzureResource,
   ResourceBaseType,
@@ -56,7 +58,6 @@ export type ArmOperationKind = ArmLifecycleOperationKind | "list" | "action" | "
 export interface ArmResourceOperation extends ArmResourceOperationData {
   path: string;
   httpOperation: HttpOperation;
-  resourceName?: string;
 }
 
 export interface ArmLifecycleOperations {
@@ -90,33 +91,36 @@ interface ArmResourceOperationData {
   kind: ArmOperationKind;
   operation: Operation;
   operationGroup: string;
+  resourceModelName: string;
   resourceName?: string;
+  resourceKind?: "legacy" | "legacy-extension";
 }
 
 /** Identifying information for an arm operation */
-interface ArmOperationIdentifier {
+export interface ArmOperationIdentifier {
   name: string;
   kind: ArmOperationKind;
   operationGroup: string;
   operation: Operation;
   resource?: Model;
   resourceName?: string;
+  resourceKind?: "legacy" | "legacy-extension";
 }
 
-interface ArmLifecycleOperationData {
+export interface ArmLifecycleOperationData {
   read?: ArmResourceOperationData;
   createOrUpdate?: ArmResourceOperationData;
   update?: ArmResourceOperationData;
   delete?: ArmResourceOperationData;
 }
 
-interface ArmResourceOperationsData {
+export interface ArmResourceOperationsData {
   lifecycle: ArmLifecycleOperationData;
   lists: { [key: string]: ArmResourceOperationData };
   actions: { [key: string]: ArmResourceOperationData };
 }
 
-function getArmResourceOperations(
+export function getArmResourceOperations(
   program: Program,
   resourceType: Model,
 ): ArmResourceOperationsData {
@@ -142,7 +146,7 @@ function resolveHttpOperations<T extends Record<string, ArmResourceOperationData
       ...item,
       path: httpOperation.path,
       httpOperation: httpOperation,
-      resourceName: getResourceNameForOperation(program, item.operation),
+      resourceName: getResourceNameForOperation(program, item, httpOperation.path),
     };
   }
   return result as any;
@@ -199,6 +203,7 @@ function setResourceLifecycleOperation(
     kind: kind,
     operation: target,
     operationGroup: target.interface.name,
+    resourceModelName: resourceType.name,
     resourceName: resolvedResourceName,
   });
 }
@@ -248,12 +253,13 @@ export function setArmOperationIdentifier(
     operationGroup: data.operationGroup,
     resource: resourceType,
     resourceName: data.resourceName,
+    resourceKind: data.resourceKind,
   };
   // Initialize the operations for the resource type if not already done
   if (!getArmResourceOperationData(program, target)) {
-    setArmResourceOperationData(program, target, operationId);
+    setArmResourceOperationData(program, target, { ...data });
   }
-  addArmResourceOperation(program, resourceType, operationId);
+  //addArmResourceOperation(program, resourceType, operationId);
 }
 
 export const $armResourceRead: ArmResourceReadDecorator = (
@@ -328,7 +334,14 @@ export const $armResourceList: ArmResourceListDecorator = (
     resourceName: operation.resourceName,
   };
   addArmResourceOperation(context.program, resourceType, opId);
-  setArmOperationIdentifier(context.program, target, resourceType, opId);
+  setArmOperationIdentifier(context.program, target, resourceType, {
+    kind: "list",
+    name: target.name,
+    operation: target,
+    operationGroup: target.interface.name,
+    resourceModelName: resourceType.name,
+    resourceName: operation.resourceName,
+  });
 };
 
 export function armRenameListByOperationInternal(
@@ -460,7 +473,14 @@ export const $armResourceAction: ArmResourceActionDecorator = (
     resourceName: resolvedResourceName,
   };
   addArmResourceOperation(program, resourceType, opId);
-  setArmOperationIdentifier(context.program, target, resourceType, opId);
+  setArmOperationIdentifier(context.program, target, resourceType, {
+    kind: "action",
+    name: target.name,
+    operation: target,
+    operationGroup: target.interface.name,
+    resourceModelName: resourceType.name,
+    resourceName: resolvedResourceName,
+  });
 
   const segment = getSegment(program, target) ?? getActionSegment(program, target);
   if (!segment) {
@@ -641,6 +661,62 @@ function createParamMutator(sourceParameterName: string, targetParameterName: st
     },
   };
 }
-function getResourceNameForOperation(program: Program, operation: Operation): string | undefined {
-  throw new Error("Function not implemented.");
+
+export function getDefaultLegacyExtensionResourceName(
+  path: string,
+  resourceName: string,
+  operationKind: ArmOperationKind,
+): string {
+  const providerIndex = path.lastIndexOf("/providers");
+  if (providerIndex > -1 && providerIndex < path.length - 1) {
+    const targetPath = path.slice(0, providerIndex);
+    const extensionPath = path.slice(providerIndex);
+    const extensionInfo = getResourcePathElements(extensionPath, operationKind);
+    if (!extensionInfo) return resourceName;
+    const extensionName = extensionInfo.resourceType.types.flatMap((t) => pascalCase(t)).join("");
+    if (targetPath.length === 0) {
+      return extensionName;
+    }
+    if (targetPath.length === 1) {
+      return `${pascalCase(targetPath[0].replaceAll("{", "").replaceAll("}", ""))}${extensionName}`;
+    }
+    const targetInfo = getResourcePathElements(targetPath, "read");
+    if (!targetInfo || targetInfo.resourceType.types.length === 0) return resourceName;
+    const types = targetInfo.resourceType.types;
+    return `${pascalCase(types[types.length - 1])}${extensionName}`;
+  }
+  return resourceName;
+}
+
+function getDefaultLegacyResourceName(operation: ArmResourceOperationData, httpOp: string): string {
+  const pathInfo = getResourcePathElements(httpOp, operation.kind);
+  if (pathInfo !== undefined) {
+    let types: string[] = pathInfo.resourceType.types;
+    if (types.length > 1) {
+      types = types.slice(types.length - 2);
+    }
+    return types.flatMap((t) => pascalCase(t)).join("");
+  } else {
+    return operation.resourceModelName;
+  }
+}
+export function getResourceNameForOperation(
+  program: Program,
+  operation: ArmResourceOperationData,
+  operationPath: string,
+): string | undefined {
+  if (operation.resourceName !== undefined && operation.resourceName.length > 0)
+    return operation.resourceName;
+  if (operation.resourceKind === "legacy-extension") {
+    return getDefaultLegacyExtensionResourceName(
+      operationPath,
+      operation.resourceModelName,
+      operation.kind,
+    );
+  }
+  if (operation.resourceKind === "legacy") {
+    return getDefaultLegacyResourceName(operation, operationPath);
+  }
+
+  return undefined;
 }
