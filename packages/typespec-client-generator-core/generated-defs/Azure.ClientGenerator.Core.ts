@@ -13,7 +13,11 @@ import type {
 } from "@typespec/compiler";
 
 /**
- * Changes the name of a client, method, parameter, union, model, enum, model property, etc. generated in the client SDK.
+ * Overrides the generated name for client SDK elements including clients, methods, parameters,
+ * unions, models, enums, and model properties.
+ *
+ * This decorator takes precedence over all other naming mechanisms, including the `name`
+ * property in `@client` decorator and default naming conventions.
  *
  * @param target The type you want to rename.
  * @param rename The rename you want applied to the object.
