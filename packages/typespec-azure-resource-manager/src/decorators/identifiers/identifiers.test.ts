@@ -1,25 +1,36 @@
 import { Tester } from "#test/tester.js";
-import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
-import { it } from "vitest";
+import { expectDiagnosticEmpty, expectDiagnostics, t } from "@typespec/compiler/testing";
+import { expect, it } from "vitest";
+import { getArmIdentifiers } from "../../resource.js";
 
 it("allows multiple model properties in identifiers decorator", async () => {
   const diagnostics = await Tester.diagnose(`
-    @armProviderNamespace
-    namespace Microsoft.Contoso;
-
     model Dog {
       name: string;
       age: int32;
     }
     
-    model Pets
-    {
+    model Pets {
       @identifiers(#["name", "age"])
       dogs: Dog[];
     }
 `);
 
   expectDiagnosticEmpty(diagnostics);
+});
+
+it("can be used on a array model", async () => {
+  const { Pets, program } = await Tester.compile(t.code`
+    model Dog {
+      name: string;
+      age: int32;
+    }
+    
+    @identifiers(#["name"])
+    model ${t.model("Pets")} is Dog[];
+`);
+
+  expect(getArmIdentifiers(program, Pets)).toEqual(["name"]);
 });
 
 it("allows inner model properties in identifiers decorator", async () => {
@@ -47,9 +58,6 @@ it("allows inner model properties in identifiers decorator", async () => {
 
 it("emits diagnostic when identifiers is not of a model property object array", async () => {
   const diagnostics = await Tester.diagnose(`
-    @armProviderNamespace
-    namespace Microsoft.Contoso;
-
     model Dog {
       name: string;
     }
@@ -61,13 +69,25 @@ it("emits diagnostic when identifiers is not of a model property object array", 
     }
 `);
 
-  expectDiagnostics(diagnostics, [
-    {
-      code: "@azure-tools/typespec-azure-resource-manager/decorator-param-wrong-type",
-      message:
-        "The @identifiers decorator must be applied to a property that is an array of objects",
-    },
-  ]);
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-azure-resource-manager/decorator-param-wrong-type",
+    message: "The @identifiers decorator must be applied to a property that is an array of objects",
+  });
+});
+
+it("emits diagnostic when used on non array model", async () => {
+  const diagnostics = await Tester.diagnose(`
+    @identifiers(#["name"])
+    model Pets {
+      dogs: string[];
+    }
+`);
+
+  expectDiagnostics(diagnostics, {
+    code: "decorator-wrong-target",
+    message:
+      "Cannot apply @identifiers decorator to Pets since it is not assignable to ModelProperty | unknown[]",
+  });
 });
 
 it("emits diagnostics when a provider cannot be updated", async () => {

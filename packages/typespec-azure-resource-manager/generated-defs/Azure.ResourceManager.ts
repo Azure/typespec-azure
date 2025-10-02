@@ -296,7 +296,7 @@ export type ResourceBaseTypeDecorator = (
  */
 export type IdentifiersDecorator = (
   context: DecoratorContext,
-  entity: ModelProperty,
+  entity: ModelProperty | Type,
   properties: readonly string[],
 ) => void;
 

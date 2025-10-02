@@ -296,7 +296,7 @@ The properties that are used as identifiers for the object needs to be provided 
 
 #### Target
 
-`ModelProperty`
+`ModelProperty | unknown[]`
 
 #### Parameters
 
