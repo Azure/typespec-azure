@@ -233,6 +233,8 @@ export interface AutorestDocumentEmitterOptions {
    * @default "for-visibility-only"
    */
   readonly emitCommonTypesSchema?: "never" | "for-visibility-changes";
+
+  readonly xmlStrategy: "xml-service" | "none";
 }
 
 /**
@@ -305,6 +307,7 @@ export async function getOpenAPIForService(
   const auth = processAuth(service.type);
 
   const xml = await resolveXmlModule();
+  const xmlStrategy = options.xmlStrategy;
 
   const root: OpenAPI2Document = {
     swagger: "2.0",
@@ -391,7 +394,9 @@ export async function getOpenAPIForService(
   if (allRequestContentTypes.length === 0) allRequestContentTypes = ["application/json"];
   const globalConsumes = new Set<string>(allRequestContentTypes);
 
-  const specHasXml = globalProduces.has("application/xml") || globalConsumes.has("application/xml");
+  const shouldEmitXml =
+    xmlStrategy !== "none" &&
+    (globalProduces.has("application/xml") || globalConsumes.has("application/xml"));
   const specIsOnlyXml =
     globalProduces.size === 1 &&
     globalProduces.has("application/xml") &&
@@ -1553,7 +1558,7 @@ export async function getOpenAPIForService(
         checkDuplicateTypeName(program, processed.type, name, root.definitions!);
         processed.ref.value = "#/definitions/" + encodeURIComponent(name);
         if (processed.schema) {
-          if (specHasXml)
+          if (shouldEmitXml)
             attachXml(
               processed.type,
               name,
@@ -2010,7 +2015,7 @@ export async function getOpenAPIForService(
         property["x-ms-client-name"] = clientName;
       }
 
-      if (specHasXml && xml.available) {
+      if (shouldEmitXml && xml.available) {
         const xmlName = resolveEncodedName(program, prop, "application/xml");
 
         if (xmlName !== propertySchemaName) {
@@ -2133,7 +2138,7 @@ export async function getOpenAPIForService(
       applyArmIdentifiersDecorator(prop.type, propSchema, prop);
     }
 
-    if (specHasXml && xml.available) {
+    if (shouldEmitXml && xml.available) {
       attachPropertyXml(prop, propSchema);
     }
 
