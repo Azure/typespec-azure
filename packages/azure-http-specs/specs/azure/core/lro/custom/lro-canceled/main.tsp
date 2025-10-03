@@ -89,24 +89,9 @@ model SecurityDomainObject {
   4. GET operation status eventually returns Stopped (indicating @lroCanceled)
   """)
 @pollingOperation(uploadPending)
-@finalOperation(uploadPending)
 @route("/securitydomain/upload")
 @post
-op upload is Foundations.LongRunningOperation<
-  {
-    /**
-     * The Security Domain to be restored.
-     */
-    @body
-    securityDomain: SecurityDomainObject;
-  },
-  {
-    /**
-     * The status of the Security Domain restore operation.
-     */
-    @body response: SecurityDomainOperationStatus;
-  }
->;
+op upload is Foundations.LongRunningOperation<SecurityDomainObject, SecurityDomainOperationStatus>;
 
 /**
  * Get Security Domain upload operation status
