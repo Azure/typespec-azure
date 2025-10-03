@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-autorest",
-  "version": "0.59.1",
+  "version": "0.60.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec library for emitting openapi from the TypeSpec REST protocol binding",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -63,7 +63,13 @@
     "@typespec/http": "workspace:^",
     "@typespec/openapi": "workspace:^",
     "@typespec/rest": "workspace:^",
-    "@typespec/versioning": "workspace:^"
+    "@typespec/versioning": "workspace:^",
+    "@typespec/xml": "workspace:^"
+  },
+  "peerDependenciesMeta": {
+    "@typespec/xml": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:^",

@@ -1,4 +1,10 @@
 import {
+  FinalStateValue,
+  getLroMetadata,
+  isPreviewVersion,
+  LroMetadata,
+} from "@azure-tools/typespec-azure-core";
+import {
   BooleanLiteral,
   compilerAssert,
   createDiagnosticCollector,
@@ -7,6 +13,7 @@ import {
   getDoc,
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
+  getSummary,
   getVisibilityForClass,
   ignoreDiagnostics,
   isNeverType,
@@ -37,21 +44,31 @@ import {
   getVersioningMutators,
   getVersions,
 } from "@typespec/versioning";
-import { getClientDocExplicit, getClientLocation, getParamAlias } from "./decorators.js";
+import {
+  getAlternateType,
+  getClientDocExplicit,
+  getClientLocation,
+  getMarkAsLro,
+  getParamAlias,
+} from "./decorators.js";
 import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 import {
   DecoratorInfo,
+  ExternalTypeInfo,
   SdkBuiltInType,
   SdkClient,
+  SdkClientType,
   SdkEnumType,
   SdkHeaderParameter,
   SdkHttpResponse,
   SdkMethodParameter,
   SdkOperationGroup,
+  SdkServiceOperation,
   SdkType,
   TCGCContext,
 } from "./interfaces.js";
 import { createDiagnostic, createStateSymbol } from "./lib.js";
+import { getSdkBasicServiceMethod } from "./methods.js";
 import {
   getCrossLanguageDefinitionId,
   getDefaultApiVersion,
@@ -92,6 +109,7 @@ export const clientKey = createStateSymbol("client");
 export const operationGroupKey = createStateSymbol("operationGroup");
 export const clientLocationKey = createStateSymbol("clientLocation");
 export const omitOperation = createStateSymbol("omitOperation");
+export const overrideKey = createStateSymbol("override");
 
 export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
   return (
@@ -295,6 +313,9 @@ interface DefaultSdkTypeBase<TKind> {
   deprecation?: string;
   kind: TKind;
   decorators: DecoratorInfo[];
+  external?: ExternalTypeInfo;
+  doc?: string;
+  summary?: string;
 }
 
 /**
@@ -307,12 +328,28 @@ export function getSdkTypeBaseHelper<TKind>(
   kind: TKind,
 ): [DefaultSdkTypeBase<TKind>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  return diagnostics.wrap({
+
+  const base: DefaultSdkTypeBase<TKind> = {
     __raw: type,
     deprecation: getDeprecationDetails(context.program, type)?.message,
     kind,
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
-  });
+    doc: getClientDoc(context, type),
+    summary: getSummary(context.program, type),
+  };
+  if (
+    type.kind === "ModelProperty" ||
+    type.kind === "Scalar" ||
+    type.kind === "Model" ||
+    type.kind === "Enum" ||
+    type.kind === "Union"
+  ) {
+    const external = getAlternateType(context, type);
+    if (external) {
+      base.external = external;
+    }
+  }
+  return diagnostics.wrap(base);
 }
 
 export function getNamespacePrefix(namespace: Namespace): string {
@@ -520,9 +557,22 @@ export function filterApiVersionsInEnum(
   removeVersionsLargerThanExplicitlySpecified(context, sdkVersionsEnum.values);
   const defaultApiVersion = getDefaultApiVersion(context, client.service);
   if (!context.previewStringRegex.test(defaultApiVersion?.value || "")) {
-    sdkVersionsEnum.values = sdkVersionsEnum.values.filter(
-      (v) => typeof v.value === "string" && !context.previewStringRegex.test(v.value),
-    );
+    sdkVersionsEnum.values = sdkVersionsEnum.values.filter((v) => {
+      if (typeof v.value !== "string") {
+        return true;
+      }
+
+      // Check if the version has `@previewVersion` decorator
+      if (v.__raw && v.__raw.kind === "EnumMember") {
+        const enumMember = v.__raw;
+        if (isPreviewVersion(context.program, enumMember)) {
+          return false;
+        }
+      }
+
+      // Fall back to regex check for backward compatibility
+      return !context.previewStringRegex.test(v.value);
+    });
   }
 }
 
@@ -831,4 +881,48 @@ export function findEntriesWithTarget<TSource extends Type, TTarget>(
     }
   }
   return results;
+}
+
+/**
+ * Retrieves Long Running Operation (LRO) metadata for a given operation.
+ *
+ * This function serves as a wrapper that:
+ * 1. First tries to get LRO metadata using the `getLroMetadata` function from the Azure Core library
+ * 2. If unavailable or undefined, it would check for the existence of a `getMarkAsLro` function
+ *    and return a mock LRO metadata object if the operation is marked as LRO
+ *
+ * @param context - The TypeSpec client generator context
+ * @param operation - The TypeSpec operation to check for LRO metadata
+ * @returns The LRO metadata for the operation if available, otherwise undefined
+ */
+export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
+  operation: Operation,
+  client: SdkClientType<TServiceOperation>,
+): LroMetadata | undefined {
+  const lroMetaData = getLroMetadata(context.program, operation);
+  if (lroMetaData) {
+    return lroMetaData;
+  }
+  if (getMarkAsLro(context, operation)) {
+    // we guard against this in the setting of `@markAsLro`
+    const sdkMethod = ignoreDiagnostics(getSdkBasicServiceMethod(context, operation, client));
+    const returnType = sdkMethod.response.type!.__raw! as Model;
+    return {
+      operation,
+      logicalResult: returnType,
+      finalStateVia: FinalStateValue.originalUri, // doesn't really matter, but for get LRO
+      pollingInfo: {
+        kind: "pollingOperationStep",
+        responseModel: returnType,
+        terminationStatus: {
+          kind: "status-code",
+        },
+      },
+      envelopeResult: returnType,
+      finalEnvelopeResult: returnType,
+      finalResult: returnType,
+    };
+  }
+  return undefined;
 }

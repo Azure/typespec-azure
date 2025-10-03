@@ -1,8 +1,8 @@
 import type { Model, StringLiteral } from "@typespec/compiler";
 import {
-  type BasicTestRunner,
   expectDiagnosticEmpty,
   expectDiagnostics,
+  TesterInstance,
 } from "@typespec/compiler/testing";
 import type { HttpOperation } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
@@ -11,12 +11,7 @@ import { isFinalLocation } from "../src/decorators/final-location.js";
 import { isPollingLocation } from "../src/decorators/polling-location.js";
 import { type LroMetadata, getLroMetadata } from "../src/lro-helpers.js";
 import { getNamespaceName } from "../src/rules/utils.js";
-import {
-  type SimpleHttpOperation,
-  createAzureCoreTestRunner,
-  getOperations,
-  getSimplifiedOperations,
-} from "./test-host.js";
+import { type SimpleHttpOperation, getOperations, getSimplifiedOperations } from "./test-host.js";
 
 describe("typespec-azure-core: operation templates", () => {
   it("gathers metadata about ResourceCreateOrUpdate operation template", async () => {
@@ -50,55 +45,6 @@ describe("typespec-azure-core: operation templates", () => {
     );
 
     expectDiagnosticEmpty(diagnostics);
-  });
-
-  it("recursively make updatable properties optional for Upsert", async () => {
-    const runner = await createAzureCoreTestRunner();
-    const _ = (await runner.compile(
-      `
-      @test
-      model FlowerProperties {
-        petals: int32;
-        berries?: "banana" | "tomato"
-      }
-
-      @test
-      @resource("flowers")
-      model Flower {
-        @key
-        name: string;
-        description?: string;
-
-        similarFlowers: Flower[];
-
-        properties: FlowerProperties;
-      }
-
-      @test
-      model UpsertableFlowerProperties is Azure.Core.Foundations.ResourceCreateOrUpdateModel<FlowerProperties> {};
-
-      @test
-      model UpsertableFlower is Azure.Core.Foundations.ResourceCreateOrUpdateModel<Flower> {};
-      `,
-    )) as {
-      FlowerProperties: Model;
-      Flower: Model;
-      UpsertableFlowerProperties: Model;
-      UpsertableFlower: Model;
-    };
-
-    // function assertAllOptional(model: ModelType, visited: Set<string>) {
-    //   model.properties.forEach((prop) => {
-    //     ok(prop.optional, `Property ${prop.name} was not made optional?`);
-    //     if (prop.type.kind === "Model" && !visited.has(prop.type.name)) {
-    //       visited.add(prop.type.name);
-    //       assertAllOptional(prop.type, visited);
-    //     }
-    //   });
-    // }
-    // TODO: We need to recursively make things optional
-    //assertAllOptional(compiled.UpsertableFlowerProperties, new Set<string>());
-    //assertAllOptional(compiled.UpsertableFlower, new Set<string>());
   });
 
   it("properly annotates long-running operations with a status monitor", async () => {
@@ -258,7 +204,7 @@ describe("typespec-azure-core: operation templates", () => {
   async function compileLroOperation(
     code: string,
     operationName?: string,
-  ): Promise<[HttpOperation, LroMetadata | undefined, BasicTestRunner]> {
+  ): Promise<[HttpOperation, LroMetadata | undefined, TesterInstance]> {
     let [operations, diagnostics, runner] = await getOperations(
       `
       model TestModel {

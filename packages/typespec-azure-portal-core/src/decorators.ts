@@ -1,13 +1,13 @@
 import { getArmResourceKind } from "@azure-tools/typespec-azure-resource-manager";
 import {
-  BooleanLiteral,
-  CompilerHost,
-  DecoratorContext,
-  Model,
-  ModelProperty,
-  Program,
-  StringLiteral,
-  Type,
+  type BooleanLiteral,
+  type CompilerHost,
+  type DecoratorContext,
+  type Model,
+  type ModelProperty,
+  type Program,
+  type StringLiteral,
+  type Type,
   getDirectoryPath,
   getSourceLocation,
   normalizePath,
@@ -16,7 +16,7 @@ import {
 } from "@typespec/compiler";
 import { VersionMap, getVersions } from "@typespec/versioning";
 import { PortalCoreKeys, reportDiagnostic } from "./lib.js";
-import {
+import type {
   AboutOptions,
   BrowseOptions,
   DisplayNamesOptions,

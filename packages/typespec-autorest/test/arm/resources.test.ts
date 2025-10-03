@@ -6,8 +6,7 @@ it("emits correct paths for tenant resources", async () => {
   const openApi = await compileOpenAPI(
     `
         @armProviderNamespace
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        namespace Microsoft.Contoso;
+              namespace Microsoft.Contoso;
 
         @doc("Widget resource")
         model Widget is ProxyResource<WidgetProperties> {
@@ -97,8 +96,7 @@ it("emits correct paths for checkLocalName endpoints", async () => {
   const openApi = await compileOpenAPI(
     `
           @armProviderNamespace
-          @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-          namespace Microsoft.Contoso;
+                  namespace Microsoft.Contoso;
 
           @doc("Widget resource")
           model Widget is ProxyResource<WidgetProperties> {
@@ -146,8 +144,7 @@ it("emits correct paths for ArmResourceHead operation", async () => {
     `
         @armProviderNamespace
         @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        namespace Microsoft.Contoso;
+              namespace Microsoft.Contoso;
         @doc("Widget resource")
         model Widget is ProxyResource<WidgetProperties> {
           @doc("The name of the widget")
@@ -216,8 +213,7 @@ it("emits correct fixed union name parameter for resource", async () => {
   const openApi = await compileOpenAPI(
     `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Widget resource")
     model Widget is ProxyResource<WidgetProperties> {
@@ -279,8 +275,7 @@ it("emits a scalar string with decorator parameter for resource", async () => {
   const openApi = await compileOpenAPI(
     `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Widget resource")
     model Widget is ProxyResource<WidgetProperties> {
@@ -324,8 +319,7 @@ it("emits x-ms-azure-resource for resource with @azureResourceBase", async () =>
   const openApi = await compileOpenAPI(
     `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Widget resource")
     @Azure.ResourceManager.Private.azureResourceBase
@@ -342,8 +336,7 @@ it("emits x-ms-external for resource with @armExternalType", async () => {
   const openApi = await compileOpenAPI(
     `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
     @doc("Widget resource")
@@ -361,8 +354,7 @@ it("emits x-ms-azure-resource for resource with @customAzureResource and options
   const openApi = await compileOpenAPI(
     `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
     @doc("Widget resource")
@@ -379,8 +371,7 @@ it("does not emit x-ms-azure-resource for resource with @customAzureResource", a
   const openApi = await compileOpenAPI(
     `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
     @doc("Widget resource")
@@ -398,8 +389,7 @@ it("excludes properties marked @invisible from the resource payload", async () =
   const openApi = await compileOpenAPI(
     `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Widget resource")
     model Widget is ProxyResource<WidgetProperties> {
@@ -457,8 +447,7 @@ it("allows resources with multiple endpoints using LegacyOperations", async () =
   const openApi = await compileOpenAPI(
     `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.ContosoProviderhub;
+      namespace Microsoft.ContosoProviderhub;
 
     using Azure.ResourceManager.Legacy;
 
@@ -625,8 +614,7 @@ it("allows action requests with optional body parameters", async () => {
   const openApi = await compileOpenAPI(
     `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.ContosoProviderhub;
+      namespace Microsoft.ContosoProviderhub;
 
     /** A ContosoProviderHub resource */
     model Employee is TrackedResource<EmployeeProperties> {

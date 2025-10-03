@@ -1,5 +1,7 @@
 ---
 title: 6. Complete Example and Generate OpenApi 2.0 spec
+description: Complete ARM example
+llmstxt: true
 ---
 
 To generate an OpenAPI v2 (Swagger) specification from the service definition, run the following command inside of the project folder:
@@ -31,7 +33,6 @@ using Azure.ResourceManager;
 /** Contoso Resource Provider management API */
 @armProviderNamespace
 @service(#{ title: "ContosoProviderHubClient", version: "2021-01-01-preview" })
-@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 namespace Microsoft.ContosoProviderHub;
 

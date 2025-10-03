@@ -1,5 +1,28 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.60.1
+
+### Bug Fixes
+
+- [#3330](https://github.com/Azure/typespec-azure/pull/3330) Fix #3294 Add model and operation templates for private link
+- [#3337](https://github.com/Azure/typespec-azure/pull/3337) Fix #3243 Allow polymorphic legacy resources
+- [#3332](https://github.com/Azure/typespec-azure/pull/3332) Fix #3295 Allow tenant-level external resources
+
+
+## 0.60.0
+
+### Bump dependencies
+
+- [#3207](https://github.com/Azure/typespec-azure/pull/3207) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3240](https://github.com/Azure/typespec-azure/pull/3240) Add request parameters to legacy operations list
+- [#3242](https://github.com/Azure/typespec-azure/pull/3242) Fix #3201 Remove duplicate TrackedResource type
+- [#3196](https://github.com/Azure/typespec-azure/pull/3196) Fix optionality for ArmCustomPatch templates
+- [#3178](https://github.com/Azure/typespec-azure/pull/3178) Allow renaming parameters in an operation
+
+
 ## 0.59.2
 
 ### Bug Fixes

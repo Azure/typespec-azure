@@ -413,3 +413,90 @@ it("response body of scalar with encode", async () => {
   strictEqual(serviceResponse.type?.kind, "bytes");
   strictEqual(serviceResponse.type?.encode, "base64url");
 });
+
+it("multiple response types for one status code", async () => {
+  await runner.diagnose(`
+    @service
+    namespace TestService {
+      model One {
+        name: string;
+      }
+      model Two {
+        age: int32;
+      }
+      op doStuff(): One | Two;
+    }
+  `);
+
+  const sdkPackage = runner.context.sdkPackage;
+  strictEqual(sdkPackage.models.length, 2);
+  const oneModel = sdkPackage.models.find((m) => m.name === "One");
+  const twoModel = sdkPackage.models.find((m) => m.name === "Two");
+  ok(oneModel);
+  ok(twoModel);
+  const method = getServiceMethodOfClient(sdkPackage);
+  const methodResponseType = method.response.type;
+  ok(methodResponseType);
+  strictEqual(methodResponseType.kind, "union");
+  ok(methodResponseType.variantTypes.find((x) => x === oneModel));
+  ok(methodResponseType.variantTypes.find((x) => x === twoModel));
+  const serviceResponses = method.operation.responses;
+  strictEqual(serviceResponses.length, 1);
+  const serviceResponseType = serviceResponses[0].type;
+  ok(serviceResponseType);
+  strictEqual(serviceResponseType.kind, "union");
+  ok(serviceResponseType.variantTypes.find((x) => x === oneModel));
+  ok(serviceResponseType.variantTypes.find((x) => x === twoModel));
+});
+
+it("multiple response types for one status code plus additional model for other status code", async () => {
+  await runner.diagnose(`
+    @service
+    namespace TestService {
+      model One {
+        name: string;
+      }
+      model Two {
+        age: int32;
+      }
+      @get
+      op doStuff(): {
+        @statusCode statusCode: 200;
+        @body body: One | Two
+      } | {
+        @statusCode statusCode: 202;
+        @body body: string;
+      };
+    }
+  `);
+
+  const sdkPackage = runner.context.sdkPackage;
+  strictEqual(sdkPackage.models.length, 2);
+  const oneModel = sdkPackage.models.find((m) => m.name === "One");
+  const twoModel = sdkPackage.models.find((m) => m.name === "Two");
+  ok(oneModel);
+  ok(twoModel);
+  const method = getServiceMethodOfClient(sdkPackage);
+  const methodResponseType = method.response.type;
+  ok(methodResponseType);
+  strictEqual(methodResponseType.kind, "union");
+  strictEqual(methodResponseType.variantTypes.length, 2);
+  const [firstVariant, secondVariant] = methodResponseType.variantTypes;
+  ok(firstVariant);
+  ok(secondVariant);
+  strictEqual(firstVariant.kind, "union");
+  ok(firstVariant.variantTypes.find((x) => x === oneModel));
+  ok(firstVariant.variantTypes.find((x) => x === twoModel));
+  strictEqual(secondVariant.kind, "string");
+  const serviceResponses = method.operation.responses;
+  strictEqual(serviceResponses.length, 2);
+  const unionServiceResponseType = serviceResponses[0].type;
+  ok(unionServiceResponseType);
+  strictEqual(unionServiceResponseType.kind, "union");
+  ok(unionServiceResponseType.variantTypes.find((x) => x === oneModel));
+  ok(unionServiceResponseType.variantTypes.find((x) => x === twoModel));
+
+  const stringServiceResponseType = serviceResponses[1].type;
+  ok(stringServiceResponseType);
+  strictEqual(stringServiceResponseType.kind, "string");
+});

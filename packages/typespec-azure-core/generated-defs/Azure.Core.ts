@@ -67,16 +67,6 @@ export type PollingLocationDecorator = (
 export type PreviewVersionDecorator = (context: DecoratorContext, target: EnumMember) => void;
 
 /**
- * Marks a Model as a paged collection.
- */
-export type PagedResultDecorator = (context: DecoratorContext, entity: Model) => void;
-
-/**
- * Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
- */
-export type ItemsDecorator = (context: DecoratorContext, entity: ModelProperty) => void;
-
-/**
  * Used for custom StatusMonitor implementation.
  * Identifies an EnumMember as a long-running "Succeeded" terminal state.
  */
@@ -186,20 +176,6 @@ export type UseFinalStateViaDecorator = (
 ) => void;
 
 /**
- * Identifies that an operation is used to retrieve the next page for paged operations.
- *
- * @param linkedOperation The linked Operation
- * @param parameters Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will
- * be passed to the linked operation request.
- */
-export type NextPageOperationDecorator = (
-  context: DecoratorContext,
-  entity: Operation,
-  linkedOperation: Operation,
-  parameters?: Type,
-) => void;
-
-/**
  * Specifies that an array model or array-typed property should contain only unique items.
  */
 export type UniqueItemsDecorator = (
@@ -212,8 +188,6 @@ export type AzureCoreDecorators = {
   finalLocation: FinalLocationDecorator;
   pollingLocation: PollingLocationDecorator;
   previewVersion: PreviewVersionDecorator;
-  pagedResult: PagedResultDecorator;
-  items: ItemsDecorator;
   lroSucceeded: LroSucceededDecorator;
   lroCanceled: LroCanceledDecorator;
   lroFailed: LroFailedDecorator;
@@ -224,6 +198,5 @@ export type AzureCoreDecorators = {
   pollingOperation: PollingOperationDecorator;
   finalOperation: FinalOperationDecorator;
   useFinalStateVia: UseFinalStateViaDecorator;
-  nextPageOperation: NextPageOperationDecorator;
   uniqueItems: UniqueItemsDecorator;
 };

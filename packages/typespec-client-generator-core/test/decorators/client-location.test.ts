@@ -585,8 +585,7 @@ describe("Parameter", () => {
     /** Api versions */
     enum Versions {
       /** 2024-04-01-preview api version */
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      V2024_04_01_PREVIEW: "2024-04-01-preview",
+          V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
 
     @autoRoute
@@ -646,8 +645,7 @@ describe("Parameter", () => {
     /** Api versions */
     enum Versions {
       /** 2024-04-01-preview api version */
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      V2024_04_01_PREVIEW: "2024-04-01-preview",
+          V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
 
     @subscriptionResource
@@ -730,5 +728,114 @@ describe("Parameter", () => {
     ok(deleteSubIdOperationParam);
     strictEqual(deleteSubIdOperationParam.correspondingMethodParams.length, 1);
     strictEqual(deleteSubIdOperationParam.correspondingMethodParams[0], subIdClientParam);
+  });
+
+  it("move to `@clientInitialization` for grandparent client", async () => {
+    await runner.compile(
+      `
+      @service
+      namespace Grandparent;
+
+      namespace Parent {
+        model Blob {
+          id: string;
+          name: string;
+          size: int32;
+          path: string;
+        }
+        interface Child {
+          @route("/blob")
+          @get
+          getBlob(
+            @query
+            @global.Azure.ClientGenerator.Core.clientLocation(Grandparent)
+            storageAccount: string,
+
+            @query container: string,
+            @query blob: string,
+          ): Blob;
+        }
+      }
+      `,
+    );
+    const sdkPackage = runner.context.sdkPackage;
+    const grandparentClient = sdkPackage.clients.find((c) => c.name === "GrandparentClient");
+    ok(grandparentClient);
+    strictEqual(grandparentClient.clientInitialization.parameters.length, 2);
+    ok(grandparentClient.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+    ok(grandparentClient.clientInitialization.parameters.find((p) => p.name === "storageAccount"));
+
+    const parentClient = grandparentClient.children?.find((c) => c.name === "Parent");
+    ok(parentClient);
+    strictEqual(parentClient.clientInitialization.parameters.length, 2);
+    ok(parentClient.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+    ok(parentClient.clientInitialization.parameters.find((p) => p.name === "storageAccount"));
+
+    const childClient = parentClient.children?.find((c) => c.name === "Child");
+    ok(childClient);
+    strictEqual(childClient.clientInitialization.parameters.length, 2);
+    ok(childClient.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+    ok(childClient.clientInitialization.parameters.find((p) => p.name === "storageAccount"));
+
+    const method = childClient.methods.find((m) => m.name === "getBlob");
+    ok(method);
+    strictEqual(method.parameters.length, 3);
+    ok(method.parameters.find((p) => p.name === "container"));
+    ok(method.parameters.find((p) => p.name === "blob"));
+    ok(method.parameters.find((p) => p.name === "accept"));
+  });
+
+  it("move to `@clientInitialization` for parent client", async () => {
+    await runner.compile(
+      `
+      @service
+      namespace Grandparent;
+
+      namespace Parent {
+        model Blob {
+          id: string;
+          name: string;
+          size: int32;
+          path: string;
+        }
+        interface Child {
+          @route("/blob")
+          @get
+          getBlob(
+            @query
+            @global.Azure.ClientGenerator.Core.clientLocation(Parent)
+            storageAccount: string,
+
+            @query container: string,
+            @query blob: string,
+          ): Blob;
+        }
+      }
+      `,
+    );
+    const sdkPackage = runner.context.sdkPackage;
+    const grandparentClient = sdkPackage.clients.find((c) => c.name === "GrandparentClient");
+    ok(grandparentClient);
+    strictEqual(grandparentClient.clientInitialization.parameters.length, 1);
+    ok(grandparentClient.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+
+    const parentClient = grandparentClient.children?.find((c) => c.name === "Parent");
+    ok(parentClient);
+    strictEqual(parentClient.clientInitialization.parameters.length, 2);
+    ok(parentClient.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+    ok(parentClient.clientInitialization.parameters.find((p) => p.name === "storageAccount"));
+
+    const childClient = parentClient.children?.find((c) => c.name === "Child");
+    ok(childClient);
+    strictEqual(childClient.clientInitialization.parameters.length, 2);
+    ok(childClient.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+    ok(childClient.clientInitialization.parameters.find((p) => p.name === "storageAccount"));
+
+    const method = childClient.methods.find((m) => m.name === "getBlob");
+    ok(method);
+    strictEqual(method.parameters.length, 3);
+    ok(method.parameters.find((p) => p.name === "container"));
+    ok(method.parameters.find((p) => p.name === "blob"));
+    ok(method.parameters.find((p) => p.name === "accept"));
   });
 });

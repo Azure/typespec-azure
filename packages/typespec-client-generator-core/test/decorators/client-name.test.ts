@@ -1,6 +1,6 @@
 import { Model, Operation } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { strictEqual } from "assert";
+import { ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
 import { getClientNameOverride } from "../../src/decorators.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
@@ -186,6 +186,69 @@ it("decorator on template parameter", async function () {
   `);
 
   strictEqual(runner.context.sdkPackage.clients[0].methods[0].parameters[0].name, "body");
+});
+
+it("apply with @client decorator to namespace client", async () => {
+  await runner.compile(`
+    @service
+    @client
+    @clientName("MyServiceClient")
+    namespace MyService;
+    op test(): void;
+  `);
+
+  strictEqual(runner.context.sdkPackage.clients[0].name, "MyServiceClient");
+});
+
+it("apply with @client decorator to interface client", async () => {
+  await runner.compile(`
+    @service
+    namespace MyService;
+
+    @client
+    @clientName("MyInterfaceClient")
+    interface MyInterface {
+      op test(): void;
+    }
+  `);
+
+  strictEqual(runner.context.sdkPackage.clients[0].name, "MyInterfaceClient");
+});
+
+it("apply with @operationGroup decorator to interface client", async () => {
+  await runner.compile(`
+    @service
+    namespace MyService;
+
+    @operationGroup
+    @clientName("MyOperationGroup")
+    interface MyInterface {
+      op test(): void;
+    }
+  `);
+
+  strictEqual(runner.context.sdkPackage.clients.length, 1);
+  const myServiceClient = runner.context.sdkPackage.clients[0];
+  strictEqual(myServiceClient.name, "MyServiceClient");
+  ok(myServiceClient.children);
+  strictEqual(myServiceClient.children.length, 1);
+  const myOperationGroup = myServiceClient.children[0];
+  strictEqual(myOperationGroup.name, "MyOperationGroup");
+});
+
+it("overrides client name from @client definition", async () => {
+  await runner.compile(`
+    @service
+    namespace MyService;
+
+    @client({"name": "DoNotUseThisName"})
+    @clientName("MyInterfaceClient")
+    interface MyInterface {
+      op test(): void;
+    }
+  `);
+
+  strictEqual(runner.context.sdkPackage.clients[0].name, "MyInterfaceClient");
 });
 
 it("empty client name", async () => {

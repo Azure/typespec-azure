@@ -1,5 +1,50 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.60.3
+
+### Bug Fixes
+
+- [#3328](https://github.com/Azure/typespec-azure/pull/3328) Fix propagation of client initialization parameters set on parent clients
+- [#3327](https://github.com/Azure/typespec-azure/pull/3327) Allow `@markAsLro` to work with union return types
+
+
+## 0.60.2
+
+### Bug Fixes
+
+- [#3300](https://github.com/Azure/typespec-azure/pull/3300) add `@Azure.ClientGenerator.Core.Legacy.markAsLro` for legacy brownfield services that need to mark non-lro methods as lro
+
+
+## 0.60.1
+
+### Bug Fixes
+
+- [#3293](https://github.com/Azure/typespec-azure/pull/3293) Allow `@alternateType` to reference external types as well
+
+
+## 0.60.0
+
+### Breaking Changes
+
+- [#3202](https://github.com/Azure/typespec-azure/pull/3202) Move deprecated `@flattenProperty` decorator into the `Azure.ClientGenerator.Core.Legacy` namespace
+- [#3189](https://github.com/Azure/typespec-azure/pull/3189) Compare type when map body parameter to method parameter. This is a behavior breaking change. The Http parameter's corresponding parameter may change.
+
+### Features
+
+- [#3223](https://github.com/Azure/typespec-azure/pull/3223) add `.decorators` property to `SdkNamespace` type that will display decorators listed in the allowed list
+- [#2980](https://github.com/Azure/typespec-azure/pull/2980) Add support for `@clientLocation` to apply to parameters.
+- [#3199](https://github.com/Azure/typespec-azure/pull/3199) Add `.pageSizeParameterSegments` to `.pagingMetadata` on paging methods to return the path to the page size parameter
+
+### Bump dependencies
+
+- [#3207](https://github.com/Azure/typespec-azure/pull/3207) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3232](https://github.com/Azure/typespec-azure/pull/3232) Add warning for `@clientName` that is applied to override methods bc they're ineffectual
+- [#3208](https://github.com/Azure/typespec-azure/pull/3208) Return union of response types with warning instead of silently selecting the first one
+
+
 ## 0.59.1
 
 ### Bug Fixes

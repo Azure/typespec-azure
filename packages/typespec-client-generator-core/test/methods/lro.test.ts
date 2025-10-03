@@ -26,10 +26,8 @@ describe("data plane LRO templates", () => {
         @versioned(Versions)
         namespace TestClient;
         enum Versions {
-          @useDependency(Azure.Core.Versions.v1_0_Preview_1)
           v1: "v1",
-          @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-          v2: "v2",
+                  v2: "v2",
         }
       
         alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalRequests &
@@ -577,10 +575,8 @@ describe("data plane LRO templates", () => {
       @versioned(Versions)
       namespace TestClient {
         enum Versions {
-          @useDependency(Azure.Core.Versions.v1_0_Preview_1)
           v1: "v1",
-          @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-          v2: "v2",
+                  v2: "v2",
         }
       
         alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalRequests &
@@ -598,7 +594,7 @@ describe("data plane LRO templates", () => {
         op longRunning(): AcceptedResponse;
       }
 
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2, TestClient.Versions.v2)
+      @useDependency(TestClient.Versions.v2)
       namespace NonService {
         @route("/poll")
         @get
@@ -639,9 +635,8 @@ describe("data plane LRO templates", () => {
     });
     await runnerWithCore.compileWithCustomization(
       `
-      @useDependency(Versions.v1_0_Preview_2)
       @server("http://localhost:3000", "endpoint")
-      @service()
+      @service
       namespace DocumentIntelligence;
         @lroStatus
         @doc("Operation status.")
@@ -838,8 +833,7 @@ describe("Arm LRO templates", () => {
         @versioned(Versions)
         namespace TestClient;
         enum Versions {
-          @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-          @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+                  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
           v1: "v1",
         }
         ${code}`,
@@ -1051,7 +1045,6 @@ it("customized lro delete", async () => {
     namespace My.Service;
 
     enum MyVersions {
-      @useDependency(Versions.v1_0_Preview_2)
       v1: "v1",
     }
 
@@ -1098,8 +1091,7 @@ describe("getLroMetadata", () => {
     @doc("The API version.")
     enum Versions {
       @doc("The 2022-12-01-preview version.")
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      v2022_12_01_preview: "2022-12-01-preview",
+          v2022_12_01_preview: "2022-12-01-preview",
     }
 
     @resource("users")

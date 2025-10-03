@@ -1,7 +1,7 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 import { UsageFlags } from "../../src/interfaces.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 
@@ -365,6 +365,8 @@ it("remove required parameter", async () => {
   )[1];
   expectDiagnostics(diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/override-parameters-mismatch",
+    message:
+      'Method "func" has different parameters definition from the override operation. Please check the parameter defined in the override operation: "bar".',
   });
 });
 
@@ -419,15 +421,17 @@ it("core template", async () => {
   });
   await runnerWithCore.compileWithCustomization(
     `
-    @useDependency(Versions.v1_0_Preview_2)
     @server("http://localhost:3000", "endpoint")
-    @service()
+    @service
+    @versioned(Versions)
     namespace My.Service;
+
+    enum Versions { v1  }
 
     model Params {
       foo: string;
       params: Params[];
-}
+    }
 
     @route("/template")
     op templateOp is Azure.Core.RpcOperation<
@@ -510,4 +514,74 @@ it("remove optional query param and add secret name", async () => {
   ok(maxResultsParam);
   strictEqual(maxResultsParam.correspondingMethodParams.length, 0);
   strictEqual(maxResultsParam.name, "maxresults");
+});
+
+describe("@clientName", () => {
+  it("original method", async () => {
+    await runner.compileWithCustomization(
+      `
+      @service
+      namespace KeyVault;
+
+      op getSecret(@query("secret-name") secretName: string): void;
+      `,
+      `
+      op getSecretOverride(@query("secret-name") secretName: string): void;
+      @@override(KeyVault.getSecret, getSecretOverride);
+      @@clientName(KeyVault.getSecret, "listSecretProperties");
+      `,
+    );
+    const sdkPackage = runner.context.sdkPackage;
+    const method = sdkPackage.clients[0].methods[0];
+    strictEqual(method.parameters.length, 1);
+    strictEqual(method.name, "listSecretProperties");
+  });
+  it("override method", async () => {
+    const diagnostics = await runner.compileAndDiagnoseWithCustomization(
+      `
+      @service
+      namespace KeyVault;
+
+      op getSecret(@query("secret-name") secretName: string): void;
+      `,
+      `
+      op getSecretOverride(@query("secret-name") secretName: string): void;
+      @@override(KeyVault.getSecret, getSecretOverride);
+      @@clientName(getSecretOverride, "listSecretProperties");
+      `,
+    );
+    expectDiagnostics(diagnostics[1], {
+      code: "@azure-tools/typespec-client-generator-core/client-name-ineffective",
+      message:
+        'Application of @clientName decorator to listSecretProperties is not effective because it is applied to the override method. Please apply it on the original method definition "getSecret" instead.',
+    });
+    const sdkPackage = runner.context.sdkPackage;
+    const method = sdkPackage.clients[0].methods[0];
+    strictEqual(method.parameters.length, 1);
+    strictEqual(method.name, "getSecret");
+  });
+
+  it("override parameter", async () => {
+    await runner.compileWithCustomization(
+      `
+      @service
+      namespace KeyVault;
+
+      op getSecret(@query("secret-name") secretName: string): void;
+      `,
+      `
+      alias OverrideParameters = {
+        @query("secret-name") secretName: string,
+      };
+      
+      op getSecretOverride(...OverrideParameters): void;
+      @@override(KeyVault.getSecret, getSecretOverride);
+      @@clientName(OverrideParameters.secretName, "secretNameOverride");
+      `,
+    );
+    const sdkPackage = runner.context.sdkPackage;
+    const method = sdkPackage.clients[0].methods[0];
+    strictEqual(method.parameters.length, 1);
+    strictEqual(method.parameters[0].name, "secretNameOverride");
+  });
 });

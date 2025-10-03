@@ -1,18 +1,13 @@
-import {
-  BasicTestRunner,
-  LinterRuleTester,
-  createLinterRuleTester,
-} from "@typespec/compiler/testing";
+import { Tester } from "#test/test-host.js";
+import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { byosRule } from "../../src/rules/byos.js";
-import { createAzureCoreTestRunner } from "../test-host.js";
 
 describe("typespec-azure-core: byos rule", () => {
-  let runner: BasicTestRunner;
   let tester: LinterRuleTester;
 
   beforeEach(async () => {
-    runner = await createAzureCoreTestRunner();
+    const runner = await Tester.createInstance();
     tester = createLinterRuleTester(runner, byosRule, "@azure-tools/typespec-azure-core");
   });
 

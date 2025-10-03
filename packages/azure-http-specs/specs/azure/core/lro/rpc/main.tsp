@@ -25,7 +25,6 @@ namespace _Specs_.Azure.Core.Lro.Rpc;
 @doc("The API version.")
 enum Versions {
   @doc("The 2022-12-01-preview version.")
-  @useDependency(global.Azure.Core.Versions.v1_0_Preview_2)
   v2022_12_01_preview: "2022-12-01-preview",
 }
 

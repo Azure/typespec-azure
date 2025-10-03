@@ -57,13 +57,117 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_AlternateType_ExternalType_getModel
+
+- Endpoint: `get /azure/client-generator-core/alternate-type/external/model`
+
+Input: None
+Output: Feature object with geometry, properties, and optional id fields.
+Example response:
+
+```json
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-122.25, 37.87]
+  },
+  "properties": {
+    "name": "A single point of interest",
+    "category": "landmark",
+    "elevation": 100
+  },
+  "id": "feature-1"
+}
+```
+
+### Azure_ClientGenerator_Core_AlternateType_ExternalType_getProperty
+
+- Endpoint: `get /azure/client-generator-core/alternate-type/external/property`
+
+Input: None
+Output: ModelWithFeatureProperty object with feature and additionalProperty fields.
+Example response:
+
+```json
+{
+  "feature": {
+    "type": "Feature",
+    "geometry": {
+      "type": "Point",
+      "coordinates": [-122.25, 37.87]
+    },
+    "properties": {
+      "name": "A single point of interest",
+      "category": "landmark",
+      "elevation": 100
+    },
+    "id": "feature-1"
+  },
+  "additionalProperty": "extra"
+}
+```
+
+### Azure_ClientGenerator_Core_AlternateType_ExternalType_putModel
+
+- Endpoint: `put /azure/client-generator-core/alternate-type/external/model`
+
+Input: Feature object in request body.
+Example input:
+
+```json
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-122.25, 37.87]
+  },
+  "properties": {
+    "name": "A single point of interest",
+    "category": "landmark",
+    "elevation": 100
+  },
+  "id": "feature-1"
+}
+```
+
+Output: None (204/empty response)
+
+### Azure_ClientGenerator_Core_AlternateType_ExternalType_putProperty
+
+- Endpoint: `put /azure/client-generator-core/alternate-type/external/property`
+
+Input: ModelWithFeatureProperty object in request body.
+Example input:
+
+```json
+{
+  "feature": {
+    "type": "Feature",
+    "geometry": {
+      "type": "Point",
+      "coordinates": [-122.25, 37.87]
+    },
+    "properties": {
+      "name": "A single point of interest",
+      "category": "landmark",
+      "elevation": 100
+    },
+    "id": "feature-1"
+  },
+  "additionalProperty": "extra"
+}
+```
+
+Output: None (204/empty response)
+
 ### Azure_ClientGenerator_Core_ClientLocation_MoveMethodParameterToClient
 
 - Endpoint: `get /azure/client-generator-core/client-location/blob`
 
 Test moving a method parameter to client.
 
-The parameter `storageAccount` from operation `getBlob` should be moved to the client in the generated code.
+The parameter `storageAccount` from operation `getBlob` should be moved to the `MoveMethodParameterToClient` in the generated code.
 
 Expected request:
 
@@ -347,11 +451,37 @@ param2: param2
 
 Expected response: 204 No Content
 
+### Azure_ClientGenerator_Core_Override_RemoveOptionalParameter_removeOptional
+
+- Endpoint: `get /azure/client-generator-core/override/remove-optional/{param1}`
+
+Verify that after `@override`, optional parameters can be removed from the client method signature.
+
+Expected path parameter:
+param1: param1
+
+Expected query parameter:
+param2: param2
+
+Expected response: 204 No Content
+
 ### Azure_ClientGenerator_Core_Override_ReorderParameters_reorder
 
 - Endpoint: `get /azure/client-generator-core/override/reorder/{param2}/{param1}`
 
 Verify that after `@override` the parameters are reordered correctly in the client method signature.
+
+Expected path parameter:
+param1: param1
+param2: param2
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_Override_RequireOptionalParameter_requireOptional
+
+- Endpoint: `get /azure/client-generator-core/override/require-optional/{param1}/{param2}`
+
+Verify that after `@override` an optional parameter can be made required in the client method signature.
 
 Expected path parameter:
 param1: param1
@@ -3540,6 +3670,77 @@ Expected header parameters:
 - x-ms-client-request-id=<any uuid string>
   Expected response header:
 - x-ms-client-request-id=<uuid string same with request header>
+
+### Azure_Versioning_PreviewVersion_getWidget
+
+- Endpoint: `get /azure/versioning/previewVersion/widgets/{id}`
+
+Test @previewVersion decorator with stable operations.
+Should send a preview api-version and response should contain color field.
+
+Expected path parameter: id=widget-123
+Expected query parameter: api-version=2024-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "widget-123",
+  "name": "Sample Widget",
+  "color": "blue"
+}
+```
+
+### Azure_Versioning_PreviewVersion_listWidgets
+
+- Endpoint: `get /azure/versioning/previewVersion/widgets`
+
+Test @previewVersion decorator with version-specific query parameters.
+Request should send stable api-version and response should not contain color field.
+
+Expected query parameter: api-version=2024-06-01
+Expected query parameter: name=test (color not available in stable version)
+
+Expected response body:
+
+```json
+{
+  "widgets": [
+    {
+      "id": "widget-1",
+      "name": "test"
+    }
+  ]
+}
+```
+
+### Azure_Versioning_PreviewVersion_updateWidgetColor
+
+- Endpoint: `patch /azure/versioning/previewVersion/widgets/{id}/color`
+
+Test @previewVersion decorator with preview-only operations.
+Only available in preview API versions.
+
+Expected path parameter: id=widget-123
+Expected query parameter: api-version=2024-12-01-preview
+
+Expected input body:
+
+```json
+{
+  "color": "red"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "widget-123",
+  "name": "Sample Widget",
+  "color": "red"
+}
+```
 
 ### Client_AlternateApiVersion_Service_Header_headerApiVersion
 

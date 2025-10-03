@@ -41,8 +41,7 @@ function getServiceWithDefaultApiVersion(op: string) {
       /**
        * The version 2022-12-01-preview.
        */
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      v2022_12_01_preview: "2022-12-01-preview",
+          v2022_12_01_preview: "2022-12-01-preview",
     }
 
     ${op}
@@ -570,7 +569,7 @@ it("service with no default api version, method with api version param", async (
   const apiVersionMethodParam = withApiVersion.parameters[0];
   strictEqual(apiVersionMethodParam.name, "apiVersion");
   strictEqual(apiVersionMethodParam.kind, "method");
-  strictEqual(apiVersionMethodParam.isApiVersionParam, true);
+  strictEqual(apiVersionMethodParam.isApiVersionParam, false);
   strictEqual(apiVersionMethodParam.optional, false);
   strictEqual(apiVersionMethodParam.onClient, false);
   strictEqual(apiVersionMethodParam.type.kind, "string");
@@ -579,7 +578,7 @@ it("service with no default api version, method with api version param", async (
   strictEqual(withApiVersion.operation.parameters.length, 1);
   const apiVersionParam = withApiVersion.operation.parameters[0];
   strictEqual(apiVersionParam.kind, "query");
-  strictEqual(apiVersionParam.isApiVersionParam, true);
+  strictEqual(apiVersionParam.isApiVersionParam, false);
   strictEqual(apiVersionParam.optional, false);
   strictEqual(apiVersionParam.onClient, false);
   strictEqual(apiVersionParam.type.kind, "string");

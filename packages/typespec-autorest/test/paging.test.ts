@@ -6,8 +6,7 @@ it("use Azure.Core.Page as the response", async () => {
   const res = await compileOpenAPI(
     `
     @service
-    @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-    namespace Test {
+      namespace Test {
       @list
       op list(): Azure.Core.Page<{}>;
     }

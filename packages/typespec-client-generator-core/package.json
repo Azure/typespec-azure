@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-client-generator-core",
-  "version": "0.59.1",
+  "version": "0.60.3",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Data Plane Generation library",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -47,7 +47,7 @@
     "test:ci": "vitest run --coverage  --reporter=junit --reporter=default",
     "lint": "eslint .  --max-warnings=0",
     "lint:fix": "eslint . --fix ",
-    "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../website/src/content/docs/docs/libraries/typespec-client-generator-core/reference"
+    "regen-docs": "tspd doc .  --enable-experimental --llmstxt --output-dir ../../website/src/content/docs/docs/libraries/typespec-client-generator-core/reference"
   },
   "files": [
     "lib/*.tsp",

@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-resource-manager",
-  "version": "0.59.2",
+  "version": "0.60.1",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Azure Resource Manager library",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -30,6 +30,9 @@
       "default": "./dist/src/testing/index.js"
     }
   },
+  "imports": {
+    "#test/*": "./test/*"
+  },
   "type": "module",
   "engines": {
     "node": ">=20.0.0"
@@ -46,7 +49,7 @@
     "test:ci": "vitest run --coverage  --reporter=junit --reporter=default",
     "lint": "eslint .  --max-warnings=0",
     "lint:fix": "eslint . --fix ",
-    "regen-docs": "tspd doc .  --enable-experimental  --output-dir ../../website/src/content/docs/docs/libraries/azure-resource-manager/reference"
+    "regen-docs": "tspd doc .  --enable-experimental --llmstxt  --output-dir ../../website/src/content/docs/docs/libraries/azure-resource-manager/reference"
   },
   "files": [
     "lib/**/*.tsp",

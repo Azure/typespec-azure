@@ -18,8 +18,8 @@ namespace _Specs_.Azure.ClientGenerator.Core.FlattenProperty;
 model FlattenModel {
   name: string;
 
-  #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
-  @flattenProperty
+  #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Testing backcompat"
+  @global.Azure.ClientGenerator.Core.Legacy.flattenProperty
   properties: ChildModel;
 }
 
@@ -27,8 +27,8 @@ model FlattenModel {
 model NestedFlattenModel {
   name: string;
 
-  #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
-  @flattenProperty
+  #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Testing backcompat"
+  @global.Azure.ClientGenerator.Core.Legacy.flattenProperty
   properties: ChildFlattenModel;
 }
 
@@ -42,8 +42,8 @@ model ChildModel {
 model ChildFlattenModel {
   summary: string;
 
-  #suppress "deprecated" "@flattenProperty decorator is not recommended to use."
-  @flattenProperty
+  #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Testing backcompat"
+  @global.Azure.ClientGenerator.Core.Legacy.flattenProperty
   properties: ChildModel;
 }
 
