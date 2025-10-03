@@ -35,9 +35,9 @@ enum Versions {
 union OperationStatus {
   string,
 
-  /** The operation was canceled. */
+  /** The operation was stopped. */
   @lroCanceled
-  Canceled: "Canceled",
+  Stopped: "Stopped",
 
   /** The operation succeeded. */
   Succeeded: "Succeeded",
@@ -80,13 +80,13 @@ model SecurityDomainObject {
  */
 @scenario
 @scenarioDoc("""
-  Test LRO operation with @lroCanceled decorator. Send security domain object with value 'test-domain' and expect operation to eventually return status 'Canceled'.
+  Test LRO operation with @lroCanceled decorator. Send security domain object with value 'test-domain' and expect operation to eventually return status 'Stopped'.
   
   Expected sequence:
   1. POST /securitydomain/upload with body {"value": "test-domain"}
   2. Returns 202 with operation-location header
   3. GET operation status returns InProgress initially
-  4. GET operation status eventually returns Canceled (indicating @lroCanceled)
+  4. GET operation status eventually returns Stopped (indicating @lroCanceled)
   """)
 @pollingOperation(uploadPending)
 @finalOperation(uploadPending)
@@ -113,11 +113,11 @@ op upload is Foundations.LongRunningOperation<
  */
 @scenario
 @scenarioDoc("""
-  Poll operation status endpoint. Initially returns InProgress, then Canceled when the operation is canceled.
+  Poll operation status endpoint. Initially returns InProgress, then Stopped when the operation is canceled.
   
   Expected behavior:
   - First few calls return status: 'InProgress'
-  - Eventually returns status: 'Canceled' (indicating @lroCanceled)
+  - Eventually returns status: 'Stopped' (indicating @lroCanceled)
   """)
 @route("/securitydomain/upload/pending")
 @get

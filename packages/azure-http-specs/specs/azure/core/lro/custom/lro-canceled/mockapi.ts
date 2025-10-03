@@ -18,7 +18,7 @@ function uploadPendingHandler(req: MockRequest) {
   const response =
     uploadPollCount === 1
       ? { status: "InProgress", status_details: "Security domain upload in progress" }
-      : { status: "Canceled", status_details: "Security domain upload was canceled" };
+      : { status: "Stopped", status_details: "Security domain upload was stopped" };
 
   return { status: 200, body: json(response) };
 }
@@ -80,8 +80,8 @@ Scenarios.Azure_Core_Lro_Custom_LroCanceled_upload = passOnSuccess([
     response: {
       status: 200,
       body: json({
-        status: "Canceled",
-        status_details: "Security domain upload was canceled",
+        status: "Stopped",
+        status_details: "Security domain upload was stopped",
       }),
     },
     handler: uploadPendingHandler,
@@ -116,8 +116,8 @@ Scenarios.Azure_Core_Lro_Custom_LroCanceled_uploadPending = passOnSuccess([
     response: {
       status: 200,
       body: json({
-        status: "Canceled",
-        status_details: "Security domain upload was canceled",
+        status: "Stopped",
+        status_details: "Security domain upload was stopped",
       }),
     },
     handler: uploadPendingHandler,
