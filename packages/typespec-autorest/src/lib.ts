@@ -108,6 +108,16 @@ export interface AutorestEmitterOptions {
    * @default "for-visibility-changes"
    */
   "emit-common-types-schema"?: "never" | "for-visibility-changes";
+
+  /**
+   * Strategy for applying XML serialization metadata to schemas.
+   *
+   * - "xml-service": Apply XML serialization metadata for any service that uses the `"application/xml"` content type.
+   * - "none": Do not apply any XML serialization metadata.
+   *
+   * @default "xml-service"
+   */
+  "xml-strategy"?: "xml-service" | "none";
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
@@ -232,6 +242,13 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       default: "for-visibility-changes",
       description:
         "Determine whether and how to emit schemas for common-types rather than referencing them",
+    },
+    "xml-strategy": {
+      type: "string",
+      enum: ["xml-service", "none"],
+      nullable: true,
+      default: "xml-service",
+      description: "Strategy for applying XML serialization metadata to schemas.",
     },
   },
   required: [],

@@ -25,6 +25,7 @@ import {
 import {
   getClientNameOverride,
   getLegacyHierarchyBuilding,
+  getMarkAsLro,
   shouldFlattenProperty,
 } from "@azure-tools/typespec-client-generator-core";
 import {
@@ -232,6 +233,8 @@ export interface AutorestDocumentEmitterOptions {
    * @default "for-visibility-only"
    */
   readonly emitCommonTypesSchema?: "never" | "for-visibility-changes";
+
+  readonly xmlStrategy: "xml-service" | "none";
 }
 
 /**
@@ -304,6 +307,7 @@ export async function getOpenAPIForService(
   const auth = processAuth(service.type);
 
   const xml = await resolveXmlModule();
+  const xmlStrategy = options.xmlStrategy;
 
   const root: OpenAPI2Document = {
     swagger: "2.0",
@@ -369,16 +373,18 @@ export async function getOpenAPIForService(
   const routes = httpService.operations;
   reportIfNoRoutes(program, routes);
 
+  const xmlEnabled = xmlStrategy !== "none";
+
   // The set of produces/consumes values found in all operations
   let allResponseContentTypes = routes
     .flatMap((route) => route.responses)
     .flatMap((res) => res.responses)
-    .flatMap((res) => res.body?.contentTypes)
+    .flatMap((res) => res.body?.contentTypes ?? [])
     .filter(
       (ct) =>
         // XML and JSON are privileged to be the only content types that can live at the top level and inform global
         // serializer/naming behavior.
-        ct === "application/json" || ct === "application/xml",
+        ct === "application/json" || (xmlEnabled && ct === "application/xml"),
     );
   if (allResponseContentTypes.length === 0) allResponseContentTypes = ["application/json"];
   const globalProduces = new Set<string>(allResponseContentTypes);
@@ -386,12 +392,16 @@ export async function getOpenAPIForService(
   let allRequestContentTypes = routes
     .flatMap((route) => route.parameters)
     .flatMap((param) => param.body?.contentTypes ?? [])
-    .filter((ct) => ct === "application/json" || ct === "application/xml");
+    .filter(
+      (ct) => !!ct && (ct === "application/json" || (xmlEnabled && ct === "application/xml")),
+    );
   if (allRequestContentTypes.length === 0) allRequestContentTypes = ["application/json"];
   const globalConsumes = new Set<string>(allRequestContentTypes);
 
-  const specHasXml = globalProduces.has("application/xml") || globalConsumes.has("application/xml");
+  const shouldEmitXml =
+    xmlEnabled && (globalProduces.has("application/xml") || globalConsumes.has("application/xml"));
   const specIsOnlyXml =
+    xmlEnabled &&
     globalProduces.size === 1 &&
     globalProduces.has("application/xml") &&
     globalConsumes.size === 1 &&
@@ -662,6 +672,9 @@ export async function getOpenAPIForService(
           currentEndpoint["x-ms-long-running-operation-options"] = lroOptions;
         }
       }
+    }
+    if (getMarkAsLro(context.tcgcSdkContext, op) === true) {
+      currentEndpoint["x-ms-long-running-operation"] = true;
     }
 
     // Extract paged metadata from Azure.Core.Page
@@ -1549,7 +1562,7 @@ export async function getOpenAPIForService(
         checkDuplicateTypeName(program, processed.type, name, root.definitions!);
         processed.ref.value = "#/definitions/" + encodeURIComponent(name);
         if (processed.schema) {
-          if (specHasXml)
+          if (shouldEmitXml)
             attachXml(
               processed.type,
               name,
@@ -1908,6 +1921,8 @@ export async function getOpenAPIForService(
       description: getDoc(program, model),
     };
 
+    applyIntrinsicDecorators(model, modelSchema);
+
     if (model.baseModel) {
       const discriminatorValue = getDiscriminatorValue(model);
       if (discriminatorValue) {
@@ -2004,7 +2019,7 @@ export async function getOpenAPIForService(
         property["x-ms-client-name"] = clientName;
       }
 
-      if (specHasXml && xml.available) {
+      if (shouldEmitXml && xml.available) {
         const xmlName = resolveEncodedName(program, prop, "application/xml");
 
         if (xmlName !== propertySchemaName) {
@@ -2127,7 +2142,7 @@ export async function getOpenAPIForService(
       applyArmIdentifiersDecorator(prop.type, propSchema, prop);
     }
 
-    if (specHasXml && xml.available) {
+    if (shouldEmitXml && xml.available) {
       attachPropertyXml(prop, propSchema);
     }
 
@@ -2153,6 +2168,9 @@ export async function getOpenAPIForService(
     }
     if (type.kind === "Model" && isArmExternalType(program, type) === true) {
       emitObject["x-ms-external"] = true;
+    }
+    if (type.kind === "Model" && isSecret(program, type) === true) {
+      emitObject["x-ms-secret"] = true;
     }
     if (type.kind === "Scalar") {
       const ext = getArmResourceIdentifierConfig(program, type);
