@@ -373,16 +373,18 @@ export async function getOpenAPIForService(
   const routes = httpService.operations;
   reportIfNoRoutes(program, routes);
 
+  const xmlEnabled = xmlStrategy !== "none";
+
   // The set of produces/consumes values found in all operations
   let allResponseContentTypes = routes
     .flatMap((route) => route.responses)
     .flatMap((res) => res.responses)
-    .flatMap((res) => res.body?.contentTypes)
+    .flatMap((res) => res.body?.contentTypes ?? [])
     .filter(
       (ct) =>
         // XML and JSON are privileged to be the only content types that can live at the top level and inform global
         // serializer/naming behavior.
-        ct === "application/json" || ct === "application/xml",
+        ct === "application/json" || (xmlEnabled && ct === "application/xml"),
     );
   if (allResponseContentTypes.length === 0) allResponseContentTypes = ["application/json"];
   const globalProduces = new Set<string>(allResponseContentTypes);
@@ -390,14 +392,16 @@ export async function getOpenAPIForService(
   let allRequestContentTypes = routes
     .flatMap((route) => route.parameters)
     .flatMap((param) => param.body?.contentTypes ?? [])
-    .filter((ct) => ct === "application/json" || ct === "application/xml");
+    .filter(
+      (ct) => !!ct && (ct === "application/json" || (xmlEnabled && ct === "application/xml")),
+    );
   if (allRequestContentTypes.length === 0) allRequestContentTypes = ["application/json"];
   const globalConsumes = new Set<string>(allRequestContentTypes);
 
   const shouldEmitXml =
-    xmlStrategy !== "none" &&
-    (globalProduces.has("application/xml") || globalConsumes.has("application/xml"));
+    xmlEnabled && (globalProduces.has("application/xml") || globalConsumes.has("application/xml"));
   const specIsOnlyXml =
+    xmlEnabled &&
     globalProduces.size === 1 &&
     globalProduces.has("application/xml") &&
     globalConsumes.size === 1 &&
