@@ -218,7 +218,8 @@ export type ResourceParentTypeDecorator = (
   parentType: "Subscription" | "ResourceGroup" | "Tenant" | "Extension",
 ) => void;
 
-/** Marks a resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
+/**
+ * Marks a resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
  *
  * @param target The operation to associate the resourceType with
  * @param resourceType The resource model

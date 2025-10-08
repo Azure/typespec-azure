@@ -1243,7 +1243,7 @@ model DependentProperties {
   });
 
   it("collects operation information for legacy endpoints", async () => {
-    const { program, diagnostics } = await compileAndDiagnose(`
+    const { program } = await Tester.compile(`
 
 using Azure.Core;
 
@@ -1403,7 +1403,6 @@ model MoveResponse {
   movingStatus: string;
 }
 `);
-    expectDiagnosticEmpty(diagnostics);
     const resources = resolveArmResources(program);
     expect(resources).toBeDefined();
     expect(resources.resourceModels).toBeDefined();
@@ -1471,7 +1470,7 @@ model MoveResponse {
     });
   });
   it("collects operation information for routed endpoints", async () => {
-    const { program, diagnostics } = await compileAndDiagnose(`
+    const { program } = await Tester.compile(`
 
 using Azure.Core;
 
@@ -1642,7 +1641,6 @@ model MoveResponse {
 }
 
 `);
-    expectDiagnosticEmpty(diagnostics);
     const resources = resolveArmResources(program);
     expect(resources).toBeDefined();
     expect(resources.resourceModels).toBeDefined();
