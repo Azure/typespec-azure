@@ -1,5 +1,20 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.30
+
+### Features
+
+- [#3255](https://github.com/Azure/typespec-azure/pull/3255) Add spector test cases for @previewVersion decorator
+- [#3273](https://github.com/Azure/typespec-azure/pull/3273) Add "optional parameter be required in client" and "optional parameter not included in client" test case for `@override` decorator
+- [#3306](https://github.com/Azure/typespec-azure/pull/3306) Add test for external types used in `@alternateType`
+
+### Bug Fixes
+
+- [#3345](https://github.com/Azure/typespec-azure/pull/3345) Fix client.tsp of client-operation-group for python
+- [#3301](https://github.com/Azure/typespec-azure/pull/3301) Consistency for java namespace
+- [#3258](https://github.com/Azure/typespec-azure/pull/3258) Fix missing decorator for the test case of moving method parameter to client.
+
+
 ## 0.1.0-alpha.29
 
 ### Features

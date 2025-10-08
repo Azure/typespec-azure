@@ -1,5 +1,20 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.61.0
+
+### Features
+
+- [#3356](https://github.com/Azure/typespec-azure/pull/3356) Support `@identifiers` on array model
+
+### Bug Fixes
+
+- [#3268](https://github.com/Azure/typespec-azure/pull/3268) Remove versioning
+  
+  ```diff lang=tsp
+  -@useDependency(Azure.ResourceManager.Versions.v1_preview2)
+  ```
+
+
 ## 0.60.1
 
 ### Bug Fixes
