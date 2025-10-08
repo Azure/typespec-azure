@@ -31,10 +31,13 @@ export const ArmStateKeys = {
   // private.decorator.ts
   azureResourceBase: azureResourceManagerCreateStateSymbol("azureResourceBase"),
   armConditionalClientFlatten: azureResourceManagerCreateStateSymbol("armConditionalClientFlatten"),
+  renamePathParameters: azureResourceManagerCreateStateSymbol("renamePathParameters"),
 
   // commontypes.private.decorators.ts
   armCommonDefinitions: azureResourceManagerCreateStateSymbol("armCommonDefinitions"),
   armCommonParameters: azureResourceManagerCreateStateSymbol("armCommonParameters"),
   armCommonTypesVersions: azureResourceManagerCreateStateSymbol("armCommonTypesVersions"),
   armResourceRoute: azureResourceManagerCreateStateSymbol("armResourceRoute"),
+  armExternalType: azureResourceManagerCreateStateSymbol("armExternalType"),
+  inlineAzureType: azureResourceManagerCreateStateSymbol("inlineAzureType"),
 };

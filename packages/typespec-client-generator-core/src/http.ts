@@ -30,7 +30,7 @@ import {
 } from "@typespec/http";
 import { getStreamMetadata } from "@typespec/http/experimental";
 import { camelCase } from "change-case";
-import { getParamAlias, getResponseAsBool } from "./decorators.js";
+import { getResponseAsBool } from "./decorators.js";
 import {
   CollectionFormat,
   SdkBodyParameter,
@@ -53,6 +53,7 @@ import {
   compareModelProperties,
   getAvailableApiVersions,
   getClientDoc,
+  getCorrespondingClientParam,
   getHttpBodyType,
   getHttpOperationResponseHeaders,
   getStreamAsBytes,
@@ -479,6 +480,7 @@ function getSdkHttpResponseAndExceptions(
   },
   readonly Diagnostic[],
 ] {
+  const tk = $(context.program);
   const diagnostics = createDiagnosticCollector();
   const responses: SdkHttpResponse[] = [];
   const exceptions: SdkHttpErrorResponse[] = [];
@@ -511,19 +513,16 @@ function getSdkHttpResponseAndExceptions(
               target: innerResponse.body.type,
               format: {
                 operation: httpOperation.operation.name,
-                response:
-                  innerResponse.body.type.kind === "Model"
-                    ? innerResponse.body.type.name
-                    : innerResponse.body.type.kind,
               },
             }),
           );
+          body = tk.union.create([body, innerResponse.body.type]);
+        } else if (!body) {
+          body = innerResponse.body.type;
         }
         contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
         body =
-          innerResponse.body.type.kind === "Model"
-            ? getEffectivePayloadType(context, innerResponse.body.type, Visibility.Read)
-            : innerResponse.body.type;
+          body.kind === "Model" ? getEffectivePayloadType(context, body, Visibility.Read) : body;
         if (getStreamMetadata(context.program, innerResponse)) {
           // map stream response body type to bytes
           type = diagnostics.pipe(getStreamAsBytes(context, innerResponse.body.type));
@@ -582,59 +581,58 @@ export function getCorrespondingMethodParams(
 ): [(SdkMethodParameter | SdkModelPropertyType)[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
-  // 1. To see if the service parameter is a client parameter.
-  const client = context.getClientForOperation(operation);
-  let clientParams = context.__clientParametersCache.get(client);
-  if (!clientParams) {
-    clientParams = [];
-    context.__clientParametersCache.set(client, clientParams);
-  }
-
-  const correspondingClientParams = clientParams.filter(
-    (x) =>
-      compareModelProperties(context, x.__raw, serviceParam.__raw) ||
-      (x.__raw?.kind === "ModelProperty" && getParamAlias(context, x.__raw) === serviceParam.name),
-  );
-  if (correspondingClientParams.length > 0) {
-    return diagnostics.wrap(correspondingClientParams);
-  }
-
-  // 2. To see if the service parameter is api version parameter that has been elevated to client.
-  if (serviceParam.isApiVersionParam && serviceParam.onClient) {
-    const existingApiVersion = clientParams?.find((x) => isApiVersion(context, x.__raw!));
-    if (!existingApiVersion) {
-      diagnostics.add(
-        createDiagnostic({
-          code: "no-corresponding-method-param",
-          target: operation,
-          format: {
-            paramName: "apiVersion",
-            methodName: operation.name,
-          },
-        }),
+  if (serviceParam.onClient) {
+    // 1. To see if the service parameter is a client parameter.
+    if (serviceParam.__raw) {
+      const correspondingClientParam = getCorrespondingClientParam(
+        context,
+        serviceParam.__raw,
+        operation,
       );
-      return diagnostics.wrap([]);
+      if (correspondingClientParam) return diagnostics.wrap([correspondingClientParam]);
     }
-    return diagnostics.wrap(existingApiVersion ? [existingApiVersion] : []);
-  }
 
-  // 3. To see if the service parameter is subscription parameter that has been elevated to client (only for arm service).
-  if (isSubscriptionId(context, serviceParam)) {
-    const subId = clientParams.find((x) => isSubscriptionId(context, x));
-    if (!subId) {
-      diagnostics.add(
-        createDiagnostic({
-          code: "no-corresponding-method-param",
-          target: operation,
-          format: {
-            paramName: "subscriptionId",
-            methodName: operation.name,
-          },
-        }),
-      );
-      return diagnostics.wrap([]);
+    const clientParams = context.__clientParametersCache.get(
+      context.getClientForOperation(operation),
+    );
+
+    // 2. To see if the service parameter is api version parameter that has been elevated to client.
+    if (clientParams && serviceParam.isApiVersionParam && serviceParam.onClient) {
+      const existingApiVersion = clientParams.find((x) => isApiVersion(context, x.__raw!));
+      if (!existingApiVersion) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "no-corresponding-method-param",
+            target: operation,
+            format: {
+              paramName: "apiVersion",
+              methodName: operation.name,
+            },
+          }),
+        );
+        return diagnostics.wrap([]);
+      }
+      return diagnostics.wrap(existingApiVersion ? [existingApiVersion] : []);
     }
-    return diagnostics.wrap(subId ? [subId] : []);
+
+    // 3. To see if the service parameter is subscription parameter that has been elevated to client (only for arm service).
+    if (clientParams && isSubscriptionId(context, serviceParam)) {
+      const subId = clientParams.find((x) => isSubscriptionId(context, x));
+      if (!subId) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "no-corresponding-method-param",
+            target: operation,
+            format: {
+              paramName: "subscriptionId",
+              methodName: operation.name,
+            },
+          }),
+        );
+        return diagnostics.wrap([]);
+      }
+      return diagnostics.wrap(subId ? [subId] : []);
+    }
   }
 
   // 4. To see if the service parameter is a method parameter or a property of a method parameter.
@@ -714,6 +712,10 @@ function findMapping(
       serviceParam.serializedName === "Accept" &&
       methodParam.name === "accept"
     ) {
+      return methodParam;
+    }
+    // If the service parameter is a body parameter, try to see if we could find a method parameter with same type of the body parameter.
+    if (serviceParam.kind === "body" && serviceParam.type === methodParam.type) {
       return methodParam;
     }
     // BFS to find the mapping.

@@ -35,6 +35,21 @@ extern dec assignUniqueProviderNameValue(target: ModelProperty, resource: Model)
 extern dec armResourceInternal(target: Model, properties: Model);
 
 /**
+ * This decorator identifies Azure Resource Manager resource types that do not define
+ * the name identifier parameter and type
+ * @param target Azure Resource Manager resource type
+ * @param properties Azure Resource Manager resource properties
+ * @param type The resource type name, e.g. "virtualMachines"
+ * @param nameParameter The name of the resource name parameter, e.g. "virtualMachineName"
+ */
+extern dec armResourceWithParameter(
+  target: Model,
+  properties: Model,
+  type: valueof string,
+  nameParameter: valueof string
+);
+
+/**
  * Omit a property in the target model.
  * @internal
  * @param propertyName Name of the property to omit
@@ -111,3 +126,14 @@ extern dec armResourcePropertiesOptionality(target: ModelProperty, isOptional: v
 
 /** designates a parameter as an explicit bodyRoot and sets the optionality of the parameter */
 extern dec armBodyRoot(target: ModelProperty, isOptional: valueof boolean);
+
+/** designates a type as a legacy type and emits a warning diagnostic when used */
+extern dec legacyType(target: Model | Operation | Interface | Scalar);
+
+/** Determines the built-in parent of a base resource
+ * @param parentType The parent type of the resource (Subscription, ResourceGroup, Tenant, Extension)
+ */
+extern dec resourceParentType(
+  target: Model,
+  parentType: valueof "Subscription" | "ResourceGroup" | "Tenant" | "Extension"
+);

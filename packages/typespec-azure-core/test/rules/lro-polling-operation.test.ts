@@ -1,31 +1,24 @@
-import {
-  BasicTestRunner,
-  LinterRuleTester,
-  createLinterRuleTester,
-} from "@typespec/compiler/testing";
-import { beforeEach, describe, it } from "vitest";
+import { Tester } from "#test/test-host.js";
+import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
+import { beforeEach, it } from "vitest";
 import { longRunningOperationsRequirePollingOperation } from "../../src/rules/lro-polling-operation.js";
-import { createAzureCoreTestRunner } from "../test-host.js";
 
-describe("typespec-azure-core: long-running-polling-operation-required rule", () => {
-  let runner: BasicTestRunner;
-  let tester: LinterRuleTester;
+let tester: LinterRuleTester;
 
-  beforeEach(async () => {
-    runner = await createAzureCoreTestRunner({ omitServiceNamespace: true });
-    tester = createLinterRuleTester(
-      runner,
-      longRunningOperationsRequirePollingOperation,
-      "@azure-tools/typespec-azure-core",
-    );
-  });
+beforeEach(async () => {
+  const runner = await Tester.createInstance();
+  tester = createLinterRuleTester(
+    runner,
+    longRunningOperationsRequirePollingOperation,
+    "@azure-tools/typespec-azure-core",
+  );
+});
 
-  it("emits `long-running-polling-operation-required` when a long-running operation has no pollingOperation", async () => {
-    await tester
-      .expect(
-        `
-        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-        namespace Test;
+it("emits `long-running-polling-operation-required` when a long-running operation has no pollingOperation", async () => {
+  await tester
+    .expect(
+      `
+              namespace Test;
 
         op read(): Foundations.LongRunningStatusLocation;
         op readWithError(): Foundations.LongRunningStatusLocation | { error: string };
@@ -34,32 +27,31 @@ describe("typespec-azure-core: long-running-polling-operation-required rule", ()
           location: string;
         } | { error: string };
       `,
-      )
-      .toEmitDiagnostics([
-        {
-          code: "@azure-tools/typespec-azure-core/long-running-polling-operation-required",
-          message:
-            "This operation has an 'Operation-Location' header but no polling operation. Use the '@pollingOperation' decorator to link a status polling operation.",
-        },
-        {
-          code: "@azure-tools/typespec-azure-core/long-running-polling-operation-required",
-          message:
-            "This operation has an 'Operation-Location' header but no polling operation. Use the '@pollingOperation' decorator to link a status polling operation.",
-        },
-        {
-          code: "@azure-tools/typespec-azure-core/long-running-polling-operation-required",
-          message:
-            "This operation has an 'Operation-Location' header but no polling operation. Use the '@pollingOperation' decorator to link a status polling operation.",
-        },
-      ]);
-  });
+    )
+    .toEmitDiagnostics([
+      {
+        code: "@azure-tools/typespec-azure-core/long-running-polling-operation-required",
+        message:
+          "This operation has an 'Operation-Location' header but no polling operation. Use the '@pollingOperation' decorator to link a status polling operation.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-core/long-running-polling-operation-required",
+        message:
+          "This operation has an 'Operation-Location' header but no polling operation. Use the '@pollingOperation' decorator to link a status polling operation.",
+      },
+      {
+        code: "@azure-tools/typespec-azure-core/long-running-polling-operation-required",
+        message:
+          "This operation has an 'Operation-Location' header but no polling operation. Use the '@pollingOperation' decorator to link a status polling operation.",
+      },
+    ]);
+});
 
-  it("does not emit `long-running-polling-operation-required` when a long-running operation has a pollingOperation", async () => {
-    await tester
-      .expect(
-        `
-        @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-        namespace Test;
+it("does not emit `long-running-polling-operation-required` when a long-running operation has a pollingOperation", async () => {
+  await tester
+    .expect(
+      `
+              namespace Test;
 
         op getOperationStatus is Foundations.GetOperationStatus;
 
@@ -75,7 +67,6 @@ describe("typespec-azure-core: long-running-polling-operation-required rule", ()
           location: string;
         } | { error: string };
       `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
 });

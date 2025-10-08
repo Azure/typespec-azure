@@ -308,6 +308,19 @@ Depending on the package where the fix needs to go do this on the `Microsoft/typ
 1. Find the backmerge branch [here](https://github.com/Azure/typespec-azure/branches) and click "New pull request".
 1. Rebase merge the new backmerge PR into main.
 
+## llms.txt
+
+The website build generates `llms.txt` and `llms-full.txt` files based on 2 factors:
+
+1. Presence of `llms.txt: true` frontmatter. See [example](website/src/content/docs/docs/getstarted/azure-core/step01.md) for an example of this in practice.
+1. The source document exists in a defined "topic". See [topic configuration](website/src/utils/llmstxt.ts) for where to define topics. Each topic appears as its own "section" in the root `llms.txt` file, and also generates its own `llms.txt` file at the specified `pathPrefix`.
+
+For libraries, update the `regen-docs` npm script to include the `--llmstxt` flag to opt into llms.txt generation. See [example](packages/typespec-azure-core/package.json) for an example:
+
+> "regen-docs": "tspd doc . --enable-experimental --llmstxt --output-dir ../../website/src/content/docs/docs/libraries/azure-core/reference"
+
+For now the guidance is to prioritize including documentation for TypeSpec users as opposed to including documentation for emitter/library authors.
+
 ## Labels
 
 TypeSpec repo use labels to help categorize and manage issues and PRs. The following is a list of labels and their descriptions.

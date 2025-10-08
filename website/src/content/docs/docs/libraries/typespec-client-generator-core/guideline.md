@@ -348,3 +348,20 @@ If there is no `@usage` used in the spec, all types' usage in TCGC is calculated
    - If a segment is a method's parameter, the concatenated name is `Parameter` + parameter name in PascalCase.
    - If a segment is a model's additional property, the concatenated name is `AdditionalProperty`.
    - If a segment is a model's property, the concatenated name is the property name in PascalCase, and the property name is converted to singular if the property type is an array or dictionary.
+
+### Extending the decorator allowlist (additionalDecorators)
+
+By default, TCGC only includes decorators that are on a safe allowlist when populating the `decorators` arrays on the client type graph. Language emitters that need to include extra decorators (for example to enable core/custom decorators in the generated SDK model) can append regular-expression strings to that allowlist using the `additionalDecorators` option passed to `createSdkContext`.
+
+Each entry should be a string containing a regular expression matched against the fully-qualified decorator name (for example: `Azure.ClientGenerator.Core.@override`). Because these are provided as JavaScript strings, backslashes must be escaped (see example).
+
+Example (inside an emitter or emitter class):
+
+```ts
+this.sdkContext = await createSdkContext(this.emitterContext, LIB_NAME, {
+  additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@override"],
+  versioning: { previewStringRegex: /$/ },
+}); // include all versions and do the filter by ourselves
+```
+
+These patterns are appended to the default allowlist used by TCGC; matched decorators will be included on the resulting `Sdk*` types' `decorators` lists.

@@ -13,7 +13,11 @@ import type {
 } from "@typespec/compiler";
 
 /**
- * Changes the name of a client, method, parameter, union, model, enum, model property, etc. generated in the client SDK.
+ * Overrides the generated name for client SDK elements including clients, methods, parameters,
+ * unions, models, enums, and model properties.
+ *
+ * This decorator takes precedence over all other naming mechanisms, including the `name`
+ * property in `@client` decorator and default naming conventions.
  *
  * @param target The type you want to rename.
  * @param rename The rename you want applied to the object.
@@ -377,29 +381,6 @@ export type AccessDecorator = (
 ) => void;
 
 /**
- * Set whether a model property should be flattened or not.
- * This decorator is not recommended to use for green field services.
- *
- * @param target The target model property that you want to flatten.
- * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
- * @example
- * ```typespec
- * model Foo {
- *    @flattenProperty
- *    prop: Bar;
- * }
- * model Bar {
- * }
- * ```
- */
-export type FlattenPropertyDecorator = (
-  context: DecoratorContext,
-  target: ModelProperty,
-  scope?: string,
-) => void;
-
-/**
  * Customize a method's signature in the generated client SDK.
  * Currently, only parameter signature customization is supported.
  * This decorator allows you to specify a different method signature for the client SDK than the original definition.
@@ -573,11 +554,12 @@ export type ClientNamespaceDecorator = (
 ) => void;
 
 /**
- * Set an alternate type for a model property, Scalar, or function parameter. Note that `@encode` will be overridden by the one defined in the alternate type.
+ * Set an alternate type for a model property, Scalar, Model, Enum, Union, or function parameter. Note that `@encode` will be overridden by the one defined in the alternate type.
  * When the source type is `Scalar`, the alternate type must be `Scalar`.
+ * The replaced type could be a type defined in the TypeSpec or an external type declared by type identity, package that export the type and package version.
  *
  * @param target The source type to which the alternate type will be applied.
- * @param alternate The alternate type to apply to the target.
+ * @param alternate The alternate type to apply to the target. Can be a TypeSpec type or an ExternalType.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Change a model property to a different type
@@ -606,10 +588,31 @@ export type ClientNamespaceDecorator = (
  *   locations: string[];
  * }
  * ```
+ * @example Use external type for DFE case
+ * ```typespec
+ * @alternateType({
+ *   identity: "Azure.Core.Expressions.DataFactoryExpression",
+ * }, "csharp")
+ * union Dfe<T> {
+ *   T,
+ *   DfeExpression
+ * }
+ * ```
+ * @example Use external type with package information
+ * ```typespec
+ * @alternateType({
+ *   identity: "pystac.Collection",
+ *   package: "pystac",
+ *   minVersion: "1.13.0",
+ * }, "python")
+ * model ItemCollection {
+ *   // ... properties
+ * }
+ * ```
  */
 export type AlternateTypeDecorator = (
   context: DecoratorContext,
-  target: ModelProperty | Scalar,
+  target: ModelProperty | Scalar | Model | Enum | Union,
   alternate: Type,
   scope?: string,
 ) => void;
@@ -751,9 +754,8 @@ export type ResponseAsBoolDecorator = (
 ) => void;
 
 /**
- * Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name.
- * This decorator allows you to change the client an operation belongs to in the client SDK.
- * This decorator cannot be used along with `@client` or `@operationGroup` decorators.
+ * Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name. For this usage, the decorator cannot be used along with `@client` or `@operationGroup` decorators.
+ * Change the parameter location to operation or client. For this usage, the decorator cannot be used in the parameter defined in  `@clientInitialization` decorator.
  *
  * @param source The operation to change location for.
  * @param target The target `Namespace`, `Interface` or a string which can indicate the client.
@@ -814,11 +816,27 @@ export type ResponseAsBoolDecorator = (
  * }
  *
  * ```
+ * @example Move parameter from operation to client
+ * ```typespec
+ * @service
+ * namespace MyClient;
+ *
+ * getHealthStatus(
+ *   @clientLocation(MyClient) // This parameter will be moved to the `.clientInitialization` parameters of `MyClient`. It will not appear on the operation-level.
+ *   clientId: string
+ * ): void;
+ * ```
+ * @example Move parameter from client to operation
+ * ```typespec
+ * // client.tsp
+ *
+ * @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, get); // This will keep the `subscriptionId` parameter on the operation level instead of applying TCGC's default logic of elevating `subscriptionId` to client.
+ * ```
  */
 export type ClientLocationDecorator = (
   context: DecoratorContext,
-  source: Operation,
-  target: Interface | Namespace | string,
+  source: Operation | ModelProperty,
+  target: Interface | Namespace | Operation | string,
   scope?: string,
 ) => void;
 
@@ -869,7 +887,6 @@ export type AzureClientGeneratorCoreDecorators = {
   operationGroup: OperationGroupDecorator;
   usage: UsageDecorator;
   access: AccessDecorator;
-  flattenProperty: FlattenPropertyDecorator;
   override: OverrideDecorator;
   useSystemTextJsonConverter: UseSystemTextJsonConverterDecorator;
   clientInitialization: ClientInitializationDecorator;

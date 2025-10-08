@@ -1,5 +1,5 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { deepStrictEqual, strictEqual } from "assert";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { SdkMethodParameter } from "../../src/interfaces.js";
 import { getPropertySegmentsFromModelOrParameters } from "../../src/methods.js";
@@ -14,71 +14,6 @@ beforeEach(async () => {
     autoUsings: ["Azure.Core", "Azure.Core.Traits"],
     emitterName: "@azure-tools/typespec-java",
   });
-});
-
-it("azure paged result with encoded name", async () => {
-  await runner.compileWithBuiltInService(`
-    op test(): ListTestResult;
-    #suppress "deprecated" "Keep for validation purposes."
-    @pagedResult
-    model ListTestResult {
-      #suppress "deprecated" "Keep for validation purposes."
-      @items
-      @clientName("values")
-      tests: Test[];
-      @nextLink
-      @clientName("nextLink")
-      next: string;
-    }
-    model Test {
-      id: string;
-    }
-  `);
-  const sdkPackage = runner.context.sdkPackage;
-  const method = getServiceMethodOfClient(sdkPackage);
-  strictEqual(method.name, "test");
-  strictEqual(method.kind, "paging");
-  strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
-  strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
-
-  const response = method.response;
-  strictEqual(response.kind, "method");
-  strictEqual(response.resultSegments?.length, 1);
-  strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
-  strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
-});
-
-it("azure paged result with next link in header", async () => {
-  await runner.compileWithBuiltInService(`
-    op test(): ListTestResult;
-    #suppress "deprecated" "Keep for validation purposes."
-    @pagedResult
-    model ListTestResult {
-      #suppress "deprecated" "Keep for validation purposes."
-      @items
-      @clientName("values")
-      tests: Test[];
-      @nextLink
-      @clientName("nextLink")
-      @header
-      next: string;
-    }
-    model Test {
-      id: string;
-    }
-  `);
-  const sdkPackage = runner.context.sdkPackage;
-  const method = getServiceMethodOfClient(sdkPackage);
-  strictEqual(method.name, "test");
-  strictEqual(method.kind, "paging");
-  strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
-  strictEqual(method.pagingMetadata.nextLinkSegments[0], method.operation.responses[0].headers[0]);
-
-  const response = method.response;
-  strictEqual(response.kind, "method");
-  strictEqual(response.resultSegments?.length, 1);
-  strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
-  strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
 });
 
 it("normal paged result", async () => {
@@ -410,42 +345,6 @@ it("normal paged result with asymmetric nesting", async () => {
   strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
 });
 
-it("azure page result with inheritance", async () => {
-  await runner.compileWithBuiltInService(`
-    op test(): ExtendedListTestResult;
-    #suppress "deprecated" "Keep for validation purposes."
-    @pagedResult
-    model ListTestResult {
-      #suppress "deprecated" "Keep for validation purposes."
-      @items
-      values: Test[];
-
-      @nextLink
-      nextLink: string;
-    }
-
-    model ExtendedListTestResult extends ListTestResult {
-      message: string;
-    }
-    
-    model Test {
-      id: string;
-    }
-  `);
-  const sdkPackage = runner.context.sdkPackage;
-  const method = getServiceMethodOfClient(sdkPackage);
-  strictEqual(method.name, "test");
-  strictEqual(method.kind, "paging");
-  strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
-  strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[1].properties[1]);
-
-  const response = method.response;
-  strictEqual(response.kind, "method");
-  strictEqual(response.resultSegments?.length, 1);
-  strictEqual(response.resultSegments[0], sdkPackage.models[1].properties[0]);
-  strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
-});
-
 describe("common paging with continuation token", () => {
   it("continuation token in response body and query parameter", async () => {
     await runner.compileWithBuiltInService(`
@@ -759,52 +658,6 @@ it("getPropertySegmentsFromModelOrParameters test for nested case of parameter",
   );
 });
 
-it("next link with re-injected parameters", async () => {
-  await runner.compileWithBuiltInAzureCoreService(`
-    model TestOptions {
-      @query
-      includePending?: boolean;
-
-      @query
-      includeExpired?: boolean;
-    }
-
-    op test(...TestOptions): ListTestResult;
-
-    #suppress "deprecated" "Keep for validation purposes."
-    @pagedResult
-    model ListTestResult {
-      #suppress "deprecated" "Keep for validation purposes."
-      @items
-      values: Test[];
-      @nextLink
-      nextLink: Azure.Core.Legacy.parameterizedNextLink<[TestOptions.includePending, TestOptions.includeExpired]>;
-    }
-
-    model Test {
-      id: string;
-    }
-  `);
-
-  const sdkPackage = runner.context.sdkPackage;
-  const method = getServiceMethodOfClient(sdkPackage);
-  strictEqual(method.name, "test");
-  strictEqual(method.kind, "paging");
-  strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
-  strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
-  strictEqual(method.pagingMetadata.nextLinkReInjectedParametersSegments?.length, 2);
-  strictEqual(method.pagingMetadata.nextLinkReInjectedParametersSegments[0].length, 1);
-  strictEqual(
-    method.pagingMetadata.nextLinkReInjectedParametersSegments[0][0],
-    method.parameters[0],
-  );
-  strictEqual(method.pagingMetadata.nextLinkReInjectedParametersSegments[1].length, 1);
-  strictEqual(
-    method.pagingMetadata.nextLinkReInjectedParametersSegments[1][0],
-    method.parameters[1],
-  );
-});
-
 it("unbranded next link with re-injected parameters", async () => {
   await runner.compileWithBuiltInAzureCoreService(`
     model TestOptions {
@@ -846,52 +699,6 @@ it("unbranded next link with re-injected parameters", async () => {
   strictEqual(
     method.pagingMetadata.nextLinkReInjectedParametersSegments[1][0],
     method.parameters[1],
-  );
-});
-
-it("next link with mix of re-injected parameters and not", async () => {
-  await runner.compileWithBuiltInAzureCoreService(`
-    model IncludePendingOptions {
-      @query
-      includePending?: boolean;
-    }
-      
-    model User {
-      @key
-      @visibility(Lifecycle.Read)
-      id: int32;
-    }
-
-    #suppress "deprecated" "Keep for validation purposes."
-    @pagedResult
-    model ParameterizedNextLinkPagingResult {
-      #suppress "deprecated" "Keep for validation purposes."
-      @items
-      values: User[];
-
-      @nextLink
-      nextLink: Azure.Core.Legacy.parameterizedNextLink<[IncludePendingOptions.includePending]>;
-    }
-
-    @doc("List with parameterized next link that re-injects parameters.")
-    @route("/with-parameterized-next-link")
-    op test(
-      ...IncludePendingOptions,
-      @query select: string,
-    ): ParameterizedNextLinkPagingResult;
-  `);
-
-  const sdkPackage = runner.context.sdkPackage;
-  const method = getServiceMethodOfClient(sdkPackage);
-  strictEqual(method.name, "test");
-  strictEqual(method.kind, "paging");
-  strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
-  strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
-  strictEqual(method.pagingMetadata.nextLinkReInjectedParametersSegments?.length, 1);
-  strictEqual(method.pagingMetadata.nextLinkReInjectedParametersSegments[0].length, 1);
-  strictEqual(
-    method.pagingMetadata.nextLinkReInjectedParametersSegments[0][0],
-    method.parameters[0],
   );
 });
 
@@ -939,56 +746,6 @@ it("unbranded next link with mix of re-injected parameters and not", async () =>
   );
 });
 
-it("next link with reinjected parameters with versioning", async () => {
-  await runner.compile(`
-    @server("http://localhost:3000", "endpoint")
-    @service()
-    @versioned(Versions)
-    namespace My.Service;
-
-    /** Api versions */
-    enum Versions {
-      /** 2024-04-01-preview api version */
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      V2024_04_01_PREVIEW: "2024-04-01-preview",
-    }
-
-    model TestOptions {
-      @query
-      includePending?: boolean;
-    }
-
-    op test(...TestOptions): ListTestResult;
-
-    #suppress "deprecated" "Keep for validation purposes."
-    @pagedResult
-    model ListTestResult {
-      #suppress "deprecated" "Keep for validation purposes."
-      @items
-      values: Test[];
-      @nextLink
-      nextLink: Azure.Core.Legacy.parameterizedNextLink<[TestOptions.includePending]>;
-    }
-
-    model Test {
-      id: string;
-    }
-  `);
-
-  const sdkPackage = runner.context.sdkPackage;
-  const method = getServiceMethodOfClient(sdkPackage);
-  strictEqual(method.name, "test");
-  strictEqual(method.kind, "paging");
-  strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
-  strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
-  strictEqual(method.pagingMetadata.nextLinkReInjectedParametersSegments?.length, 1);
-  strictEqual(method.pagingMetadata.nextLinkReInjectedParametersSegments[0].length, 1);
-  strictEqual(
-    method.pagingMetadata.nextLinkReInjectedParametersSegments[0][0],
-    method.parameters[0],
-  );
-});
-
 it("unbranded next link with reinjected parameters with versioning", async () => {
   await runner.compile(`
     @server("http://localhost:3000", "endpoint")
@@ -999,8 +756,7 @@ it("unbranded next link with reinjected parameters with versioning", async () =>
     /** Api versions */
     enum Versions {
       /** 2024-04-01-preview api version */
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      V2024_04_01_PREVIEW: "2024-04-01-preview",
+          V2024_04_01_PREVIEW: "2024-04-01-preview",
     }
 
     model TestOptions {
@@ -1100,4 +856,97 @@ it("paged result with body root", async () => {
   strictEqual(response.resultSegments?.length, 1);
   strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
   strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
+});
+
+it("next link with body root and inheritance", async () => {
+  await runner.compileWithBuiltInService(`
+    @list
+    op test(): TestResponse<ListTestResult>;
+
+    model ListMeta{
+      @nextLink
+      nextLink: url;
+    }
+
+    model ListTestResult extends ListMeta {
+      @pageItems
+      tests: Test[];
+
+      @header
+      h: string;
+    }
+    model Test {
+      id: string;
+    }
+    model TestResponse<ResponseBody> {
+      ...OkResponse;
+
+      @bodyRoot
+      body: ResponseBody;
+    }
+  `);
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  strictEqual(method.name, "test");
+  strictEqual(method.kind, "paging");
+  strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
+  strictEqual(
+    method.pagingMetadata.nextLinkSegments[0],
+    sdkPackage.models[0].baseModel?.properties[0],
+  );
+
+  const response = method.response;
+  strictEqual(response.kind, "method");
+  strictEqual(response.resultSegments?.length, 1);
+  strictEqual(response.resultSegments[0], sdkPackage.models[0].properties[0]);
+  strictEqual(method.pagingMetadata.pageItemsSegments, response.resultSegments);
+});
+
+it("@pageSize parameter check", async () => {
+  await runner.compileWithBuiltInService(`
+    model Page<T> {
+      @pageItems items: T[];
+    }
+    model Pet {
+      id: string;
+    }
+    @list op listPets(@pageIndex page: int32, @pageSize size: int8): Page<Pet>;
+  `);
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  strictEqual(method.name, "listPets");
+  strictEqual(method.kind, "paging");
+  const pageSizeParameter = method.parameters.find((p) => p.name === "size");
+  ok(pageSizeParameter);
+  strictEqual(method.pagingMetadata.pageSizeParameterSegments?.length, 1);
+  strictEqual(method.pagingMetadata.pageSizeParameterSegments[0], pageSizeParameter);
+});
+
+it("@pageSize nested parameter check", async () => {
+  await runner.compileWithBuiltInService(`
+    model PaginationSection {
+      @pageSize pageSize: int8;
+      @pageIndex pageIndex: int32;
+    }
+    model Page<T> {
+      @pageItems items: T[];
+    }
+    model Pet {
+      id: string;
+    }
+    @list op listPets(pagination: PaginationSection): Page<Pet>;
+  `);
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  strictEqual(method.name, "listPets");
+  strictEqual(method.kind, "paging");
+  const methodParam = method.parameters.find((p) => p.name === "pagination");
+  strictEqual(methodParam?.type.kind, "model");
+  const pageSizeParameter = methodParam?.type.properties.find((p) => p.name === "pageSize");
+  ok(pageSizeParameter);
+  const pageSizeParameterSegments = method.pagingMetadata.pageSizeParameterSegments;
+  ok(pageSizeParameterSegments);
+  strictEqual(pageSizeParameterSegments.length, 2);
+  strictEqual(pageSizeParameterSegments[0], methodParam);
+  strictEqual(pageSizeParameterSegments[1], pageSizeParameter);
 });

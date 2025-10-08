@@ -5,6 +5,8 @@ import ora, { type Ora } from "ora";
 import { resolve } from "pathe";
 import pc from "picocolors";
 
+export class ValidationFailedError extends Error {}
+
 export const projectRoot = resolve(import.meta.dirname, "..");
 export const repoRoot = resolve(projectRoot, "../..");
 

@@ -2,7 +2,7 @@ import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, strictEqual } from "assert";
 import { it } from "vitest";
 import { canonicalVersion } from "../src/emitter.js";
-import { diagnoseOpenApiFor, openApiFor } from "./test-host.js";
+import { diagnoseOpenApiFor, openApiFor } from "./tester.js";
 
 it("works with models", async () => {
   const v = await openApiFor(

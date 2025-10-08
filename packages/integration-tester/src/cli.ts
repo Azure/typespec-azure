@@ -3,7 +3,7 @@ import { parseArgs } from "node:util";
 import { join, resolve } from "pathe";
 import { parse } from "yaml";
 import { runIntegrationTestSuite, Stages, type Stage } from "./run.js";
-import { projectRoot } from "./utils.js";
+import { projectRoot, ValidationFailedError } from "./utils.js";
 
 process.on("SIGINT", () => process.exit(0));
 
@@ -47,8 +47,15 @@ if (args.values.stage) {
 }
 
 const wd = join(projectRoot, "temp", suiteName);
-await runIntegrationTestSuite(wd, suiteName, suite, {
-  clean: args.values.clean,
-  stages,
-  tgzDir: args.values["tgz-dir"] && resolve(process.cwd(), args.values["tgz-dir"]),
-});
+try {
+  await runIntegrationTestSuite(wd, suiteName, suite, {
+    clean: args.values.clean,
+    stages,
+    tgzDir: args.values["tgz-dir"] && resolve(process.cwd(), args.values["tgz-dir"]),
+  });
+} catch (error) {
+  if (error instanceof ValidationFailedError) {
+    process.exit(1);
+  }
+  throw error;
+}

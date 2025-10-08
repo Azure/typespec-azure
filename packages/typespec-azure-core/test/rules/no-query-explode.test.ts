@@ -1,17 +1,12 @@
-import {
-  BasicTestRunner,
-  LinterRuleTester,
-  createLinterRuleTester,
-} from "@typespec/compiler/testing";
+import { Tester } from "#test/test-host.js";
+import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 import { noQueryExplodeRule } from "../../src/rules/no-query-explode.js";
-import { createAzureCoreTestRunner } from "../test-host.js";
 
-let runner: BasicTestRunner;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await createAzureCoreTestRunner();
+  const runner = await Tester.createInstance();
   tester = createLinterRuleTester(runner, noQueryExplodeRule, "@azure-tools/typespec-azure-core");
 });
 

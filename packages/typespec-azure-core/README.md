@@ -74,16 +74,13 @@ Available ruleSets:
 
 - [`@finalLocation`](#@finallocation)
 - [`@finalOperation`](#@finaloperation)
-- [`@items`](#@items)
 - [`@lroCanceled`](#@lrocanceled)
 - [`@lroErrorResult`](#@lroerrorresult)
 - [`@lroFailed`](#@lrofailed)
 - [`@lroResult`](#@lroresult)
 - [`@lroStatus`](#@lrostatus)
 - [`@lroSucceeded`](#@lrosucceeded)
-- [`@nextPageOperation`](#@nextpageoperation)
 - [`@operationLink`](#@operationlink)
-- [`@pagedResult`](#@pagedresult)
 - [`@pollingLocation`](#@pollinglocation)
 - [`@pollingOperation`](#@pollingoperation)
 - [`@pollingOperationParameter`](#@pollingoperationparameter)
@@ -127,24 +124,6 @@ Identifies that an operation is the final operation for an LRO.
 | --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
 | linkedOperation | `Operation` | The linked Operation                                                                                                      |
 | parameters      | `{}`        | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
-
-#### `@items`
-
-_Deprecated: Do not use this decorator. Use @pageItems instead._
-
-Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
-
-```typespec
-@Azure.Core.items
-```
-
-##### Target
-
-`ModelProperty`
-
-##### Parameters
-
-None
 
 #### `@lroCanceled`
 
@@ -251,25 +230,6 @@ Identifies an EnumMember as a long-running "Succeeded" terminal state.
 
 None
 
-#### `@nextPageOperation`
-
-Identifies that an operation is used to retrieve the next page for paged operations.
-
-```typespec
-@Azure.Core.nextPageOperation(linkedOperation: Operation, parameters?: {})
-```
-
-##### Target
-
-`Operation`
-
-##### Parameters
-
-| Name            | Type        | Description                                                                                                               |
-| --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
-| linkedOperation | `Operation` | The linked Operation                                                                                                      |
-| parameters      | `{}`        | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
-
 #### `@operationLink`
 
 Identifies an operation that is linked to the target operation.
@@ -289,24 +249,6 @@ Identifies an operation that is linked to the target operation.
 | linkedOperation | `Operation`      | The linked Operation                                                                                                      |
 | linkType        | `valueof string` | A string indicating the role of the linked operation                                                                      |
 | parameters      | `{}`             | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
-
-#### `@pagedResult`
-
-_Deprecated: Do not use this decorator. Use @list decorator on the operation instead._
-
-Marks a Model as a paged collection.
-
-```typespec
-@Azure.Core.pagedResult
-```
-
-##### Target
-
-`Model`
-
-##### Parameters
-
-None
 
 #### `@pollingLocation`
 

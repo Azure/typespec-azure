@@ -12,7 +12,7 @@ beforeEach(async () => {
   runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
 });
 it("is api version query", async () => {
-  const { func } = (await runner.compile(`
+  const { func } = (await runner.compileWithVersionedService(`
     @test op func(@query("api-version") myApiVersion: string): void;
   `)) as { func: Operation };
 
@@ -22,7 +22,7 @@ it("is api version query", async () => {
 });
 
 it("is api version path", async () => {
-  const { func } = (await runner.compile(`
+  const { func } = (await runner.compileWithVersionedService(`
     @test op func(@path apiVersion: string): void;
   `)) as { func: Operation };
 
@@ -57,6 +57,7 @@ it("api version in host param", async () => {
         ApiVersion: APIVersions,
       }
     )
+    @versioned(APIVersions)
     namespace MyService;
     enum APIVersions {
       v1_0: "v1.0",

@@ -57,8 +57,7 @@ describe("typespec-autorest: format", () => {
     const diagnostics = await AzureTester.diagnose(
       `
       @service
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      namespace Test;
+          namespace Test;
 
       model Widget {
         eTag: eTag;

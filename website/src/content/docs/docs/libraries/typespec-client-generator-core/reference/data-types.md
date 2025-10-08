@@ -1,5 +1,7 @@
 ---
 title: "Data types"
+description: "Data types exported by @azure-tools/typespec-client-generator-core"
+llmstxt: true
 ---
 
 ## Azure.ClientGenerator.Core
@@ -33,6 +35,22 @@ model Azure.ClientGenerator.Core.ClientOptions
 | -------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | service? | `Namespace` | The service that this client is generated for. If not specified, TCGC will look up the first parent namespace decorated with `@service` for the target.<br />The namespace should be decorated with `@service`. |
 | name?    | `string`    | The name of the client. If not specified, the default name will be `<Name of the target>Client`.                                                                                                                |
+
+### `ExternalType` {#Azure.ClientGenerator.Core.ExternalType}
+
+Represents an external type that can be used in alternate type definitions.
+
+```typespec
+model Azure.ClientGenerator.Core.ExternalType
+```
+
+#### Properties
+
+| Name        | Type     | Description                                                                             |
+| ----------- | -------- | --------------------------------------------------------------------------------------- |
+| identity    | `string` | The identity of the external type. For example, `pystac.Collection`                     |
+| package?    | `string` | The package that exports the external type. For example, `pystac`                       |
+| minVersion? | `string` | The minimum version of the package to use for your external type. For example, `1.13.0` |
 
 ### `Access` {#Azure.ClientGenerator.Core.Access}
 

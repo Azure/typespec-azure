@@ -1,6 +1,5 @@
 import {
   type Diagnostic,
-  type IntrinsicType,
   type Model,
   type ModelProperty,
   type Operation,
@@ -14,7 +13,6 @@ import {
   isErrorType,
   isType,
 } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/typekit";
 import {
   type HttpOperationResponse,
   getHeaderFieldName,
@@ -25,19 +23,15 @@ import {
   isHeader,
   isMetadata,
 } from "@typespec/http";
-import { getLroErrorResult } from "./decorators/lro-error-result.js";
-import { getLroResult } from "./decorators/lro-result.js";
-import {
-  extractLroStates,
-  findLroStatusProperty,
-  getLongRunningStates,
-  LongRunningStates,
-} from "./decorators/lro-status.js";
+import { findLroStatusProperty } from "./decorators/lro-status.js";
 import { OperationLink } from "./decorators/operation-link.js";
-import { isPollingLocation } from "./decorators/polling-location.js";
+import {
+  extractStatusMonitorInfo,
+  isPollingLocation,
+  StatusMonitorMetadata,
+} from "./decorators/polling-location.js";
 import { getPollingOperationParameter } from "./decorators/polling-operation-parameter.js";
 import { createDiagnostic } from "./lib.js";
-import type { ModelPropertyTerminationStatus } from "./lro-helpers.js";
 import { getAllProperties } from "./utils.js";
 
 export interface LroOperationInfo {
@@ -64,67 +58,8 @@ export interface ResultInfo {
   /** information about the linked status monitor */
   statusMonitor?: StatusMonitorMetadata;
 }
-/** Metadata for the STatusMonitor */
-export interface StatusMonitorMetadata {
-  /** The model type of the status monitor */
-  monitorType: Model;
-  /** Information on polling status property and termina states */
-  terminationInfo: ModelPropertyTerminationStatus;
-
-  lroStates: LongRunningStates;
-
-  /** The property containing the response when polling terminates with success */
-  successProperty?: ModelProperty;
-
-  /** The property containing error information when polling terminates with failure */
-  errorProperty?: ModelProperty;
-
-  statusProperty: ModelProperty;
-
-  successType: Model | IntrinsicType;
-
-  errorType?: Model;
-}
 
 export type SourceKind = "RequestParameter" | "RequestBody" | "ResponseBody";
-
-export function extractStatusMonitorInfo(
-  program: Program,
-  model: Model,
-  statusProperty: ModelProperty,
-): [StatusMonitorMetadata | undefined, readonly Diagnostic[]] {
-  const diagnosticsToToss = createDiagnosticCollector();
-  const diagnosticsToKeep = createDiagnosticCollector();
-  const lroResult = diagnosticsToKeep.pipe(getLroResult(program, model, true));
-  const successProperty: ModelProperty | undefined =
-    lroResult?.kind === "ModelProperty" ? lroResult : undefined;
-  const errorProperty: ModelProperty | undefined = diagnosticsToKeep.pipe(
-    getLroErrorResult(program, model, true),
-  );
-  const states: LongRunningStates | undefined =
-    getLongRunningStates(program, statusProperty) ??
-    diagnosticsToToss.pipe(extractLroStates(program, statusProperty));
-  if (!states || !statusProperty) return diagnosticsToKeep.wrap(undefined);
-  return diagnosticsToKeep.wrap({
-    monitorType: getEffectiveModelType(program, model, (p) => !isMetadata(program, p)) ?? model,
-    successProperty: successProperty,
-    errorProperty: errorProperty,
-    statusProperty: statusProperty,
-    lroStates: states,
-    errorType: errorProperty?.type.kind === "Model" ? errorProperty.type : undefined,
-    successType:
-      successProperty?.type?.kind === "Intrinsic" || successProperty?.type?.kind === "Model"
-        ? successProperty.type
-        : $(program).intrinsic.void,
-    terminationInfo: {
-      kind: "model-property",
-      property: statusProperty,
-      canceledState: states.canceledState,
-      failedState: states.failedState,
-      succeededState: states.succeededState,
-    },
-  });
-}
 
 function getBodyModel(program: Program, model: Model): Model | undefined {
   const bodyProps = [...getAllProperties(model).values()].filter(

@@ -1,13 +1,11 @@
 import {
   FinalStateValue,
   LroMetadata,
-  PagedResultMetadata,
   UnionEnum,
   extractLroStates,
   getArmResourceIdentifierConfig,
   getAsEmbeddingVector,
   getLroMetadata,
-  getPagedResult,
   getUnionAsEnum,
   hasUniqueItems,
 } from "@azure-tools/typespec-azure-core";
@@ -15,8 +13,11 @@ import {
   getArmCommonTypeOpenAPIRef,
   getArmIdentifiers,
   getArmKeyIdentifiers,
+  getCustomResourceOptions,
   getExternalTypeRef,
+  getInlineAzureType,
   isArmCommonType,
+  isArmExternalType,
   isArmProviderNamespace,
   isAzureResource,
   isConditionallyFlattened,
@@ -24,6 +25,7 @@ import {
 import {
   getClientNameOverride,
   getLegacyHierarchyBuilding,
+  getMarkAsLro,
   shouldFlattenProperty,
 } from "@azure-tools/typespec-client-generator-core";
 import {
@@ -68,6 +70,7 @@ import {
   getMinItems,
   getMinLength,
   getMinValue,
+  getNamespaceFullName,
   getPagingOperation,
   getPattern,
   getProperty,
@@ -168,10 +171,12 @@ import {
   PrimitiveItems,
   Refable,
   XMSLongRunningFinalState,
+  XmlObject,
   XmsPageable,
 } from "./openapi2-document.js";
 import type { AutorestEmitterResult, LoadedExample } from "./types.js";
 import { AutorestEmitterContext, getClientName, resolveOperationId } from "./utils.js";
+import { resolveXmlModule } from "./xml.js";
 
 interface SchemaContext {
   readonly visibility: Visibility;
@@ -228,6 +233,8 @@ export interface AutorestDocumentEmitterOptions {
    * @default "for-visibility-only"
    */
   readonly emitCommonTypesSchema?: "never" | "for-visibility-changes";
+
+  readonly xmlStrategy: "xml-service" | "none";
 }
 
 /**
@@ -299,6 +306,9 @@ export async function getOpenAPIForService(
   const info = resolveInfo(program, service.type);
   const auth = processAuth(service.type);
 
+  const xml = await resolveXmlModule();
+  const xmlStrategy = options.xmlStrategy;
+
   const root: OpenAPI2Document = {
     swagger: "2.0",
     info: {
@@ -354,10 +364,6 @@ export async function getOpenAPIForService(
   // De-dupe the per-endpoint tags that will be added into the #/tags
   const tags: Set<string> = new Set();
 
-  // The set of produces/consumes values found in all operations
-  const globalProduces = new Set<string>(["application/json"]);
-  const globalConsumes = new Set<string>(["application/json"]);
-
   const operationIdsWithExample = new Set<string>();
 
   const [exampleMap, diagnostics] = await loadExamples(program, options, context.version);
@@ -366,6 +372,40 @@ export async function getOpenAPIForService(
   const httpService = ignoreDiagnostics(getHttpService(program, service.type));
   const routes = httpService.operations;
   reportIfNoRoutes(program, routes);
+
+  const xmlEnabled = xmlStrategy !== "none";
+
+  // The set of produces/consumes values found in all operations
+  let allResponseContentTypes = routes
+    .flatMap((route) => route.responses)
+    .flatMap((res) => res.responses)
+    .flatMap((res) => res.body?.contentTypes ?? [])
+    .filter(
+      (ct) =>
+        // XML and JSON are privileged to be the only content types that can live at the top level and inform global
+        // serializer/naming behavior.
+        ct === "application/json" || (xmlEnabled && ct === "application/xml"),
+    );
+  if (allResponseContentTypes.length === 0) allResponseContentTypes = ["application/json"];
+  const globalProduces = new Set<string>(allResponseContentTypes);
+
+  let allRequestContentTypes = routes
+    .flatMap((route) => route.parameters)
+    .flatMap((param) => param.body?.contentTypes ?? [])
+    .filter(
+      (ct) => !!ct && (ct === "application/json" || (xmlEnabled && ct === "application/xml")),
+    );
+  if (allRequestContentTypes.length === 0) allRequestContentTypes = ["application/json"];
+  const globalConsumes = new Set<string>(allRequestContentTypes);
+
+  const shouldEmitXml =
+    xmlEnabled && (globalProduces.has("application/xml") || globalConsumes.has("application/xml"));
+  const specIsOnlyXml =
+    xmlEnabled &&
+    globalProduces.size === 1 &&
+    globalProduces.has("application/xml") &&
+    globalConsumes.size === 1 &&
+    globalConsumes.has("application/xml");
 
   routes.forEach(emitOperation);
 
@@ -484,50 +524,12 @@ export async function getOpenAPIForService(
     };
   }
 
-  function getLastSegment(segments: string[] | undefined): string | undefined {
-    if (segments) {
-      return segments[segments.length - 1];
-    }
-    return undefined;
-  }
-
-  function extractPagedMetadataNested(
-    program: Program,
-    type: Model,
-  ): PagedResultMetadata | undefined {
-    // This only works for `is Page<T>` not `extends Page<T>`.
-    let paged = getPagedResult(program, type);
-    if (paged) {
-      return paged;
-    }
-    if (type.baseModel) {
-      paged = getPagedResult(program, type.baseModel);
-    }
-    if (paged) {
-      return paged;
-    }
-    const templateArguments = type.templateMapper;
-    if (templateArguments) {
-      for (const argument of templateArguments.args) {
-        const modelArgument = argument as Model;
-        if (modelArgument) {
-          paged = extractPagedMetadataNested(program, modelArgument);
-          if (paged) {
-            return paged;
-          }
-        }
-      }
-    }
-    return paged;
-  }
-
   function resolveXmsPageable(program: Program, operation: HttpOperation): XmsPageable | undefined {
     if (isList(program, operation.operation)) {
       const pagedInfo = ignoreDiagnostics(getPagingOperation(program, operation.operation));
       return pagedInfo && getXmsPageableForPagingOperation(pagedInfo);
-    } else {
-      return extractAzureCorePagedMetadata(program, operation);
     }
+    return undefined;
   }
 
   function getXmsPageableForPagingOperation(paging: PagingOperation): XmsPageable | undefined {
@@ -537,25 +539,6 @@ export async function getOpenAPIForService(
         nextLinkName: paging.output.nextLink.property.name,
         itemName: itemsName === "value" ? undefined : itemsName,
       };
-    }
-    return undefined;
-  }
-
-  function extractAzureCorePagedMetadata(program: Program, operation: HttpOperation) {
-    for (const response of operation.responses) {
-      const paged = extractPagedMetadataNested(program, response.type as Model);
-      if (paged) {
-        const nextLinkName = getLastSegment(paged.nextLinkSegments);
-        const itemName = getLastSegment(paged.itemsSegments);
-        if (nextLinkName) {
-          return {
-            nextLinkName,
-            itemName: itemName !== "value" ? itemName : undefined,
-          };
-        }
-        // Once we find paged metadata, we don't need to processes any further.
-        return undefined;
-      }
     }
     return undefined;
   }
@@ -689,6 +672,9 @@ export async function getOpenAPIForService(
           currentEndpoint["x-ms-long-running-operation-options"] = lroOptions;
         }
       }
+    }
+    if (getMarkAsLro(context.tcgcSdkContext, op) === true) {
+      currentEndpoint["x-ms-long-running-operation"] = true;
     }
 
     // Extract paged metadata from Azure.Core.Page
@@ -963,6 +949,16 @@ export async function getOpenAPIForService(
     }
     return undefined;
   }
+  function shouldInlineCoreScalarProperty(type: Type): boolean {
+    if (
+      type.kind !== "ModelProperty" ||
+      type.type.kind !== "Scalar" ||
+      type.type.namespace === undefined
+    )
+      return false;
+    const nsName = getNamespaceFullName(type.type.namespace);
+    return nsName === "Azure.Core" && getInlineAzureType(program, type) === true;
+  }
   function getSchemaOrRef(type: Type, schemaContext: SchemaContext, namespace?: Namespace): any {
     let schemaNameOverride: ((name: string, visibility: Visibility) => string) | undefined =
       undefined;
@@ -1085,11 +1081,6 @@ export async function getOpenAPIForService(
     return placeholder;
   }
 
-  function getJsonName(type: Type & { name: string }): string {
-    const encodedName = resolveEncodedName(program, type, "application/json");
-    return encodedName === type.name ? type.name : encodedName;
-  }
-
   function emitEndpointParameters(methodParams: HttpOperationParameters, visibility: Visibility) {
     const consumes: string[] = methodParams.body?.contentTypes ?? [];
 
@@ -1170,7 +1161,13 @@ export async function getOpenAPIForService(
 
     if (body.property) {
       const prop = body.property;
-      emitParameter(prop, () => getOpenAPI2BodyParameter(prop, getJsonName(prop), schema));
+      emitParameter(prop, () =>
+        getOpenAPI2BodyParameter(
+          prop,
+          resolveEncodedName(program, prop, "application/json"),
+          schema,
+        ),
+      );
     } else {
       currentEndpoint.parameters.push({
         name: "body",
@@ -1340,7 +1337,7 @@ export async function getOpenAPIForService(
       schema: bodySchema,
     };
 
-    const jsonName = getJsonName(param);
+    const jsonName = resolveEncodedName(program, param, "application/json");
     if (jsonName !== param.name) {
       // Special case to be able to keep pre-existing cases where you have both the body parameter name and x-ms-client-name
       reportDeprecated(
@@ -1565,6 +1562,12 @@ export async function getOpenAPIForService(
         checkDuplicateTypeName(program, processed.type, name, root.definitions!);
         processed.ref.value = "#/definitions/" + encodeURIComponent(name);
         if (processed.schema) {
+          if (shouldEmitXml)
+            attachXml(
+              processed.type,
+              name,
+              processed as ProcessedSchema & { schema: OpenAPI2Schema },
+            );
           root.definitions![name] = processed.schema;
         }
       }
@@ -1918,6 +1921,8 @@ export async function getOpenAPIForService(
       description: getDoc(program, model),
     };
 
+    applyIntrinsicDecorators(model, modelSchema);
+
     if (model.baseModel) {
       const discriminatorValue = getDiscriminatorValue(model);
       if (discriminatorValue) {
@@ -1983,14 +1988,16 @@ export async function getOpenAPIForService(
         continue;
       }
 
-      const jsonName = getJsonName(prop);
+      const propertySchemaName = specIsOnlyXml
+        ? resolveEncodedName(program, prop, "application/xml")
+        : resolveEncodedName(program, prop, "application/json");
       const clientName = getClientName(context, prop);
 
       const description = getDoc(program, prop);
       // if this property is a discriminator property, remove it to keep autorest validation happy
       if (model.baseModel) {
         const { propertyName } = getDiscriminator(program, model.baseModel) || {};
-        if (jsonName === propertyName) {
+        if (propertySchemaName === propertyName) {
           continue;
         }
       }
@@ -2002,15 +2009,25 @@ export async function getOpenAPIForService(
         if (!modelSchema.required) {
           modelSchema.required = [];
         }
-        modelSchema.required.push(jsonName);
+        modelSchema.required.push(propertySchemaName);
       }
 
       // Apply decorators on the property to the type's schema
-      properties[jsonName] = resolveProperty(prop, schemaContext);
-      const property: OpenAPI2SchemaProperty = properties[jsonName];
-      if (jsonName !== clientName) {
+      properties[propertySchemaName] = resolveProperty(prop, schemaContext);
+      const property: OpenAPI2SchemaProperty = properties[propertySchemaName];
+      if (propertySchemaName !== clientName) {
         property["x-ms-client-name"] = clientName;
       }
+
+      if (shouldEmitXml && xml.available) {
+        const xmlName = resolveEncodedName(program, prop, "application/xml");
+
+        if (xmlName !== propertySchemaName) {
+          property.xml ??= {};
+          property.xml.name = xmlName;
+        }
+      }
+
       if (description) {
         property.description = description;
       }
@@ -2078,6 +2095,7 @@ export async function getOpenAPIForService(
 
     // Attach any OpenAPI extensions
     attachExtensions(model, modelSchema);
+
     return modelSchema;
   }
 
@@ -2114,8 +2132,18 @@ export async function getOpenAPIForService(
         propSchema = getSchemaOrRef(prop.type, context);
       }
     } else {
-      propSchema = getSchemaOrRef(prop.type, context);
+      propSchema = shouldInlineCoreScalarProperty(prop)
+        ? getSchemaForInlineType(
+            prop.type,
+            getOpenAPITypeName(program, prop.type, typeNameOptions),
+            context,
+          )
+        : getSchemaOrRef(prop.type, context);
       applyArmIdentifiersDecorator(prop.type, propSchema, prop);
+    }
+
+    if (shouldEmitXml && xml.available) {
+      attachPropertyXml(prop, propSchema);
     }
 
     if (options.armResourceFlattening && isConditionallyFlattened(program, prop)) {
@@ -2128,11 +2156,21 @@ export async function getOpenAPIForService(
   function attachExtensions(type: Type, emitObject: any) {
     // Attach any OpenAPI extensions
     const extensions = getExtensions(program, type);
-    if (isAzureResource(program, type as Model)) {
+    if (
+      type.kind === "Model" &&
+      (isAzureResource(program, type) ||
+        getCustomResourceOptions(program, type)?.isAzureResource === true)
+    ) {
       emitObject["x-ms-azure-resource"] = true;
     }
     if (getAsEmbeddingVector(program, type as Model) !== undefined) {
       emitObject["x-ms-embedding-vector"] = true;
+    }
+    if (type.kind === "Model" && isArmExternalType(program, type) === true) {
+      emitObject["x-ms-external"] = true;
+    }
+    if (type.kind === "Model" && isSecret(program, type) === true) {
+      emitObject["x-ms-secret"] = true;
     }
     if (type.kind === "Scalar") {
       const ext = getArmResourceIdentifierConfig(program, type);
@@ -2144,6 +2182,82 @@ export async function getOpenAPIForService(
       for (const key of extensions.keys()) {
         emitObject[key] = extensions.get(key);
       }
+    }
+  }
+
+  function attachXml(
+    type: Type,
+    schemaName: string,
+    processed: ProcessedSchema & { schema: OpenAPI2Schema },
+  ) {
+    if (!xml.available) return;
+
+    const ns = xml.module.getNs(program, type);
+
+    if ("name" in type && type.name !== undefined && typeof type.name === "string") {
+      const xmlName = resolveEncodedName(
+        program,
+        type as Type & { name: string },
+        "application/xml",
+      );
+      if (xmlName && xmlName !== schemaName) setXmlField("name", xmlName);
+    }
+
+    if (ns) {
+      if (ns.namespace) setXmlField("namespace", ns.namespace);
+      if (ns.prefix) setXmlField("prefix", ns.prefix);
+    }
+
+    function setXmlField<K extends keyof XmlObject>(key: K, value: XmlObject[K]) {
+      processed.schema.xml ??= {};
+      processed.schema.xml[key] = value;
+    }
+  }
+
+  function attachPropertyXml(prop: ModelProperty, propSchema: OpenAPI2SchemaProperty) {
+    if (!xml.available) return;
+
+    if (xml.module.isAttribute(program, prop)) {
+      setXmlField("attribute", true);
+    }
+
+    if (prop.type.kind === "Model" && isArrayModelType(program, prop.type)) {
+      const wrapped = !xml.module.isUnwrapped(program, prop);
+
+      setXmlField("wrapped", wrapped);
+    }
+
+    let encode = getEncode(program, prop);
+
+    let resolvedEncodeType = encode?.type ?? prop.type;
+
+    while (
+      resolvedEncodeType.kind === "Scalar" &&
+      (encode = getEncode(program, resolvedEncodeType))
+    ) {
+      resolvedEncodeType = encode.type;
+    }
+
+    if (
+      resolvedEncodeType.kind === "Scalar" &&
+      $(program).scalar.extendsString(resolvedEncodeType)
+    ) {
+      if (xml.module.isUnwrapped(program, prop)) {
+        setXmlField("x-ms-text", true);
+      }
+    }
+
+    const xmlNs = xml.module.getNs(program, prop);
+
+    if (xmlNs) {
+      setXmlField("namespace", xmlNs.namespace);
+
+      if (xmlNs.prefix) setXmlField("prefix", xmlNs.prefix);
+    }
+
+    function setXmlField<K extends keyof XmlObject>(key: K, value: XmlObject[K]) {
+      propSchema.xml ??= {};
+      propSchema.xml[key] = value;
     }
   }
 

@@ -1,5 +1,6 @@
 ---
 title: Renaming Types
+llmstxt: true
 ---
 
 import { ClientTabs, ClientTabItem } from "@components/client-tabs";
@@ -66,11 +67,15 @@ namespace PetStoreNamespace
 ```
 
 ```typescript
-interface InputModel {
-  name: string;
+export interface InputModel {
+  readonly name: string;
 }
 
-const model: InputModel = await client.path("/petStore/model/{name}").get();
+export async function get(
+  context: Client,
+  name: string,
+  options: GetOptionalParams = { requestOptions: {} }
+): Promise<InputModel>；
 ```
 
 ```java
@@ -84,6 +89,24 @@ public final class PetStoreNamespaceClient {
     public Response<BinaryData> getWithResponse(String name, RequestOptions requestOptions)
     public InputModel get(String name)
 }
+```
+
+```go
+type InputModel struct {
+	Name string
+}
+
+type PetStoreNamespaceClientGetResponse struct {
+	InputModel
+}
+
+type PetStoreNamespaceClient struct {}
+
+func NewPetStoreNamespaceClient() *PetStoreNamespaceClient {
+  return &PetStoreNamespaceClient{}
+}
+
+func (client *PetStoreNamespaceClient) Get(ctx context.Context, name string, options *PetStoreNamespaceClientGetOptions) (PetStoreNamespaceClientGetResponse, error)
 ```
 
 </ClientTabs>
@@ -163,6 +186,25 @@ public final class PetStoreNamespaceClient {
 }
 ```
 
+```go
+type InputOptions struct {
+	Name string
+}
+
+type PetStoreNamespaceClientGetResponse struct {
+	InputOptions
+}
+
+type PetStoreNamespaceClient struct {}
+
+func NewPetStoreNamespaceClient() *PetStoreNamespaceClient {
+  return &PetStoreNamespaceClient{}
+}
+
+func (client *PetStoreNamespaceClient) Get(ctx context.Context, name string, options *PetStoreNamespaceClientGetOptions) (PetStoreNamespaceClientGetResponse, error)
+
+```
+
 </ClientTabs>
 
 ### Renaming operations and parameters
@@ -225,6 +267,25 @@ public final class PetStoreNamespaceClient {
     public Response<BinaryData> readModelWithResponse(String name, RequestOptions requestOptions)
     public InputModel readModel(String name)
 }
+```
+
+```go
+type InputModel struct {
+	Name string
+}
+
+type PetStoreNamespaceClient struct {}
+
+func NewPetStoreNamespaceClient() *PetStoreNamespaceClient {
+  return &PetStoreNamespaceClient{}
+}
+
+type PetStoreNamespaceClientReadResponse struct {
+	InputModel
+}
+
+func (client *PetStoreNamespaceClient) Read(ctx context.Context, name string, options *PetStoreNamespaceClientReadOptions) (PetStoreNamespaceClientReadResponse, error)
+
 ```
 
 </ClientTabs>

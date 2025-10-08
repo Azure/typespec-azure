@@ -5,6 +5,7 @@ import {
   getProperty as compilerGetProperty,
   DecoratorContext,
   getKeyName,
+  getNamespaceFullName,
   getTags,
   Interface,
   isArrayModelType,
@@ -23,6 +24,7 @@ import {
 import { useStateMap } from "@typespec/compiler/utils";
 import { getHttpOperation, isPathParam } from "@typespec/http";
 import { $autoRoute, getParentResource, getSegment } from "@typespec/rest";
+
 import {
   ArmProviderNameValueDecorator,
   ArmResourceOperationsDecorator,
@@ -37,7 +39,11 @@ import {
   SubscriptionResourceDecorator,
   TenantResourceDecorator,
 } from "../generated-defs/Azure.ResourceManager.js";
-import { CustomAzureResourceDecorator } from "../generated-defs/Azure.ResourceManager.Legacy.js";
+import {
+  ArmExternalTypeDecorator,
+  CustomAzureResourceDecorator,
+  CustomResourceOptions,
+} from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { reportDiagnostic } from "./lib.js";
 import {
   getArmProviderNamespace,
@@ -79,6 +85,19 @@ export interface ArmResourceDetailsBase {
   /** A reference to the TypeSpec type */
   typespecType: Model;
 }
+
+export const [isArmExternalType, setArmExternalType] = useStateMap<Model, boolean>(
+  ArmStateKeys.armExternalType,
+);
+
+export const $armExternalType: ArmExternalTypeDecorator = (
+  context: DecoratorContext,
+  entity: Model,
+) => {
+  const { program } = context;
+  if (isTemplateDeclaration(entity)) return;
+  setArmExternalType(program, entity, true);
+};
 
 /** Details for RP resources */
 export interface ArmResourceDetails extends ArmResourceDetailsBase {
@@ -188,11 +207,12 @@ export const $armVirtualResource: ArmVirtualResourceDecorator = (
 export const $customAzureResource: CustomAzureResourceDecorator = (
   context: DecoratorContext,
   entity: Model,
+  options?: CustomResourceOptions,
 ) => {
   const { program } = context;
+  const optionsValue = options ?? { isAzureResource: false };
   if (isTemplateDeclaration(entity)) return;
-
-  program.stateMap(ArmStateKeys.customAzureResource).set(entity, "Custom");
+  setCustomResource(program, entity, optionsValue);
 };
 
 function getProperty(
@@ -245,6 +265,12 @@ export function getArmVirtualResourceDetails(
   return undefined;
 }
 
+const [getCustomResourceOptions, setCustomResource] = useStateMap<Model, CustomResourceOptions>(
+  ArmStateKeys.customAzureResource,
+);
+
+export { getCustomResourceOptions };
+
 /**
  * Determine if the given model is a custom resource.
  * @param program The program to process.
@@ -252,7 +278,8 @@ export function getArmVirtualResourceDetails(
  * @returns true if the model or any model it extends is marked as a resource, otherwise false.
  */
 export function isCustomAzureResource(program: Program, target: Model): boolean {
-  if (program.stateMap(ArmStateKeys.customAzureResource).has(target)) return true;
+  const resourceOptions = getCustomResourceOptions(program, target);
+  if (resourceOptions) return true;
   if (target.baseModel) return isCustomAzureResource(program, target.baseModel);
   return false;
 }
@@ -731,7 +758,14 @@ export function getArmResourceInfo(
 export function getArmResourceKind(resourceType: Model): ArmResourceKind | undefined {
   if (resourceType.baseModel) {
     const coreType = resourceType.baseModel;
-    if (coreType.name.startsWith("TrackedResource")) {
+    const coreTypeNamespace = coreType.namespace ? getNamespaceFullName(coreType.namespace) : "";
+    if (
+      coreType.name.startsWith("TrackedResource") ||
+      coreType.name.startsWith("LegacyTrackedResource") ||
+      (coreTypeNamespace.startsWith("Azure.ResourceManager") &&
+        resourceType.properties.has("location") &&
+        resourceType.properties.has("tags"))
+    ) {
       return "Tracked";
     } else if (coreType.name.startsWith("ProxyResource")) {
       return "Proxy";
@@ -883,12 +917,11 @@ export const $armProviderNameValue: ArmProviderNameValueDecorator = (
 
 export const $identifiers: IdentifiersDecorator = (
   context: DecoratorContext,
-  entity: ModelProperty,
+  entity: ModelProperty | Type,
   properties: readonly string[],
 ) => {
   const { program } = context;
-  const { type } = entity;
-
+  const type = entity.kind === "ModelProperty" ? entity.type : entity;
   if (
     type.kind !== "Model" ||
     !isArrayModelType(program, type) ||
@@ -906,18 +939,21 @@ export const $identifiers: IdentifiersDecorator = (
 };
 
 /**
- * This function returns identifiers using the @identifiers decorator
+ * This function returns identifiers using the '@identifiers' decorator
  *
  * @param program The program to process.
  * @param entity The array model type to check.
  * @returns returns list of arm identifiers for the given array model type if any or undefined.
  */
-export function getArmIdentifiers(program: Program, entity: ModelProperty): string[] | undefined {
+export function getArmIdentifiers(
+  program: Program,
+  entity: ModelProperty | Model,
+): string[] | undefined {
   return program.stateMap(ArmStateKeys.armIdentifiers).get(entity);
 }
 
 /**
- * This function returns identifiers using the @key decorator.
+ * This function returns identifiers using the '@key' decorator.
  *
  * @param program The program to process.
  * @param entity The array model type to check.

@@ -1,5 +1,46 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.60.1
+
+### Bug Fixes
+
+- [#3330](https://github.com/Azure/typespec-azure/pull/3330) Fix #3294 Add model and operation templates for private link
+- [#3337](https://github.com/Azure/typespec-azure/pull/3337) Fix #3243 Allow polymorphic legacy resources
+- [#3332](https://github.com/Azure/typespec-azure/pull/3332) Fix #3295 Allow tenant-level external resources
+
+
+## 0.60.0
+
+### Bump dependencies
+
+- [#3207](https://github.com/Azure/typespec-azure/pull/3207) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3240](https://github.com/Azure/typespec-azure/pull/3240) Add request parameters to legacy operations list
+- [#3242](https://github.com/Azure/typespec-azure/pull/3242) Fix #3201 Remove duplicate TrackedResource type
+- [#3196](https://github.com/Azure/typespec-azure/pull/3196) Fix optionality for ArmCustomPatch templates
+- [#3178](https://github.com/Azure/typespec-azure/pull/3178) Allow renaming parameters in an operation
+
+
+## 0.59.2
+
+### Bug Fixes
+
+- [#3147](https://github.com/Azure/typespec-azure/pull/3147) Add support for x-ms-external through armExternalResource decorator
+- [#3154](https://github.com/Azure/typespec-azure/pull/3154) Add single page list and correct put template names
+- [#3172](https://github.com/Azure/typespec-azure/pull/3172) Add single page list and legacy put and patch operations
+
+
+## 0.59.1
+
+### Bug Fixes
+
+- [#3142](https://github.com/Azure/typespec-azure/pull/3142) Relax constraints for Action request and synchronous response parameters
+- [#3143](https://github.com/Azure/typespec-azure/pull/3143) Add templates for optional location and etags
+- [#3141](https://github.com/Azure/typespec-azure/pull/3141) Add operations for Private Endpoints
+
+
 ## 0.59.0
 
 ### Deprecations

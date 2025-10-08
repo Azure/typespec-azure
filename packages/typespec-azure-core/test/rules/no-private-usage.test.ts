@@ -1,17 +1,12 @@
-import {
-  BasicTestRunner,
-  LinterRuleTester,
-  createLinterRuleTester,
-} from "@typespec/compiler/testing";
+import { Tester } from "#test/test-host.js";
+import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 import { noPrivateUsage } from "../../src/rules/no-private-usage.js";
-import { createAzureCoreTestRunner } from "../test-host.js";
 
-let runner: BasicTestRunner;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await createAzureCoreTestRunner({ omitServiceNamespace: true });
+  const runner = await Tester.createInstance();
   tester = createLinterRuleTester(runner, noPrivateUsage, "@azure-tools/typespec-azure-core");
 });
 
@@ -19,8 +14,7 @@ it("emits a warning diagnostic if using type from Azure.Core.Foundations.Private
   await tester
     .expect(
       `        
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      namespace MyService {
+          namespace MyService {
         model Foo {
           bar: Azure.Core.Foundations.Private.ArmResourceIdentifierConfigOptions
         }
@@ -40,8 +34,7 @@ it("emits a warning diagnostic if using decorators from Azure.Core.Foundations.P
   await tester
     .expect(
       `
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      namespace MyService {
+          namespace MyService {
         @Azure.Core.Foundations.Private.embeddingVector(string)
         model Foo {}
       }

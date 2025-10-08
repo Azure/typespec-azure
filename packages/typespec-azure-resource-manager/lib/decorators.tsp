@@ -211,13 +211,14 @@ extern dec armCommonTypesVersion(
  * Azure.ResourceManager common types.
  *
  * @param propertiesType: The type of the resource properties.
+ * @param provider Optional. The resource provider namespace for the virtual resource.
  */
 extern dec armVirtualResource(target: Model, provider?: valueof string);
 
 /**
  * This decorator sets the base type of the given resource.
  *
- * @param baseType The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension"
+ * @param baseTypeIt The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension"
  */
 extern dec resourceBaseType(
   target: Model,
@@ -238,4 +239,4 @@ extern dec resourceBaseType(
  * }
  * ```
  */
-extern dec identifiers(entity: ModelProperty, properties: valueof string[]);
+extern dec identifiers(entity: ModelProperty | Array<unknown>, properties: valueof string[]);

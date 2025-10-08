@@ -243,8 +243,6 @@ function getSdkBuiltInTypeWithDiagnostics(
   const stdType = {
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, kind)),
     name: getLibraryName(context, type),
-    doc: getClientDoc(context, type),
-    summary: getSummary(context.program, type),
     baseType:
       type.baseScalar && !context.program.checker.isStdType(type) // we only calculate the base type when this type has a base type and this type is not a std type because for std types there is no point of calculating its base type.
         ? diagnostics.pipe(getSdkBuiltInTypeWithDiagnostics(context, type.baseScalar, kind))
@@ -311,8 +309,6 @@ function getSdkDateTimeType(
     encode: (encode ?? "rfc3339") as DateTimeKnownEncoding,
     wireType: wireType ?? getTypeSpecBuiltInType(context, "string"),
     baseType: baseType,
-    doc: getClientDoc(context, type),
-    summary: getSummary(context.program, type),
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
   });
 }
@@ -409,8 +405,6 @@ function getSdkDurationTypeWithDiagnostics(
     encode: (encode ?? "ISO8601") as DurationKnownEncoding,
     wireType: wireType ?? getTypeSpecBuiltInType(context, "string"),
     baseType: baseType,
-    doc: getClientDoc(context, type),
-    summary: getSummary(context.program, type),
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
   });
 }
@@ -811,8 +805,6 @@ export function getSdkModelWithDiagnostics(
       name: name,
       isGeneratedName: !type.name,
       namespace: getClientNamespace(context, type),
-      doc: getClientDoc(context, type),
-      summary: getSummary(context.program, type),
       properties: [],
       additionalProperties: undefined, // going to set additional properties in the next few lines when we look at base model
       access: "public",
@@ -951,8 +943,6 @@ function getSdkEnumValueWithDiagnostics(
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "enumvalue")),
     name: getLibraryName(context, type),
     value: type.value ?? type.name,
-    doc: getClientDoc(context, type),
-    summary: getSummary(context.program, type),
     enumType,
     valueType: enumType.valueType,
   });
@@ -975,8 +965,6 @@ function getSdkEnumWithDiagnostics(
       name: getLibraryName(context, type),
       isGeneratedName: false,
       namespace: getClientNamespace(context, type),
-      doc: getClientDoc(context, type),
-      summary: getSummary(context.program, type),
       valueType: diagnostics.pipe(
         getSdkEnumValueType(
           context,
@@ -1014,8 +1002,6 @@ function getSdkUnionEnumValues(
     values.push({
       ...diagnostics.pipe(getSdkTypeBaseHelper(context, member.type, "enumvalue")),
       name: name ? name : `${member.value}`,
-      doc: getClientDoc(context, member.type),
-      summary: getSummary(context.program, member.type),
       value: member.value,
       valueType: enumType.valueType,
       enumType,
@@ -1041,8 +1027,6 @@ export function getSdkUnionEnumWithDiagnostics(
     name,
     isGeneratedName: !type.union.name,
     namespace: getClientNamespace(context, type.union),
-    doc: getClientDoc(context, union),
-    summary: getSummary(context.program, union),
     valueType:
       diagnostics.pipe(getUnionAsEnumValueType(context, type.union)) ??
       diagnostics.pipe(
@@ -1090,8 +1074,12 @@ export function getClientTypeWithDiagnostics(
       retval = getSdkTypeForIntrinsic(context, type);
       break;
     case "Scalar":
+      const scalarAlternateType = getAlternateType(context, type);
       retval = diagnostics.pipe(
-        getSdkDateTimeOrDurationOrBuiltInType(context, getAlternateType(context, type) ?? type),
+        getSdkDateTimeOrDurationOrBuiltInType(
+          context,
+          scalarAlternateType && scalarAlternateType.kind === "Scalar" ? scalarAlternateType : type,
+        ),
       );
       break;
     case "Enum":

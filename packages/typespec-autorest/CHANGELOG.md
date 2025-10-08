@@ -1,5 +1,25 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.60.0
+
+### Bump dependencies
+
+- [#3207](https://github.com/Azure/typespec-azure/pull/3207) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3196](https://github.com/Azure/typespec-azure/pull/3196) Fix optionality for ArmCustomPatch templates
+
+
+## 0.59.1
+
+### Bug Fixes
+
+- [#3173](https://github.com/Azure/typespec-azure/pull/3173) Inline azureLocation
+- [#3147](https://github.com/Azure/typespec-azure/pull/3147) Add support for x-ms-external through armExternalResource decorator
+- [#3147](https://github.com/Azure/typespec-azure/pull/3147) Add support for x-ms-azure-resource extension for custom resources
+
+
 ## 0.59.0
 
 ### Features

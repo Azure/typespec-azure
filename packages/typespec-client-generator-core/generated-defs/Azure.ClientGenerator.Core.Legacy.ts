@@ -1,4 +1,4 @@
-import type { DecoratorContext, Model } from "@typespec/compiler";
+import type { DecoratorContext, Model, ModelProperty, Operation } from "@typespec/compiler";
 
 /**
  * Adds support for client-level multiple levels of inheritance.
@@ -47,6 +47,67 @@ export type HierarchyBuildingDecorator = (
   scope?: string,
 ) => void;
 
+/**
+ * Set whether a model property should be flattened or not.
+ * This decorator is not recommended to use for green field services.
+ *
+ * @param target The target model property that you want to flatten.
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ * @example
+ * ```typespec
+ * model Foo {
+ *    @flattenProperty
+ *    prop: Bar;
+ * }
+ * model Bar {
+ * }
+ * ```
+ */
+export type FlattenPropertyDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  scope?: string,
+) => void;
+
+/**
+ * Forces an operation to be treated as a Long Running Operation (LRO) by the SDK generators,
+ * even when the operation is not long-running on the service side.
+ *
+ * NOTE: When used, you will need to verify the operatio and add tests for the generated code
+ * to make sure the end-to-end works for library users, since there is a risk that forcing
+ * this operation to be LRO will result in errors.
+ *
+ * When applied, TCGC will treat the operation as an LRO and SDK generators should:
+ * - Generate polling mechanisms (pollers)
+ * - Return appropriate LRO-specific return types
+ * - Handle the operation as an asynchronous long-running process
+ *
+ * This decorator is considered legacy functionality and should only be used when
+ * standard TypeSpec LRO patterns are not feasible.
+ *
+ * @param target The operation that should be treated as a Long Running Operation
+ * @param scope Specifies the target language emitters that the decorator should apply.
+ * If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ * @example Force a regular operation to be treated as LRO for backward compatibility
+ * ```typespec
+ * @Azure.ClientGenerator.Core.Legacy.markAsLro
+ * @route("/deployments/{deploymentId}")
+ * @post
+ * op startDeployment(
+ *   @path deploymentId: string,
+ * ): DeploymentResult | ErrorResponse;
+ * ```
+ */
+export type MarkAsLroDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: string,
+) => void;
+
 export type AzureClientGeneratorCoreLegacyDecorators = {
   hierarchyBuilding: HierarchyBuildingDecorator;
+  flattenProperty: FlattenPropertyDecorator;
+  markAsLro: MarkAsLroDecorator;
 };
