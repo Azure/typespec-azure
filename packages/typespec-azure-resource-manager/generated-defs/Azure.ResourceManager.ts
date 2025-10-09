@@ -47,7 +47,7 @@ export type ArmProviderNameValueDecorator = (context: DecoratorContext, target: 
  */
 export type IdentifiersDecorator = (
   context: DecoratorContext,
-  entity: ModelProperty,
+  entity: ModelProperty | Type,
   properties: readonly string[],
 ) => void;
 
