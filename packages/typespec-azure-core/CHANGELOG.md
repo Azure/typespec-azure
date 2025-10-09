@@ -1,5 +1,31 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.61.0
+
+### Breaking Changes
+
+- [#3266](https://github.com/Azure/typespec-azure/pull/3266) Remove legacy Azure.Core paging. The following was removed
+    - `@pagedResult` decorator
+    - `@items` decorator
+    - [API] `getPagedResult` -> `getPagingOperation` in `@typespec/compiler`
+    - [API] `getItems`
+    - [API] `getNextLink`
+- [#3214](https://github.com/Azure/typespec-azure/pull/3214) Remove unused `@nextPageOperation` decorator.
+
+### Features
+
+- [#3325](https://github.com/Azure/typespec-azure/pull/3325) Export `isPreviewVersion` for `@previewVersion` decorator.
+
+### Bug Fixes
+
+- [#3346](https://github.com/Azure/typespec-azure/pull/3346) [rpc-operation-request-body] Correctly ignores properties marked with `@bodyIgnore`
+- [#3268](https://github.com/Azure/typespec-azure/pull/3268) Remove versioning
+  
+  ```diff lang=tsp
+  -@useDependency(Azure.Core.Versions.v1_preview2)
+  ```
+
+
 ## 0.60.0
 
 ### Bump dependencies

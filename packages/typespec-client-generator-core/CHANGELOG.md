@@ -1,5 +1,27 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.61.0
+
+### Breaking Changes
+
+- [#3286](https://github.com/Azure/typespec-azure/pull/3286) Change `isApiVersion` logic. If a service is not versioning, the function always return false.
+
+### Features
+
+- [#3198](https://github.com/Azure/typespec-azure/pull/3198) Add `getHttpOperationParametersForClientParameter` helper to find corresponding HTTP parameter list for a client initialization parameter.
+- [#3325](https://github.com/Azure/typespec-azure/pull/3325) Add support for `@previewVersion` decorator in API version filtering. TCGC now checks for the `@previewVersion` decorator on enum members in addition to the existing regex-based preview version filtering.
+- [#3233](https://github.com/Azure/typespec-azure/pull/3233) Allow `@alternateType` to reference external types as well
+
+### Bug Fixes
+
+- [#3353](https://github.com/Azure/typespec-azure/pull/3353) Handle wrong `api-version` config.
+- [#3285](https://github.com/Azure/typespec-azure/pull/3285) Fix missing doc for nullable type.
+- [#3324](https://github.com/Azure/typespec-azure/pull/3324) Refine error message for `@override`.
+- [#3266](https://github.com/Azure/typespec-azure/pull/3266) Cleanup usage of legacy Azure.Core paging apis
+- [#3361](https://github.com/Azure/typespec-azure/pull/3361) Fix bug ignoring `@clientName` decorator when applied to `@client` clients
+- [#3311](https://github.com/Azure/typespec-azure/pull/3311) Fix missing example for operation directly extends from templated interface.
+
+
 ## 0.60.3
 
 ### Bug Fixes
