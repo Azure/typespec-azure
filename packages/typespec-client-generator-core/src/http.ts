@@ -599,41 +599,19 @@ export function getCorrespondingMethodParams(
     // 2. To see if the service parameter is api version parameter that has been elevated to client.
     if (clientParams && serviceParam.isApiVersionParam && serviceParam.onClient) {
       const existingApiVersion = clientParams.find((x) => isApiVersion(context, x.__raw!));
-      if (!existingApiVersion) {
-        diagnostics.add(
-          createDiagnostic({
-            code: "no-corresponding-method-param",
-            target: operation,
-            format: {
-              paramName: "apiVersion",
-              methodName: operation.name,
-            },
-          }),
-        );
-        return diagnostics.wrap([]);
-      }
-      return diagnostics.wrap(existingApiVersion ? [existingApiVersion] : []);
+      if (existingApiVersion) return diagnostics.wrap([existingApiVersion]);
     }
 
     // 3. To see if the service parameter is subscription parameter that has been elevated to client (only for arm service).
     if (clientParams && isSubscriptionId(context, serviceParam)) {
       const subId = clientParams.find((x) => isSubscriptionId(context, x));
-      if (!subId) {
-        diagnostics.add(
-          createDiagnostic({
-            code: "no-corresponding-method-param",
-            target: operation,
-            format: {
-              paramName: "subscriptionId",
-              methodName: operation.name,
-            },
-          }),
-        );
-        return diagnostics.wrap([]);
-      }
-      return diagnostics.wrap(subId ? [subId] : []);
+      if (subId) return diagnostics.wrap([subId]);
     }
   }
+
+  // Since service param come from the original operation when using `@override`, so the `onClient` info might not be correct.
+  // We need to reset the `onClient` info for the service param and find corresponding method param again.
+  serviceParam.onClient = false;
 
   // 4. To see if the service parameter is a method parameter or a property of a method parameter.
   const directMapping = findMapping(context, methodParameters, serviceParam);

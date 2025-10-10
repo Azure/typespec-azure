@@ -49,6 +49,7 @@ import {
   getClientDocExplicit,
   getClientLocation,
   getMarkAsLro,
+  getOverriddenClientMethod,
   getParamAlias,
 } from "./decorators.js";
 import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
@@ -638,7 +639,10 @@ export function isOnClient(
   versioning?: boolean,
 ): boolean {
   const clientLocation = getClientLocation(context, type);
-  if (operation && clientLocation === operation) {
+  if (
+    operation &&
+    clientLocation === (getOverriddenClientMethod(context, operation) ?? operation)
+  ) {
     // if the type has explicitly been moved to the operation, it is not on the client
     return false;
   }
