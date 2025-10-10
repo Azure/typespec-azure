@@ -149,14 +149,15 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.ListByParent(
 
 ##### Template Parameters
 
-| Name           | Description                                                   |
-| -------------- | ------------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateEndpointConnection          |
-| Resource       | Optional. The PrivateEndpointConnection resource being listed |
-| BaseParameters | Optional. Allows overriding the operation parameters          |
-| Parameters     | Optional. Additional parameters after the path parameters     |
-| Response       | Optional. The success response for the list operation         |
-| Error          | Optional. The error response, if non-standard.                |
+| Name           | Description                                                                       |
+| -------------- | --------------------------------------------------------------------------------- |
+| ParentResource | the parent resource of the PrivateEndpointConnection                              |
+| Resource       | Optional. The PrivateEndpointConnection resource being listed                     |
+| BaseParameters | Optional. Allows overriding the operation parameters                              |
+| Parameters     | Optional. Additional parameters after the path parameters                         |
+| Response       | Optional. The success response for the list operation                             |
+| Error          | Optional. The error response, if non-standard.                                    |
+| ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
 
 #### `PrivateEndpoints.Read` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.Read}
 
@@ -166,14 +167,15 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.Read(provider
 
 ##### Template Parameters
 
-| Name           | Description                                               |
-| -------------- | --------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateEndpointConnection      |
-| Resource       | the PrivateEndpointConnection resource being read         |
-| BaseParameters | Optional. Allows overriding the operation parameters      |
-| Parameters     | Optional. Additional parameters after the path parameters |
-| Response       | Optional. The success response for the read operation     |
-| Error          | Optional. The error response, if non-standard.            |
+| Name           | Description                                                                       |
+| -------------- | --------------------------------------------------------------------------------- |
+| ParentResource | the parent resource of the PrivateEndpointConnection                              |
+| Resource       | the PrivateEndpointConnection resource being read                                 |
+| BaseParameters | Optional. Allows overriding the operation parameters                              |
+| Parameters     | Optional. Additional parameters after the path parameters                         |
+| Response       | Optional. The success response for the read operation                             |
+| Error          | Optional. The error response, if non-standard.                                    |
+| ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
 
 #### `PrivateEndpoints.CreateOrUpdateAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CreateOrUpdateAsync}
 
@@ -183,15 +185,16 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CreateOrUpdat
 
 ##### Template Parameters
 
-| Name           | Description                                                             |
-| -------------- | ----------------------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateEndpointConnection                    |
-| Resource       | the PrivateEndpointConnection resource being created or updated         |
-| BaseParameters | Optional. Allows overriding the operation parameters                    |
-| LroHeaders     | Optional. Allows overriding the lro headers returned on resource create |
-| Parameters     | Optional. Additional parameters after the path parameters               |
-| Response       | Optional. The success response for the createOrUpdate operation         |
-| Error          | Optional. The error response, if non-standard.                          |
+| Name           | Description                                                                       |
+| -------------- | --------------------------------------------------------------------------------- |
+| ParentResource | the parent resource of the PrivateEndpointConnection                              |
+| Resource       | the PrivateEndpointConnection resource being created or updated                   |
+| BaseParameters | Optional. Allows overriding the operation parameters                              |
+| LroHeaders     | Optional. Allows overriding the lro headers returned on resource create           |
+| Parameters     | Optional. Additional parameters after the path parameters                         |
+| Response       | Optional. The success response for the createOrUpdate operation                   |
+| Error          | Optional. The error response, if non-standard.                                    |
+| ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
 
 #### `PrivateEndpoints.CreateOrReplaceSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CreateOrReplaceSync}
 
@@ -201,14 +204,15 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CreateOrRepla
 
 ##### Template Parameters
 
-| Name           | Description                                                     |
-| -------------- | --------------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateEndpointConnection            |
-| Resource       | the PrivateEndpointConnection resource being created or updated |
-| BaseParameters | Optional. Allows overriding the operation parameters            |
-| Parameters     | Optional. Additional parameters after the path parameters       |
-| Response       | Optional. The success response for the createOrUpdate operation |
-| Error          | Optional. The error response, if non-standard.                  |
+| Name           | Description                                                                       |
+| -------------- | --------------------------------------------------------------------------------- |
+| ParentResource | the parent resource of the PrivateEndpointConnection                              |
+| Resource       | the PrivateEndpointConnection resource being created or updated                   |
+| BaseParameters | Optional. Allows overriding the operation parameters                              |
+| Parameters     | Optional. Additional parameters after the path parameters                         |
+| Response       | Optional. The success response for the createOrUpdate operation                   |
+| Error          | Optional. The error response, if non-standard.                                    |
+| ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
 
 #### `PrivateEndpoints.CreateOrReplaceAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CreateOrReplaceAsync}
 
@@ -218,15 +222,16 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CreateOrRepla
 
 ##### Template Parameters
 
-| Name           | Description                                                             |
-| -------------- | ----------------------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateEndpointConnection                    |
-| Resource       | the PrivateEndpointConnection resource being created or updated         |
-| BaseParameters | Optional. Allows overriding the operation parameters                    |
-| LroHeaders     | Optional. Allows overriding the lro headers returned on resource create |
-| Parameters     | Optional. Additional parameters after the path parameters               |
-| Response       | Optional. The success response for the createOrReplace operation        |
-| Error          | Optional. The error response, if non-standard.                          |
+| Name           | Description                                                                       |
+| -------------- | --------------------------------------------------------------------------------- |
+| ParentResource | the parent resource of the PrivateEndpointConnection                              |
+| Resource       | the PrivateEndpointConnection resource being created or updated                   |
+| BaseParameters | Optional. Allows overriding the operation parameters                              |
+| LroHeaders     | Optional. Allows overriding the lro headers returned on resource create           |
+| Parameters     | Optional. Additional parameters after the path parameters                         |
+| Response       | Optional. The success response for the createOrReplace operation                  |
+| Error          | Optional. The error response, if non-standard.                                    |
+| ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
 
 #### `PrivateEndpoints.CustomPatchAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CustomPatchAsync}
 
@@ -238,16 +243,17 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CustomPatchAs
 
 ##### Template Parameters
 
-| Name           | Description                                                                   |
-| -------------- | ----------------------------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateEndpointConnection                          |
-| Resource       | the PrivateEndpointConnection resource being updated                          |
-| PatchModel     | The input model for the PATCH request                                         |
-| BaseParameters | Optional. Allows overriding the operation parameters                          |
-| LroHeaders     | Optional. Allows overriding the lro headers returned in the Accepted response |
-| Parameters     | Optional. Additional parameters after the path parameters                     |
-| Response       | Optional. The success response for the patch operation                        |
-| Error          | Optional. The error response, if non-standard.                                |
+| Name           | Description                                                                       |
+| -------------- | --------------------------------------------------------------------------------- |
+| ParentResource | the parent resource of the PrivateEndpointConnection                              |
+| Resource       | the PrivateEndpointConnection resource being updated                              |
+| PatchModel     | The input model for the PATCH request                                             |
+| BaseParameters | Optional. Allows overriding the operation parameters                              |
+| LroHeaders     | Optional. Allows overriding the lro headers returned in the Accepted response     |
+| Parameters     | Optional. Additional parameters after the path parameters                         |
+| Response       | Optional. The success response for the patch operation                            |
+| Error          | Optional. The error response, if non-standard.                                    |
+| ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
 
 #### `PrivateEndpoints.CustomPatchSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CustomPatchSync}
 
@@ -257,15 +263,16 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CustomPatchSy
 
 ##### Template Parameters
 
-| Name           | Description                                                    |
-| -------------- | -------------------------------------------------------------- |
-| ParentResource | The parent resource of the PrivateEndpointConnection           |
-| Resource       | Optional. The PrivateEndpointConnection resource being patched |
-| PatchModel     | The input model for the PATCH request                          |
-| BaseParameters | Optional. Allows overriding the operation parameters           |
-| Parameters     | Optional. Additional parameters after the path parameters      |
-| Response       | Optional. The success response for the patch operation         |
-| Error          | Optional. The error response, if non-standard.                 |
+| Name           | Description                                                                       |
+| -------------- | --------------------------------------------------------------------------------- |
+| ParentResource | The parent resource of the PrivateEndpointConnection                              |
+| Resource       | Optional. The PrivateEndpointConnection resource being patched                    |
+| PatchModel     | The input model for the PATCH request                                             |
+| BaseParameters | Optional. Allows overriding the operation parameters                              |
+| Parameters     | Optional. Additional parameters after the path parameters                         |
+| Response       | Optional. The success response for the patch operation                            |
+| Error          | Optional. The error response, if non-standard.                                    |
+| ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
 
 #### `PrivateEndpoints.DeleteAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.DeleteAsync}
 
@@ -275,15 +282,16 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.DeleteAsync(p
 
 ##### Template Parameters
 
-| Name           | Description                                                               |
-| -------------- | ------------------------------------------------------------------------- |
-| ParentResource | The parent resource of the PrivateEndpointConnection                      |
-| Resource       | Optional. The PrivateEndpointConnection resource being deleted            |
-| BaseParameters | Optional. Allows overriding the parameters for the operation              |
-| LroHeaders     | Optional. Allows overriding the headers returned in the Accepted response |
-| Parameters     | Optional. Additional parameters after the path parameters                 |
-| Response       | Optional. The success response(s) for the delete operation                |
-| Error          | Optional. The error response, if non-standard.                            |
+| Name           | Description                                                                       |
+| -------------- | --------------------------------------------------------------------------------- |
+| ParentResource | The parent resource of the PrivateEndpointConnection                              |
+| Resource       | Optional. The PrivateEndpointConnection resource being deleted                    |
+| BaseParameters | Optional. Allows overriding the parameters for the operation                      |
+| LroHeaders     | Optional. Allows overriding the headers returned in the Accepted response         |
+| Parameters     | Optional. Additional parameters after the path parameters                         |
+| Response       | Optional. The success response(s) for the delete operation                        |
+| Error          | Optional. The error response, if non-standard.                                    |
+| ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
 
 #### `PrivateEndpoints.DeleteSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.DeleteSync}
 
@@ -293,14 +301,15 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.DeleteSync(pr
 
 ##### Template Parameters
 
-| Name           | Description                                                  |
-| -------------- | ------------------------------------------------------------ |
-| ParentResource | The parent resource of the PrivateEndpointConnection         |
-| Resource       | The PrivateEndpointConnection resource being deleted         |
-| BaseParameters | Optional. Allows overriding the parameters for the operation |
-| Parameters     | Optional. Additional parameters after the path parameters    |
-| Response       | Optional. The success response(s) for the delete operation   |
-| Error          | Optional. The error response, if non-standard.               |
+| Name           | Description                                                                       |
+| -------------- | --------------------------------------------------------------------------------- |
+| ParentResource | The parent resource of the PrivateEndpointConnection                              |
+| Resource       | The PrivateEndpointConnection resource being deleted                              |
+| BaseParameters | Optional. Allows overriding the parameters for the operation                      |
+| Parameters     | Optional. Additional parameters after the path parameters                         |
+| Response       | Optional. The success response(s) for the delete operation                        |
+| Error          | Optional. The error response, if non-standard.                                    |
+| ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
 
 #### `PrivateEndpoints.DeleteAsyncBase` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.DeleteAsyncBase}
 
@@ -310,14 +319,15 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.DeleteAsyncBa
 
 ##### Template Parameters
 
-| Name           | Description                                                    |
-| -------------- | -------------------------------------------------------------- |
-| ParentResource | The parent resource of the PrivateEndpointConnection           |
-| Response       | The response type for the operation                            |
-| Resource       | Optional. The PrivateEndpointConnection resource being deleted |
-| BaseParameters | Optional. Allows overriding the parameters for the operation   |
-| Parameters     | Optional. Additional parameters after the path parameters      |
-| Error          | Optional. The error response, if non-standard.                 |
+| Name           | Description                                                                       |
+| -------------- | --------------------------------------------------------------------------------- |
+| ParentResource | The parent resource of the PrivateEndpointConnection                              |
+| Response       | The response type for the operation                                               |
+| Resource       | Optional. The PrivateEndpointConnection resource being deleted                    |
+| BaseParameters | Optional. Allows overriding the parameters for the operation                      |
+| Parameters     | Optional. Additional parameters after the path parameters                         |
+| Error          | Optional. The error response, if non-standard.                                    |
+| ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
 
 #### Examples
 
@@ -354,14 +364,15 @@ op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.ListByParent(pro
 
 ##### Template Parameters
 
-| Name           | Description                                               |
-| -------------- | --------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateLink                    |
-| Resource       | Optional. The PrivateLink resource being listed           |
-| BaseParameters | Optional. Allows overriding the operation parameters      |
-| Parameters     | Optional. Additional parameters after the path parameters |
-| Response       | Optional. The success response for the list operation     |
-| Error          | Optional. The error response, if non-standard.            |
+| Name           | Description                                                        |
+| -------------- | ------------------------------------------------------------------ |
+| ParentResource | the parent resource of the PrivateLink                             |
+| Resource       | Optional. The PrivateLink resource being listed                    |
+| BaseParameters | Optional. Allows overriding the operation parameters               |
+| Parameters     | Optional. Additional parameters after the path parameters          |
+| Response       | Optional. The success response for the list operation              |
+| Error          | Optional. The error response, if non-standard.                     |
+| ResourceName   | Optional. The name of the private link resource being operated on. |
 
 #### `PrivateLinks.ListSinglePageByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.ListSinglePageByParent}
 
@@ -371,14 +382,15 @@ op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.ListSinglePageBy
 
 ##### Template Parameters
 
-| Name           | Description                                               |
-| -------------- | --------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateLink                    |
-| Resource       | Optional. The PrivateLink resource being listed           |
-| BaseParameters | Optional. Allows overriding the operation parameters      |
-| Parameters     | Optional. Additional parameters after the path parameters |
-| Response       | Optional. The success response for the list operation     |
-| Error          | Optional. The error response, if non-standard.            |
+| Name           | Description                                                        |
+| -------------- | ------------------------------------------------------------------ |
+| ParentResource | the parent resource of the PrivateLink                             |
+| Resource       | Optional. The PrivateLink resource being listed                    |
+| BaseParameters | Optional. Allows overriding the operation parameters               |
+| Parameters     | Optional. Additional parameters after the path parameters          |
+| Response       | Optional. The success response for the list operation              |
+| Error          | Optional. The error response, if non-standard.                     |
+| ResourceName   | Optional. The name of the private link resource being operated on. |
 
 #### `PrivateLinks.Read` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.Read}
 
@@ -388,14 +400,15 @@ op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.Read(provider: "
 
 ##### Template Parameters
 
-| Name           | Description                                               |
-| -------------- | --------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateLink                    |
-| Resource       | the PrivateLink resource being read                       |
-| BaseParameters | Optional. Allows overriding the operation parameters      |
-| Parameters     | Optional. Additional parameters after the path parameters |
-| Response       | Optional. The success response for the read operation     |
-| Error          | Optional. The error response, if non-standard.            |
+| Name           | Description                                                        |
+| -------------- | ------------------------------------------------------------------ |
+| ParentResource | the parent resource of the PrivateLink                             |
+| Resource       | the PrivateLink resource being read                                |
+| BaseParameters | Optional. Allows overriding the operation parameters               |
+| Parameters     | Optional. Additional parameters after the path parameters          |
+| Response       | Optional. The success response for the read operation              |
+| Error          | Optional. The error response, if non-standard.                     |
+| ResourceName   | Optional. The name of the private link resource being operated on. |
 
 #### Examples
 

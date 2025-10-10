@@ -42,6 +42,7 @@ import {
   AssignUniqueProviderNameValueDecorator,
   AzureResourceBaseDecorator,
   AzureResourceManagerPrivateDecorators,
+  BuiltInResourceOperationDecorator,
   ConditionalClientFlattenDecorator,
   DefaultResourceKeySegmentNameDecorator,
   EnforceConstraintDecorator,
@@ -706,6 +707,21 @@ const $extensionResourceOperation: ExtensionResourceOperationDecorator = (
   );
 };
 
+const $builtInResourceOperation: BuiltInResourceOperationDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  parentResourceType: Model,
+  builtInResourceType: Model,
+  operationType: "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
+  resourceName?: string,
+) => {
+  const resolvedResourceName =
+    resourceName === undefined || resourceName.length === 0
+      ? `${parentResourceType.name}${builtInResourceType.name}`
+      : resourceName;
+  callOperationDecorator(context, target, builtInResourceType, resolvedResourceName, operationType);
+};
+
 const $legacyResourceOperation: LegacyResourceOperationDecorator = (
   context: DecoratorContext,
   target: Operation,
@@ -831,6 +847,7 @@ export const $decorators = {
     extensionResourceOperation: $extensionResourceOperation,
     legacyExtensionResourceOperation: $legacyExtensionResourceOperation,
     legacyResourceOperation: $legacyResourceOperation,
+    builtInResourceOperation: $builtInResourceOperation,
   } satisfies AzureResourceManagerPrivateDecorators,
   "Azure.ResourceManager.Extension.Private": {
     builtInResource: $builtInResource,

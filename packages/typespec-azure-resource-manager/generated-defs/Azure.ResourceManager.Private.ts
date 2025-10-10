@@ -253,6 +253,24 @@ export type ExtensionResourceOperationDecorator = (
 ) => void;
 
 /**
+ * Marks an extension resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
+ *
+ * @param target The operation to associate the resourceType with
+ * @param targetResourceType The resource model for the target resource
+ * @param extensionResourceType The resource model for the extension resource
+ * @param operationType The type of operation being performed
+ * @param resourceName Optional. The name of the resource. If not provided, the scope and resource name will be used
+ */
+export type BuiltInResourceOperationDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  parentResourceType: Model,
+  builtInResourceType: Model,
+  operationType: "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
+  resourceName?: string,
+) => void;
+
+/**
  * Marks a resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
  *
  * @param target The operation to associate the resourceType with
@@ -288,5 +306,6 @@ export type AzureResourceManagerPrivateDecorators = {
   resourceParentType: ResourceParentTypeDecorator;
   legacyResourceOperation: LegacyResourceOperationDecorator;
   extensionResourceOperation: ExtensionResourceOperationDecorator;
+  builtInResourceOperation: BuiltInResourceOperationDecorator;
   legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorator;
 };
