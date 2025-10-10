@@ -206,6 +206,15 @@ function setResourceLifecycleOperation(
     resourceModelName: resourceType.name,
     resourceName: resolvedResourceName,
   });
+  const operationId: ArmOperationIdentifier = {
+    name: target.name,
+    kind: kind,
+    operation: target,
+    operationGroup: target.interface.name,
+    resource: resourceType,
+    resourceName: resolvedResourceName,
+  };
+  addArmResourceOperation(context.program, resourceType, operationId);
 }
 
 export const [getArmOperationList, setArmOperationList] = useStateMap<
@@ -246,20 +255,11 @@ export function setArmOperationIdentifier(
   resourceType: Model,
   data: ArmResourceOperationData,
 ): void {
-  const operationId: ArmOperationIdentifier = {
-    name: data.name,
-    kind: data.kind,
-    operation: target,
-    operationGroup: data.operationGroup,
-    resource: resourceType,
-    resourceName: data.resourceName,
-    resourceKind: data.resourceKind,
-  };
   // Initialize the operations for the resource type if not already done
   if (!getArmResourceOperationData(program, target)) {
     setArmResourceOperationData(program, target, { ...data });
   }
-  //addArmResourceOperation(program, resourceType, operationId);
+  // addArmResourceOperation(program, resourceType, operationId);
 }
 
 export const $armResourceRead: ArmResourceReadDecorator = (

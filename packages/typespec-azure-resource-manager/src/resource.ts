@@ -460,7 +460,7 @@ export function getResourcePathElements(
   const instanceSegments: string[] = segments.slice(0, providerIndex + 2);
   for (let i = providerIndex + 2; i < segments.length; i += 2) {
     if (isVariableSegment(segments[i])) {
-      return undefined;
+      break;
     }
 
     if (i + 1 < segments.length && isVariableSegment(segments[i + 1])) {
@@ -552,8 +552,12 @@ export function isResourceOperationMatch(
     resourceName?: string;
   },
 ): boolean {
-  if (source.resourceName && target.resourceName)
-    return source.resourceName.toLowerCase() === target.resourceName.toLowerCase();
+  if (
+    source.resourceName &&
+    target.resourceName &&
+    source.resourceName.toLowerCase() !== target.resourceName.toLowerCase()
+  )
+    return false;
   if (source.resourceType.provider.toLowerCase() !== target.resourceType.provider.toLowerCase())
     return false;
   if (source.resourceType.types.length !== target.resourceType.types.length) return false;
@@ -561,7 +565,7 @@ export function isResourceOperationMatch(
     if (source.resourceType.types[i].toLowerCase() !== target.resourceType.types[i].toLowerCase())
       return false;
   }
-  const sourceSegments = source.resourceInstancePath.split("/");
+  /*const sourceSegments = source.resourceInstancePath.split("/");
   const targetSegments = target.resourceInstancePath.split("/");
   if (sourceSegments.length !== targetSegments.length) return false;
   for (let i = 0; i < sourceSegments.length; i++) {
@@ -571,7 +575,7 @@ export function isResourceOperationMatch(
       }
       if (sourceSegments[i].toLowerCase() !== targetSegments[i].toLowerCase()) return false;
     } else if (!isVariableSegment(targetSegments[i])) return false;
-  }
+  }*/
   return true;
 }
 

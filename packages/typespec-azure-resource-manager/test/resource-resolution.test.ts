@@ -29,9 +29,10 @@ interface ResourceOperationsCheck {
   actions?: ArmOperationCheck[];
 }
 
-interface ResolvedOperationsCheck {
+interface ResolvedResourceCheck {
   resourceType: ResourceType;
   resourceInstancePath: string;
+  resourceName?: string;
   operations: ResourceOperationsCheck;
 }
 
@@ -55,9 +56,12 @@ function checkArmOperationsHas(
   }
 }
 
-function checkResolvedOperations(operations: ResolvedResource, check: ResolvedOperationsCheck) {
+function checkResolvedOperations(operations: ResolvedResource, check: ResolvedResourceCheck) {
   expect(operations.resourceType).toEqual(check.resourceType);
   expect(operations.resourceInstancePath).toEqual(check.resourceInstancePath);
+  if (check.resourceName) {
+    expect(operations.resourceName).toEqual(check.resourceName);
+  }
   if (check.operations.actions) {
     checkArmOperationsHas(operations.operations.actions, check.operations.actions);
   } else {
@@ -1681,6 +1685,7 @@ model MoveResponse {
       },
       resourceInstancePath:
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/employeeResources/{employeeId}",
+      resourceName: "BuildingsEmployeeResources",
     });
 
     const roomScope = employee.resources[1];
@@ -1705,6 +1710,7 @@ model MoveResponse {
       },
       resourceInstancePath:
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/rooms/{roomId}/employeeResources/{employeeId}",
+      resourceName: "RoomsEmployeeResources",
     });
   });
 });
