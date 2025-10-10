@@ -641,8 +641,7 @@ export function isOnClient(
   const clientLocation = getClientLocation(context, type);
   if (
     operation &&
-    (clientLocation === operation ||
-      clientLocation === getOverriddenClientMethod(context, operation))
+    clientLocation === (getOverriddenClientMethod(context, operation) ?? operation)
   ) {
     // if the type has explicitly been moved to the operation, it is not on the client
     return false;
