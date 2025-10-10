@@ -1,6 +1,5 @@
 using Http;
 using Rest;
-using OpenAPI;
 using Azure.ResourceManager.Foundations;
 using Azure.ResourceManager.Private;
 using Azure.ResourceManager.CommonTypes.Private;
