@@ -3,6 +3,11 @@ import "./main.tsp";
 
 using Azure.ClientGenerator.Core;
 
+@@global.Azure.ClientGenerator.Core.clientNamespace(_Specs_.Azure.ClientGenerator.Core.AlternateType,
+  "azure.clientgenerator.core.alternatetype",
+  "java"
+);
+
 @@alternateType(_Specs_.Azure.ClientGenerator.Core.AlternateType.ExternalType.Feature,
   {
     identity: "geojson.Feature",
