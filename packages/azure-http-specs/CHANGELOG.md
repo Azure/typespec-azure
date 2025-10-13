@@ -1,5 +1,12 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.31
+
+### Bug Fixes
+
+- [#3380](https://github.com/Azure/typespec-azure/pull/3380) Fix missing ApiVersionParameter in PreviewVersion test.
+
+
 ## 0.1.0-alpha.30
 
 ### Features
