@@ -1,4 +1,3 @@
-import "@typespec/openapi";
 import "@typespec/http";
 import "@typespec/rest";
 
@@ -11,7 +10,6 @@ import "../private.decorators.tsp";
 import "../parameters.tsp";
 
 using Http;
-using OpenAPI;
 using Azure.ResourceManager.Private;
 
 namespace Azure.ResourceManager.Foundations;

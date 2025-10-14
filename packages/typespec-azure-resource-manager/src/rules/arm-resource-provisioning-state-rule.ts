@@ -1,8 +1,8 @@
 import { Enum, Model, createRule, getProperty, paramMessage } from "@typespec/compiler";
 
 import { getUnionAsEnum } from "@azure-tools/typespec-azure-core";
-import { isReadonlyProperty } from "@typespec/openapi";
 import { getArmResource } from "../resource.js";
+import { isReadonlyProperty } from "../utils.js";
 import { getSourceProperty } from "./utils.js";
 
 export const armResourceProvisioningStateRule = createRule({
