@@ -694,6 +694,13 @@ const $extensionResourceOperation: ExtensionResourceOperationDecorator = (
   operationType: "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
   resourceName?: string,
 ) => {
+  if (
+    target.interface === undefined ||
+    target.interface.node === undefined ||
+    target.interface.node.templateParameters.length > 0
+  ) {
+    return;
+  }
   const resolvedResourceName =
     resourceName === undefined || resourceName.length === 0
       ? `${targetResourceType.name}${extensionResourceType.name}`
@@ -715,6 +722,13 @@ const $builtInResourceOperation: BuiltInResourceOperationDecorator = (
   operationType: "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
   resourceName?: string,
 ) => {
+  if (
+    target.interface === undefined ||
+    target.interface.node === undefined ||
+    target.interface.node.templateParameters.length > 0
+  ) {
+    return;
+  }
   const resolvedResourceName =
     resourceName === undefined || resourceName.length === 0
       ? `${parentResourceType.name}${builtInResourceType.name}`

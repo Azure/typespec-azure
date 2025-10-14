@@ -207,7 +207,8 @@ op CreateOrReplaceAsync<
   LroHeaders,
   Parameters,
   Response,
-  Error
+  Error,
+  OverrideResourceName
 >;
 
 /**
@@ -334,7 +335,14 @@ op DeleteAsync<
   Response extends {} = ArmDeletedResponse | ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
   Error extends {} = ErrorResponse,
   OverrideResourceName extends valueof string = ""
-> is DeleteAsyncBase<TargetResource, ExtensionResource, Response, Parameters, Error>;
+> is DeleteAsyncBase<
+  TargetResource,
+  ExtensionResource,
+  Response,
+  Parameters,
+  Error,
+  OverrideResourceName
+>;
 
 /**
  * @dev Delete a resource asynchronously
@@ -360,7 +368,14 @@ op DeleteWithoutOkAsync<
   Response extends {} = ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
   Error extends {} = ErrorResponse,
   OverrideResourceName extends valueof string = ""
-> is DeleteAsyncBase<TargetResource, ExtensionResource, Response, Parameters, Error>;
+> is DeleteAsyncBase<
+  TargetResource,
+  ExtensionResource,
+  Response,
+  Parameters,
+  Error,
+  OverrideResourceName
+>;
 
 /**
  * Delete a resource synchronously

@@ -36,6 +36,7 @@ model PrivateEndpointConnectionResource<Description extends valueof string = "A 
 /**
  * Operations over private endpoint connection resources.
  * @template PrivateEndpointResource The type of the private endpoint connection resource. You must declare a private endpoint connection resource type in your provider namespace.
+ * @template PrivateEndpointResourceName Optional. The name of the private endpoint connection resource in this context, by default, this is `{targetResourceName}PrivateEndpointConnection`.
  *
  * @example
  * ```ts
@@ -49,7 +50,10 @@ model PrivateEndpointConnectionResource<Description extends valueof string = "A 
  * }
  * ```
  */
-interface PrivateEndpoints<PrivateEndpointResource extends PrivateEndpointConnectionResource> {
+interface PrivateEndpoints<
+  PrivateEndpointResource extends PrivateEndpointConnectionResource,
+  PrivateEndpointResourceName extends valueof string = ""
+> {
   /**
    * @dev List the private endpoint connections over a resource
    * @template ParentResource the parent resource of the PrivateEndpointConnection
@@ -77,7 +81,7 @@ interface PrivateEndpoints<PrivateEndpointResource extends PrivateEndpointConnec
     Parameters extends {} = {},
     Response extends {} = ArmResponse<ResourceListResult<Resource>>,
     Error extends {} = ErrorResponse,
-    ResourceName extends valueof string = ""
+    ResourceName extends valueof string = PrivateEndpointResourceName
   > is ArmReadOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> & Parameters,
     Response,
@@ -105,7 +109,7 @@ interface PrivateEndpoints<PrivateEndpointResource extends PrivateEndpointConnec
     Parameters extends {} = {},
     Response extends {} = ArmResponse<Resource>,
     Error extends {} = ErrorResponse,
-    ResourceName extends valueof string = ""
+    ResourceName extends valueof string = PrivateEndpointResourceName
   > is ArmReadOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
       KeysOf<PrivateEndpointConnectionParameter> &
@@ -143,7 +147,7 @@ interface PrivateEndpoints<PrivateEndpointResource extends PrivateEndpointConnec
       LroHeaders
     >,
     Error extends {} = ErrorResponse,
-    ResourceName extends valueof string = ""
+    ResourceName extends valueof string = PrivateEndpointResourceName
   > is ArmCreateOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
       KeysOf<PrivateEndpointConnectionParameter> &
@@ -175,7 +179,7 @@ interface PrivateEndpoints<PrivateEndpointResource extends PrivateEndpointConnec
     Parameters extends {} = {},
     Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
     Error extends {} = ErrorResponse,
-    ResourceName extends valueof string = ""
+    ResourceName extends valueof string = PrivateEndpointResourceName
   > is ArmCreateOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
       KeysOf<PrivateEndpointConnectionParameter> &
@@ -209,7 +213,7 @@ interface PrivateEndpoints<PrivateEndpointResource extends PrivateEndpointConnec
       LroHeaders
     >,
     Error extends {} = ErrorResponse,
-    ResourceName extends valueof string = ""
+    ResourceName extends valueof string = PrivateEndpointResourceName
   > is PrivateEndpoints.CreateOrUpdateAsync<
     ParentResource,
     Resource,
@@ -255,7 +259,7 @@ interface PrivateEndpoints<PrivateEndpointResource extends PrivateEndpointConnec
       LroHeaders
     >,
     Error extends {} = ErrorResponse,
-    ResourceName extends valueof string = ""
+    ResourceName extends valueof string = PrivateEndpointResourceName
   > is ArmUpdateOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
       KeysOf<PrivateEndpointConnectionParameter> &
@@ -289,7 +293,7 @@ interface PrivateEndpoints<PrivateEndpointResource extends PrivateEndpointConnec
     Parameters extends {} = {},
     Response extends {} = ArmResponse<Resource>,
     Error extends {} = ErrorResponse,
-    ResourceName extends valueof string = ""
+    ResourceName extends valueof string = PrivateEndpointResourceName
   > is ArmUpdateOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
       KeysOf<PrivateEndpointConnectionParameter> &
@@ -320,7 +324,7 @@ interface PrivateEndpoints<PrivateEndpointResource extends PrivateEndpointConnec
     Parameters extends {} = {},
     Response extends {} = ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
     Error extends {} = ErrorResponse,
-    ResourceName extends valueof string = ""
+    ResourceName extends valueof string = PrivateEndpointResourceName
   > is PrivateEndpoints.DeleteAsyncBase<
     ParentResource,
     Response,
@@ -353,7 +357,7 @@ interface PrivateEndpoints<PrivateEndpointResource extends PrivateEndpointConnec
     Parameters extends {} = {},
     Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse,
     Error = ErrorResponse,
-    ResourceName extends valueof string = ""
+    ResourceName extends valueof string = PrivateEndpointResourceName
   >(
     ...ResourceInstanceParameters<ParentResource, BaseParameters>,
     ...KeysOf<PrivateEndpointConnectionParameter>,
@@ -382,7 +386,7 @@ interface PrivateEndpoints<PrivateEndpointResource extends PrivateEndpointConnec
     BaseParameters = DefaultBaseParameters<ParentResource>,
     Parameters extends {} = {},
     Error extends {} = ErrorResponse,
-    ResourceName extends valueof string = ""
+    ResourceName extends valueof string = PrivateEndpointResourceName
   >(
     ...ResourceInstanceParameters<ParentResource, BaseParameters>,
     ...KeysOf<PrivateEndpointConnectionParameter>,

@@ -320,12 +320,13 @@ export const $armResourceList: ArmResourceListDecorator = (
   // We can't resolve the operation path yet so treat the operation as a partial
   // type so that we can fill in the missing details later
   const operations = getArmResourceOperations(context.program, resourceType);
+  const resolvedResourceName: string = resourceName ?? resourceType.name;
   const operation: Partial<ArmResourceOperation> = {
     name: target.name,
     kind: "list",
     operation: target,
     operationGroup: target.interface.name,
-    resourceName: resourceName ?? resourceType.name,
+    resourceName: resolvedResourceName,
   };
 
   operations.lists[target.name] = operation as ArmResourceOperation;
@@ -335,7 +336,7 @@ export const $armResourceList: ArmResourceListDecorator = (
     operation: target,
     operationGroup: target.interface.name,
     resource: resourceType,
-    resourceName: operation.resourceName,
+    resourceName: resolvedResourceName,
   };
   addArmResourceOperation(context.program, resourceType, opId);
   setArmOperationIdentifier(context.program, target, resourceType, {
@@ -344,7 +345,7 @@ export const $armResourceList: ArmResourceListDecorator = (
     operation: target,
     operationGroup: target.interface.name,
     resourceModelName: resourceType.name,
-    resourceName: operation.resourceName,
+    resourceName: resolvedResourceName,
   });
 };
 

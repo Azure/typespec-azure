@@ -132,19 +132,20 @@ op Azure.ResourceManager.Operations.list(apiVersion: string, provider: "Microsof
 Operations over private endpoint connection resources.
 
 ```typespec
-interface Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>
+interface Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>
 ```
 
 #### Template Parameters
 
-| Name                    | Description                                                                                                                                    |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| PrivateEndpointResource | The type of the private endpoint connection resource. You must declare a private endpoint connection resource type in your provider namespace. |
+| Name                        | Description                                                                                                                                          |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PrivateEndpointResource     | The type of the private endpoint connection resource. You must declare a private endpoint connection resource type in your provider namespace.       |
+| PrivateEndpointResourceName | Optional. The name of the private endpoint connection resource in this context, by default, this is `{targetResourceName}PrivateEndpointConnection`. |
 
-#### `PrivateEndpoints.ListByParent` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.ListByParent}
+#### `PrivateEndpoints.ListByParent` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.ListByParent}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
@@ -159,10 +160,10 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.ListByParent(
 | Error          | Optional. The error response, if non-standard.                                    |
 | ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.Read` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.Read}
+#### `PrivateEndpoints.Read` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.Read}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.Read(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.Read(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
 ```
 
 ##### Template Parameters
@@ -177,10 +178,10 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.Read(provider
 | Error          | Optional. The error response, if non-standard.                                    |
 | ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.CreateOrUpdateAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CreateOrUpdateAsync}
+#### `PrivateEndpoints.CreateOrUpdateAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.CreateOrUpdateAsync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CreateOrUpdateAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.CreateOrUpdateAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
 ```
 
 ##### Template Parameters
@@ -196,10 +197,10 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CreateOrUpdat
 | Error          | Optional. The error response, if non-standard.                                    |
 | ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.CreateOrReplaceSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CreateOrReplaceSync}
+#### `PrivateEndpoints.CreateOrReplaceSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.CreateOrReplaceSync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CreateOrReplaceSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.CreateOrReplaceSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
 ```
 
 ##### Template Parameters
@@ -214,10 +215,10 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CreateOrRepla
 | Error          | Optional. The error response, if non-standard.                                    |
 | ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.CreateOrReplaceAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CreateOrReplaceAsync}
+#### `PrivateEndpoints.CreateOrReplaceAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.CreateOrReplaceAsync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CreateOrReplaceAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.CreateOrReplaceAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
 ```
 
 ##### Template Parameters
@@ -233,12 +234,12 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CreateOrRepla
 | Error          | Optional. The error response, if non-standard.                                    |
 | ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.CustomPatchAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CustomPatchAsync}
+#### `PrivateEndpoints.CustomPatchAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.CustomPatchAsync}
 
 A long-running resource update using a custom PATCH payload (Asynchronous) to update a PrivateEndpointConnection to a resource.
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CustomPatchAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, properties: PatchModel): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.CustomPatchAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, properties: PatchModel): Response | Error
 ```
 
 ##### Template Parameters
@@ -255,10 +256,10 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CustomPatchAs
 | Error          | Optional. The error response, if non-standard.                                    |
 | ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.CustomPatchSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CustomPatchSync}
+#### `PrivateEndpoints.CustomPatchSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.CustomPatchSync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CustomPatchSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, properties: PatchModel): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.CustomPatchSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, properties: PatchModel): Response | Error
 ```
 
 ##### Template Parameters
@@ -274,10 +275,10 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CustomPatchSy
 | Error          | Optional. The error response, if non-standard.                                    |
 | ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.DeleteAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.DeleteAsync}
+#### `PrivateEndpoints.DeleteAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.DeleteAsync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.DeleteAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.DeleteAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
 ```
 
 ##### Template Parameters
@@ -293,10 +294,10 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.DeleteAsync(p
 | Error          | Optional. The error response, if non-standard.                                    |
 | ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.DeleteSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.DeleteSync}
+#### `PrivateEndpoints.DeleteSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.DeleteSync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.DeleteSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.DeleteSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
 ```
 
 ##### Template Parameters
@@ -311,10 +312,10 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.DeleteSync(pr
 | Error          | Optional. The error response, if non-standard.                                    |
 | ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.DeleteAsyncBase` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.DeleteAsyncBase}
+#### `PrivateEndpoints.DeleteAsyncBase` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.DeleteAsyncBase}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.DeleteAsyncBase(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.DeleteAsyncBase(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
 ```
 
 ##### Template Parameters
@@ -347,19 +348,20 @@ interface Employees {
 Operations over private link resources.
 
 ```typespec
-interface Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>
+interface Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, PrivateLinkResourceName>
 ```
 
 #### Template Parameters
 
-| Name                     | Description                                                                                                      |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------- |
-| PrivateLinkResourceModel | The type of the private link resource. You must declare a private link resource type in your provider namespace. |
+| Name                     | Description                                                                                                             |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| PrivateLinkResourceModel | The type of the private link resource. You must declare a private link resource type in your provider namespace.        |
+| PrivateLinkResourceName  | Optional. The name of the private link resource in this context, by default, this is `{targetResourceName}PrivateLink`. |
 
-#### `PrivateLinks.ListByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.ListByParent}
+#### `PrivateLinks.ListByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, PrivateLinkResourceName>.ListByParent}
 
 ```typespec
-op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, PrivateLinkResourceName>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
@@ -374,10 +376,10 @@ op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.ListByParent(pro
 | Error          | Optional. The error response, if non-standard.                     |
 | ResourceName   | Optional. The name of the private link resource being operated on. |
 
-#### `PrivateLinks.ListSinglePageByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.ListSinglePageByParent}
+#### `PrivateLinks.ListSinglePageByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, PrivateLinkResourceName>.ListSinglePageByParent}
 
 ```typespec
-op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, PrivateLinkResourceName>.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
@@ -392,10 +394,10 @@ op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.ListSinglePageBy
 | Error          | Optional. The error response, if non-standard.                     |
 | ResourceName   | Optional. The name of the private link resource being operated on. |
 
-#### `PrivateLinks.Read` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.Read}
+#### `PrivateLinks.Read` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, PrivateLinkResourceName>.Read}
 
 ```typespec
-op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.Read(provider: "Microsoft.ThisWillBeReplaced", privateLinkResourceName: string): Response | Error
+op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, PrivateLinkResourceName>.Read(provider: "Microsoft.ThisWillBeReplaced", privateLinkResourceName: string): Response | Error
 ```
 
 ##### Template Parameters

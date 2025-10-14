@@ -939,6 +939,265 @@ interface GenericResources {
     ]);
   });
 
+  it("allows overriding resource name for extension resources", async () => {
+    const { program } = await Tester.compile(`
+      using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+model Employee is ExtensionResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@lroStatus
+union ProvisioningState {
+  ResourceProvisioningState,
+  string,
+}
+
+interface EmplOps<Scope extends Azure.ResourceManager.Foundations.SimpleResource, LocalResourceName extends valueof string> {
+  get is Extension.Read<Scope, Employee, OverrideResourceName = LocalResourceName>;
+
+  create is Extension.CreateOrReplaceAsync<Scope, Employee, OverrideResourceName = LocalResourceName>;
+  update is Extension.CustomPatchSync<
+    Scope,
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>, 
+    OverrideResourceName = LocalResourceName
+  >;
+  delete is Extension.DeleteWithoutOkAsync<Scope, Employee, OverrideResourceName = LocalResourceName>;
+  list is Extension.ListByTarget<Scope, Employee, OverrideResourceName = LocalResourceName>;
+  move is Extension.ActionSync<Scope, Employee, MoveRequest, MoveResponse, OverrideResourceName = LocalResourceName>;
+}
+
+alias VirtualMachine = Extension.ExternalResource<
+  "Microsoft.Compute",
+  "virtualMachines",
+  "vmName",
+  NamePattern = "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$",
+  Description = "The name of the virtual machine"
+>;
+
+@armResourceOperations
+interface Employees extends EmplOps<Extension.ScopeParameter, "EmployeesAtScope"> {}
+@armResourceOperations
+interface Tenants extends EmplOps<Extension.Tenant, "EmployeesAtTenant"> {}
+@armResourceOperations
+interface Subscriptions extends EmplOps<Extension.Subscription, "EmployeesAtSubscription"> {}
+
+
+@armResourceOperations
+interface VirtualMachines extends EmplOps<VirtualMachine, "EmployeesAtVirtualMachine"> {}
+
+model MoveRequest {
+  from: string;
+  to: string;
+}
+
+model MoveResponse {
+  movingStatus: string;
+}
+
+alias GenericResourceParameters = {
+  ...ApiVersionParameter;
+  ...SubscriptionIdParameter;
+  ...ResourceGroupParameter;
+
+  @path
+  @segment("providers")
+  @key
+  providerNamespace: string;
+
+  @path @key parentType: string;
+  @path @key parentName: string;
+  @path @key resourceType: string;
+  @path @key resourceName: string;
+};
+
+alias ParentParameters = {
+  ...Extension.ExtensionProviderNamespace<Employee>;
+  ...ParentKeysOf<Employee>;
+};
+
+interface GenericOps
+  extends Azure.ResourceManager.Legacy.ExtensionOperations<
+      GenericResourceParameters,
+      ParentParameters,
+      {
+        ...Extension.ExtensionProviderNamespace<Employee>,
+        ...KeysOf<Employee>,
+      },
+      ResourceName = "EmployeesAtGenericResource"
+    > {}
+
+@armResourceOperations
+interface GenericResources {
+  get is GenericOps.Read<Employee>;
+  create is GenericOps.CreateOrUpdateAsync<Employee>;
+  update is GenericOps.CustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+  delete is GenericOps.DeleteWithoutOkAsync<Employee>;
+  list is GenericOps.List<Employee>;
+}
+
+      `);
+    const resources = resolveArmResources(program);
+    expect(resources).toMatchObject({
+      resourceModels: expect.any(Array),
+      providerOperations: expect.any(Array),
+    });
+    ok(resources.resourceModels);
+    expect(resources.resourceModels).toHaveLength(2);
+    const employee = resources.resourceModels[0];
+    ok(employee);
+    expect(employee).toMatchObject({
+      kind: "Extension",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      resources: expect.any(Array),
+    });
+    ok(employee.resources);
+    expect(employee.resources).toHaveLength(5);
+    const tenant = employee.resources[0];
+    ok(tenant);
+    checkResolvedOperations(tenant, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [{ operationGroup: "Tenants", name: "create", kind: "createOrUpdate" }],
+          delete: [{ operationGroup: "Tenants", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "Tenants", name: "get", kind: "read" }],
+          update: [{ operationGroup: "Tenants", name: "update", kind: "update" }],
+        },
+        actions: [{ operationGroup: "Tenants", name: "move", kind: "action" }],
+        lists: [{ operationGroup: "Tenants", name: "list", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees"],
+      },
+      resourceInstancePath: "/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+      resourceName: "EmployeesAtTenant",
+    });
+
+    const scope = employee.resources[1];
+    ok(scope);
+    checkResolvedOperations(scope, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [{ operationGroup: "Employees", name: "create", kind: "createOrUpdate" }],
+          delete: [{ operationGroup: "Employees", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "Employees", name: "get", kind: "read" }],
+          update: [{ operationGroup: "Employees", name: "update", kind: "update" }],
+        },
+        actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
+        lists: [{ operationGroup: "Employees", name: "list", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees"],
+      },
+      resourceInstancePath:
+        "/{scope}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+      resourceName: "EmployeesAtScope",
+    });
+
+    const subscription = employee.resources[2];
+    ok(subscription);
+    checkResolvedOperations(subscription, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            { operationGroup: "Subscriptions", name: "create", kind: "createOrUpdate" },
+          ],
+          delete: [{ operationGroup: "Subscriptions", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "Subscriptions", name: "get", kind: "read" }],
+          update: [{ operationGroup: "Subscriptions", name: "update", kind: "update" }],
+        },
+        actions: [{ operationGroup: "Subscriptions", name: "move", kind: "action" }],
+        lists: [{ operationGroup: "Subscriptions", name: "list", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+      resourceName: "EmployeesAtSubscription",
+    });
+
+    const vms = employee.resources[3];
+    ok(vms);
+    checkResolvedOperations(vms, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            { operationGroup: "VirtualMachines", name: "create", kind: "createOrUpdate" },
+          ],
+          delete: [{ operationGroup: "VirtualMachines", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "VirtualMachines", name: "get", kind: "read" }],
+          update: [{ operationGroup: "VirtualMachines", name: "update", kind: "update" }],
+        },
+        actions: [{ operationGroup: "VirtualMachines", name: "move", kind: "action" }],
+        lists: [{ operationGroup: "VirtualMachines", name: "list", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees"],
+      },
+      resourceName: "EmployeesAtVirtualMachine",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    });
+
+    const generics = employee.resources[4];
+    ok(generics);
+    checkResolvedOperations(generics, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            { operationGroup: "GenericResources", name: "create", kind: "createOrUpdate" },
+          ],
+          delete: [{ operationGroup: "GenericResources", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "GenericResources", name: "get", kind: "read" }],
+          update: [{ operationGroup: "GenericResources", name: "update", kind: "update" }],
+        },
+        lists: [{ operationGroup: "GenericResources", name: "list", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees"],
+      },
+      resourceName: "EmployeesAtGenericResource",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerNamespace}/{parentType}/{parentName}/{resourceType}/{resourceName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    });
+
+    const externalVm = resources.resourceModels[1];
+    expect(externalVm).toMatchObject({
+      kind: "Virtual",
+      providerNamespace: "Microsoft.Compute",
+      type: expect.anything(),
+      resources: [],
+    });
+
+    checkArmOperationsHas(resources.providerOperations, [
+      { operationGroup: "Operations", name: "list", kind: "other" },
+    ]);
+  });
+
   it("collects operation information for private endpoints", async () => {
     const { program } = await Tester.compile(`
 
@@ -1216,6 +1475,538 @@ model DependentProperties {
     ]);
   });
 
+  it("allows overriding resource name for private endpoints", async () => {
+    const { program } = await Tester.compile(`
+
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+// For more information about the proxy vs tracked,
+// see https://armwiki.azurewebsites.net/rp_onboarding/tracked_vs_proxy_resources.html?q=proxy%20resource
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@lroStatus
+union ProvisioningState {
+  ResourceProvisioningState,
+
+  Provisioning: "Provisioning",
+
+  Updating: "Updating",
+
+  Deleting: "Deleting",
+
+  Accepted: "Accepted",
+
+  string,
+}
+
+model PrivateEndpointConnection is PrivateEndpointConnectionResource;
+alias PrivateEndpointOperations = PrivateEndpoints<PrivateEndpointConnection, "EmployeePrivate">;
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+  update is ArmCustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+  delete is ArmResourceDeleteSync<Employee>;
+  listByResourceGroup is ArmResourceListByParent<Employee>;
+  listBySubscription is ArmListBySubscription<Employee>;
+  move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
+
+  checkExistence is ArmResourceCheckExistence<Employee>;
+
+  getPrivateEndpointConnection is PrivateEndpointOperations.Read<Employee>;
+  createOrUpdatePrivateEndpointConnection is PrivateEndpointOperations.CreateOrUpdateAsync<Employee>;
+  updatePrivateEndpointConnection is PrivateEndpointOperations.CustomPatchAsync<Employee>;
+  deletePrivateEndpointConnection is PrivateEndpointOperations.DeleteAsync<Employee>;
+  listPrivateEndpointConnections is PrivateEndpointOperations.ListByParent<Employee>;
+}
+
+model MoveRequest {
+  from: string;
+
+  to: string;
+}
+
+model MoveResponse {
+  movingStatus: string;
+}
+
+`);
+    const resources = resolveArmResources(program);
+    expect(resources).toBeDefined();
+    expect(resources.resourceModels).toBeDefined();
+    expect(resources.resourceModels).toHaveLength(2);
+    ok(resources.resourceModels);
+    const employee = resources.resourceModels[0];
+    ok(employee);
+    expect(employee).toMatchObject({
+      kind: "Tracked",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      resources: expect.any(Array),
+    });
+    ok(employee.resources);
+    expect(employee.resources).toHaveLength(1);
+
+    const mainScope = employee.resources[0];
+    ok(mainScope);
+    checkResolvedOperations(mainScope, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            { operationGroup: "Employees", name: "createOrUpdate", kind: "createOrUpdate" },
+          ],
+          delete: [{ operationGroup: "Employees", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "Employees", name: "get", kind: "read" }],
+          update: [{ operationGroup: "Employees", name: "update", kind: "update" }],
+        },
+        actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
+        lists: [
+          { operationGroup: "Employees", name: "listBySubscription", kind: "list" },
+          { operationGroup: "Employees", name: "listByResourceGroup", kind: "list" },
+        ],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees"],
+      },
+      resourceName: "Employee",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    });
+
+    const privateEndpointConnection = resources.resourceModels[1];
+    ok(privateEndpointConnection);
+    ok(privateEndpointConnection.resources);
+    expect(privateEndpointConnection.resources).toHaveLength(1);
+    const privateForEmplInstance = privateEndpointConnection.resources[0];
+    ok(privateForEmplInstance);
+    checkResolvedOperations(privateForEmplInstance, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            {
+              operationGroup: "Employees",
+              name: "createOrUpdatePrivateEndpointConnection",
+              kind: "createOrUpdate",
+            },
+          ],
+          delete: [
+            {
+              operationGroup: "Employees",
+              name: "deletePrivateEndpointConnection",
+              kind: "delete",
+            },
+          ],
+          read: [
+            { operationGroup: "Employees", name: "getPrivateEndpointConnection", kind: "read" },
+          ],
+          update: [
+            {
+              operationGroup: "Employees",
+              name: "updatePrivateEndpointConnection",
+              kind: "update",
+            },
+          ],
+        },
+        lists: [
+          { operationGroup: "Employees", name: "listPrivateEndpointConnections", kind: "list" },
+        ],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees", "privateEndpointConnections"],
+      },
+      resourceName: "EmployeePrivate",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/privateEndpointConnections/{privateEndpointConnectionName}",
+    });
+
+    checkArmOperationsHas(resources.providerOperations, [
+      { operationGroup: "Employees", name: "checkExistence", kind: "other" },
+      { operationGroup: "Operations", name: "list", kind: "other" },
+    ]);
+  });
+
+  it("collects operation information for private links", async () => {
+    const { program } = await Tester.compile(`
+
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+// For more information about the proxy vs tracked,
+// see https://armwiki.azurewebsites.net/rp_onboarding/tracked_vs_proxy_resources.html?q=proxy%20resource
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@lroStatus
+union ProvisioningState {
+  ResourceProvisioningState,
+
+  Provisioning: "Provisioning",
+
+  Updating: "Updating",
+
+  Deleting: "Deleting",
+
+  Accepted: "Accepted",
+
+  string,
+}
+
+model PrivateLinkResource is PrivateLink;
+alias PrivateLinkOperations = PrivateLinks<PrivateLinkResource>;
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+  update is ArmCustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+  delete is ArmResourceDeleteSync<Employee>;
+  listByResourceGroup is ArmResourceListByParent<Employee>;
+  listBySubscription is ArmListBySubscription<Employee>;
+  move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
+
+  checkExistence is ArmResourceCheckExistence<Employee>;
+}
+
+@armResourceOperations(PrivateLinkResource)
+interface EmployeePrivateLinks {
+  list is PrivateLinkOperations.ListByParent<Employee>;
+}
+
+model MoveRequest {
+  from: string;
+
+  to: string;
+}
+
+model MoveResponse {
+  movingStatus: string;
+}
+
+@armResourceOperations
+interface Dependents {
+  get is ArmResourceRead<Dependent>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Dependent>;
+  update is ArmCustomPatchSync<
+    Dependent,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Dependent, DependentProperties>
+  >;
+  delete is ArmResourceDeleteSync<Dependent>;
+  list is ArmResourceListByParent<Dependent>;
+}
+
+@armResourceOperations(PrivateLinkResource)
+interface DependentPrivateLinks {
+  list is PrivateLinkOperations.ListByParent<Dependent>;
+}
+
+@parentResource(Employee)
+model Dependent is ProxyResource<DependentProperties> {
+  ...ResourceNameParameter<Dependent>;
+}
+
+model DependentProperties {
+  age: int32;
+  gender: string;
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+`);
+    const resources = resolveArmResources(program);
+    expect(resources).toBeDefined();
+    expect(resources.resourceModels).toBeDefined();
+    expect(resources.resourceModels).toHaveLength(3);
+    ok(resources.resourceModels);
+    const employee = resources.resourceModels[0];
+    ok(employee);
+    expect(employee).toMatchObject({
+      kind: "Tracked",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      resources: expect.any(Array),
+    });
+    ok(employee.resources);
+    expect(employee.resources).toHaveLength(1);
+
+    const mainScope = employee.resources[0];
+    ok(mainScope);
+    checkResolvedOperations(mainScope, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            { operationGroup: "Employees", name: "createOrUpdate", kind: "createOrUpdate" },
+          ],
+          delete: [{ operationGroup: "Employees", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "Employees", name: "get", kind: "read" }],
+          update: [{ operationGroup: "Employees", name: "update", kind: "update" }],
+        },
+        actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
+        lists: [
+          { operationGroup: "Employees", name: "listBySubscription", kind: "list" },
+          { operationGroup: "Employees", name: "listByResourceGroup", kind: "list" },
+        ],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees"],
+      },
+      resourceName: "Employee",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    });
+
+    const dependent = resources.resourceModels[2];
+    ok(dependent);
+    expect(dependent).toMatchObject({
+      kind: "Proxy",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      resources: expect.any(Array),
+    });
+    ok(dependent.resources);
+    expect(dependent.resources).toHaveLength(1);
+    const instanceScope = dependent.resources[0];
+    ok(instanceScope);
+    checkResolvedOperations(instanceScope, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            { operationGroup: "Dependents", name: "createOrUpdate", kind: "createOrUpdate" },
+          ],
+          delete: [{ operationGroup: "Dependents", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "Dependents", name: "get", kind: "read" }],
+          update: [{ operationGroup: "Dependents", name: "update", kind: "update" }],
+        },
+        lists: [{ operationGroup: "Dependents", name: "list", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees", "dependents"],
+      },
+      resourceName: "Dependent",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}",
+    });
+
+    const privateLink = resources.resourceModels[1];
+    ok(privateLink);
+    ok(privateLink.resources);
+    expect(privateLink.resources).toHaveLength(2);
+    const privateForEmplInstance = privateLink.resources[0];
+    ok(privateForEmplInstance);
+    checkResolvedOperations(privateForEmplInstance, {
+      operations: {
+        lists: [{ operationGroup: "EmployeePrivateLinks", name: "list", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees", "privateLinkResources"],
+      },
+      resourceName: "EmployeePrivateLinkResource",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/privateLinkResources/{name}",
+    });
+
+    const privateForDepInstance = privateLink.resources[1];
+    ok(privateForDepInstance);
+
+    checkResolvedOperations(privateForDepInstance, {
+      operations: {
+        lists: [{ operationGroup: "DependentPrivateLinks", name: "list", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees", "dependents", "privateLinkResources"],
+      },
+      resourceName: "DependentPrivateLinkResource",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}/privateLinkResources/{name}",
+    });
+
+    checkArmOperationsHas(resources.providerOperations, [
+      { operationGroup: "Employees", name: "checkExistence", kind: "other" },
+      { operationGroup: "Operations", name: "list", kind: "other" },
+    ]);
+  });
+
+  it("allows overriding resource name for private links", async () => {
+    const { program } = await Tester.compile(`
+
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+// For more information about the proxy vs tracked,
+// see https://armwiki.azurewebsites.net/rp_onboarding/tracked_vs_proxy_resources.html?q=proxy%20resource
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@lroStatus
+union ProvisioningState {
+  ResourceProvisioningState,
+
+  Provisioning: "Provisioning",
+
+  Updating: "Updating",
+
+  Deleting: "Deleting",
+
+  Accepted: "Accepted",
+
+  string,
+}
+
+model PrivateLinkResource is PrivateLink;
+alias PrivateLinkOperations = PrivateLinks<PrivateLinkResource>;
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+  update is ArmCustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+  delete is ArmResourceDeleteSync<Employee>;
+  listByResourceGroup is ArmResourceListByParent<Employee>;
+  listBySubscription is ArmListBySubscription<Employee>;
+  move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
+
+  checkExistence is ArmResourceCheckExistence<Employee>;
+}
+
+@armResourceOperations(PrivateLinkResource)
+interface EmployeePrivateLinks {
+  list is PrivateLinkOperations.ListByParent<Employee, ResourceName = "PrivateLinkForEmployee">;
+}
+
+model MoveRequest {
+  from: string;
+
+  to: string;
+}
+
+model MoveResponse {
+  movingStatus: string;
+}
+`);
+    const resources = resolveArmResources(program);
+    expect(resources).toBeDefined();
+    expect(resources.resourceModels).toBeDefined();
+    expect(resources.resourceModels).toHaveLength(2);
+    ok(resources.resourceModels);
+    const employee = resources.resourceModels[0];
+    ok(employee);
+    expect(employee).toMatchObject({
+      kind: "Tracked",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      resources: expect.any(Array),
+    });
+    ok(employee.resources);
+    expect(employee.resources).toHaveLength(1);
+
+    const mainScope = employee.resources[0];
+    ok(mainScope);
+    checkResolvedOperations(mainScope, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            { operationGroup: "Employees", name: "createOrUpdate", kind: "createOrUpdate" },
+          ],
+          delete: [{ operationGroup: "Employees", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "Employees", name: "get", kind: "read" }],
+          update: [{ operationGroup: "Employees", name: "update", kind: "update" }],
+        },
+        actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
+        lists: [
+          { operationGroup: "Employees", name: "listBySubscription", kind: "list" },
+          { operationGroup: "Employees", name: "listByResourceGroup", kind: "list" },
+        ],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees"],
+      },
+      resourceName: "Employee",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    });
+
+    const privateLink = resources.resourceModels[1];
+    ok(privateLink);
+    ok(privateLink.resources);
+    expect(privateLink.resources).toHaveLength(1);
+    const privateForEmplInstance = privateLink.resources[0];
+    ok(privateForEmplInstance);
+    checkResolvedOperations(privateForEmplInstance, {
+      operations: {
+        lists: [{ operationGroup: "EmployeePrivateLinks", name: "list", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees", "privateLinkResources"],
+      },
+      resourceName: "PrivateLinkForEmployee",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/privateLinkResources/{name}",
+    });
+
+    checkArmOperationsHas(resources.providerOperations, [
+      { operationGroup: "Employees", name: "checkExistence", kind: "other" },
+      { operationGroup: "Operations", name: "list", kind: "other" },
+    ]);
+  });
+
   it("collects operation information for legacy endpoints", async () => {
     const { program } = await Tester.compile(`
 
@@ -1443,6 +2234,169 @@ model MoveResponse {
       resourceName: "RoomsEmployeeResources",
       resourceInstancePath:
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/rooms/{roomId}/employeeResources/{employeeId}",
+    });
+  });
+
+  it("allows overriding resource name for legacy endpoints", async () => {
+    const { program } = await Tester.compile(`
+
+using Azure.Core;
+
+/** Contoso Resource Provider management API. */
+@armProviderNamespace
+@service(#{ title: "ContosoProviderHubClient" })
+@versioned(Versions)
+namespace Microsoft.ContosoProviderHub;
+
+/** Contoso API versions */
+enum Versions {
+  /** 2021-10-01-preview version */
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v2021_20_01_preview: "2021-10-01-preview",
+}
+
+// For more information about the proxy vs tracked,
+// see https://armwiki.azurewebsites.net/rp_onboarding/tracked_vs_proxy_resources.html?q=proxy%20resource
+/** A ContosoProviderHub resource */
+model Employee is ProxyResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+/** Employee properties */
+model EmployeeProperties {
+  /** Age of employee */
+  age?: int32;
+
+  /** City of employee */
+  city?: string;
+
+  /** Profile of employee */
+  @encode("base64url")
+  profile?: bytes;
+
+  /** The status of the last operation. */
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+/** The provisioning state of a resource. */
+@lroStatus
+union ProvisioningState {
+  ResourceProvisioningState,
+
+  /** The resource is being provisioned */
+  Provisioning: "Provisioning",
+
+  /** The resource is updating */
+  Updating: "Updating",
+
+  /** The resource is being deleted */
+  Deleting: "Deleting",
+
+  /** The resource create request has been accepted */
+  Accepted: "Accepted",
+
+  string,
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+alias EmployeeBuildingOps = Azure.ResourceManager.Legacy.LegacyOperations<
+  {
+    ...ApiVersionParameter;
+    ...SubscriptionIdParameter;
+    ...ResourceGroupParameter;
+    ...Azure.ResourceManager.Legacy.Provider;
+
+    /** The name of the API Management service. */
+    @path
+    @segment("buildings")
+    @key
+    @pattern("^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$")
+    buildingName: string;
+  },
+  {
+    /** Diagnostic identifier. Must be unique in the current API Management service instance. */
+    @path
+    @segment("employeeResources")
+    @key
+    @pattern("^[^*#&+:<>?]+$")
+    employeeId: string;
+  },
+  ResourceName = "EmployeesForBuilding",
+>;
+
+@armResourceOperations
+interface EmployeesByBuilding {
+  get is EmployeeBuildingOps.Read<Employee>;
+  createOrUpdate is EmployeeBuildingOps.CreateOrUpdateAsync<Employee>;
+  update is EmployeeBuildingOps.CustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+  delete is EmployeeBuildingOps.DeleteSync<Employee>;
+  list is EmployeeBuildingOps.List<Employee>;
+  /** A sample resource action that move employee to different location */
+  move is EmployeeBuildingOps.ActionSync<Employee, MoveRequest, MoveResponse>;
+}
+
+/** Employee move request */
+model MoveRequest {
+  /** The moving from location */
+  from: string;
+
+  /** The moving to location */
+  to: string;
+}
+
+/** Employee move response */
+model MoveResponse {
+  /** The status of the move */
+  movingStatus: string;
+}
+`);
+    const resources = resolveArmResources(program);
+    expect(resources).toBeDefined();
+    expect(resources.resourceModels).toBeDefined();
+    expect(resources.resourceModels).toHaveLength(1);
+    ok(resources.resourceModels);
+    const employee = resources.resourceModels[0];
+    ok(employee);
+    expect(employee).toMatchObject({
+      kind: "Proxy",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      resources: expect.any(Array),
+    });
+    ok(employee.resources);
+    expect(employee.resources).toHaveLength(1);
+    const buildingScope = employee.resources[0];
+
+    ok(buildingScope);
+    checkResolvedOperations(buildingScope, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            {
+              operationGroup: "EmployeesByBuilding",
+              name: "createOrUpdate",
+              kind: "createOrUpdate",
+            },
+          ],
+          delete: [{ operationGroup: "EmployeesByBuilding", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "EmployeesByBuilding", name: "get", kind: "read" }],
+          update: [{ operationGroup: "EmployeesByBuilding", name: "update", kind: "update" }],
+        },
+        actions: [{ operationGroup: "EmployeesByBuilding", name: "move", kind: "action" }],
+        lists: [{ operationGroup: "EmployeesByBuilding", name: "list", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["buildings", "employeeResources"],
+      },
+      resourceName: "EmployeesForBuilding",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/employeeResources/{employeeId}",
     });
   });
   it("collects operation information for routed endpoints", async () => {

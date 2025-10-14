@@ -36,6 +36,7 @@ model PrivateLink<Description extends valueof string = "A private link resource.
 /**
  * Operations over private link resources.
  * @template PrivateLinkResourceModel The type of the private link resource. You must declare a private link resource type in your provider namespace.
+ * @template PrivateLinkResourceName Optional. The name of the private link resource in this context, by default, this is `{targetResourceName}PrivateLink`.
  *
  * @example
  * ```ts
@@ -49,7 +50,10 @@ model PrivateLink<Description extends valueof string = "A private link resource.
  * }
  * ```
  */
-interface PrivateLinks<PrivateLinkResourceModel extends PrivateLink> {
+interface PrivateLinks<
+  PrivateLinkResourceModel extends PrivateLink,
+  PrivateLinkResourceName extends valueof string = ""
+> {
   /**
    * @dev List the private links to a resource
    * @template ParentResource the parent resource of the PrivateLink
@@ -77,7 +81,7 @@ interface PrivateLinks<PrivateLinkResourceModel extends PrivateLink> {
     Parameters extends {} = {},
     Response extends {} = ArmResponse<ResourceListResult<Resource>>,
     Error extends {} = ErrorResponse,
-    ResourceName extends valueof string = ""
+    ResourceName extends valueof string = PrivateLinkResourceName
   > is ArmReadOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> & Parameters,
     Response,
@@ -111,7 +115,7 @@ interface PrivateLinks<PrivateLinkResourceModel extends PrivateLink> {
     Parameters extends {} = {},
     Response extends {} = ArmResponse<ResourceListResult<Resource>>,
     Error extends {} = ErrorResponse,
-    ResourceName extends valueof string = ""
+    ResourceName extends valueof string = PrivateLinkResourceName
   > is ArmReadOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> & Parameters,
     Response,
@@ -139,7 +143,7 @@ interface PrivateLinks<PrivateLinkResourceModel extends PrivateLink> {
     Parameters extends {} = {},
     Response extends {} = ArmResponse<Resource>,
     Error extends {} = ErrorResponse,
-    ResourceName extends valueof string = ""
+    ResourceName extends valueof string = PrivateLinkResourceName
   > is ArmReadOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
       KeysOf<PrivateLinkResourceParameter> &
