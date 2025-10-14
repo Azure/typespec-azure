@@ -259,7 +259,6 @@ export function setArmOperationIdentifier(
   if (!getArmResourceOperationData(program, target)) {
     setArmResourceOperationData(program, target, { ...data });
   }
-  // addArmResourceOperation(program, resourceType, operationId);
 }
 
 export const $armResourceRead: ArmResourceReadDecorator = (
