@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.61.1
+
+### Bug Fixes
+
+- [#3376](https://github.com/Azure/typespec-azure/pull/3376) Support `@clientLocation` for model property along with `@override`.
+
+
 ## 0.61.0
 
 ### Breaking Changes
