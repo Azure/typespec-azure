@@ -266,36 +266,40 @@ export const $armResourceRead: ArmResourceReadDecorator = (
   context: DecoratorContext,
   target: Operation,
   resourceType: Model,
+  resourceName?: string,
 ) => {
   context.call($readsResource, target, resourceType);
-  setResourceLifecycleOperation(context, target, resourceType, "read");
+  setResourceLifecycleOperation(context, target, resourceType, "read", resourceName);
 };
 
 export const $armResourceCreateOrUpdate: ArmResourceCreateOrUpdateDecorator = (
   context: DecoratorContext,
   target: Operation,
   resourceType: Model,
+  resourceName?: string,
 ) => {
   context.call($createsOrReplacesResource, target, resourceType);
-  setResourceLifecycleOperation(context, target, resourceType, "createOrUpdate");
+  setResourceLifecycleOperation(context, target, resourceType, "createOrUpdate", resourceName);
 };
 
 export const $armResourceUpdate: ArmResourceUpdateDecorator = (
   context: DecoratorContext,
   target: Operation,
   resourceType: Model,
+  resourceName?: string,
 ) => {
   context.call($updatesResource, target, resourceType);
-  setResourceLifecycleOperation(context, target, resourceType, "update");
+  setResourceLifecycleOperation(context, target, resourceType, "update", resourceName);
 };
 
 export const $armResourceDelete: ArmResourceDeleteDecorator = (
   context: DecoratorContext,
   target: Operation,
   resourceType: Model,
+  resourceName?: string,
 ) => {
   context.call($deletesResource, target, resourceType);
-  setResourceLifecycleOperation(context, target, resourceType, "delete");
+  setResourceLifecycleOperation(context, target, resourceType, "delete", resourceName);
 };
 
 export const $armResourceList: ArmResourceListDecorator = (

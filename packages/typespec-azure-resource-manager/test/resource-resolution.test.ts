@@ -6,7 +6,7 @@ import {
   isResourceOperationMatch,
   resolveArmResources,
   ResolvedResource,
-  ResolvedResourceInfo,
+  ResourcePathInfo,
   ResourceType,
 } from "../src/resource.js";
 import { Tester } from "./tester.js";
@@ -113,7 +113,7 @@ describe("unit tests for resource manager helpers", () => {
       title: string;
       path: string;
       kind: ArmOperationKind;
-      expected: ResolvedResourceInfo;
+      expected: ResourcePathInfo;
     }[] = [
       {
         title: "tracked resource path",
@@ -126,7 +126,6 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}",
-          resourceName: "Foo",
         },
       },
       {
@@ -140,7 +139,6 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}",
-          resourceName: "Foo",
         },
       },
       {
@@ -154,7 +152,6 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{name}",
-          resourceName: "Foo",
         },
       },
       {
@@ -167,7 +164,6 @@ describe("unit tests for resource manager helpers", () => {
             types: ["foos"],
           },
           resourceInstancePath: "/providers/Microsoft.Test/foos/{name}",
-          resourceName: "Foo",
         },
       },
       {
@@ -181,7 +177,6 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}/providers/Microsoft.Bar/bars/{barName}",
-          resourceName: "Bar",
         },
       },
       {
@@ -195,7 +190,6 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}/providers/Microsoft.Bar/bars/{barName}/basses/{name}",
-          resourceName: "Bass",
         },
       },
       {
@@ -209,7 +203,6 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}/providers/Microsoft.Bar/bars/{barName}/basses/{baseName}",
-          resourceName: "Bass",
         },
       },
       {
@@ -223,7 +216,6 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/{name}",
-          resourceName: "Bass",
         },
       },
       {
@@ -237,7 +229,6 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/{name}",
-          resourceName: "Bass",
         },
       },
       {
@@ -251,7 +242,6 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}",
-          resourceName: "Bar",
         },
       },
       {
@@ -265,7 +255,6 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default",
-          resourceName: "Bass",
         },
       },
       {
@@ -279,7 +268,6 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default",
-          resourceName: "Bass",
         },
       },
       {
@@ -293,7 +281,32 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default",
-          resourceName: "Bass",
+        },
+      },
+      {
+        title: "Read path with extra variable segments",
+        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/drums/{actionName}/doSomething/{doSomethingElse}/andAnotherThing",
+        kind: "read",
+        expected: {
+          resourceType: {
+            provider: "Microsoft.Bar",
+            types: ["bars"],
+          },
+          resourceInstancePath:
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}",
+        },
+      },
+      {
+        title: "Action path with extra variable segments",
+        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/drums/{actionName}/doSomething/{doSomethingElse}/andAnotherThing",
+        kind: "action",
+        expected: {
+          resourceType: {
+            provider: "Microsoft.Bar",
+            types: ["bars"],
+          },
+          resourceInstancePath:
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}",
         },
       },
     ];
@@ -314,16 +327,6 @@ describe("unit tests for resource manager helpers", () => {
         title: "lifecycle operation path with no providers",
         path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/bars/{barName}/basses/drums/{actionName}/doSomething/{doSomethingElse}/andAnotherThing",
         kind: "read",
-      },
-      {
-        title: "invalid read path with extra variable segments",
-        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/drums/{actionName}/doSomething/{doSomethingElse}/andAnotherThing",
-        kind: "read",
-      },
-      {
-        title: "invalid action path with extra variable segments",
-        path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/drums/{actionName}/doSomething/{doSomethingElse}/andAnotherThing",
-        kind: "action",
       },
     ];
     for (const { title, path, kind } of invalidCases) {
@@ -407,8 +410,8 @@ describe("unit tests for resource manager helpers", () => {
   describe("isResourceOperationMatch does not match operations over different resources", () => {
     const cases: {
       title: string;
-      source: { resourceType: ResourceType; resourceInstancePath: string };
-      target: { resourceType: ResourceType; resourceInstancePath: string };
+      source: { resourceType: ResourceType; resourceInstancePath: string; resourceName?: string };
+      target: { resourceType: ResourceType; resourceInstancePath: string; resourceName?: string };
     }[] = [
       {
         title: "operations with different resource types",
@@ -449,26 +452,7 @@ describe("unit tests for resource manager helpers", () => {
         },
       },
       {
-        title: "operations with different number of static path segments",
-        source: {
-          resourceType: {
-            provider: "Microsoft.Bar",
-            types: ["bars"],
-          },
-          resourceInstancePath:
-            "/subscriptions/{subscriptionId}/providers/Microsoft.Bar/bars/{barName}",
-        },
-        target: {
-          resourceType: {
-            provider: "Microsoft.Bar",
-            types: ["bars"],
-          },
-          resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Bar/bars/{barName}",
-        },
-      },
-      {
-        title: "operations with different static path segments",
+        title: "operations with different resource names",
         source: {
           resourceType: {
             provider: "Microsoft.Bar",
@@ -476,6 +460,7 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subs/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Bar/bars/{barName}",
+          resourceName: "Bar",
         },
         target: {
           resourceType: {
@@ -484,6 +469,7 @@ describe("unit tests for resource manager helpers", () => {
           },
           resourceInstancePath:
             "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Bar/bars/{barName}",
+          resourceName: "NotBar",
         },
       },
     ];
@@ -563,22 +549,8 @@ interface Employees {
       resources: expect.any(Array),
     });
     ok(employee.resources);
-    const subscriptionScope = employee.resources[0];
-    ok(subscriptionScope);
-    checkResolvedOperations(subscriptionScope, {
-      operations: {
-        lifecycle: {},
-        lists: [{ operationGroup: "Employees", name: "listBySubscription", kind: "list" }],
-      },
-      resourceType: {
-        provider: "Microsoft.ContosoProviderHub",
-        types: ["employees"],
-      },
-      resourceInstancePath:
-        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{name}",
-    });
 
-    const mainScope = employee.resources[1];
+    const mainScope = employee.resources[0];
     ok(mainScope);
     checkResolvedOperations(mainScope, {
       operations: {
@@ -591,12 +563,16 @@ interface Employees {
           update: [{ operationGroup: "Employees", name: "update", kind: "update" }],
         },
         actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
-        lists: [{ operationGroup: "Employees", name: "listByResourceGroup", kind: "list" }],
+        lists: [
+          { operationGroup: "Employees", name: "listBySubscription", kind: "list" },
+          { operationGroup: "Employees", name: "listByResourceGroup", kind: "list" },
+        ],
       },
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
         types: ["employees"],
       },
+      resourceName: "Employee",
       resourceInstancePath:
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
@@ -1081,22 +1057,9 @@ model DependentProperties {
       resources: expect.any(Array),
     });
     ok(employee.resources);
-    const subscriptionScope = employee.resources[0];
-    ok(subscriptionScope);
-    checkResolvedOperations(subscriptionScope, {
-      operations: {
-        lifecycle: {},
-        lists: [{ operationGroup: "Employees", name: "listBySubscription", kind: "list" }],
-      },
-      resourceType: {
-        provider: "Microsoft.ContosoProviderHub",
-        types: ["employees"],
-      },
-      resourceInstancePath:
-        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{name}",
-    });
+    expect(employee.resources).toHaveLength(1);
 
-    const mainScope = employee.resources[1];
+    const mainScope = employee.resources[0];
     ok(mainScope);
     checkResolvedOperations(mainScope, {
       operations: {
@@ -1109,12 +1072,16 @@ model DependentProperties {
           update: [{ operationGroup: "Employees", name: "update", kind: "update" }],
         },
         actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
-        lists: [{ operationGroup: "Employees", name: "listByResourceGroup", kind: "list" }],
+        lists: [
+          { operationGroup: "Employees", name: "listBySubscription", kind: "list" },
+          { operationGroup: "Employees", name: "listByResourceGroup", kind: "list" },
+        ],
       },
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
         types: ["employees"],
       },
+      resourceName: "Employee",
       resourceInstancePath:
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
@@ -1147,6 +1114,7 @@ model DependentProperties {
         provider: "Microsoft.ContosoProviderHub",
         types: ["employees", "dependents"],
       },
+      resourceName: "Dependent",
       resourceInstancePath:
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}",
     });
@@ -1193,6 +1161,7 @@ model DependentProperties {
         provider: "Microsoft.ContosoProviderHub",
         types: ["employees", "privateEndpointConnections"],
       },
+      resourceName: "EmployeePrivateEndpointConnection",
       resourceInstancePath:
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/privateEndpointConnections/{privateEndpointConnectionName}",
     });
@@ -1236,6 +1205,7 @@ model DependentProperties {
         provider: "Microsoft.ContosoProviderHub",
         types: ["employees", "dependents", "privateEndpointConnections"],
       },
+      resourceName: "DependentPrivateEndpointConnection",
       resourceInstancePath:
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}/privateEndpointConnections/{privateEndpointConnectionName}",
     });
@@ -1445,6 +1415,7 @@ model MoveResponse {
         provider: "Microsoft.ContosoProviderHub",
         types: ["buildings", "employeeResources"],
       },
+      resourceName: "BuildingsEmployeeResources",
       resourceInstancePath:
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/employeeResources/{employeeId}",
     });
@@ -1469,6 +1440,7 @@ model MoveResponse {
         provider: "Microsoft.ContosoProviderHub",
         types: ["buildings", "rooms", "employeeResources"],
       },
+      resourceName: "RoomsEmployeeResources",
       resourceInstancePath:
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/rooms/{roomId}/employeeResources/{employeeId}",
     });
