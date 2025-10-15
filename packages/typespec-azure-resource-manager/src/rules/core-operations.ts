@@ -4,18 +4,13 @@ import {
   Operation,
   Program,
   createRule,
+  isTemplateInstance,
   paramMessage,
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
 import { HttpVerb, getOperationVerb } from "@typespec/http";
 import { getSegment } from "@typespec/rest";
-import {
-  getNamespaceName,
-  getSourceModel,
-  isInternalTypeSpec,
-  isSourceOperationResourceManagerInternal,
-  isTemplatedInterfaceOperation,
-} from "./utils.js";
+import { getNamespaceName, getSourceModel, isTemplatedInterfaceOperation } from "./utils.js";
 
 export const coreOperationsRule = createRule({
   name: "arm-resource-operation",
@@ -30,10 +25,7 @@ export const coreOperationsRule = createRule({
   create(context) {
     return {
       operation: (operation: Operation) => {
-        if (
-          !isInternalTypeSpec(context.program, operation) &&
-          !isSourceOperationResourceManagerInternal(operation)
-        ) {
+        if (!isTemplateInstance(operation)) {
           const verb = getOperationVerb(context.program, operation);
           if (
             !isTemplatedInterfaceOperation(operation) &&
