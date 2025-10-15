@@ -22,7 +22,17 @@ import {
 import { $ } from "@typespec/compiler/typekit";
 import { useStateMap } from "@typespec/compiler/utils";
 import { $bodyRoot, getHttpOperation } from "@typespec/http";
-import { $actionSegment, $segment, getActionSegment, getSegment } from "@typespec/rest";
+import {
+  $actionSegment,
+  $createsOrReplacesResource,
+  $deletesResource,
+  $listsResource,
+  $readsResource,
+  $segment,
+  $updatesResource,
+  getActionSegment,
+  getSegment,
+} from "@typespec/rest";
 import { camelCase } from "change-case";
 import pluralize from "pluralize";
 import {
@@ -686,6 +696,31 @@ function callOperationDecorator(
   }
 }
 
+function callLifecycleDecorator(
+  context: DecoratorContext,
+  target: Operation,
+  resourceType: Model,
+  operationType: "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
+): void {
+  switch (operationType) {
+    case "read":
+      context.call($readsResource, target, resourceType);
+      break;
+    case "createOrUpdate":
+      context.call($createsOrReplacesResource, target, resourceType);
+      break;
+    case "update":
+      context.call($updatesResource, target, resourceType);
+      break;
+    case "delete":
+      context.call($deletesResource, target, resourceType);
+      break;
+    case "list":
+      context.call($listsResource, target, resourceType);
+      break;
+  }
+}
+
 const $extensionResourceOperation: ExtensionResourceOperationDecorator = (
   context: DecoratorContext,
   target: Operation,
@@ -786,8 +821,9 @@ const $legacyResourceOperation: LegacyResourceOperationDecorator = (
     resourceKind: "legacy",
   });
 
+  const { program } = context;
+  callLifecycleDecorator(context, target, resourceType, operationType);
   if (operationType === "action") {
-    const { program } = context;
     const segment = getSegment(program, target) ?? getActionSegment(program, target);
     if (!segment) {
       // Also apply the @actionSegment decorator to the operation
@@ -849,8 +885,9 @@ const $legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorat
     resourceName: resolvedResourceName,
     resourceKind: "legacy-extension",
   });
+  const { program } = context;
+  callLifecycleDecorator(context, target, resourceType, operationType);
   if (operationType === "action") {
-    const { program } = context;
     const segment = getSegment(program, target) ?? getActionSegment(program, target);
     if (!segment) {
       // Also apply the @actionSegment decorator to the operation
