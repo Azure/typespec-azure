@@ -30,10 +30,12 @@ export const coreOperationsRule = createRule({
   create(context) {
     return {
       operation: (operation: Operation) => {
-        if (!isTemplateInstance(operation)) {
+        if (
+          !isSourceOperationResourceManagerInternal(operation) &&
+          !isTemplateInstance(operation)
+        ) {
           const verb = getOperationVerb(context.program, operation);
           if (
-            !isSourceOperationResourceManagerInternal(operation) &&
             !isTemplatedInterfaceOperation(operation) &&
             (!operation.node?.parent ||
               operation.node.parent.kind !== SyntaxKind.InterfaceStatement)
