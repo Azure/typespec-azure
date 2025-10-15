@@ -10,7 +10,12 @@ import {
 import { SyntaxKind } from "@typespec/compiler/ast";
 import { HttpVerb, getOperationVerb } from "@typespec/http";
 import { getSegment } from "@typespec/rest";
-import { getNamespaceName, getSourceModel, isTemplatedInterfaceOperation } from "./utils.js";
+import {
+  getNamespaceName,
+  getSourceModel,
+  isSourceOperationResourceManagerInternal,
+  isTemplatedInterfaceOperation,
+} from "./utils.js";
 
 export const coreOperationsRule = createRule({
   name: "arm-resource-operation",
@@ -28,6 +33,7 @@ export const coreOperationsRule = createRule({
         if (!isTemplateInstance(operation)) {
           const verb = getOperationVerb(context.program, operation);
           if (
+            !isSourceOperationResourceManagerInternal(operation) &&
             !isTemplatedInterfaceOperation(operation) &&
             (!operation.node?.parent ||
               operation.node.parent.kind !== SyntaxKind.InterfaceStatement)
