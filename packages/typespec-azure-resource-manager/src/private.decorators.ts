@@ -22,7 +22,7 @@ import {
 import { $ } from "@typespec/compiler/typekit";
 import { useStateMap } from "@typespec/compiler/utils";
 import { $bodyRoot, getHttpOperation } from "@typespec/http";
-import { $segment, getSegment } from "@typespec/rest";
+import { $actionSegment, $segment, getActionSegment, getSegment } from "@typespec/rest";
 import { camelCase } from "change-case";
 import pluralize from "pluralize";
 import {
@@ -785,7 +785,20 @@ const $legacyResourceOperation: LegacyResourceOperationDecorator = (
     resourceName: resolvedResourceName,
     resourceKind: "legacy",
   });
+
+  if (operationType === "action") {
+    const { program } = context;
+    const segment = getSegment(program, target) ?? getActionSegment(program, target);
+    if (!segment) {
+      // Also apply the @actionSegment decorator to the operation
+      context.call($actionSegment, target, uncapitalize(target.name));
+    }
+  }
 };
+
+function uncapitalize(str: string): string {
+  return str.charAt(0).toLowerCase() + str.slice(1);
+}
 
 const $legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorator = (
   context: DecoratorContext,
@@ -836,6 +849,14 @@ const $legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorat
     resourceName: resolvedResourceName,
     resourceKind: "legacy-extension",
   });
+  if (operationType === "action") {
+    const { program } = context;
+    const segment = getSegment(program, target) ?? getActionSegment(program, target);
+    if (!segment) {
+      // Also apply the @actionSegment decorator to the operation
+      context.call($actionSegment, target, uncapitalize(target.name));
+    }
+  }
 };
 
 /** @internal */
