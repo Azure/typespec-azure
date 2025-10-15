@@ -132,203 +132,203 @@ op Azure.ResourceManager.Operations.list(apiVersion: string, provider: "Microsof
 Operations over private endpoint connection resources.
 
 ```typespec
-interface Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>
+interface Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>
 ```
 
 #### Template Parameters
 
-| Name                        | Description                                                                                                                                          |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PrivateEndpointResource     | The type of the private endpoint connection resource. You must declare a private endpoint connection resource type in your provider namespace.       |
-| PrivateEndpointResourceName | Optional. The name of the private endpoint connection resource in this context, by default, this is `{targetResourceName}PrivateEndpointConnection`. |
+| Name                    | Description                                                                                                                                          |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PrivateEndpointResource | The type of the private endpoint connection resource. You must declare a private endpoint connection resource type in your provider namespace.       |
+| ResourceName            | Optional. The name of the private endpoint connection resource in this context, by default, this is `{targetResourceName}PrivateEndpointConnection`. |
 
-#### `PrivateEndpoints.ListByParent` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.ListByParent}
+#### `PrivateEndpoints.ListByParent` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.ListByParent}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                                       |
-| -------------- | --------------------------------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateEndpointConnection                              |
-| Resource       | Optional. The PrivateEndpointConnection resource being listed                     |
-| BaseParameters | Optional. Allows overriding the operation parameters                              |
-| Parameters     | Optional. Additional parameters after the path parameters                         |
-| Response       | Optional. The success response for the list operation                             |
-| Error          | Optional. The error response, if non-standard.                                    |
-| ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
+| Name                 | Description                                                                       |
+| -------------------- | --------------------------------------------------------------------------------- |
+| ParentResource       | the parent resource of the PrivateEndpointConnection                              |
+| Resource             | Optional. The PrivateEndpointConnection resource being listed                     |
+| BaseParameters       | Optional. Allows overriding the operation parameters                              |
+| Parameters           | Optional. Additional parameters after the path parameters                         |
+| Response             | Optional. The success response for the list operation                             |
+| Error                | Optional. The error response, if non-standard.                                    |
+| OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.Read` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.Read}
+#### `PrivateEndpoints.Read` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.Read}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.Read(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.Read(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                                       |
-| -------------- | --------------------------------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateEndpointConnection                              |
-| Resource       | the PrivateEndpointConnection resource being read                                 |
-| BaseParameters | Optional. Allows overriding the operation parameters                              |
-| Parameters     | Optional. Additional parameters after the path parameters                         |
-| Response       | Optional. The success response for the read operation                             |
-| Error          | Optional. The error response, if non-standard.                                    |
-| ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
+| Name                 | Description                                                                       |
+| -------------------- | --------------------------------------------------------------------------------- |
+| ParentResource       | the parent resource of the PrivateEndpointConnection                              |
+| Resource             | the PrivateEndpointConnection resource being read                                 |
+| BaseParameters       | Optional. Allows overriding the operation parameters                              |
+| Parameters           | Optional. Additional parameters after the path parameters                         |
+| Response             | Optional. The success response for the read operation                             |
+| Error                | Optional. The error response, if non-standard.                                    |
+| OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.CreateOrUpdateAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.CreateOrUpdateAsync}
+#### `PrivateEndpoints.CreateOrUpdateAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CreateOrUpdateAsync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.CreateOrUpdateAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CreateOrUpdateAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                                       |
-| -------------- | --------------------------------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateEndpointConnection                              |
-| Resource       | the PrivateEndpointConnection resource being created or updated                   |
-| BaseParameters | Optional. Allows overriding the operation parameters                              |
-| LroHeaders     | Optional. Allows overriding the lro headers returned on resource create           |
-| Parameters     | Optional. Additional parameters after the path parameters                         |
-| Response       | Optional. The success response for the createOrUpdate operation                   |
-| Error          | Optional. The error response, if non-standard.                                    |
-| ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
+| Name                 | Description                                                                       |
+| -------------------- | --------------------------------------------------------------------------------- |
+| ParentResource       | the parent resource of the PrivateEndpointConnection                              |
+| Resource             | the PrivateEndpointConnection resource being created or updated                   |
+| BaseParameters       | Optional. Allows overriding the operation parameters                              |
+| LroHeaders           | Optional. Allows overriding the lro headers returned on resource create           |
+| Parameters           | Optional. Additional parameters after the path parameters                         |
+| Response             | Optional. The success response for the createOrUpdate operation                   |
+| Error                | Optional. The error response, if non-standard.                                    |
+| OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.CreateOrReplaceSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.CreateOrReplaceSync}
+#### `PrivateEndpoints.CreateOrReplaceSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CreateOrReplaceSync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.CreateOrReplaceSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CreateOrReplaceSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                                       |
-| -------------- | --------------------------------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateEndpointConnection                              |
-| Resource       | the PrivateEndpointConnection resource being created or updated                   |
-| BaseParameters | Optional. Allows overriding the operation parameters                              |
-| Parameters     | Optional. Additional parameters after the path parameters                         |
-| Response       | Optional. The success response for the createOrUpdate operation                   |
-| Error          | Optional. The error response, if non-standard.                                    |
-| ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
+| Name                 | Description                                                                       |
+| -------------------- | --------------------------------------------------------------------------------- |
+| ParentResource       | the parent resource of the PrivateEndpointConnection                              |
+| Resource             | the PrivateEndpointConnection resource being created or updated                   |
+| BaseParameters       | Optional. Allows overriding the operation parameters                              |
+| Parameters           | Optional. Additional parameters after the path parameters                         |
+| Response             | Optional. The success response for the createOrUpdate operation                   |
+| Error                | Optional. The error response, if non-standard.                                    |
+| OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.CreateOrReplaceAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.CreateOrReplaceAsync}
+#### `PrivateEndpoints.CreateOrReplaceAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CreateOrReplaceAsync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.CreateOrReplaceAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CreateOrReplaceAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                                       |
-| -------------- | --------------------------------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateEndpointConnection                              |
-| Resource       | the PrivateEndpointConnection resource being created or updated                   |
-| BaseParameters | Optional. Allows overriding the operation parameters                              |
-| LroHeaders     | Optional. Allows overriding the lro headers returned on resource create           |
-| Parameters     | Optional. Additional parameters after the path parameters                         |
-| Response       | Optional. The success response for the createOrReplace operation                  |
-| Error          | Optional. The error response, if non-standard.                                    |
-| ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
+| Name                 | Description                                                                       |
+| -------------------- | --------------------------------------------------------------------------------- |
+| ParentResource       | the parent resource of the PrivateEndpointConnection                              |
+| Resource             | the PrivateEndpointConnection resource being created or updated                   |
+| BaseParameters       | Optional. Allows overriding the operation parameters                              |
+| LroHeaders           | Optional. Allows overriding the lro headers returned on resource create           |
+| Parameters           | Optional. Additional parameters after the path parameters                         |
+| Response             | Optional. The success response for the createOrReplace operation                  |
+| Error                | Optional. The error response, if non-standard.                                    |
+| OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.CustomPatchAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.CustomPatchAsync}
+#### `PrivateEndpoints.CustomPatchAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CustomPatchAsync}
 
 A long-running resource update using a custom PATCH payload (Asynchronous) to update a PrivateEndpointConnection to a resource.
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.CustomPatchAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, properties: PatchModel): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CustomPatchAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, properties: PatchModel): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                                       |
-| -------------- | --------------------------------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateEndpointConnection                              |
-| Resource       | the PrivateEndpointConnection resource being updated                              |
-| PatchModel     | The input model for the PATCH request                                             |
-| BaseParameters | Optional. Allows overriding the operation parameters                              |
-| LroHeaders     | Optional. Allows overriding the lro headers returned in the Accepted response     |
-| Parameters     | Optional. Additional parameters after the path parameters                         |
-| Response       | Optional. The success response for the patch operation                            |
-| Error          | Optional. The error response, if non-standard.                                    |
-| ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
+| Name                 | Description                                                                       |
+| -------------------- | --------------------------------------------------------------------------------- |
+| ParentResource       | the parent resource of the PrivateEndpointConnection                              |
+| Resource             | the PrivateEndpointConnection resource being updated                              |
+| PatchModel           | The input model for the PATCH request                                             |
+| BaseParameters       | Optional. Allows overriding the operation parameters                              |
+| LroHeaders           | Optional. Allows overriding the lro headers returned in the Accepted response     |
+| Parameters           | Optional. Additional parameters after the path parameters                         |
+| Response             | Optional. The success response for the patch operation                            |
+| Error                | Optional. The error response, if non-standard.                                    |
+| OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.CustomPatchSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.CustomPatchSync}
+#### `PrivateEndpoints.CustomPatchSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CustomPatchSync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.CustomPatchSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, properties: PatchModel): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CustomPatchSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, properties: PatchModel): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                                       |
-| -------------- | --------------------------------------------------------------------------------- |
-| ParentResource | The parent resource of the PrivateEndpointConnection                              |
-| Resource       | Optional. The PrivateEndpointConnection resource being patched                    |
-| PatchModel     | The input model for the PATCH request                                             |
-| BaseParameters | Optional. Allows overriding the operation parameters                              |
-| Parameters     | Optional. Additional parameters after the path parameters                         |
-| Response       | Optional. The success response for the patch operation                            |
-| Error          | Optional. The error response, if non-standard.                                    |
-| ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
+| Name                 | Description                                                                       |
+| -------------------- | --------------------------------------------------------------------------------- |
+| ParentResource       | The parent resource of the PrivateEndpointConnection                              |
+| Resource             | Optional. The PrivateEndpointConnection resource being patched                    |
+| PatchModel           | The input model for the PATCH request                                             |
+| BaseParameters       | Optional. Allows overriding the operation parameters                              |
+| Parameters           | Optional. Additional parameters after the path parameters                         |
+| Response             | Optional. The success response for the patch operation                            |
+| Error                | Optional. The error response, if non-standard.                                    |
+| OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.DeleteAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.DeleteAsync}
+#### `PrivateEndpoints.DeleteAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.DeleteAsync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.DeleteAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.DeleteAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                                       |
-| -------------- | --------------------------------------------------------------------------------- |
-| ParentResource | The parent resource of the PrivateEndpointConnection                              |
-| Resource       | Optional. The PrivateEndpointConnection resource being deleted                    |
-| BaseParameters | Optional. Allows overriding the parameters for the operation                      |
-| LroHeaders     | Optional. Allows overriding the headers returned in the Accepted response         |
-| Parameters     | Optional. Additional parameters after the path parameters                         |
-| Response       | Optional. The success response(s) for the delete operation                        |
-| Error          | Optional. The error response, if non-standard.                                    |
-| ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
+| Name                 | Description                                                                       |
+| -------------------- | --------------------------------------------------------------------------------- |
+| ParentResource       | The parent resource of the PrivateEndpointConnection                              |
+| Resource             | Optional. The PrivateEndpointConnection resource being deleted                    |
+| BaseParameters       | Optional. Allows overriding the parameters for the operation                      |
+| LroHeaders           | Optional. Allows overriding the headers returned in the Accepted response         |
+| Parameters           | Optional. Additional parameters after the path parameters                         |
+| Response             | Optional. The success response(s) for the delete operation                        |
+| Error                | Optional. The error response, if non-standard.                                    |
+| OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.DeleteSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.DeleteSync}
+#### `PrivateEndpoints.DeleteSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.DeleteSync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.DeleteSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.DeleteSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                                       |
-| -------------- | --------------------------------------------------------------------------------- |
-| ParentResource | The parent resource of the PrivateEndpointConnection                              |
-| Resource       | The PrivateEndpointConnection resource being deleted                              |
-| BaseParameters | Optional. Allows overriding the parameters for the operation                      |
-| Parameters     | Optional. Additional parameters after the path parameters                         |
-| Response       | Optional. The success response(s) for the delete operation                        |
-| Error          | Optional. The error response, if non-standard.                                    |
-| ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
+| Name                 | Description                                                                       |
+| -------------------- | --------------------------------------------------------------------------------- |
+| ParentResource       | The parent resource of the PrivateEndpointConnection                              |
+| Resource             | The PrivateEndpointConnection resource being deleted                              |
+| BaseParameters       | Optional. Allows overriding the parameters for the operation                      |
+| Parameters           | Optional. Additional parameters after the path parameters                         |
+| Response             | Optional. The success response(s) for the delete operation                        |
+| Error                | Optional. The error response, if non-standard.                                    |
+| OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.DeleteAsyncBase` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.DeleteAsyncBase}
+#### `PrivateEndpoints.DeleteAsyncBase` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.DeleteAsyncBase}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, PrivateEndpointResourceName>.DeleteAsyncBase(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.DeleteAsyncBase(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                                       |
-| -------------- | --------------------------------------------------------------------------------- |
-| ParentResource | The parent resource of the PrivateEndpointConnection                              |
-| Response       | The response type for the operation                                               |
-| Resource       | Optional. The PrivateEndpointConnection resource being deleted                    |
-| BaseParameters | Optional. Allows overriding the parameters for the operation                      |
-| Parameters     | Optional. Additional parameters after the path parameters                         |
-| Error          | Optional. The error response, if non-standard.                                    |
-| ResourceName   | Optional. The name of the private endpoint connection resource being operated on. |
+| Name                 | Description                                                                       |
+| -------------------- | --------------------------------------------------------------------------------- |
+| ParentResource       | The parent resource of the PrivateEndpointConnection                              |
+| Response             | The response type for the operation                                               |
+| Resource             | Optional. The PrivateEndpointConnection resource being deleted                    |
+| BaseParameters       | Optional. Allows overriding the parameters for the operation                      |
+| Parameters           | Optional. Additional parameters after the path parameters                         |
+| Error                | Optional. The error response, if non-standard.                                    |
+| OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
 #### Examples
 
@@ -348,7 +348,7 @@ interface Employees {
 Operations over private link resources.
 
 ```typespec
-interface Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, PrivateLinkResourceName>
+interface Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>
 ```
 
 #### Template Parameters
@@ -356,61 +356,61 @@ interface Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, PrivateLi
 | Name                     | Description                                                                                                             |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
 | PrivateLinkResourceModel | The type of the private link resource. You must declare a private link resource type in your provider namespace.        |
-| PrivateLinkResourceName  | Optional. The name of the private link resource in this context, by default, this is `{targetResourceName}PrivateLink`. |
+| ResourceName             | Optional. The name of the private link resource in this context, by default, this is `{targetResourceName}PrivateLink`. |
 
-#### `PrivateLinks.ListByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, PrivateLinkResourceName>.ListByParent}
+#### `PrivateLinks.ListByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>.ListByParent}
 
 ```typespec
-op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, PrivateLinkResourceName>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                        |
-| -------------- | ------------------------------------------------------------------ |
-| ParentResource | the parent resource of the PrivateLink                             |
-| Resource       | Optional. The PrivateLink resource being listed                    |
-| BaseParameters | Optional. Allows overriding the operation parameters               |
-| Parameters     | Optional. Additional parameters after the path parameters          |
-| Response       | Optional. The success response for the list operation              |
-| Error          | Optional. The error response, if non-standard.                     |
-| ResourceName   | Optional. The name of the private link resource being operated on. |
+| Name                 | Description                                                        |
+| -------------------- | ------------------------------------------------------------------ |
+| ParentResource       | the parent resource of the PrivateLink                             |
+| Resource             | Optional. The PrivateLink resource being listed                    |
+| BaseParameters       | Optional. Allows overriding the operation parameters               |
+| Parameters           | Optional. Additional parameters after the path parameters          |
+| Response             | Optional. The success response for the list operation              |
+| Error                | Optional. The error response, if non-standard.                     |
+| OverrideResourceName | Optional. The name of the private link resource being operated on. |
 
-#### `PrivateLinks.ListSinglePageByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, PrivateLinkResourceName>.ListSinglePageByParent}
+#### `PrivateLinks.ListSinglePageByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>.ListSinglePageByParent}
 
 ```typespec
-op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, PrivateLinkResourceName>.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                        |
-| -------------- | ------------------------------------------------------------------ |
-| ParentResource | the parent resource of the PrivateLink                             |
-| Resource       | Optional. The PrivateLink resource being listed                    |
-| BaseParameters | Optional. Allows overriding the operation parameters               |
-| Parameters     | Optional. Additional parameters after the path parameters          |
-| Response       | Optional. The success response for the list operation              |
-| Error          | Optional. The error response, if non-standard.                     |
-| ResourceName   | Optional. The name of the private link resource being operated on. |
+| Name                 | Description                                                        |
+| -------------------- | ------------------------------------------------------------------ |
+| ParentResource       | the parent resource of the PrivateLink                             |
+| Resource             | Optional. The PrivateLink resource being listed                    |
+| BaseParameters       | Optional. Allows overriding the operation parameters               |
+| Parameters           | Optional. Additional parameters after the path parameters          |
+| Response             | Optional. The success response for the list operation              |
+| Error                | Optional. The error response, if non-standard.                     |
+| OverrideResourceName | Optional. The name of the private link resource being operated on. |
 
-#### `PrivateLinks.Read` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, PrivateLinkResourceName>.Read}
+#### `PrivateLinks.Read` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>.Read}
 
 ```typespec
-op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, PrivateLinkResourceName>.Read(provider: "Microsoft.ThisWillBeReplaced", privateLinkResourceName: string): Response | Error
+op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>.Read(provider: "Microsoft.ThisWillBeReplaced", privateLinkResourceName: string): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                        |
-| -------------- | ------------------------------------------------------------------ |
-| ParentResource | the parent resource of the PrivateLink                             |
-| Resource       | the PrivateLink resource being read                                |
-| BaseParameters | Optional. Allows overriding the operation parameters               |
-| Parameters     | Optional. Additional parameters after the path parameters          |
-| Response       | Optional. The success response for the read operation              |
-| Error          | Optional. The error response, if non-standard.                     |
-| ResourceName   | Optional. The name of the private link resource being operated on. |
+| Name                 | Description                                                        |
+| -------------------- | ------------------------------------------------------------------ |
+| ParentResource       | the parent resource of the PrivateLink                             |
+| Resource             | the PrivateLink resource being read                                |
+| BaseParameters       | Optional. Allows overriding the operation parameters               |
+| Parameters           | Optional. Additional parameters after the path parameters          |
+| Response             | Optional. The success response for the read operation              |
+| Error                | Optional. The error response, if non-standard.                     |
+| OverrideResourceName | Optional. The name of the private link resource being operated on. |
 
 #### Examples
 
@@ -2229,7 +2229,7 @@ An operation template used to build resource operations in which the same resour
 is accessible at multiple, fixed resource paths. Can be used with static routes.
 
 ```typespec
-interface Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>
+interface Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>
 ```
 
 #### Template Parameters
@@ -2240,14 +2240,14 @@ interface Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, Resour
 | ResourceTypeParameter | The path parameter for the resource name                                         |
 | ErrorType             | Optional. The type of error models used in operations created form this template |
 | ResourceRoute         | Optional. The resource route to use for operations in the interface.             |
-| ResourceName          | Optional. The name of the resource type described in this template               |
+| RoutedResourceName    | Optional. The name of the resource type described in this template               |
 
-#### `RoutedOperations.CreateOrUpdateAsync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.CreateOrUpdateAsync}
+#### `RoutedOperations.CreateOrUpdateAsync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.CreateOrUpdateAsync}
 
 A long-running resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.CreateOrUpdateAsync(resource: Request): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.CreateOrUpdateAsync(resource: Request): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2264,12 +2264,12 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | Request              | Optional. The request body for the createOrUpdate operation.            |
 | OverrideResourceName | Optional. The name of the resource type being acted upon.               |
 
-#### `RoutedOperations.CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.CreateOrUpdateSync}
+#### `RoutedOperations.CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.CreateOrUpdateSync}
 
 A synchronous resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.CreateOrUpdateSync(resource: Request): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.CreateOrUpdateSync(resource: Request): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2285,12 +2285,12 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | Request              | Optional. The request body for the createOrUpdate operation. |
 | OverrideResourceName | Optional. The name of the resource type being acted upon.    |
 
-#### `RoutedOperations.CustomPatchAsync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.CustomPatchAsync}
+#### `RoutedOperations.CustomPatchAsync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.CustomPatchAsync}
 
 A long-running resource Update (PATCH)
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.CustomPatchAsync(properties: PatchModel): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.CustomPatchAsync(properties: PatchModel): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2307,12 +2307,12 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | OverrideRouteOptions | Optional. The route options for the operation.                          |
 | OverrideResourceName | Optional. The name of the resource type being acted upon.               |
 
-#### `RoutedOperations.CustomPatchSync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.CustomPatchSync}
+#### `RoutedOperations.CustomPatchSync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.CustomPatchSync}
 
 A synchronous resource Update (PATCH)
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.CustomPatchSync(properties: PatchModel): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.CustomPatchSync(properties: PatchModel): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2328,12 +2328,12 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | OverrideRouteOptions | Optional. The route options for the operation.            |
 | OverrideResourceName | Optional. The name of the resource type being acted upon. |
 
-#### `RoutedOperations.DeleteWithoutOkAsync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.DeleteWithoutOkAsync}
+#### `RoutedOperations.DeleteWithoutOkAsync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.DeleteWithoutOkAsync}
 
 Delete a resource asynchronously
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.DeleteWithoutOkAsync(): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.DeleteWithoutOkAsync(): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2348,12 +2348,12 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | OverrideRouteOptions | Optional. The route options for the operation.             |
 | OverrideResourceName | Optional. The name of the resource type being acted upon.  |
 
-#### `RoutedOperations.DeleteSync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.DeleteSync}
+#### `RoutedOperations.DeleteSync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.DeleteSync}
 
 Delete a resource synchronously
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.DeleteSync(): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.DeleteSync(): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2367,10 +2367,10 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | OverrideRouteOptions | Optional. The route options for the operation.             |
 | OverrideResourceName | Optional. The name of the resource type being acted upon.  |
 
-#### `RoutedOperations.Read` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.Read}
+#### `RoutedOperations.Read` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.Read}
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.Read(): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.Read(): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2384,12 +2384,12 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | OverrideRouteOptions | Optional. The route options for the operation.            |
 | OverrideResourceName | Optional. The name of the resource type being acted upon. |
 
-#### `RoutedOperations.CheckExistence` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.CheckExistence}
+#### `RoutedOperations.CheckExistence` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.CheckExistence}
 
 Check a resource's existence via HEAD operation
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.CheckExistence(): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.CheckExistence(): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2403,12 +2403,12 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | OverrideRouteOptions | Optional. The route options for the operation.                                                   |
 | OverrideResourceName | Optional. The name of the resource type being acted upon.                                        |
 
-#### `RoutedOperations.List` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.List}
+#### `RoutedOperations.List` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.List}
 
 List a resource
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.List(): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.List(): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2422,12 +2422,12 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | OverrideRouteOptions | Optional. The route options for the operation.            |
 | OverrideResourceName | Optional. The name of the resource type being acted upon. |
 
-#### `RoutedOperations.ListSinglePage` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.ListSinglePage}
+#### `RoutedOperations.ListSinglePage` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.ListSinglePage}
 
 List a single page of the resource
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.ListSinglePage(): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.ListSinglePage(): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2441,12 +2441,12 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | OverrideRouteOptions | Optional. The route options for the operation.            |
 | OverrideResourceName | Optional. The name of the resource type being acted upon. |
 
-#### `RoutedOperations.ActionSync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.ActionSync}
+#### `RoutedOperations.ActionSync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.ActionSync}
 
 A synchronous resource action.
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.ActionSync(body: Request): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.ActionSync(body: Request): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2462,12 +2462,12 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | OverrideRouteOptions | Optional. The route options for the operation.            |
 | OverrideResourceName | Optional. The name of the resource type being acted upon. |
 
-#### `RoutedOperations.ActionAsync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.ActionAsync}
+#### `RoutedOperations.ActionAsync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.ActionAsync}
 
 A long-running resource action.
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, ResourceName>.ActionAsync(body: Request): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.ActionAsync(body: Request): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
