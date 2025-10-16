@@ -20,7 +20,7 @@ interface LegacyOperations<
   ParentParameters extends {},
   ResourceTypeParameter extends {},
   ErrorType extends {} = ErrorResponse,
-  ResourceName extends valueof string = ""
+  ResourceName extends valueof string = string("")
 >
   extends RoutedOperations<
       ParentParameters,
@@ -44,7 +44,7 @@ interface RoutedOperations<
   ResourceTypeParameter extends {},
   ErrorType extends {} = ErrorResponse,
   ResourceRoute extends valueof ArmOperationOptions = #{ useStaticRoute: false },
-  RoutedResourceName extends valueof string = ""
+  RoutedResourceName extends valueof string = string("")
 > {
   /**
    * A long-running resource CreateOrUpdate (PUT)
@@ -77,7 +77,7 @@ interface RoutedOperations<
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
     Request extends {} | void = Resource,
-    OverrideResourceName extends valueof string = RoutedResourceName
+    OverrideResourceName extends valueof string = "${RoutedResourceName}"
   >(
     ...ParentParameters,
     ...ResourceTypeParameter,
@@ -110,7 +110,7 @@ interface RoutedOperations<
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
     Request extends {} | void = Resource,
-    OverrideResourceName extends valueof string = RoutedResourceName
+    OverrideResourceName extends valueof string = "${RoutedResourceName}"
   >(
     ...ParentParameters,
     ...ResourceTypeParameter,
@@ -152,7 +152,7 @@ interface RoutedOperations<
     OptionalRequestBody extends valueof boolean = false,
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
-    OverrideResourceName extends valueof string = RoutedResourceName
+    OverrideResourceName extends valueof string = "${RoutedResourceName}"
   >(
     ...ParentParameters,
     ...ResourceTypeParameter,
@@ -184,7 +184,7 @@ interface RoutedOperations<
     OptionalRequestBody extends valueof boolean = false,
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
-    OverrideResourceName extends valueof string = RoutedResourceName
+    OverrideResourceName extends valueof string = "${RoutedResourceName}"
   >(
     ...ParentParameters,
     ...ResourceTypeParameter,
@@ -217,7 +217,7 @@ interface RoutedOperations<
     Response extends {} = ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
-    OverrideResourceName extends valueof string = RoutedResourceName
+    OverrideResourceName extends valueof string = "${RoutedResourceName}"
   >(...ParentParameters, ...ResourceTypeParameter, ...Parameters): Response | OverrideErrorType;
 
   /**
@@ -242,7 +242,7 @@ interface RoutedOperations<
     Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse,
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
-    OverrideResourceName extends valueof string = RoutedResourceName
+    OverrideResourceName extends valueof string = "${RoutedResourceName}"
   >(...ParentParameters, ...ResourceTypeParameter, ...Parameters): Response | OverrideErrorType;
 
   /**
@@ -266,7 +266,7 @@ interface RoutedOperations<
     Response extends {} = ArmResponse<Resource>,
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
-    OverrideResourceName extends valueof string = RoutedResourceName
+    OverrideResourceName extends valueof string = "${RoutedResourceName}"
   >(...ParentParameters, ...ResourceTypeParameter, ...Parameters): Response | OverrideErrorType;
 
   /**
@@ -289,7 +289,7 @@ interface RoutedOperations<
     Response extends {} = ArmResourceExistsResponse | ArmResourceNotFoundResponse,
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
-    OverrideResourceName extends valueof string = RoutedResourceName
+    OverrideResourceName extends valueof string = "${RoutedResourceName}"
   > is Foundations.ArmReadOperation<
     ParentParameters & ResourceTypeParameter & Parameters,
     Response,
@@ -319,7 +319,7 @@ interface RoutedOperations<
     Response extends {} = ArmResponse<ResourceListResult<Resource>>,
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
-    OverrideResourceName extends valueof string = RoutedResourceName
+    OverrideResourceName extends valueof string = "${RoutedResourceName}"
   >(...ParentParameters, ...Parameters): Response | OverrideErrorType;
 
   /**
@@ -344,7 +344,7 @@ interface RoutedOperations<
     Response extends {} = ArmResponse<ResourceListResult<Resource>>,
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
-    OverrideResourceName extends valueof string = RoutedResourceName
+    OverrideResourceName extends valueof string = "${RoutedResourceName}"
   >(...ParentParameters, ...Parameters): Response | OverrideErrorType;
 
   /**
@@ -373,7 +373,7 @@ interface RoutedOperations<
     OptionalRequestBody extends valueof boolean = false,
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
-    OverrideResourceName extends valueof string = RoutedResourceName
+    OverrideResourceName extends valueof string = "${RoutedResourceName}"
   >(
     ...ParentParameters,
     ...ResourceTypeParameter,
@@ -423,7 +423,7 @@ interface RoutedOperations<
     OptionalRequestBody extends valueof boolean = false,
     OverrideErrorType extends {} = ErrorType,
     OverrideRouteOptions extends valueof ArmOperationOptions = ResourceRoute,
-    OverrideResourceName extends valueof string = RoutedResourceName
+    OverrideResourceName extends valueof string = "${RoutedResourceName}"
   >(
     ...ParentParameters,
     ...ResourceTypeParameter,

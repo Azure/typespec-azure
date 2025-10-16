@@ -52,7 +52,7 @@ model PrivateLink<Description extends valueof string = "A private link resource.
  */
 interface PrivateLinks<
   PrivateLinkResourceModel extends PrivateLink,
-  ResourceName extends valueof string = ""
+  ResourceName extends valueof string = string("")
 > {
   /**
    * @dev List the private links to a resource
@@ -81,7 +81,7 @@ interface PrivateLinks<
     Parameters extends {} = {},
     Response extends {} = ArmResponse<ResourceListResult<Resource>>,
     Error extends {} = ErrorResponse,
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmReadOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> & Parameters,
     Response,
@@ -115,7 +115,7 @@ interface PrivateLinks<
     Parameters extends {} = {},
     Response extends {} = ArmResponse<ResourceListResult<Resource>>,
     Error extends {} = ErrorResponse,
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmReadOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> & Parameters,
     Response,
@@ -143,7 +143,7 @@ interface PrivateLinks<
     Parameters extends {} = {},
     Response extends {} = ArmResponse<Resource>,
     Error extends {} = ErrorResponse,
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmReadOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
       KeysOf<PrivateLinkResourceParameter> &

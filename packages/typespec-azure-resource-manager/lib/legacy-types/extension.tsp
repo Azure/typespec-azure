@@ -19,7 +19,7 @@ interface ExtensionOperations<
   TargetParameters extends {},
   ExtensionParentParameters extends {},
   ExtensionInstanceParameters extends {},
-  ResourceName extends valueof string = ""
+  ResourceName extends valueof string = string("")
 > {
   /**
    * A long-running resource CreateOrUpdate (PUT)
@@ -51,7 +51,7 @@ interface ExtensionOperations<
     ErrorType extends {} = ErrorResponse,
     OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
     Request extends {} | void = Resource,
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(
     ...TargetParameters,
     ...ExtensionInstanceParameters,
@@ -83,7 +83,7 @@ interface ExtensionOperations<
     ErrorType extends {} = ErrorResponse,
     OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
     Request extends {} | void = Resource,
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(
     ...TargetParameters,
     ...ExtensionInstanceParameters,
@@ -124,7 +124,7 @@ interface ExtensionOperations<
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
     OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(
     ...TargetParameters,
     ...ExtensionInstanceParameters,
@@ -155,7 +155,7 @@ interface ExtensionOperations<
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
     OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(
     ...TargetParameters,
     ...ExtensionInstanceParameters,
@@ -187,7 +187,7 @@ interface ExtensionOperations<
     Response extends {} = ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
     ErrorType extends {} = ErrorResponse,
     OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(...TargetParameters, ...ExtensionInstanceParameters, ...Parameters): Response | ErrorType;
 
   /**
@@ -211,7 +211,7 @@ interface ExtensionOperations<
     Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse,
     ErrorType extends {} = ErrorResponse,
     OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(...TargetParameters, ...ExtensionInstanceParameters, ...Parameters): Response | ErrorType;
 
   /**
@@ -234,7 +234,7 @@ interface ExtensionOperations<
     Response extends {} = ArmResponse<Resource>,
     ErrorType extends {} = ErrorResponse,
     OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(...TargetParameters, ...ExtensionInstanceParameters, ...Parameters): Response | ErrorType;
 
   /**
@@ -256,7 +256,7 @@ interface ExtensionOperations<
     Response extends {} = ArmResourceExistsResponse | ArmResourceNotFoundResponse,
     ErrorType extends {} = ErrorResponse,
     OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   > is Foundations.ArmReadOperation<
     TargetParameters & ExtensionInstanceParameters & Parameters,
     Response,
@@ -283,7 +283,7 @@ interface ExtensionOperations<
     Response extends {} = ArmResponse<ResourceListResult<Resource>>,
     ErrorType extends {} = ErrorResponse,
     OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(...TargetParameters, ...ExtensionParentParameters, ...Parameters): Response | ErrorType;
 
   /**
@@ -306,7 +306,7 @@ interface ExtensionOperations<
     Response extends {} = ArmResponse<ResourceListResult<Resource>>,
     ErrorType extends {} = ErrorResponse,
     OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(...TargetParameters, ...ExtensionParentParameters, ...Parameters): Response | ErrorType;
 
   /**
@@ -334,7 +334,7 @@ interface ExtensionOperations<
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
     OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(
     ...TargetParameters,
     ...ExtensionInstanceParameters,
@@ -383,7 +383,7 @@ interface ExtensionOperations<
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
     OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(
     ...TargetParameters,
     ...ExtensionInstanceParameters,

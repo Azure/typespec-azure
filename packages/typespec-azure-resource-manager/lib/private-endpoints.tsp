@@ -52,7 +52,7 @@ model PrivateEndpointConnectionResource<Description extends valueof string = "A 
  */
 interface PrivateEndpoints<
   PrivateEndpointResource extends PrivateEndpointConnectionResource,
-  ResourceName extends valueof string = ""
+  ResourceName extends valueof string = string("")
 > {
   /**
    * @dev List the private endpoint connections over a resource
@@ -81,7 +81,7 @@ interface PrivateEndpoints<
     Parameters extends {} = {},
     Response extends {} = ArmResponse<ResourceListResult<Resource>>,
     Error extends {} = ErrorResponse,
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmReadOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> & Parameters,
     Response,
@@ -109,7 +109,7 @@ interface PrivateEndpoints<
     Parameters extends {} = {},
     Response extends {} = ArmResponse<Resource>,
     Error extends {} = ErrorResponse,
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmReadOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
       KeysOf<PrivateEndpointConnectionParameter> &
@@ -147,7 +147,7 @@ interface PrivateEndpoints<
       LroHeaders
     >,
     Error extends {} = ErrorResponse,
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmCreateOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
       KeysOf<PrivateEndpointConnectionParameter> &
@@ -169,7 +169,7 @@ interface PrivateEndpoints<
    */
   @autoRoute
   @doc("Create a {name} PrivateEndpointConnection", ParentResource)
-  @builtInResourceOperation(ParentResource, Resource, "createOrUpdate", ResourceName)
+  @builtInResourceOperation(ParentResource, Resource, "createOrUpdate", OverrideResourceName)
   @Private.enforceConstraint(ParentResource, Foundations.Resource)
   @put
   CreateOrReplaceSync<
@@ -179,7 +179,7 @@ interface PrivateEndpoints<
     Parameters extends {} = {},
     Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedSyncResponse<Resource>,
     Error extends {} = ErrorResponse,
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmCreateOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
       KeysOf<PrivateEndpointConnectionParameter> &
@@ -213,7 +213,7 @@ interface PrivateEndpoints<
       LroHeaders
     >,
     Error extends {} = ErrorResponse,
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   > is PrivateEndpoints.CreateOrUpdateAsync<
     ParentResource,
     Resource,
@@ -259,7 +259,7 @@ interface PrivateEndpoints<
       LroHeaders
     >,
     Error extends {} = ErrorResponse,
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmUpdateOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
       KeysOf<PrivateEndpointConnectionParameter> &
@@ -282,7 +282,7 @@ interface PrivateEndpoints<
    */
   @autoRoute
   @doc("Update a {name PrivateEndpointConnection}", ParentResource)
-  @builtInResourceOperation(ParentResource, Resource, "update", ResourceName)
+  @builtInResourceOperation(ParentResource, Resource, "update", OverrideResourceName)
   @Private.enforceConstraint(ParentResource, Foundations.Resource)
   @patch(#{ implicitOptionality: false })
   CustomPatchSync<
@@ -293,7 +293,7 @@ interface PrivateEndpoints<
     Parameters extends {} = {},
     Response extends {} = ArmResponse<Resource>,
     Error extends {} = ErrorResponse,
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmUpdateOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
       KeysOf<PrivateEndpointConnectionParameter> &
@@ -324,7 +324,7 @@ interface PrivateEndpoints<
     Parameters extends {} = {},
     Response extends {} = ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
     Error extends {} = ErrorResponse,
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   > is PrivateEndpoints.DeleteAsyncBase<
     ParentResource,
     Response,
@@ -357,7 +357,7 @@ interface PrivateEndpoints<
     Parameters extends {} = {},
     Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse,
     Error = ErrorResponse,
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(
     ...ResourceInstanceParameters<ParentResource, BaseParameters>,
     ...KeysOf<PrivateEndpointConnectionParameter>,
@@ -386,7 +386,7 @@ interface PrivateEndpoints<
     BaseParameters = DefaultBaseParameters<ParentResource>,
     Parameters extends {} = {},
     Error extends {} = ErrorResponse,
-    OverrideResourceName extends valueof string = ResourceName
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(
     ...ResourceInstanceParameters<ParentResource, BaseParameters>,
     ...KeysOf<PrivateEndpointConnectionParameter>,
