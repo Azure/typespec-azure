@@ -121,8 +121,4 @@ extern dec markAsLro(target: Operation, scope?: valueof string);
  * op listItems(): PageResult;
  * ```
  */
-extern dec nextLinkOperation(
-  target: Operation,
-  verb: valueof string,
-  scope?: valueof string
-);
+extern dec nextLinkOperation(target: Operation, verb: valueof string, scope?: valueof string);

@@ -37,9 +37,7 @@ it("should store next link operation HTTP verb", async () => {
     }
   `);
 
-  const namespace = runner.context.program.resolveTypeReference(
-    "TestService",
-  )[0]! as Namespace;
+  const namespace = runner.context.program.resolveTypeReference("TestService")[0]! as Namespace;
   const operation = namespace.operations.get("listItems")! as Operation;
   const verb = getNextLinkOperation(runner.context, operation);
   strictEqual(verb, "POST");
@@ -67,9 +65,7 @@ it("should apply nextLinkOperation with language scope", async () => {
     }
   `);
 
-  const namespace = runner.context.program.resolveTypeReference(
-    "TestService",
-  )[0]! as Namespace;
+  const namespace = runner.context.program.resolveTypeReference("TestService")[0]! as Namespace;
   const operation = namespace.operations.get("listItems")! as Operation;
   const verb = getNextLinkOperation(runner.context, operation);
   strictEqual(verb, "PUT");
@@ -96,9 +92,7 @@ it("should return undefined when decorator is not applied", async () => {
     }
   `);
 
-  const namespace = runner.context.program.resolveTypeReference(
-    "TestService",
-  )[0]! as Namespace;
+  const namespace = runner.context.program.resolveTypeReference("TestService")[0]! as Namespace;
   const operation = namespace.operations.get("listItems")! as Operation;
   const verb = getNextLinkOperation(runner.context, operation);
   strictEqual(verb, undefined);
@@ -133,10 +127,8 @@ it("should support different HTTP verbs", async () => {
     }
   `);
 
-  const namespace = runner.context.program.resolveTypeReference(
-    "TestService",
-  )[0]! as Namespace;
-  
+  const namespace = runner.context.program.resolveTypeReference("TestService")[0]! as Namespace;
+
   const listWithGetOp = namespace.operations.get("listWithGet")! as Operation;
   const getVerb = getNextLinkOperation(runner.context, listWithGetOp);
   strictEqual(getVerb, "GET");
