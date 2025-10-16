@@ -1489,7 +1489,14 @@ export const $nextLinkOperation: NextLinkOperationDecorator = (
     });
     return;
   }
-  setScopedDecoratorData(context, $nextLinkOperation, nextLinkOperationKey, target, upperVerb, scope);
+  setScopedDecoratorData(
+    context,
+    $nextLinkOperation,
+    nextLinkOperationKey,
+    target,
+    upperVerb,
+    scope,
+  );
 };
 
 /**
