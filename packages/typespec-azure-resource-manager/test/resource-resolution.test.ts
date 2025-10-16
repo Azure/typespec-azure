@@ -1926,7 +1926,7 @@ interface Employees {
 
 @armResourceOperations(PrivateLinkResource)
 interface EmployeePrivateLinks {
-  list is PrivateLinkOperations.ListByParent<Employee, ResourceName = "PrivateLinkForEmployee">;
+  list is PrivateLinkOperations.ListByParent<Employee, OverrideResourceName = "PrivateLinkForEmployee">;
 }
 
 model MoveRequest {

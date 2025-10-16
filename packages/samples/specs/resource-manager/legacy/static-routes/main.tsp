@@ -87,7 +87,7 @@ interface EmplOps
         useStaticRoute: true,
         route: "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees",
       },
-      ResourceName = "SubscriptionEmployee"
+      RoutedResourceName = "SubscriptionEmployee"
     > {}
 
 alias BaseParams = {
@@ -106,7 +106,7 @@ interface EmplOps2
       },
       ErrorResponse,
       #{ useStaticRoute: true },
-      ResourceName = "SubscriptionEmployee"
+      RoutedResourceName = "SubscriptionEmployee"
     > {}
 
 alias BaseParams2 = {
