@@ -1480,6 +1480,12 @@ export const $nextLinkOperation: NextLinkOperationDecorator = (
   setScopedDecoratorData(context, $nextLinkOperation, nextLinkOperationKey, target, verb, scope);
 };
 
+/**
+ * Get the HTTP verb specified for next link operations in paging scenarios.
+ * @param context TCGCContext
+ * @param entity Operation to check for nextLinkOperation decorator
+ * @returns The HTTP verb string (e.g., "POST", "GET") if decorator is applied, undefined otherwise
+ */
 export function getNextLinkOperation(context: TCGCContext, entity: Operation): string | undefined {
   return getScopedDecoratorData(context, nextLinkOperationKey, entity);
 }
