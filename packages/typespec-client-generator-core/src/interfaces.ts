@@ -875,22 +875,24 @@ export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOpera
 /**
  * Paging operation info.
  */
-interface SdkPagingServiceMethodOptions<_TServiceOperation extends SdkServiceOperation> {
+interface SdkPagingServiceMethodOptions<TServiceOperation extends SdkServiceOperation> {
   /** Paging info. */
-  pagingMetadata: SdkPagingServiceMetadata;
+  pagingMetadata: SdkPagingServiceMetadata<TServiceOperation>;
 }
 
 /**
  * Paging operation metadata.
  */
-export interface SdkPagingServiceMetadata {
+export interface SdkPagingServiceMetadata<TServiceOperation extends SdkServiceOperation> {
   /** Paging metadata from TypeSpec core library. */
   __raw?: PagingOperation;
 
   /** Segments to indicate how to get next page link value from response. */
   nextLinkSegments?: (SdkServiceResponseHeader | SdkModelPropertyType)[];
+  /** Method used to get next page. If not defined, use the initial method. */
+  nextLinkOperation?: SdkServiceMethod<TServiceOperation>;
   /** HTTP verb to use for the next link operation. Defaults to "GET" if not specified. */
-  nextLinkOperation?: string;
+  nextLinkVerb?: string;
   /** Segments to indicate how to get parameters that are needed to be injected into next page link. */
   nextLinkReInjectedParametersSegments?: (SdkMethodParameter | SdkModelPropertyType)[][];
   /** Segments to indicate how to set continuation token for next page request. */

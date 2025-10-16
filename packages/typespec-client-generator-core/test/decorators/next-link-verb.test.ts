@@ -2,7 +2,7 @@ import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { Namespace, Operation } from "@typespec/compiler";
 import { strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
-import { getNextLinkOperation } from "../../src/decorators.js";
+import { getNextLinkVerb } from "../../src/decorators.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
 let runner: SdkTestRunner;
@@ -15,7 +15,7 @@ beforeEach(async () => {
   });
 });
 
-it("should store next link operation HTTP verb", async () => {
+it("should store next link verb HTTP verb", async () => {
   await runner.compile(`
     @service
     namespace TestService {
@@ -30,7 +30,7 @@ it("should store next link operation HTTP verb", async () => {
         id: string;
       }
       
-      @Azure.ClientGenerator.Core.Legacy.nextLinkOperation("POST")
+      @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST")
       @list
       @post
       op listItems(): ListTestResult;
@@ -39,11 +39,11 @@ it("should store next link operation HTTP verb", async () => {
 
   const namespace = runner.context.program.resolveTypeReference("TestService")[0]! as Namespace;
   const operation = namespace.operations.get("listItems")! as Operation;
-  const verb = getNextLinkOperation(runner.context, operation);
+  const verb = getNextLinkVerb(runner.context, operation);
   strictEqual(verb, "POST");
 });
 
-it("should apply nextLinkOperation with language scope", async () => {
+it("should apply nextLinkVerb with language scope", async () => {
   await runner.compile(`
     @service
     namespace TestService {
@@ -58,7 +58,7 @@ it("should apply nextLinkOperation with language scope", async () => {
         id: string;
       }
       
-      @Azure.ClientGenerator.Core.Legacy.nextLinkOperation("POST", "java")
+      @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST", "java")
       @list
       @post
       op listItems(): ListTestResult;
@@ -67,7 +67,7 @@ it("should apply nextLinkOperation with language scope", async () => {
 
   const namespace = runner.context.program.resolveTypeReference("TestService")[0]! as Namespace;
   const operation = namespace.operations.get("listItems")! as Operation;
-  const verb = getNextLinkOperation(runner.context, operation);
+  const verb = getNextLinkVerb(runner.context, operation);
   strictEqual(verb, "POST");
 });
 
@@ -94,7 +94,7 @@ it("should return GET when decorator is not applied", async () => {
 
   const namespace = runner.context.program.resolveTypeReference("TestService")[0]! as Namespace;
   const operation = namespace.operations.get("listItems")! as Operation;
-  const verb = getNextLinkOperation(runner.context, operation);
+  const verb = getNextLinkVerb(runner.context, operation);
   strictEqual(verb, "GET");
 });
 
@@ -113,13 +113,13 @@ it("should support POST and GET HTTP verbs", async () => {
         id: string;
       }
       
-      @Azure.ClientGenerator.Core.Legacy.nextLinkOperation("GET")
+      @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("GET")
       @list
       @route("/list-get")
       @post
       op listWithGet(): ListTestResult;
       
-      @Azure.ClientGenerator.Core.Legacy.nextLinkOperation("POST")
+      @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST")
       @list
       @route("/list-post")
       @post
@@ -130,11 +130,11 @@ it("should support POST and GET HTTP verbs", async () => {
   const namespace = runner.context.program.resolveTypeReference("TestService")[0]! as Namespace;
 
   const listWithGetOp = namespace.operations.get("listWithGet")! as Operation;
-  const getVerb = getNextLinkOperation(runner.context, listWithGetOp);
+  const getVerb = getNextLinkVerb(runner.context, listWithGetOp);
   strictEqual(getVerb, "GET");
 
   const listWithPostOp = namespace.operations.get("listWithPost")! as Operation;
-  const postVerb = getNextLinkOperation(runner.context, listWithPostOp);
+  const postVerb = getNextLinkVerb(runner.context, listWithPostOp);
   strictEqual(postVerb, "POST");
 });
 
@@ -153,7 +153,7 @@ it("should reject invalid HTTP verbs", async () => {
         id: string;
       }
       
-      @Azure.ClientGenerator.Core.Legacy.nextLinkOperation("PATCH")
+      @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("PATCH")
       @list
       @post
       op listItems(): ListTestResult;

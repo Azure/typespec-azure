@@ -122,12 +122,12 @@ export type MarkAsLroDecorator = (
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Specify POST for next link operations
  * ```typespec
- * @Azure.ClientGenerator.Core.Legacy.nextLinkOperation("POST")
+ * @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST")
  * @post
  * op listItems(): PageResult;
  * ```
  */
-export type NextLinkOperationDecorator = (
+export type NextLinkVerbDecorator = (
   context: DecoratorContext,
   target: Operation,
   verb: string,
@@ -138,5 +138,5 @@ export type AzureClientGeneratorCoreLegacyDecorators = {
   hierarchyBuilding: HierarchyBuildingDecorator;
   flattenProperty: FlattenPropertyDecorator;
   markAsLro: MarkAsLroDecorator;
-  nextLinkOperation: NextLinkOperationDecorator;
+  nextLinkVerb: NextLinkVerbDecorator;
 };

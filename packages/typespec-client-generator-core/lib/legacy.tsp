@@ -115,9 +115,9 @@ extern dec markAsLro(target: Operation, scope?: valueof string);
  *
  * @example Specify POST for next link operations
  * ```typespec
- * @Azure.ClientGenerator.Core.Legacy.nextLinkOperation("POST")
+ * @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST")
  * @post
  * op listItems(): PageResult;
  * ```
  */
-extern dec nextLinkOperation(target: Operation, verb: valueof string, scope?: valueof string);
+extern dec nextLinkVerb(target: Operation, verb: valueof string, scope?: valueof string);

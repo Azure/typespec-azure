@@ -16,7 +16,7 @@ import {
   $flattenProperty,
   $legacyHierarchyBuilding,
   $markAsLro,
-  $nextLinkOperation,
+  $nextLinkVerb,
   $operationGroup,
   $override,
   $paramAlias,
@@ -59,6 +59,6 @@ export const $decorators = {
     hierarchyBuilding: $legacyHierarchyBuilding,
     flattenProperty: $flattenProperty,
     markAsLro: $markAsLro,
-    nextLinkOperation: $nextLinkOperation,
+    nextLinkVerb: $nextLinkVerb,
   } satisfies AzureClientGeneratorCoreLegacyDecorators,
 };

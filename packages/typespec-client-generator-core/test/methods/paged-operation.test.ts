@@ -36,7 +36,7 @@ it("normal paged result", async () => {
   strictEqual(method.kind, "paging");
   strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
   strictEqual(method.pagingMetadata.nextLinkSegments[0], sdkPackage.models[0].properties[1]);
-  strictEqual(method.pagingMetadata.nextLinkOperation, "GET");
+  strictEqual(method.pagingMetadata.nextLinkVerb, "GET");
 
   const response = method.response;
   strictEqual(response.kind, "method");
@@ -952,9 +952,9 @@ it("@pageSize nested parameter check", async () => {
   strictEqual(pageSizeParameterSegments[1], pageSizeParameter);
 });
 
-it("paged result with nextLinkOperation decorator POST", async () => {
+it("paged result with nextLinkVerb decorator POST", async () => {
   await runner.compileWithBuiltInService(`
-    @Azure.ClientGenerator.Core.Legacy.nextLinkOperation("POST")
+    @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST")
     @list
     op test(): ListTestResult;
     model ListTestResult {
@@ -971,5 +971,5 @@ it("paged result with nextLinkOperation decorator POST", async () => {
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
-  strictEqual(method.pagingMetadata.nextLinkOperation, "POST");
+  strictEqual(method.pagingMetadata.nextLinkVerb, "POST");
 });

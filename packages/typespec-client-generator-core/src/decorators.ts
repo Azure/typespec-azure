@@ -47,7 +47,7 @@ import {
   FlattenPropertyDecorator,
   HierarchyBuildingDecorator,
   MarkAsLroDecorator,
-  NextLinkOperationDecorator,
+  NextLinkVerbDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
   AccessFlags,
@@ -1469,9 +1469,9 @@ export function getMarkAsLro(context: TCGCContext, entity: Operation): boolean {
   return getScopedDecoratorData(context, markAsLroKey, entity) ?? false;
 }
 
-const nextLinkOperationKey = createStateSymbol("nextLinkOperation");
+const nextLinkVerbKey = createStateSymbol("nextLinkVerb");
 
-export const $nextLinkOperation: NextLinkOperationDecorator = (
+export const $nextLinkVerb: NextLinkVerbDecorator = (
   context: DecoratorContext,
   target: Operation,
   verb: string,
@@ -1491,8 +1491,8 @@ export const $nextLinkOperation: NextLinkOperationDecorator = (
   }
   setScopedDecoratorData(
     context,
-    $nextLinkOperation,
-    nextLinkOperationKey,
+    $nextLinkVerb,
+    nextLinkVerbKey,
     target,
     upperVerb,
     scope,
@@ -1502,11 +1502,11 @@ export const $nextLinkOperation: NextLinkOperationDecorator = (
 /**
  * Get the HTTP verb specified for next link operations in paging scenarios.
  * @param context TCGCContext
- * @param entity Operation to check for nextLinkOperation decorator
+ * @param entity Operation to check for nextLinkVerb decorator
  * @returns The HTTP verb string ("POST" or "GET"). Defaults to "GET" if decorator is not applied.
  */
-export function getNextLinkOperation(context: TCGCContext, entity: Operation): string {
-  return getScopedDecoratorData(context, nextLinkOperationKey, entity) ?? "GET";
+export function getNextLinkVerb(context: TCGCContext, entity: Operation): string {
+  return getScopedDecoratorData(context, nextLinkVerbKey, entity) ?? "GET";
 }
 
 /**
