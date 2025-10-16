@@ -883,7 +883,7 @@ interface SdkPagingServiceMethodOptions<TServiceOperation extends SdkServiceOper
 /**
  * Paging operation metadata.
  */
-export interface SdkPagingServiceMetadata<TServiceOperation extends SdkServiceOperation> {
+export interface SdkPagingServiceMetadata<_TServiceOperation extends SdkServiceOperation> {
   /** Paging metadata from TypeSpec core library. */
   __raw?: PagingOperation;
 
