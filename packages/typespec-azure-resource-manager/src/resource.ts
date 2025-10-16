@@ -116,18 +116,14 @@ export interface ArmVirtualResourceDetails {
   provider?: string;
 }
 
-/** New base details for resolved resources */
-export interface ResourceModelMetadata {
+/** New details for a resolved resource */
+export interface ResourceModel {
   /** The model type for the resource */
   type: Model;
   /** The kind of resource (extension | tracked | proxy | custom | virtual | built-in) */
   kind: ArmResourceKind;
   /** The provider namespace */
   providerNamespace: string;
-}
-
-/** New details for a resolved resource */
-export interface ResourceModel extends ResourceModelMetadata {
   /** The set of resolved operations for a resource.  For most 
         resources there will be 1 returned record */
   resources?: ResolvedResource[];
