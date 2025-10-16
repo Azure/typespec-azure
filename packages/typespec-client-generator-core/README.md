@@ -1225,6 +1225,7 @@ model MyModel {
 - [`@flattenProperty`](#@flattenproperty)
 - [`@hierarchyBuilding`](#@hierarchybuilding)
 - [`@markAsLro`](#@markaslro)
+- [`@nextLinkOperation`](#@nextlinkoperation)
 
 #### `@flattenProperty`
 
@@ -1354,4 +1355,40 @@ The operation that should be treated as a Long Running Operation
 @route("/deployments/{deploymentId}")
 @post
 op startDeployment(@path deploymentId: string): DeploymentResult | ErrorResponse;
+```
+
+#### `@nextLinkOperation`
+
+Specifies the HTTP verb for the next link operation in a paging scenario.
+
+This decorator allows you to override the HTTP method used for fetching the next page
+when the default GET method is not appropriate. Only "POST" and "GET" are supported.
+
+This decorator is considered legacy functionality and should only be used when
+standard TypeSpec paging patterns are not sufficient.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.nextLinkOperation(verb: valueof string, scope?: valueof string)
+```
+
+##### Target
+
+The paging operation to specify next link operation behavior for
+`Operation`
+
+##### Parameters
+
+| Name  | Type             | Description                                                                                                                                                                                                                                                     |
+| ----- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| verb  | `valueof string` | The HTTP verb to use for next link operations. Must be "POST" or "GET".                                                                                                                                                                                         |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+
+##### Examples
+
+###### Specify POST for next link operations
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.nextLinkOperation("POST")
+@post
+op listItems(): PageResult;
 ```
