@@ -97,3 +97,32 @@ extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
  *
  */
 extern dec markAsLro(target: Operation, scope?: valueof string);
+
+/**
+ * Specifies the HTTP verb for the next link operation in a paging scenario.
+ *
+ * This decorator allows you to override the HTTP method used for fetching the next page
+ * when the default GET method is not appropriate. This is useful in scenarios where
+ * subsequent paging calls need to use POST or other HTTP methods.
+ *
+ * This decorator is considered legacy functionality and should only be used when
+ * standard TypeSpec paging patterns are not sufficient.
+ *
+ * @param target The paging operation to specify next link operation behavior for
+ * @param verb The HTTP verb to use for next link operations (e.g., "POST", "GET")
+ * @param scope Specifies the target language emitters that the decorator should apply.
+ * If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * @example Specify POST for next link operations
+ * ```typespec
+ * @Azure.ClientGenerator.Core.Legacy.nextLinkOperation("POST")
+ * @post
+ * op listItems(): PageResult;
+ * ```
+ */
+extern dec nextLinkOperation(
+  target: Operation,
+  verb: valueof string,
+  scope?: valueof string
+);

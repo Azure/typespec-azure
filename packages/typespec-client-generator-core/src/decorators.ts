@@ -47,6 +47,7 @@ import {
   FlattenPropertyDecorator,
   HierarchyBuildingDecorator,
   MarkAsLroDecorator,
+  NextLinkOperationDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
   AccessFlags,
@@ -1466,6 +1467,21 @@ export const $markAsLro: MarkAsLroDecorator = (
 
 export function getMarkAsLro(context: TCGCContext, entity: Operation): boolean {
   return getScopedDecoratorData(context, markAsLroKey, entity) ?? false;
+}
+
+const nextLinkOperationKey = createStateSymbol("nextLinkOperation");
+
+export const $nextLinkOperation: NextLinkOperationDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  verb: string,
+  scope?: LanguageScopes,
+) => {
+  setScopedDecoratorData(context, $nextLinkOperation, nextLinkOperationKey, target, verb, scope);
+};
+
+export function getNextLinkOperation(context: TCGCContext, entity: Operation): string | undefined {
+  return getScopedDecoratorData(context, nextLinkOperationKey, entity);
 }
 
 /**
