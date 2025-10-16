@@ -1477,17 +1477,29 @@ export const $nextLinkOperation: NextLinkOperationDecorator = (
   verb: string,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(context, $nextLinkOperation, nextLinkOperationKey, target, verb, scope);
+  // Validate the verb to be "POST" or "GET"
+  const upperVerb = verb.toUpperCase();
+  if (upperVerb !== "POST" && upperVerb !== "GET") {
+    reportDiagnostic(context.program, {
+      code: "invalid-next-link-operation-verb",
+      format: {
+        verb: verb,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+  setScopedDecoratorData(context, $nextLinkOperation, nextLinkOperationKey, target, upperVerb, scope);
 };
 
 /**
  * Get the HTTP verb specified for next link operations in paging scenarios.
  * @param context TCGCContext
  * @param entity Operation to check for nextLinkOperation decorator
- * @returns The HTTP verb string (e.g., "POST", "GET") if decorator is applied, undefined otherwise
+ * @returns The HTTP verb string ("POST" or "GET"). Defaults to "GET" if decorator is not applied.
  */
-export function getNextLinkOperation(context: TCGCContext, entity: Operation): string | undefined {
-  return getScopedDecoratorData(context, nextLinkOperationKey, entity);
+export function getNextLinkOperation(context: TCGCContext, entity: Operation): string {
+  return getScopedDecoratorData(context, nextLinkOperationKey, entity) ?? "GET";
 }
 
 /**

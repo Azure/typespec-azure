@@ -102,14 +102,13 @@ extern dec markAsLro(target: Operation, scope?: valueof string);
  * Specifies the HTTP verb for the next link operation in a paging scenario.
  *
  * This decorator allows you to override the HTTP method used for fetching the next page
- * when the default GET method is not appropriate. This is useful in scenarios where
- * subsequent paging calls need to use POST or other HTTP methods.
+ * when the default GET method is not appropriate. Only "POST" and "GET" are supported.
  *
  * This decorator is considered legacy functionality and should only be used when
  * standard TypeSpec paging patterns are not sufficient.
  *
  * @param target The paging operation to specify next link operation behavior for
- * @param verb The HTTP verb to use for next link operations (e.g., "POST", "GET")
+ * @param verb The HTTP verb to use for next link operations. Must be "POST" or "GET".
  * @param scope Specifies the target language emitters that the decorator should apply.
  * If not set, the decorator will be applied to all language emitters by default.
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.

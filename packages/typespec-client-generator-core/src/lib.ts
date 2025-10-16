@@ -459,6 +459,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`@markAsLro decorator is ineffective since this operation already returns real LRO metadata. Please remove the @markAsLro decorator.`,
       },
     },
+    "invalid-next-link-operation-verb": {
+      severity: "error",
+      messages: {
+        default: paramMessage`@nextLinkOperation decorator only supports "POST" or "GET" HTTP verbs, but got "${"verb"}".`,
+      },
+    },
     "api-version-undefined": {
       severity: "warning",
       messages: {
