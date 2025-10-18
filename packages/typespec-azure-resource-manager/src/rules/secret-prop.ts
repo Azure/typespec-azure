@@ -1,4 +1,11 @@
-import { ModelProperty, createRule, isSecret, paramMessage } from "@typespec/compiler";
+import {
+  ModelProperty,
+  UsageFlags,
+  createRule,
+  isSecret,
+  paramMessage,
+  resolveUsages,
+} from "@typespec/compiler";
 
 export const secretProprule = createRule({
   name: "secret-prop",
@@ -9,8 +16,12 @@ export const secretProprule = createRule({
     default: paramMessage`Property '${"propertyName"}' looks like it contains sensitive information. Consider marking it with @secret decorator to ensure it is handled securely.`,
   },
   create(context) {
+    const usages = resolveUsages(context.program.getGlobalNamespaceType());
     return {
       modelProperty: (property: ModelProperty) => {
+        if (!property.model || !usages.isUsedAs(property.model, UsageFlags.Output)) {
+          return;
+        }
         if (
           isPotentialSensitiveProperty(property.name) &&
           !isSecret(context.program, property) &&
