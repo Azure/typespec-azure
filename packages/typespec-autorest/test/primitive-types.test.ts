@@ -289,6 +289,8 @@ describe("typespec-autorest: primitives", () => {
     describe("bytes", () => {
       it("set format to 'base64' by default", () =>
         testEncode("bytes", { type: "string", format: "byte" }));
+      it("set format to byte when encoding bytes as base64", () =>
+        testEncode("bytes", { type: "string", format: "byte" }, "base64"));
       it("set format to base64url when encoding bytes as base64url", () =>
         testEncode("bytes", { type: "string", format: "base64url" }, "base64url"));
     });
