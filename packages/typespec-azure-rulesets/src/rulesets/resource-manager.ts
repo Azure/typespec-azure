@@ -86,6 +86,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-resource-patch": true,
     "@azure-tools/typespec-azure-resource-manager/resource-name": true,
     "@azure-tools/typespec-azure-resource-manager/retry-after": true,
+    "@azure-tools/typespec-azure-resource-manager/secret-prop": true,
     "@azure-tools/typespec-azure-resource-manager/unsupported-type": true,
 
     // TCGC rules
