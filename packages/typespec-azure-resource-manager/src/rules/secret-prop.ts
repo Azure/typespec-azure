@@ -6,7 +6,15 @@ import {
   paramMessage,
   resolveUsages,
 } from "@typespec/compiler";
+import { $ } from "@typespec/compiler/typekit";
 
+function isKeyValuePairKeyProp(property: ModelProperty): boolean {
+  return (
+    property.name === "key" &&
+    property.model?.properties.has("value") === true &&
+    property.model?.properties.size === 2
+  );
+}
 export const secretProprule = createRule({
   name: "secret-prop",
   description: `Check that property with names indicating sensitive information(e.g. contains auth, password, token, secret, etc.) are marked with @secret decorator.`,
@@ -22,10 +30,22 @@ export const secretProprule = createRule({
         if (!property.model || !usages.isUsedAs(property.model, UsageFlags.Output)) {
           return;
         }
+        const tk = $(context.program);
         if (
           isPotentialSensitiveProperty(property.name) &&
           !isSecret(context.program, property) &&
-          !isSecret(context.program, property.type)
+          !isSecret(context.program, property.type) &&
+          property.type !== tk.builtin.url &&
+          tk.type.isAssignableTo(property.type, tk.builtin.string) &&
+          property.type.kind !== "Union" &&
+          property.type.kind !== "Enum" &&
+          !property.name.endsWith("Uri") &&
+          !property.name.endsWith("Url") &&
+          !property.name.endsWith("Name") &&
+          !property.name.endsWith("Type") &&
+          !property.name.endsWith("Id") &&
+          !property.name.endsWith("ID") &&
+          !isKeyValuePairKeyProp(property)
         ) {
           context.reportDiagnostic({
             target: property,
