@@ -120,4 +120,4 @@ extern dec markAsLro(target: Operation, scope?: valueof string);
  * op listItems(): PageResult;
  * ```
  */
-extern dec nextLinkVerb(target: Operation, verb: valueof string, scope?: valueof string);
+extern dec nextLinkVerb(target: Operation, verb: "GET" | "POST", scope?: valueof string);

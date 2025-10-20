@@ -1,168 +1,147 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { createTcgcTesterInstance, TcgcTesterInstance } from "#test/tester.js";
 import { Namespace, Operation } from "@typespec/compiler";
 import { strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
 import { getNextLinkVerb } from "../../src/decorators.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
-let runner: SdkTestRunner;
+let instance: TcgcTesterInstance;
 
 beforeEach(async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+  instance = await createTcgcTesterInstance({
     emitterName: "@azure-tools/typespec-java",
   });
 });
 
 it("should store next link verb HTTP verb", async () => {
-  await runner.compile(`
-    @service
-    namespace TestService {
-      model ListTestResult {
-        @pageItems
-        tests: Test[];
-        @TypeSpec.nextLink
-        next: string;
-      }
-      
-      model Test {
-        id: string;
-      }
-      
-      @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST")
-      @list
-      @post
-      op listItems(): ListTestResult;
+  await instance.compileWithBuiltInService(`
+    model ListTestResult {
+      @pageItems
+      tests: Test[];
+      @nextLink
+      next: string;
     }
+    
+    model Test {
+      id: string;
+    }
+    
+    @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST")
+    @list
+    @post
+    op listItems(): ListTestResult;
   `);
 
-  const namespace = runner.context.program.resolveTypeReference("TestService")[0]! as Namespace;
+  const namespace = instance.context.program.resolveTypeReference("TestService")[0]! as Namespace;
   const operation = namespace.operations.get("listItems")! as Operation;
-  const verb = getNextLinkVerb(runner.context, operation);
+  const verb = getNextLinkVerb(instance.context, operation);
   strictEqual(verb, "POST");
 });
 
 it("should apply nextLinkVerb with language scope", async () => {
-  await runner.compile(`
-    @service
-    namespace TestService {
-      model ListTestResult {
-        @pageItems
-        tests: Test[];
-        @TypeSpec.nextLink
-        next: string;
-      }
-      
-      model Test {
-        id: string;
-      }
-      
-      @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST", "java")
-      @list
-      @post
-      op listItems(): ListTestResult;
+  await instance.compileWithBuiltInService(`
+    model ListTestResult {
+      @pageItems
+      tests: Test[];
+      @TypeSpec.nextLink
+      next: string;
     }
+    
+    model Test {
+      id: string;
+    }
+    
+    @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST", "java")
+    @list
+    @post
+    op listItems(): ListTestResult;
   `);
 
-  const namespace = runner.context.program.resolveTypeReference("TestService")[0]! as Namespace;
+  const namespace = instance.context.program.resolveTypeReference("TestService")[0]! as Namespace;
   const operation = namespace.operations.get("listItems")! as Operation;
-  const verb = getNextLinkVerb(runner.context, operation);
+  const verb = getNextLinkVerb(instance.context, operation);
   strictEqual(verb, "POST");
 });
 
 it("should return GET when decorator is not applied", async () => {
-  await runner.compile(`
-    @service
-    namespace TestService {
-      model ListTestResult {
-        @pageItems
-        tests: Test[];
-        @TypeSpec.nextLink
-        next: string;
-      }
-      
-      model Test {
-        id: string;
-      }
-      
-      @list
-      @post
-      op listItems(): ListTestResult;
+  await instance.compileWithBuiltInService(`
+    model ListTestResult {
+      @pageItems
+      tests: Test[];
+      @TypeSpec.nextLink
+      next: string;
     }
+    
+    model Test {
+      id: string;
+    }
+    
+    @list
+    @post
+    op listItems(): ListTestResult;
   `);
 
-  const namespace = runner.context.program.resolveTypeReference("TestService")[0]! as Namespace;
+  const namespace = instance.context.program.resolveTypeReference("TestService")[0]! as Namespace;
   const operation = namespace.operations.get("listItems")! as Operation;
-  const verb = getNextLinkVerb(runner.context, operation);
+  const verb = getNextLinkVerb(instance.context, operation);
   strictEqual(verb, "GET");
 });
 
 it("should support POST and GET HTTP verbs", async () => {
-  await runner.compile(`
-    @service
-    namespace TestService {
-      model ListTestResult {
-        @pageItems
-        tests: Test[];
-        @TypeSpec.nextLink
-        next: string;
-      }
-      
-      model Test {
-        id: string;
-      }
-      
-      @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("GET")
-      @list
-      @route("/list-get")
-      @post
-      op listWithGet(): ListTestResult;
-      
-      @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST")
-      @list
-      @route("/list-post")
-      @post
-      op listWithPost(): ListTestResult;
+  await instance.compileWithBuiltInService(`
+    model ListTestResult {
+      @pageItems
+      tests: Test[];
+      @TypeSpec.nextLink
+      next: string;
     }
+    
+    model Test {
+      id: string;
+    }
+    
+    @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("GET")
+    @list
+    @route("/list-get")
+    @post
+    op listWithGet(): ListTestResult;
+    
+    @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST")
+    @list
+    @route("/list-post")
+    @post
+    op listWithPost(): ListTestResult;
   `);
 
-  const namespace = runner.context.program.resolveTypeReference("TestService")[0]! as Namespace;
+  const namespace = instance.context.program.resolveTypeReference("TestService")[0]! as Namespace;
 
   const listWithGetOp = namespace.operations.get("listWithGet")! as Operation;
-  const getVerb = getNextLinkVerb(runner.context, listWithGetOp);
+  const getVerb = getNextLinkVerb(instance.context, listWithGetOp);
   strictEqual(getVerb, "GET");
 
   const listWithPostOp = namespace.operations.get("listWithPost")! as Operation;
-  const postVerb = getNextLinkVerb(runner.context, listWithPostOp);
+  const postVerb = getNextLinkVerb(instance.context, listWithPostOp);
   strictEqual(postVerb, "POST");
 });
 
 it("should reject invalid HTTP verbs", async () => {
-  const diagnostics = await runner.diagnose(`
-    @service
-    namespace TestService {
-      model ListTestResult {
-        @pageItems
-        tests: Test[];
-        @TypeSpec.nextLink
-        next: string;
-      }
-      
-      model Test {
-        id: string;
-      }
-      
-      @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("PATCH")
-      @list
-      @post
-      op listItems(): ListTestResult;
+  const diagnostics = await instance.diagnose(`
+    model ListTestResult {
+      @pageItems
+      tests: Test[];
+      @TypeSpec.nextLink
+      next: string;
     }
+    
+    model Test {
+      id: string;
+    }
+    
+    @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("PATCH")
+    @list
+    @post
+    op listItems(): ListTestResult;
   `);
 
   strictEqual(diagnostics.length, 1);
-  strictEqual(
-    diagnostics[0].code,
-    "@azure-tools/typespec-client-generator-core/invalid-next-link-operation-verb",
-  );
+  strictEqual(diagnostics[0].code, "invalid-argument");
 });

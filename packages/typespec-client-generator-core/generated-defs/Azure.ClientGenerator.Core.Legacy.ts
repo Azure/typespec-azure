@@ -1,4 +1,4 @@
-import type { DecoratorContext, Model, ModelProperty, Operation } from "@typespec/compiler";
+import type { DecoratorContext, Model, ModelProperty, Operation, Type } from "@typespec/compiler";
 
 /**
  * Adds support for client-level multiple levels of inheritance.
@@ -130,7 +130,7 @@ export type MarkAsLroDecorator = (
 export type NextLinkVerbDecorator = (
   context: DecoratorContext,
   target: Operation,
-  verb: string,
+  verb: Type,
   scope?: string,
 ) => void;
 

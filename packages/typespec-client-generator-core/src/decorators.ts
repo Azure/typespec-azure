@@ -14,6 +14,7 @@ import {
   Scalar,
   Type,
   Union,
+  compilerAssert,
   getDiscriminator,
   getNamespaceFullName,
   ignoreDiagnostics,
@@ -1474,29 +1475,14 @@ const nextLinkVerbKey = createStateSymbol("nextLinkVerb");
 export const $nextLinkVerb: NextLinkVerbDecorator = (
   context: DecoratorContext,
   target: Operation,
-  verb: string,
+  verb: Type,
   scope?: LanguageScopes,
 ) => {
-  // Validate the verb to be "POST" or "GET"
-  const upperVerb = verb.toUpperCase();
-  if (upperVerb !== "POST" && upperVerb !== "GET") {
-    reportDiagnostic(context.program, {
-      code: "invalid-next-link-operation-verb",
-      format: {
-        verb: verb,
-      },
-      target: context.decoratorTarget,
-    });
-    return;
-  }
-  setScopedDecoratorData(
-    context,
-    $nextLinkVerb,
-    nextLinkVerbKey,
-    target,
-    upperVerb,
-    scope,
+  compilerAssert(
+    verb.kind === "String" && (verb.value === "POST" || verb.value === "GET"),
+    "@nextLinkVerb decorator only supports 'POST' or 'GET' string literal values.",
   );
+  setScopedDecoratorData(context, $nextLinkVerb, nextLinkVerbKey, target, verb.value, scope);
 };
 
 /**
