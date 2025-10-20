@@ -4,7 +4,6 @@ import {
   passOnSuccess,
   ScenarioMockApi,
   ValidationError,
-  withServiceKeys,
 } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
@@ -163,79 +162,6 @@ const validResourceExtensionsResource = {
   },
 };
 
-function getServiceKey(resourceUri: string) {
-  switch (resourceUri) {
-    case RESOURCE_GROUP_SCOPE_URI:
-      return "ResourceGroup" as const;
-    case SUBSCRIPTION_SCOPE_URI:
-      return "Subscription" as const;
-    case TENANT_SCOPE_URI:
-      return "Tenant" as const;
-    case RESOURCE_SCOPE_URI:
-      return "Resource" as const;
-    default:
-      throw new ValidationError(
-        "Invalid resource uri",
-        `${RESOURCE_GROUP_SCOPE_URI} | ${SUBSCRIPTION_SCOPE_URI} | ${TENANT_SCOPE_URI} | ${RESOURCE_SCOPE_URI}`,
-        resourceUri,
-      );
-  }
-}
-
-function requestHandler(
-  req: MockRequest,
-  requestMethod: string,
-  resourceUri: string,
-  validResource: any,
-) {
-  const serviceKey = getServiceKey(resourceUri);
-  switch (requestMethod) {
-    case "get":
-      return {
-        pass: serviceKey,
-        status: 200,
-        body: json(validResource),
-      } as const;
-    case "put":
-      return {
-        pass: serviceKey,
-        status: 200,
-        body: json(validResource),
-      } as const;
-    case "patch":
-      return {
-        pass: serviceKey,
-        status: 200,
-        body: json({
-          ...validResource,
-          properties: {
-            provisioningState: "Succeeded",
-            description: "valid2",
-          },
-        }),
-      } as const;
-    case "delete":
-      return {
-        pass: serviceKey,
-        status: 204,
-      } as const;
-    case "list":
-      return {
-        pass: serviceKey,
-        status: 200,
-        body: json({
-          value: [validResource],
-        }),
-      } as const;
-    default:
-      throw new ValidationError(
-        "Invalid request method",
-        `"get" | "put" | "patch" | "delete" | "list"`,
-        requestMethod,
-      );
-  }
-}
-
 function getUri(resourceUri: string, requestMethod: string): string {
   switch (requestMethod) {
     case "list":
@@ -252,12 +178,7 @@ function getUri(resourceUri: string, requestMethod: string): string {
 }
 
 // extension tracked resource
-Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceKeys([
-  "ResourceGroup",
-  "Subscription",
-  "Tenant",
-  "Resource",
-]).pass([
+Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = passOnSuccess([
   {
     uri: getUri(RESOURCE_GROUP_SCOPE_URI, "get"),
     method: "get",
@@ -270,8 +191,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
       status: 200,
       body: json(validResourceGroupExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "get", RESOURCE_GROUP_SCOPE_URI, validResourceGroupExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -286,8 +205,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
       status: 200,
       body: json(validResourceGroupExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "get", RESOURCE_GROUP_SCOPE_URI, validResourceGroupExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -302,8 +219,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
       status: 200,
       body: json(validSubscriptionExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "get", SUBSCRIPTION_SCOPE_URI, validSubscriptionExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -318,8 +233,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
       status: 200,
       body: json(validSubscriptionExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "get", SUBSCRIPTION_SCOPE_URI, validSubscriptionExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -334,8 +247,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
       status: 200,
       body: json(validTenantExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "get", TENANT_SCOPE_URI, validTenantExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -350,8 +261,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
       status: 200,
       body: json(validTenantExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "get", TENANT_SCOPE_URI, validTenantExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -366,8 +275,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
       status: 200,
       body: json(validResourceExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "get", RESOURCE_SCOPE_URI, validResourceExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -382,18 +289,11 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
       status: 200,
       body: json(validResourceExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "get", RESOURCE_SCOPE_URI, validResourceExtensionsResource),
     kind: "MockApiDefinition",
   },
 ]);
 
-Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = withServiceKeys([
-  "ResourceGroup",
-  "Subscription",
-  "Tenant",
-  "Resource",
-]).pass([
+Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = passOnSuccess([
   {
     uri: getUri(RESOURCE_GROUP_SCOPE_URI, "put"),
     method: "put",
@@ -411,8 +311,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
       status: 200,
       body: json(validResourceGroupExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "put", RESOURCE_GROUP_SCOPE_URI, validResourceGroupExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -432,8 +330,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
       status: 200,
       body: json(validResourceGroupExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "put", RESOURCE_GROUP_SCOPE_URI, validResourceGroupExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -453,8 +349,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
       status: 200,
       body: json(validSubscriptionExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "put", SUBSCRIPTION_SCOPE_URI, validSubscriptionExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -474,8 +368,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
       status: 200,
       body: json(validSubscriptionExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "put", SUBSCRIPTION_SCOPE_URI, validSubscriptionExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -495,8 +387,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
       status: 200,
       body: json(validTenantExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "put", TENANT_SCOPE_URI, validTenantExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -516,8 +406,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
       status: 200,
       body: json(validTenantExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "put", TENANT_SCOPE_URI, validTenantExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -537,8 +425,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
       status: 200,
       body: json(validResourceExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "put", RESOURCE_SCOPE_URI, validResourceExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -558,18 +444,11 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
       status: 200,
       body: json(validResourceExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "put", RESOURCE_SCOPE_URI, validResourceExtensionsResource),
     kind: "MockApiDefinition",
   },
 ]);
 
-Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServiceKeys([
-  "ResourceGroup",
-  "Subscription",
-  "Tenant",
-  "Resource",
-]).pass([
+Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuccess([
   {
     uri: getUri(RESOURCE_GROUP_SCOPE_URI, "patch"),
     method: "patch",
@@ -593,8 +472,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
         },
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "patch", RESOURCE_GROUP_SCOPE_URI, validResourceGroupExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -620,8 +497,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
         },
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "patch", RESOURCE_GROUP_SCOPE_URI, validResourceGroupExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -647,8 +522,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
         },
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "patch", SUBSCRIPTION_SCOPE_URI, validSubscriptionExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -674,8 +547,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
         },
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "patch", SUBSCRIPTION_SCOPE_URI, validSubscriptionExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -701,8 +572,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
         },
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "patch", TENANT_SCOPE_URI, validTenantExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -728,8 +597,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
         },
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "patch", TENANT_SCOPE_URI, validTenantExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -755,8 +622,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
         },
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "patch", RESOURCE_SCOPE_URI, validResourceExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -782,18 +647,11 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
         },
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "patch", RESOURCE_SCOPE_URI, validResourceExtensionsResource),
     kind: "MockApiDefinition",
   },
 ]);
 
-Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServiceKeys([
-  "ResourceGroup",
-  "Subscription",
-  "Tenant",
-  "Resource",
-]).pass([
+Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = passOnSuccess([
   {
     uri: getUri(RESOURCE_GROUP_SCOPE_URI, "delete"),
     method: "delete",
@@ -805,7 +663,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     response: {
       status: 204,
     },
-    handler: (req: MockRequest) => requestHandler(req, "delete", RESOURCE_GROUP_SCOPE_URI, null),
     kind: "MockApiDefinition",
   },
   {
@@ -819,7 +676,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     response: {
       status: 204,
     },
-    handler: (req: MockRequest) => requestHandler(req, "delete", RESOURCE_GROUP_SCOPE_URI, null),
     kind: "MockApiDefinition",
   },
   {
@@ -833,7 +689,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     response: {
       status: 204,
     },
-    handler: (req: MockRequest) => requestHandler(req, "delete", SUBSCRIPTION_SCOPE_URI, null),
     kind: "MockApiDefinition",
   },
   {
@@ -847,7 +702,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     response: {
       status: 204,
     },
-    handler: (req: MockRequest) => requestHandler(req, "delete", SUBSCRIPTION_SCOPE_URI, null),
     kind: "MockApiDefinition",
   },
   {
@@ -861,7 +715,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     response: {
       status: 204,
     },
-    handler: (req: MockRequest) => requestHandler(req, "delete", TENANT_SCOPE_URI, null),
     kind: "MockApiDefinition",
   },
   {
@@ -875,7 +728,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     response: {
       status: 204,
     },
-    handler: (req: MockRequest) => requestHandler(req, "delete", TENANT_SCOPE_URI, null),
     kind: "MockApiDefinition",
   },
   {
@@ -889,7 +741,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     response: {
       status: 204,
     },
-    handler: (req: MockRequest) => requestHandler(req, "delete", RESOURCE_SCOPE_URI, null),
     kind: "MockApiDefinition",
   },
   {
@@ -903,17 +754,11 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     response: {
       status: 204,
     },
-    handler: (req: MockRequest) => requestHandler(req, "delete", RESOURCE_SCOPE_URI, null),
     kind: "MockApiDefinition",
   },
 ]);
 
-Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = withServiceKeys([
-  "ResourceGroup",
-  "Subscription",
-  "Tenant",
-  "Resource",
-]).pass([
+Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = passOnSuccess([
   {
     uri: getUri(RESOURCE_GROUP_SCOPE_URI, "list"),
     method: "get",
@@ -928,8 +773,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
         value: [validResourceGroupExtensionsResource],
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "list", RESOURCE_GROUP_SCOPE_URI, validResourceGroupExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -946,8 +789,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
         value: [validResourceGroupExtensionsResource],
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "list", RESOURCE_GROUP_SCOPE_URI, validResourceGroupExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -964,8 +805,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
         value: [validSubscriptionExtensionsResource],
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "list", SUBSCRIPTION_SCOPE_URI, validSubscriptionExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -982,8 +821,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
         value: [validSubscriptionExtensionsResource],
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "list", SUBSCRIPTION_SCOPE_URI, validSubscriptionExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -1000,8 +837,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
         value: [validTenantExtensionsResource],
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "list", TENANT_SCOPE_URI, validTenantExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -1018,8 +853,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
         value: [validTenantExtensionsResource],
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "list", TENANT_SCOPE_URI, validTenantExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -1036,8 +869,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
         value: [validResourceExtensionsResource],
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "list", RESOURCE_SCOPE_URI, validResourceExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
@@ -1054,8 +885,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
         value: [validResourceExtensionsResource],
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "list", RESOURCE_SCOPE_URI, validResourceExtensionsResource),
     kind: "MockApiDefinition",
   },
 ]);
