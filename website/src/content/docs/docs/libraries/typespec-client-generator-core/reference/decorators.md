@@ -1226,7 +1226,7 @@ The operation that should be treated as a Long Running Operation
 op startDeployment(@path deploymentId: string): DeploymentResult | ErrorResponse;
 ```
 
-### `@nextLinkOperation` {#@Azure.ClientGenerator.Core.Legacy.nextLinkOperation}
+### `@nextLinkVerb` {#@Azure.ClientGenerator.Core.Legacy.nextLinkVerb}
 
 Specifies the HTTP verb for the next link operation in a paging scenario.
 
@@ -1237,7 +1237,7 @@ This decorator is considered legacy functionality and should only be used when
 standard TypeSpec paging patterns are not sufficient.
 
 ```typespec
-@Azure.ClientGenerator.Core.Legacy.nextLinkOperation(verb: valueof string, scope?: valueof string)
+@Azure.ClientGenerator.Core.Legacy.nextLinkVerb(verb: "GET" | "POST", scope?: valueof string)
 ```
 
 #### Target
@@ -1247,17 +1247,17 @@ The paging operation to specify next link operation behavior for
 
 #### Parameters
 
-| Name  | Type             | Description                                                                                                                                                                                                                                                     |
-| ----- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| verb  | `valueof string` | The HTTP verb to use for next link operations. Must be "POST" or "GET".                                                                                                                                                                                         |
-| scope | `valueof string` | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| Name  | Type              | Description                                                                                                                                                                                                                                                     |
+| ----- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| verb  | `"GET" \| "POST"` | The HTTP verb to use for next link operations. Must be "POST" or "GET".                                                                                                                                                                                         |
+| scope | `valueof string`  | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
 
 #### Examples
 
 ##### Specify POST for next link operations
 
 ```typespec
-@Azure.ClientGenerator.Core.Legacy.nextLinkOperation("POST")
+@Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST")
 @post
 op listItems(): PageResult;
 ```
