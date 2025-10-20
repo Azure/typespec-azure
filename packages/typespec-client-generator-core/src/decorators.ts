@@ -1491,7 +1491,7 @@ export const $nextLinkVerb: NextLinkVerbDecorator = (
  * @param entity Operation to check for nextLinkVerb decorator
  * @returns The HTTP verb string ("POST" or "GET"). Defaults to "GET" if decorator is not applied.
  */
-export function getNextLinkVerb(context: TCGCContext, entity: Operation): string {
+export function getNextLinkVerb(context: TCGCContext, entity: Operation): "GET" | "POST" {
   return getScopedDecoratorData(context, nextLinkVerbKey, entity) ?? "GET";
 }
 
