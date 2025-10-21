@@ -509,17 +509,11 @@ export function getSdkUnionWithDiagnostics(
       diagnostics.add(createDiagnostic({ code: "union-null", target: type }));
       retval = diagnostics.pipe(getEmptyUnionType(context, type, operation));
       updateReferencedTypeMap(context, type, retval);
-      if (retval.external) {
-        updateUsageOrAccess(context, UsageFlags.External, retval, { skipFirst: true });
-      }
     } else if (checkUnionCircular(type)) {
       // union with circular ref, report diagnostic and fall back to empty union
       diagnostics.add(createDiagnostic({ code: "union-circular", target: type }));
       retval = diagnostics.pipe(getEmptyUnionType(context, type, operation));
       updateReferencedTypeMap(context, type, retval);
-      if (retval.external) {
-        updateUsageOrAccess(context, UsageFlags.External, retval, { skipFirst: true });
-      }
     } else {
       const namespace = getClientNamespace(context, type);
       // if a union is `type | null`, then we will return a nullable wrapper type of the type
@@ -535,9 +529,6 @@ export function getSdkUnionWithDiagnostics(
           namespace,
         };
         updateReferencedTypeMap(context, type, retval);
-        if (retval.external) {
-          updateUsageOrAccess(context, UsageFlags.External, retval, { skipFirst: true });
-        }
         retval.type = diagnostics.pipe(
           getClientTypeWithDiagnostics(context, nonNullOptions[0], operation),
         );
@@ -569,9 +560,6 @@ export function getSdkUnionWithDiagnostics(
             };
           }
           updateReferencedTypeMap(context, type, retval);
-          if (retval.external) {
-            updateUsageOrAccess(context, UsageFlags.External, retval, { skipFirst: true });
-          }
         }
       }
 
@@ -600,9 +588,6 @@ export function getSdkUnionWithDiagnostics(
           };
         }
         updateReferencedTypeMap(context, type, retval);
-        if (retval.external) {
-          updateUsageOrAccess(context, UsageFlags.External, retval, { skipFirst: true });
-        }
         const variantTypes = nonNullOptions.map((x) =>
           diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation)),
         );
@@ -829,11 +814,6 @@ export function getSdkModelWithDiagnostics(
       serializationOptions: {},
     };
     updateReferencedTypeMap(context, type, sdkType);
-    
-    // If the type has external info, propagate External usage flag to referenced types (but not the external type itself)
-    if (sdkType.external) {
-      updateUsageOrAccess(context, UsageFlags.External, sdkType, { skipFirst: true });
-    }
 
     // model MyModel is Record<> {} should be model with additional properties
     if (type.sourceModel?.kind === "Model" && type.sourceModel?.name === "Record") {
@@ -901,11 +881,6 @@ export function getSdkModelWithDiagnostics(
     }
     diagnostics.pipe(addDiscriminatorToModelType(context, type, sdkType));
     updateReferencedTypeMap(context, type, sdkType);
-    
-    // If the type has external info, propagate External usage flag to referenced types (but not the external type itself)
-    if (sdkType.external) {
-      updateUsageOrAccess(context, UsageFlags.External, sdkType, { skipFirst: true });
-    }
   }
   return diagnostics.wrap(sdkType);
 }
@@ -1012,11 +987,6 @@ function getSdkEnumWithDiagnostics(
     }
   }
   updateReferencedTypeMap(context, type, sdkType);
-  
-  // If the type has external info, propagate External usage flag to referenced types (but not the external type itself)
-  if (sdkType.external) {
-    updateUsageOrAccess(context, UsageFlags.External, sdkType, { skipFirst: true });
-  }
   
   return diagnostics.wrap(sdkType);
 }
@@ -1786,6 +1756,19 @@ function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
   }
 }
 
+function updateExternalUsage(context: TCGCContext): void {
+  // Propagate External usage flag from external types to their referenced types
+  for (const [_, sdkType] of context.__referencedTypeCache.entries()) {
+    if (
+      sdkType.external &&
+      (sdkType.kind === "model" || sdkType.kind === "enum" || sdkType.kind === "union")
+    ) {
+      // Propagate External usage to referenced types, but not to the external type itself
+      updateUsageOrAccess(context, UsageFlags.External, sdkType, { skipFirst: true });
+    }
+  }
+}
+
 function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   for (const sdkType of context.__referencedTypeCache.values()) {
@@ -1986,6 +1969,8 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   diagnostics.pipe(updateUsageOverride(context));
   // update spread model
   updateSpreadModelUsageAndAccess(context);
+  // update external usage
+  updateExternalUsage(context);
   // update discriminated subtypes and filter out duplicate properties from `@hierarchyBuilding`
   diagnostics.pipe(handleLegacyHierarchyBuilding(context));
   // update generated name
