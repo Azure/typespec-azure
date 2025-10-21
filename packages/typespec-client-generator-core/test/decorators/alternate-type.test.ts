@@ -710,6 +710,7 @@ describe("external types", () => {
           features: StacItem[];
           links?: Link[];
           context?: ContextExtension;
+          shared?: SharedModel;
         }
 
         model ItemCollectionType {
@@ -779,5 +780,51 @@ describe("external types", () => {
     // ItemCollection2 is not external, should NOT have External flag
     strictEqual(itemCollection2?.kind, "model");
     strictEqual((itemCollection2.usage & UsageFlags.External) === 0, true);
+  });
+
+  it("should set External usage flag for transitively referenced types", async () => {
+    await runner.compile(`
+      @service
+      namespace MyService {
+        @alternateType({
+          identity: "external.Collection",
+          package: "external-lib",
+        }, "python")
+        model ExternalModel {
+          nested: NestedModel;
+        }
+
+        model NestedModel {
+          deepNested: DeepNestedModel;
+          value: string;
+        }
+
+        model DeepNestedModel {
+          id: int32;
+        }
+
+        @route("/test")
+        op test(@body body: ExternalModel): void;
+      };
+    `);
+
+    const models = getAllModels(runner.context);
+    const externalModel = models.find((m) => m.name === "ExternalModel");
+    const nestedModel = models.find((m) => m.name === "NestedModel");
+    const deepNestedModel = models.find((m) => m.name === "DeepNestedModel");
+
+    // ExternalModel has external info, should NOT have External usage flag
+    strictEqual(externalModel?.kind, "model");
+    strictEqual(externalModel.external?.identity, "external.Collection");
+    strictEqual((externalModel.usage & UsageFlags.External) === 0, true);
+
+    // NestedModel is only referenced by ExternalModel, should have External usage flag
+    strictEqual(nestedModel?.kind, "model");
+    strictEqual((nestedModel.usage & UsageFlags.External) > 0, true);
+
+    // DeepNestedModel is only referenced by NestedModel (which has External flag)
+    // So it should also have External flag (recursive propagation)
+    strictEqual(deepNestedModel?.kind, "model");
+    strictEqual((deepNestedModel.usage & UsageFlags.External) > 0, true);
   });
 });
