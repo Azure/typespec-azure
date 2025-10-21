@@ -695,4 +695,41 @@ describe("external types", () => {
       "External library version mismatch. There are multiple versions of collections-lib: 1.0.0 and 1.0.1. Please unify the versions.",
     );
   });
+
+  it("should not treat regular TypeSpec models as external types", async () => {
+    const csharpRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
+    await csharpRunner.compile(`
+      @service
+      namespace MyService {
+        // Regular TypeSpec model that should NOT be treated as external
+        model ManagedServiceIdentity {
+          principalId?: string;
+          tenantId?: string;
+          type: string;
+        }
+
+        model Employee {
+          name: string;
+          identity?: ManagedServiceIdentity;
+        }
+
+        @route("/test")
+        op test(@body body: Employee): void;
+
+        // Apply alternateType to change the identity property type
+        @@alternateType(Employee.identity, ManagedServiceIdentity, "csharp");
+      };
+    `);
+
+    const models = getAllModels(csharpRunner.context);
+    const employee = models.find((m) => m.name === "Employee");
+    strictEqual(employee?.kind, "model");
+
+    const identityProperty = employee.properties.find((p) => p.name === "identity");
+    strictEqual(identityProperty?.type.kind, "model");
+    strictEqual(identityProperty?.type.name, "ManagedServiceIdentity");
+    
+    // The key check: it should NOT have external property set
+    strictEqual(identityProperty?.type.external, undefined);
+  });
 });

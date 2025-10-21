@@ -743,6 +743,36 @@ const alternateTypeKey = createStateSymbol("alternateType");
  * @param alternate target type to replace the source type or ExternalType object
  * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
  */
+/**
+ * Check if a model is an instance of the ExternalType template from TCGC.
+ * The ExternalType template has properties: identity (required), package (optional), minVersion (optional)
+ */
+function isExternalTypeTemplate(model: Model): boolean {
+  if (model.indexer !== undefined) {
+    return false;
+  }
+  
+  const properties = [...model.properties.values()];
+  
+  // Check if it has an 'identity' property with String literal type
+  const hasIdentity = properties.some(
+    (prop) => prop.name === "identity" && prop.type.kind === "String"
+  );
+  
+  if (!hasIdentity) {
+    return false;
+  }
+  
+  // Check that all other properties are only 'package' or 'minVersion' with String literal types
+  const otherProps = properties.filter((prop) => prop.name !== "identity");
+  const validProps = otherProps.every(
+    (prop) =>
+      (prop.name === "package" || prop.name === "minVersion") && prop.type.kind === "String"
+  );
+  
+  return validProps;
+}
+
 export const $alternateType: AlternateTypeDecorator = (
   context: DecoratorContext,
   source: ModelProperty | Scalar | Model | Enum | Union,
@@ -750,7 +780,7 @@ export const $alternateType: AlternateTypeDecorator = (
   scope?: LanguageScopes,
 ) => {
   let alternateInput: Type | ExternalTypeInfo = alternate;
-  if (alternate.kind === "Model" && alternate.indexer === undefined) {
+  if (alternate.kind === "Model" && isExternalTypeTemplate(alternate)) {
     // This means we're dealing with external type
     if (!scope) {
       reportDiagnostic(context.program, {
