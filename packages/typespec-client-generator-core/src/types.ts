@@ -1862,10 +1862,10 @@ function updateExternalUsage(context: TCGCContext): void {
     }
   }
 
-  // Mark types with External usage flag
+  // Use updateUsageOrAccess to set External usage flag (without propagation)
   for (const type of typesToMarkExternal) {
     if (type.kind === "model" || type.kind === "enum" || type.kind === "union") {
-      type.usage |= UsageFlags.External;
+      updateUsageOrAccess(context, UsageFlags.External, type, { propagation: false });
     }
   }
 }
