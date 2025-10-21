@@ -751,25 +751,25 @@ function isExternalTypeTemplate(model: Model): boolean {
   if (model.indexer !== undefined) {
     return false;
   }
-  
+
   const properties = [...model.properties.values()];
-  
+
   // Check if it has an 'identity' property with String literal type
   const hasIdentity = properties.some(
-    (prop) => prop.name === "identity" && prop.type.kind === "String"
+    (prop) => prop.name === "identity" && prop.type.kind === "String",
   );
-  
+
   if (!hasIdentity) {
     return false;
   }
-  
+
   // Check that all other properties are only 'package' or 'minVersion' with String literal types
   const otherProps = properties.filter((prop) => prop.name !== "identity");
   const validProps = otherProps.every(
     (prop) =>
-      (prop.name === "package" || prop.name === "minVersion") && prop.type.kind === "String"
+      (prop.name === "package" || prop.name === "minVersion") && prop.type.kind === "String",
   );
-  
+
   return validProps;
 }
 

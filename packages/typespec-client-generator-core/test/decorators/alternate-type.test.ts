@@ -728,7 +728,7 @@ describe("external types", () => {
     const identityProperty = employee.properties.find((p) => p.name === "identity");
     strictEqual(identityProperty?.type.kind, "model");
     strictEqual(identityProperty?.type.name, "ManagedServiceIdentity");
-    
+
     // The key check: it should NOT have external property set
     strictEqual(identityProperty?.type.external, undefined);
   });
