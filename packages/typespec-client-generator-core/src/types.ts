@@ -1755,6 +1755,87 @@ function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
   }
 }
 
+function updateExternalUsage(context: TCGCContext): void {
+  // First, collect all types that have external info
+  const externalTypes = new Set<SdkType>();
+  for (const [_, sdkType] of context.__referencedTypeCache.entries()) {
+    if (sdkType.external) {
+      externalTypes.add(sdkType);
+    }
+  }
+
+  // If no external types, nothing to do
+  if (externalTypes.size === 0) return;
+
+  // Build a map of which types reference which other types
+  const typeReferences = new Map<SdkType, Set<SdkType>>();
+  
+  function collectReferences(type: SdkType, referencedBy: SdkType): void {
+    if (!typeReferences.has(type)) {
+      typeReferences.set(type, new Set());
+    }
+    typeReferences.get(type)!.add(referencedBy);
+  }
+
+  function traverseType(type: SdkType, referencedBy: SdkType, visited: Set<SdkType> = new Set()): void {
+    if (visited.has(type)) return;
+    visited.add(type);
+
+    if (type.kind === "model") {
+      collectReferences(type, referencedBy);
+      for (const prop of type.properties) {
+        traverseType(prop.type, referencedBy, visited);
+      }
+      if (type.baseModel) {
+        traverseType(type.baseModel, referencedBy, visited);
+      }
+      if (type.additionalProperties) {
+        traverseType(type.additionalProperties, referencedBy, visited);
+      }
+      if (type.discriminatedSubtypes) {
+        for (const subtype of Object.values(type.discriminatedSubtypes)) {
+          traverseType(subtype, referencedBy, visited);
+        }
+      }
+    } else if (type.kind === "enum") {
+      collectReferences(type, referencedBy);
+    } else if (type.kind === "union") {
+      collectReferences(type, referencedBy);
+      for (const variantType of type.variantTypes) {
+        traverseType(variantType, referencedBy, visited);
+      }
+    } else if (type.kind === "array") {
+      traverseType(type.valueType, referencedBy, visited);
+    } else if (type.kind === "dict") {
+      traverseType(type.valueType, referencedBy, visited);
+    } else if (type.kind === "nullable") {
+      traverseType(type.type, referencedBy, visited);
+    } else if (type.kind === "enumvalue") {
+      traverseType(type.enumType, referencedBy, visited);
+    }
+  }
+
+  // Traverse all external types to find what they reference
+  for (const externalType of externalTypes) {
+    traverseType(externalType, externalType);
+  }
+
+  // Mark types as External if they are ONLY referenced by external types
+  for (const [type, referencedBySet] of typeReferences.entries()) {
+    // Skip the external types themselves
+    if (externalTypes.has(type)) continue;
+    
+    // Check if all references are from external types
+    const allReferencesAreExternal = Array.from(referencedBySet).every(refBy => externalTypes.has(refBy));
+    
+    if (allReferencesAreExternal && referencedBySet.size > 0) {
+      if (type.kind === "model" || type.kind === "enum" || type.kind === "union") {
+        type.usage |= UsageFlags.External;
+      }
+    }
+  }
+}
+
 function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   for (const sdkType of context.__referencedTypeCache.values()) {
@@ -1955,6 +2036,8 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   diagnostics.pipe(updateUsageOverride(context));
   // update spread model
   updateSpreadModelUsageAndAccess(context);
+  // update external usage
+  updateExternalUsage(context);
   // update discriminated subtypes and filter out duplicate properties from `@hierarchyBuilding`
   diagnostics.pipe(handleLegacyHierarchyBuilding(context));
   // update generated name
