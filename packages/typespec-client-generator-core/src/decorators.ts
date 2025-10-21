@@ -733,21 +733,11 @@ export function getOverriddenClientMethod(
   return getScopedDecoratorData(context, overrideKey, entity);
 }
 
-const alternateTypeKey = createStateSymbol("alternateType");
-
 /**
- * Replace a source type with an alternate type in a specific scope.
- *
- * @param context the decorator context
- * @param source source type to be replaced
- * @param alternate target type to replace the source type or ExternalType object
- * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
+ * Check if a model is an external type.
+ * The external type model has properties: identity (required), package (optional), minVersion (optional).
  */
-/**
- * Check if a model is an instance of the ExternalType template from TCGC.
- * The ExternalType template has properties: identity (required), package (optional), minVersion (optional)
- */
-function isExternalTypeTemplate(model: Model): boolean {
+function isExternalType(model: Model): boolean {
   if (model.indexer !== undefined) {
     return false;
   }
@@ -773,6 +763,16 @@ function isExternalTypeTemplate(model: Model): boolean {
   return validProps;
 }
 
+const alternateTypeKey = createStateSymbol("alternateType");
+
+/**
+ * Replace a source type with an alternate type in a specific scope.
+ *
+ * @param context the decorator context
+ * @param source source type to be replaced
+ * @param alternate target type to replace the source type or ExternalType object
+ * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
+ */
 export const $alternateType: AlternateTypeDecorator = (
   context: DecoratorContext,
   source: ModelProperty | Scalar | Model | Enum | Union,
@@ -780,7 +780,7 @@ export const $alternateType: AlternateTypeDecorator = (
   scope?: LanguageScopes,
 ) => {
   let alternateInput: Type | ExternalTypeInfo = alternate;
-  if (alternate.kind === "Model" && isExternalTypeTemplate(alternate)) {
+  if (alternate.kind === "Model" && isExternalType(alternate)) {
     // This means we're dealing with external type
     if (!scope) {
       reportDiagnostic(context.program, {
