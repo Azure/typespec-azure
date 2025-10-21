@@ -710,7 +710,7 @@ describe("external types", () => {
 
         model Employee {
           name: string;
-          identity?: ManagedServiceIdentity;
+          identity: ManagedServiceIdentity;
         }
 
         @route("/test")
