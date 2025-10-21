@@ -509,11 +509,17 @@ export function getSdkUnionWithDiagnostics(
       diagnostics.add(createDiagnostic({ code: "union-null", target: type }));
       retval = diagnostics.pipe(getEmptyUnionType(context, type, operation));
       updateReferencedTypeMap(context, type, retval);
+      if (retval.external) {
+        updateUsageOrAccess(context, UsageFlags.External, retval);
+      }
     } else if (checkUnionCircular(type)) {
       // union with circular ref, report diagnostic and fall back to empty union
       diagnostics.add(createDiagnostic({ code: "union-circular", target: type }));
       retval = diagnostics.pipe(getEmptyUnionType(context, type, operation));
       updateReferencedTypeMap(context, type, retval);
+      if (retval.external) {
+        updateUsageOrAccess(context, UsageFlags.External, retval);
+      }
     } else {
       const namespace = getClientNamespace(context, type);
       // if a union is `type | null`, then we will return a nullable wrapper type of the type
@@ -529,6 +535,9 @@ export function getSdkUnionWithDiagnostics(
           namespace,
         };
         updateReferencedTypeMap(context, type, retval);
+        if (retval.external) {
+          updateUsageOrAccess(context, UsageFlags.External, retval);
+        }
         retval.type = diagnostics.pipe(
           getClientTypeWithDiagnostics(context, nonNullOptions[0], operation),
         );
@@ -560,6 +569,9 @@ export function getSdkUnionWithDiagnostics(
             };
           }
           updateReferencedTypeMap(context, type, retval);
+          if (retval.external) {
+            updateUsageOrAccess(context, UsageFlags.External, retval);
+          }
         }
       }
 
@@ -588,6 +600,9 @@ export function getSdkUnionWithDiagnostics(
           };
         }
         updateReferencedTypeMap(context, type, retval);
+        if (retval.external) {
+          updateUsageOrAccess(context, UsageFlags.External, retval);
+        }
         const variantTypes = nonNullOptions.map((x) =>
           diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation)),
         );
@@ -814,6 +829,11 @@ export function getSdkModelWithDiagnostics(
       serializationOptions: {},
     };
     updateReferencedTypeMap(context, type, sdkType);
+    
+    // If the type has external info, propagate External usage flag to referenced types
+    if (sdkType.external) {
+      updateUsageOrAccess(context, UsageFlags.External, sdkType);
+    }
 
     // model MyModel is Record<> {} should be model with additional properties
     if (type.sourceModel?.kind === "Model" && type.sourceModel?.name === "Record") {
@@ -881,6 +901,11 @@ export function getSdkModelWithDiagnostics(
     }
     diagnostics.pipe(addDiscriminatorToModelType(context, type, sdkType));
     updateReferencedTypeMap(context, type, sdkType);
+    
+    // If the type has external info, propagate External usage flag to referenced types
+    if (sdkType.external) {
+      updateUsageOrAccess(context, UsageFlags.External, sdkType);
+    }
   }
   return diagnostics.wrap(sdkType);
 }
@@ -987,6 +1012,12 @@ function getSdkEnumWithDiagnostics(
     }
   }
   updateReferencedTypeMap(context, type, sdkType);
+  
+  // If the type has external info, propagate External usage flag to referenced types
+  if (sdkType.external) {
+    updateUsageOrAccess(context, UsageFlags.External, sdkType);
+  }
+  
   return diagnostics.wrap(sdkType);
 }
 
@@ -1377,11 +1408,6 @@ function updateReferencedTypeMap(context: TCGCContext, type: Type, sdkType: SdkT
     return;
   }
   context.__referencedTypeCache!.set(type, sdkType);
-  
-  // If the type has external info, propagate External usage flag to referenced types
-  if (sdkType.external && (sdkType.kind === "model" || sdkType.kind === "enum" || sdkType.kind === "union")) {
-    updateUsageOrAccess(context, UsageFlags.External, sdkType);
-  }
 }
 
 interface PropagationOptions {
