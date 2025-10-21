@@ -510,7 +510,7 @@ export function getSdkUnionWithDiagnostics(
       retval = diagnostics.pipe(getEmptyUnionType(context, type, operation));
       updateReferencedTypeMap(context, type, retval);
       if (retval.external) {
-        updateUsageOrAccess(context, UsageFlags.External, retval);
+        updateUsageOrAccess(context, UsageFlags.External, retval, { skipFirst: true });
       }
     } else if (checkUnionCircular(type)) {
       // union with circular ref, report diagnostic and fall back to empty union
@@ -518,7 +518,7 @@ export function getSdkUnionWithDiagnostics(
       retval = diagnostics.pipe(getEmptyUnionType(context, type, operation));
       updateReferencedTypeMap(context, type, retval);
       if (retval.external) {
-        updateUsageOrAccess(context, UsageFlags.External, retval);
+        updateUsageOrAccess(context, UsageFlags.External, retval, { skipFirst: true });
       }
     } else {
       const namespace = getClientNamespace(context, type);
@@ -536,7 +536,7 @@ export function getSdkUnionWithDiagnostics(
         };
         updateReferencedTypeMap(context, type, retval);
         if (retval.external) {
-          updateUsageOrAccess(context, UsageFlags.External, retval);
+          updateUsageOrAccess(context, UsageFlags.External, retval, { skipFirst: true });
         }
         retval.type = diagnostics.pipe(
           getClientTypeWithDiagnostics(context, nonNullOptions[0], operation),
@@ -570,7 +570,7 @@ export function getSdkUnionWithDiagnostics(
           }
           updateReferencedTypeMap(context, type, retval);
           if (retval.external) {
-            updateUsageOrAccess(context, UsageFlags.External, retval);
+            updateUsageOrAccess(context, UsageFlags.External, retval, { skipFirst: true });
           }
         }
       }
@@ -601,7 +601,7 @@ export function getSdkUnionWithDiagnostics(
         }
         updateReferencedTypeMap(context, type, retval);
         if (retval.external) {
-          updateUsageOrAccess(context, UsageFlags.External, retval);
+          updateUsageOrAccess(context, UsageFlags.External, retval, { skipFirst: true });
         }
         const variantTypes = nonNullOptions.map((x) =>
           diagnostics.pipe(getClientTypeWithDiagnostics(context, x, operation)),
@@ -830,9 +830,9 @@ export function getSdkModelWithDiagnostics(
     };
     updateReferencedTypeMap(context, type, sdkType);
     
-    // If the type has external info, propagate External usage flag to referenced types
+    // If the type has external info, propagate External usage flag to referenced types (but not the external type itself)
     if (sdkType.external) {
-      updateUsageOrAccess(context, UsageFlags.External, sdkType);
+      updateUsageOrAccess(context, UsageFlags.External, sdkType, { skipFirst: true });
     }
 
     // model MyModel is Record<> {} should be model with additional properties
@@ -902,9 +902,9 @@ export function getSdkModelWithDiagnostics(
     diagnostics.pipe(addDiscriminatorToModelType(context, type, sdkType));
     updateReferencedTypeMap(context, type, sdkType);
     
-    // If the type has external info, propagate External usage flag to referenced types
+    // If the type has external info, propagate External usage flag to referenced types (but not the external type itself)
     if (sdkType.external) {
-      updateUsageOrAccess(context, UsageFlags.External, sdkType);
+      updateUsageOrAccess(context, UsageFlags.External, sdkType, { skipFirst: true });
     }
   }
   return diagnostics.wrap(sdkType);
@@ -1013,9 +1013,9 @@ function getSdkEnumWithDiagnostics(
   }
   updateReferencedTypeMap(context, type, sdkType);
   
-  // If the type has external info, propagate External usage flag to referenced types
+  // If the type has external info, propagate External usage flag to referenced types (but not the external type itself)
   if (sdkType.external) {
-    updateUsageOrAccess(context, UsageFlags.External, sdkType);
+    updateUsageOrAccess(context, UsageFlags.External, sdkType, { skipFirst: true });
   }
   
   return diagnostics.wrap(sdkType);
