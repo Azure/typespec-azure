@@ -696,7 +696,7 @@ describe("external types", () => {
     );
   });
 
-  it("should set External usage flag for types only referenced by external types", async () => {
+  it("should set External usage flag for types referenced by external types", async () => {
     await runner.compile(`
       @service
       namespace MyService {
@@ -773,9 +773,11 @@ describe("external types", () => {
     strictEqual(contextExtension?.kind, "model");
     strictEqual((contextExtension.usage & UsageFlags.External) > 0, true);
 
-    // SharedModel is used by both external and non-external types, so should NOT have External flag
+    // SharedModel is used by both external and non-external types
+    // It will have External flag (from ItemCollection) AND Input flag (from ItemCollection2)
     strictEqual(sharedModel?.kind, "model");
-    strictEqual((sharedModel.usage & UsageFlags.External) === 0, true);
+    strictEqual((sharedModel.usage & UsageFlags.External) > 0, true);
+    strictEqual((sharedModel.usage & UsageFlags.Input) > 0, true);
 
     // ItemCollection2 is not external, should NOT have External flag
     strictEqual(itemCollection2?.kind, "model");

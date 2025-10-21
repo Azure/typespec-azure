@@ -1377,6 +1377,11 @@ function updateReferencedTypeMap(context: TCGCContext, type: Type, sdkType: SdkT
     return;
   }
   context.__referencedTypeCache!.set(type, sdkType);
+  
+  // If the type has external info, propagate External usage flag to referenced types
+  if (sdkType.external && (sdkType.kind === "model" || sdkType.kind === "enum" || sdkType.kind === "union")) {
+    updateUsageOrAccess(context, UsageFlags.External, sdkType);
+  }
 }
 
 interface PropagationOptions {
@@ -1755,121 +1760,6 @@ function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
   }
 }
 
-function updateExternalUsage(context: TCGCContext): void {
-  // First, collect all types that have external info
-  const externalTypes = new Set<SdkType>();
-  for (const [_, sdkType] of context.__referencedTypeCache.entries()) {
-    if (sdkType.external) {
-      externalTypes.add(sdkType);
-    }
-  }
-
-  // If no external types, nothing to do
-  if (externalTypes.size === 0) return;
-
-  // Build a map of which types are referenced by which other types
-  // Key: a type, Value: set of types that reference it
-  const typeReferencedBy = new Map<SdkType, Set<SdkType>>();
-  
-  function collectReference(referencedType: SdkType, referencedBy: SdkType): void {
-    if (!typeReferencedBy.has(referencedType)) {
-      typeReferencedBy.set(referencedType, new Set());
-    }
-    typeReferencedBy.get(referencedType)!.add(referencedBy);
-  }
-
-  function traverseTypeReferences(type: SdkType, rootType: SdkType, visited: Set<SdkType> = new Set()): void {
-    if (visited.has(type)) return;
-    visited.add(type);
-
-    if (type.kind === "model") {
-      // Record that rootType references this model
-      if (type !== rootType) {
-        collectReference(type, rootType);
-      }
-      // Traverse properties
-      for (const prop of type.properties) {
-        traverseTypeReferences(prop.type, rootType, visited);
-      }
-      if (type.baseModel) {
-        traverseTypeReferences(type.baseModel, rootType, visited);
-      }
-      if (type.additionalProperties) {
-        traverseTypeReferences(type.additionalProperties, rootType, visited);
-      }
-      if (type.discriminatedSubtypes) {
-        for (const subtype of Object.values(type.discriminatedSubtypes)) {
-          traverseTypeReferences(subtype, rootType, visited);
-        }
-      }
-    } else if (type.kind === "enum") {
-      if (type !== rootType) {
-        collectReference(type, rootType);
-      }
-    } else if (type.kind === "union") {
-      if (type !== rootType) {
-        collectReference(type, rootType);
-      }
-      for (const variantType of type.variantTypes) {
-        traverseTypeReferences(variantType, rootType, visited);
-      }
-    } else if (type.kind === "array") {
-      traverseTypeReferences(type.valueType, rootType, visited);
-    } else if (type.kind === "dict") {
-      traverseTypeReferences(type.valueType, rootType, visited);
-    } else if (type.kind === "nullable") {
-      traverseTypeReferences(type.type, rootType, visited);
-    } else if (type.kind === "enumvalue") {
-      traverseTypeReferences(type.enumType, rootType, visited);
-    }
-  }
-
-  // Traverse all types in the cache to build the reference map
-  for (const [_, sdkType] of context.__referencedTypeCache.entries()) {
-    traverseTypeReferences(sdkType, sdkType);
-  }
-
-  // Track which types should have External flag
-  // Start with types directly referenced by external types
-  const typesToMarkExternal = new Set<SdkType>();
-  
-  // Find types that are ONLY referenced by external types (directly)
-  for (const [type, referencedBySet] of typeReferencedBy.entries()) {
-    if (externalTypes.has(type)) continue; // Skip external types themselves
-    
-    const allReferencesAreExternal = Array.from(referencedBySet).every(refBy => externalTypes.has(refBy));
-    if (allReferencesAreExternal && referencedBySet.size > 0) {
-      typesToMarkExternal.add(type);
-    }
-  }
-
-  // Recursively find types that are only referenced by types in typesToMarkExternal
-  let changed = true;
-  while (changed) {
-    changed = false;
-    for (const [type, referencedBySet] of typeReferencedBy.entries()) {
-      if (externalTypes.has(type) || typesToMarkExternal.has(type)) continue;
-      
-      // Check if all references are from external types or types already marked as external
-      const allReferencesAreExternalOrMarked = Array.from(referencedBySet).every(
-        refBy => externalTypes.has(refBy) || typesToMarkExternal.has(refBy)
-      );
-      
-      if (allReferencesAreExternalOrMarked && referencedBySet.size > 0) {
-        typesToMarkExternal.add(type);
-        changed = true;
-      }
-    }
-  }
-
-  // Use updateUsageOrAccess to set External usage flag (without propagation)
-  for (const type of typesToMarkExternal) {
-    if (type.kind === "model" || type.kind === "enum" || type.kind === "union") {
-      updateUsageOrAccess(context, UsageFlags.External, type, { propagation: false });
-    }
-  }
-}
-
 function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   for (const sdkType of context.__referencedTypeCache.values()) {
@@ -2070,8 +1960,6 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   diagnostics.pipe(updateUsageOverride(context));
   // update spread model
   updateSpreadModelUsageAndAccess(context);
-  // update external usage
-  updateExternalUsage(context);
   // update discriminated subtypes and filter out duplicate properties from `@hierarchyBuilding`
   diagnostics.pipe(handleLegacyHierarchyBuilding(context));
   // update generated name
