@@ -858,7 +858,7 @@ export function getAlternateType(
     alternateTypeKey,
     source,
   );
-  if (retval !== undefined && "identity" in retval) {
+  if (retval !== undefined && "identity" in retval && !("kind" in retval)) {
     if (!context.__externalPackageToVersions) {
       context.__externalPackageToVersions = new Map();
     }
