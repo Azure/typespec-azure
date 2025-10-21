@@ -1763,8 +1763,8 @@ function updateExternalUsage(context: TCGCContext): void {
       sdkType.external &&
       (sdkType.kind === "model" || sdkType.kind === "enum" || sdkType.kind === "union")
     ) {
-      // Propagate External usage to referenced types, but not to the external type itself
-      updateUsageOrAccess(context, UsageFlags.External, sdkType, { skipFirst: true });
+      // Propagate External usage to the external type itself and all referenced types
+      updateUsageOrAccess(context, UsageFlags.External, sdkType);
     }
   }
 }

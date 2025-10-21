@@ -755,10 +755,10 @@ describe("external types", () => {
     const sharedModel = models.find((m) => m.name === "SharedModel");
     const itemCollection2 = models.find((m) => m.name === "ItemCollection2");
 
-    // ItemCollection has external info, so it should NOT have External usage flag
+    // ItemCollection has external info and should have External usage flag
     strictEqual(itemCollection?.kind, "model");
     strictEqual(itemCollection.external?.identity, "pystac.Collection");
-    strictEqual((itemCollection.usage & UsageFlags.External) === 0, true);
+    strictEqual((itemCollection.usage & UsageFlags.External) > 0, true);
 
     // Types only referenced by ItemCollection should have External usage flag
     strictEqual(itemCollectionType?.kind, "model");
@@ -815,10 +815,10 @@ describe("external types", () => {
     const nestedModel = models.find((m) => m.name === "NestedModel");
     const deepNestedModel = models.find((m) => m.name === "DeepNestedModel");
 
-    // ExternalModel has external info, should NOT have External usage flag
+    // ExternalModel has external info and should have External usage flag
     strictEqual(externalModel?.kind, "model");
     strictEqual(externalModel.external?.identity, "external.Collection");
-    strictEqual((externalModel.usage & UsageFlags.External) === 0, true);
+    strictEqual((externalModel.usage & UsageFlags.External) > 0, true);
 
     // NestedModel is only referenced by ExternalModel, should have External usage flag
     strictEqual(nestedModel?.kind, "model");
