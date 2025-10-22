@@ -987,7 +987,7 @@ function getSdkEnumWithDiagnostics(
     }
   }
   updateReferencedTypeMap(context, type, sdkType);
-  
+
   return diagnostics.wrap(sdkType);
 }
 

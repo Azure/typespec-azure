@@ -763,13 +763,13 @@ describe("external types", () => {
     // Types only referenced by ItemCollection should have External usage flag
     strictEqual(itemCollectionType?.kind, "model");
     strictEqual((itemCollectionType.usage & UsageFlags.External) > 0, true);
-    
+
     strictEqual(stacItem?.kind, "model");
     strictEqual((stacItem.usage & UsageFlags.External) > 0, true);
-    
+
     strictEqual(link?.kind, "model");
     strictEqual((link.usage & UsageFlags.External) > 0, true);
-    
+
     strictEqual(contextExtension?.kind, "model");
     strictEqual((contextExtension.usage & UsageFlags.External) > 0, true);
 
