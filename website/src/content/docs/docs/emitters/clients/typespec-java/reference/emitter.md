@@ -84,6 +84,18 @@ When set to `true`, the generated SDK uses stream style serialization. Default v
 
 When set to `true`, the emitter generates Java `Object` for TypeSpec `unknown`; otherwise, the emitter generates `BinaryData`. Default value is `false`. This option is for backward-compatibility.
 
+### `float32-as-double`
+
+**Type:** `boolean`
+
+When set to `true`, the emitter generates Java `double` for TypeSpec `float32`; otherwise, the emitter generates `float`. Default value is `true`. This option is for backward-compatibility.
+
+### `uuid-as-string`
+
+**Type:** `boolean`
+
+When set to `true`, the emitter generates Java `String` for TypeSpec `Azure.Core.uuid`; otherwise, the emitter generates `UUID`. Default value is `true`. This option is for backward-compatibility.
+
 ### `generate-protocol-methods`
 
 **Type:** `boolean`
