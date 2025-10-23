@@ -1,9 +1,10 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { strictEqual } from "assert";
+import { ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
 import { getAllModels } from "../../src/types.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
+import { getServiceMethodOfClient } from "../utils.js";
 
 let runner: SdkTestRunner;
 
@@ -147,4 +148,23 @@ it("verify diagnostic gets raised for usage", async () => {
         'Referencing elements inside Legacy namespace "Azure.ClientGenerator.Core.Legacy" is not allowed.',
     },
   ]);
+});
+
+it("body parameter of model type should have been flattened", async () => {
+  await runner.compileWithBuiltInService(`
+    model TestModel {
+      prop: string;
+    }
+
+    op func1(@body body: TestModel): void;
+
+    @@Legacy.flattenProperty(func1::parameters.body);
+  `);
+
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+
+  const bodyMethodParam = method.parameters.find((x) => x.name === "body");
+  ok(bodyMethodParam);
+  strictEqual(bodyMethodParam.flatten, true);
 });

@@ -232,6 +232,7 @@ function getSdkHttpParameters(
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`,
         decorators: diagnostics.pipe(getTypeDecorators(context, tspBody.type)),
         access: "public",
+        flatten: false,
       };
     }
     if (retval.bodyParam) {
@@ -348,6 +349,7 @@ function createContentTypeOrAcceptHeader(
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.${name}`,
     decorators: [],
     access: "public",
+    flatten: false,
   };
 }
 
