@@ -917,7 +917,20 @@ export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation
   if (getMarkAsLro(context, operation)) {
     // we guard against this in the setting of `@markAsLro`
     const sdkMethod = ignoreDiagnostics(getSdkBasicServiceMethod(context, operation, client));
-    const returnType = sdkMethod.response.type!.__raw! as Model;
+    let returnType: Model;
+    const sdkMethodResponseType = sdkMethod.response.type!;
+    switch (sdkMethodResponseType.kind) {
+      case "nullable":
+        returnType = sdkMethodResponseType.type.__raw! as Model;
+        break;
+      case "model":
+        returnType = sdkMethodResponseType.__raw! as Model;
+        break;
+      default:
+        throw new Error(
+          `LRO method ${operation.name} with @markAsLro must have a model return type.`,
+        );
+    }
     return {
       operation,
       logicalResult: returnType,
