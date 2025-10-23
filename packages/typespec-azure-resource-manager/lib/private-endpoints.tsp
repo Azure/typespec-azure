@@ -138,11 +138,12 @@ interface PrivateEndpoints<PrivateEndpointResource extends PrivateEndpointConnec
       LroHeaders
     >,
     Error extends {} = ErrorResponse
-  > is ArmCreateOperation<
-    ResourceInstanceParameters<ParentResource, BaseParameters> &
-      KeysOf<PrivateEndpointConnectionParameter> &
-      Parameters,
+  > is Azure.ResourceManager.Private.PrivateEndpoints.CreateOrUpdateAsync<
+    ParentResource,
     Resource,
+    BaseParameters,
+    LroHeaders,
+    Parameters,
     Response,
     Error
   >;
@@ -200,7 +201,7 @@ interface PrivateEndpoints<PrivateEndpointResource extends PrivateEndpointConnec
       LroHeaders
     >,
     Error extends {} = ErrorResponse
-  > is PrivateEndpoints.CreateOrUpdateAsync<
+  > is Azure.ResourceManager.Private.PrivateEndpoints.CreateOrUpdateAsync<
     ParentResource,
     Resource,
     BaseParameters,
@@ -304,7 +305,7 @@ interface PrivateEndpoints<PrivateEndpointResource extends PrivateEndpointConnec
     Parameters extends {} = {},
     Response extends {} = ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
     Error extends {} = ErrorResponse
-  > is PrivateEndpoints.DeleteAsyncBase<
+  > is Azure.ResourceManager.Private.PrivateEndpoints.DeleteAsyncBase<
     ParentResource,
     Response,
     Resource,
@@ -361,11 +362,14 @@ interface PrivateEndpoints<PrivateEndpointResource extends PrivateEndpointConnec
     BaseParameters = DefaultBaseParameters<ParentResource>,
     Parameters extends {} = {},
     Error extends {} = ErrorResponse
-  >(
-    ...ResourceInstanceParameters<ParentResource, BaseParameters>,
-    ...KeysOf<PrivateEndpointConnectionParameter>,
-    ...Parameters,
-  ): Response | Error;
+  > is Azure.ResourceManager.Private.PrivateEndpoints.DeleteAsyncBase<
+    ParentResource,
+    Response,
+    Resource,
+    BaseParameters,
+    Parameters,
+    Error
+  >;
 }
 
 /** PATCH model for private endpoint connections */
@@ -376,4 +380,72 @@ model PrivateEndpointConnectionUpdate
   >>> {
   /** The private endpoint connection properties */
   properties?: OptionalProperties<UpdateableProperties<CommonTypes.PrivateEndpointConnectionProperties>>;
+}
+
+namespace Private {
+  namespace PrivateEndpoints {
+    /**
+     * @dev Delete a PrivateEndpointConnection to a resource asynchronously
+     * @template ParentResource The parent resource of the PrivateEndpointConnection
+     * @template Response The response type for the operation
+     * @template Resource Optional. The PrivateEndpointConnection resource being deleted
+     * @template BaseParameters Optional. Allows overriding the parameters for the operation
+     * @template Parameters Optional. Additional parameters after the path parameters
+     * @template Error Optional. The error response, if non-standard.
+     */
+    @autoRoute
+    @doc("Delete a {name} PrivateEndpointConnection", ParentResource)
+    @armResourceDelete(Resource)
+    @Private.enforceConstraint(ParentResource, Foundations.Resource)
+    @delete
+    op DeleteAsyncBase<
+      ParentResource extends Foundations.SimpleResource,
+      Response,
+      Resource extends PrivateEndpointConnectionResource,
+      BaseParameters = DefaultBaseParameters<ParentResource>,
+      Parameters extends {} = {},
+      Error extends {} = ErrorResponse
+    >(
+      ...ResourceInstanceParameters<ParentResource, BaseParameters>,
+      ...KeysOf<PrivateEndpointConnectionParameter>,
+      ...Parameters,
+    ): Response | Error;
+
+    /**
+     * @dev A long-running resource CreateOrUpdate (PUT) for a PrivateEndpointConnection to a resource
+     * @template ParentResource the parent resource of the PrivateEndpointConnection
+     * @template Resource the PrivateEndpointConnection resource being created or updated
+     * @template BaseParameters Optional. Allows overriding the operation parameters
+     * @template LroHeaders Optional.  Allows overriding the lro headers returned on resource create
+     * @template Parameters Optional. Additional parameters after the path parameters
+     * @template Response Optional. The success response for the createOrUpdate operation
+     * @template Error Optional. The error response, if non-standard.
+     */
+    @autoRoute
+    @doc("Create a {name} PrivateEndpointConnection", ParentResource)
+    @armResourceCreateOrUpdate(Resource)
+    @Private.enforceConstraint(ParentResource, Foundations.Resource)
+    @Azure.Core.Foundations.Private.defaultFinalStateVia(#["location", "azure-async-operation"])
+    @put
+    op CreateOrUpdateAsync<
+      ParentResource extends Foundations.SimpleResource,
+      Resource extends PrivateEndpointConnectionResource,
+      BaseParameters = DefaultBaseParameters<ParentResource>,
+      LroHeaders extends TypeSpec.Reflection.Model = ArmAsyncOperationHeader<FinalResult = Resource> &
+        Azure.Core.Foundations.RetryAfterHeader,
+      Parameters extends {} = {},
+      Response extends {} = ArmResourceUpdatedResponse<Resource> | ArmResourceCreatedResponse<
+        Resource,
+        LroHeaders
+      >,
+      Error extends {} = ErrorResponse
+    > is ArmCreateOperation<
+      ResourceInstanceParameters<ParentResource, BaseParameters> &
+        KeysOf<PrivateEndpointConnectionParameter> &
+        Parameters,
+      Resource,
+      Response,
+      Error
+    >;
+  }
 }
