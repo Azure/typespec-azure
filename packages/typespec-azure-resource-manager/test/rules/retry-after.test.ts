@@ -24,21 +24,11 @@ it("is valid if there is an interface called Operations extending Azure.Resource
   await tester
     .expect(
       `
-        @service
         @armProviderNamespace
-        @versioned(Versions)
         namespace Microsoft.Foo;
         
-        enum Versions {
-                          @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
-          "2021-10-01-preview",
-        }
-        
         model FooResource is TrackedResource<{}> {
-          @key("foo")
-          @segment("foo")
-          @path
-          name: string;
+          ...ResourceNameParameter<FooResource>;
         }
         
         model UpdateFooResponse {
@@ -49,7 +39,6 @@ it("is valid if there is an interface called Operations extending Azure.Resource
         @armResourceOperations
         interface FooResources {
           @armResourceUpdate(FooResource)
-          @OpenAPI.extension("x-ms-long-running-operation", true)
           @patch(#{implicitOptionality: true})
           update(): UpdateFooResponse;
         }
@@ -62,20 +51,25 @@ it("emit warnings for long running operation without retry after header in respo
   await tester
     .expect(
       `
-              @armProviderNamespace
+        @armProviderNamespace
         namespace Microsoft.Foo;
    
         model FooResource is TrackedResource<{}> {
-          @key("foo") @segment("foo") @path
-          name: string;
+          ...ResourceNameParameter<FooResource>;
         }
-  
+
+        @Azure.Core.lroStatus
+        enum Status {
+          Failed,
+          Succeeded,
+          Canceled,
+        }
         @armResourceOperations
         interface FooResources {
-          @armResourceUpdate(FooResource)
-          @OpenAPI.extension("x-ms-long-running-operation", true)
-          @patch(#{implicitOptionality: true}) 
-          op update(): FooResource;
+          @Azure.Core.pollingOperation(FooResources.getOperationStatus)
+          @post op update(): FooResource;
+
+          op getOperationStatus(): {status: Status};
         }
       `,
     )

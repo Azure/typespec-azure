@@ -1,5 +1,4 @@
 import "../dist/src/tsp-index.js";
-import "@typespec/openapi";
 import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/versioning";
@@ -19,11 +18,5 @@ import "./responses.tsp";
 import "./parameters.tsp";
 import "./private-endpoints.tsp";
 import "./private-links.tsp";
-
-using Http;
-using Rest;
-using Versioning;
-using OpenAPI;
-using Azure.ResourceManager.Foundations;
 
 namespace Azure.ResourceManager;
