@@ -89,6 +89,24 @@ it("doesn't emit diagnostic for internal operations", async () => {
     .toBeValid();
 });
 
+it("doesn't emit diagnostic for operaton templates", async () => {
+  await tester
+    .expect(
+      `
+      @armProviderNamespace
+      namespace Microsoft.ContosoProviderHub;
+
+      @armResourceOperations
+      interface Employees {
+        getData is ArmBodyProviderActionSync<string>;
+      }
+
+      op ArmBodyProviderActionSync<T>(t: T, ...Azure.ResourceManager.Foundations.DefaultBaseParameters<TenantActionScope>): void;
+    `,
+    )
+    .toBeValid();
+});
+
 it("Detects operations outside interfaces", async () => {
   await tester
     .expect(
