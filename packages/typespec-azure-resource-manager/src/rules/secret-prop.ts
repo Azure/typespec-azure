@@ -36,15 +36,6 @@ export const secretProprule = createRule({
           !isSecret(context.program, property) &&
           !isSecret(context.program, property.type) &&
           property.type !== tk.builtin.url &&
-          tk.type.isAssignableTo(property.type, tk.builtin.string) &&
-          property.type.kind !== "Union" &&
-          property.type.kind !== "Enum" &&
-          !property.name.endsWith("Uri") &&
-          !property.name.endsWith("Url") &&
-          !property.name.endsWith("Name") &&
-          !property.name.endsWith("Type") &&
-          !property.name.endsWith("Id") &&
-          !property.name.endsWith("ID") &&
           !isKeyValuePairKeyProp(property)
         ) {
           context.reportDiagnostic({
@@ -72,5 +63,5 @@ const sensitiveKeywords = [
 
 function isPotentialSensitiveProperty(propertyName: string): boolean {
   const upperName = propertyName.toUpperCase();
-  return sensitiveKeywords.some((keyword) => upperName.includes(keyword));
+  return sensitiveKeywords.some((keyword) => upperName.endsWith(keyword));
 }
