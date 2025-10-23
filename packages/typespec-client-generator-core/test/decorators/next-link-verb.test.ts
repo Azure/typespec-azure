@@ -1,19 +1,12 @@
-import { createTcgcTesterInstance, TcgcTesterInstance } from "#test/tester.js";
-import { Namespace, Operation } from "@typespec/compiler";
+import { t } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
+import { createTCGCContext } from "../../src/context.js";
 import { getNextLinkVerb } from "../../src/decorators.js";
-
-let instance: TcgcTesterInstance;
-
-beforeEach(async () => {
-  instance = await createTcgcTesterInstance({
-    emitterName: "@azure-tools/typespec-java",
-  });
-});
+import { SimpleTesterWithBuiltInService } from "../tester.js";
 
 it("should store next link verb HTTP verb", async () => {
-  await instance.compileWithBuiltInService(`
+  const { listItems, program } = await SimpleTesterWithBuiltInService.compile(t.code`
     model ListTestResult {
       @pageItems
       tests: Test[];
@@ -25,49 +18,47 @@ it("should store next link verb HTTP verb", async () => {
       id: string;
     }
     
-    @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST")
+    @Legacy.nextLinkVerb("POST")
     @list
     @post
-    op listItems(): ListTestResult;
+    op ${t.op("listItems")}(): ListTestResult;
   `);
 
-  const namespace = instance.context.program.resolveTypeReference("TestService")[0]! as Namespace;
-  const operation = namespace.operations.get("listItems")! as Operation;
-  const verb = getNextLinkVerb(instance.context, operation);
+  const tcgcContext = createTCGCContext(program);
+  const verb = getNextLinkVerb(tcgcContext, listItems);
   strictEqual(verb, "POST");
 });
 
 it("should apply nextLinkVerb with language scope", async () => {
-  await instance.compileWithBuiltInService(`
+  const { listItems, program } = await SimpleTesterWithBuiltInService.compile(t.code`
     model ListTestResult {
       @pageItems
       tests: Test[];
-      @TypeSpec.nextLink
+      @nextLink
       next: string;
     }
     
     model Test {
       id: string;
     }
-    
-    @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST", "java")
+
+    @Legacy.nextLinkVerb("POST", "java")
     @list
     @post
-    op listItems(): ListTestResult;
+    op ${t.op("listItems")}(): ListTestResult;
   `);
 
-  const namespace = instance.context.program.resolveTypeReference("TestService")[0]! as Namespace;
-  const operation = namespace.operations.get("listItems")! as Operation;
-  const verb = getNextLinkVerb(instance.context, operation);
+  const tcgcContext = createTCGCContext(program, "@azure-tools/typespec-java");
+  const verb = getNextLinkVerb(tcgcContext, listItems);
   strictEqual(verb, "POST");
 });
 
 it("should return GET when decorator is not applied", async () => {
-  await instance.compileWithBuiltInService(`
+  const { listItems, program } = await SimpleTesterWithBuiltInService.compile(t.code`
     model ListTestResult {
       @pageItems
       tests: Test[];
-      @TypeSpec.nextLink
+      @nextLink
       next: string;
     }
     
@@ -77,21 +68,21 @@ it("should return GET when decorator is not applied", async () => {
     
     @list
     @post
-    op listItems(): ListTestResult;
+    op ${t.op("listItems")}(): ListTestResult;
   `);
 
-  const namespace = instance.context.program.resolveTypeReference("TestService")[0]! as Namespace;
-  const operation = namespace.operations.get("listItems")! as Operation;
-  const verb = getNextLinkVerb(instance.context, operation);
+  const tcgcContext = createTCGCContext(program);
+  const verb = getNextLinkVerb(tcgcContext, listItems);
   strictEqual(verb, "GET");
 });
 
 it("should support POST and GET HTTP verbs", async () => {
-  await instance.compileWithBuiltInService(`
+  const { listWithGet, listWithPost, program } =
+    await SimpleTesterWithBuiltInService.compile(t.code`
     model ListTestResult {
       @pageItems
       tests: Test[];
-      @TypeSpec.nextLink
+      @nextLink
       next: string;
     }
     
@@ -99,36 +90,34 @@ it("should support POST and GET HTTP verbs", async () => {
       id: string;
     }
     
-    @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("GET")
+    @Legacy.nextLinkVerb("GET")
     @list
     @route("/list-get")
     @post
-    op listWithGet(): ListTestResult;
-    
-    @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST")
+    op ${t.op("listWithGet")}(): ListTestResult;
+
+    @Legacy.nextLinkVerb("POST")
     @list
     @route("/list-post")
     @post
-    op listWithPost(): ListTestResult;
+    op ${t.op("listWithPost")}(): ListTestResult;
   `);
 
-  const namespace = instance.context.program.resolveTypeReference("TestService")[0]! as Namespace;
+  const tcgcContext = createTCGCContext(program);
 
-  const listWithGetOp = namespace.operations.get("listWithGet")! as Operation;
-  const getVerb = getNextLinkVerb(instance.context, listWithGetOp);
+  const getVerb = getNextLinkVerb(tcgcContext, listWithGet);
   strictEqual(getVerb, "GET");
 
-  const listWithPostOp = namespace.operations.get("listWithPost")! as Operation;
-  const postVerb = getNextLinkVerb(instance.context, listWithPostOp);
+  const postVerb = getNextLinkVerb(tcgcContext, listWithPost);
   strictEqual(postVerb, "POST");
 });
 
 it("should reject invalid HTTP verbs", async () => {
-  const diagnostics = await instance.diagnose(`
+  const diagnostics = await SimpleTesterWithBuiltInService.diagnose(`
     model ListTestResult {
       @pageItems
       tests: Test[];
-      @TypeSpec.nextLink
+      @nextLink
       next: string;
     }
     
@@ -136,7 +125,7 @@ it("should reject invalid HTTP verbs", async () => {
       id: string;
     }
     
-    @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("PATCH")
+    @Legacy.nextLinkVerb("PATCH")
     @list
     @post
     op listItems(): ListTestResult;
