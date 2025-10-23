@@ -127,7 +127,7 @@ jobs:
       - run: pnpm install
         name: Install dependencies
 
-      - run: node eng/scripts/download-common-types.js v3
+      - run: pnpm tsx eng/scripts/sync-common-types.ts
         name: Swagger - Fetch common-types v3
 
       - run: node eng/scripts/check-for-changed-files.js
