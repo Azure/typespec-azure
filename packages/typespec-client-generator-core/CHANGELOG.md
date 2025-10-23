@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.61.2
+
+### Bug Fixes
+
+- [#3426](https://github.com/Azure/typespec-azure/pull/3426) Fix `@alternateType` decorator incorrectly treating regular TypeSpec models as external types
+
+
 ## 0.61.1
 
 ### Bug Fixes
