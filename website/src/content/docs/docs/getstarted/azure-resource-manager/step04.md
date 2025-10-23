@@ -26,7 +26,7 @@ interface Users extends TrackedResourceOperations<User, UserProperties> {
 }
 ```
 
-The following operation templates for different kinds of actions are provider in the `Azure.ResourceManager` namespace:
+The following operation templates for different kinds of actions are provided in the `Azure.ResourceManager` namespace:
 
 | Template                                                 | Description                                                                                        |
 | -------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |

@@ -8,7 +8,7 @@ To define an Azure Resource Manager service, the first thing you will need to do
 
 ```typespec
 @armProviderNamespace
-@service(#{title: "<service name>", version: "<service version>"})
+@service(#{ title: "<service name>" })
 namespace <mynamespace>;
 ```
 
@@ -16,7 +16,7 @@ For example:
 
 ```typespec
 @armProviderNamespace
-@service(#{ title: "Contoso User Service", version: "2020-10-01-preview" })
+@service(#{ title: "Contoso User Service" })
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 namespace Contoso.Users;
 ```
