@@ -934,7 +934,7 @@ export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation
     return {
       operation,
       logicalResult: returnType,
-      finalStateVia: FinalStateValue.originalUri, // doesn't really matter, but for get LRO
+      finalStateVia: FinalStateValue.location,
       pollingInfo: {
         kind: "pollingOperationStep",
         responseModel: returnType,
