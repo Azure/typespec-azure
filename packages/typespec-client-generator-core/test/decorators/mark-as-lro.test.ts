@@ -181,8 +181,8 @@ it("should work with ArmResourceRead", async () => {
       }
       @Azure.ClientGenerator.Core.Legacy.markAsLro
       op getProductionSiteDeploymentStatus is ArmResourceRead<
-      Employee
-    >;
+        Employee
+      >;
     `);
 
   const methods = armRunner.context.sdkPackage.clients[0].methods;
@@ -190,6 +190,43 @@ it("should work with ArmResourceRead", async () => {
   const method = methods[0];
   strictEqual(method.kind, "lro");
   strictEqual(method.name, "getProductionSiteDeploymentStatus");
+
+  const metadata = method.lroMetadata;
+  ok(metadata);
+  strictEqual(metadata.finalStateVia, FinalStateValue.originalUri);
+  strictEqual(method.response.type?.kind, "model");
+  strictEqual(method.response.type?.name, "Employee");
+  strictEqual(metadata.envelopeResult?.name, "Employee");
+  strictEqual(metadata.finalResponse?.envelopeResult?.name, "Employee");
+  strictEqual(metadata.finalResponse?.result?.name, "Employee");
+  ok(!metadata.finalResponse?.resultSegments);
+});
+
+it("Extension.Read", async () => {
+  const armRunner = await createSdkTestRunner({
+    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
+    autoUsings: ["Azure.ResourceManager", "Azure.Core"],
+    emitterName: "@azure-tools/typespec-python",
+  });
+  await armRunner.compileWithBuiltInAzureResourceManagerService(`
+    /** A ContosoProviderHub resource */
+    model Employee is TrackedResource<{}> {
+      ...ResourceNameParameter<Employee>;
+    }
+    @Azure.ClientGenerator.Core.Legacy.markAsLro
+    op get is Extension.Read<
+      Extension.ScopeParameter,
+      Employee,
+      Response = ArmResponse<Employee> | ArmAcceptedResponse,
+      Error = ErrorResponse
+    >;
+    `);
+
+  const methods = armRunner.context.sdkPackage.clients[0].methods;
+  strictEqual(methods.length, 1);
+  const method = methods[0];
+  strictEqual(method.kind, "lro");
+  strictEqual(method.name, "get");
 
   const metadata = method.lroMetadata;
   ok(metadata);
