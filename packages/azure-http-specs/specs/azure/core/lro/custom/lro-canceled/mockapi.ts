@@ -17,8 +17,8 @@ function uploadPendingHandler(req: MockRequest) {
   uploadPollCount += 1;
   const response =
     uploadPollCount === 1
-      ? { status: "InProgress", status_details: "Security domain upload in progress" }
-      : { status: "Stopped", status_details: "Security domain upload was stopped" };
+      ? { status: "InProgress", statusDetails: "Security domain upload in progress" }
+      : { status: "Stopped", statusDetails: "Security domain upload was stopped" };
 
   return { status: 200, body: json(response) };
 }
@@ -38,7 +38,7 @@ Scenarios.Azure_Core_Lro_Custom_LroCanceled_upload = passOnSuccess([
       headers: {
         "operation-location": dyn`${dynItem("baseUrl")}/azure/core/lro/custom/lro-canceled/securitydomain/upload/pending`,
       },
-      body: json({ status: "InProgress", status_details: "Security domain upload initiated" }),
+      body: json({ status: "InProgress", statusDetails: "Security domain upload initiated" }),
     },
     handler: (req: MockRequest) => {
       req.expect.containsQueryParam("api-version", "2022-12-01-preview");
@@ -49,7 +49,7 @@ Scenarios.Azure_Core_Lro_Custom_LroCanceled_upload = passOnSuccess([
         headers: {
           "operation-location": `${req.baseUrl}/azure/core/lro/custom/lro-canceled/securitydomain/upload/pending`,
         },
-        body: json({ status: "InProgress", status_details: "Security domain upload initiated" }),
+        body: json({ status: "InProgress", statusDetails: "Security domain upload initiated" }),
       };
     },
     kind: "MockApiDefinition",
@@ -64,7 +64,7 @@ Scenarios.Azure_Core_Lro_Custom_LroCanceled_upload = passOnSuccess([
     },
     response: {
       status: 202,
-      body: json({ status: "InProgress", status_details: "Security domain upload in progress" }),
+      body: json({ status: "InProgress", statusDetails: "Security domain upload in progress" }),
     },
     handler: uploadPendingHandler,
     kind: "MockApiDefinition",
@@ -81,7 +81,7 @@ Scenarios.Azure_Core_Lro_Custom_LroCanceled_upload = passOnSuccess([
       status: 200,
       body: json({
         status: "Stopped",
-        status_details: "Security domain upload was stopped",
+        statusDetails: "Security domain upload was stopped",
       }),
     },
     handler: uploadPendingHandler,
@@ -100,7 +100,7 @@ Scenarios.Azure_Core_Lro_Custom_LroCanceled_uploadPending = passOnSuccess([
     },
     response: {
       status: 202,
-      body: json({ status: "InProgress", status_details: "Security domain upload in progress" }),
+      body: json({ status: "InProgress", statusDetails: "Security domain upload in progress" }),
     },
     handler: uploadPendingHandler,
     kind: "MockApiDefinition",
@@ -117,7 +117,7 @@ Scenarios.Azure_Core_Lro_Custom_LroCanceled_uploadPending = passOnSuccess([
       status: 200,
       body: json({
         status: "Stopped",
-        status_details: "Security domain upload was stopped",
+        statusDetails: "Security domain upload was stopped",
       }),
     },
     handler: uploadPendingHandler,

@@ -17,8 +17,8 @@ function uploadPendingHandler(req: MockRequest) {
   uploadPollCount += 1;
   const response =
     uploadPollCount === 1
-      ? { status: "InProgress", status_details: "Security domain upload in progress" }
-      : { status: "Success", status_details: "Security domain upload completed successfully" };
+      ? { status: "InProgress", statusDetails: "Security domain upload in progress" }
+      : { status: "Success", statusDetails: "Security domain upload completed successfully" };
 
   return { status: 200, body: json(response) };
 }
@@ -67,7 +67,7 @@ Scenarios.Azure_Core_Lro_Custom_UseFinalStateVia_upload = passOnSuccess([
       headers: {
         "operation-location": dyn`${dynItem("baseUrl")}/azure/core/lro/custom/final-state-via/securitydomain/upload/pending`,
       },
-      body: json({ status: "InProgress", status_details: "Security domain upload in progress" }),
+      body: json({ status: "InProgress", statusDetails: "Security domain upload in progress" }),
     },
     handler: uploadPendingHandler,
     kind: "MockApiDefinition",
@@ -87,7 +87,7 @@ Scenarios.Azure_Core_Lro_Custom_UseFinalStateVia_upload = passOnSuccess([
       },
       body: json({
         status: "Success",
-        status_details: "Security domain upload completed successfully",
+        statusDetails: "Security domain upload completed successfully",
       }),
     },
     handler: uploadPendingHandler,
