@@ -47,6 +47,7 @@ import {
   SdkQueryParameter,
   SdkServiceResponseHeader,
   SdkType,
+  SerializationOptions,
   TCGCContext,
 } from "./interfaces.js";
 import {
@@ -103,6 +104,7 @@ export function getSdkHttpOperation(
       responses.push({
         ...fourOFourResponse,
         statusCodes: 404,
+        serializationOptions: {},
       });
       exceptions.splice(exceptions.indexOf(fourOFourResponse), 1);
       // remove the exception from the list
@@ -119,6 +121,7 @@ export function getSdkHttpOperation(
         ),
         headers: [],
         __raw: (responses[0] || exceptions[0]).__raw,
+        serializationOptions: {},
       });
     }
   }
@@ -482,11 +485,13 @@ function getSdkHttpResponseAndExceptions(
   const diagnostics = createDiagnosticCollector();
   const responses: SdkHttpResponse[] = [];
   const exceptions: SdkHttpErrorResponse[] = [];
+  let serializationOptions: SerializationOptions = {};
   for (const response of httpOperation.responses) {
     const headers: SdkServiceResponseHeader[] = [];
     let body: Type | undefined;
     let type: SdkType | undefined;
     let contentTypes: string[] = [];
+
     for (const innerResponse of response.responses) {
       const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
         ? "application/json"
@@ -504,6 +509,9 @@ function getSdkHttpResponseAndExceptions(
         context.__responseHeaderCache.set(header, headers[headers.length - 1]);
       }
       if (innerResponse.body && !isNeverOrVoidType(innerResponse.body.type)) {
+        if (innerResponse.body.bodyKind === "file") {
+          serializationOptions = { binary: { isFile: true } };
+        }
         if (body && body !== innerResponse.body.type) {
           diagnostics.add(
             createDiagnostic({
@@ -548,6 +556,7 @@ function getSdkHttpResponseAndExceptions(
         httpOperation.operation,
       ),
       description: response.description,
+      serializationOptions,
     };
 
     if (

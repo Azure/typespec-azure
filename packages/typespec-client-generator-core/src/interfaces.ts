@@ -805,6 +805,7 @@ interface SdkHttpResponseBase extends SdkServiceResponse {
 
 export interface SdkHttpResponse extends SdkHttpResponseBase {
   statusCodes: number | HttpStatusCodeRange;
+  serializationOptions: SerializationOptions;
 }
 
 export interface SdkHttpErrorResponse extends SdkHttpResponseBase {
