@@ -180,20 +180,16 @@ function getSdkHttpParameters(
   // we add correspondingMethodParams after we create the type, since we need the info on the type
   const correspondingMethodParams: (SdkMethodParameter | SdkModelPropertyType)[] = [];
   if (tspBody) {
-    if (tspBody.bodyKind === "file") {
-      // file body is not supported yet
-      diagnostics.add(
-        createDiagnostic({
-          code: "unsupported-http-file-body",
-          target: tspBody.property ?? tspBody.type,
-        }),
-      );
-      return diagnostics.wrap(retval);
-    }
     if (tspBody.property && !isNeverOrVoidType(tspBody.property.type)) {
       const bodyParam = diagnostics.pipe(
         getSdkHttpParameter(context, tspBody.property, httpOperation.operation, undefined, "body"),
       );
+      if (tspBody.bodyKind === "file" && bodyParam.kind === "body") {
+        if (!bodyParam.serializationOptions) {
+          bodyParam.serializationOptions = {};
+        }
+        bodyParam.serializationOptions.binary = { isFile: true };
+      }
       if (bodyParam.kind !== "body") {
         diagnostics.add(
           createDiagnostic({
@@ -232,6 +228,7 @@ function getSdkHttpParameters(
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`,
         decorators: diagnostics.pipe(getTypeDecorators(context, tspBody.type)),
         access: "public",
+        serializationOptions: {},
       };
     }
     if (retval.bodyParam) {
@@ -434,6 +431,7 @@ export function getSdkHttpParameter(
       defaultContentType: "application/json",
       optional: param.optional,
       correspondingMethodParams: [],
+      serializationOptions: {},
     });
   }
   const headerQueryBase = {
