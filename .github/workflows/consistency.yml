@@ -40,7 +40,8 @@ jobs:
 
       - run: node eng/scripts/validate-core-submodule.js
         name: Check that core submodule is merged to core repo
-        if: !startsWith(github.branch , 'release/')
+        if: |
+          !startsWith(github.base_ref, 'release/')
 
   # Validate spell check
   spellcheck:
