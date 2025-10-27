@@ -19,7 +19,7 @@ namespace Azure.Core {
    *   v3Preview
    * }
    * ```
-   * 
+   *
    */
   extern dec previewVersion(target: TypeSpec.Reflection.EnumMember);
 
@@ -132,6 +132,14 @@ namespace Azure.Core {
    * Specifies that an array model or array-typed property should contain only unique items.
    */
   extern dec uniqueItems(entity: ModelProperty | Model);
+}
+
+namespace Azure.Core.Private {
+  extern dec changePropertyType(target: ModelProperty, newType: Model | Union | Scalar | Enum);
+
+  extern dec extendModel(target: Model, source: Model);
+
+  extern dec copyVariants(target: Union, sourceUnion: Union);
 }
 
 namespace Azure.Core.Foundations {

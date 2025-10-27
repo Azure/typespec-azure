@@ -23,6 +23,11 @@ import { $defaultFinalStateVia } from "./decorators/private/default-final-state-
 import { $embeddingVector } from "./decorators/private/embedding-vector.js";
 import { $ensureResourceType } from "./decorators/private/ensure-resource-type.js";
 import { $ensureVerb } from "./decorators/private/ensure-verb.js";
+import {
+  $changePropertyType,
+  $copyVariants,
+  $extendModel,
+} from "./decorators/private/experimental.js";
 import { $needsRoute } from "./decorators/private/needs-route.js";
 import { parameterizedNextLinkConfigDecorator } from "./decorators/private/parameterized-next-link-config.js";
 import { $spreadCustomParameters } from "./decorators/private/spread-custom-parameters.js";
@@ -97,4 +102,10 @@ export const $decorators = {
     traitSource: $traitSource,
     ensureTraitsPresent: $ensureTraitsPresent,
   } satisfies AzureCoreTraitsPrivateDecorators,
+
+  "Azure.Core.Private": {
+    changePropertyType: $changePropertyType,
+    extendModel: $extendModel,
+    copyVariants: $copyVariants,
+  },
 };
