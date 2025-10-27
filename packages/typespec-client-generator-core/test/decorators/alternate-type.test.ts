@@ -828,7 +828,8 @@ describe("external types", () => {
     // So it should also have External flag (recursive propagation)
     strictEqual(deepNestedModel?.kind, "model");
     strictEqual((deepNestedModel.usage & UsageFlags.External) > 0, true);
-  
+  });
+
   it("should not treat regular TypeSpec models as external types", async () => {
     const csharpRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
     await csharpRunner.compile(`
