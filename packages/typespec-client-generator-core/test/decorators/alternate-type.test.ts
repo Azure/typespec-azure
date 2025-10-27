@@ -775,6 +775,8 @@ describe("external types", () => {
 
     // SharedModel is used by both external and non-external types
     // It will have External flag (from ItemCollection) AND Input flag (from ItemCollection2)
+    // NOTE: for shared model, TCGC actually shall not set External flag, because it's not fully external.
+    // But for simplicity we just keep it this way since we may not meet this scenario in the future.
     strictEqual(sharedModel?.kind, "model");
     strictEqual((sharedModel.usage & UsageFlags.External) > 0, true);
     strictEqual((sharedModel.usage & UsageFlags.Input) > 0, true);
