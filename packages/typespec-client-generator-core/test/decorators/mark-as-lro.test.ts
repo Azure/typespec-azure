@@ -49,7 +49,7 @@ it("should mark regular operation as LRO when decorated with @markAsLro", async 
   // Check LRO metadata exists
   const metadata = method.lroMetadata;
   ok(metadata);
-  strictEqual(metadata.finalStateVia, FinalStateValue.originalUri);
+  strictEqual(metadata.finalStateVia, FinalStateValue.location);
 
   // Check that the response model is properly set
   const responseType = method.response.type;
@@ -193,7 +193,7 @@ it("should work with ArmResourceRead", async () => {
 
   const metadata = method.lroMetadata;
   ok(metadata);
-  strictEqual(metadata.finalStateVia, FinalStateValue.originalUri);
+  strictEqual(metadata.finalStateVia, FinalStateValue.location);
   strictEqual(method.response.type?.kind, "model");
   strictEqual(method.response.type?.name, "Employee");
   strictEqual(metadata.envelopeResult?.name, "Employee");
@@ -230,7 +230,7 @@ it("Extension.Read", async () => {
 
   const metadata = method.lroMetadata;
   ok(metadata);
-  strictEqual(metadata.finalStateVia, FinalStateValue.originalUri);
+  strictEqual(metadata.finalStateVia, FinalStateValue.location);
   strictEqual(method.response.type?.kind, "model");
   strictEqual(method.response.type?.name, "Employee");
   strictEqual(metadata.envelopeResult?.name, "Employee");
