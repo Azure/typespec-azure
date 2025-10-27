@@ -1,7 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
-import { SdkArrayType, SdkBuiltInType } from "../../src/interfaces.js";
+import { SdkArrayType, SdkBuiltInType, UsageFlags } from "../../src/interfaces.js";
 import { getAllModels } from "../../src/types.js";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
@@ -694,6 +694,142 @@ describe("external types", () => {
       diagnostics[0].message,
       "External library version mismatch. There are multiple versions of collections-lib: 1.0.0 and 1.0.1. Please unify the versions.",
     );
+  });
+
+  it("should set External usage flag for types referenced by external types", async () => {
+    await runner.compile(`
+      @service
+      namespace MyService {
+        @alternateType({
+          identity: "pystac.Collection",
+          package: "pystac",
+          minVersion: "1.13.0",
+        }, "python")
+        model ItemCollection {
+          type: ItemCollectionType;
+          features: StacItem[];
+          links?: Link[];
+          context?: ContextExtension;
+          shared?: SharedModel;
+        }
+
+        model ItemCollectionType {
+          value: string;
+        }
+
+        model StacItem {
+          id: string;
+        }
+
+        model Link {
+          href: string;
+        }
+
+        model ContextExtension {
+          page: int32;
+        }
+
+        // This model is used both in external type and in another operation
+        model SharedModel {
+          name: string;
+        }
+
+        model ItemCollection2 {
+          shared: SharedModel;
+        }
+
+        @route("/test1")
+        op test1(@body body: ItemCollection): void;
+
+        @route("/test2")
+        op test2(@body body: ItemCollection2): void;
+      };
+    `);
+
+    const models = getAllModels(runner.context);
+    const itemCollection = models.find((m) => m.name === "ItemCollection");
+    const itemCollectionType = models.find((m) => m.name === "ItemCollectionType");
+    const stacItem = models.find((m) => m.name === "StacItem");
+    const link = models.find((m) => m.name === "Link");
+    const contextExtension = models.find((m) => m.name === "ContextExtension");
+    const sharedModel = models.find((m) => m.name === "SharedModel");
+    const itemCollection2 = models.find((m) => m.name === "ItemCollection2");
+
+    // ItemCollection has external info and should have External usage flag
+    strictEqual(itemCollection?.kind, "model");
+    strictEqual(itemCollection.external?.identity, "pystac.Collection");
+    strictEqual((itemCollection.usage & UsageFlags.External) > 0, true);
+
+    // Types only referenced by ItemCollection should have External usage flag
+    strictEqual(itemCollectionType?.kind, "model");
+    strictEqual((itemCollectionType.usage & UsageFlags.External) > 0, true);
+
+    strictEqual(stacItem?.kind, "model");
+    strictEqual((stacItem.usage & UsageFlags.External) > 0, true);
+
+    strictEqual(link?.kind, "model");
+    strictEqual((link.usage & UsageFlags.External) > 0, true);
+
+    strictEqual(contextExtension?.kind, "model");
+    strictEqual((contextExtension.usage & UsageFlags.External) > 0, true);
+
+    // SharedModel is used by both external and non-external types
+    // It will have External flag (from ItemCollection) AND Input flag (from ItemCollection2)
+    // NOTE: for shared model, TCGC actually shall not set External flag, because it's not fully external.
+    // But for simplicity we just keep it this way since we may not meet this scenario in the future.
+    strictEqual(sharedModel?.kind, "model");
+    strictEqual((sharedModel.usage & UsageFlags.External) > 0, true);
+    strictEqual((sharedModel.usage & UsageFlags.Input) > 0, true);
+
+    // ItemCollection2 is not external, should NOT have External flag
+    strictEqual(itemCollection2?.kind, "model");
+    strictEqual((itemCollection2.usage & UsageFlags.External) === 0, true);
+  });
+
+  it("should set External usage flag for transitively referenced types", async () => {
+    await runner.compile(`
+      @service
+      namespace MyService {
+        @alternateType({
+          identity: "external.Collection",
+          package: "external-lib",
+        }, "python")
+        model ExternalModel {
+          nested: NestedModel;
+        }
+
+        model NestedModel {
+          deepNested: DeepNestedModel;
+          value: string;
+        }
+
+        model DeepNestedModel {
+          id: int32;
+        }
+
+        @route("/test")
+        op test(@body body: ExternalModel): void;
+      };
+    `);
+
+    const models = getAllModels(runner.context);
+    const externalModel = models.find((m) => m.name === "ExternalModel");
+    const nestedModel = models.find((m) => m.name === "NestedModel");
+    const deepNestedModel = models.find((m) => m.name === "DeepNestedModel");
+
+    // ExternalModel has external info and should have External usage flag
+    strictEqual(externalModel?.kind, "model");
+    strictEqual(externalModel.external?.identity, "external.Collection");
+    strictEqual((externalModel.usage & UsageFlags.External) > 0, true);
+
+    // NestedModel is only referenced by ExternalModel, should have External usage flag
+    strictEqual(nestedModel?.kind, "model");
+    strictEqual((nestedModel.usage & UsageFlags.External) > 0, true);
+
+    // DeepNestedModel is only referenced by NestedModel (which has External flag)
+    // So it should also have External flag (recursive propagation)
+    strictEqual(deepNestedModel?.kind, "model");
+    strictEqual((deepNestedModel.usage & UsageFlags.External) > 0, true);
   });
 
   it("should not treat regular TypeSpec models as external types", async () => {

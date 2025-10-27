@@ -146,6 +146,8 @@ export enum UsageFlags {
   LroPolling = 1 << 12,
   /** Set when type is used as LRO final envelop response. */
   LroFinalEnvelope = 1 << 13,
+  /** Set when type is only referenced by external types. */
+  External = 1 << 14,
 }
 
 /**
