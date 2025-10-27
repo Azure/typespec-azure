@@ -182,7 +182,7 @@ None
 #### `@armResourceAction`
 
 ```typespec
-@Azure.ResourceManager.armResourceAction(resourceType: Model)
+@Azure.ResourceManager.armResourceAction(resourceType: Model, resourceName?: valueof string)
 ```
 
 ##### Target
@@ -191,9 +191,10 @@ None
 
 ##### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name         | Type             | Description                                                                                      |
+| ------------ | ---------------- | ------------------------------------------------------------------------------------------------ |
+| resourceType | `Model`          | Resource model                                                                                   |
+| resourceName | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource type will be used. |
 
 #### `@armResourceCollectionAction`
 
@@ -214,7 +215,7 @@ None
 #### `@armResourceCreateOrUpdate`
 
 ```typespec
-@Azure.ResourceManager.armResourceCreateOrUpdate(resourceType: Model)
+@Azure.ResourceManager.armResourceCreateOrUpdate(resourceType: Model, resourceName?: valueof string)
 ```
 
 ##### Target
@@ -223,14 +224,15 @@ None
 
 ##### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name         | Type             | Description                                                                                      |
+| ------------ | ---------------- | ------------------------------------------------------------------------------------------------ |
+| resourceType | `Model`          | Resource model                                                                                   |
+| resourceName | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource type will be used. |
 
 #### `@armResourceDelete`
 
 ```typespec
-@Azure.ResourceManager.armResourceDelete(resourceType: Model)
+@Azure.ResourceManager.armResourceDelete(resourceType: Model, resourceName?: valueof string)
 ```
 
 ##### Target
@@ -239,14 +241,15 @@ None
 
 ##### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name         | Type             | Description                                                                                      |
+| ------------ | ---------------- | ------------------------------------------------------------------------------------------------ |
+| resourceType | `Model`          | Resource model                                                                                   |
+| resourceName | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource type will be used. |
 
 #### `@armResourceList`
 
 ```typespec
-@Azure.ResourceManager.armResourceList(resourceType: Model)
+@Azure.ResourceManager.armResourceList(resourceType: Model, resourceName?: valueof string)
 ```
 
 ##### Target
@@ -255,9 +258,10 @@ None
 
 ##### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name         | Type             | Description                                                                                      |
+| ------------ | ---------------- | ------------------------------------------------------------------------------------------------ |
+| resourceType | `Model`          | Resource model                                                                                   |
+| resourceName | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource type will be used. |
 
 #### `@armResourceOperations`
 
@@ -296,7 +300,7 @@ individually tagged
 #### `@armResourceRead`
 
 ```typespec
-@Azure.ResourceManager.armResourceRead(resourceType: Model)
+@Azure.ResourceManager.armResourceRead(resourceType: Model, resourceName?: valueof string)
 ```
 
 ##### Target
@@ -305,14 +309,15 @@ individually tagged
 
 ##### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name         | Type             | Description                                                                                      |
+| ------------ | ---------------- | ------------------------------------------------------------------------------------------------ |
+| resourceType | `Model`          | Resource model                                                                                   |
+| resourceName | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource type will be used. |
 
 #### `@armResourceUpdate`
 
 ```typespec
-@Azure.ResourceManager.armResourceUpdate(resourceType: Model)
+@Azure.ResourceManager.armResourceUpdate(resourceType: Model, resourceName?: valueof string)
 ```
 
 ##### Target
@@ -321,9 +326,10 @@ individually tagged
 
 ##### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name         | Type             | Description                                                                                      |
+| ------------ | ---------------- | ------------------------------------------------------------------------------------------------ |
+| resourceType | `Model`          | Resource model                                                                                   |
+| resourceName | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource type will be used. |
 
 #### `@armVirtualResource`
 

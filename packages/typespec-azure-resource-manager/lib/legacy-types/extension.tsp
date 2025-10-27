@@ -12,12 +12,14 @@ using Rest;
  * @template TargetParameters The path parameters for the target resource
  * @template ExtensionParentParameters Parent parameters of the extension resource
  * @template ExtensionInstanceParameters The instance parameters of the extension resource
+ * @template ResourceName Optional. The name of the resource type at this scope in clients.
  */
 @doc("")
 interface ExtensionOperations<
   TargetParameters extends {},
   ExtensionParentParameters extends {},
-  ExtensionInstanceParameters extends {}
+  ExtensionInstanceParameters extends {},
+  ResourceName extends valueof string = string("")
 > {
   /**
    * A long-running resource CreateOrUpdate (PUT)
@@ -29,10 +31,11 @@ interface ExtensionOperations<
    * @template ErrorType Optional. The error response, if non-standard.
    * @template OperationOptions Optional. The route options for the operation.
    * @template Request Optional. The request body for the createOrUpdate operation.
+   * @template OverrideResourceName Optional. The name of the resource type at this scope in clients.
    */
   @armOperationRoute(OperationOptions)
   @doc("Create a {name}", Resource)
-  @armResourceCreateOrUpdate(Resource)
+  @legacyExtensionResourceOperation(Resource, "createOrUpdate", OverrideResourceName)
   @Azure.Core.Foundations.Private.defaultFinalStateVia(#["location", "azure-async-operation"])
   @put
   CreateOrUpdateAsync<
@@ -47,7 +50,8 @@ interface ExtensionOperations<
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
     OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
-    Request extends {} | void = Resource
+    Request extends {} | void = Resource,
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(
     ...TargetParameters,
     ...ExtensionInstanceParameters,
@@ -64,11 +68,12 @@ interface ExtensionOperations<
    * @template ErrorType Optional. The error response, if non-standard.
    * @template OperationOptions Optional. The route options for the operation.
    * @template Request Optional. The request body for the createOrUpdate operation.
+   * @template OverrideResourceName Optional. The name of the resource type at this scope in clients.
    */
   #suppress "@azure-tools/typespec-azure-core/no-private-usage"
   @armOperationRoute(OperationOptions)
   @doc("Create a {name}", Resource)
-  @armResourceCreateOrUpdate(Resource)
+  @legacyExtensionResourceOperation(Resource, "createOrUpdate", OverrideResourceName)
   @put
   CreateOrUpdateSync<
     Resource extends Foundations.SimpleResource,
@@ -77,7 +82,8 @@ interface ExtensionOperations<
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
     OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
-    Request extends {} | void = Resource
+    Request extends {} | void = Resource,
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(
     ...TargetParameters,
     ...ExtensionInstanceParameters,
@@ -95,10 +101,11 @@ interface ExtensionOperations<
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    * @template ErrorType Optional. The error response, if non-standard.
    * @template OperationOptions Optional. The route options for the operation.
+   * @template OverrideResourceName Optional. The name of the resource type at this scope in clients.
    */
   @armOperationRoute(OperationOptions)
   @doc("Update a {name}", Resource)
-  @armResourceUpdate(Resource)
+  @legacyExtensionResourceOperation(Resource, "update", OverrideResourceName)
   @patch(#{ implicitOptionality: false })
   CustomPatchAsync<
     Resource extends Foundations.SimpleResource,
@@ -116,7 +123,8 @@ interface ExtensionOperations<
     >,
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
-    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(
     ...TargetParameters,
     ...ExtensionInstanceParameters,
@@ -133,10 +141,11 @@ interface ExtensionOperations<
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    * @template ErrorType Optional. The error response, if non-standard.
    * @template OperationOptions Optional. The route options for the operation.
+   * @template OverrideResourceName Optional. The name of the resource type at this scope in clients.
    */
   @armOperationRoute(OperationOptions)
   @doc("Update a {name}", Resource)
-  @armResourceUpdate(Resource)
+  @legacyExtensionResourceOperation(Resource, "update", OverrideResourceName)
   @patch(#{ implicitOptionality: false })
   CustomPatchSync<
     Resource extends Foundations.SimpleResource,
@@ -145,7 +154,8 @@ interface ExtensionOperations<
     Response extends {} = ArmResponse<Resource>,
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
-    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(
     ...TargetParameters,
     ...ExtensionInstanceParameters,
@@ -161,13 +171,14 @@ interface ExtensionOperations<
    * @template Response Optional. The success response(s) for the delete operation
    * @template ErrorType Optional. The error response, if non-standard.
    * @template OperationOptions Optional. The route options for the operation.
+   * @template OverrideResourceName Optional. The name of the resource type at this scope in clients.
    */
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "Valid"
   @armOperationRoute(OperationOptions)
   @doc("Delete a {name}", Resource)
   @delete
   @deletesResource(Resource)
-  @armResourceDelete(Resource)
+  @legacyExtensionResourceOperation(Resource, "delete", OverrideResourceName)
   DeleteWithoutOkAsync<
     Resource extends Foundations.SimpleResource,
     LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
@@ -175,7 +186,8 @@ interface ExtensionOperations<
     Parameters extends {} = {},
     Response extends {} = ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
     ErrorType extends {} = ErrorResponse,
-    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(...TargetParameters, ...ExtensionInstanceParameters, ...Parameters): Response | ErrorType;
 
   /**
@@ -185,19 +197,21 @@ interface ExtensionOperations<
    * @template Response Optional. The success response(s) for the delete operation
    * @template ErrorType Optional. The error response, if non-standard.
    * @template OperationOptions Optional. The route options for the operation.
+   * @template OverrideResourceName Optional. The name of the resource type at this scope in clients.
    */
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "Valid"
   @armOperationRoute(OperationOptions)
   @doc("Delete a {name}", Resource)
   @delete
   @deletesResource(Resource)
-  @armResourceDelete(Resource)
+  @legacyExtensionResourceOperation(Resource, "delete", OverrideResourceName)
   DeleteSync<
     Resource extends Foundations.SimpleResource,
     Parameters extends {} = {},
     Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse,
     ErrorType extends {} = ErrorResponse,
-    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(...TargetParameters, ...ExtensionInstanceParameters, ...Parameters): Response | ErrorType;
 
   /**
@@ -207,18 +221,20 @@ interface ExtensionOperations<
    * @template Response Optional. The success response for a get operation.
    * @template ErrorType Optional. The error response, if non-standard.
    * @template OperationOptions Optional. The route options for the operation.
+   * @template OverrideResourceName Optional. The name of the resource type at this scope in clients.
    */
   @armOperationRoute(OperationOptions)
   @doc("Get a {name}", Resource)
   @get
   @readsResource(Resource)
-  @armResourceRead(Resource)
+  @legacyExtensionResourceOperation(Resource, "read", OverrideResourceName)
   Read<
     Resource extends Foundations.SimpleResource,
     Parameters extends {} = {},
     Response extends {} = ArmResponse<Resource>,
     ErrorType extends {} = ErrorResponse,
-    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(...TargetParameters, ...ExtensionInstanceParameters, ...Parameters): Response | ErrorType;
 
   /**
@@ -228,16 +244,19 @@ interface ExtensionOperations<
    * @template Response Optional. The success response for a head operation (by default NoContent or NotFound response).
    * @template ErrorType Optional. The error response, if non-standard.
    * @template OperationOptions Optional. The route options for the operation.
+   * @template OverrideResourceName Optional. The name of the resource type at this scope in clients.
    */
   @armOperationRoute(OperationOptions)
   @doc("Check for the existence of a {name}", Resource)
+  @legacyExtensionResourceOperation(Resource, "action", OverrideResourceName)
   @head
   CheckExistence<
     Resource extends Foundations.SimpleResource,
     Parameters extends {} = {},
     Response extends {} = ArmResourceExistsResponse | ArmResourceNotFoundResponse,
     ErrorType extends {} = ErrorResponse,
-    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
+    OverrideResourceName extends valueof string = "${ResourceName}"
   > is Foundations.ArmReadOperation<
     TargetParameters & ExtensionInstanceParameters & Parameters,
     Response,
@@ -250,19 +269,21 @@ interface ExtensionOperations<
    * @template Response Optional. The response returned by the list
    * @template ErrorType Optional. The error response, if non-standard.
    * @template OperationOptions Optional. The route options for the operation.
+   * @template OverrideResourceName Optional. The name of the resource type at this scope in clients.
    */
   @armOperationRoute(OperationOptions)
   @doc("List a {name}", Resource)
   @get
   @list
   @listsResource(Resource)
-  @armResourceList(Resource)
+  @legacyExtensionResourceOperation(Resource, "list", OverrideResourceName)
   List<
     Resource extends Foundations.SimpleResource,
     Parameters extends {} = {},
     Response extends {} = ArmResponse<ResourceListResult<Resource>>,
     ErrorType extends {} = ErrorResponse,
-    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(...TargetParameters, ...ExtensionParentParameters, ...Parameters): Response | ErrorType;
 
   /**
@@ -272,18 +293,20 @@ interface ExtensionOperations<
    * @template Response Optional. The response returned by the list
    * @template ErrorType Optional. The error response, if non-standard.
    * @template OperationOptions Optional. The route options for the operation.
+   * @template OverrideResourceName Optional. The name of the resource type at this scope in clients.
    */
   @armOperationRoute(OperationOptions)
   @doc("List a {name}", Resource)
   @get
   @listsResource(Resource)
-  @armResourceList(Resource)
+  @legacyExtensionResourceOperation(Resource, "list", OverrideResourceName)
   ListSinglePage<
     Resource extends Foundations.SimpleResource,
     Parameters extends {} = {},
     Response extends {} = ArmResponse<ResourceListResult<Resource>>,
     ErrorType extends {} = ErrorResponse,
-    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(...TargetParameters, ...ExtensionParentParameters, ...Parameters): Response | ErrorType;
 
   /**
@@ -295,10 +318,11 @@ interface ExtensionOperations<
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    * @template ErrorType Optional. The error response, if non-standard.
    * @template OperationOptions Optional. The route options for the operation.
+   * @template OverrideResourceName Optional. The name of the resource type at this scope in clients.
    */
   @doc("")
   @armOperationRoute(OperationOptions)
-  @armResourceAction(Resource)
+  @legacyExtensionResourceOperation(Resource, "action", OverrideResourceName)
   @Private.enforceConstraint(Resource, Foundations.Resource)
   @post
   @returnsDoc("Azure operation completed successfully.")
@@ -309,7 +333,8 @@ interface ExtensionOperations<
     Parameters extends {} = {},
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
-    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(
     ...TargetParameters,
     ...ExtensionInstanceParameters,
@@ -331,11 +356,12 @@ interface ExtensionOperations<
    * @template OptionalRequestBody Optional. Indicates whether the request body is optional
    * @template ErrorType Optional. The error response, if non-standard.
    * @template OperationOptions Optional. The route options for the operation.
+   * @template OverrideResourceName Optional. The name of the resource type at this scope in clients.
    */
   #suppress "@azure-tools/typespec-azure-core/no-response-body" "ARM"
   @doc("")
   @armOperationRoute(OperationOptions)
-  @armResourceAction(Resource)
+  @legacyExtensionResourceOperation(Resource, "action", OverrideResourceName)
   @Private.enforceConstraint(Resource, Foundations.Resource)
   @post
   @returnsDoc("Azure operation completed successfully.")
@@ -356,7 +382,8 @@ interface ExtensionOperations<
     > | Result,
     OptionalRequestBody extends valueof boolean = false,
     ErrorType extends {} = ErrorResponse,
-    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false }
+    OperationOptions extends valueof ArmOperationOptions = #{ useStaticRoute: false },
+    OverrideResourceName extends valueof string = "${ResourceName}"
   >(
     ...TargetParameters,
     ...ExtensionInstanceParameters,
