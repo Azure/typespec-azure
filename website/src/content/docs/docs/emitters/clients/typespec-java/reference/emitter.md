@@ -84,6 +84,18 @@ When set to `true`, the generated SDK uses stream style serialization. Default v
 
 When set to `true`, the emitter generates Java `Object` for TypeSpec `unknown`; otherwise, the emitter generates `BinaryData`. Default value is `false`. This option is for backward-compatibility.
 
+### `float32-as-double`
+
+**Type:** `boolean`
+
+When set to `true`, the emitter generates Java `double` for TypeSpec `float32`; otherwise, the emitter generates `float`. Default value is `true`. This option is for backward-compatibility.
+
+### `uuid-as-string`
+
+**Type:** `boolean`
+
+When set to `true`, the emitter generates Java `String` for TypeSpec `Azure.Core.uuid`; otherwise, the emitter generates `UUID`. Default value is `true`. This option is for backward-compatibility.
+
 ### `generate-protocol-methods`
 
 **Type:** `boolean`
@@ -126,6 +138,12 @@ Specify the package name for custom model classes.
 
 Specify the Java class that to be executed by emitter for [code customization](https://github.com/Azure/autorest.java/blob/main/customization-base/README.md), during post-process.
 
+### `rename-model`
+
+**Type:** `string,object`
+
+Rename the model classes, in case they cannot be renamed via TCGC. E.g., anonymous models or templated models. Format should be in key-value form.
+
 ### `skip-special-headers`
 
 **Type:** `array`
@@ -154,7 +172,7 @@ When set to `true`, the emitter will take the history of api-versions in TypeSpe
 
 **Type:** `boolean`
 
-When set to `true`, the emitter will not include `##-preview` api-versions in ServiceVersion class. Default value is `false`. The option should be set to `true`, if the intended release is SDK of stable version.
+When set to `true`, the emitter will not include `##-preview` api-versions in ServiceVersion class, if the release targets a stable api-version. Default value is `true`. The option should be set to `true`, if the intended release is SDK of stable version.
 
 ### `dev-options`
 
