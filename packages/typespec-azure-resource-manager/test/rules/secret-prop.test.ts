@@ -13,15 +13,26 @@ beforeEach(async () => {
   );
 });
 
-describe("emit warning for property containing words", () => {
+describe("emit warning for property ending with words", () => {
   it.each(["Auth", "Password", "Token", "Secret"])("for keyword %s", async (keyword) => {
     await tester
-      .expect(`model Test { some${keyword}Info: string; }; op test(): Test;`)
+      .expect(`model Test { some${keyword}: string; }; op test(): Test;`)
       .toEmitDiagnostics({
         code: "@azure-tools/typespec-azure-resource-manager/secret-prop",
-        message: `Property 'some${keyword}Info' looks like it contains sensitive information. Consider marking it with @secret decorator to ensure it is handled securely.`,
+        message: `Property 'some${keyword}' looks like it contains sensitive information. Consider marking it with @secret decorator to ensure it is handled securely.`,
       });
   });
+});
+
+it("doesn't flag if the property is only used in the middle", async () => {
+  await tester
+    .expect(
+      `
+      model Test { passwordConfig: string; }
+      op test(test: Test, key: string): void;
+    `,
+    )
+    .toBeValid();
 });
 
 it("doesn't flag if the property is not used in output", async () => {
@@ -41,7 +52,7 @@ it("valid if the property has @secret", async () => {
       `
         model Test {
           @secret
-          somePasswordInfo: string;
+          somePassword: string;
         }
         `,
     )
@@ -53,7 +64,7 @@ it("valid if the property type has @secret", async () => {
     .expect(
       `
         model Test {
-          somePasswordInfo: myPassword;
+          somePassword: myPassword;
         }
         
         @secret
