@@ -24,6 +24,12 @@ describe("emit warning for property ending with words", () => {
   });
 });
 
+describe("doesn't excluded suffix", async () => {
+  it.each(["publicKey"])("for keyword %s", async (keyword) => {
+    await tester.expect(`model Test { some${keyword}: string; }; op test(): Test;`).toBeValid();
+  });
+});
+
 it("doesn't flag if the property is only used in the middle", async () => {
   await tester
     .expect(

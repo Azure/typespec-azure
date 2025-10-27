@@ -35,7 +35,7 @@ export const secretProprule = createRule({
           isPotentialSensitiveProperty(property.name) &&
           !isSecret(context.program, property) &&
           !isSecret(context.program, property.type) &&
-          property.type !== tk.builtin.url &&
+          property.type === tk.builtin.string &&
           !isKeyValuePairKeyProp(property)
         ) {
           context.reportDiagnostic({
@@ -61,7 +61,12 @@ const sensitiveKeywords = [
   "connection",
 ].map((keyword) => keyword.toUpperCase());
 
+/** Set of keyword that shouldn't be flagged */
+const excludeKeywords = ["publicKey"].map((keyword) => keyword.toUpperCase());
 function isPotentialSensitiveProperty(propertyName: string): boolean {
   const upperName = propertyName.toUpperCase();
-  return sensitiveKeywords.some((keyword) => upperName.endsWith(keyword));
+  return (
+    sensitiveKeywords.some((keyword) => upperName.endsWith(keyword)) &&
+    !excludeKeywords.some((keyword) => upperName.endsWith(keyword))
+  );
 }

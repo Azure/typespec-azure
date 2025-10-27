@@ -22,6 +22,10 @@ const args = parseArgs({
     "tgz-dir": {
       type: "string",
     },
+    repo: {
+      type: "string",
+      description: "The path to the repository to test. Defaults temp/{suiteName}.",
+    },
   },
 });
 
@@ -46,7 +50,7 @@ if (args.values.stage) {
   }
 }
 
-const wd = join(projectRoot, "temp", suiteName);
+const wd = args.values.repo ?? join(projectRoot, "temp", suiteName);
 try {
   await runIntegrationTestSuite(wd, suiteName, suite, {
     clean: args.values.clean,
