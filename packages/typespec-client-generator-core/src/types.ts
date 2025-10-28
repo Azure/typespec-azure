@@ -1213,6 +1213,7 @@ export function getSdkCredentialParameter(
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.credential`,
     decorators: [],
     access: "public",
+    flatten: false,
   };
 }
 
@@ -1250,6 +1251,7 @@ export function getSdkModelPropertyTypeBase(
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
     visibility: getSdkVisibility(context, type),
     access: getAccess(context, type),
+    flatten: shouldFlattenProperty(context, type),
   });
 }
 
@@ -1286,7 +1288,6 @@ export function getSdkModelPropertyType(
       discriminator: false,
       serializedName: getPropertyNames(context, type)[1],
       isMultipartFileInput: false,
-      flatten: shouldFlattenProperty(context, type),
       serializationOptions: {},
     };
     context.__modelPropertyCache.set(type, property);
