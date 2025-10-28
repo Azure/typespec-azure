@@ -79,7 +79,12 @@ op Read<
 @doc("Check for the existence of a {name}", ExtensionResource)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
-@extensionResourceOperation(TargetResource, ExtensionResource, "action", OverrideResourceName)
+@extensionResourceOperation(
+  TargetResource,
+  ExtensionResource,
+  "checkExistence",
+  OverrideResourceName
+)
 @head
 op CheckExistence<
   TargetResource extends SimpleResource,

@@ -69,6 +69,7 @@ import { reportDiagnostic } from "./lib.js";
 import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
 import {
   $armResourceAction,
+  $armResourceCheckExistence,
   $armResourceCreateOrUpdate,
   $armResourceDelete,
   $armResourceList,
@@ -672,7 +673,14 @@ function callOperationDecorator(
   target: Operation,
   resourceType: Model,
   resourceName: string,
-  operationType: "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
+  operationType:
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
 ): void {
   switch (operationType) {
     case "read":
@@ -693,6 +701,9 @@ function callOperationDecorator(
     case "action":
       context.call($armResourceAction, target, resourceType, resourceName);
       break;
+    case "checkExistence":
+      context.call($armResourceCheckExistence, target, resourceType, resourceName);
+      break;
   }
 }
 
@@ -700,7 +711,14 @@ function callLifecycleDecorator(
   context: DecoratorContext,
   target: Operation,
   resourceType: Model,
-  operationType: "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
+  operationType:
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
 ): void {
   switch (operationType) {
     case "read":
@@ -718,6 +736,12 @@ function callLifecycleDecorator(
     case "list":
       context.call($listsResource, target, resourceType);
       break;
+    case "action":
+      context.call($armResourceAction, target, resourceType);
+      break;
+    case "checkExistence":
+      context.call($armResourceCheckExistence, target, resourceType);
+      break;
   }
 }
 
@@ -726,7 +750,14 @@ const $extensionResourceOperation: ExtensionResourceOperationDecorator = (
   target: Operation,
   targetResourceType: Model,
   extensionResourceType: Model,
-  operationType: "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
+  operationType:
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
   resourceName?: string,
 ) => {
   if (
@@ -754,7 +785,14 @@ const $builtInResourceOperation: BuiltInResourceOperationDecorator = (
   target: Operation,
   parentResourceType: Model,
   builtInResourceType: Model,
-  operationType: "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
+  operationType:
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
   resourceName?: string,
 ) => {
   if (
@@ -775,7 +813,14 @@ const $legacyResourceOperation: LegacyResourceOperationDecorator = (
   context: DecoratorContext,
   target: Operation,
   resourceType: Model,
-  operationType: "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
+  operationType:
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
   resourceName?: string,
 ) => {
   if (
@@ -840,7 +885,14 @@ const $legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorat
   context: DecoratorContext,
   target: Operation,
   resourceType: Model,
-  operationType: "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
+  operationType:
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
   resourceName?: string,
 ) => {
   if (

@@ -231,6 +231,19 @@ export type ArmResourceListDecorator = (
 ) => void;
 
 /**
+ * Marks the operation as being a check existence (HEAD) operation
+ *
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
+ */
+export type ArmResourceCheckExistenceDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  resourceModel: Model,
+  resourceName?: string,
+) => void;
+
+/**
  * This decorator is used to identify interfaces containing resource operations.
  * By default, it marks the interface with the `@autoRoute` decorator so that
  * all of its contained operations will have their routes generated
@@ -330,6 +343,7 @@ export type AzureResourceManagerDecorators = {
   armResourceUpdate: ArmResourceUpdateDecorator;
   armResourceDelete: ArmResourceDeleteDecorator;
   armResourceList: ArmResourceListDecorator;
+  armResourceCheckExistence: ArmResourceCheckExistenceDecorator;
   armResourceOperations: ArmResourceOperationsDecorator;
   armCommonTypesVersion: ArmCommonTypesVersionDecorator;
   armVirtualResource: ArmVirtualResourceDecorator;

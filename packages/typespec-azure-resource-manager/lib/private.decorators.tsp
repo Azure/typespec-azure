@@ -148,7 +148,14 @@ extern dec resourceParentType(
 extern dec legacyResourceOperation(
   target: Operation,
   resourceType: Model,
-  operationType: valueof "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
+  operationType: valueof
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
   resourceName?: valueof string
 );
 
@@ -164,7 +171,14 @@ extern dec extensionResourceOperation(
   target: Operation,
   targetResourceType: Model,
   extensionResourceType: Model,
-  operationType: valueof "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
+  operationType: valueof
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
   resourceName?: valueof string
 );
 
@@ -180,7 +194,14 @@ extern dec builtInResourceOperation(
   target: Operation,
   parentResourceType: Model,
   builtInResourceType: Model,
-  operationType: valueof "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
+  operationType: valueof
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
   resourceName?: valueof string
 );
 
@@ -194,6 +215,13 @@ extern dec builtInResourceOperation(
 extern dec legacyExtensionResourceOperation(
   target: Operation,
   resourceType: Model,
-  operationType: valueof "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
+  operationType: valueof
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
   resourceName?: valueof string
 );

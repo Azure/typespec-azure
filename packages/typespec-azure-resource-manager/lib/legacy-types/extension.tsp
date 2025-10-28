@@ -248,7 +248,7 @@ interface ExtensionOperations<
    */
   @armOperationRoute(OperationOptions)
   @doc("Check for the existence of a {name}", Resource)
-  @legacyExtensionResourceOperation(Resource, "action", OverrideResourceName)
+  @legacyExtensionResourceOperation(Resource, "checkExistence", OverrideResourceName)
   @head
   CheckExistence<
     Resource extends Foundations.SimpleResource,

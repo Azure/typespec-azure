@@ -25,6 +25,7 @@ interface ResourceOperationsCheck {
     read?: ArmOperationCheck[];
     update?: ArmOperationCheck[];
     delete?: ArmOperationCheck[];
+    checkExistence?: ArmOperationCheck[];
   };
   actions?: ArmOperationCheck[];
 }
@@ -101,6 +102,14 @@ function checkResolvedOperations(operations: ResolvedResource, check: ResolvedRe
       );
     } else {
       expect(operations.operations.lifecycle.update).toBeUndefined();
+    }
+    if (check.operations.lifecycle.checkExistence) {
+      checkArmOperationsHas(
+        operations.operations.lifecycle.checkExistence,
+        check.operations.lifecycle.checkExistence,
+      );
+    } else {
+      expect(operations.operations.lifecycle.checkExistence).toBeUndefined();
     }
   } else {
     expect(operations.operations.lifecycle).toEqual({});
@@ -561,6 +570,9 @@ interface Employees {
           delete: [{ operationGroup: "Employees", name: "delete", kind: "delete" }],
           read: [{ operationGroup: "Employees", name: "get", kind: "read" }],
           update: [{ operationGroup: "Employees", name: "update", kind: "update" }],
+          checkExistence: [
+            { operationGroup: "Employees", name: "checkExistence", kind: "checkExistence" },
+          ],
         },
         actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
         lists: [
@@ -578,7 +590,6 @@ interface Employees {
     });
 
     checkArmOperationsHas(resources.providerOperations, [
-      { operationGroup: "Employees", name: "checkExistence", kind: "other" },
       { operationGroup: "Operations", name: "list", kind: "other" },
     ]);
   });
@@ -1329,6 +1340,9 @@ model DependentProperties {
           delete: [{ operationGroup: "Employees", name: "delete", kind: "delete" }],
           read: [{ operationGroup: "Employees", name: "get", kind: "read" }],
           update: [{ operationGroup: "Employees", name: "update", kind: "update" }],
+          checkExistence: [
+            { operationGroup: "Employees", name: "checkExistence", kind: "checkExistence" },
+          ],
         },
         actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
         lists: [
@@ -1470,7 +1484,6 @@ model DependentProperties {
     });
 
     checkArmOperationsHas(resources.providerOperations, [
-      { operationGroup: "Employees", name: "checkExistence", kind: "other" },
       { operationGroup: "Operations", name: "list", kind: "other" },
     ]);
   });
@@ -1577,6 +1590,9 @@ model MoveResponse {
           delete: [{ operationGroup: "Employees", name: "delete", kind: "delete" }],
           read: [{ operationGroup: "Employees", name: "get", kind: "read" }],
           update: [{ operationGroup: "Employees", name: "update", kind: "update" }],
+          checkExistence: [
+            { operationGroup: "Employees", name: "checkExistence", kind: "checkExistence" },
+          ],
         },
         actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
         lists: [
@@ -1641,7 +1657,6 @@ model MoveResponse {
     });
 
     checkArmOperationsHas(resources.providerOperations, [
-      { operationGroup: "Employees", name: "checkExistence", kind: "other" },
       { operationGroup: "Operations", name: "list", kind: "other" },
     ]);
   });
@@ -1776,6 +1791,9 @@ model DependentProperties {
           delete: [{ operationGroup: "Employees", name: "delete", kind: "delete" }],
           read: [{ operationGroup: "Employees", name: "get", kind: "read" }],
           update: [{ operationGroup: "Employees", name: "update", kind: "update" }],
+          checkExistence: [
+            { operationGroup: "Employees", name: "checkExistence", kind: "checkExistence" },
+          ],
         },
         actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
         lists: [
@@ -1861,7 +1879,6 @@ model DependentProperties {
     });
 
     checkArmOperationsHas(resources.providerOperations, [
-      { operationGroup: "Employees", name: "checkExistence", kind: "other" },
       { operationGroup: "Operations", name: "list", kind: "other" },
     ]);
   });
@@ -1966,6 +1983,9 @@ model MoveResponse {
           delete: [{ operationGroup: "Employees", name: "delete", kind: "delete" }],
           read: [{ operationGroup: "Employees", name: "get", kind: "read" }],
           update: [{ operationGroup: "Employees", name: "update", kind: "update" }],
+          checkExistence: [
+            { operationGroup: "Employees", name: "checkExistence", kind: "checkExistence" },
+          ],
         },
         actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
         lists: [
@@ -2002,7 +2022,6 @@ model MoveResponse {
     });
 
     checkArmOperationsHas(resources.providerOperations, [
-      { operationGroup: "Employees", name: "checkExistence", kind: "other" },
       { operationGroup: "Operations", name: "list", kind: "other" },
     ]);
   });

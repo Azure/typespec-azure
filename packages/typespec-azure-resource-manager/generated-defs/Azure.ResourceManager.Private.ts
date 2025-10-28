@@ -230,7 +230,14 @@ export type LegacyResourceOperationDecorator = (
   context: DecoratorContext,
   target: Operation,
   resourceType: Model,
-  operationType: "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
+  operationType:
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
   resourceName?: string,
 ) => void;
 
@@ -248,7 +255,14 @@ export type ExtensionResourceOperationDecorator = (
   target: Operation,
   targetResourceType: Model,
   extensionResourceType: Model,
-  operationType: "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
+  operationType:
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
   resourceName?: string,
 ) => void;
 
@@ -266,7 +280,14 @@ export type BuiltInResourceOperationDecorator = (
   target: Operation,
   parentResourceType: Model,
   builtInResourceType: Model,
-  operationType: "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
+  operationType:
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
   resourceName?: string,
 ) => void;
 
@@ -282,7 +303,14 @@ export type LegacyExtensionResourceOperationDecorator = (
   context: DecoratorContext,
   target: Operation,
   resourceType: Model,
-  operationType: "read" | "createOrUpdate" | "update" | "delete" | "list" | "action",
+  operationType:
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
   resourceName?: string,
 ) => void;
 

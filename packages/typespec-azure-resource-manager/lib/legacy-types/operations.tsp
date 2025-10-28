@@ -279,7 +279,7 @@ interface RoutedOperations<
    * @template OverrideResourceName Optional. The name of the resource type being acted upon.
    */
   @armOperationRoute(OverrideRouteOptions)
-  @legacyResourceOperation(Resource, "action", OverrideResourceName)
+  @legacyResourceOperation(Resource, "checkExistence", OverrideResourceName)
   @doc("Check for the existence of a {name}", Resource)
   @Private.armUpdateProviderNamespace
   @head

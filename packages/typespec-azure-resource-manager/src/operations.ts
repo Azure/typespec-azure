@@ -28,6 +28,7 @@ import {
 import { pascalCase } from "change-case";
 import {
   ArmResourceActionDecorator,
+  ArmResourceCheckExistenceDecorator,
   ArmResourceCollectionActionDecorator,
   ArmResourceCreateOrUpdateDecorator,
   ArmResourceDeleteDecorator,
@@ -52,7 +53,12 @@ import {
 } from "./resource.js";
 import { ArmStateKeys } from "./state.js";
 
-export type ArmLifecycleOperationKind = "read" | "createOrUpdate" | "update" | "delete";
+export type ArmLifecycleOperationKind =
+  | "read"
+  | "createOrUpdate"
+  | "update"
+  | "delete"
+  | "checkExistence";
 export type ArmOperationKind = ArmLifecycleOperationKind | "list" | "action" | "other";
 
 export interface ArmResourceOperation extends ArmResourceOperationData {
@@ -65,6 +71,7 @@ export interface ArmLifecycleOperations {
   createOrUpdate?: ArmResourceOperation;
   update?: ArmResourceOperation;
   delete?: ArmResourceOperation;
+  checkExistence?: ArmResourceOperation;
 }
 
 export interface ArmResourceLifecycleOperations {
@@ -72,6 +79,7 @@ export interface ArmResourceLifecycleOperations {
   createOrUpdate?: ArmResourceOperation[];
   update?: ArmResourceOperation[];
   delete?: ArmResourceOperation[];
+  checkExistence?: ArmResourceOperation[];
 }
 
 export interface ArmResolvedOperationsForResource {
@@ -112,6 +120,7 @@ export interface ArmLifecycleOperationData {
   createOrUpdate?: ArmResourceOperationData;
   update?: ArmResourceOperationData;
   delete?: ArmResourceOperationData;
+  checkExistence?: ArmResourceOperationData;
 }
 
 export interface ArmResourceOperationsData {
@@ -260,6 +269,15 @@ export function setArmOperationIdentifier(
     setArmResourceOperationData(program, target, { ...data });
   }
 }
+
+export const $armResourceCheckExistence: ArmResourceCheckExistenceDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  resourceType: Model,
+  resourceName?: string,
+) => {
+  setResourceLifecycleOperation(context, target, resourceType, "checkExistence", resourceName);
+};
 
 export const $armResourceRead: ArmResourceReadDecorator = (
   context: DecoratorContext,

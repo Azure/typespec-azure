@@ -173,6 +173,17 @@ extern dec armResourceDelete(
 extern dec armResourceList(target: Operation, resourceModel: Model, resourceName?: valueof string);
 
 /**
+ * Marks the operation as being a check existence (HEAD) operation
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
+ */
+extern dec armResourceCheckExistence(
+  target: Operation,
+  resourceModel: Model,
+  resourceName?: valueof string
+);
+
+/**
  * This decorator is used to identify interfaces containing resource operations.
  * By default, it marks the interface with the `@autoRoute` decorator so that
  * all of its contained operations will have their routes generated

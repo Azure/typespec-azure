@@ -115,6 +115,25 @@ None
 | resourceModel | `Model`          | Resource model                                                                                    |
 | resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
+### `@armResourceCheckExistence` {#@Azure.ResourceManager.armResourceCheckExistence}
+
+Marks the operation as being a check existence (HEAD) operation
+
+```typespec
+@Azure.ResourceManager.armResourceCheckExistence(resourceModel: Model, resourceName?: valueof string)
+```
+
+#### Target
+
+`Operation`
+
+#### Parameters
+
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
+
 ### `@armResourceCollectionAction` {#@Azure.ResourceManager.armResourceCollectionAction}
 
 Marks the operation as being a collection action

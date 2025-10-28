@@ -141,17 +141,27 @@ export interface ResourcePathInfo {
   resourceInstancePath: string;
 }
 
-export interface ResolvedResourceInfo extends ResourcePathInfo {
+export interface ResolvedResourceInfo {
+  /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
+  resourceType: ResourceType;
+  /** The path to the instance of a resource */
+  resourceInstancePath: string;
   /** The name of the resource at this instance path  */
   resourceName: string;
 }
 
 /** Resolved operations, including operations for non-arm resources */
-export interface ResolvedResource extends ResolvedResourceInfo {
+export interface ResolvedResource {
   /** The lifecycle and action operations using this resourceInstancePath (or the parent path) */
   operations: ArmResolvedOperationsForResource;
   /** Other operations associated with this resource */
   associatedOperations?: ArmResourceOperation[];
+  /** The name of the resource at this instance path  */
+  resourceName: string;
+  /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
+  resourceType: ResourceType;
+  /** The path to the instance of a resource */
+  resourceInstancePath: string;
 }
 
 /** Description of the resource type */
@@ -520,6 +530,10 @@ function tryAddLifecycleOperation(
       operations.actions ??= [];
       addUniqueOperation(sourceOperation, operations.actions);
       return true;
+    case "checkExistence":
+      operations.lifecycle.checkExistence ??= [];
+      addUniqueOperation(sourceOperation, operations.lifecycle.checkExistence);
+      return true;
     case "other":
       targetResource.associatedOperations ??= [];
       addUniqueOperation(sourceOperation, targetResource.associatedOperations);
@@ -702,6 +716,7 @@ export function resolveArmResourceOperations(
           createOrUpdate: undefined,
           update: undefined,
           delete: undefined,
+          checkExistence: undefined,
         },
         actions: [],
         lists: [],
