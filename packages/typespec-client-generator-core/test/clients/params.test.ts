@@ -816,3 +816,70 @@ it("client level signatures by default", async () => {
     "subscriptionId",
   ]);
 });
+
+it("optional client param with some methods using, some not", async () => {
+  await runner.compileWithCustomization(`
+    @service
+    namespace ClientOptionalParams;
+
+    model ExpandParameter {
+      @query("$expand")
+      expand?: string;
+    }
+
+    namespace WithExpand {
+      @route("/with-expand")
+      op test(@query("$expand") expand?: string): void;
+    }
+
+    namespace WithoutExpand {
+      @route("/without-expand")
+      op test(): void;
+    }
+  `,
+  `
+  @@clientInitialization(ClientOptionalParams,
+  {
+    parameters: ClientOptionalParams.ExpandParameter
+  });
+  `);
+
+  const sdkPackage = runner.context.sdkPackage;
+  const clientOptionalParamsClient = sdkPackage.clients[0];
+  strictEqual(clientOptionalParamsClient.children?.length, 2);
+  strictEqual(clientOptionalParamsClient.clientInitialization.parameters.length, 2);
+  ok(clientOptionalParamsClient.clientInitialization.parameters.find(p => p.name === "endpoint"));
+  const expandParam = clientOptionalParamsClient.clientInitialization.parameters.find(p => p.name === "expand");
+  ok(expandParam);
+  strictEqual(expandParam.optional, true);
+  strictEqual(expandParam.onClient, true);
+
+  const withExpandClient = clientOptionalParamsClient.children?.find(c => c.name === "WithExpand");
+  ok(withExpandClient);
+  strictEqual(withExpandClient.methods.length, 1);
+  strictEqual(withExpandClient.clientInitialization.parameters.length, 2);
+  ok(withExpandClient.clientInitialization.parameters.find(p => p.name === "endpoint"));
+  const expandClientParam = withExpandClient.clientInitialization.parameters.find(p => p.name === "expand");
+  ok(expandClientParam);
+  strictEqual(expandClientParam.optional, true);
+  strictEqual(expandClientParam.onClient, true);
+
+  const withExpandMethod = withExpandClient.methods[0];
+  strictEqual(withExpandMethod.parameters.length, 0);
+  strictEqual(withExpandMethod.operation.parameters.length, 1);
+  strictEqual(withExpandMethod.operation.parameters[0].correspondingMethodParams[0], expandParam);
+
+  const withoutExpandClient = clientOptionalParamsClient.children?.find(c => c.name === "WithoutExpand");
+  ok(withoutExpandClient);
+  strictEqual(withoutExpandClient.methods.length, 1);
+  strictEqual(withoutExpandClient.clientInitialization.parameters.length, 2);
+  ok(withoutExpandClient.clientInitialization.parameters.find(p => p.name === "endpoint"));
+  const withoutExpandClientParam = withoutExpandClient.clientInitialization.parameters.find(p => p.name === "expand");
+  ok(withoutExpandClientParam);
+  strictEqual(withoutExpandClientParam.optional, true);
+  strictEqual(withoutExpandClientParam.onClient, true);
+  
+  const withoutExpandMethod = withoutExpandClient.methods[0];
+  strictEqual(withoutExpandMethod.parameters.length, 0);
+  strictEqual(withoutExpandMethod.operation.parameters.length, 0);
+});
