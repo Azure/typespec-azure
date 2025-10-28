@@ -351,8 +351,7 @@ function createSdkClientInitializationType<
   if (
     !initializationOptions?.parameters &&
     parent &&
-    ((result.initializedBy & InitializedByFlags.Parent) === InitializedByFlags.Parent ||
-      result.initializedBy === InitializedByFlags.Default)
+    result.initializedBy !== InitializedByFlags.Individually
   ) {
     // Prepend parent parameters to child parameters
     // This ensures parent parameters come first, child-specific parameters come after
