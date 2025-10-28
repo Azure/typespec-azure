@@ -19,7 +19,6 @@ using Spector;
     versioned: Versions,
   }
 )
-@global.Azure.ClientGenerator.Core.clientNamespace("azure.core.lro.custom.lroFailed", "java")
 namespace _Specs_.Azure.Core.Lro.Custom.LroFailed;
 
 @doc("The API version.")
