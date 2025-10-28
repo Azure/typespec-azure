@@ -9,6 +9,7 @@ import {
 } from "./decorators.js";
 import { getSdkHttpParameter } from "./http.js";
 import {
+  ClientInitializationOptions,
   InitializedByFlags,
   SdkClient,
   SdkClientInitializationType,
@@ -277,10 +278,11 @@ function createSdkClientInitializationType<
     isGeneratedName: true,
     decorators: [],
   };
+  let initializationOptions: ClientInitializationOptions | undefined = undefined;
 
   // customization
   if (client.type) {
-    const initializationOptions = getClientInitializationOptions(context, client.type);
+    initializationOptions = getClientInitializationOptions(context, client.type);
     if (initializationOptions?.parameters) {
       result.doc = getDoc(context.program, initializationOptions.parameters);
       result.summary = getSummary(context.program, initializationOptions.parameters);
@@ -345,7 +347,9 @@ function createSdkClientInitializationType<
   }
 
   // Propagate parent client initialization parameters if InitializedBy.Parent or no InitializedBy is set
+  // Only propagate if no custom parameters are set on the child
   if (
+    !initializationOptions?.parameters &&
     parent &&
     ((result.initializedBy & InitializedByFlags.Parent) === InitializedByFlags.Parent ||
       result.initializedBy === InitializedByFlags.Default)
