@@ -58,7 +58,6 @@ model SecurityDomainOperationStatus {
   /**
    * Details of the operation status.
    */
-  #suppress "@azure-tools/typespec-azure-core/casing-style" "Preserving original casing"
   statusDetails?: string;
 }
 
