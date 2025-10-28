@@ -27,7 +27,7 @@ it("basic file input", async () => {
   const bodyParam = httpOperation.bodyParam;
   ok(bodyParam);
   strictEqual(bodyParam.type.kind, "model");
-  strictEqual(bodyParam.serializationOptions.binary?.isFile, true);
+  strictEqual(bodyParam.type.serializationOptions.binary?.isFile, true);
   const fileModel = runner.context.sdkPackage.models.find((m) => m.name === "File");
   ok(fileModel);
   strictEqual(fileModel.properties.length, 3);
@@ -56,7 +56,7 @@ it("file input with content type", async () => {
   const bodyParam = httpOperation.bodyParam;
   ok(bodyParam);
   strictEqual(bodyParam.type.kind, "model");
-  strictEqual(bodyParam.serializationOptions.binary?.isFile, true);
+  strictEqual(bodyParam.type.serializationOptions.binary?.isFile, true);
   const fileModel = bodyParam.type;
   const contentType = fileModel.properties.find((p) => p.name === "contentType")!;
   strictEqual(contentType.type.kind, "constant");
@@ -86,7 +86,8 @@ it("basic file output", async () => {
   strictEqual(contentType.type.kind, "string");
   ok(fileModel.properties.find((p) => p.name === "contents"));
   ok(fileModel.properties.find((p) => p.name === "filename"));
-  strictEqual(responseBody.serializationOptions.binary?.isFile, true);
+  ok(responseBody.type);
+  strictEqual(responseBody.type.serializationOptions.binary?.isFile, true);
 });
 
 it("self-defined file", async () => {
@@ -126,7 +127,7 @@ it("self-defined file", async () => {
   const uploadBodyParam = uploadHttpOperation.bodyParam;
   ok(uploadBodyParam);
   strictEqual(uploadBodyParam.type, specFile);
-  strictEqual(uploadBodyParam.serializationOptions.binary?.isFile, true);
+  strictEqual(uploadBodyParam.type.serializationOptions.binary?.isFile, true);
   const uploadHeaderParam = uploadHttpOperation.parameters.find(
     (p) => p.serializedName === "x-filename",
   );
@@ -140,5 +141,5 @@ it("self-defined file", async () => {
   const downloadResponse = downloadHttpOperation.responses[0];
   ok(downloadResponse);
   strictEqual(downloadResponse.type, specFile);
-  strictEqual(downloadResponse.serializationOptions.binary?.isFile, true);
+  strictEqual(downloadResponse.type.serializationOptions.binary?.isFile, true);
 });

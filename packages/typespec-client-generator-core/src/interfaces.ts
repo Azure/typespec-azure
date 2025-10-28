@@ -759,7 +759,6 @@ export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   defaultContentType: string;
   /** Corresponding method level parameter or model property for current parameter. */
   correspondingMethodParams: (SdkMethodParameter | SdkModelPropertyType)[];
-  serializationOptions: SerializationOptions;
 }
 
 export type SdkHttpParameter =
@@ -805,7 +804,6 @@ interface SdkHttpResponseBase extends SdkServiceResponse {
 
 export interface SdkHttpResponse extends SdkHttpResponseBase {
   statusCodes: number | HttpStatusCodeRange;
-  serializationOptions: SerializationOptions;
 }
 
 export interface SdkHttpErrorResponse extends SdkHttpResponseBase {

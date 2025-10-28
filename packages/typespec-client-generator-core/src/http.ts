@@ -104,7 +104,6 @@ export function getSdkHttpOperation(
       responses.push({
         ...fourOFourResponse,
         statusCodes: 404,
-        serializationOptions: {},
       });
       exceptions.splice(exceptions.indexOf(fourOFourResponse), 1);
       // remove the exception from the list
@@ -121,7 +120,6 @@ export function getSdkHttpOperation(
         ),
         headers: [],
         __raw: (responses[0] || exceptions[0]).__raw,
-        serializationOptions: {},
       });
     }
   }
@@ -187,9 +185,13 @@ function getSdkHttpParameters(
       const bodyParam = diagnostics.pipe(
         getSdkHttpParameter(context, tspBody.property, httpOperation.operation, undefined, "body"),
       );
-      if (tspBody.bodyKind === "file" && bodyParam.kind === "body") {
-        bodyParam.serializationOptions = bodyParam.serializationOptions || {};
-        bodyParam.serializationOptions.binary = { isFile: true };
+      if (
+        tspBody.bodyKind === "file" &&
+        bodyParam.kind === "body" &&
+        bodyParam.type.kind === "model"
+      ) {
+        bodyParam.type.serializationOptions = bodyParam.type.serializationOptions || {};
+        bodyParam.type.serializationOptions.binary = { isFile: true };
       }
       if (bodyParam.kind !== "body") {
         diagnostics.add(
@@ -229,7 +231,6 @@ function getSdkHttpParameters(
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`,
         decorators: diagnostics.pipe(getTypeDecorators(context, tspBody.type)),
         access: "public",
-        serializationOptions: {},
       };
     }
     if (retval.bodyParam) {
@@ -538,6 +539,9 @@ function getSdkHttpResponseAndExceptions(
             addEncodeInfo(context, innerResponse.body.property, type, defaultContentType);
           }
         }
+        if (type.kind === "model") {
+          type.serializationOptions = { ...type.serializationOptions, ...serializationOptions };
+        }
       }
     }
     const sdkResponse = {
@@ -554,7 +558,6 @@ function getSdkHttpResponseAndExceptions(
         httpOperation.operation,
       ),
       description: response.description,
-      serializationOptions,
     };
 
     if (
