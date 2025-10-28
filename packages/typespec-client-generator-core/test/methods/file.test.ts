@@ -88,3 +88,57 @@ it("basic file output", async () => {
   ok(fileModel.properties.find((p) => p.name === "filename"));
   strictEqual(responseBody.serializationOptions.binary?.isFile, true);
 });
+
+it("self-defined file", async () => {
+  await runner.compileWithBuiltInService(
+    `
+      model SpecFile extends File<"application/json" | "application/yaml", string> {
+        // Provide a header that contains the name of the file when created or updated
+        @header("x-filename")
+        filename: string;
+      }
+      
+      @post op uploadSpec(@bodyRoot spec: SpecFile): void;
+      @get op downloadSpec(@path name: string): SpecFile;
+      
+    `,
+  );
+  const sdkPackage = runner.context.sdkPackage;
+  // model
+  const specFile = sdkPackage.models.find((m) => m.name === "SpecFile");
+  ok(specFile);
+  ok(specFile.baseModel);
+  strictEqual(specFile.baseModel.name, "File");
+  const contentTypeProp = specFile.baseModel.properties.find((p) => p.name === "contentType");
+  ok(contentTypeProp);
+  strictEqual(contentTypeProp.type.kind, "enum");
+  strictEqual(contentTypeProp.type.values.length, 2);
+  ok(contentTypeProp.type.values.find((v) => v.value === "application/json"));
+  ok(contentTypeProp.type.values.find((v) => v.value === "application/yaml"));
+
+  // uploadMethod
+  const uploadMethod = sdkPackage.clients[0].methods.find((m) => m.name === "uploadSpec");
+  ok(uploadMethod);
+  const uploadMethodParam = uploadMethod.parameters.find((p) => p.name === "spec");
+  ok(uploadMethodParam);
+  strictEqual(uploadMethodParam.type, specFile);
+  const uploadHttpOperation = uploadMethod.operation;
+  const uploadBodyParam = uploadHttpOperation.bodyParam;
+  ok(uploadBodyParam);
+  strictEqual(uploadBodyParam.type, specFile);
+  strictEqual(uploadBodyParam.serializationOptions.binary?.isFile, true);
+  const uploadHeaderParam = uploadHttpOperation.parameters.find(
+    (p) => p.serializedName === "x-filename",
+  );
+  ok(uploadHeaderParam);
+  strictEqual(uploadHeaderParam.type.kind, "string");
+
+  // downloadMethod
+  const downloadMethod = sdkPackage.clients[0].methods.find((m) => m.name === "downloadSpec");
+  ok(downloadMethod);
+  const downloadHttpOperation = downloadMethod.operation;
+  const downloadResponse = downloadHttpOperation.responses[0];
+  ok(downloadResponse);
+  strictEqual(downloadResponse.type, specFile);
+  strictEqual(downloadResponse.serializationOptions.binary?.isFile, true);
+});
