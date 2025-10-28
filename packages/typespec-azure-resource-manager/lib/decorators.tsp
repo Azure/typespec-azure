@@ -121,44 +121,56 @@ extern dec armProviderNameValue(target: Operation);
 extern dec armResourceCollectionAction(target: Operation);
 
 /**
- * @param resourceType Resource model
- * @param resourceName Optional. The name of the resource. If not provided, the name of the resource type will be used.
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
-extern dec armResourceAction(target: Operation, resourceType: Model, resourceName?: valueof string);
-
-/**
- * @param resourceType Resource model
- * @param resourceName Optional. The name of the resource. If not provided, the name of the resource type will be used.
- */
-extern dec armResourceCreateOrUpdate(
+extern dec armResourceAction(
   target: Operation,
-  resourceType: Model,
+  resourceModel: Model,
   resourceName?: valueof string
 );
 
 /**
- * @param resourceType Resource model
- * @param resourceName Optional. The name of the resource. If not provided, the name of the resource type will be used.
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
-extern dec armResourceRead(target: Operation, resourceType: Model, resourceName?: valueof string);
+extern dec armResourceCreateOrUpdate(
+  target: Operation,
+  resourceModel: Model,
+  resourceName?: valueof string
+);
 
 /**
- * @param resourceType Resource model
- * @param resourceName Optional. The name of the resource. If not provided, the name of the resource type will be used.
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
-extern dec armResourceUpdate(target: Operation, resourceType: Model, resourceName?: valueof string);
+extern dec armResourceRead(target: Operation, resourceModel: Model, resourceName?: valueof string);
 
 /**
- * @param resourceType Resource model
- * @param resourceName Optional. The name of the resource. If not provided, the name of the resource type will be used.
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
-extern dec armResourceDelete(target: Operation, resourceType: Model, resourceName?: valueof string);
+extern dec armResourceUpdate(
+  target: Operation,
+  resourceModel: Model,
+  resourceName?: valueof string
+);
 
 /**
- * @param resourceType Resource model
- * @param resourceName Optional. The name of the resource. If not provided, the name of the resource type will be used.
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
-extern dec armResourceList(target: Operation, resourceType: Model, resourceName?: valueof string);
+extern dec armResourceDelete(
+  target: Operation,
+  resourceModel: Model,
+  resourceName?: valueof string
+);
+
+/**
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
+ */
+extern dec armResourceList(target: Operation, resourceModel: Model, resourceName?: valueof string);
 
 /**
  * This decorator is used to identify interfaces containing resource operations.

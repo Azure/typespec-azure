@@ -150,13 +150,13 @@ export type ExtensionResourceDecorator = (context: DecoratorContext, target: Mod
  *
  *
  *
- * @param resourceType Resource model
- * @param resourceName Optional. The name of the resource. If not provided, the name of the resource type will be used.
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
 export type ArmResourceActionDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model,
+  resourceModel: Model,
   resourceName?: string,
 ) => void;
 
@@ -164,13 +164,13 @@ export type ArmResourceActionDecorator = (
  *
  *
  *
- * @param resourceType Resource model
- * @param resourceName Optional. The name of the resource. If not provided, the name of the resource type will be used.
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
 export type ArmResourceCreateOrUpdateDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model,
+  resourceModel: Model,
   resourceName?: string,
 ) => void;
 
@@ -178,13 +178,13 @@ export type ArmResourceCreateOrUpdateDecorator = (
  *
  *
  *
- * @param resourceType Resource model
- * @param resourceName Optional. The name of the resource. If not provided, the name of the resource type will be used.
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
 export type ArmResourceReadDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model,
+  resourceModel: Model,
   resourceName?: string,
 ) => void;
 
@@ -192,13 +192,13 @@ export type ArmResourceReadDecorator = (
  *
  *
  *
- * @param resourceType Resource model
- * @param resourceName Optional. The name of the resource. If not provided, the name of the resource type will be used.
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
 export type ArmResourceUpdateDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model,
+  resourceModel: Model,
   resourceName?: string,
 ) => void;
 
@@ -206,13 +206,13 @@ export type ArmResourceUpdateDecorator = (
  *
  *
  *
- * @param resourceType Resource model
- * @param resourceName Optional. The name of the resource. If not provided, the name of the resource type will be used.
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
 export type ArmResourceDeleteDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model,
+  resourceModel: Model,
   resourceName?: string,
 ) => void;
 
@@ -220,13 +220,13 @@ export type ArmResourceDeleteDecorator = (
  *
  *
  *
- * @param resourceType Resource model
- * @param resourceName Optional. The name of the resource. If not provided, the name of the resource type will be used.
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
 export type ArmResourceListDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model,
+  resourceModel: Model,
   resourceName?: string,
 ) => void;
 

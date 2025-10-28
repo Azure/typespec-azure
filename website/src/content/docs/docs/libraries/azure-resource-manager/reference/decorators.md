@@ -101,7 +101,7 @@ None
 ### `@armResourceAction` {#@Azure.ResourceManager.armResourceAction}
 
 ```typespec
-@Azure.ResourceManager.armResourceAction(resourceType: Model, resourceName?: valueof string)
+@Azure.ResourceManager.armResourceAction(resourceModel: Model, resourceName?: valueof string)
 ```
 
 #### Target
@@ -110,10 +110,10 @@ None
 
 #### Parameters
 
-| Name         | Type             | Description                                                                                      |
-| ------------ | ---------------- | ------------------------------------------------------------------------------------------------ |
-| resourceType | `Model`          | Resource model                                                                                   |
-| resourceName | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource type will be used. |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 ### `@armResourceCollectionAction` {#@Azure.ResourceManager.armResourceCollectionAction}
 
@@ -134,7 +134,7 @@ None
 ### `@armResourceCreateOrUpdate` {#@Azure.ResourceManager.armResourceCreateOrUpdate}
 
 ```typespec
-@Azure.ResourceManager.armResourceCreateOrUpdate(resourceType: Model, resourceName?: valueof string)
+@Azure.ResourceManager.armResourceCreateOrUpdate(resourceModel: Model, resourceName?: valueof string)
 ```
 
 #### Target
@@ -143,15 +143,15 @@ None
 
 #### Parameters
 
-| Name         | Type             | Description                                                                                      |
-| ------------ | ---------------- | ------------------------------------------------------------------------------------------------ |
-| resourceType | `Model`          | Resource model                                                                                   |
-| resourceName | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource type will be used. |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 ### `@armResourceDelete` {#@Azure.ResourceManager.armResourceDelete}
 
 ```typespec
-@Azure.ResourceManager.armResourceDelete(resourceType: Model, resourceName?: valueof string)
+@Azure.ResourceManager.armResourceDelete(resourceModel: Model, resourceName?: valueof string)
 ```
 
 #### Target
@@ -160,15 +160,15 @@ None
 
 #### Parameters
 
-| Name         | Type             | Description                                                                                      |
-| ------------ | ---------------- | ------------------------------------------------------------------------------------------------ |
-| resourceType | `Model`          | Resource model                                                                                   |
-| resourceName | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource type will be used. |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 ### `@armResourceList` {#@Azure.ResourceManager.armResourceList}
 
 ```typespec
-@Azure.ResourceManager.armResourceList(resourceType: Model, resourceName?: valueof string)
+@Azure.ResourceManager.armResourceList(resourceModel: Model, resourceName?: valueof string)
 ```
 
 #### Target
@@ -177,10 +177,10 @@ None
 
 #### Parameters
 
-| Name         | Type             | Description                                                                                      |
-| ------------ | ---------------- | ------------------------------------------------------------------------------------------------ |
-| resourceType | `Model`          | Resource model                                                                                   |
-| resourceName | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource type will be used. |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 ### `@armResourceOperations` {#@Azure.ResourceManager.armResourceOperations}
 
@@ -219,7 +219,7 @@ individually tagged
 ### `@armResourceRead` {#@Azure.ResourceManager.armResourceRead}
 
 ```typespec
-@Azure.ResourceManager.armResourceRead(resourceType: Model, resourceName?: valueof string)
+@Azure.ResourceManager.armResourceRead(resourceModel: Model, resourceName?: valueof string)
 ```
 
 #### Target
@@ -228,15 +228,15 @@ individually tagged
 
 #### Parameters
 
-| Name         | Type             | Description                                                                                      |
-| ------------ | ---------------- | ------------------------------------------------------------------------------------------------ |
-| resourceType | `Model`          | Resource model                                                                                   |
-| resourceName | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource type will be used. |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 ### `@armResourceUpdate` {#@Azure.ResourceManager.armResourceUpdate}
 
 ```typespec
-@Azure.ResourceManager.armResourceUpdate(resourceType: Model, resourceName?: valueof string)
+@Azure.ResourceManager.armResourceUpdate(resourceModel: Model, resourceName?: valueof string)
 ```
 
 #### Target
@@ -245,10 +245,10 @@ individually tagged
 
 #### Parameters
 
-| Name         | Type             | Description                                                                                      |
-| ------------ | ---------------- | ------------------------------------------------------------------------------------------------ |
-| resourceType | `Model`          | Resource model                                                                                   |
-| resourceName | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource type will be used. |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 ### `@armVirtualResource` {#@Azure.ResourceManager.armVirtualResource}
 
