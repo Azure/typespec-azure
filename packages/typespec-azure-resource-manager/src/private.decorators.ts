@@ -736,9 +736,6 @@ function callLifecycleDecorator(
     case "list":
       context.call($listsResource, target, resourceType);
       break;
-    case "action":
-      context.call($armResourceAction, target, resourceType);
-      break;
     case "checkExistence":
       context.call($armResourceCheckExistence, target, resourceType);
       break;
