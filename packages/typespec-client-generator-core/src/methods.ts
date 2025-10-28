@@ -389,9 +389,11 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     finalResponse: getFinalResponse(),
     finalStep: getSdkLroServiceFinalStep(context, rawMetadata.finalStep),
     pollingStep: {
-      responseBody: diagnostics.pipe(
-        getClientTypeWithDiagnostics(context, rawMetadata.pollingInfo.responseModel),
-      ) as SdkModelType,
+      responseBody: rawMetadata.pollingInfo.responseModel
+        ? (diagnostics.pipe(
+            getClientTypeWithDiagnostics(context, rawMetadata.pollingInfo.responseModel),
+          ) as SdkModelType)
+        : undefined,
     },
     operation: ignoreDiagnostics(getSdkBasicServiceMethod(context, rawMetadata.operation, client))
       .operation,
