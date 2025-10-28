@@ -188,9 +188,7 @@ function getSdkHttpParameters(
         getSdkHttpParameter(context, tspBody.property, httpOperation.operation, undefined, "body"),
       );
       if (tspBody.bodyKind === "file" && bodyParam.kind === "body") {
-        if (!bodyParam.serializationOptions) {
-          bodyParam.serializationOptions = {};
-        }
+        bodyParam.serializationOptions = bodyParam.serializationOptions || {};
         bodyParam.serializationOptions.binary = { isFile: true };
       }
       if (bodyParam.kind !== "body") {
