@@ -17,7 +17,7 @@ function isKeyValuePairKeyProp(property: ModelProperty): boolean {
 }
 export const secretProprule = createRule({
   name: "secret-prop",
-  description: `Check that property with names indicating sensitive information(e.g. contains auth, password, token, secret, etc.) are marked with @secret decorator.`,
+  description: `RPC-v1-13: Check that property with names indicating sensitive information(e.g. contains auth, password, token, secret, etc.) are marked with @secret decorator.`,
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/secret-prop",
   messages: {
