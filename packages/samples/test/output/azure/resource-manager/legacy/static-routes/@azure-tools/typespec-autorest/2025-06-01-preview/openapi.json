@@ -379,6 +379,49 @@
         }
       }
     },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/start/sub/tasks/{taskName}": {
+      "post": {
+        "operationId": "EmployeeSubscriptions_StartSubTask",
+        "tags": [
+          "EmployeeSubscriptions"
+        ],
+        "description": "start a subtask at an odd route with extra parameters",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "name": "employeeName",
+            "in": "path",
+            "description": "The name of the Employee",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "taskName",
+            "in": "path",
+            "description": "name of the task",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Azure operation completed successfully."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees": {
       "get": {
         "operationId": "EmployeeResourceGroups_ListByResourceGroup",
