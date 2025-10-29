@@ -731,3 +731,34 @@ it("operationGroup2", async () => {
   strictEqual(barClient.methods[0].name, "two");
   strictEqual(barClient.methods[0].crossLanguageDefinitionId, "TestService.Bar.two");
 });
+
+it("optional params propagated", async () => {
+  await runner.compileWithCustomization(
+    `
+    @service(#{
+      title: "Test optional client param is propagated",
+    })
+    namespace ClientOptionalParams;
+      model ExpandParameter {
+        @query("$expand")
+        $expand?: string;
+      }
+
+      namespace WithExpand {
+        @route("/with")
+        op test(@query("$expand")$expand?: string): void;
+      }
+
+      namespace WithoutExpand {
+        @route("/without")
+        op test(): void;
+      }`,
+    `
+  @@clientInitialization(ClientOptionalParams,
+    {
+      parameters: ClientOptionalParams.ExpandParameter,
+    },
+  );
+`,
+  );
+});
