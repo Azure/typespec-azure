@@ -43,7 +43,7 @@ configuration:
           - addReply:
               reply: >-
                 Hi @${issueAuthor}.
-                The PR will be closed since the PR has no update for 60 days. If this is still relevant please reopen.
+                This PR will be closed since it has had no update for 60 days. If this change is still relevant, please reopen the PR.
 
 onFailure:
 onSuccess:
