@@ -1,5 +1,29 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.61.0
+
+### Features
+
+- [#3356](https://github.com/Azure/typespec-azure/pull/3356) Support `@identifiers` on array model
+
+### Bug Fixes
+
+- [#3268](https://github.com/Azure/typespec-azure/pull/3268) Remove versioning
+  
+  ```diff lang=tsp
+  -@useDependency(Azure.ResourceManager.Versions.v1_preview2)
+  ```
+
+
+## 0.60.1
+
+### Bug Fixes
+
+- [#3330](https://github.com/Azure/typespec-azure/pull/3330) Fix #3294 Add model and operation templates for private link
+- [#3337](https://github.com/Azure/typespec-azure/pull/3337) Fix #3243 Allow polymorphic legacy resources
+- [#3332](https://github.com/Azure/typespec-azure/pull/3332) Fix #3295 Allow tenant-level external resources
+
+
 ## 0.60.0
 
 ### Bump dependencies

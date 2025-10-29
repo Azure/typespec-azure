@@ -1,30 +1,29 @@
+import { Tester } from "#test/tester.js";
 import {
-  BasicTestRunner,
   LinterRuleTester,
+  TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
-import { beforeEach, describe, it } from "vitest";
-import { createAzureResourceManagerTestRunner } from "../test-host.js";
+import { beforeEach, it } from "vitest";
 
 import { armResourceOperationsRule } from "../../src/rules/arm-resource-operation-response.js";
 
-describe("typespec-azure-resource-manager: arm resource operations rule", () => {
-  let runner: BasicTestRunner;
-  let tester: LinterRuleTester;
+let runner: TesterInstance;
+let tester: LinterRuleTester;
 
-  beforeEach(async () => {
-    runner = await createAzureResourceManagerTestRunner();
-    tester = createLinterRuleTester(
-      runner,
-      armResourceOperationsRule,
-      "@azure-tools/typespec-azure-resource-manager",
-    );
-  });
+beforeEach(async () => {
+  runner = await Tester.createInstance();
+  tester = createLinterRuleTester(
+    runner,
+    armResourceOperationsRule,
+    "@azure-tools/typespec-azure-resource-manager",
+  );
+});
 
-  it("emits diagnostics if response type is different from resource type.", async () => {
-    await tester
-      .expect(
-        `
+it("emits diagnostics if response type is different from resource type.", async () => {
+  await tester
+    .expect(
+      `
               @armProviderNamespace
         namespace Microsoft.Foo;
 
@@ -45,17 +44,17 @@ describe("typespec-azure-resource-manager: arm resource operations rule", () => 
           @get @armResourceList(FooResource) listBySubscription(...Foundations.SubscriptionScope<FooResource>): ArmResponse<ResourceListResult<FooResource>> | ErrorResponse;
         }
       `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
-        message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
-      });
-  });
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
+      message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
+    });
+});
 
-  it("emits diagnostics if response type of create operation is different from resource type.", async () => {
-    await tester
-      .expect(
-        `
+it("emits diagnostics if response type of create operation is different from resource type.", async () => {
+  await tester
+    .expect(
+      `
               @armProviderNamespace
         namespace Microsoft.Foo;
 
@@ -74,17 +73,17 @@ describe("typespec-azure-resource-manager: arm resource operations rule", () => 
           @put @armResourceCreateOrUpdate(FooResource) create(...ResourceInstanceParameters<FooResource>, @bodyRoot resource: FooResource): ArmResponse<FooResource> | ArmCreatedResponse<BarResource> | ErrorResponse;
         }
       `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
-        message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
-      });
-  });
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
+      message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
+    });
+});
 
-  it("emits diagnostics if response type of list operation is different from resource type.", async () => {
-    await tester
-      .expect(
-        `
+it("emits diagnostics if response type of list operation is different from resource type.", async () => {
+  await tester
+    .expect(
+      `
               @armProviderNamespace
         namespace Microsoft.Foo;
         
@@ -103,10 +102,9 @@ describe("typespec-azure-resource-manager: arm resource operations rule", () => 
           @get @armResourceList(FooResource) listBySubscription(...Foundations.SubscriptionScope<FooResource>): ArmResponse<ResourceListResult<BarResource>> | ErrorResponse;
         }
       `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
-        message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
-      });
-  });
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response",
+      message: "[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema.",
+    });
 });

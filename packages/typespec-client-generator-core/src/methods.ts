@@ -1,6 +1,5 @@
 import {
   FinalOperationStep,
-  getLroMetadata,
   getParameterizedNextLinkArguments,
   NextOperationLink,
   NextOperationReference,
@@ -24,6 +23,7 @@ import { $ } from "@typespec/compiler/typekit";
 import { createSdkClientType } from "./clients.js";
 import {
   getAccess,
+  getNextLinkVerb,
   getOverriddenClientMethod,
   getResponseAsBool,
   listOperationGroups,
@@ -68,6 +68,7 @@ import {
   getClientDoc,
   getCorrespondingClientParam,
   getHashForType,
+  getTcgcLroMetadata,
   getTypeDecorators,
   isNeverOrVoidType,
   isSubscriptionId,
@@ -229,6 +230,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
             context.__responseHeaderCache.get(segment) ??
             context.__modelPropertyCache.get(segment)!,
         ),
+        nextLinkVerb: getNextLinkVerb(context, operation),
         continuationTokenParameterSegments: pagingMetadata.input.continuationToken?.path.map(
           (r) => context.__methodParameterCache.get(r) ?? context.__modelPropertyCache.get(r)!,
         ),
@@ -371,7 +373,7 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
 ): SdkLroServiceMetadata | undefined {
-  const rawMetadata = getLroMetadata(context.program, operation);
+  const rawMetadata = getTcgcLroMetadata(context, operation, client);
   if (rawMetadata === undefined) {
     return undefined;
   }
@@ -611,7 +613,7 @@ function getSdkMethodResponse(
   };
 }
 
-function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>(
+export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
@@ -683,7 +685,7 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
-  const lro = getLroMetadata(context.program, operation);
+  const lro = getTcgcLroMetadata(context, operation, client);
   const paging = isList(context.program, operation);
   if (lro && paging) {
     return getSdkLroPagingServiceMethod<TServiceOperation>(context, operation, client);

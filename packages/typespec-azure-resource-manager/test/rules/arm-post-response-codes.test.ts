@@ -1,17 +1,18 @@
+import { Tester } from "#test/tester.js";
 import {
-  BasicTestRunner,
   LinterRuleTester,
+  TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { armPostResponseCodesRule } from "../../src/rules/arm-post-response-codes.js";
-import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
-let runner: BasicTestRunner;
+import { armPostResponseCodesRule } from "../../src/rules/arm-post-response-codes.js";
+
+let runner: TesterInstance;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await createAzureResourceManagerTestRunner();
+  runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
     armPostResponseCodesRule,
@@ -24,7 +25,7 @@ it("Emits a warning for a synchronous post operation that does not contain the a
     .expect(
       `
       @armProviderNamespace
-          namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
@@ -57,7 +58,7 @@ it("Emits a warning for a synchronous post operation that does not contain the a
     .expect(
       `
       @armProviderNamespace
-          namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
@@ -91,7 +92,7 @@ it("Does not emit a warning for a synchronous post operation that contains the 2
     .expect(
       `
       @armProviderNamespace
-          namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
@@ -120,7 +121,7 @@ it("Does not emit a warning for a synchronous post operation that contains 204 a
     .expect(
       `
       @armProviderNamespace
-          namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
         @pattern("^[a-zA-Z0-9-]{3,24}$")
@@ -159,7 +160,6 @@ it("Does not emit a warning for a long-running post operation that satisfies the
       }
             
       model Widget is TrackedResource<{}> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -203,7 +203,6 @@ it("Emits a warning for a long-running post operation that has a 202 response wi
       }
             
       model Widget is TrackedResource<{}> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -248,7 +247,6 @@ it("Emits a warning for a long-running post operation that has a 200 response wi
       }
             
       model Widget is TrackedResource<{}> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path
@@ -295,7 +293,6 @@ it("Emits a warning for a long-running post operation that has invalid response 
       }
             
       model Widget is TrackedResource<{}> {
-        @doc("Widget name")
         @key("widgetName")
         @segment("widgets")
         @path

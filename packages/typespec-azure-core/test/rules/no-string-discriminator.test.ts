@@ -1,17 +1,12 @@
-import {
-  BasicTestRunner,
-  LinterRuleTester,
-  createLinterRuleTester,
-} from "@typespec/compiler/testing";
+import { Tester } from "#test/test-host.js";
+import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 import { noStringDiscriminatorRule } from "../../src/rules/no-string-discriminator.js";
-import { createAzureCoreTestRunner } from "../test-host.js";
 
-let runner: BasicTestRunner;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await createAzureCoreTestRunner({ omitServiceNamespace: true });
+  const runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
     noStringDiscriminatorRule,

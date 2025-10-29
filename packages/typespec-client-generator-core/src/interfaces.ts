@@ -146,6 +146,8 @@ export enum UsageFlags {
   LroPolling = 1 << 12,
   /** Set when type is used as LRO final envelop response. */
   LroFinalEnvelope = 1 << 13,
+  /** Set when type is only referenced by external types. */
+  External = 1 << 14,
 }
 
 /**
@@ -891,6 +893,8 @@ export interface SdkPagingServiceMetadata<TServiceOperation extends SdkServiceOp
   nextLinkSegments?: (SdkServiceResponseHeader | SdkModelPropertyType)[];
   /** Method used to get next page. If not defined, use the initial method. */
   nextLinkOperation?: SdkServiceMethod<TServiceOperation>;
+  /** HTTP verb to use for the next link operation. Defaults to "GET" if not specified. */
+  nextLinkVerb?: "GET" | "POST";
   /** Segments to indicate how to get parameters that are needed to be injected into next page link. */
   nextLinkReInjectedParametersSegments?: (SdkMethodParameter | SdkModelPropertyType)[][];
   /** Segments to indicate how to set continuation token for next page request. */

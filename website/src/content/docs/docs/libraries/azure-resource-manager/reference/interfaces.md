@@ -332,6 +332,84 @@ interface Employees {
 }
 ```
 
+### `PrivateLinks` {#Azure.ResourceManager.PrivateLinks}
+
+Operations over private link resources.
+
+```typespec
+interface Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>
+```
+
+#### Template Parameters
+
+| Name                     | Description                                                                                                      |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| PrivateLinkResourceModel | The type of the private link resource. You must declare a private link resource type in your provider namespace. |
+
+#### `PrivateLinks.ListByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.ListByParent}
+
+```typespec
+op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+```
+
+##### Template Parameters
+
+| Name           | Description                                               |
+| -------------- | --------------------------------------------------------- |
+| ParentResource | the parent resource of the PrivateLink                    |
+| Resource       | Optional. The PrivateLink resource being listed           |
+| BaseParameters | Optional. Allows overriding the operation parameters      |
+| Parameters     | Optional. Additional parameters after the path parameters |
+| Response       | Optional. The success response for the list operation     |
+| Error          | Optional. The error response, if non-standard.            |
+
+#### `PrivateLinks.ListSinglePageByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.ListSinglePageByParent}
+
+```typespec
+op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+```
+
+##### Template Parameters
+
+| Name           | Description                                               |
+| -------------- | --------------------------------------------------------- |
+| ParentResource | the parent resource of the PrivateLink                    |
+| Resource       | Optional. The PrivateLink resource being listed           |
+| BaseParameters | Optional. Allows overriding the operation parameters      |
+| Parameters     | Optional. Additional parameters after the path parameters |
+| Response       | Optional. The success response for the list operation     |
+| Error          | Optional. The error response, if non-standard.            |
+
+#### `PrivateLinks.Read` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.Read}
+
+```typespec
+op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.Read(provider: "Microsoft.ThisWillBeReplaced", privateLinkResourceName: string): Response | Error
+```
+
+##### Template Parameters
+
+| Name           | Description                                               |
+| -------------- | --------------------------------------------------------- |
+| ParentResource | the parent resource of the PrivateLink                    |
+| Resource       | the PrivateLink resource being read                       |
+| BaseParameters | Optional. Allows overriding the operation parameters      |
+| Parameters     | Optional. Additional parameters after the path parameters |
+| Response       | Optional. The success response for the read operation     |
+| Error          | Optional. The error response, if non-standard.            |
+
+#### Examples
+
+```ts
+namespace Microsoft.Contoso;
+model PrivateLink is PrivateLinkResource {}
+alias EmployeeConnectionOps is PrivateLinks<PrivateLink>;
+@armResourceOperations
+interface Employees {
+ @doc("get a private link for resource employee")
+ getPrivateLink is EmployeeConnectionOps.Read<Employee>;
+}
+```
+
 ### `ProxyResourceOperations` {#Azure.ResourceManager.ProxyResourceOperations}
 
 A composite interface for Proxy resources that include `ResourceInstanceOperations<Resource, Properties>`
@@ -2681,3 +2759,40 @@ op Azure.ResourceManager.Legacy.PrivateEndpoints.ListSinglePageByParent(provider
 | Parameters     | Optional. Additional parameters after the path parameters     |
 | Response       | Optional. The success response for the list operation         |
 | Error          | Optional. The error response, if non-standard.                |
+
+## Azure.ResourceManager.Private.PrivateEndpoints
+
+### `CreateOrUpdateAsync` {#Azure.ResourceManager.Private.PrivateEndpoints.CreateOrUpdateAsync}
+
+```typespec
+op Azure.ResourceManager.Private.PrivateEndpoints.CreateOrUpdateAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
+```
+
+#### Template Parameters
+
+| Name           | Description                                                             |
+| -------------- | ----------------------------------------------------------------------- |
+| ParentResource | the parent resource of the PrivateEndpointConnection                    |
+| Resource       | the PrivateEndpointConnection resource being created or updated         |
+| BaseParameters | Optional. Allows overriding the operation parameters                    |
+| LroHeaders     | Optional. Allows overriding the lro headers returned on resource create |
+| Parameters     | Optional. Additional parameters after the path parameters               |
+| Response       | Optional. The success response for the createOrUpdate operation         |
+| Error          | Optional. The error response, if non-standard.                          |
+
+### `DeleteAsyncBase` {#Azure.ResourceManager.Private.PrivateEndpoints.DeleteAsyncBase}
+
+```typespec
+op Azure.ResourceManager.Private.PrivateEndpoints.DeleteAsyncBase(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+```
+
+#### Template Parameters
+
+| Name           | Description                                                    |
+| -------------- | -------------------------------------------------------------- |
+| ParentResource | The parent resource of the PrivateEndpointConnection           |
+| Response       | The response type for the operation                            |
+| Resource       | Optional. The PrivateEndpointConnection resource being deleted |
+| BaseParameters | Optional. Allows overriding the parameters for the operation   |
+| Parameters     | Optional. Additional parameters after the path parameters      |
+| Error          | Optional. The error response, if non-standard.                 |

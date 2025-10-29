@@ -589,7 +589,11 @@ getHealthStatus(
 
 ### `@clientName` {#@Azure.ClientGenerator.Core.clientName}
 
-Changes the name of a client, method, parameter, union, model, enum, model property, etc. generated in the client SDK.
+Overrides the generated name for client SDK elements including clients, methods, parameters,
+unions, models, enums, and model properties.
+
+This decorator takes precedence over all other naming mechanisms, including the `name`
+property in `@client` decorator and default naming conventions.
 
 ```typespec
 @Azure.ClientGenerator.Core.clientName(rename: valueof string, scope?: valueof string)
@@ -1176,4 +1180,84 @@ model SportsCar extends Vehicle {
   topSpeed: int32;
 }
 
+```
+
+### `@markAsLro` {#@Azure.ClientGenerator.Core.Legacy.markAsLro}
+
+Forces an operation to be treated as a Long Running Operation (LRO) by the SDK generators,
+even when the operation is not long-running on the service side.
+
+NOTE: When used, you will need to verify the operatio and add tests for the generated code
+to make sure the end-to-end works for library users, since there is a risk that forcing
+this operation to be LRO will result in errors.
+
+When applied, TCGC will treat the operation as an LRO and SDK generators should:
+
+- Generate polling mechanisms (pollers)
+- Return appropriate LRO-specific return types
+- Handle the operation as an asynchronous long-running process
+
+This decorator is considered legacy functionality and should only be used when
+standard TypeSpec LRO patterns are not feasible.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.markAsLro(scope?: valueof string)
+```
+
+#### Target
+
+The operation that should be treated as a Long Running Operation
+`Operation`
+
+#### Parameters
+
+| Name  | Type             | Description                                                                                                                                                                                                                                                     |
+| ----- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+
+#### Examples
+
+##### Force a regular operation to be treated as LRO for backward compatibility
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.markAsLro
+@route("/deployments/{deploymentId}")
+@post
+op startDeployment(@path deploymentId: string): DeploymentResult | ErrorResponse;
+```
+
+### `@nextLinkVerb` {#@Azure.ClientGenerator.Core.Legacy.nextLinkVerb}
+
+Specifies the HTTP verb for the next link operation in a paging scenario.
+
+This decorator allows you to override the HTTP method used for fetching the next page
+when the default GET method is not appropriate. Only "POST" and "GET" are supported.
+
+This decorator is considered legacy functionality and should only be used when
+standard TypeSpec paging patterns are not sufficient.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.nextLinkVerb(verb: "GET" | "POST", scope?: valueof string)
+```
+
+#### Target
+
+The paging operation to specify next link operation behavior for
+`Operation`
+
+#### Parameters
+
+| Name  | Type              | Description                                                                                                                                                                                                                                                     |
+| ----- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| verb  | `"GET" \| "POST"` | The HTTP verb to use for next link operations. Must be "POST" or "GET".                                                                                                                                                                                         |
+| scope | `valueof string`  | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+
+#### Examples
+
+##### Specify POST for next link operations
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST")
+@post
+op listItems(): PageResult;
 ```

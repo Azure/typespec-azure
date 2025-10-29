@@ -1,3 +1,4 @@
+import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
   DecoratorContext,
   DecoratorFunction,
@@ -13,14 +14,17 @@ import {
   Scalar,
   Type,
   Union,
+  compilerAssert,
   getDiscriminator,
   getNamespaceFullName,
   ignoreDiagnostics,
+  isErrorModel,
   isService,
   isTemplateDeclaration,
 } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
+import { getHttpOperation } from "@typespec/http";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
@@ -43,6 +47,8 @@ import {
 import {
   FlattenPropertyDecorator,
   HierarchyBuildingDecorator,
+  MarkAsLroDecorator,
+  NextLinkVerbDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
   AccessFlags,
@@ -729,6 +735,36 @@ export function getOverriddenClientMethod(
   return getScopedDecoratorData(context, overrideKey, entity);
 }
 
+/**
+ * Check if a model is an external type.
+ * The external type model has properties: identity (required), package (optional), minVersion (optional).
+ */
+function isExternalType(model: Model): boolean {
+  if (model.indexer !== undefined) {
+    return false;
+  }
+
+  const properties = [...model.properties.values()];
+
+  // Check if it has an 'identity' property with String literal type
+  const hasIdentity = properties.some(
+    (prop) => prop.name === "identity" && prop.type.kind === "String",
+  );
+
+  if (!hasIdentity) {
+    return false;
+  }
+
+  // Check that all other properties are only 'package' or 'minVersion' with String literal types
+  const otherProps = properties.filter((prop) => prop.name !== "identity");
+  const validProps = otherProps.every(
+    (prop) =>
+      (prop.name === "package" || prop.name === "minVersion") && prop.type.kind === "String",
+  );
+
+  return validProps;
+}
+
 const alternateTypeKey = createStateSymbol("alternateType");
 
 /**
@@ -746,7 +782,7 @@ export const $alternateType: AlternateTypeDecorator = (
   scope?: LanguageScopes,
 ) => {
   let alternateInput: Type | ExternalTypeInfo = alternate;
-  if (alternate.kind === "Model" && alternate.indexer === undefined) {
+  if (alternate.kind === "Model" && isExternalType(alternate)) {
     // This means we're dealing with external type
     if (!scope) {
       reportDiagnostic(context.program, {
@@ -824,7 +860,7 @@ export function getAlternateType(
     alternateTypeKey,
     source,
   );
-  if (retval !== undefined && "identity" in retval) {
+  if (retval !== undefined && "identity" in retval && !("kind" in retval)) {
     if (!context.__externalPackageToVersions) {
       context.__externalPackageToVersions = new Map();
     }
@@ -945,29 +981,33 @@ export function getClientInitializationOptions(
   }
 
   let parametersModel = options?.properties.get("parameters")?.type;
-  const movedParameters = findEntriesWithTarget<ModelProperty, Namespace | Interface>(
-    context,
-    clientLocationKey,
-    entity,
-    "ModelProperty",
-  );
-  const tk = $(context.program);
-  if (movedParameters.length > 0) {
-    if (parametersModel) {
-      // If the parameters model already exists, we will merge the moved parameters into it.
-      for (const movedParameter of movedParameters) {
-        parametersModel.properties.set(movedParameter.name, movedParameter);
+  let currEntity: Namespace | Interface | undefined = entity;
+  while (currEntity) {
+    const movedParameters = findEntriesWithTarget<ModelProperty, Namespace | Interface>(
+      context,
+      clientLocationKey,
+      currEntity,
+      "ModelProperty",
+    );
+    const tk = $(context.program);
+    if (movedParameters.length > 0) {
+      if (parametersModel) {
+        // If the parameters model already exists, we will merge the moved parameters into it.
+        for (const movedParameter of movedParameters) {
+          parametersModel.properties.set(movedParameter.name, movedParameter);
+        }
+      } else {
+        parametersModel = tk.model.create({
+          name: "ClientInitializationParameters",
+          properties: {
+            ...Object.fromEntries(
+              movedParameters.map((movedParameter) => [movedParameter.name, movedParameter]),
+            ),
+          },
+        });
       }
-    } else {
-      parametersModel = tk.model.create({
-        name: "ClientInitializationParameters",
-        properties: {
-          ...Object.fromEntries(
-            movedParameters.map((movedParameter) => [movedParameter.name, movedParameter]),
-          ),
-        },
-      });
     }
+    currEntity = currEntity.namespace;
   }
 
   return {
@@ -1419,6 +1459,70 @@ export function getLegacyHierarchyBuilding(context: TCGCContext, target: Model):
   if (!context.enableLegacyHierarchyBuilding) return undefined;
 
   return getScopedDecoratorData(context, legacyHierarchyBuildingKey, target);
+}
+
+const markAsLroKey = createStateSymbol("markAsLro");
+
+export const $markAsLro: MarkAsLroDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: LanguageScopes,
+) => {
+  const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, target));
+  const hasModelResponse = httpOperation.responses.filter(
+    (r) =>
+      r.type?.kind === "Model" && !(r.statusCodes === "*" || isErrorModel(context.program, r.type)),
+  )[0];
+  if (!hasModelResponse) {
+    reportDiagnostic(context.program, {
+      code: "invalid-mark-as-lro-target",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+  if (getLroMetadata(context.program, target)) {
+    reportDiagnostic(context.program, {
+      code: "mark-as-lro-ineffective",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+  setScopedDecoratorData(context, $markAsLro, markAsLroKey, target, true, scope);
+};
+
+export function getMarkAsLro(context: TCGCContext, entity: Operation): boolean {
+  return getScopedDecoratorData(context, markAsLroKey, entity) ?? false;
+}
+
+const nextLinkVerbKey = createStateSymbol("nextLinkVerb");
+
+export const $nextLinkVerb: NextLinkVerbDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  verb: Type,
+  scope?: LanguageScopes,
+) => {
+  compilerAssert(
+    verb.kind === "String" && (verb.value === "POST" || verb.value === "GET"),
+    "@nextLinkVerb decorator only supports 'POST' or 'GET' string literal values.",
+  );
+  setScopedDecoratorData(context, $nextLinkVerb, nextLinkVerbKey, target, verb.value, scope);
+};
+
+/**
+ * Get the HTTP verb specified for next link operations in paging scenarios.
+ * @param context TCGCContext
+ * @param entity Operation to check for nextLinkVerb decorator
+ * @returns The HTTP verb string ("POST" or "GET"). Defaults to "GET" if decorator is not applied.
+ */
+export function getNextLinkVerb(context: TCGCContext, entity: Operation): "GET" | "POST" {
+  return getScopedDecoratorData(context, nextLinkVerbKey, entity) ?? "GET";
 }
 
 /**

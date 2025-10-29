@@ -68,7 +68,10 @@ model Widget {
 @doc("Get widget by id (available in all versions)")
 @get
 @route("/widgets/{id}")
-op getWidget(@path id: string): Widget | NotFoundResponse;
+op getWidget(
+  @path id: string,
+  ...global.Azure.Core.Foundations.ApiVersionParameter,
+): Widget | NotFoundResponse;
 
 @doc("Update widget color request.")
 model UpdateWidgetColorRequest {
@@ -108,6 +111,7 @@ op updateWidgetColor(
   @path id: string,
   @header("Content-Type") contentType: "application/merge-patch+json",
   @body colorUpdate: UpdateWidgetColorRequest,
+  ...global.Azure.Core.Foundations.ApiVersionParameter,
 ): Widget | NotFoundResponse;
 
 @scenario
@@ -136,6 +140,7 @@ op updateWidgetColor(
 op listWidgets(
   @query name?: string,
   @query @added(ApiVersions.v2024_12_01_preview) color?: string,
+  ...global.Azure.Core.Foundations.ApiVersionParameter,
 ): {
   widgets: Widget[];
 };
