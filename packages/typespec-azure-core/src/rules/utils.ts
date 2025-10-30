@@ -16,7 +16,6 @@ import {
   Operation,
   Program,
   Scalar,
-  SourceLocation,
   Type,
   Union,
   UnionVariant,
@@ -153,24 +152,6 @@ export function isPascalCaseWithAcceptedAcronyms(
 export function isCamelCaseNoAcronyms(name: string): boolean {
   if (name === undefined || name === null || name === "") return true;
   return /^[^a-zA-Z0-9]?[a-z][a-z0-9]*([A-Z][a-z0-9]+)*[A-Z]?$/.test(name);
-}
-
-export function findLineStartAndIndent(location: SourceLocation): {
-  lineStart: number;
-  indent: string;
-} {
-  const text = location.file.text;
-  let pos = location.pos;
-  let indent = 0;
-  while (pos > 0 && text[pos - 1] !== "\n") {
-    if ([" ", "\t", "\n"].includes(text[pos - 1])) {
-      indent++;
-    } else {
-      indent = 0;
-    }
-    pos--;
-  }
-  return { lineStart: pos, indent: location.file.text.slice(pos, pos + indent) };
 }
 
 export function checkReferenceInDisallowedNamespace(
