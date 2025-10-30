@@ -820,7 +820,7 @@ it("one client from multiple services", async () => {
   strictEqual(client.clientInitialization.parameters[0].name, "endpoint");
   const aiClient = client.children!.find((c) => c.name === "AI");
   ok(aiClient);
-  
+
   // AI client should have api versions from ServiceA
   strictEqual(aiClient.apiVersions.length, 2);
   deepStrictEqual(aiClient.apiVersions, ["av1", "av2"]);
@@ -846,7 +846,7 @@ it("one client from multiple services", async () => {
 
   const biClient = client.children!.find((c) => c.name === "BI");
   ok(biClient);
-  
+
   strictEqual(biClient.apiVersions.length, 2);
   deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
   strictEqual(biClient.clientInitialization.parameters.length, 2);
@@ -856,7 +856,7 @@ it("one client from multiple services", async () => {
   strictEqual(biApiVersionParam.isApiVersionParam, true);
   strictEqual(biApiVersionParam.onClient, true);
   strictEqual(biApiVersionParam.clientDefaultValue, "bv2");
-  
+
   // BI client should have btest method with VersionsB api version
   const biMethod = biClient.methods[0];
   strictEqual(biMethod.name, "btest");
