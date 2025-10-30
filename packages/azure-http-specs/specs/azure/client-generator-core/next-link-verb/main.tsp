@@ -28,7 +28,7 @@ model ListTestResult {
 
   @nextLink
   @doc("Link to fetch more tests.")
-  next: string;
+  next?: string;
 }
 
 @scenario
