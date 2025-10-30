@@ -60,7 +60,7 @@ it("arm client with operation groups", async () => {
     enum Versions {
       /** 2024-04-01-preview api version */
           V2024_04_01_PREVIEW: "2024-04-01-preview",
-    }
+    }F
 
     model TestTrackedResource is TrackedResource<TestTrackedResourceProperties> {
       ...ResourceNameParameter<TestTrackedResource>;
@@ -761,4 +761,55 @@ it("optional params propagated", async () => {
   );
 `,
   );
+});
+
+it("one client from multiple services", async () => {
+  await runner.compileWithCustomization(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+
+      interface AI {
+        @route("/atest")
+        atest(): void;
+      }
+    }
+
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+
+      interface BI {
+        @route("/btest")
+        btest(): void;
+      }
+    }`,
+    `
+  @client
+  @service
+  namespace CombineClient {
+    @clientInitialization({initializedBy: InitializedBy.individually})
+    @client({service: ServiceA, parent: CombineClient})
+    interface AI extends ServiceA.AI {}
+    @clientInitialization({initializedBy: InitializedBy.individually})
+    @client({service: ServiceB, parent: CombineClient})
+    interface BI extends ServiceB.BI {}
+  }
+`,
+  );
+  const sdkPackage = runner.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  strictEqual(client.apiVersions.length, 2);
+  deepStrictEqual(client.apiVersions, ["av2", "bv2"]);
 });
