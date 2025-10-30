@@ -49,6 +49,7 @@ import {
   getClientDocExplicit,
   getClientLocation,
   getMarkAsLro,
+  getOverriddenClientMethod,
   getParamAlias,
 } from "./decorators.js";
 import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
@@ -345,7 +346,13 @@ export function getSdkTypeBaseHelper<TKind>(
     type.kind === "Union"
   ) {
     const external = getAlternateType(context, type);
-    if (external) {
+    // Only set external if it's an ExternalTypeInfo (has 'identity' but not 'kind' property), not a regular Type
+    if (
+      external &&
+      typeof external === "object" &&
+      "identity" in external &&
+      !("kind" in external)
+    ) {
       base.external = external;
     }
   }
@@ -638,7 +645,10 @@ export function isOnClient(
   versioning?: boolean,
 ): boolean {
   const clientLocation = getClientLocation(context, type);
-  if (operation && clientLocation === operation) {
+  if (
+    operation &&
+    clientLocation === (getOverriddenClientMethod(context, operation) ?? operation)
+  ) {
     // if the type has explicitly been moved to the operation, it is not on the client
     return false;
   }

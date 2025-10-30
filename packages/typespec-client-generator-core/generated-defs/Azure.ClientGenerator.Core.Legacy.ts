@@ -1,4 +1,4 @@
-import type { DecoratorContext, Model, ModelProperty, Operation } from "@typespec/compiler";
+import type { DecoratorContext, Model, ModelProperty, Operation, Type } from "@typespec/compiler";
 
 /**
  * Adds support for client-level multiple levels of inheritance.
@@ -106,8 +106,37 @@ export type MarkAsLroDecorator = (
   scope?: string,
 ) => void;
 
+/**
+ * Specifies the HTTP verb for the next link operation in a paging scenario.
+ *
+ * This decorator allows you to override the HTTP method used for fetching the next page
+ * when the default GET method is not appropriate. Only "POST" and "GET" are supported.
+ *
+ * This decorator is considered legacy functionality and should only be used when
+ * standard TypeSpec paging patterns are not sufficient.
+ *
+ * @param target The paging operation to specify next link operation behavior for
+ * @param verb The HTTP verb to use for next link operations. Must be "POST" or "GET".
+ * @param scope Specifies the target language emitters that the decorator should apply.
+ * If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ * @example Specify POST for next link operations
+ * ```typespec
+ * @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST")
+ * @post
+ * op listItems(): PageResult;
+ * ```
+ */
+export type NextLinkVerbDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  verb: Type,
+  scope?: string,
+) => void;
+
 export type AzureClientGeneratorCoreLegacyDecorators = {
   hierarchyBuilding: HierarchyBuildingDecorator;
   flattenProperty: FlattenPropertyDecorator;
   markAsLro: MarkAsLroDecorator;
+  nextLinkVerb: NextLinkVerbDecorator;
 };
