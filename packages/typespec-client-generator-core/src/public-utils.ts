@@ -89,6 +89,39 @@ export function getDefaultApiVersion(
   }
 }
 
+function getVersionEnumForService(context: TCGCContext, type: ModelProperty): Enum | undefined {
+  if (context.__packageVersionEnum) {
+    return context.__packageVersionEnum;
+  }
+
+  // Try to find the service from the model property's namespace hierarchy
+  let namespace = getNamespaceFromType(type.model);
+
+  // Walk up the namespace hierarchy to find a versioned service
+  while (namespace) {
+    const versions = getVersions(context.program, namespace)[1]?.getVersions();
+    if (versions?.length) {
+      const versionEnum = versions[0].enumMember.enum;
+      context.__packageVersionEnum = versionEnum;
+      return versionEnum;
+    }
+    namespace = namespace.namespace;
+  }
+
+  // Fallback: try to get from any service namespace
+  const services = listAllServiceNamespaces(context);
+  if (services.length > 0) {
+    const versions = getVersions(context.program, services[0])[1]?.getVersions();
+    if (versions?.length) {
+      const versionEnum = versions[0].enumMember.enum;
+      context.__packageVersionEnum = versionEnum;
+      return versionEnum;
+    }
+  }
+
+  return undefined;
+}
+
 /**
  * Return whether a parameter is the Api Version parameter of a client
  * @param program
@@ -102,7 +135,7 @@ export function isApiVersion(context: TCGCContext, type: ModelProperty): boolean
     return override;
   }
   // if the service is not versioning, then no api version parameter
-  const versionEnum = context.getPackageVersionEnum();
+  const versionEnum = getVersionEnumForService(context, type);
   if (!versionEnum) {
     return false;
   }

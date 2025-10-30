@@ -73,7 +73,7 @@ it("basic default version", async () => {
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v3");
-  deepStrictEqual(runnerWithVersion.context.getPackageVersions(), ["v1", "v2", "v3"]);
+  deepStrictEqual(runnerWithVersion.context.getApiVersions(), ["v1", "v2", "v3"]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -174,7 +174,7 @@ it("basic latest version", async () => {
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v3");
-  deepStrictEqual(runnerWithVersion.context.getPackageVersions(), ["v1", "v2", "v3"]);
+  deepStrictEqual(runnerWithVersion.context.getApiVersions(), ["v1", "v2", "v3"]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -274,7 +274,7 @@ it("basic v3 version", async () => {
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v3");
-  deepStrictEqual(runnerWithVersion.context.getPackageVersions(), ["v1", "v2", "v3"]);
+  deepStrictEqual(runnerWithVersion.context.getApiVersions(), ["v1", "v2", "v3"]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -374,7 +374,7 @@ it("basic v2 version", async () => {
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v2");
-  deepStrictEqual(runnerWithVersion.context.getPackageVersions(), ["v1", "v2"]);
+  deepStrictEqual(runnerWithVersion.context.getApiVersions(), ["v1", "v2"]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -477,7 +477,7 @@ it("basic v1 version", async () => {
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v1");
-  deepStrictEqual(runnerWithVersion.context.getPackageVersions(), ["v1"]);
+  deepStrictEqual(runnerWithVersion.context.getApiVersions(), ["v1"]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -565,7 +565,7 @@ it("basic all version", async () => {
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "all");
-  deepStrictEqual(runnerWithVersion.context.getPackageVersions(), ["v1", "v2", "v3"]);
+  deepStrictEqual(runnerWithVersion.context.getApiVersions(), ["v1", "v2", "v3"]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -1427,7 +1427,7 @@ it("version not exist", async () => {
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v3");
-  deepStrictEqual(runnerWithVersion.context.getPackageVersions(), ["v1", "v2", "v3"]);
+  deepStrictEqual(runnerWithVersion.context.getApiVersions(), ["v1", "v2", "v3"]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
