@@ -797,11 +797,11 @@ it("one client from multiple services", async () => {
   @client
   @service
   namespace CombineClient {
-    @clientInitialization({initializedBy: InitializedBy.individually})
-    @client({service: ServiceA, parent: CombineClient})
+    @clientInitialization({initializedBy: InitializedBy.individually | InitializedBy.parent})
+    @client({service: ServiceA})
     interface AI extends ServiceA.AI {}
-    @clientInitialization({initializedBy: InitializedBy.individually})
-    @client({service: ServiceB, parent: CombineClient})
+    @clientInitialization({initializedBy: InitializedBy.individually | InitializedBy.parent})
+    @client({service: ServiceB})
     interface BI extends ServiceB.BI {}
   }
 `,
