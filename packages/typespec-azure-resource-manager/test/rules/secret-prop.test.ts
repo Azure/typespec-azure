@@ -92,7 +92,7 @@ describe("codefix", () => {
       `,
       )
       .applyCodeFix("add-decorator-secret").toEqual(`
-        model FooModel {
+        model Test {
           @secret
           somePassword: string;
         }
