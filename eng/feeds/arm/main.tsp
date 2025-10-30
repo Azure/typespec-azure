@@ -16,7 +16,7 @@ using Azure.ResourceManager;
 @service(#{
   title: "Microsoft.{{parameters.ServiceNamespace}} management service",
 })
-@versioned(Microsoft.Contoso.Versions)
+@versioned(Microsoft.{{parameters.ServiceNamespace}}.Versions)
 namespace Microsoft.{{parameters.ServiceNamespace}};
 
 /** The available API versions. */
