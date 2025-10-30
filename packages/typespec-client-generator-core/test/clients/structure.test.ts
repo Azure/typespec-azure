@@ -798,10 +798,10 @@ it("one client from multiple services", async () => {
   @service
   namespace CombineClient {
     @clientInitialization({initializedBy: InitializedBy.individually | InitializedBy.parent})
-    @client({service: ServiceA})
+    @client({service: ServiceA, parent: CombineClient})
     interface AI extends ServiceA.AI {}
     @clientInitialization({initializedBy: InitializedBy.individually | InitializedBy.parent})
-    @client({service: ServiceB})
+    @client({service: ServiceB, parent: CombineClient})
     interface BI extends ServiceB.BI {}
   }
 `,
@@ -810,6 +810,14 @@ it("one client from multiple services", async () => {
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "CombineClient");
-  strictEqual(client.apiVersions.length, 2);
-  deepStrictEqual(client.apiVersions, ["av2", "bv2"]);
+  strictEqual(client.apiVersions.length, 0);
+  strictEqual(client.children!.length, 2);
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+  strictEqual(aiClient.methods.length, 1);
+  strictEqual(aiClient.methods[0].name, "atest");
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+  strictEqual(biClient.methods.length, 1);
+  strictEqual(biClient.methods[0].name, "btest");
 });

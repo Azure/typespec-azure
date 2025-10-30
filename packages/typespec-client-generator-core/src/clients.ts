@@ -187,6 +187,14 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
       name = override;
     }
   }
+  if (!parent && client.kind === "SdkClient" && client.parent) {
+    const parentRaw = context.__rawClientsOperationGroupsCache?.get(client.parent) as
+      | SdkClient
+      | undefined;
+    parent = context.__clientTypesCache?.find((c) => c.__raw === parentRaw) as
+      | SdkClientType<TServiceOperation>
+      | undefined;
+  }
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
@@ -208,7 +216,8 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
   );
   addDefaultClientParameters(context, sdkClientType);
   // update initialization model properties
-
+  context.__clientTypesCache = context.__clientTypesCache || [];
+  context.__clientTypesCache.push(sdkClientType);
   return diagnostics.wrap(sdkClientType);
 }
 
