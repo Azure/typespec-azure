@@ -3111,6 +3111,9 @@ importers:
       '@typespec/library-linter':
         specifier: workspace:^
         version: link:../../core/packages/library-linter
+      '@typespec/openapi':
+        specifier: workspace:^
+        version: link:../../core/packages/openapi
       '@typespec/rest':
         specifier: workspace:^
         version: link:../../core/packages/rest
