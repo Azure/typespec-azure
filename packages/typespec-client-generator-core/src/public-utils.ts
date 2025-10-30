@@ -93,22 +93,33 @@ function getVersionEnumForService(context: TCGCContext, type: ModelProperty): En
   if (context.__packageVersionEnum) {
     return context.__packageVersionEnum;
   }
-  let service = getNamespaceFromType(type.model);
-  if (!service) {
-    const namespaces = listAllServiceNamespaces(context);
-    if (namespaces.length === 0) {
-      return undefined;
+
+  // Try to find the service from the model property's namespace hierarchy
+  let namespace = getNamespaceFromType(type.model);
+
+  // Walk up the namespace hierarchy to find a versioned service
+  while (namespace) {
+    const versions = getVersions(context.program, namespace)[1]?.getVersions();
+    if (versions?.length) {
+      const versionEnum = versions[0].enumMember.enum;
+      context.__packageVersionEnum = versionEnum;
+      return versionEnum;
     }
-    service = namespaces[0];
+    namespace = namespace.namespace;
   }
-  let retval = getVersions(context.program, service)[1]?.getVersions()?.[0].enumMember.enum
-  while(!retval && service) {
-    service = service.namespace;
-    if (service) {
-      retval = getVersions(context.program, service)[1]?.getVersions()?.[0].enumMember.enum
+
+  // Fallback: try to get from any service namespace
+  const services = listAllServiceNamespaces(context);
+  if (services.length > 0) {
+    const versions = getVersions(context.program, services[0])[1]?.getVersions();
+    if (versions?.length) {
+      const versionEnum = versions[0].enumMember.enum;
+      context.__packageVersionEnum = versionEnum;
+      return versionEnum;
     }
   }
-  return retval;
+
+  return undefined;
 }
 
 /**

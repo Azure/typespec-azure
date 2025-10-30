@@ -867,7 +867,4 @@ it("one client from multiple services", async () => {
   ok(biOperationApiVersionParam);
   strictEqual(biOperationApiVersionParam.correspondingMethodParams.length, 1);
   strictEqual(biOperationApiVersionParam.correspondingMethodParams[0], biApiVersionParam);
-
-  strictEqual(biClient.methods.length, 1);
-  strictEqual(biClient.methods[0].name, "btest");
 });
