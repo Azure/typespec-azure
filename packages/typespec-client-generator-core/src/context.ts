@@ -113,17 +113,17 @@ export function createTCGCContext(
       }
       this.__tspTypeToApiVersions.set(type, mergedApiVersions);
     },
-    getPackageVersions(): string[] {
-      if (this.__packageVersions) {
+    getPackageVersions(service?: Namespace): string[] {
+      if (this.__packageVersions?.length) {
         return this.__packageVersions;
       }
-      const service = listServices(program)[0];
+      service = service ?? listServices(program)[0]?.type;
       if (!service) {
         this.__packageVersions = [];
         return this.__packageVersions;
       }
 
-      const versions = getVersions(program, service.type)[1]?.getVersions();
+      const versions = getVersions(program, service)[1]?.getVersions();
       if (!versions) {
         this.__packageVersions = [];
         return this.__packageVersions;
@@ -142,7 +142,7 @@ export function createTCGCContext(
         reportDiagnostic(this.program, {
           code: "api-version-undefined",
           format: { version: this.apiVersion },
-          target: service.type,
+          target: service,
         });
         this.apiVersion = this.__packageVersions[this.__packageVersions.length - 1];
       }

@@ -81,7 +81,7 @@ export interface TCGCContext {
   getMutatedGlobalNamespace(): Namespace;
   getApiVersionsForType(type: Type): string[];
   setApiVersionsForType(type: Type, apiVersions: string[]): void;
-  getPackageVersions(): string[];
+  getPackageVersions(service?: Namespace): string[];
   getPackageVersionEnum(): Enum | undefined;
   getClients(): SdkClient[];
   getClientOrOperationGroup(type: Namespace | Interface): SdkClient | SdkOperationGroup | undefined;

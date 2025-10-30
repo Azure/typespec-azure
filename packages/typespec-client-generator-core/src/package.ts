@@ -160,7 +160,7 @@ function populateApiVersionInformation(context: TCGCContext): void {
       filterApiVersionsWithDecorators(
         context,
         clientOperationGroup.type ?? clientOperationGroup.service,
-        context.getPackageVersions(),
+        context.getPackageVersions(clientOperationGroup.service),
       ),
     );
 
