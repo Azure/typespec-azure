@@ -60,7 +60,7 @@ it("arm client with operation groups", async () => {
     enum Versions {
       /** 2024-04-01-preview api version */
           V2024_04_01_PREVIEW: "2024-04-01-preview",
-    }F
+    }
 
     model TestTrackedResource is TrackedResource<TestTrackedResourceProperties> {
       ...ResourceNameParameter<TestTrackedResource>;
