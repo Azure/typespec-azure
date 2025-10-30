@@ -775,8 +775,8 @@ it("one client from multiple services", async () => {
       }
 
       interface AI {
-        @route("/atest")
-        atest(@query("api-version") apiVersion: VersionsA): void;
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
       }
     }
 
@@ -789,8 +789,8 @@ it("one client from multiple services", async () => {
       }
 
       interface BI {
-        @route("/btest")
-        btest(@query("api-version") apiVersion: VersionsB): void;
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): void;
       }
     }`,
     `
@@ -832,10 +832,10 @@ it("one client from multiple services", async () => {
   strictEqual(aiApiVersionParam.onClient, true);
   strictEqual(aiApiVersionParam.clientDefaultValue, "av2");
 
-  // AI client should have atest method with VersionsA api version
+  // AI client should have aTest method with VersionsA api version
   strictEqual(aiClient.methods.length, 1);
   const aiMethod = aiClient.methods[0];
-  strictEqual(aiMethod.name, "atest");
+  strictEqual(aiMethod.name, "aTest");
   strictEqual(aiMethod.parameters.length, 0);
   const aiOperation = aiMethod.operation;
   strictEqual(aiOperation.parameters.length, 1);
@@ -857,9 +857,9 @@ it("one client from multiple services", async () => {
   strictEqual(biApiVersionParam.onClient, true);
   strictEqual(biApiVersionParam.clientDefaultValue, "bv2");
 
-  // BI client should have btest method with VersionsB api version
+  // BI client should have bTest method with VersionsB api version
   const biMethod = biClient.methods[0];
-  strictEqual(biMethod.name, "btest");
+  strictEqual(biMethod.name, "bTest");
   strictEqual(biMethod.parameters.length, 0);
   const biOperation = biMethod.operation;
   strictEqual(biOperation.parameters.length, 1);
