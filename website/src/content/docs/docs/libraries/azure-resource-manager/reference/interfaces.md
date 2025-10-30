@@ -132,192 +132,203 @@ op Azure.ResourceManager.Operations.list(apiVersion: string, provider: "Microsof
 Operations over private endpoint connection resources.
 
 ```typespec
-interface Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>
+interface Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>
 ```
 
 #### Template Parameters
 
-| Name                    | Description                                                                                                                                    |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| PrivateEndpointResource | The type of the private endpoint connection resource. You must declare a private endpoint connection resource type in your provider namespace. |
+| Name                    | Description                                                                                                                                          |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PrivateEndpointResource | The type of the private endpoint connection resource. You must declare a private endpoint connection resource type in your provider namespace.       |
+| ResourceName            | Optional. The name of the private endpoint connection resource in this context, by default, this is `{targetResourceName}PrivateEndpointConnection`. |
 
-#### `PrivateEndpoints.ListByParent` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.ListByParent}
+#### `PrivateEndpoints.ListByParent` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.ListByParent}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                   |
-| -------------- | ------------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateEndpointConnection          |
-| Resource       | Optional. The PrivateEndpointConnection resource being listed |
-| BaseParameters | Optional. Allows overriding the operation parameters          |
-| Parameters     | Optional. Additional parameters after the path parameters     |
-| Response       | Optional. The success response for the list operation         |
-| Error          | Optional. The error response, if non-standard.                |
+| Name                 | Description                                                                       |
+| -------------------- | --------------------------------------------------------------------------------- |
+| ParentResource       | the parent resource of the PrivateEndpointConnection                              |
+| Resource             | Optional. The PrivateEndpointConnection resource being listed                     |
+| BaseParameters       | Optional. Allows overriding the operation parameters                              |
+| Parameters           | Optional. Additional parameters after the path parameters                         |
+| Response             | Optional. The success response for the list operation                             |
+| Error                | Optional. The error response, if non-standard.                                    |
+| OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.Read` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.Read}
+#### `PrivateEndpoints.Read` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.Read}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.Read(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.Read(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                               |
-| -------------- | --------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateEndpointConnection      |
-| Resource       | the PrivateEndpointConnection resource being read         |
-| BaseParameters | Optional. Allows overriding the operation parameters      |
-| Parameters     | Optional. Additional parameters after the path parameters |
-| Response       | Optional. The success response for the read operation     |
-| Error          | Optional. The error response, if non-standard.            |
+| Name                 | Description                                                                       |
+| -------------------- | --------------------------------------------------------------------------------- |
+| ParentResource       | the parent resource of the PrivateEndpointConnection                              |
+| Resource             | the PrivateEndpointConnection resource being read                                 |
+| BaseParameters       | Optional. Allows overriding the operation parameters                              |
+| Parameters           | Optional. Additional parameters after the path parameters                         |
+| Response             | Optional. The success response for the read operation                             |
+| Error                | Optional. The error response, if non-standard.                                    |
+| OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.CreateOrUpdateAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CreateOrUpdateAsync}
+#### `PrivateEndpoints.CreateOrUpdateAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CreateOrUpdateAsync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CreateOrUpdateAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CreateOrUpdateAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                             |
-| -------------- | ----------------------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateEndpointConnection                    |
-| Resource       | the PrivateEndpointConnection resource being created or updated         |
-| BaseParameters | Optional. Allows overriding the operation parameters                    |
-| LroHeaders     | Optional. Allows overriding the lro headers returned on resource create |
-| Parameters     | Optional. Additional parameters after the path parameters               |
-| Response       | Optional. The success response for the createOrUpdate operation         |
-| Error          | Optional. The error response, if non-standard.                          |
+| Name                 | Description                                                                       |
+| -------------------- | --------------------------------------------------------------------------------- |
+| ParentResource       | the parent resource of the PrivateEndpointConnection                              |
+| Resource             | the PrivateEndpointConnection resource being created or updated                   |
+| BaseParameters       | Optional. Allows overriding the operation parameters                              |
+| LroHeaders           | Optional. Allows overriding the lro headers returned on resource create           |
+| Parameters           | Optional. Additional parameters after the path parameters                         |
+| Response             | Optional. The success response for the createOrUpdate operation                   |
+| Error                | Optional. The error response, if non-standard.                                    |
+| OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.CreateOrReplaceSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CreateOrReplaceSync}
+#### `PrivateEndpoints.CreateOrReplaceSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CreateOrReplaceSync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CreateOrReplaceSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CreateOrReplaceSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                     |
-| -------------- | --------------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateEndpointConnection            |
-| Resource       | the PrivateEndpointConnection resource being created or updated |
-| BaseParameters | Optional. Allows overriding the operation parameters            |
-| Parameters     | Optional. Additional parameters after the path parameters       |
-| Response       | Optional. The success response for the createOrUpdate operation |
-| Error          | Optional. The error response, if non-standard.                  |
+| Name                 | Description                                                                       |
+| -------------------- | --------------------------------------------------------------------------------- |
+| ParentResource       | the parent resource of the PrivateEndpointConnection                              |
+| Resource             | the PrivateEndpointConnection resource being created or updated                   |
+| BaseParameters       | Optional. Allows overriding the operation parameters                              |
+| Parameters           | Optional. Additional parameters after the path parameters                         |
+| Response             | Optional. The success response for the createOrUpdate operation                   |
+| Error                | Optional. The error response, if non-standard.                                    |
+| OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.CreateOrReplaceAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CreateOrReplaceAsync}
+#### `PrivateEndpoints.CreateOrReplaceAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CreateOrReplaceAsync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CreateOrReplaceAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CreateOrReplaceAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                             |
-| -------------- | ----------------------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateEndpointConnection                    |
-| Resource       | the PrivateEndpointConnection resource being created or updated         |
-| BaseParameters | Optional. Allows overriding the operation parameters                    |
-| LroHeaders     | Optional. Allows overriding the lro headers returned on resource create |
-| Parameters     | Optional. Additional parameters after the path parameters               |
-| Response       | Optional. The success response for the createOrReplace operation        |
-| Error          | Optional. The error response, if non-standard.                          |
+| Name                 | Description                                                                       |
+| -------------------- | --------------------------------------------------------------------------------- |
+| ParentResource       | the parent resource of the PrivateEndpointConnection                              |
+| Resource             | the PrivateEndpointConnection resource being created or updated                   |
+| BaseParameters       | Optional. Allows overriding the operation parameters                              |
+| LroHeaders           | Optional. Allows overriding the lro headers returned on resource create           |
+| Parameters           | Optional. Additional parameters after the path parameters                         |
+| Response             | Optional. The success response for the createOrReplace operation                  |
+| Error                | Optional. The error response, if non-standard.                                    |
+| OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.CustomPatchAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CustomPatchAsync}
+#### `PrivateEndpoints.CustomPatchAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CustomPatchAsync}
 
 A long-running resource update using a custom PATCH payload (Asynchronous) to update a PrivateEndpointConnection to a resource.
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CustomPatchAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, properties: PatchModel): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CustomPatchAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, properties: PatchModel): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                                   |
-| -------------- | ----------------------------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateEndpointConnection                          |
-| Resource       | the PrivateEndpointConnection resource being updated                          |
-| PatchModel     | The input model for the PATCH request                                         |
-| BaseParameters | Optional. Allows overriding the operation parameters                          |
-| LroHeaders     | Optional. Allows overriding the lro headers returned in the Accepted response |
-| Parameters     | Optional. Additional parameters after the path parameters                     |
-| Response       | Optional. The success response for the patch operation                        |
-| Error          | Optional. The error response, if non-standard.                                |
+| Name                 | Description                                                                       |
+| -------------------- | --------------------------------------------------------------------------------- |
+| ParentResource       | the parent resource of the PrivateEndpointConnection                              |
+| Resource             | the PrivateEndpointConnection resource being updated                              |
+| PatchModel           | The input model for the PATCH request                                             |
+| BaseParameters       | Optional. Allows overriding the operation parameters                              |
+| LroHeaders           | Optional. Allows overriding the lro headers returned in the Accepted response     |
+| Parameters           | Optional. Additional parameters after the path parameters                         |
+| Response             | Optional. The success response for the patch operation                            |
+| Error                | Optional. The error response, if non-standard.                                    |
+| OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.CustomPatchSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CustomPatchSync}
+#### `PrivateEndpoints.CustomPatchSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CustomPatchSync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.CustomPatchSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, properties: PatchModel): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CustomPatchSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, properties: PatchModel): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                    |
-| -------------- | -------------------------------------------------------------- |
-| ParentResource | The parent resource of the PrivateEndpointConnection           |
-| Resource       | Optional. The PrivateEndpointConnection resource being patched |
-| PatchModel     | The input model for the PATCH request                          |
-| BaseParameters | Optional. Allows overriding the operation parameters           |
-| Parameters     | Optional. Additional parameters after the path parameters      |
-| Response       | Optional. The success response for the patch operation         |
-| Error          | Optional. The error response, if non-standard.                 |
+| Name                 | Description                                                                       |
+| -------------------- | --------------------------------------------------------------------------------- |
+| ParentResource       | The parent resource of the PrivateEndpointConnection                              |
+| Resource             | Optional. The PrivateEndpointConnection resource being patched                    |
+| PatchModel           | The input model for the PATCH request                                             |
+| BaseParameters       | Optional. Allows overriding the operation parameters                              |
+| Parameters           | Optional. Additional parameters after the path parameters                         |
+| Response             | Optional. The success response for the patch operation                            |
+| Error                | Optional. The error response, if non-standard.                                    |
+| OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.DeleteAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.DeleteAsync}
+#### `PrivateEndpoints.DeleteAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.DeleteAsync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.DeleteAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.DeleteAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                               |
-| -------------- | ------------------------------------------------------------------------- |
-| ParentResource | The parent resource of the PrivateEndpointConnection                      |
-| Resource       | Optional. The PrivateEndpointConnection resource being deleted            |
-| BaseParameters | Optional. Allows overriding the parameters for the operation              |
-| LroHeaders     | Optional. Allows overriding the headers returned in the Accepted response |
-| Parameters     | Optional. Additional parameters after the path parameters                 |
-| Response       | Optional. The success response(s) for the delete operation                |
-| Error          | Optional. The error response, if non-standard.                            |
+| Name                 | Description                                                                       |
+| -------------------- | --------------------------------------------------------------------------------- |
+| ParentResource       | The parent resource of the PrivateEndpointConnection                              |
+| Resource             | Optional. The PrivateEndpointConnection resource being deleted                    |
+| BaseParameters       | Optional. Allows overriding the parameters for the operation                      |
+| LroHeaders           | Optional. Allows overriding the headers returned in the Accepted response         |
+| Parameters           | Optional. Additional parameters after the path parameters                         |
+| Response             | Optional. The success response(s) for the delete operation                        |
+| Error                | Optional. The error response, if non-standard.                                    |
+| OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.DeleteSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.DeleteSync}
+#### `PrivateEndpoints.DeleteSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.DeleteSync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.DeleteSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.DeleteSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                  |
-| -------------- | ------------------------------------------------------------ |
-| ParentResource | The parent resource of the PrivateEndpointConnection         |
-| Resource       | The PrivateEndpointConnection resource being deleted         |
-| BaseParameters | Optional. Allows overriding the parameters for the operation |
-| Parameters     | Optional. Additional parameters after the path parameters    |
-| Response       | Optional. The success response(s) for the delete operation   |
-| Error          | Optional. The error response, if non-standard.               |
+| Name                 | Description                                                                       |
+| -------------------- | --------------------------------------------------------------------------------- |
+| ParentResource       | The parent resource of the PrivateEndpointConnection                              |
+| Resource             | The PrivateEndpointConnection resource being deleted                              |
+| BaseParameters       | Optional. Allows overriding the parameters for the operation                      |
+| Parameters           | Optional. Additional parameters after the path parameters                         |
+| Response             | Optional. The success response(s) for the delete operation                        |
+| Error                | Optional. The error response, if non-standard.                                    |
+| OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.DeleteAsyncBase` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.DeleteAsyncBase}
+#### `PrivateEndpoints.DeleteAsyncBase` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.DeleteAsyncBase}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource>.DeleteAsyncBase(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.DeleteAsyncBase(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                                    |
-| -------------- | -------------------------------------------------------------- |
-| ParentResource | The parent resource of the PrivateEndpointConnection           |
-| Response       | The response type for the operation                            |
-| Resource       | Optional. The PrivateEndpointConnection resource being deleted |
-| BaseParameters | Optional. Allows overriding the parameters for the operation   |
-| Parameters     | Optional. Additional parameters after the path parameters      |
-| Error          | Optional. The error response, if non-standard.                 |
+| Name                 | Description                                                                       |
+| -------------------- | --------------------------------------------------------------------------------- |
+| ParentResource       | The parent resource of the PrivateEndpointConnection                              |
+| Response             | The response type for the operation                                               |
+| Resource             | Optional. The PrivateEndpointConnection resource being deleted                    |
+| BaseParameters       | Optional. Allows overriding the parameters for the operation                      |
+| Parameters           | Optional. Additional parameters after the path parameters                         |
+| Error                | Optional. The error response, if non-standard.                                    |
+| OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
 #### Examples
 
@@ -337,65 +348,69 @@ interface Employees {
 Operations over private link resources.
 
 ```typespec
-interface Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>
+interface Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>
 ```
 
 #### Template Parameters
 
-| Name                     | Description                                                                                                      |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------- |
-| PrivateLinkResourceModel | The type of the private link resource. You must declare a private link resource type in your provider namespace. |
+| Name                     | Description                                                                                                             |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| PrivateLinkResourceModel | The type of the private link resource. You must declare a private link resource type in your provider namespace.        |
+| ResourceName             | Optional. The name of the private link resource in this context, by default, this is `{targetResourceName}PrivateLink`. |
 
-#### `PrivateLinks.ListByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.ListByParent}
+#### `PrivateLinks.ListByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>.ListByParent}
 
 ```typespec
-op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                               |
-| -------------- | --------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateLink                    |
-| Resource       | Optional. The PrivateLink resource being listed           |
-| BaseParameters | Optional. Allows overriding the operation parameters      |
-| Parameters     | Optional. Additional parameters after the path parameters |
-| Response       | Optional. The success response for the list operation     |
-| Error          | Optional. The error response, if non-standard.            |
+| Name                 | Description                                                        |
+| -------------------- | ------------------------------------------------------------------ |
+| ParentResource       | the parent resource of the PrivateLink                             |
+| Resource             | Optional. The PrivateLink resource being listed                    |
+| BaseParameters       | Optional. Allows overriding the operation parameters               |
+| Parameters           | Optional. Additional parameters after the path parameters          |
+| Response             | Optional. The success response for the list operation              |
+| Error                | Optional. The error response, if non-standard.                     |
+| OverrideResourceName | Optional. The name of the private link resource being operated on. |
 
-#### `PrivateLinks.ListSinglePageByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.ListSinglePageByParent}
+#### `PrivateLinks.ListSinglePageByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>.ListSinglePageByParent}
 
 ```typespec
-op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                               |
-| -------------- | --------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateLink                    |
-| Resource       | Optional. The PrivateLink resource being listed           |
-| BaseParameters | Optional. Allows overriding the operation parameters      |
-| Parameters     | Optional. Additional parameters after the path parameters |
-| Response       | Optional. The success response for the list operation     |
-| Error          | Optional. The error response, if non-standard.            |
+| Name                 | Description                                                        |
+| -------------------- | ------------------------------------------------------------------ |
+| ParentResource       | the parent resource of the PrivateLink                             |
+| Resource             | Optional. The PrivateLink resource being listed                    |
+| BaseParameters       | Optional. Allows overriding the operation parameters               |
+| Parameters           | Optional. Additional parameters after the path parameters          |
+| Response             | Optional. The success response for the list operation              |
+| Error                | Optional. The error response, if non-standard.                     |
+| OverrideResourceName | Optional. The name of the private link resource being operated on. |
 
-#### `PrivateLinks.Read` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.Read}
+#### `PrivateLinks.Read` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>.Read}
 
 ```typespec
-op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel>.Read(provider: "Microsoft.ThisWillBeReplaced", privateLinkResourceName: string): Response | Error
+op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>.Read(provider: "Microsoft.ThisWillBeReplaced", privateLinkResourceName: string): Response | Error
 ```
 
 ##### Template Parameters
 
-| Name           | Description                                               |
-| -------------- | --------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateLink                    |
-| Resource       | the PrivateLink resource being read                       |
-| BaseParameters | Optional. Allows overriding the operation parameters      |
-| Parameters     | Optional. Additional parameters after the path parameters |
-| Response       | Optional. The success response for the read operation     |
-| Error          | Optional. The error response, if non-standard.            |
+| Name                 | Description                                                        |
+| -------------------- | ------------------------------------------------------------------ |
+| ParentResource       | the parent resource of the PrivateLink                             |
+| Resource             | the PrivateLink resource being read                                |
+| BaseParameters       | Optional. Allows overriding the operation parameters               |
+| Parameters           | Optional. Additional parameters after the path parameters          |
+| Response             | Optional. The success response for the read operation              |
+| Error                | Optional. The error response, if non-standard.                     |
+| OverrideResourceName | Optional. The name of the private link resource being operated on. |
 
 #### Examples
 
@@ -1420,16 +1435,17 @@ op Azure.ResourceManager.Extension.ActionAsync(apiVersion: string, subscriptionI
 
 #### Template Parameters
 
-| Name                | Description                                                                                              |
-| ------------------- | -------------------------------------------------------------------------------------------------------- |
-| TargetResource      | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource   | The resource being acted upon                                                                            |
-| Request             | The request model for the action                                                                         |
-| Response            | The response model for the action                                                                        |
-| LroHeaders          | Optional. Allows overriding the headers returned in the Accepted response                                |
-| Parameters          | Optional. Additional parameters after the path parameters                                                |
-| Error               | Optional. The error response, if non-standard.                                                           |
-| OptionalRequestBody | Optional. Indicates whether the body parameter is optional.                                              |
+| Name                 | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource       | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource    | The resource being acted upon                                                                            |
+| Request              | The request model for the action                                                                         |
+| Response             | The response model for the action                                                                        |
+| LroHeaders           | Optional. Allows overriding the headers returned in the Accepted response                                |
+| Parameters           | Optional. Additional parameters after the path parameters                                                |
+| Error                | Optional. The error response, if non-standard.                                                           |
+| OptionalRequestBody  | Optional. Indicates whether the body parameter is optional.                                              |
+| OverrideResourceName | Optional. Allows overriding the resource name for this scope in generated clients.                       |
 
 ### `ActionAsyncBase` {#Azure.ResourceManager.Extension.ActionAsyncBase}
 
@@ -1441,15 +1457,16 @@ op Azure.ResourceManager.Extension.ActionAsyncBase(apiVersion: string, subscript
 
 #### Template Parameters
 
-| Name                | Description                                                                                              |
-| ------------------- | -------------------------------------------------------------------------------------------------------- |
-| TargetResource      | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource   | The resource being acted upon                                                                            |
-| Request             | The request model for the action                                                                         |
-| Response            | The response type for the action                                                                         |
-| Parameters          | Optional. Additional parameters after the path parameters                                                |
-| Error               | Optional. The error response, if non-standard.                                                           |
-| OptionalRequestBody | Optional. Indicates whether the request body is optional.                                                |
+| Name                 | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource       | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource    | The resource being acted upon                                                                            |
+| Request              | The request model for the action                                                                         |
+| Response             | The response type for the action                                                                         |
+| Parameters           | Optional. Additional parameters after the path parameters                                                |
+| Error                | Optional. The error response, if non-standard.                                                           |
+| OptionalRequestBody  | Optional. Indicates whether the request body is optional.                                                |
+| OverrideResourceName | Optional. Allows overriding the resource name for this scope in generated clients.                       |
 
 ### `ActionNoContentSync` {#Azure.ResourceManager.Extension.ActionNoContentSync}
 
@@ -1461,14 +1478,15 @@ op Azure.ResourceManager.Extension.ActionNoContentSync(apiVersion: string, subsc
 
 #### Template Parameters
 
-| Name                | Description                                                                                              |
-| ------------------- | -------------------------------------------------------------------------------------------------------- |
-| TargetResource      | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource   | The resource being acted upon                                                                            |
-| Request             | The request model for the action                                                                         |
-| Parameters          | Optional. Additional parameters after the path parameters                                                |
-| Error               | Optional. The error response, if non-standard.                                                           |
-| OptionalRequestBody | Optional. Indicates whether the request body is optional.                                                |
+| Name                 | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource       | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource    | The resource being acted upon                                                                            |
+| Request              | The request model for the action                                                                         |
+| Parameters           | Optional. Additional parameters after the path parameters                                                |
+| Error                | Optional. The error response, if non-standard.                                                           |
+| OptionalRequestBody  | Optional. Indicates whether the request body is optional.                                                |
+| OverrideResourceName | Optional. Allows overriding the resource name for this scope in generated clients.                       |
 
 ### `ActionNoResponseContentAsync` {#Azure.ResourceManager.Extension.ActionNoResponseContentAsync}
 
@@ -1478,15 +1496,16 @@ op Azure.ResourceManager.Extension.ActionNoResponseContentAsync(apiVersion: stri
 
 #### Template Parameters
 
-| Name                | Description                                                                                              |
-| ------------------- | -------------------------------------------------------------------------------------------------------- |
-| TargetResource      | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource   | The resource being acted upon                                                                            |
-| Request             | The request model for the action                                                                         |
-| LroHeaders          | Optional. Allows overriding the headers returned in the Accepted response                                |
-| Parameters          | Optional. Additional parameters after the path parameters                                                |
-| Error               | Optional. The error response, if non-standard.                                                           |
-| OptionalRequestBody | Optional. Indicates whether the body parameter is optional.                                              |
+| Name                 | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource       | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource    | The resource being acted upon                                                                            |
+| Request              | The request model for the action                                                                         |
+| LroHeaders           | Optional. Allows overriding the headers returned in the Accepted response                                |
+| Parameters           | Optional. Additional parameters after the path parameters                                                |
+| Error                | Optional. The error response, if non-standard.                                                           |
+| OptionalRequestBody  | Optional. Indicates whether the body parameter is optional.                                              |
+| OverrideResourceName | Optional. Allows overriding the resource name for this scope in generated clients.                       |
 
 ### `ActionSync` {#Azure.ResourceManager.Extension.ActionSync}
 
@@ -1498,15 +1517,16 @@ op Azure.ResourceManager.Extension.ActionSync(apiVersion: string, subscriptionId
 
 #### Template Parameters
 
-| Name                | Description                                                                                              |
-| ------------------- | -------------------------------------------------------------------------------------------------------- |
-| TargetResource      | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource   | The resource being acted upon                                                                            |
-| Request             | The request model for the action                                                                         |
-| Response            | The response model for the action                                                                        |
-| Parameters          | Optional. Additional parameters after the path parameters                                                |
-| Error               | Optional. The error response, if non-standard.                                                           |
-| OptionalRequestBody | Optional. Indicates whether the body parameter is optional.                                              |
+| Name                 | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource       | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource    | The resource being acted upon                                                                            |
+| Request              | The request model for the action                                                                         |
+| Response             | The response model for the action                                                                        |
+| Parameters           | Optional. Additional parameters after the path parameters                                                |
+| Error                | Optional. The error response, if non-standard.                                                           |
+| OptionalRequestBody  | Optional. Indicates whether the body parameter is optional.                                              |
+| OverrideResourceName | Optional. Allows overriding the resource name for this scope in generated clients.                       |
 
 ### `CheckExistence` {#Azure.ResourceManager.Extension.CheckExistence}
 
@@ -1518,13 +1538,14 @@ op Azure.ResourceManager.Extension.CheckExistence(apiVersion: string, subscripti
 
 #### Template Parameters
 
-| Name              | Description                                                                                              |
-| ----------------- | -------------------------------------------------------------------------------------------------------- |
-| TargetResource    | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource | the extension resource being checked                                                                     |
-| Parameters        | Optional. Additional parameters after the path parameters                                                |
-| Response          | Optional. The success response for the read operation                                                    |
-| Error             | Optional. The error response, if non-standard.                                                           |
+| Name                 | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource       | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource    | the extension resource being checked                                                                     |
+| Parameters           | Optional. Additional parameters after the path parameters                                                |
+| Response             | Optional. The success response for the read operation                                                    |
+| Error                | Optional. The error response, if non-standard.                                                           |
+| OverrideResourceName | Optional. Allows overriding the resource name for this scope in generated clients.                       |
 
 ### `CreateOrReplaceAsync` {#Azure.ResourceManager.Extension.CreateOrReplaceAsync}
 
@@ -1534,14 +1555,15 @@ op Azure.ResourceManager.Extension.CreateOrReplaceAsync(apiVersion: string, subs
 
 #### Template Parameters
 
-| Name              | Description                                                                                              |
-| ----------------- | -------------------------------------------------------------------------------------------------------- |
-| TargetResource    | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource | the resource being created or replaced                                                                   |
-| LroHeaders        | Optional. Allows overriding the lro headers returned on resource create                                  |
-| Parameters        | Optional. Additional parameters after the path parameters                                                |
-| Response          | Optional. The success response for the createOrReplace operation                                         |
-| Error             | Optional. The error response, if non-standard.                                                           |
+| Name                 | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource       | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource    | the resource being created or replaced                                                                   |
+| LroHeaders           | Optional. Allows overriding the lro headers returned on resource create                                  |
+| Parameters           | Optional. Additional parameters after the path parameters                                                |
+| Response             | Optional. The success response for the createOrReplace operation                                         |
+| Error                | Optional. The error response, if non-standard.                                                           |
+| OverrideResourceName | Optional. Allows overriding the resource name for this scope in generated clients                        |
 
 ### `CreateOrReplaceSync` {#Azure.ResourceManager.Extension.CreateOrReplaceSync}
 
@@ -1553,13 +1575,14 @@ op Azure.ResourceManager.Extension.CreateOrReplaceSync(apiVersion: string, subsc
 
 #### Template Parameters
 
-| Name              | Description                                                                                              |
-| ----------------- | -------------------------------------------------------------------------------------------------------- |
-| TargetResource    | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource | the resource being created or replaced                                                                   |
-| Parameters        | Optional. Additional parameters after the path parameters                                                |
-| Response          | Optional. The success response for the createOrUpdate operation                                          |
-| Error             | Optional. The error response, if non-standard.                                                           |
+| Name                 | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource       | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource    | the resource being created or replaced                                                                   |
+| Parameters           | Optional. Additional parameters after the path parameters                                                |
+| Response             | Optional. The success response for the createOrUpdate operation                                          |
+| Error                | Optional. The error response, if non-standard.                                                           |
+| OverrideResourceName | Optional. Allows overriding the resource name for this scope in generated clients.                       |
 
 ### `CreateOrUpdateAsync` {#Azure.ResourceManager.Extension.CreateOrUpdateAsync}
 
@@ -1571,14 +1594,15 @@ op Azure.ResourceManager.Extension.CreateOrUpdateAsync(apiVersion: string, subsc
 
 #### Template Parameters
 
-| Name              | Description                                                                                              |
-| ----------------- | -------------------------------------------------------------------------------------------------------- |
-| TargetResource    | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource | the resource being created or updated                                                                    |
-| LroHeaders        | Optional. Allows overriding the lro headers returned on resource create                                  |
-| Parameters        | Optional. Additional parameters after the path parameters                                                |
-| Response          | Optional. The success response for the createOrUpdate operation                                          |
-| Error             | Optional. The error response, if non-standard.                                                           |
+| Name                 | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource       | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource    | the resource being created or updated                                                                    |
+| LroHeaders           | Optional. Allows overriding the lro headers returned on resource create                                  |
+| Parameters           | Optional. Additional parameters after the path parameters                                                |
+| Response             | Optional. The success response for the createOrUpdate operation                                          |
+| Error                | Optional. The error response, if non-standard.                                                           |
+| OverrideResourceName | Optional. Allows overriding the resource name for this scope in generated clients                        |
 
 ### `CustomPatchAsync` {#Azure.ResourceManager.Extension.CustomPatchAsync}
 
@@ -1590,15 +1614,16 @@ op Azure.ResourceManager.Extension.CustomPatchAsync(apiVersion: string, subscrip
 
 #### Template Parameters
 
-| Name              | Description                                                                                              |
-| ----------------- | -------------------------------------------------------------------------------------------------------- |
-| TargetResource    | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource | the resource being patched                                                                               |
-| PatchModel        | The input model for the PATCH request                                                                    |
-| LroHeaders        | Optional. Allows overriding the lro headers returned in the Accepted response                            |
-| Parameters        | Optional. Additional parameters after the path parameters                                                |
-| Response          | Optional. The success response for the patch operation                                                   |
-| Error             | Optional. The error response, if non-standard.                                                           |
+| Name                 | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource       | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource    | the resource being patched                                                                               |
+| PatchModel           | The input model for the PATCH request                                                                    |
+| LroHeaders           | Optional. Allows overriding the lro headers returned in the Accepted response                            |
+| Parameters           | Optional. Additional parameters after the path parameters                                                |
+| Response             | Optional. The success response for the patch operation                                                   |
+| Error                | Optional. The error response, if non-standard.                                                           |
+| OverrideResourceName | Optional. Allows overriding the resource name for this scope in generated clients                        |
 
 ### `CustomPatchSync` {#Azure.ResourceManager.Extension.CustomPatchSync}
 
@@ -1610,14 +1635,15 @@ op Azure.ResourceManager.Extension.CustomPatchSync(apiVersion: string, subscript
 
 #### Template Parameters
 
-| Name              | Description                                                                                              |
-| ----------------- | -------------------------------------------------------------------------------------------------------- |
-| TargetResource    | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource | the resource being patched                                                                               |
-| PatchModel        | The input model for the PATCH request                                                                    |
-| Parameters        | Optional. Additional parameters after the path parameters                                                |
-| Response          | Optional. The success response for the patch operation                                                   |
-| Error             | Optional. The error response, if non-standard.                                                           |
+| Name                 | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource       | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource    | the resource being patched                                                                               |
+| PatchModel           | The input model for the PATCH request                                                                    |
+| Parameters           | Optional. Additional parameters after the path parameters                                                |
+| Response             | Optional. The success response for the patch operation                                                   |
+| Error                | Optional. The error response, if non-standard.                                                           |
+| OverrideResourceName | Optional. Allows overriding the resource name for this scope in generated clients.                       |
 
 ### `DeleteAsync` {#Azure.ResourceManager.Extension.DeleteAsync}
 
@@ -1631,14 +1657,15 @@ op Azure.ResourceManager.Extension.DeleteAsync(apiVersion: string, subscriptionI
 
 #### Template Parameters
 
-| Name              | Description                                                                                              |
-| ----------------- | -------------------------------------------------------------------------------------------------------- |
-| TargetResource    | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource | The resource being deleted                                                                               |
-| LroHeaders        | Optional. Allows overriding the headers in the Accepted response                                         |
-| Parameters        | Optional. Additional parameters after the path parameters                                                |
-| Response          | Optional. The success response(s) for the delete operation                                               |
-| Error             | Optional. The error response, if non-standard.                                                           |
+| Name                 | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource       | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource    | The resource being deleted                                                                               |
+| LroHeaders           | Optional. Allows overriding the headers in the Accepted response                                         |
+| Parameters           | Optional. Additional parameters after the path parameters                                                |
+| Response             | Optional. The success response(s) for the delete operation                                               |
+| Error                | Optional. The error response, if non-standard.                                                           |
+| OverrideResourceName | Optional. Allows overriding the resource name for this scope in generated clients.                       |
 
 ### `DeleteAsyncBase` {#Azure.ResourceManager.Extension.DeleteAsyncBase}
 
@@ -1648,13 +1675,14 @@ op Azure.ResourceManager.Extension.DeleteAsyncBase(apiVersion: string, subscript
 
 #### Template Parameters
 
-| Name              | Description                                                                                              |
-| ----------------- | -------------------------------------------------------------------------------------------------------- |
-| TargetResource    | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource | The resource being deleted                                                                               |
-| Response          | The response type for the operation                                                                      |
-| Parameters        | Optional. Additional parameters after the path parameters                                                |
-| Error             | Optional. The error response, if non-standard.                                                           |
+| Name                 | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource       | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource    | The resource being deleted                                                                               |
+| Response             | The response type for the operation                                                                      |
+| Parameters           | Optional. Additional parameters after the path parameters                                                |
+| Error                | Optional. The error response, if non-standard.                                                           |
+| OverrideResourceName | Optional. Allows overriding the resource name for this scope in generated clients.                       |
 
 ### `DeleteSync` {#Azure.ResourceManager.Extension.DeleteSync}
 
@@ -1666,13 +1694,14 @@ op Azure.ResourceManager.Extension.DeleteSync(apiVersion: string, subscriptionId
 
 #### Template Parameters
 
-| Name              | Description                                                                                              |
-| ----------------- | -------------------------------------------------------------------------------------------------------- |
-| TargetResource    | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource | The resource being deleted                                                                               |
-| Parameters        | Optional. Additional parameters after the path parameters                                                |
-| Response          | Optional. The success response(s) for the delete operation                                               |
-| Error             | Optional. The error response, if non-standard.                                                           |
+| Name                 | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource       | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource    | The resource being deleted                                                                               |
+| Parameters           | Optional. Additional parameters after the path parameters                                                |
+| Response             | Optional. The success response(s) for the delete operation                                               |
+| Error                | Optional. The error response, if non-standard.                                                           |
+| OverrideResourceName | Optional. Allows overriding the resource name for this scope in generated clients.                       |
 
 ### `DeleteWithoutOkAsync` {#Azure.ResourceManager.Extension.DeleteWithoutOkAsync}
 
@@ -1682,14 +1711,15 @@ op Azure.ResourceManager.Extension.DeleteWithoutOkAsync(apiVersion: string, subs
 
 #### Template Parameters
 
-| Name              | Description                                                                                              |
-| ----------------- | -------------------------------------------------------------------------------------------------------- |
-| TargetResource    | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource | The resource being deleted                                                                               |
-| LroHeaders        | Optional. Allows overriding the headers returned in the Accepted response                                |
-| Parameters        | Optional. Additional parameters after the path parameters                                                |
-| Response          | Optional. The success response(s) for the delete operation                                               |
-| Error             | Optional. The error response, if non-standard.                                                           |
+| Name                 | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource       | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource    | The resource being deleted                                                                               |
+| LroHeaders           | Optional. Allows overriding the headers returned in the Accepted response                                |
+| Parameters           | Optional. Additional parameters after the path parameters                                                |
+| Response             | Optional. The success response(s) for the delete operation                                               |
+| Error                | Optional. The error response, if non-standard.                                                           |
+| OverrideResourceName | Optional. Allows overriding the resource name for this scope in generated clients.                       |
 
 ### `ListByTarget` {#Azure.ResourceManager.Extension.ListByTarget}
 
@@ -1701,13 +1731,14 @@ op Azure.ResourceManager.Extension.ListByTarget(apiVersion: string, subscription
 
 #### Template Parameters
 
-| Name              | Description                                                                                                |
-| ----------------- | ---------------------------------------------------------------------------------------------------------- |
-| TargetResource    | The target to list at, e.g. Extension.Subscription or Extension>ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource | the resource being listed                                                                                  |
-| Parameters        | Optional. Additional parameters after the path parameters                                                  |
-| Response          | Optional. The success response for the list operation                                                      |
-| Error             | Optional. The error response, if non-standard.                                                             |
+| Name                 | Description                                                                                                |
+| -------------------- | ---------------------------------------------------------------------------------------------------------- |
+| TargetResource       | The target to list at, e.g. Extension.Subscription or Extension>ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource    | the resource being listed                                                                                  |
+| Parameters           | Optional. Additional parameters after the path parameters                                                  |
+| Response             | Optional. The success response for the list operation                                                      |
+| Error                | Optional. The error response, if non-standard.                                                             |
+| OverrideResourceName | Optional. Allows overriding the resource name for this scope in generated clients.                         |
 
 ### `Read` {#Azure.ResourceManager.Extension.Read}
 
@@ -1719,13 +1750,14 @@ op Azure.ResourceManager.Extension.Read(apiVersion: string, subscriptionId: Azur
 
 #### Template Parameters
 
-| Name              | Description                                                                                              |
-| ----------------- | -------------------------------------------------------------------------------------------------------- |
-| TargetResource    | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource | the resource being rea                                                                                   |
-| Parameters        | Optional. Additional parameters after the path parameters                                                |
-| Response          | Optional. The success response for the read operation                                                    |
-| Error             | Optional. The error response, if non-standard.                                                           |
+| Name                 | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource       | The target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource    | the resource being rea                                                                                   |
+| Parameters           | Optional. Additional parameters after the path parameters                                                |
+| Response             | Optional. The success response for the read operation                                                    |
+| Error                | Optional. The error response, if non-standard.                                                           |
+| OverrideResourceName | Optional. Allows overriding the resource name for this scope in generated clients.                       |
 
 ## Azure.ResourceManager.Foundations
 
@@ -1799,247 +1831,260 @@ op Azure.ResourceManager.Foundations.checkNameAvailability(apiVersion: string, b
 An operation template used to build extension resource operations using non-standard paths.
 
 ```typespec
-interface Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>
+interface Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>
 ```
 
 #### Template Parameters
 
-| Name                        | Description                                       |
-| --------------------------- | ------------------------------------------------- |
-| TargetParameters            | The path parameters for the target resource       |
-| ExtensionParentParameters   | Parent parameters of the extension resource       |
-| ExtensionInstanceParameters | The instance parameters of the extension resource |
+| Name                        | Description                                                       |
+| --------------------------- | ----------------------------------------------------------------- |
+| TargetParameters            | The path parameters for the target resource                       |
+| ExtensionParentParameters   | Parent parameters of the extension resource                       |
+| ExtensionInstanceParameters | The instance parameters of the extension resource                 |
+| ResourceName                | Optional. The name of the resource type at this scope in clients. |
 
-#### `ExtensionOperations.CreateOrUpdateAsync` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.CreateOrUpdateAsync}
+#### `ExtensionOperations.CreateOrUpdateAsync` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.CreateOrUpdateAsync}
 
 A long-running resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.CreateOrUpdateAsync(resource: Request): Response | ErrorType
+op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.CreateOrUpdateAsync(resource: Request): Response | ErrorType
 ```
 
 ##### Template Parameters
 
-| Name                | Description                                                             |
-| ------------------- | ----------------------------------------------------------------------- |
-| Resource            | the resource being created or updated                                   |
-| LroHeaders          | Optional. Allows overriding the lro headers returned on resource create |
-| Parameters          | Optional. Additional parameters after the path parameters               |
-| Response            | Optional. The success response(s) for the PUT operation                 |
-| OptionalRequestBody | Optional. Indicates whether the request body is optional                |
-| ErrorType           | Optional. The error response, if non-standard.                          |
-| OperationOptions    | Optional. The route options for the operation.                          |
-| Request             | Optional. The request body for the createOrUpdate operation.            |
+| Name                 | Description                                                             |
+| -------------------- | ----------------------------------------------------------------------- |
+| Resource             | the resource being created or updated                                   |
+| LroHeaders           | Optional. Allows overriding the lro headers returned on resource create |
+| Parameters           | Optional. Additional parameters after the path parameters               |
+| Response             | Optional. The success response(s) for the PUT operation                 |
+| OptionalRequestBody  | Optional. Indicates whether the request body is optional                |
+| ErrorType            | Optional. The error response, if non-standard.                          |
+| OperationOptions     | Optional. The route options for the operation.                          |
+| Request              | Optional. The request body for the createOrUpdate operation.            |
+| OverrideResourceName | Optional. The name of the resource type at this scope in clients.       |
 
-#### `ExtensionOperations.CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.CreateOrUpdateSync}
+#### `ExtensionOperations.CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.CreateOrUpdateSync}
 
 A synchronous resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.CreateOrUpdateSync(resource: Request): Response | ErrorType
+op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.CreateOrUpdateSync(resource: Request): Response | ErrorType
 ```
 
 ##### Template Parameters
 
-| Name                | Description                                                  |
-| ------------------- | ------------------------------------------------------------ |
-| Resource            | the resource being created or updated                        |
-| Parameters          | Optional. Additional parameters after the path parameters    |
-| Response            | Optional. The success response(s) for the PUT operation      |
-| OptionalRequestBody | Optional. Indicates whether the request body is optional     |
-| ErrorType           | Optional. The error response, if non-standard.               |
-| OperationOptions    | Optional. The route options for the operation.               |
-| Request             | Optional. The request body for the createOrUpdate operation. |
+| Name                 | Description                                                       |
+| -------------------- | ----------------------------------------------------------------- |
+| Resource             | the resource being created or updated                             |
+| Parameters           | Optional. Additional parameters after the path parameters         |
+| Response             | Optional. The success response(s) for the PUT operation           |
+| OptionalRequestBody  | Optional. Indicates whether the request body is optional          |
+| ErrorType            | Optional. The error response, if non-standard.                    |
+| OperationOptions     | Optional. The route options for the operation.                    |
+| Request              | Optional. The request body for the createOrUpdate operation.      |
+| OverrideResourceName | Optional. The name of the resource type at this scope in clients. |
 
-#### `ExtensionOperations.CustomPatchAsync` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.CustomPatchAsync}
+#### `ExtensionOperations.CustomPatchAsync` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.CustomPatchAsync}
 
 A long-running resource Update (PATCH)
 
 ```typespec
-op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.CustomPatchAsync(properties: PatchModel): Response | ErrorType
+op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.CustomPatchAsync(properties: PatchModel): Response | ErrorType
 ```
 
 ##### Template Parameters
 
-| Name                | Description                                                             |
-| ------------------- | ----------------------------------------------------------------------- |
-| Resource            | the resource being created or updated                                   |
-| PatchModel          | the PATCH request model                                                 |
-| LroHeaders          | Optional. Allows overriding the lro headers returned on resource create |
-| Parameters          | Optional. Additional parameters after the path parameters               |
-| Response            | Optional. The success response(s) for the PATCH operation               |
-| OptionalRequestBody | Optional. Indicates whether the request body is optional                |
-| ErrorType           | Optional. The error response, if non-standard.                          |
-| OperationOptions    | Optional. The route options for the operation.                          |
+| Name                 | Description                                                             |
+| -------------------- | ----------------------------------------------------------------------- |
+| Resource             | the resource being created or updated                                   |
+| PatchModel           | the PATCH request model                                                 |
+| LroHeaders           | Optional. Allows overriding the lro headers returned on resource create |
+| Parameters           | Optional. Additional parameters after the path parameters               |
+| Response             | Optional. The success response(s) for the PATCH operation               |
+| OptionalRequestBody  | Optional. Indicates whether the request body is optional                |
+| ErrorType            | Optional. The error response, if non-standard.                          |
+| OperationOptions     | Optional. The route options for the operation.                          |
+| OverrideResourceName | Optional. The name of the resource type at this scope in clients.       |
 
-#### `ExtensionOperations.CustomPatchSync` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.CustomPatchSync}
+#### `ExtensionOperations.CustomPatchSync` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.CustomPatchSync}
 
 A synchronous resource Update (PATCH)
 
 ```typespec
-op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.CustomPatchSync(properties: PatchModel): Response | ErrorType
+op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.CustomPatchSync(properties: PatchModel): Response | ErrorType
 ```
 
 ##### Template Parameters
 
-| Name                | Description                                               |
-| ------------------- | --------------------------------------------------------- |
-| Resource            | the resource being created or updated                     |
-| PatchModel          | the PATCH request model                                   |
-| Parameters          | Optional. Additional parameters after the path parameters |
-| Response            | Optional. The success response(s) for the PATCH operation |
-| OptionalRequestBody | Optional. Indicates whether the request body is optional  |
-| ErrorType           | Optional. The error response, if non-standard.            |
-| OperationOptions    | Optional. The route options for the operation.            |
+| Name                 | Description                                                       |
+| -------------------- | ----------------------------------------------------------------- |
+| Resource             | the resource being created or updated                             |
+| PatchModel           | the PATCH request model                                           |
+| Parameters           | Optional. Additional parameters after the path parameters         |
+| Response             | Optional. The success response(s) for the PATCH operation         |
+| OptionalRequestBody  | Optional. Indicates whether the request body is optional          |
+| ErrorType            | Optional. The error response, if non-standard.                    |
+| OperationOptions     | Optional. The route options for the operation.                    |
+| OverrideResourceName | Optional. The name of the resource type at this scope in clients. |
 
-#### `ExtensionOperations.DeleteWithoutOkAsync` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.DeleteWithoutOkAsync}
+#### `ExtensionOperations.DeleteWithoutOkAsync` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.DeleteWithoutOkAsync}
 
 Delete a resource asynchronously
 
 ```typespec
-op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.DeleteWithoutOkAsync(): Response | ErrorType
+op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.DeleteWithoutOkAsync(): Response | ErrorType
 ```
 
 ##### Template Parameters
 
-| Name             | Description                                                |
-| ---------------- | ---------------------------------------------------------- |
-| Resource         | The resource being deleted                                 |
-| LroHeaders       | The lro headers for the operation                          |
-| Parameters       | Optional. Additional parameters after the path parameters  |
-| Response         | Optional. The success response(s) for the delete operation |
-| ErrorType        | Optional. The error response, if non-standard.             |
-| OperationOptions | Optional. The route options for the operation.             |
+| Name                 | Description                                                       |
+| -------------------- | ----------------------------------------------------------------- |
+| Resource             | The resource being deleted                                        |
+| LroHeaders           | The lro headers for the operation                                 |
+| Parameters           | Optional. Additional parameters after the path parameters         |
+| Response             | Optional. The success response(s) for the delete operation        |
+| ErrorType            | Optional. The error response, if non-standard.                    |
+| OperationOptions     | Optional. The route options for the operation.                    |
+| OverrideResourceName | Optional. The name of the resource type at this scope in clients. |
 
-#### `ExtensionOperations.DeleteSync` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.DeleteSync}
+#### `ExtensionOperations.DeleteSync` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.DeleteSync}
 
 Delete a resource synchronously
 
 ```typespec
-op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.DeleteSync(): Response | ErrorType
+op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.DeleteSync(): Response | ErrorType
 ```
 
 ##### Template Parameters
 
-| Name             | Description                                                |
-| ---------------- | ---------------------------------------------------------- |
-| Resource         | The resource being deleted                                 |
-| Parameters       | Optional. Additional parameters after the path parameters  |
-| Response         | Optional. The success response(s) for the delete operation |
-| ErrorType        | Optional. The error response, if non-standard.             |
-| OperationOptions | Optional. The route options for the operation.             |
+| Name                 | Description                                                       |
+| -------------------- | ----------------------------------------------------------------- |
+| Resource             | The resource being deleted                                        |
+| Parameters           | Optional. Additional parameters after the path parameters         |
+| Response             | Optional. The success response(s) for the delete operation        |
+| ErrorType            | Optional. The error response, if non-standard.                    |
+| OperationOptions     | Optional. The route options for the operation.                    |
+| OverrideResourceName | Optional. The name of the resource type at this scope in clients. |
 
-#### `ExtensionOperations.Read` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.Read}
+#### `ExtensionOperations.Read` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.Read}
 
 ```typespec
-op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.Read(): Response | ErrorType
+op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.Read(): Response | ErrorType
 ```
 
 ##### Template Parameters
 
-| Name             | Description                                               |
-| ---------------- | --------------------------------------------------------- |
-| Resource         | The resource being read                                   |
-| Parameters       | Optional. Additional parameters after the path parameters |
-| Response         | Optional. The success response for a get operation.       |
-| ErrorType        | Optional. The error response, if non-standard.            |
-| OperationOptions | Optional. The route options for the operation.            |
+| Name                 | Description                                                       |
+| -------------------- | ----------------------------------------------------------------- |
+| Resource             | The resource being read                                           |
+| Parameters           | Optional. Additional parameters after the path parameters         |
+| Response             | Optional. The success response for a get operation.               |
+| ErrorType            | Optional. The error response, if non-standard.                    |
+| OperationOptions     | Optional. The route options for the operation.                    |
+| OverrideResourceName | Optional. The name of the resource type at this scope in clients. |
 
-#### `ExtensionOperations.CheckExistence` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.CheckExistence}
+#### `ExtensionOperations.CheckExistence` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.CheckExistence}
 
 Check a resource's existence via HEAD operation
 
 ```typespec
-op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.CheckExistence(): Response | ErrorType
+op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.CheckExistence(): Response | ErrorType
 ```
 
 ##### Template Parameters
 
-| Name             | Description                                                                                      |
-| ---------------- | ------------------------------------------------------------------------------------------------ |
-| Resource         | The resource being checked                                                                       |
-| Parameters       | Optional. Additional parameters after the path parameters                                        |
-| Response         | Optional. The success response for a head operation (by default NoContent or NotFound response). |
-| ErrorType        | Optional. The error response, if non-standard.                                                   |
-| OperationOptions | Optional. The route options for the operation.                                                   |
+| Name                 | Description                                                                                      |
+| -------------------- | ------------------------------------------------------------------------------------------------ |
+| Resource             | The resource being checked                                                                       |
+| Parameters           | Optional. Additional parameters after the path parameters                                        |
+| Response             | Optional. The success response for a head operation (by default NoContent or NotFound response). |
+| ErrorType            | Optional. The error response, if non-standard.                                                   |
+| OperationOptions     | Optional. The route options for the operation.                                                   |
+| OverrideResourceName | Optional. The name of the resource type at this scope in clients.                                |
 
-#### `ExtensionOperations.List` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.List}
+#### `ExtensionOperations.List` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.List}
 
 List a resource
 
 ```typespec
-op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.List(): Response | ErrorType
+op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.List(): Response | ErrorType
 ```
 
 ##### Template Parameters
 
-| Name             | Description                                               |
-| ---------------- | --------------------------------------------------------- |
-| Resource         | The resource being listed                                 |
-| Parameters       | Optional. Additional parameters after the path parameters |
-| Response         | Optional. The response returned by the list               |
-| ErrorType        | Optional. The error response, if non-standard.            |
-| OperationOptions | Optional. The route options for the operation.            |
+| Name                 | Description                                                       |
+| -------------------- | ----------------------------------------------------------------- |
+| Resource             | The resource being listed                                         |
+| Parameters           | Optional. Additional parameters after the path parameters         |
+| Response             | Optional. The response returned by the list                       |
+| ErrorType            | Optional. The error response, if non-standard.                    |
+| OperationOptions     | Optional. The route options for the operation.                    |
+| OverrideResourceName | Optional. The name of the resource type at this scope in clients. |
 
-#### `ExtensionOperations.ListSinglePage` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.ListSinglePage}
+#### `ExtensionOperations.ListSinglePage` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.ListSinglePage}
 
 List a resource, without pagination
 
 ```typespec
-op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.ListSinglePage(): Response | ErrorType
+op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.ListSinglePage(): Response | ErrorType
 ```
 
 ##### Template Parameters
 
-| Name             | Description                                               |
-| ---------------- | --------------------------------------------------------- |
-| Resource         | The resource being listed                                 |
-| Parameters       | Optional. Additional parameters after the path parameters |
-| Response         | Optional. The response returned by the list               |
-| ErrorType        | Optional. The error response, if non-standard.            |
-| OperationOptions | Optional. The route options for the operation.            |
+| Name                 | Description                                                       |
+| -------------------- | ----------------------------------------------------------------- |
+| Resource             | The resource being listed                                         |
+| Parameters           | Optional. Additional parameters after the path parameters         |
+| Response             | Optional. The response returned by the list                       |
+| ErrorType            | Optional. The error response, if non-standard.                    |
+| OperationOptions     | Optional. The route options for the operation.                    |
+| OverrideResourceName | Optional. The name of the resource type at this scope in clients. |
 
-#### `ExtensionOperations.ActionSync` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.ActionSync}
+#### `ExtensionOperations.ActionSync` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.ActionSync}
 
 A synchronous resource action.
 
 ```typespec
-op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.ActionSync(body: Request): Response | ErrorType
+op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.ActionSync(body: Request): Response | ErrorType
 ```
 
 ##### Template Parameters
 
-| Name                | Description                                               |
-| ------------------- | --------------------------------------------------------- |
-| Resource            | The resource being acted upon                             |
-| Request             | The request model for the action                          |
-| Response            | The response model for the action                         |
-| Parameters          | Optional. Additional parameters after the path parameters |
-| OptionalRequestBody | Optional. Indicates whether the request body is optional  |
-| ErrorType           | Optional. The error response, if non-standard.            |
-| OperationOptions    | Optional. The route options for the operation.            |
+| Name                 | Description                                                       |
+| -------------------- | ----------------------------------------------------------------- |
+| Resource             | The resource being acted upon                                     |
+| Request              | The request model for the action                                  |
+| Response             | The response model for the action                                 |
+| Parameters           | Optional. Additional parameters after the path parameters         |
+| OptionalRequestBody  | Optional. Indicates whether the request body is optional          |
+| ErrorType            | Optional. The error response, if non-standard.                    |
+| OperationOptions     | Optional. The route options for the operation.                    |
+| OverrideResourceName | Optional. The name of the resource type at this scope in clients. |
 
-#### `ExtensionOperations.ActionAsync` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.ActionAsync}
+#### `ExtensionOperations.ActionAsync` {#Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.ActionAsync}
 
 A long-running resource action.
 
 ```typespec
-op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters>.ActionAsync(body: Request): Response | ErrorType
+op Azure.ResourceManager.Legacy.ExtensionOperations<TargetParameters, ExtensionParentParameters, ExtensionInstanceParameters, ResourceName>.ActionAsync(body: Request): Response | ErrorType
 ```
 
 ##### Template Parameters
 
-| Name                | Description                                                               |
-| ------------------- | ------------------------------------------------------------------------- |
-| Resource            | The resource being acted upon                                             |
-| Request             | The request model for the action                                          |
-| Result              | The result model for the action                                           |
-| LroHeaders          | Optional. Allows overriding the headers returned in the Accepted response |
-| Parameters          | Optional. Additional parameters after the path parameters                 |
-| Response            | The full response union of the action                                     |
-| OptionalRequestBody | Optional. Indicates whether the request body is optional                  |
-| ErrorType           | Optional. The error response, if non-standard.                            |
-| OperationOptions    | Optional. The route options for the operation.                            |
+| Name                 | Description                                                               |
+| -------------------- | ------------------------------------------------------------------------- |
+| Resource             | The resource being acted upon                                             |
+| Request              | The request model for the action                                          |
+| Result               | The result model for the action                                           |
+| LroHeaders           | Optional. Allows overriding the headers returned in the Accepted response |
+| Parameters           | Optional. Additional parameters after the path parameters                 |
+| Response             | The full response union of the action                                     |
+| OptionalRequestBody  | Optional. Indicates whether the request body is optional                  |
+| ErrorType            | Optional. The error response, if non-standard.                            |
+| OperationOptions     | Optional. The route options for the operation.                            |
+| OverrideResourceName | Optional. The name of the resource type at this scope in clients.         |
 
 ### `LegacyOperations` {#Azure.ResourceManager.Legacy.LegacyOperations}
 
@@ -2047,7 +2092,7 @@ An operation template used to build resource operations in which the same resour
 is accessible at multiple, fixed resource paths.
 
 ```typespec
-interface Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>
+interface Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>
 ```
 
 #### Template Parameters
@@ -2057,99 +2102,100 @@ interface Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, Resour
 | ParentParameters      | The path parameters for the resource parent                                      |
 | ResourceTypeParameter | The path parameter for the resource name                                         |
 | ErrorType             | Optional. The type of error models used in operations created form this template |
+| ResourceName          | Optional. The name of the resource type described in this template               |
 
-#### `LegacyOperations.CreateOrUpdateAsync` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.CreateOrUpdateAsync}
+#### `LegacyOperations.CreateOrUpdateAsync` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.CreateOrUpdateAsync}
 
 A long-running resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.CreateOrUpdateAsync(resource: Request): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.CreateOrUpdateAsync(resource: Request): Response | OverrideErrorType
 ```
 
-#### `LegacyOperations.CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.CreateOrUpdateSync}
+#### `LegacyOperations.CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.CreateOrUpdateSync}
 
 A synchronous resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.CreateOrUpdateSync(resource: Request): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.CreateOrUpdateSync(resource: Request): Response | OverrideErrorType
 ```
 
-#### `LegacyOperations.CustomPatchAsync` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.CustomPatchAsync}
+#### `LegacyOperations.CustomPatchAsync` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.CustomPatchAsync}
 
 A long-running resource Update (PATCH)
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.CustomPatchAsync(properties: PatchModel): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.CustomPatchAsync(properties: PatchModel): Response | OverrideErrorType
 ```
 
-#### `LegacyOperations.CustomPatchSync` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.CustomPatchSync}
+#### `LegacyOperations.CustomPatchSync` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.CustomPatchSync}
 
 A synchronous resource Update (PATCH)
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.CustomPatchSync(properties: PatchModel): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.CustomPatchSync(properties: PatchModel): Response | OverrideErrorType
 ```
 
-#### `LegacyOperations.DeleteWithoutOkAsync` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.DeleteWithoutOkAsync}
+#### `LegacyOperations.DeleteWithoutOkAsync` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.DeleteWithoutOkAsync}
 
 Delete a resource asynchronously
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.DeleteWithoutOkAsync(): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.DeleteWithoutOkAsync(): Response | OverrideErrorType
 ```
 
-#### `LegacyOperations.DeleteSync` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.DeleteSync}
+#### `LegacyOperations.DeleteSync` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.DeleteSync}
 
 Delete a resource synchronously
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.DeleteSync(): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.DeleteSync(): Response | OverrideErrorType
 ```
 
-#### `LegacyOperations.Read` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.Read}
+#### `LegacyOperations.Read` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.Read}
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.Read(): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.Read(): Response | OverrideErrorType
 ```
 
-#### `LegacyOperations.CheckExistence` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.CheckExistence}
+#### `LegacyOperations.CheckExistence` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.CheckExistence}
 
 Check a resource's existence via HEAD operation
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.CheckExistence(): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.CheckExistence(): Response | OverrideErrorType
 ```
 
-#### `LegacyOperations.List` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.List}
+#### `LegacyOperations.List` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.List}
 
 List a resource
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.List(): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.List(): Response | OverrideErrorType
 ```
 
-#### `LegacyOperations.ListSinglePage` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.ListSinglePage}
+#### `LegacyOperations.ListSinglePage` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.ListSinglePage}
 
 List a single page of the resource
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.ListSinglePage(): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.ListSinglePage(): Response | OverrideErrorType
 ```
 
-#### `LegacyOperations.ActionSync` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.ActionSync}
+#### `LegacyOperations.ActionSync` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.ActionSync}
 
 A synchronous resource action.
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.ActionSync(body: Request): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.ActionSync(body: Request): Response | OverrideErrorType
 ```
 
-#### `LegacyOperations.ActionAsync` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.ActionAsync}
+#### `LegacyOperations.ActionAsync` {#Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.ActionAsync}
 
 A long-running resource action.
 
 ```typespec
-op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType>.ActionAsync(body: Request): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.LegacyOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceName>.ActionAsync(body: Request): Response | OverrideErrorType
 ```
 
 ### `Operations` {#Azure.ResourceManager.Legacy.Operations}
@@ -2183,7 +2229,7 @@ An operation template used to build resource operations in which the same resour
 is accessible at multiple, fixed resource paths. Can be used with static routes.
 
 ```typespec
-interface Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>
+interface Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>
 ```
 
 #### Template Parameters
@@ -2194,13 +2240,14 @@ interface Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, Resour
 | ResourceTypeParameter | The path parameter for the resource name                                         |
 | ErrorType             | Optional. The type of error models used in operations created form this template |
 | ResourceRoute         | Optional. The resource route to use for operations in the interface.             |
+| RoutedResourceName    | Optional. The name of the resource type described in this template               |
 
-#### `RoutedOperations.CreateOrUpdateAsync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.CreateOrUpdateAsync}
+#### `RoutedOperations.CreateOrUpdateAsync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.CreateOrUpdateAsync}
 
 A long-running resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.CreateOrUpdateAsync(resource: Request): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.CreateOrUpdateAsync(resource: Request): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2215,13 +2262,14 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | OverrideErrorType    | Optional. The error response, if non-standard.                          |
 | OverrideRouteOptions | Optional. The route options for the operation.                          |
 | Request              | Optional. The request body for the createOrUpdate operation.            |
+| OverrideResourceName | Optional. The name of the resource type being acted upon.               |
 
-#### `RoutedOperations.CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.CreateOrUpdateSync}
+#### `RoutedOperations.CreateOrUpdateSync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.CreateOrUpdateSync}
 
 A synchronous resource CreateOrUpdate (PUT)
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.CreateOrUpdateSync(resource: Request): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.CreateOrUpdateSync(resource: Request): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2235,13 +2283,14 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | OverrideErrorType    | Optional. The error response, if non-standard.               |
 | OverrideRouteOptions | Optional. The route options for the operation.               |
 | Request              | Optional. The request body for the createOrUpdate operation. |
+| OverrideResourceName | Optional. The name of the resource type being acted upon.    |
 
-#### `RoutedOperations.CustomPatchAsync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.CustomPatchAsync}
+#### `RoutedOperations.CustomPatchAsync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.CustomPatchAsync}
 
 A long-running resource Update (PATCH)
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.CustomPatchAsync(properties: PatchModel): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.CustomPatchAsync(properties: PatchModel): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2256,13 +2305,14 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | OptionalRequestBody  | Optional. Indicates whether the request body is optional                |
 | OverrideErrorType    | Optional. The error response, if non-standard.                          |
 | OverrideRouteOptions | Optional. The route options for the operation.                          |
+| OverrideResourceName | Optional. The name of the resource type being acted upon.               |
 
-#### `RoutedOperations.CustomPatchSync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.CustomPatchSync}
+#### `RoutedOperations.CustomPatchSync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.CustomPatchSync}
 
 A synchronous resource Update (PATCH)
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.CustomPatchSync(properties: PatchModel): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.CustomPatchSync(properties: PatchModel): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2276,13 +2326,14 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | OptionalRequestBody  | Optional. Indicates whether the request body is optional  |
 | OverrideErrorType    | Optional. The error response, if non-standard.            |
 | OverrideRouteOptions | Optional. The route options for the operation.            |
+| OverrideResourceName | Optional. The name of the resource type being acted upon. |
 
-#### `RoutedOperations.DeleteWithoutOkAsync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.DeleteWithoutOkAsync}
+#### `RoutedOperations.DeleteWithoutOkAsync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.DeleteWithoutOkAsync}
 
 Delete a resource asynchronously
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.DeleteWithoutOkAsync(): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.DeleteWithoutOkAsync(): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2295,13 +2346,14 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | Response             | Optional. The success response(s) for the delete operation |
 | OverrideErrorType    | Optional. The error response, if non-standard.             |
 | OverrideRouteOptions | Optional. The route options for the operation.             |
+| OverrideResourceName | Optional. The name of the resource type being acted upon.  |
 
-#### `RoutedOperations.DeleteSync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.DeleteSync}
+#### `RoutedOperations.DeleteSync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.DeleteSync}
 
 Delete a resource synchronously
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.DeleteSync(): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.DeleteSync(): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2313,11 +2365,12 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | Response             | Optional. The success response(s) for the delete operation |
 | OverrideErrorType    | Optional. The error response, if non-standard.             |
 | OverrideRouteOptions | Optional. The route options for the operation.             |
+| OverrideResourceName | Optional. The name of the resource type being acted upon.  |
 
-#### `RoutedOperations.Read` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.Read}
+#### `RoutedOperations.Read` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.Read}
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.Read(): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.Read(): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2329,13 +2382,14 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | Response             | Optional. The success response for a get operation.       |
 | OverrideErrorType    | Optional. The error response, if non-standard.            |
 | OverrideRouteOptions | Optional. The route options for the operation.            |
+| OverrideResourceName | Optional. The name of the resource type being acted upon. |
 
-#### `RoutedOperations.CheckExistence` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.CheckExistence}
+#### `RoutedOperations.CheckExistence` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.CheckExistence}
 
 Check a resource's existence via HEAD operation
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.CheckExistence(): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.CheckExistence(): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2347,13 +2401,14 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | Response             | Optional. The success response for a head operation (by default NoContent or NotFound response). |
 | OverrideErrorType    | Optional. The error response, if non-standard.                                                   |
 | OverrideRouteOptions | Optional. The route options for the operation.                                                   |
+| OverrideResourceName | Optional. The name of the resource type being acted upon.                                        |
 
-#### `RoutedOperations.List` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.List}
+#### `RoutedOperations.List` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.List}
 
 List a resource
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.List(): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.List(): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2365,13 +2420,14 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | Response             | Optional. The response returned by the list               |
 | OverrideErrorType    | Optional. The error response, if non-standard.            |
 | OverrideRouteOptions | Optional. The route options for the operation.            |
+| OverrideResourceName | Optional. The name of the resource type being acted upon. |
 
-#### `RoutedOperations.ListSinglePage` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.ListSinglePage}
+#### `RoutedOperations.ListSinglePage` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.ListSinglePage}
 
 List a single page of the resource
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.ListSinglePage(): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.ListSinglePage(): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2383,13 +2439,14 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | Response             | Optional. The response returned by the list               |
 | OverrideErrorType    | Optional. The error response, if non-standard.            |
 | OverrideRouteOptions | Optional. The route options for the operation.            |
+| OverrideResourceName | Optional. The name of the resource type being acted upon. |
 
-#### `RoutedOperations.ActionSync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.ActionSync}
+#### `RoutedOperations.ActionSync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.ActionSync}
 
 A synchronous resource action.
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.ActionSync(body: Request): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.ActionSync(body: Request): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2403,13 +2460,14 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | OptionalRequestBody  | Optional. Indicates whether the request body is optional  |
 | OverrideErrorType    | Optional. The error response, if non-standard.            |
 | OverrideRouteOptions | Optional. The route options for the operation.            |
+| OverrideResourceName | Optional. The name of the resource type being acted upon. |
 
-#### `RoutedOperations.ActionAsync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.ActionAsync}
+#### `RoutedOperations.ActionAsync` {#Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.ActionAsync}
 
 A long-running resource action.
 
 ```typespec
-op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute>.ActionAsync(body: Request): Response | OverrideErrorType
+op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeParameter, ErrorType, ResourceRoute, RoutedResourceName>.ActionAsync(body: Request): Response | OverrideErrorType
 ```
 
 ##### Template Parameters
@@ -2425,6 +2483,7 @@ op Azure.ResourceManager.Legacy.RoutedOperations<ParentParameters, ResourceTypeP
 | OptionalRequestBody  | Optional. Indicates whether the request body is optional                  |
 | OverrideErrorType    | Optional. The error response, if non-standard.                            |
 | OverrideRouteOptions | Optional. The route options for the operation.                            |
+| OverrideResourceName | Optional. The name of the resource type being acted upon.                 |
 
 ### `ArmListSinglePageByParent` {#Azure.ResourceManager.Legacy.ArmListSinglePageByParent}
 
@@ -2589,16 +2648,17 @@ op Azure.ResourceManager.Legacy.Extension.CreateOrReplaceAsync(apiVersion: strin
 
 #### Template Parameters
 
-| Name                | Description                                                                                              |
-| ------------------- | -------------------------------------------------------------------------------------------------------- |
-| TargetResource      | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource   | the resource being created or updated                                                                    |
-| Request             | Optional. The request body for the createOrUpdate operation                                              |
-| LroHeaders          | Optional. Allows overriding the lro headers returned on resource create                                  |
-| Parameters          | Optional. Additional parameters after the path parameters                                                |
-| Response            | Optional. The success response for the createOrUpdate operation                                          |
-| Error               | Optional. The error response, if non-standard.                                                           |
-| OptionalRequestBody | Optional. If true, the request body is optional                                                          |
+| Name                 | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource       | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource    | the resource being created or updated                                                                    |
+| Request              | Optional. The request body for the createOrUpdate operation                                              |
+| LroHeaders           | Optional. Allows overriding the lro headers returned on resource create                                  |
+| Parameters           | Optional. Additional parameters after the path parameters                                                |
+| Response             | Optional. The success response for the createOrUpdate operation                                          |
+| Error                | Optional. The error response, if non-standard.                                                           |
+| OptionalRequestBody  | Optional. If true, the request body is optional                                                          |
+| OverrideResourceName | Optional. The name of the resource type at this scope in clients.                                        |
 
 ### `CreateOrReplaceSync` {#Azure.ResourceManager.Legacy.Extension.CreateOrReplaceSync}
 
@@ -2610,15 +2670,16 @@ op Azure.ResourceManager.Legacy.Extension.CreateOrReplaceSync(apiVersion: string
 
 #### Template Parameters
 
-| Name                | Description                                                                                              |
-| ------------------- | -------------------------------------------------------------------------------------------------------- |
-| TargetResource      | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource   | the resource being created or replaced                                                                   |
-| Request             | Optional. The request body for the createOrUpdate operation                                              |
-| Parameters          | Optional. Additional parameters after the path parameters                                                |
-| Response            | Optional. The success response for the createOrUpdate operation                                          |
-| Error               | Optional. The error response, if non-standard.                                                           |
-| OptionalRequestBody | Optional. If true, the request body is optional                                                          |
+| Name                 | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource       | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource    | the resource being created or replaced                                                                   |
+| Request              | Optional. The request body for the createOrUpdate operation                                              |
+| Parameters           | Optional. Additional parameters after the path parameters                                                |
+| Response             | Optional. The success response for the createOrUpdate operation                                          |
+| Error                | Optional. The error response, if non-standard.                                                           |
+| OptionalRequestBody  | Optional. If true, the request body is optional                                                          |
+| OverrideResourceName | Optional. The name of the resource type at this scope in clients.                                        |
 
 ### `CustomPatchAsync` {#Azure.ResourceManager.Legacy.Extension.CustomPatchAsync}
 
@@ -2630,16 +2691,17 @@ op Azure.ResourceManager.Legacy.Extension.CustomPatchAsync(apiVersion: string, s
 
 #### Template Parameters
 
-| Name                | Description                                                                                              |
-| ------------------- | -------------------------------------------------------------------------------------------------------- |
-| TargetResource      | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource   | the resource being patched                                                                               |
-| PatchModel          | The input model for the PATCH request                                                                    |
-| LroHeaders          | Optional. Allows overriding the lro headers returned in the Accepted response                            |
-| Parameters          | Optional. Additional parameters after the path parameters                                                |
-| Response            | Optional. The success response for the patch operation                                                   |
-| Error               | Optional. The error response, if non-standard.                                                           |
-| OptionalRequestBody | Optional. Whether the request body is optional.                                                          |
+| Name                 | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource       | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource    | the resource being patched                                                                               |
+| PatchModel           | The input model for the PATCH request                                                                    |
+| LroHeaders           | Optional. Allows overriding the lro headers returned in the Accepted response                            |
+| Parameters           | Optional. Additional parameters after the path parameters                                                |
+| Response             | Optional. The success response for the patch operation                                                   |
+| Error                | Optional. The error response, if non-standard.                                                           |
+| OptionalRequestBody  | Optional. Whether the request body is optional.                                                          |
+| OverrideResourceName | Optional. The name of the resource type at this scope in clients.                                        |
 
 ### `CustomPatchSync` {#Azure.ResourceManager.Legacy.Extension.CustomPatchSync}
 
@@ -2651,15 +2713,16 @@ op Azure.ResourceManager.Legacy.Extension.CustomPatchSync(apiVersion: string, su
 
 #### Template Parameters
 
-| Name                | Description                                                                                              |
-| ------------------- | -------------------------------------------------------------------------------------------------------- |
-| TargetResource      | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
-| ExtensionResource   | the resource being patched                                                                               |
-| PatchModel          | The input model for the PATCH request                                                                    |
-| Parameters          | Optional. Additional parameters after the path parameters                                                |
-| Response            | Optional. The success response for the patch operation                                                   |
-| Error               | Optional. The error response, if non-standard.                                                           |
-| OptionalRequestBody | Optional. Whether the request body is optional.                                                          |
+| Name                 | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| TargetResource       | the target resource, e.g. Extension.Subscription or Extension.ManagementGroup or Extension.ResourceGroup |
+| ExtensionResource    | the resource being patched                                                                               |
+| PatchModel           | The input model for the PATCH request                                                                    |
+| Parameters           | Optional. Additional parameters after the path parameters                                                |
+| Response             | Optional. The success response for the patch operation                                                   |
+| Error                | Optional. The error response, if non-standard.                                                           |
+| OptionalRequestBody  | Optional. Whether the request body is optional.                                                          |
+| OverrideResourceName | Optional. The name of the resource type at this scope in clients.                                        |
 
 ## Azure.ResourceManager.Legacy.PrivateEndpoints
 
@@ -2759,40 +2822,3 @@ op Azure.ResourceManager.Legacy.PrivateEndpoints.ListSinglePageByParent(provider
 | Parameters     | Optional. Additional parameters after the path parameters     |
 | Response       | Optional. The success response for the list operation         |
 | Error          | Optional. The error response, if non-standard.                |
-
-## Azure.ResourceManager.Private.PrivateEndpoints
-
-### `CreateOrUpdateAsync` {#Azure.ResourceManager.Private.PrivateEndpoints.CreateOrUpdateAsync}
-
-```typespec
-op Azure.ResourceManager.Private.PrivateEndpoints.CreateOrUpdateAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
-```
-
-#### Template Parameters
-
-| Name           | Description                                                             |
-| -------------- | ----------------------------------------------------------------------- |
-| ParentResource | the parent resource of the PrivateEndpointConnection                    |
-| Resource       | the PrivateEndpointConnection resource being created or updated         |
-| BaseParameters | Optional. Allows overriding the operation parameters                    |
-| LroHeaders     | Optional. Allows overriding the lro headers returned on resource create |
-| Parameters     | Optional. Additional parameters after the path parameters               |
-| Response       | Optional. The success response for the createOrUpdate operation         |
-| Error          | Optional. The error response, if non-standard.                          |
-
-### `DeleteAsyncBase` {#Azure.ResourceManager.Private.PrivateEndpoints.DeleteAsyncBase}
-
-```typespec
-op Azure.ResourceManager.Private.PrivateEndpoints.DeleteAsyncBase(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
-```
-
-#### Template Parameters
-
-| Name           | Description                                                    |
-| -------------- | -------------------------------------------------------------- |
-| ParentResource | The parent resource of the PrivateEndpointConnection           |
-| Response       | The response type for the operation                            |
-| Resource       | Optional. The PrivateEndpointConnection resource being deleted |
-| BaseParameters | Optional. Allows overriding the parameters for the operation   |
-| Parameters     | Optional. Additional parameters after the path parameters      |
-| Error          | Optional. The error response, if non-standard.                 |
