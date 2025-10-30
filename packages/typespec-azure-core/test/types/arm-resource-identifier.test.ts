@@ -1,22 +1,22 @@
-import { ModelProperty, Scalar } from "@typespec/compiler";
-import { BasicTestRunner } from "@typespec/compiler/testing";
+import { Tester } from "#test/test-host.js";
+import type { Scalar } from "@typespec/compiler";
+import { t, type TesterInstance } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { beforeEach, describe, expect, it } from "vitest";
-import { getArmResourceIdentifierConfig } from "../../src/decorators.js";
-import { createAzureCoreTestRunner } from "../test-host.js";
+import { getArmResourceIdentifierConfig } from "../../src/decorators/private/arm-resource-identifier-config.js";
 
-let runner: BasicTestRunner;
+let runner: TesterInstance;
 beforeEach(async () => {
-  runner = await createAzureCoreTestRunner();
+  runner = await Tester.createInstance();
 });
 
 describe("when used as ref", () => {
   async function compileAsRef(ref: string): Promise<Scalar> {
-    const { prop } = (await runner.compile(`
+    const { prop } = await runner.compile(t.code`
     model Test {
-      @test prop: ${ref};
+      ${t.modelProperty("prop")}: ${ref};
     }
-  `)) as { prop: ModelProperty };
+  `);
 
     const type = prop.type;
     strictEqual(type.kind, "Scalar");
@@ -71,9 +71,9 @@ describe("when used as ref", () => {
 
 describe("when used as scalar extends", () => {
   async function compileOnScalar(ref: string): Promise<Scalar> {
-    const { test } = (await runner.compile(`
-    @test scalar test extends ${ref};
-  `)) as { test: Scalar };
+    const { test } = await runner.compile(t.code`
+        scalar ${t.scalar("test")} extends ${ref};
+    `);
 
     return test.baseScalar!;
   }

@@ -26,10 +26,8 @@ describe("data plane LRO templates", () => {
         @versioned(Versions)
         namespace TestClient;
         enum Versions {
-          @useDependency(Azure.Core.Versions.v1_0_Preview_1)
           v1: "v1",
-          @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-          v2: "v2",
+                  v2: "v2",
         }
       
         alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalRequests &
@@ -111,7 +109,6 @@ describe("data plane LRO templates", () => {
         "roundtrip model should have the usage of LroFinalEnvelope",
       );
       strictEqual(roundtripModel.serializationOptions.json?.name, "User");
-      assert.isUndefined(metadata.finalResponse?.resultPath);
       assert.isUndefined(metadata.finalResponse?.resultSegments);
     });
 
@@ -237,7 +234,6 @@ describe("data plane LRO templates", () => {
 
       strictEqual(metadata.finalResponse?.envelopeResult, pollingModel);
       strictEqual(metadata.finalResponse?.result, returnModel);
-      strictEqual(metadata.finalResponse?.resultPath, "result");
       // find the property
       const resultProperty = pollingModel.properties.find((p) => p.name === "result");
       ok(metadata.finalResponse?.resultSegments);
@@ -333,7 +329,6 @@ describe("data plane LRO templates", () => {
       ok(returnModel);
       strictEqual(metadata.finalResponse?.envelopeResult, pollingModel);
       strictEqual(metadata.finalResponse?.result, returnModel);
-      strictEqual(metadata.finalResponse?.resultPath, "result");
       // find the property
       const resultProperty = pollingModel.properties.find((p) => p.name === "result");
       ok(metadata.finalResponse?.resultSegments);
@@ -408,7 +403,6 @@ describe("data plane LRO templates", () => {
       strictEqual(lroMethod.kind, "lro");
       const lroMetadata = lroMethod.lroMetadata;
       ok(lroMetadata);
-      strictEqual(lroMetadata.finalResponse?.resultPath, "result"); // this is showing the typespec name, which is neither client name nor wire name
       // find the model
       const envelopeResult = runner.context.sdkPackage.models.find(
         (m) => m.name === "OperationDetails",
@@ -581,10 +575,8 @@ describe("data plane LRO templates", () => {
       @versioned(Versions)
       namespace TestClient {
         enum Versions {
-          @useDependency(Azure.Core.Versions.v1_0_Preview_1)
           v1: "v1",
-          @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-          v2: "v2",
+                  v2: "v2",
         }
       
         alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalRequests &
@@ -602,7 +594,7 @@ describe("data plane LRO templates", () => {
         op longRunning(): AcceptedResponse;
       }
 
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2, TestClient.Versions.v2)
+      @useDependency(TestClient.Versions.v2)
       namespace NonService {
         @route("/poll")
         @get
@@ -643,9 +635,8 @@ describe("data plane LRO templates", () => {
     });
     await runnerWithCore.compileWithCustomization(
       `
-      @useDependency(Versions.v1_0_Preview_2)
       @server("http://localhost:3000", "endpoint")
-      @service()
+      @service
       namespace DocumentIntelligence;
         @lroStatus
         @doc("Operation status.")
@@ -772,7 +763,58 @@ describe("data plane LRO templates", () => {
     strictEqual(models.length, 4);
     const analyzeOperationModel = models.find((m) => m.name === "AnalyzeOperation");
     ok(analyzeOperationModel);
+    const analyzeResultProp = analyzeOperationModel.properties.find(
+      (p) => p.name === "analyzeResult",
+    );
+    ok(analyzeResultProp);
+    const analyzeResultModel = models.find((m) => m.name === "AnalyzeResult");
+    strictEqual(analyzeResultProp.type, analyzeResultModel);
+    ok(analyzeResultModel);
     strictEqual(analyzeOperationModel.usage, UsageFlags.LroFinalEnvelope | UsageFlags.LroPolling);
+    const analyzeDocument = runnerWithCore.context.sdkPackage.clients[0].methods[0];
+    strictEqual(analyzeDocument.kind, "lro");
+    const lroMetadata = analyzeDocument.lroMetadata;
+    strictEqual(lroMetadata.envelopeResult, analyzeOperationModel);
+    strictEqual(lroMetadata.finalEnvelopeResult, analyzeOperationModel);
+    const finalResponse = lroMetadata.finalResponse;
+    ok(finalResponse);
+    strictEqual(finalResponse.envelopeResult, analyzeOperationModel);
+    strictEqual(finalResponse.result, analyzeResultModel);
+    strictEqual(finalResponse.resultSegments?.length, 1);
+    strictEqual(finalResponse.resultSegments[0], analyzeResultProp);
+    strictEqual(lroMetadata.finalResultPath, "analyzeResult");
+    strictEqual(lroMetadata.finalStateVia, FinalStateValue.operationLocation);
+    const finalStep = lroMetadata.finalStep;
+    ok(finalStep);
+    strictEqual(finalStep.kind, "pollingSuccessProperty");
+    strictEqual(finalStep.responseModel, analyzeResultModel);
+    strictEqual(finalStep.sourceProperty, analyzeResultProp);
+    strictEqual(finalStep.target, analyzeResultProp);
+    strictEqual(lroMetadata.logicalPath, "analyzeResult");
+    strictEqual(lroMetadata.logicalResult, analyzeResultModel);
+    const operation = lroMetadata.operation;
+    strictEqual(operation.kind, "http");
+    strictEqual(operation.path, "/documentModels/{modelId}:analyze");
+    ok(operation.bodyParam);
+    strictEqual(operation.verb, "post");
+    const pollingInfo = lroMetadata.pollingInfo;
+    strictEqual(pollingInfo.kind, "pollingOperationStep");
+    strictEqual(pollingInfo.responseModel, analyzeOperationModel);
+    strictEqual(pollingInfo.resultProperty, analyzeResultProp);
+    strictEqual(
+      pollingInfo.errorProperty,
+      analyzeOperationModel.properties.find((p) => p.name === "error"),
+    );
+    const terminationStatus = pollingInfo.terminationStatus;
+    strictEqual(terminationStatus.kind, "model-property");
+    deepStrictEqual(terminationStatus.canceledState, ["canceled", "skipped"]);
+    deepStrictEqual(terminationStatus.failedState, ["failed"]);
+    deepStrictEqual(terminationStatus.succeededState, ["succeeded"]);
+    strictEqual(
+      terminationStatus.property,
+      analyzeOperationModel.properties.find((p) => p.name === "status"),
+    );
+    strictEqual(lroMetadata.pollingStep.responseBody, analyzeOperationModel);
   });
 });
 
@@ -791,8 +833,7 @@ describe("Arm LRO templates", () => {
         @versioned(Versions)
         namespace TestClient;
         enum Versions {
-          @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-          @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+                  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
           v1: "v1",
         }
         ${code}`,
@@ -873,7 +914,6 @@ describe("Arm LRO templates", () => {
 
     strictEqual(metadata.finalResponse?.envelopeResult, roundtripModel);
     strictEqual(metadata.finalResponse?.result, roundtripModel);
-    assert.isUndefined(metadata.finalResponse.resultPath);
     assert.isUndefined(metadata.finalResponse.resultSegments);
   });
 
@@ -1005,7 +1045,6 @@ it("customized lro delete", async () => {
     namespace My.Service;
 
     enum MyVersions {
-      @useDependency(Versions.v1_0_Preview_2)
       v1: "v1",
     }
 
@@ -1052,8 +1091,7 @@ describe("getLroMetadata", () => {
     @doc("The API version.")
     enum Versions {
       @doc("The 2022-12-01-preview version.")
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      v2022_12_01_preview: "2022-12-01-preview",
+          v2022_12_01_preview: "2022-12-01-preview",
     }
 
     @resource("users")

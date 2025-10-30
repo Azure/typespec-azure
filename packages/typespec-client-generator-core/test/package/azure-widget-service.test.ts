@@ -46,8 +46,7 @@ async function compileAzureWidgetService(runner: SdkTestRunner, code: string) {
   @doc("The Contoso Widget Manager service version.")
   enum Versions {
     @doc("Version 2022-08-31")
-    @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-    "2022-08-30",
+      "2022-08-30",
   }
 
   // Models ////////////////////
@@ -465,7 +464,6 @@ it("poll widget", async () => {
   const methodResponse = createOrUpdate.response;
   strictEqual(methodResponse.kind, "method");
   strictEqual(methodResponse.type, widgetModel);
-  strictEqual(createOrUpdate.response.resultPath, "result");
   strictEqual(createOrUpdate.response.resultSegments?.length, 1);
   strictEqual(
     createOrUpdate.response.resultSegments[0],
@@ -476,19 +474,19 @@ it("lro delete", async () => {
   await compileAzureWidgetService(
     runnerWithCore,
     `
-      op delete is ResourceOperations.LongRunningResourceDelete<Widget>;
+      op delete is Operations.LongRunningResourceDelete<Widget>;
       `,
   );
   const method = getServiceMethodOfClient(runnerWithCore.context.sdkPackage);
   strictEqual(method.name, "delete");
   strictEqual(method.kind, "lro");
   strictEqual(method.response.type, undefined);
-  strictEqual(runnerWithCore.context.sdkPackage.models.length, 3);
+  strictEqual(runnerWithCore.context.sdkPackage.models.length, 4);
   strictEqual(
     runnerWithCore.context.sdkPackage.models.filter((x) => !isAzureCoreModel(x)).length,
     0,
   );
-  strictEqual(runnerWithCore.context.sdkPackage.enums.length, 2);
+  strictEqual(runnerWithCore.context.sdkPackage.enums.length, 3);
   strictEqual(
     runnerWithCore.context.sdkPackage.enums.filter((x) => !isAzureCoreModel(x)).length,
     1,
@@ -586,11 +584,10 @@ it("paging", async () => {
   strictEqual(nextLinkProperty.type.crossLanguageDefinitionId, "TypeSpec.Rest.ResourceLocation");
   strictEqual(nextLinkProperty.type.baseType?.kind, "url");
   strictEqual(nextLinkProperty.serializedName, "nextLink");
-  strictEqual(nextLinkProperty.serializedName, listManufacturers.nextLinkPath);
 
   const clientRequestIdProperty = pagingModel.properties.find((x) => x.name === "clientRequestId");
   ok(clientRequestIdProperty);
-  strictEqual(clientRequestIdProperty.kind, "header");
+  strictEqual(clientRequestIdProperty.kind, "property");
 });
 
 it("getWidgetAnalytics", async () => {

@@ -1,23 +1,29 @@
 import {
-  getLroMetadata,
-  getPagedResult,
+  FinalOperationStep,
   getParameterizedNextLinkArguments,
+  NextOperationLink,
+  NextOperationReference,
+  OperationLink,
+  OperationReference,
+  PollingOperationStep,
+  TerminationStatus,
 } from "@azure-tools/typespec-azure-core";
 import {
+  compilerAssert,
   createDiagnosticCollector,
   Diagnostic,
-  getPagingOperation,
   getSummary,
+  ignoreDiagnostics,
   isList,
   Model,
   ModelProperty,
   Operation,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
-import { isHeader } from "@typespec/http";
 import { createSdkClientType } from "./clients.js";
 import {
   getAccess,
+  getNextLinkVerb,
   getOverriddenClientMethod,
   getResponseAsBool,
   listOperationGroups,
@@ -27,11 +33,11 @@ import {
 } from "./decorators.js";
 import { getSdkHttpOperation } from "./http.js";
 import {
-  SdkBodyModelPropertyType,
   SdkClient,
   SdkClientType,
   SdkLroPagingServiceMethod,
   SdkLroServiceFinalResponse,
+  SdkLroServiceFinalStep,
   SdkLroServiceMetadata,
   SdkLroServiceMethod,
   SdkMethod,
@@ -39,10 +45,17 @@ import {
   SdkMethodResponse,
   SdkModelPropertyType,
   SdkModelType,
+  SdkNextOperationLink,
+  SdkNextOperationReference,
   SdkOperationGroup,
+  SdkOperationLink,
+  SdkOperationReference,
   SdkPagingServiceMethod,
+  SdkPollingOperationStep,
+  SdkPropertyMap,
   SdkServiceMethod,
   SdkServiceOperation,
+  SdkTerminationStatus,
   SdkType,
   TCGCContext,
   UsageFlags,
@@ -53,7 +66,9 @@ import {
   getAllResponseBodiesAndNonBodyExists,
   getAvailableApiVersions,
   getClientDoc,
+  getCorrespondingClientParam,
   getHashForType,
+  getTcgcLroMetadata,
   getTypeDecorators,
   isNeverOrVoidType,
   isSubscriptionId,
@@ -67,9 +82,10 @@ import {
 import {
   getClientTypeWithDiagnostics,
   getSdkBuiltInType,
+  getSdkModel,
   getSdkModelPropertyType,
+  getSdkModelPropertyTypeBase,
 } from "./types.js";
-
 function getSdkServiceOperation<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
@@ -105,6 +121,37 @@ function getSdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperat
   });
 }
 
+function getPageSizeParameterSegments<TServiceOperation extends SdkServiceOperation>(
+  baseServiceMethod: SdkServiceMethod<TServiceOperation>,
+): (SdkModelPropertyType | SdkMethodParameter)[] {
+  function recurseToFindPageSizeParameterInModel(
+    param: SdkMethodParameter,
+    model: SdkModelType,
+  ): (SdkModelPropertyType | SdkMethodParameter)[] {
+    for (const prop of model.properties) {
+      if (prop.__raw && prop.__raw.decorators.find((d) => d.definition?.name === "@pageSize")) {
+        return [param, prop];
+      }
+      if (prop.type.kind === "model") {
+        const nested = recurseToFindPageSizeParameterInModel(param, prop.type);
+        if (nested.length > 0) {
+          return nested;
+        }
+      }
+    }
+    return [];
+  }
+  for (const p of baseServiceMethod.parameters) {
+    if (p.__raw && p.__raw.decorators.find((d) => d.definition?.name === "@pageSize")) {
+      return [p];
+    }
+    if (p.type.kind === "model") {
+      return recurseToFindPageSizeParameterInModel(p, p.type);
+    }
+  }
+  return [];
+}
+
 function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
@@ -124,13 +171,11 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
 
   // normal paging
   if (isList(context.program, operation)) {
-    const pagingOperation = diagnostics.pipe(getPagingOperation(context.program, operation));
+    const pagingMetadata = $(context.program).operation.getPagingMetadata(
+      getOverriddenClientMethod(context, operation) ?? operation,
+    );
 
-    if (
-      responseType?.__raw?.kind !== "Model" ||
-      responseType.kind !== "model" ||
-      !pagingOperation
-    ) {
+    if (responseType?.__raw?.kind !== "Model" || responseType.kind !== "model" || !pagingMetadata) {
       diagnostics.add(
         createDiagnostic({
           code: "unexpected-pageable-operation-return-type",
@@ -148,271 +193,120 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    baseServiceMethod.response.resultPath = getPropertyPathFromModel(
-      context,
-      responseType?.__raw,
-      (p) =>
-        p.kind === "ModelProperty" &&
-        findRootSourceProperty(p) ===
-          findRootSourceProperty(pagingOperation.output.pageItems.property),
+    const resultSegments = mapFirstSegmentForResultSegments(
+      pagingMetadata.output.pageItems.path,
+      baseServiceMethod.response,
     );
-    baseServiceMethod.response.resultSegments = getPropertySegmentsFromModelOrParameters(
-      responseType,
-      (p) =>
-        p.__raw?.kind === "ModelProperty" &&
-        findRootSourceProperty(p.__raw) ===
-          findRootSourceProperty(pagingOperation.output.pageItems.property),
+    const nextLinkSegments = mapFirstSegmentForResultSegments(
+      pagingMetadata.output.nextLink?.path,
+      baseServiceMethod.response,
+    );
+    const continuationTokenResponseSegments = mapFirstSegmentForResultSegments(
+      pagingMetadata.output.continuationToken?.path,
+      baseServiceMethod.response,
     );
 
-    let nextLinkPath = undefined;
-    let nextLinkSegments = undefined;
-    if (pagingOperation.output.nextLink) {
-      if (isHeader(context.program, pagingOperation.output.nextLink.property)) {
-        nextLinkSegments = baseServiceMethod.operation.responses
-          .map((r) => r.headers)
-          .flat()
-          .filter(
-            (h) =>
-              h.__raw?.kind === "ModelProperty" &&
-              findRootSourceProperty(h.__raw) ===
-                findRootSourceProperty(pagingOperation.output.nextLink!.property),
-          );
-        nextLinkPath = getLibraryName(context, nextLinkSegments[0].__raw);
-      } else {
-        nextLinkPath = getPropertyPathFromModel(
-          context,
-          responseType?.__raw,
-          (p) =>
-            p.kind === "ModelProperty" &&
-            findRootSourceProperty(p) ===
-              findRootSourceProperty(pagingOperation.output.nextLink!.property),
-        );
-        nextLinkSegments = getPropertySegmentsFromModelOrParameters(
-          responseType,
-          (p) =>
-            p.__raw?.kind === "ModelProperty" &&
-            findRootSourceProperty(p.__raw) ===
-              findRootSourceProperty(pagingOperation.output.nextLink!.property),
-        );
-      }
-    }
-
-    let continuationTokenParameterSegments = undefined;
-    let continuationTokenResponseSegments = undefined;
-    if (pagingOperation.input.continuationToken) {
-      continuationTokenParameterSegments = getPropertySegmentsFromModelOrParameters(
-        baseServiceMethod.parameters,
-        (p) =>
-          p.__raw?.kind === "ModelProperty" &&
-          findRootSourceProperty(p.__raw) ===
-            findRootSourceProperty(pagingOperation.input.continuationToken!.property),
-      );
-    }
-    if (pagingOperation.output.continuationToken) {
-      if (isHeader(context.program, pagingOperation.output.continuationToken.property)) {
-        continuationTokenResponseSegments = baseServiceMethod.operation.responses
-          .map((r) => r.headers)
-          .flat()
-          .filter(
-            (h) =>
-              h.__raw?.kind === "ModelProperty" &&
-              findRootSourceProperty(h.__raw) ===
-                findRootSourceProperty(pagingOperation.output.continuationToken!.property),
-          );
-      } else {
-        continuationTokenResponseSegments = getPropertySegmentsFromModelOrParameters(
-          responseType,
-          (p) =>
-            p.__raw?.kind === "ModelProperty" &&
-            findRootSourceProperty(p.__raw) ===
-              findRootSourceProperty(pagingOperation.output.continuationToken!.property),
-        );
-      }
-    }
+    baseServiceMethod.response.resultSegments = resultSegments?.map(
+      (resultSegment) => context.__modelPropertyCache.get(resultSegment)!,
+    );
 
     context.__pagedResultSet.add(responseType);
     // tcgc will let all paging method return a list of items
     baseServiceMethod.response.type = diagnostics.pipe(
-      getClientTypeWithDiagnostics(context, pagingOperation?.output.pageItems.property.type),
+      getClientTypeWithDiagnostics(
+        context,
+        pagingMetadata.output.pageItems.property.type,
+        operation,
+      ),
     );
 
     return diagnostics.wrap({
       ...baseServiceMethod,
       kind: "paging",
-      nextLinkPath,
       pagingMetadata: {
-        __raw: pagingOperation,
-        nextLinkSegments,
-        continuationTokenParameterSegments,
-        continuationTokenResponseSegments,
+        __raw: pagingMetadata,
+        nextLinkSegments: nextLinkSegments?.map(
+          (segment) =>
+            context.__responseHeaderCache.get(segment) ??
+            context.__modelPropertyCache.get(segment)!,
+        ),
+        nextLinkVerb: getNextLinkVerb(context, operation),
+        continuationTokenParameterSegments: pagingMetadata.input.continuationToken?.path.map(
+          (r) => context.__methodParameterCache.get(r) ?? context.__modelPropertyCache.get(r)!,
+        ),
+        continuationTokenResponseSegments: continuationTokenResponseSegments?.map(
+          (segment) =>
+            context.__responseHeaderCache.get(segment) ??
+            context.__modelPropertyCache.get(segment)!,
+        ),
         pageItemsSegments: baseServiceMethod.response.resultSegments,
+        pageSizeParameterSegments: getPageSizeParameterSegments(baseServiceMethod),
+        nextLinkReInjectedParametersSegments:
+          pagingMetadata.output.nextLink?.property.type.kind === "Scalar"
+            ? (
+                getParameterizedNextLinkArguments(
+                  context.program,
+                  pagingMetadata.output.nextLink.property.type,
+                ) ?? []
+              ).map(
+                (t: ModelProperty) =>
+                  getPropertySegmentsFromModelOrParameters(
+                    baseServiceMethod.parameters,
+                    (p) =>
+                      p.__raw?.kind === "ModelProperty" &&
+                      findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
+                  )!,
+              )
+            : undefined,
       },
     });
+  } else {
+    compilerAssert(false, "Unexpected operation should be paged if calling this function");
   }
-
-  // azure core paging
-  const pagedMetadata = getPagedResult(context.program, operation)!;
-
-  if (
-    responseType?.__raw?.kind !== "Model" ||
-    responseType.kind !== "model" ||
-    !pagedMetadata.itemsProperty
-  ) {
-    diagnostics.add(
-      createDiagnostic({
-        code: "unexpected-pageable-operation-return-type",
-        target: operation,
-        format: {
-          operationName: operation.name,
-        },
-      }),
-    );
-    // return as page method with no paging info
-    return diagnostics.wrap({
-      ...baseServiceMethod,
-      kind: "paging",
-      pagingMetadata: {},
-    });
-  }
-
-  context.__pagedResultSet.add(responseType);
-
-  // tcgc will let all paging method return a list of items
-  baseServiceMethod.response.type = diagnostics.pipe(
-    getClientTypeWithDiagnostics(context, pagedMetadata.itemsProperty.type),
-  );
-
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
-  baseServiceMethod.response.resultPath = getPropertyPathFromSegment(
-    context,
-    pagedMetadata.modelType,
-    pagedMetadata.itemsSegments,
-  );
-  baseServiceMethod.response.resultSegments = getPropertySegmentsFromModelOrParameters(
-    responseType,
-    (p) => p.__raw === pagedMetadata.itemsProperty,
-  );
-
-  let nextLinkPath = undefined;
-  let nextLinkSegments = undefined;
-  let nextLinkReInjectedParametersSegments = undefined;
-  if (pagedMetadata.nextLinkProperty) {
-    if (isHeader(context.program, pagedMetadata.nextLinkProperty)) {
-      nextLinkSegments = baseServiceMethod.operation.responses
-        .map((r) => r.headers)
-        .flat()
-        .filter(
-          (h) =>
-            h.__raw?.kind === "ModelProperty" &&
-            findRootSourceProperty(h.__raw) ===
-              findRootSourceProperty(pagedMetadata.nextLinkProperty!),
-        );
-      nextLinkPath = getLibraryName(context, nextLinkSegments[0].__raw);
-    } else {
-      nextLinkPath = getPropertyPathFromSegment(
-        context,
-        pagedMetadata.modelType,
-        pagedMetadata?.nextLinkSegments,
-      );
-      nextLinkSegments = getPropertySegmentsFromModelOrParameters(
-        responseType,
-        (p) => p.__raw === pagedMetadata.nextLinkProperty,
-      );
-    }
-
-    if (pagedMetadata.nextLinkProperty.type.kind === "Scalar") {
-      nextLinkReInjectedParametersSegments = (
-        getParameterizedNextLinkArguments(context.program, pagedMetadata.nextLinkProperty.type) ??
-        []
-      ).map(
-        (t: ModelProperty) =>
-          getPropertySegmentsFromModelOrParameters(
-            baseServiceMethod.parameters,
-            (p) =>
-              p.__raw?.kind === "ModelProperty" &&
-              findRootSourceProperty(p.__raw) === findRootSourceProperty(t),
-          )!,
-      );
-    }
-  }
-
-  return diagnostics.wrap({
-    ...baseServiceMethod,
-    __raw_paged_metadata: pagedMetadata,
-    kind: "paging",
-    nextLinkPath,
-    nextLinkOperation: pagedMetadata?.nextLinkOperation
-      ? diagnostics.pipe(
-          getSdkServiceOperation<TServiceOperation>(
-            context,
-            pagedMetadata.nextLinkOperation,
-            baseServiceMethod.parameters,
-          ),
-        )
-      : undefined,
-    pagingMetadata: {
-      __raw: pagedMetadata,
-      nextLinkSegments,
-      nextLinkOperation: pagedMetadata?.nextLinkOperation
-        ? diagnostics.pipe(
-            getSdkServiceMethod<TServiceOperation>(
-              context,
-              pagedMetadata.nextLinkOperation,
-              client,
-            ),
-          )
-        : undefined,
-      nextLinkReInjectedParametersSegments,
-      pageItemsSegments: baseServiceMethod.response.resultSegments,
-    },
-  });
 }
 
-export function getPropertyPathFromModel(
-  context: TCGCContext,
-  model: Model,
-  predicate: (property: ModelProperty) => boolean,
-): string | undefined {
-  const queue: { model: Model; path: ModelProperty[] }[] = [];
-
-  if (model.baseModel) {
-    const baseResult = getPropertyPathFromModel(context, model.baseModel, predicate);
-    if (baseResult) return baseResult;
-  }
-
-  for (const prop of model.properties.values()) {
-    if (predicate(prop)) {
-      return getLibraryName(context, prop);
-    }
-    if (prop.type.kind === "Model") {
-      queue.push({ model: prop.type, path: [prop] });
-    }
-  }
-
-  while (queue.length > 0) {
-    const { model, path } = queue.shift()!;
-    for (const prop of model.properties.values()) {
-      if (predicate(prop)) {
-        return path
-          .concat(prop)
-          .map((s) => getLibraryName(context, s))
-          .join(".");
+function mapFirstSegmentForResultSegments(
+  resultSegments: ModelProperty[] | undefined,
+  response: SdkMethodResponse,
+): ModelProperty[] | undefined {
+  if (resultSegments === undefined || response === undefined) return undefined;
+  // TCGC use Http response type as the return type
+  // For implicit body response, we need to locate the first segment in the response type
+  // Several cases:
+  // 1. `op test(): {items, nextLink}`
+  // 2. `op test(): {items, nextLink} & {a, b, c}`
+  // 3. `op test(): {@bodyRoot body: {items, nextLink}}`
+  const responseModel =
+    response.type?.kind === "model"
+      ? response.type
+      : response.type?.kind === "nullable" && response.type.type.kind === "model"
+        ? response.type.type
+        : undefined;
+  if (resultSegments.length > 0 && responseModel) {
+    for (let i = 0; i < resultSegments.length; i++) {
+      const segment = resultSegments[i];
+      let current: SdkModelType | undefined = responseModel;
+      while (current) {
+        for (const property of current.properties ?? []) {
+          if (
+            property.__raw &&
+            findRootSourceProperty(property.__raw) === findRootSourceProperty(segment)
+          ) {
+            return [property.__raw, ...resultSegments.slice(i + 1)];
+          }
+        }
+        current = current.baseModel;
       }
-      if (prop.type.kind === "Model") {
-        queue.push({ model: prop.type, path: path.concat(prop) });
-      }
     }
   }
-
-  return undefined;
+  return resultSegments;
 }
 
 export function getPropertySegmentsFromModelOrParameters(
   source: SdkModelType | SdkMethodParameter[],
-  predicate: (property: SdkModelPropertyType) => boolean,
-): SdkModelPropertyType[] | undefined {
-  const queue: { model: SdkModelType; path: SdkModelPropertyType[] }[] = [];
+  predicate: (property: SdkMethodParameter | SdkModelPropertyType) => boolean,
+): (SdkMethodParameter | SdkModelPropertyType)[] | undefined {
+  const queue: { model: SdkModelType; path: (SdkMethodParameter | SdkModelPropertyType)[] }[] = [];
 
   if (!Array.isArray(source)) {
     if (source.baseModel) {
@@ -445,45 +339,18 @@ export function getPropertySegmentsFromModelOrParameters(
   return undefined;
 }
 
-function getPropertyPathFromSegment(
-  context: TCGCContext,
-  type: Model,
-  segments?: string[],
-): string {
-  if (!segments || segments.length === 0) {
-    return "";
-  }
-  const wireSegments = [];
-  let current = type;
-  for (const segment of segments) {
-    const property = current.properties.get(segment);
-    if (!property) {
-      if (current.baseModel) {
-        return getPropertyPathFromSegment(context, current.baseModel, segments);
-      }
-      return "";
-    }
-    wireSegments.push(getLibraryName(context, property));
-    current = property.type as Model;
-  }
-  return wireSegments.join(".");
-}
-
 function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
 ): [SdkLroServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const metadata = getServiceMethodLroMetadata(context, operation)!;
+  const metadata = getServiceMethodLroMetadata(context, operation, client)!;
   const baseServiceMethod = diagnostics.pipe(
     getSdkBasicServiceMethod<TServiceOperation>(context, operation, client),
   );
 
   baseServiceMethod.response.type = metadata.finalResponse?.result;
-
-  // eslint-disable-next-line @typescript-eslint/no-deprecated
-  baseServiceMethod.response.resultPath = metadata.finalResponse?.resultPath;
   baseServiceMethod.response.resultSegments = metadata.finalResponse?.resultSegments;
 
   return diagnostics.wrap({
@@ -501,29 +368,164 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
   });
 }
 
-function getServiceMethodLroMetadata(
+function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
+  client: SdkClientType<TServiceOperation>,
 ): SdkLroServiceMetadata | undefined {
-  const rawMetadata = getLroMetadata(context.program, operation);
+  const rawMetadata = getTcgcLroMetadata(context, operation, client);
   if (rawMetadata === undefined) {
     return undefined;
   }
 
+  let finalEnvelopeResult: SdkModelType | "void" | undefined = undefined;
   const diagnostics = createDiagnosticCollector();
-
+  if (rawMetadata.finalEnvelopeResult === "void") {
+    finalEnvelopeResult = "void";
+  } else if (rawMetadata.finalEnvelopeResult) {
+    finalEnvelopeResult = getSdkModel(context, rawMetadata.finalEnvelopeResult);
+  }
   return {
     __raw: rawMetadata,
     finalStateVia: rawMetadata.finalStateVia,
     finalResponse: getFinalResponse(),
-    finalStep:
-      rawMetadata.finalStep !== undefined ? { kind: rawMetadata.finalStep.kind } : undefined,
+    finalStep: getSdkLroServiceFinalStep(context, rawMetadata.finalStep),
     pollingStep: {
       responseBody: diagnostics.pipe(
         getClientTypeWithDiagnostics(context, rawMetadata.pollingInfo.responseModel),
       ) as SdkModelType,
     },
+    operation: ignoreDiagnostics(getSdkBasicServiceMethod(context, rawMetadata.operation, client))
+      .operation,
+    logicalResult: getSdkModel(context, rawMetadata.logicalResult),
+    statusMonitorStep: getStatusMonitorStep(context, rawMetadata.statusMonitorStep),
+    pollingInfo: getPollingInfo(context, rawMetadata.pollingInfo),
+    envelopeResult: getSdkModel(context, rawMetadata.envelopeResult),
+    logicalPath: rawMetadata.logicalPath,
+    finalEnvelopeResult,
+    finalResultPath: rawMetadata.finalResultPath,
   };
+
+  function getSdkLroServiceFinalStep(
+    context: TCGCContext,
+    step: FinalOperationStep | undefined,
+  ): SdkLroServiceFinalStep | undefined {
+    if (!step) return undefined;
+    switch (step.kind) {
+      case "finalOperationLink": {
+        return {
+          kind: "finalOperationLink",
+          target: getSdkOperationLink(context, step.target),
+        };
+      }
+      case "finalOperationReference": {
+        return {
+          kind: "finalOperationReference",
+          target: getSdkOperationReference(context, step.target, client),
+        };
+      }
+      case "pollingSuccessProperty": {
+        return {
+          kind: "pollingSuccessProperty",
+          responseModel: getSdkModel(context, step.responseModel),
+          target: ignoreDiagnostics(getSdkModelPropertyType(context, step.target)),
+          sourceProperty: step.sourceProperty
+            ? ignoreDiagnostics(getSdkModelPropertyType(context, step.sourceProperty))
+            : undefined,
+        };
+      }
+      case "noPollingResult": {
+        return {
+          kind: "noPollingResult",
+          responseModel: undefined,
+        };
+      }
+    }
+  }
+
+  function getStatusMonitorStep(
+    context: TCGCContext,
+    statusMonitorStep: NextOperationLink | NextOperationReference | undefined,
+  ): SdkNextOperationLink | SdkNextOperationReference | undefined {
+    if (!statusMonitorStep) return undefined;
+    if (statusMonitorStep.kind === "nextOperationLink") {
+      return {
+        kind: "nextOperationLink",
+        responseModel: getSdkModel(context, statusMonitorStep.responseModel),
+        target: getSdkOperationLink(context, statusMonitorStep.target),
+      };
+    }
+    return {
+      kind: "nextOperationReference",
+      responseModel: getSdkModel(context, statusMonitorStep.responseModel),
+      target: getSdkOperationReference(context, statusMonitorStep.target, client),
+    };
+  }
+
+  function getSdkOperationLink(context: TCGCContext, link: OperationLink): SdkOperationLink {
+    return {
+      kind: "link",
+      location: link.location,
+      property: ignoreDiagnostics(getSdkModelPropertyType(context, link.property)),
+    };
+  }
+
+  function getSdkOperationReference<TServiceOperation extends SdkServiceOperation>(
+    context: TCGCContext,
+    reference: OperationReference,
+    client: SdkClientType<TServiceOperation>,
+  ): SdkOperationReference {
+    const parameters: Map<string, SdkPropertyMap> = new Map();
+    for (const [key, p] of reference.parameters?.entries() ?? []) {
+      parameters.set(key, {
+        sourceKind: p.sourceKind,
+        source: ignoreDiagnostics(getSdkModelPropertyType(context, p.source)),
+        target: ignoreDiagnostics(getSdkModelPropertyType(context, p.target)),
+      });
+    }
+    return {
+      kind: "reference",
+      operation: ignoreDiagnostics(getSdkBasicServiceMethod(context, reference.operation, client))
+        .operation,
+      parameterMap: reference.parameterMap,
+      parameters,
+      link: reference.link ? getSdkOperationLink(context, reference.link) : undefined,
+    };
+  }
+
+  function getPollingInfo(
+    context: TCGCContext,
+    pollingInfo: PollingOperationStep,
+  ): SdkPollingOperationStep {
+    const resultProperty = pollingInfo.resultProperty
+      ? ignoreDiagnostics(getSdkModelPropertyType(context, pollingInfo.resultProperty))
+      : undefined;
+    const errorProperty = pollingInfo.errorProperty
+      ? ignoreDiagnostics(getSdkModelPropertyType(context, pollingInfo.errorProperty))
+      : undefined;
+    return {
+      kind: "pollingOperationStep",
+      responseModel: getSdkModel(context, pollingInfo.responseModel),
+      terminationStatus: getTerminationStatus(context, pollingInfo.terminationStatus),
+      resultProperty,
+      errorProperty,
+    };
+  }
+
+  function getTerminationStatus(
+    context: TCGCContext,
+    terminationStatus: TerminationStatus,
+  ): SdkTerminationStatus {
+    switch (terminationStatus.kind) {
+      case "status-code":
+        return terminationStatus;
+      case "model-property":
+        return {
+          ...terminationStatus,
+          property: ignoreDiagnostics(getSdkModelPropertyType(context, terminationStatus.property)),
+        };
+    }
+  }
 
   function getFinalResponse(): SdkLroServiceFinalResponse | undefined {
     if (
@@ -541,7 +543,7 @@ function getServiceMethodLroMetadata(
     ) as SdkModelType;
     const resultPath = rawMetadata.finalResultPath;
     // find the property inside the envelope result using the final result path
-    let sdkProperty: SdkBodyModelPropertyType | undefined = undefined;
+    let sdkProperty: SdkModelPropertyType | undefined = undefined;
     for (const property of envelopeResult.properties) {
       if (property.__raw === undefined || property.kind !== "property") {
         continue;
@@ -555,7 +557,6 @@ function getServiceMethodLroMetadata(
     return {
       envelopeResult,
       result,
-      resultPath,
       resultSegments: sdkProperty !== undefined ? [sdkProperty] : undefined,
     };
   }
@@ -612,7 +613,7 @@ function getSdkMethodResponse(
   };
 }
 
-function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>(
+export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
@@ -640,19 +641,13 @@ function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
     if (isNeverOrVoidType(param.type)) continue;
     const sdkMethodParam = diagnostics.pipe(getSdkMethodParameter(context, param, operation));
     if (sdkMethodParam.onClient) {
-      const operationLocation = context.getClientForOperation(operation);
+      // add API version and subscription ID parameters to the client parameters
       if (sdkMethodParam.isApiVersionParam) {
-        if (
-          !context.__clientParametersCache.get(operationLocation)?.find((x) => x.isApiVersionParam)
-        ) {
+        if (!clientParams.find((x) => x.isApiVersionParam)) {
           clientParams.push(sdkMethodParam);
         }
       } else if (isSubscriptionId(context, param)) {
-        if (
-          !context.__clientParametersCache
-            .get(operationLocation)
-            ?.find((x) => isSubscriptionId(context, x))
-        ) {
+        if (!clientParams.find((x) => isSubscriptionId(context, x))) {
           clientParams.push(sdkMethodParam);
         }
       }
@@ -690,8 +685,8 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
-  const lro = getLroMetadata(context.program, operation);
-  const paging = getPagedResult(context.program, operation) || isList(context.program, operation);
+  const lro = getTcgcLroMetadata(context, operation, client);
+  const paging = isList(context.program, operation);
   if (lro && paging) {
     return getSdkLroPagingServiceMethod<TServiceOperation>(context, operation, client);
   } else if (paging) {
@@ -702,16 +697,30 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   return getSdkBasicServiceMethod<TServiceOperation>(context, operation, client);
 }
 
-function getSdkMethodParameter(
+export function getSdkMethodParameter(
   context: TCGCContext,
   type: ModelProperty,
-  operation: Operation,
+  operation?: Operation,
 ): [SdkMethodParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  return diagnostics.wrap({
-    ...diagnostics.pipe(getSdkModelPropertyType(context, type, operation)),
-    kind: "method",
-  });
+
+  let property = context.__methodParameterCache?.get(type);
+
+  if (!property) {
+    // for parameter that has elevated to client or parent client, we will use the client parameter directly
+    if (operation) {
+      const correspondingClientParam = getCorrespondingClientParam(context, type, operation);
+      if (correspondingClientParam) return diagnostics.wrap(correspondingClientParam);
+    }
+
+    property = {
+      ...diagnostics.pipe(getSdkModelPropertyTypeBase(context, type, operation)),
+      kind: "method",
+    };
+
+    context.__methodParameterCache.set(type, property);
+  }
+  return diagnostics.wrap(property);
 }
 
 export function createSdkMethods<TServiceOperation extends SdkServiceOperation>(

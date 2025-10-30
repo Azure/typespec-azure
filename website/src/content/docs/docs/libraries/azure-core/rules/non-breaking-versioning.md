@@ -70,3 +70,12 @@ model Foo {
   bar?: string;
 }
 ```
+
+- Made optional with default
+
+```tsp
+model Foo {
+  @madeOptional(Versions.v2024_01_01)
+  bar?: string = "default";
+}
+```

@@ -1,7 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { createAutorestTestRunner, openApiFor } from "./test-host.js";
+import { compileOpenAPI, openApiFor, Tester } from "./test-host.js";
 
 describe("typespec-autorest: polymorphic model inheritance with discriminator", () => {
   it("discriminator can be a simple string literal", async () => {
@@ -196,6 +196,8 @@ describe("typespec-autorest: polymorphic model inheritance with discriminator", 
 
       op read(): { @body body: Pet };
       `);
+    ok(openApi);
+    ok(openApi.definitions);
     ok(openApi.definitions.Pet, "expected definition named Pet");
     ok(openApi.definitions.Cat, "expected definition named Cat");
     ok(openApi.definitions.Dog, "expected definition named Dog");
@@ -227,6 +229,78 @@ describe("typespec-autorest: polymorphic model inheritance with discriminator", 
     });
     deepStrictEqual(openApi.definitions.Beagle.allOf, [{ $ref: "#/definitions/Dog" }]);
     deepStrictEqual(openApi.definitions.Poodle.allOf, [{ $ref: "#/definitions/Dog" }]);
+  });
+
+  it("defines multi-level single discriminator hierarchy", async () => {
+    const openApi = await compileOpenAPI(
+      `
+      @discriminator("kind")
+      model Pet {
+        name: string;
+        weight?: float32;
+      }
+      model Cat extends Pet {
+        kind: "cat";
+        meow: int32;
+      }
+      alias DogProperties = {
+        bark: string;
+      };
+
+      model Dog extends Pet {
+        kind: "dog";
+        ...DogProperties;
+      }
+
+      @Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(Dog)
+      model Beagle extends Pet {
+        kind: "beagle";
+        ...DogProperties;
+      }
+      
+      @Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(Dog)
+      model Poodle extends Pet {
+        kind: "poodle";
+        ...DogProperties;
+      }
+
+      op read(): { @body body: Pet };
+      `,
+      { preset: "azure" },
+    );
+    ok(openApi.definitions);
+    ok(openApi.definitions.Cat, "expected definition named Cat");
+    ok(openApi.definitions.Beagle, "expected definition named Beagle");
+    ok(openApi.definitions.Poodle, "expected definition named Poodle");
+    deepStrictEqual(openApi.definitions.Pet, {
+      type: "object",
+      properties: {
+        kind: { type: "string", description: "Discriminator property for Pet." },
+        name: { type: "string" },
+        weight: { type: "number", format: "float" },
+      },
+      required: ["kind", "name"],
+      discriminator: "kind",
+    });
+    deepStrictEqual(openApi.definitions.Dog, {
+      type: "object",
+      properties: {
+        bark: { type: "string" },
+      },
+      required: ["bark"],
+      allOf: [{ $ref: "#/definitions/Pet" }],
+      "x-ms-discriminator-value": "dog",
+    });
+    deepStrictEqual(openApi.definitions.Beagle, {
+      type: "object",
+      allOf: [{ $ref: "#/definitions/Dog" }],
+      "x-ms-discriminator-value": "beagle",
+    });
+    deepStrictEqual(openApi.definitions.Poodle, {
+      type: "object",
+      allOf: [{ $ref: "#/definitions/Dog" }],
+      "x-ms-discriminator-value": "poodle",
+    });
   });
 
   it("defines discriminated union with enum", async () => {
@@ -289,8 +363,7 @@ describe("typespec-autorest: polymorphic model inheritance with discriminator", 
   });
 
   it("issues diagnostics for errors in a discriminated union", async () => {
-    const runner = await createAutorestTestRunner();
-    const diagnostics = await runner.diagnose(
+    const diagnostics = await Tester.diagnose(
       `
       @discriminator("kind")
       model Pet {
@@ -344,8 +417,7 @@ describe("typespec-autorest: polymorphic model inheritance with discriminator", 
   });
 
   it("issues diagnostics for duplicate discriminator values", async () => {
-    const runner = await createAutorestTestRunner();
-    const diagnostics = await runner.diagnose(
+    const diagnostics = await Tester.diagnose(
       `
       @discriminator("kind")
       model Pet {

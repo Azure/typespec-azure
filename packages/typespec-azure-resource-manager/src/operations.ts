@@ -7,9 +7,16 @@ import {
   Operation,
   Program,
 } from "@typespec/compiler";
-import { getHttpOperation, HttpOperation } from "@typespec/http";
+import {
+  unsafe_mutateSubgraph as mutateSubgraph,
+  unsafe_Mutator as Mutator,
+  unsafe_MutatorFlow as MutatorFlow,
+} from "@typespec/compiler/experimental";
+import { useStateMap } from "@typespec/compiler/utils";
+import { $route, getHttpOperation, HttpOperation, isPathParam } from "@typespec/http";
 import {
   $actionSegment,
+  $autoRoute,
   $createsOrReplacesResource,
   $deletesResource,
   $readsResource,
@@ -27,6 +34,11 @@ import {
   ArmResourceReadDecorator,
   ArmResourceUpdateDecorator,
 } from "../generated-defs/Azure.ResourceManager.js";
+import {
+  ArmOperationOptions,
+  ArmOperationRouteDecorator,
+  RenamePathParameterDecorator,
+} from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { reportDiagnostic } from "./lib.js";
 import { isArmLibraryNamespace } from "./namespace.js";
 import {
@@ -39,7 +51,7 @@ import {
 import { ArmStateKeys } from "./state.js";
 
 export type ArmLifecycleOperationKind = "read" | "createOrUpdate" | "update" | "delete";
-export type ArmOperationKind = ArmLifecycleOperationKind | "list" | "action";
+export type ArmOperationKind = ArmLifecycleOperationKind | "list" | "action" | "other";
 
 export interface ArmResourceOperation extends ArmResourceOperationData {
   path: string;
@@ -53,6 +65,19 @@ export interface ArmLifecycleOperations {
   delete?: ArmResourceOperation;
 }
 
+export interface ArmResourceLifecycleOperations {
+  read?: ArmResourceOperation[];
+  createOrUpdate?: ArmResourceOperation[];
+  update?: ArmResourceOperation[];
+  delete?: ArmResourceOperation[];
+}
+
+export interface ArmResolvedOperationsForResource {
+  lifecycle: ArmResourceLifecycleOperations;
+  lists: ArmResourceOperation[];
+  actions: ArmResourceOperation[];
+}
+
 export interface ArmResourceOperations {
   lifecycle: ArmLifecycleOperations;
   lists: { [key: string]: ArmResourceOperation };
@@ -64,6 +89,15 @@ interface ArmResourceOperationData {
   kind: ArmOperationKind;
   operation: Operation;
   operationGroup: string;
+}
+
+/** Identifying information for an arm operation */
+interface ArmOperationIdentifier {
+  name: string;
+  kind: ArmOperationKind;
+  operationGroup: string;
+  operation: Operation;
+  resource?: Model;
 }
 
 interface ArmLifecycleOperationData {
@@ -132,7 +166,6 @@ function setResourceLifecycleOperation(
   target: Operation,
   resourceType: Model,
   kind: ArmLifecycleOperationKind,
-  decoratorName: string,
 ) {
   // Only register methods from non-templated interface types
   if (
@@ -154,6 +187,64 @@ function setResourceLifecycleOperation(
   };
 
   operations.lifecycle[kind] = operation as ArmResourceOperation;
+  setArmOperationIdentifier(context.program, target, resourceType, {
+    name: target.name,
+    kind: kind,
+    operation: target,
+    operationGroup: target.interface.name,
+  });
+}
+
+export const [getArmOperationList, setArmOperationList] = useStateMap<
+  Model,
+  Set<ArmOperationIdentifier>
+>(ArmStateKeys.resourceOperationList);
+
+export function getArmResourceOperationList(
+  program: Program,
+  resourceType: Model,
+): Set<ArmOperationIdentifier> {
+  let operations = getArmOperationList(program, resourceType);
+  if (operations === undefined) {
+    operations = new Set<ArmOperationIdentifier>();
+    setArmOperationList(program, resourceType, operations);
+  }
+  return operations;
+}
+
+export function addArmResourceOperation(
+  program: Program,
+  resourceType: Model,
+  operationData: ArmOperationIdentifier,
+): void {
+  const operations = getArmResourceOperationList(program, resourceType);
+  operations.add(operationData);
+  setArmOperationList(program, resourceType, operations);
+}
+
+export const [getArmResourceOperationData, setArmResourceOperationData] = useStateMap<
+  Operation,
+  ArmResourceOperationData
+>(ArmStateKeys.armResourceOperationData);
+
+export function setArmOperationIdentifier(
+  program: Program,
+  target: Operation,
+  resourceType: Model,
+  data: ArmResourceOperationData,
+): void {
+  const operationId: ArmOperationIdentifier = {
+    name: data.name,
+    kind: data.kind,
+    operation: target,
+    operationGroup: data.operationGroup,
+    resource: resourceType,
+  };
+  // Initialize the operations for the resource type if not already done
+  if (!getArmResourceOperationData(program, target)) {
+    setArmResourceOperationData(program, target, operationId);
+  }
+  addArmResourceOperation(program, resourceType, operationId);
 }
 
 export const $armResourceRead: ArmResourceReadDecorator = (
@@ -162,7 +253,7 @@ export const $armResourceRead: ArmResourceReadDecorator = (
   resourceType: Model,
 ) => {
   context.call($readsResource, target, resourceType);
-  setResourceLifecycleOperation(context, target, resourceType, "read", "@armResourceRead");
+  setResourceLifecycleOperation(context, target, resourceType, "read");
 };
 
 export const $armResourceCreateOrUpdate: ArmResourceCreateOrUpdateDecorator = (
@@ -171,13 +262,7 @@ export const $armResourceCreateOrUpdate: ArmResourceCreateOrUpdateDecorator = (
   resourceType: Model,
 ) => {
   context.call($createsOrReplacesResource, target, resourceType);
-  setResourceLifecycleOperation(
-    context,
-    target,
-    resourceType,
-    "createOrUpdate",
-    "@armResourceCreateOrUpdate",
-  );
+  setResourceLifecycleOperation(context, target, resourceType, "createOrUpdate");
 };
 
 export const $armResourceUpdate: ArmResourceUpdateDecorator = (
@@ -186,7 +271,7 @@ export const $armResourceUpdate: ArmResourceUpdateDecorator = (
   resourceType: Model,
 ) => {
   context.call($updatesResource, target, resourceType);
-  setResourceLifecycleOperation(context, target, resourceType, "update", "@armResourceUpdate");
+  setResourceLifecycleOperation(context, target, resourceType, "update");
 };
 
 export const $armResourceDelete: ArmResourceDeleteDecorator = (
@@ -195,7 +280,7 @@ export const $armResourceDelete: ArmResourceDeleteDecorator = (
   resourceType: Model,
 ) => {
   context.call($deletesResource, target, resourceType);
-  setResourceLifecycleOperation(context, target, resourceType, "delete", "@armResourceDelete");
+  setResourceLifecycleOperation(context, target, resourceType, "delete");
 };
 
 export const $armResourceList: ArmResourceListDecorator = (
@@ -223,6 +308,19 @@ export const $armResourceList: ArmResourceListDecorator = (
   };
 
   operations.lists[target.name] = operation as ArmResourceOperation;
+  addArmResourceOperation(context.program, resourceType, {
+    name: target.name,
+    kind: "list",
+    operation: target,
+    operationGroup: target.interface.name,
+    resource: resourceType,
+  });
+  setArmOperationIdentifier(context.program, target, resourceType, {
+    name: target.name,
+    kind: "list",
+    operation: target,
+    operationGroup: target.interface.name,
+  });
 };
 
 export function armRenameListByOperationInternal(
@@ -342,6 +440,19 @@ export const $armResourceAction: ArmResourceActionDecorator = (
   };
 
   operations.actions[target.name] = operation as ArmResourceOperation;
+  addArmResourceOperation(program, resourceType, {
+    name: target.name,
+    kind: "action",
+    operation: target,
+    operationGroup: target.interface.name,
+    resource: resourceType,
+  });
+  setArmOperationIdentifier(context.program, target, resourceType, {
+    name: target.name,
+    kind: "action",
+    operation: target,
+    operationGroup: target.interface.name,
+  });
 
   const segment = getSegment(program, target) ?? getActionSegment(program, target);
   if (!segment) {
@@ -366,4 +477,159 @@ export const $armResourceCollectionAction: ArmResourceCollectionActionDecorator 
 
 export function isArmCollectionAction(program: Program, target: Operation): boolean {
   return program.stateMap(ArmStateKeys.armResourceCollectionAction).get(target) === true;
+}
+
+export const $armOperationRoute: ArmOperationRouteDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  options?: ArmOperationOptions,
+) => {
+  const route: string | undefined = options?.route;
+
+  if (!route && !options?.useStaticRoute) {
+    context.call($autoRoute, target);
+    return;
+  }
+  if (route && route.length > 0) {
+    context.call($route, target, route);
+  }
+};
+
+export function getRouteOptions(program: Program, target: Operation): ArmOperationOptions {
+  let options: ArmOperationOptions | undefined = undefined;
+  if (target.interface) {
+    options = options || program.stateMap(ArmStateKeys.armResourceRoute).get(target.interface);
+    if (options) return options;
+  }
+  if (target.sourceOperation?.interface) {
+    options =
+      options ||
+      program.stateMap(ArmStateKeys.armResourceRoute).get(target.sourceOperation.interface);
+  }
+  if (target.sourceOperation?.interface?.sourceInterfaces[0]) {
+    options =
+      options ||
+      program
+        .stateMap(ArmStateKeys.armResourceRoute)
+        .get(target.sourceOperation.interface.sourceInterfaces[0]);
+  }
+
+  if (options) return options;
+  return {
+    useStaticRoute: false,
+  };
+}
+
+function storeRenamePathParameters(
+  program: Program,
+  target: Operation,
+  sourceName: string,
+  targetName: string,
+): void {
+  let renameMap = program.stateMap(ArmStateKeys.renamePathParameters).get(target);
+  if (renameMap === undefined) {
+    renameMap = new Map<string, string>();
+  }
+  renameMap.set(sourceName, targetName);
+  program.stateMap(ArmStateKeys.renamePathParameters).set(target, renameMap);
+}
+
+function getRenamePathParameter(
+  program: Program,
+  target: Operation,
+  sourceName: string,
+  targetName: string,
+): boolean {
+  const renameMap = program.stateMap(ArmStateKeys.renamePathParameters).get(target);
+  if (renameMap === undefined) {
+    program.stateMap(ArmStateKeys.renamePathParameters).set(target, new Map<string, string>());
+    return false;
+  }
+  return renameMap.get(sourceName) === targetName;
+}
+
+/**
+ * Renames a path parameter in an Azure Resource Manager operation.
+ * @param context The decorator context.
+ * @param target The operation to modify.
+ * @param sourceParameterName The name of the parameter to rename.
+ * @param targetParameterName The new name for the parameter.
+ * @returns
+ */
+export const $renamePathParameter: RenamePathParameterDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  sourceParameterName: string,
+  targetParameterName: string,
+) => {
+  const { program } = context;
+  if (getRenamePathParameter(program, target, sourceParameterName, targetParameterName)) {
+    return;
+  }
+
+  const toMutate = target.parameters;
+  const existingTarget = toMutate.properties.get(targetParameterName);
+  const existingSource = toMutate.properties.get(sourceParameterName);
+  if (existingSource === undefined && existingTarget !== undefined) return;
+  if (existingTarget !== undefined) {
+    reportDiagnostic(context.program, {
+      code: "invalid-parameter-rename",
+      messageId: "overwrite",
+      format: { oldName: sourceParameterName, newName: targetParameterName },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+  if (existingSource === undefined) {
+    reportDiagnostic(context.program, {
+      code: "invalid-parameter-rename",
+      messageId: "missing",
+      format: { oldName: sourceParameterName },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+  if (!isPathParam(program, existingSource)) {
+    reportDiagnostic(context.program, {
+      code: "invalid-parameter-rename",
+      messageId: "notpath",
+      format: { oldName: sourceParameterName },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+
+  const mutated = mutateSubgraph(
+    program,
+    [createParamMutator(sourceParameterName, targetParameterName)],
+    toMutate,
+  );
+  target.parameters = mutated.type as Model;
+  storeRenamePathParameters(program, target, sourceParameterName, targetParameterName);
+};
+
+function createParamMutator(sourceParameterName: string, targetParameterName: string): Mutator {
+  return {
+    name: "RenameMutator",
+    Model: {
+      filter: (m, prog) => {
+        const param = m.properties.get(sourceParameterName);
+        if (
+          m.properties.has(targetParameterName) ||
+          param === undefined ||
+          !isPathParam(prog, param)
+        ) {
+          return MutatorFlow.DoNotMutate;
+        }
+        return MutatorFlow.DoNotRecur;
+      },
+      mutate: (_, clone) => {
+        const param = clone.properties.get(sourceParameterName);
+        param!.name = targetParameterName;
+        clone.properties.delete(sourceParameterName);
+        clone.properties.set(targetParameterName, param!);
+        return MutatorFlow.DoNotRecur;
+      },
+    },
+  };
 }

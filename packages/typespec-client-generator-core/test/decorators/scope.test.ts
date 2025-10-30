@@ -331,6 +331,35 @@ it("include operation from csharp client", async () => {
   ok(model);
 });
 
+it("include operation from only csharp client", async () => {
+  const runnerWithCSharp = await createSdkTestRunner({
+    emitterName: "@azure-tools/typespec-python",
+  });
+  await runnerWithCSharp.compile(`
+      @service
+      namespace MyService {
+        model Test {
+          prop: string;
+        }
+        @scope("csharp")
+        op func(
+          @body body: Test
+        ): void;
+
+        @route("/test")
+        op test(
+          @body body: Test
+        ): void;
+      }
+    `);
+
+  const sdkPackage = runnerWithCSharp.context.sdkPackage;
+  const client = sdkPackage.clients[0];
+  ok(client);
+  strictEqual(client.methods.length, 1);
+  strictEqual(client.methods[0].name, "test");
+});
+
 it("exclude operation from csharp client", async () => {
   const runnerWithCSharp = await createSdkTestRunner({
     emitterName: "@azure-tools/typespec-csharp",

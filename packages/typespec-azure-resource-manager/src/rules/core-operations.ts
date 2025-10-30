@@ -4,6 +4,7 @@ import {
   Operation,
   Program,
   createRule,
+  isTemplateInstance,
   paramMessage,
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
@@ -12,7 +13,6 @@ import { getSegment } from "@typespec/rest";
 import {
   getNamespaceName,
   getSourceModel,
-  isInternalTypeSpec,
   isSourceOperationResourceManagerInternal,
   isTemplatedInterfaceOperation,
 } from "./utils.js";
@@ -31,8 +31,8 @@ export const coreOperationsRule = createRule({
     return {
       operation: (operation: Operation) => {
         if (
-          !isInternalTypeSpec(context.program, operation) &&
-          !isSourceOperationResourceManagerInternal(operation)
+          !isSourceOperationResourceManagerInternal(operation) &&
+          !isTemplateInstance(operation)
         ) {
           const verb = getOperationVerb(context.program, operation);
           if (

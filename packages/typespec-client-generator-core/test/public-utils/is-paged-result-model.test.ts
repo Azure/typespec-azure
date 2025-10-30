@@ -10,35 +10,6 @@ beforeEach(async () => {
   runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
 });
 
-it("normal paged model", async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runner.compileWithBuiltInAzureCoreService(`
-    @pagedResult
-    model TestResult {
-      @items
-      value: Test[];
-
-      @nextLink
-      nextLink?: url;
-    }
-
-    model Test {
-      prop: string;
-    }
-
-    op test(): TestResult;
-  `);
-
-  const sdkPackage = runner.context.sdkPackage;
-  ok(
-    isPagedResultModel(runner.context, sdkPackage.models.filter((m) => m.name === "TestResult")[0]),
-  );
-});
-
 it("template paged model", async () => {
   runner = await createSdkTestRunner({
     librariesToAdd: [AzureCoreTestLibrary],
@@ -52,6 +23,7 @@ it("template paged model", async () => {
       prop: string;
     }
 
+    @list
     op test(): TestResult;
   `);
 
@@ -72,6 +44,7 @@ it("another usage of template paged model", async () => {
       prop: string;
     }
 
+    @list
     op test(): Page<Test>;
   `);
 
@@ -92,6 +65,7 @@ it("paged model use template list", async () => {
       prop: string;
     }
 
+    @list
     op testTemplate<T extends {}>(): Page<T>;
 
     op test is testTemplate<Test>;

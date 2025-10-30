@@ -1,10 +1,25 @@
-import type { DecoratorContext, Model, ModelProperty } from "@typespec/compiler";
+import type { DecoratorContext, Model, ModelProperty, Operation } from "@typespec/compiler";
+
+export interface CustomResourceOptions {
+  readonly isAzureResource?: boolean;
+}
+
+export interface ArmOperationOptions {
+  readonly useStaticRoute?: boolean;
+  readonly route?: string;
+}
 
 /**
  * This decorator is used on resources that do not satisfy the definition of a resource
  * but need to be identified as such.
+ *
+ * @param options Options for customizing the behavior of the resource
  */
-export type CustomAzureResourceDecorator = (context: DecoratorContext, target: Model) => void;
+export type CustomAzureResourceDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  options?: CustomResourceOptions,
+) => void;
 
 /**
  * Specify an external reference that should be used when emitting this type.
@@ -17,7 +32,44 @@ export type ExternalTypeRefDecorator = (
   jsonRef: string,
 ) => void;
 
+/**
+ * Signifies that an operation is an Azure Resource Manager operation
+ * and optionally associates the operation with a route template.
+ *
+ * @param target The operation to associate the model with
+ * @param route Optional route to associate with the operation
+ */
+export type ArmOperationRouteDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  route?: ArmOperationOptions,
+) => void;
+
+/**
+ * Signifies that a Resource is represented using a library type in generated SDKs.
+ *
+ * @param target The model to that is an external resource
+ */
+export type ArmExternalTypeDecorator = (context: DecoratorContext, target: Model) => void;
+
+/**
+ * Renames a path parameter in an Azure Resource Manager operation.
+ *
+ * @param target The operation or interface to modify
+ * @param sourceParameterName The name of the parameter to rename
+ * @param targetParameterName The new name for the parameter
+ */
+export type RenamePathParameterDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  sourceParameterName: string,
+  targetParameterName: string,
+) => void;
+
 export type AzureResourceManagerLegacyDecorators = {
   customAzureResource: CustomAzureResourceDecorator;
   externalTypeRef: ExternalTypeRefDecorator;
+  armOperationRoute: ArmOperationRouteDecorator;
+  armExternalType: ArmExternalTypeDecorator;
+  renamePathParameter: RenamePathParameterDecorator;
 };

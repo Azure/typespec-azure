@@ -2,11 +2,11 @@ import {
   Operation,
   createRule,
   ignoreDiagnostics,
+  isList,
   isTemplateDeclarationOrInstance,
 } from "@typespec/compiler";
 import { getHttpOperation } from "@typespec/http";
 import { isListOperation } from "@typespec/rest";
-import { getPagedResult } from "../decorators.js";
 
 export const useStandardNames = createRule({
   name: "use-standard-names",
@@ -32,8 +32,7 @@ export const useStandardNames = createRule({
         const name = op.name;
         const statusCodes = httpOp.responses.map((x) => x.statusCodes.toString());
         // operation is a list if it is decoratored as such (for example, through a template) or returns a paged result
-        const isList =
-          isListOperation(context.program, op) || getPagedResult(context.program, op) !== undefined;
+        const isListOp = isListOperation(context.program, op) || isList(context.program, op);
         let errorMessage:
           | "list"
           | "get"
@@ -45,9 +44,9 @@ export const useStandardNames = createRule({
           | undefined;
         switch (verb) {
           case "get":
-            if (isList && !name.startsWith("list")) {
+            if (isListOp && !name.startsWith("list")) {
               errorMessage = "list";
-            } else if (!isList && !name.startsWith("get")) {
+            } else if (!isListOp && !name.startsWith("get")) {
               errorMessage = "get";
             }
             break;

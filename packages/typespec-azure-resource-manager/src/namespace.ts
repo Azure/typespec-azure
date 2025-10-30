@@ -23,13 +23,10 @@ import {
 } from "../generated-defs/Azure.ResourceManager.js";
 import { $armCommonTypesVersion } from "./common-types.js";
 import { reportDiagnostic } from "./lib.js";
-import { getSingletonResourceKey } from "./resource.js";
+import { getArmVirtualResourceDetails, getSingletonResourceKey } from "./resource.js";
 import { ArmStateKeys } from "./state.js";
 
-function getArmCommonTypesVersion(
-  context: DecoratorContext,
-  entity: Namespace | EnumMember,
-): EnumValue | undefined {
+function getArmCommonTypesVersion(entity: Namespace | EnumMember): EnumValue | undefined {
   return entity.decorators.find((x) => x.definition?.name === "@armCommonTypesVersion")?.args[0]
     .jsValue as EnumValue | undefined;
 }
@@ -169,7 +166,7 @@ export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
     }
   }
 
-  const armCommonTypesVersion = getArmCommonTypesVersion(context, entity);
+  const armCommonTypesVersion = getArmCommonTypesVersion(entity);
 
   // If it is versioned namespace, we will check each Version enum member. If no
   // @armCommonTypeVersion decorator, add the one
@@ -177,7 +174,7 @@ export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
   if (versioned) {
     const versionEnum = versioned.args[0].value as Enum;
     versionEnum.members.forEach((v) => {
-      if (!getArmCommonTypesVersion(context, v)) {
+      if (!getArmCommonTypesVersion(v)) {
         context.call($armCommonTypesVersion, v, armCommonTypesVersion ?? "v3");
       }
     });
@@ -271,19 +268,48 @@ export function getArmProviderNamespace(
   program: Program,
   entity: Namespace | Model,
 ): string | undefined {
-  let currentNamespace: Namespace | undefined =
-    entity.kind === "Namespace" ? entity : entity.namespace;
+  if (entity.kind === "Model") {
+    const details = getArmVirtualResourceDetails(program, entity);
+    if (details?.provider !== undefined) {
+      return details.provider;
+    }
+  }
 
+  const currentNamespace: Namespace | undefined =
+    entity.kind === "Namespace" ? entity : entity.namespace;
+  return getArmProviderFromNamespace(program, currentNamespace);
+}
+
+function getArmProviderFromNamespace(
+  program: Program,
+  ns: Namespace | undefined,
+): string | undefined {
   let armProviderNamespace: string | undefined;
-  while (currentNamespace) {
-    armProviderNamespace = program
-      .stateMap(ArmStateKeys.armProviderNamespaces)
-      .get(currentNamespace);
+  while (ns) {
+    armProviderNamespace = program.stateMap(ArmStateKeys.armProviderNamespaces).get(ns);
     if (armProviderNamespace) {
       return armProviderNamespace;
     }
 
-    currentNamespace = currentNamespace.namespace;
+    ns = ns.namespace;
+  }
+
+  return undefined;
+}
+
+export function resolveProviderNamespace(
+  program: Program,
+  ns?: Namespace | undefined,
+): Namespace | undefined {
+  ns = ns ?? program.getGlobalNamespaceType();
+  if (program.stateMap(ArmStateKeys.armProviderNamespaces).get(ns)) {
+    return ns;
+  }
+  for (const child of ns.namespaces.values()) {
+    const providerNs = resolveProviderNamespace(program, child);
+    if (providerNs) {
+      return providerNs;
+    }
   }
 
   return undefined;

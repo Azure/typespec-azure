@@ -1,0 +1,50 @@
+import { createLinterRuleTester, LinterRuleTester } from "@typespec/compiler/testing";
+import { beforeEach, it } from "vitest";
+
+import { Tester } from "#test/tester.js";
+import { armCustomResourceNoKey } from "../../src/rules/arm-custom-resource-no-key.js";
+
+let tester: LinterRuleTester;
+
+beforeEach(async () => {
+  tester = createLinterRuleTester(
+    await Tester.createInstance(),
+    armCustomResourceNoKey,
+    "@azure-tools/typespec-azure-resource-manager",
+  );
+});
+
+it("emits diagnostic when missing @key on custom resource", async () => {
+  await tester
+    .expect(
+      `
+    @armProviderNamespace
+    namespace Microsoft.Contoso;
+    
+    @Azure.ResourceManager.Legacy.customAzureResource
+    model CustomResource {
+      someId: string;
+    }
+  `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/arm-custom-resource-no-key",
+    });
+});
+
+it("allows custom resource with @key", async () => {
+  await tester
+    .expect(
+      `
+    @armProviderNamespace
+    namespace Microsoft.Contoso;
+    
+    @Azure.ResourceManager.Legacy.customAzureResource
+    model CustomResource {
+      @key
+      someId: string;
+    }
+  `,
+    )
+    .toBeValid();
+});

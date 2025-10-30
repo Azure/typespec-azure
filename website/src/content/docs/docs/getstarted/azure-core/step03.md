@@ -1,12 +1,13 @@
 ---
 title: 3. Using the versioned Azure.Core types
+description: Using versioned Azure.Core
+llmstxt: true
 ---
 
 Before you can use the models and operations defined in the `Azure.Core` namespace, you will need to specify the API version of the `Azure.Core` library that your service uses. You can do this by adding the `@useDependency` decorator to the `Contoso.WidgetManager` namespace as seen here:
 
 ```typespec
 @service(#{ title: "Contoso Widget Manager" })
-@useDependency(Azure.Core.Versions.v1_0_Preview_2)
 namespace Contoso.WidgetManager;
 ```
 

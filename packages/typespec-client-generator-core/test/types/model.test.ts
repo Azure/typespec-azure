@@ -882,8 +882,9 @@ it("lro core filterOutCoreModels false", async () => {
   strictEqual(models[3].crossLanguageDefinitionId, "Azure.Core.ResourceOperationStatus");
   strictEqual(models[4].name, "User");
   strictEqual(models[4].crossLanguageDefinitionId, "My.Service.User");
-  strictEqual(runner.context.sdkPackage.enums.length, 1);
+  strictEqual(runner.context.sdkPackage.enums.length, 2);
   strictEqual(runner.context.sdkPackage.enums[0].name, "OperationState");
+  strictEqual(runner.context.sdkPackage.enums[1].name, "Versions");
 });
 
 it("model with core property", async () => {
@@ -1796,7 +1797,7 @@ it("header property on body root model visibility", async function () {
   strictEqual(inputModel.properties.length, 1);
   const nameProperty = inputModel.properties[0];
   strictEqual(nameProperty.name, "name");
-  strictEqual(nameProperty.kind, "header");
+  strictEqual(nameProperty.kind, "property");
   ok(nameProperty.visibility);
   strictEqual(nameProperty.visibility.length, 1);
   strictEqual(nameProperty.visibility[0], Visibility.Read);

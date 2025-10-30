@@ -6,6 +6,7 @@ function azureResourceManagerCreateStateSymbol(name: string): symbol {
 }
 
 export const ArmStateKeys = {
+  armProviderCache: azureResourceManagerCreateStateSymbol("armProviderCache"),
   armProviderNamespaces: azureResourceManagerCreateStateSymbol("armProviderNamespaces"),
   armResourceOperations: azureResourceManagerCreateStateSymbol("armResourceOperations"),
   armResourceCollectionAction: azureResourceManagerCreateStateSymbol("armResourceCollectionAction"),
@@ -16,8 +17,11 @@ export const ArmStateKeys = {
   armCommonTypesVersion: azureResourceManagerCreateStateSymbol("armCommonTypesVersion"),
   armIdentifiers: azureResourceManagerCreateStateSymbol("armIdentifiers"),
   externalTypeRef: azureResourceManagerCreateStateSymbol("externalTypeRef"),
+  armResourceOperationData: azureResourceManagerCreateStateSymbol("armResourceOperationData"),
+  resourceOperationList: azureResourceManagerCreateStateSymbol("resourceOperationList"),
 
   // resource.ts
+  armResolvedResources: azureResourceManagerCreateStateSymbol("armResolvedResources"),
   armResourcesCached: azureResourceManagerCreateStateSymbol("armResourcesCached"),
   armSingletonResources: azureResourceManagerCreateStateSymbol("armSingletonResources"),
   resourceBaseType: azureResourceManagerCreateStateSymbol("resourceBaseTypeKey"),
@@ -27,9 +31,13 @@ export const ArmStateKeys = {
   // private.decorator.ts
   azureResourceBase: azureResourceManagerCreateStateSymbol("azureResourceBase"),
   armConditionalClientFlatten: azureResourceManagerCreateStateSymbol("armConditionalClientFlatten"),
+  renamePathParameters: azureResourceManagerCreateStateSymbol("renamePathParameters"),
 
   // commontypes.private.decorators.ts
   armCommonDefinitions: azureResourceManagerCreateStateSymbol("armCommonDefinitions"),
   armCommonParameters: azureResourceManagerCreateStateSymbol("armCommonParameters"),
   armCommonTypesVersions: azureResourceManagerCreateStateSymbol("armCommonTypesVersions"),
+  armResourceRoute: azureResourceManagerCreateStateSymbol("armResourceRoute"),
+  armExternalType: azureResourceManagerCreateStateSymbol("armExternalType"),
+  inlineAzureType: azureResourceManagerCreateStateSymbol("inlineAzureType"),
 };

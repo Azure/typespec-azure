@@ -1,21 +1,22 @@
 import { deepStrictEqual } from "assert";
 import { it } from "vitest";
-import { openApiFor } from "./test-host.js";
+import { compileOpenAPI } from "./test-host.js";
 
 it("applies x-ms-client-flatten for property marked with @flattenProperty", async () => {
-  const res = await openApiFor(
+  const res = await compileOpenAPI(
     `
     model Widget {
-      #suppress "deprecated" "for test"
-      @flattenProperty
+      #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "for test"
+      @Azure.ClientGenerator.Core.Legacy.flattenProperty
       properties?: WidgetProperties;
     }
 
     model WidgetProperties {
     }
     `,
+    { preset: "azure" },
   );
-  const model = res.definitions["Widget"]!;
+  const model = res.definitions?.["Widget"]!;
   deepStrictEqual(model, {
     properties: {
       properties: {

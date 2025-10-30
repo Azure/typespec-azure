@@ -55,6 +55,7 @@ const defaultOptions = {
     "{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json",
   "new-line": "lf",
   "include-x-typespec-name": "never",
+  "xml-strategy": "xml-service",
 } as const;
 
 export async function $onEmit(context: EmitContext<AutorestEmitterOptions>) {
@@ -112,6 +113,7 @@ export function resolveAutorestOptions(
     emitLroOptions: resolvedOptions["emit-lro-options"],
     armResourceFlattening: resolvedOptions["arm-resource-flattening"],
     emitCommonTypesSchema: resolvedOptions["emit-common-types-schema"],
+    xmlStrategy: resolvedOptions["xml-strategy"],
   };
 }
 
@@ -120,6 +122,7 @@ export async function getAllServicesAtAllVersions(
   options: ResolvedAutorestEmitterOptions,
 ): Promise<AutorestServiceRecord[]> {
   const tcgcSdkContext = createTCGCContext(program, "@azure-tools/typespec-autorest");
+  tcgcSdkContext.enableLegacyHierarchyBuilding = true;
 
   const services = listServices(program);
   if (services.length === 0) {

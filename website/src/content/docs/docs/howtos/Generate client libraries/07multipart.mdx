@@ -1,0 +1,146 @@
+---
+title: Multipart Operations
+llmstxt: true
+---
+
+import { ClientTabs, ClientTabItem } from "@components/client-tabs";
+
+This doc details what emitters will generate for multipart request.
+
+## Multipart request with `@multipartBody`
+
+With `@multipartBody`, typespec author could define part of multipart request with more detailed info.
+For example, typespec author could use `File` model predefined in `@typespec/http` to declare the requiredness of filename and
+contentType.
+
+<ClientTabs>
+
+```typespec
+model Address {
+  city: string;
+}
+model MultipartRequest {
+  id: HttpPart<string>;
+  address: HttpPart<Address>;
+  profileImage: HttpPart<File>;
+  previousAddresses: HttpPart<Address[]>;
+  pictures: HttpPart<File>[];
+}
+
+@post
+op upload(
+  @header contentType: "multipart/form-data",
+  @multipartBody body: MultipartRequest,
+): NoContentResponse;
+```
+
+```python
+class MultipartRequest:
+    id: str = rest_field()
+    address: "Address" = rest_field()
+    profile_image: FileType = rest_field(name="profileImage", is_multipart_file_input=True)
+    pictures: List[FileType] = rest_field(is_multipart_file_input=True)
+
+def upload(
+    self, body: Union[_models.MultipartRequest, JSON], **kwargs: Any
+) -> None:
+```
+
+```csharp
+# TODO
+```
+
+```typescript
+/** model interface MultipartRequest */
+export interface MultipartRequest {
+  id: string;
+  address: Address;
+  profileImage: FileContents | { contents: FileContents; contentType?: string; filename?: string };
+  previousAddresses: Address[];
+  pictures: Array<
+    FileContents | { contents: FileContents; contentType?: string; filename?: string }
+  >;
+}
+
+export function multipartRequestSerializer(item: MultipartRequest): any {
+  return [
+    { name: "id", body: item["id"] },
+    { name: "address", body: addressSerializer(item["address"]) },
+    createFilePartDescriptor("profileImage", item["profileImage"]),
+    {
+      name: "previousAddresses",
+      body: addressArraySerializer(item["previousAddresses"]),
+    },
+    ...item["pictures"].map((x: unknown) => createFilePartDescriptor("pictures", x)),
+  ];
+}
+
+/** model interface Address */
+export interface Address {
+  city: string;
+}
+
+export function addressSerializer(item: Address): any {
+  return { city: item["city"] };
+}
+
+export function addressArraySerializer(result: Array<Address>): any[] {
+  return result.map((item) => {
+    return addressSerializer(item);
+  });
+}
+
+// Modular api layer
+export async function upload(
+  context: Client,
+  body: MultipartRequest,
+  options: UploadOptionalParams = { requestOptions: {} },
+): Promise<void>;
+
+// Modular classical client layer
+export class TestServiceClient {
+  upload(
+    body: MultipartRequest,
+    options: UploadOptionalParams = { requestOptions: {} },
+  ): Promise<void>;
+}
+```
+
+```java
+// Model class
+@Immutable
+public final class MultipartRequest {
+    public MultipartRequest(String id, Address address, FileDetails profileImage, List<Address> previousAddresses, List<FileDetails> pictures);
+}
+
+// Client API
+public void upload(MultipartRequest body);
+```
+
+```go
+type Address struct {
+	City *string
+}
+
+type File struct {
+	Contents []byte
+	ContentType *string
+	Filename *string
+}
+
+type MultipartRequest struct {
+	Address Address
+	ID string
+	Pictures []streaming.MultipartContent
+	PreviousAddresses []Address
+	ProfileImage streaming.MultipartContent
+}
+
+type FileUploadServiceClientUploadOptions struct {}
+
+type FileUploadServiceClientUploadResponse struct {}
+
+func (client *FileUploadServiceClient) Upload(ctx context.Context, body MultipartRequest, options *FileUploadServiceClientUploadOptions) (FileUploadServiceClientUploadResponse, error)
+```
+
+</ClientTabs>

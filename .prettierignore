@@ -65,6 +65,7 @@ core/packages/compiler/templates/__snapshots__/
 # Skip formatting tsp files
 
 *.noformat.tsp
+core/packages/compiler/test/e2e/cli/scenarios/unformatted/
 
 # Tm Grammars generated files
 core/grammars/

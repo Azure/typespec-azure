@@ -52,7 +52,7 @@
   },
   "typescript.tsdk": "node_modules/typescript/lib",
   "git.ignoreLimitWarning": true,
-  "vitest.workspaceConfig": "./vitest.workspace.ts",
+  "vitest.workspaceConfig": "./vitest.config.ts",
   "prettier.configPath": ".prettierrc.json",
   "prettier.ignorePath": ".prettierignore",
   "prettier.prettierPath": "./core/packages/compiler/node_modules/prettier/index.cjs",
@@ -60,5 +60,5 @@
   "typespec.tsp-server.path": "${workspaceRoot}/core/packages/compiler",
   "cSpell.words": ["autorest", "typespec"],
   "dotnet.defaultSolution": "disable",
-  "eslint.experimental.useFlatConfig": true // Still needed new version coming soon should work without https://github.com/microsoft/vscode-eslint/issues/1644
+  "eslint.useFlatConfig": true
 }

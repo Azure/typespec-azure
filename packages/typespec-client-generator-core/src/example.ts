@@ -3,7 +3,12 @@ import {
   Diagnostic,
   DiagnosticCollector,
   NoTarget,
+  Program,
   createDiagnosticCollector,
+  getAnyExtensionFromPath,
+  getRelativePathFromDirectory,
+  joinPaths,
+  normalizePath,
   resolvePath,
 } from "@typespec/compiler";
 import {
@@ -79,7 +84,7 @@ async function loadExamples(
   }
 
   const map = new Map<string, Record<string, LoadedExample>>();
-  const exampleFiles = await context.program.host.readDir(exampleDir);
+  const exampleFiles = await searchExampleJsonFiles(context.program, exampleDir);
   for (const fileName of exampleFiles) {
     try {
       const exampleFile = await context.program.host.readFile(resolvePath(exampleDir, fileName));
@@ -133,6 +138,33 @@ async function loadExamples(
   return diagnostics.wrap(map);
 }
 
+async function searchExampleJsonFiles(program: Program, exampleDir: string): Promise<string[]> {
+  const host = program.host;
+  const exampleFiles: string[] = [];
+
+  // Recursive file search
+  async function recursiveSearch(dir: string): Promise<void> {
+    const fileItems = await host.readDir(dir);
+
+    for (const item of fileItems) {
+      const fullPath = joinPaths(dir, item);
+      const relativePath = getRelativePathFromDirectory(exampleDir, fullPath, false);
+
+      if ((await host.stat(fullPath)).isDirectory()) {
+        await recursiveSearch(fullPath);
+      } else if (
+        (await host.stat(fullPath)).isFile() &&
+        getAnyExtensionFromPath(item) === ".json"
+      ) {
+        exampleFiles.push(normalizePath(relativePath));
+      }
+    }
+  }
+
+  await recursiveSearch(exampleDir);
+  return exampleFiles;
+}
+
 export async function handleClientExamples(
   context: TCGCContext,
   client: SdkClientType<SdkServiceOperation>,
@@ -150,9 +182,9 @@ export async function handleClientExamples(
       clientQueue.push(...client.children);
     }
     for (const method of client.methods) {
-      // since operation could have customization in client.tsp, we need to handle all the original operation (exclude the templated operation)
+      // since operation could have customization in client.tsp, we need to handle all the original operation
       let operation = method.__raw;
-      while (operation && operation.templateMapper === undefined) {
+      while (operation) {
         // try operation id with renaming
         let operationId = resolveOperationId(context, operation, true).toLowerCase();
         if (examples.has(operationId)) {
@@ -376,7 +408,7 @@ function handleHttpResponse(
 }
 
 function getSdkTypeExample(
-  type: SdkType | SdkModelPropertyType,
+  type: SdkType,
   example: any,
   relativePath: string,
 ): [SdkExampleValue | undefined, readonly Diagnostic[]] {
@@ -476,6 +508,42 @@ function getSdkTypeExample(
   return diagnostics.wrap(undefined);
 }
 
+/**
+ * Attempts to convert a string value to a number.
+ * Returns the converted number if valid, undefined otherwise.
+ */
+function tryConvertStringToNumber(value: string): number | undefined {
+  if (typeof value !== "string" || value.trim() === "") {
+    return undefined;
+  }
+
+  const num = Number(value.trim());
+  if (isNaN(num) || !isFinite(num)) {
+    return undefined;
+  }
+
+  return num;
+}
+
+/**
+ * Attempts to convert a string value to a boolean.
+ * Returns the converted boolean if valid, undefined otherwise.
+ */
+function tryConvertStringToBoolean(value: string): boolean | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  const lowerValue = value.toLowerCase().trim();
+  if (lowerValue === "true") {
+    return true;
+  } else if (lowerValue === "false") {
+    return false;
+  }
+
+  return undefined;
+}
+
 function getSdkBaseTypeExample(
   kind: "string" | "number" | "boolean",
   type: SdkType,
@@ -483,15 +551,41 @@ function getSdkBaseTypeExample(
   relativePath: string,
 ): [SdkExampleValue | undefined, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+
+  // Direct type match - use as is
   if (typeof example === kind) {
     return diagnostics.wrap({
       kind,
       type,
       value: example,
     } as SdkExampleValue);
-  } else {
-    addExampleValueNoMappingDignostic(diagnostics, example, relativePath);
   }
+
+  // Try string conversion for number and boolean types
+  if (typeof example === "string") {
+    if (kind === "number") {
+      const convertedNumber = tryConvertStringToNumber(example);
+      if (convertedNumber !== undefined) {
+        return diagnostics.wrap({
+          kind,
+          type,
+          value: convertedNumber,
+        } as SdkExampleValue);
+      }
+    } else if (kind === "boolean") {
+      const convertedBoolean = tryConvertStringToBoolean(example);
+      if (convertedBoolean !== undefined) {
+        return diagnostics.wrap({
+          kind,
+          type,
+          value: convertedBoolean,
+        } as SdkExampleValue);
+      }
+    }
+  }
+
+  // If no conversion was possible, add diagnostic
+  addExampleValueNoMappingDignostic(diagnostics, example, relativePath);
   return diagnostics.wrap(undefined);
 }
 

@@ -28,11 +28,13 @@ import {
   SdkDictionaryType,
   SdkEnumType,
   SdkHttpOperation,
+  SdkMethodParameter,
   SdkModelPropertyType,
   SdkModelType,
   SdkNullableType,
   SdkOperationGroup,
   SdkServiceOperation,
+  SdkServiceResponseHeader,
   SdkUnionType,
   TCGCContext,
 } from "./interfaces.js";
@@ -44,6 +46,7 @@ import {
   TCGCEmitterOptions,
   TspLiteralType,
 } from "./internal-utils.js";
+import { reportDiagnostic } from "./lib.js";
 import { createSdkPackage } from "./package.js";
 import { listAllServiceNamespaces } from "./public-utils.js";
 
@@ -73,7 +76,9 @@ export function createTCGCContext(
       SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType
     >(),
     __arrayDictionaryCache: new Map<Type, SdkDictionaryType | SdkArrayType>(),
+    __methodParameterCache: new Map<ModelProperty, SdkMethodParameter>(),
     __modelPropertyCache: new Map<ModelProperty, SdkModelPropertyType>(),
+    __responseHeaderCache: new Map<ModelProperty, SdkServiceResponseHeader>(),
     __generatedNames: new Map<Union | Model | TspLiteralType, string>(),
     __httpOperationCache: new Map<Operation, HttpOperation>(),
     __clientParametersCache: new Map(),
@@ -127,6 +132,20 @@ export function createTCGCContext(
       removeVersionsLargerThanExplicitlySpecified(this, versions);
 
       this.__packageVersions = versions.map((version) => version.value);
+
+      if (
+        this.apiVersion !== undefined &&
+        this.apiVersion !== "latest" &&
+        this.apiVersion !== "all" &&
+        !this.__packageVersions.includes(this.apiVersion)
+      ) {
+        reportDiagnostic(this.program, {
+          code: "api-version-undefined",
+          format: { version: this.apiVersion },
+          target: service.type,
+        });
+        this.apiVersion = this.__packageVersions[this.__packageVersions.length - 1];
+      }
       return this.__packageVersions;
     },
     getPackageVersionEnum(): Enum | undefined {
@@ -180,6 +199,7 @@ export interface CreateSdkContextOptions {
   disableUsageAccessPropagationToBase?: boolean; // this flag is for some languages that has no need to generate base model, but generate model with composition
   exportTCGCoutput?: boolean; // this flag is for emitter to export TCGC output as yaml file
   flattenUnionAsEnum?: boolean; // this flag is for emitter to decide whether tcgc should flatten union as enum
+  enableLegacyHierarchyBuilding?: boolean; // this flag is for emitter to decide whether tcgc should respect the `@hierarchyBuilding` decorator
 }
 
 export async function createSdkContext<
@@ -213,6 +233,7 @@ export async function createSdkContext<
     previewStringRegex: options?.versioning?.previewStringRegex || tcgcContext.previewStringRegex,
     disableUsageAccessPropagationToBase: options?.disableUsageAccessPropagationToBase ?? false,
     flattenUnionAsEnum: options?.flattenUnionAsEnum ?? true,
+    enableLegacyHierarchyBuilding: options?.enableLegacyHierarchyBuilding ?? true,
   };
   sdkContext.sdkPackage = diagnostics.pipe(createSdkPackage(sdkContext));
   for (const client of sdkContext.sdkPackage.clients) {

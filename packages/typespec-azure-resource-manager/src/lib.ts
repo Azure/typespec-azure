@@ -104,10 +104,31 @@ export const $lib = createTypeSpecLibrary({
         default: "Resource types must have a property with '@path` and '@segment' decorators.",
       },
     },
+    "resource-without-provider-namespace": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`The resource "${"resourceName"}" does not have a provider namespace.  Please use a resource in a namespace marked with '@armProviderNamespace' or a virtual resource with a specific namespace`,
+      },
+    },
     "template-type-constraint-no-met": {
       severity: "error",
       messages: {
         default: paramMessage`The template parameter "${"sourceType"}" for "${"entity"}" does not extend the constraint type "${"constraintType"}". ${"actionMessage"}`,
+      },
+    },
+    "invalid-parameter-rename": {
+      severity: "warning",
+      messages: {
+        overwrite: paramMessage`The parameter "${"oldName"}" cannot be renamed to "${"newName"}, a parameter named "${"newName"}" already exists".`,
+        missing: paramMessage`The parameter "${"oldName"}" does not exist and so cannot be renamed.`,
+        notpath: paramMessage`The parameter "${"oldName"}" is not a path parameter and so cannot be renamed.`,
+      },
+    },
+    "legacy-type-usage": {
+      severity: "warning",
+      messages: {
+        default:
+          "This type is meant for conversion of legacy service APIs.  This type should not be used in new service APIs.",
       },
     },
   },

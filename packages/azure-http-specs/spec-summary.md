@@ -57,6 +57,173 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_AlternateType_ExternalType_getModel
+
+- Endpoint: `get /azure/client-generator-core/alternate-type/external/model`
+
+Input: None
+Output: Feature object with geometry, properties, and optional id fields.
+Example response:
+
+```json
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-122.25, 37.87]
+  },
+  "properties": {
+    "name": "A single point of interest",
+    "category": "landmark",
+    "elevation": 100
+  },
+  "id": "feature-1"
+}
+```
+
+### Azure_ClientGenerator_Core_AlternateType_ExternalType_getProperty
+
+- Endpoint: `get /azure/client-generator-core/alternate-type/external/property`
+
+Input: None
+Output: ModelWithFeatureProperty object with feature and additionalProperty fields.
+Example response:
+
+```json
+{
+  "feature": {
+    "type": "Feature",
+    "geometry": {
+      "type": "Point",
+      "coordinates": [-122.25, 37.87]
+    },
+    "properties": {
+      "name": "A single point of interest",
+      "category": "landmark",
+      "elevation": 100
+    },
+    "id": "feature-1"
+  },
+  "additionalProperty": "extra"
+}
+```
+
+### Azure_ClientGenerator_Core_AlternateType_ExternalType_putModel
+
+- Endpoint: `put /azure/client-generator-core/alternate-type/external/model`
+
+Input: Feature object in request body.
+Example input:
+
+```json
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-122.25, 37.87]
+  },
+  "properties": {
+    "name": "A single point of interest",
+    "category": "landmark",
+    "elevation": 100
+  },
+  "id": "feature-1"
+}
+```
+
+Output: None (204/empty response)
+
+### Azure_ClientGenerator_Core_AlternateType_ExternalType_putProperty
+
+- Endpoint: `put /azure/client-generator-core/alternate-type/external/property`
+
+Input: ModelWithFeatureProperty object in request body.
+Example input:
+
+```json
+{
+  "feature": {
+    "type": "Feature",
+    "geometry": {
+      "type": "Point",
+      "coordinates": [-122.25, 37.87]
+    },
+    "properties": {
+      "name": "A single point of interest",
+      "category": "landmark",
+      "elevation": 100
+    },
+    "id": "feature-1"
+  },
+  "additionalProperty": "extra"
+}
+```
+
+Output: None (204/empty response)
+
+### Azure_ClientGenerator_Core_ClientLocation_MoveMethodParameterToClient
+
+- Endpoint: `get /azure/client-generator-core/client-location/blob`
+
+Test moving a method parameter to client.
+
+The parameter `storageAccount` from operation `getBlob` should be moved to the `MoveMethodParameterToClient` in the generated code.
+
+Expected request:
+
+- GET /blob?storageAccount=testaccount&container=testcontainer&blob=testblob.txt
+
+Expected response:
+
+- Status: 200
+- Body: {"id": "blob-001", "name": "testblob.txt", "size": 1024, "path": "/testcontainer/testblob.txt"}
+
+### Azure_ClientGenerator_Core_ClientLocation_MoveToExistingSubClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-location/admin`
+  - `get /azure/client-generator-core/client-location/user`
+  - `get /azure/client-generator-core/client-location/user`
+
+Test moving an operation from one sub client to another existing sub client.
+
+Operation `deleteUser` from interface `UserOperations` should be moved to interface `AdminOperations` using @clientLocation(AdminOperations).
+
+Expected client structure:
+
+- Interface UserOperations should contain only operation `getUser`
+- Interface AdminOperations should contain operations `getAdminInfo` and `deleteUser` (moved from UserOperations)
+
+### Azure_ClientGenerator_Core_ClientLocation_MoveToNewSubClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-location/products`
+  - `get /azure/client-generator-core/client-location/products/archive`
+
+Test moving an operation to a new sub client specified by string name.
+
+Operation `archiveProduct` from interface `ProductOperations` should be moved to a new sub client named "ArchiveOperations" using @clientLocation("ArchiveOperations").
+
+Expected client structure:
+
+- Interface ProductOperations should contain only operation `listProducts`
+- A new sub client "ArchiveOperations" should be created containing operation `archiveProduct`
+
+### Azure_ClientGenerator_Core_ClientLocation_MoveToRootClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-location/resource`
+  - `get /azure/client-generator-core/client-location/health`
+
+Test moving an operation to the root client.
+
+Operation `getHealthStatus` from interface `ResourceOperations` should be moved to the root client using @clientLocation(service namespace).
+
+Expected client structure:
+
+- Interface ResourceOperations should contain only operation `getResource`
+- Root client should contain operation `getHealthStatus` (moved from ResourceOperations)
+
 ### Azure_ClientGenerator_Core_DeserializeEmptyStringAsNull_get
 
 - Endpoint: `get /azure/client-generator-core/deserialize-empty-string-as-null/responseModel`
@@ -134,6 +301,194 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_HierarchyBuilding_AnimalOperations_updateDogAsAnimal
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/dog/as-animal`
+
+Test operation that accepts Animal input and returns Animal output.
+Service expects Dog data and returns Dog data.
+Due to @hierarchyBuilding(Pet), Dog should inherit from Pet rather than Animal directly.
+Expected request body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+### Azure_ClientGenerator_Core_HierarchyBuilding_AnimalOperations_updatePetAsAnimal
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/pet/as-animal`
+
+Test operation that accepts Animal input and returns Animal output.
+Service expects Pet data and returns Pet data.
+Expected request body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy",
+  "trained": true
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy",
+  "trained": true
+}
+```
+
+### Azure_ClientGenerator_Core_HierarchyBuilding_DogOperations_updateDogAsDog
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/dog/as-dog`
+
+Test operation that accepts Dog input and returns Dog output.
+This operation validates Dog type directly.
+Expected request body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+### Azure_ClientGenerator_Core_HierarchyBuilding_PetOperations_updateDogAsPet
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/dog/as-pet`
+
+Test operation that accepts Pet input and returns Pet output.
+Service expects Dog data and returns Dog data.
+This validates that Dog can be used as Pet due to @hierarchyBuilding decorator.
+Expected request body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+### Azure_ClientGenerator_Core_HierarchyBuilding_PetOperations_updatePetAsPet
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/pet/as-pet`
+
+Test operation that accepts Pet input and returns Pet output.
+This operation validates Pet type directly.
+Expected request body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy",
+  "trained": true
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy",
+  "trained": true
+}
+```
+
+### Azure_ClientGenerator_Core_Override_GroupParameters_group
+
+- Endpoint: `get /azure/client-generator-core/override/group`
+
+Verify that after `@override` the parameters are grouped correctly to `GroupParametersOptions` in the client method signature.
+
+Expected query parameter:
+param1: param1
+param2: param2
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_Override_RemoveOptionalParameter_removeOptional
+
+- Endpoint: `get /azure/client-generator-core/override/remove-optional/{param1}`
+
+Verify that after `@override`, optional parameters can be removed from the client method signature.
+
+Expected path parameter:
+param1: param1
+
+Expected query parameter:
+param2: param2
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_Override_ReorderParameters_reorder
+
+- Endpoint: `get /azure/client-generator-core/override/reorder/{param2}/{param1}`
+
+Verify that after `@override` the parameters are reordered correctly in the client method signature.
+
+Expected path parameter:
+param1: param1
+param2: param2
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_Override_RequireOptionalParameter_requireOptional
+
+- Endpoint: `get /azure/client-generator-core/override/require-optional/{param1}/{param2}`
+
+Verify that after `@override` an optional parameter can be made required in the client method signature.
+
+Expected path parameter:
+param1: param1
+param2: param2
+
+Expected response: 204 No Content
+
 ### Azure_ClientGenerator_Core_Usage_ModelInOperation
 
 - Endpoints:
@@ -144,7 +499,7 @@ Expected response body:
 
 This scenario contains 4 public operations. All should be generated and exported.
 'OrphanModel' is not used but specified as 'public' and 'input', so it should be generated in SDK. The 'orphanModelSerializable' operation verifies that the model can be serialized to JSON.
-The other models are override to roundtrip, so they should be generated and exported as well.
+The other models' usage is additive to roundtrip, so they should be generated and exported as well.
 
 ### Azure_ClientGeneratorCore_ClientInitialization_HeaderParam
 
@@ -172,18 +527,15 @@ client.withBody({ name: "test-name" });  // No need to pass name here
 ### Azure_ClientGeneratorCore_ClientInitialization_MixedParams
 
 - Endpoints:
-
   - `get /azure/client-generator-core/client-initialization/mixed-params/with-query`
   - `get /azure/client-generator-core/client-initialization/mixed-params/with-body`
 
   Client for testing a mix of client-level and method-level parameters.
 
   Parameters elevated to client level:
-
   - name: "test-name-value" (header parameter)
 
   Parameters remaining at method level:
-
   - region: "us-west" (query parameter)
 
   Expected client usage:
@@ -798,12 +1150,10 @@ This scenario is to test two operations with two different page item types.
   parameters are maintained in next link URLs.
 
   Expected query parameters on initial request:
-
   - includePending=true
   - select=name
 
   Expected query parameters on next link request. Note: the SDK will need to re-inject this parameter:
-
   - includePending=true (note: the client will need to manually re-inject this parameter into the next link)
   - select=name (note: this is returned in the next link, the client does NOT need to manually re-inject this parameter)
 
@@ -1265,6 +1615,347 @@ Expected response body:
 }
 ```
 
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_ResourceGroupResourceOperations_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation for resource group-scoped resource with client-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_ResourceGroupResourceOperations_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation for resource group-scoped resource with client-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource",
+  "name": "rg-resource",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources",
+  "location": "eastus",
+  "properties": {
+    "resourceGroupSetting": "test-setting",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_ResourceGroupResourceOperations_put
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation for resource group-scoped resource with client-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "location": "eastus",
+  "properties": {
+    "resourceGroupSetting": "test-setting"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource",
+  "name": "rg-resource",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources",
+  "location": "eastus",
+  "properties": {
+    "resourceGroupSetting": "test-setting",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_SubscriptionResourceOperations_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation for subscription-scoped resource with method-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_SubscriptionResourceOperations_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation for subscription-scoped resource with method-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource",
+  "name": "sub-resource",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResources",
+  "properties": {
+    "subscriptionSetting": "test-sub-setting",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_SubscriptionResourceOperations_put
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation for subscription-scoped resource with method-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "properties": {
+    "subscriptionSetting": "test-sub-setting"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource",
+  "name": "sub-resource",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResources",
+  "properties": {
+    "subscriptionSetting": "test-sub-setting",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_Operations
+
+- Endpoint: `get https://management.azure.com`
+
+Operations list GET operation for Azure.ResourceManager.MethodSubscriptionId.
+Expected path: /providers/Azure.ResourceManager.MethodSubscriptionId/operations
+Expected query parameter: api-version=2023-12-01-preview
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "name": "Azure.ResourceManager.MethodSubscriptionId/services/read",
+      "isDataAction": false,
+      "display": {
+        "provider": "Azure.ResourceManager.MethodSubscriptionId",
+        "resource": "services",
+        "operation": "Lists services",
+        "description": "Lists registered services"
+      }
+    }
+  ]
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource1Operations_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation for SubscriptionResource1 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource1Operations_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation for SubscriptionResource1 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1",
+  "name": "sub-resource-1",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s",
+  "properties": {
+    "description": "Valid subscription resource 1",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource1Operations_put
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation for SubscriptionResource1 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "properties": {
+    "description": "Valid subscription resource 1"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1",
+  "name": "sub-resource-1",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s",
+  "properties": {
+    "description": "Valid subscription resource 1",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource2Operations_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation for SubscriptionResource2 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource2Operations_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation for SubscriptionResource2 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2",
+  "name": "sub-resource-2",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s",
+  "properties": {
+    "configValue": "test-config",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource2Operations_put
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation for SubscriptionResource2 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "properties": {
+    "configValue": "test-config"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2",
+  "name": "sub-resource-2",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s",
+  "properties": {
+    "configValue": "test-config",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
 ### Azure_ResourceManager_NonResource_NonResourceOperations_create
 
 - Endpoint: `put https://management.azure.com/subscriptions/{subscriptionId}/providers/Microsoft.NonResource/locations/{location}/otherParameters/{parameter}`
@@ -1600,6 +2291,176 @@ Expected response body:
 ```json
 {
   "content": "order1,product1,1"
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_OptionalBody_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation to retrieve a widget.
+
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1
+Expected query parameter: api-version=2023-12-01-preview
+Expected status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1",
+  "name": "widget1",
+  "type": "Azure.ResourceManager.OperationTemplates/widgets",
+  "location": "eastus",
+  "properties": {
+    "name": "widget1",
+    "description": "A test widget",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_OptionalBody_patch
+
+- Endpoint: `patch https://management.azure.com`
+
+Resource PATCH operation using Legacy.CustomPatchSync with optional request body.
+This tests the optional body functionality in two scenarios:
+
+1. Empty body scenario: Request body is not sent
+2. With body scenario: Request body contains update data
+
+Expected verb: PATCH  
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1
+Expected query parameter: api-version=2023-12-01-preview
+
+Scenario 1 - Expected request body: None (empty body)
+Scenario 2 - Expected request body: {"properties": {"name": "updated-widget", "description": "Updated description"}}
+
+Expected status code: 200
+Expected response body (empty body scenario):
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1",
+  "name": "widget1",
+  "type": "Azure.ResourceManager.OperationTemplates/widgets",
+  "location": "eastus",
+  "properties": {
+    "name": "widget1",
+    "description": "A test widget",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+Expected response body (with body scenario):
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1",
+  "name": "widget1",
+  "type": "Azure.ResourceManager.OperationTemplates/widgets",
+  "location": "eastus",
+  "properties": {
+    "name": "updated-widget",
+    "description": "Updated description",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": <any date>,
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": <any date>,
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_OptionalBody_post
+
+- Endpoint: `post https://management.azure.com`
+
+Resource POST action operation using ArmResourceActionSync with optional request body.
+This tests the optional body functionality in two scenarios:
+
+1. Empty body scenario: Request body is not sent
+2. With body scenario: Request body contains action data
+
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1/post
+Expected query parameter: api-version=2023-12-01-preview
+
+Scenario 1 - Expected request body: None (empty body)
+Scenario 2 - Expected request body: {"actionType": "perform", "parameters": "test-parameters"}
+
+Expected status code: 200
+Expected response body (empty body scenario):
+
+```json
+{
+  "result": "Action completed successfully"
+}
+```
+
+Expected response body (with body scenario):
+
+```json
+{
+  "result": "Action completed successfully with parameters"
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_OptionalBody_providerPost
+
+- Endpoint: `post https://management.azure.com`
+
+Provider POST action operation using ArmProviderActionSync with optional request body.
+This tests the optional body functionality for subscription-scoped provider actions in two scenarios:
+
+1. Empty body scenario: Request body is not sent (uses default allowance)
+2. With body scenario: Request body contains allowance change data
+
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/providerPost
+Expected query parameter: api-version=2023-12-01-preview
+
+Scenario 1 - Expected request body: None (empty body)
+Scenario 2 - Expected request body: {"totalAllowed": 100, "reason": "Increased demand"}
+
+Expected status code: 200
+Expected response body (empty body scenario):
+
+```json
+{
+  "totalAllowed": 50,
+  "status": "Changed to default allowance"
+}
+```
+
+Expected response body (with body scenario):
+
+```json
+{
+  "totalAllowed": 100,
+  "status": "Changed to requested allowance"
 }
 ```
 
@@ -2810,6 +3671,77 @@ Expected header parameters:
   Expected response header:
 - x-ms-client-request-id=<uuid string same with request header>
 
+### Azure_Versioning_PreviewVersion_getWidget
+
+- Endpoint: `get /azure/versioning/previewVersion/widgets/{id}`
+
+Test @previewVersion decorator with stable operations.
+Should send a preview api-version and response should contain color field.
+
+Expected path parameter: id=widget-123
+Expected query parameter: api-version=2024-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "widget-123",
+  "name": "Sample Widget",
+  "color": "blue"
+}
+```
+
+### Azure_Versioning_PreviewVersion_listWidgets
+
+- Endpoint: `get /azure/versioning/previewVersion/widgets`
+
+Test @previewVersion decorator with version-specific query parameters.
+Request should send stable api-version and response should not contain color field.
+
+Expected query parameter: api-version=2024-06-01
+Expected query parameter: name=test (color not available in stable version)
+
+Expected response body:
+
+```json
+{
+  "widgets": [
+    {
+      "id": "widget-1",
+      "name": "test"
+    }
+  ]
+}
+```
+
+### Azure_Versioning_PreviewVersion_updateWidgetColor
+
+- Endpoint: `patch /azure/versioning/previewVersion/widgets/{id}/color`
+
+Test @previewVersion decorator with preview-only operations.
+Only available in preview API versions.
+
+Expected path parameter: id=widget-123
+Expected query parameter: api-version=2024-12-01-preview
+
+Expected input body:
+
+```json
+{
+  "color": "red"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "widget-123",
+  "name": "Sample Widget",
+  "color": "red"
+}
+```
+
 ### Client_AlternateApiVersion_Service_Header_headerApiVersion
 
 - Endpoint: `post /azure/client-generator-core/api-version/header`
@@ -2844,6 +3776,28 @@ Expected client namespace for models:
 - FirstClientResult: Client.ClientNamespace.First
 - SecondClientResult: Client.ClientNamespace.Second
 - SecondClientEnumType: Client.ClientNamespace.Second.Sub
+
+### Client_Naming_EnumConflict_FirstOperations_first
+
+- Endpoint: `post /client/naming/enum-conflict/first`
+
+Test enum with same name in different namespace - first namespace.
+Expected request body:
+
+```json
+{ "status": "active", "name": "test" }
+```
+
+### Client_Naming_EnumConflict_SecondOperations_second
+
+- Endpoint: `post /client/naming/enum-conflict/second`
+
+Test enum with same name in different namespace - second namespace.
+Expected request body:
+
+```json
+{ "status": "running", "description": "test description" }
+```
 
 ### Client_Naming_Header_request
 
@@ -2973,6 +3927,35 @@ Expected request body:
   ```json
   "value1"
   ```
+
+### Client_Overload_list
+
+- Endpoint: `get /client/overload/resources`
+
+List all resources operation.
+
+Expected request: GET /client/overload/resources
+Expected response body:
+
+```json
+[
+  { "id": "1", "name": "foo", "scope": "car" },
+  { "id": "2", "name": "bar", "scope": "bike" }
+]
+```
+
+### Client_Overload_listByScope
+
+- Endpoint: `get /client/overload/resources/{scope}`
+
+List resources by scope operation. This operation uses `@clientName("list", "csharp")` to generate it as an overload method named "list" in C# client code, demonstrating method overloading capabilities.
+
+Expected request: GET /client/overload/resources/car
+Expected response body:
+
+```json
+[{ "id": "1", "name": "foo", "scope": "car" }]
+```
 
 ### Client_Structure_AnotherClientOperationGroup
 

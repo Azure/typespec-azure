@@ -59,7 +59,6 @@ model OperationStatus<StatusResult = never, StatusError = Foundations.Error> {
  * Conveys the resource instance to an operation as a request body.
  * @template Resource The type of the resource instance.
  */
-@added(Azure.Core.Versions.v1_0_Preview_2)
 @doc("Conveys the resource instance to an operation as a request body.")
 model ResourceBody<Resource> {
   @doc("The resource instance.")
@@ -164,7 +163,7 @@ model Error {
   innererror?: InnerError;
 }
 
-@doc("An object containing more specific information about the error. As per Microsoft One API guidelines - https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#handling-errors.")
+@doc("An object containing more specific information about the error. As per Azure REST API guidelines - https://aka.ms/AzureRestApiGuidelines#handling-errors.")
 model InnerError {
   @doc("One of a server-defined set of error codes.")
   code?: string;
@@ -242,7 +241,6 @@ model CustomResponseFields<Custom extends TypeSpec.Reflection.Model> {}
  * @template Resource The type of the resource.
  * @template Traits Traits which apply to the page.
  */
-@pagedResult
 @friendlyName("Paged{name}", Resource)
 @doc("Paged collection of {name} items", Resource)
 model CustomPage<
@@ -250,7 +248,7 @@ model CustomPage<
   Traits extends TypeSpec.Reflection.Model = {}
 > {
   @doc("The {name} items on this page", Resource)
-  @items
+  @pageItems
   value: Resource[];
 
   @doc("The link to the next page of items")
@@ -389,6 +387,7 @@ op ResourceCollectionOperation<
  * @template ErrorResponse The type of the error response. If not provided, the default error response type will be used.
  */
 @listsResource(Resource)
+@list
 @Private.ensureResourceType(Resource)
 op ResourceList<
   Resource extends TypeSpec.Reflection.Model,
@@ -406,11 +405,13 @@ op ResourceList<
  */
 #suppress "@azure-tools/typespec-providerhub/no-inline-model" "This operation signature is not used in Azure Resource Manager operations (yet)"
 @autoRoute
+@listsResource(Resource)
+@Private.ensureResourceType(Resource)
 op NonPagedResourceList<
   Resource extends TypeSpec.Reflection.Model,
   Traits extends TypeSpec.Reflection.Model = {},
   ErrorResponse = Azure.Core.Foundations.ErrorResponse
-> is Foundations.ResourceList<
+> is ResourceCollectionOperation<
   Resource,
   TraitProperties<Traits, TraitLocation.Parameters, TraitContext.List>,
   Body<Resource[]> & TraitProperties<Traits, TraitLocation.Response, TraitContext.List>,

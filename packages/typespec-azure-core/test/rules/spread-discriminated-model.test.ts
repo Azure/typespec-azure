@@ -1,19 +1,17 @@
 import {
-  BasicTestRunner,
-  LinterRuleTester,
   createLinterRuleTester,
   extractCursor,
+  LinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { spreadDiscriminatedModelRule } from "../../src/rules/spread-discriminated-model.js";
-import { createAzureCoreTestRunner, getRunnerPosOffset } from "../test-host.js";
+import { Tester } from "../test-host.js";
 
 describe("typespec-azure-core: spread-discriminated-model rule", () => {
-  let runner: BasicTestRunner;
   let tester: LinterRuleTester;
 
   beforeEach(async () => {
-    runner = await createAzureCoreTestRunner({ omitServiceNamespace: true });
+    const runner = await Tester.createInstance();
     tester = createLinterRuleTester(
       runner,
       spreadDiscriminatedModelRule,
@@ -22,7 +20,7 @@ describe("typespec-azure-core: spread-discriminated-model rule", () => {
   });
 
   it("emit warning when spreading a model with a discriminator", async () => {
-    const { pos, source } = extractCursor(`
+    const { source } = extractCursor(`
     @discriminator("kind")
     model Pet { kind: string; }
     
@@ -30,7 +28,6 @@ describe("typespec-azure-core: spread-discriminated-model rule", () => {
     `);
     await tester.expect(source).toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-core/spread-discriminated-model",
-      pos: getRunnerPosOffset(pos),
       message:
         "Model 'Pet' is being spread but has a discriminator. The relation between those 2 models will be lost and defeat the purpose of `@discriminator` Consider using `extends` instead.",
     });

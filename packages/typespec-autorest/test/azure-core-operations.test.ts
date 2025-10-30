@@ -1,6 +1,6 @@
 import { deepStrictEqual } from "assert";
 import { describe, it } from "vitest";
-import { openApiFor } from "./test-host.js";
+import { compileOpenAPI } from "./test-host.js";
 
 const wrapperCode = `
 using Azure.Core.Traits;
@@ -28,7 +28,6 @@ https://westus.api.widget.contoso.com).
     endpoint: string,
   }
 )
-@useDependency(Azure.Core.Versions.v1_0_Preview_2)
 namespace Contoso.WidgetManager;
 
 alias ServiceTraits = SupportsRepeatableRequests &
@@ -40,7 +39,8 @@ alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
 
 describe("typespec-autorest: Azure.Core.ResourceOperations", () => {
   it("ensure properties with 'create' visibility are included in the ResourceCreateOrUpdate body", async () => {
-    const result = await openApiFor(`
+    const result = await compileOpenAPI(
+      `
         ${wrapperCode}
     
         @doc("A widget.")
@@ -62,13 +62,16 @@ describe("typespec-autorest: Azure.Core.ResourceOperations", () => {
         @doc("Create or update a widget.")
         @test
         op createOrUpdateWidget is Operations.ResourceCreateOrUpdate<Widget>;
-      `);
-    const propKeys = Object.keys(result.definitions["WidgetCreateOrUpdate"].properties);
+      `,
+      { preset: "azure" },
+    );
+    const propKeys = Object.keys(result.definitions?.["WidgetCreateOrUpdate"].properties!);
     deepStrictEqual(propKeys, ["modality", "color"]);
   });
 
   it("ensure properties with 'create' visibility are included in the LongRunningResourceCreateOrUpdate body", async () => {
-    const result = await openApiFor(`
+    const result = await compileOpenAPI(
+      `
       ${wrapperCode}
 
       @doc("A widget.")
@@ -90,9 +93,11 @@ describe("typespec-autorest: Azure.Core.ResourceOperations", () => {
       @doc("Create or update a widget.")
       @test
       op createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
-    `);
+    `,
+      { preset: "azure" },
+    );
 
-    const propKeys = Object.keys(result.definitions["WidgetCreateOrUpdate"].properties);
+    const propKeys = Object.keys(result.definitions!["WidgetCreateOrUpdate"].properties!);
     deepStrictEqual(propKeys, ["modality", "color"]);
   });
 
@@ -108,7 +113,8 @@ describe("typespec-autorest: Azure.Core.ResourceOperations", () => {
       });
     }
 
-    const result = await openApiFor(`
+    const result = await compileOpenAPI(
+      `
       ${wrapperCode}
 
       @doc("A widget.")
@@ -129,12 +135,14 @@ describe("typespec-autorest: Azure.Core.ResourceOperations", () => {
       @doc(".")
       @test
       op actionWidget is Operations.ResourceAction<Widget, {}, {}>;
-    `);
+    `,
+      { preset: "azure" },
+    );
 
-    let params = result.paths["/widgets/{widgetName}:actionWidget"].post.parameters;
+    let params = result.paths["/widgets/{widgetName}:actionWidget"].post!.parameters;
     checkParams(params, "/widgets/{widgetName}:actionWidget");
 
-    params = result.paths["/widgets"].get.parameters;
+    params = result.paths["/widgets"].get!.parameters;
     checkParams(params, "/widgets");
   });
 });

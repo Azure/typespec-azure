@@ -16,6 +16,7 @@ namespace Azure.ResourceManager;
  */
 @autoRoute
 @doc("List {name} resources by subscription ID", Resource)
+@list
 @listsResource(Resource)
 @segmentOf(Resource)
 @armResourceList(Resource)
@@ -40,6 +41,7 @@ op ArmListBySubscription<
  */
 @get
 @autoRoute
+@list
 @listsResource(Resource)
 @segmentOf(Resource)
 @Private.armRenameListByOperation(Resource, ParentName, ParentFriendlyName, false) // This must come before @armResourceList!
@@ -69,6 +71,7 @@ op ArmResourceListByParent<
  */
 @get
 @autoRoute
+@list
 @listsResource(Resource)
 @segmentOf(Resource)
 @Private.armRenameListByOperation(Resource) // This must come before @armResourceList!
@@ -257,6 +260,7 @@ op ArmResourceCreateOrReplaceAsync<
  * @template LroHeaders Optional.  Allows overriding the lro headers that appear in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
  */
+@patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmTagsPatchAsync<
   Resource extends Foundations.SimpleResource,
@@ -285,6 +289,7 @@ op ArmTagsPatchAsync<
  * @template LroHeaders Optional.  Allows overriding the lro headers returned in the Accepted response
  * @template Parameters Optional. Additional parameters after the path parameters
  */
+@patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourcePatchAsync<
   Resource extends Foundations.SimpleResource,
@@ -312,8 +317,8 @@ op ArmResourcePatchAsync<
 @autoRoute
 @doc("Update a {name}", Resource)
 @armResourceUpdate(Resource)
+@patch(#{ implicitOptionality: false })
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@patch(#{ implicitOptionality: true })
 op ArmCustomPatchAsync<
   Resource extends Foundations.SimpleResource,
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
@@ -343,6 +348,7 @@ op ArmCustomPatchAsync<
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
  */
+@patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmTagsPatchSync<
   Resource extends Foundations.SimpleResource,
@@ -357,6 +363,7 @@ op ArmTagsPatchSync<
  * @template BaseParameters Optional. Allows overriding the operation parameters
  * @template Parameters Optional. Additional parameters after the path parameters
  */
+@patch(#{ implicitOptionality: true })
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourcePatchSync<
   Resource extends Foundations.SimpleResource,
@@ -377,8 +384,8 @@ op ArmResourcePatchSync<
 @autoRoute
 @doc("Update a {name}", Resource)
 @armResourceUpdate(Resource)
+@patch(#{ implicitOptionality: false })
 @Private.enforceConstraint(Resource, Foundations.Resource)
-@patch(#{ implicitOptionality: true })
 op ArmCustomPatchSync<
   Resource extends Foundations.SimpleResource,
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<Resource>,
@@ -492,8 +499,8 @@ op ArmResourceDeleteSync<
 @post
 op ArmResourceActionAsyncBase<
   Resource extends Foundations.SimpleResource,
-  Request extends TypeSpec.Reflection.Model | void,
-  Response extends TypeSpec.Reflection.Model | void,
+  Request,
+  Response extends {} | void,
   BaseParameters extends TypeSpec.Reflection.Model,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
@@ -522,8 +529,8 @@ op ArmResourceActionAsyncBase<
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceActionAsync<
   Resource extends Foundations.SimpleResource,
-  Request extends TypeSpec.Reflection.Model | void,
-  Response extends TypeSpec.Reflection.Model | void,
+  Request,
+  Response extends {} | void,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
@@ -561,8 +568,8 @@ op ArmResourceActionAsync<
 @returnsDoc("Azure operation completed successfully.")
 op ArmResourceActionSync<
   Resource extends Foundations.SimpleResource,
-  Request extends TypeSpec.Reflection.Model | void,
-  Response extends TypeSpec.Reflection.Model | void,
+  Request,
+  Response,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
@@ -622,7 +629,7 @@ op ArmResourceActionNoContentAsync<
 @Private.enforceConstraint(Resource, Foundations.Resource)
 op ArmResourceActionNoResponseContentAsync<
   Resource extends Foundations.SimpleResource,
-  Request extends TypeSpec.Reflection.Model | void,
+  Request,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
@@ -658,7 +665,7 @@ op ArmResourceActionNoResponseContentAsync<
 @post
 op ArmResourceActionNoContentSync<
   Resource extends Foundations.SimpleResource,
-  Request extends TypeSpec.Reflection.Model | void,
+  Request,
   BaseParameters = DefaultBaseParameters<Resource>,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
@@ -686,7 +693,7 @@ op checkGlobalNameAvailability<
   Response extends TypeSpec.Reflection.Model = CheckNameAvailabilityResponse,
   AdditionalParams extends TypeSpec.Reflection.Model = {}
 > is checkNameAvailability<
-  SubscriptionIdParameter & DefaultProviderNamespace,
+  CommonTypes.SubscriptionIdParameter & DefaultProviderNamespace,
   Request,
   Response,
   AdditionalParams
@@ -706,7 +713,7 @@ op checkLocalNameAvailability<
   Response extends TypeSpec.Reflection.Model = CheckNameAvailabilityResponse,
   AdditionalParams extends TypeSpec.Reflection.Model = {}
 > is checkNameAvailability<
-  SubscriptionIdParameter & DefaultProviderNamespace & LocationResourceParameter,
+  CommonTypes.SubscriptionIdParameter & DefaultProviderNamespace & LocationResourceParameter,
   Request,
   Response,
   AdditionalParams
@@ -734,6 +741,7 @@ op ArmProviderActionSync<
   OptionalRequestBody extends valueof boolean = false
 >(
   ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
+  ...Scope,
   ...ProviderNamespace<Scope>,
   ...Parameters,
 
@@ -770,6 +778,7 @@ op ArmProviderActionAsync<
   OptionalRequestBody extends valueof boolean = false
 >(
   ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
+  ...Scope,
   ...ProviderNamespace<Scope>,
   ...Parameters,
 

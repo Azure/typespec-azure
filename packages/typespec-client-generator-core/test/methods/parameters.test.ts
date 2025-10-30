@@ -294,8 +294,7 @@ it("header collection format wrong encode", async () => {
 
   expectDiagnostics(runner.context.diagnostics, [
     { code: "@azure-tools/typespec-client-generator-core/invalid-encode-for-collection-format" },
-    { code: "@azure-tools/typespec-client-generator-core/invalid-encode-for-collection-format" },
-  ]); // the duplication is because the header is proceed both in method level and operation level, need to be optimized later
+  ]);
 });
 
 it("query basic", async () => {
@@ -462,8 +461,7 @@ it("query collection format wrong encode", async () => {
 
   expectDiagnostics(runner.context.diagnostics, [
     { code: "@azure-tools/typespec-client-generator-core/invalid-encode-for-collection-format" },
-    { code: "@azure-tools/typespec-client-generator-core/invalid-encode-for-collection-format" },
-  ]); // the duplication is because the header is proceed both in method level and operation level, need to be optimized later
+  ]);
 });
 
 it("cookie basic", async () => {
@@ -660,21 +658,21 @@ it("parameter grouping", async () => {
   strictEqual(methodParam.type.properties.length, 3);
 
   const model = methodParam.type;
-  strictEqual(model.properties[0].kind, "header");
+  strictEqual(model.properties[0].kind, "property");
   strictEqual(model.properties[0].name, "header");
   strictEqual(model.properties[0].optional, false);
   strictEqual(model.properties[0].onClient, false);
   strictEqual(model.properties[0].isApiVersionParam, false);
   strictEqual(model.properties[0].type.kind, "string");
 
-  strictEqual(model.properties[1].kind, "query");
+  strictEqual(model.properties[1].kind, "property");
   strictEqual(model.properties[1].name, "query");
   strictEqual(model.properties[1].optional, false);
   strictEqual(model.properties[1].onClient, false);
   strictEqual(model.properties[1].isApiVersionParam, false);
   strictEqual(model.properties[1].type.kind, "string");
 
-  strictEqual(model.properties[2].kind, "body");
+  strictEqual(model.properties[2].kind, "property");
   strictEqual(model.properties[2].name, "body");
   strictEqual(model.properties[2].optional, false);
   strictEqual(model.properties[2].onClient, false);

@@ -1,4 +1,5 @@
 import { AzureClientGeneratorCoreDecorators } from "../generated-defs/Azure.ClientGenerator.Core.js";
+import { AzureClientGeneratorCoreLegacyDecorators } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
   $access,
   $alternateType,
@@ -13,6 +14,9 @@ import {
   $convenientAPI,
   $deserializeEmptyStringAsNull,
   $flattenProperty,
+  $legacyHierarchyBuilding,
+  $markAsLro,
+  $nextLinkVerb,
   $operationGroup,
   $override,
   $paramAlias,
@@ -36,8 +40,6 @@ export const $decorators = {
     operationGroup: $operationGroup,
     usage: $usage,
     access: $access,
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    flattenProperty: $flattenProperty,
     override: $override,
     useSystemTextJsonConverter: $useSystemTextJsonConverter,
     clientInitialization: $clientInitialization,
@@ -51,5 +53,12 @@ export const $decorators = {
     responseAsBool: $responseAsBool,
     clientDoc: $clientDoc,
     clientLocation: $clientLocation,
-  } as AzureClientGeneratorCoreDecorators,
+  } satisfies AzureClientGeneratorCoreDecorators,
+
+  "Azure.ClientGenerator.Core.Legacy": {
+    hierarchyBuilding: $legacyHierarchyBuilding,
+    flattenProperty: $flattenProperty,
+    markAsLro: $markAsLro,
+    nextLinkVerb: $nextLinkVerb,
+  } satisfies AzureClientGeneratorCoreLegacyDecorators,
 };

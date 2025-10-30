@@ -1,5 +1,6 @@
 ---
 title: Common Behavior for Client Packages
+llmstxt: true
 ---
 
 import { ClientTabs, ClientTabItem } from "@components/client-tabs";
@@ -32,7 +33,55 @@ model Food {
 ```
 
 ```python
-# TODO
+# generated _client.py
+class PetStoreClient(_PetStoreClientOperationsMixin):
+    def __init__(self, endpoint: str, **kwargs: Any) -> None: ...
+
+# generated models/_models.py
+class Food(_Model):
+    name: str = rest_field(visibility=["read", "create", "update", "delete", "query"])
+    """Required."""
+    quantity: int = rest_field(visibility=["read", "create", "update", "delete", "query"])
+    """Required."""
+
+    @overload
+    def __init__(
+        self,
+        *,
+        name: str,
+        quantity: int,
+    ) -> None: ...
+
+    @overload
+    def __init__(self, mapping: Mapping[str, Any]) -> None:
+        """
+        :param mapping: raw JSON to initialize the model.
+        :type mapping: Mapping[str, Any]
+        """
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+
+# generated _operations/_operations.py
+class _PetStoreClientOperationsMixin:
+
+    @overload
+    def feed(self, *, food: _models.Food, content_type: str = "application/json", **kwargs: Any) -> None:
+
+    @overload
+    def feed(self, body: JSON, *, content_type: str = "application/json", **kwargs: Any) -> None:
+
+    @overload
+    def feed(self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any) -> None:
+
+    @distributed_trace
+    def feed(
+        self, body: Union[JSON, IO[bytes]] = _Unset, *, food: _models.Food = _Unset, **kwargs: Any
+    ) -> None:
+
+#usage sample
+client = PetStoreClient(endpoint="https://xxx")
+client.feed(Food(name="pork", "quantity="1"))
 ```
 
 ```csharp
@@ -40,11 +89,69 @@ model Food {
 ```
 
 ```typescript
-// TODO
+const client = new PetStoreClient();
+const food:Food = {
+    name: "food";
+    quantity: 3;
+}
+client.feed(food);
 ```
 
 ```java
-// TODO
+// Client builder class
+package petstore;
+
+@ServiceClientBuilder(serviceClients = { PetStoreClient.class, PetStoreAsyncClient.class })
+public final class PetStoreClientBuilder implements HttpTrait<PetStoreClientBuilder>,
+    ConfigurationTrait<PetStoreClientBuilder>, EndpointTrait<PetStoreClientBuilder> {
+
+    public PetStoreClientBuilder();
+
+    public PetStoreClient buildClient();
+}
+
+// Client class
+@ServiceClient(builder = PetStoreClientBuilder.class)
+public final class PetStoreClient {
+    public void feed(Food food);
+}
+
+// Model class
+package petstore.models;
+
+@Immutable
+public final class Food implements JsonSerializable<Food> {
+    public Food(String name, int quantity);
+
+    public String getName();
+    public int getQuantity();
+}
+```
+
+```go
+// generated petstore_client.go
+
+func NewPetStoreClient() *PetStoreClient {
+	return &PetStoreClient{}
+}
+
+func (client *PetStoreClient) Feed(ctx context.Context, food Food, options *PetStoreClientFeedOptions) (PetStoreClientFeedResponse, error) {}
+
+// generated model.go
+type Food struct {
+	Name *string
+	Quantity *int32
+}
+
+// generated options.go
+type PetStoreClientFeedOptions struct {}
+
+// generated response.go
+type PetStoreClientFeedResponse struct {}
+
+// Usage Sample
+petStoreClient := NewPetStoreClient()
+petStoreClient.Feed(context.Background(), Food{Name:to.Ptr("name"), Quantity:to.Ptr(1)}, &PetStoreClientFeedOptions{})
 ```
 
 </ClientTabs>
@@ -78,7 +185,7 @@ namespace Customization;
 ```
 
 ```python
-# TODO
+# models/_models.py is moved to models/models/_models.py
 ```
 
 ```csharp
@@ -86,11 +193,48 @@ namespace Customization;
 ```
 
 ```typescript
-// TODO
+const client = new PetStoreClient();
+const food: Food = {
+    name: "food";
+    quantity: 3;
+}
+client.feed(food);
 ```
 
 ```java
-// TODO
+// Client builder class
+package petstore;
+
+@ServiceClientBuilder(serviceClients = { PetStoreClient.class, PetStoreAsyncClient.class })
+public final class PetStoreClientBuilder implements HttpTrait<PetStoreClientBuilder>,
+    ConfigurationTrait<PetStoreClientBuilder>, EndpointTrait<PetStoreClientBuilder> {
+
+    public PetStoreClientBuilder();
+
+    public PetStoreClient buildClient();
+}
+
+// Client class
+@ServiceClient(builder = PetStoreClientBuilder.class)
+public final class PetStoreClient {
+    public void feed(Food food);
+}
+
+// Model class
+package petstore.models;
+
+@Immutable
+public final class Food implements JsonSerializable<Food> {
+    public Food(String name, int quantity);
+
+    public String getName();
+    public int getQuantity();
+}
+```
+
+```go
+// NOT_SUPPORTED
+
 ```
 
 </ClientTabs>

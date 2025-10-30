@@ -595,3 +595,43 @@ it("disableUsageAccessPropagationToBase true discriminator propagation", async (
   strictEqual(models[4].usage, UsageFlags.Output | UsageFlags.Json);
   strictEqual(models[4].name, "Salmon");
 });
+
+it("disableUsageAccessPropagationToBase true discriminator without ref propagation", async () => {
+  runner = await createSdkTestRunner(
+    { emitterName: "@azure-tools/typespec-python" },
+    { disableUsageAccessPropagationToBase: true },
+  );
+  await runner.compileWithBuiltInService(
+    `
+      @discriminator("kind")
+      model Fish {
+        age: int32;
+      }
+
+      model Shark extends Fish {
+        kind: "shark";
+      }
+
+      model Salmon extends Fish {
+        kind: "salmon";
+      }
+
+
+      @get
+      @route("/getFish")
+      op getShark(): Shark;
+
+      @get
+      @route("/getSalmon")
+      op getSalmon(): Salmon;
+    `,
+  );
+  const models = runner.context.sdkPackage.models;
+  strictEqual(models.length, 3);
+  strictEqual(models[0].usage, UsageFlags.Output | UsageFlags.Json);
+  strictEqual(models[0].name, "Shark");
+  strictEqual(models[1].usage, UsageFlags.Output | UsageFlags.Json);
+  strictEqual(models[1].name, "Fish");
+  strictEqual(models[2].usage, UsageFlags.Output | UsageFlags.Json);
+  strictEqual(models[2].name, "Salmon");
+});

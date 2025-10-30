@@ -1,12 +1,12 @@
 import { deepEqual, deepStrictEqual, ok, strictEqual } from "assert";
-import { it } from "vitest";
-import { openApiFor } from "../test-host.js";
+import { expect, it } from "vitest";
+import { compileOpenAPI } from "../test-host.js";
 
 it("emits correct paths for tenant resources", async () => {
-  const openApi = await openApiFor(`
+  const openApi = await compileOpenAPI(
+    `
         @armProviderNamespace
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        namespace Microsoft.Contoso;
+              namespace Microsoft.Contoso;
 
         @doc("Widget resource")
         model Widget is ProxyResource<WidgetProperties> {
@@ -71,7 +71,9 @@ it("emits correct paths for tenant resources", async () => {
           increment: safeint
         ): ArmNoContentResponse<"Weight added successfully"> | ErrorResponse;
       }
-      `);
+      `,
+    { preset: "azure" },
+  );
   ok(openApi.paths["/providers/Microsoft.Contoso/widgets"].get);
   ok(openApi.paths["/providers/Microsoft.Contoso/widgets/{widgetName}"].get);
   ok(openApi.paths["/providers/Microsoft.Contoso/widgets/{widgetName}"].put);
@@ -91,10 +93,10 @@ it("emits correct paths for tenant resources", async () => {
 });
 
 it("emits correct paths for checkLocalName endpoints", async () => {
-  const openApi = await openApiFor(`
+  const openApi = await compileOpenAPI(
+    `
           @armProviderNamespace
-          @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-          namespace Microsoft.Contoso;
+                  namespace Microsoft.Contoso;
 
           @doc("Widget resource")
           model Widget is ProxyResource<WidgetProperties> {
@@ -122,7 +124,9 @@ it("emits correct paths for checkLocalName endpoints", async () => {
             checkName is checkGlobalNameAvailability;
             checkLocalName is checkLocalNameAvailability;
           }
-      `);
+      `,
+    { preset: "azure" },
+  );
   ok(
     openApi.paths[
       "/subscriptions/{subscriptionId}/providers/Microsoft.Contoso/checkNameAvailability"
@@ -136,11 +140,11 @@ it("emits correct paths for checkLocalName endpoints", async () => {
 });
 
 it("emits correct paths for ArmResourceHead operation", async () => {
-  const openApi = await openApiFor(`
+  const openApi = await compileOpenAPI(
+    `
         @armProviderNamespace
         @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        namespace Microsoft.Contoso;
+              namespace Microsoft.Contoso;
         @doc("Widget resource")
         model Widget is ProxyResource<WidgetProperties> {
           @doc("The name of the widget")
@@ -163,7 +167,9 @@ it("emits correct paths for ArmResourceHead operation", async () => {
         interface Widgets extends Operations {
           checkExist is ArmResourceCheckExistence<Widget>;
         }
-    `);
+    `,
+    { preset: "azure" },
+  );
   const headOperation =
     openApi.paths[
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}"
@@ -204,10 +210,10 @@ it("emits correct paths for ArmResourceHead operation", async () => {
 });
 
 it("emits correct fixed union name parameter for resource", async () => {
-  const openApi = await openApiFor(`
+  const openApi = await compileOpenAPI(
+    `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Widget resource")
     model Widget is ProxyResource<WidgetProperties> {
@@ -231,7 +237,9 @@ it("emits correct fixed union name parameter for resource", async () => {
     interface Widgets extends Operations {
       get is ArmResourceRead<Widget>;
     }
-`);
+`,
+    { preset: "azure" },
+  );
   const getOperation =
     openApi.paths[
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}"
@@ -264,10 +272,10 @@ it("emits correct fixed union name parameter for resource", async () => {
 });
 
 it("emits a scalar string with decorator parameter for resource", async () => {
-  const openApi = await openApiFor(`
+  const openApi = await compileOpenAPI(
+    `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Widget resource")
     model Widget is ProxyResource<WidgetProperties> {
@@ -287,7 +295,9 @@ it("emits a scalar string with decorator parameter for resource", async () => {
     interface Widgets extends Operations {
       get is ArmResourceRead<Widget>;
     }
-`);
+`,
+    { preset: "azure" },
+  );
   const getOperation =
     openApi.paths[
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}"
@@ -306,25 +316,80 @@ it("emits a scalar string with decorator parameter for resource", async () => {
 });
 
 it("emits x-ms-azure-resource for resource with @azureResourceBase", async () => {
-  const openApi = await openApiFor(`
+  const openApi = await compileOpenAPI(
+    `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Widget resource")
     @Azure.ResourceManager.Private.azureResourceBase
     model Widget {
        name: string;
     }
-`);
-  ok(openApi.definitions.Widget["x-ms-azure-resource"]);
+`,
+    { preset: "azure" },
+  );
+  ok(openApi.definitions?.Widget["x-ms-azure-resource"]);
+});
+
+it("emits x-ms-external for resource with @armExternalType", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+    #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
+    @doc("Widget resource")
+    @Azure.ResourceManager.Legacy.armExternalType
+    model Widget {
+       name: string;
+    }
+`,
+    { preset: "azure" },
+  );
+  ok(openApi.definitions?.Widget["x-ms-external"]);
+});
+
+it("emits x-ms-azure-resource for resource with @customAzureResource and options", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+    #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
+    @doc("Widget resource")
+    @Azure.ResourceManager.Legacy.customAzureResource(#{isAzureResource: true})
+    model Widget {
+       name: string;
+    }
+`,
+    { preset: "azure" },
+  );
+  ok(openApi.definitions?.Widget["x-ms-azure-resource"]);
+});
+it("does not emit x-ms-azure-resource for resource with @customAzureResource", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+    #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
+    @doc("Widget resource")
+    @Azure.ResourceManager.Legacy.customAzureResource
+    model Widget {
+       name: string;
+    }
+`,
+    { preset: "azure" },
+  );
+  expect(openApi.definitions?.Widget["x-ms-azure-resource"]).toBeUndefined();
 });
 
 it("excludes properties marked @invisible from the resource payload", async () => {
-  const openApi = await openApiFor(`
+  const openApi = await compileOpenAPI(
+    `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Widget resource")
     model Widget is ProxyResource<WidgetProperties> {
@@ -347,9 +412,11 @@ it("excludes properties marked @invisible from the resource payload", async () =
     interface Widgets extends Operations {
       get is ArmResourceRead<Widget>;
     }
-  `);
+  `,
+    { preset: "azure" },
+  );
 
-  const Widget = openApi.definitions.Widget;
+  const Widget = openApi.definitions?.Widget;
 
   ok(Widget);
 
@@ -361,7 +428,7 @@ it("excludes properties marked @invisible from the resource payload", async () =
     },
   });
 
-  const WidgetProperties = openApi.definitions.WidgetProperties;
+  const WidgetProperties = openApi.definitions?.WidgetProperties;
 
   deepEqual(WidgetProperties, {
     type: "object",
@@ -377,10 +444,10 @@ it("excludes properties marked @invisible from the resource payload", async () =
 });
 
 it("allows resources with multiple endpoints using LegacyOperations", async () => {
-  const openApi = await openApiFor(`
+  const openApi = await compileOpenAPI(
+    `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.ContosoProviderhub;
+      namespace Microsoft.ContosoProviderhub;
 
     using Azure.ResourceManager.Legacy;
 
@@ -511,7 +578,9 @@ it("allows resources with multiple endpoints using LegacyOperations", async () =
       /** A sample HEAD operation to check resource existence */
       checkExistence is ArmResourceCheckExistence<Employee>;
     }
-      `);
+      `,
+    { preset: "azure" },
+  );
   ok(
     openApi.paths[
       "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/employees"
@@ -540,11 +609,12 @@ it("allows resources with multiple endpoints using LegacyOperations", async () =
   ok(resourceGroupOperations.put);
   ok(resourceGroupOperations.head);
 });
+
 it("allows action requests with optional body parameters", async () => {
-  const openApi = await openApiFor(`
+  const openApi = await compileOpenAPI(
+    `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.ContosoProviderhub;
+      namespace Microsoft.ContosoProviderhub;
 
     /** A ContosoProviderHub resource */
     model Employee is TrackedResource<EmployeeProperties> {
@@ -625,7 +695,9 @@ it("allows action requests with optional body parameters", async () => {
       move is ArmResourceActionAsync<Employee, MoveRequest, MoveResponse, OptionalRequestBody = true>;
 
     }
-      `);
+      `,
+    { preset: "azure" },
+  );
 
   const resourceGroupPath =
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderhub/employees/{employeeName}";

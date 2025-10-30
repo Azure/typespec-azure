@@ -65,6 +65,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-resource-invalid-version-format": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-key-invalid-chars": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-name-pattern": true,
+    "@azure-tools/typespec-azure-resource-manager/arm-custom-resource-no-key": true,
     "@azure-tools/typespec-azure-resource-manager/arm-custom-resource-usage-discourage": true,
     "@azure-tools/typespec-azure-resource-manager/arm-legacy-operations-discourage": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-operation-response": true,
@@ -85,6 +86,7 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/arm-resource-patch": true,
     "@azure-tools/typespec-azure-resource-manager/resource-name": true,
     "@azure-tools/typespec-azure-resource-manager/retry-after": true,
+    "@azure-tools/typespec-azure-resource-manager/secret-prop": true,
     "@azure-tools/typespec-azure-resource-manager/unsupported-type": true,
 
     // TCGC rules

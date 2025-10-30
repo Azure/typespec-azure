@@ -1,5 +1,162 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.61.2
+
+### Bug Fixes
+
+- [#3426](https://github.com/Azure/typespec-azure/pull/3426) Fix `@alternateType` decorator incorrectly treating regular TypeSpec models as external types
+
+
+## 0.61.1
+
+### Bug Fixes
+
+- [#3376](https://github.com/Azure/typespec-azure/pull/3376) Support `@clientLocation` for model property along with `@override`.
+
+
+## 0.61.0
+
+### Breaking Changes
+
+- [#3286](https://github.com/Azure/typespec-azure/pull/3286) Change `isApiVersion` logic. If a service is not versioning, the function always return false.
+
+### Features
+
+- [#3198](https://github.com/Azure/typespec-azure/pull/3198) Add `getHttpOperationParametersForClientParameter` helper to find corresponding HTTP parameter list for a client initialization parameter.
+- [#3325](https://github.com/Azure/typespec-azure/pull/3325) Add support for `@previewVersion` decorator in API version filtering. TCGC now checks for the `@previewVersion` decorator on enum members in addition to the existing regex-based preview version filtering.
+- [#3233](https://github.com/Azure/typespec-azure/pull/3233) Allow `@alternateType` to reference external types as well
+
+### Bug Fixes
+
+- [#3353](https://github.com/Azure/typespec-azure/pull/3353) Handle wrong `api-version` config.
+- [#3285](https://github.com/Azure/typespec-azure/pull/3285) Fix missing doc for nullable type.
+- [#3324](https://github.com/Azure/typespec-azure/pull/3324) Refine error message for `@override`.
+- [#3266](https://github.com/Azure/typespec-azure/pull/3266) Cleanup usage of legacy Azure.Core paging apis
+- [#3361](https://github.com/Azure/typespec-azure/pull/3361) Fix bug ignoring `@clientName` decorator when applied to `@client` clients
+- [#3311](https://github.com/Azure/typespec-azure/pull/3311) Fix missing example for operation directly extends from templated interface.
+
+
+## 0.60.3
+
+### Bug Fixes
+
+- [#3328](https://github.com/Azure/typespec-azure/pull/3328) Fix propagation of client initialization parameters set on parent clients
+- [#3327](https://github.com/Azure/typespec-azure/pull/3327) Allow `@markAsLro` to work with union return types
+
+
+## 0.60.2
+
+### Bug Fixes
+
+- [#3300](https://github.com/Azure/typespec-azure/pull/3300) add `@Azure.ClientGenerator.Core.Legacy.markAsLro` for legacy brownfield services that need to mark non-lro methods as lro
+
+
+## 0.60.1
+
+### Bug Fixes
+
+- [#3293](https://github.com/Azure/typespec-azure/pull/3293) Allow `@alternateType` to reference external types as well
+
+
+## 0.60.0
+
+### Breaking Changes
+
+- [#3202](https://github.com/Azure/typespec-azure/pull/3202) Move deprecated `@flattenProperty` decorator into the `Azure.ClientGenerator.Core.Legacy` namespace
+- [#3189](https://github.com/Azure/typespec-azure/pull/3189) Compare type when map body parameter to method parameter. This is a behavior breaking change. The Http parameter's corresponding parameter may change.
+
+### Features
+
+- [#3223](https://github.com/Azure/typespec-azure/pull/3223) add `.decorators` property to `SdkNamespace` type that will display decorators listed in the allowed list
+- [#2980](https://github.com/Azure/typespec-azure/pull/2980) Add support for `@clientLocation` to apply to parameters.
+- [#3199](https://github.com/Azure/typespec-azure/pull/3199) Add `.pageSizeParameterSegments` to `.pagingMetadata` on paging methods to return the path to the page size parameter
+
+### Bump dependencies
+
+- [#3207](https://github.com/Azure/typespec-azure/pull/3207) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3232](https://github.com/Azure/typespec-azure/pull/3232) Add warning for `@clientName` that is applied to override methods bc they're ineffectual
+- [#3208](https://github.com/Azure/typespec-azure/pull/3208) Return union of response types with warning instead of silently selecting the first one
+
+
+## 0.59.1
+
+### Bug Fixes
+
+- [#3160](https://github.com/Azure/typespec-azure/pull/3160) Consider inheritance when mapping first segment for paging result.
+
+
+## 0.59.0
+
+No changes, version bump only.
+
+## 0.58.2
+
+### Features
+
+- [#3093](https://github.com/Azure/typespec-azure/pull/3093) Report warning for operations with same name when using `@clientName` for .NET.
+
+### Bug Fixes
+
+- [#3107](https://github.com/Azure/typespec-azure/pull/3107) Support multipart response and fix multipart anonymous model naming empty.
+- [#3120](https://github.com/Azure/typespec-azure/pull/3120) Fix next link re-injection segments missing problem after migrating to unbranded pagination.
+
+
+## 0.58.1
+
+### Bump dependencies
+
+- [#3029](https://github.com/Azure/typespec-azure/pull/3029) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3051](https://github.com/Azure/typespec-azure/pull/3051) Do not add accept header if only error response has body.
+- [#3053](https://github.com/Azure/typespec-azure/pull/3053) Accept string value examples for number/boolean types
+- [#3004](https://github.com/Azure/typespec-azure/pull/3004) Fix typing inconsistent when using `@alternateType` along with `@override`.
+- [#3012](https://github.com/Azure/typespec-azure/pull/3012) Replace the property type of a multipart model with the real body type for the HTTP part. Put all other info into the property's multipart serialization option with `MultipartOptions` type. Add `headers` property with `SdkHeaderParameter[]` type in `MultipartOptions` interface.
+- [#3063](https://github.com/Azure/typespec-azure/pull/3063) Find the correct first segment before doing page segments mapping.
+- [#2817](https://github.com/Azure/typespec-azure/pull/2817) Removed type alias: `SdkModelPropertyType` and `SdkParameter`. For the place that used these two aliases, changed to more explicit type, e.g., for the property of `SdkModelType`, the type now is `SdkModelPropertyType` only. Since current model property will never be `SdkHttpParameter`, emitter could not filter them out from a model. Use `isHttpMetadata` instead.
+- [#3000](https://github.com/Azure/typespec-azure/pull/3000) Fix relative import from `typespec-azure-core`
+- [#3031](https://github.com/Azure/typespec-azure/pull/3031) Add `@hierarchyBuilding` decorator for legacy backcompat multi-level discriminator handling.
+
+
+## 0.58.0
+
+### Bug Fixes
+
+- [#2984](https://github.com/Azure/typespec-azure/pull/2984) Fix wrong API version elevator logic with `@clientLocation`.
+
+
+## 0.57.3
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2859](https://github.com/Azure/typespec-azure/pull/2859) Add support for other lro metadata
+
+
+## 0.57.2
+
+### Features
+
+- [#2890](https://github.com/Azure/typespec-azure/pull/2890) Support load examples in nested folders.
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2889](https://github.com/Azure/typespec-azure/pull/2889) Consider `@clientLocation` when validate client name collision.
+- [#2871](https://github.com/Azure/typespec-azure/pull/2871) Fix scope calculation logic.
+- [#2861](https://github.com/Azure/typespec-azure/pull/2861) Fix `disableUsageAccessPropagationToBase` issue for discriminated model.
+
+
 ## 0.57.1
 
 ### Bug Fixes

@@ -1,0 +1,14 @@
+{
+  "operationId": "getStringToNumberParameter",
+  "title": "getStringToNumberParameter",
+  "parameters": {
+    "count": "10",
+    "price": "99.99",
+    "negative": "-42"
+  },
+  "responses": {
+    "200": {
+      "body": "success"
+    }
+  }
+}

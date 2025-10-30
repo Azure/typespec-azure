@@ -1,5 +1,149 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.31
+
+### Bug Fixes
+
+- [#3380](https://github.com/Azure/typespec-azure/pull/3380) Fix missing ApiVersionParameter in PreviewVersion test.
+
+
+## 0.1.0-alpha.30
+
+### Features
+
+- [#3255](https://github.com/Azure/typespec-azure/pull/3255) Add spector test cases for @previewVersion decorator
+- [#3273](https://github.com/Azure/typespec-azure/pull/3273) Add "optional parameter be required in client" and "optional parameter not included in client" test case for `@override` decorator
+- [#3306](https://github.com/Azure/typespec-azure/pull/3306) Add test for external types used in `@alternateType`
+
+### Bug Fixes
+
+- [#3345](https://github.com/Azure/typespec-azure/pull/3345) Fix client.tsp of client-operation-group for python
+- [#3301](https://github.com/Azure/typespec-azure/pull/3301) Consistency for java namespace
+- [#3258](https://github.com/Azure/typespec-azure/pull/3258) Fix missing decorator for the test case of moving method parameter to client.
+
+
+## 0.1.0-alpha.29
+
+### Features
+
+- [#3291](https://github.com/Azure/typespec-azure/pull/3291) Add spector test cases for @previewVersion decorator
+
+### Bug Fixes
+
+- [#3291](https://github.com/Azure/typespec-azure/pull/3291) Fix missing decorator for the test case of moving method parameter to client.
+
+
+## 0.1.0-alpha.28
+
+### Features
+
+- [#3187](https://github.com/Azure/typespec-azure/pull/3187) Add tests for `@clientLocation`'s new usage to move parameter location.
+
+### Bump dependencies
+
+- [#3207](https://github.com/Azure/typespec-azure/pull/3207) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3202](https://github.com/Azure/typespec-azure/pull/3202) Switch to the `@flattenProperty` decorator from the `Azure.ClientGenerator.Core.Legacy` namespace
+
+
+## 0.1.0-alpha.27
+
+### Bug Fixes
+
+- [#3163](https://github.com/Azure/typespec-azure/pull/3163) Avoid conflict in namespace/model names
+
+
+## 0.1.0-alpha.26
+
+### Bug Fixes
+
+- [#3131](https://github.com/Azure/typespec-azure/pull/3131) Update test case for multi layter discriminator
+
+
+## 0.1.0-alpha.25
+
+### Deprecations
+
+- [#2974](https://github.com/Azure/typespec-azure/pull/2974) Deprecate pageable decorators `@Azure.Core.items` and `@Azure.Core.pagedResult`. Use `@TypeSpec.pageItems` and `@TypeSpec.list` instead.
+
+### Bump dependencies
+
+- [#3029](https://github.com/Azure/typespec-azure/pull/3029) Upgrade dependencies
+
+
+## 0.1.0-alpha.24
+
+### Deprecations
+
+- [#2974](https://github.com/Azure/typespec-azure/pull/2974) Deprecate pageable decorators `@Azure.Core.items` and `@Azure.Core.pagedResult`. Use `@TypeSpec.pageItems` and `@TypeSpec.list` instead.
+
+### Features
+
+- [#3083](https://github.com/Azure/typespec-azure/pull/3083) add spector test cases for `@legacy.hierarchyBuilding`
+- [#3090](https://github.com/Azure/typespec-azure/pull/3090) Add test for enum with same name in different namespace.
+- [#3094](https://github.com/Azure/typespec-azure/pull/3094) Add test for overload method in C# client code.
+
+### Bug Fixes
+
+- [#3086](https://github.com/Azure/typespec-azure/pull/3086) Fix missing list decorator
+
+
+## 0.1.0-alpha.23
+
+### Features
+
+- [#2952](https://github.com/Azure/typespec-azure/pull/2952) Add test case for TCGC override
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+
+## 0.1.0-alpha.22
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2901](https://github.com/Azure/typespec-azure/pull/2901) - Fixed ARM test template for large headers.
+  - Fixed ARM mockapi for user-defined error case.
+
+
+## 0.1.0-alpha.21
+
+### Features
+
+- [#2840](https://github.com/Azure/typespec-azure/pull/2840) feat: Add comprehensive ARM optional body template test cases
+  
+  Add test scenarios for Azure Resource Manager optional body templates including:
+  - GET operation using Azure.ResourceManager.ArmResourceRead for resource retrieval
+  - PATCH operation using Azure.ResourceManager.Legacy.CustomPatchSync with OptionalRequestBody = true
+  - POST action operation using Azure.ResourceManager.ArmResourceActionSync with OptionalRequestBody = true  
+  - POST provider action operation using Azure.ResourceManager.ArmProviderActionSync with OptionalRequestBody = true
+  
+  Each PATCH and POST operation tests both empty body and with-body scenarios using withServiceKeys to validate the optional request body functionality where operations can be called with or without sending a request body.
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+
+## 0.1.0-alpha.20
+
+### Features
+
+- [#2852](https://github.com/Azure/typespec-azure/pull/2852) Update `@usage` decorator tests to adopt new additive logic and add JSON serialization support
+- [#2854](https://github.com/Azure/typespec-azure/pull/2854) Add comprehensive test scenarios for `@clientLocation` decorator
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+
 ## 0.1.0-alpha.19
 
 ### Features

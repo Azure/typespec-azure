@@ -1,11 +1,11 @@
 import { paramMessage } from "@typespec/compiler";
 import { deepStrictEqual } from "assert";
 import { describe, it } from "vitest";
-import { openApiFor } from "./test-host.js";
+import { compileOpenAPI } from "./test-host.js";
 
 describe("typespec-autorest: Long-running Operations", () => {
   it("includes x-ms-long-running-operation", async () => {
-    const openapi = await openApiFor(
+    const openapi = await compileOpenAPI(
       `
       using Azure.Core.Traits;
 
@@ -32,8 +32,7 @@ describe("typespec-autorest: Long-running Operations", () => {
           endpoint: string,
         }
       )
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      namespace Test;
+          namespace Test;
 
       alias ServiceTraits = SupportsRepeatableRequests & SupportsConditionalRequests & SupportsClientRequestId;
 
@@ -57,12 +56,11 @@ describe("typespec-autorest: Long-running Operations", () => {
       @pollingOperation(getWidgetOperationStatus)
       op createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
       `,
-      undefined,
-      { "emit-lro-options": "all" },
+      { preset: "azure", options: { "emit-lro-options": "all" } },
     );
 
     deepStrictEqual(
-      openapi.paths["/widgets/{widgetName}"].patch["x-ms-long-running-operation"],
+      openapi.paths["/widgets/{widgetName}"].patch?.["x-ms-long-running-operation"],
       true,
     );
     deepStrictEqual(
@@ -73,18 +71,57 @@ describe("typespec-autorest: Long-running Operations", () => {
       },
     );
     deepStrictEqual(
-      openapi.paths["/widgets/{widgetName}/operations/{operationId}"].get[
+      openapi.paths["/widgets/{widgetName}/operations/{operationId}"].get?.[
         "x-ms-long-running-operation"
       ],
       undefined,
     );
   });
 
+  it("includes x-ms-long-running-operation for lro get", async () => {
+    const openapi = await compileOpenAPI(
+      `
+      using Azure.Core.Traits;
+
+      @service(#{
+        title: "Contoso Widget Manager",
+      })
+      namespace Test;
+
+      alias ServiceTraits = SupportsRepeatableRequests & SupportsConditionalRequests & SupportsClientRequestId;
+
+      alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
+
+      @resource("widgets")
+      model Widget {
+        @key("widgetName")
+        @visibility(Lifecycle.Read)
+        name: string;
+        manufacturerId: string;
+      
+      ...EtagProperty;
+      }
+
+      @Azure.ClientGenerator.Core.Legacy.markAsLro
+      op getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget>;
+    
+      @pollingOperation(getWidgetOperationStatus)
+      op createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
+      `,
+      { preset: "azure", options: { "emit-lro-options": "all" } },
+    );
+
+    deepStrictEqual(
+      openapi.paths["/widgets/{widgetName}/operations/{operationId}"].get?.[
+        "x-ms-long-running-operation"
+      ],
+      true,
+    );
+  });
+
   const armCode = paramMessage`
       @armProviderNamespace
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+              namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -126,84 +163,81 @@ describe("typespec-autorest: Long-running Operations", () => {
       }
       `;
   it("includes x-ms-long-running-operation-options for ARM operations", async () => {
-    const openapi = await openApiFor(
+    const openapi = await compileOpenAPI(
       armCode.apply(armCode, [
         { putOp: "createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;" },
       ]),
-      undefined,
-      { "emit-lro-options": "all" },
+      { preset: "azure", options: { "emit-lro-options": "all" } },
     );
 
     const itemPath =
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
-    deepStrictEqual(openapi.paths[itemPath].put["x-ms-long-running-operation"], true);
+    deepStrictEqual(openapi.paths[itemPath].put?.["x-ms-long-running-operation"], true);
     deepStrictEqual(openapi.paths[itemPath].put["x-ms-long-running-operation-options"], {
       "final-state-via": "azure-async-operation",
       "final-state-schema": "#/definitions/Widget",
     });
 
-    deepStrictEqual(openapi.paths[itemPath].patch["x-ms-long-running-operation"], true);
+    deepStrictEqual(openapi.paths[itemPath].patch?.["x-ms-long-running-operation"], true);
     deepStrictEqual(openapi.paths[itemPath].patch["x-ms-long-running-operation-options"], {
       "final-state-via": "location",
       "final-state-schema": "#/definitions/Widget",
     });
 
-    deepStrictEqual(openapi.paths[itemPath].delete["x-ms-long-running-operation"], true);
+    deepStrictEqual(openapi.paths[itemPath].delete?.["x-ms-long-running-operation"], true);
     deepStrictEqual(openapi.paths[itemPath].delete["x-ms-long-running-operation-options"], {
       "final-state-via": "location",
     });
     const restartPath = `${itemPath}/restart`;
-    deepStrictEqual(openapi.paths[restartPath].post["x-ms-long-running-operation"], true);
+    deepStrictEqual(openapi.paths[restartPath].post?.["x-ms-long-running-operation"], true);
     deepStrictEqual(openapi.paths[restartPath].post["x-ms-long-running-operation-options"], {
       "final-state-via": "location",
     });
     const mungePath = `${itemPath}/munge`;
-    deepStrictEqual(openapi.paths[mungePath].post["x-ms-long-running-operation"], true);
+    deepStrictEqual(openapi.paths[mungePath].post?.["x-ms-long-running-operation"], true);
     deepStrictEqual(openapi.paths[mungePath].post["x-ms-long-running-operation-options"], {
       "final-state-via": "location",
       "final-state-schema": "#/definitions/Widget",
     });
     const alterPath = `${itemPath}/alter`;
-    deepStrictEqual(openapi.paths[alterPath].post["x-ms-long-running-operation"], true);
+    deepStrictEqual(openapi.paths[alterPath].post?.["x-ms-long-running-operation"], true);
     deepStrictEqual(openapi.paths[alterPath].post["x-ms-long-running-operation-options"], {
       "final-state-via": "azure-async-operation",
     });
   });
   it("Uses final-state-via: location when location is provided for ARM PUT", async () => {
-    const openapi = await openApiFor(
+    const openapi = await compileOpenAPI(
       armCode.apply(armCode, [
         {
           putOp:
             "createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget, LroHeaders = ArmLroLocationHeader<FinalResult = Widget> & Azure.Core.Foundations.RetryAfterHeader>;",
         },
       ]),
-      undefined,
-      { "emit-lro-options": "all" },
+      { preset: "azure", options: { "emit-lro-options": "all" } },
     );
 
     const itemPath =
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
-    deepStrictEqual(openapi.paths[itemPath].put["x-ms-long-running-operation"], true);
+    deepStrictEqual(openapi.paths[itemPath].put?.["x-ms-long-running-operation"], true);
     deepStrictEqual(openapi.paths[itemPath].put["x-ms-long-running-operation-options"], {
       "final-state-via": "location",
       "final-state-schema": "#/definitions/Widget",
     });
   });
   it("Uses final-state-via: original-uri when no lro headers are provided for ARM PUT", async () => {
-    const openapi = await openApiFor(
+    const openapi = await compileOpenAPI(
       armCode.apply(armCode, [
         {
           putOp:
             "createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget, LroHeaders = Azure.Core.Foundations.RetryAfterHeader>;",
         },
       ]),
-      undefined,
-      { "emit-lro-options": "all" },
+      { preset: "azure", options: { "emit-lro-options": "all" } },
     );
 
     const itemPath =
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
-    deepStrictEqual(openapi.paths[itemPath].put["x-ms-long-running-operation"], true);
+    deepStrictEqual(openapi.paths[itemPath].put?.["x-ms-long-running-operation"], true);
     deepStrictEqual(openapi.paths[itemPath].put["x-ms-long-running-operation-options"], {
       "final-state-via": "original-uri",
       "final-state-schema": "#/definitions/Widget",
@@ -211,7 +245,7 @@ describe("typespec-autorest: Long-running Operations", () => {
   });
 
   it("Allows azure-async-operation override without headers for ARM PUT", async () => {
-    const openapi = await openApiFor(
+    const openapi = await compileOpenAPI(
       armCode.apply(armCode, [
         {
           putOp: `#suppress "@azure-tools/typespec-azure-core/invalid-final-state" "test"
@@ -220,13 +254,12 @@ describe("typespec-autorest: Long-running Operations", () => {
           `,
         },
       ]),
-      undefined,
-      { "emit-lro-options": "all" },
+      { preset: "azure", options: { "emit-lro-options": "all" } },
     );
 
     const itemPath =
       "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}";
-    deepStrictEqual(openapi.paths[itemPath].put["x-ms-long-running-operation"], true);
+    deepStrictEqual(openapi.paths[itemPath].put?.["x-ms-long-running-operation"], true);
     deepStrictEqual(openapi.paths[itemPath].put["x-ms-long-running-operation-options"], {
       "final-state-via": "azure-async-operation",
       "final-state-schema": "#/definitions/Widget",

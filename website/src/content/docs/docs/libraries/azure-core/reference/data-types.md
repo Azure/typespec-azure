@@ -1,5 +1,7 @@
 ---
 title: "Data types"
+description: "Data types exported by @azure-tools/typespec-azure-core"
+llmstxt: true
 ---
 
 ## Azure.Core
@@ -467,19 +469,6 @@ model Azure.Core.TopQueryParameter
 | ---- | ------- | ------------------------------------- |
 | top? | `int32` | The number of result items to return. |
 
-### `Versions` {#Azure.Core.Versions}
-
-Supported versions of Azure.Core TypeSpec building blocks.
-
-```typespec
-enum Azure.Core.Versions
-```
-
-| Name           | Value             | Description           |
-| -------------- | ----------------- | --------------------- |
-| v1_0_Preview_1 | `"1.0-preview.1"` | Version 1.0-preview.1 |
-| v1_0_Preview_2 | `"1.0-preview.2"` | Version 1.0-preview.2 |
-
 ### `ArmResourceDeploymentScope` {#Azure.Core.ArmResourceDeploymentScope}
 
 ```typespec
@@ -529,7 +518,7 @@ model MyModel {
   scoped: armResourceIdentifier<[
     {
       type: "Microsoft.Compute/vm";
-      scopes: ["tenant", "resourceGroup"];
+      scopes: ["Tenant", "ResourceGroup"];
     }
   ]>;
 }
@@ -809,7 +798,7 @@ model Azure.Core.Foundations.ErrorResponseBase<Error>
 
 ### `InnerError` {#Azure.Core.Foundations.InnerError}
 
-An object containing more specific information about the error. As per Microsoft One API guidelines - https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#handling-errors.
+An object containing more specific information about the error. As per Azure REST API guidelines - https://aka.ms/AzureRestApiGuidelines#handling-errors.
 
 ```typespec
 model Azure.Core.Foundations.InnerError
@@ -1042,7 +1031,7 @@ model Certificate {
   name: string;
 }
 model Page {
-  @items items: Certificate[];
+  @pageItems items: Certificate[];
   @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[
     ListCertificateOptions.includePending
   ]>;

@@ -1,8 +1,9 @@
 ---
 title: Content Type Negotiation
+llmstxt: true
 ---
 
-See [Http documentation on content type negotiation](https://typespec.io/docs/next/libraries/http/content-types#content-type-negotiation) for the general concept
+See [Http documentation on content type negotiation](https://typespec.io/docs/libraries/http/content-types/#content-type-negotiation) for the general concept
 
 ## Usage with Azure.Core operations
 

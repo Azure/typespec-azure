@@ -1,34 +1,26 @@
-import { Interface, Operation } from "@typespec/compiler";
-import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
+import { t } from "@typespec/compiler/testing";
 import { getHttpOperation } from "@typespec/http";
 import { strictEqual } from "assert";
 import { it } from "vitest";
-import { compileAndDiagnose } from "./test-host.js";
+import { Tester } from "./tester.js";
 
 it("singleton resource route check", async () => {
-  const { program, types, diagnostics } = await compileAndDiagnose(`
+  const { program, Foos, RenamedFoos, renamedGet } = await Tester.compile(t.code`
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
     namespace Microsoft.Test {
-      @doc("The state of the resource")
       enum ResourceState {
-      @doc(".") Succeeded,
-      @doc(".") Canceled,
-      @doc(".") Failed
+        Succeeded,
+        Canceled,
+        Failed
       }
 
-      @doc("Foo properties")
       model FooResourceProperties {
-        @doc("Name of the resource")
         displayName?: string = "default";
-        @doc("The provisioning State")
         provisioningState: ResourceState;
       }
 
-      @doc("Foo resource")
       @singleton
       model FooResource is TrackedResource<FooResourceProperties> {
-        @doc("foo name")
         @key("fooName")
         @segment("foos")
         @path
@@ -36,31 +28,19 @@ it("singleton resource route check", async () => {
       }
       
       @armResourceOperations
-      #suppress "deprecated" "test"
-      @test
-      interface Foos {
+      interface ${t.interface("Foos")} {
         get is ArmResourceRead<FooResource>;
       }
     }
 
     namespace Customization {
-      @test
-      interface RenamedFoos extends Microsoft.Test.Foos {}
+      interface ${t.interface("RenamedFoos")} extends Microsoft.Test.Foos {}
 
       interface NewFoos {
-        @test
-        renamedGet is Microsoft.Test.Foos.get;
+        ${t.op("renamedGet")} is Microsoft.Test.Foos.get;
       }
     }
   `);
-
-  const { Foos, RenamedFoos, renamedGet } = types as {
-    Foos: Interface;
-    RenamedFoos: Interface;
-    renamedGet: Operation;
-  };
-
-  expectDiagnosticEmpty(diagnostics);
 
   strictEqual(
     getHttpOperation(program, Foos.operations.get("get")!)[0].path,

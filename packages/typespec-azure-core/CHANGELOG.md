@@ -1,5 +1,74 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.61.0
+
+### Breaking Changes
+
+- [#3266](https://github.com/Azure/typespec-azure/pull/3266) Remove legacy Azure.Core paging. The following was removed
+    - `@pagedResult` decorator
+    - `@items` decorator
+    - [API] `getPagedResult` -> `getPagingOperation` in `@typespec/compiler`
+    - [API] `getItems`
+    - [API] `getNextLink`
+- [#3214](https://github.com/Azure/typespec-azure/pull/3214) Remove unused `@nextPageOperation` decorator.
+
+### Features
+
+- [#3325](https://github.com/Azure/typespec-azure/pull/3325) Export `isPreviewVersion` for `@previewVersion` decorator.
+
+### Bug Fixes
+
+- [#3346](https://github.com/Azure/typespec-azure/pull/3346) [rpc-operation-request-body] Correctly ignores properties marked with `@bodyIgnore`
+- [#3268](https://github.com/Azure/typespec-azure/pull/3268) Remove versioning
+  
+  ```diff lang=tsp
+  -@useDependency(Azure.Core.Versions.v1_preview2)
+  ```
+
+
+## 0.60.0
+
+### Bump dependencies
+
+- [#3207](https://github.com/Azure/typespec-azure/pull/3207) Upgrade dependencies
+
+
+## 0.59.0
+
+### Breaking Changes
+
+- [#2757](https://github.com/Azure/typespec-azure/pull/2757) Remove deprecated `@fixed` decorator.
+
+### Deprecations
+
+- [#2974](https://github.com/Azure/typespec-azure/pull/2974) Deprecate pageable decorators `@Azure.Core.items` and `@Azure.Core.pagedResult`. Use `@TypeSpec.pageItems` and `@TypeSpec.list` instead.
+
+### Features
+
+- [#3028](https://github.com/Azure/typespec-azure/pull/3028) Allow paged models to be used with TypeSpec core paging(`@list` operations)
+- [#3125](https://github.com/Azure/typespec-azure/pull/3125) Add  uniqueItems support to Azure.Core and typespec-autorest
+- [#2979](https://github.com/Azure/typespec-azure/pull/2979) Add validation when `@pollingOperationParameter` is referencing non existent parameter
+
+### Bump dependencies
+
+- [#3029](https://github.com/Azure/typespec-azure/pull/3029) Upgrade dependencies
+
+
+## 0.58.0
+
+### Features
+
+- [#2976](https://github.com/Azure/typespec-azure/pull/2976) Introduce `@previewVersion` decorator
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2599](https://github.com/Azure/typespec-azure/pull/2599) Fix old reference to api guidelines in Azure.Core
+
+
 ## 0.57.0
 
 ### Bug Fixes

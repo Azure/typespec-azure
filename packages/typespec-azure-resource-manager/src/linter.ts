@@ -1,5 +1,6 @@
 import { defineLinter } from "@typespec/compiler";
 import { armCommonTypesVersionRule } from "./rules/arm-common-types-version.js";
+import { armCustomResourceNoKey } from "./rules/arm-custom-resource-no-key.js";
 import { armCustomResourceUsageDiscourage } from "./rules/arm-custom-resource-usage-discourage.js";
 import { armDeleteResponseCodesRule } from "./rules/arm-delete-response-codes.js";
 import { armNoRecordRule } from "./rules/arm-no-record.js";
@@ -19,17 +20,18 @@ import { armResourcePathInvalidCharsRule } from "./rules/arm-resource-path-inval
 import { armResourceProvisioningStateRule } from "./rules/arm-resource-provisioning-state-rule.js";
 import { beyondNestingRule } from "./rules/beyond-nesting-levels.js";
 import { coreOperationsRule } from "./rules/core-operations.js";
-import { deleteOperationMissingRule } from "./rules/delete-operation.js";
 import { envelopePropertiesRules } from "./rules/envelope-properties.js";
-import { listBySubscriptionRule } from "./rules/list-operation.js";
+import { improperSubscriptionListOperationRule } from "./rules/improper-subscription-list-operation.js";
 import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
+import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { operationsInterfaceMissingRule } from "./rules/operations-interface-missing.js";
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
+import { secretProprule } from "./rules/secret-prop.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
 
 const rules = [
@@ -47,6 +49,7 @@ const rules = [
   armResourceOperationsRule,
   armResourcePathInvalidCharsRule,
   armResourceProvisioningStateRule,
+  armCustomResourceNoKey,
   armCustomResourceUsageDiscourage,
   beyondNestingRule,
   coreOperationsRule,
@@ -54,7 +57,7 @@ const rules = [
   envelopePropertiesRules,
   interfacesRule,
   armResourceInvalidActionVerbRule,
-  listBySubscriptionRule,
+  improperSubscriptionListOperationRule,
   lroLocationHeaderRule,
   missingXmsIdentifiersRule,
   noResponseBodyRule,
@@ -64,6 +67,7 @@ const rules = [
   resourceNameRule,
   retryAfterRule,
   unsupportedTypeRule,
+  secretProprule,
   noEmptyModel,
 ];
 

@@ -1,7 +1,9 @@
 ---
 title: "Decorators"
+description: "Decorators exported by @azure-tools/typespec-azure-core"
 toc_min_heading_level: 2
 toc_max_heading_level: 3
+llmstxt: true
 ---
 
 ## Azure.Core
@@ -42,39 +44,6 @@ Identifies that an operation is the final operation for an LRO.
 | --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
 | linkedOperation | `Operation` | The linked Operation                                                                                                      |
 | parameters      | `{}`        | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
-
-### `@fixed` {#@Azure.Core.fixed}
-
-Marks an Enum as being fixed since enums in Azure are
-assumed to be extensible.
-
-```typespec
-@Azure.Core.fixed
-```
-
-#### Target
-
-`Enum`
-
-#### Parameters
-
-None
-
-### `@items` {#@Azure.Core.items}
-
-Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
-
-```typespec
-@Azure.Core.items
-```
-
-#### Target
-
-`ModelProperty`
-
-#### Parameters
-
-None
 
 ### `@lroCanceled` {#@Azure.Core.lroCanceled}
 
@@ -181,25 +150,6 @@ Identifies an EnumMember as a long-running "Succeeded" terminal state.
 
 None
 
-### `@nextPageOperation` {#@Azure.Core.nextPageOperation}
-
-Identifies that an operation is used to retrieve the next page for paged operations.
-
-```typespec
-@Azure.Core.nextPageOperation(linkedOperation: Operation, parameters?: {})
-```
-
-#### Target
-
-`Operation`
-
-#### Parameters
-
-| Name            | Type        | Description                                                                                                               |
-| --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
-| linkedOperation | `Operation` | The linked Operation                                                                                                      |
-| parameters      | `{}`        | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
-
 ### `@operationLink` {#@Azure.Core.operationLink}
 
 Identifies an operation that is linked to the target operation.
@@ -219,22 +169,6 @@ Identifies an operation that is linked to the target operation.
 | linkedOperation | `Operation`      | The linked Operation                                                                                                      |
 | linkType        | `valueof string` | A string indicating the role of the linked operation                                                                      |
 | parameters      | `{}`             | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
-
-### `@pagedResult` {#@Azure.Core.pagedResult}
-
-Marks a Model as a paged collection.
-
-```typespec
-@Azure.Core.pagedResult
-```
-
-#### Target
-
-`Model`
-
-#### Parameters
-
-None
 
 ### `@pollingLocation` {#@Azure.Core.pollingLocation}
 
@@ -290,6 +224,56 @@ Used to define how to call custom polling operations for long-running operations
 | Name            | Type                      | Description                                                                                                                                                                                        |
 | --------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | targetParameter | `ModelProperty \| string` | A reference to the polling operation parameter this parameter<br />provides a value for, or the name of that parameter. The default value is the name of<br />the decorated parameter or property. |
+
+### `@previewVersion` {#@Azure.Core.previewVersion}
+
+Decorator that marks a Version EnumMember as a preview version.
+This is used to indicate that the version is not yet stable and may change in future releases.
+
+```typespec
+@Azure.Core.previewVersion
+```
+
+#### Target
+
+The EnumMember that represents the preview version.
+`EnumMember`
+
+#### Parameters
+
+None
+
+#### Examples
+
+```typespec
+@versioned(Versions)
+@service(#{ title: "Widget Service" })
+namespace DemoService;
+
+enum Versions {
+  v1,
+  v2,
+
+  @previewVersion
+  v3Preview,
+}
+```
+
+### `@uniqueItems` {#@Azure.Core.uniqueItems}
+
+Specifies that an array model or array-typed property should contain only unique items.
+
+```typespec
+@Azure.Core.uniqueItems
+```
+
+#### Target
+
+`ModelProperty | Model`
+
+#### Parameters
+
+None
 
 ### `@useFinalStateVia` {#@Azure.Core.useFinalStateVia}
 

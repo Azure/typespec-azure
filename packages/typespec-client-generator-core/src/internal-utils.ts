@@ -1,4 +1,10 @@
 import {
+  FinalStateValue,
+  getLroMetadata,
+  isPreviewVersion,
+  LroMetadata,
+} from "@azure-tools/typespec-azure-core";
+import {
   BooleanLiteral,
   compilerAssert,
   createDiagnosticCollector,
@@ -7,6 +13,7 @@ import {
   getDoc,
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
+  getSummary,
   getVisibilityForClass,
   ignoreDiagnostics,
   isNeverType,
@@ -37,26 +44,39 @@ import {
   getVersioningMutators,
   getVersions,
 } from "@typespec/versioning";
-import { getClientDocExplicit, getParamAlias } from "./decorators.js";
+import {
+  getAlternateType,
+  getClientDocExplicit,
+  getClientLocation,
+  getMarkAsLro,
+  getOverriddenClientMethod,
+  getParamAlias,
+} from "./decorators.js";
+import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 import {
   DecoratorInfo,
+  ExternalTypeInfo,
   SdkBuiltInType,
   SdkClient,
+  SdkClientType,
   SdkEnumType,
+  SdkHeaderParameter,
   SdkHttpResponse,
-  SdkModelPropertyType,
+  SdkMethodParameter,
   SdkOperationGroup,
+  SdkServiceOperation,
   SdkType,
   TCGCContext,
 } from "./interfaces.js";
 import { createDiagnostic, createStateSymbol } from "./lib.js";
+import { getSdkBasicServiceMethod } from "./methods.js";
 import {
   getCrossLanguageDefinitionId,
   getDefaultApiVersion,
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
-import { getClientTypeWithDiagnostics, getSdkModelPropertyType } from "./types.js";
+import { getClientTypeWithDiagnostics } from "./types.js";
 
 export interface TCGCEmitterOptions extends BrandedSdkEmitterOptionsInterface {
   "emitter-name"?: string;
@@ -90,21 +110,41 @@ export const clientKey = createStateSymbol("client");
 export const operationGroupKey = createStateSymbol("operationGroup");
 export const clientLocationKey = createStateSymbol("clientLocation");
 export const omitOperation = createStateSymbol("omitOperation");
+export const overrideKey = createStateSymbol("override");
 
 export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
   return (
-    listScopedDecoratorData(context, clientKey).length > 0 ||
-    listScopedDecoratorData(context, operationGroupKey).length > 0
+    listScopedDecoratorData(context, clientKey).size > 0 ||
+    listScopedDecoratorData(context, operationGroupKey).size > 0
   );
 }
 
-export function listScopedDecoratorData(context: TCGCContext, key: symbol): any[] {
-  const retval = [...context.program.stateMap(key).values()];
-  return retval
-    .filter((targetEntry) => {
-      return targetEntry[context.emitterName] || targetEntry[AllScopes];
-    })
-    .flatMap((targetEntry) => targetEntry[context.emitterName] ?? targetEntry[AllScopes]);
+export function listScopedDecoratorData(
+  context: TCGCContext,
+  key: symbol,
+  languageScope?: string | typeof AllScopes,
+): Map<Type, any> {
+  const scope = languageScope ?? context.emitterName;
+  const retval: Map<Type, any> = new Map();
+  for (const [type, data] of context.program.stateMap(key).entries()) {
+    if (data[scope]) {
+      // positive scope case
+      retval.set(type, data[scope]);
+    } else if (data[negationScopesKey]) {
+      // negative scope case
+      if (data[negationScopesKey].includes(scope)) {
+        // if the scope is negated, we should not include it
+        continue;
+      } else {
+        // if the scope is not negated, we should include it
+        retval.set(type, data[AllScopes]);
+      }
+    } else if (data[AllScopes]) {
+      // all scopes case
+      retval.set(type, data[AllScopes]);
+    }
+  }
+  return retval;
 }
 
 export function getScopedDecoratorData(
@@ -274,6 +314,9 @@ interface DefaultSdkTypeBase<TKind> {
   deprecation?: string;
   kind: TKind;
   decorators: DecoratorInfo[];
+  external?: ExternalTypeInfo;
+  doc?: string;
+  summary?: string;
 }
 
 /**
@@ -286,12 +329,34 @@ export function getSdkTypeBaseHelper<TKind>(
   kind: TKind,
 ): [DefaultSdkTypeBase<TKind>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  return diagnostics.wrap({
+
+  const base: DefaultSdkTypeBase<TKind> = {
     __raw: type,
     deprecation: getDeprecationDetails(context.program, type)?.message,
     kind,
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
-  });
+    doc: getClientDoc(context, type),
+    summary: getSummary(context.program, type),
+  };
+  if (
+    type.kind === "ModelProperty" ||
+    type.kind === "Scalar" ||
+    type.kind === "Model" ||
+    type.kind === "Enum" ||
+    type.kind === "Union"
+  ) {
+    const external = getAlternateType(context, type);
+    // Only set external if it's an ExternalTypeInfo (has 'identity' but not 'kind' property), not a regular Type
+    if (
+      external &&
+      typeof external === "object" &&
+      "identity" in external &&
+      !("kind" in external)
+    ) {
+      base.external = external;
+    }
+  }
+  return diagnostics.wrap(base);
 }
 
 export function getNamespacePrefix(namespace: Namespace): string {
@@ -385,22 +450,12 @@ export function isAzureCoreTspModel(t: Type): boolean {
   );
 }
 
-export function isAcceptHeader(param: SdkModelPropertyType): boolean {
+export function isAcceptHeader(param: SdkHeaderParameter): boolean {
   return param.kind === "header" && param.serializedName.toLowerCase() === "accept";
 }
 
-export function isContentTypeHeader(param: SdkModelPropertyType): boolean {
+export function isContentTypeHeader(param: SdkHeaderParameter): boolean {
   return param.kind === "header" && param.serializedName.toLowerCase() === "content-type";
-}
-
-export function isMultipartOperation(context: TCGCContext, operation?: Operation): boolean {
-  if (!operation) return false;
-  const httpOperation = getHttpOperationWithCache(context, operation);
-  const httpBody = httpOperation.parameters.body;
-  if (httpBody && httpBody.type.kind === "Model") {
-    return httpBody.contentTypes.some((x) => x.startsWith("multipart/"));
-  }
-  return false;
 }
 
 export function isHttpOperation(context: TCGCContext, obj: any): obj is HttpOperation {
@@ -509,9 +564,22 @@ export function filterApiVersionsInEnum(
   removeVersionsLargerThanExplicitlySpecified(context, sdkVersionsEnum.values);
   const defaultApiVersion = getDefaultApiVersion(context, client.service);
   if (!context.previewStringRegex.test(defaultApiVersion?.value || "")) {
-    sdkVersionsEnum.values = sdkVersionsEnum.values.filter(
-      (v) => typeof v.value === "string" && !context.previewStringRegex.test(v.value),
-    );
+    sdkVersionsEnum.values = sdkVersionsEnum.values.filter((v) => {
+      if (typeof v.value !== "string") {
+        return true;
+      }
+
+      // Check if the version has `@previewVersion` decorator
+      if (v.__raw && v.__raw.kind === "EnumMember") {
+        const enumMember = v.__raw;
+        if (isPreviewVersion(context.program, enumMember)) {
+          return false;
+        }
+      }
+
+      // Fall back to regex check for backward compatibility
+      return !context.previewStringRegex.test(v.value);
+    });
   }
 }
 
@@ -524,11 +592,13 @@ export function twoParamsEquivalent(
     return false;
   }
   return (
-    param1.name === param2.name ||
-    getParamAlias(context, param1) === param2.name ||
-    param1.name === getParamAlias(context, param2)
+    param1.type === param2.type &&
+    (param1.name === param2.name ||
+      getParamAlias(context, param1) === param2.name ||
+      param1.name === getParamAlias(context, param2))
   );
 }
+
 /**
  * If body is from spread, then it does not directly from a model property.
  * @param httpBody
@@ -540,26 +610,30 @@ export function isHttpBodySpread(httpBody: HttpPayloadBody): boolean {
 }
 
 /**
- * If body is from simple spread, then we use the original model as body model.
+ * If body is from simple spread, then we use the original model as body model. Else we return the body type directly.
  * @param type
  * @returns
  */
-export function getHttpBodySpreadModel(type: Model): Model {
-  if (type.sourceModels.length === 1 && type.sourceModels[0].usage === "spread") {
-    const innerModel = type.sourceModels[0].model;
-    // for case: `op test(...Model):void;`
-    if (innerModel.name !== "" && innerModel.properties.size === type.properties.size) {
-      return innerModel;
+export function getHttpBodyType(httpBody: HttpPayloadBody): Type {
+  const type = httpBody.type;
+  if (isHttpBodySpread(httpBody) && type.kind === "Model") {
+    if (type.sourceModels.length === 1 && type.sourceModels[0].usage === "spread") {
+      const innerModel = type.sourceModels[0].model;
+      // for case: `op test(...Model):void;`
+      if (innerModel.name !== "" && innerModel.properties.size === type.properties.size) {
+        return innerModel;
+      }
+      // for case: `op test(@header h: string, @query q: string, ...Model): void;`
+      if (
+        innerModel.sourceModels.length === 1 &&
+        innerModel.sourceModels[0].usage === "spread" &&
+        innerModel.sourceModels[0].model.name !== "" &&
+        innerModel.sourceModels[0].model.properties.size === type.properties.size
+      ) {
+        return innerModel.sourceModels[0].model;
+      }
     }
-    // for case: `op test(@header h: string, @query q: string, ...Model): void;`
-    if (
-      innerModel.sourceModels.length === 1 &&
-      innerModel.sourceModels[0].usage === "spread" &&
-      innerModel.sourceModels[0].model.name !== "" &&
-      innerModel.sourceModels[0].model.properties.size === type.properties.size
-    ) {
-      return innerModel.sourceModels[0].model;
-    }
+    return type;
   }
   return type;
 }
@@ -570,17 +644,43 @@ export function isOnClient(
   operation?: Operation,
   versioning?: boolean,
 ): boolean {
-  const client = operation ? context.getClientForOperation(operation) : undefined;
+  const clientLocation = getClientLocation(context, type);
+  if (
+    operation &&
+    clientLocation === (getOverriddenClientMethod(context, operation) ?? operation)
+  ) {
+    // if the type has explicitly been moved to the operation, it is not on the client
+    return false;
+  }
   return (
     isSubscriptionId(context, type) ||
     (isApiVersion(context, type) && versioning) ||
-    Boolean(
-      client &&
-        context.__clientParametersCache
-          .get(client)
-          ?.find((x) => twoParamsEquivalent(context, x.__raw, type)),
-    )
+    (operation !== undefined && getCorrespondingClientParam(context, type, operation) !== undefined)
   );
+}
+
+export function getCorrespondingClientParam(
+  context: TCGCContext,
+  type: ModelProperty,
+  operation: Operation,
+): SdkMethodParameter | undefined {
+  const clientParams = [];
+  let client: SdkClient | SdkOperationGroup | undefined = context.getClientForOperation(operation);
+  while (client) {
+    const clientParamsForClient = context.__clientParametersCache.get(client);
+    if (clientParamsForClient) {
+      clientParams.push(...clientParamsForClient);
+    }
+    if (client.kind === "SdkClient") {
+      break;
+    }
+    client = client.parent;
+  }
+  const correspondingClientParam = clientParams?.find((x) =>
+    twoParamsEquivalent(context, x.__raw, type),
+  );
+  if (correspondingClientParam) return correspondingClientParam;
+  return undefined;
 }
 
 export function getValueTypeValue(
@@ -752,21 +852,87 @@ export function compareModelProperties(
   if (!modelPropA || !modelPropB) return false;
   if (modelPropA.name !== modelPropB.name || modelPropA.type !== modelPropB.type) return false;
   if (!context) return true; // if we don't have a context, we can't further compare the types. Assume true.
-  const sdkA = ignoreDiagnostics(getSdkModelPropertyType(context, modelPropA));
-  const sdkB = ignoreDiagnostics(getSdkModelPropertyType(context, modelPropB));
-  if (sdkA.kind === "method" || sdkB.kind === "method") {
-    // if we're comparing method vs service param, we just need to check the name and type
+  // compare serialized names if they are http parameters
+  if (!isSdkHttpParameter(context, modelPropA) || !isSdkHttpParameter(context, modelPropB))
     return true;
+  const sdkA = ignoreDiagnostics(getSdkHttpParameter(context, modelPropA));
+  const sdkB = ignoreDiagnostics(getSdkHttpParameter(context, modelPropB));
+  return sdkA.kind === sdkB.kind && sdkA.serializedName === sdkB.serializedName;
+}
+
+export function* filterMapValuesIterator<V>(
+  iterator: MapIterator<V>,
+  predicate: (value: V) => boolean,
+): MapIterator<V> {
+  for (const value of iterator) {
+    if (predicate(value)) {
+      yield value;
+    }
   }
-  switch (sdkA.kind) {
-    case "cookie":
-    case "header":
-    case "query":
-    case "path":
-    case "responseheader":
-    case "body":
-      return sdkA.kind === sdkB.kind && sdkA.serializedName === sdkB.serializedName;
-    default:
-      return sdkA.kind === sdkB.kind;
+}
+
+/**
+ * Find all entries in a scoped decorator state map where the target matches a specific value
+ */
+export function findEntriesWithTarget<TSource extends Type, TTarget>(
+  context: TCGCContext,
+  stateKey: symbol,
+  targetValue: TTarget,
+  sourceKind?: TSource["kind"],
+): TSource[] {
+  const results: TSource[] = [];
+
+  for (const [type, target] of listScopedDecoratorData(context, stateKey)) {
+    if (sourceKind && type.kind !== sourceKind) {
+      continue;
+    }
+    if (target === targetValue) {
+      results.push(type as TSource);
+    }
   }
+  return results;
+}
+
+/**
+ * Retrieves Long Running Operation (LRO) metadata for a given operation.
+ *
+ * This function serves as a wrapper that:
+ * 1. First tries to get LRO metadata using the `getLroMetadata` function from the Azure Core library
+ * 2. If unavailable or undefined, it would check for the existence of a `getMarkAsLro` function
+ *    and return a mock LRO metadata object if the operation is marked as LRO
+ *
+ * @param context - The TypeSpec client generator context
+ * @param operation - The TypeSpec operation to check for LRO metadata
+ * @returns The LRO metadata for the operation if available, otherwise undefined
+ */
+export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
+  operation: Operation,
+  client: SdkClientType<TServiceOperation>,
+): LroMetadata | undefined {
+  const lroMetaData = getLroMetadata(context.program, operation);
+  if (lroMetaData) {
+    return lroMetaData;
+  }
+  if (getMarkAsLro(context, operation)) {
+    // we guard against this in the setting of `@markAsLro`
+    const sdkMethod = ignoreDiagnostics(getSdkBasicServiceMethod(context, operation, client));
+    const returnType = sdkMethod.response.type!.__raw! as Model;
+    return {
+      operation,
+      logicalResult: returnType,
+      finalStateVia: FinalStateValue.originalUri, // doesn't really matter, but for get LRO
+      pollingInfo: {
+        kind: "pollingOperationStep",
+        responseModel: returnType,
+        terminationStatus: {
+          kind: "status-code",
+        },
+      },
+      envelopeResult: returnType,
+      finalEnvelopeResult: returnType,
+      finalResult: returnType,
+    };
+  }
+  return undefined;
 }

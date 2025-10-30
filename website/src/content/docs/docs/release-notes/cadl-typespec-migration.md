@@ -11,9 +11,7 @@ We understand that change can be challenging, and we appreciate your patience an
 ## Name Changes
 
 - Packages:
-
   - NPM package scope:
-
     - @cadl-lang/[xx] -> @typespec/[xx]
     - @azure-tools/ unchanged.
 
@@ -35,21 +33,17 @@ We understand that change can be challenging, and we appreciate your patience an
 | @azure-tools/cadl-providerhub-controller | - (emitter only)             | @azure-tools/typespec-providerhub-controller | -                                 |
 
 - File extension:
-
   - `.cadl` -> `.tsp`
 
 - Configuration file:
-
   - `cadl-project.yaml` -> `tspconfig.yaml`
 
 - CLI
-
   - `npx cadl compile .` -> `npx tsp compile .`
 
 - Compiler JS APIs
   - All artifacts with `*Cadl*` in the name have been updated to `*TypeSpec*`. However, aliases have been created with older `*Cadl*` name with `@deprecated` flag.
 - Noteable changes:
-
   - @cadl-lang/rest was split into two packages, @typespec/rest and @typespec/http
   - `@azure-tools/cadl-dpg` has been renamed to `@azure-tools/typespec-client-generator-core`. See above table for details.
 

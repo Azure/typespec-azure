@@ -1,0 +1,15 @@
+{
+  "operationId": "getStringToBooleanParameter",
+  "title": "getStringToBooleanParameter",
+  "parameters": {
+    "enabled": "true",
+    "disabled": "false",
+    "upperEnabled": "TRUE",
+    "mixedEnabled": "True"
+  },
+  "responses": {
+    "200": {
+      "body": "success"
+    }
+  }
+}

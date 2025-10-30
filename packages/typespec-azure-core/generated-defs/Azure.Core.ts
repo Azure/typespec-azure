@@ -46,20 +46,25 @@ export type PollingLocationDecorator = (
 ) => void;
 
 /**
- * Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
+ * Decorator that marks a Version EnumMember as a preview version.
+ * This is used to indicate that the version is not yet stable and may change in future releases.
+ *
+ * @param target The EnumMember that represents the preview version.
+ * @example
+ * ```typespec
+ * @versioned(Versions)
+ * @service(#{ title: "Widget Service" })
+ * namespace DemoService;
+ *
+ * enum Versions {
+ *   v1,
+ *   v2,
+ *   @previewVersion
+ *   v3Preview
+ * }
+ * ```
  */
-export type ItemsDecorator = (context: DecoratorContext, entity: ModelProperty) => void;
-
-/**
- * Marks a Model as a paged collection.
- */
-export type PagedResultDecorator = (context: DecoratorContext, entity: Model) => void;
-
-/**
- * Marks an Enum as being fixed since enums in Azure are
- * assumed to be extensible.
- */
-export type FixedDecorator = (context: DecoratorContext, target: Enum) => void;
+export type PreviewVersionDecorator = (context: DecoratorContext, target: EnumMember) => void;
 
 /**
  * Used for custom StatusMonitor implementation.
@@ -171,26 +176,18 @@ export type UseFinalStateViaDecorator = (
 ) => void;
 
 /**
- * Identifies that an operation is used to retrieve the next page for paged operations.
- *
- * @param linkedOperation The linked Operation
- * @param parameters Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will
- * be passed to the linked operation request.
+ * Specifies that an array model or array-typed property should contain only unique items.
  */
-export type NextPageOperationDecorator = (
+export type UniqueItemsDecorator = (
   context: DecoratorContext,
-  entity: Operation,
-  linkedOperation: Operation,
-  parameters?: Type,
+  entity: ModelProperty | Model,
 ) => void;
 
 export type AzureCoreDecorators = {
   lroStatus: LroStatusDecorator;
   finalLocation: FinalLocationDecorator;
   pollingLocation: PollingLocationDecorator;
-  items: ItemsDecorator;
-  pagedResult: PagedResultDecorator;
-  fixed: FixedDecorator;
+  previewVersion: PreviewVersionDecorator;
   lroSucceeded: LroSucceededDecorator;
   lroCanceled: LroCanceledDecorator;
   lroFailed: LroFailedDecorator;
@@ -201,5 +198,5 @@ export type AzureCoreDecorators = {
   pollingOperation: PollingOperationDecorator;
   finalOperation: FinalOperationDecorator;
   useFinalStateVia: UseFinalStateViaDecorator;
-  nextPageOperation: NextPageOperationDecorator;
+  uniqueItems: UniqueItemsDecorator;
 };

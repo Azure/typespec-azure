@@ -1,6 +1,5 @@
 using Http;
 using Rest;
-using OpenAPI;
 using Versioning;
 using Azure.Core;
 
@@ -45,7 +44,8 @@ model TrackedResource extends Resource {
 
   /** The geo-location where the resource lives */
   @visibility(Lifecycle.Read, Lifecycle.Create)
-  location: string;
+  @Azure.ResourceManager.CommonTypes.Private.inlineAzureType
+  location: Azure.Core.azureLocation;
 }
 
 /**
@@ -344,6 +344,8 @@ union createdByType {
   string,
 }
 
+/** @dev Resource Identity Type */
+@doc("")
 union ResourceIdentityType {
   SystemAssigned: "SystemAssigned",
 }
@@ -367,6 +369,7 @@ model Identity {
   type?: ResourceIdentityType;
 }
 
+/** @dev Properties of a KeyVault */
 model KeyVaultProperties {
   /** Key vault uri to access the encryption key. */
   keyIdentifier?: string;
@@ -516,6 +519,7 @@ model LocationParameter {
   @path
   @minLength(1)
   @segment("locations")
+  @Azure.ResourceManager.CommonTypes.Private.inlineAzureType
   location: string;
 }
 

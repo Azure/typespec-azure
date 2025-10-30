@@ -1,5 +1,87 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.61.0
+
+### Features
+
+- [#3358](https://github.com/Azure/typespec-azure/pull/3358) Support x-ms-secret in model types
+- [#3358](https://github.com/Azure/typespec-azure/pull/3358) Allow x-ms-long-running-operation for resource get
+- [#3360](https://github.com/Azure/typespec-azure/pull/3360) Added an `xml-strategy` option to control whether the emitter outputs XML serialization metadata. The options are:
+  
+  - `xml-strategy: xml-service`: Emit XML serialization metadata for the whole service and all its schemas if the service uses the "application/xml" content-type.
+  - `xml-strategy: none`: Never emit XML serialization metadata.
+- [#3290](https://github.com/Azure/typespec-azure/pull/3290) Added support for emitting XML annotations.
+
+### Bug Fixes
+
+- [#3266](https://github.com/Azure/typespec-azure/pull/3266) Cleanup usage of legacy Azure.Core paging apis
+
+
+## 0.60.0
+
+### Bump dependencies
+
+- [#3207](https://github.com/Azure/typespec-azure/pull/3207) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3196](https://github.com/Azure/typespec-azure/pull/3196) Fix optionality for ArmCustomPatch templates
+
+
+## 0.59.1
+
+### Bug Fixes
+
+- [#3173](https://github.com/Azure/typespec-azure/pull/3173) Inline azureLocation
+- [#3147](https://github.com/Azure/typespec-azure/pull/3147) Add support for x-ms-external through armExternalResource decorator
+- [#3147](https://github.com/Azure/typespec-azure/pull/3147) Add support for x-ms-azure-resource extension for custom resources
+
+
+## 0.59.0
+
+### Features
+
+- [#3126](https://github.com/Azure/typespec-azure/pull/3126) Add multi-level discriminator support to typespec-autorest
+- [#3125](https://github.com/Azure/typespec-azure/pull/3125) Add  uniqueItems support to Azure.Core and typespec-autorest
+
+### Bump dependencies
+
+- [#3029](https://github.com/Azure/typespec-azure/pull/3029) Upgrade dependencies
+
+
+## 0.58.1
+
+### Bug Fixes
+
+- [#3003](https://github.com/Azure/typespec-azure/pull/3003) Preserve explicit query parameters defined in the route by including them in `x-ms-paths`
+
+
+## 0.58.0
+
+### Breaking Changes
+
+- [#2927](https://github.com/Azure/typespec-azure/pull/2927) Change operation ID normalization logic to only capitalize the first letter.
+
+### Features
+
+- [#2968](https://github.com/Azure/typespec-azure/pull/2968) Support using enum member as type of parameter
+
+### Bump dependencies
+
+- [#2867](https://github.com/Azure/typespec-azure/pull/2867) Upgrade dependencies
+
+### Bug Fixes
+
+- [#2970](https://github.com/Azure/typespec-azure/pull/2970) Fix the default pageable item name from `items` to `value` to align with the official AutoRest documentation.
+
+
+## 0.57.1
+
+### Bug Fixes
+
+- [#2898](https://github.com/Azure/typespec-azure/pull/2898) Add `@clientLocation` support to `resolveOperationId` function
+
+
 ## 0.57.0
 
 ### Bump dependencies
