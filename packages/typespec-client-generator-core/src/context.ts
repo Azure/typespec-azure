@@ -113,7 +113,7 @@ export function createTCGCContext(
       }
       this.__tspTypeToApiVersions.set(type, mergedApiVersions);
     },
-    getPackageVersions(service?: Namespace): string[] {
+    getApiVersions(service?: Namespace): string[] {
       if (this.__packageVersions?.length) {
         return this.__packageVersions;
       }
@@ -147,16 +147,6 @@ export function createTCGCContext(
         this.apiVersion = this.__packageVersions[this.__packageVersions.length - 1];
       }
       return this.__packageVersions;
-    },
-    getPackageVersionEnum(): Enum | undefined {
-      if (this.__packageVersionEnum) {
-        return this.__packageVersionEnum;
-      }
-      const namespaces = listAllServiceNamespaces(this);
-      if (namespaces.length === 0) {
-        return undefined;
-      }
-      return getVersions(this.program, namespaces[0])[1]?.getVersions()?.[0].enumMember.enum;
     },
     getClients(): SdkClient[] {
       if (!this.__rawClientsOperationGroupsCache) {

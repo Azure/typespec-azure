@@ -780,7 +780,7 @@ function getVersioningMutator(
 
 export function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Namespace {
   const globalNamespace = context.program.getGlobalNamespaceType();
-  const allApiVersions = context.getPackageVersions();
+  const allApiVersions = context.getApiVersions();
   if (allApiVersions.length === 0 || context.apiVersion === "all") return globalNamespace;
 
   const mutator = getVersioningMutator(

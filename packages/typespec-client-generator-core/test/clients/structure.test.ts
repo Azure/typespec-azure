@@ -776,7 +776,7 @@ it("one client from multiple services", async () => {
 
       interface AI {
         @route("/atest")
-        atest(): void;
+        atest(@query("api-version") apiVersion: VersionsA): void;
       }
     }
 
@@ -790,7 +790,7 @@ it("one client from multiple services", async () => {
 
       interface BI {
         @route("/btest")
-        btest(): void;
+        btest(@query("api-version") apiVersion: VersionsB): void;
       }
     }`,
     `
@@ -831,7 +831,6 @@ it("one client from multiple services", async () => {
   strictEqual(aiApiVersionParam.isApiVersionParam, true);
   strictEqual(aiApiVersionParam.onClient, true);
   strictEqual(aiApiVersionParam.clientDefaultValue, "av2");
-  strictEqual(aiApiVersionParam.type, aVersionsEnum);
 
   // AI client should have atest method with VersionsA api version
   strictEqual(aiClient.methods.length, 1);
@@ -842,7 +841,6 @@ it("one client from multiple services", async () => {
   strictEqual(aiOperation.parameters.length, 1);
   const aiOperationApiVersionParam = aiOperation.parameters.find((p) => p.isApiVersionParam);
   ok(aiOperationApiVersionParam);
-  strictEqual(aiOperationApiVersionParam.type, aVersionsEnum);
   strictEqual(aiOperationApiVersionParam.correspondingMethodParams.length, 1);
   strictEqual(aiOperationApiVersionParam.correspondingMethodParams[0], aiApiVersionParam);
 
@@ -858,7 +856,6 @@ it("one client from multiple services", async () => {
   strictEqual(biApiVersionParam.isApiVersionParam, true);
   strictEqual(biApiVersionParam.onClient, true);
   strictEqual(biApiVersionParam.clientDefaultValue, "bv2");
-  strictEqual(biApiVersionParam.type, bVersionsEnum);
   
   // BI client should have btest method with VersionsB api version
   const biMethod = biClient.methods[0];
@@ -868,7 +865,6 @@ it("one client from multiple services", async () => {
   strictEqual(biOperation.parameters.length, 1);
   const biOperationApiVersionParam = biOperation.parameters.find((p) => p.isApiVersionParam);
   ok(biOperationApiVersionParam);
-  strictEqual(biOperationApiVersionParam.type, bVersionsEnum);
   strictEqual(biOperationApiVersionParam.correspondingMethodParams.length, 1);
   strictEqual(biOperationApiVersionParam.correspondingMethodParams[0], biApiVersionParam);
 

@@ -27,7 +27,7 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
   diagnostics.pipe(handleAllTypes(context));
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   const allReferencedTypes = getAllReferencedTypes(context);
-  const versions = context.getPackageVersions();
+  const versions = context.getApiVersions();
   const sdkPackage: SdkPackage<TServiceOperation> = {
     clients: diagnostics.pipe(createClients(context)),
     models: allReferencedTypes.filter((x): x is SdkModelType => x.kind === "model"),
@@ -160,7 +160,7 @@ function populateApiVersionInformation(context: TCGCContext): void {
       filterApiVersionsWithDecorators(
         context,
         clientOperationGroup.type ?? clientOperationGroup.service,
-        context.getPackageVersions(clientOperationGroup.service),
+        context.getApiVersions(clientOperationGroup.service),
       ),
     );
 
