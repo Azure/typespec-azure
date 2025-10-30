@@ -598,6 +598,7 @@ export interface SerializationOptions {
   json?: JsonSerializationOptions;
   xml?: XmlSerializationOptions;
   multipart?: MultipartOptions;
+  binary?: BinarySerializationOptions;
 }
 
 /**
@@ -629,6 +630,11 @@ export interface XmlSerializationOptions {
     namespace: string;
     prefix: string;
   };
+}
+
+export interface BinarySerializationOptions {
+  /** Whether this is a file/stream input */
+  isFile: boolean;
 }
 
 /**
