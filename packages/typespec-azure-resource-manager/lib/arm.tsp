@@ -4,6 +4,9 @@ import "@typespec/rest";
 import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 
+// Kept for legacy reasons remove when specs are migrated
+import "@typespec/openapi";
+
 import "./foundations/arm.foundations.tsp";
 import "./legacy-types/arm.legacy.tsp";
 import "./common-types/common-types.tsp";

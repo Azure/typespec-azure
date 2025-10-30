@@ -65,6 +65,7 @@
     "@typespec/compiler": "workspace:^",
     "@typespec/http": "workspace:^",
     "@typespec/rest": "workspace:^",
+    "@typespec/openapi": "workspace:^",
     "@typespec/versioning": "workspace:^"
   },
   "devDependencies": {
@@ -77,6 +78,7 @@
     "@typespec/rest": "workspace:^",
     "@typespec/tspd": "workspace:^",
     "@typespec/versioning": "workspace:^",
+    "@typespec/openapi": "workspace:^",
     "@vitest/coverage-v8": "^4.0.4",
     "@vitest/ui": "^4.0.4",
     "c8": "^10.1.3",
