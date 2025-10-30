@@ -439,6 +439,40 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_NextLinkVerb_listItems
+
+- Endpoint: `post /azure/client-generator-core/next-link-verb/items`
+
+Test for @nextLinkVerb decorator with POST verb.
+This operation should use POST for both the initial request and the next link request.
+
+Expected initial request: POST /azure/client-generator-core/next-link-verb/items
+Expected response body:
+
+```json
+{
+  "tests": [
+    {
+      "id": "test1"
+    }
+  ],
+  "next": "http://localhost:3000/azure/client-generator-core/next-link-verb/items/page/2"
+}
+```
+
+Expected next link request: POST /azure/client-generator-core/next-link-verb/items/page/2
+Expected response body:
+
+```json
+{
+  "tests": [
+    {
+      "id": "test2"
+    }
+  ]
+}
+```
+
 ### Azure_ClientGenerator_Core_Override_GroupParameters_group
 
 - Endpoint: `get /azure/client-generator-core/override/group`
