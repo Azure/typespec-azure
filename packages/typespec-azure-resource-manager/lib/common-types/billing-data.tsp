@@ -119,12 +119,12 @@ model BillingScheduleChange {
   billingToken?: string;
 
   /**
-   * Indicates when the change is expected to become effective. Mutually exclusive with `effectiveDate`.
+   * Indicates when the change is expected to become effective.
    */
   effective?: BillingScheduleChangeEffectiveType = "Renewal";
 
   /**
-   * The absolute date when the change is expected to become effective. Mutually exclusive with `effective`.
+   * The absolute date when the change is expected to become effective. Required when `effective` = `AbsoluteDate`.
    */
   effectiveDate?: utcDateTime;
 }
@@ -137,13 +137,13 @@ union BillingState {
   /** Resource's billing has not yet started. */
   Pending: "Pending",
 
-  /** Resource's billing is activated. */
+  /** Resource's billing is activate. */
   Active: "Active",
 
-  /** Resource's billing is warned. */
+  /** Resource's billing is in a warning state. */
   Warned: "Warned",
 
-  /** Resource's billing is deactivated. */
+  /** Resource's billing is inactive. */
   Inactive: "Inactive",
 
   string,
@@ -182,6 +182,9 @@ union BillingRenewalType {
  */
 @added(Versions.v6)
 union BillingScheduleChangeEffectiveType {
+  /** At a specified date. */
+  AbsoluteDate: "AbsoluteDate",
+
   /** At time of term renewal. */
   Renewal: "Renewal",
 

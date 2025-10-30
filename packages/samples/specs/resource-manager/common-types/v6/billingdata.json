@@ -213,6 +213,11 @@
             "modelAsString": true,
             "values": [
               {
+                "name": "AbsoluteDate",
+                "value": "AbsoluteDate",
+                "description": "At a specified date."
+              },
+              {
                 "name": "Renewal",
                 "value": "Renewal",
                 "description": "At time of term renewal."
@@ -243,6 +248,11 @@
         "name": "BillingScheduleChangeEffectiveType",
         "modelAsString": true,
         "values": [
+          {
+            "name": "AbsoluteDate",
+            "value": "AbsoluteDate",
+            "description": "At a specified date."
+          },
           {
             "name": "Renewal",
             "value": "Renewal",
