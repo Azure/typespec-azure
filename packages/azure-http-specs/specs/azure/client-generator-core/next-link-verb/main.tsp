@@ -27,12 +27,12 @@ model Test {
 @doc("Paged response model.")
 model ListTestResult {
   @pageItems
-  @doc("List of tests.")
-  tests: Test[];
+  @doc("List of items.")
+  items: Test[];
 
   @nextLink
-  @doc("Link to fetch more tests.")
-  next?: string;
+  @doc("Link to fetch more items.")
+  nextLink?: string;
 }
 
 @scenario
@@ -44,12 +44,12 @@ model ListTestResult {
   Expected response body:
   ```json
   {
-    "tests": [
+    "items": [
       {
         "id": "test1"
       }
     ],
-    "next": "http://localhost:3000/azure/client-generator-core/next-link-verb/items/page/2"
+    "nextLink": "http://localhost:3000/azure/client-generator-core/next-link-verb/items/page/2"
   }
   ```
   
@@ -57,7 +57,7 @@ model ListTestResult {
   Expected response body:
   ```json
   {
-    "tests": [
+    "items": [
       {
         "id": "test2"
       }

@@ -451,12 +451,12 @@ Expected response body:
 
 ```json
 {
-  "tests": [
+  "items": [
     {
       "id": "test1"
     }
   ],
-  "next": "http://localhost:3000/azure/client-generator-core/next-link-verb/items/page/2"
+  "nextLink": "http://localhost:3000/azure/client-generator-core/next-link-verb/items/page/2"
 }
 ```
 
@@ -465,7 +465,7 @@ Expected response body:
 
 ```json
 {
-  "tests": [
+  "items": [
     {
       "id": "test2"
     }

@@ -11,12 +11,12 @@ Scenarios.Azure_ClientGenerator_Core_NextLinkVerb_listItems = passOnSuccess([
     response: {
       status: 200,
       body: json({
-        tests: [
+        items: [
           {
             id: "test1",
           },
         ],
-        next: dyn`${dynItem("baseUrl")}/azure/client-generator-core/next-link-verb/items/page/2`,
+        nextLink: dyn`${dynItem("baseUrl")}/azure/client-generator-core/next-link-verb/items/page/2`,
       }),
     },
     kind: "MockApiDefinition",
@@ -29,7 +29,7 @@ Scenarios.Azure_ClientGenerator_Core_NextLinkVerb_listItems = passOnSuccess([
     response: {
       status: 200,
       body: json({
-        tests: [
+        items: [
           {
             id: "test2",
           },
