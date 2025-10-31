@@ -89,7 +89,10 @@ model SecurityDomainObject {
 @pollingOperation(uploadPending)
 @route("/securitydomain/upload")
 @post
-op upload is Foundations.LongRunningOperation<SecurityDomainObject, SecurityDomainOperationStatus>;
+op upload is Foundations.LongRunningOperation<
+  SecurityDomainObject,
+  SecurityDomainOperationStatus & AcceptedResponse
+>;
 
 /**
  * Get Security Domain upload operation status

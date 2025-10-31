@@ -38,7 +38,7 @@ union OperationStatus {
   Succeeded: "Succeeded",
 
   /** The operation is in progress. */
-  InProgress: "InProgress",
+  Working: "Working",
 
   /** The operation failed. */
   Failed: "Failed",
@@ -84,7 +84,10 @@ model SecurityDomainObject {
   """)
 @route("/securitydomain/upload")
 @post
-op upload is Foundations.LongRunningOperation<SecurityDomainObject, SecurityDomainOperationStatus>;
+op upload is Foundations.LongRunningOperation<
+  SecurityDomainObject,
+  SecurityDomainOperationStatus & AcceptedResponse
+>;
 
 /**
  * Get Security Domain upload operation status
