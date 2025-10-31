@@ -1,5 +1,29 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.61.1
+
+### Bug Fixes
+
+- [#3452](https://github.com/Azure/typespec-azure/pull/3452) Fix #3416 Allow flattening for body parameters
+
+
+## 0.61.0
+
+### Features
+
+- [#3358](https://github.com/Azure/typespec-azure/pull/3358) Support x-ms-secret in model types
+- [#3358](https://github.com/Azure/typespec-azure/pull/3358) Allow x-ms-long-running-operation for resource get
+- [#3360](https://github.com/Azure/typespec-azure/pull/3360) Added an `xml-strategy` option to control whether the emitter outputs XML serialization metadata. The options are:
+  
+  - `xml-strategy: xml-service`: Emit XML serialization metadata for the whole service and all its schemas if the service uses the "application/xml" content-type.
+  - `xml-strategy: none`: Never emit XML serialization metadata.
+- [#3290](https://github.com/Azure/typespec-azure/pull/3290) Added support for emitting XML annotations.
+
+### Bug Fixes
+
+- [#3266](https://github.com/Azure/typespec-azure/pull/3266) Cleanup usage of legacy Azure.Core paging apis
+
+
 ## 0.60.0
 
 ### Bump dependencies

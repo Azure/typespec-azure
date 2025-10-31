@@ -3,6 +3,7 @@ import { $ } from "@typespec/compiler/typekit";
 import { getServers, HttpServer } from "@typespec/http";
 import {
   getClientInitializationOptions,
+  getClientNameOverride,
   getClientNamespace,
   listOperationGroups,
 } from "./decorators.js";
@@ -67,6 +68,7 @@ function getEndpointTypeFromSingleServer<
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.__raw.service)}.endpoint`,
         decorators: [],
         access: "public",
+        flatten: false,
       },
     ],
     decorators: [],
@@ -170,6 +172,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, rawClient.service)}.endpoint`,
     decorators: [],
     access: "public",
+    flatten: false,
   });
 }
 
@@ -179,10 +182,17 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
   parent?: SdkClientType<TServiceOperation>,
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  let name = client.kind === "SdkClient" ? client.name : client.groupPath.split(".").at(-1)!;
+  if (client.type) {
+    const override = getClientNameOverride(context, client.type);
+    if (override) {
+      name = override;
+    }
+  }
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
-    name: client.kind === "SdkClient" ? client.name : client.groupPath.split(".").at(-1)!,
+    name,
     doc: client.type ? getClientDoc(context, client.type) : undefined,
     summary: client.type ? getSummary(context.program, client.type) : undefined,
     methods: [],

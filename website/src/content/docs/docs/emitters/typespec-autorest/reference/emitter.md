@@ -156,3 +156,9 @@ Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of
 **Type:** `"never" | "for-visibility-changes"`
 
 Determine whether and how to emit schemas for common-types rather than referencing them
+
+### `xml-strategy`
+
+**Type:** `"xml-service" | "none"`
+
+Strategy for applying XML serialization metadata to schemas.

@@ -838,4 +838,85 @@ describe("Parameter", () => {
     ok(method.parameters.find((p) => p.name === "blob"));
     ok(method.parameters.find((p) => p.name === "accept"));
   });
+
+  it("with @override", async () => {
+    runner = await createSdkTestRunner({
+      librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
+      autoUsings: ["Azure.ResourceManager", "Azure.Core"],
+      emitterName: "@azure-tools/typespec-python",
+    });
+
+    await runner.compile(
+      `
+        @armProviderNamespace
+        @service(#{ title: "ContosoProviderHubClient" })
+        @versioned(Versions)
+        namespace Microsoft.ContosoProviderHub;
+
+        /** Contoso API versions */
+        enum Versions {
+          /** 2021-10-01-preview version */
+          @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+          "2021-10-01-preview",
+        }
+
+        /** A ContosoProviderHub resource */
+        model Employee is TrackedResource<EmployeeProperties> {
+          ...ResourceNameParameter<Employee>;
+        }
+
+        /** Employee properties */
+        model EmployeeProperties {
+          prop: string;
+        }
+
+        @armResourceOperations
+        interface Employees {
+          get is ArmResourceRead<Employee>;
+        }
+
+        op employeeGet(
+          ...ApiVersionParameter,
+
+          #suppress "@azure-tools/typespec-azure-core/documentation-required" "customization"
+          @clientLocation(employeeGet, "java,python,go,javascript")
+          subscriptionId: Azure.Core.uuid,
+
+          ...ResourceGroupParameter,
+          ...Azure.ResourceManager.Foundations.DefaultProviderNamespace,
+          #suppress "@azure-tools/typespec-azure-core/documentation-required" "customization"
+          employeeName: string,
+        ): Employee;
+
+        @@override(Employees.get, employeeGet);
+      `,
+    );
+    const sdkPackage = runner.context.sdkPackage;
+    const client = sdkPackage.clients[0];
+    ok(client);
+
+    strictEqual(client.clientInitialization.parameters.length, 3);
+    ok(client.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+    ok(client.clientInitialization.parameters.find((p) => p.name === "credential"));
+    ok(client.clientInitialization.parameters.find((p) => p.name === "apiVersion"));
+
+    const method = client.children?.[0].methods?.[0];
+    ok(method);
+    strictEqual(method.name, "get");
+    strictEqual(method.parameters.length, 4);
+    ok(method.parameters.find((p) => p.name === "subscriptionId"));
+    ok(method.parameters.find((p) => p.name === "resourceGroupName"));
+    ok(method.parameters.find((p) => p.name === "employeeName"));
+    ok(method.parameters.find((p) => p.name === "accept"));
+
+    const operation = method.operation;
+    ok(operation);
+    strictEqual(operation.parameters.length, 5);
+    const subIdParam = operation.parameters.find((p) => p.name === "subscriptionId");
+    ok(subIdParam);
+    const subIdMethodParam = method.parameters.find((p) => p.name === "subscriptionId");
+    ok(subIdMethodParam);
+    strictEqual(subIdParam.correspondingMethodParams.length, 1);
+    strictEqual(subIdParam.correspondingMethodParams[0], subIdMethodParam);
+  });
 });
