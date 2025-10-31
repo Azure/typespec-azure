@@ -92,6 +92,28 @@ model ExtendedLocationOptional {
 model ResourceWithPathParameter {}
 
 /**
+ * Model representing the  `kind` envelope property only for use with a polymorphic resource..
+ * Spread this model into a resource model if the resource support ARM `kind`.
+ * @template Type The type of the kind property. Default is string. However you can pass a union with string values.
+ *
+ * @example
+ *
+ * ```typespec
+ * model Foo is TrackedResource<FooProperties> {
+ *   // Only have standard Succeeded, Failed, Cancelled states
+ *   ...PolymorphicResourceKindProperty;
+ * }
+ * ```
+ */
+@doc("The resource kind property envelope.")
+model PolymorphicResourceKindProperty<Type extends string = string> {
+  @doc("Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type.  If supported, the resource provider must validate and persist this value.")
+  @pattern("^[-\\w\\._,\\(\\\\\\)]+$")
+  @visibility(Lifecycle.Read, Lifecycle.Create)
+  kind: Type;
+}
+
+/**
  * Discriminated tracked resource types can be created by instantiating this type, with 'kind' as the discriminator property.
  *
  * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
@@ -116,7 +138,7 @@ model DiscriminatedTrackedResource<
   KindType extends string = string,
   Description extends valueof string = "Polymorphic Tracked resource types can be created by instantiating this type, with 'kind' as the discriminator."
 > extends Foundations.TrackedResource {
-  ...ResourceKindProperty<KindType>;
+  ...PolymorphicResourceKindProperty<KindType>;
 }
 
 /**
@@ -144,7 +166,7 @@ model DiscriminatedProxyResource<
   KindType extends string = string,
   Description extends valueof string = "Polymorphic proxy resource types can be created by instantiating this type, using 'kind' as the discriminator property."
 > extends Foundations.ProxyResource {
-  ...ResourceKindProperty<KindType>;
+  ...PolymorphicResourceKindProperty<KindType>;
 }
 
 /**
@@ -173,5 +195,5 @@ model DiscriminatedExtensionResource<
   KindType extends string = string,
   Description extends valueof string = "Polymorphic extension resource types can be created by aliasing this type using a specific property type."
 > extends Foundations.ExtensionResource {
-  ...ResourceKindProperty<KindType>;
+  ...PolymorphicResourceKindProperty<KindType>;
 }

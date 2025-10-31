@@ -69,6 +69,7 @@ function getEndpointTypeFromSingleServer<
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.__raw.service)}.endpoint`,
         decorators: [],
         access: "public",
+        flatten: false,
       },
     ],
     decorators: [],
@@ -172,6 +173,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, rawClient.service)}.endpoint`,
     decorators: [],
     access: "public",
+    flatten: false,
   });
 }
 
