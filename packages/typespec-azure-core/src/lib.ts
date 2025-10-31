@@ -249,6 +249,12 @@ export const $lib = createTypeSpecLibrary({
         default: `@uniqueItems can only be applied to arrays and array-valued model properties.`,
       },
     },
+    "experimental-feature": {
+      severity: "warning",
+      messages: {
+        default: "This is an experimental feature and is subject to change or removal.",
+      },
+    },
   },
 
   state: {

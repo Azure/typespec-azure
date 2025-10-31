@@ -25,7 +25,7 @@ export type CopyVariantsDecorator = (
   sourceUnion: Union,
 ) => void;
 
-export type AzureCorePrivateDecorators = {
+export type AzureCoreExperimentalDecorators = {
   changePropertyType: ChangePropertyTypeDecorator;
   extendModel: ExtendModelDecorator;
   copyVariants: CopyVariantsDecorator;

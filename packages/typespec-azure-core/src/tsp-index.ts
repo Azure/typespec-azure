@@ -1,9 +1,11 @@
+import { AzureCoreExperimentalDecorators } from "../generated-defs/Azure.Core.Experimental.js";
 import type { AzureCoreFoundationsDecorators } from "../generated-defs/Azure.Core.Foundations.js";
 import type { AzureCoreFoundationsPrivateDecorators } from "../generated-defs/Azure.Core.Foundations.Private.js";
 import type { AzureCoreDecorators } from "../generated-defs/Azure.Core.js";
 import type { AzureCoreTraitsDecorators } from "../generated-defs/Azure.Core.Traits.js";
 import type { AzureCoreTraitsPrivateDecorators } from "../generated-defs/Azure.Core.Traits.Private.js";
 import { $requestParameter, $responseProperty } from "./decorators.js";
+import { $changePropertyType, $copyVariants, $extendModel } from "./decorators/experimental.js";
 import { $finalLocation } from "./decorators/final-location.js";
 import { $finalOperation } from "./decorators/final-operation.js";
 import { $omitKeyProperties } from "./decorators/foundations/omit-key-properties.js";
@@ -23,11 +25,6 @@ import { $defaultFinalStateVia } from "./decorators/private/default-final-state-
 import { $embeddingVector } from "./decorators/private/embedding-vector.js";
 import { $ensureResourceType } from "./decorators/private/ensure-resource-type.js";
 import { $ensureVerb } from "./decorators/private/ensure-verb.js";
-import {
-  $changePropertyType,
-  $copyVariants,
-  $extendModel,
-} from "./decorators/private/experimental.js";
 import { $needsRoute } from "./decorators/private/needs-route.js";
 import { parameterizedNextLinkConfigDecorator } from "./decorators/private/parameterized-next-link-config.js";
 import { $spreadCustomParameters } from "./decorators/private/spread-custom-parameters.js";
@@ -103,9 +100,9 @@ export const $decorators = {
     ensureTraitsPresent: $ensureTraitsPresent,
   } satisfies AzureCoreTraitsPrivateDecorators,
 
-  "Azure.Core.Private": {
+  "Azure.Core.Experimental": {
     changePropertyType: $changePropertyType,
     extendModel: $extendModel,
     copyVariants: $copyVariants,
-  },
+  } satisfies AzureCoreExperimentalDecorators,
 };

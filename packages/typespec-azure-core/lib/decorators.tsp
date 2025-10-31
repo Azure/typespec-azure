@@ -134,14 +134,6 @@ namespace Azure.Core {
   extern dec uniqueItems(entity: ModelProperty | Model);
 }
 
-namespace Azure.Core.Private {
-  extern dec changePropertyType(target: ModelProperty, newType: Model | Union | Scalar | Enum);
-
-  extern dec extendModel(target: Model, source: Model);
-
-  extern dec copyVariants(target: Union, sourceUnion: Union);
-}
-
 namespace Azure.Core.Foundations {
   /**
    * Deletes any key properties from the model.
@@ -229,4 +221,12 @@ namespace Azure.Core.Foundations.Private {
    * guidelines.
    */
   extern dec parameterizedNextLinkConfig(target: Scalar, parameters: ModelProperty[]);
+}
+
+namespace Azure.Core.Experimental {
+  extern dec changePropertyType(target: ModelProperty, newType: Model | Union | Scalar | Enum);
+
+  extern dec extendModel(target: Model, source: Model);
+
+  extern dec copyVariants(target: Union, sourceUnion: Union);
 }
