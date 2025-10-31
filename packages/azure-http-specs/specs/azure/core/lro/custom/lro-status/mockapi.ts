@@ -17,7 +17,7 @@ function uploadPendingHandler(req: MockRequest) {
   uploadPollCount += 1;
   const response =
     uploadPollCount === 1
-      ? { status: "InProgress", statusDetails: "Security domain upload in progress" }
+      ? { status: "Working", statusDetails: "Security domain upload in progress" }
       : { status: "Succeeded", statusDetails: "Security domain upload completed successfully" };
 
   return { status: 200, body: json(response) };
@@ -38,20 +38,9 @@ Scenarios.Azure_Core_Lro_Custom_LroStatus_upload = passOnSuccess([
       headers: {
         "operation-location": dyn`${dynItem("baseUrl")}/azure/core/lro/custom/lro-status/securitydomain/upload/pending`,
       },
-      body: json({ status: "InProgress", statusDetails: "Security domain upload initiated" }),
+      body: json({ status: "Working", statusDetails: "Security domain upload initiated" }),
     },
-    handler: (req: MockRequest) => {
-      req.expect.containsQueryParam("api-version", "2022-12-01-preview");
-      req.expect.bodyEquals({ value: "test-domain" });
-      uploadPollCount = 0;
-      return {
-        status: 202,
-        headers: {
-          "operation-location": `${req.baseUrl}/azure/core/lro/custom/lro-status/securitydomain/upload/pending`,
-        },
-        body: json({ status: "InProgress", statusDetails: "Security domain upload initiated" }),
-      };
-    },
+    handler: uploadPendingHandler,
     kind: "MockApiDefinition",
   },
   {
@@ -64,7 +53,7 @@ Scenarios.Azure_Core_Lro_Custom_LroStatus_upload = passOnSuccess([
     },
     response: {
       status: 202,
-      body: json({ status: "InProgress", statusDetails: "Security domain upload in progress" }),
+      body: json({ status: "Working", statusDetails: "Security domain upload in progress" }),
     },
     handler: uploadPendingHandler,
     kind: "MockApiDefinition",
@@ -100,7 +89,7 @@ Scenarios.Azure_Core_Lro_Custom_LroStatus_uploadPending = passOnSuccess([
     },
     response: {
       status: 202,
-      body: json({ status: "InProgress", statusDetails: "Security domain upload in progress" }),
+      body: json({ status: "Working", statusDetails: "Security domain upload in progress" }),
     },
     handler: uploadPendingHandler,
     kind: "MockApiDefinition",

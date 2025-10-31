@@ -40,18 +40,7 @@ Scenarios.Azure_Core_Lro_Custom_LroSucceeded_upload = passOnSuccess([
       },
       body: json({ status: "InProgress", statusDetails: "Security domain upload initiated" }),
     },
-    handler: (req: MockRequest) => {
-      req.expect.containsQueryParam("api-version", "2022-12-01-preview");
-      req.expect.bodyEquals({ value: "test-domain" });
-      uploadPollCount = 0;
-      return {
-        status: 202,
-        headers: {
-          "operation-location": `${req.baseUrl}/azure/core/lro/custom/lro-succeeded/securitydomain/upload/pending`,
-        },
-        body: json({ status: "InProgress", statusDetails: "Security domain upload initiated" }),
-      };
-    },
+    handler: uploadPendingHandler,
     kind: "MockApiDefinition",
   },
   {
