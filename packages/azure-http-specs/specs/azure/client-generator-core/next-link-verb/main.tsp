@@ -10,7 +10,11 @@ using Azure.ClientGenerator.Core;
 @scenarioService("/azure/client-generator-core/next-link-verb")
 @global.Azure.ClientGenerator.Core.clientNamespace(
   "azure.clientgenerator.core.nextlinkverb",
-  "java,python"
+  "java"
+)
+@global.Azure.ClientGenerator.Core.clientNamespace(
+  "specs.azure.clientgenerator.core.nextlinkverb",
+  "python"
 )
 namespace _Specs_.Azure.ClientGenerator.Core.NextLinkVerb;
 
