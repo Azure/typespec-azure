@@ -14,13 +14,14 @@ using Azure.ResourceManager.Private;
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the list operation
  * @template Error Optional. The error response, if non-standard.
+ * @template OverrideResourceName Optional. Allows overriding the resource name for this scope in generated clients.
  */
 @autoRoute
 @doc("List {name} resources by scope", ExtensionResource)
 @list
 @listsResource(ExtensionResource)
 @segmentOf(ExtensionResource)
-@armResourceList(ExtensionResource)
+@extensionResourceOperation(TargetResource, ExtensionResource, "list", OverrideResourceName)
 @get
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
@@ -29,7 +30,8 @@ op ListByTarget<
   ExtensionResource extends Foundations.SimpleResource,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<ResourceListResult<ExtensionResource>>,
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OverrideResourceName extends valueof string = ""
 > is ArmReadOperation<
   ExtensionParentParameters<TargetResource, ExtensionResource> & Parameters,
   Response,
@@ -43,19 +45,21 @@ op ListByTarget<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the read operation
  * @template Error Optional. The error response, if non-standard.
+ * @template OverrideResourceName Optional. Allows overriding the resource name for this scope in generated clients.
  */
 @autoRoute
 @doc("Get a {name}", ExtensionResource)
 @get
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
-@armResourceRead(ExtensionResource)
+@extensionResourceOperation(TargetResource, ExtensionResource, "read", OverrideResourceName)
 op Read<
   TargetResource extends SimpleResource,
   ExtensionResource extends SimpleResource,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<ExtensionResource>,
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OverrideResourceName extends valueof string = ""
 > is ArmReadOperation<
   ExtensionInstanceParameters<TargetResource, ExtensionResource> & Parameters,
   Response,
@@ -69,18 +73,26 @@ op Read<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the read operation
  * @template Error Optional. The error response, if non-standard.
+ * @template OverrideResourceName Optional. Allows overriding the resource name for this scope in generated clients.
  */
 @autoRoute
 @doc("Check for the existence of a {name}", ExtensionResource)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
+@extensionResourceOperation(
+  TargetResource,
+  ExtensionResource,
+  "checkExistence",
+  OverrideResourceName
+)
 @head
 op CheckExistence<
   TargetResource extends SimpleResource,
   ExtensionResource extends SimpleResource,
   Parameters extends {} = {},
   Response extends {} = ArmResourceExistsResponse | ArmResourceNotFoundResponse,
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OverrideResourceName extends valueof string = ""
 > is ArmReadOperation<
   ExtensionInstanceParameters<TargetResource, ExtensionResource> & Parameters,
   Response,
@@ -95,10 +107,16 @@ op CheckExistence<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the createOrUpdate operation
  * @template Error Optional. The error response, if non-standard.
+ * @template OverrideResourceName Optional. Allows overriding the resource name for this scope in generated clients
  */
 @autoRoute
 @doc("Create a {name}", ExtensionResource)
-@armResourceCreateOrUpdate(ExtensionResource)
+@extensionResourceOperation(
+  TargetResource,
+  ExtensionResource,
+  "createOrUpdate",
+  OverrideResourceName
+)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 @Azure.Core.Foundations.Private.defaultFinalStateVia(#["location", "azure-async-operation"])
@@ -113,7 +131,8 @@ op CreateOrUpdateAsync<
     ExtensionResource,
     LroHeaders
   >,
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OverrideResourceName extends valueof string = ""
 > is ArmCreateOperation<
   ExtensionInstanceParameters<TargetResource, ExtensionResource> & Parameters,
   ExtensionResource,
@@ -128,10 +147,16 @@ op CreateOrUpdateAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the createOrUpdate operation
  * @template Error Optional. The error response, if non-standard.
+ * @template OverrideResourceName Optional. Allows overriding the resource name for this scope in generated clients.
  */
 @autoRoute
 @doc("Create a {name}", ExtensionResource)
-@armResourceCreateOrUpdate(ExtensionResource)
+@extensionResourceOperation(
+  TargetResource,
+  ExtensionResource,
+  "createOrUpdate",
+  OverrideResourceName
+)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 @put
@@ -140,7 +165,8 @@ op CreateOrReplaceSync<
   ExtensionResource extends Foundations.SimpleResource,
   Parameters extends {} = {},
   Response extends {} = ArmResourceUpdatedResponse<ExtensionResource> | ArmResourceCreatedSyncResponse<ExtensionResource>,
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OverrideResourceName extends valueof string = ""
 > is ArmCreateOperation<
   ExtensionInstanceParameters<TargetResource, ExtensionResource> & Parameters,
   ExtensionResource,
@@ -156,7 +182,16 @@ op CreateOrReplaceSync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the createOrReplace operation
  * @template Error Optional. The error response, if non-standard.
+ * @template OverrideResourceName Optional. Allows overriding the resource name for this scope in generated clients
  */
+@autoRoute
+@doc("Create a {name}", ExtensionResource)
+@extensionResourceOperation(
+  TargetResource,
+  ExtensionResource,
+  "createOrUpdate",
+  OverrideResourceName
+)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 op CreateOrReplaceAsync<
@@ -169,14 +204,16 @@ op CreateOrReplaceAsync<
     ExtensionResource,
     LroHeaders
   >,
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OverrideResourceName extends valueof string = ""
 > is CreateOrUpdateAsync<
   TargetResource,
   ExtensionResource,
   LroHeaders,
   Parameters,
   Response,
-  Error
+  Error,
+  OverrideResourceName
 >;
 
 /**
@@ -188,10 +225,11 @@ op CreateOrReplaceAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the patch operation
  * @template Error Optional. The error response, if non-standard.
+ * @template OverrideResourceName Optional. Allows overriding the resource name for this scope in generated clients
  */
 @autoRoute
 @doc("Update a {name}", ExtensionResource)
-@armResourceUpdate(ExtensionResource)
+@extensionResourceOperation(TargetResource, ExtensionResource, "update", OverrideResourceName)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 @patch(#{ implicitOptionality: false })
@@ -210,7 +248,8 @@ op CustomPatchAsync<
     "Resource update request accepted.",
     LroHeaders
   >,
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OverrideResourceName extends valueof string = ""
 > is ArmUpdateOperation<
   ExtensionInstanceParameters<TargetResource, ExtensionResource> & Parameters,
   PatchModel,
@@ -226,10 +265,11 @@ op CustomPatchAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response for the patch operation
  * @template Error Optional. The error response, if non-standard.
+ * @template OverrideResourceName Optional. Allows overriding the resource name for this scope in generated clients.
  */
 @autoRoute
 @doc("Update a {name}", ExtensionResource)
-@armResourceUpdate(ExtensionResource)
+@extensionResourceOperation(TargetResource, ExtensionResource, "update", OverrideResourceName)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 @patch(#{ implicitOptionality: false })
@@ -239,7 +279,8 @@ op CustomPatchSync<
   PatchModel extends TypeSpec.Reflection.Model = TagsUpdateModel<ExtensionResource>,
   Parameters extends {} = {},
   Response extends {} = ArmResponse<ExtensionResource>,
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OverrideResourceName extends valueof string = ""
 > is ArmUpdateOperation<
   ExtensionInstanceParameters<TargetResource, ExtensionResource> & Parameters,
   PatchModel,
@@ -254,10 +295,11 @@ op CustomPatchSync<
  * @template Response The response type for the operation
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
+ * @template OverrideResourceName Optional. Allows overriding the resource name for this scope in generated clients.
  */
 @autoRoute
 @doc("Delete a {name}", ExtensionResource)
-@armResourceDelete(ExtensionResource)
+@extensionResourceOperation(TargetResource, ExtensionResource, "delete", OverrideResourceName)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 @delete
@@ -266,7 +308,8 @@ op DeleteAsyncBase<
   ExtensionResource extends Foundations.SimpleResource,
   Response,
   Parameters extends {} = {},
-  Error extends {} = ErrorResponse
+  Error extends {} = ErrorResponse,
+  OverrideResourceName extends valueof string = ""
 >(
   ...ExtensionInstanceParameters<TargetResource, ExtensionResource>,
   ...Parameters,
@@ -280,8 +323,12 @@ op DeleteAsyncBase<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response(s) for the delete operation
  * @template Error Optional. The error response, if non-standard.
+ * @template OverrideResourceName Optional. Allows overriding the resource name for this scope in generated clients.
  */
 #deprecated "Use 'DeleteWithoutOkAsync' instead"
+@autoRoute
+@doc("Delete a {name}", ExtensionResource)
+@extensionResourceOperation(TargetResource, ExtensionResource, "delete", OverrideResourceName)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 op DeleteAsync<
@@ -291,8 +338,16 @@ op DeleteAsync<
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmDeletedResponse | ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
-  Error extends {} = ErrorResponse
-> is DeleteAsyncBase<TargetResource, ExtensionResource, Response, Parameters, Error>;
+  Error extends {} = ErrorResponse,
+  OverrideResourceName extends valueof string = ""
+> is DeleteAsyncBase<
+  TargetResource,
+  ExtensionResource,
+  Response,
+  Parameters,
+  Error,
+  OverrideResourceName
+>;
 
 /**
  * @dev Delete a resource asynchronously
@@ -302,7 +357,11 @@ op DeleteAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response(s) for the delete operation
  * @template Error Optional. The error response, if non-standard.
+ * @template OverrideResourceName Optional. Allows overriding the resource name for this scope in generated clients.
  */
+@autoRoute
+@doc("Delete a {name}", ExtensionResource)
+@extensionResourceOperation(TargetResource, ExtensionResource, "delete", OverrideResourceName)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 op DeleteWithoutOkAsync<
@@ -312,8 +371,16 @@ op DeleteWithoutOkAsync<
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
-  Error extends {} = ErrorResponse
-> is DeleteAsyncBase<TargetResource, ExtensionResource, Response, Parameters, Error>;
+  Error extends {} = ErrorResponse,
+  OverrideResourceName extends valueof string = ""
+> is DeleteAsyncBase<
+  TargetResource,
+  ExtensionResource,
+  Response,
+  Parameters,
+  Error,
+  OverrideResourceName
+>;
 
 /**
  * Delete a resource synchronously
@@ -322,10 +389,11 @@ op DeleteWithoutOkAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Response Optional. The success response(s) for the delete operation
  * @template Error Optional. The error response, if non-standard.
+ * @template OverrideResourceName Optional. Allows overriding the resource name for this scope in generated clients.
  */
 @autoRoute
 @doc("Delete a {name}", ExtensionResource)
-@armResourceDelete(ExtensionResource)
+@extensionResourceOperation(TargetResource, ExtensionResource, "delete", OverrideResourceName)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 @delete
@@ -334,7 +402,8 @@ op DeleteSync<
   ExtensionResource extends Foundations.SimpleResource,
   Parameters extends {} = {},
   Response extends {} = ArmDeletedResponse | ArmDeletedNoContentResponse,
-  Error = ErrorResponse
+  Error = ErrorResponse,
+  OverrideResourceName extends valueof string = ""
 >(
   ...ExtensionInstanceParameters<TargetResource, ExtensionResource>,
   ...Parameters,
@@ -349,9 +418,10 @@ op DeleteSync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
  * @template OptionalRequestBody Optional. Indicates whether the request body is optional.
+ * @template OverrideResourceName Optional. Allows overriding the resource name for this scope in generated clients.
  */
 @autoRoute
-@armResourceAction(ExtensionResource)
+@extensionResourceOperation(TargetResource, ExtensionResource, "action", OverrideResourceName)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 @post
@@ -362,7 +432,8 @@ op ActionAsyncBase<
   Response extends TypeSpec.Reflection.Model | void,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
-  OptionalRequestBody extends valueof boolean = false
+  OptionalRequestBody extends valueof boolean = false,
+  OverrideResourceName extends valueof string = ""
 >(
   ...ExtensionInstanceParameters<TargetResource, ExtensionResource>,
   ...Parameters,
@@ -382,7 +453,10 @@ op ActionAsyncBase<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
  * @template OptionalRequestBody Optional. Indicates whether the body parameter is optional.
+ * @template OverrideResourceName Optional. Allows overriding the resource name for this scope in generated clients.
  */
+@autoRoute
+@extensionResourceOperation(TargetResource, ExtensionResource, "action", OverrideResourceName)
 @returnsDoc("Azure operation completed successfully.")
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 op ActionAsync<
@@ -398,7 +472,8 @@ op ActionAsync<
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
-  OptionalRequestBody extends valueof boolean = false
+  OptionalRequestBody extends valueof boolean = false,
+  OverrideResourceName extends valueof string = ""
 > is ActionAsyncBase<
   TargetResource,
   ExtensionResource,
@@ -418,9 +493,10 @@ op ActionAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
  * @template OptionalRequestBody Optional. Indicates whether the body parameter is optional.
+ * @template OverrideResourceName Optional. Allows overriding the resource name for this scope in generated clients.
  */
 @autoRoute
-@armResourceAction(ExtensionResource)
+@extensionResourceOperation(TargetResource, ExtensionResource, "action", OverrideResourceName)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 @post
@@ -432,7 +508,8 @@ op ActionSync<
   Response extends TypeSpec.Reflection.Model | void,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
-  OptionalRequestBody extends valueof boolean = false
+  OptionalRequestBody extends valueof boolean = false,
+  OverrideResourceName extends valueof string = ""
 >(
   ...ExtensionInstanceParameters<TargetResource, ExtensionResource>,
   ...Parameters,
@@ -451,9 +528,13 @@ op ActionSync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
  * @template OptionalRequestBody Optional. Indicates whether the body parameter is optional.
+ * @template OverrideResourceName Optional. Allows overriding the resource name for this scope in generated clients.
  */
+@autoRoute
+@extensionResourceOperation(TargetResource, ExtensionResource, "action", OverrideResourceName)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
+@post
 op ActionNoResponseContentAsync<
   TargetResource extends Foundations.SimpleResource,
   ExtensionResource extends Foundations.SimpleResource,
@@ -466,7 +547,8 @@ op ActionNoResponseContentAsync<
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
-  OptionalRequestBody extends valueof boolean = false
+  OptionalRequestBody extends valueof boolean = false,
+  OverrideResourceName extends valueof string = ""
 > is ActionAsyncBase<
   TargetResource,
   ExtensionResource,
@@ -485,9 +567,11 @@ op ActionNoResponseContentAsync<
  * @template Parameters Optional. Additional parameters after the path parameters
  * @template Error Optional. The error response, if non-standard.
  * @template OptionalRequestBody Optional. Indicates whether the request body is optional.
+ * @template OverrideResourceName Optional. Allows overriding the resource name for this scope in generated clients.
+ *
  */
 @autoRoute
-@armResourceAction(ExtensionResource)
+@extensionResourceOperation(TargetResource, ExtensionResource, "action", OverrideResourceName)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 @post
@@ -497,7 +581,8 @@ op ActionNoContentSync<
   Request extends TypeSpec.Reflection.Model | void,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
-  OptionalRequestBody extends valueof boolean = false
+  OptionalRequestBody extends valueof boolean = false,
+  OverrideResourceName extends valueof string = ""
 >(
   ...ExtensionInstanceParameters<TargetResource, ExtensionResource>,
   ...Parameters,
