@@ -8,6 +8,7 @@ export const Tester = createTester(resolvePath(import.meta.dirname, ".."), {
     "@azure-tools/typespec-azure-resource-manager",
     "@typespec/rest",
     "@typespec/http",
+    "@typespec/openapi",
     "@typespec/versioning",
   ],
 })
