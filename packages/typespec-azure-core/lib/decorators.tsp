@@ -19,7 +19,7 @@ namespace Azure.Core {
    *   v3Preview
    * }
    * ```
-   * 
+   *
    */
   extern dec previewVersion(target: TypeSpec.Reflection.EnumMember);
 
@@ -221,4 +221,12 @@ namespace Azure.Core.Foundations.Private {
    * guidelines.
    */
   extern dec parameterizedNextLinkConfig(target: Scalar, parameters: ModelProperty[]);
+}
+
+namespace Azure.Core.Experimental {
+  extern dec changePropertyType(target: ModelProperty, newType: Model | Union | Scalar | Enum);
+
+  extern dec extendModel(target: Model, source: Model);
+
+  extern dec copyVariants(target: Union, sourceUnion: Union);
 }
