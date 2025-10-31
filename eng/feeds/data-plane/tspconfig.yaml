@@ -12,7 +12,7 @@ options:
     output-file: "{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json"
   "@azure-tools/typespec-python":    
     emitter-output-dir: "{output-dir}/{service-dir}/{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}"
-    namespace: "azure.{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
+    namespace: "{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
     package-mode: dataplane
   "@azure-tools/typespec-csharp":
     emitter-output-dir: "{output-dir}/{service-dir}/{{parameters.ServiceNamespace}}"

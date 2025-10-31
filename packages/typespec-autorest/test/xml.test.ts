@@ -1,4 +1,4 @@
-import { deepStrictEqual } from "assert";
+import { deepStrictEqual, strictEqual } from "assert";
 import { it } from "vitest";
 import { openApiFor } from "./test-host.js";
 
@@ -174,4 +174,53 @@ it("can mark a property as XML text using x-ms-text", async () => {
     `);
 
   deepStrictEqual(openapi.definitions["Payload"].properties["content"].xml["x-ms-text"], true);
+});
+
+it("does not emit XML metadata when the xml-strategy is 'none'", async () => {
+  // Example that includes everything
+  const openapi = await openApiFor(
+    `
+      @Xml.name("CustomName")
+      @Xml.ns("http://example.com/ns", "ex")
+      model Payload {
+        @Xml.name("RenamedProperty")
+        @Xml.ns("http://example.com/propns", "prop")
+        property: string;
+
+        @Xml.unwrapped
+        items: string[];
+
+        data: {
+          @Xml.unwrapped
+          content: string;
+        };
+      }
+
+      @get op getXml(
+        @header contentType: "application/xml",
+        @body body: string;
+      ): {
+        @header contentType: "application/xml";
+        @body body: string;
+      };
+    `,
+    /* versions  */ undefined,
+    /* options */ { "xml-strategy": "none" },
+  );
+
+  strictEqual(openapi.definitions["Payload"]["xml"], undefined);
+  strictEqual(openapi.definitions["Payload"].properties["property"].xml, undefined);
+
+  strictEqual(openapi.definitions["Payload"].properties["items"].xml, undefined);
+  strictEqual(openapi.definitions["Payload"].properties["data"].xml, undefined);
+  strictEqual(
+    openapi.definitions["Payload"].properties["data"].properties["content"].xml,
+    undefined,
+  );
+
+  deepStrictEqual(openapi.consumes, ["application/json"]);
+  deepStrictEqual(openapi.produces, ["application/json"]);
+
+  deepStrictEqual(openapi.paths["/"].get.consumes, ["application/xml"]);
+  deepStrictEqual(openapi.paths["/"].get.produces, ["application/xml"]);
 });

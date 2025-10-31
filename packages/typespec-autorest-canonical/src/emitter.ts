@@ -32,6 +32,7 @@ const defaultOptions = {
   "output-file": "{azure-resource-provider-folder}/{service-name}/canonical/openapi.json",
   "new-line": "lf",
   "include-x-typespec-name": "never",
+  "xml-strategy": "xml-service",
 } as const;
 
 export const canonicalVersion = "canonical";
@@ -70,6 +71,7 @@ export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptio
     includeXTypeSpecName: resolvedOptions["include-x-typespec-name"],
     armTypesDir,
     useReadOnlyStatusSchema: true,
+    xmlStrategy: resolvedOptions["xml-strategy"],
   };
 
   await emitAllServices(context.program, tcgcSdkContext, options);

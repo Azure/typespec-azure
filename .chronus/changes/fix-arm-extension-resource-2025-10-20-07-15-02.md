@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-Fix client.tsp of client-operation-group for python
+Bug fix for Arm ExtensionResource test case

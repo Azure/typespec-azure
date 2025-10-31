@@ -20,16 +20,16 @@
   "scripts": {
     "watch": "tsc -p ./tsconfig.build.json --watch",
     "build": "tsc -p ./tsconfig.build.json",
-    "clean": "rimraf dist/ .temp/",
+    "clean": "rimraf dist/ temp/",
     "test": "vitest run",
     "test:watch": "vitest -w"
   },
   "dependencies": {
     "@pnpm/workspace.find-packages": "^1000.0.24",
     "execa": "^9.5.2",
-    "globby": "~14.1.0",
+    "globby": "~15.0.0",
     "log-symbols": "^7.0.1",
-    "ora": "^8.1.1",
+    "ora": "^9.0.0",
     "pathe": "^2.0.3",
     "picocolors": "~1.1.1",
     "simple-git": "^3.28.0",
@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "typescript": "~5.9.2",
-    "vitest": "^3.1.2"
+    "vitest": "^4.0.4"
   },
   "bugs": "https://github.com/microsoft/typespec/issues"
 }
