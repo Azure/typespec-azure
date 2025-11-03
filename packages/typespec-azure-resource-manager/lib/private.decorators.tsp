@@ -101,6 +101,7 @@ extern dec azureResourceBase(target: Model);
  * It will programatically enabled/disable client flattening with @flattenProperty with autorest
  * emitter flags to maintain compatibility in swagger.
  */
+#deprecated "Use @Azure.ClientGenerator.Core.Legacy.flattenProperty instead."
 extern dec conditionalClientFlatten(target: ModelProperty);
 
 /**
