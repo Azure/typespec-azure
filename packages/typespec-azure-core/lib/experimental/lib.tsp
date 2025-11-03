@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import "../azure-core.tsp";
 import "../../dist/src/experimental/tsp-index.js";
 
 namespace Azure.Core.Experimental;

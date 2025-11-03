@@ -31,7 +31,7 @@
     },
     "./experimental": {
       "typespec": "./lib/experimental/lib.tsp",
-      "default": "./dist/src/experimental/tsp-index.js"
+      "import": "./dist/src/experimental/index.js"
     }
   },
   "imports": {
