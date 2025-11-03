@@ -410,8 +410,8 @@ importers:
         specifier: ^7.7.1
         version: 7.7.3
       tar:
-        specifier: ^7.4.3
-        version: 7.5.1
+        specifier: ^7.5.2
+        version: 7.5.2
       temporal-polyfill:
         specifier: ^0.3.0
         version: 0.3.0
@@ -12508,6 +12508,10 @@ packages:
     resolution: {integrity: sha512-nlGpxf+hv0v7GkWBK2V9spgactGOp0qvfWRxUMjqHyzrt3SgwE48DIv/FhqPHJYLHpgW1opq3nERbz5Anq7n1g==}
     engines: {node: '>=18'}
 
+  tar@7.5.2:
+    resolution: {integrity: sha512-7NyxrTE4Anh8km8iEy7o0QYPs+0JKBTj5ZaqHg6B39erLg0qYXN3BijtShwbsNSvQ+LN75+KV+C4QR/f6Gwnpg==}
+    engines: {node: '>=18'}
+
   tau-prolog@0.2.81:
     resolution: {integrity: sha512-cHSdGumv+GfRweqE3Okd81+ZH1Ux6PoJ+WPjzoAFVar0SRoUxW93vPvWTbnTtlz++IpSEQ0yUPWlLBcTMQ8uOg==}
 
@@ -20384,7 +20388,7 @@ snapshots:
       minipass-pipeline: 1.2.4
       p-map: 7.0.3
       ssri: 12.0.0
-      tar: 7.5.1
+      tar: 7.5.2
       unique-filename: 4.0.0
 
   cacache@20.0.1:
@@ -24131,7 +24135,7 @@ snapshots:
       nopt: 8.1.0
       proc-log: 5.0.0
       semver: 7.7.3
-      tar: 7.5.1
+      tar: 7.5.2
       tinyglobby: 0.2.15
       which: 5.0.0
     transitivePeerDependencies:
@@ -24551,7 +24555,7 @@ snapshots:
       promise-retry: 2.0.1
       sigstore: 4.0.0
       ssri: 12.0.0
-      tar: 7.5.1
+      tar: 7.5.2
     transitivePeerDependencies:
       - supports-color
 
@@ -26210,6 +26214,14 @@ snapshots:
       yallist: 4.0.0
 
   tar@7.5.1:
+    dependencies:
+      '@isaacs/fs-minipass': 4.0.1
+      chownr: 3.0.0
+      minipass: 7.1.2
+      minizlib: 3.1.0
+      yallist: 5.0.0
+
+  tar@7.5.2:
     dependencies:
       '@isaacs/fs-minipass': 4.0.1
       chownr: 3.0.0
