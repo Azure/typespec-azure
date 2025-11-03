@@ -2,6 +2,7 @@
 changeKind: deprecation
 packages:
   - "@azure-tools/typespec-autorest"
+  - "@azure-tools/typespec-azure-resource-manager"
 ---
 
 Deprecate `arm-resource-flattening` option to reduce confusion with new flattening mechanisms.
