@@ -9,6 +9,7 @@ import {
 } from "./decorators.js";
 import { getSdkHttpParameter } from "./http.js";
 import {
+  ClientInitializationOptions,
   InitializedByFlags,
   SdkClient,
   SdkClientInitializationType,
@@ -198,7 +199,9 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     methods: [],
     apiVersions: context.getApiVersionsForType(client.type ?? client.service),
     namespace: getClientNamespace(context, client.type ?? client.service),
-    clientInitialization: diagnostics.pipe(createSdkClientInitializationType(context, client)),
+    clientInitialization: diagnostics.pipe(
+      createSdkClientInitializationType(context, client, parent),
+    ),
     decorators: client.type ? diagnostics.pipe(getTypeDecorators(context, client.type)) : [],
     parent,
     // if it is client, the crossLanguageDefinitionId is the ${namespace}, if it is operation group, the crosslanguageDefinitionId is the %{namespace}.%{operationGroupName}
@@ -258,9 +261,12 @@ function addDefaultClientParameters<
   ];
 }
 
-function createSdkClientInitializationType(
+function createSdkClientInitializationType<
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+>(
   context: TCGCContext,
   client: SdkClient | SdkOperationGroup,
+  parent?: SdkClientType<TServiceOperation> | undefined,
 ): [SdkClientInitializationType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const name = `${client.kind === "SdkClient" ? client.name : client.groupPath.split(".").at(-1)}Options`;
@@ -274,10 +280,11 @@ function createSdkClientInitializationType(
     isGeneratedName: true,
     decorators: [],
   };
+  let initializationOptions: ClientInitializationOptions | undefined = undefined;
 
   // customization
   if (client.type) {
-    const initializationOptions = getClientInitializationOptions(context, client.type);
+    initializationOptions = getClientInitializationOptions(context, client.type);
     if (initializationOptions?.parameters) {
       result.doc = getDoc(context.program, initializationOptions.parameters);
       result.summary = getSummary(context.program, initializationOptions.parameters);
@@ -337,6 +344,37 @@ function createSdkClientInitializationType(
       }
       for (const param of result.parameters) {
         if (param.kind === "method") clientParams.push(param);
+      }
+    }
+  }
+
+  // Propagate parent client initialization parameters if InitializedBy.Parent or no InitializedBy is set
+  // Only propagate if no custom parameters are set on the child
+  if (
+    !initializationOptions?.parameters &&
+    parent &&
+    result.initializedBy !== InitializedByFlags.Individually
+  ) {
+    // Prepend parent parameters to child parameters
+    // This ensures parent parameters come first, child-specific parameters come after
+    const parentParams = parent.clientInitialization.parameters;
+    const childParamNames = new Set(result.parameters.map((p) => p.name));
+
+    // Only add parent params that aren't already defined in child
+    const inheritedParams = parentParams.filter((p) => !childParamNames.has(p.name));
+
+    result.parameters = [...inheritedParams, ...result.parameters];
+
+    // Also update the cache to include parent parameters
+    let clientParams = context.__clientParametersCache.get(client);
+    if (!clientParams) {
+      clientParams = [];
+      context.__clientParametersCache.set(client, clientParams);
+    }
+
+    for (const param of inheritedParams) {
+      if (param.kind === "method" && !clientParams.some((cp) => cp.name === param.name)) {
+        clientParams.push(param);
       }
     }
   }
