@@ -352,13 +352,6 @@ export const $lib = createTypeSpecLibrary({
           "Only encode of `ArrayEncoding.pipeDelimited` and `ArrayEncoding.spaceDelimited` is supported for collection format.",
       },
     },
-    "no-discriminated-unions": {
-      severity: "error",
-      messages: {
-        default:
-          "Discriminated unions are not supported. Please redefine the type using model with hierarchy and `@discriminator` decorator.",
-      },
-    },
     "non-head-bool-response-decorator": {
       severity: "warning",
       messages: {
