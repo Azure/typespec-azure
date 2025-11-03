@@ -503,8 +503,8 @@ export interface DiscriminatedOptions {
   envelope: "object" | "none";
   /** Name of the discriminator property. */
   discriminatorPropertyName: string;
-  /** Name of the property envelopping the data. */
-  envelopePropertyName: string;
+  /** Name of the property envelopping the data. `undefined` if envelope is "none" */
+  envelopePropertyName?: string;
 }
 
 export interface SdkModelType extends SdkTypeBase {

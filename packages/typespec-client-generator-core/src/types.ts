@@ -581,7 +581,11 @@ export function getSdkUnionWithDiagnostics(
           retval.discriminatedOptions = {
             envelope: discriminatedOptions.envelope ?? "object",
             discriminatorPropertyName: discriminatedOptions.discriminatorPropertyName ?? "kind",
-            envelopePropertyName: discriminatedOptions.envelopePropertyName ?? "value",
+            envelopePropertyName:
+              (discriminatedOptions.envelopePropertyName ??
+              discriminatedOptions.envelope === "none")
+                ? undefined
+                : "value",
           };
         }
         if (nullOption !== undefined) {
