@@ -582,10 +582,8 @@ export function getSdkUnionWithDiagnostics(
             envelope: discriminatedOptions.envelope ?? "object",
             discriminatorPropertyName: discriminatedOptions.discriminatorPropertyName ?? "kind",
             envelopePropertyName:
-              (discriminatedOptions.envelopePropertyName ??
-              discriminatedOptions.envelope === "none")
-                ? undefined
-                : "value",
+              discriminatedOptions.envelopePropertyName ??
+              (discriminatedOptions.envelope === "none" ? undefined : "value"),
           };
         }
         if (nullOption !== undefined) {
