@@ -868,3 +868,131 @@ it("one client from multiple services", async () => {
   strictEqual(biOperationApiVersionParam.correspondingMethodParams.length, 1);
   strictEqual(biOperationApiVersionParam.correspondingMethodParams[0], biApiVersionParam);
 });
+
+it("one client from multiple services with versioning", async () => {
+  await runner.compileWithCustomization(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+        av3,
+      }
+
+      @added(VersionsA.av2)
+      model ServiceAModel {
+        id: string;
+        @added(VersionsA.av3)
+        name?: string;
+      }
+
+      interface AI {
+        @added(VersionsA.av2)
+        @route("/atest")
+        atest(@query("api-version") apiVersion: VersionsA): ServiceAModel;
+        
+        @added(VersionsA.av3)
+        @route("/anew")
+        aNewOp(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+
+      model ServiceBModel {
+        data: string;
+      }
+
+      interface BI {
+        @route("/btest")
+        btest(@query("api-version") apiVersion: VersionsB): ServiceBModel;
+        
+        @added(VersionsB.bv2)
+        @route("/bnew")
+        bNewOp(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+    `
+    @client
+    @service
+    namespace CombineClient {
+      @client({parent: CombineClient, service: ServiceA})
+      @clientInitialization({initializedBy: InitializedBy.parent})
+      interface AI extends ServiceA.AI {}
+
+      @client({parent: CombineClient, service: ServiceB})
+      @clientInitialization({initializedBy: InitializedBy.parent})
+      interface BI extends ServiceB.BI {}
+    }
+  `,
+  );
+
+  const sdkPackage = runner.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+
+  // Should have 2 children (AI and BI)
+  strictEqual(client.children?.length, 2);
+
+  const aiClient = client.children?.find((c) => c.name === "AI");
+  ok(aiClient);
+
+  // AI client should have ServiceA's api versions
+  deepStrictEqual(aiClient.apiVersions, ["av1", "av2", "av3"]);
+
+  // Check ServiceAModel exists and has correct versioning
+  const serviceAModel = sdkPackage.models.find((m) => m.name === "ServiceAModel");
+  ok(serviceAModel);
+  deepStrictEqual(serviceAModel.apiVersions, ["av2", "av3"]); // Added in av2
+
+  // Check model property versioning
+  const nameProperty = serviceAModel.properties.find((p) => p.name === "name");
+  ok(nameProperty);
+  deepStrictEqual(nameProperty.apiVersions, ["av3"]); // Added in av3
+
+  const idProperty = serviceAModel.properties.find((p) => p.name === "id");
+  ok(idProperty);
+
+  // AI client should have 2 methods initially, but aNewOp is only available from av3
+  const aiMethods = aiClient.methods;
+  const atestMethod = aiMethods.find((m) => m.name === "atest");
+  ok(atestMethod);
+  deepStrictEqual(atestMethod.apiVersions, ["av2", "av3"]);
+
+  const aNewMethod = aiMethods.find((m) => m.name === "aNewOp");
+  ok(aNewMethod);
+  deepStrictEqual(aNewMethod.apiVersions, ["av3"]); // Added in av3
+
+  const biClient = client.children?.find((c) => c.name === "BI");
+  ok(biClient);
+
+  // BI client should have ServiceB's api versions
+  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
+
+  // Check ServiceBModel versioning
+  const serviceBModel = sdkPackage.models.find((m) => m.name === "ServiceBModel");
+  ok(serviceBModel);
+  deepStrictEqual(serviceBModel.apiVersions, ["bv1", "bv2"]); // Available from start
+
+  // BI client methods
+  const biMethods = biClient.methods;
+  const btestMethod = biMethods.find((m) => m.name === "btest");
+  ok(btestMethod);
+  deepStrictEqual(btestMethod.apiVersions, ["bv1", "bv2"]);
+
+  const bNewMethod = biMethods.find((m) => m.name === "bNewOp");
+  ok(bNewMethod);
+  deepStrictEqual(bNewMethod.apiVersions, ["bv2"]); // Added in bv2
+
+  // Parent client should have no versioning
+  deepStrictEqual(client.apiVersions, []);
+});
