@@ -578,12 +578,14 @@ export function getSdkUnionWithDiagnostics(
         };
         const discriminatedOptions = $(context.program).union.getDiscriminatedUnion(type)?.options;
         if (discriminatedOptions) {
+          const envelope = discriminatedOptions.envelope ?? "object";
           retval.discriminatedOptions = {
-            envelope: discriminatedOptions.envelope ?? "object",
+            envelope,
             discriminatorPropertyName: discriminatedOptions.discriminatorPropertyName ?? "kind",
             envelopePropertyName:
-              discriminatedOptions.envelopePropertyName ??
-              (discriminatedOptions.envelope === "none" ? undefined : "value"),
+              envelope === "none"
+                ? undefined
+                : (discriminatedOptions.envelopePropertyName ?? "value"),
           };
         }
         if (nullOption !== undefined) {
