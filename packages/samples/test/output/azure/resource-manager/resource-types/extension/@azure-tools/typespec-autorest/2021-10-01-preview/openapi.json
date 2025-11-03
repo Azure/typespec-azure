@@ -401,8 +401,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/RoleAssignmentProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       },
       "allOf": [
@@ -454,8 +453,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/RoleAssignmentUpdateProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       }
     },

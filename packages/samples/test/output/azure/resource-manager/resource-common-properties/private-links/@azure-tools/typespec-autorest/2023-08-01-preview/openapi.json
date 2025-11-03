@@ -648,8 +648,7 @@
       "properties": {
         "properties": {
           "$ref": "../../../../../../../../../specs/resource-manager/common-types/v4/privatelinks.json#/definitions/PrivateEndpointConnectionProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       },
       "allOf": [
@@ -685,8 +684,7 @@
       "properties": {
         "properties": {
           "$ref": "../../../../../../../../../specs/resource-manager/common-types/v4/privatelinks.json#/definitions/PrivateLinkResourceProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       },
       "allOf": [
@@ -750,8 +748,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/TestTrackedProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       },
       "allOf": [
