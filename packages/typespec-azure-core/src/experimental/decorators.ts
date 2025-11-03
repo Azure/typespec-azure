@@ -2,22 +2,31 @@ import { DecoratorContext, Enum, Model, ModelProperty, Scalar, Union } from "@ty
 import { reportDiagnostic } from "../lib.js";
 
 export function $changePropertyType(
-  context: DecoratorContext,
+  ctx: DecoratorContext,
   target: ModelProperty,
   newType: Model | Union | Scalar | Enum,
 ) {
-  reportDiagnostic(context.program, {
+  reportDiagnostic(ctx.program, {
     code: "experimental-feature",
-    target: target,
+    messageId: "dangerous",
+    format: {
+      feature: "@changePropertyType",
+    },
+    target: ctx.decoratorTarget,
   });
   target.type = newType;
 }
 
-export function $extendModel(context: DecoratorContext, target: Model, baseModel: Model) {
-  reportDiagnostic(context.program, {
+export function $copyProperties(ctx: DecoratorContext, target: Model, baseModel: Model) {
+  reportDiagnostic(ctx.program, {
     code: "experimental-feature",
-    target: target,
+    messageId: "dangerous",
+    format: {
+      feature: "@copyProperties",
+    },
+    target: ctx.decoratorTarget,
   });
+
   for (const [propName, prop] of baseModel.properties) {
     if (target.properties.has(propName)) {
       continue;
@@ -26,11 +35,16 @@ export function $extendModel(context: DecoratorContext, target: Model, baseModel
   }
 }
 
-export function $copyVariants(context: DecoratorContext, target: Union, sourceUnion: Union) {
-  reportDiagnostic(context.program, {
+export function $copyVariants(ctx: DecoratorContext, target: Union, sourceUnion: Union) {
+  reportDiagnostic(ctx.program, {
     code: "experimental-feature",
-    target: target,
+    messageId: "dangerous",
+    format: {
+      feature: "@copyVariants",
+    },
+    target: ctx.decoratorTarget,
   });
+
   for (const [variantName, variantType] of sourceUnion.variants) {
     if (target.variants.has(variantName)) {
       continue;

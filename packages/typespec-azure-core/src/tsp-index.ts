@@ -1,11 +1,9 @@
-import { AzureCoreExperimentalDecorators } from "../generated-defs/Azure.Core.Experimental.js";
 import type { AzureCoreFoundationsDecorators } from "../generated-defs/Azure.Core.Foundations.js";
 import type { AzureCoreFoundationsPrivateDecorators } from "../generated-defs/Azure.Core.Foundations.Private.js";
 import type { AzureCoreDecorators } from "../generated-defs/Azure.Core.js";
 import type { AzureCoreTraitsDecorators } from "../generated-defs/Azure.Core.Traits.js";
 import type { AzureCoreTraitsPrivateDecorators } from "../generated-defs/Azure.Core.Traits.Private.js";
 import { $requestParameter, $responseProperty } from "./decorators.js";
-import { $changePropertyType, $copyVariants, $extendModel } from "./decorators/experimental.js";
 import { $finalLocation } from "./decorators/final-location.js";
 import { $finalOperation } from "./decorators/final-operation.js";
 import { $omitKeyProperties } from "./decorators/foundations/omit-key-properties.js";
@@ -99,10 +97,4 @@ export const $decorators = {
     traitSource: $traitSource,
     ensureTraitsPresent: $ensureTraitsPresent,
   } satisfies AzureCoreTraitsPrivateDecorators,
-
-  "Azure.Core.Experimental": {
-    changePropertyType: $changePropertyType,
-    extendModel: $extendModel,
-    copyVariants: $copyVariants,
-  } satisfies AzureCoreExperimentalDecorators,
 };

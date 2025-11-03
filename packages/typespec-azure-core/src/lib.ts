@@ -252,7 +252,8 @@ export const $lib = createTypeSpecLibrary({
     "experimental-feature": {
       severity: "warning",
       messages: {
-        default: "This is an experimental feature and is subject to change or removal.",
+        default: paramMessage`'${"feature"}' is an experimental feature and may be removed or changed at any time. Suppress this warning and proceed with caution if you are sure you want to use it.`,
+        dangerous: paramMessage`'${"feature"}' is a DANGEROUS experiemental feature that may be removed or changed at any time and may cause unexpected behavior. Suppress this warning and proceed with extreme caution if you are sure you want to use it.`,
       },
     },
   },
