@@ -147,13 +147,7 @@ interface TopLevel {
     }
     ```
     """)
-  update is ArmCustomPatchAsync<
-    TopLevelTrackedResource,
-    Azure.ResourceManager.Foundations.ResourceUpdateModel<
-      TopLevelTrackedResource,
-      TopLevelTrackedResourceProperties
-    >
-  >;
+  update is ArmCustomPatchAsync<TopLevelTrackedResource, TopLevelTrackedResource>;
 
   @scenario
   @scenarioDoc("""

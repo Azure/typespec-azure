@@ -130,13 +130,7 @@ interface LocationResources {
     }
     ```
     """)
-  update is ArmCustomPatchSync<
-    LocationResource,
-    Azure.ResourceManager.Foundations.ResourceUpdateModel<
-      LocationResource,
-      LocationResourceProperties
-    >
-  >;
+  update is ArmCustomPatchSync<LocationResource, LocationResource>;
 
   @scenario
   @scenarioDoc("""

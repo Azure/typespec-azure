@@ -133,13 +133,7 @@ interface Singleton {
     }
     ```
     """)
-  update is ArmCustomPatchSync<
-    SingletonTrackedResource,
-    Azure.ResourceManager.Foundations.ResourceUpdateModel<
-      SingletonTrackedResource,
-      SingletonTrackedResourceProperties
-    >
-  >;
+  update is ArmCustomPatchSync<SingletonTrackedResource, SingletonTrackedResource>;
 
   @scenario
   @scenarioDoc("""
