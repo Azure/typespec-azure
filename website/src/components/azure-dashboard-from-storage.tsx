@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { 
   type CoverageFromAzureStorageOptions, 
   type CoverageSummary, 
   getCoverageSummaries 
 } from "@typespec/spec-dashboard";
-import { useEffectAsync } from "../utils/use-effect-async";
 import { AzureDashboard } from "./azure-dashboard";
 
 export const AzureDashboardFromStorage = (props: { options: CoverageFromAzureStorageOptions }) => {
@@ -12,12 +11,12 @@ export const AzureDashboardFromStorage = (props: { options: CoverageFromAzureSto
     undefined,
   );
 
-  useEffectAsync(async () => {
-    const coverageSummaries = await getCoverageSummaries(props.options);
-
-    if (coverageSummaries) {
-      setCoverageSummaries(() => coverageSummaries);
-    }
+  useEffect(() => {
+    getCoverageSummaries(props.options).then((coverageSummaries) => {
+      if (coverageSummaries) {
+        setCoverageSummaries(coverageSummaries);
+      }
+    }).catch(console.error);
   }, []);
   
   return (

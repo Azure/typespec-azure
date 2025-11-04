@@ -1,13 +1,9 @@
 import type { CoverageSummary } from "@typespec/spec-dashboard";
 import { Dashboard } from "@typespec/spec-dashboard";
 import type { ScenarioData } from "@typespec/spec-coverage-sdk";
-import { FunctionComponent, useEffect } from "react";
+import { useEffect } from "react";
 
-export interface AzureDashboardProps {
-  coverageSummaries: CoverageSummary[];
-}
-
-export const AzureDashboard: FunctionComponent<AzureDashboardProps> = ({ coverageSummaries }) => {
+export const AzureDashboard = ({ coverageSummaries }: { coverageSummaries: CoverageSummary[] }) => {
   // Split Azure coverage summaries into data plane and management plane
   const processedSummaries = coverageSummaries.flatMap((coverageSummary) => {
     if (coverageSummary.manifest.setName === "@azure-tools/azure-http-specs") {
