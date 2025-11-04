@@ -136,7 +136,7 @@ interface Nested {
     }
     ```
     """)
-  update is ArmCustomPatchAsync<NestedProxyResource, NestedProxyResource>;
+  update is ArmCustomPatchAsync<NestedProxyResource, NestedProxyResourceProperties>;
 
   @scenario
   @scenarioDoc("""

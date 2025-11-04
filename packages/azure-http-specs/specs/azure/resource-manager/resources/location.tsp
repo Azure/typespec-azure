@@ -130,7 +130,7 @@ interface LocationResources {
     }
     ```
     """)
-  update is ArmCustomPatchSync<LocationResource, LocationResource>;
+  update is ArmCustomPatchSync<LocationResource, LocationResourceProperties>;
 
   @scenario
   @scenarioDoc("""
