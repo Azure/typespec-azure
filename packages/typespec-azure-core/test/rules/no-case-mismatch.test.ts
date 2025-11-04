@@ -72,3 +72,20 @@ it("doesn't flag if names are differ by more than casing", async () => {
     )
     .toBeValid();
 });
+
+it("doesn't flag template instances", async () => {
+  await tester
+    .expect(
+      `
+        model Template<T> {
+          t: T;
+        }
+
+        model Test {
+          a: Template<string>;
+          b: Template<int32>;
+        }
+      `,
+    )
+    .toBeValid();
+});

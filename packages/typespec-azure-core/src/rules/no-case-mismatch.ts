@@ -4,6 +4,7 @@ import {
   type Namespace,
   type Union,
   createRule,
+  isTemplateInstance,
   paramMessage,
 } from "@typespec/compiler";
 import { DuplicateTracker } from "@typespec/compiler/utils";
@@ -22,7 +23,7 @@ export const noCaseMismatchRule = createRule({
     const duplicateTrackers = new Map<Namespace, DuplicateTracker<string, DataType>>();
 
     const track = (type: DataType) => {
-      if (!(type.namespace && type.name)) {
+      if (!(type.namespace && type.name) || isTemplateInstance(type)) {
         return;
       }
       let tracker = duplicateTrackers.get(type.namespace);
