@@ -7,11 +7,7 @@ import {
 import { useEffectAsync } from "../utils/use-effect-async";
 import { AzureDashboard } from "./azure-dashboard";
 
-export interface AzureDashboardFromStorageProps {
-  options: CoverageFromAzureStorageOptions;
-}
-
-export const AzureDashboardFromStorage = (props: AzureDashboardFromStorageProps) => {
+export const AzureDashboardFromStorage = (props: { options: CoverageFromAzureStorageOptions }) => {
   const [coverageSummaries, setCoverageSummaries] = useState<CoverageSummary[] | undefined>(
     undefined,
   );
