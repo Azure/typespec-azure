@@ -586,6 +586,8 @@ export interface SdkModelPropertyTypeBase<TType extends SdkTypeBase = SdkType>
   visibility?: Visibility[];
   /** Whether the type has public or private accessibility */
   access: AccessFlags;
+  /** Whether this property could be flattened */
+  flatten: boolean;
 }
 
 /**
@@ -687,7 +689,6 @@ export interface SdkModelPropertyType extends SdkModelPropertyTypeBase {
    * @deprecated This property is deprecated. Use `serializationOptions.multipart` instead.
    */
   multipartOptions?: MultipartOptions;
-  flatten: boolean;
 }
 
 export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes" | "simple" | "form";
