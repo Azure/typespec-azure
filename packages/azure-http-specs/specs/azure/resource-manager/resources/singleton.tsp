@@ -133,7 +133,7 @@ interface Singleton {
     }
     ```
     """)
-  update is ArmCustomPatchSync<SingletonTrackedResource, SingletonTrackedResourceProperties>;
+  update is ArmCustomPatchSync<SingletonTrackedResource, SingletonTrackedResource>;
 
   @scenario
   @scenarioDoc("""
