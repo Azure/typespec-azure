@@ -32,20 +32,34 @@ const options: CoverageFromAzureStorageOptions = {
 <script>
   // Client-side script to split Azure table into Data Plane and Management Plane
   function splitAzureTables() {
-    // Find all dashboard tables
+    console.log('[Azure Dashboard] Attempting to split tables...');
     const tables = document.querySelectorAll('table');
+    console.log(`[Azure Dashboard] Found ${tables.length} tables`);
     
-    tables.forEach((table) => {
+    tables.forEach((table, index) => {
+      // Skip if already processed
+      if (table.hasAttribute('data-split-processed')) {
+        console.log(`[Azure Dashboard] Table ${index} already processed, skipping`);
+        return;
+      }
+      
       const headerCell = table.querySelector('th');
+      console.log(`[Azure Dashboard] Table ${index} header:`, headerCell?.textContent);
+      
       if (!headerCell || !headerCell.textContent?.includes('Azure')) {
         return;
       }
       
+      console.log(`[Azure Dashboard] Found Azure table at index ${index}`);
+      
       // Check if this is the Azure table by looking at row content
       const rows = Array.from(table.querySelectorAll('tbody tr'));
+      console.log(`[Azure Dashboard] Table has ${rows.length} rows`);
+      
       const azureRows = rows.filter(row => 
         row.textContent?.includes('Azure_')
       );
+      console.log(`[Azure Dashboard] Found ${azureRows.length} Azure rows`);
       
       if (azureRows.length === 0) {
         return;
@@ -64,10 +78,18 @@ const options: CoverageFromAzureStorageOptions = {
         }
       });
       
+      console.log(`[Azure Dashboard] Data plane rows: ${dataPlaneRows.length}, Mgmt plane rows: ${mgmtPlaneRows.length}`);
+      
       // If we have both types, split the table
       if (dataPlaneRows.length > 0 && mgmtPlaneRows.length > 0) {
+        console.log('[Azure Dashboard] Splitting table...');
+        
+        // Mark as processed before cloning
+        table.setAttribute('data-split-processed', 'true');
+        
         // Clone the table for management plane
         const mgmtTable = table.cloneNode(true) as HTMLElement;
+        mgmtTable.setAttribute('data-split-processed', 'true');
         
         // Update headers
         const dataHeader = table.querySelector('th');
@@ -106,19 +128,39 @@ const options: CoverageFromAzureStorageOptions = {
             } else {
               tableParent.parentElement.appendChild(mgmtContainer);
             }
+            
+            console.log('[Azure Dashboard] Successfully split table!');
           }
         }
+      } else if (dataPlaneRows.length > 0 || mgmtPlaneRows.length > 0) {
+        console.log('[Azure Dashboard] Only one type of rows found, not splitting');
       }
     });
   }
   
-  // Run when DOM is ready
+  // Run with multiple attempts to catch the React render
+  let attemptCount = 0;
+  const maxAttempts = 10;
+  
+  function attemptSplit() {
+    attemptCount++;
+    console.log(`[Azure Dashboard] Split attempt ${attemptCount}/${maxAttempts}`);
+    
+    splitAzureTables();
+    
+    // Keep trying if we haven't found and split the table yet
+    if (attemptCount < maxAttempts && !document.querySelector('table[data-split-processed]')) {
+      setTimeout(attemptSplit, 500);
+    }
+  }
+  
+  // Start attempting after a short delay
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(splitAzureTables, 1000);
+      setTimeout(attemptSplit, 500);
     });
   } else {
-    setTimeout(splitAzureTables, 1000);
+    setTimeout(attemptSplit, 500);
   }
   
   // Also observe for dynamic content
@@ -129,8 +171,9 @@ const options: CoverageFromAzureStorageOptions = {
       )
     );
     
-    if (hasNewTables) {
-      setTimeout(splitAzureTables, 500);
+    if (hasNewTables && !document.querySelector('table[data-split-processed]')) {
+      console.log('[Azure Dashboard] New tables detected, attempting split');
+      setTimeout(splitAzureTables, 300);
     }
   });
   
