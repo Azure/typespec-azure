@@ -417,7 +417,13 @@ interface ExtensionsResources {
     }
     ```
     """)
-  update is ArmResourcePatchSync<ExtensionsResource, ExtensionsResourceProperties>;
+  update is ArmCustomPatchSync<
+    ExtensionsResource,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<
+      ExtensionsResource,
+      ExtensionsResourceProperties
+    >
+  >;
 
   @scenario
   @scenarioDoc("""
