@@ -144,8 +144,11 @@ interface ManagedIdentity {
     }
     ```
     """)
-  updateWithUserAssignedAndSystemAssigned is ArmResourcePatchSync<
+  updateWithUserAssignedAndSystemAssigned is ArmCustomPatchSync<
     ManagedIdentityTrackedResource,
-    ManagedIdentityTrackedResourceProperties
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<
+      ManagedIdentityTrackedResource,
+      ManagedIdentityTrackedResourceProperties
+    >
   >;
 }
