@@ -1505,7 +1505,6 @@ model Azure.ResourceManager.CommonTypes.BillingData
 | productCode   | `Core.uuid`                                                                            | The product identifier referencing a product in the catalog.                         |
 | productToken? | `string`                                                                               | Product token (JWT) identifying a specific version of the product.                   |
 | quantity      | `int64`                                                                                | The number of instances of the product.                                              |
-| amount?       | `float64`                                                                              | A value indicating an amount of a configured unit of measure in the product.         |
 | startDate?    | `utcDateTime`                                                                          | Start date indicating the beginning of the term for which the resource is committed. |
 | endDate?      | `utcDateTime`                                                                          | End date indicating the end of the term for which the resource is committed.         |
 | billingToken? | `string`                                                                               | Billing token (JWT) representing additional billing context.                         |
@@ -1538,13 +1537,14 @@ model Azure.ResourceManager.CommonTypes.BillingScheduleChange
 
 | Name           | Type                                                                                                                         | Description                                                                                                                                                                                                                   |
 | -------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| effective      | [`BillingScheduleChangeEffectiveType`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingScheduleChangeEffectiveType) | Indicates when the change is expected to become effective.                                                                                                                                                                    |
+| effectiveDate? | `utcDateTime`                                                                                                                | The absolute date when the change is expected to become effective. Required when `effective` = `AbsoluteDate`.                                                                                                                |
+| kind           | [`BillingScheduleChangeKind`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingScheduleChangeKind)                   | The kind of change.                                                                                                                                                                                                           |
 | productCode?   | `Core.uuid`                                                                                                                  | The new product identifier. When not specified, the resource's product code remains unchanged.                                                                                                                                |
 | productToken?  | `string`                                                                                                                     | Product token (JWT) identifying a specific version of the scheduled product. Can only be<br />specified when productCode is specified also.                                                                                   |
 | quantity?      | `int64`                                                                                                                      | The new number of instances of the product. When not specified, the resource's quantity remains unchanged.                                                                                                                    |
 | endDate?       | `utcDateTime`                                                                                                                | The new (coterminous) end date of the product. Can only be specified when effective = renewal.<br />When not specified, the resource's end date is calculated based on the renewal date and the<br />product's term duration. |
 | billingToken?  | `string`                                                                                                                     | Billing token (JWT) representing additional billing context.                                                                                                                                                                  |
-| effective?     | [`BillingScheduleChangeEffectiveType`](./data-types.md#Azure.ResourceManager.CommonTypes.BillingScheduleChangeEffectiveType) | Indicates when the change is expected to become effective.                                                                                                                                                                    |
-| effectiveDate? | `utcDateTime`                                                                                                                | The absolute date when the change is expected to become effective. Required when `effective` = `AbsoluteDate`.                                                                                                                |
 
 ### `CheckNameAvailabilityRequest` {#Azure.ResourceManager.CommonTypes.CheckNameAvailabilityRequest}
 
@@ -2683,6 +2683,14 @@ When a scheduled change is expected to become effective.
 
 ```typespec
 union Azure.ResourceManager.CommonTypes.BillingScheduleChangeEffectiveType
+```
+
+### `BillingScheduleChangeKind` {#Azure.ResourceManager.CommonTypes.BillingScheduleChangeKind}
+
+When a scheduled change is expected to become effective.
+
+```typespec
+union Azure.ResourceManager.CommonTypes.BillingScheduleChangeKind
 ```
 
 ### `BillingState` {#Azure.ResourceManager.CommonTypes.BillingState}
