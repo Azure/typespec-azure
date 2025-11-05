@@ -176,30 +176,6 @@
       "type": "object",
       "description": "Billing schedule change.",
       "properties": {
-        "productCode": {
-          "type": "string",
-          "format": "uuid",
-          "description": "The new product identifier. When not specified, the resource's product code remains unchanged."
-        },
-        "productToken": {
-          "type": "string",
-          "description": "Product token (JWT) identifying a specific version of the scheduled product. Can only be\nspecified when productCode is specified also."
-        },
-        "quantity": {
-          "type": "integer",
-          "format": "int64",
-          "description": "The new number of instances of the product. When not specified, the resource's quantity remains unchanged.",
-          "default": 1
-        },
-        "endDate": {
-          "type": "string",
-          "format": "date-time",
-          "description": "The new (coterminous) end date of the product. Can only be specified when effective = renewal.\nWhen not specified, the resource's end date is calculated based on the renewal date and the\nproduct's term duration."
-        },
-        "billingToken": {
-          "type": "string",
-          "description": "Billing token (JWT) representing additional billing context."
-        },
         "effective": {
           "type": "string",
           "description": "Indicates when the change is expected to become effective.",
@@ -235,8 +211,60 @@
           "type": "string",
           "format": "date-time",
           "description": "The absolute date when the change is expected to become effective. Required when `effective` = `AbsoluteDate`."
+        },
+        "kind": {
+          "type": "string",
+          "description": "The kind of change.",
+          "default": "Update",
+          "enum": [
+            "Update",
+            "Cancel"
+          ],
+          "x-ms-enum": {
+            "name": "BillingScheduleChangeKind",
+            "modelAsString": true,
+            "values": [
+              {
+                "name": "Update",
+                "value": "Update",
+                "description": "Update the resource."
+              },
+              {
+                "name": "Cancel",
+                "value": "Cancel",
+                "description": "Cancel the resource."
+              }
+            ]
+          }
+        },
+        "productCode": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The new product identifier. When not specified, the resource's product code remains unchanged."
+        },
+        "productToken": {
+          "type": "string",
+          "description": "Product token (JWT) identifying a specific version of the scheduled product. Can only be\nspecified when productCode is specified also."
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The new number of instances of the product. When not specified, the resource's quantity remains unchanged."
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The new (coterminous) end date of the product. Can only be specified when effective = renewal.\nWhen not specified, the resource's end date is calculated based on the renewal date and the\nproduct's term duration."
+        },
+        "billingToken": {
+          "type": "string",
+          "description": "Billing token (JWT) representing additional billing context."
         }
-      }
+      },
+      "required": [
+        "effective",
+        "kind"
+      ]
     },
     "BillingScheduleChangeEffectiveType": {
       "type": "string",
@@ -264,6 +292,30 @@
             "name": "NextCycle",
             "value": "NextCycle",
             "description": "When the next billing plan cycle charge occurs."
+          }
+        ]
+      }
+    },
+    "BillingScheduleChangeKind": {
+      "type": "string",
+      "description": "When a scheduled change is expected to become effective.",
+      "enum": [
+        "Update",
+        "Cancel"
+      ],
+      "x-ms-enum": {
+        "name": "BillingScheduleChangeKind",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Update",
+            "value": "Update",
+            "description": "Update the resource."
+          },
+          {
+            "name": "Cancel",
+            "value": "Cancel",
+            "description": "Cancel the resource."
           }
         ]
       }

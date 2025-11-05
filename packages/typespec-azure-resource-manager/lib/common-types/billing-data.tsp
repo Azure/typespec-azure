@@ -86,6 +86,21 @@ model BillingSchedule {
 @added(Versions.v6)
 model BillingScheduleChange {
   /**
+   * Indicates when the change is expected to become effective.
+   */
+  effective: BillingScheduleChangeEffectiveType = "Renewal";
+
+  /**
+   * The absolute date when the change is expected to become effective. Required when `effective` = `AbsoluteDate`.
+   */
+  effectiveDate?: utcDateTime;
+
+  /**
+    * The kind of change. 
+    */
+  kind: BillingScheduleChangeKind = "Update";
+
+  /**
    * The new product identifier. When not specified, the resource's product code remains unchanged.
    */
   productCode?: uuid;
@@ -99,7 +114,7 @@ model BillingScheduleChange {
   /**
    * The new number of instances of the product. When not specified, the resource's quantity remains unchanged.
    */
-  quantity?: int64 = 1;
+  quantity?: int64;
 
   /**
    * The new (coterminous) end date of the product. Can only be specified when effective = renewal.
@@ -112,16 +127,6 @@ model BillingScheduleChange {
    * Billing token (JWT) representing additional billing context.
    */
   billingToken?: string;
-
-  /**
-   * Indicates when the change is expected to become effective.
-   */
-  effective?: BillingScheduleChangeEffectiveType = "Renewal";
-
-  /**
-   * The absolute date when the change is expected to become effective. Required when `effective` = `AbsoluteDate`.
-   */
-  effectiveDate?: utcDateTime;
 }
 
 /**
@@ -185,6 +190,20 @@ union BillingScheduleChangeEffectiveType {
 
   /** When the next billing plan cycle charge occurs. */
   NextCycle: "NextCycle",
+
+  string,
+}
+
+/**
+ * When a scheduled change is expected to become effective.
+ */
+@added(Versions.v6)
+union BillingScheduleChangeKind {
+  /** Update the resource. */
+  Update: "Update",
+
+  /** Cancel the resource. */
+  Cancel: "Cancel",
 
   string,
 }
