@@ -586,6 +586,8 @@ export interface SdkModelPropertyTypeBase<TType extends SdkTypeBase = SdkType>
   visibility?: Visibility[];
   /** Whether the type has public or private accessibility */
   access: AccessFlags;
+  /** Whether this property could be flattened */
+  flatten: boolean;
 }
 
 /**
@@ -598,6 +600,7 @@ export interface SerializationOptions {
   json?: JsonSerializationOptions;
   xml?: XmlSerializationOptions;
   multipart?: MultipartOptions;
+  binary?: BinarySerializationOptions;
 }
 
 /**
@@ -629,6 +632,11 @@ export interface XmlSerializationOptions {
     namespace: string;
     prefix: string;
   };
+}
+
+export interface BinarySerializationOptions {
+  /** Whether this is a file/stream input */
+  isFile: boolean;
 }
 
 /**
@@ -687,7 +695,6 @@ export interface SdkModelPropertyType extends SdkModelPropertyTypeBase {
    * @deprecated This property is deprecated. Use `serializationOptions.multipart` instead.
    */
   multipartOptions?: MultipartOptions;
-  flatten: boolean;
 }
 
 export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes" | "simple" | "form";

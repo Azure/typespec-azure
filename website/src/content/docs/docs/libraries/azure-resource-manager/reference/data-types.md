@@ -3544,9 +3544,9 @@ model Dog extends Pet {
 
 #### Properties
 
-| Name  | Type       | Description |
-| ----- | ---------- | ----------- |
-| kind? | `KindType` |             |
+| Name | Type       | Description |
+| ---- | ---------- | ----------- |
+| kind | `KindType` |             |
 
 ### `DiscriminatedProxyResource` {#Azure.ResourceManager.Legacy.DiscriminatedProxyResource}
 
@@ -3578,9 +3578,9 @@ model Dog extends Pet {
 
 #### Properties
 
-| Name  | Type       | Description |
-| ----- | ---------- | ----------- |
-| kind? | `KindType` |             |
+| Name | Type       | Description |
+| ---- | ---------- | ----------- |
+| kind | `KindType` |             |
 
 ### `DiscriminatedTrackedResource` {#Azure.ResourceManager.Legacy.DiscriminatedTrackedResource}
 
@@ -3612,9 +3612,9 @@ model Dog extends Pet {
 
 #### Properties
 
-| Name  | Type       | Description |
-| ----- | ---------- | ----------- |
-| kind? | `KindType` |             |
+| Name | Type       | Description |
+| ---- | ---------- | ----------- |
+| kind | `KindType` |             |
 
 ### `ExtendedLocationOptional` {#Azure.ResourceManager.Legacy.ExtendedLocationOptional}
 
@@ -3699,6 +3699,36 @@ model Foo is TrackedResource<FooProperties> {
 | Name      | Type                                                                                                | Description                                               |
 | --------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
 | identity? | [`ManagedServiceIdentityV4`](./data-types.md#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4) | The managed service identities assigned to this resource. |
+
+### `PolymorphicResourceKindProperty` {#Azure.ResourceManager.Legacy.PolymorphicResourceKindProperty}
+
+Model representing the `kind` envelope property only for use with a polymorphic resource..
+Spread this model into a resource model if the resource support ARM `kind`.
+
+```typespec
+model Azure.ResourceManager.Legacy.PolymorphicResourceKindProperty<Type>
+```
+
+#### Template Parameters
+
+| Name | Description                                                                                        |
+| ---- | -------------------------------------------------------------------------------------------------- |
+| Type | The type of the kind property. Default is string. However you can pass a union with string values. |
+
+#### Examples
+
+```typespec
+model Foo is TrackedResource<FooProperties> {
+  // Only have standard Succeeded, Failed, Cancelled states
+  ...PolymorphicResourceKindProperty;
+}
+```
+
+#### Properties
+
+| Name | Type   | Description |
+| ---- | ------ | ----------- |
+| kind | `Type` |             |
 
 ### `Provider` {#Azure.ResourceManager.Legacy.Provider}
 

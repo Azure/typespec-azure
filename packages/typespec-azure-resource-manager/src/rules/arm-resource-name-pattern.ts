@@ -2,43 +2,15 @@ import {
   DiagnosticTarget,
   ModelProperty,
   Program,
-  SourceLocation,
+  createAddDecoratorCodeFix,
   createRule,
-  defineCodeFix,
   getPattern,
-  getSourceLocation,
 } from "@typespec/compiler";
 
 import { getArmResources } from "../resource.js";
 
-// TODO: Replace this with a reusable implementation from the compiler package when implemented.
-// Issue: https://github.com/microsoft/typespec/issues/3044
 function createPatternCodeFix(diagnosticTarget: DiagnosticTarget) {
-  return defineCodeFix({
-    id: "add-pattern-decorator",
-    label: "Add `@pattern` decorator to the resource name property with the default ARM pattern.",
-    fix: (context) => {
-      const location = getSourceLocation(diagnosticTarget);
-      const { lineStart, indent } = findLineStartAndIndent(location);
-      const updatedLocation = { ...location, pos: lineStart };
-      return context.prependText(updatedLocation, `${indent}@pattern("^[a-zA-Z0-9-]{3,24}$")\n`);
-    },
-  });
-}
-
-function findLineStartAndIndent(location: SourceLocation): { lineStart: number; indent: string } {
-  const text = location.file.text;
-  let pos = location.pos;
-  let indent = 0;
-  while (pos > 0 && text[pos - 1] !== "\n") {
-    if ([" ", "\t", "\n"].includes(text[pos - 1])) {
-      indent++;
-    } else {
-      indent = 0;
-    }
-    pos--;
-  }
-  return { lineStart: pos, indent: location.file.text.slice(pos, pos + indent) };
+  return createAddDecoratorCodeFix(diagnosticTarget, "pattern", ['"^[a-zA-Z0-9-]{3,24}$"']);
 }
 
 /**
