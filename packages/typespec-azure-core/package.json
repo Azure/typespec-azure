@@ -56,7 +56,7 @@
     "regen-docs": "tspd doc .  --enable-experimental --llmstxt --output-dir ../../website/src/content/docs/docs/libraries/azure-core/reference"
   },
   "files": [
-    "lib/*.tsp",
+    "lib/**/*.tsp",
     "dist/**",
     "!dist/test/**"
   ],
