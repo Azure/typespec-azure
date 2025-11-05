@@ -96,7 +96,7 @@ model BillingScheduleChange {
   effectiveDate?: utcDateTime;
 
   /**
-   * The kind of change. 
+   * The kind of change.
    */
   kind: BillingScheduleChangeKind = "Update";
 
