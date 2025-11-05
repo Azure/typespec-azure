@@ -43,11 +43,6 @@ model BillingData {
   quantity: int64 = 1;
 
   /**
-   * A value indicating an amount of a configured unit of measure in the product.
-   */
-  amount?: float64;
-
-  /**
    * Start date indicating the beginning of the term for which the resource is committed.
    */
   startDate?: utcDateTime;

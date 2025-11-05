@@ -80,11 +80,6 @@
           "description": "The number of instances of the product.",
           "default": 1
         },
-        "amount": {
-          "type": "number",
-          "format": "double",
-          "description": "A value indicating an amount of a configured unit of measure in the product."
-        },
         "startDate": {
           "type": "string",
           "format": "date-time",
