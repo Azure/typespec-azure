@@ -7,15 +7,28 @@ export const AzureDashboardWrapper = (props: { options: CoverageFromAzureStorage
 
   useEffect(() => {
     const splitTables = () => {
-      if (!containerRef.current || processedRef.current) return;
+      console.log('[AzureDashboardWrapper] splitTables called');
+      if (!containerRef.current) {
+        console.log('[AzureDashboardWrapper] No containerRef');
+        return;
+      }
+      if (processedRef.current) {
+        console.log('[AzureDashboardWrapper] Already processed');
+        return;
+      }
 
       const tables = containerRef.current.querySelectorAll('table');
+      console.log(`[AzureDashboardWrapper] Found ${tables.length} tables`);
       
-      tables.forEach((table) => {
+      tables.forEach((table, index) => {
         // Skip if already processed
-        if (table.hasAttribute('data-azure-split')) return;
+        if (table.hasAttribute('data-azure-split')) {
+          console.log(`[AzureDashboardWrapper] Table ${index} already has split attribute`);
+          return;
+        }
         
         const headerCell = table.querySelector('th');
+        console.log(`[AzureDashboardWrapper] Table ${index} header:`, headerCell?.textContent);
         if (!headerCell?.textContent?.includes('Azure')) return;
 
         // Find all rows in the table body
@@ -37,8 +50,11 @@ export const AzureDashboardWrapper = (props: { options: CoverageFromAzureStorage
           }
         });
 
+        console.log(`[AzureDashboardWrapper] Data plane: ${dataPlaneRows.length}, Mgmt plane: ${mgmtPlaneRows.length}`);
+        
         // Only split if we have both types
         if (dataPlaneRows.length > 0 && mgmtPlaneRows.length > 0) {
+          console.log('[AzureDashboardWrapper] Splitting table!');
           // Mark table as processed
           table.setAttribute('data-azure-split', 'true');
           
@@ -88,8 +104,15 @@ export const AzureDashboardWrapper = (props: { options: CoverageFromAzureStorage
               }
               
               processedRef.current = true;
+              console.log('[AzureDashboardWrapper] Table split complete!');
+            } else {
+              console.log('[AzureDashboardWrapper] No table container parent found');
             }
+          } else {
+            console.log('[AzureDashboardWrapper] No tbody found');
           }
+        } else {
+          console.log('[AzureDashboardWrapper] Not enough rows to split - need both data plane and mgmt plane rows');
         }
       });
     };
