@@ -38,17 +38,17 @@
               {
                 "name": "Active",
                 "value": "Active",
-                "description": "Resource's billing is activated."
+                "description": "Resource's billing is activate."
               },
               {
                 "name": "Warned",
                 "value": "Warned",
-                "description": "Resource's billing is warned."
+                "description": "Resource's billing is in a warning state."
               },
               {
                 "name": "Inactive",
                 "value": "Inactive",
-                "description": "Resource's billing is deactivated."
+                "description": "Resource's billing is inactive."
               }
             ]
           },
@@ -207,9 +207,10 @@
         },
         "effective": {
           "type": "string",
-          "description": "Indicates when the change is expected to become effective. Mutually exclusive with `effectiveDate`.",
+          "description": "Indicates when the change is expected to become effective.",
           "default": "Renewal",
           "enum": [
+            "AbsoluteDate",
             "Renewal",
             "NextCycle"
           ],
@@ -238,7 +239,7 @@
         "effectiveDate": {
           "type": "string",
           "format": "date-time",
-          "description": "The absolute date when the change is expected to become effective. Mutually exclusive with `effective`."
+          "description": "The absolute date when the change is expected to become effective. Required when `effective` = `AbsoluteDate`."
         }
       }
     },
@@ -246,6 +247,7 @@
       "type": "string",
       "description": "When a scheduled change is expected to become effective.",
       "enum": [
+        "AbsoluteDate",
         "Renewal",
         "NextCycle"
       ],
@@ -292,17 +294,17 @@
           {
             "name": "Active",
             "value": "Active",
-            "description": "Resource's billing is activated."
+            "description": "Resource's billing is activate."
           },
           {
             "name": "Warned",
             "value": "Warned",
-            "description": "Resource's billing is warned."
+            "description": "Resource's billing is in a warning state."
           },
           {
             "name": "Inactive",
             "value": "Inactive",
-            "description": "Resource's billing is deactivated."
+            "description": "Resource's billing is inactive."
           }
         ]
       }
