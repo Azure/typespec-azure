@@ -1,4 +1,4 @@
-import { type Union, createRule, paramMessage } from "@typespec/compiler";
+import { createRule, paramMessage } from "@typespec/compiler";
 
 export const noUnionExprRule = createRule({
   name: "no-union-expr",
@@ -10,11 +10,12 @@ export const noUnionExprRule = createRule({
   },
   create(context) {
     return {
-      union: (union: Union) => {
-        if (!union.name) {
+      modelProperty: (prop) => {
+        const type = prop.type;
+        if (type.kind === "Union" && !type.name) {
           context.reportDiagnostic({
-            format: { enumName: union.name },
-            target: union,
+            format: { enumName: type.name },
+            target: prop,
             codefixes: [],
           });
         }
