@@ -101,6 +101,7 @@ export interface AutorestEmitterOptions {
   /**
    * Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of the
    * ARM resource properties.
+   * @deprecated
    */
   "arm-resource-flattening"?: boolean;
   /**
