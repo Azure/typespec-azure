@@ -14,7 +14,6 @@ using Rest;
 using Versioning;
 using Azure.Core;
 using Azure.ResourceManager;
-using OpenAPI;
 
 @armProviderNamespace
 @service
