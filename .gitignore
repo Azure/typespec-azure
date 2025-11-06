@@ -216,3 +216,5 @@ packages/samples/test/output/azure/templates-contoso/setup.*
 
 # Playwright
 .last-run.json
+
+.pnpm-store/

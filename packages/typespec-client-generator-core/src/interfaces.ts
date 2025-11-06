@@ -490,10 +490,21 @@ export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends 
   variantTypes: TValueType[];
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
-  /** Whether the type has public or private accessibility */
+  /** Whether the type has public or private accessibility. */
   access: AccessFlags;
   /** Bitmap of the usage for the type. */
   usage: UsageFlags;
+  /** Info to distinguish between different union variants. */
+  discriminatedOptions?: DiscriminatedOptions;
+}
+
+export interface DiscriminatedOptions {
+  /** How is the discriminated union serialized.  */
+  envelope: "object" | "none";
+  /** Name of the discriminator property. */
+  discriminatorPropertyName: string;
+  /** Name of the property envelopping the data. `undefined` if envelope is "none" */
+  envelopePropertyName?: string;
 }
 
 export interface SdkModelType extends SdkTypeBase {
@@ -600,6 +611,7 @@ export interface SerializationOptions {
   json?: JsonSerializationOptions;
   xml?: XmlSerializationOptions;
   multipart?: MultipartOptions;
+  binary?: BinarySerializationOptions;
 }
 
 /**
@@ -631,6 +643,11 @@ export interface XmlSerializationOptions {
     namespace: string;
     prefix: string;
   };
+}
+
+export interface BinarySerializationOptions {
+  /** Whether this is a file/stream input */
+  isFile: boolean;
 }
 
 /**

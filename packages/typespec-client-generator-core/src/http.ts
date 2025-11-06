@@ -47,6 +47,7 @@ import {
   SdkQueryParameter,
   SdkServiceResponseHeader,
   SdkType,
+  SerializationOptions,
   TCGCContext,
 } from "./interfaces.js";
 import {
@@ -180,20 +181,18 @@ function getSdkHttpParameters(
   // we add correspondingMethodParams after we create the type, since we need the info on the type
   const correspondingMethodParams: (SdkMethodParameter | SdkModelPropertyType)[] = [];
   if (tspBody) {
-    if (tspBody.bodyKind === "file") {
-      // file body is not supported yet
-      diagnostics.add(
-        createDiagnostic({
-          code: "unsupported-http-file-body",
-          target: tspBody.property ?? tspBody.type,
-        }),
-      );
-      return diagnostics.wrap(retval);
-    }
     if (tspBody.property && !isNeverOrVoidType(tspBody.property.type)) {
       const bodyParam = diagnostics.pipe(
         getSdkHttpParameter(context, tspBody.property, httpOperation.operation, undefined, "body"),
       );
+      if (
+        tspBody.bodyKind === "file" &&
+        bodyParam.kind === "body" &&
+        bodyParam.type.kind === "model"
+      ) {
+        bodyParam.type.serializationOptions = bodyParam.type.serializationOptions || {};
+        bodyParam.type.serializationOptions.binary = { isFile: true };
+      }
       if (bodyParam.kind !== "body") {
         diagnostics.add(
           createDiagnostic({
@@ -436,6 +435,7 @@ export function getSdkHttpParameter(
       defaultContentType: "application/json",
       optional: param.optional,
       correspondingMethodParams: [],
+      serializationOptions: {},
     });
   }
   const headerQueryBase = {
@@ -486,11 +486,13 @@ function getSdkHttpResponseAndExceptions(
   const diagnostics = createDiagnosticCollector();
   const responses: SdkHttpResponse[] = [];
   const exceptions: SdkHttpErrorResponse[] = [];
+  let serializationOptions: SerializationOptions = {};
   for (const response of httpOperation.responses) {
     const headers: SdkServiceResponseHeader[] = [];
     let body: Type | undefined;
     let type: SdkType | undefined;
     let contentTypes: string[] = [];
+
     for (const innerResponse of response.responses) {
       const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
         ? "application/json"
@@ -508,6 +510,9 @@ function getSdkHttpResponseAndExceptions(
         context.__responseHeaderCache.set(header, headers[headers.length - 1]);
       }
       if (innerResponse.body && !isNeverOrVoidType(innerResponse.body.type)) {
+        if (innerResponse.body.bodyKind === "file") {
+          serializationOptions = { binary: { isFile: true } };
+        }
         if (body && body !== innerResponse.body.type) {
           diagnostics.add(
             createDiagnostic({
@@ -535,6 +540,9 @@ function getSdkHttpResponseAndExceptions(
           if (innerResponse.body.property) {
             addEncodeInfo(context, innerResponse.body.property, type, defaultContentType);
           }
+        }
+        if (type.kind === "model") {
+          type.serializationOptions = { ...type.serializationOptions, ...serializationOptions };
         }
       }
     }
