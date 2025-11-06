@@ -54,3 +54,28 @@ it("ok when union is just | null", async () => {
     )
     .toBeValid();
 });
+
+it("ok for status code", async () => {
+  await tester
+    .expect(
+      `
+      op test(): {
+        @statusCode _: 200 | 400 | 500;
+      };
+      `,
+    )
+    .toBeValid();
+});
+
+it("ok for content type", async () => {
+  await tester
+    .expect(
+      `
+      op test(): {
+        @header contentType: "application/json" | "text/plain";
+        @body _: string;
+      };
+      `,
+    )
+    .toBeValid();
+});
