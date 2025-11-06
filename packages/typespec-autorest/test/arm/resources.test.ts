@@ -527,13 +527,12 @@ it("allows resources with multiple endpoints using LegacyOperations", async () =
       message: string;
     }
 
-    @armResourceOperations
-    interface OtherOps
-      extends Azure.ResourceManager.Legacy.LegacyOperations<
+    alias OtherOps
+      = Azure.ResourceManager.Legacy.LegacyOperations<
           ParentParameters = ParentScope,
           ResourceTypeParameter = InstanceScope,
           ErrorType = MyErrorType
-        > {}
+        >;
 
     alias BaseScope = {
       ...ApiVersionParameter;

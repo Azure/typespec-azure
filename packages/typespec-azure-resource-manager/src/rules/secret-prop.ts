@@ -1,6 +1,7 @@
 import {
   ModelProperty,
   UsageFlags,
+  createAddDecoratorCodeFix,
   createRule,
   isSecret,
   paramMessage,
@@ -43,6 +44,7 @@ export const secretProprule = createRule({
             format: {
               propertyName: property.name,
             },
+            codefixes: [createAddDecoratorCodeFix(property, "secret")],
           });
         }
       },

@@ -218,6 +218,102 @@ export type ResourceParentTypeDecorator = (
   parentType: "Subscription" | "ResourceGroup" | "Tenant" | "Extension",
 ) => void;
 
+/**
+ * Marks a resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
+ *
+ * @param target The operation to associate the resourceType with
+ * @param resourceType The resource model
+ * @param operationType The type of operation being performed
+ * @param resourceName Optional. The name of the resource. If not provided, the resource type will be used
+ */
+export type LegacyResourceOperationDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  resourceType: Model,
+  operationType:
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
+  resourceName?: string,
+) => void;
+
+/**
+ * Marks an extension resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
+ *
+ * @param target The operation to associate the resourceType with
+ * @param targetResourceType The resource model for the target resource
+ * @param extensionResourceType The resource model for the extension resource
+ * @param operationType The type of operation being performed
+ * @param resourceName Optional. The name of the resource. If not provided, the scope and resource name will be used
+ */
+export type ExtensionResourceOperationDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  targetResourceType: Model,
+  extensionResourceType: Model,
+  operationType:
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
+  resourceName?: string,
+) => void;
+
+/**
+ * Marks an extension resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
+ *
+ * @param target The operation to associate the resourceType with
+ * @param targetResourceType The resource model for the target resource
+ * @param extensionResourceType The resource model for the extension resource
+ * @param operationType The type of operation being performed
+ * @param resourceName Optional. The name of the resource. If not provided, the scope and resource name will be used
+ */
+export type BuiltInResourceOperationDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  parentResourceType: Model,
+  builtInResourceType: Model,
+  operationType:
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
+  resourceName?: string,
+) => void;
+
+/**
+ * Marks a resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
+ *
+ * @param target The operation to associate the resourceType with
+ * @param resourceType The resource model
+ * @param operationType The type of operation being performed
+ * @param resourceName Optional. The name of the resource. If not provided, the resource type will be used
+ */
+export type LegacyExtensionResourceOperationDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  resourceType: Model,
+  operationType:
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
+  resourceName?: string,
+) => void;
+
 export type AzureResourceManagerPrivateDecorators = {
   resourceParameterBaseFor: ResourceParameterBaseForDecorator;
   resourceBaseParametersOf: ResourceBaseParametersOfDecorator;
@@ -236,4 +332,8 @@ export type AzureResourceManagerPrivateDecorators = {
   armBodyRoot: ArmBodyRootDecorator;
   legacyType: LegacyTypeDecorator;
   resourceParentType: ResourceParentTypeDecorator;
+  legacyResourceOperation: LegacyResourceOperationDecorator;
+  extensionResourceOperation: ExtensionResourceOperationDecorator;
+  builtInResourceOperation: BuiltInResourceOperationDecorator;
+  legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorator;
 };

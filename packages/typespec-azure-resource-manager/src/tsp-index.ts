@@ -5,6 +5,7 @@ import { $armLibraryNamespace, $armProviderNamespace, $useLibraryNamespace } fro
 import {
   $armOperationRoute,
   $armResourceAction,
+  $armResourceCheckExistence,
   $armResourceCollectionAction,
   $armResourceCreateOrUpdate,
   $armResourceDelete,
@@ -51,6 +52,7 @@ export const $decorators = {
     armResourceUpdate: $armResourceUpdate,
     armResourceDelete: $armResourceDelete,
     armResourceList: $armResourceList,
+    armResourceCheckExistence: $armResourceCheckExistence,
     armResourceOperations: $armResourceOperations,
     armCommonTypesVersion: $armCommonTypesVersion,
     armVirtualResource: $armVirtualResource,

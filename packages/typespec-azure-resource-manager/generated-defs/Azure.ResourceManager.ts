@@ -169,72 +169,97 @@ export type ExtensionResourceDecorator = (context: DecoratorContext, target: Mod
  *
  *
  *
- * @param resourceType Resource model
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
 export type ArmResourceActionDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model,
+  resourceModel: Model,
+  resourceName?: string,
 ) => void;
 
 /**
  *
  *
  *
- * @param resourceType Resource model
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
 export type ArmResourceCreateOrUpdateDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model,
+  resourceModel: Model,
+  resourceName?: string,
 ) => void;
 
 /**
  *
  *
  *
- * @param resourceType Resource model
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
 export type ArmResourceReadDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model,
+  resourceModel: Model,
+  resourceName?: string,
 ) => void;
 
 /**
  *
  *
  *
- * @param resourceType Resource model
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
 export type ArmResourceUpdateDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model,
+  resourceModel: Model,
+  resourceName?: string,
 ) => void;
 
 /**
  *
  *
  *
- * @param resourceType Resource model
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
 export type ArmResourceDeleteDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model,
+  resourceModel: Model,
+  resourceName?: string,
 ) => void;
 
 /**
  *
  *
  *
- * @param resourceType Resource model
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
 export type ArmResourceListDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model,
+  resourceModel: Model,
+  resourceName?: string,
+) => void;
+
+/**
+ * Marks the operation as being a check existence (HEAD) operation
+ *
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
+ */
+export type ArmResourceCheckExistenceDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  resourceModel: Model,
+  resourceName?: string,
 ) => void;
 
 /**
@@ -319,6 +344,7 @@ export type AzureResourceManagerDecorators = {
   armResourceUpdate: ArmResourceUpdateDecorator;
   armResourceDelete: ArmResourceDeleteDecorator;
   armResourceList: ArmResourceListDecorator;
+  armResourceCheckExistence: ArmResourceCheckExistenceDecorator;
   armResourceOperations: ArmResourceOperationsDecorator;
   armCommonTypesVersion: ArmCommonTypesVersionDecorator;
   armVirtualResource: ArmVirtualResourceDecorator;

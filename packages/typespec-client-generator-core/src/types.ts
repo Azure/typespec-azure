@@ -115,6 +115,7 @@ import {
   getPropertyNames,
 } from "./public-utils.js";
 
+import { $ } from "@typespec/compiler/typekit";
 import { getVersions } from "@typespec/versioning";
 import { getNs, isAttribute, isUnwrapped } from "@typespec/xml";
 import { getSdkHttpParameter } from "./http.js";
@@ -575,6 +576,18 @@ export function getSdkUnionWithDiagnostics(
           access: "public",
           usage: UsageFlags.None,
         };
+        const discriminatedOptions = $(context.program).union.getDiscriminatedUnion(type)?.options;
+        if (discriminatedOptions) {
+          const envelope = discriminatedOptions.envelope ?? "object";
+          retval.discriminatedOptions = {
+            envelope,
+            discriminatorPropertyName: discriminatedOptions.discriminatorPropertyName ?? "kind",
+            envelopePropertyName:
+              envelope === "none"
+                ? undefined
+                : (discriminatedOptions.envelopePropertyName ?? "value"),
+          };
+        }
         if (nullOption !== undefined) {
           retval = {
             ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
@@ -1213,6 +1226,7 @@ export function getSdkCredentialParameter(
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.credential`,
     decorators: [],
     access: "public",
+    flatten: false,
   };
 }
 
@@ -1250,6 +1264,7 @@ export function getSdkModelPropertyTypeBase(
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
     visibility: getSdkVisibility(context, type),
     access: getAccess(context, type),
+    flatten: shouldFlattenProperty(context, type),
   });
 }
 
@@ -1286,7 +1301,6 @@ export function getSdkModelPropertyType(
       discriminator: false,
       serializedName: getPropertyNames(context, type)[1],
       isMultipartFileInput: false,
-      flatten: shouldFlattenProperty(context, type),
       serializationOptions: {},
     };
     context.__modelPropertyCache.set(type, property);

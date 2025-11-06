@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.61.1
+
+### Bug Fixes
+
+- [#3452](https://github.com/Azure/typespec-azure/pull/3452) Fix #3416 Allow flattening for body parameters
+
+
 ## 0.61.0
 
 ### Features
