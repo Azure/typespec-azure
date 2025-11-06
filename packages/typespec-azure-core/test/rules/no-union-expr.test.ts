@@ -23,6 +23,7 @@ it("emits diagnostic when using union expression", async () => {
       code: "@azure-tools/typespec-azure-core/no-union-expr",
     });
 });
+
 it("ok when using union declaration", async () => {
   await tester
     .expect(
@@ -36,6 +37,19 @@ it("ok when using union declaration", async () => {
           Rejected: "Rejected",
           string,
         }
+      `,
+    )
+    .toBeValid();
+});
+
+it("ok when union is just | null", async () => {
+  await tester
+    .expect(
+      `
+      model Status { }
+      model Request {
+        approvalStatus: Status | null;
+      }
       `,
     )
     .toBeValid();
