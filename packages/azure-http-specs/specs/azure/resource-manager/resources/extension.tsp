@@ -412,7 +412,7 @@ interface ExtensionsResources {
     }
     ```
     """)
-  update is ArmResourcePatchSync<ExtensionsResource, ExtensionsResourceProperties>;
+  update is ArmCustomPatchSync<ExtensionsResource, ExtensionsResource>;
 
   @scenario
   @scenarioDoc("""

@@ -126,7 +126,7 @@ interface LocationResources {
     }
     ```
     """)
-  update is ArmResourcePatchSync<LocationResource, LocationResourceProperties>;
+  update is ArmCustomPatchSync<LocationResource, LocationResource>;
 
   @scenario
   @scenarioDoc("""

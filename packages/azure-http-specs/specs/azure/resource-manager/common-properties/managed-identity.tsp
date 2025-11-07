@@ -143,8 +143,8 @@ interface ManagedIdentity {
     }
     ```
     """)
-  updateWithUserAssignedAndSystemAssigned is ArmResourcePatchSync<
+  updateWithUserAssignedAndSystemAssigned is ArmCustomPatchSync<
     ManagedIdentityTrackedResource,
-    ManagedIdentityTrackedResourceProperties
+    ManagedIdentityTrackedResource
   >;
 }

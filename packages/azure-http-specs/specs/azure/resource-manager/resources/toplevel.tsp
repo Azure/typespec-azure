@@ -144,7 +144,7 @@ interface TopLevel {
     }
     ```
     """)
-  update is ArmResourcePatchAsync<TopLevelTrackedResource, TopLevelTrackedResourceProperties>;
+  update is ArmCustomPatchAsync<TopLevelTrackedResource, TopLevelTrackedResource>;
 
   @scenario
   @scenarioDoc("""
