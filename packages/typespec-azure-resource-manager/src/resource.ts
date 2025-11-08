@@ -130,7 +130,9 @@ export interface ResourceModel {
 }
 
 export interface Provider {
-  resourceModels?: ResourceModel[];
+  /** The set of resources in this provider */
+  resources?: ResolvedResource[];
+  /** non-resource operations in this provider */
   providerOperations?: ArmResourceOperation[];
 }
 
@@ -152,6 +154,12 @@ export interface ResolvedResourceInfo {
 
 /** Resolved operations, including operations for non-arm resources */
 export interface ResolvedResource {
+  /** The model type for the resource */
+  type: Model;
+  /** The kind of resource (extension | tracked | proxy | custom | virtual | built-in) */
+  kind: "Tracked" | "Proxy" | "Extension" | "Other";
+  /** The provider namespace */
+  providerNamespace: string;
   /** The lifecycle and action operations using this resourceInstancePath (or the parent path) */
   operations: ArmResolvedOperationsForResource;
   /** Other operations associated with this resource */
@@ -162,6 +170,10 @@ export interface ResolvedResource {
   resourceType: ResourceType;
   /** The path to the instance of a resource */
   resourceInstancePath: string;
+  /** The parent of this resource */
+  parent?: ResolvedResource;
+  /** The scope of this resource */
+  scope?: string;
 }
 
 /** Description of the resource type */
@@ -399,36 +411,56 @@ export const [getResolvedResources, setResolvedResources] = useStateMap<Namespac
   ArmStateKeys.armResolvedResources,
 );
 
+export function getPublicResourceKind(
+  typespecType: Model,
+): "Tracked" | "Proxy" | "Extension" | "Other" | undefined {
+  const kind = getArmResourceKind(typespecType);
+  if (kind === undefined) return undefined;
+  switch (kind) {
+    case "Tracked":
+      return "Tracked";
+    case "Proxy":
+      return "Proxy";
+    case "Extension":
+      return "Extension";
+    default:
+      return "Other";
+  }
+}
+
 export function resolveArmResources(program: Program): Provider {
   const provider = resolveProviderNamespace(program);
   if (provider === undefined) return {};
   const resolvedResources = getResolvedResources(program, provider);
-  if (
-    resolvedResources?.resourceModels !== undefined &&
-    resolvedResources.resourceModels.length > 0
-  ) {
+  if (resolvedResources?.resources !== undefined && resolvedResources.resources.length > 0) {
     // Return the cached resource details
     return resolvedResources;
   }
 
   // We haven't generated the full resource details yet
-  const resources: ResourceModel[] = [];
+  const resources: ResolvedResource[] = [];
   for (const resource of listArmResources(program)) {
     const operations = resolveArmResourceOperations(program, resource.typespecType);
-    const fullResource: ResourceModel = {
-      type: resource.typespecType,
-      kind:
-        getArmResourceKind(resource.typespecType) ??
-        (operations.length > 0 ? "Tracked" : "Virtual"),
-      providerNamespace: resource.armProviderNamespace,
-      resources: operations,
-    };
-    resources.push(fullResource);
+    for (const op of operations) {
+      const fullResource: ResolvedResource = {
+        ...op,
+        type: resource.typespecType,
+        kind:
+          getPublicResourceKind(resource.typespecType) ??
+          (operations.length > 0 ? "Tracked" : "Other"),
+        providerNamespace: resource.armProviderNamespace,
+        parent: getResourceParent(operations, op),
+      };
+      resources.push(fullResource);
+    }
+  }
+  for (const resource of resources) {
+    resource.scope = resource.parent?.scope ?? getScope(resource);
   }
 
   // Add the unmarked operations
   const resolved: Provider = {
-    resourceModels: resources,
+    resources: resources,
     providerOperations: getUnassociatedOperations(program).filter(
       (op) => !isArmResourceOperation(program, op.operation),
     ),
@@ -436,6 +468,58 @@ export function resolveArmResources(program: Program): Provider {
 
   setResolvedResources(program, provider, resolved);
   return resolved;
+}
+
+function getResourceParent(
+  resources: ResolvedResource[],
+  child: ResolvedResource,
+): ResolvedResource | undefined {
+  for (const resource of resources) {
+    if (
+      resource.resourceType.types.length + 1 === child.resourceType.types.length &&
+      resource.resourceType.provider === child.resourceType.provider &&
+      resource.resourceType.types.join("/") === child.resourceType.types.slice(0, -1).join("/")
+    ) {
+      return resource;
+    }
+  }
+
+  return undefined;
+}
+
+function getScope(resource: ResolvedResource): string | undefined {
+  const partsIndex = resource.resourceInstancePath.lastIndexOf("/providers");
+  if (partsIndex === 0) return "Tenant";
+  const segments = resource.resourceInstancePath.slice(0, partsIndex - 1).split("/");
+  if (
+    resource.resourceType.types.length === 2 &&
+    resource.resourceType.types[0].toLowerCase() === "locations"
+  )
+    return "Location";
+  if (segments.length === 1 && isVariableSegment(segments[0])) return "Scope";
+  if (
+    segments.length === 2 &&
+    isVariableSegment(segments[1]) &&
+    segments[0].toLowerCase() === "subscriptions"
+  )
+    return "Subscription";
+  if (
+    segments.length === 4 &&
+    isVariableSegment(segments[3]) &&
+    segments[0].toLowerCase() === "subscriptions" &&
+    segments[2].toLowerCase() === "resourcegroups"
+  )
+    return "ResourceGroup";
+  if (
+    segments.length === 4 &&
+    isVariableSegment(segments[3]) &&
+    segments[0].toLowerCase() === "providers" &&
+    segments[1].toLowerCase() === "microsoft.management" &&
+    segments[2].toLowerCase() === "managementgroups"
+  )
+    return "ManagementGroup";
+  if (segments.some((s) => s.toLowerCase() === "providers")) return "ExternalResource";
+  return undefined;
 }
 
 function isVariableSegment(segment: string): boolean {
