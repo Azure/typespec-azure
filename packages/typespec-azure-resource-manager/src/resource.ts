@@ -152,6 +152,21 @@ export interface ResolvedResourceInfo {
   resourceName: string;
 }
 
+interface ResolvedResourceOperations {
+  operations: ArmResolvedOperationsForResource;
+  /** Other operations associated with this resource */
+  associatedOperations?: ArmResourceOperation[];
+  /** The name of the resource at this instance path  */
+  resourceName: string;
+  /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
+  resourceType: ResourceType;
+  /** The path to the instance of a resource */
+  resourceInstancePath: string;
+  /** The parent of this resource */
+  parent?: ResolvedResource;
+  /** The scope of this resource */
+  scope?: string;
+}
 /** Resolved operations, including operations for non-arm resources */
 export interface ResolvedResource {
   /** The model type for the resource */
@@ -415,7 +430,7 @@ export function getPublicResourceKind(
   typespecType: Model,
 ): "Tracked" | "Proxy" | "Extension" | "Other" | undefined {
   const kind = getArmResourceKind(typespecType);
-  if (kind === undefined) return undefined;
+  if (kind === undefined) return "Other";
   switch (kind) {
     case "Tracked":
       return "Tracked";
@@ -449,13 +464,15 @@ export function resolveArmResources(program: Program): Provider {
           getPublicResourceKind(resource.typespecType) ??
           (operations.length > 0 ? "Tracked" : "Other"),
         providerNamespace: resource.armProviderNamespace,
-        parent: getResourceParent(operations, op),
       };
       resources.push(fullResource);
     }
   }
   for (const resource of resources) {
-    resource.scope = resource.parent?.scope ?? getScope(resource);
+    resource.parent = getResourceParent(resources, resource);
+  }
+  for (const resource of resources) {
+    resource.scope = getScope(resource);
   }
 
   // Add the unmarked operations
@@ -488,9 +505,14 @@ function getResourceParent(
 }
 
 function getScope(resource: ResolvedResource): string | undefined {
+  if (resource.scope !== undefined) return resource.scope;
+  if (resource.parent !== undefined) return getScope(resource.parent);
   const partsIndex = resource.resourceInstancePath.lastIndexOf("/providers");
   if (partsIndex === 0) return "Tenant";
-  const segments = resource.resourceInstancePath.slice(0, partsIndex - 1).split("/");
+  const segments = resource.resourceInstancePath
+    .slice(0, partsIndex)
+    .split("/")
+    .filter((s) => s.length > 0);
   if (
     resource.resourceType.types.length === 2 &&
     resource.resourceType.types[0].toLowerCase() === "locations"
@@ -585,7 +607,7 @@ export function getResourcePathElements(
 function tryAddLifecycleOperation(
   resourceType: ResourceType,
   sourceOperation: ArmResourceOperation,
-  targetResource: ResolvedResource,
+  targetResource: ResolvedResourceOperations,
 ): boolean {
   const opType = sourceOperation.kind;
   const operations = targetResource.operations;
@@ -628,7 +650,7 @@ function tryAddLifecycleOperation(
 
 function addAssociatedOperation(
   sourceOperation: ArmResourceOperation,
-  targetOperation: ResolvedResource,
+  targetOperation: ResolvedResourceOperations,
 ): void {
   targetOperation.associatedOperations ??= [];
   addUniqueOperation(sourceOperation, targetOperation.associatedOperations);
@@ -752,8 +774,8 @@ function addUniqueOperation(operation: ArmResourceOperation, operations: ArmReso
 export function resolveArmResourceOperations(
   program: Program,
   resourceType: Model,
-): ResolvedResource[] {
-  const resolvedOperations: Set<ResolvedResource> = new Set<ResolvedResource>();
+): ResolvedResourceOperations[] {
+  const resolvedOperations: Set<ResolvedResourceOperations> = new Set<ResolvedResourceOperations>();
   const operations = getArmResourceOperationList(program, resourceType);
   for (const operation of operations) {
     const armOperation: ArmResourceOperation | undefined = getResourceOperation(
@@ -790,7 +812,7 @@ export function resolveArmResourceOperations(
 
     if (matched) continue;
     // If we don't have an operation for this resource, create a new one
-    const newResource: ResolvedResource = {
+    const newResource: ResolvedResourceOperations = {
       resourceType: resourceInfo.resourceType,
       resourceInstancePath: resourceInfo.resourceInstancePath,
       resourceName: resourceInfo.resourceName,
@@ -865,6 +887,8 @@ export function getArmResourceKind(resourceType: Model): ArmResourceKind | undef
       return "Proxy";
     } else if (coreType.name.startsWith("ExtensionResource")) {
       return "Extension";
+    } else if (coreTypeNamespace === "Azure.ResourceManager.CommonTypes") {
+      return "BuiltIn";
     }
   }
 

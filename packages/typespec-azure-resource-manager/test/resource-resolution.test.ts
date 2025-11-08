@@ -544,24 +544,19 @@ interface Employees {
   checkExistence is ArmResourceCheckExistence<Employee>;
 }
 `);
-    const resources = resolveArmResources(program);
-    expect(resources).toBeDefined();
-    expect(resources.resourceModels).toBeDefined();
-    expect(resources.resourceModels).toHaveLength(1);
-    ok(resources.resourceModels);
-    const employee = resources.resourceModels[0];
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    expect(provider.resources).toHaveLength(1);
+    const employee = provider.resources![0];
     ok(employee);
     expect(employee).toMatchObject({
       kind: "Tracked",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
-      resources: expect.any(Array),
     });
-    ok(employee.resources);
 
-    const mainScope = employee.resources[0];
-    ok(mainScope);
-    checkResolvedOperations(mainScope, {
+    checkResolvedOperations(employee, {
       operations: {
         lifecycle: {
           createOrUpdate: [
@@ -589,7 +584,7 @@ interface Employees {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    checkArmOperationsHas(resources.providerOperations, [
+    checkArmOperationsHas(provider.providerOperations, [
       { operationGroup: "Operations", name: "list", kind: "other" },
     ]);
   });
@@ -728,24 +723,21 @@ interface GenericResources {
 }
 
       `);
-    const resources = resolveArmResources(program);
-    expect(resources).toMatchObject({
-      resourceModels: expect.any(Array),
+    const provider = resolveArmResources(program);
+    expect(provider).toMatchObject({
       providerOperations: expect.any(Array),
     });
-    ok(resources.resourceModels);
-    const employee = resources.resourceModels[0];
+    ok(provider.resources);
+    const employee = provider.resources[0];
     ok(employee);
     expect(employee).toMatchObject({
       kind: "Extension",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
-      resources: expect.any(Array),
+      scope: "Tenant",
     });
-    ok(employee.resources);
-    const tenant = employee.resources[0];
-    ok(tenant);
-    checkResolvedOperations(tenant, {
+
+    checkResolvedOperations(employee, {
       operations: {
         lifecycle: {
           createOrUpdate: [{ operationGroup: "Tenants", name: "create", kind: "createOrUpdate" }],
@@ -763,8 +755,14 @@ interface GenericResources {
       resourceInstancePath: "/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const scope = employee.resources[1];
+    const scope = provider.resources[1];
     ok(scope);
+    expect(scope).toMatchObject({
+      kind: "Extension",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "Scope",
+    });
     checkResolvedOperations(scope, {
       operations: {
         lifecycle: {
@@ -784,8 +782,14 @@ interface GenericResources {
         "/{scope}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const subscription = employee.resources[2];
+    const subscription = provider.resources[2];
     ok(subscription);
+    expect(subscription).toMatchObject({
+      kind: "Extension",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "Subscription",
+    });
     checkResolvedOperations(subscription, {
       operations: {
         lifecycle: {
@@ -807,8 +811,14 @@ interface GenericResources {
         "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const managementGroups = employee.resources[3];
+    const managementGroups = provider.resources[3];
     ok(managementGroups);
+    expect(managementGroups).toMatchObject({
+      kind: "Extension",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ManagementGroup",
+    });
     checkResolvedOperations(managementGroups, {
       operations: {
         lifecycle: {
@@ -830,8 +840,14 @@ interface GenericResources {
         "/providers/Microsoft.Management/managementGroups/{managementGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const resourceGroup = employee.resources[4];
+    const resourceGroup = provider.resources[4];
     ok(resourceGroup);
+    expect(resourceGroup).toMatchObject({
+      kind: "Extension",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+    });
     checkResolvedOperations(resourceGroup, {
       operations: {
         lifecycle: {
@@ -853,8 +869,14 @@ interface GenericResources {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const vms = employee.resources[5];
+    const vms = provider.resources[5];
     ok(vms);
+    expect(vms).toMatchObject({
+      kind: "Extension",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ExternalResource",
+    });
     checkResolvedOperations(vms, {
       operations: {
         lifecycle: {
@@ -876,8 +898,14 @@ interface GenericResources {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const scaleSets = employee.resources[6];
+    const scaleSets = provider.resources[6];
     ok(scaleSets);
+    expect(scaleSets).toMatchObject({
+      kind: "Extension",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ExternalResource",
+    });
     checkResolvedOperations(scaleSets, {
       operations: {
         lifecycle: {
@@ -899,8 +927,14 @@ interface GenericResources {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{scaleSetName}/virtualMachineScaleSetVms/{scaleSetVmName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const generics = employee.resources[7];
+    const generics = provider.resources[7];
     ok(generics);
+    expect(generics).toMatchObject({
+      kind: "Extension",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ExternalResource",
+    });
     checkResolvedOperations(generics, {
       operations: {
         lifecycle: {
@@ -921,31 +955,7 @@ interface GenericResources {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerNamespace}/{parentType}/{parentName}/{resourceType}/{resourceName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const externalVm = resources.resourceModels[1];
-    expect(externalVm).toMatchObject({
-      kind: "Virtual",
-      providerNamespace: "Microsoft.Compute",
-      type: expect.anything(),
-      resources: [],
-    });
-
-    const externalScaleSet = resources.resourceModels[2];
-    expect(externalScaleSet).toMatchObject({
-      kind: "Virtual",
-      providerNamespace: "Microsoft.Compute",
-      type: expect.anything(),
-      resources: [],
-    });
-
-    const externalManagementGroup = resources.resourceModels[3];
-    expect(externalManagementGroup).toMatchObject({
-      kind: "Virtual",
-      providerNamespace: "Microsoft.Management",
-      type: expect.anything(),
-      resources: [],
-    });
-
-    checkArmOperationsHas(resources.providerOperations, [
+    checkArmOperationsHas(provider.providerOperations, [
       { operationGroup: "Operations", name: "list", kind: "other" },
     ]);
   });
@@ -1065,26 +1075,23 @@ interface GenericResources {
 }
 
       `);
-    const resources = resolveArmResources(program);
-    expect(resources).toMatchObject({
-      resourceModels: expect.any(Array),
+    const provider = resolveArmResources(program);
+    expect(provider).toMatchObject({
+      resources: expect.any(Array),
       providerOperations: expect.any(Array),
     });
-    ok(resources.resourceModels);
-    expect(resources.resourceModels).toHaveLength(2);
-    const employee = resources.resourceModels[0];
+    ok(provider.resources);
+    expect(provider.resources).toHaveLength(5);
+    const employee = provider.resources[0];
     ok(employee);
     expect(employee).toMatchObject({
       kind: "Extension",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
-      resources: expect.any(Array),
+      scope: "Tenant",
     });
-    ok(employee.resources);
-    expect(employee.resources).toHaveLength(5);
-    const tenant = employee.resources[0];
-    ok(tenant);
-    checkResolvedOperations(tenant, {
+
+    checkResolvedOperations(employee, {
       operations: {
         lifecycle: {
           createOrUpdate: [{ operationGroup: "Tenants", name: "create", kind: "createOrUpdate" }],
@@ -1103,8 +1110,14 @@ interface GenericResources {
       resourceName: "EmployeesAtTenant",
     });
 
-    const scope = employee.resources[1];
+    const scope = provider.resources[1];
     ok(scope);
+    expect(scope).toMatchObject({
+      kind: "Extension",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "Scope",
+    });
     checkResolvedOperations(scope, {
       operations: {
         lifecycle: {
@@ -1125,8 +1138,15 @@ interface GenericResources {
       resourceName: "EmployeesAtScope",
     });
 
-    const subscription = employee.resources[2];
+    const subscription = provider.resources[2];
     ok(subscription);
+    expect(subscription).toMatchObject({
+      kind: "Extension",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+
+      scope: "Subscription",
+    });
     checkResolvedOperations(subscription, {
       operations: {
         lifecycle: {
@@ -1149,8 +1169,15 @@ interface GenericResources {
       resourceName: "EmployeesAtSubscription",
     });
 
-    const vms = employee.resources[3];
+    const vms = provider.resources[3];
     ok(vms);
+    expect(vms).toMatchObject({
+      kind: "Extension",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+
+      scope: "ExternalResource",
+    });
     checkResolvedOperations(vms, {
       operations: {
         lifecycle: {
@@ -1173,8 +1200,15 @@ interface GenericResources {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const generics = employee.resources[4];
+    const generics = provider.resources[4];
     ok(generics);
+    expect(generics).toMatchObject({
+      kind: "Extension",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+
+      scope: "ExternalResource",
+    });
     checkResolvedOperations(generics, {
       operations: {
         lifecycle: {
@@ -1196,15 +1230,7 @@ interface GenericResources {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerNamespace}/{parentType}/{parentName}/{resourceType}/{resourceName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const externalVm = resources.resourceModels[1];
-    expect(externalVm).toMatchObject({
-      kind: "Virtual",
-      providerNamespace: "Microsoft.Compute",
-      type: expect.anything(),
-      resources: [],
-    });
-
-    checkArmOperationsHas(resources.providerOperations, [
+    checkArmOperationsHas(provider.providerOperations, [
       { operationGroup: "Operations", name: "list", kind: "other" },
     ]);
   });
@@ -1313,25 +1339,21 @@ model DependentProperties {
   provisioningState?: ProvisioningState;
 }
 `);
-    const resources = resolveArmResources(program);
-    expect(resources).toBeDefined();
-    expect(resources.resourceModels).toBeDefined();
-    expect(resources.resourceModels).toHaveLength(3);
-    ok(resources.resourceModels);
-    const employee = resources.resourceModels[0];
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    expect(provider.resources).toHaveLength(4);
+    ok(provider.resources);
+    const employee = provider.resources[0];
     ok(employee);
     expect(employee).toMatchObject({
       kind: "Tracked",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
-      resources: expect.any(Array),
-    });
-    ok(employee.resources);
-    expect(employee.resources).toHaveLength(1);
 
-    const mainScope = employee.resources[0];
-    ok(mainScope);
-    checkResolvedOperations(mainScope, {
+      scope: "ResourceGroup",
+    });
+    checkResolvedOperations(employee, {
       operations: {
         lifecycle: {
           createOrUpdate: [
@@ -1359,19 +1381,17 @@ model DependentProperties {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const dependent = resources.resourceModels[2];
+    const dependent = provider.resources[3];
     ok(dependent);
     expect(dependent).toMatchObject({
       kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
-      resources: expect.any(Array),
+      scope: "ResourceGroup",
+      parent: expect.any(Object),
     });
-    ok(dependent.resources);
-    expect(dependent.resources).toHaveLength(1);
-    const instanceScope = dependent.resources[0];
-    ok(instanceScope);
-    checkResolvedOperations(instanceScope, {
+
+    checkResolvedOperations(dependent, {
       operations: {
         lifecycle: {
           createOrUpdate: [
@@ -1392,13 +1412,16 @@ model DependentProperties {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}",
     });
 
-    const privateEndpointConnection = resources.resourceModels[1];
+    const privateEndpointConnection = provider.resources[1];
     ok(privateEndpointConnection);
-    ok(privateEndpointConnection.resources);
-    expect(privateEndpointConnection.resources).toHaveLength(2);
-    const privateForEmplInstance = privateEndpointConnection.resources[0];
-    ok(privateForEmplInstance);
-    checkResolvedOperations(privateForEmplInstance, {
+    expect(privateEndpointConnection).toMatchObject({
+      kind: "Other",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      parent: expect.any(Object),
+    });
+    checkResolvedOperations(privateEndpointConnection, {
       operations: {
         lifecycle: {
           createOrUpdate: [
@@ -1439,8 +1462,15 @@ model DependentProperties {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/privateEndpointConnections/{privateEndpointConnectionName}",
     });
 
-    const privateForDepInstance = privateEndpointConnection.resources[1];
+    const privateForDepInstance = provider.resources[2];
     ok(privateForDepInstance);
+    expect(privateForDepInstance).toMatchObject({
+      kind: "Other",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      parent: expect.any(Object),
+    });
 
     checkResolvedOperations(privateForDepInstance, {
       operations: {
@@ -1483,7 +1513,7 @@ model DependentProperties {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}/privateEndpointConnections/{privateEndpointConnectionName}",
     });
 
-    checkArmOperationsHas(resources.providerOperations, [
+    checkArmOperationsHas(provider.providerOperations, [
       { operationGroup: "Operations", name: "list", kind: "other" },
     ]);
   });
@@ -1563,25 +1593,21 @@ model MoveResponse {
 }
 
 `);
-    const resources = resolveArmResources(program);
-    expect(resources).toBeDefined();
-    expect(resources.resourceModels).toBeDefined();
-    expect(resources.resourceModels).toHaveLength(2);
-    ok(resources.resourceModels);
-    const employee = resources.resourceModels[0];
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    expect(provider.resources).toHaveLength(2);
+    ok(provider.resources);
+    const employee = provider.resources[0];
     ok(employee);
     expect(employee).toMatchObject({
       kind: "Tracked",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
-      resources: expect.any(Array),
+      scope: "ResourceGroup",
     });
-    ok(employee.resources);
-    expect(employee.resources).toHaveLength(1);
 
-    const mainScope = employee.resources[0];
-    ok(mainScope);
-    checkResolvedOperations(mainScope, {
+    checkResolvedOperations(employee, {
       operations: {
         lifecycle: {
           createOrUpdate: [
@@ -1609,13 +1635,17 @@ model MoveResponse {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const privateEndpointConnection = resources.resourceModels[1];
+    const privateEndpointConnection = provider.resources[1];
     ok(privateEndpointConnection);
-    ok(privateEndpointConnection.resources);
-    expect(privateEndpointConnection.resources).toHaveLength(1);
-    const privateForEmplInstance = privateEndpointConnection.resources[0];
-    ok(privateForEmplInstance);
-    checkResolvedOperations(privateForEmplInstance, {
+    expect(privateEndpointConnection).toMatchObject({
+      kind: "Other",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      parent: expect.any(Object),
+    });
+
+    checkResolvedOperations(privateEndpointConnection, {
       operations: {
         lifecycle: {
           createOrUpdate: [
@@ -1656,7 +1686,7 @@ model MoveResponse {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/privateEndpointConnections/{privateEndpointConnectionName}",
     });
 
-    checkArmOperationsHas(resources.providerOperations, [
+    checkArmOperationsHas(provider.providerOperations, [
       { operationGroup: "Operations", name: "list", kind: "other" },
     ]);
   });
@@ -1764,25 +1794,21 @@ model DependentProperties {
   provisioningState?: ProvisioningState;
 }
 `);
-    const resources = resolveArmResources(program);
-    expect(resources).toBeDefined();
-    expect(resources.resourceModels).toBeDefined();
-    expect(resources.resourceModels).toHaveLength(3);
-    ok(resources.resourceModels);
-    const employee = resources.resourceModels[0];
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    expect(provider.resources).toHaveLength(4);
+    ok(provider.resources);
+    const employee = provider.resources[0];
     ok(employee);
     expect(employee).toMatchObject({
       kind: "Tracked",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
-      resources: expect.any(Array),
+      scope: "ResourceGroup",
     });
-    ok(employee.resources);
-    expect(employee.resources).toHaveLength(1);
 
-    const mainScope = employee.resources[0];
-    ok(mainScope);
-    checkResolvedOperations(mainScope, {
+    checkResolvedOperations(employee, {
       operations: {
         lifecycle: {
           createOrUpdate: [
@@ -1810,19 +1836,17 @@ model DependentProperties {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const dependent = resources.resourceModels[2];
+    const dependent = provider.resources[3];
     ok(dependent);
     expect(dependent).toMatchObject({
       kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
-      resources: expect.any(Array),
+      scope: "ResourceGroup",
+      parent: expect.any(Object),
     });
-    ok(dependent.resources);
-    expect(dependent.resources).toHaveLength(1);
-    const instanceScope = dependent.resources[0];
-    ok(instanceScope);
-    checkResolvedOperations(instanceScope, {
+
+    checkResolvedOperations(dependent, {
       operations: {
         lifecycle: {
           createOrUpdate: [
@@ -1843,13 +1867,16 @@ model DependentProperties {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}",
     });
 
-    const privateLink = resources.resourceModels[1];
+    const privateLink = provider.resources[1];
     ok(privateLink);
-    ok(privateLink.resources);
-    expect(privateLink.resources).toHaveLength(2);
-    const privateForEmplInstance = privateLink.resources[0];
-    ok(privateForEmplInstance);
-    checkResolvedOperations(privateForEmplInstance, {
+    expect(privateLink).toMatchObject({
+      kind: "Other",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      parent: expect.any(Object),
+    });
+    checkResolvedOperations(privateLink, {
       operations: {
         lists: [{ operationGroup: "EmployeePrivateLinks", name: "list", kind: "list" }],
       },
@@ -1862,8 +1889,15 @@ model DependentProperties {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/privateLinkResources/{name}",
     });
 
-    const privateForDepInstance = privateLink.resources[1];
+    const privateForDepInstance = provider.resources[2];
     ok(privateForDepInstance);
+    expect(privateForDepInstance).toMatchObject({
+      kind: "Other",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      parent: expect.any(Object),
+    });
 
     checkResolvedOperations(privateForDepInstance, {
       operations: {
@@ -1878,7 +1912,7 @@ model DependentProperties {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}/privateLinkResources/{name}",
     });
 
-    checkArmOperationsHas(resources.providerOperations, [
+    checkArmOperationsHas(provider.providerOperations, [
       { operationGroup: "Operations", name: "list", kind: "other" },
     ]);
   });
@@ -1956,25 +1990,21 @@ model MoveResponse {
   movingStatus: string;
 }
 `);
-    const resources = resolveArmResources(program);
-    expect(resources).toBeDefined();
-    expect(resources.resourceModels).toBeDefined();
-    expect(resources.resourceModels).toHaveLength(2);
-    ok(resources.resourceModels);
-    const employee = resources.resourceModels[0];
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    expect(provider.resources).toHaveLength(2);
+    ok(provider.resources);
+    const employee = provider.resources[0];
     ok(employee);
     expect(employee).toMatchObject({
       kind: "Tracked",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
-      resources: expect.any(Array),
+      scope: "ResourceGroup",
     });
-    ok(employee.resources);
-    expect(employee.resources).toHaveLength(1);
 
-    const mainScope = employee.resources[0];
-    ok(mainScope);
-    checkResolvedOperations(mainScope, {
+    checkResolvedOperations(employee, {
       operations: {
         lifecycle: {
           createOrUpdate: [
@@ -2002,13 +2032,17 @@ model MoveResponse {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const privateLink = resources.resourceModels[1];
+    const privateLink = provider.resources[1];
     ok(privateLink);
-    ok(privateLink.resources);
-    expect(privateLink.resources).toHaveLength(1);
-    const privateForEmplInstance = privateLink.resources[0];
-    ok(privateForEmplInstance);
-    checkResolvedOperations(privateForEmplInstance, {
+    expect(privateLink).toMatchObject({
+      kind: "Other",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      parent: expect.any(Object),
+    });
+
+    checkResolvedOperations(privateLink, {
       operations: {
         lists: [{ operationGroup: "EmployeePrivateLinks", name: "list", kind: "list" }],
       },
@@ -2021,7 +2055,7 @@ model MoveResponse {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/privateLinkResources/{name}",
     });
 
-    checkArmOperationsHas(resources.providerOperations, [
+    checkArmOperationsHas(provider.providerOperations, [
       { operationGroup: "Operations", name: "list", kind: "other" },
     ]);
   });
@@ -2187,24 +2221,21 @@ model MoveResponse {
   movingStatus: string;
 }
 `);
-    const resources = resolveArmResources(program);
-    expect(resources).toBeDefined();
-    expect(resources.resourceModels).toBeDefined();
-    expect(resources.resourceModels).toHaveLength(1);
-    ok(resources.resourceModels);
-    const employee = resources.resourceModels[0];
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    expect(provider.resources).toHaveLength(2);
+    ok(provider.resources);
+    const employee = provider.resources[0];
     ok(employee);
     expect(employee).toMatchObject({
       kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
-      resources: expect.any(Array),
+      scope: "ResourceGroup",
     });
-    ok(employee.resources);
-    const buildingScope = employee.resources[0];
 
-    ok(buildingScope);
-    checkResolvedOperations(buildingScope, {
+    checkResolvedOperations(employee, {
       operations: {
         lifecycle: {
           createOrUpdate: [
@@ -2230,7 +2261,13 @@ model MoveResponse {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/employeeResources/{employeeId}",
     });
 
-    const roomScope = employee.resources[1];
+    const roomScope = provider.resources[1];
+    expect(roomScope).toMatchObject({
+      kind: "Proxy",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+    });
 
     ok(roomScope);
     checkResolvedOperations(roomScope, {
@@ -2374,25 +2411,21 @@ model MoveResponse {
   movingStatus: string;
 }
 `);
-    const resources = resolveArmResources(program);
-    expect(resources).toBeDefined();
-    expect(resources.resourceModels).toBeDefined();
-    expect(resources.resourceModels).toHaveLength(1);
-    ok(resources.resourceModels);
-    const employee = resources.resourceModels[0];
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    expect(provider.resources).toHaveLength(1);
+    ok(provider.resources);
+    const employee = provider.resources[0];
     ok(employee);
     expect(employee).toMatchObject({
       kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
-      resources: expect.any(Array),
+      scope: "ResourceGroup",
     });
-    ok(employee.resources);
-    expect(employee.resources).toHaveLength(1);
-    const buildingScope = employee.resources[0];
 
-    ok(buildingScope);
-    checkResolvedOperations(buildingScope, {
+    checkResolvedOperations(employee, {
       operations: {
         lifecycle: {
           createOrUpdate: [
@@ -2590,24 +2623,21 @@ model MoveResponse {
 }
 
 `);
-    const resources = resolveArmResources(program);
-    expect(resources).toBeDefined();
-    expect(resources.resourceModels).toBeDefined();
-    expect(resources.resourceModels).toHaveLength(1);
-    ok(resources.resourceModels);
-    const employee = resources.resourceModels[0];
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    expect(provider.resources).toHaveLength(2);
+    ok(provider.resources);
+    const employee = provider.resources[0];
     ok(employee);
     expect(employee).toMatchObject({
       kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
-      resources: expect.any(Array),
+      scope: "ResourceGroup",
     });
-    ok(employee.resources);
-    const buildingScope = employee.resources[0];
 
-    ok(buildingScope);
-    checkResolvedOperations(buildingScope, {
+    checkResolvedOperations(employee, {
       operations: {
         lifecycle: {
           createOrUpdate: [
@@ -2633,9 +2663,15 @@ model MoveResponse {
       resourceName: "BuildingsEmployeeResources",
     });
 
-    const roomScope = employee.resources[1];
+    const roomScope = provider.resources[1];
 
     ok(roomScope);
+    expect(employee).toMatchObject({
+      kind: "Proxy",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+    });
     checkResolvedOperations(roomScope, {
       operations: {
         lifecycle: {
