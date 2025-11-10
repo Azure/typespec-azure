@@ -23,6 +23,7 @@ import { $ } from "@typespec/compiler/typekit";
 import { createSdkClientType } from "./clients.js";
 import {
   getAccess,
+  getNextLinkVerb,
   getOverriddenClientMethod,
   getResponseAsBool,
   listOperationGroups,
@@ -229,6 +230,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
             context.__responseHeaderCache.get(segment) ??
             context.__modelPropertyCache.get(segment)!,
         ),
+        nextLinkVerb: getNextLinkVerb(context, operation),
         continuationTokenParameterSegments: pagingMetadata.input.continuationToken?.path.map(
           (r) => context.__methodParameterCache.get(r) ?? context.__modelPropertyCache.get(r)!,
         ),
@@ -389,9 +391,11 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     finalResponse: getFinalResponse(),
     finalStep: getSdkLroServiceFinalStep(context, rawMetadata.finalStep),
     pollingStep: {
-      responseBody: diagnostics.pipe(
-        getClientTypeWithDiagnostics(context, rawMetadata.pollingInfo.responseModel),
-      ) as SdkModelType,
+      responseBody: rawMetadata.pollingInfo.responseModel
+        ? (diagnostics.pipe(
+            getClientTypeWithDiagnostics(context, rawMetadata.pollingInfo.responseModel),
+          ) as SdkModelType)
+        : undefined,
     },
     operation: ignoreDiagnostics(getSdkBasicServiceMethod(context, rawMetadata.operation, client))
       .operation,

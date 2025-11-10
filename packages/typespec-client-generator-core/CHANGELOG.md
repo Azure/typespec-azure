@@ -1,5 +1,27 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.61.3
+
+### Bug Fixes
+
+- [#3439](https://github.com/Azure/typespec-azure/pull/3439) Support `@flattenProperty` on parameters.
+- [#3441](https://github.com/Azure/typespec-azure/pull/3441) Fix usage of `@markAsLro` for lro operations with nullable overall response types
+
+
+## 0.61.2
+
+### Bug Fixes
+
+- [#3426](https://github.com/Azure/typespec-azure/pull/3426) Fix `@alternateType` decorator incorrectly treating regular TypeSpec models as external types
+
+
+## 0.61.1
+
+### Bug Fixes
+
+- [#3376](https://github.com/Azure/typespec-azure/pull/3376) Support `@clientLocation` for model property along with `@override`.
+
+
 ## 0.61.0
 
 ### Breaking Changes

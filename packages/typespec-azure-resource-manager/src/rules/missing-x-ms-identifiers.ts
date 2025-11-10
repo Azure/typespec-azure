@@ -7,7 +7,6 @@ import {
   isArrayModelType,
   paramMessage,
 } from "@typespec/compiler";
-import { getExtensions } from "@typespec/openapi";
 import { isArmCommonType } from "../common-types.js";
 import { getArmIdentifiers, getArmKeyIdentifiers } from "../resource.js";
 
@@ -53,54 +52,45 @@ export const missingXmsIdentifiersRule = createRule({
         return false;
       }
 
-      const xmsIdentifiers = getExtensions(program, property ?? array).get("x-ms-identifiers");
       const armIdentifiers = getArmIdentifiers(program, property);
       const armKeyIdentifiers = getArmKeyIdentifiers(program, array);
-      const identifiers = armIdentifiers ?? armKeyIdentifiers ?? xmsIdentifiers;
+      const identifiers = armIdentifiers ?? armKeyIdentifiers;
 
       if (identifiers === undefined) {
         return true;
       }
 
-      if (Array.isArray(identifiers)) {
-        for (const propIdentifier of identifiers) {
-          if (typeof propIdentifier === "string") {
-            const props = propIdentifier.replace(/^\//, "").split("/");
-            let element = elementType;
-            for (const prop of props) {
-              if (element === undefined || element.kind !== "Model") {
-                context.reportDiagnostic({
-                  messageId: "missingProperty",
-                  format: { propertyName: prop, targetModelName: element?.name },
-                  target: property,
-                });
-                return false;
-              }
-              const propertyValue = getProperty(element, prop);
-              if (propertyValue === undefined) {
-                context.reportDiagnostic({
-                  messageId: "missingProperty",
-                  format: { propertyName: prop, targetModelName: elementType.name },
-                  target: property,
-                });
-              }
-
-              element = propertyValue?.type as ArrayModelType;
+      for (const propIdentifier of identifiers) {
+        if (typeof propIdentifier === "string") {
+          const props = propIdentifier.replace(/^\//, "").split("/");
+          let element = elementType;
+          for (const prop of props) {
+            if (element === undefined || element.kind !== "Model") {
+              context.reportDiagnostic({
+                messageId: "missingProperty",
+                format: { propertyName: prop, targetModelName: element?.name },
+                target: property,
+              });
+              return false;
             }
-          } else {
-            context.reportDiagnostic({
-              messageId: "notArray",
-              format: { valueType: typeof propIdentifier },
-              target: property,
-            });
+            const propertyValue = getProperty(element, prop);
+            if (propertyValue === undefined) {
+              context.reportDiagnostic({
+                messageId: "missingProperty",
+                format: { propertyName: prop, targetModelName: elementType.name },
+                target: property,
+              });
+            }
+
+            element = propertyValue?.type as ArrayModelType;
           }
+        } else {
+          context.reportDiagnostic({
+            messageId: "notArray",
+            format: { valueType: typeof propIdentifier },
+            target: property,
+          });
         }
-      } else {
-        context.reportDiagnostic({
-          messageId: "notArray",
-          format: { valueType: typeof xmsIdentifiers },
-          target: property,
-        });
       }
 
       return false;

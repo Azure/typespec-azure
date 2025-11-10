@@ -352,23 +352,10 @@ export const $lib = createTypeSpecLibrary({
           "Only encode of `ArrayEncoding.pipeDelimited` and `ArrayEncoding.spaceDelimited` is supported for collection format.",
       },
     },
-    "no-discriminated-unions": {
-      severity: "error",
-      messages: {
-        default:
-          "Discriminated unions are not supported. Please redefine the type using model with hierarchy and `@discriminator` decorator.",
-      },
-    },
     "non-head-bool-response-decorator": {
       severity: "warning",
       messages: {
         default: paramMessage`@responseAsBool decorator can only be used on HEAD operations. Will ignore decorator on ${"operationName"}.`,
-      },
-    },
-    "unsupported-http-file-body": {
-      severity: "error",
-      messages: {
-        default: "File body is not supported for HTTP operations. Please use bytes instead.",
       },
     },
     "require-versioned-service": {

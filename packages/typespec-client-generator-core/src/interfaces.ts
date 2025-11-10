@@ -146,6 +146,8 @@ export enum UsageFlags {
   LroPolling = 1 << 12,
   /** Set when type is used as LRO final envelop response. */
   LroFinalEnvelope = 1 << 13,
+  /** Set when type is only referenced by external types. */
+  External = 1 << 14,
 }
 
 /**
@@ -488,10 +490,21 @@ export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends 
   variantTypes: TValueType[];
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
-  /** Whether the type has public or private accessibility */
+  /** Whether the type has public or private accessibility. */
   access: AccessFlags;
   /** Bitmap of the usage for the type. */
   usage: UsageFlags;
+  /** Info to distinguish between different union variants. */
+  discriminatedOptions?: DiscriminatedOptions;
+}
+
+export interface DiscriminatedOptions {
+  /** How is the discriminated union serialized.  */
+  envelope: "object" | "none";
+  /** Name of the discriminator property. */
+  discriminatorPropertyName: string;
+  /** Name of the property envelopping the data. `undefined` if envelope is "none" */
+  envelopePropertyName?: string;
 }
 
 export interface SdkModelType extends SdkTypeBase {
@@ -584,6 +597,8 @@ export interface SdkModelPropertyTypeBase<TType extends SdkTypeBase = SdkType>
   visibility?: Visibility[];
   /** Whether the type has public or private accessibility */
   access: AccessFlags;
+  /** Whether this property could be flattened */
+  flatten: boolean;
 }
 
 /**
@@ -596,6 +611,7 @@ export interface SerializationOptions {
   json?: JsonSerializationOptions;
   xml?: XmlSerializationOptions;
   multipart?: MultipartOptions;
+  binary?: BinarySerializationOptions;
 }
 
 /**
@@ -627,6 +643,11 @@ export interface XmlSerializationOptions {
     namespace: string;
     prefix: string;
   };
+}
+
+export interface BinarySerializationOptions {
+  /** Whether this is a file/stream input */
+  isFile: boolean;
 }
 
 /**
@@ -685,7 +706,6 @@ export interface SdkModelPropertyType extends SdkModelPropertyTypeBase {
    * @deprecated This property is deprecated. Use `serializationOptions.multipart` instead.
    */
   multipartOptions?: MultipartOptions;
-  flatten: boolean;
 }
 
 export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes" | "simple" | "form";
@@ -891,6 +911,8 @@ export interface SdkPagingServiceMetadata<TServiceOperation extends SdkServiceOp
   nextLinkSegments?: (SdkServiceResponseHeader | SdkModelPropertyType)[];
   /** Method used to get next page. If not defined, use the initial method. */
   nextLinkOperation?: SdkServiceMethod<TServiceOperation>;
+  /** HTTP verb to use for the next link operation. Defaults to "GET" if not specified. */
+  nextLinkVerb?: "GET" | "POST";
   /** Segments to indicate how to get parameters that are needed to be injected into next page link. */
   nextLinkReInjectedParametersSegments?: (SdkMethodParameter | SdkModelPropertyType)[][];
   /** Segments to indicate how to set continuation token for next page request. */
