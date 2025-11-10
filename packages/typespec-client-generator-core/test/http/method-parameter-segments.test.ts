@@ -84,7 +84,7 @@ it("body parameter - direct mapping", async () => {
   const serviceOperation = method.operation;
 
   ok(serviceOperation.bodyParam);
-  
+
   // Check correspondingMethodParams (deprecated but still populated)
   strictEqual(serviceOperation.bodyParam.correspondingMethodParams.length, 1);
   strictEqual(serviceOperation.bodyParam.correspondingMethodParams[0].name, "body");
@@ -136,18 +136,18 @@ it("spread body - multiple paths", async () => {
   const serviceOperation = method.operation;
 
   ok(serviceOperation.bodyParam);
-  
+
   // Check correspondingMethodParams returns multiple final properties
   strictEqual(serviceOperation.bodyParam.correspondingMethodParams.length, 2);
 
   // Check new methodParameterSegments has multiple paths (one per spread property)
   strictEqual(serviceOperation.bodyParam.methodParameterSegments.length, 2);
-  
+
   // First path should be to key1
   strictEqual(serviceOperation.bodyParam.methodParameterSegments[0].length, 1);
   strictEqual(serviceOperation.bodyParam.methodParameterSegments[0][0].name, "key1");
   strictEqual(serviceOperation.bodyParam.methodParameterSegments[0][0].kind, "method");
-  
+
   // Second path should be to key2
   strictEqual(serviceOperation.bodyParam.methodParameterSegments[1].length, 1);
   strictEqual(serviceOperation.bodyParam.methodParameterSegments[1][0].name, "key2");
