@@ -25,6 +25,7 @@ import { useStateMap } from "@typespec/compiler/utils";
 import { getHttpOperation, isPathParam } from "@typespec/http";
 import { $autoRoute, getParentResource, getSegment } from "@typespec/rest";
 
+import { pascalCase } from "change-case";
 import {
   ArmProviderNameValueDecorator,
   ArmResourceOperationsDecorator,
@@ -501,7 +502,35 @@ function getResourceParent(
     }
   }
 
+  if (child.resourceType.types.length > 1) {
+    const parent: ResolvedResource = {
+      type: child.type,
+      kind: "Other",
+      providerNamespace: child.providerNamespace,
+      resourceType: {
+        provider: child.resourceType.provider,
+        types: child.resourceType.types.slice(0, -1),
+      },
+      resourceName: getParentName(child.resourceType.types[child.resourceType.types.length - 2]),
+      resourceInstancePath: `/${child.resourceInstancePath
+        .split("/")
+        .filter((s) => s.length > 0)
+        .slice(0, -2)
+        .join("/")}`,
+      operations: { lifecycle: {}, actions: [], lists: [] },
+    };
+    resources.push(parent);
+    return parent;
+  }
+
   return undefined;
+}
+
+function getParentName(typeName: string): string {
+  if (typeName.endsWith("s")) {
+    typeName = typeName.slice(0, -1);
+  }
+  return pascalCase(typeName);
 }
 
 function getScope(resource: ResolvedResource): string | undefined {

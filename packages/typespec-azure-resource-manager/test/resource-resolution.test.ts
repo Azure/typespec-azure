@@ -2224,7 +2224,7 @@ model MoveResponse {
     const provider = resolveArmResources(program);
     expect(provider).toBeDefined();
     expect(provider.resources).toBeDefined();
-    expect(provider.resources).toHaveLength(2);
+    expect(provider.resources).toHaveLength(4);
     ok(provider.resources);
     const employee = provider.resources[0];
     ok(employee);
@@ -2290,6 +2290,47 @@ model MoveResponse {
       resourceName: "RoomsEmployeeResources",
       resourceInstancePath:
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/rooms/{roomId}/employeeResources/{employeeId}",
+    });
+
+    const building = provider.resources[2];
+    ok(building);
+    expect(building).toMatchObject({
+      kind: "Other",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      operations: {
+        lifecycle: {},
+        actions: [],
+        lists: [],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["buildings"],
+      },
+      resourceName: "Building",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}",
+    });
+    const room = provider.resources[3];
+    ok(room);
+    expect(room).toMatchObject({
+      kind: "Other",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      operations: {
+        lifecycle: {},
+        actions: [],
+        lists: [],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["buildings", "rooms"],
+      },
+      resourceName: "Room",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/rooms/{roomId}",
     });
   });
 
@@ -2414,7 +2455,7 @@ model MoveResponse {
     const provider = resolveArmResources(program);
     expect(provider).toBeDefined();
     expect(provider.resources).toBeDefined();
-    expect(provider.resources).toHaveLength(1);
+    expect(provider.resources).toHaveLength(2);
     ok(provider.resources);
     const employee = provider.resources[0];
     ok(employee);
@@ -2449,6 +2490,26 @@ model MoveResponse {
       resourceName: "EmployeesForBuilding",
       resourceInstancePath:
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/employeeResources/{employeeId}",
+    });
+    const building = provider.resources[1];
+    ok(building);
+    expect(building).toMatchObject({
+      kind: "Other",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      operations: {
+        lifecycle: {},
+        actions: [],
+        lists: [],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["buildings"],
+      },
+      resourceName: "Building",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}",
     });
   });
   it("collects operation information for routed endpoints", async () => {
@@ -2626,7 +2687,7 @@ model MoveResponse {
     const provider = resolveArmResources(program);
     expect(provider).toBeDefined();
     expect(provider.resources).toBeDefined();
-    expect(provider.resources).toHaveLength(2);
+    expect(provider.resources).toHaveLength(4);
     ok(provider.resources);
     const employee = provider.resources[0];
     ok(employee);
@@ -2692,6 +2753,46 @@ model MoveResponse {
       resourceInstancePath:
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/rooms/{roomId}/employeeResources/{employeeId}",
       resourceName: "RoomsEmployeeResources",
+    });
+    const building = provider.resources[2];
+    ok(building);
+    expect(building).toMatchObject({
+      kind: "Other",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      operations: {
+        lifecycle: {},
+        actions: [],
+        lists: [],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["buildings"],
+      },
+      resourceName: "Building",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}",
+    });
+    const room = provider.resources[3];
+    ok(room);
+    expect(room).toMatchObject({
+      kind: "Other",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      operations: {
+        lifecycle: {},
+        actions: [],
+        lists: [],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["buildings", "rooms"],
+      },
+      resourceName: "Room",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/rooms/{roomId}",
     });
   });
 });
