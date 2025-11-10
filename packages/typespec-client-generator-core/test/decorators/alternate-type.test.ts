@@ -869,3 +869,89 @@ describe("external types", () => {
     strictEqual(identityProperty?.type.external, undefined);
   });
 });
+
+it("should not set usage on original enum when parameter has alternateType", async () => {
+  const { Test } = (await runner.compile(`
+    @service
+    @test namespace TestService {
+      @test
+      enum Test {
+        default,
+      }
+      
+      op test(@path p: Test): void;
+      
+      @@alternateType(TestService::parameters.p, "string");
+    }
+  `)) as { Test: Enum };
+
+  const models = runner.context.sdkPackage.clients[0];
+  const method = models.methods[0];
+  strictEqual(method.name, "test");
+  
+  // The parameter should have string type, not Test enum
+  const param = method.parameters[0];
+  strictEqual(param.type.kind, "string");
+  
+  // The original Test enum should have None usage (0) since it's replaced
+  const sdkEnum = runner.context.__referencedTypeCache.get(Test);
+  strictEqual(sdkEnum?.kind, "enum");
+  strictEqual(sdkEnum.usage, UsageFlags.None, "Test enum should have None usage");
+});
+
+it("should not set usage on original model when parameter has alternateType", async () => {
+  const { TestModel } = (await runner.compile(`
+    @service
+    @test namespace TestService {
+      @test
+      model TestModel {
+        value: string;
+      }
+      
+      op test(@body body: TestModel): void;
+      
+      @@alternateType(TestService::parameters.body, "string");
+    }
+  `)) as { TestModel: Model };
+
+  const models = runner.context.sdkPackage.clients[0];
+  const method = models.methods[0];
+  strictEqual(method.name, "test");
+  
+  // The parameter should have string type, not TestModel
+  const param = method.parameters[0];
+  strictEqual(param.type.kind, "string");
+  
+  // The original TestModel should have None usage (0) since it's replaced
+  const sdkModel = runner.context.__referencedTypeCache.get(TestModel);
+  strictEqual(sdkModel?.kind, "model");
+  strictEqual(sdkModel.usage, UsageFlags.None, "TestModel should have None usage");
+});
+
+it("should not set usage on original enum when inline alternateType is used", async () => {
+  const { Status } = (await runner.compile(`
+    @service
+    @test namespace TestService {
+      @test
+      enum Status {
+        Active,
+        Inactive,
+      }
+      
+      op test(@alternateType(string) @path status: Status): void;
+    }
+  `)) as { Status: Enum };
+
+  const models = runner.context.sdkPackage.clients[0];
+  const method = models.methods[0];
+  strictEqual(method.name, "test");
+  
+  // The parameter should have string type, not Status enum
+  const param = method.parameters[0];
+  strictEqual(param.type.kind, "string");
+  
+  // The original Status enum should have None usage (0) since it's replaced
+  const sdkEnum = runner.context.__referencedTypeCache.get(Status);
+  strictEqual(sdkEnum?.kind, "enum");
+  strictEqual(sdkEnum.usage, UsageFlags.None, "Status enum should have None usage");
+});
