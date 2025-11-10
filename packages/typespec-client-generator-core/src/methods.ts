@@ -595,23 +595,11 @@ function getSdkMethodResponse(
     } else if (responseTypes.size === 1) {
       type = allResponseBodies[0];
     }
-    if (nonBodyExists && type) {
-      type = {
-        kind: "nullable",
-        name: createGeneratedName(context, operation, "NullableResponse"),
-        crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operation)}.NullableResponse`,
-        isGeneratedName: true,
-        type: type,
-        decorators: [],
-        access: "public",
-        usage: UsageFlags.Output,
-        namespace: client.namespace,
-      };
-    }
   }
   return {
     kind: "method",
     type,
+    ...(nonBodyExists && type !== undefined && { optional: true }),
   };
 }
 
