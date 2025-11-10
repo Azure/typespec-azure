@@ -722,7 +722,7 @@ function findMappingWithPath(
       return path;
     }
 
-    // Handle special cases for content-type and accept headers
+    // Two following two hard coded mapping is for the case that TCGC help to add content type and accept header when not exists.
     if (
       serviceParam.kind === "header" &&
       serviceParam.serializedName === "Content-Type" &&
