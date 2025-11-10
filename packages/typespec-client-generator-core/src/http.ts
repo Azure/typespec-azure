@@ -228,6 +228,7 @@ function getSdkHttpParameters(
         type,
         optional: isHttpBodySpread(tspBody) ? false : (tspBody.property?.optional ?? false), // optional is always false for spread body
         correspondingMethodParams,
+        methodParameterSegments: [],
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`,
         decorators: diagnostics.pipe(getTypeDecorators(context, tspBody.type)),
         access: "public",
@@ -237,6 +238,14 @@ function getSdkHttpParameters(
     if (retval.bodyParam) {
       retval.bodyParam.correspondingMethodParams = diagnostics.pipe(
         getCorrespondingMethodParams(
+          context,
+          httpOperation.operation,
+          methodParameters,
+          retval.bodyParam,
+        ),
+      );
+      retval.bodyParam.methodParameterSegments = diagnostics.pipe(
+        getMethodParameterSegments(
           context,
           httpOperation.operation,
           methodParameters,
@@ -272,6 +281,7 @@ function getSdkHttpParameters(
       kind: "header",
       serializedName: "Content-Type",
       correspondingMethodParams,
+      methodParameterSegments: [],
     });
   }
   if (responseBody && !headerParams.some((h) => isAcceptHeader(h))) {
@@ -290,11 +300,15 @@ function getSdkHttpParameters(
       kind: "header",
       serializedName: "Accept",
       correspondingMethodParams,
+      methodParameterSegments: [],
     });
   }
   for (const param of retval.parameters) {
     param.correspondingMethodParams = diagnostics.pipe(
       getCorrespondingMethodParams(context, httpOperation.operation, methodParameters, param),
+    );
+    param.methodParameterSegments = diagnostics.pipe(
+      getMethodParameterSegments(context, httpOperation.operation, methodParameters, param),
     );
   }
   return diagnostics.wrap(retval);
@@ -414,6 +428,7 @@ export function getSdkHttpParameter(
         $(program).type.isAssignableTo(param.type, $(program).builtin.url, param.type),
       serializedName: getPathParamName(program, param) ?? base.name,
       correspondingMethodParams: [],
+      methodParameterSegments: [],
       optional: param.optional,
     });
   }
@@ -423,6 +438,7 @@ export function getSdkHttpParameter(
       kind: "cookie",
       serializedName: getCookieParamOptions(program, param)?.name ?? base.name,
       correspondingMethodParams: [],
+      methodParameterSegments: [],
       optional: param.optional,
     });
   }
@@ -435,6 +451,7 @@ export function getSdkHttpParameter(
       defaultContentType: "application/json",
       optional: param.optional,
       correspondingMethodParams: [],
+      methodParameterSegments: [],
       serializationOptions: {},
     });
   }
@@ -443,6 +460,7 @@ export function getSdkHttpParameter(
     optional: param.optional,
     collectionFormat: diagnostics.pipe(getCollectionFormat(context, param)),
     correspondingMethodParams: [],
+    methodParameterSegments: [],
   };
   if (isQueryParam(context.program, param) || location === "query") {
     return diagnostics.wrap({
@@ -665,6 +683,98 @@ export function getCorrespondingMethodParams(
 }
 
 /**
+ * Get method parameter segments for a service parameter.
+ * This builds the complete path from method parameters to the HTTP parameter.
+ * For body parameters with spread, multiple paths may be returned.
+ * @param context
+ * @param operation
+ * @param methodParameters
+ * @param serviceParam
+ * @returns Array of path segments, where each inner array represents a complete path
+ */
+export function getMethodParameterSegments(
+  context: TCGCContext,
+  operation: Operation,
+  methodParameters: SdkMethodParameter[],
+  serviceParam: SdkHttpParameter,
+): [(SdkMethodParameter | SdkModelPropertyType)[][], readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+
+  if (serviceParam.onClient) {
+    // 1. To see if the service parameter is a client parameter.
+    if (serviceParam.__raw) {
+      const correspondingClientParam = getCorrespondingClientParam(
+        context,
+        serviceParam.__raw,
+        operation,
+      );
+      if (correspondingClientParam) return diagnostics.wrap([[correspondingClientParam]]);
+    }
+
+    const clientParams = context.__clientParametersCache.get(
+      context.getClientForOperation(operation),
+    );
+
+    // 2. To see if the service parameter is api version parameter that has been elevated to client.
+    if (clientParams && serviceParam.isApiVersionParam && serviceParam.onClient) {
+      const existingApiVersion = clientParams.find((x) => isApiVersion(context, x.__raw!));
+      if (existingApiVersion) return diagnostics.wrap([[existingApiVersion]]);
+    }
+
+    // 3. To see if the service parameter is subscription parameter that has been elevated to client (only for arm service).
+    if (clientParams && isSubscriptionId(context, serviceParam)) {
+      const subId = clientParams.find((x) => isSubscriptionId(context, x));
+      if (subId) return diagnostics.wrap([[subId]]);
+    }
+  }
+
+  // Since service param come from the original operation when using `@override`, so the `onClient` info might not be correct.
+  // We need to reset the `onClient` info for the service param and find corresponding method param again.
+  serviceParam.onClient = false;
+
+  // 4. To see if the service parameter is a method parameter or a property of a method parameter.
+  const directMappingPath = findMappingWithPath(context, methodParameters, serviceParam);
+  if (directMappingPath) {
+    return diagnostics.wrap([directMappingPath]);
+  }
+
+  // 5. To see if all the property of the service parameter could be mapped to a method parameter or a property of a method parameter.
+  // This is the spread body case where multiple paths may exist.
+  if (serviceParam.kind === "body" && serviceParam.type.kind === "model") {
+    const paths: (SdkMethodParameter | SdkModelPropertyType)[][] = [];
+    let optionalSkip = 0;
+    for (const serviceParamProp of serviceParam.type.properties) {
+      const propertyMappingPath = findMappingWithPath(context, methodParameters, serviceParamProp);
+      if (propertyMappingPath) {
+        paths.push(propertyMappingPath);
+      } else if (serviceParamProp.optional) {
+        // If the property is optional, we can skip the mapping.
+        optionalSkip++;
+      }
+    }
+    if (paths.length + optionalSkip === serviceParam.type.properties.length) {
+      return diagnostics.wrap(paths);
+    }
+  }
+
+  // If mapping could not be found, and the service param is required, TCGC will report error since we can't generate the client code without this mapping.
+  if (!serviceParam.optional) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "no-corresponding-method-param",
+        target: operation,
+        format: {
+          paramName: serviceParam.name,
+          methodName: operation.name,
+        },
+      }),
+    );
+  }
+
+  return diagnostics.wrap([]);
+}
+
+/**
  * Try to find the mapping of a service paramete or a property of a service parameter to a method parameter or a property of a method parameter.
  * @param methodParameters
  * @param serviceParam
@@ -713,6 +823,72 @@ function findMapping(
       while (current) {
         for (const prop of methodParam.type.properties) {
           queue.push(prop);
+        }
+        current = current.baseModel;
+      }
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Build path segments from method parameters to service parameter.
+ * This function finds the complete path from method parameter to the HTTP parameter.
+ * @param context
+ * @param methodParameters
+ * @param serviceParam
+ * @returns An array of path segments, where each segment is a path from method parameter to the service parameter
+ */
+function findMappingWithPath(
+  context: TCGCContext,
+  methodParameters: SdkMethodParameter[],
+  serviceParam: SdkHttpParameter | SdkModelPropertyType,
+): (SdkMethodParameter | SdkModelPropertyType)[] | undefined {
+  // Use a queue of tuples: [current parameter, path to reach it]
+  const queue: [(SdkMethodParameter | SdkModelPropertyType), (SdkMethodParameter | SdkModelPropertyType)[]][] = 
+    methodParameters.map(p => [p, [p]]);
+  const visited: Set<SdkModelType> = new Set();
+  
+  while (queue.length > 0) {
+    const [methodParam, path] = queue.shift()!;
+    
+    // Check if we found the target
+    if (
+      methodParam.__raw &&
+      serviceParam.__raw &&
+      compareModelProperties(context, methodParam.__raw, serviceParam.__raw)
+    ) {
+      return path;
+    }
+    
+    // Handle special cases for content-type and accept headers
+    if (
+      serviceParam.kind === "header" &&
+      serviceParam.serializedName === "Content-Type" &&
+      methodParam.name === "contentType"
+    ) {
+      return path;
+    }
+    if (
+      serviceParam.kind === "header" &&
+      serviceParam.serializedName === "Accept" &&
+      methodParam.name === "accept"
+    ) {
+      return path;
+    }
+    
+    // If the service parameter is a body parameter with same type
+    if (serviceParam.kind === "body" && serviceParam.type === methodParam.type) {
+      return path;
+    }
+    
+    // BFS to explore nested properties
+    if (methodParam.type.kind === "model" && !visited.has(methodParam.type)) {
+      visited.add(methodParam.type);
+      let current: SdkModelType | undefined = methodParam.type;
+      while (current) {
+        for (const prop of current.properties) {
+          queue.push([prop, [...path, prop]]);
         }
         current = current.baseModel;
       }
