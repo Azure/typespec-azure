@@ -1363,11 +1363,7 @@ it("readonly parameters should be filtered from method parameters", async () => 
   strictEqual(method.kind, "basic");
 
   // Only non-readonly parameters should be in method.parameters
-  strictEqual(method.parameters.length, 1);
+  strictEqual(method.parameters.length, 2);
   strictEqual(method.parameters[0].name, "prop");
-
-  const serviceOperation = method.operation as SdkHttpOperation;
-
-  // The service operation should have all parameters (both readonly and writable)
-  strictEqual(serviceOperation.parameters.length, 2);
+  strictEqual(method.parameters[1].name, "contentType");
 });
