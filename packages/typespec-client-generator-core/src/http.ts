@@ -245,6 +245,7 @@ function getSdkHttpParameters(
         ),
       );
       // Derive correspondingMethodParams from methodParameterSegments (last element of each path)
+      // eslint-disable-next-line @typescript-eslint/no-deprecated
       retval.bodyParam.correspondingMethodParams = retval.bodyParam.methodParameterSegments.map(
         (segment) => segment[segment.length - 1],
       );
@@ -256,6 +257,7 @@ function getSdkHttpParameters(
         retval.bodyParam.type = diagnostics.pipe(
           getStreamAsBytes(context, retval.bodyParam.type.__raw!),
         );
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
         retval.bodyParam.correspondingMethodParams.map((p) => (p.type = retval.bodyParam!.type));
       }
     }
@@ -304,6 +306,7 @@ function getSdkHttpParameters(
       getMethodParameterSegments(context, httpOperation.operation, methodParameters, param),
     );
     // Derive correspondingMethodParams from methodParameterSegments (last element of each path)
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     param.correspondingMethodParams = param.methodParameterSegments.map(
       (segment) => segment[segment.length - 1],
     );
@@ -380,7 +383,9 @@ function addContentTypeInfoToBodyParam(
   bodyParam.defaultContentType = defaultContentType;
   diagnostics.pipe(addEncodeInfo(context, bodyParam.__raw!, bodyParam.type, defaultContentType));
   // set the correct encode for body parameter of method according to the content-type
+  // eslint-disable-next-line @typescript-eslint/no-deprecated
   if (bodyParam.correspondingMethodParams.length === 1) {
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     const methodBodyParam = bodyParam.correspondingMethodParams[0];
     diagnostics.pipe(
       addEncodeInfo(

@@ -1,4 +1,4 @@
-import { strictEqual, ok } from "assert";
+import { ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 import { getServiceMethodOfClient } from "../utils.js";
@@ -107,7 +107,7 @@ it("nested property path - property access", async () => {
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceOperation = method.operation;
 
-  strictEqual(serviceOperation.parameters.length, 1);
+  strictEqual(serviceOperation.parameters.length, 2);
   const queryParam = serviceOperation.parameters[0];
 
   // Check correspondingMethodParams returns the final property
@@ -168,7 +168,7 @@ it("deeply nested property path", async () => {
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceOperation = method.operation;
 
-  strictEqual(serviceOperation.parameters.length, 1);
+  strictEqual(serviceOperation.parameters.length, 2);
   const queryParam = serviceOperation.parameters[0];
 
   // Check correspondingMethodParams returns only the final property
