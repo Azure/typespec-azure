@@ -1347,3 +1347,35 @@ it("isOverride true", async () => {
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.isOverride, true);
 });
+
+it("readonly parameters should be filtered from method parameters", async () => {
+  await runner.compileWithBuiltInService(`
+    @route("upload")
+    @post
+    op upload(
+      @header normalHeader: string,
+      @header @visibility(Lifecycle.Read) readOnlyHeader: string,
+      @query normalQuery: string,
+      @query @visibility(Lifecycle.Read) readOnlyQuery: string,
+    ): void;
+  `);
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  strictEqual(method.kind, "basic");
+
+  // Only non-readonly parameters should be in method.parameters
+  strictEqual(method.parameters.length, 2);
+  strictEqual(method.parameters[0].name, "normalHeader");
+  strictEqual(method.parameters[1].name, "normalQuery");
+
+  const serviceOperation = method.operation as SdkHttpOperation;
+
+  // The service operation should have all 4 parameters (both readonly and writable)
+  strictEqual(serviceOperation.parameters.length, 4);
+
+  const headerParams = serviceOperation.parameters.filter((p) => p.kind === "header");
+  strictEqual(headerParams.length, 2);
+
+  const queryParams = serviceOperation.parameters.filter((p) => p.kind === "query");
+  strictEqual(queryParams.length, 2);
+});
