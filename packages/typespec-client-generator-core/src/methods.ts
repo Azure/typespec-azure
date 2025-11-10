@@ -163,7 +163,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     getSdkBasicServiceMethod<TServiceOperation>(context, operation, client),
   );
 
-  // nullable response type means the underlaying operation has multiple responses and only one of them is not empty, which is what we want
+  // If the response body type itself is nullable (e.g., {@body body: Type | null}), unwrap it for paging/LRO processing
   let responseType = baseServiceMethod.response.type;
   if (responseType?.kind === "nullable") {
     responseType = responseType.type;
