@@ -738,7 +738,7 @@ function findMappingWithPath(
       return path;
     }
 
-    // If the service parameter is a body parameter with same type
+    // If the service parameter is a body parameter, try to see if we could find a method parameter with same type of the body parameter.
     if (serviceParam.kind === "body" && serviceParam.type === methodParam.type) {
       return path;
     }
