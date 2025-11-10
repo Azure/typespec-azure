@@ -691,7 +691,7 @@ export function getMethodParameterSegments(
 }
 
 /**
- * Build path segments from method parameters to service parameter.
+ * Build path segments from method parameters to service parameter. The map could be a service parameter or a property of a service parameter to a method parameter or a property of a method parameter.
  * This function finds the complete path from method parameter to the HTTP parameter.
  * @param context
  * @param methodParameters
