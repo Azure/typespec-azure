@@ -1,3 +1,4 @@
+import { Enum, Model } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
@@ -879,9 +880,7 @@ it("should not set usage on original enum when parameter has alternateType", asy
         default,
       }
       
-      op test(@path p: Test): void;
-      
-      @@alternateType(TestService::parameters.p, "string");
+      op test(@alternateType(string) @path p: Test): void;
     }
   `)) as { Test: Enum };
 
@@ -908,9 +907,7 @@ it("should not set usage on original model when parameter has alternateType", as
         value: string;
       }
       
-      op test(@body body: TestModel): void;
-      
-      @@alternateType(TestService::parameters.body, "string");
+      op test(@alternateType(string) @body body: TestModel): void;
     }
   `)) as { TestModel: Model };
 
