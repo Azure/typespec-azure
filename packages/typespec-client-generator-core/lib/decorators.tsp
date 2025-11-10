@@ -85,7 +85,11 @@ extern dec clientName(target: unknown, rename: valueof string, scope?: valueof s
  * }
  * ```
  */
-extern dec convenientAPI(target: Operation | Namespace | Interface, flag?: valueof boolean, scope?: valueof string);
+extern dec convenientAPI(
+  target: Operation | Namespace | Interface,
+  flag?: valueof boolean,
+  scope?: valueof string
+);
 
 /**
  * Whether you want to generate an operation as a protocol method.
@@ -119,7 +123,11 @@ extern dec convenientAPI(target: Operation | Namespace | Interface, flag?: value
  * }
  * ```
  */
-extern dec protocolAPI(target: Operation | Namespace | Interface, flag?: valueof boolean, scope?: valueof string);
+extern dec protocolAPI(
+  target: Operation | Namespace | Interface,
+  flag?: valueof boolean,
+  scope?: valueof string
+);
 
 /**
  * Define the client generated in the client SDK.
