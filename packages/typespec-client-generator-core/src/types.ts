@@ -159,14 +159,14 @@ export function addEncodeInfo(
   const innerType = propertyType.kind === "nullable" ? propertyType.type : propertyType;
   const encodeData = getEncode(context.program, type);
   if (innerType.kind === "duration") {
-    if (!encodeData) return diagnostics.wrap(undefined);
+    if (!encodeData || !encodeData.encoding) return diagnostics.wrap(undefined);
     innerType.encode = encodeData.encoding;
     innerType.wireType = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, encodeData.type),
     ) as SdkBuiltInType;
   }
   if (innerType.kind === "utcDateTime" || innerType.kind === "offsetDateTime") {
-    if (encodeData) {
+    if (encodeData && encodeData.encoding) {
       innerType.encode = encodeData.encoding;
       innerType.wireType = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, encodeData.type),
