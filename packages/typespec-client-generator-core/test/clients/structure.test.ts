@@ -890,8 +890,8 @@ it("one client from multiple services with versioning", async () => {
 
       interface AI {
         @added(VersionsA.av2)
-        @route("/atest")
-        atest(@query("api-version") apiVersion: VersionsA): ServiceAModel;
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): ServiceAModel;
         
         @added(VersionsA.av3)
         @route("/anew")
@@ -912,11 +912,11 @@ it("one client from multiple services with versioning", async () => {
       }
 
       interface BI {
-        @route("/btest")
-        btest(@query("api-version") apiVersion: VersionsB): ServiceBModel;
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): ServiceBModel;
         
         @added(VersionsB.bv2)
-        @route("/bnew")
+        @route("/bNew")
         bNewOp(@query("api-version") apiVersion: VersionsB): void;
       }
     }`,
@@ -964,9 +964,9 @@ it("one client from multiple services with versioning", async () => {
 
   // AI client should have 2 methods initially, but aNewOp is only available from av3
   const aiMethods = aiClient.methods;
-  const atestMethod = aiMethods.find((m) => m.name === "atest");
-  ok(atestMethod);
-  deepStrictEqual(atestMethod.apiVersions, ["av2", "av3"]);
+  const aTestMethod = aiMethods.find((m) => m.name === "aTest");
+  ok(aTestMethod);
+  deepStrictEqual(aTestMethod.apiVersions, ["av2", "av3"]);
 
   const aNewMethod = aiMethods.find((m) => m.name === "aNewOp");
   ok(aNewMethod);
@@ -985,9 +985,9 @@ it("one client from multiple services with versioning", async () => {
 
   // BI client methods
   const biMethods = biClient.methods;
-  const btestMethod = biMethods.find((m) => m.name === "btest");
-  ok(btestMethod);
-  deepStrictEqual(btestMethod.apiVersions, ["bv1", "bv2"]);
+  const bTestMethod = biMethods.find((m) => m.name === "bTest");
+  ok(bTestMethod);
+  deepStrictEqual(bTestMethod.apiVersions, ["bv1", "bv2"]);
 
   const bNewMethod = biMethods.find((m) => m.name === "bNewOp");
   ok(bNewMethod);
