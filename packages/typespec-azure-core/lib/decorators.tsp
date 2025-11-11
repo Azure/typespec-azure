@@ -19,7 +19,7 @@ namespace Azure.Core {
    *   v3Preview
    * }
    * ```
-   * 
+   *
    */
   extern dec previewVersion(target: TypeSpec.Reflection.EnumMember);
 

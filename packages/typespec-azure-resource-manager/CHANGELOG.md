@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.61.1
+
+### Bug Fixes
+
+- [#3442](https://github.com/Azure/typespec-azure/pull/3442) Fix #3420 make kind property required in polymorphic resources
+- [#3396](https://github.com/Azure/typespec-azure/pull/3396) Update resolveArmResources to allow grouping #3252
+
+
 ## 0.61.0
 
 ### Features

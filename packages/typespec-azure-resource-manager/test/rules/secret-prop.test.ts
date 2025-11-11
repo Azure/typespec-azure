@@ -79,3 +79,24 @@ it("valid if the property type has @secret", async () => {
     )
     .toBeValid();
 });
+
+describe("codefix", () => {
+  it("add @secret on the property", async () => {
+    await tester
+      .expect(
+        `
+        model Test {
+          somePassword: string;
+        }
+        op test(): Test;
+      `,
+      )
+      .applyCodeFix("add-decorator-secret").toEqual(`
+        model Test {
+          @secret
+          somePassword: string;
+        }
+        op test(): Test;
+      `);
+  });
+});

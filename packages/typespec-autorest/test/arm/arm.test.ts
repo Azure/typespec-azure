@@ -298,37 +298,6 @@ it("can use ResourceNameParameter for default name parameter definition", async 
   ok(openapi.paths?.[privateEndpointGet]?.get?.parameters?.[1]);
 });
 
-it("can emit x-ms-client-flatten with optional configuration", async () => {
-  const openapi: any = await compileOpenAPI(
-    `
-      @armProviderNamespace
-      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-      namespace Microsoft.Contoso;
-      
-      model Employee is TrackedResource<EmployeeProperties> {
-        ...ResourceNameParameter<Employee>;
-      }
-      model EmployeeProperties {
-        age?: int32;
-        city?: string;
-        @visibility(Lifecycle.Read)
-        provisioningState?: ResourceProvisioningState;
-      }
-      @parentResource(Employee)
-      model Dependent is ProxyResource<DependentProperties> {
-        ...ResourceNameParameter<Dependent>;
-      }
-      model DependentProperties {
-        age?: int32;
-      }
-      `,
-    { preset: "azure", options: { "arm-resource-flattening": true } },
-  );
-
-  ok(openapi.definitions?.Employee?.properties?.properties?.["x-ms-client-flatten"]);
-  ok(openapi.definitions?.Dependent?.properties?.properties?.["x-ms-client-flatten"]);
-});
-
 it("no x-ms-client-flatten emitted with default configuration", async () => {
   const openapi: any = await compileOpenAPI(
     `

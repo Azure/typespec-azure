@@ -19,6 +19,7 @@ using Azure.ResourceManager.Private;
  * @template Response Optional. The success response for the createOrUpdate operation
  * @template Error Optional. The error response, if non-standard.
  * @template OptionalRequestBody Optional. If true, the request body is optional
+ * @template OverrideResourceName Optional. The name of the resource type at this scope in clients.
  */
 alias CreateOrUpdateAsync<
   TargetResource extends Foundations.SimpleResource,
@@ -32,7 +33,8 @@ alias CreateOrUpdateAsync<
     LroHeaders
   >,
   Error extends {} = ErrorResponse,
-  OptionalRequestBody extends valueof boolean = false
+  OptionalRequestBody extends valueof boolean = false,
+  OverrideResourceName extends valueof string = ""
 > = CreateOrReplaceAsync<
   TargetResource,
   ExtensionResource,
@@ -41,7 +43,8 @@ alias CreateOrUpdateAsync<
   Parameters,
   Response,
   Error,
-  OptionalRequestBody
+  OptionalRequestBody,
+  OverrideResourceName
 >;
 
 /** A long-running resource CreateOrUpdate (PUT)
@@ -53,10 +56,16 @@ alias CreateOrUpdateAsync<
  * @template Response Optional. The success response for the createOrUpdate operation
  * @template Error Optional. The error response, if non-standard.
  * @template OptionalRequestBody Optional. If true, the request body is optional
+ * @template OverrideResourceName Optional. The name of the resource type at this scope in clients.
  */
 @autoRoute
 @doc("Create a {name}", ExtensionResource)
-@armResourceCreateOrUpdate(ExtensionResource)
+@extensionResourceOperation(
+  TargetResource,
+  ExtensionResource,
+  "createOrUpdate",
+  OverrideResourceName
+)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 @Azure.Core.Foundations.Private.defaultFinalStateVia(#["location", "azure-async-operation"])
@@ -73,7 +82,8 @@ op CreateOrReplaceAsync<
     LroHeaders
   >,
   Error extends {} = ErrorResponse,
-  OptionalRequestBody extends valueof boolean = false
+  OptionalRequestBody extends valueof boolean = false,
+  OverrideResourceName extends valueof string = ""
 > is CreateOperation<
   Azure.ResourceManager.Extension.ExtensionInstanceParameters<TargetResource, ExtensionResource> &
     Parameters,
@@ -92,10 +102,16 @@ op CreateOrReplaceAsync<
  * @template Response Optional. The success response for the createOrUpdate operation
  * @template Error Optional. The error response, if non-standard.
  * @template OptionalRequestBody Optional. If true, the request body is optional
+ * @template OverrideResourceName Optional. The name of the resource type at this scope in clients.
  */
 @autoRoute
 @doc("Create a {name}", ExtensionResource)
-@armResourceCreateOrUpdate(ExtensionResource)
+@extensionResourceOperation(
+  TargetResource,
+  ExtensionResource,
+  "createOrUpdate",
+  OverrideResourceName
+)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 @put
@@ -106,7 +122,8 @@ op CreateOrReplaceSync<
   Parameters extends {} = {},
   Response extends {} = ArmResourceUpdatedResponse<ExtensionResource> | ArmResourceCreatedSyncResponse<ExtensionResource>,
   Error extends {} = ErrorResponse,
-  OptionalRequestBody extends valueof boolean = false
+  OptionalRequestBody extends valueof boolean = false,
+  OverrideResourceName extends valueof string = ""
 > is CreateOperation<
   Azure.ResourceManager.Extension.ExtensionInstanceParameters<TargetResource, ExtensionResource> &
     Parameters,
@@ -126,10 +143,11 @@ op CreateOrReplaceSync<
  * @template Response Optional. The success response for the patch operation
  * @template Error Optional. The error response, if non-standard.
  * @template OptionalRequestBody Optional. Whether the request body is optional.
+ * @template OverrideResourceName Optional. The name of the resource type at this scope in clients.
  */
 @autoRoute
 @doc("Update a {name}", ExtensionResource)
-@armResourceUpdate(ExtensionResource)
+@extensionResourceOperation(TargetResource, ExtensionResource, "update", OverrideResourceName)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 @patch(#{ implicitOptionality: false })
@@ -149,7 +167,8 @@ op CustomPatchAsync<
     LroHeaders
   >,
   Error extends {} = ErrorResponse,
-  OptionalRequestBody extends valueof boolean = false
+  OptionalRequestBody extends valueof boolean = false,
+  OverrideResourceName extends valueof string = ""
 > is UpdateOperation<
   Azure.ResourceManager.Extension.ExtensionInstanceParameters<TargetResource, ExtensionResource> &
     Parameters,
@@ -168,10 +187,11 @@ op CustomPatchAsync<
  * @template Response Optional. The success response for the patch operation
  * @template Error Optional. The error response, if non-standard.
  * @template OptionalRequestBody Optional. Whether the request body is optional.
+ * @template OverrideResourceName Optional. The name of the resource type at this scope in clients.
  */
 @autoRoute
 @doc("Update a {name}", ExtensionResource)
-@armResourceUpdate(ExtensionResource)
+@extensionResourceOperation(TargetResource, ExtensionResource, "update", OverrideResourceName)
 @enforceConstraint(TargetResource, Foundations.Resource)
 @enforceConstraint(ExtensionResource, Foundations.Resource)
 @patch(#{ implicitOptionality: false })
@@ -182,7 +202,8 @@ op CustomPatchSync<
   Parameters extends {} = {},
   Response extends {} = ArmResponse<ExtensionResource>,
   Error extends {} = ErrorResponse,
-  OptionalRequestBody extends valueof boolean = false
+  OptionalRequestBody extends valueof boolean = false,
+  OverrideResourceName extends valueof string = ""
 > is UpdateOperation<
   Azure.ResourceManager.Extension.ExtensionInstanceParameters<TargetResource, ExtensionResource> &
     Parameters,
