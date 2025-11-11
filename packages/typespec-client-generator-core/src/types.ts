@@ -2,9 +2,7 @@ import { UnionEnum, getLroMetadata, getUnionAsEnum } from "@azure-tools/typespec
 import {
   BooleanLiteral,
   BytesKnownEncoding,
-  DateTimeKnownEncoding,
   Diagnostic,
-  DurationKnownEncoding,
   EncodeData,
   Enum,
   EnumMember,
@@ -162,14 +160,14 @@ export function addEncodeInfo(
   const encodeData = getEncode(context.program, type);
   if (innerType.kind === "duration") {
     if (!encodeData) return diagnostics.wrap(undefined);
-    innerType.encode = encodeData.encoding as DurationKnownEncoding;
+    innerType.encode = encodeData.encoding;
     innerType.wireType = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, encodeData.type),
     ) as SdkBuiltInType;
   }
   if (innerType.kind === "utcDateTime" || innerType.kind === "offsetDateTime") {
     if (encodeData) {
-      innerType.encode = encodeData.encoding as DateTimeKnownEncoding;
+      innerType.encode = encodeData.encoding;
       innerType.wireType = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, encodeData.type),
       ) as SdkBuiltInType;
@@ -307,7 +305,7 @@ function getSdkDateTimeType(
   return diagnostics.wrap({
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, kind)),
     name: getLibraryName(context, type),
-    encode: (encode ?? "rfc3339") as DateTimeKnownEncoding,
+    encode: encode ?? "rfc3339",
     wireType: wireType ?? getTypeSpecBuiltInType(context, "string"),
     baseType: baseType,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
@@ -403,7 +401,7 @@ function getSdkDurationTypeWithDiagnostics(
   return diagnostics.wrap({
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, kind)),
     name: getLibraryName(context, type),
-    encode: (encode ?? "ISO8601") as DurationKnownEncoding,
+    encode: encode ?? "ISO8601",
     wireType: wireType ?? getTypeSpecBuiltInType(context, "string"),
     baseType: baseType,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
