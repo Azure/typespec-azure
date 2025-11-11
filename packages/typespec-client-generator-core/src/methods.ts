@@ -596,10 +596,19 @@ function getSdkMethodResponse(
       type = allResponseBodies[0];
     }
   }
+  
+  // Set optional property based on whether responses have bodies
+  let optional: boolean | undefined = undefined;
+  if (type !== undefined) {
+    // If we have a response type, set optional based on whether some responses lack bodies
+    optional = nonBodyExists;
+  }
+  // If type is undefined (no response), optional remains undefined
+  
   return {
     kind: "method",
     type,
-    ...(nonBodyExists && type !== undefined && { optional: true }),
+    ...(optional !== undefined && { optional }),
   };
 }
 

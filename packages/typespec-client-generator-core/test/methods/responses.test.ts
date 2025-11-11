@@ -238,7 +238,7 @@ it("Distinguish nullable body from optional response", async () => {
   const methodWithNullableBody = methods.find((m) => m.name === "operationWithNullableBody");
   ok(methodWithNullableBody);
   strictEqual(methodWithNullableBody.response.type?.kind, "nullable");
-  strictEqual(methodWithNullableBody.response.optional, undefined);
+  strictEqual(methodWithNullableBody.response.optional, false);
 
   // Test optional response
   const methodWithOptionalResponse = methods.find(
