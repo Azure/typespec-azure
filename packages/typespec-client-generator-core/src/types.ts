@@ -1561,9 +1561,7 @@ function updateTypesFromOperation(
   }
   for (const param of httpOperation.parameters.parameters) {
     if (isNeverOrVoidType(param.param.type)) continue;
-    const sdkType = diagnostics.pipe(
-      getClientTypeWithDiagnostics(context, param.param, operation),
-    );
+    const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param.param, operation));
     if (generateConvenient) {
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
     }

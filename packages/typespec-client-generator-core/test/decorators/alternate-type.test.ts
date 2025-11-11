@@ -887,11 +887,11 @@ it("should not set usage on original enum when parameter has alternateType", asy
   const models = runner.context.sdkPackage.clients[0];
   const method = models.methods[0];
   strictEqual(method.name, "test");
-  
+
   // The parameter should have string type, not Test enum
   const param = method.parameters[0];
   strictEqual(param.type.kind, "string");
-  
+
   // The original Test enum should have None usage (0) since it's replaced
   const sdkEnum = runner.context.__referencedTypeCache.get(Test);
   strictEqual(sdkEnum?.kind, "enum");
@@ -914,11 +914,11 @@ it("should not set usage on original model when parameter has alternateType", as
   const models = runner.context.sdkPackage.clients[0];
   const method = models.methods[0];
   strictEqual(method.name, "test");
-  
+
   // The parameter should have string type, not TestModel
   const param = method.parameters[0];
   strictEqual(param.type.kind, "string");
-  
+
   // The original TestModel should have None usage (0) since it's replaced
   const sdkModel = runner.context.__referencedTypeCache.get(TestModel);
   strictEqual(sdkModel?.kind, "model");
@@ -942,11 +942,11 @@ it("should not set usage on original enum when inline alternateType is used", as
   const models = runner.context.sdkPackage.clients[0];
   const method = models.methods[0];
   strictEqual(method.name, "test");
-  
+
   // The parameter should have string type, not Status enum
   const param = method.parameters[0];
   strictEqual(param.type.kind, "string");
-  
+
   // The original Status enum should have None usage (0) since it's replaced
   const sdkEnum = runner.context.__referencedTypeCache.get(Status);
   strictEqual(sdkEnum?.kind, "enum");
