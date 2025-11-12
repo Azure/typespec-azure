@@ -30,7 +30,7 @@
     "url": "git+https://github.com/Azure/typespec-azure.git"
   },
   "spector": {
-    "sourceUrl": "https://github.com/Azure/typespec-azure/tree/main/packages/azure-http-specs/specs/{scenarioPath}",
+    "sourceUrl": "https://github.com/Azure/typespec-azure/tree/main/packages/azure-http-specs/specs/{scenarioPath}"
   },
   "author": "Microsoft",
   "license": "MIT",
