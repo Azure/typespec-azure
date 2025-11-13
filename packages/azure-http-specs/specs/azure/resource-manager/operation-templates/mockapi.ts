@@ -206,7 +206,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
               ...aaoResponse,
               status: "Succeeded",
               endTime: "2024-11-08T01:42:41.5354192+00:00",
-              properties: validOrder,
+              ...validOrder,
             }
           : { ...aaoResponse, status: "InProgress" };
       const statusCode = createOrReplacePollCount > 0 ? 200 : 202;
