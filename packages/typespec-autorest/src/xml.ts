@@ -14,6 +14,7 @@ export interface XmlModuleUnavailable {
 
 export interface XmlModuleAvailable {
   readonly available: true;
+  // test remove
   readonly module: typeof import("@typespec/xml");
 }
 
