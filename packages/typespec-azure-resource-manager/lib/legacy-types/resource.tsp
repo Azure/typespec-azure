@@ -27,6 +27,7 @@ model TrackedResourceWithOptionalLocation<
   Properties extends {},
   PropertiesOptional extends valueof boolean = true
 > extends CommonTypes.Resource {
+  #suppress "deprecated" "https://github.com/Azure/typespec-azure/issues/2284"
   @doc("The RP-specific properties for this resource.")
   @conditionalClientFlatten
   @armResourcePropertiesOptionality(PropertiesOptional)

@@ -1,5 +1,37 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.62.0
+
+### Deprecations
+
+- [#3465](https://github.com/Azure/typespec-azure/pull/3465) Deprecate `arm-resource-flattening` option to reduce confusion with new flattening mechanisms.
+  
+    ```diff lang=yaml title=tspconfig.yaml
+    options:
+      @azure-tools/typespec-autoprest:
+    -   arm-resource-flattening: true
+    ```
+  
+    ```diff lang=tsp title=MyResource.tsp
+    +@@Azure.ClientGenerator.Core.Legacy.flattenProperty(MyResource.properties, "autorest");
+    ```
+
+### Features
+
+- [#3411](https://github.com/Azure/typespec-azure/pull/3411) Add new `secret-prop` rule scanning for property looking like they might contain sensitive information but not marked with `@secret`
+- [#3350](https://github.com/Azure/typespec-azure/pull/3350) Remove dependency on OpenAPI
+
+### Bump dependencies
+
+- [#3447](https://github.com/Azure/typespec-azure/pull/3447) Upgrade dependencies october 2025
+
+### Bug Fixes
+
+- [#3399](https://github.com/Azure/typespec-azure/pull/3399) `arm-resource-operation` do not flag template instances
+- [#3492](https://github.com/Azure/typespec-azure/pull/3492) Fix #3404 changes to resolveArmResources
+- [#3410](https://github.com/Azure/typespec-azure/pull/3410) Fix invalid syntax causing error with PrivateLinks
+
+
 ## 0.61.1
 
 ### Bug Fixes

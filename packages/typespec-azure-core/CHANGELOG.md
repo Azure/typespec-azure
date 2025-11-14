@@ -1,5 +1,23 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.62.0
+
+### Features
+
+- [#3449](https://github.com/Azure/typespec-azure/pull/3449) Added experimental decorators to namespace `Azure.Core.Experimental` for mutative updates to types. These decorators are dangerous and may be removed at any time, so they automatically trigger a warning diagnostic that requires a suppression.
+- [#3350](https://github.com/Azure/typespec-azure/pull/3350) Remove exception for `no-openapi` rule for using `x-ms-identifiers`. Migrating to `@identifiers` is required.
+- [#3350](https://github.com/Azure/typespec-azure/pull/3350) Remove dependency on OpenAPI
+
+### Bump dependencies
+
+- [#3447](https://github.com/Azure/typespec-azure/pull/3447) Upgrade dependencies october 2025
+
+### Bug Fixes
+
+- [#3480](https://github.com/Azure/typespec-azure/pull/3480) Include typespec sources in subdirectories of lib into the package.
+- [#3481](https://github.com/Azure/typespec-azure/pull/3481) Fix #3477 Allow uniqueItems for nullable array properties
+
+
 ## 0.61.0
 
 ### Breaking Changes
