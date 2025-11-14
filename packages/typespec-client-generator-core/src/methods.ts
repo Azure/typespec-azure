@@ -163,7 +163,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     getSdkBasicServiceMethod<TServiceOperation>(context, operation, client),
   );
 
-  // nullable response type means the underlaying operation has multiple responses and only one of them is not empty, which is what we want
+  // If the response body type itself is nullable (e.g., {@body body: Type | null}), unwrap it for paging/LRO processing
   let responseType = baseServiceMethod.response.type;
   if (responseType?.kind === "nullable") {
     responseType = responseType.type;
@@ -595,23 +595,20 @@ function getSdkMethodResponse(
     } else if (responseTypes.size === 1) {
       type = allResponseBodies[0];
     }
-    if (nonBodyExists && type) {
-      type = {
-        kind: "nullable",
-        name: createGeneratedName(context, operation, "NullableResponse"),
-        crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, operation)}.NullableResponse`,
-        isGeneratedName: true,
-        type: type,
-        decorators: [],
-        access: "public",
-        usage: UsageFlags.Output,
-        namespace: client.namespace,
-      };
-    }
   }
+  
+  // Set optional property based on whether responses have bodies
+  let optional: boolean | undefined = undefined;
+  if (type !== undefined) {
+    // If we have a response type, set optional based on whether some responses lack bodies
+    optional = nonBodyExists;
+  }
+  // If type is undefined (no response), optional remains undefined
+  
   return {
     kind: "method",
     type,
+    ...(optional !== undefined && { optional }),
   };
 }
 

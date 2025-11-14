@@ -797,6 +797,11 @@ export interface SdkMethodResponse {
    * An array of properties to fetch {result} from the {response} model. Note that this property is only for LRO and paging pattens.
    */
   resultSegments?: SdkModelPropertyType[];
+  /**
+   * Indicates whether the response type is optional. Set to true when the operation has at least one HTTP response without a body.
+   * This allows distinguishing between responses without a body and responses with a body of type `Type | null`.
+   */
+  optional?: boolean;
 }
 
 export interface SdkServiceResponse {
