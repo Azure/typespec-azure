@@ -64,26 +64,26 @@
     "@azure-tools/typespec-azure-core": "workspace:^",
     "@typespec/compiler": "workspace:^",
     "@typespec/http": "workspace:^",
-    "@typespec/rest": "workspace:^",
     "@typespec/openapi": "workspace:^",
+    "@typespec/rest": "workspace:^",
     "@typespec/versioning": "workspace:^"
   },
   "devDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:^",
-    "@types/node": "~24.9.1",
+    "@types/node": "~24.10.1",
     "@types/pluralize": "^0.0.33",
     "@typespec/compiler": "workspace:^",
     "@typespec/http": "workspace:^",
     "@typespec/library-linter": "workspace:^",
+    "@typespec/openapi": "workspace:^",
     "@typespec/rest": "workspace:^",
     "@typespec/tspd": "workspace:^",
     "@typespec/versioning": "workspace:^",
-    "@typespec/openapi": "workspace:^",
-    "@vitest/coverage-v8": "^4.0.4",
-    "@vitest/ui": "^4.0.4",
+    "@vitest/coverage-v8": "^4.0.8",
+    "@vitest/ui": "^4.0.8",
     "c8": "^10.1.3",
-    "rimraf": "~6.0.1",
+    "rimraf": "~6.1.0",
     "typescript": "~5.9.2",
-    "vitest": "^4.0.4"
+    "vitest": "^4.0.8"
   }
 }
