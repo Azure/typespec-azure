@@ -696,6 +696,7 @@ model Test {
 ### `@convenientAPI` {#@Azure.ClientGenerator.Core.convenientAPI}
 
 Whether you want to generate an operation as a convenient method.
+When applied to a namespace or interface, it affects all operations within that scope unless explicitly overridden.
 
 ```typespec
 @Azure.ClientGenerator.Core.convenientAPI(flag?: valueof boolean, scope?: valueof string)
@@ -703,8 +704,8 @@ Whether you want to generate an operation as a convenient method.
 
 #### Target
 
-The target operation.
-`Operation`
+The target operation, namespace, or interface.
+`Operation | Namespace | Interface`
 
 #### Parameters
 
@@ -715,9 +716,31 @@ The target operation.
 
 #### Examples
 
+##### Apply to a single operation
+
 ```typespec
 @convenientAPI(false)
 op test: void;
+```
+
+##### Apply to all operations in an interface
+
+```typespec
+@convenientAPI(false)
+interface MyOperations {
+  test1(): void;
+  test2(): void;
+}
+```
+
+##### Apply to all operations in a namespace
+
+```typespec
+@convenientAPI(false)
+namespace MyService {
+  op test1(): void;
+  op test2(): void;
+}
 ```
 
 ### `@deserializeEmptyStringAsNull` {#@Azure.ClientGenerator.Core.deserializeEmptyStringAsNull}
@@ -893,6 +916,7 @@ model MyServiceClientOptions {
 ### `@protocolAPI` {#@Azure.ClientGenerator.Core.protocolAPI}
 
 Whether you want to generate an operation as a protocol method.
+When applied to a namespace or interface, it affects all operations within that scope unless explicitly overridden.
 
 ```typespec
 @Azure.ClientGenerator.Core.protocolAPI(flag?: valueof boolean, scope?: valueof string)
@@ -900,8 +924,8 @@ Whether you want to generate an operation as a protocol method.
 
 #### Target
 
-The target operation.
-`Operation`
+The target operation, namespace, or interface.
+`Operation | Namespace | Interface`
 
 #### Parameters
 
@@ -912,9 +936,31 @@ The target operation.
 
 #### Examples
 
+##### Apply to a single operation
+
 ```typespec
 @protocolAPI(false)
 op test: void;
+```
+
+##### Apply to all operations in an interface
+
+```typespec
+@protocolAPI(false)
+interface MyOperations {
+  test1(): void;
+  test2(): void;
+}
+```
+
+##### Apply to all operations in a namespace
+
+```typespec
+@protocolAPI(false)
+namespace MyService {
+  op test1(): void;
+  op test2(): void;
+}
 ```
 
 ### `@responseAsBool` {#@Azure.ClientGenerator.Core.responseAsBool}
