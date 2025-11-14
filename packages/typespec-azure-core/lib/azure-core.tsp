@@ -12,4 +12,3 @@ import "./legacy.tsp";
 import "../dist/src/tsp-index.js";
 
 namespace Azure.Core;
-// test remove
