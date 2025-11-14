@@ -452,6 +452,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`The API version specified in the config: "${"version"}" is not defined in service versioning list. Fall back to the latest version.`,
       },
     },
+    "mutating-multiple-services": {
+      severity: "error",
+      messages: {
+        default: "Mutating multiple services in a single compilation is not supported.",
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,

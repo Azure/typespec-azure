@@ -2,7 +2,6 @@ import {
   createDiagnosticCollector,
   EmitContext,
   emitFile,
-  Enum,
   Interface,
   listServices,
   Model,
@@ -48,7 +47,6 @@ import {
 } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
 import { createSdkPackage } from "./package.js";
-import { listAllServiceNamespaces } from "./public-utils.js";
 
 interface CreateTCGCContextOptions {
   mutateNamespace?: boolean; // whether to mutate global namespace for versioning
@@ -113,50 +111,63 @@ export function createTCGCContext(
       }
       this.__tspTypeToApiVersions.set(type, mergedApiVersions);
     },
-    getPackageVersions(): string[] {
-      if (this.__packageVersions) {
-        return this.__packageVersions;
-      }
-      const service = listServices(program)[0];
-      if (!service) {
-        this.__packageVersions = [];
-        return this.__packageVersions;
+    getApiVersions(service?: Namespace): string[] {
+      if (!this.__serviceToVersions) {
+        this.__serviceToVersions = new Map<Namespace | undefined, string[]>();
       }
 
-      const versions = getVersions(program, service.type)[1]?.getVersions();
+      // If no service specified, try to get from undefined key (global) or the first service
+      if (!service) {
+        // Check if we have global versions cached (undefined key)
+        const globalVersions = this.__serviceToVersions.get(undefined);
+        if (globalVersions?.length) {
+          return globalVersions;
+        }
+
+        // Try to get from the first service
+        const firstService = listServices(program)[0]?.type;
+        if (firstService) {
+          service = firstService;
+        } else {
+          return [];
+        }
+      }
+
+      // Check cache for this specific service
+      const cachedVersions = this.__serviceToVersions.get(service);
+      if (cachedVersions?.length) {
+        return cachedVersions;
+      }
+
+      const versions = getVersions(program, service)[1]?.getVersions();
       if (!versions) {
-        this.__packageVersions = [];
-        return this.__packageVersions;
+        return [];
       }
 
       removeVersionsLargerThanExplicitlySpecified(this, versions);
 
-      this.__packageVersions = versions.map((version) => version.value);
+      const serviceVersions = versions.map((version) => version.value);
+      this.__serviceToVersions.set(service, serviceVersions);
+
+      // Also cache as global versions if we don't have any global versions yet
+      if (!this.__serviceToVersions.has(undefined)) {
+        this.__serviceToVersions.set(undefined, serviceVersions);
+      }
 
       if (
         this.apiVersion !== undefined &&
         this.apiVersion !== "latest" &&
         this.apiVersion !== "all" &&
-        !this.__packageVersions.includes(this.apiVersion)
+        !serviceVersions.includes(this.apiVersion)
       ) {
         reportDiagnostic(this.program, {
           code: "api-version-undefined",
           format: { version: this.apiVersion },
-          target: service.type,
+          target: service,
         });
-        this.apiVersion = this.__packageVersions[this.__packageVersions.length - 1];
+        this.apiVersion = serviceVersions[serviceVersions.length - 1];
       }
-      return this.__packageVersions;
-    },
-    getPackageVersionEnum(): Enum | undefined {
-      if (this.__packageVersionEnum) {
-        return this.__packageVersionEnum;
-      }
-      const namespaces = listAllServiceNamespaces(this);
-      if (namespaces.length === 0) {
-        return undefined;
-      }
-      return getVersions(this.program, namespaces[0])[1]?.getVersions()?.[0].enumMember.enum;
+      return serviceVersions;
     },
     getClients(): SdkClient[] {
       if (!this.__rawClientsOperationGroupsCache) {

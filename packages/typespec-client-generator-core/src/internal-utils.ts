@@ -780,8 +780,18 @@ function getVersioningMutator(
 
 export function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Namespace {
   const globalNamespace = context.program.getGlobalNamespaceType();
-  const allApiVersions = context.getPackageVersions();
+  const allApiVersions = context.getApiVersions();
   if (allApiVersions.length === 0 || context.apiVersion === "all") return globalNamespace;
+  if (listServices(context.program).length > 1) {
+    context.program.reportDiagnostic(
+      createDiagnostic({
+        code: "mutating-multiple-services",
+        format: {},
+        target: globalNamespace,
+      }),
+    );
+    return globalNamespace;
+  }
 
   const mutator = getVersioningMutator(
     context,
