@@ -186,7 +186,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
       },
     },
     response: {
-      status: 201,
+      status: 200,
       body: json({
         id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao`,
         name: "lro_create_aao",
