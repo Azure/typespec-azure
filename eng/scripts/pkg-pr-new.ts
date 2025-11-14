@@ -20,6 +20,7 @@ try {
   execSync(`pnpx pkg-pr-new publish '${modifiedPaths.join(" ")}' --pnpm`, {
     stdio: "inherit",
     encoding: "utf-8",
+    cwd: repoRoot,
   });
 } catch (e: any) {
   // eslint-disable-next-line no-console
