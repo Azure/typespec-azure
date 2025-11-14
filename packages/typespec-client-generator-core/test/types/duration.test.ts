@@ -126,3 +126,19 @@ it("float seconds decorated scalar", async function () {
   strictEqual(sdkType.valueType.baseType.encode, "ISO8601");
   strictEqual(sdkType.valueType.baseType.crossLanguageDefinitionId, "TypeSpec.duration");
 });
+
+it("custom encoding string", async function () {
+  await runner.compileWithBuiltInService(
+    `
+      @usage(Usage.input | Usage.output)
+      model Test {
+        @encode("customDurationFormat")
+        prop: duration;
+      }
+    `,
+  );
+  const sdkType = getSdkTypeHelper(runner);
+  strictEqual(sdkType.kind, "duration");
+  strictEqual(sdkType.encode, "customDurationFormat");
+  strictEqual(sdkType.wireType.kind, "string");
+});

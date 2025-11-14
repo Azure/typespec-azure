@@ -379,7 +379,7 @@ export function isSdkDateTimeEncodings(encoding: string): encoding is DateTimeKn
 interface SdkDateTimeTypeBase extends SdkTypeBase {
   name: string;
   baseType?: SdkDateTimeType;
-  encode: DateTimeKnownEncoding;
+  encode: DateTimeKnownEncoding | string;
   wireType: SdkBuiltInType;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
@@ -399,7 +399,7 @@ export interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
   name: string;
   baseType?: SdkDurationType;
-  encode: DurationKnownEncoding;
+  encode: DurationKnownEncoding | string;
   wireType: SdkBuiltInType;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
