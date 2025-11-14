@@ -2440,6 +2440,13 @@ export async function getOpenAPIForService(
           default:
             return encodeAsFormat ?? encoding;
         }
+      case "byte":
+        switch (encoding) {
+          case "base64":
+            return "byte";
+          default:
+            return encodeAsFormat ?? encoding ?? format;
+        }
       default:
         return encodeAsFormat ?? encoding ?? format;
     }

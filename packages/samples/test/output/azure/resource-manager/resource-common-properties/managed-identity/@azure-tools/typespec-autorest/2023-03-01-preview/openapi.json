@@ -404,8 +404,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/WidgetResourceProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         },
         "identity": {
           "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/managedidentity.json#/definitions/ManagedServiceIdentity",

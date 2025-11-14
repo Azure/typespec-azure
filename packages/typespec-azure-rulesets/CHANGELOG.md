@@ -1,5 +1,20 @@
 # Changelog - @azure-tools/typespec-azure-rulesets
 
+## 0.62.0
+
+### Features
+
+- [#3411](https://github.com/Azure/typespec-azure/pull/3411) Add `@azure-tools/typespec-azure-resource-manager/secret-prop` rule to `resource-manager` ruleset
+
+### Bump dependencies
+
+- [#3447](https://github.com/Azure/typespec-azure/pull/3447) Upgrade dependencies october 2025
+
+### Bug Fixes
+
+- [#3350](https://github.com/Azure/typespec-azure/pull/3350) Disable `retry-after` rule in arm ruleset which was a noop
+
+
 ## 0.61.0
 
 No changes, version bump only.

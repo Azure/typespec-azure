@@ -115,6 +115,7 @@ import {
   getPropertyNames,
 } from "./public-utils.js";
 
+import { $ } from "@typespec/compiler/typekit";
 import { getVersions } from "@typespec/versioning";
 import { getNs, isAttribute, isUnwrapped } from "@typespec/xml";
 import { getSdkHttpParameter } from "./http.js";
@@ -575,6 +576,18 @@ export function getSdkUnionWithDiagnostics(
           access: "public",
           usage: UsageFlags.None,
         };
+        const discriminatedOptions = $(context.program).union.getDiscriminatedUnion(type)?.options;
+        if (discriminatedOptions) {
+          const envelope = discriminatedOptions.envelope ?? "object";
+          retval.discriminatedOptions = {
+            envelope,
+            discriminatorPropertyName: discriminatedOptions.discriminatorPropertyName ?? "kind",
+            envelopePropertyName:
+              envelope === "none"
+                ? undefined
+                : (discriminatedOptions.envelopePropertyName ?? "value"),
+          };
+        }
         if (nullOption !== undefined) {
           retval = {
             ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),

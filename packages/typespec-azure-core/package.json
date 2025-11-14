@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-core",
-  "version": "0.61.0",
+  "version": "0.62.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Azure Core library",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -28,6 +28,10 @@
     "./testing": {
       "types": "./dist/src/testing/index.d.ts",
       "default": "./dist/src/testing/index.js"
+    },
+    "./experimental": {
+      "typespec": "./lib/experimental/lib.tsp",
+      "import": "./dist/src/experimental/index.js"
     }
   },
   "imports": {
@@ -52,7 +56,7 @@
     "regen-docs": "tspd doc .  --enable-experimental --llmstxt --output-dir ../../website/src/content/docs/docs/libraries/azure-core/reference"
   },
   "files": [
-    "lib/*.tsp",
+    "lib/**/*.tsp",
     "dist/**",
     "!dist/test/**"
   ],

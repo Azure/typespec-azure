@@ -1,9 +1,11 @@
 import "../dist/src/tsp-index.js";
-import "@typespec/openapi";
 import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
+
+// Kept for legacy reasons remove when specs are migrated
+import "@typespec/openapi";
 
 import "./foundations/arm.foundations.tsp";
 import "./legacy-types/arm.legacy.tsp";
@@ -19,11 +21,5 @@ import "./responses.tsp";
 import "./parameters.tsp";
 import "./private-endpoints.tsp";
 import "./private-links.tsp";
-
-using Http;
-using Rest;
-using Versioning;
-using OpenAPI;
-using Azure.ResourceManager.Foundations;
 
 namespace Azure.ResourceManager;

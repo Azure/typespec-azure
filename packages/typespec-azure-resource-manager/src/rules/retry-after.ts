@@ -1,7 +1,7 @@
 import { Operation, Program, createRule } from "@typespec/compiler";
 import { getResponsesForOperation } from "@typespec/http";
-
-import { getExtensions } from "@typespec/openapi";
+// import { getExtensions } from "@typespec/openapi";
+import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import { isTemplatedInterfaceOperation } from "./utils.js";
 
 /**
@@ -20,7 +20,7 @@ export const retryAfterRule = createRule({
         if (isTemplatedInterfaceOperation(op)) {
           return;
         }
-        const isLRO = getExtensions(context.program, op).has("x-ms-long-running-operation");
+        const isLRO = getLroMetadata(context.program, op) !== undefined;
         if (isLRO && !hasRetryAfterHeader(context.program, op)) {
           context.reportDiagnostic({
             target: op,
