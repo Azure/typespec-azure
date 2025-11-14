@@ -1,4 +1,5 @@
 import type { LinterRuleSet } from "@typespec/compiler";
+// test remove
 
 export default {
   enable: {
