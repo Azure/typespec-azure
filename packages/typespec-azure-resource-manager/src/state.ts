@@ -30,7 +30,6 @@ export const ArmStateKeys = {
 
   // private.decorator.ts
   azureResourceBase: azureResourceManagerCreateStateSymbol("azureResourceBase"),
-  armConditionalClientFlatten: azureResourceManagerCreateStateSymbol("armConditionalClientFlatten"),
   renamePathParameters: azureResourceManagerCreateStateSymbol("renamePathParameters"),
 
   // commontypes.private.decorators.ts
