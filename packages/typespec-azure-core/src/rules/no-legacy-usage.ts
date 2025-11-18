@@ -29,6 +29,7 @@ export const noLegacyUsage = createRule({
       model: (model) => {
         checkDecorators(model);
         model.baseModel && checkReference(model, model.baseModel, model);
+        model.sourceModels.forEach((source) => checkReference(model, source.model, model));
       },
       modelProperty: (prop) => {
         checkDecorators(prop);
