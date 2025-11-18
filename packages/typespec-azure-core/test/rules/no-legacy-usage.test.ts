@@ -7,7 +7,12 @@ let tester: LinterRuleTester;
 
 beforeEach(async () => {
   const runner = await Tester.files({
-    "dec.tsp": `
+    "node_modules/mylib/package.json": JSON.stringify({
+      exports: {
+        ".": { typespec: "./dec.tsp" },
+      },
+    }),
+    "node_modules/mylib/dec.tsp": `
       import "./dec.js";
 
       namespace MyLibrary.Legacy;
@@ -15,13 +20,13 @@ beforeEach(async () => {
       model DummyModel {}
       extern dec someDecorator(target: unknown);
     `,
-    "./dec.js": mockFile.js({
+    "node_modules/mylib/dec.js": mockFile.js({
       $decorators: {
         "MyLibrary.Legacy": { someDecorator: () => {} },
       },
     }),
   })
-    .import("./dec.tsp")
+    .import("mylib")
     .createInstance();
   tester = createLinterRuleTester(runner, noLegacyUsage, "@azure-tools/typespec-azure-core");
 });

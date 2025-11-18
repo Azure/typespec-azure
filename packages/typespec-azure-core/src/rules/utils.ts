@@ -164,6 +164,9 @@ export function checkReferenceInDisallowedNamespace(
   if (getLocationContext(context.program, origin).type !== "project") {
     return;
   }
+  if (getLocationContext(context.program, type).type === "project") {
+    return;
+  }
   if (isInDisallowedNamespace(type, disallowedNamespace)) {
     context.reportDiagnostic({
       target,
@@ -183,7 +186,8 @@ export function checkDecoratorsInDisallowedNamespace(
   for (const decorator of type.decorators) {
     if (
       decorator.definition &&
-      isInDisallowedNamespace(decorator.definition, disallowedNamespace)
+      isInDisallowedNamespace(decorator.definition, disallowedNamespace) &&
+      getLocationContext(context.program, decorator.definition).type !== "project"
     ) {
       context.reportDiagnostic({
         target: decorator.node ?? type,
