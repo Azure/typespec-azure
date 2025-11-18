@@ -9,7 +9,7 @@ using Azure.Core;
 namespace Azure.ResourceManager.CommonTypes;
 
 /** Direction of Access Rule */
-@added(Versions.v5)
+//@added(Versions.v5)
 union AccessRuleDirection {
   string,
 
@@ -21,7 +21,7 @@ union AccessRuleDirection {
 }
 
 /** Provisioning state of a network security perimeter configuration that is being created or updated. */
-@added(Versions.v5)
+//@added(Versions.v5)
 union NetworkSecurityPerimeterConfigurationProvisioningState {
   string,
   Succeeded: "Succeeded",
@@ -34,7 +34,7 @@ union NetworkSecurityPerimeterConfigurationProvisioningState {
 }
 
 /** Type of issue */
-@added(Versions.v5)
+//@added(Versions.v5)
 union IssueType {
   string,
 
@@ -52,7 +52,7 @@ union IssueType {
 }
 
 /** Severity of the issue. */
-@added(Versions.v5)
+//@added(Versions.v5)
 union Severity {
   string,
   Warning: "Warning",
@@ -60,7 +60,7 @@ union Severity {
 }
 
 /** Access mode of the resource association */
-@added(Versions.v5)
+//@added(Versions.v5)
 union ResourceAssociationAccessMode {
   string,
 
@@ -75,7 +75,7 @@ union ResourceAssociationAccessMode {
 }
 
 /** Allow, disallow, or let network security perimeter configuration control public network access to the protected resource. Value is optional but if passed in, it must be 'Enabled', 'Disabled' or 'SecuredByPerimeter'. */
-@added(Versions.v5)
+//@added(Versions.v5)
 union PublicNetworkAccess {
   string,
 
@@ -90,7 +90,7 @@ union PublicNetworkAccess {
 }
 
 /** Access rule in a network security perimeter configuration profile */
-@added(Versions.v5)
+//@added(Versions.v5)
 model AccessRule {
   /** Name of the access rule */
   name?: string;
@@ -99,7 +99,7 @@ model AccessRule {
 }
 
 /** Properties of Access Rule */
-@added(Versions.v5)
+//@added(Versions.v5)
 model AccessRuleProperties {
   direction?: AccessRuleDirection;
 
@@ -126,7 +126,7 @@ model AccessRuleProperties {
 }
 
 /** Information about a network security perimeter (NSP) */
-@added(Versions.v5)
+//@added(Versions.v5)
 model NetworkSecurityPerimeter {
   /** Fully qualified Azure resource ID of the NSP resource */
   id?: Azure.Core.armResourceIdentifier<[
@@ -144,13 +144,13 @@ model NetworkSecurityPerimeter {
 }
 
 /** Network security perimeter (NSP) configuration resource */
-@added(Versions.v5)
+//@added(Versions.v5)
 model NetworkSecurityPerimeterConfiguration extends ProxyResource {
   properties?: NetworkSecurityPerimeterConfigurationProperties;
 }
 
 /** Network security configuration properties. */
-@added(Versions.v5)
+//@added(Versions.v5)
 model NetworkSecurityPerimeterConfigurationProperties {
   @visibility(Lifecycle.Read)
   provisioningState?: NetworkSecurityPerimeterConfigurationProvisioningState;
@@ -166,7 +166,7 @@ model NetworkSecurityPerimeterConfigurationProperties {
 }
 
 /** Describes a provisioning issue for a network security perimeter configuration */
-@added(Versions.v5)
+//@added(Versions.v5)
 model ProvisioningIssue {
   /** Name of the issue */
   @visibility(Lifecycle.Read)
@@ -177,7 +177,7 @@ model ProvisioningIssue {
 }
 
 /** Details of a provisioning issue for a network security perimeter (NSP) configuration. Resource providers should generate separate provisioning issue elements for each separate issue detected, and include a meaningful and distinctive description, as well as any appropriate suggestedResourceIds and suggestedAccessRules */
-@added(Versions.v5)
+//@added(Versions.v5)
 model ProvisioningIssueProperties {
   /** Type of issue */
   @visibility(Lifecycle.Read)
@@ -202,7 +202,7 @@ model ProvisioningIssueProperties {
 }
 
 /** Information about resource association */
-@added(Versions.v5)
+//@added(Versions.v5)
 model ResourceAssociation {
   /** Name of the resource association */
   name?: string;
@@ -211,7 +211,7 @@ model ResourceAssociation {
 }
 
 /** Network security perimeter configuration profile */
-@added(Versions.v5)
+//@added(Versions.v5)
 model NetworkSecurityProfile {
   /** Name of the profile */
   name?: string;
@@ -242,15 +242,15 @@ model NetworkSecurityPerimeterConfigurationListResult {
 
 /**
  * The name for a network security perimeter configuration
- * @template Segment The resource type name for network security perimeter configuration (default is networkSecurityPerimeterConfigurations)
+ * @template KeyName The parameter name for network security perimeter configuration (default is "networkSecurityPerimeterConfigurationName")
  */
-@added(Versions.v5)
-model NetworkSecurityPerimeterConfigurationNameParameter {
+//@added(Versions.v5)
+model NetworkSecurityPerimeterConfigurationNameParameter<KeyName extends valueof string = "networkSecurityPerimeterConfigurationName"> {
   /** The name for a network security perimeter configuration */
   @path
   @minLength(1)
   @maxLength(512)
   @TypeSpec.Rest.segment("networkSecurityPerimeterConfigurations")
-  @key("networkSecurityPerimeterConfigurationName")
+  @key(KeyName)
   networkSecurityPerimeterConfigurationName: string;
 }

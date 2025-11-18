@@ -16,6 +16,7 @@ namespace Azure.ResourceManager.CommonTypes;
   "networksecurityperimeter.json"
 );
 
+//@@Versioning.added(NetworkSecurityPerimeterConfigurationProvisioningState, Versions.v5);
 /** Provisioning state of a network security perimeter configuration that is being created or updated. */
 @@armCommonDefinition(NetworkSecurityPerimeterConfigurationProvisioningState,
   "NetworkSecurityPerimeterConfigurationProvisioningState",
@@ -112,6 +113,7 @@ namespace Azure.ResourceManager.CommonTypes;
   "networksecurityperimeter.json"
 );
 
+@@Versioning.added(NetworkSecurityPerimeterConfiguration, Versions.v5);
 /** Network security perimeter configuration resource */
 @@armCommonDefinition(NetworkSecurityPerimeterConfiguration,
   "NetworkSecurityPerimeterConfiguration",
