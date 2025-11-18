@@ -181,6 +181,9 @@ export function checkDecoratorsInDisallowedNamespace(
   disallowedNamespace: "Private" | "Legacy",
 ) {
   for (const decorator of type.decorators) {
+    if (decorator.node && getLocationContext(context.program, decorator.node).type !== "project") {
+      continue;
+    }
     if (
       decorator.definition &&
       isInDisallowedNamespace(decorator.definition, disallowedNamespace) &&

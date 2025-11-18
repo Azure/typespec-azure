@@ -8,7 +8,6 @@ import {
 import {
   checkDecoratorsInDisallowedNamespace,
   checkReferenceInDisallowedNamespace,
-  isInDisallowedNamespace,
 } from "./utils.js";
 
 export const noLegacyUsage = createRule({
@@ -33,10 +32,6 @@ export const noLegacyUsage = createRule({
         model.sourceModels.forEach((source) => checkReference(model, source.model, model));
       },
       modelProperty: (prop) => {
-        const dec = prop.decorators.find((x) => x.definition?.name === "@flattenProperty");
-        if (prop.name === "properties" && dec) {
-          console.log("Prop", isInDisallowedNamespace(dec.definition!, "Legacy"));
-        }
         checkDecorators(prop);
         checkReference(prop, prop.type, prop);
       },
