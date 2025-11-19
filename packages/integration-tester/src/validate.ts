@@ -6,7 +6,7 @@ import { dirname, join, relative } from "pathe";
 import pc from "picocolors";
 import type { Entrypoint, IntegrationTestSuite } from "./config/types.js";
 import type { TaskRunner } from "./runner.js";
-import { log, ValidationFailedError } from "./utils.js";
+import { log, runWithConcurrency, ValidationFailedError } from "./utils.js";
 
 // Number of parallel TypeSpec compilations to run
 const COMPILATION_CONCURRENCY = cpus().length;
@@ -143,56 +143,4 @@ async function execTspCompile(
     success: !failed,
     output: all,
   };
-}
-
-// Function to run tasks with limited concurrency
-async function runWithConcurrency<T, R>(
-  items: T[],
-  concurrency: number,
-  processor: (item: T) => Promise<R>,
-): Promise<R[]> {
-  if (items.length === 0) {
-    return [];
-  }
-
-  const toRun = [...items];
-  const results: R[] = [];
-  let completed = 0;
-  let running = 0;
-
-  return new Promise((resolve, reject) => {
-    function runNext() {
-      if (toRun.length === 0 || running >= concurrency) {
-        return;
-      }
-
-      const item = toRun.shift();
-      if (!item) {
-        return;
-      }
-
-      running++;
-      processor(item)
-        .then((result) => {
-          results.push(result);
-          completed++;
-          running--;
-
-          if (completed === items.length) {
-            resolve(results);
-            return;
-          }
-
-          runNext();
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    }
-
-    // Start initial batch of tasks up to concurrency limit
-    for (let i = 0; i < Math.min(concurrency, toRun.length); i++) {
-      runNext();
-    }
-  });
 }
