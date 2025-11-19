@@ -19,8 +19,12 @@ const options: CoverageFromAzureStorageOptions = {
     "@azure-tools/typespec-cpp",
     "@azure-tools/typespec-rust",
   ],
-  modes: ["azure"],
+  modes: ["standard", "azure"],
   tables: [
+    {
+      name: "Standard",
+      packageName: "@typespec/http-specs",
+    },
     {
       name: "Azure Management Plane",
       packageName: "@azure-tools/azure-http-specs",
