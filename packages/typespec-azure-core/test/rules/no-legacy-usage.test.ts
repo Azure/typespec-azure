@@ -100,7 +100,7 @@ it("flags referencing legacy item in model is", async () => {
   await tester
     .expect(
       `        
-        /*errorPos*/model Test is MyLibrary.Legacy.DummyModel;
+        model Test is /*errorPos*/MyLibrary.Legacy.DummyModel;
       `,
     )
     .toEmitDiagnostics((x) => ({
@@ -128,7 +128,7 @@ it("flags referencing legacy item in model spread", async () => {
   await tester
     .expect(
       `        
-        /*errorPos*/model Test { ...MyLibrary.Legacy.DummyModel }
+        model Test { .../*errorPos*/MyLibrary.Legacy.DummyModel }
       `,
     )
     .toEmitDiagnostics((x) => ({
