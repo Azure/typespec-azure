@@ -796,11 +796,12 @@ it("one client from multiple services", async () => {
     `
   @client
   @service
+  @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
   namespace CombineClient {
-    @clientInitialization({initializedBy: InitializedBy.individually | InitializedBy.parent})
+    @clientInitialization({initializedBy: InitializedBy.parent})
     @client({service: ServiceA, parent: CombineClient})
     interface AI extends ServiceA.AI {}
-    @clientInitialization({initializedBy: InitializedBy.individually | InitializedBy.parent})
+    @clientInitialization({initializedBy: InitializedBy.parent})
     @client({service: ServiceB, parent: CombineClient})
     interface BI extends ServiceB.BI {}
   }
@@ -814,10 +815,17 @@ it("one client from multiple services", async () => {
   ok(bVersionsEnum);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "CombineClient");
-  strictEqual(client.apiVersions.length, 0);
+  strictEqual(client.apiVersions.length, 2);
+  deepStrictEqual(client.apiVersions, ["av2", "bv2"]);
   strictEqual(client.children!.length, 2);
-  strictEqual(client.clientInitialization.parameters.length, 1);
-  strictEqual(client.clientInitialization.parameters[0].name, "endpoint");
+  strictEqual(client.clientInitialization.parameters.length, 2);
+  ok(client.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+  const apiVersionParam = client.clientInitialization.parameters.find(
+    (p) => p.name === "apiVersion",
+  );
+  ok(apiVersionParam);
+  strictEqual(apiVersionParam.apiVersions.length, 2);
+  deepStrictEqual(apiVersionParam.apiVersions, ["av2", "bv2"]);
   const aiClient = client.children!.find((c) => c.name === "AI");
   ok(aiClient);
 
@@ -923,6 +931,10 @@ it("one client from multiple services with versioning", async () => {
     `
     @client
     @service
+    @useDependency(
+      ServiceA.VersionsA.av3,
+      ServiceB.VersionsB.bv2
+    )
     namespace CombineClient {
       @client({parent: CombineClient, service: ServiceA})
       @clientInitialization({initializedBy: InitializedBy.parent})
@@ -939,6 +951,11 @@ it("one client from multiple services with versioning", async () => {
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "CombineClient");
+
+  // Client should have endpoint and apiVersion parameters
+  strictEqual(client.clientInitialization.parameters.length, 2);
+  strictEqual(client.clientInitialization.parameters[0].name, "endpoint");
+  strictEqual(client.clientInitialization.parameters[1].name, "apiVersion");
 
   // Should have 2 children (AI and BI)
   strictEqual(client.children?.length, 2);
@@ -993,6 +1010,70 @@ it("one client from multiple services with versioning", async () => {
   ok(bNewMethod);
   deepStrictEqual(bNewMethod.apiVersions, ["bv2"]); // Added in bv2
 
-  // Parent client should have no versioning
-  deepStrictEqual(client.apiVersions, []);
+  // Parent client should have API versions from @useDependency
+  deepStrictEqual(client.apiVersions, ["av3", "bv2"]);
+});
+
+it("multiple services without @useDependency should require it", async () => {
+  const runnerWithVersion = await createSdkTestRunner({
+    "api-version": "latest",
+    emitterName: "@azure-tools/typespec-python",
+  });
+  await runnerWithVersion.compileWithCustomization(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+
+      interface AI {
+        @route("/atest")
+        atest(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+
+    @service 
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+
+      interface BI {
+        @route("/btest")
+        btest(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+
+    `@client
+    @service
+    @useDependency(ServiceA.VersionsA.av1, ServiceB.VersionsB.bv1)
+    namespace CombineClient {
+      @clientInitialization({initializedBy: InitializedBy.parent})
+      @client({service: ServiceA, parent: CombineClient})
+      interface AI extends ServiceA.AI {}
+      @clientInitialization({initializedBy: InitializedBy.parent})
+      @client({service: ServiceB, parent: CombineClient})
+      interface BI extends ServiceB.BI {}
+    }
+  `,
+  );
+
+  const sdkPackage = runnerWithVersion.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+
+  // Client should have endpoint and apiVersion parameters
+  strictEqual(client.clientInitialization.parameters.length, 2);
+  strictEqual(client.clientInitialization.parameters[0].name, "endpoint");
+  strictEqual(client.clientInitialization.parameters[1].name, "apiVersion");
+
+  // Parent client should have API versions from @useDependency
+  deepStrictEqual(client.apiVersions, ["av1", "bv1"]);
 });

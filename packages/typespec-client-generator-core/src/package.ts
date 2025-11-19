@@ -1,4 +1,10 @@
-import { createDiagnosticCollector, Diagnostic, ignoreDiagnostics } from "@typespec/compiler";
+import {
+  createDiagnosticCollector,
+  Diagnostic,
+  ignoreDiagnostics,
+  listServices,
+} from "@typespec/compiler";
+import { getVersionDependencies } from "@typespec/versioning";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { createSdkClientType } from "./clients.js";
 import { listClients } from "./decorators.js";
@@ -155,12 +161,58 @@ function populateApiVersionInformation(context: TCGCContext): void {
     prepareClientAndOperationCache(context);
   }
   for (const clientOperationGroup of context.__rawClientsOperationGroupsCache!.values()) {
+    let apiVersions: string[];
+
+    // Check if this is a multi-service client with @useDependency
+    if (clientOperationGroup.type?.kind === "Namespace") {
+      const services = listServices(context.program);
+      if (services.length > 1) {
+        const versionDependencies = getVersionDependencies(
+          context.program,
+          clientOperationGroup.type,
+        );
+        if (versionDependencies && versionDependencies.size > 0) {
+          // Extract version strings from dependencies for multi-service clients
+          const allVersions: string[] = [];
+          for (const [_service, versions] of versionDependencies.entries()) {
+            if (Array.isArray(versions)) {
+              for (const version of versions) {
+                if (typeof version === "string") {
+                  allVersions.push(version);
+                } else if (version && typeof version === "object" && "value" in version) {
+                  allVersions.push(String(version.value));
+                } else if (version && typeof version === "object" && "name" in version) {
+                  allVersions.push(String(version.name));
+                }
+              }
+            } else if (typeof versions === "string") {
+              allVersions.push(versions);
+            } else if (versions && typeof versions === "object" && "value" in versions) {
+              allVersions.push(String(versions.value));
+            } else if (versions && typeof versions === "object" && "name" in versions) {
+              allVersions.push(String(versions.name));
+            }
+          }
+          apiVersions = allVersions;
+        } else {
+          // No @useDependency, use normal logic
+          apiVersions = context.getApiVersions(clientOperationGroup.service);
+        }
+      } else {
+        // Single service, use normal logic
+        apiVersions = context.getApiVersions(clientOperationGroup.service);
+      }
+    } else {
+      // Not a namespace, use normal logic
+      apiVersions = context.getApiVersions(clientOperationGroup.service);
+    }
+
     context.setApiVersionsForType(
       clientOperationGroup.type ?? clientOperationGroup.service,
       filterApiVersionsWithDecorators(
         context,
         clientOperationGroup.type ?? clientOperationGroup.service,
-        context.getApiVersions(clientOperationGroup.service),
+        apiVersions,
       ),
     );
 
