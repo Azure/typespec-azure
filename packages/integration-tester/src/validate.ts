@@ -2,9 +2,9 @@ import { execa } from "execa";
 import { readdir } from "fs/promises";
 import { globby } from "globby";
 import { cpus } from "os";
-import { dirname, relative } from "pathe";
+import { dirname, join, relative } from "pathe";
 import pc from "picocolors";
-import type { IntegrationTestSuite } from "./config/types.js";
+import type { Entrypoint, IntegrationTestSuite } from "./config/types.js";
 import type { TaskRunner } from "./runner.js";
 import { log, ValidationFailedError } from "./utils.js";
 
@@ -32,7 +32,7 @@ export async function validateSpecs(
   let failureCount = 0;
   const failedFolders: string[] = []; // Create a processor function that handles the compilation and logging
   const processProject = async (projectDir: string) => {
-    const result = await verifyProject(runner, projectDir, suite);
+    const result = await verifyProject(runner, dir, projectDir, suite);
     runner.reportTaskWithDetails(
       result.success ? "pass" : "fail",
       relative(dir, projectDir),
@@ -75,42 +75,53 @@ async function findTspProjects(wd: string, pattern: string): Promise<string[]> {
   return result.map((x) => dirname(x));
 }
 
-async function findTspEntrypoint(
+/** Find which entrypoints are available */
+async function findTspEntrypoints(
   directory: string,
   suite: IntegrationTestSuite,
-): Promise<string | null> {
+): Promise<Entrypoint[]> {
   try {
     const entries = await readdir(directory);
-
-    for (const entry of suite.entrypoints ?? ["main.tsp"]) {
-      if (entries.includes(entry)) {
-        return entry;
-      }
-    }
-
-    return null;
+    return (suite.entrypoints ?? [{ name: "main.tsp" }]).filter((entrypoint) =>
+      entries.includes(entrypoint.name),
+    );
   } catch (error) {
-    return null;
+    return [];
   }
 }
 
 async function verifyProject(
   runner: TaskRunner,
+  workspaceDir: string,
   dir: string,
   suite: IntegrationTestSuite,
 ): Promise<{ success: boolean; output: string }> {
-  const entrypoint = await findTspEntrypoint(dir, suite);
+  const entrypoints = await findTspEntrypoints(dir, suite);
 
-  if (!entrypoint) {
+  if (entrypoints.length === 0) {
     const result = {
       success: false,
-      output: "No main.tsp or client.tsp file found in directory",
+      output: `Project '${dir}' has no valid entrypoints to compile. Checked for: ${suite.entrypoints?.map((e) => e.name).join(", ") ?? "main.tsp"}`,
     };
     runner.reportTaskWithDetails("fail", dir, result.output);
     return result;
   }
 
-  return execTspCompile(dir, entrypoint, entrypoint === "client.tsp" ? ["--dry-run"] : []);
+  let output = "";
+  for (const entrypoint of entrypoints) {
+    const result = await execTspCompile(
+      workspaceDir,
+      join(dir, entrypoint.name),
+      entrypoint.options,
+    );
+    if (!result.success) {
+      return result;
+    } else {
+      output += result.output;
+      output += `Entrypoint '${entrypoint.name}' compiled successfully.\n`;
+    }
+  }
+  return { success: true, output };
 }
 async function execTspCompile(
   directory: string,
