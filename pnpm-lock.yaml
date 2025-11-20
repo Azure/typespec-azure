@@ -2947,6 +2947,12 @@ importers:
       '@emotion/react':
         specifier: ^11.14.0
         version: 11.14.0(@types/react@19.2.2)(react@18.3.1)
+      '@fluentui/react-components':
+        specifier: ~9.72.3
+        version: 9.72.3(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)
+      '@fluentui/react-icons':
+        specifier: ^2.0.292
+        version: 2.0.312(react@18.3.1)
       '@typespec/compiler':
         specifier: workspace:^
         version: link:../../core/packages/compiler
@@ -2965,6 +2971,9 @@ importers:
       '@typespec/openapi3':
         specifier: workspace:^
         version: link:../../core/packages/openapi3
+      '@typespec/pack':
+        specifier: workspace:^
+        version: link:../../core/packages/pack
       '@typespec/protobuf':
         specifier: workspace:^
         version: link:../../core/packages/protobuf
@@ -3005,6 +3014,9 @@ importers:
       '@types/node':
         specifier: ~24.9.1
         version: 24.9.1
+      '@types/react':
+        specifier: ~19.2.2
+        version: 19.2.2
       '@types/react-dom':
         specifier: ~19.2.2
         version: 19.2.2(@types/react@19.2.2)

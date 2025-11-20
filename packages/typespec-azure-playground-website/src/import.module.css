@@ -1,0 +1,9 @@
+.url-input {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.error {
+  color: var(--colorPaletteRedForeground1);
+  margin-bottom: 10px;
+}
