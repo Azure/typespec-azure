@@ -2795,4 +2795,464 @@ model MoveResponse {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/rooms/{roomId}",
     });
   });
+  it("collects operation information for networkSecurityPerimeters", async () => {
+    const { program } = await Tester.compile(`
+
+using Azure.Core;
+
+@versioned(Versions)
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+/** Contoso API versions */
+enum Versions {
+  /** 2021-10-01-preview version */
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v2025_11_19_preview: "2025-11-19-preview",
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+// For more information about the proxy vs tracked,
+// see https://armwiki.azurewebsites.net/rp_onboarding/tracked_vs_proxy_resources.html?q=proxy%20resource
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@lroStatus
+union ProvisioningState {
+  ResourceProvisioningState,
+
+  Provisioning: "Provisioning",
+
+  Updating: "Updating",
+
+  Deleting: "Deleting",
+
+  Accepted: "Accepted",
+
+  string,
+}
+
+model NetworkSecurityPerimeterConfiguration is Azure.ResourceManager.NspConfiguration;
+alias NspConfigurationOperations = Azure.ResourceManager.NspConfigurations<NetworkSecurityPerimeterConfiguration>;
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+  update is ArmCustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+  delete is ArmResourceDeleteSync<Employee>;
+  listByResourceGroup is ArmResourceListByParent<Employee>;
+  listBySubscription is ArmListBySubscription<Employee>;
+  move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
+
+  checkExistence is ArmResourceCheckExistence<Employee>;
+}
+
+@armResourceOperations(PrivateLinkResource)
+interface EmployeeNetworkSecurityPerimeterConfigurations {
+  list is NspConfigurationOperations.ListByParent<Employee>;
+  get is NspConfigurationOperations.Read<Employee>;
+}
+
+model MoveRequest {
+  from: string;
+
+  to: string;
+}
+
+model MoveResponse {
+  movingStatus: string;
+}
+
+@armResourceOperations
+interface Dependents {
+  get is ArmResourceRead<Dependent>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Dependent>;
+  update is ArmCustomPatchSync<
+    Dependent,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Dependent, DependentProperties>
+  >;
+  delete is ArmResourceDeleteSync<Dependent>;
+  list is ArmResourceListByParent<Dependent>;
+}
+
+@armResourceOperations(PrivateLinkResource)
+interface DependentNetworkSecurityPerimeterConfigurations {
+  list is NspConfigurationOperations.ListByParent<Dependent>;
+  get is NspConfigurationOperations.Read<Dependent>;
+}
+
+@parentResource(Employee)
+model Dependent is ProxyResource<DependentProperties> {
+  ...ResourceNameParameter<Dependent>;
+}
+
+model DependentProperties {
+  age: int32;
+  gender: string;
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    expect(provider.resources).toHaveLength(4);
+    ok(provider.resources);
+    const employee = provider.resources[0];
+    ok(employee);
+    expect(employee).toMatchObject({
+      kind: "Tracked",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+    });
+
+    checkResolvedOperations(employee, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            { operationGroup: "Employees", name: "createOrUpdate", kind: "createOrUpdate" },
+          ],
+          delete: [{ operationGroup: "Employees", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "Employees", name: "get", kind: "read" }],
+          update: [{ operationGroup: "Employees", name: "update", kind: "update" }],
+          checkExistence: [
+            { operationGroup: "Employees", name: "checkExistence", kind: "checkExistence" },
+          ],
+        },
+        actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
+        lists: [
+          { operationGroup: "Employees", name: "listBySubscription", kind: "list" },
+          { operationGroup: "Employees", name: "listByResourceGroup", kind: "list" },
+        ],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees"],
+      },
+      resourceName: "Employee",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    });
+
+    const dependent = provider.resources[3];
+    ok(dependent);
+    expect(dependent).toMatchObject({
+      kind: "Proxy",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      parent: expect.any(Object),
+    });
+
+    checkResolvedOperations(dependent, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            { operationGroup: "Dependents", name: "createOrUpdate", kind: "createOrUpdate" },
+          ],
+          delete: [{ operationGroup: "Dependents", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "Dependents", name: "get", kind: "read" }],
+          update: [{ operationGroup: "Dependents", name: "update", kind: "update" }],
+        },
+        lists: [{ operationGroup: "Dependents", name: "list", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees", "dependents"],
+      },
+      resourceName: "Dependent",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}",
+    });
+
+    const nsp = provider.resources[1];
+    ok(nsp);
+    expect(nsp).toMatchObject({
+      kind: "Proxy",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      parent: expect.any(Object),
+    });
+    checkResolvedOperations(nsp, {
+      operations: {
+        lists: [
+          {
+            operationGroup: "EmployeeNetworkSecurityPerimeterConfigurations",
+            name: "list",
+            kind: "list",
+          },
+        ],
+        lifecycle: {
+          read: [
+            {
+              operationGroup: "EmployeeNetworkSecurityPerimeterConfigurations",
+              name: "get",
+              kind: "read",
+            },
+          ],
+        },
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees", "networkSecurityPerimeterConfigurations"],
+      },
+      resourceName: "EmployeeNetworkSecurityPerimeterConfiguration",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/networkSecurityPerimeterConfigurations/{name}",
+    });
+
+    const perimeterForDepInstance = provider.resources[2];
+    ok(perimeterForDepInstance);
+    expect(perimeterForDepInstance).toMatchObject({
+      kind: "Proxy",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      parent: expect.any(Object),
+    });
+
+    checkResolvedOperations(perimeterForDepInstance, {
+      operations: {
+        lists: [
+          {
+            operationGroup: "DependentNetworkSecurityPerimeterConfigurations",
+            name: "list",
+            kind: "list",
+          },
+        ],
+        lifecycle: {
+          read: [
+            {
+              operationGroup: "DependentNetworkSecurityPerimeterConfigurations",
+              name: "get",
+              kind: "read",
+            },
+          ],
+        },
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees", "dependents", "networkSecurityPerimeterConfigurations"],
+      },
+      resourceName: "DependentNetworkSecurityPerimeterConfiguration",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}/networkSecurityPerimeterConfigurations/{name}",
+    });
+
+    checkArmOperationsHas(provider.providerOperations, [
+      { operationGroup: "Operations", name: "list", kind: "other" },
+    ]);
+  });
+
+  it("allows overriding resource name for network security perimeters", async () => {
+    const { program } = await Tester.compile(`
+
+using Azure.Core;
+
+@versioned(Versions)
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+/** Contoso API versions */
+enum Versions {
+  /** 2021-10-01-preview version */
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v2025_11_19_preview: "2025-11-19-preview",
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+// For more information about the proxy vs tracked,
+// see https://armwiki.azurewebsites.net/rp_onboarding/tracked_vs_proxy_resources.html?q=proxy%20resource
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@lroStatus
+union ProvisioningState {
+  ResourceProvisioningState,
+
+  Provisioning: "Provisioning",
+
+  Updating: "Updating",
+
+  Deleting: "Deleting",
+
+  Accepted: "Accepted",
+
+  string,
+}
+
+model NetworkSecurityPerimeterConfiguration is Azure.ResourceManager.NspConfiguration;
+alias NspConfigurationOperations = Azure.ResourceManager.NspConfigurations<NetworkSecurityPerimeterConfiguration, ResourceName = "NetworkSecurityPerimeterConfiguration">;
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+  update is ArmCustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+  delete is ArmResourceDeleteSync<Employee>;
+  listByResourceGroup is ArmResourceListByParent<Employee>;
+  listBySubscription is ArmListBySubscription<Employee>;
+  move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
+
+  checkExistence is ArmResourceCheckExistence<Employee>;
+}
+
+@armResourceOperations(PrivateLinkResource)
+interface EmployeeNetworkSecurityPerimeterConfigurations {
+  list is NspConfigurationOperations.ListByParent<Employee>;
+  get is NspConfigurationOperations.Read<Employee>;
+}
+
+model MoveRequest {
+  from: string;
+
+  to: string;
+}
+
+model MoveResponse {
+  movingStatus: string;
+}
+
+@armResourceOperations
+interface Dependents {
+  get is ArmResourceRead<Dependent>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Dependent>;
+  update is ArmCustomPatchSync<
+    Dependent,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Dependent, DependentProperties>
+  >;
+  delete is ArmResourceDeleteSync<Dependent>;
+  list is ArmResourceListByParent<Dependent>;
+}
+
+@armResourceOperations(PrivateLinkResource)
+interface DependentNetworkSecurityPerimeterConfigurations {
+  list is NspConfigurationOperations.ListByParent<Dependent>;
+  get is NspConfigurationOperations.Read<Dependent>;
+}
+
+@parentResource(Employee)
+model Dependent is ProxyResource<DependentProperties> {
+  ...ResourceNameParameter<Dependent>;
+}
+
+model DependentProperties {
+  age: int32;
+  gender: string;
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    expect(provider.resources).toHaveLength(4);
+    ok(provider.resources);
+    const employee = provider.resources[0];
+    ok(employee);
+    expect(employee).toMatchObject({
+      kind: "Tracked",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+    });
+
+    checkResolvedOperations(employee, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            { operationGroup: "Employees", name: "createOrUpdate", kind: "createOrUpdate" },
+          ],
+          delete: [{ operationGroup: "Employees", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "Employees", name: "get", kind: "read" }],
+          update: [{ operationGroup: "Employees", name: "update", kind: "update" }],
+          checkExistence: [
+            { operationGroup: "Employees", name: "checkExistence", kind: "checkExistence" },
+          ],
+        },
+        actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
+        lists: [
+          { operationGroup: "Employees", name: "listBySubscription", kind: "list" },
+          { operationGroup: "Employees", name: "listByResourceGroup", kind: "list" },
+        ],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees"],
+      },
+      resourceName: "Employee",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    });
+
+    const nsp = provider.resources[1];
+    ok(nsp);
+    expect(nsp).toMatchObject({
+      kind: "Proxy",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      parent: expect.any(Object),
+    });
+    checkResolvedOperations(nsp, {
+      operations: {
+        lists: [
+          {
+            operationGroup: "EmployeeNetworkSecurityPerimeterConfigurations",
+            name: "list",
+            kind: "list",
+          },
+        ],
+        lifecycle: {
+          read: [
+            {
+              operationGroup: "EmployeeNetworkSecurityPerimeterConfigurations",
+              name: "get",
+              kind: "read",
+            },
+          ],
+        },
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees", "networkSecurityPerimeterConfigurations"],
+      },
+      resourceName: "NetworkSecurityPerimeterConfiguration",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/networkSecurityPerimeterConfigurations/{name}",
+    });
+
+    checkArmOperationsHas(provider.providerOperations, [
+      { operationGroup: "Operations", name: "list", kind: "other" },
+    ]);
+  });
 });

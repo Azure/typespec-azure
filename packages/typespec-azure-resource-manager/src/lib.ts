@@ -131,6 +131,12 @@ export const $lib = createTypeSpecLibrary({
           "This type is meant for conversion of legacy service APIs.  This type should not be used in new service APIs.",
       },
     },
+    "invalid-version-for-common-type": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`The specified common-types version '${"version"}'  is not valid for ${"resourceName"} resources. Please use version ${"requiredVersion"} or later of common-types.`,
+      },
+    },
   },
 });
 
