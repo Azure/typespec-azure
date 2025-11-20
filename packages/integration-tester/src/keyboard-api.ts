@@ -8,7 +8,7 @@ const keys = [
   ["f", "rerun only failed tests"],
   ["q", "quit"],
 ];
-const cancelKeys = ["space", "c", "h", ...keys.map((key) => key[0]).flat()];
+const cancelKeys = ["space", "c", ...keys.map((key) => key[0]).flat()];
 
 export function registerConsoleShortcuts(
   ctx: TspRunner,

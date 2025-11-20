@@ -5,7 +5,7 @@ import { cpus } from "os";
 import { dirname, join, relative } from "pathe";
 import pc from "picocolors";
 import type { Entrypoint, IntegrationTestSuite } from "./config/types.js";
-import { registerConsoleShortcuts } from "./keyboard-interaction.js";
+import { registerConsoleShortcuts } from "./keyboard-api.js";
 import type { TaskRunner } from "./runner.js";
 import { log, runWithConcurrency, ValidationFailedError } from "./utils.js";
 
