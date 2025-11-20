@@ -706,17 +706,17 @@ namespace MultiService
             Widget = new WidgetClient(endpoint, "2.0", options);
             Gadget = new GadgetClient(endpoint, "1.1", options);
         }
-        
+
         public virtual WidgetClient Widget { get; }
         public virtual GadgetClient Gadget { get; }
     }
-    
+
     public partial class WidgetClient
     {
         public virtual async Task<Response<IReadOnlyList<Widget>>> ListWidgetsAsync(RequestContext context = null) {}
         public virtual Response<IReadOnlyList<Widget>> ListWidgets(RequestContext context = null) {}
     }
-    
+
     public partial class GadgetClient
     {
         public virtual async Task<Response<IReadOnlyList<Gadget>>> ListGadgetsAsync(RequestContext context = null) {}
@@ -745,8 +745,8 @@ const gadgets = await client.gadget.listGadgets();
 ```
 
 ```java
-@ServiceClientBuilder(serviceClients = { 
-    MultiServiceClient.class, 
+@ServiceClientBuilder(serviceClients = {
+    MultiServiceClient.class,
     WidgetClient.class,
     GadgetClient.class,
     MultiServiceAsyncClient.class,
@@ -755,7 +755,7 @@ const gadgets = await client.gadget.listGadgets();
 })
 public final class MultiServiceClientBuilder implements HttpTrait<MultiServiceClientBuilder>,
     ConfigurationTrait<MultiServiceClientBuilder>, EndpointTrait<MultiServiceClientBuilder> {
-    
+
     public MultiServiceClientBuilder();
     public MultiServiceClient buildClient();
 }
@@ -764,16 +764,16 @@ public final class MultiServiceClientBuilder implements HttpTrait<MultiServiceCl
 public final class MultiServiceClient {
     private final WidgetClient widgetClient;
     private final GadgetClient gadgetClient;
-    
+
     MultiServiceClient(String endpoint) {
         this.widgetClient = new WidgetClient(endpoint, "2.0");
         this.gadgetClient = new GadgetClient(endpoint, "1.1");
     }
-    
+
     public WidgetClient getWidget() {
         return this.widgetClient;
     }
-    
+
     public GadgetClient getGadget() {
         return this.gadgetClient;
     }
@@ -793,7 +793,7 @@ public final class GadgetClient {
 MultiServiceClient client = new MultiServiceClientBuilder()
     .endpoint("https://api.example.com")
     .buildClient();
-    
+
 var widgets = client.getWidget().listWidgets();
 var gadgets = client.getGadget().listGadgets();
 ```
@@ -810,12 +810,12 @@ func NewMultiServiceClient(endpoint string, options *MultiServiceClientOptions) 
     if err != nil {
         return nil, err
     }
-    
+
     gadgetClient, err := NewGadgetClient(endpoint, "1.1", options)
     if err != nil {
         return nil, err
     }
-    
+
     return &MultiServiceClient{
         widgetClient:  widgetClient,
         gadgetClient:  gadgetClient,
