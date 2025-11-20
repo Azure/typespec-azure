@@ -16,11 +16,11 @@ namespace Service.MultiService.FirstService {
   interface Operations {
     @doc("Operation from first service")
     @route("/one")
-    op firstOne(@query("api-version") apiVersion: FirstServiceVersions): void;
+    firstOne(@query("api-version") apiVersion: FirstServiceVersions): void;
 
     @doc("Another operation from first service")
     @route("/two")
-    op firstTwo(@query("api-version") apiVersion: FirstServiceVersions): void;
+    firstTwo(@query("api-version") apiVersion: FirstServiceVersions): void;
   }
 }
 
@@ -36,10 +36,10 @@ namespace Service.MultiService.SecondService {
   interface Operations {
     @doc("Operation from second service")
     @route("/one")
-    op secondOne(@query("api-version") apiVersion: SecondServiceVersions): void;
+    secondOne(@query("api-version") apiVersion: SecondServiceVersions): void;
 
     @doc("Another operation from second service")
     @route("/two")
-    op secondTwo(@query("api-version") apiVersion: SecondServiceVersions): void;
+    secondTwo(@query("api-version") apiVersion: SecondServiceVersions): void;
   }
 }
