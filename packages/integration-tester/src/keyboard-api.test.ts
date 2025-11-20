@@ -60,7 +60,7 @@ describe("when tests are running", () => {
     });
   });
 
-  it("does NOT calls cancelCurrentRun when other keys are pressed", () => {
+  it("does NOT call cancelCurrentRun when other keys are pressed", () => {
     stdin.emit("data", "b");
     stdin.emit("data", "d");
     expect(runner.cancelCurrentRun).not.toHaveBeenCalled();
