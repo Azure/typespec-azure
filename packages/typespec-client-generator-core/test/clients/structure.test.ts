@@ -1030,8 +1030,8 @@ it("multiple services without @useDependency should require it", async () => {
       }
 
       interface AI {
-        @route("/atest")
-        atest(@query("api-version") apiVersion: VersionsA): void;
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
       }
     }
 
@@ -1044,8 +1044,8 @@ it("multiple services without @useDependency should require it", async () => {
       }
 
       interface BI {
-        @route("/btest")
-        btest(@query("api-version") apiVersion: VersionsB): void;
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): void;
       }
     }`,
 
