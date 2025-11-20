@@ -78,9 +78,6 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "@vscode/vsce-sign",
-      "esbuild",
-      "sharp",
       "tree-sitter"
     ]
   }
