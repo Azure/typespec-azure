@@ -59,7 +59,7 @@ export function getServiceMethodOfClient(
 }
 
 export function getServiceNamespace(runner: SdkTestRunner) {
-  // Use the unmutated program to find service namespaces, since servers are defined there
+  // Use the non-mutated program to find service namespaces, since servers are defined there
   const globalNs = runner.context.program.getGlobalNamespaceType();
   for (const [_, ns] of globalNs.namespaces) {
     if (isService(runner.context.program, ns)) {
