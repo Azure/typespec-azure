@@ -9,9 +9,6 @@ alias KeyEncryptionKeyIdentity = CommonTypes.KeyEncryptionKeyIdentity;
 alias CustomerManagedKeyEncryption = CommonTypes.CustomerManagedKeyEncryption;
 alias EncryptionConfiguration = CommonTypes.Encryption;
 
-// network-security-perimeter
-alias NspConfigurationParameter = CommonTypes.NetworkSecurityPerimeterConfigurationNameParameter;
-
 // private-links
 alias PrivateEndpoint = CommonTypes.PrivateEndpoint;
 alias PrivateEndpointConnection = CommonTypes.PrivateEndpointConnection;

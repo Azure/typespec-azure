@@ -110,90 +110,6 @@ op Azure.ResourceManager.ExtensionResourceOperations<Resource, Properties>.delet
 op Azure.ResourceManager.ExtensionResourceOperations<Resource, Properties>.listByParent(apiVersion: string, resourceUri: string, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
-### `NspConfigurations` {#Azure.ResourceManager.NspConfigurations}
-
-Operations over network security perimeter resources.
-
-```typespec
-interface Azure.ResourceManager.NspConfigurations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>
-```
-
-#### Template Parameters
-
-| Name                          | Description                                                                                                                                                                   |
-| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| NspConfigurationResourceModel | The type of the network security perimeter configuration resource. You must declare a network security perimeter configuration resource type in your provider namespace.      |
-| NspConfigurationKeyName       | Optional. The NSP configuration resource name parameter. By default, this is `networkSecurityPerimeterConfigurationName`.                                                     |
-| ResourceName                  | Optional. The name of the network security perimeter configuration resource in this context, by default, this is `{targetResourceName}NetworkSecurityPerimeterConfiguration`. |
-
-#### `NspConfigurations.ListByParent` {#Azure.ResourceManager.NspConfigurations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.ListByParent}
-
-```typespec
-op Azure.ResourceManager.NspConfigurations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
-```
-
-##### Template Parameters
-
-| Name                 | Description                                                                                    |
-| -------------------- | ---------------------------------------------------------------------------------------------- |
-| ParentResource       | the parent resource of the NspConfiguration                                                    |
-| Resource             | Optional. The NspConfiguration resource being listed                                           |
-| BaseParameters       | Optional. Allows overriding the operation parameters                                           |
-| Parameters           | Optional. Additional parameters after the path parameters                                      |
-| Response             | Optional. The success response for the list operation                                          |
-| Error                | Optional. The error response, if non-standard.                                                 |
-| OverrideResourceName | Optional. The name of the network security perimeter configuration resource being operated on. |
-
-#### `NspConfigurations.ListSinglePageByParent` {#Azure.ResourceManager.NspConfigurations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.ListSinglePageByParent}
-
-```typespec
-op Azure.ResourceManager.NspConfigurations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
-```
-
-##### Template Parameters
-
-| Name                 | Description                                                                                    |
-| -------------------- | ---------------------------------------------------------------------------------------------- |
-| ParentResource       | the parent resource of the NspConfiguration                                                    |
-| Resource             | Optional. The NspConfiguration resource being listed                                           |
-| BaseParameters       | Optional. Allows overriding the operation parameters                                           |
-| Parameters           | Optional. Additional parameters after the path parameters                                      |
-| Response             | Optional. The success response for the list operation                                          |
-| Error                | Optional. The error response, if non-standard.                                                 |
-| OverrideResourceName | Optional. The name of the network security perimeter configuration resource being operated on. |
-
-#### `NspConfigurations.Read` {#Azure.ResourceManager.NspConfigurations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.Read}
-
-```typespec
-op Azure.ResourceManager.NspConfigurations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.Read(provider: "Microsoft.ThisWillBeReplaced", networkSecurityPerimeterConfigurationName: string): Response | Error
-```
-
-##### Template Parameters
-
-| Name                 | Description                                                                                                              |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| ParentResource       | the parent resource of the NspConfiguration                                                                              |
-| Resource             | the NspConfiguration resource being read                                                                                 |
-| BaseParameters       | Optional. Allows overriding the operation parameters                                                                     |
-| KeyName              | Optional. The NSP configuration resource name parameter. By default, this is `networkSecurityPerimeterConfigurationName` |
-| Parameters           | Optional. Additional parameters after the path parameters                                                                |
-| Response             | Optional. The success response for the read operation                                                                    |
-| Error                | Optional. The error response, if non-standard.                                                                           |
-| OverrideResourceName | Optional. The name of the network security perimeter configuration resource being operated on.                           |
-
-#### Examples
-
-```ts
-namespace Microsoft.Contoso;
-model NspConfiguration is NspConfigurationResource {}
-alias EmployeeNspConfigurationOps is NspConfigurations<NspConfiguration>;
-@armResourceOperations
-interface Employees {
- @doc("get a network security perimeter configuration for resource employee")
- getNspConfiguration is EmployeeNspConfigurationOps.Read<Employee>;
-}
-```
-
 ### `Operations` {#Azure.ResourceManager.Operations}
 
 This is the interface that implements the standard Azure Resource Manager operation that returns
@@ -1508,6 +1424,92 @@ op Azure.ResourceManager.checkLocalNameAvailability(apiVersion: string, subscrip
 | Request          | the availability request, defaults to the standard request, containing name and resource type |
 | Response         | the availability response, default to the standard response                                   |
 | AdditionalParams | A model specifying additional non-path parameters to the availability request                 |
+
+## Azure.ResourceManager.CommonTypes
+
+### `NspConfigurationOperations` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations}
+
+Operations over network security perimeter resources.
+
+```typespec
+interface Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>
+```
+
+#### Template Parameters
+
+| Name                          | Description                                                                                                                                                                   |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| NspConfigurationResourceModel | The type of the network security perimeter configuration resource. You must declare a network security perimeter configuration resource type in your provider namespace.      |
+| NspConfigurationKeyName       | Optional. The NSP configuration resource name parameter. By default, this is `networkSecurityPerimeterConfigurationName`.                                                     |
+| ResourceName                  | Optional. The name of the network security perimeter configuration resource in this context, by default, this is `{targetResourceName}NetworkSecurityPerimeterConfiguration`. |
+
+#### `NspConfigurationOperations.ListByParent` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.ListByParent}
+
+```typespec
+op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+```
+
+##### Template Parameters
+
+| Name                 | Description                                                                                    |
+| -------------------- | ---------------------------------------------------------------------------------------------- |
+| ParentResource       | the parent resource of the NspConfiguration                                                    |
+| Resource             | Optional. The NspConfiguration resource being listed                                           |
+| BaseParameters       | Optional. Allows overriding the operation parameters                                           |
+| Parameters           | Optional. Additional parameters after the path parameters                                      |
+| Response             | Optional. The success response for the list operation                                          |
+| Error                | Optional. The error response, if non-standard.                                                 |
+| OverrideResourceName | Optional. The name of the network security perimeter configuration resource being operated on. |
+
+#### `NspConfigurationOperations.ListSinglePageByParent` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.ListSinglePageByParent}
+
+```typespec
+op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+```
+
+##### Template Parameters
+
+| Name                 | Description                                                                                    |
+| -------------------- | ---------------------------------------------------------------------------------------------- |
+| ParentResource       | the parent resource of the NspConfiguration                                                    |
+| Resource             | Optional. The NspConfiguration resource being listed                                           |
+| BaseParameters       | Optional. Allows overriding the operation parameters                                           |
+| Parameters           | Optional. Additional parameters after the path parameters                                      |
+| Response             | Optional. The success response for the list operation                                          |
+| Error                | Optional. The error response, if non-standard.                                                 |
+| OverrideResourceName | Optional. The name of the network security perimeter configuration resource being operated on. |
+
+#### `NspConfigurationOperations.Read` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.Read}
+
+```typespec
+op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.Read(provider: "Microsoft.ThisWillBeReplaced", networkSecurityPerimeterConfigurationName: string): Response | Error
+```
+
+##### Template Parameters
+
+| Name                 | Description                                                                                                              |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| ParentResource       | the parent resource of the NspConfiguration                                                                              |
+| Resource             | the NspConfiguration resource being read                                                                                 |
+| BaseParameters       | Optional. Allows overriding the operation parameters                                                                     |
+| KeyName              | Optional. The NSP configuration resource name parameter. By default, this is `networkSecurityPerimeterConfigurationName` |
+| Parameters           | Optional. Additional parameters after the path parameters                                                                |
+| Response             | Optional. The success response for the read operation                                                                    |
+| Error                | Optional. The error response, if non-standard.                                                                           |
+| OverrideResourceName | Optional. The name of the network security perimeter configuration resource being operated on.                           |
+
+#### Examples
+
+```ts
+namespace Microsoft.Contoso;
+model NspConfiguration is NspConfigurationResource {}
+alias EmployeeNspConfigurationOps is NspConfigurations<NspConfiguration>;
+@armResourceOperations
+interface Employees {
+ @doc("get a network security perimeter configuration for resource employee")
+ getNspConfiguration is EmployeeNspConfigurationOps.Read<Employee>;
+}
+```
 
 ## Azure.ResourceManager.Extension
 

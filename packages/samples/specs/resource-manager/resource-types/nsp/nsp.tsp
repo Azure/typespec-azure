@@ -18,7 +18,7 @@ namespace Microsoft.ContosoProviderHub;
 enum Versions {
   /** 2021-10-01-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  `2021-10-01-preview`,
+  `2025-11-19-preview`,
 }
 
 // For more information about the proxy vs tracked,
@@ -66,9 +66,8 @@ union ProvisioningState {
 }
 
 interface Operations extends Azure.ResourceManager.Operations {}
-model MyNspResource
-  is Azure.ResourceManager.CommonTypes.NspConfigurationResource<"networkSecurityPerimeterConfigurationName">;
-alias NspConfigurationOperations = Azure.ResourceManager.CommonTypes.NspConfigurations<MyNspResource>;
+model NetworkSecurityPerimeterConfiguration is Azure.ResourceManager.NspConfiguration;
+alias NspConfigurationOperations = Azure.ResourceManager.NspConfigurations<NetworkSecurityPerimeterConfiguration>;
 
 @armResourceOperations
 interface Employees {
@@ -87,8 +86,10 @@ interface Employees {
   /** A sample HEAD operation to check resource existence */
   checkExistence is ArmResourceCheckExistence<Employee>;
 
+  /** Get a Network Security Perimeter Configuration for this employee */
   getNsp is NspConfigurationOperations.Read<Employee>;
-  listNsps is NspConfigurationOperations.ListByParent<Employee>;
+  /** List the Network Security Perimeters for this employee */
+  listNsp is NspConfigurationOperations.ListByParent<Employee>;
 }
 
 /** Employee move request */

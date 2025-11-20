@@ -824,41 +824,6 @@ model Foo is TrackedResource<FooProperties> {
 | --------- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------- |
 | identity? | [`SystemAssignedServiceIdentity`](./data-types.md#Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentity) | The managed service identities assigned to this resource. |
 
-### `NspConfigurationResource` {#Azure.ResourceManager.NspConfigurationResource}
-
-Network security perimeter (NSP) configuration resource. Providers must instantiate an instance of this resource in their
-provider namespace to enable NSP capabilities for their resources.
-
-```typespec
-model Azure.ResourceManager.NspConfigurationResource<KeyName, Description>
-```
-
-#### Template Parameters
-
-| Name        | Description                                                                                                                           |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| KeyName     | Optional. The name of the NSP configuration resource name parameter. By default, this is `networkSecurityPerimeterConfigurationName`. |
-| Description | Optional. The documentary description of the NSP configuration resource name parameter.                                               |
-
-#### Examples
-
-```ts
-namespace Microsoft.Contoso;
-model NspConfiguration is NspConfigurationResource {}
-alias EmployeeConfigOps is NspConfigurations<NspConfiguration>;
-@armResourceOperations
-interface Employees {
- @doc("get a network security perimeter configuration for resource employee")
- getNspConfiguration is EmployeeConfigOps.Read<Employee>;
-}
-```
-
-#### Properties
-
-| Name        | Type                                                                                                                                                   | Description |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
-| properties? | [`NetworkSecurityPerimeterConfigurationProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationProperties) |             |
-
 ### `ParentKeysOf` {#Azure.ResourceManager.ParentKeysOf}
 
 Extracts the key (path) parameters from the parent(s) of the given resource
@@ -1919,14 +1884,8 @@ model Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationLis
 The name for a network security perimeter configuration
 
 ```typespec
-model Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationNameParameter<KeyName>
+model Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationNameParameter
 ```
-
-#### Template Parameters
-
-| Name    | Description                                                                                                              |
-| ------- | ------------------------------------------------------------------------------------------------------------------------ |
-| KeyName | The parameter name for network security perimeter configuration (default is "networkSecurityPerimeterConfigurationName") |
 
 #### Properties
 
@@ -1969,6 +1928,41 @@ model Azure.ResourceManager.CommonTypes.NetworkSecurityProfile
 | accessRules?               | `ResourceManager.CommonTypes.AccessRule[]` | List of Access Rules                    |
 | diagnosticSettingsVersion? | `int32`                                    | Current diagnostic settings version     |
 | enabledLogCategories?      | `string[]`                                 | List of log categories that are enabled |
+
+### `NspConfigurationResource` {#Azure.ResourceManager.CommonTypes.NspConfigurationResource}
+
+Network security perimeter (NSP) configuration resource. Providers must instantiate an instance of this resource in their
+provider namespace to enable NSP capabilities for their resources.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.NspConfigurationResource<KeyName, Description>
+```
+
+#### Template Parameters
+
+| Name        | Description                                                                                                                           |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| KeyName     | Optional. The name of the NSP configuration resource name parameter. By default, this is `networkSecurityPerimeterConfigurationName`. |
+| Description | Optional. The documentary description of the NSP configuration resource name parameter.                                               |
+
+#### Examples
+
+```ts
+namespace Microsoft.Contoso;
+model NspConfiguration is NspConfigurationResource {}
+alias EmployeeConfigOps is NspConfigurations<NspConfiguration>;
+@armResourceOperations
+interface Employees {
+ @doc("get a network security perimeter configuration for resource employee")
+ getNspConfiguration is EmployeeConfigOps.Read<Employee>;
+}
+```
+
+#### Properties
+
+| Name        | Type                                                                                                                                                   | Description |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| properties? | [`NetworkSecurityPerimeterConfigurationProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationProperties) |             |
 
 ### `Operation` {#Azure.ResourceManager.CommonTypes.Operation}
 
