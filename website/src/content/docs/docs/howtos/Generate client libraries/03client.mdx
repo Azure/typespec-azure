@@ -590,6 +590,283 @@ petStorePetsActionsClient.Pet(context.Background(), &PetStorePetsActionsClientPe
 
 </ClientTabs>
 
+### Multi-Service Clients
+
+When a TypeSpec specification defines multiple services that need to be accessed through a single client, you can use the `@useDependency` decorator to specify version dependencies between services. This is an edge case used when a client needs to interact with multiple related services, each potentially at different API versions.
+
+#### Requirements
+
+To define a multi-service client:
+
+1. **Multiple `@service` decorators**: Define each service with its own `@service` decorator in separate namespaces
+2. **Versioning**: Each service should use the `@versioned` decorator to define its API versions
+3. **Version dependencies**: Use `@useDependency` on the client namespace to specify which version of each dependent service to use
+4. **Client definition**: Use the `@client` decorator to define the root client that will access multiple services
+
+#### Example
+
+<ClientTabs>
+
+```typespec
+// main.tsp
+@service({ title: "Widget Service" })
+@versioned(WidgetService.Versions)
+namespace WidgetService {
+  enum Versions {
+    v1_0: "1.0",
+    v2_0: "2.0",
+  }
+
+  interface Widget {
+    @route("/widgets")
+    @get op listWidgets(): Widget[];
+  }
+
+  model Widget {
+    id: string;
+    name: string;
+  }
+}
+
+@service({ title: "Gadget Service" })
+@versioned(GadgetService.Versions)
+namespace GadgetService {
+  enum Versions {
+    v1_0: "1.0",
+    v1_1: "1.1",
+  }
+
+  interface Gadget {
+    @route("/gadgets")
+    @get op listGadgets(): Gadget[];
+  }
+
+  model Gadget {
+    id: string;
+    type: string;
+  }
+}
+
+// client.tsp
+@client({
+  name: "MultiServiceClient",
+})
+@service
+@useDependency(WidgetService.Versions.v2_0)
+@useDependency(GadgetService.Versions.v1_1)
+namespace MultiServiceClient {
+  @clientInitialization({initializedBy: InitializedBy.parent})
+  @client({service: WidgetService, parent: MultiServiceClient})
+  interface WidgetClient extends WidgetService.Widget;
+
+  @clientInitialization({initializedBy: InitializedBy.parent})
+  @client({service: GadgetService, parent: MultiServiceClient})
+  interface GadgetClient extends GadgetService.Gadget;
+}
+```
+
+```python
+# generated _client.py
+class MultiServiceClient:
+    def __init__(
+        self,
+        endpoint: str,
+        **kwargs: Any
+    ) -> None:
+        self._endpoint = endpoint
+        self.widget = WidgetOperations(endpoint=endpoint, api_version="2.0", **kwargs)
+        self.gadget = GadgetOperations(endpoint=endpoint, api_version="1.1", **kwargs)
+
+# generated operations/_operations.py
+class WidgetOperations:
+    @distributed_trace
+    def list_widgets(self, **kwargs: Any) -> List[Widget]:
+        """List widgets from Widget Service v2.0"""
+
+class GadgetOperations:
+    @distributed_trace
+    def list_gadgets(self, **kwargs: Any) -> List[Gadget]:
+        """List gadgets from Gadget Service v1.1"""
+
+# Usage
+from multi_service import MultiServiceClient
+
+client = MultiServiceClient(endpoint="https://api.example.com")
+widgets = client.widget.list_widgets()
+gadgets = client.gadget.list_gadgets()
+```
+
+```csharp
+namespace MultiService
+{
+    public partial class MultiServiceClient
+    {
+        public MultiServiceClient(Uri endpoint, MultiServiceClientOptions options)
+        {
+            Widget = new WidgetClient(endpoint, "2.0", options);
+            Gadget = new GadgetClient(endpoint, "1.1", options);
+        }
+        
+        public virtual WidgetClient Widget { get; }
+        public virtual GadgetClient Gadget { get; }
+    }
+    
+    public partial class WidgetClient
+    {
+        public virtual async Task<Response<IReadOnlyList<Widget>>> ListWidgetsAsync(RequestContext context = null) {}
+        public virtual Response<IReadOnlyList<Widget>> ListWidgets(RequestContext context = null) {}
+    }
+    
+    public partial class GadgetClient
+    {
+        public virtual async Task<Response<IReadOnlyList<Gadget>>> ListGadgetsAsync(RequestContext context = null) {}
+        public virtual Response<IReadOnlyList<Gadget>> ListGadgets(RequestContext context = null) {}
+    }
+}
+
+// Usage
+using MultiService;
+
+var client = new MultiServiceClient(new Uri("https://api.example.com"), new MultiServiceClientOptions());
+var widgets = client.Widget.ListWidgets();
+var gadgets = client.Gadget.ListGadgets();
+```
+
+```typescript
+import { MultiServiceClient } from "@azure/multi-service";
+
+const client = new MultiServiceClient("https://api.example.com");
+
+// Access Widget service operations (v2.0)
+const widgets = await client.widget.listWidgets();
+
+// Access Gadget service operations (v1.1)
+const gadgets = await client.gadget.listGadgets();
+```
+
+```java
+@ServiceClientBuilder(serviceClients = { 
+    MultiServiceClient.class, 
+    WidgetClient.class,
+    GadgetClient.class,
+    MultiServiceAsyncClient.class,
+    WidgetAsyncClient.class,
+    GadgetAsyncClient.class
+})
+public final class MultiServiceClientBuilder implements HttpTrait<MultiServiceClientBuilder>,
+    ConfigurationTrait<MultiServiceClientBuilder>, EndpointTrait<MultiServiceClientBuilder> {
+    
+    public MultiServiceClientBuilder();
+    public MultiServiceClient buildClient();
+}
+
+@ServiceClient(builder = MultiServiceClientBuilder.class)
+public final class MultiServiceClient {
+    private final WidgetClient widgetClient;
+    private final GadgetClient gadgetClient;
+    
+    MultiServiceClient(String endpoint) {
+        this.widgetClient = new WidgetClient(endpoint, "2.0");
+        this.gadgetClient = new GadgetClient(endpoint, "1.1");
+    }
+    
+    public WidgetClient getWidget() {
+        return this.widgetClient;
+    }
+    
+    public GadgetClient getGadget() {
+        return this.gadgetClient;
+    }
+}
+
+@ServiceClient(builder = MultiServiceClientBuilder.class)
+public final class WidgetClient {
+    public PagedIterable<Widget> listWidgets();
+}
+
+@ServiceClient(builder = MultiServiceClientBuilder.class)
+public final class GadgetClient {
+    public PagedIterable<Gadget> listGadgets();
+}
+
+// Usage
+MultiServiceClient client = new MultiServiceClientBuilder()
+    .endpoint("https://api.example.com")
+    .buildClient();
+    
+var widgets = client.getWidget().listWidgets();
+var gadgets = client.getGadget().listGadgets();
+```
+
+```go
+// generated multiservice_client.go
+type MultiServiceClient struct {
+    widgetClient  *WidgetClient
+    gadgetClient  *GadgetClient
+}
+
+func NewMultiServiceClient(endpoint string, options *MultiServiceClientOptions) (*MultiServiceClient, error) {
+    widgetClient, err := NewWidgetClient(endpoint, "2.0", options)
+    if err != nil {
+        return nil, err
+    }
+    
+    gadgetClient, err := NewGadgetClient(endpoint, "1.1", options)
+    if err != nil {
+        return nil, err
+    }
+    
+    return &MultiServiceClient{
+        widgetClient:  widgetClient,
+        gadgetClient:  gadgetClient,
+    }, nil
+}
+
+func (client *MultiServiceClient) Widget() *WidgetClient {
+    return client.widgetClient
+}
+
+func (client *MultiServiceClient) Gadget() *GadgetClient {
+    return client.gadgetClient
+}
+
+// generated widget_client.go
+type WidgetClient struct {}
+
+func NewWidgetClient(endpoint string, apiVersion string, options *MultiServiceClientOptions) (*WidgetClient, error) {
+    return &WidgetClient{}, nil
+}
+
+func (client *WidgetClient) ListWidgets(ctx context.Context, options *WidgetClientListWidgetsOptions) (WidgetClientListWidgetsResponse, error) {}
+
+// generated gadget_client.go
+type GadgetClient struct {}
+
+func NewGadgetClient(endpoint string, apiVersion string, options *MultiServiceClientOptions) (*GadgetClient, error) {
+    return &GadgetClient{}, nil
+}
+
+func (client *GadgetClient) ListGadgets(ctx context.Context, options *GadgetClientListGadgetsOptions) (GadgetClientListGadgetsResponse, error) {}
+
+// Usage
+client, err := NewMultiServiceClient("https://api.example.com", nil)
+if err != nil {
+    // handle error
+}
+
+widgets, err := client.Widget().ListWidgets(context.Background(), nil)
+gadgets, err := client.Gadget().ListGadgets(context.Background(), nil)
+```
+
+</ClientTabs>
+
+#### Key Behaviors
+
+- **API Version Parameter**: The generated client will include an `apiVersion` parameter that combines the versions specified in the `@useDependency` decorators
+- **Versioning Mutation**: Operations from each service are correctly mutated to the specified version, ensuring that only operations available at that version are included
+- **Service Namespace**: The `service` property in the `@client` decorator specifies which service namespace serves as the primary service
+- **Version Format**: The API versions are extracted from the `@useDependency` decorators and populated in the client's `apiVersions` array
+
 ## Customizations
 
 Customizations SHOULD always be made in a file named `client.tsp` alongside `main.tsp`.
