@@ -1631,7 +1631,7 @@ importers:
         specifier: workspace:^
         version: link:../openapi3
       '@typespec/pack':
-        specifier: workspace:~
+        specifier: workspace:^
         version: link:../pack
       '@typespec/playground':
         specifier: workspace:^
