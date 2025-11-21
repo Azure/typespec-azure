@@ -7,6 +7,7 @@ import { compositionOverInheritanceRule } from "./rules/composition-over-inherit
 import { friendlyNameRule } from "./rules/friendly-name.js";
 import { knownEncodingRule } from "./rules/known-encoding.js";
 import { longRunningOperationsRequirePollingOperation } from "./rules/lro-polling-operation.js";
+import { noCaseMismatchRule } from "./rules/no-case-mismatch.js";
 import { noClosedLiteralUnionRule } from "./rules/no-closed-literal-union.js";
 import { noEnumRule } from "./rules/no-enum.js";
 import { noErrorStatusCodesRule } from "./rules/no-error-status-codes.js";
@@ -47,6 +48,7 @@ const rules = [
   compositionOverInheritanceRule,
   knownEncodingRule,
   longRunningOperationsRequirePollingOperation,
+  noCaseMismatchRule,
   noClosedLiteralUnionRule,
   noEnumRule,
   noErrorStatusCodesRule,
