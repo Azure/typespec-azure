@@ -68,7 +68,7 @@ export class TspRunner {
     this.dir = dir;
     this.suite = suite;
     this.#options = options;
-    this.#projectDirs = tspConfigDirs.slice(0, 10); // TODO: remove for test
+    this.#projectDirs = tspConfigDirs;
   }
 
   async run(): Promise<void> {
