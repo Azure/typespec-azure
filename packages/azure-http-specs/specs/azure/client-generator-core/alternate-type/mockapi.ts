@@ -14,7 +14,7 @@ function createMockApiDefinitions(
 ): [MockApiDefinition, MockApiDefinition] {
   return [
     {
-      uri: `/azure/client-generator-core/access/${route}`,
+      uri: `/azure/client-generator-core/alternate-type/external/${route}`,
       method: "get",
       response: {
         status: 200,
@@ -23,7 +23,7 @@ function createMockApiDefinitions(
       kind: "MockApiDefinition",
     },
     {
-      uri: `/azure/client-generator-core/access/${route}`,
+      uri: `/azure/client-generator-core/alternate-type/external/${route}`,
       method: "put",
       request: {
         body,

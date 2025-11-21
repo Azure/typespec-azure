@@ -1,5 +1,49 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.62.0
+
+### Features
+
+- [#3449](https://github.com/Azure/typespec-azure/pull/3449) Added experimental decorators to namespace `Azure.Core.Experimental` for mutative updates to types. These decorators are dangerous and may be removed at any time, so they automatically trigger a warning diagnostic that requires a suppression.
+- [#3350](https://github.com/Azure/typespec-azure/pull/3350) Remove exception for `no-openapi` rule for using `x-ms-identifiers`. Migrating to `@identifiers` is required.
+- [#3350](https://github.com/Azure/typespec-azure/pull/3350) Remove dependency on OpenAPI
+
+### Bump dependencies
+
+- [#3447](https://github.com/Azure/typespec-azure/pull/3447) Upgrade dependencies october 2025
+
+### Bug Fixes
+
+- [#3480](https://github.com/Azure/typespec-azure/pull/3480) Include typespec sources in subdirectories of lib into the package.
+- [#3481](https://github.com/Azure/typespec-azure/pull/3481) Fix #3477 Allow uniqueItems for nullable array properties
+
+
+## 0.61.0
+
+### Breaking Changes
+
+- [#3266](https://github.com/Azure/typespec-azure/pull/3266) Remove legacy Azure.Core paging. The following was removed
+    - `@pagedResult` decorator
+    - `@items` decorator
+    - [API] `getPagedResult` -> `getPagingOperation` in `@typespec/compiler`
+    - [API] `getItems`
+    - [API] `getNextLink`
+- [#3214](https://github.com/Azure/typespec-azure/pull/3214) Remove unused `@nextPageOperation` decorator.
+
+### Features
+
+- [#3325](https://github.com/Azure/typespec-azure/pull/3325) Export `isPreviewVersion` for `@previewVersion` decorator.
+
+### Bug Fixes
+
+- [#3346](https://github.com/Azure/typespec-azure/pull/3346) [rpc-operation-request-body] Correctly ignores properties marked with `@bodyIgnore`
+- [#3268](https://github.com/Azure/typespec-azure/pull/3268) Remove versioning
+  
+  ```diff lang=tsp
+  -@useDependency(Azure.Core.Versions.v1_preview2)
+  ```
+
+
 ## 0.60.0
 
 ### Bump dependencies

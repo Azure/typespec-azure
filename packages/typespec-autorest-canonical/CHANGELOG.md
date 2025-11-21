@@ -1,5 +1,19 @@
 # Changelog - @azure-tools/typespec-autorest-canonical
 
+## 0.23.0
+
+### Bump dependencies
+
+- [#3447](https://github.com/Azure/typespec-azure/pull/3447) Upgrade dependencies october 2025
+
+
+## 0.22.0
+
+### Features
+
+- [#3360](https://github.com/Azure/typespec-azure/pull/3360) Exposed option `xml-strategy` from the base typespec-autorest emitter.
+
+
 ## 0.21.0
 
 ### Bump dependencies

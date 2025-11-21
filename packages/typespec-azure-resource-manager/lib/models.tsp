@@ -1,6 +1,5 @@
 using Http;
 using Rest;
-using OpenAPI;
 using Azure.Core;
 using Azure.ResourceManager.Foundations;
 using Azure.ResourceManager.Private;
@@ -66,6 +65,7 @@ model ResourceNameParameter<
 @Http.Private.includeInapplicableMetadataInPayload(false)
 model TrackedResource<Properties extends {}, PropertiesOptional extends valueof boolean = true>
   extends Foundations.TrackedResource {
+  #suppress "deprecated" "https://github.com/Azure/typespec-azure/issues/2284"
   @doc("The resource-specific properties for this resource.")
   @conditionalClientFlatten
   @armResourcePropertiesOptionality(PropertiesOptional)
@@ -91,6 +91,7 @@ model TrackedResource<Properties extends {}, PropertiesOptional extends valueof 
 @Http.Private.includeInapplicableMetadataInPayload(false)
 model ProxyResource<Properties extends {}, PropertiesOptional extends valueof boolean = true>
   extends Foundations.ProxyResource {
+  #suppress "deprecated" "https://github.com/Azure/typespec-azure/issues/2284"
   @doc("The resource-specific properties for this resource.")
   @conditionalClientFlatten
   @armResourcePropertiesOptionality(PropertiesOptional)
@@ -122,6 +123,7 @@ model ProxyResource<Properties extends {}, PropertiesOptional extends valueof bo
 @Http.Private.includeInapplicableMetadataInPayload(false)
 model ExtensionResource<Properties extends {}, PropertiesOptional extends valueof boolean = true>
   extends Foundations.ExtensionResource {
+  #suppress "deprecated" "https://github.com/Azure/typespec-azure/issues/2284"
   @doc("The resource-specific properties for this resource.")
   @conditionalClientFlatten
   @armResourcePropertiesOptionality(PropertiesOptional)

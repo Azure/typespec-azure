@@ -33,6 +33,25 @@ export type ArmResourceCollectionActionDecorator = (
 export type ArmProviderNameValueDecorator = (context: DecoratorContext, target: Operation) => void;
 
 /**
+ * This decorator is used to indicate the identifying properties of objects in the array, e.g. size
+ * The properties that are used as identifiers for the object needs to be provided as a list of strings.
+ *
+ * @param properties The list of properties that are used as identifiers for the object. This needs to be provided as a list of strings.
+ * @example
+ * ```typespec
+ * model Pet {
+ *  @identifiers(#["size"])
+ *  dog: Dog;
+ * }
+ * ```
+ */
+export type IdentifiersDecorator = (
+  context: DecoratorContext,
+  entity: ModelProperty | Type,
+  properties: readonly string[],
+) => void;
+
+/**
  * `@armProviderNamespace` sets the Azure Resource Manager provider name. It will default to use the
  * Namespace element value unless an override value is specified.
  *
@@ -150,72 +169,97 @@ export type ExtensionResourceDecorator = (context: DecoratorContext, target: Mod
  *
  *
  *
- * @param resourceType Resource model
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
 export type ArmResourceActionDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model,
+  resourceModel: Model,
+  resourceName?: string,
 ) => void;
 
 /**
  *
  *
  *
- * @param resourceType Resource model
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
 export type ArmResourceCreateOrUpdateDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model,
+  resourceModel: Model,
+  resourceName?: string,
 ) => void;
 
 /**
  *
  *
  *
- * @param resourceType Resource model
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
 export type ArmResourceReadDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model,
+  resourceModel: Model,
+  resourceName?: string,
 ) => void;
 
 /**
  *
  *
  *
- * @param resourceType Resource model
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
 export type ArmResourceUpdateDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model,
+  resourceModel: Model,
+  resourceName?: string,
 ) => void;
 
 /**
  *
  *
  *
- * @param resourceType Resource model
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
 export type ArmResourceDeleteDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model,
+  resourceModel: Model,
+  resourceName?: string,
 ) => void;
 
 /**
  *
  *
  *
- * @param resourceType Resource model
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
  */
 export type ArmResourceListDecorator = (
   context: DecoratorContext,
   target: Operation,
-  resourceType: Model,
+  resourceModel: Model,
+  resourceName?: string,
+) => void;
+
+/**
+ * Marks the operation as being a check existence (HEAD) operation
+ *
+ * @param resourceModel Resource model
+ * @param resourceName Optional. The name of the resource. If not provided, the name of the resource model will be used.
+ */
+export type ArmResourceCheckExistenceDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  resourceModel: Model,
+  resourceName?: string,
 ) => void;
 
 /**
@@ -281,28 +325,10 @@ export type ResourceBaseTypeDecorator = (
   baseTypeIt: Type,
 ) => void;
 
-/**
- * This decorator is used to indicate the identifying properties of objects in the array, e.g. size
- * The properties that are used as identifiers for the object needs to be provided as a list of strings.
- *
- * @param properties The list of properties that are used as identifiers for the object. This needs to be provided as a list of strings.
- * @example
- * ```typespec
- * model Pet {
- *  @identifiers(#["size"])
- *  dog: Dog;
- * }
- * ```
- */
-export type IdentifiersDecorator = (
-  context: DecoratorContext,
-  entity: ModelProperty | Type,
-  properties: readonly string[],
-) => void;
-
 export type AzureResourceManagerDecorators = {
   armResourceCollectionAction: ArmResourceCollectionActionDecorator;
   armProviderNameValue: ArmProviderNameValueDecorator;
+  identifiers: IdentifiersDecorator;
   armProviderNamespace: ArmProviderNamespaceDecorator;
   useLibraryNamespace: UseLibraryNamespaceDecorator;
   armLibraryNamespace: ArmLibraryNamespaceDecorator;
@@ -318,9 +344,9 @@ export type AzureResourceManagerDecorators = {
   armResourceUpdate: ArmResourceUpdateDecorator;
   armResourceDelete: ArmResourceDeleteDecorator;
   armResourceList: ArmResourceListDecorator;
+  armResourceCheckExistence: ArmResourceCheckExistenceDecorator;
   armResourceOperations: ArmResourceOperationsDecorator;
   armCommonTypesVersion: ArmCommonTypesVersionDecorator;
   armVirtualResource: ArmVirtualResourceDecorator;
   resourceBaseType: ResourceBaseTypeDecorator;
-  identifiers: IdentifiersDecorator;
 };

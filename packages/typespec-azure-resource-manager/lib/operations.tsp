@@ -123,6 +123,7 @@ op ArmResourceRead<
  */
 @autoRoute
 @doc("Check for the existence of a {name}", Resource)
+@armResourceCheckExistence(Resource)
 @head
 op ArmResourceCheckExistence<
   Resource extends {},

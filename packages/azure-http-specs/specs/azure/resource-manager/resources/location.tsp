@@ -4,11 +4,7 @@ import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 import "@typespec/spector";
 
-using Http;
 using Rest;
-using Azure.Core;
-using Azure.ResourceManager;
-using OpenAPI;
 using Spector;
 
 namespace Azure.ResourceManager.Resources;
@@ -130,7 +126,7 @@ interface LocationResources {
     }
     ```
     """)
-  update is ArmResourcePatchSync<LocationResource, LocationResourceProperties>;
+  update is ArmCustomPatchSync<LocationResource, LocationResource>;
 
   @scenario
   @scenarioDoc("""

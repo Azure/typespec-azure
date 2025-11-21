@@ -39,32 +39,12 @@ it("emit warning for array of model without x-ms-identifiers", async () => {
     });
 });
 
-it("emit warning if value is not a tuple", async () => {
-  await tester
-    .expect(
-      `
-        model Foo {
-          @OpenAPI.extension("x-ms-identifiers", "customName")
-          bar: Bar[];
-        }
-
-        model Bar {
-          customName: string;
-        }
-        `,
-    )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
-      message: `Value passed to @OpenAPI.extension("x-ms-identifiers",...) was a "string". Pass an array of property name.`,
-    });
-});
-
 it("emit diagnostic when x-ms-identifiers property names are not found in the target type", async () => {
   await tester
     .expect(
       `
         model Foo {
-          @OpenAPI.extension("x-ms-identifiers", #["not-a-prop"])
+          @identifiers(#["not-a-prop"])
           bar: Bar[];
         }
 
@@ -79,12 +59,12 @@ it("emit diagnostic when x-ms-identifiers property names are not found in the ta
     });
 });
 
-it(`doesn't emit diagnostic if @extension("x-ms-identifiers",...) is specified`, async () => {
+it(`doesn't emit diagnostic if @identifiers(...) is specified`, async () => {
   await tester
     .expect(
       `
         model Foo {
-          @OpenAPI.extension("x-ms-identifiers", #["customName"])
+          @identifiers(#["customName"])
           bar: Bar[];
         }
 
@@ -101,7 +81,7 @@ it(`doesn't emit diagnostic if x-ms-identifiers property is defined in a base cl
     .expect(
       `
         model Foo {
-          @OpenAPI.extension("x-ms-identifiers", #["name"])
+          @identifiers(#["name"])
           bar: Child[];
         }
 
@@ -125,52 +105,6 @@ it(`doesn't emit diagnostic if element is a primitive type`, async () => {
 
         model Bar {
           id: string;
-        }
-        `,
-    )
-    .toBeValid();
-});
-
-it("allow array of x-ms-identifiers", async () => {
-  await tester
-    .expect(
-      `
-        model Pet {
-          @OpenAPI.extension("x-ms-identifiers", #["food/brand/name"])
-          pet: Dog[];
-        }
- 
-        model Dog {
-          food: Food;
-        }
-        
-        model Food {
-          brand: Brand;
-        }
-        
-        model Brand {
-          name: string;
-        }
-        `,
-    )
-    .toBeValid();
-});
-
-it("allow array of x-ms-identifiers starting with /", async () => {
-  await tester
-    .expect(
-      `
-        model Pet {
-          @OpenAPI.extension("x-ms-identifiers", #["/food/brand"])
-          pet: Dog[];
-        }
- 
-        model Dog {
-          food: Food;
-        }
-        
-        model Food {
-          brand: string;
         }
         `,
     )
@@ -236,7 +170,7 @@ it("emit diagnostic if a section is not found", async () => {
     .expect(
       `
         model Pet {
-          @OpenAPI.extension("x-ms-identifiers", #["food/brand"])
+          @identifiers(#["food/brand"])
           pet: Dog[];
         }
  

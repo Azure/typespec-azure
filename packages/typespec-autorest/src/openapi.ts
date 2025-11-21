@@ -1337,6 +1337,10 @@ export async function getOpenAPIForService(
       schema: bodySchema,
     };
 
+    if (shouldFlattenProperty(context.tcgcSdkContext, param) === true) {
+      result["x-ms-client-flatten"] = true;
+    }
+
     const jsonName = resolveEncodedName(program, param, "application/json");
     if (jsonName !== param.name) {
       // Special case to be able to keep pre-existing cases where you have both the body parameter name and x-ms-client-name
@@ -2435,6 +2439,13 @@ export async function getOpenAPIForService(
             return "duration";
           default:
             return encodeAsFormat ?? encoding;
+        }
+      case "byte":
+        switch (encoding) {
+          case "base64":
+            return "byte";
+          default:
+            return encodeAsFormat ?? encoding ?? format;
         }
       default:
         return encodeAsFormat ?? encoding ?? format;

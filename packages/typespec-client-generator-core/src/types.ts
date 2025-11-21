@@ -115,6 +115,7 @@ import {
   getPropertyNames,
 } from "./public-utils.js";
 
+import { $ } from "@typespec/compiler/typekit";
 import { getVersions } from "@typespec/versioning";
 import { getNs, isAttribute, isUnwrapped } from "@typespec/xml";
 import { getSdkHttpParameter } from "./http.js";
@@ -575,6 +576,18 @@ export function getSdkUnionWithDiagnostics(
           access: "public",
           usage: UsageFlags.None,
         };
+        const discriminatedOptions = $(context.program).union.getDiscriminatedUnion(type)?.options;
+        if (discriminatedOptions) {
+          const envelope = discriminatedOptions.envelope ?? "object";
+          retval.discriminatedOptions = {
+            envelope,
+            discriminatorPropertyName: discriminatedOptions.discriminatorPropertyName ?? "kind",
+            envelopePropertyName:
+              envelope === "none"
+                ? undefined
+                : (discriminatedOptions.envelopePropertyName ?? "value"),
+          };
+        }
         if (nullOption !== undefined) {
           retval = {
             ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, "nullable")),
@@ -987,6 +1000,7 @@ function getSdkEnumWithDiagnostics(
     }
   }
   updateReferencedTypeMap(context, type, sdkType);
+
   return diagnostics.wrap(sdkType);
 }
 
@@ -1212,6 +1226,7 @@ export function getSdkCredentialParameter(
     crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.credential`,
     decorators: [],
     access: "public",
+    flatten: false,
   };
 }
 
@@ -1249,6 +1264,7 @@ export function getSdkModelPropertyTypeBase(
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
     visibility: getSdkVisibility(context, type),
     access: getAccess(context, type),
+    flatten: shouldFlattenProperty(context, type),
   });
 }
 
@@ -1285,7 +1301,6 @@ export function getSdkModelPropertyType(
       discriminator: false,
       serializedName: getPropertyNames(context, type)[1],
       isMultipartFileInput: false,
-      flatten: shouldFlattenProperty(context, type),
       serializationOptions: {},
     };
     context.__modelPropertyCache.set(type, property);
@@ -1755,6 +1770,19 @@ function updateSpreadModelUsageAndAccess(context: TCGCContext): void {
   }
 }
 
+function updateExternalUsage(context: TCGCContext): void {
+  // Propagate External usage flag from external types to their referenced types
+  for (const [_, sdkType] of context.__referencedTypeCache.entries()) {
+    if (
+      sdkType.external &&
+      (sdkType.kind === "model" || sdkType.kind === "enum" || sdkType.kind === "union")
+    ) {
+      // Propagate External usage to the external type itself and all referenced types
+      updateUsageOrAccess(context, UsageFlags.External, sdkType);
+    }
+  }
+}
+
 function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   for (const sdkType of context.__referencedTypeCache.values()) {
@@ -1955,6 +1983,8 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   diagnostics.pipe(updateUsageOverride(context));
   // update spread model
   updateSpreadModelUsageAndAccess(context);
+  // update external usage
+  updateExternalUsage(context);
   // update discriminated subtypes and filter out duplicate properties from `@hierarchyBuilding`
   diagnostics.pipe(handleLegacyHierarchyBuilding(context));
   // update generated name

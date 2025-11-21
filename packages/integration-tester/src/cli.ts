@@ -22,6 +22,16 @@ const args = parseArgs({
     "tgz-dir": {
       type: "string",
     },
+    repo: {
+      type: "string",
+      description: "The path to the repository to test. Defaults temp/{suiteName}.",
+    },
+    interactive: {
+      type: "boolean",
+      default: false,
+      short: "i",
+      description: "Enable interactive mode for validation.",
+    },
   },
 });
 
@@ -46,12 +56,13 @@ if (args.values.stage) {
   }
 }
 
-const wd = join(projectRoot, "temp", suiteName);
+const wd = args.values.repo ?? join(projectRoot, "temp", suiteName);
 try {
   await runIntegrationTestSuite(wd, suiteName, suite, {
     clean: args.values.clean,
     stages,
     tgzDir: args.values["tgz-dir"] && resolve(process.cwd(), args.values["tgz-dir"]),
+    interactive: args.values.interactive,
   });
 } catch (error) {
   if (error instanceof ValidationFailedError) {
