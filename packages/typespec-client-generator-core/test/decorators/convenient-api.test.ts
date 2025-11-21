@@ -73,6 +73,188 @@ describe("@convenientAPI", () => {
   });
 });
 
+describe("@convenientAPI on interface", () => {
+  it("applies convenientAPI false to all operations in interface", async () => {
+    const testCode = `
+      @service
+      namespace MyService {
+        @convenientAPI(false)
+        @operationGroup
+        interface MyOperations {
+          @test("test1")
+          @route("/test1")
+          op test1(): void;
+          @test("test2")
+          @route("/test2")
+          op test2(): void;
+        }
+      }
+    `;
+    const { test1, test2 } = (await runner.compile(testCode)) as {
+      test1: Operation;
+      test2: Operation;
+    };
+
+    // Test the core functionality - shouldGenerateConvenient should return false
+    strictEqual(shouldGenerateConvenient(runner.context, test1), false);
+    strictEqual(shouldGenerateConvenient(runner.context, test2), false);
+  });
+
+  it("operation level convenientAPI overrides interface level", async () => {
+    const testCode = `
+      @service
+      namespace MyService {
+        @convenientAPI(false)
+        @operationGroup
+        interface MyOperations {
+          @convenientAPI(true)
+          @test("test1")
+          @route("/test1")
+          op test1(): void;
+          @test("test2")
+          @route("/test2")
+          op test2(): void;
+        }
+      }
+    `;
+    const { test1, test2 } = (await runner.compile(testCode)) as {
+      test1: Operation;
+      test2: Operation;
+    };
+
+    // Test the override behavior
+    strictEqual(shouldGenerateConvenient(runner.context, test1), true);
+    strictEqual(shouldGenerateConvenient(runner.context, test2), false);
+  });
+});
+
+describe("@convenientAPI on namespace", () => {
+  it("applies convenientAPI false to all operations in namespace", async () => {
+    // Test by applying decorator in an augmentation style within TestService
+    const testCode = `
+      @service
+      @convenientAPI(false)
+      namespace TestService2 {
+        @test("test1")
+        @route("/test1")
+        op test1(): void;
+        @test("test2")
+        @route("/test2")
+        op test2(): void;
+      }
+    `;
+    const { test1, test2 } = (await runner.compile(testCode)) as {
+      test1: Operation;
+      test2: Operation;
+    };
+
+    strictEqual(shouldGenerateConvenient(runner.context, test1), false);
+    strictEqual(shouldGenerateConvenient(runner.context, test2), false);
+
+    const methods = runner.context.sdkPackage.clients[0].methods;
+    strictEqual(methods.length, 2);
+    strictEqual(methods[0].generateConvenient, false);
+    strictEqual(methods[1].generateConvenient, false);
+  });
+
+  it("operation level convenientAPI overrides namespace level", async () => {
+    const testCode = `
+      @service
+      @convenientAPI(false)
+      namespace TestService2 {
+        @convenientAPI(true)
+        @test("test1")
+        @route("/test1")
+        op test1(): void;
+        @test("test2")
+        @route("/test2")
+        op test2(): void;
+      }
+    `;
+    const { test1, test2 } = (await runner.compile(testCode)) as {
+      test1: Operation;
+      test2: Operation;
+    };
+
+    strictEqual(shouldGenerateConvenient(runner.context, test1), true);
+    strictEqual(shouldGenerateConvenient(runner.context, test2), false);
+
+    const methods = runner.context.sdkPackage.clients[0].methods;
+    strictEqual(methods.length, 2);
+    strictEqual(methods[0].generateConvenient, true);
+    strictEqual(methods[1].generateConvenient, false);
+  });
+
+  it("propagates convenientAPI from parent namespace to child namespace", async () => {
+    const testCode = `
+      @service
+      @convenientAPI(false)
+      namespace TestService2 {
+        @test("test1")
+        @route("/test1")
+        op test1(): void;
+      }
+    `;
+    const { test1 } = (await runner.compile(testCode)) as { test1: Operation };
+
+    strictEqual(shouldGenerateConvenient(runner.context, test1), false);
+
+    const methods = runner.context.sdkPackage.clients[0].methods;
+    strictEqual(methods.length, 1);
+    strictEqual(methods[0].generateConvenient, false);
+  });
+});
+
+describe("@convenientAPI with interface in namespace", () => {
+  it("operation inherits from interface when namespace has no decorator", async () => {
+    const testCode = `
+      namespace MyService {
+        @convenientAPI(false)
+        interface MyOperations {
+          @test("test1")
+          op test1(): void;
+        }
+      }
+    `;
+    const { test1 } = await runner.compileWithBuiltInService(testCode);
+
+    strictEqual(shouldGenerateConvenient(runner.context, test1 as Operation), false);
+  });
+
+  it("interface decorator takes precedence over namespace decorator", async () => {
+    const testCode = `
+      @convenientAPI(true)
+      namespace MyService {
+        @convenientAPI(false)
+        interface MyOperations {
+          @test("test1")
+          op test1(): void;
+        }
+      }
+    `;
+    const { test1 } = await runner.compileWithBuiltInService(testCode);
+
+    strictEqual(shouldGenerateConvenient(runner.context, test1 as Operation), false);
+  });
+
+  it("operation decorator takes precedence over interface and namespace", async () => {
+    const testCode = `
+      @convenientAPI(false)
+      namespace MyService {
+        @convenientAPI(false)
+        interface MyOperations {
+          @convenientAPI(true)
+          @test("test1")
+          op test1(): void;
+        }
+      }
+    `;
+    const { test1 } = await runner.compileWithBuiltInService(testCode);
+
+    strictEqual(shouldGenerateConvenient(runner.context, test1 as Operation), true);
+  });
+});
+
 describe("@protocolAPI and @convenientAPI with scope", () => {
   it("mark an operation as protocolAPI false for csharp and convenientAPI false for java, pass in default sdkContext", async () => {
     const testCode = `
@@ -120,6 +302,46 @@ describe("@protocolAPI and @convenientAPI with scope", () => {
 
       strictEqual(shouldGenerateConvenient(runner.context, test), true);
       strictEqual(method.generateConvenient, true);
+    }
+  });
+
+  it("namespace level decorator with scope applies to all operations", async () => {
+    const testCode = `
+      @service
+      @convenientAPI(false, "python")
+      namespace TestService3 {
+        @test("test1")
+        @route("/test1")
+        op test1(): void;
+        @test("test2")
+        @route("/test2")
+        op test2(): void;
+      }
+    `;
+
+    // python should get convenientAPI=false
+    {
+      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
+      const { test1, test2 } = (await runner.compile(testCode)) as {
+        test1: Operation;
+        test2: Operation;
+      };
+
+      strictEqual(shouldGenerateConvenient(runner.context, test1), false);
+      strictEqual(shouldGenerateConvenient(runner.context, test2), false);
+    }
+
+    // java should use default behavior
+    {
+      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+      const { test1, test2 } = (await runner.compile(testCode)) as {
+        test1: Operation;
+        test2: Operation;
+      };
+
+      // Should fall back to context default which is true
+      strictEqual(shouldGenerateConvenient(runner.context, test1), true);
+      strictEqual(shouldGenerateConvenient(runner.context, test2), true);
     }
   });
 });
