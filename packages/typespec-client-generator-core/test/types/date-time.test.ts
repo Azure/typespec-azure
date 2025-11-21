@@ -175,3 +175,19 @@ it("unixTimestamp array", async function () {
   strictEqual(sdkType.valueType.baseType?.kind, "utcDateTime");
   strictEqual(sdkType.valueType.baseType.wireType.kind, "string");
 });
+
+it("custom encoding string", async function () {
+  await runner.compileWithBuiltInService(
+    `
+      @usage(Usage.input | Usage.output)
+      model Test {
+        @encode("customFormat")
+        prop: utcDateTime;
+      }
+    `,
+  );
+  const sdkType = getSdkTypeHelper(runner);
+  strictEqual(sdkType.kind, "utcDateTime");
+  strictEqual(sdkType.encode, "customFormat");
+  strictEqual(sdkType.wireType.kind, "string");
+});
