@@ -29,6 +29,16 @@ const options: CoverageFromAzureStorageOptions = {
       name: "Azure Management Plane",
       packageName: "@azure-tools/azure-http-specs",
       prefixes: ["Azure_ResourceManager_"],
+      emitterNames: [
+        "@azure-tools/typespec-python",
+        "@azure-tools/typespec-go",
+        "@azure-typespec/http-client-csharp-mgmt",
+        "@azure-tools/typespec-ts-rlc",
+        "@azure-tools/typespec-ts-modular",
+        "@azure-tools/typespec-java",
+        "@azure-tools/typespec-cpp",
+        "@azure-tools/typespec-rust",
+      ],
     },
     {
       name: "Azure Data Plane",
