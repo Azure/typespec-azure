@@ -77,6 +77,7 @@ export class TspRunner {
       if (result.failureCount > 0) {
         throw new ValidationFailedError();
       }
+      return;
     }
     registerConsoleShortcuts(this);
     await this.rerunAll();
