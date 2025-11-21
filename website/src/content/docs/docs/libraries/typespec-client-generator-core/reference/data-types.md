@@ -31,10 +31,11 @@ model Azure.ClientGenerator.Core.ClientOptions
 
 #### Properties
 
-| Name     | Type        | Description                                                                                                                                                                                                     |
-| -------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| service? | `Namespace` | The service that this client is generated for. If not specified, TCGC will look up the first parent namespace decorated with `@service` for the target.<br />The namespace should be decorated with `@service`. |
-| name?    | `string`    | The name of the client. If not specified, the default name will be `<Name of the target>Client`.                                                                                                                |
+| Name     | Type                     | Description                                                                                                                                                                                                     |
+| -------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| service? | `Namespace`              | The service that this client is generated for. If not specified, TCGC will look up the first parent namespace decorated with `@service` for the target.<br />The namespace should be decorated with `@service`. |
+| name?    | `string`                 | The name of the client. If not specified, the default name will be `<Name of the target>Client`.                                                                                                                |
+| parent?  | `Namespace \| Interface` | The parent client of this client. If specified, this client will be generated as a sub client of the parent client.                                                                                             |
 
 ### `ExternalType` {#Azure.ClientGenerator.Core.ExternalType}
 
