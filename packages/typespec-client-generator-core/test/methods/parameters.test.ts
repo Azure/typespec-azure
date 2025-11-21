@@ -1347,3 +1347,23 @@ it("isOverride true", async () => {
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.isOverride, true);
 });
+
+it("readonly parameters should be filtered from method parameters", async () => {
+  await runner.compileWithBuiltInService(`
+    model Image {
+      prop: string;
+      @visibility(Lifecycle.Read)
+      readOnly: string;
+    }
+
+    op upload(...Image): void;
+  `);
+  const sdkPackage = runner.context.sdkPackage;
+  const method = getServiceMethodOfClient(sdkPackage);
+  strictEqual(method.kind, "basic");
+
+  // Only non-readonly parameters should be in method.parameters
+  strictEqual(method.parameters.length, 2);
+  strictEqual(method.parameters[0].name, "prop");
+  strictEqual(method.parameters[1].name, "contentType");
+});
