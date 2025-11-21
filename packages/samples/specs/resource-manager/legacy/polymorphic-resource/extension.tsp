@@ -9,6 +9,7 @@ using Azure.ResourceManager;
 namespace Microsoft.ContosoProviderHub;
 
 /** A ContosoProviderHub resource */
+#suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "For sample purpose"
 model Cost is Azure.ResourceManager.Legacy.DiscriminatedExtensionResource {
   ...ResourceNameParameter<Cost>;
 }
