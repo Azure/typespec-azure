@@ -189,7 +189,7 @@ export interface ResolvedResource {
   /** The parent of this resource */
   parent?: ResolvedResource;
   /** The scope of this resource */
-  scope?: string;
+  scope?: string | ResolvedResource;
 }
 
 /** Description of the resource type */
@@ -469,11 +469,11 @@ export function resolveArmResources(program: Program): Provider {
       resources.push(fullResource);
     }
   }
-  for (const resource of resources) {
-    resource.parent = getResourceParent(resources, resource);
-  }
-  for (const resource of resources) {
-    resource.scope = getScope(resource);
+  const toProcess = resources.slice();
+  while (toProcess.length > 0) {
+    const resource = toProcess.shift()!;
+    resource.parent = getResourceParent(resources, resource, toProcess);
+    resource.scope = getResourceScope(resources, resource, toProcess);
   }
 
   // Add the unmarked operations
@@ -489,10 +489,12 @@ export function resolveArmResources(program: Program): Provider {
 }
 
 function getResourceParent(
-  resources: ResolvedResource[],
+  knownResources: ResolvedResource[],
   child: ResolvedResource,
+  resourcesToProcess: ResolvedResource[],
 ): ResolvedResource | undefined {
-  for (const resource of resources) {
+  if (child.resourceType.types.length < 2) return undefined;
+  for (const resource of knownResources) {
     if (
       resource.resourceType.types.length + 1 === child.resourceType.types.length &&
       resource.resourceType.provider === child.resourceType.provider &&
@@ -501,29 +503,25 @@ function getResourceParent(
       return resource;
     }
   }
-
-  if (child.resourceType.types.length > 1) {
-    const parent: ResolvedResource = {
-      type: child.type,
-      kind: "Other",
-      providerNamespace: child.providerNamespace,
-      resourceType: {
-        provider: child.resourceType.provider,
-        types: child.resourceType.types.slice(0, -1),
-      },
-      resourceName: getParentName(child.resourceType.types[child.resourceType.types.length - 2]),
-      resourceInstancePath: `/${child.resourceInstancePath
-        .split("/")
-        .filter((s) => s.length > 0)
-        .slice(0, -2)
-        .join("/")}`,
-      operations: { lifecycle: {}, actions: [], lists: [] },
-    };
-    resources.push(parent);
-    return parent;
-  }
-
-  return undefined;
+  const parent: ResolvedResource = {
+    type: child.type,
+    kind: "Other",
+    providerNamespace: child.providerNamespace,
+    resourceType: {
+      provider: child.resourceType.provider,
+      types: child.resourceType.types.slice(0, -1),
+    },
+    resourceName: getParentName(child.resourceType.types[child.resourceType.types.length - 2]),
+    resourceInstancePath: `/${child.resourceInstancePath
+      .split("/")
+      .filter((s) => s.length > 0)
+      .slice(0, -2)
+      .join("/")}`,
+    operations: { lifecycle: {}, actions: [], lists: [] },
+  };
+  knownResources.push(parent);
+  resourcesToProcess.push(parent);
+  return parent;
 }
 
 function getParentName(typeName: string): string {
@@ -533,20 +531,21 @@ function getParentName(typeName: string): string {
   return pascalCase(typeName);
 }
 
-function getScope(resource: ResolvedResource): string | undefined {
+function getResourceScope(
+  knownResources: ResolvedResource[],
+  resource: ResolvedResource,
+  resourcesToProcess: ResolvedResource[],
+): ResolvedResource | string | undefined {
   if (resource.scope !== undefined) return resource.scope;
-  if (resource.parent !== undefined) return getScope(resource.parent);
+  if (resource.parent !== undefined)
+    return getResourceScope(knownResources, resource.parent, resourcesToProcess);
   const partsIndex = resource.resourceInstancePath.lastIndexOf("/providers");
   if (partsIndex === 0) return "Tenant";
+
   const segments = resource.resourceInstancePath
     .slice(0, partsIndex)
     .split("/")
     .filter((s) => s.length > 0);
-  if (
-    resource.resourceType.types.length === 2 &&
-    resource.resourceType.types[0].toLowerCase() === "locations"
-  )
-    return "Location";
   if (segments.length === 1 && isVariableSegment(segments[0])) return "Scope";
   if (
     segments.length === 2 &&
@@ -569,7 +568,56 @@ function getScope(resource: ResolvedResource): string | undefined {
     segments[2].toLowerCase() === "managementgroups"
   )
     return "ManagementGroup";
-  if (segments.some((s) => s.toLowerCase() === "providers")) return "ExternalResource";
+  if (segments.some((s) => s.toLowerCase() === "providers")) {
+    const parentProviderIndex = segments.findLastIndex((s) => s.toLowerCase() === "providers");
+    if (segments.length < parentProviderIndex + 2) {
+      return "ExternalResource";
+    }
+    const provider = segments[parentProviderIndex + 1];
+    if (isVariableSegment(provider)) {
+      return "ExternalResource";
+    }
+    const typeSegments: string[] = segments.slice(parentProviderIndex + 2);
+    if (typeSegments.length % 2 !== 0) {
+      return "ExternalResource";
+    }
+    const types: string[] = [];
+    for (let i = 0; i < typeSegments.length; i++) {
+      if (i % 2 === 0) {
+        if (isVariableSegment(typeSegments[i])) {
+          return "ExternalResource";
+        }
+        types.push(typeSegments[i]);
+      } else if (!isVariableSegment(typeSegments[i])) {
+        return "ExternalResource";
+      }
+    }
+    const parent: ResolvedResource = {
+      type: resource.type,
+      kind: "Other",
+      providerNamespace: provider,
+      resourceType: {
+        provider: provider,
+        types: types,
+      },
+      resourceName: getParentName(segments[parentProviderIndex + 2]),
+      resourceInstancePath: `/${segments.join("/")}`,
+      operations: { lifecycle: {}, actions: [], lists: [] },
+    };
+    for (const knownResource of knownResources) {
+      if (
+        parent.resourceType.provider.toLowerCase() ===
+          knownResource.resourceType.provider.toLowerCase() &&
+        parent.resourceType.types.flatMap((r) => r.toLowerCase()).join("/") ===
+          knownResource.resourceType.types.flatMap((k) => k.toLowerCase()).join("/")
+      ) {
+        return knownResource;
+      }
+    }
+    knownResources.push(parent);
+    resourcesToProcess.push(parent);
+    return parent;
+  }
   return undefined;
 }
 
