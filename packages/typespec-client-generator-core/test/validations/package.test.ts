@@ -28,6 +28,9 @@ it("multiple-services", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/multiple-services",
     },
+    {
+      code: "@azure-tools/typespec-client-generator-core/multiple-services",
+    },
   ]);
 
   strictEqual(listClients(runner.context).length, 1);
