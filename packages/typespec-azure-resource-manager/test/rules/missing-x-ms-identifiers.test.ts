@@ -4,7 +4,7 @@ import {
   TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
-import { beforeEach, it } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 
 import { missingXmsIdentifiersRule } from "../../src/rules/missing-x-ms-identifiers.js";
 
@@ -35,7 +35,7 @@ it("emit warning for array of model without x-ms-identifiers", async () => {
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
-      message: `Missing identifying properties of objects in the array item, please add @OpenAPI.extension("x-ms-identifiers", #[<prop>]) to specify it. If there are no appropriate identifying properties, please add @OpenAPI.extension("x-ms-identifiers", #[]).`,
+      message: `Missing identifying properties of objects in the array item, please add @identifiers(#["<prop>"]) to specify it. If there are no appropriate identifying properties, please add @identifiers(#[]).`,
     });
 });
 
@@ -184,4 +184,31 @@ it("emit diagnostic if a section is not found", async () => {
       code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
       message: `Property "brand" is not found in "string". Make sure value of x-ms-identifiers extension are valid property name of the array element.`,
     });
+});
+
+describe("codefix", () => {
+  it("adds @identifiers decorator", async () => {
+    await tester
+      .expect(
+        `
+        model Foo {
+          bar: Bar[];
+        }
+
+        model Bar {
+          customName: string;
+        }
+        `,
+      )
+      .applyCodeFix("add-decorator-identifiers").toEqual(`
+        model Foo {
+          @identifiers(#["<prop>"])
+          bar: Bar[];
+        }
+
+        model Bar {
+          customName: string;
+        }
+      `);
+  });
 });
