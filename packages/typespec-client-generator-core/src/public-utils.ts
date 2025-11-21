@@ -763,6 +763,7 @@ export function getHttpOperationParameter(
   // So, when we try to find which http parameter a parameter or property corresponds to, we compare the `correspondingMethodParams` list directly.
   // If a method parameter is spread case, then we need to find the cooresponding http body parameter's property.
   for (const p of operation.parameters) {
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     for (const cp of p.correspondingMethodParams) {
       if (cp === param) {
         return p;
@@ -770,6 +771,7 @@ export function getHttpOperationParameter(
     }
   }
   if (operation.bodyParam) {
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     for (const cp of operation.bodyParam.correspondingMethodParams) {
       if (cp === param) {
         if (operation.bodyParam.type.kind === "model" && operation.bodyParam.type !== param.type) {

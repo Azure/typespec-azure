@@ -71,6 +71,7 @@ function getEndpointTypeFromSingleServer<
         optional: false,
         serializedName: "endpoint",
         correspondingMethodParams: [],
+        methodParameterSegments: [],
         type: getSdkBuiltInType(context, $(context.program).builtin.url),
         isApiVersionParam: false,
         apiVersions: context.getApiVersionsForType(client.__raw.type ?? client.__raw.service),
