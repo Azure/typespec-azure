@@ -22,8 +22,8 @@ const options: CoverageFromAzureStorageOptions = {
   modes: ["azure"],
   tables: [
     {
-      name: "Standard",
-      packageName: "@typespec/http-specs",
+      name: "Azure Data Plane",
+      packageName: "@azure-tools/azure-http-specs",
     },
     {
       name: "Azure Management Plane",
@@ -41,8 +41,8 @@ const options: CoverageFromAzureStorageOptions = {
       ],
     },
     {
-      name: "Azure Data Plane",
-      packageName: "@azure-tools/azure-http-specs",
+      name: "Standard",
+      packageName: "@typespec/http-specs",
     },
   ],
 };
