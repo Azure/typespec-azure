@@ -25,6 +25,7 @@ enum Versions {
 
 interface Operations extends Azure.ResourceManager.Operations {}
 
+#suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "For sample purpose"
 @doc("Widget Resource")
 model WidgetResource is TrackedResource<WidgetResourceProperties> {
   @pattern("^[a-zA-Z0-9-]{3,24}$")

@@ -22,8 +22,9 @@ export class TaskRunner<Stages extends string = string> {
     await fn();
   }
 
-  reportTaskWithDetails(status: "pass" | "fail", name: string, details: string) {
-    const statusStr = status === "pass" ? pc.green("pass") : pc.red("fail");
+  reportTaskWithDetails(status: "pass" | "fail" | "skip", name: string, details: string) {
+    const statusStr =
+      status === "pass" ? pc.green("pass") : status === "fail" ? pc.red("fail") : pc.gray("skip");
     const message = `${statusStr} ${name}`;
     if (this.#verbose || status === "fail") {
       this.group(message, details);
