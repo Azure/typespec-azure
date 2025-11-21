@@ -452,6 +452,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`The API version specified in the config: "${"version"}" is not defined in service versioning list. Fall back to the latest version.`,
       },
     },
+    "multiple-services-require-use-dependency": {
+      severity: "error",
+      messages: {
+        default: paramMessage`When using multiple services, you must use @useDependency to specify the versions of sub-services that the main service depends on. Found services: ${"services"}`,
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,
