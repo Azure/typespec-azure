@@ -600,7 +600,7 @@ function getResourceScope(
         provider: provider,
         types: types,
       },
-      resourceName: getParentName(segments[parentProviderIndex + 2]),
+      resourceName: getParentName(types[types.length - 1]),
       resourceInstancePath: `/${segments.join("/")}`,
       operations: { lifecycle: {}, actions: [], lists: [] },
     };

@@ -730,6 +730,7 @@ interface GenericResources {
       providerOperations: expect.any(Array),
     });
     ok(provider.resources);
+    expect(provider.resources).toHaveLength(11);
     const employee = provider.resources[0];
     ok(employee);
     expect(employee).toMatchObject({
@@ -913,15 +914,15 @@ interface GenericResources {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const scaleSets = provider.resources[6];
-    ok(scaleSets);
-    expect(scaleSets).toMatchObject({
+    const scaleSetVms = provider.resources[6];
+    ok(scaleSetVms);
+    expect(scaleSetVms).toMatchObject({
       kind: "Extension",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
     });
-    expect(scaleSets.scope).toBeDefined();
-    expect(scaleSets.scope).toMatchObject({
+    expect(scaleSetVms.scope).toBeDefined();
+    expect(scaleSetVms.scope).toMatchObject({
       resourceName: "VirtualMachineScaleSetVm",
       resourceType: {
         provider: "Microsoft.Compute",
@@ -930,7 +931,7 @@ interface GenericResources {
       resourceInstancePath:
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{scaleSetName}/virtualMachineScaleSetVms/{scaleSetVmName}",
     });
-    checkResolvedOperations(scaleSets, {
+    checkResolvedOperations(scaleSetVms, {
       operations: {
         lifecycle: {
           createOrUpdate: [
@@ -976,6 +977,54 @@ interface GenericResources {
       },
       resourceInstancePath:
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerNamespace}/{parentType}/{parentName}/{resourceType}/{resourceName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    });
+
+    const vmExternal = provider.resources[8];
+    ok(vmExternal);
+    expect(vmExternal).toMatchObject({
+      kind: "Other",
+      providerNamespace: "Microsoft.Compute",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      resourceName: "VirtualMachine",
+      resourceType: {
+        provider: "Microsoft.Compute",
+        types: ["virtualMachines"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}",
+    });
+
+    const scaleSetVmExternal = provider.resources[9];
+    ok(scaleSetVmExternal);
+    expect(scaleSetVmExternal).toMatchObject({
+      kind: "Other",
+      providerNamespace: "Microsoft.Compute",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      resourceName: "VirtualMachineScaleSetVm",
+      resourceType: {
+        provider: "Microsoft.Compute",
+        types: ["virtualMachineScaleSets", "virtualMachineScaleSetVms"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{scaleSetName}/virtualMachineScaleSetVms/{scaleSetVmName}",
+    });
+
+    const scaleSetExternal = provider.resources[10];
+    ok(scaleSetExternal);
+    expect(scaleSetExternal).toMatchObject({
+      kind: "Other",
+      providerNamespace: "Microsoft.Compute",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      resourceName: "VirtualMachineScaleSet",
+      resourceType: {
+        provider: "Microsoft.Compute",
+        types: ["virtualMachineScaleSets"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{scaleSetName}",
     });
 
     checkArmOperationsHas(provider.providerOperations, [
