@@ -113,7 +113,7 @@ interface LargeHeaders {
   two6k is ArmResourceActionAsync<
     LargeHeader,
     void,
-    CancelResult,
+    CancelResult | void,
     LroHeaders = ArmCombinedLroHeaders<FinalResult = CancelResult> &
       Azure.Core.Foundations.RetryAfterHeader,
     OptionalRequestBody = true
