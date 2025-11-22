@@ -4,11 +4,6 @@ using Azure.ResourceManager.CommonTypes.Private;
 
 namespace Azure.ResourceManager.CommonTypes;
 
-#suppress "deprecated" "https://github.com/Azure/typespec-azure/issues/2284"
-@@Azure.ResourceManager.Private.conditionalClientFlatten(PrivateLinkResource.properties);
-#suppress "deprecated" "https://github.com/Azure/typespec-azure/issues/2284"
-@@Azure.ResourceManager.Private.conditionalClientFlatten(PrivateEndpointConnection.properties);
-
 /** The private endpoint */
 @@armCommonDefinition(PrivateEndpoint,
   "PrivateEndpoint",
