@@ -39,7 +39,6 @@
 - [#3442](https://github.com/Azure/typespec-azure/pull/3442) Fix #3420 make kind property required in polymorphic resources
 - [#3396](https://github.com/Azure/typespec-azure/pull/3396) Update resolveArmResources to allow grouping #3252
 
-
 ## 0.61.0
 
 ### Features
@@ -49,11 +48,10 @@
 ### Bug Fixes
 
 - [#3268](https://github.com/Azure/typespec-azure/pull/3268) Remove versioning
-  
+
   ```diff lang=tsp
   -@useDependency(Azure.ResourceManager.Versions.v1_preview2)
   ```
-
 
 ## 0.60.1
 
@@ -62,7 +60,6 @@
 - [#3330](https://github.com/Azure/typespec-azure/pull/3330) Fix #3294 Add model and operation templates for private link
 - [#3337](https://github.com/Azure/typespec-azure/pull/3337) Fix #3243 Allow polymorphic legacy resources
 - [#3332](https://github.com/Azure/typespec-azure/pull/3332) Fix #3295 Allow tenant-level external resources
-
 
 ## 0.60.0
 
@@ -77,7 +74,6 @@
 - [#3196](https://github.com/Azure/typespec-azure/pull/3196) Fix optionality for ArmCustomPatch templates
 - [#3178](https://github.com/Azure/typespec-azure/pull/3178) Allow renaming parameters in an operation
 
-
 ## 0.59.2
 
 ### Bug Fixes
@@ -86,7 +82,6 @@
 - [#3154](https://github.com/Azure/typespec-azure/pull/3154) Add single page list and correct put template names
 - [#3172](https://github.com/Azure/typespec-azure/pull/3172) Add single page list and legacy put and patch operations
 
-
 ## 0.59.1
 
 ### Bug Fixes
@@ -94,7 +89,6 @@
 - [#3142](https://github.com/Azure/typespec-azure/pull/3142) Relax constraints for Action request and synchronous response parameters
 - [#3143](https://github.com/Azure/typespec-azure/pull/3143) Add templates for optional location and etags
 - [#3141](https://github.com/Azure/typespec-azure/pull/3141) Add operations for Private Endpoints
-
 
 ## 0.59.0
 
@@ -116,14 +110,12 @@
 
 - [#3085](https://github.com/Azure/typespec-azure/pull/3085) Fix implicitOptionality setting in Legacy PATCH operations
 
-
 ## 0.58.1
 
 ### Bug Fixes
 
 - [#3030](https://github.com/Azure/typespec-azure/pull/3030) Use OverrideErrorType parameter in legacy list operation
 - [#3026](https://github.com/Azure/typespec-azure/pull/3026) Fix #1876 Add ResolveArmOperations method
-
 
 ## 0.58.0
 
@@ -137,28 +129,30 @@
 - [#2959](https://github.com/Azure/typespec-azure/pull/2959) Improve `no-resource-delete-operation` message
 - [#2820](https://github.com/Azure/typespec-azure/pull/2820) Add the `@items` and `@nextLink` decorators to the common types `PrivateEndpointConnectionListResult` and `PrivateLinkResourceListResult` to support the @`pagedResult` feature.
 
-
 ## 0.57.2
 
 ### Bug Fixes
 
 - [#2772](https://github.com/Azure/typespec-azure/pull/2772) Allow toggling `@autoRoute` in legacy operations
 
-
 ## 0.57.1
 
 ### Bug Fixes
 
 - [#2896](https://github.com/Azure/typespec-azure/pull/2896) Add a legacy operation template for `Operations_List` that enables customization of both the response and error response types. This provides flexibility to specify custom response or error as needed.
-  
+
   For example:
+
   ```tsp
   interface Operations
-    extends Azure.ResourceManager.Legacy.Operations<Response = ArmResponse<Azure.Core.Page<CustomResponse>> {}
+    extends Azure.ResourceManager.Legacy.Operations<
+        Response = ArmResponse<Azure.Core.Page<CustomResponse>>,
+        {}
+      > {}
   ```
+
 - [#2897](https://github.com/Azure/typespec-azure/pull/2897) Added a linter rule to warn when a `@Azure.ResourceManager.Legacy.customAzureResource` does not contain a `@key` property, as this can cause duplicate operations.
 - [#2892](https://github.com/Azure/typespec-azure/pull/2892) Fix #2764 Add advanced extension resource support
-
 
 ## 0.57.0
 
@@ -173,7 +167,6 @@
 - [#2691](https://github.com/Azure/typespec-azure/pull/2691) Fix `@key` decorator resolution for `x-ms-identifiers`: when `@key` is applied to a property named `id` or `name`, it will no longer add an identifier.
 - [#2749](https://github.com/Azure/typespec-azure/pull/2749) Relax constraints to allow resources that override properties of Foundations.Resource
 
-
 ## 0.56.2
 
 ### Bug Fixes
@@ -182,7 +175,6 @@
 - [#2727](https://github.com/Azure/typespec-azure/pull/2727) Change the body name of legacy operations
 - [#2722](https://github.com/Azure/typespec-azure/pull/2722) Support singleton key replacement in auto route for reusing case.
 
-
 ## 0.56.1
 
 ### Bug Fixes
@@ -190,7 +182,6 @@
 - [#2676](https://github.com/Azure/typespec-azure/pull/2676) Corrected the references for `PrivateEndpointConnectionListResultV5` and `PrivateLinkResourceListResultV5` in `common-types`.
 - [#2675](https://github.com/Azure/typespec-azure/pull/2675) Add support for resources with multiple operation paths
 - [#2674](https://github.com/Azure/typespec-azure/pull/2674) Allow optional request bodies in Resource actions templates
-
 
 ## 0.56.0
 
@@ -203,14 +194,12 @@
   - The `@armProviderNamespace` is correctly identified in both scenarios: when applied to the array type or the model property.
 - [#2625](https://github.com/Azure/typespec-azure/pull/2625) Make Patch templates specify implicitOptionality
 
-
 ## 0.55.0
 
 ### Bug Fixes
 
 - [#2435](https://github.com/Azure/typespec-azure/pull/2435) Change OperationStatusResult.resourceId to armResourceIdentifier
 - [#2564](https://github.com/Azure/typespec-azure/pull/2564) Handle types without nodes
-
 
 ## 0.54.0
 
@@ -222,7 +211,6 @@
 ### Bump dependencies
 
 - [#2433](https://github.com/Azure/typespec-azure/pull/2433) Upgrade dependencies
-
 
 ## 0.53.0
 
@@ -240,13 +228,11 @@
 - [#2328](https://github.com/Azure/typespec-azure/pull/2328) Fix `ArmProviderActionAsync` and `ArmProviderActionSync` operations as both operations were returning `ErrorResponse` and not accepting changes to the error response type.
 - [#2357](https://github.com/Azure/typespec-azure/pull/2357) Cleanup use of typespec compiler internal apis.
 
-
 ## 0.52.0
 
 ### Features
 
 - [#2263](https://github.com/Azure/typespec-azure/pull/2263) Update azure core libraries to use Enum-based visibility modifiers instead of strings.
-
 
 ## 0.51.0
 
@@ -267,7 +253,6 @@
 - [#2173](https://github.com/Azure/typespec-azure/pull/2173) Update versioning handling to use new mutator approach
 - [#2094](https://github.com/Azure/typespec-azure/pull/2094) Use the `@identifiers` decorator to identify and utilize identifiers for `x-ms-identifiers`. Additionally, use the `@key` decorator to identify identifiers.
 
-
 ## 0.50.0
 
 No changes, version bump only.
@@ -277,7 +262,7 @@ No changes, version bump only.
 ### Bug Fixes
 
 - [#1866](https://github.com/Azure/typespec-azure/pull/1866) Fix the `no-empty-model` rule to prevent it from being triggered for Records, as this is already covered by another rule.
-- [#1886](https://github.com/Azure/typespec-azure/pull/1886) Replace usage of  `Azure.Core.nextLink`  to `TypeSpec.nextLink`.
+- [#1886](https://github.com/Azure/typespec-azure/pull/1886) Replace usage of `Azure.Core.nextLink` to `TypeSpec.nextLink`.
 - [#1950](https://github.com/Azure/typespec-azure/pull/1950) Update lockfile for core changes
 
 ### Features
@@ -287,7 +272,6 @@ No changes, version bump only.
 - [#1881](https://github.com/Azure/typespec-azure/pull/1881) common-types consistency with original swagger
 - [#1923](https://github.com/Azure/typespec-azure/pull/1923) Add the `@Azure.ResourceManager.Legacy.customAzureResource` decorator to identify ARM resources that do not use the base resource types.
 - [#1740](https://github.com/Azure/typespec-azure/pull/1740) Update the `arm no-response-body` rule to behave similarly to the core rule, but with the additional requirement that the 202 response can and should also be empty
-
 
 ## 0.48.0
 
@@ -305,15 +289,13 @@ No changes, version bump only.
 
 - [#1670](https://github.com/Azure/typespec-azure/pull/1670) Add an envelope model for a standard availability zones API contract.
 - [#1674](https://github.com/Azure/typespec-azure/pull/1674) Remove restrictions requiring Foundation.Resource in ArmResourceListByParent. This will allow using the template for non-standard resources / collection actions that return a list.
-As part of the change, the response can now return any type. This will be specified in the response section using a new  `ResourceListCustomResult<type>` model.
-
+  As part of the change, the response can now return any type. This will be specified in the response section using a new `ResourceListCustomResult<type>` model.
 
 ## 0.47.1
 
 ### Bug Fixes
 
 - [#1673](https://github.com/Azure/typespec-azure/pull/1673) Fix `ArmProviderActionAsync` to correctly return 202 responses.
-
 
 ## 0.47.0
 
@@ -334,13 +316,11 @@ As part of the change, the response can now return any type. This will be specif
 - [#1505](https://github.com/Azure/typespec-azure/pull/1505) Added common-types managed identity with delegation and network security perimeter
 - [#1555](https://github.com/Azure/typespec-azure/pull/1555) Add `no-empty-model` rule
 
-
 ## 0.46.1
 
 ### Bug Fixes
 
 - [#1512](https://github.com/Azure/typespec-azure/pull/1512) `x-ms-skip-url-encoding` should be replaced with `allowReserved`
-
 
 ## 0.46.0
 
@@ -352,7 +332,6 @@ As part of the change, the response can now return any type. This will be specif
 
 - [#1482](https://github.com/Azure/typespec-azure/pull/1482) Add mobo type to TypeSpec-Azure common types
 
-
 ## 0.45.0
 
 ### Bug Fixes
@@ -362,7 +341,6 @@ As part of the change, the response can now return any type. This will be specif
 ### Bump dependencies
 
 - [#1219](https://github.com/Azure/typespec-azure/pull/1219) Update dependencies
-
 
 ## 0.44.0
 
@@ -402,9 +380,9 @@ With this change, the operation name will form the second part of the operation 
 ```
 
 You can modify the operation name to match existing spec to avoid breaking changes.
+
 - [#1146](https://github.com/Azure/typespec-azure/pull/1146) Moved `@armRenameListByOperation` into `Azure.ResourceManager.Private` namespace. Adding back original listByParent doc resolution logic to keep swagger changes to minimal.
 - [#1105](https://github.com/Azure/typespec-azure/pull/1105) `x-ms-client-flatten` extension on some of resource properties property is now configurable to be emitted by autorest emitter. Default is false which will skip emission of that extension.
-
 
 ## 0.43.0
 
