@@ -1,41 +1,69 @@
 import { deepStrictEqual, strictEqual } from "assert";
-import { describe, it } from "vitest";
+import { expect, it } from "vitest";
 import { openApiFor } from "./test-host.js";
 
-describe("typespec-autorest: documentation", () => {
-  it("supports summary and description", async () => {
-    const openApi = await openApiFor(`
-        @summary("This is a summary")
-        @doc("This is the longer description")
-        op read(): {};
-      `);
-    strictEqual(openApi.paths["/"].get.summary, "This is a summary");
-    strictEqual(openApi.paths["/"].get.description, "This is the longer description");
-  });
+it("supports summary and description", async () => {
+  const openApi = await openApiFor(`
+      @summary("This is a summary")
+      @doc("This is the longer description")
+      op read(): {};
+    `);
+  strictEqual(openApi.paths["/"].get.summary, "This is a summary");
+  strictEqual(openApi.paths["/"].get.description, "This is the longer description");
+});
 
-  it("supports externalDocs on operation", async () => {
-    const openApi = await openApiFor(`
-        @externalDocs("https://example.com", "more info")
-        op read(): {};
-      `);
-    deepStrictEqual(openApi.paths["/"].get.externalDocs, {
-      url: "https://example.com",
-      description: "more info",
-    });
-  });
-
-  it("supports externalDocs on models", async () => {
-    const openApi = await openApiFor(`
-      op read(): Foo;
-      
+it("supports externalDocs on operation", async () => {
+  const openApi = await openApiFor(`
       @externalDocs("https://example.com", "more info")
+      op read(): {};
+    `);
+  deepStrictEqual(openApi.paths["/"].get.externalDocs, {
+    url: "https://example.com",
+    description: "more info",
+  });
+});
+
+it("supports externalDocs on models", async () => {
+  const openApi = await openApiFor(`
+    @externalDocs("https://example.com", "more info")
+    model Foo {
+      name: string;
+    }
+    `);
+  deepStrictEqual(openApi.definitions.Foo.externalDocs, {
+    url: "https://example.com",
+    description: "more info",
+  });
+});
+
+it("supports externalDocs on properties", async () => {
+  const openApi = await openApiFor(`
       model Foo {
+        @externalDocs("https://example.com", "more info")
         name: string;
       }
       `);
-    deepStrictEqual(openApi.definitions.Foo.externalDocs, {
+  expect(openApi.definitions.Foo.properties.name).toEqual({
+    type: "string",
+    externalDocs: {
       url: "https://example.com",
       description: "more info",
-    });
+    },
+  });
+});
+it("supports externalDocs on properties resulting in a $ref", async () => {
+  const openApi = await openApiFor(`
+      model Foo {
+        @externalDocs("https://example.com", "more info")
+        name: Bar;
+      }
+      model Bar {}
+      `);
+  expect(openApi.definitions.Foo.properties.name).toEqual({
+    $ref: "#/definitions/Bar",
+    externalDocs: {
+      url: "https://example.com",
+      description: "more info",
+    },
   });
 });
