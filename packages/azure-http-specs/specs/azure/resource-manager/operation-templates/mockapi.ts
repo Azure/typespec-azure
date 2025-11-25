@@ -186,7 +186,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
       },
     },
     response: {
-      status: 202,
+      status: 200,
       body: json({
         id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_create_aao`,
         name: "lro_create_aao",
@@ -206,10 +206,10 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_createOrReplace = passOnS
               ...aaoResponse,
               status: "Succeeded",
               endTime: "2024-11-08T01:42:41.5354192+00:00",
-              properties: validOrder,
+              ...validOrder,
             }
           : { ...aaoResponse, status: "InProgress" };
-      const statusCode = createOrReplacePollCount > 0 ? 200 : 202;
+      const statusCode = 200;
       createOrReplacePollCount += 1;
       return {
         status: statusCode,

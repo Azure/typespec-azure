@@ -2,19 +2,25 @@ import { execa } from "execa";
 import { readdir } from "fs/promises";
 import { globby } from "globby";
 import { cpus } from "os";
-import { dirname, relative } from "pathe";
+import { dirname, join, relative } from "pathe";
 import pc from "picocolors";
-import type { IntegrationTestSuite } from "./config/types.js";
+import type { Entrypoint, IntegrationTestSuite } from "./config/types.js";
+import { registerConsoleShortcuts } from "./keyboard-api.js";
 import type { TaskRunner } from "./runner.js";
-import { log, ValidationFailedError } from "./utils.js";
+import { log, runWithConcurrency, ValidationFailedError } from "./utils.js";
 
 // Number of parallel TypeSpec compilations to run
 const COMPILATION_CONCURRENCY = cpus().length;
+
+export interface ValidateSpecsOptions {
+  interactive?: boolean;
+}
 
 export async function validateSpecs(
   runner: TaskRunner,
   dir: string,
   suite: IntegrationTestSuite,
+  options: ValidateSpecsOptions = {},
 ): Promise<void> {
   const tspConfigDirs = await findTspProjects(dir, suite.pattern ?? "**/tspconfig.yaml");
 
@@ -28,43 +34,162 @@ export async function validateSpecs(
     tspConfigDirs.map((projectDir) => pc.bold(relative(dir, projectDir))).join("\n"),
   );
 
+  const tspRunner = new TspRunner(runner, dir, suite, tspConfigDirs, options);
+  await tspRunner.run();
+}
+
+/** Run  */
+export class TspRunner {
+  /** If the runner is currently cancelling */
+  isCancelling = false;
+  runningPromise: Promise<BatchRunResult> | null = null;
+
+  /** Workspace directory */
+  dir: string;
+
+  /** Test suit used for this runner */
+  suite: IntegrationTestSuite;
+
+  /** Last set of failing projects */
+  #failedProjects: string[] = [];
+
+  #runner: TaskRunner;
+  #projectDirs: string[];
+  #options: ValidateSpecsOptions;
+
+  constructor(
+    runner: TaskRunner,
+    dir: string,
+    suite: IntegrationTestSuite,
+    tspConfigDirs: string[],
+    options: ValidateSpecsOptions = {},
+  ) {
+    this.#runner = runner;
+    this.dir = dir;
+    this.suite = suite;
+    this.#options = options;
+    this.#projectDirs = tspConfigDirs;
+  }
+
+  async run(): Promise<void> {
+    if (!this.#options.interactive) {
+      const result = await this.#exec(this.#projectDirs);
+      if (result.failureCount > 0) {
+        throw new ValidationFailedError();
+      }
+      return;
+    }
+    registerConsoleShortcuts(this);
+    await this.rerunAll();
+  }
+
+  async #exec(projectsToRun: string[]): Promise<BatchRunResult> {
+    this.runningPromise = this.#execWorker(projectsToRun);
+    return await this.runningPromise;
+  }
+  async #execWorker(projectsToRun: string[]): Promise<BatchRunResult> {
+    this.isCancelling = false;
+    const result = await runValidation(this.#runner, this, projectsToRun);
+    if (this.#options.interactive) {
+      log(
+        `\nPress ${pc.yellow("a")} to rerun all tests, ${pc.yellow("f")} to rerun failed tests, or ${pc.yellow("q")} to quit.`,
+      );
+    }
+    this.#failedProjects = result.failedProjects;
+    this.runningPromise = null;
+    return result;
+  }
+
+  async cancelCurrentRun(): Promise<void> {
+    if (this.runningPromise) {
+      this.isCancelling = true;
+      await this.runningPromise;
+      this.isCancelling = false;
+    }
+  }
+
+  async rerunFailed(): Promise<void> {
+    process.stdin.write("\x1Bc"); // Clear console
+    if (this.#failedProjects.length === 0) {
+      log(pc.green("No failed projects to rerun."));
+      return;
+    }
+    log(pc.green(`Rerunning ${pc.yellow(this.#failedProjects.length)} failed project(s)...`));
+    await this.#exec(this.#failedProjects);
+  }
+
+  async rerunAll(): Promise<void> {
+    process.stdin.write("\x1Bc"); // Clear console
+    log(pc.green(`Running all ${this.#projectDirs.length} projects...`));
+    await this.#exec(this.#projectDirs);
+  }
+
+  exit(): void {
+    process.exit(this.#failedProjects.length > 0 ? 1 : 0);
+  }
+}
+
+export interface BatchRunResult {
+  readonly successCount: number;
+  readonly failureCount: number;
+  readonly skippedCount: number;
+  readonly failedProjects: string[];
+}
+async function runValidation(
+  runner: TaskRunner,
+  tspRunner: TspRunner,
+  projectsToRun: string[],
+): Promise<BatchRunResult> {
   let successCount = 0;
   let failureCount = 0;
-  const failedFolders: string[] = []; // Create a processor function that handles the compilation and logging
+  let skippedCount = 0;
+  const failedProjects: string[] = [];
+
+  // Create a processor function that handles the compilation and logging
   const processProject = async (projectDir: string) => {
-    const result = await verifyProject(runner, projectDir, suite);
-    runner.reportTaskWithDetails(
-      result.success ? "pass" : "fail",
-      relative(dir, projectDir),
-      result.output,
-    );
+    if (tspRunner.isCancelling) {
+      runner.reportTaskWithDetails("skip", relative(tspRunner.dir, projectDir), "Cancelled");
+      return { dir: projectDir, result: { status: "skip", output: "Cancelled" } };
+    }
+    const result = await verifyProject(runner, tspRunner.dir, projectDir, tspRunner.suite);
+    runner.reportTaskWithDetails(result.status, relative(tspRunner.dir, projectDir), result.output);
     return { dir: projectDir, result };
   };
 
   // Run compilations in parallel with limited concurrency
-  const results = await runWithConcurrency(tspConfigDirs, COMPILATION_CONCURRENCY, processProject);
+  const results = await runWithConcurrency(projectsToRun, COMPILATION_CONCURRENCY, processProject);
 
   // Count successes and failures
   for (const { dir, result } of results) {
-    if (result.success) {
-      successCount++;
-    } else {
-      failureCount++;
-      failedFolders.push(dir);
+    switch (result.status) {
+      case "skip":
+        skippedCount++;
+        break;
+      case "pass":
+        successCount++;
+        break;
+      case "fail":
+        failureCount++;
+        failedProjects.push(dir);
+        break;
     }
   }
 
   log(`\n=== Summary ===`);
   const passed = pc.bold(pc.green(`${successCount} passed`));
   const failed = failureCount > 0 ? pc.bold(pc.red(`${failureCount} failed`)) : undefined;
-  log([passed, failed].filter(Boolean).join(pc.gray(" | ")), pc.gray(`(${tspConfigDirs.length})`));
+  const skipped = skippedCount > 0 ? pc.bold(pc.gray(`${skippedCount} skipped`)) : undefined;
+  log(
+    [passed, failed, skipped].filter(Boolean).join(pc.gray(" | ")),
+    pc.gray(`(${projectsToRun.length})`),
+  );
 
   if (failureCount > 0) {
     log("\nFailed folders:");
-    failedFolders.forEach((x) => log(`  - ${relative(dir, x)}`));
-
-    throw new ValidationFailedError();
+    failedProjects.forEach((x) => log(`  - ${relative(tspRunner.dir, x)}`));
   }
+
+  return { successCount, failureCount, skippedCount, failedProjects };
 }
 
 async function findTspProjects(wd: string, pattern: string): Promise<string[]> {
@@ -75,43 +200,59 @@ async function findTspProjects(wd: string, pattern: string): Promise<string[]> {
   return result.map((x) => dirname(x));
 }
 
-async function findTspEntrypoint(
+/** Find which entrypoints are available */
+async function findTspEntrypoints(
   directory: string,
   suite: IntegrationTestSuite,
-): Promise<string | null> {
+): Promise<Entrypoint[]> {
   try {
     const entries = await readdir(directory);
-
-    for (const entry of suite.entrypoints ?? ["main.tsp"]) {
-      if (entries.includes(entry)) {
-        return entry;
-      }
-    }
-
-    return null;
+    return (suite.entrypoints ?? [{ name: "main.tsp" }]).filter((entrypoint) =>
+      entries.includes(entrypoint.name),
+    );
   } catch (error) {
-    return null;
+    return [];
   }
 }
 
+interface ProjectTestResult {
+  status: "pass" | "fail" | "skip";
+  output: string;
+}
 async function verifyProject(
   runner: TaskRunner,
+  workspaceDir: string,
   dir: string,
   suite: IntegrationTestSuite,
-): Promise<{ success: boolean; output: string }> {
-  const entrypoint = await findTspEntrypoint(dir, suite);
+): Promise<ProjectTestResult> {
+  const entrypoints = await findTspEntrypoints(dir, suite);
 
-  if (!entrypoint) {
-    const result = {
-      success: false,
-      output: "No main.tsp or client.tsp file found in directory",
+  if (entrypoints.length === 0) {
+    const result: ProjectTestResult = {
+      status: "fail",
+      output: `Project '${dir}' has no valid entrypoints to compile. Checked for: ${suite.entrypoints?.map((e) => e.name).join(", ") ?? "main.tsp"}`,
     };
     runner.reportTaskWithDetails("fail", dir, result.output);
     return result;
   }
 
-  return execTspCompile(dir, entrypoint, entrypoint === "client.tsp" ? ["--dry-run"] : []);
+  let output = "";
+  for (const entrypoint of entrypoints) {
+    const result = await execTspCompile(
+      workspaceDir,
+      join(dir, entrypoint.name),
+      entrypoint.options,
+    );
+    if (!result.success) {
+      return { status: "fail", output: result.output };
+    } else {
+      output += result.output;
+      output += `Entrypoint '${entrypoint.name}' compiled successfully.\n`;
+    }
+  }
+  return { status: "pass", output };
 }
+
 async function execTspCompile(
   directory: string,
   file: string,
@@ -132,56 +273,4 @@ async function execTspCompile(
     success: !failed,
     output: all,
   };
-}
-
-// Function to run tasks with limited concurrency
-async function runWithConcurrency<T, R>(
-  items: T[],
-  concurrency: number,
-  processor: (item: T) => Promise<R>,
-): Promise<R[]> {
-  if (items.length === 0) {
-    return [];
-  }
-
-  const toRun = [...items];
-  const results: R[] = [];
-  let completed = 0;
-  let running = 0;
-
-  return new Promise((resolve, reject) => {
-    function runNext() {
-      if (toRun.length === 0 || running >= concurrency) {
-        return;
-      }
-
-      const item = toRun.shift();
-      if (!item) {
-        return;
-      }
-
-      running++;
-      processor(item)
-        .then((result) => {
-          results.push(result);
-          completed++;
-          running--;
-
-          if (completed === items.length) {
-            resolve(results);
-            return;
-          }
-
-          runNext();
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    }
-
-    // Start initial batch of tasks up to concurrency limit
-    for (let i = 0; i < Math.min(concurrency, toRun.length); i++) {
-      runNext();
-    }
-  });
 }
