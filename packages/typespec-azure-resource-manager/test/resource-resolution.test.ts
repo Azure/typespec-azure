@@ -554,6 +554,8 @@ interface Employees {
       kind: "Tracked",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
+      scope: "ResourceGroup",
+      parent: undefined,
     });
 
     checkResolvedOperations(employee, {
@@ -728,6 +730,7 @@ interface GenericResources {
       providerOperations: expect.any(Array),
     });
     ok(provider.resources);
+    expect(provider.resources).toHaveLength(11);
     const employee = provider.resources[0];
     ok(employee);
     expect(employee).toMatchObject({
@@ -735,6 +738,7 @@ interface GenericResources {
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "Tenant",
+      parent: undefined,
     });
 
     checkResolvedOperations(employee, {
@@ -762,6 +766,7 @@ interface GenericResources {
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "Scope",
+      parent: undefined,
     });
     checkResolvedOperations(scope, {
       operations: {
@@ -789,6 +794,7 @@ interface GenericResources {
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "Subscription",
+      parent: undefined,
     });
     checkResolvedOperations(subscription, {
       operations: {
@@ -818,6 +824,7 @@ interface GenericResources {
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ManagementGroup",
+      parent: undefined,
     });
     checkResolvedOperations(managementGroups, {
       operations: {
@@ -875,7 +882,16 @@ interface GenericResources {
       kind: "Extension",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
-      scope: "ExternalResource",
+      scope: expect.objectContaining({
+        resourceName: "VirtualMachine",
+        resourceType: {
+          provider: "Microsoft.Compute",
+          types: ["virtualMachines"],
+        },
+        resourceInstancePath:
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}",
+      }),
+      parent: undefined,
     });
     checkResolvedOperations(vms, {
       operations: {
@@ -898,15 +914,24 @@ interface GenericResources {
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
 
-    const scaleSets = provider.resources[6];
-    ok(scaleSets);
-    expect(scaleSets).toMatchObject({
+    const scaleSetVms = provider.resources[6];
+    ok(scaleSetVms);
+    expect(scaleSetVms).toMatchObject({
       kind: "Extension",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
-      scope: "ExternalResource",
     });
-    checkResolvedOperations(scaleSets, {
+    expect(scaleSetVms.scope).toBeDefined();
+    expect(scaleSetVms.scope).toMatchObject({
+      resourceName: "VirtualMachineScaleSetVm",
+      resourceType: {
+        provider: "Microsoft.Compute",
+        types: ["virtualMachineScaleSets", "virtualMachineScaleSetVms"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{scaleSetName}/virtualMachineScaleSetVms/{scaleSetVmName}",
+    });
+    checkResolvedOperations(scaleSetVms, {
       operations: {
         lifecycle: {
           createOrUpdate: [
@@ -926,7 +951,6 @@ interface GenericResources {
       resourceInstancePath:
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{scaleSetName}/virtualMachineScaleSetVms/{scaleSetVmName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
     });
-
     const generics = provider.resources[7];
     ok(generics);
     expect(generics).toMatchObject({
@@ -953,6 +977,54 @@ interface GenericResources {
       },
       resourceInstancePath:
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerNamespace}/{parentType}/{parentName}/{resourceType}/{resourceName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    });
+
+    const vmExternal = provider.resources[8];
+    ok(vmExternal);
+    expect(vmExternal).toMatchObject({
+      kind: "Other",
+      providerNamespace: "Microsoft.Compute",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      resourceName: "VirtualMachine",
+      resourceType: {
+        provider: "Microsoft.Compute",
+        types: ["virtualMachines"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}",
+    });
+
+    const scaleSetVmExternal = provider.resources[9];
+    ok(scaleSetVmExternal);
+    expect(scaleSetVmExternal).toMatchObject({
+      kind: "Other",
+      providerNamespace: "Microsoft.Compute",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      resourceName: "VirtualMachineScaleSetVm",
+      resourceType: {
+        provider: "Microsoft.Compute",
+        types: ["virtualMachineScaleSets", "virtualMachineScaleSetVms"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{scaleSetName}/virtualMachineScaleSetVms/{scaleSetVmName}",
+    });
+
+    const scaleSetExternal = provider.resources[10];
+    ok(scaleSetExternal);
+    expect(scaleSetExternal).toMatchObject({
+      kind: "Other",
+      providerNamespace: "Microsoft.Compute",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      resourceName: "VirtualMachineScaleSet",
+      resourceType: {
+        provider: "Microsoft.Compute",
+        types: ["virtualMachineScaleSets"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{scaleSetName}",
     });
 
     checkArmOperationsHas(provider.providerOperations, [
@@ -1081,7 +1153,7 @@ interface GenericResources {
       providerOperations: expect.any(Array),
     });
     ok(provider.resources);
-    expect(provider.resources).toHaveLength(5);
+    expect(provider.resources).toHaveLength(6);
     const employee = provider.resources[0];
     ok(employee);
     expect(employee).toMatchObject({
@@ -1176,7 +1248,16 @@ interface GenericResources {
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
 
-      scope: "ExternalResource",
+      scope: expect.objectContaining({
+        resourceName: "VirtualMachine",
+        resourceType: {
+          provider: "Microsoft.Compute",
+          types: ["virtualMachines"],
+        },
+        resourceInstancePath:
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}",
+      }),
+      parent: undefined,
     });
     checkResolvedOperations(vms, {
       operations: {
@@ -1388,7 +1469,15 @@ model DependentProperties {
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
-      parent: expect.any(Object),
+      parent: expect.objectContaining({
+        resourceName: "Employee",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["employees"],
+        },
+        resourceInstancePath:
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+      }),
     });
 
     checkResolvedOperations(dependent, {
@@ -1419,7 +1508,15 @@ model DependentProperties {
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
-      parent: expect.any(Object),
+      parent: expect.objectContaining({
+        resourceName: "Employee",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["employees"],
+        },
+        resourceInstancePath:
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+      }),
     });
     checkResolvedOperations(privateEndpointConnection, {
       operations: {
@@ -1469,7 +1566,15 @@ model DependentProperties {
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
-      parent: expect.any(Object),
+      parent: expect.objectContaining({
+        resourceName: "Dependent",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["employees", "dependents"],
+        },
+        resourceInstancePath:
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}",
+      }),
     });
 
     checkResolvedOperations(privateForDepInstance, {
@@ -1642,7 +1747,15 @@ model MoveResponse {
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
-      parent: expect.any(Object),
+      parent: expect.objectContaining({
+        resourceName: "Employee",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["employees"],
+        },
+        resourceInstancePath:
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+      }),
     });
 
     checkResolvedOperations(privateEndpointConnection, {
@@ -1843,7 +1956,15 @@ model DependentProperties {
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
-      parent: expect.any(Object),
+      parent: expect.objectContaining({
+        resourceName: "Employee",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["employees"],
+        },
+        resourceInstancePath:
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+      }),
     });
 
     checkResolvedOperations(dependent, {
@@ -1874,7 +1995,15 @@ model DependentProperties {
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
-      parent: expect.any(Object),
+      parent: expect.objectContaining({
+        resourceName: "Employee",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["employees"],
+        },
+        resourceInstancePath:
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+      }),
     });
     checkResolvedOperations(privateLink, {
       operations: {
@@ -1896,7 +2025,15 @@ model DependentProperties {
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
-      parent: expect.any(Object),
+      parent: expect.objectContaining({
+        resourceName: "Dependent",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["employees", "dependents"],
+        },
+        resourceInstancePath:
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}",
+      }),
     });
 
     checkResolvedOperations(privateForDepInstance, {
@@ -1929,6 +2066,7 @@ interface Operations extends Azure.ResourceManager.Operations {}
 
 // For more information about the proxy vs tracked,
 // see https://armwiki.azurewebsites.net/rp_onboarding/tracked_vs_proxy_resources.html?q=proxy%20resource
+@parentResource(SubscriptionLocationResource)
 model Employee is TrackedResource<EmployeeProperties> {
   ...ResourceNameParameter<Employee>;
 }
@@ -1968,8 +2106,7 @@ interface Employees {
     Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
   >;
   delete is ArmResourceDeleteSync<Employee>;
-  listByResourceGroup is ArmResourceListByParent<Employee>;
-  listBySubscription is ArmListBySubscription<Employee>;
+  listByLocation is ArmResourceListByParent<Employee>;
   move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
 
   checkExistence is ArmResourceCheckExistence<Employee>;
@@ -1993,7 +2130,7 @@ model MoveResponse {
     const provider = resolveArmResources(program);
     expect(provider).toBeDefined();
     expect(provider.resources).toBeDefined();
-    expect(provider.resources).toHaveLength(2);
+    expect(provider.resources).toHaveLength(3);
     ok(provider.resources);
     const employee = provider.resources[0];
     ok(employee);
@@ -2001,7 +2138,16 @@ model MoveResponse {
       kind: "Tracked",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
-      scope: "ResourceGroup",
+      scope: "Subscription",
+      parent: expect.objectContaining({
+        resourceName: "Location",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["locations"],
+        },
+        resourceInstancePath:
+          "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}",
+      }),
     });
 
     checkResolvedOperations(employee, {
@@ -2018,18 +2164,15 @@ model MoveResponse {
           ],
         },
         actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
-        lists: [
-          { operationGroup: "Employees", name: "listBySubscription", kind: "list" },
-          { operationGroup: "Employees", name: "listByResourceGroup", kind: "list" },
-        ],
+        lists: [{ operationGroup: "Employees", name: "listByLocation", kind: "list" }],
       },
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
-        types: ["employees"],
+        types: ["locations", "employees"],
       },
       resourceName: "Employee",
       resourceInstancePath:
-        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}/employees/{employeeName}",
     });
 
     const privateLink = provider.resources[1];
@@ -2038,8 +2181,16 @@ model MoveResponse {
       kind: "Other",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
-      scope: "ResourceGroup",
-      parent: expect.any(Object),
+      scope: "Subscription",
+      parent: expect.objectContaining({
+        resourceName: "Employee",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["locations", "employees"],
+        },
+        resourceInstancePath:
+          "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}/employees/{employeeName}",
+      }),
     });
 
     checkResolvedOperations(privateLink, {
@@ -2048,11 +2199,26 @@ model MoveResponse {
       },
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
-        types: ["employees", "privateLinkResources"],
+        types: ["locations", "employees", "privateLinkResources"],
       },
       resourceName: "PrivateLinkForEmployee",
       resourceInstancePath:
-        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/privateLinkResources/{name}",
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}/employees/{employeeName}/privateLinkResources/{name}",
+    });
+    const location = provider.resources[2];
+    ok(location);
+    expect(location).toMatchObject({
+      type: expect.anything(),
+      kind: "Other",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      scope: "Subscription",
+      resourceName: "Location",
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["locations"],
+      },
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/locations/{location}",
     });
 
     checkArmOperationsHas(provider.providerOperations, [
@@ -2233,6 +2399,15 @@ model MoveResponse {
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
+      parent: expect.objectContaining({
+        resourceName: "Building",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["buildings"],
+        },
+        resourceInstancePath:
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}",
+      }),
     });
 
     checkResolvedOperations(employee, {
@@ -2267,6 +2442,15 @@ model MoveResponse {
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
+      parent: expect.objectContaining({
+        resourceName: "Room",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["buildings", "rooms"],
+        },
+        resourceInstancePath:
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/rooms/{roomId}",
+      }),
     });
 
     ok(roomScope);
@@ -2464,6 +2648,15 @@ model MoveResponse {
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
+      parent: expect.objectContaining({
+        resourceName: "Building",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["buildings"],
+        },
+        resourceInstancePath:
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}",
+      }),
     });
 
     checkResolvedOperations(employee, {
@@ -2696,6 +2889,15 @@ model MoveResponse {
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
+      parent: expect.objectContaining({
+        resourceName: "Building",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["buildings"],
+        },
+        resourceInstancePath:
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}",
+      }),
     });
 
     checkResolvedOperations(employee, {
@@ -2727,11 +2929,20 @@ model MoveResponse {
     const roomScope = provider.resources[1];
 
     ok(roomScope);
-    expect(employee).toMatchObject({
+    expect(roomScope).toMatchObject({
       kind: "Proxy",
       providerNamespace: "Microsoft.ContosoProviderHub",
       type: expect.anything(),
       scope: "ResourceGroup",
+      parent: expect.objectContaining({
+        resourceName: "Room",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["buildings", "rooms"],
+        },
+        resourceInstancePath:
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/rooms/{roomId}",
+      }),
     });
     checkResolvedOperations(roomScope, {
       operations: {
@@ -2794,5 +3005,503 @@ model MoveResponse {
       resourceInstancePath:
         "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/buildings/{buildingName}/rooms/{roomId}",
     });
+  });
+  it("collects operation information for networkSecurityPerimeters", async () => {
+    const { program } = await Tester.compile(`
+
+using Azure.Core;
+
+@versioned(Versions)
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+/** Contoso API versions */
+enum Versions {
+  /** 2021-10-01-preview version */
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v2025_11_19_preview: "2025-11-19-preview",
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+// For more information about the proxy vs tracked,
+// see https://armwiki.azurewebsites.net/rp_onboarding/tracked_vs_proxy_resources.html?q=proxy%20resource
+@parentResource(ResourceGroupLocationResource)
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@lroStatus
+union ProvisioningState {
+  ResourceProvisioningState,
+
+  Provisioning: "Provisioning",
+
+  Updating: "Updating",
+
+  Deleting: "Deleting",
+
+  Accepted: "Accepted",
+
+  string,
+}
+
+model NetworkSecurityPerimeterConfiguration is Azure.ResourceManager.NspConfiguration;
+alias NspConfigurationOperations = Azure.ResourceManager.NspConfigurations<NetworkSecurityPerimeterConfiguration>;
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+  update is ArmCustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+  delete is ArmResourceDeleteSync<Employee>;
+  listByLocation is ArmResourceListByParent<Employee>;
+  move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
+  checkExistence is ArmResourceCheckExistence<Employee>;
+}
+
+@armResourceOperations(PrivateLinkResource)
+interface EmployeeNetworkSecurityPerimeterConfigurations {
+  list is NspConfigurationOperations.ListByParent<Employee>;
+  get is NspConfigurationOperations.Read<Employee>;
+}
+
+model MoveRequest {
+  from: string;
+
+  to: string;
+}
+
+model MoveResponse {
+  movingStatus: string;
+}
+
+@armResourceOperations
+interface Dependents {
+  get is ArmResourceRead<Dependent>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Dependent>;
+  update is ArmCustomPatchSync<
+    Dependent,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Dependent, DependentProperties>
+  >;
+  delete is ArmResourceDeleteSync<Dependent>;
+  list is ArmResourceListByParent<Dependent>;
+}
+
+@armResourceOperations(PrivateLinkResource)
+interface DependentNetworkSecurityPerimeterConfigurations {
+  list is NspConfigurationOperations.ListByParent<Dependent>;
+  get is NspConfigurationOperations.Read<Dependent>;
+}
+
+@parentResource(Employee)
+model Dependent is ProxyResource<DependentProperties> {
+  ...ResourceNameParameter<Dependent>;
+}
+
+model DependentProperties {
+  age: int32;
+  gender: string;
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    expect(provider.resources).toHaveLength(5);
+    ok(provider.resources);
+    const employee = provider.resources[0];
+    ok(employee);
+    expect(employee).toMatchObject({
+      kind: "Tracked",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      parent: expect.objectContaining({
+        resourceName: "Location",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["locations"],
+        },
+        resourceInstancePath:
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/locations/{location}",
+      }),
+    });
+
+    checkResolvedOperations(employee, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            { operationGroup: "Employees", name: "createOrUpdate", kind: "createOrUpdate" },
+          ],
+          delete: [{ operationGroup: "Employees", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "Employees", name: "get", kind: "read" }],
+          update: [{ operationGroup: "Employees", name: "update", kind: "update" }],
+          checkExistence: [
+            { operationGroup: "Employees", name: "checkExistence", kind: "checkExistence" },
+          ],
+        },
+        actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
+        lists: [{ operationGroup: "Employees", name: "listByLocation", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["locations", "employees"],
+      },
+      resourceName: "Employee",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/locations/{location}/employees/{employeeName}",
+    });
+
+    const dependent = provider.resources[3];
+    ok(dependent);
+    expect(dependent).toMatchObject({
+      kind: "Proxy",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      parent: expect.objectContaining({
+        resourceName: "Employee",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["locations", "employees"],
+        },
+        resourceInstancePath:
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/locations/{location}/employees/{employeeName}",
+      }),
+    });
+
+    checkResolvedOperations(dependent, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            { operationGroup: "Dependents", name: "createOrUpdate", kind: "createOrUpdate" },
+          ],
+          delete: [{ operationGroup: "Dependents", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "Dependents", name: "get", kind: "read" }],
+          update: [{ operationGroup: "Dependents", name: "update", kind: "update" }],
+        },
+        lists: [{ operationGroup: "Dependents", name: "list", kind: "list" }],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["locations", "employees", "dependents"],
+      },
+      resourceName: "Dependent",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/locations/{location}/employees/{employeeName}/dependents/{dependentName}",
+    });
+
+    const nsp = provider.resources[1];
+    ok(nsp);
+    expect(nsp).toMatchObject({
+      kind: "Proxy",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      parent: expect.objectContaining({
+        resourceName: "Employee",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["locations", "employees"],
+        },
+        resourceInstancePath:
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/locations/{location}/employees/{employeeName}",
+      }),
+    });
+    checkResolvedOperations(nsp, {
+      operations: {
+        lists: [
+          {
+            operationGroup: "EmployeeNetworkSecurityPerimeterConfigurations",
+            name: "list",
+            kind: "list",
+          },
+        ],
+        lifecycle: {
+          read: [
+            {
+              operationGroup: "EmployeeNetworkSecurityPerimeterConfigurations",
+              name: "get",
+              kind: "read",
+            },
+          ],
+        },
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["locations", "employees", "networkSecurityPerimeterConfigurations"],
+      },
+      resourceName: "EmployeeNetworkSecurityPerimeterConfiguration",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/locations/{location}/employees/{employeeName}/networkSecurityPerimeterConfigurations/{name}",
+    });
+
+    const perimeterForDepInstance = provider.resources[2];
+    ok(perimeterForDepInstance);
+    expect(perimeterForDepInstance).toMatchObject({
+      kind: "Proxy",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      parent: expect.objectContaining({
+        resourceName: "Dependent",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["locations", "employees", "dependents"],
+        },
+        resourceInstancePath:
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/locations/{location}/employees/{employeeName}/dependents/{dependentName}",
+      }),
+    });
+
+    checkResolvedOperations(perimeterForDepInstance, {
+      operations: {
+        lists: [
+          {
+            operationGroup: "DependentNetworkSecurityPerimeterConfigurations",
+            name: "list",
+            kind: "list",
+          },
+        ],
+        lifecycle: {
+          read: [
+            {
+              operationGroup: "DependentNetworkSecurityPerimeterConfigurations",
+              name: "get",
+              kind: "read",
+            },
+          ],
+        },
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["locations", "employees", "dependents", "networkSecurityPerimeterConfigurations"],
+      },
+      resourceName: "DependentNetworkSecurityPerimeterConfiguration",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/locations/{location}/employees/{employeeName}/dependents/{dependentName}/networkSecurityPerimeterConfigurations/{name}",
+    });
+
+    checkArmOperationsHas(provider.providerOperations, [
+      { operationGroup: "Operations", name: "list", kind: "other" },
+    ]);
+  });
+
+  it("allows overriding resource name for network security perimeters", async () => {
+    const { program } = await Tester.compile(`
+
+using Azure.Core;
+
+@versioned(Versions)
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+/** Contoso API versions */
+enum Versions {
+  /** 2021-10-01-preview version */
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v2025_11_19_preview: "2025-11-19-preview",
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+// For more information about the proxy vs tracked,
+// see https://armwiki.azurewebsites.net/rp_onboarding/tracked_vs_proxy_resources.html?q=proxy%20resource
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@lroStatus
+union ProvisioningState {
+  ResourceProvisioningState,
+
+  Provisioning: "Provisioning",
+
+  Updating: "Updating",
+
+  Deleting: "Deleting",
+
+  Accepted: "Accepted",
+
+  string,
+}
+
+model NetworkSecurityPerimeterConfiguration is Azure.ResourceManager.NspConfiguration;
+alias NspConfigurationOperations = Azure.ResourceManager.NspConfigurations<NetworkSecurityPerimeterConfiguration, ResourceName = "NetworkSecurityPerimeterConfiguration">;
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+  update is ArmCustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+  delete is ArmResourceDeleteSync<Employee>;
+  listByResourceGroup is ArmResourceListByParent<Employee>;
+  listBySubscription is ArmListBySubscription<Employee>;
+  move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
+
+  checkExistence is ArmResourceCheckExistence<Employee>;
+}
+
+@armResourceOperations(PrivateLinkResource)
+interface EmployeeNetworkSecurityPerimeterConfigurations {
+  list is NspConfigurationOperations.ListByParent<Employee>;
+  get is NspConfigurationOperations.Read<Employee>;
+}
+
+model MoveRequest {
+  from: string;
+
+  to: string;
+}
+
+model MoveResponse {
+  movingStatus: string;
+}
+
+@armResourceOperations
+interface Dependents {
+  get is ArmResourceRead<Dependent>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Dependent>;
+  update is ArmCustomPatchSync<
+    Dependent,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Dependent, DependentProperties>
+  >;
+  delete is ArmResourceDeleteSync<Dependent>;
+  list is ArmResourceListByParent<Dependent>;
+}
+
+@armResourceOperations(PrivateLinkResource)
+interface DependentNetworkSecurityPerimeterConfigurations {
+  list is NspConfigurationOperations.ListByParent<Dependent>;
+  get is NspConfigurationOperations.Read<Dependent>;
+}
+
+@parentResource(Employee)
+model Dependent is ProxyResource<DependentProperties> {
+  ...ResourceNameParameter<Dependent>;
+}
+
+model DependentProperties {
+  age: int32;
+  gender: string;
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    expect(provider.resources).toHaveLength(4);
+    ok(provider.resources);
+    const employee = provider.resources[0];
+    ok(employee);
+    expect(employee).toMatchObject({
+      kind: "Tracked",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      parent: undefined,
+    });
+
+    checkResolvedOperations(employee, {
+      operations: {
+        lifecycle: {
+          createOrUpdate: [
+            { operationGroup: "Employees", name: "createOrUpdate", kind: "createOrUpdate" },
+          ],
+          delete: [{ operationGroup: "Employees", name: "delete", kind: "delete" }],
+          read: [{ operationGroup: "Employees", name: "get", kind: "read" }],
+          update: [{ operationGroup: "Employees", name: "update", kind: "update" }],
+          checkExistence: [
+            { operationGroup: "Employees", name: "checkExistence", kind: "checkExistence" },
+          ],
+        },
+        actions: [{ operationGroup: "Employees", name: "move", kind: "action" }],
+        lists: [
+          { operationGroup: "Employees", name: "listBySubscription", kind: "list" },
+          { operationGroup: "Employees", name: "listByResourceGroup", kind: "list" },
+        ],
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees"],
+      },
+      resourceName: "Employee",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+    });
+
+    const nsp = provider.resources[1];
+    ok(nsp);
+    expect(nsp).toMatchObject({
+      kind: "Proxy",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      parent: expect.objectContaining({
+        resourceName: "Employee",
+        resourceType: {
+          provider: "Microsoft.ContosoProviderHub",
+          types: ["employees"],
+        },
+        resourceInstancePath:
+          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}",
+      }),
+    });
+    checkResolvedOperations(nsp, {
+      operations: {
+        lists: [
+          {
+            operationGroup: "EmployeeNetworkSecurityPerimeterConfigurations",
+            name: "list",
+            kind: "list",
+          },
+        ],
+        lifecycle: {
+          read: [
+            {
+              operationGroup: "EmployeeNetworkSecurityPerimeterConfigurations",
+              name: "get",
+              kind: "read",
+            },
+          ],
+        },
+      },
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees", "networkSecurityPerimeterConfigurations"],
+      },
+      resourceName: "NetworkSecurityPerimeterConfiguration",
+      resourceInstancePath:
+        "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/networkSecurityPerimeterConfigurations/{name}",
+    });
+
+    checkArmOperationsHas(provider.providerOperations, [
+      { operationGroup: "Operations", name: "list", kind: "other" },
+    ]);
   });
 });
