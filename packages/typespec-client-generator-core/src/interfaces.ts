@@ -265,7 +265,7 @@ export type SdkType =
 export interface SdkBuiltInType<TKind extends SdkBuiltInKinds = SdkBuiltInKinds>
   extends SdkTypeBase {
   kind: TKind;
-  /** How to encode the type in wire. */
+  /** How to encode the type on wire. */
   encode?: string;
   /** Client name for the type. */
   name: string;
@@ -380,6 +380,7 @@ export function isSdkDateTimeEncodings(encoding: string): encoding is DateTimeKn
 interface SdkDateTimeTypeBase extends SdkTypeBase {
   name: string;
   baseType?: SdkDateTimeType;
+  /** How to encode the type on wire. */
   encode: DateTimeKnownEncoding;
   wireType: SdkBuiltInType;
   /** Unique ID for the current type. */
@@ -401,6 +402,7 @@ export interface SdkDurationType extends SdkTypeBase {
   name: string;
   baseType?: SdkDurationType;
   encode: DurationKnownEncoding;
+  /** How to encode the type on wire. */
   wireType: SdkBuiltInType;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
@@ -600,7 +602,15 @@ export interface SdkModelPropertyTypeBase<TType extends SdkTypeBase = SdkType>
   access: AccessFlags;
   /** Whether this property could be flattened */
   flatten: boolean;
+  /** How to encode the property on wire. */
+  encode?: ArrayKnownEncoding;
 }
+
+export type ArrayKnownEncoding =
+  | "pipeDelimited"
+  | "spaceDelimited"
+  | "commaDelimited"
+  | "newlineDelimited";
 
 /**
  * Options to show how to serialize a model/property.

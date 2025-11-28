@@ -8,6 +8,7 @@ let runner: SdkTestRunner;
 beforeEach(async () => {
   runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
 });
+
 afterEach(async () => {
   for (const modelsOrEnums of [runner.context.sdkPackage.models, runner.context.sdkPackage.enums]) {
     for (const item of modelsOrEnums) {
@@ -15,6 +16,7 @@ afterEach(async () => {
     }
   }
 });
+
 it("use model is to represent array", async () => {
   await runner.compile(`
     @service
@@ -163,4 +165,21 @@ it("recursive array type", async () => {
   strictEqual(testArrayModel.properties.length, 1);
   const prop = testArrayModel.properties[0];
   strictEqual(prop.type, modelProp.type);
+});
+
+it("array with encode", async () => {
+  await runner.compileWithBuiltInService(`
+    model Foo {
+      @encode(ArrayEncoding.commaDelimited)
+      prop: string[];
+    }
+
+    op get(): Foo;
+  `);
+  const model = runner.context.sdkPackage.models[0];
+  strictEqual(model.kind, "model");
+  strictEqual(model.name, "Foo");
+  strictEqual(model.properties.length, 1);
+  const modelProp = model.properties[0];
+  strictEqual(modelProp.encode, "commaDelimited");
 });
