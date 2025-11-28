@@ -1,7 +1,6 @@
 import { UnionEnum, getLroMetadata, getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   BooleanLiteral,
-  BytesKnownEncoding,
   Diagnostic,
   EncodeData,
   Enum,
@@ -176,8 +175,8 @@ export function addEncodeInfo(
     }
   }
   if (innerType.kind === "bytes") {
-    if (encodeData) {
-      innerType.encode = encodeData.encoding as BytesKnownEncoding;
+    if (encodeData && encodeData.encoding) {
+      innerType.encode = encodeData.encoding;
     } else if (type.kind === "Scalar" || !defaultContentType) {
       // for scalar bytes without specific encode, or no specific content type, fallback to base64
       innerType.encode = "base64";
