@@ -164,7 +164,7 @@ model Operation {
 }
 
 /**
- * Localized display information for and operation.
+ * Localized display information for an operation.
  */
 model OperationDisplay {
   /** 
