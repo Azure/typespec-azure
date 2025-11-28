@@ -181,5 +181,6 @@ it("array with encode", async () => {
   strictEqual(model.name, "Foo");
   strictEqual(model.properties.length, 1);
   const modelProp = model.properties[0];
+  strictEqual(modelProp.type.kind, "array");
   strictEqual(modelProp.encode, "commaDelimited");
 });

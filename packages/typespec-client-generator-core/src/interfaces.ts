@@ -401,8 +401,8 @@ export interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
   name: string;
   baseType?: SdkDurationType;
-  encode: DurationKnownEncoding;
   /** How to encode the type on wire. */
+  encode: DurationKnownEncoding;
   wireType: SdkBuiltInType;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
