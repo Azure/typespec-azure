@@ -4216,3 +4216,27 @@ With the above two calls, we test the following configurations from this service
 - A client generated from the second service spec can call the second deployment of a service with api version v2 with the updated changes
 
 Tests that we can grow up an operation from accepting one required parameter to accepting a required parameter and an optional parameter.
+
+### Service_MultiService_Scenario
+
+- Endpoints:
+  - `get /multi-service/first/one`
+  - `get /multi-service/first/two`
+  - `get /multi-service/second/one`
+  - `get /multi-service/second/two`
+
+Test that a client can expose operations from multiple services.
+This scenario demonstrates creating a unified client that provides access to
+operations from different services using the @client decorator.
+
+```ts
+const client = new MultiServiceClient();
+
+// Call operations from first service - uses api-version 1.1.0
+client.firstOne();
+client.firstTwo();
+
+// Call operations from second service - uses api-version 2.1.0
+client.secondOne();
+client.secondTwo();
+```

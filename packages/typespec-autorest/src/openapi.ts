@@ -153,6 +153,7 @@ import { createDiagnostic, reportDiagnostic } from "./lib.js";
 import {
   OpenAPI2BodyParameter,
   OpenAPI2Document,
+  OpenAPI2ExternalDocs,
   OpenAPI2FileSchema,
   OpenAPI2HeaderDefinition,
   OpenAPI2HeaderParameter,
@@ -2040,7 +2041,7 @@ export async function getOpenAPIForService(
       if (prop.defaultValue && !("$ref" in property)) {
         property.default = getDefaultValue(prop.defaultValue, prop);
       }
-
+      applyExternalDocs(prop, property);
       if (isReadonlyProperty(program, prop)) {
         property.readOnly = true;
       } else {
@@ -2440,6 +2441,13 @@ export async function getOpenAPIForService(
           default:
             return encodeAsFormat ?? encoding;
         }
+      case "byte":
+        switch (encoding) {
+          case "base64":
+            return "byte";
+          default:
+            return encodeAsFormat ?? encoding ?? format;
+        }
       default:
         return encodeAsFormat ?? encoding ?? format;
     }
@@ -2451,7 +2459,7 @@ export async function getOpenAPIForService(
       target.title = summary;
     }
   }
-  function applyExternalDocs(typespecType: Type, target: Record<string, unknown>) {
+  function applyExternalDocs(typespecType: Type, target: { externalDocs?: OpenAPI2ExternalDocs }) {
     const externalDocs = getExternalDocs(program, typespecType);
     if (externalDocs) {
       target.externalDocs = externalDocs;

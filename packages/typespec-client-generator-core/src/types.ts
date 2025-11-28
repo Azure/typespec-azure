@@ -1136,7 +1136,7 @@ export function getClientType(context: TCGCContext, type: Type, operation?: Oper
   return ignoreDiagnostics(getClientTypeWithDiagnostics(context, type, operation));
 }
 
-export function isReadOnly(property: SdkModelPropertyType) {
+export function isReadOnly(property: SdkModelPropertyTypeBase) {
   if (
     property.visibility &&
     property.visibility.includes(Visibility.Read) &&

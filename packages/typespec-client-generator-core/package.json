@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-client-generator-core",
-  "version": "0.61.3",
+  "version": "0.62.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Data Plane Generation library",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -74,7 +74,7 @@
   "devDependencies": {
     "@azure-tools/typespec-azure-core": "workspace:^",
     "@azure-tools/typespec-azure-resource-manager": "workspace:^",
-    "@types/node": "~24.9.1",
+    "@types/node": "~24.10.1",
     "@types/pluralize": "^0.0.33",
     "@typespec/compiler": "workspace:^",
     "@typespec/events": "workspace:^",
@@ -90,7 +90,7 @@
     "@vitest/coverage-v8": "^4.0.4",
     "@vitest/ui": "^4.0.4",
     "c8": "^10.1.3",
-    "rimraf": "~6.0.1",
+    "rimraf": "~6.1.2",
     "typescript": "~5.9.2",
     "vitest": "^4.0.4"
   }

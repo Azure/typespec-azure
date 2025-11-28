@@ -1,3 +1,4 @@
+import { isService } from "@typespec/compiler";
 import { strictEqual } from "assert";
 import {
   SdkClientType,
@@ -58,5 +59,13 @@ export function getServiceMethodOfClient(
 }
 
 export function getServiceNamespace(runner: SdkTestRunner) {
+  // Use the non-mutated program to find service namespaces, since servers are defined there
+  const globalNs = runner.context.program.getGlobalNamespaceType();
+  for (const [_, ns] of globalNs.namespaces) {
+    if (isService(runner.context.program, ns)) {
+      return ns;
+    }
+  }
+  // Fallback to mutated namespace lookup
   return listAllServiceNamespaces(runner.context)[0];
 }

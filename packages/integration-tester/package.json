@@ -27,7 +27,7 @@
   "dependencies": {
     "@pnpm/workspace.find-packages": "^1000.0.24",
     "execa": "^9.5.2",
-    "globby": "~15.0.0",
+    "globby": "~16.0.0",
     "log-symbols": "^7.0.1",
     "ora": "^9.0.0",
     "pathe": "^2.0.3",

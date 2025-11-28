@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-Add spector test for `@nextLinkVerb` decorator
+Add test for multi-service scenarios

@@ -1,5 +1,23 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.62.0
+
+### Features
+
+- [#3422](https://github.com/Azure/typespec-azure/pull/3422) Add new `External` usage flag to `UsageFlags` enum. This flag is automatically set for types that are only referenced by external types (types with `@alternateType` decorator pointing to external library types). The flag propagates recursively through the type graph, marking all types that are exclusively accessible through external types.
+- [#3401](https://github.com/Azure/typespec-azure/pull/3401) Add `@nextLinkVerb` decorator to specify HTTP verb for next page calls in paging operations. The decorator accepts "POST" or "GET" and defaults to "GET" when not specified. The `nextLinkVerb` field in `SdkPagingServiceMetadata` stores the HTTP verb as a string.
+- [#3464](https://github.com/Azure/typespec-azure/pull/3464) Support discriminated union.
+- [#3448](https://github.com/Azure/typespec-azure/pull/3448) add support for `Http.File` types as input and output
+
+### Bump dependencies
+
+- [#3447](https://github.com/Azure/typespec-azure/pull/3447) Upgrade dependencies october 2025
+
+### Bug Fixes
+
+- [#3451](https://github.com/Azure/typespec-azure/pull/3451) Propagate client initialization parameters to subclients
+
+
 ## 0.61.3
 
 ### Bug Fixes
