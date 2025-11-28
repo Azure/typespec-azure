@@ -27,6 +27,7 @@ enum Versions {
 interface Operations extends Azure.ResourceManager.Operations {}
 
 /** A best practice resource */
+#suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "For sample purpose"
 model BestPractice is Azure.ResourceManager.ProxyResource<BestPracticeProperties> {
   ...ResourceNameParameter<
     Resource = BestPractice,

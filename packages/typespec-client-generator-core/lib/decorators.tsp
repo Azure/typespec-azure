@@ -55,33 +55,79 @@ extern dec clientName(target: unknown, rename: valueof string, scope?: valueof s
 
 /**
  * Whether you want to generate an operation as a convenient method.
- * @param target The target operation.
+ * When applied to a namespace or interface, it affects all operations within that scope unless explicitly overridden.
+ * @param target The target operation, namespace, or interface.
  * @param flag Whether to generate the operation as a convenience method or not.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  *
- * @example
+ * @example Apply to a single operation
  * ```typespec
  * @convenientAPI(false)
  * op test: void;
  * ```
+ *
+ * @example Apply to all operations in an interface
+ * ```typespec
+ * @convenientAPI(false)
+ * interface MyOperations {
+ *   op test1(): void;
+ *   op test2(): void;
+ * }
+ * ```
+ *
+ * @example Apply to all operations in a namespace
+ * ```typespec
+ * @convenientAPI(false)
+ * namespace MyService {
+ *   op test1(): void;
+ *   op test2(): void;
+ * }
+ * ```
  */
-extern dec convenientAPI(target: Operation, flag?: valueof boolean, scope?: valueof string);
+extern dec convenientAPI(
+  target: Operation | Namespace | Interface,
+  flag?: valueof boolean,
+  scope?: valueof string
+);
 
 /**
  * Whether you want to generate an operation as a protocol method.
- * @param target The target operation.
+ * When applied to a namespace or interface, it affects all operations within that scope unless explicitly overridden.
+ * @param target The target operation, namespace, or interface.
  * @param flag Whether to generate the operation as a protocol method or not.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  *
- * @example
+ * @example Apply to a single operation
  * ```typespec
  * @protocolAPI(false)
  * op test: void;
  * ```
+ *
+ * @example Apply to all operations in an interface
+ * ```typespec
+ * @protocolAPI(false)
+ * interface MyOperations {
+ *   op test1(): void;
+ *   op test2(): void;
+ * }
+ * ```
+ *
+ * @example Apply to all operations in a namespace
+ * ```typespec
+ * @protocolAPI(false)
+ * namespace MyService {
+ *   op test1(): void;
+ *   op test2(): void;
+ * }
+ * ```
  */
-extern dec protocolAPI(target: Operation, flag?: valueof boolean, scope?: valueof string);
+extern dec protocolAPI(
+  target: Operation | Namespace | Interface,
+  flag?: valueof boolean,
+  scope?: valueof string
+);
 
 /**
  * Define the client generated in the client SDK.
@@ -126,6 +172,11 @@ model ClientOptions {
    * The name of the client. If not specified, the default name will be `<Name of the target>Client`.
    */
   name?: string;
+
+  /**
+   * The parent client of this client. If specified, this client will be generated as a sub client of the parent client.
+   */
+  parent?: Namespace | Interface;
 }
 
 /**

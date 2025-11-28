@@ -226,3 +226,15 @@ extern dec legacyExtensionResourceOperation(
     | "checkExistence",
   resourceName?: valueof string
 );
+
+/**
+ * Validates that the specified common-types version is valid for the given resource type.
+ * @param target The resource model
+ * @param version The common-types version
+ * @param resourceName The name of the resource
+ */
+extern dec validateCommonTypesVersionForResource(
+  target: Model,
+  version: valueof string,
+  resourceName: valueof string
+);

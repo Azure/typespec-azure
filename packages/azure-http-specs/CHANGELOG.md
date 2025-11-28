@@ -1,5 +1,22 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.32
+
+### Features
+
+- [#3458](https://github.com/Azure/typespec-azure/pull/3458) Add spector test for `@nextLinkVerb` decorator
+
+### Bump dependencies
+
+- [#3447](https://github.com/Azure/typespec-azure/pull/3447) Upgrade dependencies october 2025
+
+### Bug Fixes
+
+- [#3428](https://github.com/Azure/typespec-azure/pull/3428) Fix URI inconsistency in alternate-type mockapi.ts to match main.tsp definition
+- [#3424](https://github.com/Azure/typespec-azure/pull/3424) Bug fix for Arm ExtensionResource test case
+- [#3350](https://github.com/Azure/typespec-azure/pull/3350) Remove unused openapi using
+
+
 ## 0.1.0-alpha.31
 
 ### Bug Fixes

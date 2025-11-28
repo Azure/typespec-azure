@@ -180,10 +180,10 @@ export function checkDecoratorsInDisallowedNamespace(
   type: Type & DecoratedType,
   disallowedNamespace: "Private" | "Legacy",
 ) {
-  if (getLocationContext(context.program, type).type !== "project") {
-    return;
-  }
   for (const decorator of type.decorators) {
+    if (decorator.node && getLocationContext(context.program, decorator.node).type !== "project") {
+      continue;
+    }
     if (
       decorator.definition &&
       isInDisallowedNamespace(decorator.definition, disallowedNamespace) &&
@@ -197,7 +197,7 @@ export function checkDecoratorsInDisallowedNamespace(
   }
 }
 
-function isInDisallowedNamespace(
+export function isInDisallowedNamespace(
   type: Type,
   disallowedNamespace: "Private" | "Legacy",
 ): type is Type & { namespace: Namespace } {
