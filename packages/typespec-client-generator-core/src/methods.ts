@@ -63,7 +63,6 @@ import {
 import {
   createGeneratedName,
   findRootSourceProperty,
-  getAllResponseBodiesAndNonBodyExists,
   getAvailableApiVersions,
   getClientDoc,
   getCorrespondingClientParam,
@@ -571,8 +570,17 @@ function getSdkMethodResponse(
   client: SdkClientType<SdkServiceOperation>,
 ): SdkMethodResponse {
   const responses = sdkOperation.responses;
-  // TODO: put head as bool here
-  const { allResponseBodies, nonBodyExists } = getAllResponseBodiesAndNonBodyExists(responses);
+
+  const allResponseBodies: SdkType[] = [];
+  let containsResponseWithoutBody = false;
+  responses.forEach((response) => {
+    if (response.type) {
+      allResponseBodies.push(response.type);
+    } else {
+      containsResponseWithoutBody = true;
+    }
+  });
+
   const responseTypes = new Set<string>(allResponseBodies.map((x) => getHashForType(x)));
   let type: SdkType | undefined = undefined;
   if (getResponseAsBool(context, operation)) {
@@ -596,15 +604,15 @@ function getSdkMethodResponse(
       type = allResponseBodies[0];
     }
   }
-  
+
   // Set optional property based on whether responses have bodies
+  // If type is undefined (no response), optional remains undefined
   let optional: boolean | undefined = undefined;
   if (type !== undefined) {
     // If we have a response type, set optional based on whether some responses lack bodies
-    optional = nonBodyExists;
+    optional = containsResponseWithoutBody;
   }
-  // If type is undefined (no response), optional remains undefined
-  
+
   return {
     kind: "method",
     type,
