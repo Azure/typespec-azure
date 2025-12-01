@@ -221,3 +221,83 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParentClient_ChildClien
     kind: "MockApiDefinition",
   },
 ]);
+
+// Mock responses for OptionalParams scenario
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_OptionalParams = passOnSuccess([
+  {
+    uri: "/azure/client-generator-core/client-initialization/optional-params/with-query",
+    method: "get",
+    request: {
+      query: {
+        id: "test-id",
+        region: "us-west",
+      },
+      headers: {
+        name: "test-name-value",
+      },
+    },
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/azure/client-generator-core/client-initialization/optional-params/with-body",
+    method: "post",
+    request: {
+      query: {
+        region: "us-west",
+      },
+      headers: {
+        name: "test-name-value",
+      },
+      body: json({
+        name: "test-name",
+      }),
+    },
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+]);
+
+// Mock responses for OptionalAndRequiredParams scenario
+Scenarios.Azure_ClientGeneratorCore_ClientInitialization_OptionalAndRequiredParams = passOnSuccess([
+  {
+    uri: "/azure/client-generator-core/client-initialization/optional-and-required-params/with-query",
+    method: "get",
+    request: {
+      query: {
+        id: "test-id",
+        region: "us-west",
+      },
+      headers: {
+        name: "test-name-value",
+      },
+    },
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/azure/client-generator-core/client-initialization/optional-and-required-params/with-body",
+    method: "post",
+    request: {
+      query: {
+        region: "us-west",
+      },
+      headers: {
+        name: "test-name-value",
+      },
+      body: json({
+        name: "test-name",
+      }),
+    },
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+]);

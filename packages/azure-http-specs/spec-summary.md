@@ -608,6 +608,73 @@ client.withQuery(id: "test-id");  // No need to pass name or region here
 client.withBody({ name: "test-name" });  // No need to pass name or region here
 ```
 
+### Azure_ClientGeneratorCore_ClientInitialization_OptionalAndRequiredParams
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/optional-and-required-params/with-query`
+  - `get /azure/client-generator-core/client-initialization/optional-and-required-params/with-body`
+
+Client for testing a mix of optional and required parameters moved to client level.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (required header parameter)
+- region: "us-west" (optional query parameter)
+
+Some languages may add optional parameters as properties to ClientOptions while
+required parameters are constructor arguments.
+
+Expected client usage:
+
+```ts
+// With all parameters provided
+const client = new OptionalAndRequiredParamsClient({
+  name: "test-name-value",  // Required
+  region: "us-west"         // Optional
+});
+
+client.withQuery(id: "test-id");  // No need to pass name or region here
+client.withBody({ name: "test-name" });  // No need to pass name or region here
+
+// With only required parameter
+const clientRequiredOnly = new OptionalAndRequiredParamsClient({
+  name: "test-name-value"  // Required
+  // region is omitted (optional)
+});
+```
+
+### Azure_ClientGeneratorCore_ClientInitialization_OptionalParams
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/optional-params/with-query`
+  - `get /azure/client-generator-core/client-initialization/optional-params/with-body`
+
+Client for testing optional parameters moved to client level.
+
+Parameters elevated to client level (all optional):
+
+- name: "test-name-value" (optional header parameter)
+- region: "us-west" (optional query parameter)
+
+Some languages may add optional parameters as properties to ClientOptions.
+
+Expected client usage:
+
+```ts
+// With all optional parameters provided
+const client = new OptionalParamsClient({
+  name: "test-name-value",
+  region: "us-west"
+});
+
+client.withQuery(id: "test-id");  // No need to pass name or region here
+client.withBody({ name: "test-name" });  // No need to pass name or region here
+
+// Without optional parameters (using defaults/omitting)
+const clientNoParams = new OptionalParamsClient();
+clientNoParams.withQuery(id: "test-id");
+```
+
 ### Azure_ClientGeneratorCore_ClientInitialization_ParamAlias
 
 - Endpoints:

@@ -47,6 +47,22 @@ model ParamAliasClientOptions {
   blobName: string;
 }
 
+model OptionalParamsClientOptions {
+  @doc("Optional name parameter. This parameter is used as a header in all operations.")
+  name?: string;
+
+  @doc("Optional region parameter. This parameter is used as a query parameter.")
+  region?: string;
+}
+
+model OptionalAndRequiredParamsClientOptions {
+  @doc("Required name parameter. This parameter is used as a header in all operations.")
+  name: string;
+
+  @doc("Optional region parameter. This parameter is used as a query parameter.")
+  region?: string;
+}
+
 // Scenario 1: Header parameter moved to client level
 @scenarioDoc("""
   Client for testing header parameter moved to client level.
@@ -243,4 +259,83 @@ namespace ParentClient {
     getStandalone is Service.ChildClient.getStandalone;
     deleteStandalone is Service.ChildClient.deleteStandalone;
   }
+}
+
+// Scenario 7: Optional parameters moved to client level
+@scenarioDoc("""
+  Client for testing optional parameters moved to client level.
+  
+  Parameters elevated to client level (all optional):
+  - name: "test-name-value" (optional header parameter)
+  - region: "us-west" (optional query parameter)
+  
+  Some languages may add optional parameters as properties to ClientOptions.
+  
+  Expected client usage:
+  ```ts
+  // With all optional parameters provided
+  const client = new OptionalParamsClient({
+    name: "test-name-value",
+    region: "us-west"
+  });
+  
+  client.withQuery(id: "test-id");  // No need to pass name or region here
+  client.withBody({ name: "test-name" });  // No need to pass name or region here
+  
+  // Without optional parameters (using defaults/omitting)
+  const clientNoParams = new OptionalParamsClient();
+  clientNoParams.withQuery(id: "test-id");
+  ```
+  """)
+@scenario
+@global.Azure.ClientGenerator.Core.client({
+  name: "OptionalParamsClient",
+  service: Service,
+})
+@global.Azure.ClientGenerator.Core.clientInitialization(OptionalParamsClientOptions)
+@route("/optional-params")
+interface OptionalParams {
+  withQuery is Service.OptionalParams.withQuery;
+  withBody is Service.OptionalParams.withBody;
+}
+
+// Scenario 8: Optional and required parameters moved to client level
+@scenarioDoc("""
+  Client for testing a mix of optional and required parameters moved to client level.
+  
+  Parameters elevated to client level:
+  - name: "test-name-value" (required header parameter)
+  - region: "us-west" (optional query parameter)
+  
+  Some languages may add optional parameters as properties to ClientOptions while
+  required parameters are constructor arguments.
+  
+  Expected client usage:
+  ```ts
+  // With all parameters provided
+  const client = new OptionalAndRequiredParamsClient({
+    name: "test-name-value",  // Required
+    region: "us-west"         // Optional
+  });
+  
+  client.withQuery(id: "test-id");  // No need to pass name or region here
+  client.withBody({ name: "test-name" });  // No need to pass name or region here
+  
+  // With only required parameter
+  const clientRequiredOnly = new OptionalAndRequiredParamsClient({
+    name: "test-name-value"  // Required
+    // region is omitted (optional)
+  });
+  ```
+  """)
+@scenario
+@global.Azure.ClientGenerator.Core.client({
+  name: "OptionalAndRequiredParamsClient",
+  service: Service,
+})
+@global.Azure.ClientGenerator.Core.clientInitialization(OptionalAndRequiredParamsClientOptions)
+@route("/optional-and-required-params")
+interface OptionalAndRequiredParams {
+  withQuery is Service.OptionalAndRequiredParams.withQuery;
+  withBody is Service.OptionalAndRequiredParams.withBody;
 }
