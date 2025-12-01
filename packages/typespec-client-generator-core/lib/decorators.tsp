@@ -736,10 +736,10 @@ extern dec alternateType(
 );
 
 /**
- * Define the scope of an operation.
- * By default, the operation will be applied to all language emitters.
- * This decorator allows you to omit the operation from certain languages or apply it to specific languages.
- * @param target The target operation that you want to scope.
+ * Define the scope of an operation, model, or model property.
+ * By default, the element will be applied to all language emitters.
+ * This decorator allows you to omit the element from certain languages or apply it to specific languages.
+ * @param target The target operation, model, or model property that you want to scope.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  *
@@ -754,8 +754,24 @@ extern dec alternateType(
  * @scope("go")
  * op test: void;
  * ```
+ *
+ * @example Omit a model from a specific language
+ * ```typespec
+ * @scope("!csharp")
+ * model InternalModel {
+ *   prop: string;
+ * }
+ * ```
+ *
+ * @example Apply a model property to specific languages
+ * ```typespec
+ * model TestModel {
+ *   @scope("internal")
+ *   internalProp: string;
+ * }
+ * ```
  */
-extern dec scope(target: Operation, scope?: valueof string);
+extern dec scope(target: Operation | Model | ModelProperty, scope?: valueof string);
 
 /**
  * Specify whether a parameter is an API version parameter or not.

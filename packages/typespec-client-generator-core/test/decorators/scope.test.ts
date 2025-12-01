@@ -704,3 +704,251 @@ describe("negation", () => {
     strictEqual(javaSdkModel, undefined);
   });
 });
+
+describe("model scope", () => {
+  it("include model for matching scope", async () => {
+    const runnerWithCSharp = await createSdkTestRunner({
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    await runnerWithCSharp.compile(`
+      @service
+      namespace MyService {
+        @scope("csharp")
+        model InternalModel {
+          prop: string;
+        }
+        op func(
+          @body body: InternalModel
+        ): void;
+      }
+    `);
+
+    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const model = sdkPackage.models.find((x) => x.name === "InternalModel");
+    ok(model);
+  });
+
+  it("exclude model from non-matching scope", async () => {
+    const runnerWithPython = await createSdkTestRunner({
+      emitterName: "@azure-tools/typespec-python",
+    });
+    await runnerWithPython.compile(`
+      @service
+      namespace MyService {
+        @scope("csharp")
+        model InternalModel {
+          prop: string;
+        }
+        @scope("python")
+        model PublicModel {
+          prop: string;
+        }
+        @route("/csharp")
+        @scope("csharp")
+        op csharpFunc(
+          @body body: InternalModel
+        ): void;
+        @route("/python")
+        @scope("python")
+        op pythonFunc(
+          @body body: PublicModel
+        ): void;
+      }
+    `);
+
+    const sdkPackage = runnerWithPython.context.sdkPackage;
+    const internalModel = sdkPackage.models.find((x) => x.name === "InternalModel");
+    const publicModel = sdkPackage.models.find((x) => x.name === "PublicModel");
+    strictEqual(internalModel, undefined);
+    ok(publicModel);
+  });
+
+  it("exclude model with negation scope", async () => {
+    const runnerWithCSharp = await createSdkTestRunner({
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    await runnerWithCSharp.compile(`
+      @service
+      namespace MyService {
+        @scope("!csharp")
+        model InternalModel {
+          prop: string;
+        }
+        model PublicModel {
+          prop: string;
+        }
+        op func(
+          @body body: PublicModel
+        ): void;
+      }
+    `);
+
+    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const internalModel = sdkPackage.models.find((x) => x.name === "InternalModel");
+    const publicModel = sdkPackage.models.find((x) => x.name === "PublicModel");
+    strictEqual(internalModel, undefined);
+    ok(publicModel);
+  });
+
+  it("include model without scope decorator", async () => {
+    const runnerWithCSharp = await createSdkTestRunner({
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    await runnerWithCSharp.compile(`
+      @service
+      namespace MyService {
+        model RegularModel {
+          prop: string;
+        }
+        op func(
+          @body body: RegularModel
+        ): void;
+      }
+    `);
+
+    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const model = sdkPackage.models.find((x) => x.name === "RegularModel");
+    ok(model);
+  });
+});
+
+describe("model property scope", () => {
+  it("include property for matching scope", async () => {
+    const runnerWithCSharp = await createSdkTestRunner({
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    await runnerWithCSharp.compile(`
+      @service
+      namespace MyService {
+        model TestModel {
+          @scope("csharp")
+          csharpProp: string;
+          commonProp: string;
+        }
+        op func(
+          @body body: TestModel
+        ): void;
+      }
+    `);
+
+    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const model = sdkPackage.models.find((x) => x.name === "TestModel");
+    ok(model);
+    const csharpProp = model.properties.find((x) => x.name === "csharpProp");
+    const commonProp = model.properties.find((x) => x.name === "commonProp");
+    ok(csharpProp);
+    ok(commonProp);
+  });
+
+  it("exclude property from non-matching scope", async () => {
+    const runnerWithPython = await createSdkTestRunner({
+      emitterName: "@azure-tools/typespec-python",
+    });
+    await runnerWithPython.compile(`
+      @service
+      namespace MyService {
+        model TestModel {
+          @scope("csharp")
+          csharpProp: string;
+          commonProp: string;
+        }
+        op func(
+          @body body: TestModel
+        ): void;
+      }
+    `);
+
+    const sdkPackage = runnerWithPython.context.sdkPackage;
+    const model = sdkPackage.models.find((x) => x.name === "TestModel");
+    ok(model);
+    const csharpProp = model.properties.find((x) => x.name === "csharpProp");
+    const commonProp = model.properties.find((x) => x.name === "commonProp");
+    strictEqual(csharpProp, undefined);
+    ok(commonProp);
+  });
+
+  it("exclude property with negation scope", async () => {
+    const runnerWithCSharp = await createSdkTestRunner({
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    await runnerWithCSharp.compile(`
+      @service
+      namespace MyService {
+        model TestModel {
+          @scope("!csharp")
+          internalProp: string;
+          commonProp: string;
+        }
+        op func(
+          @body body: TestModel
+        ): void;
+      }
+    `);
+
+    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const model = sdkPackage.models.find((x) => x.name === "TestModel");
+    ok(model);
+    const internalProp = model.properties.find((x) => x.name === "internalProp");
+    const commonProp = model.properties.find((x) => x.name === "commonProp");
+    strictEqual(internalProp, undefined);
+    ok(commonProp);
+  });
+
+  it("include all properties without scope decorator", async () => {
+    const runnerWithCSharp = await createSdkTestRunner({
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    await runnerWithCSharp.compile(`
+      @service
+      namespace MyService {
+        model TestModel {
+          prop1: string;
+          prop2: int32;
+        }
+        op func(
+          @body body: TestModel
+        ): void;
+      }
+    `);
+
+    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const model = sdkPackage.models.find((x) => x.name === "TestModel");
+    ok(model);
+    strictEqual(model.properties.length, 2);
+  });
+
+  it("multiple properties with different scopes", async () => {
+    const runnerWithCSharp = await createSdkTestRunner({
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    await runnerWithCSharp.compile(`
+      @service
+      namespace MyService {
+        model TestModel {
+          @scope("csharp")
+          csharpProp: string;
+          @scope("python")
+          pythonProp: string;
+          @scope("java")
+          javaProp: string;
+          commonProp: string;
+        }
+        op func(
+          @body body: TestModel
+        ): void;
+      }
+    `);
+
+    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const model = sdkPackage.models.find((x) => x.name === "TestModel");
+    ok(model);
+    const csharpProp = model.properties.find((x) => x.name === "csharpProp");
+    const pythonProp = model.properties.find((x) => x.name === "pythonProp");
+    const javaProp = model.properties.find((x) => x.name === "javaProp");
+    const commonProp = model.properties.find((x) => x.name === "commonProp");
+    ok(csharpProp);
+    strictEqual(pythonProp, undefined);
+    strictEqual(javaProp, undefined);
+    ok(commonProp);
+  });
+});
