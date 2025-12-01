@@ -101,3 +101,32 @@ it("defines nullable record", async () => {
     type: "object",
   });
 });
+
+it("specify default value on nullable property", async () => {
+  const prop = await getPropertySchema(`
+      model Test {
+        prop?: string | null = null;
+      };
+    `);
+
+  expect(prop).toEqual({
+    type: "string",
+    "x-nullable": true,
+    default: null,
+  });
+});
+
+it("keeps constraints", async () => {
+  const prop = await getPropertySchema(`
+    model Test {
+      @minLength(3)
+      prop: string | null;
+    }
+  `);
+
+  expect(prop).toEqual({
+    type: "string",
+    "x-nullable": true,
+    minLength: 3,
+  });
+});

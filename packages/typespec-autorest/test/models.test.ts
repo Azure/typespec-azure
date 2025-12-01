@@ -185,29 +185,6 @@ describe("typespec-autorest: model definitions", () => {
     });
   });
 
-  it("specify default value on nullable property", async () => {
-    const res = await oapiForModel(
-      "Foo",
-      `
-      model Foo {
-        optional?: string | null = null;
-      };
-      `,
-    );
-
-    ok(res.defs.Foo, "expected definition named Foo");
-    deepStrictEqual(res.defs.Foo, {
-      type: "object",
-      properties: {
-        optional: {
-          type: "string",
-          "x-nullable": true,
-          default: null,
-        },
-      },
-    });
-  });
-
   it("emits models extended from models when parent is emitted", async () => {
     const res = await compileOpenAPI(
       `

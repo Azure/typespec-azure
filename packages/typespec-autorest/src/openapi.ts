@@ -74,7 +74,6 @@ import {
   getPagingOperation,
   getPattern,
   getProperty,
-  getPropertyType,
   getRelativePathFromDirectory,
   getRootLength,
   getSummary,
@@ -89,11 +88,9 @@ import {
   isList,
   isNeverType,
   isNullType,
-  isNumericType,
   isRecordModelType,
   isSecret,
   isService,
-  isStringType,
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
   isVoidType,
@@ -2288,12 +2285,6 @@ export async function getOpenAPIForService(
   ): OpenAPI2Schema {
     const newTarget = { ...target };
     const docStr = getDoc(program, typespecType);
-    const isString =
-      (typespecType.kind === "Scalar" || typespecType.kind === "ModelProperty") &&
-      isStringType(program, getPropertyType(typespecType));
-    const isNumeric =
-      (typespecType.kind === "Scalar" || typespecType.kind === "ModelProperty") &&
-      isNumericType(program, getPropertyType(typespecType));
 
     if (docStr) {
       newTarget.description = docStr;
@@ -2305,7 +2296,7 @@ export async function getOpenAPIForService(
     }
 
     const formatStr = getFormat(program, typespecType);
-    if (isString && formatStr) {
+    if (formatStr) {
       const allowedStringFormats = [
         "char",
         "binary",
@@ -2336,27 +2327,27 @@ export async function getOpenAPIForService(
     }
 
     const pattern = getPattern(program, typespecType);
-    if (isString && pattern) {
+    if (pattern) {
       newTarget.pattern = pattern;
     }
 
     const minLength = getMinLength(program, typespecType);
-    if (isString && minLength !== undefined) {
+    if (minLength !== undefined) {
       newTarget.minLength = minLength;
     }
 
     const maxLength = getMaxLength(program, typespecType);
-    if (isString && maxLength !== undefined) {
+    if (maxLength !== undefined) {
       newTarget.maxLength = maxLength;
     }
 
     const minValue = getMinValue(program, typespecType);
-    if (isNumeric && minValue !== undefined) {
+    if (minValue !== undefined) {
       newTarget.minimum = minValue;
     }
 
     const maxValue = getMaxValue(program, typespecType);
-    if (isNumeric && maxValue !== undefined) {
+    if (maxValue !== undefined) {
       newTarget.maximum = maxValue;
     }
 
