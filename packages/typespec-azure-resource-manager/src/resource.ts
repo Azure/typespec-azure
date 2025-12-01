@@ -622,7 +622,7 @@ function getResourceScope(
 }
 
 function isVariableSegment(segment: string): boolean {
-  return (segment.startsWith("{") && segment.endsWith("}")) || segment === "default";
+  return (segment.startsWith("{") && segment.endsWith("}"));
 }
 
 function getResourceInfo(
@@ -652,11 +652,7 @@ export function getResourcePathElements(
       break;
     }
 
-    if (i + 1 < segments.length && isVariableSegment(segments[i + 1])) {
-      typeSegments.push(segments[i]);
-      instanceSegments.push(segments[i]);
-      instanceSegments.push(segments[i + 1]);
-    } else if (i + 1 === segments.length) {
+    if (i + 1 === segments.length) {
       switch (kind) {
         case "list":
           typeSegments.push(segments[i]);
@@ -666,7 +662,10 @@ export function getResourcePathElements(
         default:
           break;
       }
-      break;
+    } else {
+      typeSegments.push(segments[i]);
+      instanceSegments.push(segments[i]);
+      instanceSegments.push(segments[i + 1]);
     }
   }
   if (provider !== undefined && typeSegments.length > 0) {
