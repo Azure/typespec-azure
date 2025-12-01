@@ -5,9 +5,15 @@ import "@typespec/http";
 
 using Spector;
 using Http;
-using _Specs_.Azure.ClientGenerator.Core.ClientInitialization;
+
+@route("/azure/client-generator-core/client-initialization")
+namespace _Specs_.Azure.ClientGenerator.Core.ClientInitialization;
 
 @@global.Azure.ClientGenerator.Core.clientNamespace(_Specs_.Azure.ClientGenerator.Core.ClientInitialization,
+  "azure.clientgenerator.core.clientinitialization",
+  "java"
+);
+@@global.Azure.ClientGenerator.Core.clientNamespace(Service,
   "azure.clientgenerator.core.clientinitialization",
   "java"
 );
@@ -62,13 +68,13 @@ model ParamAliasClientOptions {
 @doc("Client for testing header parameter moved to client level.")
 @global.Azure.ClientGenerator.Core.client({
   name: "HeaderParamClient",
-  service: _Specs_.Azure.ClientGenerator.Core.ClientInitialization,
+  service: Service,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization(HeaderParamClientOptions)
 @route("/header-param")
-interface HeaderParamScenario {
-  withQuery is HeaderParam.withQuery;
-  withBody is HeaderParam.withBody;
+interface HeaderParam {
+  withQuery is Service.HeaderParam.withQuery;
+  withBody is Service.HeaderParam.withBody;
 }
 
 // Scenario 2: Multiple parameters (header and query) moved to client level
@@ -93,13 +99,13 @@ interface HeaderParamScenario {
 @scenario
 @global.Azure.ClientGenerator.Core.client({
   name: "MultipleParamsClient",
-  service: _Specs_.Azure.ClientGenerator.Core.ClientInitialization,
+  service: Service,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization(MultipleParamsClientOptions)
 @route("/multiple-params")
-interface MultipleParamsScenario {
-  withQuery is MultipleParams.withQuery;
-  withBody is MultipleParams.withBody;
+interface MultipleParams {
+  withQuery is Service.MultipleParams.withQuery;
+  withBody is Service.MultipleParams.withBody;
 }
 
 // Scenario 3: Mix of client-level and method-level parameters
@@ -125,13 +131,13 @@ interface MultipleParamsScenario {
 @scenario
 @global.Azure.ClientGenerator.Core.client({
   name: "MixedParamsClient",
-  service: _Specs_.Azure.ClientGenerator.Core.ClientInitialization,
+  service: Service,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization(MixedParamsClientOptions)
 @route("/mixed-params")
-interface MixedParamsScenario {
-  withQuery is MixedParams.withQuery;
-  withBody is MixedParams.withBody;
+interface MixedParams {
+  withQuery is Service.MixedParams.withQuery;
+  withBody is Service.MixedParams.withBody;
 }
 
 // Scenario 4: Path parameter moved to client level
@@ -156,14 +162,14 @@ interface MixedParamsScenario {
 @scenario
 @global.Azure.ClientGenerator.Core.client({
   name: "PathParamClient",
-  service: _Specs_.Azure.ClientGenerator.Core.ClientInitialization,
+  service: Service,
 })
 @global.Azure.ClientGenerator.Core.clientInitialization(PathParamClientOptions)
 @route("/path")
-interface PathParamScenario {
-  withQuery is PathParam.withQuery;
-  getStandalone is PathParam.getStandalone;
-  deleteStandalone is PathParam.deleteStandalone;
+interface PathParam {
+  withQuery is Service.PathParam.withQuery;
+  getStandalone is Service.PathParam.getStandalone;
+  deleteStandalone is Service.PathParam.deleteStandalone;
 }
 
 // Scenario 5: Parameter aliases for better client API names
@@ -186,17 +192,17 @@ interface PathParamScenario {
 @global.Azure.ClientGenerator.Core.clientInitialization(ParamAliasClientOptions)
 @global.Azure.ClientGenerator.Core.client({
   name: "ParamAliasClient",
-  service: _Specs_.Azure.ClientGenerator.Core.ClientInitialization,
+  service: Service,
 })
 @route("/param-alias")
-interface ParamAliasScenario {
-  withAliasedName is ParamAlias.withAliasedName;
-  withOriginalName is ParamAlias.withOriginalName;
+interface ParamAlias {
+  withAliasedName is Service.ParamAlias.withAliasedName;
+  withOriginalName is Service.ParamAlias.withOriginalName;
 }
 
 @global.Azure.ClientGenerator.Core.client({
   name: "ParentClient",
-  service: _Specs_.Azure.ClientGenerator.Core.ClientInitialization,
+  service: Service,
 })
 namespace ParentClient {
   @scenarioDoc("""
@@ -232,9 +238,9 @@ namespace ParentClient {
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
   })
   @route("/child-client")
-  interface ChildClientScenario {
-    withQuery is ChildClient.withQuery;
-    getStandalone is ChildClient.getStandalone;
-    deleteStandalone is ChildClient.deleteStandalone;
+  interface ChildClient {
+    withQuery is Service.ChildClient.withQuery;
+    getStandalone is Service.ChildClient.getStandalone;
+    deleteStandalone is Service.ChildClient.deleteStandalone;
   }
 }
