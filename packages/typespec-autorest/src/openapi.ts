@@ -2130,6 +2130,17 @@ export async function getOpenAPIForService(
       const [asEnum, _] = getUnionAsEnum(prop.type);
       if (asEnum) {
         propSchema = getSchemaForUnionEnum(prop.type, asEnum);
+        if (propSchema["x-ms-enum"] && !propSchema["x-ms-enum"].name) {
+          const variants = [...prop.type.variants.values()];
+          const nonNullVariants = variants.filter((v) => !isNullType(v.type));
+          if (
+            nonNullVariants.length === 1 &&
+            variants.length > 1 &&
+            nonNullVariants[0].type.kind === "Enum"
+          ) {
+            propSchema["x-ms-enum"].name = nonNullVariants[0].type.name;
+          }
+        }
       } else {
         propSchema = getSchemaOrRef(prop.type, context);
       }

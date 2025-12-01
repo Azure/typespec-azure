@@ -130,3 +130,27 @@ it("keeps constraints", async () => {
     minLength: 3,
   });
 });
+
+it("nullable enum with default include x-ms-enum.name", async () => {
+  const prop = await getPropertySchema(`
+    enum PetKind { dog, cat }
+    model Test {
+      prop: PetKind | null = null;
+    }
+  `);
+
+  expect(prop).toEqual({
+    type: "string",
+    enum: ["dog", "cat"],
+    "x-ms-enum": {
+      name: "PetKind",
+      modelAsString: false,
+      values: [
+        { name: "dog", value: "dog" },
+        { name: "cat", value: "cat" },
+      ],
+    },
+    "x-nullable": true,
+    default: null,
+  });
+});
