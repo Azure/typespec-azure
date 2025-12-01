@@ -8,7 +8,7 @@ using Azure.ClientGenerator.Core;
 
 @doc("Test for client initialization decorator - moving parameters from method to client level")
 @scenarioService("/azure/client-generator-core/client-initialization")
-namespace Service;
+namespace _Specs_.Azure.ClientGenerator.Core.ClientInitialization;
 
 // Common parameter types and models
 

@@ -161,161 +161,6 @@ Example input:
 
 Output: None (204/empty response)
 
-### Azure_ClientGenerator_Core_ClientInitialization_HeaderParam
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/header-param/with-query`
-  - `get /azure/client-generator-core/client-initialization/header-param/with-body`
-
-Client for testing header parameter moved to client level.
-
-Parameters elevated to client level:
-
-- name: "test-name-value" (header parameter)
-
-Expected client usage:
-
-```ts
-const client = new HeaderParamClient({
-  name: "test-name-value"
-});
-
-client.withQuery(id: "test-id");  // No need to pass name here
-client.withBody({ name: "test-name" });  // No need to pass name here
-```
-
-### Azure_ClientGenerator_Core_ClientInitialization_MixedParams
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/mixed-params/with-query`
-  - `get /azure/client-generator-core/client-initialization/mixed-params/with-body`
-
-  Client for testing a mix of client-level and method-level parameters.
-
-  Parameters elevated to client level:
-  - name: "test-name-value" (header parameter)
-
-  Parameters remaining at method level:
-  - region: "us-west" (query parameter)
-
-  Expected client usage:
-
-  ```ts
-  const client = new MixedParamsClient({
-    name: "test-name-value"
-  });
-
-  client.withQuery(region: "us-west", id: "test-id");  // region stays as method param
-  client.withBody( region: "us-west", body: { name: "test-name" });  // region stays as method param
-  ```
-
-### Azure_ClientGenerator_Core_ClientInitialization_MultipleParams
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/multiple-params/with-query`
-  - `get /azure/client-generator-core/client-initialization/multiple-params/with-body`
-
-Client for testing multiple parameters (header and query) moved to client level.
-
-Parameters elevated to client level:
-
-- name: "test-name-value" (header parameter)
-- region: "us-west" (query parameter)
-
-Expected client usage:
-
-```ts
-const client = new MultipleParamsClient({
-  name: "test-name-value",
-  region: "us-west"
-});
-
-client.withQuery(id: "test-id");  // No need to pass name or region here
-client.withBody({ name: "test-name" });  // No need to pass name or region here
-```
-
-### Azure_ClientGenerator_Core_ClientInitialization_ParamAlias
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/param-alias/{blob}/with-aliased-name`
-  - `get /azure/client-generator-core/client-initialization/param-alias/{blobName}/with-original-name`
-
-Client for testing the @paramAlias decorator for renaming parameters in client code.
-
-Parameters elevated to client level:
-
-- blobName: "sample-blob" (path parameter)
-
-Expected client usage:
-
-```ts
-// Elevated to client level via alias
-client.withAliasedName();
-
-// Elevated to client level via original name
-client.withOriginalName();
-```
-
-### Azure_ClientGenerator_Core_ClientInitialization_ParentClient_ChildClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}`
-
-Client for testing a path parameter (blobName) moved to client level, in child client.
-
-The child client can be initialized individually, or via its parent client.
-
-Parameters elevated to client level:
-
-- blobName: "sample-blob" (path parameter)
-
-Expected client usage:
-
-```ts
-// via ParentClient
-const client = new ParentClient.getChildClient({
-  blobName: "sample-blob"
-});
-
-// directly
-const client = new ChildClient({
-  blobName: "sample-blob"
-});
-
-// No need to pass blobName to any operations
-client.withQuery(format: "text");
-client.getStandalone();
-client.deleteStandalone();
-```
-
-### Azure_ClientGenerator_Core_ClientInitialization_PathParam
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/path/{blobName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/path/{blobName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/path/{blobName}`
-
-Client for testing a path parameter (blobName) moved to client level.
-
-Parameters elevated to client level:
-
-- blobName: "sample-blob" (path parameter)
-
-Expected client usage:
-
-```ts
-const client = new PathParamClient({
-  blobName: "sample-blob"
-});
-
-// No need to pass blobName to any operations
-client.withQuery(format: "text");
-client.getStandalone();
-client.deleteStandalone();
-```
-
 ### Azure_ClientGenerator_Core_ClientLocation_MoveMethodParameterToClient
 
 - Endpoint: `get /azure/client-generator-core/client-location/blob`
@@ -4127,6 +3972,161 @@ client.group1.four();
 client.group2.two();
 client.group2.five();
 client.group2.six();
+```
+
+### HeaderParamScenario
+
+- Endpoints:
+  - `get /header-param/with-query`
+  - `get /header-param/with-body`
+
+Client for testing header parameter moved to client level.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+
+Expected client usage:
+
+```ts
+const client = new HeaderParamClient({
+  name: "test-name-value"
+});
+
+client.withQuery(id: "test-id");  // No need to pass name here
+client.withBody({ name: "test-name" });  // No need to pass name here
+```
+
+### MixedParamsScenario
+
+- Endpoints:
+  - `get /mixed-params/with-query`
+  - `get /mixed-params/with-body`
+
+  Client for testing a mix of client-level and method-level parameters.
+
+  Parameters elevated to client level:
+  - name: "test-name-value" (header parameter)
+
+  Parameters remaining at method level:
+  - region: "us-west" (query parameter)
+
+  Expected client usage:
+
+  ```ts
+  const client = new MixedParamsClient({
+    name: "test-name-value"
+  });
+
+  client.withQuery(region: "us-west", id: "test-id");  // region stays as method param
+  client.withBody( region: "us-west", body: { name: "test-name" });  // region stays as method param
+  ```
+
+### MultipleParamsScenario
+
+- Endpoints:
+  - `get /multiple-params/with-query`
+  - `get /multiple-params/with-body`
+
+Client for testing multiple parameters (header and query) moved to client level.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+- region: "us-west" (query parameter)
+
+Expected client usage:
+
+```ts
+const client = new MultipleParamsClient({
+  name: "test-name-value",
+  region: "us-west"
+});
+
+client.withQuery(id: "test-id");  // No need to pass name or region here
+client.withBody({ name: "test-name" });  // No need to pass name or region here
+```
+
+### ParamAliasScenario
+
+- Endpoints:
+  - `get /param-alias/{blob}/with-aliased-name`
+  - `get /param-alias/{blobName}/with-original-name`
+
+Client for testing the @paramAlias decorator for renaming parameters in client code.
+
+Parameters elevated to client level:
+
+- blobName: "sample-blob" (path parameter)
+
+Expected client usage:
+
+```ts
+// Elevated to client level via alias
+client.withAliasedName();
+
+// Elevated to client level via original name
+client.withOriginalName();
+```
+
+### ParentClient_ChildClientScenario
+
+- Endpoints:
+  - `get /child-client/{blobName}/with-query`
+  - `get /child-client/{blobName}/get-standalone`
+  - `get /child-client/{blobName}`
+
+Client for testing a path parameter (blobName) moved to client level, in child client.
+
+The child client can be initialized individually, or via its parent client.
+
+Parameters elevated to client level:
+
+- blobName: "sample-blob" (path parameter)
+
+Expected client usage:
+
+```ts
+// via ParentClient
+const client = new ParentClient.getChildClient({
+  blobName: "sample-blob"
+});
+
+// directly
+const client = new ChildClient({
+  blobName: "sample-blob"
+});
+
+// No need to pass blobName to any operations
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### PathParamScenario
+
+- Endpoints:
+  - `get /path/{blobName}/with-query`
+  - `get /path/{blobName}/get-standalone`
+  - `get /path/{blobName}`
+
+Client for testing a path parameter (blobName) moved to client level.
+
+Parameters elevated to client level:
+
+- blobName: "sample-blob" (path parameter)
+
+Expected client usage:
+
+```ts
+const client = new PathParamClient({
+  blobName: "sample-blob"
+});
+
+// No need to pass blobName to any operations
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
 ```
 
 ### Resiliency_ServiceDriven_addOperation
