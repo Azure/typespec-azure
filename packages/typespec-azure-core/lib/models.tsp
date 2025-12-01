@@ -75,6 +75,7 @@ model SkipQueryParameter {
 @doc("Provides the standard 'maxpagesize' query parameter for list operations.")
 model MaxPageSizeQueryParameter {
   @query
+  @pageSize
   @doc("The maximum number of result items per page.")
   maxpagesize?: int32;
 }
