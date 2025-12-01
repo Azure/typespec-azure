@@ -994,9 +994,9 @@ op headOperation(): void;
 
 ### `@scope` {#@Azure.ClientGenerator.Core.scope}
 
-Define the scope of an operation.
-By default, the operation will be applied to all language emitters.
-This decorator allows you to omit the operation from certain languages or apply it to specific languages.
+Define the scope of an operation, model, or model property.
+By default, the element will be applied to all language emitters.
+This decorator allows you to omit the element from certain languages or apply it to specific languages.
 
 ```typespec
 @Azure.ClientGenerator.Core.scope(scope?: valueof string)
@@ -1004,8 +1004,8 @@ This decorator allows you to omit the operation from certain languages or apply 
 
 #### Target
 
-The target operation that you want to scope.
-`Operation`
+The target operation, model, or model property that you want to scope.
+`Operation | Model | ModelProperty`
 
 #### Parameters
 
@@ -1027,6 +1027,24 @@ op test: void;
 ```typespec
 @scope("go")
 op test: void;
+```
+
+##### Omit a model from a specific language
+
+```typespec
+@scope("!csharp")
+model InternalModel {
+  prop: string;
+}
+```
+
+##### Apply a model property to specific languages
+
+```typespec
+model TestModel {
+  @scope("internal")
+  internalProp: string;
+}
 ```
 
 ### `@usage` {#@Azure.ClientGenerator.Core.usage}
