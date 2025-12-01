@@ -3504,4 +3504,71 @@ model DependentProperties {
       { operationGroup: "Operations", name: "list", kind: "other" },
     ]);
   });
+  it("supports multiple singleton resources", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@singleton
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@singleton
+model Building is TrackedResource<BuildingProperties> {
+  ...ResourceNameParameter<Building>;
+}
+
+model BuildingProperties {
+  address?: string;
+  
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+  update is ArmCustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+}
+
+@armResourceOperations
+interface Buildings {
+  get is ArmResourceRead<Building>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Building>;
+  update is ArmCustomPatchSync<
+    Building,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Building, BuildingProperties>
+  >;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    expect(provider.resources).toHaveLength(2);
+    const employee = provider.resources![0];
+    ok(employee);
+    expect(employee).toMatchObject({
+      kind: "Tracked",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      scope: "ResourceGroup",
+      parent: undefined,
+    });
+  });
 });
