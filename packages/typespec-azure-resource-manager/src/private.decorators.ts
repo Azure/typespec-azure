@@ -3,14 +3,18 @@ import {
   addVisibilityModifiers,
   clearVisibilityModifiersForClass,
   DecoratorContext,
+  Enum,
   getKeyName,
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
   getTypeName,
   Interface,
   isKey,
+  isTemplateDeclarationOrInstance,
+  isTemplateInstance,
   Model,
   ModelProperty,
+  Namespace,
   Operation,
   Program,
   Scalar,
@@ -64,7 +68,9 @@ import {
   ResourceBaseParametersOfDecorator,
   ResourceParameterBaseForDecorator,
   ResourceParentTypeDecorator,
+  ValidateCommonTypesVersionForResourceDecorator,
 } from "../generated-defs/Azure.ResourceManager.Private.js";
+import { getArmCommonTypesVersion } from "./common-types.js";
 import { reportDiagnostic } from "./lib.js";
 import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
 import {
@@ -446,7 +452,8 @@ export function registerArmResource(
   if (
     namespaceName === undefined ||
     namespaceName === "Azure.ResourceManager" ||
-    namespaceName === "Azure.ResourceManager.Legacy"
+    namespaceName === "Azure.ResourceManager.Legacy" ||
+    namespaceName === "Azure.ResourceManager.CommonTypes"
   ) {
     // The @armResource decorator will be evaluated on instantiations of
     // base templated resource types like TrackedResource<SomeResource>,
@@ -945,6 +952,49 @@ const $legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorat
   }
 };
 
+const $validateCommonTypesVersionForResource: ValidateCommonTypesVersionForResourceDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  version: string,
+  resourceName: string,
+) => {
+  if (isTemplateDeclarationOrInstance(target) && !isTemplateInstance(target)) {
+    return;
+  }
+  const lowestVersion = getLowestCommonTypeVersion(context.program, target.namespace!);
+  if (lowestVersion === undefined || lowestVersion < version) {
+    reportDiagnostic(context.program, {
+      code: "invalid-version-for-common-type",
+      target,
+      format: {
+        resourceName: resourceName,
+        requiredVersion: version,
+        version: lowestVersion ?? "v3",
+      },
+    });
+  }
+};
+
+function getLowestCommonTypeVersion(program: Program, ns: Namespace): string | undefined {
+  let lowestVersion = getArmCommonTypesVersion(program, ns);
+  // If it is versioned namespace, we will check each Version enum member. If no
+  // @armCommonTypeVersion decorator, add the one
+  const versioned = ns.decorators.find((x) => x.definition?.name === "@versioned");
+  if (versioned) {
+    const versionEnum = versioned.args[0].value as Enum;
+    versionEnum.members.forEach((v) => {
+      const candidateVersion = getArmCommonTypesVersion(program, v);
+      if (
+        candidateVersion !== undefined &&
+        (lowestVersion === undefined || lowestVersion > candidateVersion)
+      ) {
+        lowestVersion = candidateVersion;
+      }
+    });
+  }
+  return lowestVersion;
+}
+
 /** @internal */
 export const $decorators = {
   "Azure.ResourceManager.Private": {
@@ -969,6 +1019,7 @@ export const $decorators = {
     legacyExtensionResourceOperation: $legacyExtensionResourceOperation,
     legacyResourceOperation: $legacyResourceOperation,
     builtInResourceOperation: $builtInResourceOperation,
+    validateCommonTypesVersionForResource: $validateCommonTypesVersionForResource,
   } satisfies AzureResourceManagerPrivateDecorators,
   "Azure.ResourceManager.Extension.Private": {
     builtInResource: $builtInResource,

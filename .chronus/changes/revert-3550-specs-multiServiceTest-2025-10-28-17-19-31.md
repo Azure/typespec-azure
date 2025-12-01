@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-Add Rust language to decorator
+Revert incorrect multi-service test.

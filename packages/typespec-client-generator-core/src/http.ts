@@ -79,6 +79,7 @@ import {
   getSdkConstant,
   getSdkModelPropertyTypeBase,
   getTypeSpecBuiltInType,
+  isReadOnly,
 } from "./types.js";
 
 export function getSdkHttpOperation(
@@ -128,6 +129,7 @@ export function getSdkHttpOperation(
     getSdkHttpParameters(context, httpOperation, methodParameters, successResponsesWithBodies[0]),
   );
   filterOutUselessPathParameters(context, httpOperation, methodParameters);
+  filterOutReadOnlyParameters(methodParameters);
   return diagnostics.wrap({
     __raw: httpOperation,
     kind: "http",
@@ -784,6 +786,18 @@ function filterOutUselessPathParameters(
           p.name === (getPathParamName(context.program, param.__raw!) ?? param.name),
       ).length === 0
     ) {
+      methodParameters.splice(i, 1);
+      i--;
+    }
+  }
+}
+
+function filterOutReadOnlyParameters(methodParameters: SdkMethodParameter[]) {
+  // ReadOnly parameters should not be included in method parameters
+  // since they cannot be set by the user
+  for (let i = 0; i < methodParameters.length; i++) {
+    const param = methodParameters[i];
+    if (isReadOnly(param)) {
       methodParameters.splice(i, 1);
       i--;
     }

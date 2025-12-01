@@ -2,7 +2,7 @@
 # Change versionKind to one of: internal, fix, dependencies, feature, deprecation, breaking
 changeKind: fix
 packages:
-  - "@azure-tools/typespec-azure-resource-manager"
+  - "@azure-tools/typespec-azure-core"
 ---
 
-`arm-resource-operation` do not flag template instances
+Fix `no-legacy-usage` linting rule to check for model is, spread and augment decorators

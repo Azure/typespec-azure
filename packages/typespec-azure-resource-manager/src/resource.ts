@@ -25,6 +25,7 @@ import { useStateMap } from "@typespec/compiler/utils";
 import { getHttpOperation, isPathParam } from "@typespec/http";
 import { $autoRoute, getParentResource, getSegment } from "@typespec/rest";
 
+import { pascalCase } from "change-case";
 import {
   ArmProviderNameValueDecorator,
   ArmResourceOperationsDecorator,
@@ -130,7 +131,9 @@ export interface ResourceModel {
 }
 
 export interface Provider {
-  resourceModels?: ResourceModel[];
+  /** The set of resources in this provider */
+  resources?: ResolvedResource[];
+  /** non-resource operations in this provider */
   providerOperations?: ArmResourceOperation[];
 }
 
@@ -150,8 +153,29 @@ export interface ResolvedResourceInfo {
   resourceName: string;
 }
 
+interface ResolvedResourceOperations {
+  operations: ArmResolvedOperationsForResource;
+  /** Other operations associated with this resource */
+  associatedOperations?: ArmResourceOperation[];
+  /** The name of the resource at this instance path  */
+  resourceName: string;
+  /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
+  resourceType: ResourceType;
+  /** The path to the instance of a resource */
+  resourceInstancePath: string;
+  /** The parent of this resource */
+  parent?: ResolvedResource;
+  /** The scope of this resource */
+  scope?: string;
+}
 /** Resolved operations, including operations for non-arm resources */
 export interface ResolvedResource {
+  /** The model type for the resource */
+  type: Model;
+  /** The kind of resource (extension | tracked | proxy | custom | virtual | built-in) */
+  kind: "Tracked" | "Proxy" | "Extension" | "Other";
+  /** The provider namespace */
+  providerNamespace: string;
   /** The lifecycle and action operations using this resourceInstancePath (or the parent path) */
   operations: ArmResolvedOperationsForResource;
   /** Other operations associated with this resource */
@@ -162,6 +186,10 @@ export interface ResolvedResource {
   resourceType: ResourceType;
   /** The path to the instance of a resource */
   resourceInstancePath: string;
+  /** The parent of this resource */
+  parent?: ResolvedResource;
+  /** The scope of this resource */
+  scope?: string | ResolvedResource;
 }
 
 /** Description of the resource type */
@@ -399,36 +427,58 @@ export const [getResolvedResources, setResolvedResources] = useStateMap<Namespac
   ArmStateKeys.armResolvedResources,
 );
 
+export function getPublicResourceKind(
+  typespecType: Model,
+): "Tracked" | "Proxy" | "Extension" | "Other" | undefined {
+  const kind = getArmResourceKind(typespecType);
+  if (kind === undefined) return "Other";
+  switch (kind) {
+    case "Tracked":
+      return "Tracked";
+    case "Proxy":
+      return "Proxy";
+    case "Extension":
+      return "Extension";
+    default:
+      return "Other";
+  }
+}
+
 export function resolveArmResources(program: Program): Provider {
   const provider = resolveProviderNamespace(program);
   if (provider === undefined) return {};
   const resolvedResources = getResolvedResources(program, provider);
-  if (
-    resolvedResources?.resourceModels !== undefined &&
-    resolvedResources.resourceModels.length > 0
-  ) {
+  if (resolvedResources?.resources !== undefined && resolvedResources.resources.length > 0) {
     // Return the cached resource details
     return resolvedResources;
   }
 
   // We haven't generated the full resource details yet
-  const resources: ResourceModel[] = [];
+  const resources: ResolvedResource[] = [];
   for (const resource of listArmResources(program)) {
     const operations = resolveArmResourceOperations(program, resource.typespecType);
-    const fullResource: ResourceModel = {
-      type: resource.typespecType,
-      kind:
-        getArmResourceKind(resource.typespecType) ??
-        (operations.length > 0 ? "Tracked" : "Virtual"),
-      providerNamespace: resource.armProviderNamespace,
-      resources: operations,
-    };
-    resources.push(fullResource);
+    for (const op of operations) {
+      const fullResource: ResolvedResource = {
+        ...op,
+        type: resource.typespecType,
+        kind:
+          getPublicResourceKind(resource.typespecType) ??
+          (operations.length > 0 ? "Tracked" : "Other"),
+        providerNamespace: resource.armProviderNamespace,
+      };
+      resources.push(fullResource);
+    }
+  }
+  const toProcess = resources.slice();
+  while (toProcess.length > 0) {
+    const resource = toProcess.shift()!;
+    resource.parent = getResourceParent(resources, resource, toProcess);
+    resource.scope = getResourceScope(resources, resource, toProcess);
   }
 
   // Add the unmarked operations
   const resolved: Provider = {
-    resourceModels: resources,
+    resources: resources,
     providerOperations: getUnassociatedOperations(program).filter(
       (op) => !isArmResourceOperation(program, op.operation),
     ),
@@ -436,6 +486,139 @@ export function resolveArmResources(program: Program): Provider {
 
   setResolvedResources(program, provider, resolved);
   return resolved;
+}
+
+function getResourceParent(
+  knownResources: ResolvedResource[],
+  child: ResolvedResource,
+  resourcesToProcess: ResolvedResource[],
+): ResolvedResource | undefined {
+  if (child.resourceType.types.length < 2) return undefined;
+  for (const resource of knownResources) {
+    if (
+      resource.resourceType.types.length + 1 === child.resourceType.types.length &&
+      resource.resourceType.provider === child.resourceType.provider &&
+      resource.resourceType.types.join("/") === child.resourceType.types.slice(0, -1).join("/")
+    ) {
+      return resource;
+    }
+  }
+  const parent: ResolvedResource = {
+    type: child.type,
+    kind: "Other",
+    providerNamespace: child.providerNamespace,
+    resourceType: {
+      provider: child.resourceType.provider,
+      types: child.resourceType.types.slice(0, -1),
+    },
+    resourceName: getParentName(child.resourceType.types[child.resourceType.types.length - 2]),
+    resourceInstancePath: `/${child.resourceInstancePath
+      .split("/")
+      .filter((s) => s.length > 0)
+      .slice(0, -2)
+      .join("/")}`,
+    operations: { lifecycle: {}, actions: [], lists: [] },
+  };
+  knownResources.push(parent);
+  resourcesToProcess.push(parent);
+  return parent;
+}
+
+function getParentName(typeName: string): string {
+  if (typeName.endsWith("s")) {
+    typeName = typeName.slice(0, -1);
+  }
+  return pascalCase(typeName);
+}
+
+function getResourceScope(
+  knownResources: ResolvedResource[],
+  resource: ResolvedResource,
+  resourcesToProcess: ResolvedResource[],
+): ResolvedResource | string | undefined {
+  if (resource.scope !== undefined) return resource.scope;
+  if (resource.parent !== undefined)
+    return getResourceScope(knownResources, resource.parent, resourcesToProcess);
+  const partsIndex = resource.resourceInstancePath.lastIndexOf("/providers");
+  if (partsIndex === 0) return "Tenant";
+
+  const segments = resource.resourceInstancePath
+    .slice(0, partsIndex)
+    .split("/")
+    .filter((s) => s.length > 0);
+  if (segments.length === 1 && isVariableSegment(segments[0])) return "Scope";
+  if (
+    segments.length === 2 &&
+    isVariableSegment(segments[1]) &&
+    segments[0].toLowerCase() === "subscriptions"
+  )
+    return "Subscription";
+  if (
+    segments.length === 4 &&
+    isVariableSegment(segments[3]) &&
+    segments[0].toLowerCase() === "subscriptions" &&
+    segments[2].toLowerCase() === "resourcegroups"
+  )
+    return "ResourceGroup";
+  if (
+    segments.length === 4 &&
+    isVariableSegment(segments[3]) &&
+    segments[0].toLowerCase() === "providers" &&
+    segments[1].toLowerCase() === "microsoft.management" &&
+    segments[2].toLowerCase() === "managementgroups"
+  )
+    return "ManagementGroup";
+  if (segments.some((s) => s.toLowerCase() === "providers")) {
+    const parentProviderIndex = segments.findLastIndex((s) => s.toLowerCase() === "providers");
+    if (segments.length < parentProviderIndex + 2) {
+      return "ExternalResource";
+    }
+    const provider = segments[parentProviderIndex + 1];
+    if (isVariableSegment(provider)) {
+      return "ExternalResource";
+    }
+    const typeSegments: string[] = segments.slice(parentProviderIndex + 2);
+    if (typeSegments.length % 2 !== 0) {
+      return "ExternalResource";
+    }
+    const types: string[] = [];
+    for (let i = 0; i < typeSegments.length; i++) {
+      if (i % 2 === 0) {
+        if (isVariableSegment(typeSegments[i])) {
+          return "ExternalResource";
+        }
+        types.push(typeSegments[i]);
+      } else if (!isVariableSegment(typeSegments[i])) {
+        return "ExternalResource";
+      }
+    }
+    const parent: ResolvedResource = {
+      type: resource.type,
+      kind: "Other",
+      providerNamespace: provider,
+      resourceType: {
+        provider: provider,
+        types: types,
+      },
+      resourceName: getParentName(types[types.length - 1]),
+      resourceInstancePath: `/${segments.join("/")}`,
+      operations: { lifecycle: {}, actions: [], lists: [] },
+    };
+    for (const knownResource of knownResources) {
+      if (
+        parent.resourceType.provider.toLowerCase() ===
+          knownResource.resourceType.provider.toLowerCase() &&
+        parent.resourceType.types.flatMap((r) => r.toLowerCase()).join("/") ===
+          knownResource.resourceType.types.flatMap((k) => k.toLowerCase()).join("/")
+      ) {
+        return knownResource;
+      }
+    }
+    knownResources.push(parent);
+    resourcesToProcess.push(parent);
+    return parent;
+  }
+  return undefined;
 }
 
 function isVariableSegment(segment: string): boolean {
@@ -501,7 +684,7 @@ export function getResourcePathElements(
 function tryAddLifecycleOperation(
   resourceType: ResourceType,
   sourceOperation: ArmResourceOperation,
-  targetResource: ResolvedResource,
+  targetResource: ResolvedResourceOperations,
 ): boolean {
   const opType = sourceOperation.kind;
   const operations = targetResource.operations;
@@ -544,7 +727,7 @@ function tryAddLifecycleOperation(
 
 function addAssociatedOperation(
   sourceOperation: ArmResourceOperation,
-  targetOperation: ResolvedResource,
+  targetOperation: ResolvedResourceOperations,
 ): void {
   targetOperation.associatedOperations ??= [];
   addUniqueOperation(sourceOperation, targetOperation.associatedOperations);
@@ -668,8 +851,8 @@ function addUniqueOperation(operation: ArmResourceOperation, operations: ArmReso
 export function resolveArmResourceOperations(
   program: Program,
   resourceType: Model,
-): ResolvedResource[] {
-  const resolvedOperations: Set<ResolvedResource> = new Set<ResolvedResource>();
+): ResolvedResourceOperations[] {
+  const resolvedOperations: Set<ResolvedResourceOperations> = new Set<ResolvedResourceOperations>();
   const operations = getArmResourceOperationList(program, resourceType);
   for (const operation of operations) {
     const armOperation: ArmResourceOperation | undefined = getResourceOperation(
@@ -706,7 +889,7 @@ export function resolveArmResourceOperations(
 
     if (matched) continue;
     // If we don't have an operation for this resource, create a new one
-    const newResource: ResolvedResource = {
+    const newResource: ResolvedResourceOperations = {
       resourceType: resourceInfo.resourceType,
       resourceInstancePath: resourceInfo.resourceInstancePath,
       resourceName: resourceInfo.resourceName,
@@ -781,6 +964,8 @@ export function getArmResourceKind(resourceType: Model): ArmResourceKind | undef
       return "Proxy";
     } else if (coreType.name.startsWith("ExtensionResource")) {
       return "Extension";
+    } else if (coreTypeNamespace === "Azure.ResourceManager.CommonTypes") {
+      return "BuiltIn";
     }
   }
 

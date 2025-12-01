@@ -1,6 +1,13 @@
-import { createDiagnosticCollector, Diagnostic, getDoc, getSummary } from "@typespec/compiler";
+import {
+  createDiagnosticCollector,
+  Diagnostic,
+  getDoc,
+  getSummary,
+  listServices,
+} from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { getServers, HttpServer } from "@typespec/http";
+import { getVersionDependencies } from "@typespec/versioning";
 import {
   getClientInitializationOptions,
   getClientNameOverride,
@@ -17,6 +24,7 @@ import {
   SdkEndpointParameter,
   SdkEndpointType,
   SdkHttpOperation,
+  SdkMethodParameter,
   SdkOperationGroup,
   SdkPathParameter,
   SdkServiceOperation,
@@ -191,6 +199,14 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
       name = override;
     }
   }
+  if (!parent && client.kind === "SdkClient" && client.parent) {
+    const parentRaw = context.__rawClientsOperationGroupsCache?.get(client.parent) as
+      | SdkClient
+      | undefined;
+    parent = context.__clientTypesCache?.find((c) => c.__raw === parentRaw) as
+      | SdkClientType<TServiceOperation>
+      | undefined;
+  }
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
@@ -214,7 +230,8 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
   );
   addDefaultClientParameters(context, sdkClientType);
   // update initialization model properties
-
+  context.__clientTypesCache = context.__clientTypesCache || [];
+  context.__clientTypesCache.push(sdkClientType);
   return diagnostics.wrap(sdkClientType);
 }
 
@@ -240,6 +257,48 @@ function addDefaultClientParameters<
       if (apiVersionParam) break;
     }
   }
+
+  // Check for multi-service scenario with @useDependency
+  if (!apiVersionParam && client.__raw.kind === "SdkClient") {
+    const services = listServices(context.program);
+    if (services.length > 1 && client.__raw.type?.kind === "Namespace") {
+      // Check if this is a multi-service client with @useDependency
+      const versionDependencies = getVersionDependencies(context.program, client.__raw.type);
+      if (versionDependencies && versionDependencies.size > 0) {
+        // Create an API version parameter for multi-service clients with @useDependency
+        const stringType = context.program.checker.getStdType("string");
+
+        // Create a SdkMethodParameter for the API version
+        const apiVersionMethodParam: SdkMethodParameter = {
+          __raw: undefined,
+          kind: "method",
+          name: "apiVersion",
+          isGeneratedName: false,
+          doc: "The API version to use for the operation",
+          type: getSdkBuiltInType(context, stringType),
+          optional: false,
+          isApiVersionParam: true,
+          onClient: true,
+          apiVersions: context.getApiVersionsForType(client.__raw.type ?? client.__raw.service),
+          clientDefaultValue: undefined,
+          decorators: [],
+          crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.apiVersion`,
+          access: "public",
+          flatten: false,
+        };
+
+        // Add to cache
+        let clientParams = context.__clientParametersCache.get(client.__raw);
+        if (!clientParams) {
+          clientParams = [];
+          context.__clientParametersCache.set(client.__raw, clientParams);
+        }
+        clientParams.push(apiVersionMethodParam);
+        apiVersionParam = apiVersionMethodParam;
+      }
+    }
+  }
+
   if (apiVersionParam) {
     defaultClientParamters.push(apiVersionParam);
   }

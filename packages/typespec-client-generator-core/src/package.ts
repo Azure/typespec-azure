@@ -1,4 +1,10 @@
-import { createDiagnosticCollector, Diagnostic, ignoreDiagnostics } from "@typespec/compiler";
+import {
+  createDiagnosticCollector,
+  Diagnostic,
+  ignoreDiagnostics,
+  listServices,
+} from "@typespec/compiler";
+import { getVersionDependencies } from "@typespec/versioning";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { createSdkClientType } from "./clients.js";
 import { listClients } from "./decorators.js";
@@ -27,9 +33,9 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
   diagnostics.pipe(handleAllTypes(context));
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   const allReferencedTypes = getAllReferencedTypes(context);
-  const versions = context.getPackageVersions();
+  const versions = context.getApiVersions();
   const sdkPackage: SdkPackage<TServiceOperation> = {
-    clients: listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c))),
+    clients: diagnostics.pipe(createClients(context)),
     models: allReferencedTypes.filter((x): x is SdkModelType => x.kind === "model"),
     enums: allReferencedTypes.filter((x): x is SdkEnumType => x.kind === "enum"),
     unions: allReferencedTypes.filter(
@@ -44,6 +50,47 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
   };
   organizeNamespaces(context, sdkPackage);
   return diagnostics.wrap(sdkPackage);
+}
+
+function createClients<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
+): [SdkClientType<TServiceOperation>[], readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  if (context.__clientTypesCache) {
+    return diagnostics.wrap(context.__clientTypesCache as SdkClientType<TServiceOperation>[]);
+  }
+
+  const allClients = listClients(context).map((c) =>
+    diagnostics.pipe(createSdkClientType<TServiceOperation>(context, c)),
+  );
+
+  // Build parent-child relationships
+  // Create a map for quick lookup
+  const clientMap = new Map<SdkClientType<TServiceOperation>, SdkClientType<TServiceOperation>>();
+  for (const client of allClients) {
+    clientMap.set(client, client);
+  }
+
+  // Populate children arrays for each client based on parent relationships
+  for (const client of allClients) {
+    if (client.parent) {
+      // Find the parent client in our map
+      const parentClient = clientMap.get(client.parent);
+      if (parentClient) {
+        if (!parentClient.children) {
+          parentClient.children = [];
+        }
+        parentClient.children.push(client);
+      }
+    }
+  }
+
+  // Filter to only include root-level clients (those without a parent)
+  // Child clients will only appear in their parent's .children property
+  const rootClients = allClients.filter((client) => !client.parent);
+
+  context.__clientTypesCache = rootClients;
+  return diagnostics.wrap(rootClients);
 }
 
 function organizeNamespaces<TServiceOperation extends SdkServiceOperation>(
@@ -114,12 +161,58 @@ function populateApiVersionInformation(context: TCGCContext): void {
     prepareClientAndOperationCache(context);
   }
   for (const clientOperationGroup of context.__rawClientsOperationGroupsCache!.values()) {
+    let apiVersions: string[];
+
+    // Check if this is a multi-service client with @useDependency
+    if (clientOperationGroup.type?.kind === "Namespace") {
+      const services = listServices(context.program);
+      if (services.length > 1) {
+        const versionDependencies = getVersionDependencies(
+          context.program,
+          clientOperationGroup.type,
+        );
+        if (versionDependencies && versionDependencies.size > 0) {
+          // Extract version strings from dependencies for multi-service clients
+          const allVersions: string[] = [];
+          for (const [_service, versions] of versionDependencies.entries()) {
+            if (Array.isArray(versions)) {
+              for (const version of versions) {
+                if (typeof version === "string") {
+                  allVersions.push(version);
+                } else if (version && typeof version === "object" && "value" in version) {
+                  allVersions.push(String(version.value));
+                } else if (version && typeof version === "object" && "name" in version) {
+                  allVersions.push(String(version.name));
+                }
+              }
+            } else if (typeof versions === "string") {
+              allVersions.push(versions);
+            } else if (versions && typeof versions === "object" && "value" in versions) {
+              allVersions.push(String(versions.value));
+            } else if (versions && typeof versions === "object" && "name" in versions) {
+              allVersions.push(String(versions.name));
+            }
+          }
+          apiVersions = allVersions;
+        } else {
+          // No @useDependency, use normal logic
+          apiVersions = context.getApiVersions(clientOperationGroup.service);
+        }
+      } else {
+        // Single service, use normal logic
+        apiVersions = context.getApiVersions(clientOperationGroup.service);
+      }
+    } else {
+      // Not a namespace, use normal logic
+      apiVersions = context.getApiVersions(clientOperationGroup.service);
+    }
+
     context.setApiVersionsForType(
       clientOperationGroup.type ?? clientOperationGroup.service,
       filterApiVersionsWithDecorators(
         context,
         clientOperationGroup.type ?? clientOperationGroup.service,
-        context.getPackageVersions(),
+        apiVersions,
       ),
     );
 
