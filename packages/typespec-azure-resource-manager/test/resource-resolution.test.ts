@@ -3547,6 +3547,134 @@ model DependentProperties {
     expect(ResB.providerNamespace).toEqual("Microsoft.ServiceB");
   });
 
+  it("supports singleton resource", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@singleton
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@lroStatus
+union ProvisioningState {
+  ResourceProvisioningState,
+
+  Provisioning: "Provisioning",
+
+  Updating: "Updating",
+
+  Deleting: "Deleting",
+
+  Accepted: "Accepted",
+
+  string,
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+  update is ArmCustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    expect(provider.resources).toHaveLength(1);
+    const employee = provider.resources![0];
+    ok(employee);
+    expect(employee).toMatchObject({
+      kind: "Tracked",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees"],
+      },
+      scope: "ResourceGroup",
+      parent: undefined,
+    });
+  });
+  it("supports singleton resource with customized name", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@singleton("current")
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@lroStatus
+union ProvisioningState {
+  ResourceProvisioningState,
+
+  Provisioning: "Provisioning",
+
+  Updating: "Updating",
+
+  Deleting: "Deleting",
+
+  Accepted: "Accepted",
+
+  string,
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+  update is ArmCustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    expect(provider.resources).toHaveLength(1);
+    const employee = provider.resources![0];
+    ok(employee);
+    expect(employee).toMatchObject({
+      kind: "Tracked",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees"],
+      },
+      scope: "ResourceGroup",
+      parent: undefined,
+    });
+  });
   it("supports multiple singleton resources", async () => {
     const { program } = await Tester.compile(`
 using Azure.Core;
@@ -3627,9 +3755,7 @@ union ProvisioningState {
       type: expect.anything(),
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
-        types: [
-          "employees",
-        ],
+        types: ["employees"],
       },
       scope: "ResourceGroup",
       parent: undefined,
@@ -3642,9 +3768,7 @@ union ProvisioningState {
       type: expect.anything(),
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
-        types: [
-          "buildings",
-        ],
+        types: ["buildings"],
       },
       scope: "ResourceGroup",
       parent: undefined,
@@ -3730,9 +3854,7 @@ union ProvisioningState {
       type: expect.anything(),
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
-        types: [
-          "employees",
-        ],
+        types: ["employees"],
       },
       scope: "ResourceGroup",
       parent: undefined,
@@ -3745,9 +3867,7 @@ union ProvisioningState {
       type: expect.anything(),
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
-        types: [
-          "buildings",
-        ],
+        types: ["buildings"],
       },
       scope: "ResourceGroup",
       parent: undefined,
