@@ -208,10 +208,10 @@ describe("unit tests for resource manager helpers", () => {
         expected: {
           resourceType: {
             provider: "Microsoft.Bar",
-            types: ["bars", "basses"],
+            types: ["bars", "basses", "actionName"], // 'actionName' is treated as a type here because this action has even segments
           },
           resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}/providers/Microsoft.Bar/bars/{barName}/basses/{baseName}",
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/foos/{fooName}/providers/Microsoft.Bar/bars/{barName}/basses/{baseName}/actionName/doSomething",
         },
       },
       {
@@ -234,10 +234,10 @@ describe("unit tests for resource manager helpers", () => {
         expected: {
           resourceType: {
             provider: "Microsoft.Bar",
-            types: ["bars", "basses"],
+            types: ["bars", "basses", "actionName", "doSomethingElse"],
           },
           resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/{name}",
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/{name}/actionName/doSomething/doSomethingElse/andAnotherThing",
         },
       },
       {
@@ -247,10 +247,10 @@ describe("unit tests for resource manager helpers", () => {
         expected: {
           resourceType: {
             provider: "Microsoft.Bar",
-            types: ["bars"],
+            types: ["bars", "basses", "actionName", "doSomethingElse"],
           },
           resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}",
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/drums/actionName/doSomething/doSomethingElse/andAnotherThing",
         },
       },
       {
@@ -260,10 +260,10 @@ describe("unit tests for resource manager helpers", () => {
         expected: {
           resourceType: {
             provider: "Microsoft.Bar",
-            types: ["bars", "basses"],
+            types: ["bars", "basses", "actionName", "doSomethingElse"],
           },
           resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default",
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default/actionName/doSomething/doSomethingElse/andAnotherThing",
         },
       },
       {
@@ -273,10 +273,10 @@ describe("unit tests for resource manager helpers", () => {
         expected: {
           resourceType: {
             provider: "Microsoft.Bar",
-            types: ["bars", "basses"],
+            types: ["bars", "basses", "actionName", "doSomethingElse"],
           },
           resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default",
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default/actionName/doSomething/doSomethingElse/andAnotherThing",
         },
       },
       {
@@ -286,10 +286,10 @@ describe("unit tests for resource manager helpers", () => {
         expected: {
           resourceType: {
             provider: "Microsoft.Bar",
-            types: ["bars", "basses"],
+            types: ["bars", "basses", "actionName", "doSomethingElse"],
           },
           resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default",
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default/actionName/doSomething/doSomethingElse/andAnotherThing",
         },
       },
       {
@@ -299,10 +299,10 @@ describe("unit tests for resource manager helpers", () => {
         expected: {
           resourceType: {
             provider: "Microsoft.Bar",
-            types: ["bars"],
+            types: ["bars", "basses"],
           },
           resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}",
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/drums",
         },
       },
       {
@@ -312,10 +312,10 @@ describe("unit tests for resource manager helpers", () => {
         expected: {
           resourceType: {
             provider: "Microsoft.Bar",
-            types: ["bars"],
+            types: ["bars", "basses"],
           },
           resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}",
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/drums",
         },
       },
     ];
