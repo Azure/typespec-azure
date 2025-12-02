@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Extend @scope decorator usage to Model and ModelProperty targets
+Extend `@scope` decorator usage to `ModelProperty` targets.
