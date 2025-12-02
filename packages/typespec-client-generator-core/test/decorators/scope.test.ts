@@ -710,18 +710,15 @@ describe("model property scope", () => {
     const runnerWithCSharp = await createSdkTestRunner({
       emitterName: "@azure-tools/typespec-csharp",
     });
-    await runnerWithCSharp.compile(`
-      @service
-      namespace MyService {
-        model TestModel {
-          @scope("csharp")
-          csharpProp: string;
-          commonProp: string;
-        }
-        op func(
-          @body body: TestModel
-        ): void;
+    await runnerWithCSharp.compileWithBuiltInService(`
+      model TestModel {
+        @scope("csharp")
+        csharpProp: string;
+        commonProp: string;
       }
+      op func(
+        @body body: TestModel
+      ): void;
     `);
 
     const sdkPackage = runnerWithCSharp.context.sdkPackage;
@@ -737,18 +734,15 @@ describe("model property scope", () => {
     const runnerWithPython = await createSdkTestRunner({
       emitterName: "@azure-tools/typespec-python",
     });
-    await runnerWithPython.compile(`
-      @service
-      namespace MyService {
-        model TestModel {
-          @scope("csharp")
-          csharpProp: string;
-          commonProp: string;
-        }
-        op func(
-          @body body: TestModel
-        ): void;
+    await runnerWithPython.compileWithBuiltInService(`
+      model TestModel {
+        @scope("csharp")
+        csharpProp: string;
+        commonProp: string;
       }
+      op func(
+        @body body: TestModel
+      ): void;
     `);
 
     const sdkPackage = runnerWithPython.context.sdkPackage;
@@ -764,18 +758,15 @@ describe("model property scope", () => {
     const runnerWithCSharp = await createSdkTestRunner({
       emitterName: "@azure-tools/typespec-csharp",
     });
-    await runnerWithCSharp.compile(`
-      @service
-      namespace MyService {
-        model TestModel {
-          @scope("!csharp")
-          internalProp: string;
-          commonProp: string;
-        }
-        op func(
-          @body body: TestModel
-        ): void;
+    await runnerWithCSharp.compileWithBuiltInService(`
+      model TestModel {
+        @scope("!csharp")
+        internalProp: string;
+        commonProp: string;
       }
+      op func(
+        @body body: TestModel
+      ): void;
     `);
 
     const sdkPackage = runnerWithCSharp.context.sdkPackage;
@@ -791,17 +782,14 @@ describe("model property scope", () => {
     const runnerWithCSharp = await createSdkTestRunner({
       emitterName: "@azure-tools/typespec-csharp",
     });
-    await runnerWithCSharp.compile(`
-      @service
-      namespace MyService {
-        model TestModel {
-          prop1: string;
-          prop2: int32;
-        }
-        op func(
-          @body body: TestModel
-        ): void;
+    await runnerWithCSharp.compileWithBuiltInService(`
+      model TestModel {
+        prop1: string;
+        prop2: int32;
       }
+      op func(
+        @body body: TestModel
+      ): void;
     `);
 
     const sdkPackage = runnerWithCSharp.context.sdkPackage;
@@ -814,22 +802,19 @@ describe("model property scope", () => {
     const runnerWithCSharp = await createSdkTestRunner({
       emitterName: "@azure-tools/typespec-csharp",
     });
-    await runnerWithCSharp.compile(`
-      @service
-      namespace MyService {
-        model TestModel {
-          @scope("csharp")
-          csharpProp: string;
-          @scope("python")
-          pythonProp: string;
-          @scope("java")
-          javaProp: string;
-          commonProp: string;
-        }
-        op func(
-          @body body: TestModel
-        ): void;
+    await runnerWithCSharp.compileWithBuiltInService(`
+      model TestModel {
+        @scope("csharp")
+        csharpProp: string;
+        @scope("python")
+        pythonProp: string;
+        @scope("java")
+        javaProp: string;
+        commonProp: string;
       }
+      op func(
+        @body body: TestModel
+      ): void;
     `);
 
     const sdkPackage = runnerWithCSharp.context.sdkPackage;
