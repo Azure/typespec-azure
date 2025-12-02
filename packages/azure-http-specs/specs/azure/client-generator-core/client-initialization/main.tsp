@@ -132,28 +132,17 @@ interface ChildClient {
   deleteStandalone(@path blobName: string): void;
 }
 
-// Common models for optional parameters scenarios
-model OptionalNameHeaderParam {
-  @header("name")
-  name?: string;
-}
-
-model OptionalRegionQueryParam {
-  @query
-  region?: string;
-}
-
 // Scenario 7: Optional parameters moved to client level
 @doc("Operations with optional parameters that should be moved to client level")
 @route("/optional-params")
 interface OptionalParams {
   @route("/with-query")
   @get
-  withQuery(...OptionalNameHeaderParam, ...OptionalRegionQueryParam, @query id: string): void;
+  withQuery(@header("name") name?: string, @query region?: string, @query id: string): void;
 
   @route("/with-body")
   @post
-  withBody(...OptionalNameHeaderParam, ...OptionalRegionQueryParam, @body body: Input): void;
+  withBody(@header("name") name?: string, @query region?: string, @body body: Input): void;
 }
 
 // Scenario 8: Optional and required parameters mixed at client level
@@ -162,9 +151,9 @@ interface OptionalParams {
 interface OptionalAndRequiredParams {
   @route("/with-query")
   @get
-  withQuery(...NameHeaderParam, ...OptionalRegionQueryParam, @query id: string): void;
+  withQuery(...NameHeaderParam, @query region?: string, @query id: string): void;
 
   @route("/with-body")
   @post
-  withBody(...NameHeaderParam, ...OptionalRegionQueryParam, @body body: Input): void;
+  withBody(...NameHeaderParam, @query region?: string, @body body: Input): void;
 }
