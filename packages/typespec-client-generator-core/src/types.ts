@@ -1857,10 +1857,6 @@ function handleServiceOrphanType(
   if ((type.kind === "Model" || type.kind === "Union") && isTemplateDeclaration(type)) {
     return diagnostics.wrap(undefined);
   }
-  // skip models that are out of scope
-  if (type.kind === "Model" && !isInScope(context, type)) {
-    return diagnostics.wrap(undefined);
-  }
   const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, type));
   diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.None, sdkType));
   // add serialization options to model type

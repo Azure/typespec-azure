@@ -652,11 +652,11 @@ export type AlternateTypeDecorator = (
 ) => void;
 
 /**
- * Define the scope of an operation, model, or model property.
+ * Define the scope of an operation or model property.
  * By default, the element will be applied to all language emitters.
  * This decorator allows you to omit the element from certain languages or apply it to specific languages.
  *
- * @param target The target operation, model, or model property that you want to scope.
+ * @param target The target operation or model property that you want to scope.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Omit an operation from a specific language
@@ -669,24 +669,17 @@ export type AlternateTypeDecorator = (
  * @scope("go")
  * op test: void;
  * ```
- * @example Omit a model from a specific language
- * ```typespec
- * @scope("!csharp")
- * model InternalModel {
- *   prop: string;
- * }
- * ```
  * @example Apply a model property to specific languages
  * ```typespec
  * model TestModel {
- *   @scope("internal")
- *   internalProp: string;
+ *   @scope("csharp")
+ *   csharpOnlyProp: string;
  * }
  * ```
  */
 export type ScopeDecorator = (
   context: DecoratorContext,
-  target: Operation | Model | ModelProperty,
+  target: Operation | ModelProperty,
   scope?: string,
 ) => void;
 
