@@ -68,6 +68,7 @@ model TopQueryParameter {
 @doc("Provides the standard 'skip' query parameter for list operations.")
 model SkipQueryParameter {
   @query
+  @offset
   @doc("The number of result items to skip.")
   skip?: int32 = 0;
 }

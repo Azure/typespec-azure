@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/typespec-azure-core"
 ---
 
-Add `@pageSize` decorator to `MaxPageSizeQueryParameter`'s `maxpagesize` property
+Add pagination decorators to query parameter models: `@pageSize` to `MaxPageSizeQueryParameter.maxpagesize` and `@offset` to `SkipQueryParameter.skip`
