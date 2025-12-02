@@ -43,7 +43,7 @@ it("defines nullable enum", async () => {
   const prop = await getPropertySchema(`
     enum PetKind { dog, cat }
     model Test {
-      kind: PetKind | null;
+      prop: PetKind | null;
     }
   `);
 
@@ -57,7 +57,7 @@ it("defines nullable union", async () => {
   const prop = await getPropertySchema(`
     union PetKind { "dog", "cat" }
     model Test {
-      kind: PetKind | null;
+      prop: PetKind | null;
     }
   `);
 
@@ -70,11 +70,11 @@ it("defines nullable union", async () => {
 it("defines nullable model", async () => {
   const prop = await getPropertySchema(`
     model Pet {
-      prop: string;
+      name: string;
     }
 
     model Test {
-      type: Pet | null;
+      prop: Pet | null;
     }
   `);
   expect(prop).toEqual({
