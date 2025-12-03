@@ -7,7 +7,7 @@ using Spector;
 using Azure.ClientGenerator.Core;
 
 @doc("Test for @clientLocation decorator - moving operations between clients")
-@scenarioService("/azure/client-generator-core/client-location")
+@scenarioService("/azure/client-generator-core/client-location/move-method-parameter-to-client")
 @global.Azure.ClientGenerator.Core.clientNamespace(
   "azure.clientgenerator.core.clientlocation.MoveMethodParameterToClient",
   "java"

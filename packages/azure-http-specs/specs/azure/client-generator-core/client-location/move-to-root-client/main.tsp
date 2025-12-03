@@ -7,7 +7,7 @@ using Spector;
 using Azure.ClientGenerator.Core;
 
 @doc("Test for @clientLocation decorator - moving operations between clients")
-@scenarioService("/azure/client-generator-core/client-location")
+@scenarioService("/azure/client-generator-core/client-location/move-to-root-client")
 @global.Azure.ClientGenerator.Core.clientNamespace(
   "azure.clientgenerator.core.clientlocation.MoveToRootClient",
   "java"
