@@ -33,19 +33,6 @@ export type ResourceBaseParametersOfDecorator = (
 ) => void;
 
 /**
- * Please DO NOT USE in RestAPI specs.
- * Internal decorator that deprecated direct usage of `x-ms-client-flatten` OpenAPI extension.
- * It will programatically enabled/disable client flattening with
- *
- * @flattenProperty with autorest
- * emitter flags to maintain compatibility in swagger.
- */
-export type ConditionalClientFlattenDecorator = (
-  context: DecoratorContext,
-  target: ModelProperty,
-) => void;
-
-/**
  * Omit a property in the target model.
  *
  * @internal
@@ -314,10 +301,23 @@ export type LegacyExtensionResourceOperationDecorator = (
   resourceName?: string,
 ) => void;
 
+/**
+ * Validates that the specified common-types version is valid for the given resource type.
+ *
+ * @param target The resource model
+ * @param version The common-types version
+ * @param resourceName The name of the resource
+ */
+export type ValidateCommonTypesVersionForResourceDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  version: string,
+  resourceName: string,
+) => void;
+
 export type AzureResourceManagerPrivateDecorators = {
   resourceParameterBaseFor: ResourceParameterBaseForDecorator;
   resourceBaseParametersOf: ResourceBaseParametersOfDecorator;
-  conditionalClientFlatten: ConditionalClientFlattenDecorator;
   omitIfEmpty: OmitIfEmptyDecorator;
   assignProviderNameValue: AssignProviderNameValueDecorator;
   azureResourceBase: AzureResourceBaseDecorator;
@@ -336,4 +336,5 @@ export type AzureResourceManagerPrivateDecorators = {
   extensionResourceOperation: ExtensionResourceOperationDecorator;
   builtInResourceOperation: BuiltInResourceOperationDecorator;
   legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorator;
+  validateCommonTypesVersionForResource: ValidateCommonTypesVersionForResourceDecorator;
 };

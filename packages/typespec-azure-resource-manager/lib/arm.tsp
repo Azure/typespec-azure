@@ -21,5 +21,6 @@ import "./responses.tsp";
 import "./parameters.tsp";
 import "./private-endpoints.tsp";
 import "./private-links.tsp";
+import "./network-security-perimeter.tsp";
 
 namespace Azure.ResourceManager;

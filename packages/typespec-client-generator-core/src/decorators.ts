@@ -380,7 +380,7 @@ const protocolAPIKey = createStateSymbol("protocolAPI");
 
 export const $protocolAPI: ProtocolAPIDecorator = (
   context: DecoratorContext,
-  entity: Operation,
+  entity: Operation | Namespace | Interface,
   value?: boolean,
   scope?: LanguageScopes,
 ) => {
@@ -391,20 +391,52 @@ const convenientAPIKey = createStateSymbol("convenientAPI");
 
 export const $convenientAPI: ConvenientAPIDecorator = (
   context: DecoratorContext,
-  entity: Operation,
+  entity: Operation | Namespace | Interface,
   value?: boolean,
   scope?: LanguageScopes,
 ) => {
   setScopedDecoratorData(context, $convenientAPI, convenientAPIKey, entity, value, scope);
 };
 
+function getConvenientOrProtocolValue(
+  context: TCGCContext,
+  key: symbol,
+  entity: Operation,
+): boolean | undefined {
+  // First check if the operation itself has the decorator
+  const value = getScopedDecoratorData(context, key, entity);
+  if (value !== undefined) {
+    return value;
+  }
+
+  // Check the parent interface if the operation is in an interface
+  if (entity.interface) {
+    const interfaceValue = getScopedDecoratorData(context, key, entity.interface);
+    if (interfaceValue !== undefined) {
+      return interfaceValue;
+    }
+  }
+
+  // Check the parent namespace hierarchy
+  let currentNamespace: Namespace | undefined = entity.namespace;
+  while (currentNamespace) {
+    const namespaceValue = getScopedDecoratorData(context, key, currentNamespace);
+    if (namespaceValue !== undefined) {
+      return namespaceValue;
+    }
+    currentNamespace = currentNamespace.namespace;
+  }
+
+  return undefined;
+}
+
 export function shouldGenerateProtocol(context: TCGCContext, entity: Operation): boolean {
-  const value = getScopedDecoratorData(context, protocolAPIKey, entity);
+  const value = getConvenientOrProtocolValue(context, protocolAPIKey, entity);
   return value ?? Boolean(context.generateProtocolMethods);
 }
 
 export function shouldGenerateConvenient(context: TCGCContext, entity: Operation): boolean {
-  const value = getScopedDecoratorData(context, convenientAPIKey, entity);
+  const value = getConvenientOrProtocolValue(context, convenientAPIKey, entity);
   return value ?? Boolean(context.generateConvenienceMethods);
 }
 
