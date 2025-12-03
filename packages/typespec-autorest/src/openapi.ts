@@ -20,7 +20,6 @@ import {
   isArmExternalType,
   isArmProviderNamespace,
   isAzureResource,
-  isConditionallyFlattened,
 } from "@azure-tools/typespec-azure-resource-manager";
 import {
   getClientNameOverride,
@@ -220,11 +219,6 @@ export interface AutorestDocumentEmitterOptions {
    * @default "final-state-only"
    */
   readonly emitLroOptions?: "none" | "final-state-only" | "all";
-
-  /**
-   * readOnly property ARM resource flattening
-   */
-  readonly armResourceFlattening?: boolean;
 
   /**
    * Determines whether and how to emit schema for arm common-types
@@ -2159,11 +2153,7 @@ export async function getOpenAPIForService(
       attachPropertyXml(prop, propSchema);
     }
 
-    if (options.armResourceFlattening && isConditionallyFlattened(program, prop)) {
-      return { ...applyIntrinsicDecorators(prop, propSchema), "x-ms-client-flatten": true };
-    } else {
-      return applyIntrinsicDecorators(prop, propSchema);
-    }
+    return applyIntrinsicDecorators(prop, propSchema);
   }
 
   function attachExtensions(type: Type, emitObject: any) {
