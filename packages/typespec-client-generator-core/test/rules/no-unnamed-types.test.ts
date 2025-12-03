@@ -15,9 +15,8 @@ let tester: LinterRuleTester;
 
 beforeEach(async () => {
   runner = await createSdkTestRunner({
-    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
-    autoImports: ["@azure-tools/typespec-azure-resource-manager"],
-    autoUsings: ["Azure.ResourceManager", "Azure.Core", "Azure.Core.Traits"]
+    librariesToAdd: [AzureCoreTestLibrary, OpenAPITestLibrary],
+    autoImports: ["@azure-tools/typespec-azure-core"]
   });
   tester = createLinterRuleTester(
     runner,
@@ -240,6 +239,49 @@ describe("models", () => {
       )
       .toBeValid();
   });
+
+  it("anonymous model caused by lro metadata", async () => {
+    const armRunner = await createSdkTestRunner({
+      librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
+      autoImports: ["@azure-tools/typespec-azure-resource-manager"],
+      autoUsings: ["Azure.ResourceManager", "Azure.Core", "Azure.Core.Traits"]
+    });
+    const armTester = createLinterRuleTester(
+      armRunner,
+      noUnnamedTypesRule,
+      "@azure-tools/typespec-client-generator-core",
+    );
+    await armTester
+      .expect(
+        `
+        @armProviderNamespace
+        @service
+        @versioned(Versions)
+        namespace TestClient;
+        enum Versions {
+          @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+          v1: "v1",
+        }
+        model Employee is TrackedResource<EmployeeProperties> {
+          ...ResourceNameParameter<Employee>;
+        }
+        model MoveRequest {
+          targetResourceGroup?: string;
+        }
+        model EmployeeProperties {
+          age?: int32;
+        }
+        op move is ArmResourceActionAsync<Employee, MoveRequest, {@body body: {id?: string}}>;
+        `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
+          severity: "warning",
+          message: `Anonymous model with generated name "MoveFinalResult" detected. Define this model separately with a proper name to improve code readability and reusability.`,
+        }
+      ]);
+  });
 });
 
 describe("unions", () => {
@@ -405,41 +447,6 @@ describe("unions", () => {
         @usage(Usage.input)
         model Foo {
           prop: string | int32;
-        }
-        `,
-      )
-      .toBeValid();
-  });
-  it("anonymous model caused by lro metadata", async () => {
-    await tester
-      .expect(
-        `
-        @armProviderNamespace("My.Service")
-        @server("http://localhost:3000", "endpoint")
-        @service(#{title: "My.Service"})
-        @versioned(Versions)
-        @armCommonTypesVersion(CommonTypes.Versions.v5)
-        namespace My.Service;
-
-        /** Api versions */
-        enum Versions {
-          /** 2024-04-01-preview api version */
-          V2024_04_01_PREVIEW: "2024-04-01-preview",
-        }
-        /** A ContosoProviderHub resource */
-        model Employee is TrackedResource<EmployeeProperties> {
-          ...ResourceNameParameter<Employee>;
-        }
-
-        /** Employee properties */
-        model EmployeeProperties {
-          /** Age of employee */
-          age?: int32;
-        }
-        @armResourceOperations
-        interface Employees {
-          /** A sample resource action that move employee to different location */
-          move is ArmResourceActionAsync<Employee, {id?: string}, {@body body: {id?: string}}>;
         }
         `,
       )

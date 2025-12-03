@@ -4,7 +4,7 @@ import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-res
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { assert, beforeEach, describe, it } from "vitest";
-import { SdkClientType, SdkHttpOperation, UsageFlags } from "../../src/interfaces.js";
+import { SdkClientType, SdkHttpOperation, SdkType, UsageFlags } from "../../src/interfaces.js";
 import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
@@ -815,6 +815,97 @@ describe("data plane LRO templates", () => {
       analyzeOperationModel.properties.find((p) => p.name === "status"),
     );
     strictEqual(lroMetadata.pollingStep.responseBody, analyzeOperationModel);
+  });
+
+  // https://github.com/Azure/typespec-azure/issues/2325
+  it("LroMetadata final result anonymous model", async () => {
+    await runner.compileWithVersionedService(`
+      alias ServiceTraits = NoRepeatableRequests &
+        NoConditionalRequests &
+        NoClientRequestId;
+
+      alias apiOperations = Azure.Core.ResourceOperations<ServiceTraits>;
+
+      @doc("Create an instruction.")
+      @pollingOperation(
+        OperationProgress.getOperationResult
+      )
+      op update is apiOperations.LongRunningResourceCreateOrUpdate<Instruction>;
+
+      @resource("instruction")
+      model Instruction {
+        @key
+        @visibility(Lifecycle.Read)
+        id: string;
+
+        @visibility(Lifecycle.Update)
+        instructionId: string;
+      }
+
+      @doc("Operation Status")
+      @lroStatus
+      union OperationStatusValue {
+        @doc("The operation is Accepted.")
+        Accepted: "Accepted",
+
+        @doc("The operation is InProgress.")
+        InProgress: "InProgress",
+
+        @doc("The operation is Succeeded.")
+        Succeeded: "Succeeded",
+
+        @doc("The operation is Failed.")
+        Failed: "Failed",
+
+        @doc("The operation is Canceled.")
+        Canceled: "Canceled",
+
+        string,
+      }
+
+      @doc("Operation Response Model")
+      @resource("operation")
+      model OperationResultQuery {
+        @doc("The operation status.")
+        @visibility(Lifecycle.Read)
+        status: OperationStatusValue;
+
+        @doc("The operation id.")
+        @key("operationId")
+        @visibility(Lifecycle.Read)
+        operationId: string;
+
+        @doc("The error message.")
+        @visibility(Lifecycle.Read)
+        errorMessage: string[];
+      }
+
+      @doc("Get operation progress")
+      interface OperationProgress {
+        @doc("Get operation progress")
+        getOperationResult is apiOperations.ResourceRead<OperationResultQuery>;
+      }
+    `);
+    const method = runner.context.sdkPackage.clients[0].methods.find((m) => m.name === "update");
+    assert.exists(method);
+    strictEqual(method.kind, "lro");
+    const response = method.response.type;
+    assert.strictEqual(response?.kind, "model");
+    if (!response || response.kind !== "model") {
+      assert.fail("Expected final response to be a model.");
+    }
+    assert.isTrue(response.isGeneratedName);
+    const generatedName = response.name;
+    assert.strictEqual("UpdateFinalResult", generatedName);
+    const cdid = response.crossLanguageDefinitionId;
+    assert.isFalse(cdid.includes(".."));
+    const lroMetadata = method.lroMetadata;
+    assert.exists(lroMetadata);
+    const finalResponse = lroMetadata.finalResponse;
+    assert.exists(finalResponse);
+    const finalResult = finalResponse.result;
+    assert.exists(finalResult);
+    assert.strictEqual(finalResult.name, "UpdateFinalResult");
   });
 });
 

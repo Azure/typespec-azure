@@ -69,6 +69,7 @@ import {
   removeVersionsLargerThanExplicitlySpecified,
   resolveDuplicateGenearatedName,
 } from "./internal-utils.js";
+import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 
 /**
  * Return the default api version for a versioned service. Will return undefined if one does not exist
@@ -499,6 +500,27 @@ function getContextPath(
               return result;
             }
           }
+        }
+      }
+    }
+
+    const lroMetadata = getLroMetadata(context.program, root);
+    if (lroMetadata) {
+      const anonymousCandidates = [
+        { value: lroMetadata.finalResult, label: "FinalResult" },
+        { value: lroMetadata.logicalResult, label: "LogicalResult" },
+        { value: lroMetadata.envelopeResult, label: "EnvelopeResult" },
+        { value: lroMetadata.finalEnvelopeResult, label: "FinalEnvelopeResult" },
+      ];
+
+      for (const { value, label } of anonymousCandidates) {
+        if (!value || value === "void") {
+          continue;
+        }
+        visited.clear();
+        result = [{ name: root.name, type: root }];
+        if (dfsModelProperties(typeToFind, value, label)) {
+          return result;
         }
       }
     }
