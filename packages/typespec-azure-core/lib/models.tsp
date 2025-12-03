@@ -68,6 +68,7 @@ model TopQueryParameter {
 @doc("Provides the standard 'skip' query parameter for list operations.")
 model SkipQueryParameter {
   @query
+  @offset
   @doc("The number of result items to skip.")
   skip?: int32 = 0;
 }
@@ -75,6 +76,7 @@ model SkipQueryParameter {
 @doc("Provides the standard 'maxpagesize' query parameter for list operations.")
 model MaxPageSizeQueryParameter {
   @query
+  @pageSize
   @doc("The maximum number of result items per page.")
   maxpagesize?: int32;
 }

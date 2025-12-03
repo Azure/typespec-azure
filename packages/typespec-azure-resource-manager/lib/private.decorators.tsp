@@ -96,15 +96,6 @@ extern dec enforceConstraint(target: Operation | Model, sourceType: Model, const
 extern dec azureResourceBase(target: Model);
 
 /**
- * Please DO NOT USE in RestAPI specs.
- * Internal decorator that deprecated direct usage of `x-ms-client-flatten` OpenAPI extension.
- * It will programatically enabled/disable client flattening with @flattenProperty with autorest
- * emitter flags to maintain compatibility in swagger.
- */
-#deprecated "Use @Azure.ClientGenerator.Core.Legacy.flattenProperty instead."
-extern dec conditionalClientFlatten(target: ModelProperty);
-
-/**
  * Marks the operation as being a collection action
  * @param resourceType Resource
  * @param parentTypeName: Parent type name.
@@ -225,4 +216,16 @@ extern dec legacyExtensionResourceOperation(
     | "action"
     | "checkExistence",
   resourceName?: valueof string
+);
+
+/**
+ * Validates that the specified common-types version is valid for the given resource type.
+ * @param target The resource model
+ * @param version The common-types version
+ * @param resourceName The name of the resource
+ */
+extern dec validateCommonTypesVersionForResource(
+  target: Model,
+  version: valueof string,
+  resourceName: valueof string
 );
