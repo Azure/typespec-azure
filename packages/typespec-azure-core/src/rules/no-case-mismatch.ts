@@ -13,7 +13,7 @@ type DataType = Model | Union | Enum;
 
 export const noCaseMismatchRule = createRule({
   name: "no-case-mismatch",
-  description: "Validate that no 2 types have the same name with different casing.",
+  description: "Validate that no two types have the same name with different casing.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-case-mismatch",
   messages: {
