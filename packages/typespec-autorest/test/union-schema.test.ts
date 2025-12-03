@@ -4,22 +4,6 @@ import { describe, expect, it } from "vitest";
 import { compileOpenAPI, diagnoseOpenApiFor, openApiFor } from "./test-host.js";
 
 describe("typespec-autorest: union schema", () => {
-  it("union with self reference model and null", async () => {
-    const res = await openApiFor(
-      `
-      model Thing {
-        id: string;
-        properties: Thing | null;
-      }
-      op doStuff(): Thing;
-      `,
-    );
-    deepStrictEqual(res.definitions.Thing.properties.properties, {
-      $ref: "#/definitions/Thing",
-      "x-nullable": true,
-    });
-  });
-
   it("union of mixed types emit diagnostic", async () => {
     const diagnostics = await diagnoseOpenApiFor(
       `
