@@ -1,9 +1,9 @@
 ---
-title: "no-union-expr"
+title: "no-unnamed-union"
 ---
 
 ```text title="Full name"
-@azure-tools/typespec-azure-core/no-union-expr
+@azure-tools/typespec-azure-core/no-unnamed-union
 ```
 
 Inline union expressions (using the `|` operator) should not be used in Azure service specifications. Instead, unions must be defined as named types.

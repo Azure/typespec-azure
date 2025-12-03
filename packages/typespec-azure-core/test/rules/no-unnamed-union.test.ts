@@ -1,13 +1,13 @@
 import { Tester } from "#test/test-host.js";
 import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { noUnionExprRule } from "../../src/rules/no-union-expr.js";
+import { noUnnamedUnionRule } from "../../src/rules/no-unnamed-union.js";
 
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
   const runner = await Tester.createInstance();
-  tester = createLinterRuleTester(runner, noUnionExprRule, "@azure-tools/typespec-azure-core");
+  tester = createLinterRuleTester(runner, noUnnamedUnionRule, "@azure-tools/typespec-azure-core");
 });
 
 it("emits diagnostic when using union expression", async () => {
@@ -20,7 +20,7 @@ it("emits diagnostic when using union expression", async () => {
       `,
     )
     .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-core/no-union-expr",
+      code: "@azure-tools/typespec-azure-core/no-unnamed-union",
     });
 });
 

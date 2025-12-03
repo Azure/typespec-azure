@@ -19,7 +19,7 @@ export default {
     "@azure-tools/typespec-azure-core/no-generic-numeric": true,
     "@azure-tools/typespec-azure-core/no-nullable": true,
     "@azure-tools/typespec-azure-core/no-offsetdatetime": true,
-    "@azure-tools/typespec-azure-core/no-union-expr": true,
+    "@azure-tools/typespec-azure-core/no-unnamed-union": true,
     "@azure-tools/typespec-azure-core/no-response-body": true,
     "@azure-tools/typespec-azure-core/no-rpc-path-params": true,
     "@azure-tools/typespec-azure-core/no-openapi": true,

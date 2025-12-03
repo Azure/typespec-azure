@@ -6,4 +6,4 @@ packages:
   - "@azure-tools/typespec-azure-rulesets"
 ---
 
-Add new `no-union-expr` rule to prevent usage of unnamed unions in Azure
+Add new `no-unnamed-union` rule to prevent usage of unnamed unions in Azure
