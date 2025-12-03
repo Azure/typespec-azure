@@ -105,7 +105,6 @@ import { SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
 import { TwoLevelMap } from "@typespec/compiler/utils";
 import {
-  Authentication,
   HttpAuth,
   HttpOperation,
   HttpOperationBody,
@@ -114,13 +113,13 @@ import {
   HttpOperationResponse,
   HttpPayloadBody,
   HttpProperty,
+  HttpServiceAuthentication,
   HttpStatusCodeRange,
   HttpStatusCodesEntry,
   MetadataInfo,
   OAuth2FlowType,
   Visibility,
   createMetadataInfo,
-  getAuthentication,
   getHeaderFieldOptions,
   getHttpService,
   getServers,
@@ -129,6 +128,7 @@ import {
   isHttpFile,
   isSharedRoute,
   reportIfNoRoutes,
+  resolveAuthentication,
   resolveRequestVisibility,
 } from "@typespec/http";
 import {
@@ -295,6 +295,7 @@ export async function getOpenAPIForService(
       return !isService(program, ns);
     },
   };
+  const httpService = ignoreDiagnostics(getHttpService(program, service.type));
   const info = resolveInfo(program, service.type);
   const auth = processAuth(service.type);
 
@@ -361,7 +362,6 @@ export async function getOpenAPIForService(
   const [exampleMap, diagnostics] = await loadExamples(program, options, context.version);
   program.reportDiagnostics(diagnostics);
 
-  const httpService = ignoreDiagnostics(getHttpService(program, service.type));
   const routes = httpService.operations;
   reportIfNoRoutes(program, routes);
 
@@ -2690,7 +2690,7 @@ export async function getOpenAPIForService(
         security: Record<string, string[]>[];
       }
     | undefined {
-    const authentication = getAuthentication(program, serviceNamespace);
+    const authentication = resolveAuthentication(httpService);
     if (authentication) {
       return processServiceAuthentication(authentication, serviceNamespace);
     }
@@ -2698,29 +2698,35 @@ export async function getOpenAPIForService(
   }
 
   function processServiceAuthentication(
-    authentication: Authentication,
+    authentication: HttpServiceAuthentication,
     serviceNamespace: Namespace,
   ): {
     securitySchemes: Record<string, OpenAPI2SecurityScheme>;
     security: Record<string, string[]>[];
   } {
     const oaiSchemes: Record<string, OpenAPI2SecurityScheme> = {};
+    const scopesForScheme: Record<string, string[]> = {};
     const security: Record<string, string[]>[] = [];
-    for (const option of authentication.options) {
+    for (const scheme of authentication.schemes) {
+      const result = getOpenAPI2Scheme(scheme, serviceNamespace);
+      if (result !== undefined) {
+        const [oaiScheme, scopes] = result;
+        oaiSchemes[scheme.id] = oaiScheme;
+        scopesForScheme[scheme.id] = scopes;
+      }
+    }
+
+    for (const option of authentication.defaultAuth.options) {
       const oai3SecurityOption: Record<string, string[]> = {};
-      for (const scheme of option.schemes) {
-        const result = getOpenAPI2Scheme(scheme, serviceNamespace);
-        if (result !== undefined) {
-          const [oaiScheme, scopes] = result;
-          oaiSchemes[scheme.id] = oaiScheme;
-          oai3SecurityOption[scheme.id] = scopes;
-        }
+      for (const ref of option.all) {
+        oai3SecurityOption[ref.auth.id] = scopesForScheme[ref.auth.id];
       }
 
       if (Object.keys(oai3SecurityOption).length > 0) {
         security.push(oai3SecurityOption);
       }
     }
+
     return { securitySchemes: oaiSchemes, security };
   }
 
