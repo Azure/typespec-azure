@@ -15,7 +15,7 @@ import {
   Union,
 } from "@typespec/compiler";
 import { HttpOperation } from "@typespec/http";
-import { getVersions } from "@typespec/versioning";
+import { getVersionDependencies, getVersions } from "@typespec/versioning";
 import { stringify } from "yaml";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { defaultDecoratorsAllowList } from "./configs.js";
@@ -54,6 +54,46 @@ interface CreateTCGCContextOptions {
   mutateNamespace?: boolean; // whether to mutate global namespace for versioning
 }
 
+function validateMultiServiceVersionDependencies(context: TCGCContext): boolean {
+  const clients = context.getClients();
+
+  // Find the top-level client (root client without parent)
+  const topLevelClient = clients.find((client) => !client.parent);
+
+  if (!topLevelClient) {
+    // No top-level client found
+    return false;
+  }
+
+  // Get all sub-clients (clients with parents)
+  const subClients = clients.filter((client) => client.parent);
+
+  if (subClients.length === 0) {
+    // No sub-services, validation passes
+    return true;
+  }
+
+  // Get version dependencies for the top-level client
+  const versionDependencies = getVersionDependencies(
+    context.program,
+    topLevelClient.type as Namespace,
+  );
+
+  // Check if @useDependency decorator is used properly
+  // This would be where you check if the top-level client has @useDependency
+  // and if each sub-service has its version specified
+
+  for (const subClient of subClients) {
+    // Check if this sub-service has version dependencies specified
+    if (!versionDependencies || !versionDependencies.get(subClient.service)) {
+      // Sub-service version not specified in @useDependency
+      return false;
+    }
+  }
+
+  return true;
+}
+
 export function createTCGCContext(
   program: Program,
   emitterName?: string,
@@ -87,6 +127,7 @@ export function createTCGCContext(
     __knownScalars: getKnownScalars(),
     __httpOperationExamples: new Map(),
     __pagedResultSet: new Set(),
+    __typeToService: new Map<Type, Namespace>(),
 
     getMutatedGlobalNamespace(): Namespace {
       if (options?.mutateNamespace === false) {
@@ -101,29 +142,40 @@ export function createTCGCContext(
       return globalNamespace;
     },
     getApiVersionsForType(type): string[] {
-      return this.__tspTypeToApiVersions.get(type) ?? [];
+      const service = this.getServiceForType(type);
+      const serviceMap = this.__tspTypeToApiVersions.get(service);
+      if (serviceMap === undefined) {
+        return [];
+      }
+      return serviceMap.get(type) ?? [];
     },
     setApiVersionsForType(type, apiVersions: string[]): void {
-      const existingApiVersions = this.__tspTypeToApiVersions.get(type) ?? [];
+      const service = this.getServiceForType(type);
+      let serviceMap = this.__tspTypeToApiVersions.get(service);
+      if (!serviceMap) {
+        serviceMap = new Map();
+        this.__tspTypeToApiVersions.set(service, serviceMap);
+      }
+      const existingApiVersions = serviceMap.get(type) ?? [];
       const mergedApiVersions = [...existingApiVersions];
       for (const apiVersion of apiVersions) {
         if (!mergedApiVersions.includes(apiVersion)) {
           mergedApiVersions.push(apiVersion);
         }
       }
-      this.__tspTypeToApiVersions.set(type, mergedApiVersions);
+      serviceMap.set(type, mergedApiVersions);
     },
     getPackageVersions(): string[] {
       if (this.__packageVersions) {
         return this.__packageVersions;
       }
-      const service = listServices(program)[0];
-      if (!service) {
+      const serviceNamespace = this.getTopLevelVersionedService();
+      if (!serviceNamespace) {
         this.__packageVersions = [];
         return this.__packageVersions;
       }
 
-      const versions = getVersions(program, service.type)[1]?.getVersions();
+      const versions = getVersions(program, serviceNamespace)[1]?.getVersions();
       if (!versions) {
         this.__packageVersions = [];
         return this.__packageVersions;
@@ -142,7 +194,7 @@ export function createTCGCContext(
         reportDiagnostic(this.program, {
           code: "api-version-undefined",
           format: { version: this.apiVersion },
-          target: service.type,
+          target: serviceNamespace,
         });
         this.apiVersion = this.__packageVersions[this.__packageVersions.length - 1];
       }
@@ -185,6 +237,49 @@ export function createTCGCContext(
         prepareClientAndOperationCache(this);
       }
       return this.__operationToClientCache!.get(operation)!;
+    },
+    getServiceForType(type: Type): Namespace {
+      let service = this.__typeToService.get(type);
+      if (!service) {
+        const services = listAllServiceNamespaces(this);
+        for (const svc of services) {
+          // Check if type is in this service's namespace by walking up the namespace hierarchy
+          if ("namespace" in type && type.namespace) {
+            service = type.namespace;
+            while (service) {
+              if (service === svc) {
+                this.__typeToService.set(type, svc);
+                return svc;
+              }
+              service = service.namespace;
+            }
+          }
+        }
+        if (!service) {
+          service = this.getMutatedGlobalNamespace();
+        }
+        this.__typeToService.set(type, service);
+      }
+      return service;
+    },
+    getTopLevelVersionedService(): Namespace {
+      if (!this.__topLevelVersionedService) {
+        const services = listServices(this.program);
+        if (services.length === 0) {
+          this.__topLevelVersionedService = this.program.getGlobalNamespaceType();
+          return this.__topLevelVersionedService;
+        }
+        let targetService = services[0];
+        for (const service of services) {
+          const versions = getVersions(this.program, service.type)[1];
+          if (versions) {
+            targetService = service;
+            break;
+          }
+        }
+        this.__topLevelVersionedService = targetService.type;
+      }
+      return this.__topLevelVersionedService;
     },
   };
 }
