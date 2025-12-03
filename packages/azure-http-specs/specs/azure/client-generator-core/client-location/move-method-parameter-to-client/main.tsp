@@ -15,12 +15,11 @@ using Azure.ClientGenerator.Core;
 namespace _Specs_.Azure.ClientGenerator.Core.ClientLocation.MoveMethodParameterToClient;
 
 model Blob {
-    id: string;
-    name: string;
-    size: int32;
-    path: string;
-  }
-
+  id: string;
+  name: string;
+  size: int32;
+  path: string;
+}
 
 // Scenario 1: Move method parameter to client
 @scenarioDoc("""
