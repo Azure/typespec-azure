@@ -62,7 +62,6 @@ import {
   SdkClientType,
   SdkEnumType,
   SdkHeaderParameter,
-  SdkHttpResponse,
   SdkMethodParameter,
   SdkOperationGroup,
   SdkServiceOperation,
@@ -472,26 +471,6 @@ export function getNonNullOptions(type: Union): Type[] {
 
 export function getNullOption(type: Union): Type | undefined {
   return [...type.variants.values()].map((x) => x.type).filter((t) => isNullType(t))[0];
-}
-
-export function getAllResponseBodiesAndNonBodyExists(responses: SdkHttpResponse[]): {
-  allResponseBodies: SdkType[];
-  nonBodyExists: boolean;
-} {
-  const allResponseBodies: SdkType[] = [];
-  let nonBodyExists = false;
-  for (const response of responses) {
-    if (response.type) {
-      allResponseBodies.push(response.type);
-    } else {
-      nonBodyExists = true;
-    }
-  }
-  return { allResponseBodies, nonBodyExists };
-}
-
-export function getAllResponseBodies(responses: SdkHttpResponse[]): SdkType[] {
-  return getAllResponseBodiesAndNonBodyExists(responses).allResponseBodies;
 }
 
 /**
