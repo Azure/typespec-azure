@@ -3504,4 +3504,46 @@ model DependentProperties {
       { operationGroup: "Operations", name: "list", kind: "other" },
     ]);
   });
+
+  it("defines multiple ARM services", async () => {
+    const { program } = await Tester.compile(`
+      @service
+      @armProviderNamespace
+      namespace Microsoft.ServiceA {
+        model ResA is TrackedResource<{}> {
+          @key @segment("foos") @path name: string;
+        }
+        
+        @armResourceOperations
+        interface ResAOperations {
+          get is ArmResourceRead<ResA>;
+        }
+      }
+
+      @service
+      @armProviderNamespace
+      namespace Microsoft.ServiceB {
+        model ResB is TrackedResource<{}> {
+          @key @segment("foos") @path name: string;
+        }
+
+         
+        @armResourceOperations
+        interface ResBOperations {
+          get is ArmResourceRead<ResB>;
+        }
+      }
+    `);
+
+    const provider = resolveArmResources(program);
+    ok(provider.resources);
+    expect(provider.resources).toHaveLength(2);
+    const [ResA, ResB] = provider.resources;
+    expect(ResA.kind).toEqual("Tracked");
+    expect(ResA.resourceName).toEqual("ResA");
+    expect(ResA.providerNamespace).toEqual("Microsoft.ServiceA");
+    expect(ResB.kind).toEqual("Tracked");
+    expect(ResB.resourceName).toEqual("ResB");
+    expect(ResB.providerNamespace).toEqual("Microsoft.ServiceB");
+  });
 });
