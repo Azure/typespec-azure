@@ -12,6 +12,7 @@ export default {
     "@azure-tools/typespec-azure-core/use-extensible-enum": true,
     "@azure-tools/typespec-azure-core/known-encoding": true,
     "@azure-tools/typespec-azure-core/long-running-polling-operation-required": true,
+    "@azure-tools/typespec-azure-core/no-case-mismatch": true,
     "@azure-tools/typespec-azure-core/no-closed-literal-union": true,
     "@azure-tools/typespec-azure-core/no-enum": true,
     "@azure-tools/typespec-azure-core/no-error-status-codes": true,
