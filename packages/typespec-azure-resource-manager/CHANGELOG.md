@@ -1,5 +1,17 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.62.1
+
+### Features
+
+- [#3544](https://github.com/Azure/typespec-azure/pull/3544) Add standard operations for NetworkSecurityPerimeter
+
+### Bug Fixes
+
+- [#3525](https://github.com/Azure/typespec-azure/pull/3525) Fix `missing-x-ms-identifiers` rule message pointing to legacy `@extension` decorator instead of `@identifiers`.
+- [#3559](https://github.com/Azure/typespec-azure/pull/3559) Fix #3437 Provide consistent return values for parent and scope in resolveArmResources
+
+
 ## 0.62.0
 
 ### Deprecations

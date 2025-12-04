@@ -459,7 +459,98 @@ describe("ARM resource model:", () => {
       strictEqual((armIdProp?.type as Model).name, "armResourceIdentifier");
     });
   });
+  describe("network security perimeter", () => {
+    it("raises diagnostic when network security perimeter is used on default common-types version", async () => {
+      const diagnostics = await Tester.diagnose(`
+@versioned(Versions)
+@armProviderNamespace
+namespace Microsoft.Test;
+/** Contoso API versions */
+enum Versions {
+  /** 2021-10-01-preview version */
+  v2025_11_19_preview: "2025-11-19-preview",
+}
 
+        model NetworkSecurityPerimeterConfiguration is Azure.ResourceManager.NspConfiguration;
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-azure-resource-manager/invalid-version-for-common-type",
+      });
+    });
+    it("raises diagnostic when network security perimeter is used on v3 common-types version", async () => {
+      const diagnostics = await Tester.diagnose(`
+@versioned(Versions)
+@armProviderNamespace
+namespace Microsoft.Test;
+/** Contoso API versions */
+enum Versions {
+  /** 2021-10-01-preview version */
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v3)
+  v2025_11_19_preview: "2025-11-19-preview",
+}
+
+        model NetworkSecurityPerimeterConfiguration is Azure.ResourceManager.NspConfiguration;
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-azure-resource-manager/invalid-version-for-common-type",
+      });
+    });
+    it("raises diagnostic when network security perimeter is used on v4 common-types version", async () => {
+      const diagnostics = await Tester.diagnose(`
+@versioned(Versions)
+@armProviderNamespace
+namespace Microsoft.Test;
+/** Contoso API versions */
+enum Versions {
+  /** 2021-10-01-preview version */
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
+  v2025_11_19_preview: "2025-11-19-preview",
+}
+
+        model NetworkSecurityPerimeterConfiguration is Azure.ResourceManager.NspConfiguration;
+      `);
+
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-azure-resource-manager/invalid-version-for-common-type",
+      });
+    });
+    it("raises no diagnostic when network security perimeter is used on v5 common-types version", async () => {
+      const diagnostics = await Tester.diagnose(`
+@versioned(Versions)
+@armProviderNamespace
+namespace Microsoft.Test;
+/** Contoso API versions */
+enum Versions {
+  /** 2021-10-01-preview version */
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  v2025_11_19_preview: "2025-11-19-preview",
+}
+
+        model NetworkSecurityPerimeterConfiguration is Azure.ResourceManager.NspConfiguration;
+      `);
+
+      expectDiagnosticEmpty(diagnostics);
+    });
+    it("raises no diagnostic when network security perimeter is used on v6 common-types version", async () => {
+      const diagnostics = await Tester.diagnose(`
+@versioned(Versions)
+@armProviderNamespace
+namespace Microsoft.Test;
+/** Contoso API versions */
+enum Versions {
+  /** 2021-10-01-preview version */
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v6)
+  v2025_11_19_preview: "2025-11-19-preview",
+}
+
+        model NetworkSecurityPerimeterConfiguration is Azure.ResourceManager.NspConfiguration;
+      `);
+
+      expectDiagnosticEmpty(diagnostics);
+    });
+  });
   describe("raises diagnostics", () => {
     it("when armResourceInternal is used on a non-resource type", async () => {
       const diagnostics = await Tester.diagnose(`

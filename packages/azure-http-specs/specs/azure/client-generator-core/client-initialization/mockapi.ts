@@ -3,7 +3,7 @@ import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
 // Mock responses for HeaderParam scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_HeaderParam = passOnSuccess([
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_HeaderParam = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-initialization/header-param/with-query",
     method: "get",
@@ -39,7 +39,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_HeaderParam = passOnSuc
 ]);
 
 // Mock responses for MultipleParams scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_MultipleParams = passOnSuccess([
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_MultipleParams = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-initialization/multiple-params/with-query",
     method: "get",
@@ -79,7 +79,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_MultipleParams = passOn
 ]);
 
 // Mock responses for MixedParams scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_MixedParams = passOnSuccess([
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_MixedParams = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-initialization/mixed-params/with-query",
     method: "get",
@@ -119,7 +119,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_MixedParams = passOnSuc
 ]);
 
 // Mock responses for PathParam scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_PathParam = passOnSuccess([
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_PathParam = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-initialization/path/sample-blob/with-query",
     method: "get",
@@ -160,7 +160,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_PathParam = passOnSucce
 ]);
 
 // Mock responses for ParamAlias scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParamAlias = passOnSuccess([
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_ParamAlias = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-initialization/param-alias/sample-blob/with-aliased-name",
     method: "get",
@@ -182,7 +182,7 @@ Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParamAlias = passOnSucc
 ]);
 
 // Mock responses for ParentClient/ChildClient scenario
-Scenarios.Azure_ClientGeneratorCore_ClientInitialization_ParentClient_ChildClient = passOnSuccess([
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_ParentClient_ChildClient = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-initialization/child-client/sample-blob/with-query",
     method: "get",
