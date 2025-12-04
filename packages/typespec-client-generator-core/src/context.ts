@@ -15,7 +15,7 @@ import {
   Union,
 } from "@typespec/compiler";
 import { HttpOperation } from "@typespec/http";
-import { getVersionDependencies, getVersions } from "@typespec/versioning";
+import { getVersions } from "@typespec/versioning";
 import { stringify } from "yaml";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { defaultDecoratorsAllowList } from "./configs.js";
@@ -52,46 +52,6 @@ import { listAllServiceNamespaces } from "./public-utils.js";
 
 interface CreateTCGCContextOptions {
   mutateNamespace?: boolean; // whether to mutate global namespace for versioning
-}
-
-function validateMultiServiceVersionDependencies(context: TCGCContext): boolean {
-  const clients = context.getClients();
-
-  // Find the top-level client (root client without parent)
-  const topLevelClient = clients.find((client) => !client.parent);
-
-  if (!topLevelClient) {
-    // No top-level client found
-    return false;
-  }
-
-  // Get all sub-clients (clients with parents)
-  const subClients = clients.filter((client) => client.parent);
-
-  if (subClients.length === 0) {
-    // No sub-services, validation passes
-    return true;
-  }
-
-  // Get version dependencies for the top-level client
-  const versionDependencies = getVersionDependencies(
-    context.program,
-    topLevelClient.type as Namespace,
-  );
-
-  // Check if @useDependency decorator is used properly
-  // This would be where you check if the top-level client has @useDependency
-  // and if each sub-service has its version specified
-
-  for (const subClient of subClients) {
-    // Check if this sub-service has version dependencies specified
-    if (!versionDependencies || !versionDependencies.get(subClient.service)) {
-      // Sub-service version not specified in @useDependency
-      return false;
-    }
-  }
-
-  return true;
 }
 
 export function createTCGCContext(
