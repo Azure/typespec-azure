@@ -4,6 +4,8 @@ import {
   ArrayModelType,
   getProperty as compilerGetProperty,
   DecoratorContext,
+  Enum,
+  EnumMember,
   getKeyName,
   getNamespaceFullName,
   getTags,
@@ -44,6 +46,10 @@ import {
   ArmExternalTypeDecorator,
   CustomAzureResourceDecorator,
   CustomResourceOptions,
+  FeatureDecorator,
+  ArmFeatureOptions,
+  FeatureOptionsDecorator,
+  FeaturesDecorator,
 } from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { reportDiagnostic } from "./lib.js";
 import {
@@ -1285,3 +1291,21 @@ export function resolveResourceBaseType(type?: string | undefined): ResourceBase
   }
   return resolvedType;
 }
+
+export const $feature: FeatureDecorator = (
+  context: DecoratorContext,
+  entity: Model | Interface | Namespace,
+  featureName: EnumMember,
+) => {};
+
+export const $features: FeaturesDecorator = (
+  context: DecoratorContext,
+  entity: Namespace,
+  features: Enum,
+) => {};
+
+export const $featureOptions: FeatureOptionsDecorator = (
+  context: DecoratorContext,
+  entity: EnumMember,
+  options: ArmFeatureOptions,
+) => {};
