@@ -1,5 +1,4 @@
 import {
-  getNamespaceFullName,
   Interface,
   isService,
   isTemplateDeclaration,
@@ -256,7 +255,6 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
         name: clientName,
         service: service,
         type: service,
-        crossLanguageDefinitionId: getNamespaceFullName(service),
         subOperationGroups: [],
       },
     ];

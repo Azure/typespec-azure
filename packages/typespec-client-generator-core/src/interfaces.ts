@@ -60,7 +60,9 @@ export interface TCGCContext {
   __responseHeaderCache: Map<ModelProperty, SdkServiceResponseHeader>;
   __generatedNames: Map<Type, string>;
   __httpOperationCache: Map<Operation, HttpOperation>;
-  __tspTypeToApiVersions: Map<Type, string[]>;
+  __typeToService: Map<Type, Namespace>;
+  __topLevelVersionedService?: Namespace;
+  __tspTypeToApiVersions: Map<Namespace, Map<Type, string[]>>;
   __knownScalars?: Record<string, SdkBuiltInKinds>;
   __rawClientsOperationGroupsCache?: Map<
     Namespace | Interface | string,
@@ -74,18 +76,21 @@ export interface TCGCContext {
   __pagedResultSet: Set<SdkType>;
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
   __packageVersions?: string[]; // the package versions from the service versioning config and api version setting in tspconfig.
+  __serviceToVersions?: Map<Namespace | undefined, string[]>; // the package versions from the service versioning config and api version setting in tspconfig.
   __packageVersionEnum?: Enum; // the enum type that contains all the package versions.
   __externalPackageToVersions?: Map<string, string>;
 
   getMutatedGlobalNamespace(): Namespace;
   getApiVersionsForType(type: Type): string[];
   setApiVersionsForType(type: Type, apiVersions: string[]): void;
-  getPackageVersions(): string[];
+  getPackageVersions(service?: Namespace): string[];
   getPackageVersionEnum(): Enum | undefined;
   getClients(): SdkClient[];
   getClientOrOperationGroup(type: Namespace | Interface): SdkClient | SdkOperationGroup | undefined;
   getOperationsForClient(client: SdkClient | SdkOperationGroup): Operation[];
   getClientForOperation(operation: Operation): SdkClient | SdkOperationGroup;
+  getServiceForType(type: Type): Namespace;
+  getTopLevelVersionedService(): Namespace;
 }
 
 export interface SdkContext<
@@ -101,10 +106,8 @@ export interface SdkContext<
 export interface SdkClient {
   kind: "SdkClient";
   name: string;
-  service: Namespace;
+  service: Namespace | Namespace[];
   type: Namespace | Interface;
-  /** Unique ID for the current type. */
-  crossLanguageDefinitionId: string;
   subOperationGroups: SdkOperationGroup[];
 }
 
@@ -113,7 +116,7 @@ export interface SdkOperationGroup {
   type?: Namespace | Interface;
   subOperationGroups: SdkOperationGroup[];
   groupPath: string;
-  service: Namespace;
+  service: Namespace | Namespace[];
   /** Parent operation group or client. */
   parent?: SdkClient | SdkOperationGroup;
 }

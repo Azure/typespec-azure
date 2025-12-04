@@ -762,3 +762,116 @@ it("optional params propagated", async () => {
 `,
   );
 });
+
+it("one client from multiple services", async () => {
+  await runner.compileWithCustomization(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      interface AI {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      interface BI {
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+    `
+  @client(
+    {
+      name: "CombineClient",
+      service: [ServiceA, ServiceB],
+    }
+  )
+  @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+  namespace CombineClient {
+    @operationGroup
+    interface AI extends ServiceA.AI {}
+    @operationGroup
+    interface BI extends ServiceB.BI {}
+  }
+`,
+  );
+  const sdkPackage = runner.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const aVersionsEnum = sdkPackage.enums.find((e) => e.name === "VersionsA");
+  ok(aVersionsEnum);
+  const bVersionsEnum = sdkPackage.enums.find((e) => e.name === "VersionsB");
+  ok(bVersionsEnum);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  strictEqual(client.apiVersions.length, 2);
+  deepStrictEqual(client.apiVersions, ["av2", "bv2"]);
+  strictEqual(client.children!.length, 2);
+  strictEqual(client.clientInitialization.parameters.length, 2);
+  ok(client.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+  const apiVersionParam = client.clientInitialization.parameters.find(
+    (p) => p.name === "apiVersion",
+  );
+  ok(apiVersionParam);
+  strictEqual(apiVersionParam.apiVersions.length, 2);
+  deepStrictEqual(apiVersionParam.apiVersions, ["av2", "bv2"]);
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+
+  // AI client should have api versions from ServiceA
+  strictEqual(aiClient.apiVersions.length, 2);
+  deepStrictEqual(aiClient.apiVersions, ["av1", "av2"]);
+  strictEqual(aiClient.clientInitialization.parameters.length, 2);
+  strictEqual(aiClient.clientInitialization.parameters[0].name, "endpoint");
+  strictEqual(aiClient.clientInitialization.parameters[1].name, "apiVersion");
+  const aiApiVersionParam = aiClient.clientInitialization.parameters[1];
+  strictEqual(aiApiVersionParam.isApiVersionParam, true);
+  strictEqual(aiApiVersionParam.onClient, true);
+  strictEqual(aiApiVersionParam.clientDefaultValue, "av2");
+
+  // AI client should have aTest method with VersionsA api version
+  strictEqual(aiClient.methods.length, 1);
+  const aiMethod = aiClient.methods[0];
+  strictEqual(aiMethod.name, "aTest");
+  strictEqual(aiMethod.parameters.length, 0);
+  const aiOperation = aiMethod.operation;
+  strictEqual(aiOperation.parameters.length, 1);
+  const aiOperationApiVersionParam = aiOperation.parameters.find((p) => p.isApiVersionParam);
+  ok(aiOperationApiVersionParam);
+  strictEqual(aiOperationApiVersionParam.correspondingMethodParams.length, 1);
+  strictEqual(aiOperationApiVersionParam.correspondingMethodParams[0], aiApiVersionParam);
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+
+  strictEqual(biClient.apiVersions.length, 2);
+  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
+  strictEqual(biClient.clientInitialization.parameters.length, 2);
+  strictEqual(biClient.clientInitialization.parameters[0].name, "endpoint");
+  strictEqual(biClient.clientInitialization.parameters[1].name, "apiVersion");
+  const biApiVersionParam = biClient.clientInitialization.parameters[1];
+  strictEqual(biApiVersionParam.isApiVersionParam, true);
+  strictEqual(biApiVersionParam.onClient, true);
+  strictEqual(biApiVersionParam.clientDefaultValue, "bv2");
+
+  // BI client should have bTest method with VersionsB api version
+  const biMethod = biClient.methods[0];
+  strictEqual(biMethod.name, "bTest");
+  strictEqual(biMethod.parameters.length, 0);
+  const biOperation = biMethod.operation;
+  strictEqual(biOperation.parameters.length, 1);
+  const biOperationApiVersionParam = biOperation.parameters.find((p) => p.isApiVersionParam);
+  ok(biOperationApiVersionParam);
+  strictEqual(biOperationApiVersionParam.correspondingMethodParams.length, 1);
+  strictEqual(biOperationApiVersionParam.correspondingMethodParams[0], biApiVersionParam);
+});
