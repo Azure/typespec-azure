@@ -1,7 +1,12 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual } from "assert";
 import { expect, it } from "vitest";
-import { compileOpenAPI, diagnoseOpenApiFor, openApiFor } from "./test-host.js";
+import {
+  compileOpenAPI,
+  diagnoseOpenApiFor,
+  emitOpenApiWithDiagnostics,
+  openApiFor,
+} from "./test-host.js";
 
 it("set a basic auth", async () => {
   const res = await openApiFor(`
@@ -15,6 +20,21 @@ it("set a basic auth", async () => {
     },
   });
   deepStrictEqual(res.security, [{ BasicAuth: [] }]);
+});
+
+it("using custom http auth emit warning and doesn't include it", async () => {
+  const [res, diagnostics] = await emitOpenApiWithDiagnostics(`
+    @service
+    @useAuth({ type: AuthType.http, scheme: "SharedAccessKey" })
+    namespace MyService {}
+  `);
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-autorest/unsupported-http-auth-scheme",
+    message:
+      "The specified HTTP authentication scheme is not supported by this emitter: SharedAccessKey.",
+  });
+  expect(res.securityDefinitions).not.toBeDefined();
+  expect(res.security).not.toBeDefined();
 });
 
 it("set a ApiKeyAuth ", async () => {

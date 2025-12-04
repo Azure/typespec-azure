@@ -108,6 +108,7 @@ import {
   AuthenticationOptionReference,
   AuthenticationReference,
   HttpAuth,
+  HttpAuthRef,
   HttpOperation,
   HttpOperationBody,
   HttpOperationMultipartBody,
@@ -2714,7 +2715,7 @@ export async function getOpenAPIForService(
       }
     }
 
-    const security = getOpenAPISecurity(authentication.defaultAuth);
+    const security = getOpenAPISecurity(oaiSchemes, authentication.defaultAuth);
 
     return { securitySchemes: oaiSchemes, security };
   }
@@ -2764,24 +2765,35 @@ export async function getOpenAPIForService(
     }
   }
 
-  function getOpenAPISecurity(authReference: AuthenticationReference) {
-    const security = authReference.options.map((authOption: AuthenticationOptionReference) => {
-      const securityOption: Record<string, string[]> = {};
-      for (const httpAuthRef of authOption.all) {
-        switch (httpAuthRef.kind) {
-          case "noAuth":
-            // should emit "{}" as a security option https://github.com/OAI/OpenAPI-Specification/issues/14#issuecomment-297457320
-            continue;
-          case "oauth2":
-            securityOption[httpAuthRef.auth.id] = httpAuthRef.scopes;
-            continue;
-          default:
-            securityOption[httpAuthRef.auth.id] = [];
+  function getOpenAPISecurity(
+    oaiSchemes: Record<string, OpenAPI2SecurityScheme>,
+    authReference: AuthenticationReference,
+  ) {
+    const security = authReference.options
+      .map((authOption: AuthenticationOptionReference) => {
+        const securityOption: Record<string, string[]> = {};
+        for (const httpAuthRef of authOption.all) {
+          const scopes = getScopesForAuthReference(httpAuthRef);
+          if (httpAuthRef.auth.id in oaiSchemes && scopes) {
+            securityOption[httpAuthRef.auth.id] = scopes;
+          }
         }
-      }
-      return securityOption;
-    });
+        return securityOption;
+      })
+      .filter((x) => Object.keys(x).length > 0);
     return security;
+  }
+
+  function getScopesForAuthReference(httpAuthRef: HttpAuthRef) {
+    switch (httpAuthRef.kind) {
+      case "noAuth":
+        // should emit "{}" as a security option https://github.com/OAI/OpenAPI-Specification/issues/14#issuecomment-297457320
+        return undefined;
+      case "oauth2":
+        return httpAuthRef.scopes;
+      default:
+        return [];
+    }
   }
   function getOpenAPI2Flow(flow: OAuth2FlowType): OpenAPI2OAuth2FlowType {
     switch (flow) {
