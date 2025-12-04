@@ -60,6 +60,7 @@ import {
 } from "./decorators.js";
 import {
   AccessFlags,
+  ArrayKnownEncoding,
   SdkArrayType,
   SdkBuiltInKinds,
   SdkBuiltInType,
@@ -1245,6 +1246,20 @@ export function getSdkModelPropertyTypeBase(
   diagnostics.pipe(addEncodeInfo(context, alternateType ?? type, propertyType));
   const name = getPropertyNames(context, type)[0];
   const onClient = isOnClient(context, type, operation, apiVersions.length > 0);
+  let encode: ArrayKnownEncoding | undefined = undefined;
+  // We only support array encoding at property level for now
+  if ($(context.program).array.is(type.type)) {
+    const encodeData = getEncode(context.program, type);
+    if (encodeData?.encoding === "ArrayEncoding.pipeDelimited") {
+      encode = "pipeDelimited";
+    } else if (encodeData?.encoding === "ArrayEncoding.spaceDelimited") {
+      encode = "spaceDelimited";
+    } else if (encodeData?.encoding === "ArrayEncoding.commaDelimited") {
+      encode = "commaDelimited";
+    } else if (encodeData?.encoding === "ArrayEncoding.newlineDelimited") {
+      encode = "newlineDelimited";
+    }
+  }
   return diagnostics.wrap({
     __raw: type,
     doc: getClientDoc(context, type),
@@ -1265,6 +1280,7 @@ export function getSdkModelPropertyTypeBase(
     visibility: getSdkVisibility(context, type),
     access: getAccess(context, type),
     flatten: shouldFlattenProperty(context, type),
+    encode,
   });
 }
 
