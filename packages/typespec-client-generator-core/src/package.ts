@@ -14,7 +14,11 @@ import {
   SdkUnionType,
   TCGCContext,
 } from "./interfaces.js";
-import { filterApiVersionsWithDecorators, getTypeDecorators } from "./internal-utils.js";
+import {
+  filterApiVersionsWithDecorators,
+  getClientNamespaceType,
+  getTypeDecorators,
+} from "./internal-utils.js";
 import { getLicenseInfo } from "./license.js";
 import { getCrossLanguagePackageId, getNamespaceFromType } from "./public-utils.js";
 import { getAllReferencedTypes, handleAllTypes } from "./types.js";
@@ -114,18 +118,17 @@ function populateApiVersionInformation(context: TCGCContext): void {
     prepareClientAndOperationCache(context);
   }
   for (const clientOperationGroup of context.__rawClientsOperationGroupsCache!.values()) {
+    const clientOperationGroupType = getClientNamespaceType(clientOperationGroup);
     context.setApiVersionsForType(
-      clientOperationGroup.type ?? clientOperationGroup.service,
+      clientOperationGroupType,
       filterApiVersionsWithDecorators(
         context,
-        clientOperationGroup.type ?? clientOperationGroup.service,
+        clientOperationGroupType,
         context.getPackageVersions(),
       ),
     );
 
-    const clientApiVersions = context.getApiVersionsForType(
-      clientOperationGroup.type ?? clientOperationGroup.service,
-    );
+    const clientApiVersions = context.getApiVersionsForType(clientOperationGroupType);
     context.__clientApiVersionDefaultValueCache.set(
       clientOperationGroup,
       clientApiVersions[clientApiVersions.length - 1],

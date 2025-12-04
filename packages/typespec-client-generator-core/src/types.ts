@@ -91,6 +91,8 @@ import {
   filterApiVersionsInEnum,
   getAvailableApiVersions,
   getClientDoc,
+  getClientNamespaceType,
+  getClientServicesInArray,
   getHttpBodyType,
   getHttpOperationResponseHeaders,
   getNonNullOptions,
@@ -1176,30 +1178,32 @@ function getSdkVisibility(context: TCGCContext, type: ModelProperty): Visibility
 function getSdkCredentialType(
   context: TCGCContext,
   client: SdkClient | SdkOperationGroup,
-  authentication: Authentication,
+  authentications: Authentication[],
 ): SdkCredentialType | SdkUnionType<SdkCredentialType> {
   const credentialTypes: SdkCredentialType[] = [];
-  for (const option of authentication.options) {
-    for (const scheme of option.schemes) {
-      credentialTypes.push({
-        __raw: client.service,
-        kind: "credential",
-        scheme: scheme,
-        decorators: [],
-      });
+  for (const authentication of authentications) {
+    for (const option of authentication.options) {
+      for (const scheme of option.schemes) {
+        credentialTypes.push({
+          kind: "credential",
+          scheme: scheme,
+          decorators: [],
+        });
+      }
     }
   }
   if (credentialTypes.length > 1) {
-    const namespace = getClientNamespace(context, client.service);
+    const clientNamespaceType = getClientNamespaceType(client);
+    const namespace = getClientNamespace(context, clientNamespaceType);
     return {
       __raw: client.service,
       kind: "union",
       variantTypes: credentialTypes,
-      name: createGeneratedName(context, client.service, "CredentialUnion"),
+      name: createGeneratedName(context, clientNamespaceType, "CredentialUnion"),
       isGeneratedName: true,
       namespace,
       clientNamespace: namespace,
-      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.CredentialUnion`,
+      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, clientNamespaceType)}.CredentialUnion`,
       decorators: [],
       access: "public",
       usage: UsageFlags.None,
@@ -1212,19 +1216,22 @@ export function getSdkCredentialParameter(
   context: TCGCContext,
   client: SdkClient | SdkOperationGroup,
 ): SdkCredentialParameter | undefined {
-  const auth = getAuthentication(context.program, client.service);
-  if (!auth) return undefined;
+  const auth = getClientServicesInArray(client)
+    .map((service) => getAuthentication(context.program, service))
+    .filter((a) => a !== undefined);
+  if (auth.length === 0) return undefined;
+  const clientNamespaceType = getClientNamespaceType(client);
   return {
     type: getSdkCredentialType(context, client, auth),
     kind: "credential",
     name: "credential",
     isGeneratedName: true,
     doc: "Credential used to authenticate requests to the service.",
-    apiVersions: getAvailableApiVersions(context, client.service, client.type),
+    apiVersions: getAvailableApiVersions(context, clientNamespaceType, client.type),
     onClient: true,
     optional: false,
     isApiVersionParam: false,
-    crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.credential`,
+    crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, clientNamespaceType)}.credential`,
     decorators: [],
     access: "public",
     flatten: false,
@@ -1947,29 +1954,34 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       }
     }
     // server parameters
-    const servers = getServers(context.program, client.service);
-    if (servers !== undefined && servers[0].parameters !== undefined) {
-      for (const param of servers[0].parameters.values()) {
-        const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param));
-        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
+    const services = getClientServicesInArray(client);
+    for (const service of services) {
+      const servers = getServers(context.program, service);
+      if (servers !== undefined && servers[0].parameters !== undefined) {
+        for (const param of servers[0].parameters.values()) {
+          const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param));
+          diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
+        }
       }
-    }
-    // versioned enums
-    const [_, versionMap] = getVersions(context.program, client.service);
-    if (versionMap && versionMap.getVersions()[0]) {
-      // create sdk enum for versions enum
-      let sdkVersionsEnum: SdkEnumType;
-      const explicitApiVersions = getExplicitClientApiVersions(context, client.service);
-      if (explicitApiVersions) {
-        // add additional api versions to the enum
-        sdkVersionsEnum = diagnostics.pipe(getSdkEnumWithDiagnostics(context, explicitApiVersions));
-      } else {
-        sdkVersionsEnum = diagnostics.pipe(
-          getSdkEnumWithDiagnostics(context, versionMap.getVersions()[0].enumMember.enum),
-        );
+      // versioned enums
+      const [_, versionMap] = getVersions(context.program, service);
+      if (versionMap && versionMap.getVersions()[0]) {
+        // create sdk enum for versions enum
+        let sdkVersionsEnum: SdkEnumType;
+        const explicitApiVersions = getExplicitClientApiVersions(context, service);
+        if (explicitApiVersions) {
+          // add additional api versions to the enum
+          sdkVersionsEnum = diagnostics.pipe(
+            getSdkEnumWithDiagnostics(context, explicitApiVersions),
+          );
+        } else {
+          sdkVersionsEnum = diagnostics.pipe(
+            getSdkEnumWithDiagnostics(context, versionMap.getVersions()[0].enumMember.enum),
+          );
+        }
+        filterApiVersionsInEnum(context, client, sdkVersionsEnum);
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
       }
-      filterApiVersionsInEnum(context, client, sdkVersionsEnum);
-      diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
     }
   }
   // update for orphan models/enums/unions
