@@ -1,4 +1,13 @@
-import type { DecoratorContext, Model, ModelProperty, Operation } from "@typespec/compiler";
+import type {
+  DecoratorContext,
+  Enum,
+  EnumMember,
+  Interface,
+  Model,
+  ModelProperty,
+  Namespace,
+  Operation,
+} from "@typespec/compiler";
 
 export interface CustomResourceOptions {
   readonly isAzureResource?: boolean;
@@ -7,6 +16,12 @@ export interface CustomResourceOptions {
 export interface ArmOperationOptions {
   readonly useStaticRoute?: boolean;
   readonly route?: string;
+}
+
+export interface ArmFeatureOptions {
+  readonly featureName: string;
+  readonly fileName: string;
+  readonly description: string;
 }
 
 /**
@@ -66,10 +81,48 @@ export type RenamePathParameterDecorator = (
   targetParameterName: string,
 ) => void;
 
+/**
+ * Decorator to define a set of features
+ *
+ * @param target The enum that contains the features
+ */
+export type FeaturesDecorator = (
+  context: DecoratorContext,
+  target: Namespace,
+  features: Enum,
+) => void;
+
+/**
+ * Decorator to define options for a specific feature
+ *
+ * @param target The enum member that represents the feature
+ * @param options The options for the feature
+ */
+export type FeatureOptionsDecorator = (
+  context: DecoratorContext,
+  target: EnumMember,
+  options: ArmFeatureOptions,
+) => void;
+
+/**
+ * Decorator to associate a feature with a model, interface, or namespace
+ *
+ * @param target The target to associate the feature with
+ * @param featureName The feature to associate with the target
+ */
+export type FeatureDecorator = (
+  context: DecoratorContext,
+  target: Model | Interface | Namespace,
+  featureName: EnumMember,
+) => void;
+
 export type AzureResourceManagerLegacyDecorators = {
   customAzureResource: CustomAzureResourceDecorator;
   externalTypeRef: ExternalTypeRefDecorator;
   armOperationRoute: ArmOperationRouteDecorator;
   armExternalType: ArmExternalTypeDecorator;
   renamePathParameter: RenamePathParameterDecorator;
+  features: FeaturesDecorator;
+  featureOptions: FeatureOptionsDecorator;
+  feature: FeatureDecorator;
 };
