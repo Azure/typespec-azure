@@ -45,6 +45,7 @@ describe("@client", () => {
       {
         kind: "SdkClient",
         name: "MyClient",
+        parent: undefined,
         service: MyClient,
         type: MyClient,
         crossLanguageDefinitionId: "MyClient.MyClient",
@@ -66,6 +67,7 @@ describe("@client", () => {
       {
         kind: "SdkClient",
         name: "MyClient",
+        parent: undefined,
         service: MyService,
         type: MyClient,
         crossLanguageDefinitionId: "MyService.MyClient",

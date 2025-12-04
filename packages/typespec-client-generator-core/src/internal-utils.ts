@@ -761,17 +761,27 @@ export function getStreamAsBytes(
 
 function getVersioningMutator(
   context: TCGCContext,
-  service: Namespace,
-  apiVersion: string,
 ): unsafe_MutatorWithNamespace {
-  const versionMutator = getVersioningMutators(context.program, service);
+  // service being the top-level client
+  const clients = context.getClients();
+  let topLevelClientNamespace = clients.find((c) => c.parent === undefined)?.service;
+  if (!topLevelClientNamespace) {
+    topLevelClientNamespace = listServices(context.program)[0].type;
+  }
+
+  // namespace that has useDependency
+
+  // get the dependency graph {
+  // 
+  // }
+  const versionMutator = getVersioningMutators(context.program, context.);
   compilerAssert(
     versionMutator !== undefined && versionMutator.kind !== "transient",
     "Versioning service should not get undefined or transient versioning mutator",
   );
 
   const mutators = versionMutator.snapshots
-    .filter((snapshot) => apiVersion === snapshot.version.value)
+    .filter((snapshot) => "" === snapshot.version.value)
     .map((x) => x.mutator);
   compilerAssert(mutators.length === 1, "One api version should not get multiple mutators");
 
@@ -782,11 +792,11 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   const globalNamespace = context.program.getGlobalNamespaceType();
   const allApiVersions = context.getPackageVersions();
   if (allApiVersions.length === 0 || context.apiVersion === "all") return globalNamespace;
+  
 
   const mutator = getVersioningMutator(
     context,
-    listServices(context.program)[0].type,
-    allApiVersions[allApiVersions.length - 1],
+    allApiVersions,
   );
   const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, [mutator], globalNamespace);
   compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");

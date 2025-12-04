@@ -169,21 +169,31 @@ export function createTCGCContext(
       if (this.__packageVersions) {
         return this.__packageVersions;
       }
-      const serviceNamespace = this.getTopLevelVersionedService();
-      if (!serviceNamespace) {
+
+      const allVersions: string[] = [];
+      const services = listServices(this.program);
+
+      if (services.length === 0) {
         this.__packageVersions = [];
         return this.__packageVersions;
       }
 
-      const versions = getVersions(program, serviceNamespace)[1]?.getVersions();
-      if (!versions) {
-        this.__packageVersions = [];
-        return this.__packageVersions;
+      for (const service of services) {
+        const versions = getVersions(program, service.type)[1]?.getVersions();
+        if (versions) {
+          removeVersionsLargerThanExplicitlySpecified(this, versions);
+          const versionValues = versions.map((version) => version.value);
+
+          // Add versions that aren't already in the list
+          for (const version of versionValues) {
+            if (!allVersions.includes(version)) {
+              allVersions.push(version);
+            }
+          }
+        }
       }
 
-      removeVersionsLargerThanExplicitlySpecified(this, versions);
-
-      this.__packageVersions = versions.map((version) => version.value);
+      this.__packageVersions = allVersions;
 
       if (
         this.apiVersion !== undefined &&
@@ -194,7 +204,7 @@ export function createTCGCContext(
         reportDiagnostic(this.program, {
           code: "api-version-undefined",
           format: { version: this.apiVersion },
-          target: serviceNamespace,
+          target: this.program.getGlobalNamespaceType(),
         });
         this.apiVersion = this.__packageVersions[this.__packageVersions.length - 1];
       }
