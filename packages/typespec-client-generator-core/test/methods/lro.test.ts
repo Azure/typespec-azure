@@ -4,7 +4,7 @@ import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-res
 import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { assert, beforeEach, describe, it } from "vitest";
-import { SdkClientType, SdkHttpOperation, SdkType, UsageFlags } from "../../src/interfaces.js";
+import { SdkClientType, SdkHttpOperation, UsageFlags } from "../../src/interfaces.js";
 import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
