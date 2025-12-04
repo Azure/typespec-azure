@@ -1,14 +1,14 @@
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import {
   BasicTestRunner,
   createLinterRuleTester,
   LinterRuleTester,
 } from "@typespec/compiler/testing";
+import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { beforeEach, describe, it } from "vitest";
 import { noUnnamedTypesRule } from "../../src/rules/no-unnamed-types.rule.js";
 import { createSdkTestRunner } from "../test-host.js";
-import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 
 let runner: BasicTestRunner;
 let tester: LinterRuleTester;
@@ -16,7 +16,7 @@ let tester: LinterRuleTester;
 beforeEach(async () => {
   runner = await createSdkTestRunner({
     librariesToAdd: [AzureCoreTestLibrary, OpenAPITestLibrary],
-    autoImports: ["@azure-tools/typespec-azure-core"]
+    autoImports: ["@azure-tools/typespec-azure-core"],
   });
   tester = createLinterRuleTester(
     runner,
@@ -244,7 +244,7 @@ describe("models", () => {
     const armRunner = await createSdkTestRunner({
       librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
       autoImports: ["@azure-tools/typespec-azure-resource-manager"],
-      autoUsings: ["Azure.ResourceManager", "Azure.Core", "Azure.Core.Traits"]
+      autoUsings: ["Azure.ResourceManager", "Azure.Core", "Azure.Core.Traits"],
     });
     const armTester = createLinterRuleTester(
       armRunner,
@@ -279,7 +279,7 @@ describe("models", () => {
           code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
           severity: "warning",
           message: `Anonymous model with generated name "MoveFinalResult" detected. Define this model separately with a proper name to improve code readability and reusability.`,
-        }
+        },
       ]);
   });
 });

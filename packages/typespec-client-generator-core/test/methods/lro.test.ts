@@ -897,8 +897,8 @@ describe("data plane LRO templates", () => {
     assert.isTrue(response.isGeneratedName);
     const generatedName = response.name;
     assert.strictEqual("UpdateFinalResult", generatedName);
-    const cdid = response.crossLanguageDefinitionId;
-    assert.isFalse(cdid.includes(".."));
+    const crossLanguageId = response.crossLanguageDefinitionId;
+    assert.isFalse(crossLanguageId.includes(".."));
     const lroMetadata = method.lroMetadata;
     assert.exists(lroMetadata);
     const finalResponse = lroMetadata.finalResponse;

@@ -1,3 +1,4 @@
+import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
   Diagnostic,
   Enum,
@@ -69,7 +70,6 @@ import {
   removeVersionsLargerThanExplicitlySpecified,
   resolveDuplicateGenearatedName,
 } from "./internal-utils.js";
-import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 
 /**
  * Return the default api version for a versioned service. Will return undefined if one does not exist
