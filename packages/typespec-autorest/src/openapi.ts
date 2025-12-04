@@ -105,8 +105,10 @@ import { SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
 import { TwoLevelMap } from "@typespec/compiler/utils";
 import {
-  Authentication,
+  AuthenticationOptionReference,
+  AuthenticationReference,
   HttpAuth,
+  HttpAuthRef,
   HttpOperation,
   HttpOperationBody,
   HttpOperationMultipartBody,
@@ -114,13 +116,13 @@ import {
   HttpOperationResponse,
   HttpPayloadBody,
   HttpProperty,
+  HttpServiceAuthentication,
   HttpStatusCodeRange,
   HttpStatusCodesEntry,
   MetadataInfo,
   OAuth2FlowType,
   Visibility,
   createMetadataInfo,
-  getAuthentication,
   getHeaderFieldOptions,
   getHttpService,
   getServers,
@@ -129,6 +131,7 @@ import {
   isHttpFile,
   isSharedRoute,
   reportIfNoRoutes,
+  resolveAuthentication,
   resolveRequestVisibility,
 } from "@typespec/http";
 import {
@@ -295,6 +298,7 @@ export async function getOpenAPIForService(
       return !isService(program, ns);
     },
   };
+  const httpService = ignoreDiagnostics(getHttpService(program, service.type));
   const info = resolveInfo(program, service.type);
   const auth = processAuth(service.type);
 
@@ -361,7 +365,6 @@ export async function getOpenAPIForService(
   const [exampleMap, diagnostics] = await loadExamples(program, options, context.version);
   program.reportDiagnostics(diagnostics);
 
-  const httpService = ignoreDiagnostics(getHttpService(program, service.type));
   const routes = httpService.operations;
   reportIfNoRoutes(program, routes);
 
@@ -2690,7 +2693,7 @@ export async function getOpenAPIForService(
         security: Record<string, string[]>[];
       }
     | undefined {
-    const authentication = getAuthentication(program, serviceNamespace);
+    const authentication = resolveAuthentication(httpService);
     if (authentication) {
       return processServiceAuthentication(authentication, serviceNamespace);
     }
@@ -2698,36 +2701,29 @@ export async function getOpenAPIForService(
   }
 
   function processServiceAuthentication(
-    authentication: Authentication,
+    authentication: HttpServiceAuthentication,
     serviceNamespace: Namespace,
   ): {
     securitySchemes: Record<string, OpenAPI2SecurityScheme>;
     security: Record<string, string[]>[];
   } {
     const oaiSchemes: Record<string, OpenAPI2SecurityScheme> = {};
-    const security: Record<string, string[]>[] = [];
-    for (const option of authentication.options) {
-      const oai3SecurityOption: Record<string, string[]> = {};
-      for (const scheme of option.schemes) {
-        const result = getOpenAPI2Scheme(scheme, serviceNamespace);
-        if (result !== undefined) {
-          const [oaiScheme, scopes] = result;
-          oaiSchemes[scheme.id] = oaiScheme;
-          oai3SecurityOption[scheme.id] = scopes;
-        }
-      }
-
-      if (Object.keys(oai3SecurityOption).length > 0) {
-        security.push(oai3SecurityOption);
+    for (const scheme of authentication.schemes) {
+      const result = getOpenAPI2Scheme(scheme, serviceNamespace);
+      if (result !== undefined) {
+        oaiSchemes[scheme.id] = result;
       }
     }
+
+    const security = getOpenAPISecurity(oaiSchemes, authentication.defaultAuth);
+
     return { securitySchemes: oaiSchemes, security };
   }
 
   function getOpenAPI2Scheme(
     auth: HttpAuth,
     serviceNamespace: Namespace,
-  ): [OpenAPI2SecurityScheme, string[]] | undefined {
+  ): OpenAPI2SecurityScheme | undefined {
     switch (auth.type) {
       case "http":
         if (auth.scheme.toLowerCase() !== "basic") {
@@ -2738,32 +2734,26 @@ export async function getOpenAPIForService(
           });
           return undefined;
         }
-        return [{ type: "basic", description: auth.description }, []];
+        return { type: "basic", description: auth.description };
       case "apiKey":
         if (auth.in === "cookie") {
           return undefined;
         }
-        return [
-          { type: "apiKey", description: auth.description, in: auth.in, name: auth.name },
-          [],
-        ];
+        return { type: "apiKey", description: auth.description, in: auth.in, name: auth.name };
       case "oauth2":
         const flow = auth.flows[0];
         if (flow === undefined) {
           return undefined;
         }
         const oaiFlowName = getOpenAPI2Flow(flow.type);
-        return [
-          {
-            type: "oauth2",
-            description: auth.description,
-            flow: oaiFlowName,
-            authorizationUrl: (flow as any).authorizationUrl,
-            tokenUrl: (flow as any).tokenUrl,
-            scopes: Object.fromEntries(flow.scopes.map((x) => [x.value, x.description ?? ""])),
-          } as any,
-          flow.scopes.map((x) => x.value),
-        ];
+        return {
+          type: "oauth2",
+          description: auth.description,
+          flow: oaiFlowName,
+          authorizationUrl: (flow as any).authorizationUrl,
+          tokenUrl: (flow as any).tokenUrl,
+          scopes: Object.fromEntries(flow.scopes.map((x) => [x.value, x.description ?? ""])),
+        };
       case "openIdConnect":
       default:
         reportDiagnostic(program, {
@@ -2775,6 +2765,36 @@ export async function getOpenAPIForService(
     }
   }
 
+  function getOpenAPISecurity(
+    oaiSchemes: Record<string, OpenAPI2SecurityScheme>,
+    authReference: AuthenticationReference,
+  ) {
+    const security = authReference.options
+      .map((authOption: AuthenticationOptionReference) => {
+        const securityOption: Record<string, string[]> = {};
+        for (const httpAuthRef of authOption.all) {
+          const scopes = getScopesForAuthReference(httpAuthRef);
+          if (httpAuthRef.auth.id in oaiSchemes && scopes) {
+            securityOption[httpAuthRef.auth.id] = scopes;
+          }
+        }
+        return securityOption;
+      })
+      .filter((x) => Object.keys(x).length > 0);
+    return security;
+  }
+
+  function getScopesForAuthReference(httpAuthRef: HttpAuthRef) {
+    switch (httpAuthRef.kind) {
+      case "noAuth":
+        // should emit "{}" as a security option https://github.com/OAI/OpenAPI-Specification/issues/14#issuecomment-297457320
+        return undefined;
+      case "oauth2":
+        return httpAuthRef.scopes;
+      default:
+        return [];
+    }
+  }
   function getOpenAPI2Flow(flow: OAuth2FlowType): OpenAPI2OAuth2FlowType {
     switch (flow) {
       case "authorizationCode":
