@@ -266,6 +266,7 @@ it("emits correct fixed union name parameter for resource", async () => {
     },
     in: "path",
     name: "widgetName",
+    pattern: "^[a-zA-Z0-9-]{3,24}$",
     required: true,
     type: "string",
   });
