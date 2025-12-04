@@ -52,6 +52,7 @@ import {
   getLegacyHierarchyBuilding,
   getOverriddenClientMethod,
   getUsageOverride,
+  isInScope,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
@@ -1335,7 +1336,8 @@ function addPropertiesToModelType(
     if (
       isStatusCode(context.program, property) ||
       isNeverOrVoidType(property.type) ||
-      hasNoneVisibility(context, property)
+      hasNoneVisibility(context, property) ||
+      !isInScope(context, property)
     ) {
       continue;
     }
@@ -1353,6 +1355,10 @@ function addMultipartPropertiesToModelType(
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   for (const part of body.parts) {
+    // skip properties that are out of scope
+    if (!isInScope(context, part.property!)) {
+      continue;
+    }
     const clientProperty = diagnostics.pipe(
       getSdkModelPropertyType(context, part.property!, operation),
     );
