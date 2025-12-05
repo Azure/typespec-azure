@@ -9,7 +9,7 @@ using Azure.ClientGenerator.Core;
 @doc("Test for @clientLocation decorator - moving operations between clients")
 @scenarioService("/azure/client-generator-core/client-location/move-to-root-client")
 @global.Azure.ClientGenerator.Core.clientNamespace(
-  "azure.clientgenerator.core.clientlocation.MoveToRootClient",
+  "azure.clientgenerator.core.clientlocation.rootclient",
   "java"
 )
 namespace _Specs_.Azure.ClientGenerator.Core.ClientLocation.MoveToRootClient;
