@@ -818,7 +818,7 @@ describe("data plane LRO templates", () => {
   });
 
   // https://github.com/Azure/typespec-azure/issues/2325
-  it("LroMetadata final result anonymous model", async () => {
+  it("LroMetadata synthetic anonymous ResourceOperationStatus", async () => {
     await runner.compileWithVersionedService(`
       alias ServiceTraits = NoRepeatableRequests &
         NoConditionalRequests &
@@ -842,33 +842,12 @@ describe("data plane LRO templates", () => {
         instructionId: string;
       }
 
-      @doc("Operation Status")
-      @lroStatus
-      union OperationStatusValue {
-        @doc("The operation is Accepted.")
-        Accepted: "Accepted",
-
-        @doc("The operation is InProgress.")
-        InProgress: "InProgress",
-
-        @doc("The operation is Succeeded.")
-        Succeeded: "Succeeded",
-
-        @doc("The operation is Failed.")
-        Failed: "Failed",
-
-        @doc("The operation is Canceled.")
-        Canceled: "Canceled",
-
-        string,
-      }
-
       @doc("Operation Response Model")
       @resource("operation")
       model OperationResultQuery {
         @doc("The operation status.")
         @visibility(Lifecycle.Read)
-        status: OperationStatusValue;
+        status: Foundations.OperationState;
 
         @doc("The operation id.")
         @key("operationId")

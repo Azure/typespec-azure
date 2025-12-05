@@ -507,19 +507,19 @@ function getContextPath(
     const lroMetadata = getLroMetadata(context.program, root);
     if (lroMetadata) {
       const anonymousCandidates = [
-        { value: lroMetadata.finalResult, label: "FinalResult" },
-        { value: lroMetadata.logicalResult, label: "LogicalResult" },
-        { value: lroMetadata.envelopeResult, label: "EnvelopeResult" },
-        { value: lroMetadata.finalEnvelopeResult, label: "FinalEnvelopeResult" },
+        { lroResultType: lroMetadata.finalResult, label: "FinalResult" },
+        { lroResultType: lroMetadata.logicalResult, label: "LogicalResult" },
+        { lroResultType: lroMetadata.envelopeResult, label: "EnvelopeResult" },
+        { lroResultType: lroMetadata.finalEnvelopeResult, label: "FinalEnvelopeResult" },
       ];
 
-      for (const { value, label } of anonymousCandidates) {
-        if (!value || value === "void") {
+      for (const { lroResultType, label } of anonymousCandidates) {
+        if (!lroResultType || lroResultType === "void") {
           continue;
         }
         visited.clear();
         result = [{ name: root.name, type: root }];
-        if (dfsModelProperties(typeToFind, value, label)) {
+        if (dfsModelProperties(typeToFind, lroResultType, label)) {
           return result;
         }
       }
