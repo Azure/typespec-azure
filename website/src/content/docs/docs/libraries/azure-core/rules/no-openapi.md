@@ -17,7 +17,7 @@ Those decorators are only meant to be read by the openapi emitters which means t
 | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `@example`                           | [See examples doc](../../../migrate-swagger/faq/x-ms-examples.mdx)                                                                                              |
 | `@extension("x-ms-examples", `       | [See examples doc](../../../migrate-swagger/faq/x-ms-examples.mdx)                                                                                              |
-| `@extension("x-ms-client-flatten", ` | Use [`@flattenProperty`](../../typespec-client-generator-core/reference/decorators.md#@Azure.ClientGenerator.Core.flattenProperty)                              |
+| `@extension("x-ms-client-flatten", ` | Use [`@flattenProperty`](../../typespec-client-generator-core/reference/decorators.md#@Azure.ClientGenerator.Core.Legacy.flattenProperty)                       |
 | `@extension("x-ms-mutability", `     | Use [`@visibility` decorator](https://typespec.io/docs/standard-library/built-in-decorators#@visibility)                                                        |
 | `@extension("x-ms-enum", `           | [Enum extensibility doc](../../../troubleshoot/enum-not-extensible.md)                                                                                          |
 | `@extension("x-ms-identifiers", `    | Use [`@identifiers`](../../azure-resource-manager/reference/decorators.md#@Azure.ResourceManager.identifiers)                                                   |

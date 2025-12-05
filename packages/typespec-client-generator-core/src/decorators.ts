@@ -1196,7 +1196,7 @@ function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Names
 
 export const $scope: ScopeDecorator = (
   context: DecoratorContext,
-  entity: Operation,
+  entity: Operation | ModelProperty,
   scope?: LanguageScopes,
 ) => {
   const [negationScopes, scopes] = parseScopes(context, scope);
@@ -1558,12 +1558,12 @@ export function getNextLinkVerb(context: TCGCContext, entity: Operation): "GET" 
 }
 
 /**
- * Check if an operation is in scope for the current emitter.
+ * Check if an operation or model property is in scope for the current emitter.
  * @param context TCGCContext
- * @param entity Operation to check if it is in scope
+ * @param entity Operation or ModelProperty to check if it is in scope
  * @returns
  */
-export function isInScope(context: TCGCContext, entity: Operation): boolean {
+export function isInScope(context: TCGCContext, entity: Operation | ModelProperty): boolean {
   const scopes = getScopedDecoratorData(context, scopeKey, entity);
   const negationScopes = getScopedDecoratorData(context, negationScopesKey, entity);
 

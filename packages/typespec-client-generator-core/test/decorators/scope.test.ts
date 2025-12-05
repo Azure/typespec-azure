@@ -704,3 +704,129 @@ describe("negation", () => {
     strictEqual(javaSdkModel, undefined);
   });
 });
+
+describe("model property scope", () => {
+  it("include property for matching scope", async () => {
+    const runnerWithCSharp = await createSdkTestRunner({
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    await runnerWithCSharp.compileWithBuiltInService(`
+      model TestModel {
+        @scope("csharp")
+        csharpProp: string;
+        commonProp: string;
+      }
+      op func(
+        @body body: TestModel
+      ): void;
+    `);
+
+    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const model = sdkPackage.models.find((x) => x.name === "TestModel");
+    ok(model);
+    const csharpProp = model.properties.find((x) => x.name === "csharpProp");
+    const commonProp = model.properties.find((x) => x.name === "commonProp");
+    ok(csharpProp);
+    ok(commonProp);
+  });
+
+  it("exclude property from non-matching scope", async () => {
+    const runnerWithPython = await createSdkTestRunner({
+      emitterName: "@azure-tools/typespec-python",
+    });
+    await runnerWithPython.compileWithBuiltInService(`
+      model TestModel {
+        @scope("csharp")
+        csharpProp: string;
+        commonProp: string;
+      }
+      op func(
+        @body body: TestModel
+      ): void;
+    `);
+
+    const sdkPackage = runnerWithPython.context.sdkPackage;
+    const model = sdkPackage.models.find((x) => x.name === "TestModel");
+    ok(model);
+    const csharpProp = model.properties.find((x) => x.name === "csharpProp");
+    const commonProp = model.properties.find((x) => x.name === "commonProp");
+    strictEqual(csharpProp, undefined);
+    ok(commonProp);
+  });
+
+  it("exclude property with negation scope", async () => {
+    const runnerWithCSharp = await createSdkTestRunner({
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    await runnerWithCSharp.compileWithBuiltInService(`
+      model TestModel {
+        @scope("!csharp")
+        internalProp: string;
+        commonProp: string;
+      }
+      op func(
+        @body body: TestModel
+      ): void;
+    `);
+
+    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const model = sdkPackage.models.find((x) => x.name === "TestModel");
+    ok(model);
+    const internalProp = model.properties.find((x) => x.name === "internalProp");
+    const commonProp = model.properties.find((x) => x.name === "commonProp");
+    strictEqual(internalProp, undefined);
+    ok(commonProp);
+  });
+
+  it("include all properties without scope decorator", async () => {
+    const runnerWithCSharp = await createSdkTestRunner({
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    await runnerWithCSharp.compileWithBuiltInService(`
+      model TestModel {
+        prop1: string;
+        prop2: int32;
+      }
+      op func(
+        @body body: TestModel
+      ): void;
+    `);
+
+    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const model = sdkPackage.models.find((x) => x.name === "TestModel");
+    ok(model);
+    strictEqual(model.properties.length, 2);
+  });
+
+  it("multiple properties with different scopes", async () => {
+    const runnerWithCSharp = await createSdkTestRunner({
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    await runnerWithCSharp.compileWithBuiltInService(`
+      model TestModel {
+        @scope("csharp")
+        csharpProp: string;
+        @scope("python")
+        pythonProp: string;
+        @scope("java")
+        javaProp: string;
+        commonProp: string;
+      }
+      op func(
+        @body body: TestModel
+      ): void;
+    `);
+
+    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const model = sdkPackage.models.find((x) => x.name === "TestModel");
+    ok(model);
+    const csharpProp = model.properties.find((x) => x.name === "csharpProp");
+    const pythonProp = model.properties.find((x) => x.name === "pythonProp");
+    const javaProp = model.properties.find((x) => x.name === "javaProp");
+    const commonProp = model.properties.find((x) => x.name === "commonProp");
+    ok(csharpProp);
+    strictEqual(pythonProp, undefined);
+    strictEqual(javaProp, undefined);
+    ok(commonProp);
+  });
+});
