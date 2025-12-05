@@ -632,9 +632,13 @@ function isVariableSegment(segment: string, singletonResourceName?: string): boo
 function getResourceInfo(
   program: Program,
   operation: ArmResourceOperation,
-  singletonResourceName: string | undefined
+  singletonResourceName: string | undefined,
 ): ResolvedResourceInfo | undefined {
-  const pathInfo = getResourcePathElements(operation.httpOperation.path, operation.kind, singletonResourceName);
+  const pathInfo = getResourcePathElements(
+    operation.httpOperation.path,
+    operation.kind,
+    singletonResourceName,
+  );
   if (pathInfo === undefined) return undefined;
   return {
     ...pathInfo,
@@ -659,7 +663,10 @@ export function getResourcePathElements(
     }
 
     // if the next segment is the last segment
-    if (i + 1 === segments.length - 1 && isVariableSegment(segments[i + 1], singletonResourceName)) {
+    if (
+      i + 1 === segments.length - 1 &&
+      isVariableSegment(segments[i + 1], singletonResourceName)
+    ) {
       typeSegments.push(segments[i]);
       instanceSegments.push(segments[i]);
       instanceSegments.push(segments[i + 1]);
@@ -873,7 +880,7 @@ export function resolveArmResourceOperations(
 
     if (armOperation === undefined) continue;
     armOperation.kind = operation.kind;
-    const singletonResourceName = getSingletonResourceKey(program, resourceType)
+    const singletonResourceName = getSingletonResourceKey(program, resourceType);
 
     armOperation.resourceModelName = operation.resource?.name ?? resourceType.name;
     const resourceInfo = getResourceInfo(program, armOperation, singletonResourceName);
@@ -905,7 +912,8 @@ export function resolveArmResourceOperations(
       resourceType: resourceInfo.resourceType,
       resourceInstancePath: resourceInfo.resourceInstancePath,
       resourceName: resourceInfo.resourceName,
-      singletonResourceNames: singletonResourceName !== undefined ? [singletonResourceName] : undefined,
+      singletonResourceNames:
+        singletonResourceName !== undefined ? [singletonResourceName] : undefined,
       operations: {
         lifecycle: {
           read: undefined,

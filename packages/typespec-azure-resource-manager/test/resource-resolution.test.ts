@@ -3566,9 +3566,7 @@ interface Employees {
       type: expect.anything(),
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
-        types: [
-          "employees",
-        ],
+        types: ["employees"],
       },
       scope: "ResourceGroup",
       parent: undefined,
@@ -3632,9 +3630,7 @@ interface Employees {
       type: expect.anything(),
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
-        types: [
-          "employees",
-        ],
+        types: ["employees"],
       },
       scope: "ResourceGroup",
       parent: undefined,
@@ -3720,9 +3716,7 @@ union ProvisioningState {
       type: expect.anything(),
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
-        types: [
-          "employees",
-        ],
+        types: ["employees"],
       },
       scope: "ResourceGroup",
       parent: undefined,
@@ -3735,9 +3729,7 @@ union ProvisioningState {
       type: expect.anything(),
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
-        types: [
-          "buildings",
-        ],
+        types: ["buildings"],
       },
       scope: "ResourceGroup",
       parent: undefined,
@@ -3823,9 +3815,7 @@ union ProvisioningState {
       type: expect.anything(),
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
-        types: [
-          "employees",
-        ],
+        types: ["employees"],
       },
       scope: "ResourceGroup",
       parent: undefined,
@@ -3838,9 +3828,7 @@ union ProvisioningState {
       type: expect.anything(),
       resourceType: {
         provider: "Microsoft.ContosoProviderHub",
-        types: [
-          "buildings",
-        ],
+        types: ["buildings"],
       },
       scope: "ResourceGroup",
       parent: undefined,
