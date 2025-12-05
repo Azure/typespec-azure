@@ -3,12 +3,6 @@ import { createTypeSpecLibrary, paramMessage } from "@typespec/compiler";
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-azure-resource-manager",
   diagnostics: {
-    "single-arm-provider": {
-      severity: "error",
-      messages: {
-        default: "Only one @armProviderNamespace can be declared in a typespec spec at once.",
-      },
-    },
     "decorator-param-wrong-type": {
       severity: "error",
       messages: {
