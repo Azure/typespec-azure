@@ -84,7 +84,8 @@ export type RenamePathParameterDecorator = (
 /**
  * Decorator to define a set of features
  *
- * @param target The enum that contains the features
+ * @param target The service namespace
+ * @param features The enum that contains the features
  */
 export type FeaturesDecorator = (
   context: DecoratorContext,

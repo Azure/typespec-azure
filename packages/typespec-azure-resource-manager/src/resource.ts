@@ -1323,8 +1323,8 @@ export const $feature: FeatureDecorator = (
   featureName: EnumMember,
 ) => {
   const { program } = context;
-  const feature = (featureName.value ?? featureName.name) as string;
-  setResourceFeature(program, entity, feature);
+  const options = getFeatureOptions(program, featureName);
+  setResourceFeature(program, entity, options.featureName);
 };
 
 export const $features: FeaturesDecorator = (

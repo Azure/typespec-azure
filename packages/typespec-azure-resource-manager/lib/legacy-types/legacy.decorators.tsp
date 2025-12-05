@@ -74,7 +74,8 @@ model ArmFeatureOptions {
 
 /**
  * Decorator to define a set of features
- * @param target The enum that contains the features
+ * @param target The service namespace
+ * @param features The enum that contains the features
  */
 extern dec features(target: Namespace, features: Enum);
 
