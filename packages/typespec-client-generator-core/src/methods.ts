@@ -65,6 +65,7 @@ import {
   findRootSourceProperty,
   getAvailableApiVersions,
   getClientDoc,
+  getClientNamespaceType,
   getCorrespondingClientParam,
   getHashForType,
   getTcgcLroMetadata,
@@ -632,7 +633,7 @@ export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOpe
   const apiVersions = getAvailableApiVersions(
     context,
     operation,
-    client.__raw.type ?? client.__raw.service,
+    getClientNamespaceType(client.__raw),
   );
 
   let clientParams = context.__clientParametersCache.get(client.__raw);

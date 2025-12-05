@@ -1,5 +1,4 @@
 import {
-  getNamespaceFullName,
   Interface,
   isService,
   isTemplateDeclaration,
@@ -110,22 +109,6 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     if (group.type) {
       // operations directly under the group
       const operations = [...group.type.operations.values()];
-
-      // For interfaces that extend other interfaces, also collect operations from the source interfaces
-      // TypeSpec doesn't always automatically copy operations from extended interfaces,
-      // especially in versioning scenarios, so we need to manually collect them
-      if (group.type.kind === "Interface" && group.type.sourceInterfaces.length > 0) {
-        const operationsByName = new Map(operations.map((op) => [op.name, op]));
-        for (const sourceIface of group.type.sourceInterfaces) {
-          for (const [name, op] of sourceIface.operations) {
-            // Only add if not already present (prefer operations from derived interface)
-            if (!operationsByName.has(name)) {
-              operations.push(op);
-              operationsByName.set(name, op);
-            }
-          }
-        }
-      }
 
       // when there is explicitly `@operationGroup` or `@client`
       // operations under namespace or interface that are not decorated with `@operationGroup` or `@client`
@@ -272,7 +255,6 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
         name: clientName,
         service: service,
         type: service,
-        crossLanguageDefinitionId: getNamespaceFullName(service),
         subOperationGroups: [],
       },
     ];

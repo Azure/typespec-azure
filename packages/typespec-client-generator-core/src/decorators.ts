@@ -16,7 +16,6 @@ import {
   Union,
   compilerAssert,
   getDiscriminator,
-  getNamespaceFullName,
   ignoreDiagnostics,
   isErrorModel,
   isService,
@@ -176,18 +175,22 @@ export const $client: ClientDecorator = (
   const explicitName =
     options?.kind === "Model" ? options?.properties.get("name")?.type : undefined;
   const name: string = explicitName?.kind === "String" ? explicitName.value : target.name;
-  let service = options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
-  const parent = options?.kind === "Model" ? options?.properties.get("parent")?.type : undefined;
+  let service: Namespace | Namespace[] | undefined = undefined;
+  const serviceConfig =
+    options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
 
-  if (service?.kind !== "Namespace") {
+  if (serviceConfig?.kind === "Namespace") {
+    service = serviceConfig;
+  } else if (
+    serviceConfig?.kind === "Tuple" &&
+    serviceConfig.values.every((v) => v.kind === "Namespace")
+  ) {
+    service = serviceConfig.values;
+  } else {
     service = findClientService(context.program, target);
   }
 
-  if (
-    service === undefined ||
-    service.kind !== "Namespace" ||
-    !judgeService(context.program, service)
-  ) {
+  if (service === undefined) {
     reportDiagnostic(context.program, {
       code: "client-service",
       format: { name },
@@ -201,9 +204,7 @@ export const $client: ClientDecorator = (
     name,
     service,
     type: target,
-    crossLanguageDefinitionId: `${getNamespaceFullName(service)}.${name}`,
     subOperationGroups: [],
-    parent: parent as Namespace | Interface | undefined,
   };
   setScopedDecoratorData(context, $client, clientKey, target, client, scope);
 };
@@ -217,10 +218,7 @@ function judgeService(program: Program, type: Namespace): boolean {
   );
 }
 
-function findClientService(
-  program: Program,
-  client: Namespace | Interface,
-): Namespace | Interface | undefined {
+function findClientService(program: Program, client: Namespace | Interface): Namespace | undefined {
   let current: Namespace | undefined = client as any;
   while (current) {
     if (judgeService(program, current)) {

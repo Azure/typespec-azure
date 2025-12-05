@@ -171,7 +171,7 @@ export async function handleClientExamples(
 ): Promise<[void, readonly Diagnostic[]]> {
   const diagnostics = createDiagnosticCollector();
 
-  const packageVersions = context.getApiVersions();
+  const packageVersions = context.getPackageVersions();
   const examples = diagnostics.pipe(
     await loadExamples(context, packageVersions[packageVersions.length - 1]),
   );
