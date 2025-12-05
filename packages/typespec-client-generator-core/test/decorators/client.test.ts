@@ -47,7 +47,6 @@ describe("@client", () => {
         name: "MyClient",
         service: MyClient,
         type: MyClient,
-        crossLanguageDefinitionId: "MyClient.MyClient",
         subOperationGroups: [],
       },
     ]);
@@ -68,7 +67,6 @@ describe("@client", () => {
         name: "MyClient",
         service: MyService,
         type: MyClient,
-        crossLanguageDefinitionId: "MyService.MyClient",
         subOperationGroups: [],
       },
     ]);
@@ -183,7 +181,6 @@ describe("listClients without @client", () => {
         name: "MyServiceClient",
         service: MyService,
         type: MyService,
-        crossLanguageDefinitionId: "MyService",
         subOperationGroups: [],
       },
     ]);
@@ -446,7 +443,6 @@ describe("@operationGroup", () => {
         name: "MyServiceClient",
         service: MyService,
         type: MyService,
-        crossLanguageDefinitionId: "MyService",
         subOperationGroups: [],
       },
     ]);

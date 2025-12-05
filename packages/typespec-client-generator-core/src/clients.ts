@@ -48,10 +48,7 @@ function getEndpointTypeFromSingleServer<
 ): [SdkEndpointType[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const templateArguments: SdkPathParameter[] = [];
-  const clientNamespaceType =
-    client.__raw.type?.kind === "Interface"
-      ? client.__raw.type
-      : getClientNamespaceType(client.__raw);
+  const clientNamespaceType = getClientNamespaceType(client.__raw);
   const defaultOverridableEndpointType: SdkEndpointType = {
     kind: "endpoint",
     serverUrl: "{endpoint}",
@@ -138,7 +135,8 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
 ): [SdkEndpointParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const rawClient = client.__raw;
-  const clientNamespaceType = getClientNamespaceType(rawClient);
+  const clientType = getClientNamespaceType(rawClient);
+  const clientNamespaceType = clientType.kind === "Interface" ? clientType.namespace! : clientType;
   const servers = getServers(context.program, clientNamespaceType);
   const types: SdkEndpointType[] = [];
 
@@ -159,8 +157,8 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
       variantTypes: types,
       name: createGeneratedName(context, clientNamespaceType, "Endpoint"),
       isGeneratedName: true,
-      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, clientNamespaceType)}.Endpoint`,
-      namespace: getClientNamespace(context, clientNamespaceType),
+      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, clientType)}.Endpoint`,
+      namespace: getClientNamespace(context, clientType),
       decorators: [],
     } as SdkUnionType<SdkEndpointType>;
   } else {
@@ -174,10 +172,10 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
     doc: "Service host",
     onClient: true,
     urlEncode: false,
-    apiVersions: context.getApiVersionsForType(clientNamespaceType),
+    apiVersions: context.getApiVersionsForType(clientType),
     optional: false,
     isApiVersionParam: false,
-    crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, clientNamespaceType)}.endpoint`,
+    crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, clientType)}.endpoint`,
     decorators: [],
     access: "public",
     flatten: false,
@@ -198,7 +196,6 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     }
   }
   const clientNamespaceType = getClientNamespaceType(client);
-  const clientType = client.type?.kind === "Interface" ? client.type : clientNamespaceType;
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
@@ -207,14 +204,14 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     summary: client.type ? getSummary(context.program, client.type) : undefined,
     methods: [],
     apiVersions: context.getApiVersionsForType(clientNamespaceType),
-    namespace: getClientNamespace(context, clientType),
+    namespace: getClientNamespace(context, clientNamespaceType),
     clientInitialization: diagnostics.pipe(
       createSdkClientInitializationType(context, client, parent),
     ),
     decorators: client.type ? diagnostics.pipe(getTypeDecorators(context, client.type)) : [],
     parent,
     // if it is client, the crossLanguageDefinitionId is the ${namespace}, if it is operation group, the crosslanguageDefinitionId is the %{namespace}.%{operationGroupName}
-    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, clientType),
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, clientNamespaceType),
   };
   // NOTE: getSdkMethods recursively calls createSdkClientType
   sdkClientType.methods = diagnostics.pipe(
