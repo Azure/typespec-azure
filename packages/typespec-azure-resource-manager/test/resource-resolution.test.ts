@@ -122,6 +122,7 @@ describe("unit tests for resource manager helpers", () => {
       title: string;
       path: string;
       kind: ArmOperationKind;
+      singletonResourceName?: string;
       expected: ResourcePathInfo;
     }[] = [
       {
@@ -257,39 +258,42 @@ describe("unit tests for resource manager helpers", () => {
         title: "generic extension resource weird read path with default",
         path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default/actionName/doSomething/doSomethingElse/andAnotherThing",
         kind: "read",
+        singletonResourceName: "default",
         expected: {
           resourceType: {
             provider: "Microsoft.Bar",
-            types: ["bars", "basses"],
+            types: ["bars"],
           },
           resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default",
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}",
         },
       },
       {
         title: "handles paths with leading and trailing slashes",
         path: "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default/actionName/doSomething/doSomethingElse/andAnotherThing/",
         kind: "read",
+        singletonResourceName: "default",
         expected: {
           resourceType: {
             provider: "Microsoft.Bar",
-            types: ["bars", "basses"],
+            types: ["bars"],
           },
           resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default",
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}",
         },
       },
       {
         title: "handles paths without leading and trailing slashes",
         path: "subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default/actionName/doSomething/doSomethingElse/andAnotherThing",
         kind: "read",
+        singletonResourceName: "default",
         expected: {
           resourceType: {
             provider: "Microsoft.Bar",
-            types: ["bars", "basses"],
+            types: ["bars"],
           },
           resourceInstancePath:
-            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}/basses/default",
+            "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/{childResourceType}/{childResourceName}/providers/Microsoft.Bar/bars/{barName}",
         },
       },
       {
@@ -319,9 +323,9 @@ describe("unit tests for resource manager helpers", () => {
         },
       },
     ];
-    for (const { title, path, kind, expected } of cases) {
+    for (const { title, path, kind, singletonResourceName, expected } of cases) {
       it(`parses path for ${title} operations correctly`, () => {
-        const result = getResourcePathElements(path, kind);
+        const result = getResourcePathElements(path, kind, singletonResourceName);
         expect(result).toEqual(expected);
       });
     }
@@ -3503,6 +3507,332 @@ model DependentProperties {
     checkArmOperationsHas(provider.providerOperations, [
       { operationGroup: "Operations", name: "list", kind: "other" },
     ]);
+  });
+  it("supports singleton resource", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@singleton
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@lroStatus
+union ProvisioningState {
+  ResourceProvisioningState,
+
+  Provisioning: "Provisioning",
+
+  Updating: "Updating",
+
+  Deleting: "Deleting",
+
+  Accepted: "Accepted",
+
+  string,
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+  update is ArmCustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    expect(provider.resources).toHaveLength(1);
+    const employee = provider.resources![0];
+    ok(employee);
+    expect(employee).toMatchObject({
+      kind: "Tracked",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees"],
+      },
+      scope: "ResourceGroup",
+      parent: undefined,
+    });
+  });
+  it("supports singleton resource with customized name", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@singleton("current")
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@lroStatus
+union ProvisioningState {
+  ResourceProvisioningState,
+
+  Provisioning: "Provisioning",
+
+  Updating: "Updating",
+
+  Deleting: "Deleting",
+
+  Accepted: "Accepted",
+
+  string,
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+  update is ArmCustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    expect(provider.resources).toHaveLength(1);
+    const employee = provider.resources![0];
+    ok(employee);
+    expect(employee).toMatchObject({
+      kind: "Tracked",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees"],
+      },
+      scope: "ResourceGroup",
+      parent: undefined,
+    });
+  });
+  it("supports multiple singleton resources", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@singleton
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@singleton
+model Building is TrackedResource<BuildingProperties> {
+  ...ResourceNameParameter<Building>;
+}
+
+model BuildingProperties {
+  address?: string;
+  
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+  update is ArmCustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+}
+
+@armResourceOperations
+interface Buildings {
+  get is ArmResourceRead<Building>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Building>;
+  update is ArmCustomPatchSync<
+    Building,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Building, BuildingProperties>
+  >;
+}
+
+@lroStatus
+union ProvisioningState {
+  ResourceProvisioningState,
+
+  Provisioning: "Provisioning",
+
+  Updating: "Updating",
+
+  Deleting: "Deleting",
+
+  Accepted: "Accepted",
+
+  string,
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    expect(provider.resources).toHaveLength(2);
+    const employee = provider.resources![0];
+    ok(employee);
+    expect(employee).toMatchObject({
+      kind: "Tracked",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees"],
+      },
+      scope: "ResourceGroup",
+      parent: undefined,
+    });
+    const building = provider.resources![1];
+    ok(building);
+    expect(building).toMatchObject({
+      kind: "Tracked",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["buildings"],
+      },
+      scope: "ResourceGroup",
+      parent: undefined,
+    });
+  });
+  it("supports multiple singleton resources with different names", async () => {
+    const { program } = await Tester.compile(`
+using Azure.Core;
+
+@armProviderNamespace
+namespace Microsoft.ContosoProviderHub;
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+@singleton
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+
+model EmployeeProperties {
+  age?: int32;
+
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@singleton("current")
+model Building is TrackedResource<BuildingProperties> {
+  ...ResourceNameParameter<Building>;
+}
+
+model BuildingProperties {
+  address?: string;
+  
+  @visibility(Lifecycle.Read)
+  provisioningState?: ProvisioningState;
+}
+
+@armResourceOperations
+interface Employees {
+  get is ArmResourceRead<Employee>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+  update is ArmCustomPatchSync<
+    Employee,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Employee, EmployeeProperties>
+  >;
+}
+
+@armResourceOperations
+interface Buildings {
+  get is ArmResourceRead<Building>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<Building>;
+  update is ArmCustomPatchSync<
+    Building,
+    Azure.ResourceManager.Foundations.ResourceUpdateModel<Building, BuildingProperties>
+  >;
+}
+
+@lroStatus
+union ProvisioningState {
+  ResourceProvisioningState,
+
+  Provisioning: "Provisioning",
+
+  Updating: "Updating",
+
+  Deleting: "Deleting",
+
+  Accepted: "Accepted",
+
+  string,
+}
+`);
+    const provider = resolveArmResources(program);
+    expect(provider).toBeDefined();
+    expect(provider.resources).toBeDefined();
+    expect(provider.resources).toHaveLength(2);
+    const employee = provider.resources![0];
+    ok(employee);
+    expect(employee).toMatchObject({
+      kind: "Tracked",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["employees"],
+      },
+      scope: "ResourceGroup",
+      parent: undefined,
+    });
+    const building = provider.resources![1];
+    ok(building);
+    expect(building).toMatchObject({
+      kind: "Tracked",
+      providerNamespace: "Microsoft.ContosoProviderHub",
+      type: expect.anything(),
+      resourceType: {
+        provider: "Microsoft.ContosoProviderHub",
+        types: ["buildings"],
+      },
+      scope: "ResourceGroup",
+      parent: undefined,
+    });
   });
 
   it("defines multiple ARM services", async () => {

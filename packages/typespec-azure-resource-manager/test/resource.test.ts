@@ -244,7 +244,7 @@ describe("ARM resource model:", () => {
 
       model BarResourceProperties {
         iAmBar: string;
-       provisioningState: ResourceState;
+        provisioningState: ResourceState;
       }
 
       @singleton
