@@ -27,7 +27,7 @@ import { useStateMap } from "@typespec/compiler/utils";
 import { getHttpOperation, isPathParam } from "@typespec/http";
 import { $autoRoute, getParentResource, getSegment } from "@typespec/rest";
 
-import { pascalCase } from "change-case";
+import { camelCase, pascalCase } from "change-case";
 import {
   ArmProviderNameValueDecorator,
   ArmResourceOperationsDecorator,
@@ -44,10 +44,10 @@ import {
 } from "../generated-defs/Azure.ResourceManager.js";
 import {
   ArmExternalTypeDecorator,
+  ArmFeatureOptions,
   CustomAzureResourceDecorator,
   CustomResourceOptions,
   FeatureDecorator,
-  ArmFeatureOptions,
   FeatureOptionsDecorator,
   FeaturesDecorator,
 } from "../generated-defs/Azure.ResourceManager.Legacy.js";
@@ -1292,20 +1292,67 @@ export function resolveResourceBaseType(type?: string | undefined): ResourceBase
   return resolvedType;
 }
 
+export const [getResourceFeature, setResourceFeature] = useStateMap<
+  Model | Interface | Namespace,
+  string
+>(ArmStateKeys.armFeature);
+
+export const [getResourceFeatureSet, setResourceFeatureSet] = useStateMap<
+  Namespace,
+  Map<string, ArmFeatureOptions>
+>(ArmStateKeys.armFeatureSet);
+
+export const [getResourceFeatureOptions, setResourceFeatureOptions] = useStateMap<
+  EnumMember,
+  ArmFeatureOptions
+>(ArmStateKeys.armFeatureOptions);
+
+export function getFeatureOptions(program: Program, feature: EnumMember): ArmFeatureOptions {
+  const defaultFeatureName: string = (feature.value ?? feature.name) as string;
+  const defaultOptions: ArmFeatureOptions = {
+    featureName: defaultFeatureName,
+    fileName: camelCase(defaultFeatureName),
+    description: "",
+  };
+  return program.stateMap(ArmStateKeys.armFeatureOptions).get(feature) ?? defaultOptions;
+}
+
 export const $feature: FeatureDecorator = (
   context: DecoratorContext,
   entity: Model | Interface | Namespace,
   featureName: EnumMember,
-) => {};
+) => {
+  const { program } = context;
+  const feature = (featureName.value ?? featureName.name) as string;
+  setResourceFeature(program, entity, feature);
+};
 
 export const $features: FeaturesDecorator = (
   context: DecoratorContext,
   entity: Namespace,
   features: Enum,
-) => {};
+) => {
+  const { program } = context;
+  let featureMap: Map<string, ArmFeatureOptions> | undefined = getResourceFeatureSet(
+    program,
+    entity,
+  );
+  if (featureMap !== undefined) {
+    return featureMap;
+  }
+  featureMap = new Map<string, ArmFeatureOptions>();
+  for (const member of features.members.values()) {
+    const options = getFeatureOptions(program, member); // Ensure defaults are created
+    featureMap.set(options.featureName, options);
+  }
+  setResourceFeatureSet(program, entity, featureMap);
+  return featureMap;
+};
 
 export const $featureOptions: FeatureOptionsDecorator = (
   context: DecoratorContext,
   entity: EnumMember,
   options: ArmFeatureOptions,
-) => {};
+) => {
+  setResourceFeatureOptions(context.program, entity, options);
+};
