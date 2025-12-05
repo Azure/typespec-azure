@@ -572,6 +572,9 @@ This allows sharing Azure Resource Manager resource types across specifications
 - [`@armOperationRoute`](#@armoperationroute)
 - [`@customAzureResource`](#@customazureresource)
 - [`@externalTypeRef`](#@externaltyperef)
+- [`@feature`](#@feature)
+- [`@featureOptions`](#@featureoptions)
+- [`@features`](#@features)
 - [`@renamePathParameter`](#@renamepathparameter)
 
 #### `@armExternalType`
@@ -647,6 +650,63 @@ Specify an external reference that should be used when emitting this type.
 | Name    | Type             | Description                                                   |
 | ------- | ---------------- | ------------------------------------------------------------- |
 | jsonRef | `valueof string` | External reference(e.g. "../../common.json#/definitions/Foo") |
+
+#### `@feature`
+
+Decorator to associate a feature with a model, interface, or namespace
+
+```typespec
+@Azure.ResourceManager.Legacy.feature(featureName: EnumMember)
+```
+
+##### Target
+
+The target to associate the feature with
+`Model | Interface | Namespace`
+
+##### Parameters
+
+| Name        | Type         | Description                              |
+| ----------- | ------------ | ---------------------------------------- |
+| featureName | `EnumMember` | The feature to associate with the target |
+
+#### `@featureOptions`
+
+Decorator to define options for a specific feature
+
+```typespec
+@Azure.ResourceManager.Legacy.featureOptions(options: valueof Azure.ResourceManager.Legacy.ArmFeatureOptions)
+```
+
+##### Target
+
+The enum member that represents the feature
+`EnumMember`
+
+##### Parameters
+
+| Name    | Type                                              | Description                 |
+| ------- | ------------------------------------------------- | --------------------------- |
+| options | [valueof `ArmFeatureOptions`](#armfeatureoptions) | The options for the feature |
+
+#### `@features`
+
+Decorator to define a set of features
+
+```typespec
+@Azure.ResourceManager.Legacy.features(features: Enum)
+```
+
+##### Target
+
+The service namespace
+`Namespace`
+
+##### Parameters
+
+| Name     | Type   | Description                         |
+| -------- | ------ | ----------------------------------- |
+| features | `Enum` | The enum that contains the features |
 
 #### `@renamePathParameter`
 

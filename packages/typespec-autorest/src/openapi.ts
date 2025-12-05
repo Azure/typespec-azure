@@ -174,7 +174,13 @@ import {
   XmlObject,
   XmsPageable,
 } from "./openapi2-document.js";
-import type { AutorestEmitterResult, LoadedExample } from "./types.js";
+import {
+  LateBoundReference,
+  PendingSchema,
+  ProcessedSchema,
+  type AutorestEmitterResult,
+  type LoadedExample,
+} from "./types.js";
 import { AutorestEmitterContext, getClientName, resolveOperationId } from "./utils.js";
 import { resolveXmlModule } from "./xml.js";
 
@@ -230,56 +236,6 @@ export interface AutorestDocumentEmitterOptions {
   readonly emitCommonTypesSchema?: "never" | "for-visibility-changes";
 
   readonly xmlStrategy: "xml-service" | "none";
-}
-
-/**
- * Represents a node that will hold a JSON reference. The value is computed
- * at the end so that we can defer decisions about the name that is
- * referenced.
- */
-class Ref {
-  value?: string;
-  toJSON() {
-    compilerAssert(this.value, "Reference value never set.");
-    return this.value;
-  }
-}
-
-/**
- * Represents a non-inlined schema that will be emitted as a definition.
- * Computation of the OpenAPI schema object is deferred.
- */
-interface PendingSchema {
-  /** The TYPESPEC type for the schema */
-  type: Type;
-
-  /** The visibility to apply when computing the schema */
-  visibility: Visibility;
-
-  /**
-   * The JSON reference to use to point to this schema.
-   *
-   * Note that its value will not be computed until all schemas have been
-   * computed as we will add a suffix to the name if more than one schema
-   * must be emitted for the type for different visibilities.
-   */
-  ref: Ref;
-
-  /**
-   * Determines the schema name if an override has been set
-   * @param name The default name of the schema
-   * @param visibility The visibility in which the schema is used
-   * @returns The name of the given schema in the given visibility context
-   */
-  getSchemaNameOverride?: (name: string, visibility: Visibility) => string;
-}
-
-/**
- * Represents a schema that is ready to emit as its OpenAPI representation
- * has been produced.
- */
-interface ProcessedSchema extends PendingSchema {
-  schema: OpenAPI2Schema | undefined;
 }
 
 type HttpParameterProperties = Extract<
@@ -340,7 +296,7 @@ export async function getOpenAPIForService(
   const pendingSchemas = new TwoLevelMap<Type, Visibility, PendingSchema>();
 
   // Reuse a single ref object per Type+Visibility combination.
-  const refs = new TwoLevelMap<Type, Visibility, Ref>();
+  const refs = new TwoLevelMap<Type, Visibility, LateBoundReference>();
 
   // Keep track of inline types still in the process of having their schema computed
   // This is used to detect cycles in inline types, which is an
@@ -561,7 +517,9 @@ export async function getOpenAPIForService(
     }
   }
 
-  function getFinalStateSchema(metadata: LroMetadata): { "final-state-schema": Ref } | undefined {
+  function getFinalStateSchema(
+    metadata: LroMetadata,
+  ): { "final-state-schema": LateBoundReference } | undefined {
     if (
       metadata.finalResult !== undefined &&
       metadata.finalResult !== "void" &&
@@ -571,14 +529,14 @@ export async function getOpenAPIForService(
       const schemaOrRef = resolveExternalRef(metadata.finalResult);
 
       if (schemaOrRef !== undefined) {
-        const ref = new Ref();
+        const ref = new LateBoundReference();
         ref.value = schemaOrRef.$ref;
         return { "final-state-schema": ref };
       }
       const pending = pendingSchemas.getOrAdd(metadata.finalResult, Visibility.Read, () => ({
         type: model,
         visibility: Visibility.Read,
-        ref: refs.getOrAdd(model, Visibility.Read, () => new Ref()),
+        ref: refs.getOrAdd(model, Visibility.Read, () => new LateBoundReference()),
       }));
       return { "final-state-schema": pending.ref };
     }
@@ -1016,7 +974,7 @@ export async function getOpenAPIForService(
       const pending = pendingSchemas.getOrAdd(type, schemaContext.visibility, () => ({
         type,
         visibility: schemaContext.visibility,
-        ref: refs.getOrAdd(type, schemaContext.visibility, () => new Ref()),
+        ref: refs.getOrAdd(type, schemaContext.visibility, () => new LateBoundReference()),
         getSchemaNameOverride: schemaNameOverride,
       }));
       return { $ref: pending.ref };
