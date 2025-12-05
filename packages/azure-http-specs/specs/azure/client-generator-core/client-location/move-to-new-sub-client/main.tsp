@@ -9,7 +9,7 @@ using Azure.ClientGenerator.Core;
 @doc("Test for @clientLocation decorator - moving operations between clients")
 @scenarioService("/azure/client-generator-core/client-location/move-to-new-sub-client")
 @global.Azure.ClientGenerator.Core.clientNamespace(
-  "azure.clientgenerator.core.clientlocation.MoveToNewSubClient",
+  "azure.clientgenerator.core.clientlocation.newsubclient",
   "java"
 )
 namespace _Specs_.Azure.ClientGenerator.Core.ClientLocation.MoveToNewSubClient;
