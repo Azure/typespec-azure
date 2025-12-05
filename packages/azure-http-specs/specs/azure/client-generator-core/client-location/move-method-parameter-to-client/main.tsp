@@ -9,7 +9,7 @@ using Azure.ClientGenerator.Core;
 @doc("Test for @clientLocation decorator - moving operations between clients")
 @scenarioService("/azure/client-generator-core/client-location/move-method-parameter-to-client")
 @global.Azure.ClientGenerator.Core.clientNamespace(
-  "azure.clientgenerator.core.clientlocation.MoveMethodParameterToClient",
+  "azure.clientgenerator.core.clientlocation.parameter",
   "java"
 )
 namespace _Specs_.Azure.ClientGenerator.Core.ClientLocation.MoveMethodParameterToClient;
