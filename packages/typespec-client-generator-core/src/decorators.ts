@@ -180,13 +180,12 @@ export const $client: ClientDecorator = (
   const serviceConfig =
     options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
 
-  if (serviceConfig?.kind === "Namespace") {
+  const multiService =
+    target.kind === "Namespace" ? getMultiServiceConfig(context, target) : undefined;
+  if (multiService) {
+    service = multiService;
+  } else if (serviceConfig?.kind === "Namespace") {
     service = serviceConfig;
-  } else if (
-    serviceConfig?.kind === "Tuple" &&
-    serviceConfig.values.every((v) => v.kind === "Namespace")
-  ) {
-    service = serviceConfig.values;
   } else {
     service = findClientService(context.program, target);
   }
@@ -1608,3 +1607,40 @@ export const $multiService: MultiServiceDecorator = (
   );
   setScopedDecoratorData(context, $multiService, multiServiceKey, target, servicesConfig, scope);
 };
+
+export function getMultiServiceConfig(
+  context: DecoratorContext | TCGCContext,
+  target: Namespace,
+): Namespace[] | undefined {
+  if ("emitterName" in context) {
+    // If it's TCGCContext, we can use the getScopedDecoratorData function directly
+    return getScopedDecoratorData(context, multiServiceKey, target);
+  }
+  // Check for @multiService decorator directly on the type
+  if ("decorators" in target) {
+    for (const decorator of target.decorators) {
+      if (
+        decorator.decorator.name === "$multiService"
+      ) {
+        // Extract the services from the decorator arguments
+        const optionsArg = decorator.args[0]?.value;
+        if (
+          optionsArg &&
+          typeof optionsArg === "object" &&
+          "kind" in optionsArg &&
+          optionsArg.kind === "Model"
+        ) {
+          const servicesType = optionsArg.properties.get("services")?.type;
+          if (
+            servicesType?.kind === "Tuple" &&
+            servicesType.values.every((v) => v.kind === "Namespace")
+          ) {
+            return servicesType.values as Namespace[];
+          }
+        }
+      }
+    }
+  }
+
+  return undefined;
+}
