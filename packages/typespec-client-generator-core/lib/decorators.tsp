@@ -166,7 +166,7 @@ model ClientOptions {
    * The services that this client is generated for. If not specified, TCGC will look up the first parent namespace decorated with `@service` for the target.
    * The namespace should be decorated with `@service`.
    */
-  service?: Namespace | Namespace[];
+  service?: Namespace;
 
   /**
    * The name of the client. If not specified, the default name will be `<Name of the target>Client`.
@@ -1000,5 +1000,39 @@ extern dec clientDoc(
   target: unknown,
   documentation: valueof string,
   mode: EnumMember,
+  scope?: valueof string
+);
+
+/**
+ * Specifies that the package will be encompassing multiple services.
+ *
+ * @example
+ * ```typespec
+ * // main.tsp
+ * @service
+ *  @versioned(Service1Versions)
+ *  namespace Service1 {
+ *    op operation1(): void;
+ *
+ *    enum Service1Versions { v1, v2 }
+ *  }
+ *  @service
+ *  @versioned(Service2Versions)
+ *  namespace Service2 {
+ *   enum Service2Versions { v1, v2 }
+ *    op operation2(): void;
+ *  }
+ *
+ * // client.tsp
+ *
+ * @multiService({"services": [Service1, Service2]})
+ * @useDependency(Service1.v2, Service2.v2)
+ * namespace MultiServiceClient;
+ */
+extern dec multiService(
+  target: Namespace,
+  options: {
+    services: Namespace[],
+  },
   scope?: valueof string
 );
