@@ -4,7 +4,7 @@ import { getHeaderFieldName, isHeader, isStatusCode } from "@typespec/http";
 
 export const noUnnamedUnionRule = createRule({
   name: "no-unnamed-union",
-  description: "Azure services should not define union expression but create a declaration.",
+  description: "Azure services should not define a union expression but create a declaration.",
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-unnamed-union",
   messages: {
