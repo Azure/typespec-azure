@@ -43,7 +43,7 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
     namespaces: [],
     licenseInfo: getLicenseInfo(context),
     metadata: {
-      apiVersion: context.apiVersion === "all" ? "all" : versions[versions.length - 1],
+      apiVersion: context.apiVersion === "all" || !versions ? "all" : versions[versions.length - 1],
     },
   };
   organizeNamespaces(context, sdkPackage);
@@ -124,7 +124,7 @@ function populateApiVersionInformation(context: TCGCContext): void {
       filterApiVersionsWithDecorators(
         context,
         clientOperationGroupType,
-        context.getPackageVersions().values().next().value!,
+        context.getPackageVersions().values().next().value || [],
       ),
     );
 

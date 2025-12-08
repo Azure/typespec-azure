@@ -747,6 +747,7 @@ function getVersioningMutator(
   service: Namespace,
   apiVersion?: string,
 ): unsafe_MutatorWithNamespace | undefined {
+  if (!apiVersion) return undefined;
   const versionMutator = getVersioningMutators(context.program, service);
   compilerAssert(versionMutator !== undefined, "Versioning service should not get undefined");
   // Multi-service's mutator is transient
