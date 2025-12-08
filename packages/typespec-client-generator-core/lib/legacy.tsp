@@ -123,7 +123,7 @@ extern dec markAsLro(target: Operation, scope?: valueof string);
 extern dec nextLinkVerb(target: Operation, verb: "GET" | "POST", scope?: valueof string);
 
 /**
- * Sets a client-level default value for a model property.
+ * Sets a client-level default value for a model property or operation parameter.
  *
  * This decorator allows brownfield services to specify default values that will be 
  * used by SDK generators, maintaining backward compatibility with existing SDK users
@@ -133,7 +133,7 @@ extern dec nextLinkVerb(target: Operation, verb: "GET" | "POST", scope?: valueof
  * maintaining backward compatibility in existing services. New services should use
  * standard TypeSpec patterns for default values.
  *
- * @param target The model property that should have a client-level default value
+ * @param target The model property or operation parameter that should have a client-level default value
  * @param value The default value to be used by SDK generators
  * @param scope Specifies the target language emitters that the decorator should apply.
  * If not set, the decorator will be applied to all language emitters by default.
@@ -148,6 +148,14 @@ extern dec nextLinkVerb(target: Operation, verb: "GET" | "POST", scope?: valueof
  *   @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("standard")
  *   tier?: string;
  * }
+ * ```
+ *
+ * @example Set a default value for an operation parameter
+ * ```typespec
+ * op getItems(
+ *   @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(10)
+ *   @query pageSize?: int32
+ * ): Item[];
  * ```
  *
  * @example Apply default value only for specific languages

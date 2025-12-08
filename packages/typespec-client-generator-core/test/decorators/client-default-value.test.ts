@@ -266,3 +266,30 @@ it("sets client default value for multiple properties", async () => {
   ok(retryProperty);
   strictEqual(retryProperty.clientDefaultValue, true);
 });
+
+it("sets client default value for operation parameters", async () => {
+  await runner.compileWithBuiltInService(`
+    @route("/items")
+    @get
+    op getItems(
+      @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(10)
+      @query pageSize?: int32,
+      
+      @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("asc")
+      @query sortOrder?: string
+    ): void;
+  `);
+
+  const sdkPackage = runner.context.sdkPackage;
+  const method = sdkPackage.clients[0].methods[0];
+  strictEqual(method.kind, "basic");
+  strictEqual(method.parameters.length, 2);
+  
+  const pageSizeParam = method.parameters.find(p => p.name === "pageSize")!;
+  ok(pageSizeParam);
+  strictEqual(pageSizeParam.clientDefaultValue, 10);
+  
+  const sortOrderParam = method.parameters.find(p => p.name === "sortOrder")!;
+  ok(sortOrderParam);
+  strictEqual(sortOrderParam.clientDefaultValue, "asc");
+});
