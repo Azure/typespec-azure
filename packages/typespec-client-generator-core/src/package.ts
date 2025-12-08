@@ -1,4 +1,5 @@
 import { createDiagnosticCollector, Diagnostic, ignoreDiagnostics } from "@typespec/compiler";
+import { getVersionDependencies } from "@typespec/versioning";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { createSdkClientType } from "./clients.js";
 import { listClients } from "./decorators.js";
@@ -117,14 +118,61 @@ function populateApiVersionInformation(context: TCGCContext): void {
   if (context.__rawClientsOperationGroupsCache === undefined) {
     prepareClientAndOperationCache(context);
   }
+  
+  // Get the package versions map once (this handles both single and multi-service scenarios)
+  const packageVersions = context.getPackageVersions();
+  
   for (const clientOperationGroup of context.__rawClientsOperationGroupsCache!.values()) {
     const clientOperationGroupType = getClientNamespaceType(clientOperationGroup);
+    
+    // Get the appropriate versions for this client/operation group
+    const services = Array.isArray(clientOperationGroup.service) 
+      ? clientOperationGroup.service 
+      : [clientOperationGroup.service];
+    
+    const versionsToUse: string[] = [];
+    
+    // For multi-service clients with @useDependency, filter to only dependency versions
+    const isMultiServiceClient = clientOperationGroup.kind === "SdkClient" && Array.isArray(clientOperationGroup.service);
+    const versionDependencies = isMultiServiceClient && clientOperationGroupType.kind === "Namespace"
+      ? getVersionDependencies(context.program, clientOperationGroupType)
+      : undefined;
+    
+    for (const service of services) {
+      // Try to find versions in the map - use the service namespace name as fallback
+      let serviceVersions = packageVersions.get(service);
+      
+      // If not found by object identity, try to find by namespace name
+      if (!serviceVersions) {
+        for (const [ns, versions] of packageVersions.entries()) {
+          if (ns.name === service.name) {
+            serviceVersions = versions;
+            break;
+          }
+        }
+      }
+      
+      if (serviceVersions) {
+        // If this is a multi-service client with @useDependency, filter to only the dependency version
+        if (versionDependencies) {
+          const versionDep = versionDependencies.get(service);
+          if (versionDep && "name" in versionDep) {
+            versionsToUse.push(versionDep.value as string);
+          } else {
+            versionsToUse.push(...serviceVersions);
+          }
+        } else {
+          versionsToUse.push(...serviceVersions);
+        }
+      }
+    }
+    
     context.setApiVersionsForType(
       clientOperationGroupType,
       filterApiVersionsWithDecorators(
         context,
         clientOperationGroupType,
-        context.getPackageVersions().values().next().value || [],
+        versionsToUse,
       ),
     );
 

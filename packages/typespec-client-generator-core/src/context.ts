@@ -133,6 +133,7 @@ export function createTCGCContext(
       }
 
       this.__packageVersions = new Map();
+      // Use listServices to get unmutated namespace objects (same as what findClientService returns)
       const services = listServices(this.program);
 
       if (services.length === 0) {
@@ -151,32 +152,29 @@ export function createTCGCContext(
         // Consider apiVersion setting only if there's only one service
         removeVersionsLargerThanExplicitlySpecified(this, versions);
 
+        const filteredVersions = versions.map((version) => version.value);
+
         // Consider apiVersion setting problem only if there's only one service
         if (
           this.apiVersion !== undefined &&
           this.apiVersion !== "latest" &&
           this.apiVersion !== "all" &&
-          !this.__packageVersions.get(services[0].type)?.includes(this.apiVersion)
+          !filteredVersions.includes(this.apiVersion)
         ) {
           reportDiagnostic(this.program, {
             code: "api-version-undefined",
             format: { version: this.apiVersion },
             target: services[0].type,
           });
-          this.apiVersion = this.__packageVersions.get(services[0].type)?.[
-            this.__packageVersions.get(services[0].type)!.length - 1
-          ];
+          this.apiVersion = filteredVersions[filteredVersions.length - 1];
         }
 
-        this.__packageVersions.set(
-          services[0].type,
-          versions.map((version) => version.value),
-        );
+        this.__packageVersions.set(services[0].type, filteredVersions);
       } else {
-        // Multiple service case
+        // Multiple service case - populate map with all versions from all services
+        // (filtering based on @useDependency will be done later for multi-service clients)
         const explicitClients = listScopedDecoratorData(this, clientKey);
         for (const client of explicitClients.values()) {
-          const versionDependencies = getVersionDependencies(this.program, client.type);
           for (const specificService of client.service) {
             if (this.__packageVersions.has(specificService)) {
               continue;
@@ -188,25 +186,10 @@ export function createTCGCContext(
               continue;
             }
 
-            const versionDependency = versionDependencies?.get(specificService);
-            if (versionDependency && "name" in versionDependency) {
-              let end = false;
-              this.__packageVersions.set(
-                specificService,
-                versions
-                  .map((version) => version.value)
-                  .filter((v) => {
-                    if (end) return false;
-                    if (v === versionDependency.value) end = true;
-                    return true;
-                  }),
-              );
-            } else {
-              this.__packageVersions.set(
-                specificService,
-                versions.map((version) => version.value),
-              );
-            }
+            this.__packageVersions.set(
+              specificService,
+              versions.map((version) => version.value),
+            );
           }
         }
       }
@@ -256,6 +239,11 @@ export function createTCGCContext(
       if (!service) {
         const services = listAllServiceNamespaces(this);
         for (const svc of services) {
+          // First check if the type itself is the service namespace
+          if (type === svc) {
+            this.__typeToService.set(type, svc);
+            return svc;
+          }
           // Check if type is in this service's namespace by walking up the namespace hierarchy
           if ("namespace" in type && type.namespace) {
             service = type.namespace;
