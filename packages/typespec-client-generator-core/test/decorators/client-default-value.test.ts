@@ -31,6 +31,7 @@ it("sets client default value for a model property with numeric value", async ()
   strictEqual(model.properties.length, 1);
   
   const timeoutProperty = model.properties[0];
+  ok(timeoutProperty);
   strictEqual(timeoutProperty.kind, "property");
   strictEqual(timeoutProperty.name, "timeout");
   strictEqual(timeoutProperty.clientDefaultValue, 30);
@@ -56,6 +57,7 @@ it("sets client default value for a model property with string value", async () 
   strictEqual(model.properties.length, 1);
   
   const tierProperty = model.properties[0];
+  ok(tierProperty);
   strictEqual(tierProperty.kind, "property");
   strictEqual(tierProperty.name, "tier");
   strictEqual(tierProperty.clientDefaultValue, "standard");
@@ -81,6 +83,7 @@ it("sets client default value for a model property with boolean value", async ()
   strictEqual(model.properties.length, 1);
   
   const enableCacheProperty = model.properties[0];
+  ok(enableCacheProperty);
   strictEqual(enableCacheProperty.kind, "property");
   strictEqual(enableCacheProperty.name, "enableCache");
   strictEqual(enableCacheProperty.clientDefaultValue, false);
@@ -109,6 +112,7 @@ it("does not set client default value for property without decorator", async () 
   strictEqual(model.properties.length, 1);
   
   const timeoutProperty = model.properties[0];
+  ok(timeoutProperty);
   strictEqual(timeoutProperty.kind, "property");
   strictEqual(timeoutProperty.name, "timeout");
   strictEqual(timeoutProperty.clientDefaultValue, undefined);
@@ -155,6 +159,7 @@ it("applies decorator with language scope", async () => {
   strictEqual(model.properties.length, 1);
   
   const timeoutProperty = model.properties[0];
+  ok(timeoutProperty);
   strictEqual(timeoutProperty.kind, "property");
   strictEqual(timeoutProperty.name, "timeout");
   strictEqual(timeoutProperty.clientDefaultValue, 30);
@@ -181,6 +186,7 @@ it("applies decorator with different language scope should not apply", async () 
   strictEqual(model.properties.length, 1);
   
   const timeoutProperty = model.properties[0];
+  ok(timeoutProperty);
   strictEqual(timeoutProperty.kind, "property");
   strictEqual(timeoutProperty.name, "timeout");
   strictEqual(timeoutProperty.clientDefaultValue, undefined);
