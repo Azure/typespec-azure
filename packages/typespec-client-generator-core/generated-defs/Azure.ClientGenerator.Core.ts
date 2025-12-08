@@ -924,39 +924,6 @@ export type ClientDocDecorator = (
   scope?: string,
 ) => void;
 
-/**
- * Specifies that the package will be encompassing multiple services.
- *
- * @example
- * ```typespec
- * // main.tsp
- * @service
- *  @versioned(Service1Versions)
- *  namespace Service1 {
- *    op operation1(): void;
- *
- *    enum Service1Versions { v1, v2 }
- *  }
- *  @service
- *  @versioned(Service2Versions)
- *  namespace Service2 {
- *   enum Service2Versions { v1, v2 }
- *    op operation2(): void;
- *  }
- *
- * // client.tsp
- *
- * @multiService({"services": [Service1, Service2]})
- * @useDependency(Service1.v2, Service2.v2)
- * namespace MultiServiceClient;
- */
-export type MultiServiceDecorator = (
-  context: DecoratorContext,
-  target: Namespace,
-  options: Type,
-  scope?: string,
-) => void;
-
 export type AzureClientGeneratorCoreDecorators = {
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
@@ -978,5 +945,4 @@ export type AzureClientGeneratorCoreDecorators = {
   responseAsBool: ResponseAsBoolDecorator;
   clientLocation: ClientLocationDecorator;
   clientDoc: ClientDocDecorator;
-  multiService: MultiServiceDecorator;
 };

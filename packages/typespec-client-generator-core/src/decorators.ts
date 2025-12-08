@@ -36,7 +36,6 @@ import {
   ClientNamespaceDecorator,
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
-  MultiServiceDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
@@ -1583,28 +1582,3 @@ export function isInScope(context: TCGCContext, entity: Operation | ModelPropert
   }
   return true;
 }
-
-const multiServiceKey = createStateSymbol("multiService");
-
-export const $multiService: MultiServiceDecorator = (
-  context: DecoratorContext,
-  target: Namespace,
-  options: Type,
-  scope?: LanguageScopes,
-) => {
-  let servicesConfig: Namespace[] | undefined = undefined;
-  if (options?.kind === "Model") {
-    const servicesType = options?.properties.get("services")?.type;
-    if (
-      servicesType?.kind === "Tuple" &&
-      servicesType.values.every((v) => v.kind === "Namespace")
-    ) {
-      servicesConfig = servicesType.values as Namespace[];
-    }
-  }
-  compilerAssert(
-    servicesConfig !== undefined,
-    "The `services` property is required for the @multiService decorator.",
-  );
-  setScopedDecoratorData(context, $multiService, multiServiceKey, target, servicesConfig, scope);
-};

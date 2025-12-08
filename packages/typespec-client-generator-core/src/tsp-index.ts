@@ -16,7 +16,6 @@ import {
   $flattenProperty,
   $legacyHierarchyBuilding,
   $markAsLro,
-  $multiService,
   $nextLinkVerb,
   $operationGroup,
   $override,
@@ -54,7 +53,6 @@ export const $decorators = {
     responseAsBool: $responseAsBool,
     clientDoc: $clientDoc,
     clientLocation: $clientLocation,
-    multiService: $multiService,
   } satisfies AzureClientGeneratorCoreDecorators,
 
   "Azure.ClientGenerator.Core.Legacy": {
