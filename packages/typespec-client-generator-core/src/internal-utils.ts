@@ -20,7 +20,6 @@ import {
   isNeverType,
   isNullType,
   isVoidType,
-  listServices,
   Model,
   ModelProperty,
   Namespace,
@@ -746,15 +745,12 @@ export function getStreamAsBytes(
 function getVersioningMutator(
   context: TCGCContext,
   service: Namespace,
-  apiVersion: string,
+  apiVersion?: string,
 ): unsafe_MutatorWithNamespace | undefined {
   const versionMutator = getVersioningMutators(context.program, service);
-  compilerAssert(
-    versionMutator !== undefined,
-    "Versioning service should not get undefined or transient versioning mutator",
-  );
+  compilerAssert(versionMutator !== undefined, "Versioning service should not get undefined");
+  // Multi-service's mutator is transient
   if (versionMutator.kind === "transient") {
-    // we're in multi-service mode
     return versionMutator.mutator;
   }
   const mutators = versionMutator.snapshots
@@ -768,28 +764,20 @@ function getVersioningMutator(
 export function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Namespace {
   const globalNamespace = context.program.getGlobalNamespaceType();
   const allApiVersions = context.getPackageVersions();
-  if (allApiVersions.length === 0 || context.apiVersion === "all") return globalNamespace;
+  if (allApiVersions.size === 0 || (allApiVersions.size === 1 && context.apiVersion === "all"))
+    return globalNamespace;
 
-  // Determine which service to use for versioning without triggering client cache
-  // In multi-service scenarios, we need to find the service that defines the versioning
-  const services = listServices(context.program);
-  if (services.length === 0) return globalNamespace;
+  let mutator: unsafe_MutatorWithNamespace | undefined;
+  if (allApiVersions.size === 1) {
+    const version = allApiVersions.entries().next().value!;
 
-  // Find the service with versioning info, or use the first service
-  let targetService = services[0].type;
-  for (const service of services) {
-    const versions = getVersions(context.program, service.type)[1];
-    if (versions && versions.getVersions().length > 0) {
-      targetService = service.type;
-      break;
-    }
+    mutator = getVersioningMutator(context, version[0], version[1][version[1].length - 1]);
+  } else {
+    const explicitClients = listScopedDecoratorData(context, clientKey);
+    compilerAssert(explicitClients.size === 1, "One api version should not get multiple mutators");
+    mutator = getVersioningMutator(context, explicitClients.keys().next().value as Namespace);
   }
 
-  const mutator = getVersioningMutator(
-    context,
-    targetService,
-    allApiVersions[allApiVersions.length - 1],
-  );
   if (!mutator) return globalNamespace;
   const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, [mutator], globalNamespace);
   compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");

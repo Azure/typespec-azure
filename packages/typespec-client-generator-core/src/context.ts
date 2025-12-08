@@ -15,7 +15,7 @@ import {
   Union,
 } from "@typespec/compiler";
 import { HttpOperation } from "@typespec/http";
-import { getVersions } from "@typespec/versioning";
+import { getVersionDependencies, getVersions } from "@typespec/versioning";
 import { stringify } from "yaml";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { defaultDecoratorsAllowList } from "./configs.js";
@@ -40,7 +40,9 @@ import {
 } from "./interfaces.js";
 import {
   BrandedSdkEmitterOptionsInterface,
+  clientKey,
   handleVersioningMutationForGlobalNamespace,
+  listScopedDecoratorData,
   parseEmitterName,
   removeVersionsLargerThanExplicitlySpecified,
   TCGCEmitterOptions,
@@ -125,49 +127,90 @@ export function createTCGCContext(
       }
       serviceMap.set(type, mergedApiVersions);
     },
-    getPackageVersions(): string[] {
+    getPackageVersions(): Map<Namespace, string[]> {
       if (this.__packageVersions) {
         return this.__packageVersions;
       }
 
-      const allVersions: string[] = [];
+      this.__packageVersions = new Map();
       const services = listServices(this.program);
 
       if (services.length === 0) {
-        this.__packageVersions = [];
         return this.__packageVersions;
       }
 
-      for (const service of services) {
-        const versions = getVersions(program, service.type)[1]?.getVersions();
-        if (versions) {
-          removeVersionsLargerThanExplicitlySpecified(this, versions);
-          const versionValues = versions.map((version) => version.value);
+      if (services.length === 1) {
+        // Single service case
+        const versions = getVersions(this.program, services[0].type)[1]?.getVersions();
 
-          // Add versions that aren't already in the list
-          for (const version of versionValues) {
-            if (!allVersions.includes(version)) {
-              allVersions.push(version);
+        if (!versions) {
+          this.__packageVersions.set(services[0].type, []);
+          return this.__packageVersions;
+        }
+
+        // Consider apiVersion setting only if there's only one service
+        removeVersionsLargerThanExplicitlySpecified(this, versions);
+
+        // Consider apiVersion setting problem only if there's only one service
+        if (
+          this.apiVersion !== undefined &&
+          this.apiVersion !== "latest" &&
+          this.apiVersion !== "all" &&
+          !this.__packageVersions.get(services[0].type)?.includes(this.apiVersion)
+        ) {
+          reportDiagnostic(this.program, {
+            code: "api-version-undefined",
+            format: { version: this.apiVersion },
+            target: services[0].type,
+          });
+          this.apiVersion = this.__packageVersions.get(services[0].type)?.[
+            this.__packageVersions.get(services[0].type)!.length - 1
+          ];
+        }
+
+        this.__packageVersions.set(
+          services[0].type,
+          versions.map((version) => version.value),
+        );
+      } else {
+        // Multiple service case
+        const explicitClients = listScopedDecoratorData(this, clientKey);
+        for (const client of explicitClients.values()) {
+          const versionDependencies = getVersionDependencies(this.program, client.type);
+          for (const specificService of client.service) {
+            if (this.__packageVersions.has(specificService)) {
+              continue;
+            }
+
+            const versions = getVersions(this.program, specificService)[1]?.getVersions();
+            if (!versions) {
+              this.__packageVersions.set(specificService, []);
+              continue;
+            }
+
+            const versionDependency = versionDependencies?.get(specificService);
+            if (versionDependency && "name" in versionDependency) {
+              let end = false;
+              this.__packageVersions.set(
+                specificService,
+                versions
+                  .map((version) => version.value)
+                  .filter((v) => {
+                    if (end) return false;
+                    if (v === versionDependency.value) end = true;
+                    return true;
+                  }),
+              );
+            } else {
+              this.__packageVersions.set(
+                specificService,
+                versions.map((version) => version.value),
+              );
             }
           }
         }
       }
 
-      this.__packageVersions = allVersions;
-
-      if (
-        this.apiVersion !== undefined &&
-        this.apiVersion !== "latest" &&
-        this.apiVersion !== "all" &&
-        !this.__packageVersions.includes(this.apiVersion)
-      ) {
-        reportDiagnostic(this.program, {
-          code: "api-version-undefined",
-          format: { version: this.apiVersion },
-          target: this.program.getGlobalNamespaceType(),
-        });
-        this.apiVersion = this.__packageVersions[this.__packageVersions.length - 1];
-      }
       return this.__packageVersions;
     },
     getPackageVersionEnum(): Enum | undefined {

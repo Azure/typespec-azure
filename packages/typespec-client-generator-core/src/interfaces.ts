@@ -75,15 +75,14 @@ export interface TCGCContext {
   __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
   __pagedResultSet: Set<SdkType>;
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
-  __packageVersions?: string[]; // the package versions from the service versioning config and api version setting in tspconfig.
-  __serviceToVersions?: Map<Namespace | undefined, string[]>; // the package versions from the service versioning config and api version setting in tspconfig.
+  __packageVersions?: Map<Namespace, string[]>; // the package versions (for each service) from the service versioning config and api version setting in tspconfig.
   __packageVersionEnum?: Enum; // the enum type that contains all the package versions.
   __externalPackageToVersions?: Map<string, string>;
 
   getMutatedGlobalNamespace(): Namespace;
   getApiVersionsForType(type: Type): string[];
   setApiVersionsForType(type: Type, apiVersions: string[]): void;
-  getPackageVersions(service?: Namespace): string[];
+  getPackageVersions(service?: Namespace): Map<Namespace, string[]>;
   getPackageVersionEnum(): Enum | undefined;
   getClients(): SdkClient[];
   getClientOrOperationGroup(type: Namespace | Interface): SdkClient | SdkOperationGroup | undefined;
@@ -109,6 +108,7 @@ export interface SdkClient {
   service: Namespace | Namespace[];
   type: Namespace | Interface;
   subOperationGroups: SdkOperationGroup[];
+  autoMerge?: boolean;
 }
 
 export interface SdkOperationGroup {
