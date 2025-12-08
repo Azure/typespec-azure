@@ -45,6 +45,7 @@ import {
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
 import {
+  ClientDefaultValueDecorator,
   FlattenPropertyDecorator,
   HierarchyBuildingDecorator,
   MarkAsLroDecorator,
@@ -70,6 +71,7 @@ import {
   findEntriesWithTarget,
   findRootSourceProperty,
   getScopedDecoratorData,
+  getValueTypeValue,
   hasExplicitClientOrOperationGroup,
   listAllUserDefinedNamespaces,
   negationScopesKey,
@@ -1557,6 +1559,28 @@ export const $nextLinkVerb: NextLinkVerbDecorator = (
  */
 export function getNextLinkVerb(context: TCGCContext, entity: Operation): "GET" | "POST" {
   return getScopedDecoratorData(context, nextLinkVerbKey, entity) ?? "GET";
+}
+
+const clientDefaultValueKey = createStateSymbol("clientDefaultValue");
+
+export const $clientDefaultValue: ClientDefaultValueDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  value: Type,
+  scope?: LanguageScopes,
+) => {
+  const defaultValue = getValueTypeValue(value);
+  setScopedDecoratorData(context, $clientDefaultValue, clientDefaultValueKey, target, defaultValue, scope);
+};
+
+/**
+ * Get the client-level default value for a model property.
+ * @param context TCGCContext
+ * @param entity ModelProperty to check for clientDefaultValue decorator
+ * @returns The client-level default value if decorator is applied, undefined otherwise.
+ */
+export function getClientDefaultValue(context: TCGCContext, entity: ModelProperty): unknown {
+  return getScopedDecoratorData(context, clientDefaultValueKey, entity);
 }
 
 /**

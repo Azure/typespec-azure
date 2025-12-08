@@ -121,3 +121,41 @@ extern dec markAsLro(target: Operation, scope?: valueof string);
  * ```
  */
 extern dec nextLinkVerb(target: Operation, verb: "GET" | "POST", scope?: valueof string);
+
+/**
+ * Sets a client-level default value for a model property.
+ *
+ * This decorator allows brownfield services to specify default values that will be 
+ * used by SDK generators, maintaining backward compatibility with existing SDK users
+ * who may rely on default values that were previously generated from Swagger definitions.
+ *
+ * This decorator is considered legacy functionality and should only be used for
+ * maintaining backward compatibility in existing services. New services should use
+ * standard TypeSpec patterns for default values.
+ *
+ * @param target The model property that should have a client-level default value
+ * @param value The default value to be used by SDK generators
+ * @param scope Specifies the target language emitters that the decorator should apply.
+ * If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * @example Set a default value for a model property
+ * ```typespec
+ * model RequestOptions {
+ *   @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(30)
+ *   timeout?: int32;
+ *   
+ *   @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("standard")
+ *   tier?: string;
+ * }
+ * ```
+ *
+ * @example Apply default value only for specific languages
+ * ```typespec
+ * model Config {
+ *   @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(false, "python")
+ *   enableCache?: boolean;
+ * }
+ * ```
+ */
+extern dec clientDefaultValue(target: ModelProperty, value: unknown, scope?: valueof string);
