@@ -6,6 +6,7 @@ import {
   $apiVersion,
   $client,
   $clientApiVersions,
+  $clientDefaultValue,
   $clientDoc,
   $clientInitialization,
   $clientLocation,
@@ -60,5 +61,6 @@ export const $decorators = {
     flattenProperty: $flattenProperty,
     markAsLro: $markAsLro,
     nextLinkVerb: $nextLinkVerb,
+    clientDefaultValue: $clientDefaultValue,
   } satisfies AzureClientGeneratorCoreLegacyDecorators,
 };

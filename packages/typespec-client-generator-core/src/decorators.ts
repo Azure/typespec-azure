@@ -1569,7 +1569,23 @@ export const $clientDefaultValue: ClientDefaultValueDecorator = (
   value: Type,
   scope?: LanguageScopes,
 ) => {
-  const defaultValue = getValueTypeValue(value);
+  let defaultValue: unknown;
+  
+  // Extract the actual value from the Type
+  switch (value.kind) {
+    case "String":
+    case "Number":
+    case "Boolean":
+      defaultValue = value.value;
+      break;
+    case "EnumMember":
+      defaultValue = value.value ?? value.name;
+      break;
+    default:
+      // For other types, just skip setting the default value
+      return;
+  }
+  
   setScopedDecoratorData(context, $clientDefaultValue, clientDefaultValueKey, target, defaultValue, scope);
 };
 
