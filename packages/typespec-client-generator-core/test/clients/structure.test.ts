@@ -791,10 +791,10 @@ it("one client from multiple services", async () => {
       }
     }`,
     `
-  @multiService({services: [ServiceA, ServiceB]})
   @client(
     {
       name: "CombineClient",
+      service: [ServiceA, ServiceB],
     }
   )
   @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
