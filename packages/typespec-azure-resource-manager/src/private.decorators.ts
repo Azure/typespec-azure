@@ -57,7 +57,6 @@ import {
   AzureResourceBaseDecorator,
   AzureResourceManagerPrivateDecorators,
   BuiltInResourceOperationDecorator,
-  ConditionalClientFlattenDecorator,
   DefaultResourceKeySegmentNameDecorator,
   EnforceConstraintDecorator,
   ExtensionResourceOperationDecorator,
@@ -598,24 +597,6 @@ export function isAzureResource(program: Program, resourceType: Model): boolean 
   return isResourceBase ?? false;
 }
 
-/**
- * Please DO NOT USE in RestAPI specs.
- * Internal decorator that deprecated direct usage of `x-ms-client-flatten` OpenAPI extension.
- * It will programatically enabled/disable client flattening with @flattenProperty with autorest
- * emitter flags to maintain compatibility in swagger.
- */
-const $conditionalClientFlatten: ConditionalClientFlattenDecorator = (
-  context: DecoratorContext,
-  entity: ModelProperty,
-) => {
-  context.program.stateMap(ArmStateKeys.armConditionalClientFlatten).set(entity, true);
-};
-
-export function isConditionallyFlattened(program: Program, entity: ModelProperty): boolean {
-  const flatten = program.stateMap(ArmStateKeys.armConditionalClientFlatten).get(entity);
-  return flatten ?? false;
-}
-
 const $armRenameListByOperation: ArmRenameListByOperationDecorator = (
   context: DecoratorContext,
   entity: Operation,
@@ -1002,7 +983,6 @@ export const $decorators = {
     resourceParameterBaseFor: $resourceParameterBaseFor,
     azureResourceBase: $azureResourceBase,
     omitIfEmpty: $omitIfEmpty,
-    conditionalClientFlatten: $conditionalClientFlatten,
     assignUniqueProviderNameValue: $assignUniqueProviderNameValue,
     assignProviderNameValue: $assignProviderNameValue,
     armUpdateProviderNamespace: $armUpdateProviderNamespace,

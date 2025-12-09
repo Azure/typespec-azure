@@ -1204,3 +1204,32 @@ it("recognizes resource with customResource identifier", async () => {
 `);
   expectDiagnosticEmpty(diagnostics);
 });
+
+describe("multiple services", () => {
+  it("assign resources to the correct service", async () => {
+    const { program } = await Tester.compile(`
+    @armProviderNamespace
+    namespace Microsoft.ServiceA {
+      model ResA is TrackedResource<{}> {
+        @key @segment("foos") @path name: string;
+      }
+    }
+
+    @armProviderNamespace
+    namespace Microsoft.ServiceB {
+      model ResB is TrackedResource<{}> {
+        @key @segment("foos") @path name: string;
+      }
+    }
+  `);
+
+    const resources = getArmResources(program);
+    expect(resources).toHaveLength(2);
+
+    const [ResA, ResB] = resources;
+    expect(ResA.name).toEqual("ResA");
+    expect(ResA.armProviderNamespace).toEqual("Microsoft.ServiceA");
+    expect(ResB.name).toEqual("ResB");
+    expect(ResB.armProviderNamespace).toEqual("Microsoft.ServiceB");
+  });
+});

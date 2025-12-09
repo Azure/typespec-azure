@@ -20,7 +20,6 @@ import {
   isArmExternalType,
   isArmProviderNamespace,
   isAzureResource,
-  isConditionallyFlattened,
 } from "@azure-tools/typespec-azure-resource-manager";
 import {
   getClientNameOverride,
@@ -74,7 +73,6 @@ import {
   getPagingOperation,
   getPattern,
   getProperty,
-  getPropertyType,
   getRelativePathFromDirectory,
   getRootLength,
   getSummary,
@@ -89,11 +87,9 @@ import {
   isList,
   isNeverType,
   isNullType,
-  isNumericType,
   isRecordModelType,
   isSecret,
   isService,
-  isStringType,
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
   isVoidType,
@@ -109,8 +105,10 @@ import { SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
 import { TwoLevelMap } from "@typespec/compiler/utils";
 import {
-  Authentication,
+  AuthenticationOptionReference,
+  AuthenticationReference,
   HttpAuth,
+  HttpAuthRef,
   HttpOperation,
   HttpOperationBody,
   HttpOperationMultipartBody,
@@ -118,13 +116,13 @@ import {
   HttpOperationResponse,
   HttpPayloadBody,
   HttpProperty,
+  HttpServiceAuthentication,
   HttpStatusCodeRange,
   HttpStatusCodesEntry,
   MetadataInfo,
   OAuth2FlowType,
   Visibility,
   createMetadataInfo,
-  getAuthentication,
   getHeaderFieldOptions,
   getHttpService,
   getServers,
@@ -133,6 +131,7 @@ import {
   isHttpFile,
   isSharedRoute,
   reportIfNoRoutes,
+  resolveAuthentication,
   resolveRequestVisibility,
 } from "@typespec/http";
 import {
@@ -225,11 +224,6 @@ export interface AutorestDocumentEmitterOptions {
   readonly emitLroOptions?: "none" | "final-state-only" | "all";
 
   /**
-   * readOnly property ARM resource flattening
-   */
-  readonly armResourceFlattening?: boolean;
-
-  /**
    * Determines whether and how to emit schema for arm common-types
    * @default "for-visibility-only"
    */
@@ -304,6 +298,7 @@ export async function getOpenAPIForService(
       return !isService(program, ns);
     },
   };
+  const httpService = ignoreDiagnostics(getHttpService(program, service.type));
   const info = resolveInfo(program, service.type);
   const auth = processAuth(service.type);
 
@@ -370,7 +365,6 @@ export async function getOpenAPIForService(
   const [exampleMap, diagnostics] = await loadExamples(program, options, context.version);
   program.reportDiagnostics(diagnostics);
 
-  const httpService = ignoreDiagnostics(getHttpService(program, service.type));
   const routes = httpService.operations;
   reportIfNoRoutes(program, routes);
 
@@ -2133,6 +2127,17 @@ export async function getOpenAPIForService(
       const [asEnum, _] = getUnionAsEnum(prop.type);
       if (asEnum) {
         propSchema = getSchemaForUnionEnum(prop.type, asEnum);
+        if (propSchema["x-ms-enum"] && !propSchema["x-ms-enum"].name) {
+          const variants = [...prop.type.variants.values()];
+          const nonNullVariants = variants.filter((v) => !isNullType(v.type));
+          if (
+            nonNullVariants.length === 1 &&
+            variants.length > 1 &&
+            nonNullVariants[0].type.kind === "Enum"
+          ) {
+            propSchema["x-ms-enum"].name = nonNullVariants[0].type.name;
+          }
+        }
       } else {
         propSchema = getSchemaOrRef(prop.type, context);
       }
@@ -2151,11 +2156,7 @@ export async function getOpenAPIForService(
       attachPropertyXml(prop, propSchema);
     }
 
-    if (options.armResourceFlattening && isConditionallyFlattened(program, prop)) {
-      return { ...applyIntrinsicDecorators(prop, propSchema), "x-ms-client-flatten": true };
-    } else {
-      return applyIntrinsicDecorators(prop, propSchema);
-    }
+    return applyIntrinsicDecorators(prop, propSchema);
   }
 
   function attachExtensions(type: Type, emitObject: any) {
@@ -2288,12 +2289,6 @@ export async function getOpenAPIForService(
   ): OpenAPI2Schema {
     const newTarget = { ...target };
     const docStr = getDoc(program, typespecType);
-    const isString =
-      (typespecType.kind === "Scalar" || typespecType.kind === "ModelProperty") &&
-      isStringType(program, getPropertyType(typespecType));
-    const isNumeric =
-      (typespecType.kind === "Scalar" || typespecType.kind === "ModelProperty") &&
-      isNumericType(program, getPropertyType(typespecType));
 
     if (docStr) {
       newTarget.description = docStr;
@@ -2305,7 +2300,7 @@ export async function getOpenAPIForService(
     }
 
     const formatStr = getFormat(program, typespecType);
-    if (isString && formatStr) {
+    if (formatStr) {
       const allowedStringFormats = [
         "char",
         "binary",
@@ -2336,27 +2331,27 @@ export async function getOpenAPIForService(
     }
 
     const pattern = getPattern(program, typespecType);
-    if (isString && pattern) {
+    if (pattern) {
       newTarget.pattern = pattern;
     }
 
     const minLength = getMinLength(program, typespecType);
-    if (isString && minLength !== undefined) {
+    if (minLength !== undefined) {
       newTarget.minLength = minLength;
     }
 
     const maxLength = getMaxLength(program, typespecType);
-    if (isString && maxLength !== undefined) {
+    if (maxLength !== undefined) {
       newTarget.maxLength = maxLength;
     }
 
     const minValue = getMinValue(program, typespecType);
-    if (isNumeric && minValue !== undefined) {
+    if (minValue !== undefined) {
       newTarget.minimum = minValue;
     }
 
     const maxValue = getMaxValue(program, typespecType);
-    if (isNumeric && maxValue !== undefined) {
+    if (maxValue !== undefined) {
       newTarget.maximum = maxValue;
     }
 
@@ -2698,7 +2693,7 @@ export async function getOpenAPIForService(
         security: Record<string, string[]>[];
       }
     | undefined {
-    const authentication = getAuthentication(program, serviceNamespace);
+    const authentication = resolveAuthentication(httpService);
     if (authentication) {
       return processServiceAuthentication(authentication, serviceNamespace);
     }
@@ -2706,36 +2701,29 @@ export async function getOpenAPIForService(
   }
 
   function processServiceAuthentication(
-    authentication: Authentication,
+    authentication: HttpServiceAuthentication,
     serviceNamespace: Namespace,
   ): {
     securitySchemes: Record<string, OpenAPI2SecurityScheme>;
     security: Record<string, string[]>[];
   } {
     const oaiSchemes: Record<string, OpenAPI2SecurityScheme> = {};
-    const security: Record<string, string[]>[] = [];
-    for (const option of authentication.options) {
-      const oai3SecurityOption: Record<string, string[]> = {};
-      for (const scheme of option.schemes) {
-        const result = getOpenAPI2Scheme(scheme, serviceNamespace);
-        if (result !== undefined) {
-          const [oaiScheme, scopes] = result;
-          oaiSchemes[scheme.id] = oaiScheme;
-          oai3SecurityOption[scheme.id] = scopes;
-        }
-      }
-
-      if (Object.keys(oai3SecurityOption).length > 0) {
-        security.push(oai3SecurityOption);
+    for (const scheme of authentication.schemes) {
+      const result = getOpenAPI2Scheme(scheme, serviceNamespace);
+      if (result !== undefined) {
+        oaiSchemes[scheme.id] = result;
       }
     }
+
+    const security = getOpenAPISecurity(oaiSchemes, authentication.defaultAuth);
+
     return { securitySchemes: oaiSchemes, security };
   }
 
   function getOpenAPI2Scheme(
     auth: HttpAuth,
     serviceNamespace: Namespace,
-  ): [OpenAPI2SecurityScheme, string[]] | undefined {
+  ): OpenAPI2SecurityScheme | undefined {
     switch (auth.type) {
       case "http":
         if (auth.scheme.toLowerCase() !== "basic") {
@@ -2746,32 +2734,26 @@ export async function getOpenAPIForService(
           });
           return undefined;
         }
-        return [{ type: "basic", description: auth.description }, []];
+        return { type: "basic", description: auth.description };
       case "apiKey":
         if (auth.in === "cookie") {
           return undefined;
         }
-        return [
-          { type: "apiKey", description: auth.description, in: auth.in, name: auth.name },
-          [],
-        ];
+        return { type: "apiKey", description: auth.description, in: auth.in, name: auth.name };
       case "oauth2":
         const flow = auth.flows[0];
         if (flow === undefined) {
           return undefined;
         }
         const oaiFlowName = getOpenAPI2Flow(flow.type);
-        return [
-          {
-            type: "oauth2",
-            description: auth.description,
-            flow: oaiFlowName,
-            authorizationUrl: (flow as any).authorizationUrl,
-            tokenUrl: (flow as any).tokenUrl,
-            scopes: Object.fromEntries(flow.scopes.map((x) => [x.value, x.description ?? ""])),
-          } as any,
-          flow.scopes.map((x) => x.value),
-        ];
+        return {
+          type: "oauth2",
+          description: auth.description,
+          flow: oaiFlowName,
+          authorizationUrl: (flow as any).authorizationUrl,
+          tokenUrl: (flow as any).tokenUrl,
+          scopes: Object.fromEntries(flow.scopes.map((x) => [x.value, x.description ?? ""])),
+        };
       case "openIdConnect":
       default:
         reportDiagnostic(program, {
@@ -2783,6 +2765,36 @@ export async function getOpenAPIForService(
     }
   }
 
+  function getOpenAPISecurity(
+    oaiSchemes: Record<string, OpenAPI2SecurityScheme>,
+    authReference: AuthenticationReference,
+  ) {
+    const security = authReference.options
+      .map((authOption: AuthenticationOptionReference) => {
+        const securityOption: Record<string, string[]> = {};
+        for (const httpAuthRef of authOption.all) {
+          const scopes = getScopesForAuthReference(httpAuthRef);
+          if (httpAuthRef.auth.id in oaiSchemes && scopes) {
+            securityOption[httpAuthRef.auth.id] = scopes;
+          }
+        }
+        return securityOption;
+      })
+      .filter((x) => Object.keys(x).length > 0);
+    return security;
+  }
+
+  function getScopesForAuthReference(httpAuthRef: HttpAuthRef) {
+    switch (httpAuthRef.kind) {
+      case "noAuth":
+        // should emit "{}" as a security option https://github.com/OAI/OpenAPI-Specification/issues/14#issuecomment-297457320
+        return undefined;
+      case "oauth2":
+        return httpAuthRef.scopes;
+      default:
+        return [];
+    }
+  }
   function getOpenAPI2Flow(flow: OAuth2FlowType): OpenAPI2OAuth2FlowType {
     switch (flow) {
       case "authorizationCode":

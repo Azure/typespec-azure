@@ -265,7 +265,7 @@ export type SdkType =
 export interface SdkBuiltInType<TKind extends SdkBuiltInKinds = SdkBuiltInKinds>
   extends SdkTypeBase {
   kind: TKind;
-  /** How to encode the type in wire. */
+  /** How to encode the type on wire. */
   encode?: string;
   /** Client name for the type. */
   name: string;
@@ -380,6 +380,7 @@ export function isSdkDateTimeEncodings(encoding: string): encoding is DateTimeKn
 interface SdkDateTimeTypeBase extends SdkTypeBase {
   name: string;
   baseType?: SdkDateTimeType;
+  /** How to encode the type on wire. */
   encode: DateTimeKnownEncoding;
   wireType: SdkBuiltInType;
   /** Unique ID for the current type. */
@@ -400,6 +401,7 @@ export interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
   name: string;
   baseType?: SdkDurationType;
+  /** How to encode the type on wire. */
   encode: DurationKnownEncoding;
   wireType: SdkBuiltInType;
   /** Unique ID for the current type. */
@@ -600,7 +602,15 @@ export interface SdkModelPropertyTypeBase<TType extends SdkTypeBase = SdkType>
   access: AccessFlags;
   /** Whether this property could be flattened */
   flatten: boolean;
+  /** How to encode the property on wire. */
+  encode?: ArrayKnownEncoding;
 }
+
+export type ArrayKnownEncoding =
+  | "pipeDelimited"
+  | "spaceDelimited"
+  | "commaDelimited"
+  | "newlineDelimited";
 
 /**
  * Options to show how to serialize a model/property.
@@ -719,8 +729,17 @@ export interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
   collectionFormat?: CollectionFormat;
   /** Name for the parameter in the payload */
   serializedName: string;
-  /** Corresponding method level parameter or model property for current parameter. */
+  /**
+   * @deprecated This property is deprecated. Use `methodParameterSegments` instead.
+   * Corresponding method level parameter or model property for current parameter.
+   */
   correspondingMethodParams: (SdkMethodParameter | SdkModelPropertyType)[];
+  /**
+   * Segments to indicate the complete path from method parameters to this HTTP parameter.
+   * Each inner array represents a complete path from method parameter to the final HTTP parameter.
+   * For body parameters with spread, there can be multiple paths.
+   */
+  methodParameterSegments: (SdkMethodParameter | SdkModelPropertyType)[][];
 }
 
 /**
@@ -731,8 +750,17 @@ export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
   collectionFormat?: CollectionFormat;
   /** Name for the parameter in the payload */
   serializedName: string;
-  /** Corresponding method level parameter or model property for current parameter. */
+  /**
+   * @deprecated This property is deprecated. Use `methodParameterSegments` instead.
+   * Corresponding method level parameter or model property for current parameter.
+   */
   correspondingMethodParams: (SdkMethodParameter | SdkModelPropertyType)[];
+  /**
+   * Segments to indicate the complete path from method parameters to this HTTP parameter.
+   * Each inner array represents a complete path from method parameter to the final HTTP parameter.
+   * For body parameters with spread, there can be multiple paths.
+   */
+  methodParameterSegments: (SdkMethodParameter | SdkModelPropertyType)[][];
   explode: boolean;
 }
 
@@ -746,8 +774,17 @@ export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   allowReserved: boolean;
   /** Name for the parameter in the payload */
   serializedName: string;
-  /** Corresponding method level parameter or model property for current parameter. */
+  /**
+   * @deprecated This property is deprecated. Use `methodParameterSegments` instead.
+   * Corresponding method level parameter or model property for current parameter.
+   */
   correspondingMethodParams: (SdkMethodParameter | SdkModelPropertyType)[];
+  /**
+   * Segments to indicate the complete path from method parameters to this HTTP parameter.
+   * Each inner array represents a complete path from method parameter to the final HTTP parameter.
+   * For body parameters with spread, there can be multiple paths.
+   */
+  methodParameterSegments: (SdkMethodParameter | SdkModelPropertyType)[][];
 }
 
 /**
@@ -757,8 +794,17 @@ export interface SdkCookieParameter extends SdkModelPropertyTypeBase {
   kind: "cookie";
   /** Name for the parameter in the payload */
   serializedName: string;
-  /** Corresponding method level parameter or model property for current parameter. */
+  /**
+   * @deprecated This property is deprecated. Use `methodParameterSegments` instead.
+   * Corresponding method level parameter or model property for current parameter.
+   */
   correspondingMethodParams: (SdkMethodParameter | SdkModelPropertyType)[];
+  /**
+   * Segments to indicate the complete path from method parameters to this HTTP parameter.
+   * Each inner array represents a complete path from method parameter to the final HTTP parameter.
+   * For body parameters with spread, there can be multiple paths.
+   */
+  methodParameterSegments: (SdkMethodParameter | SdkModelPropertyType)[][];
 }
 
 /**
@@ -770,8 +816,17 @@ export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   serializedName: string;
   contentTypes: string[];
   defaultContentType: string;
-  /** Corresponding method level parameter or model property for current parameter. */
+  /**
+   * @deprecated This property is deprecated. Use `methodParameterSegments` instead.
+   * Corresponding method level parameter or model property for current parameter.
+   */
   correspondingMethodParams: (SdkMethodParameter | SdkModelPropertyType)[];
+  /**
+   * Segments to indicate the complete path from method parameters to this HTTP parameter.
+   * Each inner array represents a complete path from method parameter to the final HTTP parameter.
+   * For body parameters with spread, there can be multiple paths.
+   */
+  methodParameterSegments: (SdkMethodParameter | SdkModelPropertyType)[][];
 }
 
 export type SdkHttpParameter =
@@ -798,6 +853,11 @@ export interface SdkMethodResponse {
    * An array of properties to fetch {result} from the {response} model. Note that this property is only for LRO and paging pattens.
    */
   resultSegments?: SdkModelPropertyType[];
+  /**
+   * Indicates whether the response type is optional. Set to true when the operation has at least one HTTP response without a body.
+   * This allows distinguishing between responses without a body and responses with a body of type `Type | null`.
+   */
+  optional?: boolean;
 }
 
 export interface SdkServiceResponse {
