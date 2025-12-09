@@ -1569,7 +1569,15 @@ export const $clientDefaultValue: ClientDefaultValueDecorator = (
   value: string | boolean | Numeric,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(context, $clientDefaultValue, clientDefaultValueKey, target, value, scope);
+  const actualValue = typeof value === "object" && "asNumber" in value ? value.asNumber() : value;
+  setScopedDecoratorData(
+    context,
+    $clientDefaultValue,
+    clientDefaultValueKey,
+    target,
+    actualValue,
+    scope,
+  );
 };
 
 /**
