@@ -172,11 +172,6 @@ model ClientOptions {
    * The name of the client. If not specified, the default name will be `<Name of the target>Client`.
    */
   name?: string;
-
-  /**
-   * The parent client of this client. If specified, this client will be generated as a sub client of the parent client.
-   */
-  parent?: Namespace | Interface;
 }
 
 /**

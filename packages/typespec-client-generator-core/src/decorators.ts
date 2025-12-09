@@ -177,7 +177,6 @@ export const $client: ClientDecorator = (
     options?.kind === "Model" ? options?.properties.get("name")?.type : undefined;
   const name: string = explicitName?.kind === "String" ? explicitName.value : target.name;
   let service = options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
-  const parent = options?.kind === "Model" ? options?.properties.get("parent")?.type : undefined;
 
   if (service?.kind !== "Namespace") {
     service = findClientService(context.program, target);
@@ -203,7 +202,6 @@ export const $client: ClientDecorator = (
     type: target,
     crossLanguageDefinitionId: `${getNamespaceFullName(service)}.${name}`,
     subOperationGroups: [],
-    parent: parent as Namespace | Interface | undefined,
   };
   setScopedDecoratorData(context, $client, clientKey, target, client, scope);
 };
