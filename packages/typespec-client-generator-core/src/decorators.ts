@@ -1,26 +1,27 @@
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
+  compilerAssert,
   DecoratorContext,
   DecoratorFunction,
   Enum,
   EnumMember,
+  getDiscriminator,
+  getNamespaceFullName,
+  ignoreDiagnostics,
   Interface,
+  isErrorModel,
+  isService,
+  isTemplateDeclaration,
   Model,
   ModelProperty,
   Namespace,
+  Numeric,
   Operation,
   Program,
   RekeyableMap,
   Scalar,
   Type,
   Union,
-  compilerAssert,
-  getDiscriminator,
-  getNamespaceFullName,
-  ignoreDiagnostics,
-  isErrorModel,
-  isService,
-  isTemplateDeclaration,
 } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
@@ -71,7 +72,6 @@ import {
   findEntriesWithTarget,
   findRootSourceProperty,
   getScopedDecoratorData,
-  getValueTypeValue,
   hasExplicitClientOrOperationGroup,
   listAllUserDefinedNamespaces,
   negationScopesKey,
@@ -1566,27 +1566,10 @@ const clientDefaultValueKey = createStateSymbol("clientDefaultValue");
 export const $clientDefaultValue: ClientDefaultValueDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  value: Type,
+  value: string | boolean | Numeric,
   scope?: LanguageScopes,
 ) => {
-  let defaultValue: unknown;
-  
-  // Extract the actual value from the Type
-  switch (value.kind) {
-    case "String":
-    case "Number":
-    case "Boolean":
-      defaultValue = value.value;
-      break;
-    case "EnumMember":
-      defaultValue = value.value ?? value.name;
-      break;
-    default:
-      // For other types, just skip setting the default value
-      return;
-  }
-  
-  setScopedDecoratorData(context, $clientDefaultValue, clientDefaultValueKey, target, defaultValue, scope);
+  setScopedDecoratorData(context, $clientDefaultValue, clientDefaultValueKey, target, value, scope);
 };
 
 /**

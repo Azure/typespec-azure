@@ -166,4 +166,4 @@ extern dec nextLinkVerb(target: Operation, verb: "GET" | "POST", scope?: valueof
  * }
  * ```
  */
-extern dec clientDefaultValue(target: ModelProperty, value: valueof string | valueof numeric | valueof boolean, scope?: valueof string);
+extern dec clientDefaultValue(target: ModelProperty, value: (valueof string) | (valueof boolean) | (valueof numeric), scope?: valueof string);

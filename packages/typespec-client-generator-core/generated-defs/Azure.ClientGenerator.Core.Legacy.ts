@@ -1,4 +1,11 @@
-import type { DecoratorContext, Model, ModelProperty, Operation, Type } from "@typespec/compiler";
+import type {
+  DecoratorContext,
+  Model,
+  ModelProperty,
+  Numeric,
+  Operation,
+  Type,
+} from "@typespec/compiler";
 
 /**
  * Adds support for client-level multiple levels of inheritance.
@@ -160,7 +167,6 @@ export type NextLinkVerbDecorator = (
  *   tier?: string;
  * }
  * ```
- *
  * @example Set a default value for an operation parameter
  * ```typespec
  * op getItems(
@@ -168,7 +174,6 @@ export type NextLinkVerbDecorator = (
  *   @query pageSize?: int32
  * ): Item[];
  * ```
- *
  * @example Apply default value only for specific languages
  * ```typespec
  * model Config {
@@ -180,7 +185,7 @@ export type NextLinkVerbDecorator = (
 export type ClientDefaultValueDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
-  value: Type,
+  value: string | boolean | Numeric,
   scope?: string,
 ) => void;
 
