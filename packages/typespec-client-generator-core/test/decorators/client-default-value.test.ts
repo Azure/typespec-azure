@@ -293,3 +293,24 @@ it("sets client default value for operation parameters", async () => {
   ok(sortOrderParam);
   strictEqual(sortOrderParam.clientDefaultValue, "asc");
 });
+
+it("mixed with @alternateType", async () => {
+  await runner.compileWithBuiltInService(`
+    @route("/items")
+    @get
+    op getItems(
+      @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("10")
+      @Azure.ClientGenerator.Core.alternateType(string)
+      @query pageSize?: int32,
+      
+    ): void;
+  `);
+
+  const sdkPackage = runner.context.sdkPackage;
+  const method = sdkPackage.clients[0].methods[0];
+  strictEqual(method.kind, "basic");
+
+  const pageSizeParam = method.parameters.find((p) => p.name === "pageSize")!;
+  ok(pageSizeParam);
+  strictEqual(pageSizeParam.clientDefaultValue, "10");
+});
