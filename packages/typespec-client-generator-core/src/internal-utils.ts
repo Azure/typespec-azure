@@ -20,6 +20,7 @@ import {
   isNeverType,
   isNullType,
   isVoidType,
+  listServices,
   Model,
   ModelProperty,
   Namespace,
@@ -67,7 +68,7 @@ import {
   SdkType,
   TCGCContext,
 } from "./interfaces.js";
-import { createDiagnostic, createStateSymbol } from "./lib.js";
+import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkBasicServiceMethod } from "./methods.js";
 import {
   getCrossLanguageDefinitionId,
@@ -112,8 +113,16 @@ export const omitOperation = createStateSymbol("omitOperation");
 export const overrideKey = createStateSymbol("override");
 
 export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
+  const explicitClients = listScopedDecoratorData(context, clientKey);
+  let withAutoMerge = false;
+  explicitClients.forEach((value) => {
+    if (value.autoMerge) {
+      withAutoMerge = true;
+    }
+  });
+
   return (
-    listScopedDecoratorData(context, clientKey).size > 0 ||
+    (explicitClients.size > 0 && !withAutoMerge) ||
     listScopedDecoratorData(context, operationGroupKey).size > 0
   );
 }
@@ -747,10 +756,8 @@ function getVersioningMutator(
   service: Namespace,
   apiVersion?: string,
 ): unsafe_MutatorWithNamespace | undefined {
-  if (!apiVersion) return undefined;
   const versionMutator = getVersioningMutators(context.program, service);
-  compilerAssert(versionMutator !== undefined, "Versioning service should not get undefined");
-  // Multi-service's mutator is transient
+  if (!versionMutator) return undefined;
   if (versionMutator.kind === "transient") {
     return versionMutator.mutator;
   }
@@ -764,18 +771,72 @@ function getVersioningMutator(
 
 export function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Namespace {
   const globalNamespace = context.program.getGlobalNamespaceType();
-  const allApiVersions = context.getPackageVersions();
-  if (allApiVersions.size === 0 || (allApiVersions.size === 1 && context.apiVersion === "all"))
-    return globalNamespace;
+  const services = listServices(context.program);
+
+  // No service, thus no versioning mutation needed
+  if (services.length === 0) return globalNamespace;
+
+  // Explicit all API version setting, thus no versioning mutation needed
+  if (context.apiVersion === "all") return globalNamespace;
+
+  const explicitClients = listScopedDecoratorData(context, clientKey);
+  const explicitServices = new Set<Namespace>();
+  explicitClients.forEach((c) => {
+    const sdkClient = c as SdkClient;
+    if (Array.isArray(sdkClient.service)) {
+      sdkClient.service.forEach((s) => explicitServices.add(s));
+    } else {
+      explicitServices.add(sdkClient.service);
+    }
+  });
 
   let mutator: unsafe_MutatorWithNamespace | undefined;
-  if (allApiVersions.size === 1) {
-    const version = allApiVersions.entries().next().value!;
 
-    mutator = getVersioningMutator(context, version[0], version[1][version[1].length - 1]);
-  } else {
-    const explicitClients = listScopedDecoratorData(context, clientKey);
-    compilerAssert(explicitClients.size === 1, "One api version should not get multiple mutators");
+  // No explicit clients (choose first service) or explicit client with one service
+  if (explicitClients.size === 0 || explicitServices.size === 1) {
+    const serviceNamespace =
+      explicitClients.size === 0 ? services[0].type : explicitServices.values().next().value!;
+    const versions = getVersions(context.program, serviceNamespace)[1]?.getVersions();
+    // If the single service has no versioning, no mutation needed
+    if (!versions) return globalNamespace;
+
+    // Filter versions based on `apiVersion` config
+    removeVersionsLargerThanExplicitlySpecified(context, versions);
+    const versionsValues = versions.map((v) => v.value);
+
+    // Fix apiVersion setting problem only if there's only one service
+    if (
+      context.apiVersion !== undefined &&
+      context.apiVersion !== "latest" &&
+      context.apiVersion !== "all" &&
+      !versionsValues.includes(context.apiVersion)
+    ) {
+      reportDiagnostic(context.program, {
+        code: "api-version-undefined",
+        format: { version: context.apiVersion },
+        target: services[0].type,
+      });
+      context.apiVersion = versionsValues[versionsValues.length - 1];
+    }
+
+    mutator = getVersioningMutator(
+      context,
+      serviceNamespace,
+      versionsValues[versionsValues.length - 1],
+    );
+  }
+  // Explicit clients with multiple services
+  else {
+    // Currently we do not support multiple explicit clients with multiple services
+    if (explicitClients.size > 1 && explicitServices.size > 1) {
+      reportDiagnostic(context.program, {
+        code: "multiple-explicit-clients-multiple-services",
+        format: {},
+        target: services[0].type,
+      });
+      return globalNamespace;
+    }
+
     mutator = getVersioningMutator(context, explicitClients.keys().next().value as Namespace);
   }
 

@@ -15,7 +15,7 @@ import {
   Union,
 } from "@typespec/compiler";
 import { HttpOperation } from "@typespec/http";
-import { getVersionDependencies, getVersions } from "@typespec/versioning";
+import { getVersions } from "@typespec/versioning";
 import { stringify } from "yaml";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { defaultDecoratorsAllowList } from "./configs.js";
@@ -40,15 +40,11 @@ import {
 } from "./interfaces.js";
 import {
   BrandedSdkEmitterOptionsInterface,
-  clientKey,
   handleVersioningMutationForGlobalNamespace,
-  listScopedDecoratorData,
   parseEmitterName,
-  removeVersionsLargerThanExplicitlySpecified,
   TCGCEmitterOptions,
   TspLiteralType,
 } from "./internal-utils.js";
-import { reportDiagnostic } from "./lib.js";
 import { createSdkPackage } from "./package.js";
 import { listAllServiceNamespaces } from "./public-utils.js";
 
@@ -96,12 +92,10 @@ export function createTCGCContext(
         // If we are not mutating the global namespace, return the original global namespace type.
         return program.getGlobalNamespaceType();
       }
-      let globalNamespace = this.__mutatedGlobalNamespace;
-      if (!globalNamespace) {
-        globalNamespace = handleVersioningMutationForGlobalNamespace(this);
-        this.__mutatedGlobalNamespace = globalNamespace;
+      if (!this.__mutatedGlobalNamespace) {
+        this.__mutatedGlobalNamespace = handleVersioningMutationForGlobalNamespace(this);
       }
-      return globalNamespace;
+      return this.__mutatedGlobalNamespace;
     },
     getApiVersionsForType(type): string[] {
       const service = this.getServiceForType(type);
@@ -128,83 +122,17 @@ export function createTCGCContext(
       serviceMap.set(type, mergedApiVersions);
     },
     getPackageVersions(): Map<Namespace, string[]> {
-      if (this.__packageVersions) {
-        return this.__packageVersions;
+      if (!this.__packageVersions) {
+        prepareClientAndOperationCache(this);
       }
 
-      this.__packageVersions = new Map();
-      // Use listServices to get unmutated namespace objects (same as what findClientService returns)
-      const services = listServices(this.program);
-
-      if (services.length === 0) {
-        return this.__packageVersions;
-      }
-
-      if (services.length === 1) {
-        // Single service case
-        const versions = getVersions(this.program, services[0].type)[1]?.getVersions();
-
-        if (!versions) {
-          this.__packageVersions.set(services[0].type, []);
-          return this.__packageVersions;
-        }
-
-        // Consider apiVersion setting only if there's only one service
-        removeVersionsLargerThanExplicitlySpecified(this, versions);
-
-        const filteredVersions = versions.map((version) => version.value);
-
-        // Consider apiVersion setting problem only if there's only one service
-        if (
-          this.apiVersion !== undefined &&
-          this.apiVersion !== "latest" &&
-          this.apiVersion !== "all" &&
-          !filteredVersions.includes(this.apiVersion)
-        ) {
-          reportDiagnostic(this.program, {
-            code: "api-version-undefined",
-            format: { version: this.apiVersion },
-            target: services[0].type,
-          });
-          this.apiVersion = filteredVersions[filteredVersions.length - 1];
-        }
-
-        this.__packageVersions.set(services[0].type, filteredVersions);
-      } else {
-        // Multiple service case - populate map with all versions from all services
-        // (filtering based on @useDependency will be done later for multi-service clients)
-        const explicitClients = listScopedDecoratorData(this, clientKey);
-        for (const client of explicitClients.values()) {
-          for (const specificService of client.service) {
-            if (this.__packageVersions.has(specificService)) {
-              continue;
-            }
-
-            const versions = getVersions(this.program, specificService)[1]?.getVersions();
-            if (!versions) {
-              this.__packageVersions.set(specificService, []);
-              continue;
-            }
-
-            this.__packageVersions.set(
-              specificService,
-              versions.map((version) => version.value),
-            );
-          }
-        }
-      }
-
-      return this.__packageVersions;
+      return this.__packageVersions!;
     },
-    getPackageVersionEnum(): Enum | undefined {
-      if (this.__packageVersionEnum) {
-        return this.__packageVersionEnum;
+    getPackageVersionEnum(): Map<Namespace, Enum | undefined> {
+      if (!this.__packageVersionEnum) {
+        prepareClientAndOperationCache(this);
       }
-      const namespaces = listAllServiceNamespaces(this);
-      if (namespaces.length === 0) {
-        return undefined;
-      }
-      return getVersions(this.program, namespaces[0])[1]?.getVersions()?.[0].enumMember.enum;
+      return this.__packageVersionEnum!;
     },
     getClients(): SdkClient[] {
       if (!this.__rawClientsOperationGroupsCache) {
