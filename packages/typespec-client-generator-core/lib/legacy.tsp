@@ -134,7 +134,7 @@ extern dec nextLinkVerb(target: Operation, verb: "GET" | "POST", scope?: valueof
  * standard TypeSpec patterns for default values.
  *
  * @param target The model property or operation parameter that should have a client-level default value
- * @param value The default value to be used by SDK generators
+ * @param value The default value to be used by SDK generators (must be a string, number, or boolean literal)
  * @param scope Specifies the target language emitters that the decorator should apply.
  * If not set, the decorator will be applied to all language emitters by default.
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
@@ -166,4 +166,4 @@ extern dec nextLinkVerb(target: Operation, verb: "GET" | "POST", scope?: valueof
  * }
  * ```
  */
-extern dec clientDefaultValue(target: ModelProperty, value: unknown, scope?: valueof string);
+extern dec clientDefaultValue(target: ModelProperty, value: valueof string | valueof numeric | valueof boolean, scope?: valueof string);

@@ -137,7 +137,7 @@ export type NextLinkVerbDecorator = (
 /**
  * Sets a client-level default value for a model property or operation parameter.
  *
- * This decorator allows brownfield services to specify default values that will be 
+ * This decorator allows brownfield services to specify default values that will be
  * used by SDK generators, maintaining backward compatibility with existing SDK users
  * who may rely on default values that were previously generated from Swagger definitions.
  *
@@ -146,7 +146,7 @@ export type NextLinkVerbDecorator = (
  * standard TypeSpec patterns for default values.
  *
  * @param target The model property or operation parameter that should have a client-level default value
- * @param value The default value to be used by SDK generators
+ * @param value The default value to be used by SDK generators (must be a string, number, or boolean literal)
  * @param scope Specifies the target language emitters that the decorator should apply.
  * If not set, the decorator will be applied to all language emitters by default.
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
@@ -155,7 +155,7 @@ export type NextLinkVerbDecorator = (
  * model RequestOptions {
  *   @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(30)
  *   timeout?: int32;
- *   
+ *
  *   @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("standard")
  *   tier?: string;
  * }
