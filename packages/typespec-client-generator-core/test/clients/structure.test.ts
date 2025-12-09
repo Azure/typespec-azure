@@ -908,7 +908,6 @@ it("one client from multiple services auto merge", async () => {
       {
         name: "CombineClient",
         service: [ServiceA, ServiceB],
-        autoMerge: true,
       }
     )
     @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)

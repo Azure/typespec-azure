@@ -83,14 +83,14 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         );
       }
     }
-  } else if (clients.length >= 0) {
+  } else if (clients.length > 0) {
     // single-service client
     const versions = getVersions(
       context.program,
       clients[0].service as Namespace,
     )[1]?.getVersions();
 
-    if (!versions) {
+    if (!versions || versions.length === 0) {
       context.__packageVersions.set(clients[0].service as Namespace, []);
     } else {
       context.__packageVersionEnum.set(

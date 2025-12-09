@@ -176,7 +176,7 @@ export const $client: ClientDecorator = (
     options?.kind === "Model" ? options?.properties.get("name")?.type : undefined;
   const name: string = explicitName?.kind === "String" ? explicitName.value : target.name;
   let service: Namespace | Namespace[] | undefined = undefined;
-  let autoMerge: boolean | undefined = undefined;
+  let autoMerge: boolean | undefined = false;
   const serviceConfig =
     options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
 
@@ -187,10 +187,7 @@ export const $client: ClientDecorator = (
     serviceConfig.values.every((v) => v.kind === "Namespace")
   ) {
     service = serviceConfig.values;
-
-    const explicitAutoMerge =
-      options?.kind === "Model" ? options?.properties.get("autoMerge")?.type : undefined;
-    autoMerge = explicitAutoMerge?.kind === "Boolean" ? explicitAutoMerge.value : false;
+    autoMerge = true;
   } else {
     service = findClientService(context.program, target);
   }

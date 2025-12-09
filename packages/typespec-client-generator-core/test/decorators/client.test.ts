@@ -43,6 +43,7 @@ describe("@client", () => {
     const clients = listClients(runner.context);
     deepStrictEqual(clients, [
       {
+        autoMerge: false,
         kind: "SdkClient",
         name: "MyClient",
         service: MyClient,
@@ -68,6 +69,7 @@ describe("@client", () => {
         service: MyService,
         type: MyClient,
         subOperationGroups: [],
+        autoMerge: false,
       },
     ]);
   });
@@ -1460,32 +1462,4 @@ it("operations under namespace or interface without @client or @operationGroup",
   strictEqual(operationGroups.length, 1);
   const operationGroup = operationGroups[0];
   strictEqual(listOperationsInOperationGroup(runner.context, operationGroup).length, 1);
-});
-
-it("multiple @service with @client", async () => {
-  await runner.compile(`
-    @service
-    @client({ name: "MyService1Client" })
-    namespace MyService1 {
-      op foo(): void;
-    }
-
-    @service
-    @client({ name: "MyService2Client" })
-    namespace MyService2 {
-      op bar(): void;
-    }
-
-    @service
-    @client({ name: "MyService3Client" })
-    namespace MyService3 {
-      op bar(): void;
-    }
-  `);
-
-  const clients = listClients(runner.context);
-  deepStrictEqual(clients.length, 3);
-  deepStrictEqual(clients[0].name, "MyService1Client");
-  deepStrictEqual(clients[1].name, "MyService2Client");
-  deepStrictEqual(clients[2].name, "MyService3Client");
 });

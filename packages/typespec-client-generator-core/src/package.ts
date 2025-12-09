@@ -47,7 +47,7 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
         context.apiVersion === "all" && versions.size === 1
           ? "all"
           : versions.size === 1
-            ? [...versions.values()][0][0]
+            ? [...versions.values()][0].at(-1)
             : undefined,
     },
   };
