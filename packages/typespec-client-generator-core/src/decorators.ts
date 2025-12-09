@@ -10,6 +10,7 @@ import {
   ignoreDiagnostics,
   Interface,
   isErrorModel,
+  isNumeric,
   isService,
   isTemplateDeclaration,
   Model,
@@ -1569,7 +1570,7 @@ export const $clientDefaultValue: ClientDefaultValueDecorator = (
   value: string | boolean | Numeric,
   scope?: LanguageScopes,
 ) => {
-  const actualValue = typeof value === "object" && "asNumber" in value ? value.asNumber() : value;
+  const actualValue = isNumeric(value) ? value.asNumber() : value;
   setScopedDecoratorData(
     context,
     $clientDefaultValue,
@@ -1586,7 +1587,10 @@ export const $clientDefaultValue: ClientDefaultValueDecorator = (
  * @param entity ModelProperty to check for clientDefaultValue decorator
  * @returns The client-level default value if decorator is applied, undefined otherwise.
  */
-export function getClientDefaultValue(context: TCGCContext, entity: ModelProperty): unknown {
+export function getClientDefaultValue(
+  context: TCGCContext,
+  entity: ModelProperty,
+): string | boolean | Numeric | undefined {
   return getScopedDecoratorData(context, clientDefaultValueKey, entity);
 }
 

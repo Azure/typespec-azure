@@ -168,6 +168,6 @@ extern dec nextLinkVerb(target: Operation, verb: "GET" | "POST", scope?: valueof
  */
 extern dec clientDefaultValue(
   target: ModelProperty,
-  value: (valueof string) | (valueof boolean) | (valueof numeric),
+  value: valueof string | boolean | numeric,
   scope?: valueof string
 );

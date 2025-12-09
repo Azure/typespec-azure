@@ -220,13 +220,11 @@ it("verify diagnostic gets raised for legacy usage", async () => {
       },
     },
   );
-  expectDiagnostics(result, [
-    {
-      code: "@azure-tools/typespec-azure-core/no-legacy-usage",
-      message:
-        'Referencing elements inside Legacy namespace "Azure.ClientGenerator.Core.Legacy" is not allowed.',
-    },
-  ]);
+  expectDiagnostics(result, {
+    code: "@azure-tools/typespec-azure-core/no-legacy-usage",
+    message:
+      'Referencing elements inside Legacy namespace "Azure.ClientGenerator.Core.Legacy" is not allowed.',
+  });
 });
 
 it("sets client default value for multiple properties", async () => {
