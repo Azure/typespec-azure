@@ -1,5 +1,28 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.63.0
+
+### Breaking Changes
+
+- [#3522](https://github.com/Azure/typespec-azure/pull/3522) - Remove Private decorator `@Azure.ResourceManager.Private.conditionalClientFlatten`
+  
+    ```diff lang=tsp
+    @Azure.ResourceManager.Private.conditionalClientFlatten
+    ```
+  
+    ```diff lang=tsp title=MyResource.tsp
+    +@Azure.ClientGenerator.Core.Legacy.flattenProperty
+    ```
+
+### Features
+
+- [#3572](https://github.com/Azure/typespec-azure/pull/3572) Remove single service restriction for ARM specs
+
+### Bump dependencies
+
+- [#3546](https://github.com/Azure/typespec-azure/pull/3546) Upgrade dependencies
+
+
 ## 0.62.1
 
 ### Features
