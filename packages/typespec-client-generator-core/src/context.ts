@@ -121,12 +121,12 @@ export function createTCGCContext(
       }
       serviceMap.set(type, mergedApiVersions);
     },
-    getPackageVersions(): Map<Namespace, string[]> {
+    getPackageVersions(service?: Namespace): string[] {
       if (!this.__packageVersions) {
         prepareClientAndOperationCache(this);
       }
 
-      return this.__packageVersions!;
+      return this.__packageVersions!.get(service || this.getMutatedGlobalNamespace()) || [];
     },
     getPackageVersionEnum(): Map<Namespace, Enum | undefined> {
       if (!this.__packageVersionEnum) {
