@@ -126,13 +126,26 @@ export function createTCGCContext(
         prepareClientAndOperationCache(this);
       }
 
-      return this.__packageVersions!.get(service || this.getMutatedGlobalNamespace()) || [];
+      if (service) {
+        return this.__packageVersions!.get(service) || [];
+      }
+      // For backward compatibility, when no service is specified, return versions for the first service
+      const firstEntry = this.__packageVersions!.entries().next();
+      if (firstEntry.done) {
+        return [];
+      }
+      return firstEntry.value[1];
     },
-    getPackageVersionEnum(): Map<Namespace, Enum | undefined> {
+    getPackageVersionEnum(): Enum | undefined {
       if (!this.__packageVersionEnum) {
         prepareClientAndOperationCache(this);
       }
-      return this.__packageVersionEnum!;
+      // For backward compatibility, return the first service's version enum
+      const firstEntry = this.__packageVersionEnum!.entries().next();
+      if (firstEntry.done) {
+        return undefined;
+      }
+      return firstEntry.value[1];
     },
     getClients(): SdkClient[] {
       if (!this.__rawClientsOperationGroupsCache) {

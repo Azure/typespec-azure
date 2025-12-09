@@ -243,8 +243,17 @@ export function getClient(
   context: TCGCContext,
   type: Namespace | Interface,
 ): SdkClient | undefined {
+  // First try direct type identity match
   for (const client of listClients(context)) {
     if (client.type === type) {
+      return client;
+    }
+  }
+  // If direct match failed, try name-based matching
+  // This handles the case where the input is an original type before versioning mutation
+  // but the clients have mutated types
+  for (const client of listClients(context)) {
+    if (client.type.kind === type.kind && client.type.name === type.name) {
       return client;
     }
   }

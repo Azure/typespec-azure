@@ -7,7 +7,12 @@ import {
   Namespace,
   Operation,
 } from "@typespec/compiler";
-import { getVersionDependencies, getVersions } from "@typespec/versioning";
+import {
+  getAddedOnVersions,
+  getRemovedOnVersions,
+  getVersionDependencies,
+  getVersions,
+} from "@typespec/versioning";
 import { getClientLocation, getClientNameOverride, isInScope } from "./decorators.js";
 import { SdkClient, SdkOperationGroup, TCGCContext } from "./interfaces.js";
 import {
@@ -286,6 +291,80 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
 }
 
 /**
+ * Check if a type is available in the current target API version.
+ * Returns false if the type was @added in a later version or @removed in an earlier version.
+ */
+function isTypeAvailableInVersion(
+  context: TCGCContext,
+  type: Namespace | Interface,
+): boolean {
+  const apiVersion = context.apiVersion;
+  // eslint-disable-next-line no-console
+  console.error(`isTypeAvailableInVersion CALLED: type=${type.name}, apiVersion=${apiVersion}`);
+  // If no specific API version is set, or "all"/"latest", include all types
+  if (!apiVersion || apiVersion === "all" || apiVersion === "latest") {
+    // eslint-disable-next-line no-console
+    console.error(`  returning true (no specific version)`);
+    return true;
+  }
+
+  // Get the service namespace to check versions
+  // For interfaces, we need to find the enclosing versioned namespace
+  let serviceNs: Namespace | undefined = type.kind === "Namespace" ? type : type.namespace;
+  while (serviceNs) {
+    const versionsResult = getVersions(context.program, serviceNs);
+    if (versionsResult?.[1]?.getVersions()?.length) {
+      break;
+    }
+    serviceNs = serviceNs.namespace;
+  }
+  if (!serviceNs) return true;
+
+  const versionsResult = getVersions(context.program, serviceNs);
+  const versions = versionsResult?.[1]?.getVersions();
+  if (!versions || versions.length === 0) return true;
+
+  // Build a version index map for comparison
+  const versionIndex = new Map<string, number>();
+  versions.forEach((v, i) => versionIndex.set(v.value, i));
+
+  const targetIndex = versionIndex.get(apiVersion);
+  if (targetIndex === undefined) return true; // Unknown version, include by default
+
+  // Check @added decorator
+  const addedVersions = getAddedOnVersions(context.program, type);
+  // eslint-disable-next-line no-console
+  console.log(`isTypeAvailableInVersion: type=${type.name}, apiVersion=${apiVersion}, addedVersions=${addedVersions?.map(v => v.value)?.join(",") ?? "none"}`);
+  if (addedVersions && addedVersions.length > 0) {
+    // Type was added in a specific version - check if target version is >= added version
+    const addedVersion = addedVersions[0]; // Use first added version
+    const addedIndex = versionIndex.get(addedVersion.value);
+    // eslint-disable-next-line no-console
+    console.log(`  addedIndex=${addedIndex}, targetIndex=${targetIndex}`);
+    if (addedIndex !== undefined && targetIndex < addedIndex) {
+      // Target version is before the type was added
+      // eslint-disable-next-line no-console
+      console.log(`  EXCLUDING ${type.name} (added in ${addedVersion.value}, targeting ${apiVersion})`);
+      return false;
+    }
+  }
+
+  // Check @removed decorator
+  const removedVersions = getRemovedOnVersions(context.program, type);
+  if (removedVersions && removedVersions.length > 0) {
+    // Type was removed in a specific version - check if target version is >= removed version
+    const removedVersion = removedVersions[0]; // Use first removed version
+    const removedIndex = versionIndex.get(removedVersion.value);
+    if (removedIndex !== undefined && targetIndex >= removedIndex) {
+      // Target version is at or after the type was removed
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
  * Get or create the TCGC clients.
  * If user has explicitly defined `@client` then we will use those clients.
  * If user has not defined any `@client` then we will create a client for the first service namespace.
@@ -296,17 +375,87 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
 function getOrCreateClients(context: TCGCContext): SdkClient[] {
   const namespaces: Namespace[] = listAllUserDefinedNamespaces(context);
 
-  const explicitClients = [];
+  // Build maps from type name to mutated type for name-based matching
+  // This is needed because decorator data is stored with original types,
+  // but we need to match against mutated types after versioning
+  const mutatedNamespacesByName = new Map<string, Namespace>();
+  const mutatedInterfacesByName = new Map<string, Interface>();
   for (const ns of namespaces) {
-    if (getScopedDecoratorData(context, clientKey, ns)) {
-      explicitClients.push(getScopedDecoratorData(context, clientKey, ns));
+    mutatedNamespacesByName.set(ns.name, ns);
+    for (const i of ns.interfaces.values()) {
+      mutatedInterfacesByName.set(i.name, i);
+    }
+  }
+
+  // First try direct lookup (works when no versioning mutation happened)
+  const explicitClients: SdkClient[] = [];
+  for (const ns of namespaces) {
+    const clientData = getScopedDecoratorData(context, clientKey, ns);
+    if (clientData && isTypeAvailableInVersion(context, ns)) {
+      explicitClients.push(clientData);
     }
     for (const i of ns.interfaces.values()) {
-      if (getScopedDecoratorData(context, clientKey, i)) {
-        explicitClients.push(getScopedDecoratorData(context, clientKey, i));
+      const clientData = getScopedDecoratorData(context, clientKey, i);
+      if (clientData && isTypeAvailableInVersion(context, i)) {
+        explicitClients.push(clientData);
       }
     }
   }
+
+  // If direct lookup failed, try name-based matching
+  // This handles the versioning case where decorator data is keyed by original types
+  // but the namespaces/interfaces are mutated versions
+  if (explicitClients.length === 0) {
+    // Get all client data from the state map (keyed by original types)
+    const allClientData = listScopedDecoratorData(context, clientKey);
+    
+    for (const [originalType, sdkClient] of allClientData.entries()) {
+      // Find the corresponding mutated type by name
+      let mutatedType: Namespace | Interface | undefined;
+      if (originalType.kind === "Namespace") {
+        mutatedType = mutatedNamespacesByName.get(originalType.name);
+      } else if (originalType.kind === "Interface") {
+        mutatedType = mutatedInterfacesByName.get(originalType.name);
+      }
+
+      // Only include clients whose types still exist after versioning mutation
+      // (e.g., interfaces removed by @removed won't exist in the mutated tree)
+      if (mutatedType) {
+        // Check if the original type is available in the target API version
+        // Types marked with @added(higherVersion) should be excluded when targeting a lower version
+        if (!isTypeAvailableInVersion(context, originalType as Namespace | Interface)) {
+          continue;
+        }
+
+        // Also remap the service namespace to the mutated version
+        let mutatedService: Namespace | Namespace[] | undefined;
+        const originalService = (sdkClient as SdkClient).service;
+        
+        if (Array.isArray(originalService)) {
+          const remappedServices: Namespace[] = [];
+          for (const svc of originalService) {
+            const mutatedSvc = mutatedNamespacesByName.get(svc.name);
+            if (mutatedSvc) {
+              remappedServices.push(mutatedSvc);
+            }
+          }
+          mutatedService = remappedServices.length > 0 ? remappedServices : undefined;
+        } else {
+          mutatedService = mutatedNamespacesByName.get(originalService.name);
+        }
+
+        if (mutatedService) {
+          // Create a new client object with the mutated types
+          explicitClients.push({
+            ...(sdkClient as SdkClient),
+            type: mutatedType,
+            service: mutatedService,
+          });
+        }
+      }
+    }
+  }
+
   if (explicitClients.length > 0) {
     if (explicitClients.some((client) => isArm(client.service))) {
       context.arm = true;
