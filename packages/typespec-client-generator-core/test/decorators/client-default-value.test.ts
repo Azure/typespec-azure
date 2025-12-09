@@ -29,7 +29,7 @@ it("sets client default value for a model property with numeric value", async ()
   ok(model);
   strictEqual(model.kind, "model");
   strictEqual(model.properties.length, 1);
-  
+
   const timeoutProperty = model.properties[0];
   ok(timeoutProperty);
   strictEqual(timeoutProperty.kind, "property");
@@ -55,7 +55,7 @@ it("sets client default value for a model property with string value", async () 
   ok(model);
   strictEqual(model.kind, "model");
   strictEqual(model.properties.length, 1);
-  
+
   const tierProperty = model.properties[0];
   ok(tierProperty);
   strictEqual(tierProperty.kind, "property");
@@ -81,7 +81,7 @@ it("sets client default value for a model property with boolean value", async ()
   ok(model);
   strictEqual(model.kind, "model");
   strictEqual(model.properties.length, 1);
-  
+
   const enableCacheProperty = model.properties[0];
   ok(enableCacheProperty);
   strictEqual(enableCacheProperty.kind, "property");
@@ -110,7 +110,7 @@ it("does not set client default value for property without decorator", async () 
   ok(model);
   strictEqual(model.kind, "model");
   strictEqual(model.properties.length, 1);
-  
+
   const timeoutProperty = model.properties[0];
   ok(timeoutProperty);
   strictEqual(timeoutProperty.kind, "property");
@@ -157,7 +157,7 @@ it("applies decorator with language scope", async () => {
   ok(model);
   strictEqual(model.kind, "model");
   strictEqual(model.properties.length, 1);
-  
+
   const timeoutProperty = model.properties[0];
   ok(timeoutProperty);
   strictEqual(timeoutProperty.kind, "property");
@@ -184,7 +184,7 @@ it("applies decorator with different language scope should not apply", async () 
   ok(model);
   strictEqual(model.kind, "model");
   strictEqual(model.properties.length, 1);
-  
+
   const timeoutProperty = model.properties[0];
   ok(timeoutProperty);
   strictEqual(timeoutProperty.kind, "property");
@@ -253,16 +253,16 @@ it("sets client default value for multiple properties", async () => {
   ok(model);
   strictEqual(model.kind, "model");
   strictEqual(model.properties.length, 3);
-  
-  const timeoutProperty = model.properties.find(p => p.name === "timeout")!;
+
+  const timeoutProperty = model.properties.find((p) => p.name === "timeout")!;
   ok(timeoutProperty);
   strictEqual(timeoutProperty.clientDefaultValue, 30);
-  
-  const tierProperty = model.properties.find(p => p.name === "tier")!;
+
+  const tierProperty = model.properties.find((p) => p.name === "tier")!;
   ok(tierProperty);
   strictEqual(tierProperty.clientDefaultValue, "standard");
-  
-  const retryProperty = model.properties.find(p => p.name === "retry")!;
+
+  const retryProperty = model.properties.find((p) => p.name === "retry")!;
   ok(retryProperty);
   strictEqual(retryProperty.clientDefaultValue, true);
 });
@@ -284,12 +284,12 @@ it("sets client default value for operation parameters", async () => {
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.kind, "basic");
   strictEqual(method.parameters.length, 2);
-  
-  const pageSizeParam = method.parameters.find(p => p.name === "pageSize")!;
+
+  const pageSizeParam = method.parameters.find((p) => p.name === "pageSize")!;
   ok(pageSizeParam);
   strictEqual(pageSizeParam.clientDefaultValue, 10);
-  
-  const sortOrderParam = method.parameters.find(p => p.name === "sortOrder")!;
+
+  const sortOrderParam = method.parameters.find((p) => p.name === "sortOrder")!;
   ok(sortOrderParam);
   strictEqual(sortOrderParam.clientDefaultValue, "asc");
 });

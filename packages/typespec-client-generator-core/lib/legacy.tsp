@@ -125,7 +125,7 @@ extern dec nextLinkVerb(target: Operation, verb: "GET" | "POST", scope?: valueof
 /**
  * Sets a client-level default value for a model property or operation parameter.
  *
- * This decorator allows brownfield services to specify default values that will be 
+ * This decorator allows brownfield services to specify default values that will be
  * used by SDK generators, maintaining backward compatibility with existing SDK users
  * who may rely on default values that were previously generated from Swagger definitions.
  *
@@ -144,7 +144,7 @@ extern dec nextLinkVerb(target: Operation, verb: "GET" | "POST", scope?: valueof
  * model RequestOptions {
  *   @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(30)
  *   timeout?: int32;
- *   
+ *
  *   @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("standard")
  *   tier?: string;
  * }
@@ -166,4 +166,8 @@ extern dec nextLinkVerb(target: Operation, verb: "GET" | "POST", scope?: valueof
  * }
  * ```
  */
-extern dec clientDefaultValue(target: ModelProperty, value: (valueof string) | (valueof boolean) | (valueof numeric), scope?: valueof string);
+extern dec clientDefaultValue(
+  target: ModelProperty,
+  value: (valueof string) | (valueof boolean) | (valueof numeric),
+  scope?: valueof string
+);
