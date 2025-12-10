@@ -1,5 +1,104 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.63.0
+
+### Breaking Changes
+
+- [#3522](https://github.com/Azure/typespec-azure/pull/3522) - Remove Private decorator `@Azure.ResourceManager.Private.conditionalClientFlatten`
+  
+    ```diff lang=tsp
+    @Azure.ResourceManager.Private.conditionalClientFlatten
+    ```
+  
+    ```diff lang=tsp title=MyResource.tsp
+    +@Azure.ClientGenerator.Core.Legacy.flattenProperty
+    ```
+
+### Features
+
+- [#3572](https://github.com/Azure/typespec-azure/pull/3572) Remove single service restriction for ARM specs
+
+### Bump dependencies
+
+- [#3546](https://github.com/Azure/typespec-azure/pull/3546) Upgrade dependencies
+
+
+## 0.62.1
+
+### Features
+
+- [#3544](https://github.com/Azure/typespec-azure/pull/3544) Add standard operations for NetworkSecurityPerimeter
+
+### Bug Fixes
+
+- [#3525](https://github.com/Azure/typespec-azure/pull/3525) Fix `missing-x-ms-identifiers` rule message pointing to legacy `@extension` decorator instead of `@identifiers`.
+- [#3559](https://github.com/Azure/typespec-azure/pull/3559) Fix #3437 Provide consistent return values for parent and scope in resolveArmResources
+
+
+## 0.62.0
+
+### Deprecations
+
+- [#3465](https://github.com/Azure/typespec-azure/pull/3465) Deprecate `arm-resource-flattening` option to reduce confusion with new flattening mechanisms.
+  
+    ```diff lang=yaml title=tspconfig.yaml
+    options:
+      @azure-tools/typespec-autoprest:
+    -   arm-resource-flattening: true
+    ```
+  
+    ```diff lang=tsp title=MyResource.tsp
+    +@@Azure.ClientGenerator.Core.Legacy.flattenProperty(MyResource.properties, "autorest");
+    ```
+
+### Features
+
+- [#3411](https://github.com/Azure/typespec-azure/pull/3411) Add new `secret-prop` rule scanning for property looking like they might contain sensitive information but not marked with `@secret`
+- [#3350](https://github.com/Azure/typespec-azure/pull/3350) Remove dependency on OpenAPI
+
+### Bump dependencies
+
+- [#3447](https://github.com/Azure/typespec-azure/pull/3447) Upgrade dependencies october 2025
+
+### Bug Fixes
+
+- [#3399](https://github.com/Azure/typespec-azure/pull/3399) `arm-resource-operation` do not flag template instances
+- [#3492](https://github.com/Azure/typespec-azure/pull/3492) Fix #3404 changes to resolveArmResources
+- [#3410](https://github.com/Azure/typespec-azure/pull/3410) Fix invalid syntax causing error with PrivateLinks
+
+
+## 0.61.1
+
+### Bug Fixes
+
+- [#3442](https://github.com/Azure/typespec-azure/pull/3442) Fix #3420 make kind property required in polymorphic resources
+- [#3396](https://github.com/Azure/typespec-azure/pull/3396) Update resolveArmResources to allow grouping #3252
+
+
+## 0.61.0
+
+### Features
+
+- [#3356](https://github.com/Azure/typespec-azure/pull/3356) Support `@identifiers` on array model
+
+### Bug Fixes
+
+- [#3268](https://github.com/Azure/typespec-azure/pull/3268) Remove versioning
+  
+  ```diff lang=tsp
+  -@useDependency(Azure.ResourceManager.Versions.v1_preview2)
+  ```
+
+
+## 0.60.1
+
+### Bug Fixes
+
+- [#3330](https://github.com/Azure/typespec-azure/pull/3330) Fix #3294 Add model and operation templates for private link
+- [#3337](https://github.com/Azure/typespec-azure/pull/3337) Fix #3243 Allow polymorphic legacy resources
+- [#3332](https://github.com/Azure/typespec-azure/pull/3332) Fix #3295 Allow tenant-level external resources
+
+
 ## 0.60.0
 
 ### Bump dependencies

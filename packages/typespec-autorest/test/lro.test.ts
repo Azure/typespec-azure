@@ -78,6 +78,47 @@ describe("typespec-autorest: Long-running Operations", () => {
     );
   });
 
+  it("includes x-ms-long-running-operation for lro get", async () => {
+    const openapi = await compileOpenAPI(
+      `
+      using Azure.Core.Traits;
+
+      @service(#{
+        title: "Contoso Widget Manager",
+      })
+      namespace Test;
+
+      alias ServiceTraits = SupportsRepeatableRequests & SupportsConditionalRequests & SupportsClientRequestId;
+
+      alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
+
+      @resource("widgets")
+      model Widget {
+        @key("widgetName")
+        @visibility(Lifecycle.Read)
+        name: string;
+        manufacturerId: string;
+      
+      ...EtagProperty;
+      }
+
+      @Azure.ClientGenerator.Core.Legacy.markAsLro
+      op getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget>;
+    
+      @pollingOperation(getWidgetOperationStatus)
+      op createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
+      `,
+      { preset: "azure", options: { "emit-lro-options": "all" } },
+    );
+
+    deepStrictEqual(
+      openapi.paths["/widgets/{widgetName}/operations/{operationId}"].get?.[
+        "x-ms-long-running-operation"
+      ],
+      true,
+    );
+  });
+
   const armCode = paramMessage`
       @armProviderNamespace
               namespace Microsoft.Test;

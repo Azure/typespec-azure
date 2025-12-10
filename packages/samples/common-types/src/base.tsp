@@ -3,6 +3,8 @@ import "@typespec/openapi";
 
 // Load the current versions of Azure.ResourceManager.CommonTypes.
 import "../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/common-types/versions.tsp";
+import "../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/decorators.tsp";
+import "../../node_modules/@azure-tools/typespec-azure-resource-manager/dist/src/tsp-index.js";
 
 using Versioning;
 using Http;

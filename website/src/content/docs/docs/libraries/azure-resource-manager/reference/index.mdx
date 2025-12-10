@@ -39,6 +39,7 @@ npm install --save-peer @azure-tools/typespec-azure-resource-manager
 - [`@armProviderNamespace`](./decorators.md#@Azure.ResourceManager.armProviderNamespace)
 - [`@armProviderNameValue`](./decorators.md#@Azure.ResourceManager.armProviderNameValue)
 - [`@armResourceAction`](./decorators.md#@Azure.ResourceManager.armResourceAction)
+- [`@armResourceCheckExistence`](./decorators.md#@Azure.ResourceManager.armResourceCheckExistence)
 - [`@armResourceCollectionAction`](./decorators.md#@Azure.ResourceManager.armResourceCollectionAction)
 - [`@armResourceCreateOrUpdate`](./decorators.md#@Azure.ResourceManager.armResourceCreateOrUpdate)
 - [`@armResourceDelete`](./decorators.md#@Azure.ResourceManager.armResourceDelete)
@@ -64,6 +65,7 @@ npm install --save-peer @azure-tools/typespec-azure-resource-manager
 - [`ExtensionResourceOperations`](./interfaces.md#Azure.ResourceManager.ExtensionResourceOperations)
 - [`Operations`](./interfaces.md#Azure.ResourceManager.Operations)
 - [`PrivateEndpoints`](./interfaces.md#Azure.ResourceManager.PrivateEndpoints)
+- [`PrivateLinks`](./interfaces.md#Azure.ResourceManager.PrivateLinks)
 - [`ProxyResourceOperations`](./interfaces.md#Azure.ResourceManager.ProxyResourceOperations)
 - [`ResourceCollectionOperations`](./interfaces.md#Azure.ResourceManager.ResourceCollectionOperations)
 - [`ResourceCreateAsync`](./interfaces.md#Azure.ResourceManager.ResourceCreateAsync)
@@ -151,6 +153,7 @@ npm install --save-peer @azure-tools/typespec-azure-resource-manager
 - [`ParentKeysOf`](./data-types.md#Azure.ResourceManager.ParentKeysOf)
 - [`PrivateEndpointConnectionResource`](./data-types.md#Azure.ResourceManager.PrivateEndpointConnectionResource)
 - [`PrivateEndpointConnectionUpdate`](./data-types.md#Azure.ResourceManager.PrivateEndpointConnectionUpdate)
+- [`PrivateLink`](./data-types.md#Azure.ResourceManager.PrivateLink)
 - [`ProviderNamespace`](./data-types.md#Azure.ResourceManager.ProviderNamespace)
 - [`ProxyResource`](./data-types.md#Azure.ResourceManager.ProxyResource)
 - [`ResourceGroupLocationResource`](./data-types.md#Azure.ResourceManager.ResourceGroupLocationResource)
@@ -171,6 +174,10 @@ npm install --save-peer @azure-tools/typespec-azure-resource-manager
 - [`TrackedResource`](./data-types.md#Azure.ResourceManager.TrackedResource)
 
 ## Azure.ResourceManager.CommonTypes
+
+### Interfaces
+
+- [`NspConfigurationOperations`](./interfaces.md#Azure.ResourceManager.CommonTypes.NspConfigurationOperations)
 
 ### Models
 
@@ -208,6 +215,7 @@ npm install --save-peer @azure-tools/typespec-azure-resource-manager
 - [`NetworkSecurityPerimeterConfigurationNameParameter`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationNameParameter)
 - [`NetworkSecurityPerimeterConfigurationProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationProperties)
 - [`NetworkSecurityProfile`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityProfile)
+- [`NspConfigurationResource`](./data-types.md#Azure.ResourceManager.CommonTypes.NspConfigurationResource)
 - [`Operation`](./data-types.md#Azure.ResourceManager.CommonTypes.Operation)
 - [`OperationDisplay`](./data-types.md#Azure.ResourceManager.CommonTypes.OperationDisplay)
 - [`OperationIdParameter`](./data-types.md#Azure.ResourceManager.CommonTypes.OperationIdParameter)
@@ -342,10 +350,14 @@ npm install --save-peer @azure-tools/typespec-azure-resource-manager
 
 - [`ArmOperationOptions`](./data-types.md#Azure.ResourceManager.Legacy.ArmOperationOptions)
 - [`CustomResourceOptions`](./data-types.md#Azure.ResourceManager.Legacy.CustomResourceOptions)
+- [`DiscriminatedExtensionResource`](./data-types.md#Azure.ResourceManager.Legacy.DiscriminatedExtensionResource)
+- [`DiscriminatedProxyResource`](./data-types.md#Azure.ResourceManager.Legacy.DiscriminatedProxyResource)
+- [`DiscriminatedTrackedResource`](./data-types.md#Azure.ResourceManager.Legacy.DiscriminatedTrackedResource)
 - [`ExtendedLocationOptional`](./data-types.md#Azure.ResourceManager.Legacy.ExtendedLocationOptional)
 - [`ExtendedLocationOptionalProperty`](./data-types.md#Azure.ResourceManager.Legacy.ExtendedLocationOptionalProperty)
 - [`ManagedServiceIdentityV4`](./data-types.md#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4)
 - [`ManagedServiceIdentityV4Property`](./data-types.md#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4Property)
+- [`PolymorphicResourceKindProperty`](./data-types.md#Azure.ResourceManager.Legacy.PolymorphicResourceKindProperty)
 - [`Provider`](./data-types.md#Azure.ResourceManager.Legacy.Provider)
 - [`ProviderParameter`](./data-types.md#Azure.ResourceManager.Legacy.ProviderParameter)
 - [`ResourceWithPathParameter`](./data-types.md#Azure.ResourceManager.Legacy.ResourceWithPathParameter)

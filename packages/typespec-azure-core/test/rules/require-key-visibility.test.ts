@@ -1,56 +1,39 @@
-import {
-  BasicTestRunner,
-  LinterRuleTester,
-  createLinterRuleTester,
-  extractCursor,
-} from "@typespec/compiler/testing";
-import { beforeEach, describe, it } from "vitest";
+import { createLinterRuleTester, LinterRuleTester } from "@typespec/compiler/testing";
+import { beforeEach, it } from "vitest";
 import { requireKeyVisibility } from "../../src/rules/require-key-visibility.js";
-import { createAzureCoreTestRunner, getRunnerPosOffset } from "../test-host.js";
+import { Tester } from "../test-host.js";
 
-describe("typespec-azure-core: key-visibility-required rule", () => {
-  let runner: BasicTestRunner;
-  let tester: LinterRuleTester;
+let tester: LinterRuleTester;
 
-  beforeEach(async () => {
-    runner = await createAzureCoreTestRunner({ omitServiceNamespace: true });
-    tester = createLinterRuleTester(
-      runner,
-      requireKeyVisibility,
-      "@azure-tools/typespec-azure-core",
-    );
-  });
+beforeEach(async () => {
+  const runner = await Tester.createInstance();
+  tester = createLinterRuleTester(runner, requireKeyVisibility, "@azure-tools/typespec-azure-core");
+});
 
-  async function checkKeyVisibility(code: string, message: string) {
-    const { pos, source } = extractCursor(code);
-    await tester.expect(source).toEmitDiagnostics([
-      {
-        code: "@azure-tools/typespec-azure-core/key-visibility-required",
-        message,
-        pos: getRunnerPosOffset(pos),
-      },
-    ]);
-  }
-
-  it("emits `key-visibility-required` when key property does not have visibility decorator", async () => {
-    await checkKeyVisibility(
+it("emits `key-visibility-required` when key property does not have visibility decorator", async () => {
+  await tester
+    .expect(
       `model Foo {
-         ┆@key
+         /*loc*/@key
          name: string;
-        }`,
-      "The key property 'name' has default Lifecycle visibility, please use the @visibility decorator to change it.",
-    );
-  });
+      }`,
+    )
+    .toEmitDiagnostics((x) => ({
+      code: "@azure-tools/typespec-azure-core/key-visibility-required",
+      message:
+        "The key property 'name' has default Lifecycle visibility, please use the @visibility decorator to change it.",
+      pos: x.pos.loc.pos,
+    }));
+});
 
-  it("does not emit `key-visibility-required` when key property has visibility decorator", async () => {
-    await tester
-      .expect(
-        `model Foo {
+it("does not emit `key-visibility-required` when key property has visibility decorator", async () => {
+  await tester
+    .expect(
+      `model Foo {
          @key
          @visibility(Lifecycle.Read)
          name: string;
         }`,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
 });

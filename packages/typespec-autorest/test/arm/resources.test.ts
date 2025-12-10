@@ -266,6 +266,7 @@ it("emits correct fixed union name parameter for resource", async () => {
     },
     in: "path",
     name: "widgetName",
+    pattern: "^[a-zA-Z0-9-]{3,24}$",
     required: true,
     type: "string",
   });
@@ -527,13 +528,12 @@ it("allows resources with multiple endpoints using LegacyOperations", async () =
       message: string;
     }
 
-    @armResourceOperations
-    interface OtherOps
-      extends Azure.ResourceManager.Legacy.LegacyOperations<
+    alias OtherOps
+      = Azure.ResourceManager.Legacy.LegacyOperations<
           ParentParameters = ParentScope,
           ResourceTypeParameter = InstanceScope,
           ErrorType = MyErrorType
-        > {}
+        >;
 
     alias BaseScope = {
       ...ApiVersionParameter;

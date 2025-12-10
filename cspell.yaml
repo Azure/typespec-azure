@@ -29,6 +29,7 @@ words:
   - allof
   - apim
   - apos
+  - armcontoso
   - armId
   - azsdk
   - Bazs
@@ -62,6 +63,7 @@ words:
   - msazure
   - msdata
   - mylocation
+  - nsps
   - nupkg
   - odata
   - Onco

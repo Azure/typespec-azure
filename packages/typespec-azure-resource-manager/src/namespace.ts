@@ -22,7 +22,6 @@ import {
   UseLibraryNamespaceDecorator,
 } from "../generated-defs/Azure.ResourceManager.js";
 import { $armCommonTypesVersion } from "./common-types.js";
-import { reportDiagnostic } from "./lib.js";
 import { getArmVirtualResourceDetails, getSingletonResourceKey } from "./resource.js";
 import { ArmStateKeys } from "./state.js";
 
@@ -143,15 +142,6 @@ export const $armProviderNamespace: ArmProviderNamespaceDecorator = (
 
   const inRealm = unsafe_Realm.realmForType.has(entity);
   const override = isArmNamespaceOverride(program, entity);
-  const namespaceCount = program.stateMap(ArmStateKeys.armProviderNamespaces).size;
-  if (namespaceCount > 0 && !override && !inRealm) {
-    reportDiagnostic(program, {
-      code: "single-arm-provider",
-      target: context.decoratorTarget,
-    });
-    return;
-  }
-
   // armProviderNamespace will set the service namespace if it's not done already
   if (!override || inRealm) {
     addService(program, entity);

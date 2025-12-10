@@ -1,9 +1,11 @@
 import "../dist/src/tsp-index.js";
-import "@typespec/openapi";
 import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
+
+// Kept for legacy reasons remove when specs are migrated
+import "@typespec/openapi";
 
 import "./foundations/arm.foundations.tsp";
 import "./legacy-types/arm.legacy.tsp";
@@ -18,32 +20,7 @@ import "./interfaces.tsp";
 import "./responses.tsp";
 import "./parameters.tsp";
 import "./private-endpoints.tsp";
+import "./private-links.tsp";
+import "./network-security-perimeter.tsp";
 
-using Http;
-using Rest;
-using Versioning;
-using OpenAPI;
-using Azure.ResourceManager.Foundations;
-
-@versioned(Azure.ResourceManager.Versions)
 namespace Azure.ResourceManager;
-
-/**
- * Supported versions of Azure.ResourceManager building blocks.
- *
- * @example
- * ```typespec
- * enum Versions {
- *  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
- *  v2021_10_01_preview: "2021-10-01-preview",
- *
- *  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
- *  v2021_11_01: "2021-11-01",
- * }
- * ```
- */
-@doc("Supported versions of Azure.ResourceManager building blocks.")
-enum Versions {
-  @doc("Version 1.0-preview.1")
-  v1_0_Preview_1: "1.0-preview.1",
-}

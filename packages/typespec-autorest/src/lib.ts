@@ -99,15 +99,20 @@ export interface AutorestEmitterOptions {
   "emit-lro-options"?: "none" | "final-state-only" | "all";
 
   /**
-   * Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of the
-   * ARM resource properties.
-   */
-  "arm-resource-flattening"?: boolean;
-  /**
    * Determines whether and how to emit schemas for common-types
    * @default "for-visibility-changes"
    */
   "emit-common-types-schema"?: "never" | "for-visibility-changes";
+
+  /**
+   * Strategy for applying XML serialization metadata to schemas.
+   *
+   * - "xml-service": Apply XML serialization metadata for any service that uses the `"application/xml"` content type.
+   * - "none": Do not apply any XML serialization metadata.
+   *
+   * @default "xml-service"
+   */
+  "xml-strategy"?: "xml-service" | "none";
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
@@ -218,13 +223,6 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       description:
         "Determine whether and how to emit x-ms-long-running-operation-options for lro resolution",
     },
-    "arm-resource-flattening": {
-      type: "boolean",
-      nullable: true,
-      default: false,
-      description:
-        "Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of the ARM resource properties.",
-    },
     "emit-common-types-schema": {
       type: "string",
       enum: ["never", "for-visibility-changes"],
@@ -232,6 +230,13 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       default: "for-visibility-changes",
       description:
         "Determine whether and how to emit schemas for common-types rather than referencing them",
+    },
+    "xml-strategy": {
+      type: "string",
+      enum: ["xml-service", "none"],
+      nullable: true,
+      default: "xml-service",
+      description: "Strategy for applying XML serialization metadata to schemas.",
     },
   },
   required: [],

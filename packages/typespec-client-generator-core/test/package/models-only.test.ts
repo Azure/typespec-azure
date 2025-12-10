@@ -34,9 +34,7 @@ it("with azure and versioning decorators", async () => {
     @versioned(ServiceApiVersions)
     namespace EventGridClient {
       enum ServiceApiVersions {
-        @useDependency(Versions.v1_0_Preview_2)
         v2018_01_01: "2018-01-01",
-        @useDependency(Versions.v1_0_Preview_2)
         v2024_01_01: "2024-01-01",
       }
       /**

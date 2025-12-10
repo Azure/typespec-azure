@@ -4,7 +4,6 @@ import { compileOpenAPI } from "./test-host.js";
 
 const base = `
 @service
-@useDependency(Azure.Core.Versions.v1_0_Preview_2)
 namespace MyService;
 `;
 
@@ -94,6 +93,27 @@ describe("@uniqueItems", () => {
     deepStrictEqual(res.definitions.Pet.properties.names.uniqueItems, true);
   });
 
+  it("defines a nullable array with uniqueItems inline", async () => {
+    const res = await compileOpenAPI(
+      `
+     ${base}
+      model Pet { @uniqueItems names: string[] | null };
+      `,
+      { preset: "azure" },
+    );
+
+    ok(res.definitions);
+    ok(res.definitions.Pet);
+    ok(res.definitions.Pet.properties);
+    ok(res.definitions.Pet.properties.names, "expected definition named names");
+    deepStrictEqual(res.definitions.Pet.properties.names, {
+      type: "array",
+      uniqueItems: true,
+      items: { type: "string" },
+      "x-nullable": true,
+    });
+    deepStrictEqual(res.definitions.Pet.properties.names.uniqueItems, true);
+  });
   it("defines a named array with uniqueItems using model is", async () => {
     const res = await compileOpenAPI(
       `

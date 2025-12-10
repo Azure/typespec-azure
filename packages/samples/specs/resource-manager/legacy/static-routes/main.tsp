@@ -86,7 +86,8 @@ interface EmplOps
       #{
         useStaticRoute: true,
         route: "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees",
-      }
+      },
+      RoutedResourceName = "SubscriptionEmployee"
     > {}
 
 alias BaseParams = {
@@ -104,7 +105,8 @@ interface EmplOps2
         ...KeysOf<Employee>,
       },
       ErrorResponse,
-      #{ useStaticRoute: true }
+      #{ useStaticRoute: true },
+      RoutedResourceName = "SubscriptionEmployee"
     > {}
 
 alias BaseParams2 = {
@@ -125,6 +127,17 @@ interface EmployeeSubscriptions {
   /** start the employee */
   @route("/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/start")
   start is EmplOps.ActionSync<Employee, void, void>;
+
+  /** start a subtask at an odd route with extra parameters */
+  @route("/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/start/sub/tasks/{taskName}")
+  startSubTask is EmplOps.ActionSync<
+    Employee,
+    void,
+    void,
+    {
+      @path @doc("name of the task") taskName: string;
+    }
+  >;
 }
 
 @route("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees")

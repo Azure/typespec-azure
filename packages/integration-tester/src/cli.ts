@@ -3,7 +3,7 @@ import { parseArgs } from "node:util";
 import { join, resolve } from "pathe";
 import { parse } from "yaml";
 import { runIntegrationTestSuite, Stages, type Stage } from "./run.js";
-import { projectRoot } from "./utils.js";
+import { projectRoot, ValidationFailedError } from "./utils.js";
 
 process.on("SIGINT", () => process.exit(0));
 
@@ -21,6 +21,16 @@ const args = parseArgs({
     },
     "tgz-dir": {
       type: "string",
+    },
+    repo: {
+      type: "string",
+      description: "The path to the repository to test. Defaults temp/{suiteName}.",
+    },
+    interactive: {
+      type: "boolean",
+      default: false,
+      short: "i",
+      description: "Enable interactive mode for validation.",
     },
   },
 });
@@ -46,9 +56,17 @@ if (args.values.stage) {
   }
 }
 
-const wd = join(projectRoot, "temp", suiteName);
-await runIntegrationTestSuite(wd, suiteName, suite, {
-  clean: args.values.clean,
-  stages,
-  tgzDir: args.values["tgz-dir"] && resolve(process.cwd(), args.values["tgz-dir"]),
-});
+const wd = args.values.repo ?? join(projectRoot, "temp", suiteName);
+try {
+  await runIntegrationTestSuite(wd, suiteName, suite, {
+    clean: args.values.clean,
+    stages,
+    tgzDir: args.values["tgz-dir"] && resolve(process.cwd(), args.values["tgz-dir"]),
+    interactive: args.values.interactive,
+  });
+} catch (error) {
+  if (error instanceof ValidationFailedError) {
+    process.exit(1);
+  }
+  throw error;
+}

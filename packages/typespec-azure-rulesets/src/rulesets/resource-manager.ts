@@ -12,6 +12,7 @@ export default {
     "@azure-tools/typespec-azure-core/use-extensible-enum": true,
     "@azure-tools/typespec-azure-core/known-encoding": true,
     "@azure-tools/typespec-azure-core/long-running-polling-operation-required": true,
+    "@azure-tools/typespec-azure-core/no-case-mismatch": true,
     "@azure-tools/typespec-azure-core/no-closed-literal-union": true,
     "@azure-tools/typespec-azure-core/no-enum": true,
     "@azure-tools/typespec-azure-core/no-error-status-codes": true,
@@ -26,6 +27,7 @@ export default {
     "@azure-tools/typespec-azure-core/no-multiple-discriminator": true,
     "@azure-tools/typespec-azure-core/no-rest-library-interfaces": true,
     "@azure-tools/typespec-azure-core/no-unknown": true,
+    "@azure-tools/typespec-azure-core/no-unnamed-union": true,
     "@azure-tools/typespec-azure-core/documentation-required": true,
     "@azure-tools/typespec-azure-core/key-visibility-required": true,
     "@azure-tools/typespec-azure-core/response-schema-problem": true,
@@ -85,7 +87,8 @@ export default {
     "@azure-tools/typespec-azure-resource-manager/patch-envelope": true,
     "@azure-tools/typespec-azure-resource-manager/arm-resource-patch": true,
     "@azure-tools/typespec-azure-resource-manager/resource-name": true,
-    "@azure-tools/typespec-azure-resource-manager/retry-after": true,
+    "@azure-tools/typespec-azure-resource-manager/retry-after": false, // Disable https://github.com/Azure/typespec-azure/issues/3351
+    "@azure-tools/typespec-azure-resource-manager/secret-prop": true,
     "@azure-tools/typespec-azure-resource-manager/unsupported-type": true,
 
     // TCGC rules

@@ -1,9 +1,4 @@
-import {
-  FinalStateValue,
-  LroMetadata,
-  PagedResultMetadata,
-  ParameterSource,
-} from "@azure-tools/typespec-azure-core";
+import { FinalStateValue, LroMetadata, ParameterSource } from "@azure-tools/typespec-azure-core";
 import {
   DateTimeKnownEncoding,
   Diagnostic,
@@ -151,6 +146,8 @@ export enum UsageFlags {
   LroPolling = 1 << 12,
   /** Set when type is used as LRO final envelop response. */
   LroFinalEnvelope = 1 << 13,
+  /** Set when type is only referenced by external types. */
+  External = 1 << 14,
 }
 
 /**
@@ -267,7 +264,7 @@ export type SdkType =
 export interface SdkBuiltInType<TKind extends SdkBuiltInKinds = SdkBuiltInKinds>
   extends SdkTypeBase {
   kind: TKind;
-  /** How to encode the type in wire. */
+  /** How to encode the type on wire. */
   encode?: string;
   /** Client name for the type. */
   name: string;
@@ -382,6 +379,7 @@ export function isSdkDateTimeEncodings(encoding: string): encoding is DateTimeKn
 interface SdkDateTimeTypeBase extends SdkTypeBase {
   name: string;
   baseType?: SdkDateTimeType;
+  /** How to encode the type on wire. */
   encode: DateTimeKnownEncoding;
   wireType: SdkBuiltInType;
   /** Unique ID for the current type. */
@@ -402,6 +400,7 @@ export interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
   name: string;
   baseType?: SdkDurationType;
+  /** How to encode the type on wire. */
   encode: DurationKnownEncoding;
   wireType: SdkBuiltInType;
   /** Unique ID for the current type. */
@@ -493,10 +492,21 @@ export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends 
   variantTypes: TValueType[];
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
-  /** Whether the type has public or private accessibility */
+  /** Whether the type has public or private accessibility. */
   access: AccessFlags;
   /** Bitmap of the usage for the type. */
   usage: UsageFlags;
+  /** Info to distinguish between different union variants. */
+  discriminatedOptions?: DiscriminatedOptions;
+}
+
+export interface DiscriminatedOptions {
+  /** How is the discriminated union serialized.  */
+  envelope: "object" | "none";
+  /** Name of the discriminator property. */
+  discriminatorPropertyName: string;
+  /** Name of the property envelopping the data. `undefined` if envelope is "none" */
+  envelopePropertyName?: string;
 }
 
 export interface SdkModelType extends SdkTypeBase {
@@ -589,7 +599,17 @@ export interface SdkModelPropertyTypeBase<TType extends SdkTypeBase = SdkType>
   visibility?: Visibility[];
   /** Whether the type has public or private accessibility */
   access: AccessFlags;
+  /** Whether this property could be flattened */
+  flatten: boolean;
+  /** How to encode the property on wire. */
+  encode?: ArrayKnownEncoding;
 }
+
+export type ArrayKnownEncoding =
+  | "pipeDelimited"
+  | "spaceDelimited"
+  | "commaDelimited"
+  | "newlineDelimited";
 
 /**
  * Options to show how to serialize a model/property.
@@ -601,6 +621,7 @@ export interface SerializationOptions {
   json?: JsonSerializationOptions;
   xml?: XmlSerializationOptions;
   multipart?: MultipartOptions;
+  binary?: BinarySerializationOptions;
 }
 
 /**
@@ -632,6 +653,11 @@ export interface XmlSerializationOptions {
     namespace: string;
     prefix: string;
   };
+}
+
+export interface BinarySerializationOptions {
+  /** Whether this is a file/stream input */
+  isFile: boolean;
 }
 
 /**
@@ -690,7 +716,6 @@ export interface SdkModelPropertyType extends SdkModelPropertyTypeBase {
    * @deprecated This property is deprecated. Use `serializationOptions.multipart` instead.
    */
   multipartOptions?: MultipartOptions;
-  flatten: boolean;
 }
 
 export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes" | "simple" | "form";
@@ -703,8 +728,17 @@ export interface SdkHeaderParameter extends SdkModelPropertyTypeBase {
   collectionFormat?: CollectionFormat;
   /** Name for the parameter in the payload */
   serializedName: string;
-  /** Corresponding method level parameter or model property for current parameter. */
+  /**
+   * @deprecated This property is deprecated. Use `methodParameterSegments` instead.
+   * Corresponding method level parameter or model property for current parameter.
+   */
   correspondingMethodParams: (SdkMethodParameter | SdkModelPropertyType)[];
+  /**
+   * Segments to indicate the complete path from method parameters to this HTTP parameter.
+   * Each inner array represents a complete path from method parameter to the final HTTP parameter.
+   * For body parameters with spread, there can be multiple paths.
+   */
+  methodParameterSegments: (SdkMethodParameter | SdkModelPropertyType)[][];
 }
 
 /**
@@ -715,8 +749,17 @@ export interface SdkQueryParameter extends SdkModelPropertyTypeBase {
   collectionFormat?: CollectionFormat;
   /** Name for the parameter in the payload */
   serializedName: string;
-  /** Corresponding method level parameter or model property for current parameter. */
+  /**
+   * @deprecated This property is deprecated. Use `methodParameterSegments` instead.
+   * Corresponding method level parameter or model property for current parameter.
+   */
   correspondingMethodParams: (SdkMethodParameter | SdkModelPropertyType)[];
+  /**
+   * Segments to indicate the complete path from method parameters to this HTTP parameter.
+   * Each inner array represents a complete path from method parameter to the final HTTP parameter.
+   * For body parameters with spread, there can be multiple paths.
+   */
+  methodParameterSegments: (SdkMethodParameter | SdkModelPropertyType)[][];
   explode: boolean;
 }
 
@@ -730,8 +773,17 @@ export interface SdkPathParameter extends SdkModelPropertyTypeBase {
   allowReserved: boolean;
   /** Name for the parameter in the payload */
   serializedName: string;
-  /** Corresponding method level parameter or model property for current parameter. */
+  /**
+   * @deprecated This property is deprecated. Use `methodParameterSegments` instead.
+   * Corresponding method level parameter or model property for current parameter.
+   */
   correspondingMethodParams: (SdkMethodParameter | SdkModelPropertyType)[];
+  /**
+   * Segments to indicate the complete path from method parameters to this HTTP parameter.
+   * Each inner array represents a complete path from method parameter to the final HTTP parameter.
+   * For body parameters with spread, there can be multiple paths.
+   */
+  methodParameterSegments: (SdkMethodParameter | SdkModelPropertyType)[][];
 }
 
 /**
@@ -741,8 +793,17 @@ export interface SdkCookieParameter extends SdkModelPropertyTypeBase {
   kind: "cookie";
   /** Name for the parameter in the payload */
   serializedName: string;
-  /** Corresponding method level parameter or model property for current parameter. */
+  /**
+   * @deprecated This property is deprecated. Use `methodParameterSegments` instead.
+   * Corresponding method level parameter or model property for current parameter.
+   */
   correspondingMethodParams: (SdkMethodParameter | SdkModelPropertyType)[];
+  /**
+   * Segments to indicate the complete path from method parameters to this HTTP parameter.
+   * Each inner array represents a complete path from method parameter to the final HTTP parameter.
+   * For body parameters with spread, there can be multiple paths.
+   */
+  methodParameterSegments: (SdkMethodParameter | SdkModelPropertyType)[][];
 }
 
 /**
@@ -754,8 +815,17 @@ export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
   serializedName: string;
   contentTypes: string[];
   defaultContentType: string;
-  /** Corresponding method level parameter or model property for current parameter. */
+  /**
+   * @deprecated This property is deprecated. Use `methodParameterSegments` instead.
+   * Corresponding method level parameter or model property for current parameter.
+   */
   correspondingMethodParams: (SdkMethodParameter | SdkModelPropertyType)[];
+  /**
+   * Segments to indicate the complete path from method parameters to this HTTP parameter.
+   * Each inner array represents a complete path from method parameter to the final HTTP parameter.
+   * For body parameters with spread, there can be multiple paths.
+   */
+  methodParameterSegments: (SdkMethodParameter | SdkModelPropertyType)[][];
 }
 
 export type SdkHttpParameter =
@@ -782,6 +852,11 @@ export interface SdkMethodResponse {
    * An array of properties to fetch {result} from the {response} model. Note that this property is only for LRO and paging pattens.
    */
   resultSegments?: SdkModelPropertyType[];
+  /**
+   * Indicates whether the response type is optional. Set to true when the operation has at least one HTTP response without a body.
+   * This allows distinguishing between responses without a body and responses with a body of type `Type | null`.
+   */
+  optional?: boolean;
 }
 
 export interface SdkServiceResponse {
@@ -890,12 +965,14 @@ interface SdkPagingServiceMethodOptions<TServiceOperation extends SdkServiceOper
  */
 export interface SdkPagingServiceMetadata<TServiceOperation extends SdkServiceOperation> {
   /** Paging metadata from TypeSpec core library. */
-  __raw?: PagedResultMetadata | PagingOperation;
+  __raw?: PagingOperation;
 
   /** Segments to indicate how to get next page link value from response. */
   nextLinkSegments?: (SdkServiceResponseHeader | SdkModelPropertyType)[];
   /** Method used to get next page. If not defined, use the initial method. */
   nextLinkOperation?: SdkServiceMethod<TServiceOperation>;
+  /** HTTP verb to use for the next link operation. Defaults to "GET" if not specified. */
+  nextLinkVerb?: "GET" | "POST";
   /** Segments to indicate how to get parameters that are needed to be injected into next page link. */
   nextLinkReInjectedParametersSegments?: (SdkMethodParameter | SdkModelPropertyType)[][];
   /** Segments to indicate how to set continuation token for next page request. */

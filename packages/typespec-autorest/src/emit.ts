@@ -55,6 +55,7 @@ const defaultOptions = {
     "{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json",
   "new-line": "lf",
   "include-x-typespec-name": "never",
+  "xml-strategy": "xml-service",
 } as const;
 
 export async function $onEmit(context: EmitContext<AutorestEmitterOptions>) {
@@ -110,8 +111,8 @@ export function resolveAutorestOptions(
     armTypesDir,
     useReadOnlyStatusSchema: resolvedOptions["use-read-only-status-schema"],
     emitLroOptions: resolvedOptions["emit-lro-options"],
-    armResourceFlattening: resolvedOptions["arm-resource-flattening"],
     emitCommonTypesSchema: resolvedOptions["emit-common-types-schema"],
+    xmlStrategy: resolvedOptions["xml-strategy"],
   };
 }
 

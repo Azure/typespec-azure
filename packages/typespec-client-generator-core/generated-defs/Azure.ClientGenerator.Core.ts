@@ -13,7 +13,11 @@ import type {
 } from "@typespec/compiler";
 
 /**
- * Changes the name of a client, method, parameter, union, model, enum, model property, etc. generated in the client SDK.
+ * Overrides the generated name for client SDK elements including clients, methods, parameters,
+ * unions, models, enums, and model properties.
+ *
+ * This decorator takes precedence over all other naming mechanisms, including the `name`
+ * property in `@client` decorator and default naming conventions.
  *
  * @param target The type you want to rename.
  * @param rename The rename you want applied to the object.
@@ -60,40 +64,74 @@ export type ClientNameDecorator = (
 
 /**
  * Whether you want to generate an operation as a convenient method.
+ * When applied to a namespace or interface, it affects all operations within that scope unless explicitly overridden.
  *
- * @param target The target operation.
+ * @param target The target operation, namespace, or interface.
  * @param flag Whether to generate the operation as a convenience method or not.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
- * @example
+ * @example Apply to a single operation
  * ```typespec
  * @convenientAPI(false)
  * op test: void;
  * ```
+ * @example Apply to all operations in an interface
+ * ```typespec
+ * @convenientAPI(false)
+ * interface MyOperations {
+ *   op test1(): void;
+ *   op test2(): void;
+ * }
+ * ```
+ * @example Apply to all operations in a namespace
+ * ```typespec
+ * @convenientAPI(false)
+ * namespace MyService {
+ *   op test1(): void;
+ *   op test2(): void;
+ * }
+ * ```
  */
 export type ConvenientAPIDecorator = (
   context: DecoratorContext,
-  target: Operation,
+  target: Operation | Namespace | Interface,
   flag?: boolean,
   scope?: string,
 ) => void;
 
 /**
  * Whether you want to generate an operation as a protocol method.
+ * When applied to a namespace or interface, it affects all operations within that scope unless explicitly overridden.
  *
- * @param target The target operation.
+ * @param target The target operation, namespace, or interface.
  * @param flag Whether to generate the operation as a protocol method or not.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
- * @example
+ * @example Apply to a single operation
  * ```typespec
  * @protocolAPI(false)
  * op test: void;
  * ```
+ * @example Apply to all operations in an interface
+ * ```typespec
+ * @protocolAPI(false)
+ * interface MyOperations {
+ *   op test1(): void;
+ *   op test2(): void;
+ * }
+ * ```
+ * @example Apply to all operations in a namespace
+ * ```typespec
+ * @protocolAPI(false)
+ * namespace MyService {
+ *   op test1(): void;
+ *   op test2(): void;
+ * }
+ * ```
  */
 export type ProtocolAPIDecorator = (
   context: DecoratorContext,
-  target: Operation,
+  target: Operation | Namespace | Interface,
   flag?: boolean,
   scope?: string,
 ) => void;
@@ -614,11 +652,11 @@ export type AlternateTypeDecorator = (
 ) => void;
 
 /**
- * Define the scope of an operation.
- * By default, the operation will be applied to all language emitters.
- * This decorator allows you to omit the operation from certain languages or apply it to specific languages.
+ * Define the scope of an operation or model property.
+ * By default, the element will be applied to all language emitters.
+ * This decorator allows you to omit the element from certain languages or apply it to specific languages.
  *
- * @param target The target operation that you want to scope.
+ * @param target The target operation or model property that you want to scope.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Omit an operation from a specific language
@@ -631,8 +669,19 @@ export type AlternateTypeDecorator = (
  * @scope("go")
  * op test: void;
  * ```
+ * @example Apply a model property to specific languages
+ * ```typespec
+ * model TestModel {
+ *   @scope("csharp")
+ *   csharpOnlyProp: string;
+ * }
+ * ```
  */
-export type ScopeDecorator = (context: DecoratorContext, target: Operation, scope?: string) => void;
+export type ScopeDecorator = (
+  context: DecoratorContext,
+  target: Operation | ModelProperty,
+  scope?: string,
+) => void;
 
 /**
  * Specify whether a parameter is an API version parameter or not.

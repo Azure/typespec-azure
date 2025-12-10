@@ -57,13 +57,272 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_AlternateType_ExternalType_getModel
+
+- Endpoint: `get /azure/client-generator-core/alternate-type/external/model`
+
+Input: None
+Output: Feature object with geometry, properties, and optional id fields.
+Example response:
+
+```json
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-122.25, 37.87]
+  },
+  "properties": {
+    "name": "A single point of interest",
+    "category": "landmark",
+    "elevation": 100
+  },
+  "id": "feature-1"
+}
+```
+
+### Azure_ClientGenerator_Core_AlternateType_ExternalType_getProperty
+
+- Endpoint: `get /azure/client-generator-core/alternate-type/external/property`
+
+Input: None
+Output: ModelWithFeatureProperty object with feature and additionalProperty fields.
+Example response:
+
+```json
+{
+  "feature": {
+    "type": "Feature",
+    "geometry": {
+      "type": "Point",
+      "coordinates": [-122.25, 37.87]
+    },
+    "properties": {
+      "name": "A single point of interest",
+      "category": "landmark",
+      "elevation": 100
+    },
+    "id": "feature-1"
+  },
+  "additionalProperty": "extra"
+}
+```
+
+### Azure_ClientGenerator_Core_AlternateType_ExternalType_putModel
+
+- Endpoint: `put /azure/client-generator-core/alternate-type/external/model`
+
+Input: Feature object in request body.
+Example input:
+
+```json
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-122.25, 37.87]
+  },
+  "properties": {
+    "name": "A single point of interest",
+    "category": "landmark",
+    "elevation": 100
+  },
+  "id": "feature-1"
+}
+```
+
+Output: None (204/empty response)
+
+### Azure_ClientGenerator_Core_AlternateType_ExternalType_putProperty
+
+- Endpoint: `put /azure/client-generator-core/alternate-type/external/property`
+
+Input: ModelWithFeatureProperty object in request body.
+Example input:
+
+```json
+{
+  "feature": {
+    "type": "Feature",
+    "geometry": {
+      "type": "Point",
+      "coordinates": [-122.25, 37.87]
+    },
+    "properties": {
+      "name": "A single point of interest",
+      "category": "landmark",
+      "elevation": 100
+    },
+    "id": "feature-1"
+  },
+  "additionalProperty": "extra"
+}
+```
+
+Output: None (204/empty response)
+
+### Azure_ClientGenerator_Core_ClientInitialization_HeaderParam
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/header-param/with-query`
+  - `get /azure/client-generator-core/client-initialization/header-param/with-body`
+
+Client for testing header parameter moved to client level.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+
+Expected client usage:
+
+```ts
+const client = new HeaderParamClient({
+  name: "test-name-value"
+});
+
+client.withQuery(id: "test-id");  // No need to pass name here
+client.withBody({ name: "test-name" });  // No need to pass name here
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_MixedParams
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/mixed-params/with-query`
+  - `get /azure/client-generator-core/client-initialization/mixed-params/with-body`
+
+  Client for testing a mix of client-level and method-level parameters.
+
+  Parameters elevated to client level:
+  - name: "test-name-value" (header parameter)
+
+  Parameters remaining at method level:
+  - region: "us-west" (query parameter)
+
+  Expected client usage:
+
+  ```ts
+  const client = new MixedParamsClient({
+    name: "test-name-value"
+  });
+
+  client.withQuery(region: "us-west", id: "test-id");  // region stays as method param
+  client.withBody( region: "us-west", body: { name: "test-name" });  // region stays as method param
+  ```
+
+### Azure_ClientGenerator_Core_ClientInitialization_MultipleParams
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/multiple-params/with-query`
+  - `get /azure/client-generator-core/client-initialization/multiple-params/with-body`
+
+Client for testing multiple parameters (header and query) moved to client level.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+- region: "us-west" (query parameter)
+
+Expected client usage:
+
+```ts
+const client = new MultipleParamsClient({
+  name: "test-name-value",
+  region: "us-west"
+});
+
+client.withQuery(id: "test-id");  // No need to pass name or region here
+client.withBody({ name: "test-name" });  // No need to pass name or region here
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_ParamAlias
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/param-alias/{blob}/with-aliased-name`
+  - `get /azure/client-generator-core/client-initialization/param-alias/{blobName}/with-original-name`
+
+Client for testing the @paramAlias decorator for renaming parameters in client code.
+
+Parameters elevated to client level:
+
+- blobName: "sample-blob" (path parameter)
+
+Expected client usage:
+
+```ts
+// Elevated to client level via alias
+client.withAliasedName();
+
+// Elevated to client level via original name
+client.withOriginalName();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_ParentClient_ChildClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}`
+
+Client for testing a path parameter (blobName) moved to client level, in child client.
+
+The child client can be initialized individually, or via its parent client.
+
+Parameters elevated to client level:
+
+- blobName: "sample-blob" (path parameter)
+
+Expected client usage:
+
+```ts
+// via ParentClient
+const client = new ParentClient.getChildClient({
+  blobName: "sample-blob"
+});
+
+// directly
+const client = new ChildClient({
+  blobName: "sample-blob"
+});
+
+// No need to pass blobName to any operations
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_PathParam
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/path/{blobName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/path/{blobName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/path/{blobName}`
+
+Client for testing a path parameter (blobName) moved to client level.
+
+Parameters elevated to client level:
+
+- blobName: "sample-blob" (path parameter)
+
+Expected client usage:
+
+```ts
+const client = new PathParamClient({
+  blobName: "sample-blob"
+});
+
+// No need to pass blobName to any operations
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
 ### Azure_ClientGenerator_Core_ClientLocation_MoveMethodParameterToClient
 
 - Endpoint: `get /azure/client-generator-core/client-location/blob`
 
 Test moving a method parameter to client.
 
-The parameter `storageAccount` from operation `getBlob` should be moved to the client in the generated code.
+The parameter `storageAccount` from operation `getBlob` should be moved to the `MoveMethodParameterToClient` in the generated code.
 
 Expected request:
 
@@ -335,6 +594,40 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_NextLinkVerb_listItems
+
+- Endpoint: `post /azure/client-generator-core/next-link-verb/items`
+
+Test for @nextLinkVerb decorator with POST verb.
+This operation should use POST for both the initial request and the next link request.
+
+Expected initial request: POST /azure/client-generator-core/next-link-verb/items
+Expected response body:
+
+```json
+{
+  "items": [
+    {
+      "id": "test1"
+    }
+  ],
+  "nextLink": "http://localhost:3000/azure/client-generator-core/next-link-verb/items/page/2"
+}
+```
+
+Expected next link request: POST /azure/client-generator-core/next-link-verb/items/page/2
+Expected response body:
+
+```json
+{
+  "items": [
+    {
+      "id": "test2"
+    }
+  ]
+}
+```
+
 ### Azure_ClientGenerator_Core_Override_GroupParameters_group
 
 - Endpoint: `get /azure/client-generator-core/override/group`
@@ -347,11 +640,37 @@ param2: param2
 
 Expected response: 204 No Content
 
+### Azure_ClientGenerator_Core_Override_RemoveOptionalParameter_removeOptional
+
+- Endpoint: `get /azure/client-generator-core/override/remove-optional/{param1}`
+
+Verify that after `@override`, optional parameters can be removed from the client method signature.
+
+Expected path parameter:
+param1: param1
+
+Expected query parameter:
+param2: param2
+
+Expected response: 204 No Content
+
 ### Azure_ClientGenerator_Core_Override_ReorderParameters_reorder
 
 - Endpoint: `get /azure/client-generator-core/override/reorder/{param2}/{param1}`
 
 Verify that after `@override` the parameters are reordered correctly in the client method signature.
+
+Expected path parameter:
+param1: param1
+param2: param2
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_Override_RequireOptionalParameter_requireOptional
+
+- Endpoint: `get /azure/client-generator-core/override/require-optional/{param1}/{param2}`
+
+Verify that after `@override` an optional parameter can be made required in the client method signature.
 
 Expected path parameter:
 param1: param1
@@ -370,161 +689,6 @@ Expected response: 204 No Content
 This scenario contains 4 public operations. All should be generated and exported.
 'OrphanModel' is not used but specified as 'public' and 'input', so it should be generated in SDK. The 'orphanModelSerializable' operation verifies that the model can be serialized to JSON.
 The other models' usage is additive to roundtrip, so they should be generated and exported as well.
-
-### Azure_ClientGeneratorCore_ClientInitialization_HeaderParam
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/header-param/with-query`
-  - `get /azure/client-generator-core/client-initialization/header-param/with-body`
-
-Client for testing header parameter moved to client level.
-
-Parameters elevated to client level:
-
-- name: "test-name-value" (header parameter)
-
-Expected client usage:
-
-```ts
-const client = new HeaderParamClient({
-  name: "test-name-value"
-});
-
-client.withQuery(id: "test-id");  // No need to pass name here
-client.withBody({ name: "test-name" });  // No need to pass name here
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_MixedParams
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/mixed-params/with-query`
-  - `get /azure/client-generator-core/client-initialization/mixed-params/with-body`
-
-  Client for testing a mix of client-level and method-level parameters.
-
-  Parameters elevated to client level:
-  - name: "test-name-value" (header parameter)
-
-  Parameters remaining at method level:
-  - region: "us-west" (query parameter)
-
-  Expected client usage:
-
-  ```ts
-  const client = new MixedParamsClient({
-    name: "test-name-value"
-  });
-
-  client.withQuery(region: "us-west", id: "test-id");  // region stays as method param
-  client.withBody( region: "us-west", body: { name: "test-name" });  // region stays as method param
-  ```
-
-### Azure_ClientGeneratorCore_ClientInitialization_MultipleParams
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/multiple-params/with-query`
-  - `get /azure/client-generator-core/client-initialization/multiple-params/with-body`
-
-Client for testing multiple parameters (header and query) moved to client level.
-
-Parameters elevated to client level:
-
-- name: "test-name-value" (header parameter)
-- region: "us-west" (query parameter)
-
-Expected client usage:
-
-```ts
-const client = new MultipleParamsClient({
-  name: "test-name-value",
-  region: "us-west"
-});
-
-client.withQuery(id: "test-id");  // No need to pass name or region here
-client.withBody({ name: "test-name" });  // No need to pass name or region here
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_ParamAlias
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/param-alias/{blob}/with-aliased-name`
-  - `get /azure/client-generator-core/client-initialization/param-alias/{blobName}/with-original-name`
-
-Client for testing the @paramAlias decorator for renaming parameters in client code.
-
-Parameters elevated to client level:
-
-- blobName: "sample-blob" (path parameter)
-
-Expected client usage:
-
-```ts
-// Elevated to client level via alias
-client.withAliasedName();
-
-// Elevated to client level via original name
-client.withOriginalName();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_ParentClient_ChildClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}`
-
-Client for testing a path parameter (blobName) moved to client level, in child client.
-
-The child client can be initialized individually, or via its parent client.
-
-Parameters elevated to client level:
-
-- blobName: "sample-blob" (path parameter)
-
-Expected client usage:
-
-```ts
-// via ParentClient
-const client = new ParentClient.getChildClient({
-  blobName: "sample-blob"
-});
-
-// directly
-const client = new ChildClient({
-  blobName: "sample-blob"
-});
-
-// No need to pass blobName to any operations
-client.withQuery(format: "text");
-client.getStandalone();
-client.deleteStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_PathParam
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/path/{blobName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/path/{blobName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/path/{blobName}`
-
-Client for testing a path parameter (blobName) moved to client level.
-
-Parameters elevated to client level:
-
-- blobName: "sample-blob" (path parameter)
-
-Expected client usage:
-
-```ts
-const client = new PathParamClient({
-  blobName: "sample-blob"
-});
-
-// No need to pass blobName to any operations
-client.withQuery(format: "text");
-client.getStandalone();
-client.deleteStandalone();
-```
 
 ### Azure_Core_Basic_createOrReplace
 
@@ -3541,6 +3705,77 @@ Expected header parameters:
   Expected response header:
 - x-ms-client-request-id=<uuid string same with request header>
 
+### Azure_Versioning_PreviewVersion_getWidget
+
+- Endpoint: `get /azure/versioning/previewVersion/widgets/{id}`
+
+Test @previewVersion decorator with stable operations.
+Should send a preview api-version and response should contain color field.
+
+Expected path parameter: id=widget-123
+Expected query parameter: api-version=2024-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "widget-123",
+  "name": "Sample Widget",
+  "color": "blue"
+}
+```
+
+### Azure_Versioning_PreviewVersion_listWidgets
+
+- Endpoint: `get /azure/versioning/previewVersion/widgets`
+
+Test @previewVersion decorator with version-specific query parameters.
+Request should send stable api-version and response should not contain color field.
+
+Expected query parameter: api-version=2024-06-01
+Expected query parameter: name=test (color not available in stable version)
+
+Expected response body:
+
+```json
+{
+  "widgets": [
+    {
+      "id": "widget-1",
+      "name": "test"
+    }
+  ]
+}
+```
+
+### Azure_Versioning_PreviewVersion_updateWidgetColor
+
+- Endpoint: `patch /azure/versioning/previewVersion/widgets/{id}/color`
+
+Test @previewVersion decorator with preview-only operations.
+Only available in preview API versions.
+
+Expected path parameter: id=widget-123
+Expected query parameter: api-version=2024-12-01-preview
+
+Expected input body:
+
+```json
+{
+  "color": "red"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "widget-123",
+  "name": "Sample Widget",
+  "color": "red"
+}
+```
+
 ### Client_AlternateApiVersion_Service_Header_headerApiVersion
 
 - Endpoint: `post /azure/client-generator-core/api-version/header`
@@ -3981,71 +4216,3 @@ With the above two calls, we test the following configurations from this service
 - A client generated from the second service spec can call the second deployment of a service with api version v2 with the updated changes
 
 Tests that we can grow up an operation from accepting one required parameter to accepting a required parameter and an optional parameter.
-
-### Azure_Versioning_PreviewVersion_getWidget
-
-- Endpoint: `get /azure/versioning/previewVersion/widgets/{id}`
-
-Test @previewVersion decorator with stable operations that should work across all API versions.
-
-Expected path parameter: id=widget-123
-Expected query parameter: api-version=2024-12-01-preview
-
-Expected response body:
-
-```json
-{
-  "id": "widget-123",
-  "name": "Sample Widget",
-  "color": "blue"
-}
-```
-
-### Azure_Versioning_PreviewVersion_updateWidgetColor
-
-- Endpoint: `patch /azure/versioning/previewVersion/widgets/{id}/color`
-
-Test @previewVersion decorator with preview-only operations that are only available in preview API versions.
-
-Expected path parameter: id=widget-123
-Expected query parameter: api-version=2024-12-01-preview
-
-Expected input body:
-
-```json
-{
-  "color": "red"
-}
-```
-
-Expected response body:
-
-```json
-{
-  "id": "widget-123",
-  "name": "Sample Widget",
-  "color": "red"
-}
-```
-
-### Azure_Versioning_PreviewVersion_listWidgets
-
-- Endpoint: `get /azure/versioning/previewVersion/widgets`
-
-Test @previewVersion decorator with version-specific query parameters, demonstrating how optional preview features are handled in stable versions.
-
-Expected query parameter: api-version=2024-06-01
-Expected query parameter: name=test (color parameter not available in stable version)
-
-Expected response body:
-
-```json
-{
-  "widgets": [
-    {
-      "id": "widget-1",
-      "name": "test"
-    }
-  ]
-}
-```

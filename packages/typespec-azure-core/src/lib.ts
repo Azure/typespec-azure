@@ -249,12 +249,16 @@ export const $lib = createTypeSpecLibrary({
         default: `@uniqueItems can only be applied to arrays and array-valued model properties.`,
       },
     },
+    "experimental-feature": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`'${"feature"}' is an experimental feature and may be removed or changed at any time. Suppress this warning and proceed with caution if you are sure you want to use it.`,
+        dangerous: paramMessage`'${"feature"}' is a DANGEROUS experiemental feature that may be removed or changed at any time and may cause unexpected behavior. Suppress this warning and proceed with extreme caution if you are sure you want to use it.`,
+      },
+    },
   },
 
   state: {
-    fixed: { description: "Data for `@fixed` decorator" },
-    pagedResult: { description: "Data for `@pagedResult` decorator" },
-    items: { description: "Data for `@items` decorator" },
     lroStatus: { description: "Data for `@lroStatus` decorator" },
     lroSucceeded: { description: "Data for `@lroSucceeded` decorator" },
     lroCanceled: { description: "Data for `@lroCanceled` decorator" },

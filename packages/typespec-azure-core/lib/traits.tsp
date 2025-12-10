@@ -8,7 +8,6 @@ using Versioning;
 /**
  * Enumerates the standard trait locations for Azure.Core operations.
  */
-@added(Azure.Core.Versions.v1_0_Preview_2)
 @doc("Enumerates the standard trait locations for Azure.Core operations.")
 enum TraitLocation {
   @doc("Identifies operation parameters as the trait target.")
@@ -24,7 +23,6 @@ enum TraitLocation {
 /**
  * Enumerates the standard trait contexts for Azure.Core operations.
  */
-@added(Azure.Core.Versions.v1_0_Preview_2)
 @doc("")
 enum TraitContext {
   @doc("Trait is applicable for resource 'read' operations.")
@@ -53,7 +51,6 @@ enum TraitContext {
  * Used to override a trait.
  * @template Trait The trait to override.
  */
-@added(Azure.Core.Versions.v1_0_Preview_2)
 @Private.applyTraitOverride(Trait)
 model TraitOverride<Trait extends Model> {}
 
@@ -63,7 +60,6 @@ model TraitOverride<Trait extends Model> {}
  * @template Contexts The contexts in which the trait is applicable.
  */
 @trait
-@added(Azure.Core.Versions.v1_0_Preview_2)
 @Private.ensureAllQueryParams(Parameters)
 model QueryParametersTrait<Parameters extends Model, Contexts = unknown> {
   @traitContext(Contexts)
@@ -78,7 +74,6 @@ model QueryParametersTrait<Parameters extends Model, Contexts = unknown> {
  * @template Parameters Object describing the query parameters.
  */
 @trait
-@added(Azure.Core.Versions.v1_0_Preview_2)
 model ListQueryParametersTrait<Parameters extends Model>
   is QueryParametersTrait<Parameters, TraitContext.List>;
 
@@ -88,7 +83,6 @@ model ListQueryParametersTrait<Parameters extends Model>
  * @template Contexts The contexts in which the trait is applicable.
  */
 @trait
-@added(Azure.Core.Versions.v1_0_Preview_2)
 @Private.ensureAllHeaderParams(Headers)
 model RequestHeadersTrait<Headers extends Model, Contexts = unknown> {
   @traitContext(Contexts)
@@ -104,7 +98,6 @@ model RequestHeadersTrait<Headers extends Model, Contexts = unknown> {
  * @template Contexts The contexts in which the trait is applicable.
  */
 @trait
-@added(Azure.Core.Versions.v1_0_Preview_2)
 @Private.ensureAllHeaderParams(Headers)
 model ResponseHeadersTrait<Headers extends Model, Contexts = unknown> {
   @traitContext(Contexts)
@@ -119,7 +112,6 @@ model ResponseHeadersTrait<Headers extends Model, Contexts = unknown> {
  * @template VersionParameter The type of the version parameter.
  */
 @trait("VersionParameter")
-@added(Azure.Core.Versions.v1_0_Preview_2)
 model VersionParameterTrait<VersionParameter> {
   versionParameter: {
     @traitLocation(TraitLocation.ApiVersionParameter)
@@ -248,7 +240,6 @@ extern dec traitLocation(target: ModelProperty, contexts: EnumMember);
 extern dec traitAdded(target: Model | ModelProperty, addedVersion: EnumMember | null);
 
 namespace Private {
-  @added(Azure.Core.Versions.v1_0_Preview_2)
   @Private.addTraitProperties(Traits, Location, Contexts)
   model TraitProperties<
     Traits extends Model,

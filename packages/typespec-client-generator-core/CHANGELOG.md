@@ -1,5 +1,106 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.63.0
+
+### Breaking Changes
+
+- [#3493](https://github.com/Azure/typespec-azure/pull/3493) Add `optional` property to `SdkMethodResponse` to distinguish responses without body from nullable body types.
+- [#3495](https://github.com/Azure/typespec-azure/pull/3495) Filter read-only parameters from `SdkServiceMethod` parameters. Read-only parameters (those with `@visibility(Lifecycle.Read))` are now correctly excluded from method signatures since they cannot be set by the user.
+
+### Features
+
+- [#3625](https://github.com/Azure/typespec-azure/pull/3625) Add `@clientDefaultValue` decorator in Legacy namespace to support brownfield services that need to maintain backward compatibility with existing SDK default values from Swagger definitions.
+- [#3583](https://github.com/Azure/typespec-azure/pull/3583) Support array encode on model property.
+- [#3494](https://github.com/Azure/typespec-azure/pull/3494) Add `methodParameterSegments` property to replace `correspondingMethodParams` with complete path segments.
+- [#3596](https://github.com/Azure/typespec-azure/pull/3596) Extend `@scope` decorator usage to `ModelProperty` targets.
+- [#3496](https://github.com/Azure/typespec-azure/pull/3496) Support `@convenientAPI` and `@protocolAPI` decorators at namespace/interface level to enable decorator inheritance for all contained operations with explicit override support at the operation level.
+
+### Bump dependencies
+
+- [#3546](https://github.com/Azure/typespec-azure/pull/3546) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3498](https://github.com/Azure/typespec-azure/pull/3498) Fix incorrect usage flags being set on types when `@alternateType` is applied to operation parameters. When a parameter has `@alternateType`, the original type should not receive usage flags since it's being replaced by the alternate type. This fix ensures the usage value correctly reflects that the original type is not used (Usage = 0/None).
+
+
+## 0.62.0
+
+### Features
+
+- [#3422](https://github.com/Azure/typespec-azure/pull/3422) Add new `External` usage flag to `UsageFlags` enum. This flag is automatically set for types that are only referenced by external types (types with `@alternateType` decorator pointing to external library types). The flag propagates recursively through the type graph, marking all types that are exclusively accessible through external types.
+- [#3401](https://github.com/Azure/typespec-azure/pull/3401) Add `@nextLinkVerb` decorator to specify HTTP verb for next page calls in paging operations. The decorator accepts "POST" or "GET" and defaults to "GET" when not specified. The `nextLinkVerb` field in `SdkPagingServiceMetadata` stores the HTTP verb as a string.
+- [#3464](https://github.com/Azure/typespec-azure/pull/3464) Support discriminated union.
+- [#3448](https://github.com/Azure/typespec-azure/pull/3448) add support for `Http.File` types as input and output
+
+### Bump dependencies
+
+- [#3447](https://github.com/Azure/typespec-azure/pull/3447) Upgrade dependencies october 2025
+
+### Bug Fixes
+
+- [#3451](https://github.com/Azure/typespec-azure/pull/3451) Propagate client initialization parameters to subclients
+
+
+## 0.61.3
+
+### Bug Fixes
+
+- [#3439](https://github.com/Azure/typespec-azure/pull/3439) Support `@flattenProperty` on parameters.
+- [#3441](https://github.com/Azure/typespec-azure/pull/3441) Fix usage of `@markAsLro` for lro operations with nullable overall response types
+
+
+## 0.61.2
+
+### Bug Fixes
+
+- [#3426](https://github.com/Azure/typespec-azure/pull/3426) Fix `@alternateType` decorator incorrectly treating regular TypeSpec models as external types
+
+
+## 0.61.1
+
+### Bug Fixes
+
+- [#3376](https://github.com/Azure/typespec-azure/pull/3376) Support `@clientLocation` for model property along with `@override`.
+
+
+## 0.61.0
+
+### Breaking Changes
+
+- [#3286](https://github.com/Azure/typespec-azure/pull/3286) Change `isApiVersion` logic. If a service is not versioning, the function always return false.
+
+### Features
+
+- [#3198](https://github.com/Azure/typespec-azure/pull/3198) Add `getHttpOperationParametersForClientParameter` helper to find corresponding HTTP parameter list for a client initialization parameter.
+- [#3325](https://github.com/Azure/typespec-azure/pull/3325) Add support for `@previewVersion` decorator in API version filtering. TCGC now checks for the `@previewVersion` decorator on enum members in addition to the existing regex-based preview version filtering.
+- [#3233](https://github.com/Azure/typespec-azure/pull/3233) Allow `@alternateType` to reference external types as well
+
+### Bug Fixes
+
+- [#3353](https://github.com/Azure/typespec-azure/pull/3353) Handle wrong `api-version` config.
+- [#3285](https://github.com/Azure/typespec-azure/pull/3285) Fix missing doc for nullable type.
+- [#3324](https://github.com/Azure/typespec-azure/pull/3324) Refine error message for `@override`.
+- [#3266](https://github.com/Azure/typespec-azure/pull/3266) Cleanup usage of legacy Azure.Core paging apis
+- [#3361](https://github.com/Azure/typespec-azure/pull/3361) Fix bug ignoring `@clientName` decorator when applied to `@client` clients
+- [#3311](https://github.com/Azure/typespec-azure/pull/3311) Fix missing example for operation directly extends from templated interface.
+
+
+## 0.60.3
+
+### Bug Fixes
+
+- [#3328](https://github.com/Azure/typespec-azure/pull/3328) Fix propagation of client initialization parameters set on parent clients
+- [#3327](https://github.com/Azure/typespec-azure/pull/3327) Allow `@markAsLro` to work with union return types
+
+
+## 0.60.2
+
+### Bug Fixes
+
+- [#3300](https://github.com/Azure/typespec-azure/pull/3300) add `@Azure.ClientGenerator.Core.Legacy.markAsLro` for legacy brownfield services that need to mark non-lro methods as lro
+
+
 ## 0.60.1
 
 ### Bug Fixes

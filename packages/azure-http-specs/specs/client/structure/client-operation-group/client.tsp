@@ -56,14 +56,14 @@ namespace Client.Structure.ClientOperationGroup {
     name: "SubNamespace.SecondClient",
     service: Client.Structure.Service,
   },
-  "csharp,java,python"
+  "csharp,java"
 )
 @client(
   {
     name: "SecondClient",
     service: Client.Structure.Service,
   },
-  "javascript,go"
+  "javascript,go,python,rust"
 )
 namespace Client.Structure.AnotherClientOperationGroup {
   op five is Client.Structure.Service.Bar.five;
