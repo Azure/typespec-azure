@@ -101,6 +101,6 @@ op getOperationParameter(
 op getPathParameter(
   #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Testing legacy decorator"
   @global.Azure.ClientGenerator.Core.Legacy.clientDefaultValue("default-segment1")
-  @path segment1?: string,
+  @path segment1: string,
   @path segment2: string
 ): void;
