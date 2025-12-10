@@ -24,34 +24,10 @@ using Versioning;
     ```
   """)
 @client({
-  service: Service.MultiService.ServiceA,
+  service: [Service.MultiService.ServiceA, Service.MultiService.ServiceB],
 })
 @useDependency(
   Service.MultiService.ServiceA.VersionsA.av2,
   Service.MultiService.ServiceB.VersionsB.bv2
 )
-namespace Service.MultiService.Combined {
-  @client({
-    service: Service.MultiService.ServiceA,
-    parent: Service.MultiService.Combined,
-  })
-  @scenario
-  @scenarioDoc("""
-      Test operation aTest from ServiceA.
-      
-      Call this operation with apiVersion set to `av2`.
-    """)
-  interface FirstService extends Service.MultiService.ServiceA.AI {}
-
-  @client({
-    service: Service.MultiService.ServiceB,
-    parent: Service.MultiService.Combined,
-  })
-  @scenario
-  @scenarioDoc("""
-      Test operation bTest from ServiceB.
-    
-      Call this operation with apiVersion set to `bv2`.
-    """)
-  interface SecondService extends Service.MultiService.ServiceB.BI {}
-}
+namespace Service.MultiService.Combined;
