@@ -1,25 +1,27 @@
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
+  compilerAssert,
   DecoratorContext,
   DecoratorFunction,
   Enum,
   EnumMember,
+  getDiscriminator,
+  ignoreDiagnostics,
   Interface,
+  isErrorModel,
+  isNumeric,
+  isService,
+  isTemplateDeclaration,
   Model,
   ModelProperty,
   Namespace,
+  Numeric,
   Operation,
   Program,
   RekeyableMap,
   Scalar,
   Type,
   Union,
-  compilerAssert,
-  getDiscriminator,
-  ignoreDiagnostics,
-  isErrorModel,
-  isService,
-  isTemplateDeclaration,
 } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
@@ -44,6 +46,7 @@ import {
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
 import {
+  ClientDefaultValueDecorator,
   FlattenPropertyDecorator,
   HierarchyBuildingDecorator,
   MarkAsLroDecorator,
@@ -1567,6 +1570,38 @@ export const $nextLinkVerb: NextLinkVerbDecorator = (
  */
 export function getNextLinkVerb(context: TCGCContext, entity: Operation): "GET" | "POST" {
   return getScopedDecoratorData(context, nextLinkVerbKey, entity) ?? "GET";
+}
+
+const clientDefaultValueKey = createStateSymbol("clientDefaultValue");
+
+export const $clientDefaultValue: ClientDefaultValueDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  value: string | boolean | Numeric,
+  scope?: LanguageScopes,
+) => {
+  const actualValue = isNumeric(value) ? value.asNumber() : value;
+  setScopedDecoratorData(
+    context,
+    $clientDefaultValue,
+    clientDefaultValueKey,
+    target,
+    actualValue,
+    scope,
+  );
+};
+
+/**
+ * Get the client-level default value for a model property.
+ * @param context TCGCContext
+ * @param entity ModelProperty to check for clientDefaultValue decorator
+ * @returns The client-level default value if decorator is applied, undefined otherwise.
+ */
+export function getClientDefaultValue(
+  context: TCGCContext,
+  entity: ModelProperty,
+): string | boolean | Numeric | undefined {
+  return getScopedDecoratorData(context, clientDefaultValueKey, entity);
 }
 
 /**
