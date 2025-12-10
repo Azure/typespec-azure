@@ -36,6 +36,7 @@ import {
 import {
   unsafe_mutateSubgraphWithNamespace,
   unsafe_MutatorWithNamespace,
+  unsafe_Realm,
 } from "@typespec/compiler/experimental";
 import { $ } from "@typespec/compiler/typekit";
 import { HttpOperation, HttpOperationResponseContent, HttpPayloadBody } from "@typespec/http";
@@ -299,7 +300,7 @@ export function getAvailableApiVersions(
     return explicitlyDecorated;
   }
   context.setApiVersionsForType(type, wrapperApiVersions);
-  return context.getApiVersionsForType(type);
+  return wrapperApiVersions;
 }
 
 /**
@@ -551,7 +552,7 @@ export function filterApiVersionsInEnum(
 ): void {
   // if they explicitly set an api version, remove larger versions
   removeVersionsLargerThanExplicitlySpecified(context, sdkVersionsEnum.values);
-  const clientNamespaceType = getClientNamespaceType(client);
+  const clientNamespaceType = getActualClientType(client);
   const defaultApiVersion = getDefaultApiVersion(
     context,
     clientNamespaceType.kind === "Interface" ? clientNamespaceType.namespace! : clientNamespaceType,
@@ -780,23 +781,28 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   // Explicit all API version setting, thus no versioning mutation needed
   if (context.apiVersion === "all") return globalNamespace;
 
-  const explicitClients = listScopedDecoratorData(context, clientKey);
+  const explicitClientNamespaces: Namespace[] = [];
   const explicitServices = new Set<Namespace>();
-  explicitClients.forEach((c) => {
-    const sdkClient = c as SdkClient;
-    if (Array.isArray(sdkClient.service)) {
-      sdkClient.service.forEach((s) => explicitServices.add(s));
-    } else {
-      explicitServices.add(sdkClient.service);
+  listScopedDecoratorData(context, clientKey).forEach((v, k) => {
+    if (!unsafe_Realm.realmForType.has(k)) {
+      const sdkClient = v as SdkClient;
+      if (Array.isArray(sdkClient.service)) {
+        explicitClientNamespaces.push(k as Namespace);
+        sdkClient.service.forEach((s) => explicitServices.add(s));
+      } else {
+        explicitServices.add(sdkClient.service);
+      }
     }
   });
 
   let mutator: unsafe_MutatorWithNamespace | undefined;
 
   // No explicit clients (choose first service) or explicit client with one service
-  if (explicitClients.size === 0 || explicitServices.size === 1) {
+  if (explicitClientNamespaces.length === 0 || explicitServices.size === 1) {
     const serviceNamespace =
-      explicitClients.size === 0 ? services[0].type : explicitServices.values().next().value!;
+      explicitClientNamespaces.length === 0
+        ? services[0].type
+        : explicitServices.values().next().value!;
     const versions = getVersions(context.program, serviceNamespace)[1]?.getVersions();
     // If the single service has no versioning, no mutation needed
     if (!versions) return globalNamespace;
@@ -829,7 +835,7 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   // Explicit clients with multiple services
   else {
     // Currently we do not support multiple explicit clients with multiple services
-    if (explicitClients.size > 1 && explicitServices.size > 1) {
+    if (explicitClientNamespaces.length > 1 && explicitServices.size > 1) {
       reportDiagnostic(context.program, {
         code: "multiple-explicit-clients-multiple-services",
         format: {},
@@ -838,7 +844,7 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
       return globalNamespace;
     }
 
-    mutator = getVersioningMutator(context, explicitClients.keys().next().value as Namespace);
+    mutator = getVersioningMutator(context, explicitClientNamespaces[0]);
   }
 
   if (!mutator) return globalNamespace;
@@ -1004,16 +1010,9 @@ export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation
   return undefined;
 }
 
-export function getClientServicesInArray(client: SdkClient | SdkOperationGroup): Namespace[] {
-  return Array.isArray(client.service) ? client.service : [client.service];
-}
-
-export function getClientNamespaceType(
-  client: SdkClient | SdkOperationGroup,
-): Namespace | Interface {
-  if (client.type) {
-    return client.type;
-  }
-  compilerAssert(!Array.isArray(client.service), "Client with multiple services must have a type");
+export function getActualClientType(client: SdkClient | SdkOperationGroup): Namespace | Interface {
+  if (client.kind === "SdkClient") return client.type;
+  if (client.type) return client.type;
+  // Created operation group from `@clientLocation`. Only for single service.
   return client.service;
 }

@@ -171,6 +171,7 @@ export async function handleClientExamples(
 ): Promise<[void, readonly Diagnostic[]]> {
   const diagnostics = createDiagnosticCollector();
 
+  // TODO: example mapping for multiple services case
   const packageVersions = context.getPackageVersions().values().next().value || [];
   const examples = diagnostics.pipe(
     await loadExamples(context, packageVersions[packageVersions.length - 1]),

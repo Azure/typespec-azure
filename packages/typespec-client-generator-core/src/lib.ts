@@ -464,6 +464,13 @@ export const $lib = createTypeSpecLibrary({
         default: "Client with multiple services is missing version dependency declaration.",
       },
     },
+    "client-location-to-new-og-with-multiple-services": {
+      severity: "error",
+      messages: {
+        default:
+          "Cannot move operation to a new operation group when client has multiple services.",
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,

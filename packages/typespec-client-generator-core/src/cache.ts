@@ -123,7 +123,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     function createFirstLevelOperationGroup(
       context: TCGCContext,
       type: Namespace | Interface,
-      service: Namespace | Namespace[],
+      service: Namespace,
     ) {
       // iterate client's interfaces and namespaces to find operation groups
       if (type.kind === "Namespace") {
@@ -170,17 +170,26 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       }
     });
 
-    for (const ogName of newOperationGroupNames) {
-      const og: SdkOperationGroup = {
-        kind: "SdkOperationGroup",
-        groupPath: `${clients[0].name}.${ogName}`,
-        service: clients[0].service,
-        subOperationGroups: [],
-        parent: clients[0],
-      };
-      context.__rawClientsOperationGroupsCache.set(ogName, og);
-      clients[0].subOperationGroups!.push(og);
-      context.__clientToOperationsCache.set(og, []);
+    if (newOperationGroupNames.size > 0) {
+      if (Array.isArray(clients[0].service)) {
+        reportDiagnostic(context.program, {
+          code: "client-location-to-new-og-with-multiple-services",
+          target: clients[0].type,
+        });
+      } else {
+        for (const ogName of newOperationGroupNames) {
+          const og: SdkOperationGroup = {
+            kind: "SdkOperationGroup",
+            groupPath: `${clients[0].name}.${ogName}`,
+            service: clients[0].service,
+            subOperationGroups: [],
+            parent: clients[0],
+          };
+          context.__rawClientsOperationGroupsCache.set(ogName, og);
+          clients[0].subOperationGroups!.push(og);
+          context.__clientToOperationsCache.set(og, []);
+        }
+      }
     }
   }
 
@@ -357,7 +366,7 @@ function createOperationGroup(
   context: TCGCContext,
   type: Namespace | Interface,
   groupPathPrefix: string,
-  service: Namespace[] | Namespace,
+  service: Namespace,
   parent?: SdkClient | SdkOperationGroup,
 ): SdkOperationGroup | undefined {
   let operationGroup: SdkOperationGroup | undefined;
@@ -418,7 +427,7 @@ function buildHierarchyOfOperationGroups(
   context: TCGCContext,
   type: Namespace,
   groupPathPrefix: string,
-  service: Namespace[] | Namespace,
+  service: Namespace,
   parent?: SdkClient | SdkOperationGroup,
 ): SdkOperationGroup[] | undefined {
   // build hierarchy of operation group

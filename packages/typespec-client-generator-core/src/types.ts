@@ -66,7 +66,7 @@ import {
   SdkArrayType,
   SdkBuiltInKinds,
   SdkBuiltInType,
-  SdkClient,
+  SdkClientType,
   SdkConstantType,
   SdkCredentialParameter,
   SdkCredentialType,
@@ -76,11 +76,11 @@ import {
   SdkEnumType,
   SdkEnumValueType,
   SdkHeaderParameter,
+  SdkHttpOperation,
   SdkModelPropertyType,
   SdkModelPropertyTypeBase,
   SdkModelType,
   SdkNullableType,
-  SdkOperationGroup,
   SdkTupleType,
   SdkType,
   SdkUnionType,
@@ -93,8 +93,6 @@ import {
   filterApiVersionsInEnum,
   getAvailableApiVersions,
   getClientDoc,
-  getClientNamespaceType,
-  getClientServicesInArray,
   getHttpBodyType,
   getHttpOperationResponseHeaders,
   getNonNullOptions,
@@ -786,7 +784,7 @@ function addDiscriminatorToModelType(
       onClient: false,
       apiVersions: discriminatorProperty
         ? getAvailableApiVersions(context, discriminatorProperty.__raw!, type)
-        : getAvailableApiVersions(context, type, type),
+        : model.apiVersions,
       isApiVersionParam: false,
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
@@ -1179,33 +1177,35 @@ function getSdkVisibility(context: TCGCContext, type: ModelProperty): Visibility
 
 function getSdkCredentialType(
   context: TCGCContext,
-  client: SdkClient | SdkOperationGroup,
-  authentications: Authentication[],
+  client: SdkClientType<SdkHttpOperation>,
+  authentication: Authentication,
 ): SdkCredentialType | SdkUnionType<SdkCredentialType> {
   const credentialTypes: SdkCredentialType[] = [];
-  for (const authentication of authentications) {
-    for (const option of authentication.options) {
-      for (const scheme of option.schemes) {
-        credentialTypes.push({
-          kind: "credential",
-          scheme: scheme,
-          decorators: [],
-        });
-      }
+  for (const option of authentication.options) {
+    for (const scheme of option.schemes) {
+      credentialTypes.push({
+        // Multiple services only deal with the first server config
+        __raw: Array.isArray(client.__raw.service) ? client.__raw.service[0] : client.__raw.service,
+        kind: "credential",
+        scheme: scheme,
+        decorators: [],
+      });
     }
   }
   if (credentialTypes.length > 1) {
-    const clientNamespaceType = getClientNamespaceType(client);
-    const namespace = getClientNamespace(context, clientNamespaceType);
+    // Multiple services only deal with the first server config
+    const service = Array.isArray(client.__raw.service)
+      ? client.__raw.service[0]
+      : client.__raw.service;
     return {
-      __raw: client.service,
+      __raw: service,
       kind: "union",
       variantTypes: credentialTypes,
-      name: createGeneratedName(context, clientNamespaceType, "CredentialUnion"),
+      name: createGeneratedName(context, service, "CredentialUnion"),
       isGeneratedName: true,
-      namespace,
-      clientNamespace: namespace,
-      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, clientNamespaceType)}.CredentialUnion`,
+      namespace: client.namespace,
+      clientNamespace: client.namespace,
+      crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.CredentialUnion`,
       decorators: [],
       access: "public",
       usage: UsageFlags.None,
@@ -1216,24 +1216,25 @@ function getSdkCredentialType(
 
 export function getSdkCredentialParameter(
   context: TCGCContext,
-  client: SdkClient | SdkOperationGroup,
+  client: SdkClientType<SdkHttpOperation>,
 ): SdkCredentialParameter | undefined {
-  const auth = getClientServicesInArray(client)
-    .map((service) => getAuthentication(context.program, service))
-    .filter((a) => a !== undefined);
-  if (auth.length === 0) return undefined;
-  const clientNamespaceType = getClientNamespaceType(client);
+  // Multiple services only deal with the first server config
+  const service = Array.isArray(client.__raw.service)
+    ? client.__raw.service[0]
+    : client.__raw.service;
+  const auth = getAuthentication(context.program, service);
+  if (!auth) return undefined;
   return {
     type: getSdkCredentialType(context, client, auth),
     kind: "credential",
     name: "credential",
     isGeneratedName: true,
     doc: "Credential used to authenticate requests to the service.",
-    apiVersions: getAvailableApiVersions(context, clientNamespaceType, client.type),
+    apiVersions: client.apiVersions,
     onClient: true,
     optional: false,
     isApiVersionParam: false,
-    crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, clientNamespaceType)}.credential`,
+    crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.credential`,
     decorators: [],
     access: "public",
     flatten: false,
@@ -1964,15 +1965,16 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       }
     }
     // server parameters
-    const services = getClientServicesInArray(client);
-    for (const service of services) {
-      const servers = getServers(context.program, service);
-      if (servers !== undefined && servers[0].parameters !== undefined) {
-        for (const param of servers[0].parameters.values()) {
-          const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param));
-          diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
-        }
+    const services = Array.isArray(client.service) ? client.service : [client.service];
+    // Multiple services only deal with the first server config
+    const servers = getServers(context.program, services[0]);
+    if (servers !== undefined && servers[0].parameters !== undefined) {
+      for (const param of servers[0].parameters.values()) {
+        const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param));
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
       }
+    }
+    for (const service of services) {
       // versioned enums
       const [_, versionMap] = getVersions(context.program, service);
       if (versionMap && versionMap.getVersions()[0]) {

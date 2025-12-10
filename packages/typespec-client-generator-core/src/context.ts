@@ -4,7 +4,6 @@ import {
   emitFile,
   Enum,
   Interface,
-  listServices,
   Model,
   ModelProperty,
   Namespace,
@@ -15,7 +14,6 @@ import {
   Union,
 } from "@typespec/compiler";
 import { HttpOperation } from "@typespec/http";
-import { getVersions } from "@typespec/versioning";
 import { stringify } from "yaml";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { defaultDecoratorsAllowList } from "./configs.js";
@@ -46,7 +44,6 @@ import {
   TspLiteralType,
 } from "./internal-utils.js";
 import { createSdkPackage } from "./package.js";
-import { listAllServiceNamespaces } from "./public-utils.js";
 
 interface CreateTCGCContextOptions {
   mutateNamespace?: boolean; // whether to mutate global namespace for versioning
@@ -85,7 +82,6 @@ export function createTCGCContext(
     __knownScalars: getKnownScalars(),
     __httpOperationExamples: new Map(),
     __pagedResultSet: new Set(),
-    __typeToService: new Map<Type, Namespace>(),
 
     getMutatedGlobalNamespace(): Namespace {
       if (options?.mutateNamespace === false) {
@@ -98,28 +94,17 @@ export function createTCGCContext(
       return this.__mutatedGlobalNamespace;
     },
     getApiVersionsForType(type): string[] {
-      const service = this.getServiceForType(type);
-      const serviceMap = this.__tspTypeToApiVersions.get(service);
-      if (serviceMap === undefined) {
-        return [];
-      }
-      return serviceMap.get(type) ?? [];
+      return this.__tspTypeToApiVersions.get(type) ?? [];
     },
     setApiVersionsForType(type, apiVersions: string[]): void {
-      const service = this.getServiceForType(type);
-      let serviceMap = this.__tspTypeToApiVersions.get(service);
-      if (!serviceMap) {
-        serviceMap = new Map();
-        this.__tspTypeToApiVersions.set(service, serviceMap);
-      }
-      const existingApiVersions = serviceMap.get(type) ?? [];
+      const existingApiVersions = this.__tspTypeToApiVersions.get(type) ?? [];
       const mergedApiVersions = [...existingApiVersions];
       for (const apiVersion of apiVersions) {
         if (!mergedApiVersions.includes(apiVersion)) {
           mergedApiVersions.push(apiVersion);
         }
       }
-      serviceMap.set(type, mergedApiVersions);
+      this.__tspTypeToApiVersions.set(type, mergedApiVersions);
     },
     getPackageVersions(): Map<Namespace, string[]> {
       if (!this.__packageVersions) {
@@ -161,54 +146,6 @@ export function createTCGCContext(
         prepareClientAndOperationCache(this);
       }
       return this.__operationToClientCache!.get(operation)!;
-    },
-    getServiceForType(type: Type): Namespace {
-      let service = this.__typeToService.get(type);
-      if (!service) {
-        const services = listAllServiceNamespaces(this);
-        for (const svc of services) {
-          // First check if the type itself is the service namespace
-          if (type === svc) {
-            this.__typeToService.set(type, svc);
-            return svc;
-          }
-          // Check if type is in this service's namespace by walking up the namespace hierarchy
-          if ("namespace" in type && type.namespace) {
-            service = type.namespace;
-            while (service) {
-              if (service === svc) {
-                this.__typeToService.set(type, svc);
-                return svc;
-              }
-              service = service.namespace;
-            }
-          }
-        }
-        if (!service) {
-          service = this.getMutatedGlobalNamespace();
-        }
-        this.__typeToService.set(type, service);
-      }
-      return service;
-    },
-    getTopLevelVersionedService(): Namespace {
-      if (!this.__topLevelVersionedService) {
-        const services = listServices(this.program);
-        if (services.length === 0) {
-          this.__topLevelVersionedService = this.program.getGlobalNamespaceType();
-          return this.__topLevelVersionedService;
-        }
-        let targetService = services[0];
-        for (const service of services) {
-          const versions = getVersions(this.program, service.type)[1];
-          if (versions) {
-            targetService = service;
-            break;
-          }
-        }
-        this.__topLevelVersionedService = targetService.type;
-      }
-      return this.__topLevelVersionedService;
     },
   };
 }

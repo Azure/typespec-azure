@@ -63,9 +63,9 @@ import {
 import {
   createGeneratedName,
   findRootSourceProperty,
+  getActualClientType,
   getAvailableApiVersions,
   getClientDoc,
-  getClientNamespaceType,
   getCorrespondingClientParam,
   getHashForType,
   getTcgcLroMetadata,
@@ -86,16 +86,18 @@ import {
   getSdkModelPropertyType,
   getSdkModelPropertyTypeBase,
 } from "./types.js";
+
 function getSdkServiceOperation<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
   methodParameters: SdkMethodParameter[],
+  client: SdkClientType<TServiceOperation>,
 ): [TServiceOperation, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const httpOperation = getHttpOperationWithCache(context, operation);
   if (httpOperation) {
     const sdkHttpOperation = diagnostics.pipe(
-      getSdkHttpOperation(context, httpOperation, methodParameters),
+      getSdkHttpOperation(context, httpOperation, methodParameters, client),
     ) as TServiceOperation;
     return diagnostics.wrap(sdkHttpOperation);
   }
@@ -363,6 +365,7 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
         context,
         metadata.__raw.operation,
         baseServiceMethod.parameters,
+        client,
       ),
     ),
   });
@@ -633,7 +636,7 @@ export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOpe
   const apiVersions = getAvailableApiVersions(
     context,
     operation,
-    getClientNamespaceType(client.__raw),
+    getActualClientType(client.__raw),
   );
 
   let clientParams = context.__clientParametersCache.get(client.__raw);
@@ -665,7 +668,7 @@ export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOpe
   }
 
   const serviceOperation = diagnostics.pipe(
-    getSdkServiceOperation<TServiceOperation>(context, operation, methodParameters),
+    getSdkServiceOperation<TServiceOperation>(context, operation, methodParameters, client),
   );
   const response = getSdkMethodResponse(context, operation, serviceOperation, client);
   const name = getLibraryName(context, operation);

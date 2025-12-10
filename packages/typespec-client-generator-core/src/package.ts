@@ -16,7 +16,7 @@ import {
 } from "./interfaces.js";
 import {
   filterApiVersionsWithDecorators,
-  getClientNamespaceType,
+  getActualClientType,
   getTypeDecorators,
 } from "./internal-utils.js";
 import { getLicenseInfo } from "./license.js";
@@ -123,33 +123,25 @@ function populateApiVersionInformation(context: TCGCContext): void {
     prepareClientAndOperationCache(context);
   }
 
-  for (const clientOperationGroup of context.__rawClientsOperationGroupsCache!.values()) {
-    const clientOperationGroupType = getClientNamespaceType(clientOperationGroup);
+  // Get the package versions map once (this handles both single and multi-service scenarios)
+  const packageVersions = context.getPackageVersions();
 
-    // Get the package versions map once (this handles both single and multi-service scenarios)
-    const packageVersions = context.getPackageVersions();
+  for (const client of context.__rawClientsOperationGroupsCache!.values()) {
+    const clientType = getActualClientType(client);
 
-    // Get the appropriate versions for this client/operation group
-    const services = Array.isArray(clientOperationGroup.service)
-      ? clientOperationGroup.service
-      : [clientOperationGroup.service];
+    // Multiple service case. Set empty result.
+    if (Array.isArray(client.service)) {
+      context.setApiVersionsForType(clientType, []);
+      context.__clientApiVersionDefaultValueCache.set(client, undefined);
+    } else {
+      const versions = filterApiVersionsWithDecorators(
+        context,
+        clientType,
+        packageVersions.get(client.service)!,
+      );
+      context.setApiVersionsForType(clientType, versions);
 
-    const versionsToUse: string[] = [];
-
-    // TODO: the combine of versions from multiple services is wrong for `filterApiVersionsWithDecorators` function
-    for (const service of services) {
-      versionsToUse.push(...packageVersions.get(service)!);
+      context.__clientApiVersionDefaultValueCache.set(client, versions[versions.length - 1]);
     }
-
-    context.setApiVersionsForType(
-      clientOperationGroupType,
-      filterApiVersionsWithDecorators(context, clientOperationGroupType, versionsToUse),
-    );
-
-    const clientApiVersions = context.getApiVersionsForType(clientOperationGroupType);
-    context.__clientApiVersionDefaultValueCache.set(
-      clientOperationGroup,
-      clientApiVersions[clientApiVersions.length - 1],
-    );
   }
 }

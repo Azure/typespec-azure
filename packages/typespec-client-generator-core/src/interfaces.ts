@@ -60,9 +60,7 @@ export interface TCGCContext {
   __responseHeaderCache: Map<ModelProperty, SdkServiceResponseHeader>;
   __generatedNames: Map<Type, string>;
   __httpOperationCache: Map<Operation, HttpOperation>;
-  __typeToService: Map<Type, Namespace>;
-  __topLevelVersionedService?: Namespace;
-  __tspTypeToApiVersions: Map<Namespace, Map<Type, string[]>>;
+  __tspTypeToApiVersions: Map<Type, string[]>;
   __knownScalars?: Record<string, SdkBuiltInKinds>;
   __rawClientsOperationGroupsCache?: Map<
     Namespace | Interface | string,
@@ -88,8 +86,6 @@ export interface TCGCContext {
   getClientOrOperationGroup(type: Namespace | Interface): SdkClient | SdkOperationGroup | undefined;
   getOperationsForClient(client: SdkClient | SdkOperationGroup): Operation[];
   getClientForOperation(operation: Operation): SdkClient | SdkOperationGroup;
-  getServiceForType(type: Type): Namespace;
-  getTopLevelVersionedService(): Namespace;
 }
 
 export interface SdkContext<
@@ -115,7 +111,7 @@ export interface SdkOperationGroup {
   type?: Namespace | Interface;
   subOperationGroups: SdkOperationGroup[];
   groupPath: string;
-  service: Namespace | Namespace[];
+  service: Namespace;
   /** Parent operation group or client. */
   parent?: SdkClient | SdkOperationGroup;
 }
