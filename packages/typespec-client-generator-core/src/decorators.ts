@@ -1,26 +1,28 @@
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
+  compilerAssert,
   DecoratorContext,
   DecoratorFunction,
   Enum,
   EnumMember,
+  getDiscriminator,
+  getNamespaceFullName,
+  ignoreDiagnostics,
   Interface,
+  isErrorModel,
+  isNumeric,
+  isService,
+  isTemplateDeclaration,
   Model,
   ModelProperty,
   Namespace,
+  Numeric,
   Operation,
   Program,
   RekeyableMap,
   Scalar,
   Type,
   Union,
-  compilerAssert,
-  getDiscriminator,
-  getNamespaceFullName,
-  ignoreDiagnostics,
-  isErrorModel,
-  isService,
-  isTemplateDeclaration,
 } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
@@ -45,6 +47,7 @@ import {
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
 import {
+  ClientDefaultValueDecorator,
   FlattenPropertyDecorator,
   HierarchyBuildingDecorator,
   MarkAsLroDecorator,
@@ -177,7 +180,6 @@ export const $client: ClientDecorator = (
     options?.kind === "Model" ? options?.properties.get("name")?.type : undefined;
   const name: string = explicitName?.kind === "String" ? explicitName.value : target.name;
   let service = options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
-  const parent = options?.kind === "Model" ? options?.properties.get("parent")?.type : undefined;
 
   if (service?.kind !== "Namespace") {
     service = findClientService(context.program, target);
@@ -203,7 +205,6 @@ export const $client: ClientDecorator = (
     type: target,
     crossLanguageDefinitionId: `${getNamespaceFullName(service)}.${name}`,
     subOperationGroups: [],
-    parent: parent as Namespace | Interface | undefined,
   };
   setScopedDecoratorData(context, $client, clientKey, target, client, scope);
 };
@@ -1198,7 +1199,7 @@ function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Names
 
 export const $scope: ScopeDecorator = (
   context: DecoratorContext,
-  entity: Operation,
+  entity: Operation | ModelProperty,
   scope?: LanguageScopes,
 ) => {
   const [negationScopes, scopes] = parseScopes(context, scope);
@@ -1559,13 +1560,45 @@ export function getNextLinkVerb(context: TCGCContext, entity: Operation): "GET" 
   return getScopedDecoratorData(context, nextLinkVerbKey, entity) ?? "GET";
 }
 
+const clientDefaultValueKey = createStateSymbol("clientDefaultValue");
+
+export const $clientDefaultValue: ClientDefaultValueDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  value: string | boolean | Numeric,
+  scope?: LanguageScopes,
+) => {
+  const actualValue = isNumeric(value) ? value.asNumber() : value;
+  setScopedDecoratorData(
+    context,
+    $clientDefaultValue,
+    clientDefaultValueKey,
+    target,
+    actualValue,
+    scope,
+  );
+};
+
 /**
- * Check if an operation is in scope for the current emitter.
+ * Get the client-level default value for a model property.
  * @param context TCGCContext
- * @param entity Operation to check if it is in scope
+ * @param entity ModelProperty to check for clientDefaultValue decorator
+ * @returns The client-level default value if decorator is applied, undefined otherwise.
+ */
+export function getClientDefaultValue(
+  context: TCGCContext,
+  entity: ModelProperty,
+): string | boolean | Numeric | undefined {
+  return getScopedDecoratorData(context, clientDefaultValueKey, entity);
+}
+
+/**
+ * Check if an operation or model property is in scope for the current emitter.
+ * @param context TCGCContext
+ * @param entity Operation or ModelProperty to check if it is in scope
  * @returns
  */
-export function isInScope(context: TCGCContext, entity: Operation): boolean {
+export function isInScope(context: TCGCContext, entity: Operation | ModelProperty): boolean {
   const scopes = getScopedDecoratorData(context, scopeKey, entity);
   const negationScopes = getScopedDecoratorData(context, negationScopesKey, entity);
 

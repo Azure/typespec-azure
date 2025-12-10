@@ -41,7 +41,6 @@ import { HttpOperation, HttpOperationResponseContent, HttpPayloadBody } from "@t
 import {
   getAddedOnVersions,
   getRemovedOnVersions,
-  getVersionDependencies,
   getVersioningMutators,
   getVersions,
 } from "@typespec/versioning";
@@ -62,7 +61,6 @@ import {
   SdkClientType,
   SdkEnumType,
   SdkHeaderParameter,
-  SdkHttpResponse,
   SdkMethodParameter,
   SdkOperationGroup,
   SdkServiceOperation,
@@ -290,8 +288,7 @@ export function getAvailableApiVersions(
     context.setApiVersionsForType(type, explicitlyDecorated);
     return explicitlyDecorated;
   }
-  // If no explicit decorators, use the calculated apiVersions instead of just wrapperApiVersions
-  context.setApiVersionsForType(type, apiVersions);
+  context.setApiVersionsForType(type, wrapperApiVersions);
   return context.getApiVersionsForType(type);
 }
 
@@ -472,26 +469,6 @@ export function getNonNullOptions(type: Union): Type[] {
 
 export function getNullOption(type: Union): Type | undefined {
   return [...type.variants.values()].map((x) => x.type).filter((t) => isNullType(t))[0];
-}
-
-export function getAllResponseBodiesAndNonBodyExists(responses: SdkHttpResponse[]): {
-  allResponseBodies: SdkType[];
-  nonBodyExists: boolean;
-} {
-  const allResponseBodies: SdkType[] = [];
-  let nonBodyExists = false;
-  for (const response of responses) {
-    if (response.type) {
-      allResponseBodies.push(response.type);
-    } else {
-      nonBodyExists = true;
-    }
-  }
-  return { allResponseBodies, nonBodyExists };
-}
-
-export function getAllResponseBodies(responses: SdkHttpResponse[]): SdkType[] {
-  return getAllResponseBodiesAndNonBodyExists(responses).allResponseBodies;
 }
 
 /**
@@ -782,89 +759,12 @@ function getVersioningMutator(
 
 export function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Namespace {
   const globalNamespace = context.program.getGlobalNamespaceType();
-  const allApiVersions = context.getApiVersions();
+  const allApiVersions = context.getPackageVersions();
   if (allApiVersions.length === 0 || context.apiVersion === "all") return globalNamespace;
-
-  const services = listServices(context.program);
-  const mutators = [];
-
-  // Check for multi-service scenarios with @useDependency
-  if (services.length > 1) {
-    const clients = context.getClients();
-    if (clients.length > 0) {
-      const versionDependencies = getVersionDependencies(
-        context.program,
-        clients[0].type as Namespace,
-      );
-      if (versionDependencies && versionDependencies.size > 0) {
-        // Multi-service scenario with @useDependency - create mutators for each service
-        for (const [serviceNs, versions] of versionDependencies.entries()) {
-          if (serviceNs.kind === "Namespace") {
-            // Extract the version string from the enum member
-            let versionString: string;
-            if (Array.isArray(versions)) {
-              // Take the last version if multiple versions
-              const lastVersion = versions[versions.length - 1];
-              if (typeof lastVersion === "string") {
-                versionString = lastVersion;
-              } else if (lastVersion && typeof lastVersion === "object" && "value" in lastVersion) {
-                versionString = String(lastVersion.value);
-              } else if (lastVersion && typeof lastVersion === "object" && "name" in lastVersion) {
-                versionString = String(lastVersion.name);
-              } else {
-                continue;
-              }
-            } else if (typeof versions === "string") {
-              versionString = versions;
-            } else if (versions && typeof versions === "object" && "value" in versions) {
-              versionString = String(versions.value);
-            } else if (versions && typeof versions === "object" && "name" in versions) {
-              versionString = String(versions.name);
-            } else {
-              continue;
-            }
-
-            const mutator = getVersioningMutator(context, serviceNs, versionString);
-            mutators.push(mutator);
-          }
-        }
-
-        if (mutators.length > 0) {
-          const subgraph = unsafe_mutateSubgraphWithNamespace(
-            context.program,
-            mutators,
-            globalNamespace,
-          );
-          compilerAssert(
-            subgraph.type.kind === "Namespace",
-            "Should not have mutated to another type",
-          );
-          return subgraph.type;
-        }
-      }
-    }
-  }
-
-  // Single service scenario or no @useDependency
-  if (services.length === 0) {
-    return globalNamespace;
-  }
-
-  // Find the service that has versioning information
-  // In single-service scenarios, this should be the service with @versioned
-  // In multi-service without @useDependency, use the first service with versions
-  let targetService = services[0].type;
-  for (const service of services) {
-    const versions = getVersions(context.program, service.type)[1];
-    if (versions) {
-      targetService = service.type;
-      break;
-    }
-  }
 
   const mutator = getVersioningMutator(
     context,
-    targetService,
+    listServices(context.program)[0].type,
     allApiVersions[allApiVersions.length - 1],
   );
   const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, [mutator], globalNamespace);

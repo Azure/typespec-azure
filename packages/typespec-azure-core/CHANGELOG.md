@@ -1,5 +1,22 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.63.0
+
+### Features
+
+- [#3475](https://github.com/Azure/typespec-azure/pull/3475) Add new `no-case-mismatch` rule checking for types with names only differing by case
+
+### Bump dependencies
+
+- [#3546](https://github.com/Azure/typespec-azure/pull/3546) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3529](https://github.com/Azure/typespec-azure/pull/3529) Fix `no-legacy-usage` linting rule to check for model is, spread and augment decorators
+- [#3604](https://github.com/Azure/typespec-azure/pull/3604) Add pagination decorators to query parameter models: `@pageSize` to `MaxPageSizeQueryParameter.maxpagesize` and `@offset` to `SkipQueryParameter.skip`
+- [#3483](https://github.com/Azure/typespec-azure/pull/3483) Add new `no-unnamed-union` rule to prevent usage of unnamed unions in Azure
+
+
 ## 0.62.0
 
 ### Features

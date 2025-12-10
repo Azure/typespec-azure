@@ -44,7 +44,6 @@ describe("@client", () => {
     deepStrictEqual(clients, [
       {
         kind: "SdkClient",
-        parent: undefined,
         name: "MyClient",
         service: MyClient,
         type: MyClient,
@@ -67,7 +66,6 @@ describe("@client", () => {
       {
         kind: "SdkClient",
         name: "MyClient",
-        parent: undefined,
         service: MyService,
         type: MyClient,
         crossLanguageDefinitionId: "MyService.MyClient",

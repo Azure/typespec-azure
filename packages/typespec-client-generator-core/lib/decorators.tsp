@@ -172,11 +172,6 @@ model ClientOptions {
    * The name of the client. If not specified, the default name will be `<Name of the target>Client`.
    */
   name?: string;
-
-  /**
-   * The parent client of this client. If specified, this client will be generated as a sub client of the parent client.
-   */
-  parent?: Namespace | Interface;
 }
 
 /**
@@ -736,10 +731,10 @@ extern dec alternateType(
 );
 
 /**
- * Define the scope of an operation.
- * By default, the operation will be applied to all language emitters.
- * This decorator allows you to omit the operation from certain languages or apply it to specific languages.
- * @param target The target operation that you want to scope.
+ * Define the scope of an operation or model property.
+ * By default, the element will be applied to all language emitters.
+ * This decorator allows you to omit the element from certain languages or apply it to specific languages.
+ * @param target The target operation or model property that you want to scope.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  *
@@ -754,8 +749,16 @@ extern dec alternateType(
  * @scope("go")
  * op test: void;
  * ```
+ *
+ * @example Apply a model property to specific languages
+ * ```typespec
+ * model TestModel {
+ *   @scope("csharp")
+ *   csharpOnlyProp: string;
+ * }
+ * ```
  */
-extern dec scope(target: Operation, scope?: valueof string);
+extern dec scope(target: Operation | ModelProperty, scope?: valueof string);
 
 /**
  * Specify whether a parameter is an API version parameter or not.

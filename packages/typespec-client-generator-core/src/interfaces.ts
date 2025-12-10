@@ -67,21 +67,21 @@ export interface TCGCContext {
     SdkClient | SdkOperationGroup
   >;
   __clientToOperationsCache?: Map<SdkClient | SdkOperationGroup, Operation[]>;
-  __clientTypesCache?: SdkClientType<SdkHttpOperation>[];
   __operationToClientCache?: Map<Operation, SdkClient | SdkOperationGroup>;
   __clientParametersCache: Map<SdkClient | SdkOperationGroup, SdkMethodParameter[]>;
   __clientApiVersionDefaultValueCache: Map<SdkClient | SdkOperationGroup, string | undefined>;
   __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
   __pagedResultSet: Set<SdkType>;
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
-  __serviceToVersions?: Map<Namespace | undefined, string[]>; // the package versions from the service versioning config and api version setting in tspconfig.
+  __packageVersions?: string[]; // the package versions from the service versioning config and api version setting in tspconfig.
   __packageVersionEnum?: Enum; // the enum type that contains all the package versions.
   __externalPackageToVersions?: Map<string, string>;
 
   getMutatedGlobalNamespace(): Namespace;
   getApiVersionsForType(type: Type): string[];
   setApiVersionsForType(type: Type, apiVersions: string[]): void;
-  getApiVersions(service?: Namespace): string[];
+  getPackageVersions(): string[];
+  getPackageVersionEnum(): Enum | undefined;
   getClients(): SdkClient[];
   getClientOrOperationGroup(type: Namespace | Interface): SdkClient | SdkOperationGroup | undefined;
   getOperationsForClient(client: SdkClient | SdkOperationGroup): Operation[];
@@ -105,7 +105,6 @@ export interface SdkClient {
   type: Namespace | Interface;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
-  parent?: Namespace | Interface;
   subOperationGroups: SdkOperationGroup[];
 }
 
@@ -265,7 +264,7 @@ export type SdkType =
 export interface SdkBuiltInType<TKind extends SdkBuiltInKinds = SdkBuiltInKinds>
   extends SdkTypeBase {
   kind: TKind;
-  /** How to encode the type in wire. */
+  /** How to encode the type on wire. */
   encode?: string;
   /** Client name for the type. */
   name: string;
@@ -380,6 +379,7 @@ export function isSdkDateTimeEncodings(encoding: string): encoding is DateTimeKn
 interface SdkDateTimeTypeBase extends SdkTypeBase {
   name: string;
   baseType?: SdkDateTimeType;
+  /** How to encode the type on wire. */
   encode: DateTimeKnownEncoding;
   wireType: SdkBuiltInType;
   /** Unique ID for the current type. */
@@ -400,6 +400,7 @@ export interface SdkDurationType extends SdkTypeBase {
   kind: "duration";
   name: string;
   baseType?: SdkDurationType;
+  /** How to encode the type on wire. */
   encode: DurationKnownEncoding;
   wireType: SdkBuiltInType;
   /** Unique ID for the current type. */
@@ -600,7 +601,15 @@ export interface SdkModelPropertyTypeBase<TType extends SdkTypeBase = SdkType>
   access: AccessFlags;
   /** Whether this property could be flattened */
   flatten: boolean;
+  /** How to encode the property on wire. */
+  encode?: ArrayKnownEncoding;
 }
+
+export type ArrayKnownEncoding =
+  | "pipeDelimited"
+  | "spaceDelimited"
+  | "commaDelimited"
+  | "newlineDelimited";
 
 /**
  * Options to show how to serialize a model/property.
@@ -843,6 +852,11 @@ export interface SdkMethodResponse {
    * An array of properties to fetch {result} from the {response} model. Note that this property is only for LRO and paging pattens.
    */
   resultSegments?: SdkModelPropertyType[];
+  /**
+   * Indicates whether the response type is optional. Set to true when the operation has at least one HTTP response without a body.
+   * This allows distinguishing between responses without a body and responses with a body of type `Type | null`.
+   */
+  optional?: boolean;
 }
 
 export interface SdkServiceResponse {

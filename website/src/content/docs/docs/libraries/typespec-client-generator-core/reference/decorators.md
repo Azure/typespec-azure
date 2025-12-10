@@ -994,9 +994,9 @@ op headOperation(): void;
 
 ### `@scope` {#@Azure.ClientGenerator.Core.scope}
 
-Define the scope of an operation.
-By default, the operation will be applied to all language emitters.
-This decorator allows you to omit the operation from certain languages or apply it to specific languages.
+Define the scope of an operation or model property.
+By default, the element will be applied to all language emitters.
+This decorator allows you to omit the element from certain languages or apply it to specific languages.
 
 ```typespec
 @Azure.ClientGenerator.Core.scope(scope?: valueof string)
@@ -1004,8 +1004,8 @@ This decorator allows you to omit the operation from certain languages or apply 
 
 #### Target
 
-The target operation that you want to scope.
-`Operation`
+The target operation or model property that you want to scope.
+`Operation | ModelProperty`
 
 #### Parameters
 
@@ -1027,6 +1027,15 @@ op test: void;
 ```typespec
 @scope("go")
 op test: void;
+```
+
+##### Apply a model property to specific languages
+
+```typespec
+model TestModel {
+  @scope("csharp")
+  csharpOnlyProp: string;
+}
 ```
 
 ### `@usage` {#@Azure.ClientGenerator.Core.usage}
@@ -1141,6 +1150,67 @@ model MyModel {
 ```
 
 ## Azure.ClientGenerator.Core.Legacy
+
+### `@clientDefaultValue` {#@Azure.ClientGenerator.Core.Legacy.clientDefaultValue}
+
+Sets a client-level default value for a model property or operation parameter.
+
+This decorator allows brownfield services to specify default values that will be
+used by SDK generators, maintaining backward compatibility with existing SDK users
+who may rely on default values that were previously generated from Swagger definitions.
+
+This decorator is considered legacy functionality and should only be used for
+maintaining backward compatibility in existing services. New services should use
+standard TypeSpec patterns for default values.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.clientDefaultValue(value: valueof string | boolean | numeric, scope?: valueof string)
+```
+
+#### Target
+
+The model property or operation parameter that should have a client-level default value
+`ModelProperty`
+
+#### Parameters
+
+| Name  | Type                                   | Description                                                                                                                                                                                                                                                     |
+| ----- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| value | `valueof string \| boolean \| numeric` | The default value to be used by SDK generators (must be a string, number, or boolean literal)                                                                                                                                                                   |
+| scope | `valueof string`                       | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+
+#### Examples
+
+##### Set a default value for a model property
+
+```typespec
+model RequestOptions {
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(30)
+  timeout?: int32;
+
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("standard")
+  tier?: string;
+}
+```
+
+##### Set a default value for an operation parameter
+
+```typespec
+op getItems(
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(10)
+  @query
+  pageSize?: int32,
+): Item[];
+```
+
+##### Apply default value only for specific languages
+
+```typespec
+model Config {
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(false, "python")
+  enableCache?: boolean;
+}
+```
 
 ### `@flattenProperty` {#@Azure.ClientGenerator.Core.Legacy.flattenProperty}
 
