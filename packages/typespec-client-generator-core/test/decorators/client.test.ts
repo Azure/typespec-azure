@@ -43,7 +43,6 @@ describe("@client", () => {
     const clients = listClients(runner.context);
     deepStrictEqual(clients, [
       {
-        autoMerge: false,
         kind: "SdkClient",
         name: "MyClient",
         service: MyClient,
@@ -69,7 +68,6 @@ describe("@client", () => {
         service: MyService,
         type: MyClient,
         subOperationGroups: [],
-        autoMerge: false,
       },
     ]);
   });

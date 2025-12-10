@@ -108,7 +108,6 @@ export interface SdkClient {
   service: Namespace | Namespace[];
   type: Namespace | Interface;
   subOperationGroups: SdkOperationGroup[];
-  autoMerge?: boolean;
 }
 
 export interface SdkOperationGroup {

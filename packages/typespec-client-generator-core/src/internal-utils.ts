@@ -114,15 +114,15 @@ export const overrideKey = createStateSymbol("override");
 
 export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
   const explicitClients = listScopedDecoratorData(context, clientKey);
-  let withAutoMerge = false;
+  let multiServices = false;
   explicitClients.forEach((value) => {
-    if (value.autoMerge) {
-      withAutoMerge = true;
+    if (Array.isArray((value as SdkClient).service)) {
+      multiServices = true;
     }
   });
 
   return (
-    (explicitClients.size > 0 && !withAutoMerge) ||
+    (explicitClients.size > 0 && !multiServices) ||
     listScopedDecoratorData(context, operationGroupKey).size > 0
   );
 }

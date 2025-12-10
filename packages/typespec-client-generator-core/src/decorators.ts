@@ -179,7 +179,6 @@ export const $client: ClientDecorator = (
     options?.kind === "Model" ? options?.properties.get("name")?.type : undefined;
   const name: string = explicitName?.kind === "String" ? explicitName.value : target.name;
   let service: Namespace | Namespace[] | undefined = undefined;
-  let autoMerge: boolean | undefined = false;
   const serviceConfig =
     options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
 
@@ -190,7 +189,6 @@ export const $client: ClientDecorator = (
     serviceConfig.values.every((v) => v.kind === "Namespace")
   ) {
     service = serviceConfig.values;
-    autoMerge = true;
   } else {
     service = findClientService(context.program, target);
   }
@@ -210,7 +208,6 @@ export const $client: ClientDecorator = (
     service,
     type: target,
     subOperationGroups: [],
-    autoMerge,
   };
   setScopedDecoratorData(context, $client, clientKey, target, client, scope);
 };

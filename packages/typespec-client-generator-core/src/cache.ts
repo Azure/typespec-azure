@@ -114,13 +114,9 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   for (const client of clients) {
     const groups: SdkOperationGroup[] = [];
 
-    if (client.autoMerge) {
-      if (Array.isArray(client.service)) {
-        for (const specificService of client.service) {
-          createFirstLevelOperationGroup(context, specificService, specificService);
-        }
-      } else {
-        createFirstLevelOperationGroup(context, client.service, client.service);
+    if (Array.isArray(client.service)) {
+      for (const specificService of client.service) {
+        createFirstLevelOperationGroup(context, specificService, specificService);
       }
     } else {
       createFirstLevelOperationGroup(context, client.type, client.service);
@@ -294,10 +290,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
  * Check if a type is available in the current target API version.
  * Returns false if the type was @added in a later version or @removed in an earlier version.
  */
-function isTypeAvailableInVersion(
-  context: TCGCContext,
-  type: Namespace | Interface,
-): boolean {
+function isTypeAvailableInVersion(context: TCGCContext, type: Namespace | Interface): boolean {
   const apiVersion = context.apiVersion;
   // eslint-disable-next-line no-console
   console.error(`isTypeAvailableInVersion CALLED: type=${type.name}, apiVersion=${apiVersion}`);
@@ -334,7 +327,9 @@ function isTypeAvailableInVersion(
   // Check @added decorator
   const addedVersions = getAddedOnVersions(context.program, type);
   // eslint-disable-next-line no-console
-  console.log(`isTypeAvailableInVersion: type=${type.name}, apiVersion=${apiVersion}, addedVersions=${addedVersions?.map(v => v.value)?.join(",") ?? "none"}`);
+  console.log(
+    `isTypeAvailableInVersion: type=${type.name}, apiVersion=${apiVersion}, addedVersions=${addedVersions?.map((v) => v.value)?.join(",") ?? "none"}`,
+  );
   if (addedVersions && addedVersions.length > 0) {
     // Type was added in a specific version - check if target version is >= added version
     const addedVersion = addedVersions[0]; // Use first added version
@@ -344,7 +339,9 @@ function isTypeAvailableInVersion(
     if (addedIndex !== undefined && targetIndex < addedIndex) {
       // Target version is before the type was added
       // eslint-disable-next-line no-console
-      console.log(`  EXCLUDING ${type.name} (added in ${addedVersion.value}, targeting ${apiVersion})`);
+      console.log(
+        `  EXCLUDING ${type.name} (added in ${addedVersion.value}, targeting ${apiVersion})`,
+      );
       return false;
     }
   }
@@ -408,7 +405,7 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
   if (explicitClients.length === 0) {
     // Get all client data from the state map (keyed by original types)
     const allClientData = listScopedDecoratorData(context, clientKey);
-    
+
     for (const [originalType, sdkClient] of allClientData.entries()) {
       // Find the corresponding mutated type by name
       let mutatedType: Namespace | Interface | undefined;
@@ -430,7 +427,7 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
         // Also remap the service namespace to the mutated version
         let mutatedService: Namespace | Namespace[] | undefined;
         const originalService = (sdkClient as SdkClient).service;
-        
+
         if (Array.isArray(originalService)) {
           const remappedServices: Namespace[] = [];
           for (const svc of originalService) {
