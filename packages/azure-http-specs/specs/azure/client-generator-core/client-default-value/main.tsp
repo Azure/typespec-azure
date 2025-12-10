@@ -61,7 +61,6 @@ model ModelWithDefaultValues {
 @put
 op putModelProperty(@body body: ModelWithDefaultValues): ModelWithDefaultValues;
 
-#suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Testing legacy decorator"
 @scenario
 @route("/operation-parameter")
 @scenarioDoc("""
@@ -86,7 +85,6 @@ op getOperationParameter(
   @query format?: string
 ): void;
 
-#suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Testing legacy decorator"
 @scenario
 @route("/path-parameter/{segment1}/{segment2}")
 @scenarioDoc("""
