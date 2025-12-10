@@ -458,6 +458,12 @@ export const $lib = createTypeSpecLibrary({
         default: "Can not define multiple explicit clients with multiple services.",
       },
     },
+    "multi-service-missing-version-dependency": {
+      severity: "error",
+      messages: {
+        default: "Client with multiple services is missing version dependency declaration.",
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,

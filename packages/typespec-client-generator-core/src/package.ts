@@ -43,7 +43,12 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
     namespaces: [],
     licenseInfo: getLicenseInfo(context),
     metadata: {
-      apiVersion: context.apiVersion === "all" ? "all" : versions[versions.length - 1],
+      apiVersion:
+        context.apiVersion === "all" && versions.size === 1
+          ? "all"
+          : versions.size === 1
+            ? [...versions.values()][0].at(-1)
+            : undefined,
     },
   };
   organizeNamespaces(context, sdkPackage);
@@ -121,6 +126,9 @@ function populateApiVersionInformation(context: TCGCContext): void {
   for (const clientOperationGroup of context.__rawClientsOperationGroupsCache!.values()) {
     const clientOperationGroupType = getClientNamespaceType(clientOperationGroup);
 
+    // Get the package versions map once (this handles both single and multi-service scenarios)
+    const packageVersions = context.getPackageVersions();
+
     // Get the appropriate versions for this client/operation group
     const services = Array.isArray(clientOperationGroup.service)
       ? clientOperationGroup.service
@@ -130,7 +138,7 @@ function populateApiVersionInformation(context: TCGCContext): void {
 
     // TODO: the combine of versions from multiple services is wrong for `filterApiVersionsWithDecorators` function
     for (const service of services) {
-      versionsToUse.push(...context.getPackageVersions(service));
+      versionsToUse.push(...packageVersions.get(service)!);
     }
 
     context.setApiVersionsForType(
