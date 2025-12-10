@@ -137,7 +137,7 @@ function populateApiVersionInformation(context: TCGCContext): void {
       const versions = filterApiVersionsWithDecorators(
         context,
         clientType,
-        packageVersions.get(client.service)!,
+        packageVersions.get(client.service) || [],
       );
       context.setApiVersionsForType(clientType, versions);
 

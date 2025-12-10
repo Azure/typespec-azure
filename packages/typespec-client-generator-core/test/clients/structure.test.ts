@@ -1280,3 +1280,105 @@ it("one client from multiple services with models shared across services", async
   strictEqual(biClient.apiVersions.length, 2);
   deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
 });
+
+it("error: multiple explicit clients with multiple services", async () => {
+  const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      interface AI {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      interface BI {
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+    `
+    @client(
+      {
+        name: "ClientA",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace ClientA {}
+
+    @client(
+      {
+        name: "ClientB",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace ClientB {}
+  `,
+  );
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/multiple-explicit-clients-multiple-services",
+      message: "Can not define multiple explicit clients with multiple services.",
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/multiple-explicit-clients-multiple-services",
+      message: "Can not define multiple explicit clients with multiple services.",
+    },
+  ]);
+});
+
+it("error: client location to new operation group with multiple services", async () => {
+  const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      @route("/aTest")
+      op aTest(@query("api-version") apiVersion: VersionsA): void;
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      @route("/bTest")
+      op bTest(@query("api-version") apiVersion: VersionsB): void;
+    }`,
+    `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombineClient {}
+
+    // Try to move an operation to a new operation group that doesn't exist
+    @@clientLocation(ServiceA.aTest, "NewOperationGroup");
+  `,
+  );
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/client-location-to-new-og-with-multiple-services",
+    message: "Cannot move operation to a new operation group when client has multiple services.",
+  });
+});
