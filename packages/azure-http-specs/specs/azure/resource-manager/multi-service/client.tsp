@@ -7,18 +7,8 @@ using Azure.Core;
 using Azure.ResourceManager;
 using Azure.ClientGenerator.Core;
 
-@client
+@client({
+  service: [Microsoft.Compute, Microsoft.ComputeDisk],
+})
 @useDependency(Microsoft.Compute.Versions.v2025_04_01, Microsoft.ComputeDisk.Versions.v2025_01_02)
-namespace Azure.ResourceManager.MultiService {
-  @client({
-    service: Microsoft.Compute,
-    parent: Azure.ResourceManager.MultiService,
-  })
-  interface VitrualMachines extends Microsoft.Compute.VirtualMachines {}
-
-  @client({
-    service: Microsoft.ComputeDisk,
-    parent: Azure.ResourceManager.MultiService,
-  })
-  interface Disks extends Microsoft.ComputeDisk.Disks {}
-}
+namespace Azure.ResourceManager.MultiService;
