@@ -77,12 +77,16 @@ op putModelProperty(@body body: ModelWithDefaultValues): ModelWithDefaultValues;
 @get
 op getOperationParameter(
   @query name: string,
+
   #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Testing legacy decorator"
   @global.Azure.ClientGenerator.Core.Legacy.clientDefaultValue(10)
-  @query pageSize?: int32,
+  @query
+  pageSize?: int32,
+
   #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Testing legacy decorator"
   @global.Azure.ClientGenerator.Core.Legacy.clientDefaultValue("json")
-  @query format?: string
+  @query
+  format?: string,
 ): void;
 
 @scenario
@@ -101,6 +105,8 @@ op getOperationParameter(
 op getPathParameter(
   #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Testing legacy decorator"
   @global.Azure.ClientGenerator.Core.Legacy.clientDefaultValue("default-segment1")
-  @path segment1: string,
-  @path segment2: string
+  @path
+  segment1: string,
+
+  @path segment2: string,
 ): void;
