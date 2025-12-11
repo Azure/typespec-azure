@@ -1,3 +1,4 @@
+import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
   Diagnostic,
   Enum,
@@ -456,6 +457,27 @@ function getContextPath(
               return result;
             }
           }
+        }
+      }
+    }
+
+    const lroMetadata = getLroMetadata(context.program, root);
+    if (lroMetadata) {
+      const anonymousCandidates = [
+        { lroResultType: lroMetadata.finalResult, label: "FinalResult" },
+        { lroResultType: lroMetadata.logicalResult, label: "LogicalResult" },
+        { lroResultType: lroMetadata.envelopeResult, label: "EnvelopeResult" },
+        { lroResultType: lroMetadata.finalEnvelopeResult, label: "FinalEnvelopeResult" },
+      ];
+
+      for (const { lroResultType, label } of anonymousCandidates) {
+        if (!lroResultType || lroResultType === "void") {
+          continue;
+        }
+        visited.clear();
+        result = [{ name: root.name, type: root }];
+        if (dfsModelProperties(typeToFind, lroResultType, label)) {
+          return result;
         }
       }
     }
