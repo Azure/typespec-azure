@@ -6,7 +6,7 @@ export const Scenarios: Record<string, ScenarioMockApi> = {};
 Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveToNewSubClient_ProductOperations =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-location/products",
+      uri: "/azure/client-generator-core/client-location/move-to-new-sub-client/products",
       method: "get",
       request: {},
       response: {
@@ -15,7 +15,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveToNewSubClient_ProductOp
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-location/products/archive",
+      uri: "/azure/client-generator-core/client-location/move-to-new-sub-client/products/archive",
       method: "post",
       request: {},
       response: {

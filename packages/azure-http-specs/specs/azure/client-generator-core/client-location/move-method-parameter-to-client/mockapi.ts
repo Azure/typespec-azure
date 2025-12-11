@@ -6,7 +6,7 @@ export const Scenarios: Record<string, ScenarioMockApi> = {};
 Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveMethodParameterToClient_BlobOperations =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-location/blob",
+      uri: "/azure/client-generator-core/client-location/move-method-parameter-to-client/blob",
       method: "get",
       request: {
         query: {

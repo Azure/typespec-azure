@@ -6,7 +6,7 @@ export const Scenarios: Record<string, ScenarioMockApi> = {};
 Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveToExistingSubClient_UserOperations =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-location/user",
+      uri: "/azure/client-generator-core/client-location/move-to-existing-sub-client/user",
       method: "get",
       request: {},
       response: {
@@ -15,7 +15,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveToExistingSubClient_User
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-location/user",
+      uri: "/azure/client-generator-core/client-location/move-to-existing-sub-client/user",
       method: "delete",
       request: {},
       response: {
@@ -24,7 +24,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveToExistingSubClient_User
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-location/admin",
+      uri: "/azure/client-generator-core/client-location/move-to-existing-sub-client/admin",
       method: "get",
       request: {},
       response: {

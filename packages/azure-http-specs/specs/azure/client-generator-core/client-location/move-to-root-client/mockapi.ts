@@ -6,7 +6,7 @@ export const Scenarios: Record<string, ScenarioMockApi> = {};
 Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveToRootClient_ResourceOperations =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-location/resource",
+      uri: "/azure/client-generator-core/client-location/move-to-root-client/resource",
       method: "get",
       request: {},
       response: {
@@ -15,7 +15,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientLocation_MoveToRootClient_ResourceOpe
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-location/health",
+      uri: "/azure/client-generator-core/client-location/move-to-root-client/health",
       method: "get",
       request: {},
       response: {
