@@ -1151,6 +1151,67 @@ model MyModel {
 
 ## Azure.ClientGenerator.Core.Legacy
 
+### `@clientDefaultValue` {#@Azure.ClientGenerator.Core.Legacy.clientDefaultValue}
+
+Sets a client-level default value for a model property or operation parameter.
+
+This decorator allows brownfield services to specify default values that will be
+used by SDK generators, maintaining backward compatibility with existing SDK users
+who may rely on default values that were previously generated from Swagger definitions.
+
+This decorator is considered legacy functionality and should only be used for
+maintaining backward compatibility in existing services. New services should use
+standard TypeSpec patterns for default values.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.clientDefaultValue(value: valueof string | boolean | numeric, scope?: valueof string)
+```
+
+#### Target
+
+The model property or operation parameter that should have a client-level default value
+`ModelProperty`
+
+#### Parameters
+
+| Name  | Type                                   | Description                                                                                                                                                                                                                                                     |
+| ----- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| value | `valueof string \| boolean \| numeric` | The default value to be used by SDK generators (must be a string, number, or boolean literal)                                                                                                                                                                   |
+| scope | `valueof string`                       | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+
+#### Examples
+
+##### Set a default value for a model property
+
+```typespec
+model RequestOptions {
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(30)
+  timeout?: int32;
+
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("standard")
+  tier?: string;
+}
+```
+
+##### Set a default value for an operation parameter
+
+```typespec
+op getItems(
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(10)
+  @query
+  pageSize?: int32,
+): Item[];
+```
+
+##### Apply default value only for specific languages
+
+```typespec
+model Config {
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(false, "python")
+  enableCache?: boolean;
+}
+```
+
 ### `@flattenProperty` {#@Azure.ClientGenerator.Core.Legacy.flattenProperty}
 
 Set whether a model property should be flattened or not.

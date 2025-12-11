@@ -47,6 +47,7 @@ import {
   getAccess,
   getAccessOverride,
   getAlternateType,
+  getClientDefaultValue,
   getClientNamespace,
   getExplicitClientApiVersions,
   getLegacyHierarchyBuilding,
@@ -1261,6 +1262,7 @@ export function getSdkModelPropertyTypeBase(
       encode = "newlineDelimited";
     }
   }
+  const clientDefaultValue = getClientDefaultValue(context, type);
   return diagnostics.wrap({
     __raw: type,
     doc: getClientDoc(context, type),
@@ -1282,6 +1284,7 @@ export function getSdkModelPropertyTypeBase(
     access: getAccess(context, type),
     flatten: shouldFlattenProperty(context, type),
     encode,
+    ...(clientDefaultValue !== undefined && { clientDefaultValue }),
   });
 }
 

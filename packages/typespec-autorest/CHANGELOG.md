@@ -1,5 +1,33 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.63.0
+
+### Breaking Changes
+
+- [#3522](https://github.com/Azure/typespec-azure/pull/3522) - Remove deprecated `arm-resource-flattening` option
+  
+    ```diff lang=yaml title=tspconfig.yaml
+    options:
+      @azure-tools/typespec-autorest:
+    -   arm-resource-flattening: true
+    ```
+  
+    ```diff lang=tsp title=MyResource.tsp
+    +@@Azure.ClientGenerator.Core.Legacy.flattenProperty(MyResource.properties, "autorest");
+    ```
+
+### Bump dependencies
+
+- [#3546](https://github.com/Azure/typespec-azure/pull/3546) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3613](https://github.com/Azure/typespec-azure/pull/3613) Deduplicate authentication schemes with same name
+- [#3558](https://github.com/Azure/typespec-azure/pull/3558) Respect `@externalDocs` on properties
+- [#3602](https://github.com/Azure/typespec-azure/pull/3602) Fix constraints not applied on nullable properties
+- [#3602](https://github.com/Azure/typespec-azure/pull/3602) Fix `x-ms-enum.name` not being set on nullable enum properties with default
+
+
 ## 0.62.0
 
 ### Deprecations
