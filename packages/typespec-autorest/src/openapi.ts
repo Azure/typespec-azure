@@ -55,7 +55,6 @@ import {
   compilerAssert,
   createDiagnosticCollector,
   explainStringTemplateNotSerializable,
-  getAllTags,
   getAnyExtensionFromPath,
   getDirectoryPath,
   getDiscriminator,
@@ -83,7 +82,6 @@ import {
   isDeprecated,
   isErrorModel,
   isErrorType,
-  isGlobalNamespace,
   isList,
   isNeverType,
   isNullType,
@@ -94,7 +92,6 @@ import {
   isTemplateDeclarationOrInstance,
   isVoidType,
   joinPaths,
-  navigateTypesInNamespace,
   normalizePath,
   reportDeprecated,
   resolveEncodedName,
@@ -103,7 +100,6 @@ import {
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
-import { TwoLevelMap } from "@typespec/compiler/utils";
 import {
   AuthenticationOptionReference,
   AuthenticationReference,
@@ -135,11 +131,9 @@ import {
   resolveRequestVisibility,
 } from "@typespec/http";
 import {
-  checkDuplicateTypeName,
   getExtensions,
   getExternalDocs,
   getOpenAPITypeName,
-  getParameterKey,
   isReadonlyProperty,
   resolveInfo,
   shouldInline,
@@ -160,7 +154,6 @@ import {
   OpenAPI2Operation,
   OpenAPI2Parameter,
   OpenAPI2ParameterBase,
-  OpenAPI2PathItem,
   OpenAPI2PathParameter,
   OpenAPI2QueryParameter,
   OpenAPI2Response,
@@ -176,7 +169,6 @@ import {
 } from "./openapi2-document.js";
 import {
   LateBoundReference,
-  PendingSchema,
   ProcessedSchema,
   type AutorestEmitterResult,
   type LoadedExample,
@@ -246,8 +238,8 @@ type HttpParameterProperties = Extract<
 export async function getOpenAPIForService(
   context: AutorestEmitterContext,
   options: AutorestDocumentEmitterOptions,
-): Promise<AutorestEmitterResult> {
-  const { program, service } = context;
+): Promise<AutorestEmitterResult[]> {
+  const { program, service, proxy } = context;
   const typeNameOptions: TypeNameOptions = {
     // shorten type names by removing TypeSpec and service namespace
     namespaceFilter(ns) {
@@ -255,13 +247,15 @@ export async function getOpenAPIForService(
     },
   };
   const httpService = ignoreDiagnostics(getHttpService(program, service.type));
-  const info = resolveInfo(program, service.type);
+  proxy.addAdditionalInfo(resolveInfo(program, service.type));
   const auth = processAuth(service.type);
+  if (auth?.securitySchemes) proxy.addSecuritySchemes(auth.securitySchemes);
+  if (auth?.security) proxy.addSecurityRequirements(auth.security);
 
   const xml = await resolveXmlModule();
   const xmlStrategy = options.xmlStrategy;
 
-  const root: OpenAPI2Document = {
+  /**const root: OpenAPI2Document = {
     swagger: "2.0",
     info: {
       title: "(title)",
@@ -281,7 +275,7 @@ export async function getOpenAPIForService(
     "x-ms-paths": {},
     definitions: {},
     parameters: {},
-  };
+  };*/
 
   let currentEndpoint: OpenAPI2Operation;
   let currentConsumes: Set<string>;
@@ -293,28 +287,20 @@ export async function getOpenAPIForService(
 
   // Keep a map of all Types+Visibility combinations that were encountered
   // that need schema definitions.
-  const pendingSchemas = new TwoLevelMap<Type, Visibility, PendingSchema>();
+  const pendingSchemas = proxy.pendingSchemas;
 
   // Reuse a single ref object per Type+Visibility combination.
-  const refs = new TwoLevelMap<Type, Visibility, LateBoundReference>();
+  const refs = proxy.refs;
 
   // Keep track of inline types still in the process of having their schema computed
   // This is used to detect cycles in inline types, which is an
   const inProgressInlineTypes = new Set<Type>();
-
-  // Map model properties that represent shared parameters to their parameter
-  // definition that will go in #/parameters. Inlined parameters do not go in
-  // this map.
-  const params: Map<ModelProperty, OpenAPI2Parameter> = new Map();
 
   // Keep track of types that were processed indirectly and shouldn't be added if `omit-unreachable-types` is not set.
   // This include:
   // - Models that have had properties spread into parameters.
   // - Multipart models
   const indirectlyProcessedTypes: Set<Type> = new Set();
-
-  // De-dupe the per-endpoint tags that will be added into the #/tags
-  const tags: Set<string> = new Set();
 
   const operationIdsWithExample = new Set<string>();
 
@@ -338,7 +324,7 @@ export async function getOpenAPIForService(
         ct === "application/json" || (xmlEnabled && ct === "application/xml"),
     );
   if (allResponseContentTypes.length === 0) allResponseContentTypes = ["application/json"];
-  const globalProduces = new Set<string>(allResponseContentTypes);
+  proxy.addProduces(allResponseContentTypes);
 
   let allRequestContentTypes = routes
     .flatMap((route) => route.parameters)
@@ -347,7 +333,9 @@ export async function getOpenAPIForService(
       (ct) => !!ct && (ct === "application/json" || (xmlEnabled && ct === "application/xml")),
     );
   if (allRequestContentTypes.length === 0) allRequestContentTypes = ["application/json"];
-  const globalConsumes = new Set<string>(allRequestContentTypes);
+  proxy.addConsumes(allRequestContentTypes);
+  const globalProduces = proxy.getProduces();
+  const globalConsumes = proxy.getConsumes();
 
   const shouldEmitXml =
     xmlEnabled && (globalProduces.has("application/xml") || globalConsumes.has("application/xml"));
@@ -360,12 +348,12 @@ export async function getOpenAPIForService(
 
   routes.forEach(emitOperation);
 
-  emitParameters();
-  emitSchemas(service.type);
+  //emitParameters();
+  //emitSchemas(service.type);
   emitTags();
 
-  // Finalize global produces/consumes
-  if (globalProduces.size > 0) {
+  // Finalize global produces/consumes (move to proxy impl)
+  /*if (globalProduces.size > 0) {
     root.produces = [...globalProduces.values()];
   } else {
     delete root.produces;
@@ -374,10 +362,10 @@ export async function getOpenAPIForService(
     root.consumes = [...globalConsumes.values()];
   } else {
     delete root.consumes;
-  }
+  }*/
 
-  // Clean up empty entries
-  if (root["x-ms-paths"] && Object.keys(root["x-ms-paths"]).length === 0) {
+  // Clean up empty entries (move to proxy impl)
+  /*if (root["x-ms-paths"] && Object.keys(root["x-ms-paths"]).length === 0) {
     delete root["x-ms-paths"];
   }
   if (root.security && Object.keys(root.security).length === 0) {
@@ -385,9 +373,9 @@ export async function getOpenAPIForService(
   }
   if (root.securityDefinitions && Object.keys(root.securityDefinitions).length === 0) {
     delete root["securityDefinitions"];
-  }
+  }*/
 
-  return {
+  return proxy.resolveDocuments(); /*{
     document: root,
     operationExamples: [...operationIdsWithExample]
       .map((operationId) => {
@@ -400,7 +388,7 @@ export async function getOpenAPIForService(
       })
       .filter((x) => x) as any,
     outputFile: context.outputFile,
-  };
+  };*/
 
   function resolveHost(
     program: Program,
@@ -543,10 +531,11 @@ export async function getOpenAPIForService(
     return undefined;
   }
 
-  /** Initialize the openapi PathItem object where this operation should be added. */
+  /** Initialize the openapi PathItem object where this operation should be added.  add to implementation*/
+  /*
   function initPathItem(operation: HttpOperation): OpenAPI2PathItem {
     let { path, operation: op, verb } = operation;
-    let pathsObject: Record<string, OpenAPI2PathItem> = root.paths;
+    let pathsObject: Record<string, OpenAPI2PathItem> = proxy.createOrAddPathItem(operation);
 
     if (root.paths[path]?.[verb] === undefined && !path.includes("?")) {
       pathsObject = root.paths;
@@ -570,11 +559,11 @@ export async function getOpenAPIForService(
     }
 
     return pathsObject[path];
-  }
+  }*/
 
   function emitOperation(operation: HttpOperation) {
     const { operation: op, verb, parameters } = operation;
-    const currentPath = initPathItem(operation);
+    const currentPath = proxy.createOrAddPathItem(operation);
     if (!currentPath[verb]) {
       currentPath[verb] = {} as any;
     }
@@ -582,12 +571,12 @@ export async function getOpenAPIForService(
     currentConsumes = new Set<string>();
     currentProduces = new Set<string>();
 
-    const currentTags = getAllTags(program, op);
+    const currentTags = proxy.getTags(op);
     if (currentTags) {
-      currentEndpoint.tags = currentTags;
+      currentEndpoint.tags = [...currentTags.values()];
       for (const tag of currentTags) {
         // Add to root tags if not already there
-        tags.add(tag);
+        proxy.addTag([tag], op);
       }
     }
 
@@ -1018,16 +1007,16 @@ export async function getOpenAPIForService(
       return ref;
     }
 
-    const parameter = params.get(property);
+    const parameter = proxy.getOrAddParamPlaceholder(property);
     if (parameter) {
       return parameter;
     }
 
-    const placeholder = {} as OpenAPI2Parameter;
+    let placeholder = {} as Refable<OpenAPI2Parameter>;
 
     // only parameters inherited by spreading from non-inlined type are shared in #/parameters
     if (spreadParam && property.model && !shouldInline(program, property.model)) {
-      params.set(property, placeholder);
+      placeholder = proxy.getOrAddParamPlaceholder(property);
       indirectlyProcessedTypes.add(property.model);
     }
 
@@ -1038,7 +1027,7 @@ export async function getOpenAPIForService(
     const consumes: string[] = methodParams.body?.contentTypes ?? [];
 
     for (const httpProperty of methodParams.properties) {
-      const shared = params.get(httpProperty.property);
+      const shared = proxy.getOrAddParamPlaceholder(httpProperty.property);
       if (shared) {
         currentEndpoint.parameters.push(shared);
         continue;
@@ -1473,7 +1462,8 @@ export async function getOpenAPIForService(
     return value as any;
   }
 
-  function emitParameters() {
+  // move to impl of
+  /* function emitParameters() {
     for (const [property, param] of params) {
       // Add an extension which tells AutoRest that this is a shared operation
       // parameter definition
@@ -1491,8 +1481,10 @@ export async function getOpenAPIForService(
 
       refedParam["$ref"] = "#/parameters/" + encodeURIComponent(key);
     }
-  }
+  }*/
 
+  // move to proxy impl
+  /*
   function emitSchemas(serviceNamespace: Namespace) {
     const processedSchemas = new TwoLevelMap<Type, Visibility, ProcessedSchema>();
     processSchemas();
@@ -1529,7 +1521,9 @@ export async function getOpenAPIForService(
         }
       }
     }
-
+    */
+  // move to proxy impl
+  /*
     function processSchemas() {
       // Process pending schemas. Note that getSchemaForType may pull in new
       // pending schemas so we iterate until there are no pending schemas
@@ -1573,18 +1567,17 @@ export async function getOpenAPIForService(
         { skipSubNamespaces },
       );
       processSchemas();
-    }
+    }*/
 
-    function shouldOmitThisUnreachableType(type: Type): boolean {
-      if (
-        options.versionEnumStrategy !== "include" &&
-        type.kind === "Enum" &&
-        isVersionEnum(program, type)
-      ) {
-        return true;
-      }
-      return false;
+  function shouldOmitThisUnreachableType(type: Type): boolean {
+    if (
+      options.versionEnumStrategy !== "include" &&
+      type.kind === "Enum" &&
+      isVersionEnum(program, type)
+    ) {
+      return true;
     }
+    return false;
   }
 
   function isVersionEnum(program: Program, enumObj: Enum): boolean {
@@ -1596,8 +1589,8 @@ export async function getOpenAPIForService(
   }
 
   function emitTags() {
-    for (const tag of tags) {
-      root.tags!.push({ name: tag });
+    for (const tag of proxy.getTags()) {
+      proxy.addTag([tag]);
     }
   }
 

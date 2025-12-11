@@ -1,4 +1,4 @@
-import { getResourceFeature } from "@azure-tools/typespec-azure-resource-manager";
+import { getFeature } from "@azure-tools/typespec-azure-resource-manager";
 import {
   compilerAssert,
   Program,
@@ -9,12 +9,14 @@ import {
   type Type,
 } from "@typespec/compiler";
 import { TwoLevelMap } from "@typespec/compiler/utils";
-import { Visibility } from "@typespec/http";
+import { HttpOperation, Visibility } from "@typespec/http";
+import { AdditionalInfo } from "@typespec/openapi";
 import type {
   OpenAPI2Document,
   OpenAPI2Parameter,
   OpenAPI2PathItem,
   OpenAPI2Schema,
+  OpenAPI2SecurityScheme,
   Refable,
 } from "./openapi2-document.js";
 
@@ -90,14 +92,17 @@ export class LateBoundReference {
   isLocal?: boolean;
   file?: string;
   value?: string;
+  useFeatures: boolean = false;
+  getFileContext: () => string | undefined = () => undefined;
   setLocalValue(program: Program, inValue: string, type?: Type): void {
     if (type) {
       switch (type.kind) {
         case "Model":
-          this.file = getResourceFeature(program, type);
+        case "ModelProperty":
+          this.file = this.useFeatures ? getFeature(program, type)?.fileName : undefined;
           break;
         default:
-          this.file = "common";
+          this.file = this.useFeatures ? "common" : undefined;
       }
     }
     this.isLocal = true;
@@ -109,8 +114,10 @@ export class LateBoundReference {
   }
   toJSON() {
     compilerAssert(this.value, "Reference value never set.");
+    const referencingFile = this.getFileContext();
     if (!this.isLocal) return this.value;
-    if (this.file === undefined) return `#/definitions/${this.value}`;
+    if (referencingFile === undefined || this.file === undefined || referencingFile === this.file)
+      return `#/definitions/${this.value}`;
     return `${this.file}/definitions/${this.value}`;
   }
 }
@@ -154,6 +161,9 @@ export interface ProcessedSchema extends PendingSchema {
 
 /** Abstracts away methods to create a OpenAPI 2.0 document ragardless of layout. */
 export interface OpenApi2DocumentProxy {
+  addAdditionalInfo(info?: AdditionalInfo): void;
+  addSecuritySchemes(schemes: Record<string, OpenAPI2SecurityScheme>): void;
+  addSecurityRequirements(requirements: Record<string, string[]>[]): void;
   /**
    * Resolve the logical OpenAPI document into a set of emitter results
    */
@@ -162,25 +172,25 @@ export interface OpenApi2DocumentProxy {
    * Get the parameters for an operation
    * @param op The operation to get parameters for
    */
-  getParameters(op: Operation): Map<ModelProperty, OpenAPI2Parameter>;
+  getParameters(op?: Operation): Map<ModelProperty, OpenAPI2Parameter>;
   /** Add a tag to an operation
    * @param op The operation to add a tag to
    * @param tag The tag to add
    */
-  addTag(op: Operation, tag: string): void;
+  addTag(tag: string[], op?: Operation): void;
   /**
    * Add a produces MIME type to an operation
    * @param op The operation to add the produces MIME type to
    * @param produces The MIME type to add
    */
-  addProduces(op: Operation, produces: string): void;
+  addProduces(produces: string[], op?: Operation): void;
 
   /**
    * Add a consumes MIME type to an operation
    * @param op The operation to add the consumes MIME type to
    * @param consumes The MIME type to add
    */
-  addConsumes(op: Operation, consumes: string): void;
+  addConsumes(consumes: string[], op?: Operation): void;
 
   /**
    * Add examples to an operation
@@ -193,25 +203,25 @@ export interface OpenApi2DocumentProxy {
    * get the tags for an operation
    * @param op The operation to get tags for
    */
-  getTags(op: Operation): Set<string>;
+  getTags(op?: Operation): Set<string>;
 
   /**
    * Get the consumes MIME types for an operation
    * @param op The operation to get consumes MIME types for
    */
-  getConsumes(op: Operation): Set<string>;
+  getConsumes(op?: Operation): Set<string>;
 
   /**
    * Get the produces MIME types for an operation
    * @param op The operation to get produces MIME types for
    */
-  getProduces(op: Operation): Set<string>;
+  getProduces(op?: Operation): Set<string>;
 
   /**
    * Get or add the path associated with the given operation
    * @param op The operation to get or add the path for
    */
-  createOrAddPathItem(op: Operation): OpenAPI2PathItem;
+  createOrAddPathItem(op: HttpOperation): OpenAPI2PathItem;
 
   /**
    * Get the file name for a given type
