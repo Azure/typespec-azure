@@ -167,6 +167,8 @@ interface ResolvedResourceOperations {
   parent?: ResolvedResource;
   /** The scope of this resource */
   scope?: string;
+  /** For singleton resources, the names that can be used to reference the resource */
+  singletonResourceNames?: string[];
 }
 /** Resolved operations, including operations for non-arm resources */
 export interface ResolvedResource {
@@ -190,6 +192,8 @@ export interface ResolvedResource {
   parent?: ResolvedResource;
   /** The scope of this resource */
   scope?: string | ResolvedResource;
+  /** For singleton resources, the names that can be used to reference the resource */
+  singletonResourceNames?: string[];
 }
 
 /** Description of the resource type */
@@ -621,15 +625,20 @@ function getResourceScope(
   return undefined;
 }
 
-function isVariableSegment(segment: string): boolean {
-  return (segment.startsWith("{") && segment.endsWith("}")) || segment === "default";
+function isVariableSegment(segment: string, singletonResourceName?: string): boolean {
+  return (segment.startsWith("{") && segment.endsWith("}")) || segment === singletonResourceName;
 }
 
 function getResourceInfo(
   program: Program,
   operation: ArmResourceOperation,
+  singletonResourceName: string | undefined,
 ): ResolvedResourceInfo | undefined {
-  const pathInfo = getResourcePathElements(operation.httpOperation.path, operation.kind);
+  const pathInfo = getResourcePathElements(
+    operation.httpOperation.path,
+    operation.kind,
+    singletonResourceName,
+  );
   if (pathInfo === undefined) return undefined;
   return {
     ...pathInfo,
@@ -640,6 +649,7 @@ function getResourceInfo(
 export function getResourcePathElements(
   path: string,
   kind: ArmOperationKind,
+  singletonResourceName?: string,
 ): ResourcePathInfo | undefined {
   const segments = path.split("/").filter((s) => s.length > 0);
   const providerIndex = segments.findLastIndex((s) => s === "providers");
@@ -652,7 +662,15 @@ export function getResourcePathElements(
       break;
     }
 
-    if (i + 1 < segments.length && isVariableSegment(segments[i + 1])) {
+    // if the next segment is the last segment
+    if (
+      i + 1 === segments.length - 1 &&
+      isVariableSegment(segments[i + 1], singletonResourceName)
+    ) {
+      typeSegments.push(segments[i]);
+      instanceSegments.push(segments[i]);
+      instanceSegments.push(segments[i + 1]);
+    } else if (i + 1 < segments.length && isVariableSegment(segments[i + 1])) {
       typeSegments.push(segments[i]);
       instanceSegments.push(segments[i]);
       instanceSegments.push(segments[i + 1]);
@@ -862,9 +880,10 @@ export function resolveArmResourceOperations(
 
     if (armOperation === undefined) continue;
     armOperation.kind = operation.kind;
+    const singletonResourceName = getSingletonResourceKey(program, resourceType);
 
     armOperation.resourceModelName = operation.resource?.name ?? resourceType.name;
-    const resourceInfo = getResourceInfo(program, armOperation);
+    const resourceInfo = getResourceInfo(program, armOperation, singletonResourceName);
     if (resourceInfo === undefined) continue;
     armOperation.name = operation.name;
     armOperation.resourceKind = operation.resourceKind;
@@ -893,6 +912,8 @@ export function resolveArmResourceOperations(
       resourceType: resourceInfo.resourceType,
       resourceInstancePath: resourceInfo.resourceInstancePath,
       resourceName: resourceInfo.resourceName,
+      singletonResourceNames:
+        singletonResourceName !== undefined ? [singletonResourceName] : undefined,
       operations: {
         lifecycle: {
           read: undefined,
