@@ -850,6 +850,8 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   if (!mutator) return globalNamespace;
   const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, [mutator], globalNamespace);
   compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
+  compilerAssert(subgraph.realm !== null, "Should have a realm after mutation");
+  context.__mutatedRealm = subgraph.realm;
   return subgraph.type;
 }
 

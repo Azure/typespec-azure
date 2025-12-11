@@ -157,36 +157,40 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   if (!hasExplicitClientOrOperationGroup(context)) {
     const newOperationGroupWithService = new Map<string, Namespace>();
     listScopedDecoratorData(context, clientLocationKey).forEach((v, k) => {
-      if (typeof v === "string") {
-        if (
-          clients[0].subOperationGroups.some(
-            (og) => og.type && getLibraryName(context, og.type) === v,
-          )
-        ) {
-          // do not create a new operation group if it already exists
-          return;
-        }
-        if (newOperationGroupWithService.has(v)) {
+      // only deal with mutated types or without mutation
+      if (!context.__mutatedRealm || context.__mutatedRealm.hasType(k)) {
+        if (typeof v === "string") {
           if (
-            newOperationGroupWithService.has(v) &&
-            Array.isArray(clients[0].service) &&
-            findService(clients[0].service, k as Operation) !== newOperationGroupWithService.get(v)
+            clients[0].subOperationGroups.some(
+              (og) => og.type && getLibraryName(context, og.type) === v,
+            )
           ) {
-            // multiple services case: need to ensure operations with same client location are from the same service
-            reportDiagnostic(context.program, {
-              code: "client-location-new-operation-group-multi-service",
-              target: k,
-            });
+            // do not create a new operation group if it already exists
+            return;
           }
-          return;
-        }
+          if (newOperationGroupWithService.has(v)) {
+            if (
+              newOperationGroupWithService.has(v) &&
+              Array.isArray(clients[0].service) &&
+              findService(clients[0].service, k as Operation) !==
+                newOperationGroupWithService.get(v)
+            ) {
+              // multiple services case: need to ensure operations with same client location are from the same service
+              reportDiagnostic(context.program, {
+                code: "client-location-new-operation-group-multi-service",
+                target: k,
+              });
+            }
+            return;
+          }
 
-        newOperationGroupWithService.set(
-          v,
-          Array.isArray(clients[0].service)
-            ? findService(clients[0].service, k as Operation)
-            : clients[0].service,
-        );
+          newOperationGroupWithService.set(
+            v,
+            Array.isArray(clients[0].service)
+              ? findService(clients[0].service, k as Operation)
+              : clients[0].service,
+          );
+        }
       }
     });
 
