@@ -155,41 +155,54 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   // create operation group for `@clientLocation` of  string value
   // if no explicit `@client` or `@operationGroup`
   if (!hasExplicitClientOrOperationGroup(context)) {
-    const newOperationGroupNames = new Set<string>();
-    [...listScopedDecoratorData(context, clientLocationKey).values()].map((target) => {
-      if (typeof target === "string") {
+    const newOperationGroupWithService = new Map<string, Namespace>();
+    listScopedDecoratorData(context, clientLocationKey).forEach((v, k) => {
+      if (typeof v === "string") {
         if (
           clients[0].subOperationGroups.some(
-            (og) => og.type && getLibraryName(context, og.type) === target,
+            (og) => og.type && getLibraryName(context, og.type) === v,
           )
         ) {
           // do not create a new operation group if it already exists
           return;
         }
-        newOperationGroupNames.add(target);
+        if (newOperationGroupWithService.has(v)) {
+          if (
+            newOperationGroupWithService.has(v) &&
+            Array.isArray(clients[0].service) &&
+            findService(clients[0].service, k as Operation) !== newOperationGroupWithService.get(v)
+          ) {
+            // multiple services case: need to ensure operations with same client location are from the same service
+            reportDiagnostic(context.program, {
+              code: "client-location-new-operation-group-multi-service",
+              target: k,
+            });
+          }
+          return;
+        }
+
+        newOperationGroupWithService.set(
+          v,
+          Array.isArray(clients[0].service)
+            ? findService(clients[0].service, k as Operation)
+            : clients[0].service,
+        );
       }
     });
 
-    if (newOperationGroupNames.size > 0) {
-      if (Array.isArray(clients[0].service)) {
-        reportDiagnostic(context.program, {
-          code: "client-location-to-new-og-with-multiple-services",
-          target: clients[0].type,
-        });
-      } else {
-        for (const ogName of newOperationGroupNames) {
-          const og: SdkOperationGroup = {
-            kind: "SdkOperationGroup",
-            groupPath: `${clients[0].name}.${ogName}`,
-            service: clients[0].service,
-            subOperationGroups: [],
-            parent: clients[0],
-          };
-          context.__rawClientsOperationGroupsCache.set(ogName, og);
-          clients[0].subOperationGroups!.push(og);
-          context.__clientToOperationsCache.set(og, []);
-        }
-      }
+    if (newOperationGroupWithService.size > 0) {
+      newOperationGroupWithService.forEach((service, ogName) => {
+        const og: SdkOperationGroup = {
+          kind: "SdkOperationGroup",
+          groupPath: `${clients[0].name}.${ogName}`,
+          service: service,
+          subOperationGroups: [],
+          parent: clients[0],
+        };
+        context.__rawClientsOperationGroupsCache!.set(ogName, og);
+        clients[0].subOperationGroups!.push(og);
+        context.__clientToOperationsCache!.set(og, []);
+      });
     }
   }
 
@@ -290,6 +303,24 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       }
     }
   }
+}
+
+/**
+ * Find the service namespace that contains the given operation.
+ * @param services
+ * @param operation
+ * @returns
+ */
+function findService(services: Namespace[], operation: Operation): Namespace {
+  let namespace = operation.namespace;
+  while (namespace) {
+    if (services.includes(namespace)) {
+      return namespace;
+    }
+    namespace = namespace.namespace;
+  }
+  // fallback to the first service
+  return services[0];
 }
 
 /**

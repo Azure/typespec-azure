@@ -1373,12 +1373,14 @@ it("error: client location to new operation group with multiple services", async
     @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CombineClient {}
 
-    // Try to move an operation to a new operation group that doesn't exist
+    // Try to move operations from different services to a new operation group that doesn't exist
     @@clientLocation(ServiceA.aTest, "NewOperationGroup");
+    @@clientLocation(ServiceB.bTest, "NewOperationGroup");
   `,
   );
   expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/client-location-to-new-og-with-multiple-services",
-    message: "Cannot move operation to a new operation group when client has multiple services.",
+    code: "@azure-tools/typespec-client-generator-core/client-location-new-operation-group-multi-service",
+    message:
+      "Cannot move operations from different services to a new operation group that doesn't exist.",
   });
 });
