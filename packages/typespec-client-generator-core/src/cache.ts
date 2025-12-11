@@ -53,39 +53,37 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       clients[0]!.type as Namespace,
     );
 
-    if (versionDependencies) {
-      for (const specificService of clients[0].service) {
-        if (context.__packageVersions.has(specificService)) {
-          continue;
-        }
-
-        const versions = getVersions(context.program, specificService)[1]?.getVersions();
-        if (!versions) {
-          context.__packageVersions.set(specificService, []);
-          continue;
-        }
-
-        context.__packageVersionEnum.set(specificService, versions[0].enumMember.enum);
-
-        const versionDependency = versionDependencies?.get(specificService);
-
-        compilerAssert(
-          versionDependency !== undefined && "name" in versionDependency,
-          "Client with multiple services is missing version dependency declaration.",
-        );
-
-        let end = false;
-        context.__packageVersions.set(
-          specificService,
-          versions
-            .map((version) => version.value)
-            .filter((v) => {
-              if (end) return false;
-              if (v === versionDependency.value) end = true;
-              return true;
-            }),
-        );
+    for (const specificService of clients[0].service) {
+      if (context.__packageVersions.has(specificService)) {
+        continue;
       }
+
+      const versions = getVersions(context.program, specificService)[1]?.getVersions();
+      if (!versions) {
+        context.__packageVersions.set(specificService, []);
+        continue;
+      }
+
+      context.__packageVersionEnum.set(specificService, versions[0].enumMember.enum);
+
+      const versionDependency = versionDependencies?.get(specificService);
+
+      compilerAssert(
+        versionDependency !== undefined && "name" in versionDependency,
+        "Client with multiple services is missing version dependency declaration.",
+      );
+
+      let end = false;
+      context.__packageVersions.set(
+        specificService,
+        versions
+          .map((version) => version.value)
+          .filter((v) => {
+            if (end) return false;
+            if (v === versionDependency.value) end = true;
+            return true;
+          }),
+      );
     }
   } else if (clients.length > 0) {
     // single-service client
@@ -219,7 +217,14 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     const group = queue.shift()!;
     if (group.type) {
       // operations directly under the group
-      const operations = [...group.type.operations.values()];
+      const operations = [];
+      if (group.kind === "SdkClient" && Array.isArray(group.service)) {
+        // multi-service client
+        operations.push(...group.service.flatMap((service) => [...service.operations.values()]));
+      } else {
+        // single-service client or operation group
+        operations.push(...group.type.operations.values());
+      }
 
       // when there is explicitly `@operationGroup` or `@client`
       // operations under namespace or interface that are not decorated with `@operationGroup` or `@client`

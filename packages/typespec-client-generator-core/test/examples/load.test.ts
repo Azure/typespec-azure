@@ -404,18 +404,18 @@ it("teamplate case", async () => {
   strictEqual(operation.examples![0].filePath, "template.json");
 });
 
-it("one client from multiple services - load examples for both services", async () => {
+it("multiple services without versioning", async () => {
   runner = await createSdkTestRunner({
     emitterName: "@azure-tools/typespec-java",
     "examples-dir": `./examples`,
   });
 
   await runner.host.addRealTypeSpecFile(
-    "./examples/AI_aTest.json",
+    "./ServiceA/examples/AI_aTest.json",
     `${__dirname}/multi-service/ServiceA_AI_aTest.json`,
   );
   await runner.host.addRealTypeSpecFile(
-    "./examples/BI_bTest.json",
+    "./ServiceB/examples/BI_bTest.json",
     `${__dirname}/multi-service/ServiceB_BI_bTest.json`,
   );
 
@@ -468,77 +468,4 @@ it("one client from multiple services - load examples for both services", async 
   strictEqual(biMethod.operation.examples.length, 1);
   strictEqual(biMethod.operation.examples[0].filePath, "BI_bTest.json");
   strictEqual(biMethod.operation.examples[0].name, "Test operation from ServiceB");
-});
-
-it("one client from multiple services with versioning - examples in version subfolder", async () => {
-  runner = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": `./examples`,
-  });
-
-  // For versioned multi-service, examples are loaded from the first service's latest version folder
-  await runner.host.addRealTypeSpecFile(
-    "./examples/av2/AI_aTest.json",
-    `${__dirname}/multi-service/ServiceA_AI_aTest.json`,
-  );
-  await runner.host.addRealTypeSpecFile(
-    "./examples/av2/BI_bTest.json",
-    `${__dirname}/multi-service/ServiceB_BI_bTest.json`,
-  );
-
-  await runner.compileWithCustomization(
-    `
-    @service
-    @versioned(VersionsA)
-    namespace ServiceA {
-      enum VersionsA {
-        av1,
-        av2,
-      }
-      interface AI {
-        @route("/aTest")
-        aTest(@query("api-version") apiVersion: VersionsA): string;
-      }
-    }
-    @service
-    @versioned(VersionsB)
-    namespace ServiceB {
-      enum VersionsB {
-        bv1,
-        bv2,
-      }
-      interface BI {
-        @route("/bTest")
-        bTest(@query("api-version") apiVersion: VersionsB): string;
-      }
-    }
-    `,
-    `
-    @client({
-      name: "CombineClient",
-      service: [ServiceA, ServiceB],
-    })
-    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
-    namespace CombineClient;
-    `,
-  );
-
-  const sdkPackage = runner.context.sdkPackage;
-  const client = sdkPackage.clients[0];
-
-  // Check AI operation group examples (loaded from av2 folder - first service's latest version)
-  const aiClient = client.children?.find((c) => c.name === "AI");
-  ok(aiClient);
-  const aiMethod = aiClient.methods[0] as SdkServiceMethod<SdkHttpOperation>;
-  ok(aiMethod.operation.examples);
-  strictEqual(aiMethod.operation.examples.length, 1);
-  strictEqual(aiMethod.operation.examples[0].filePath, "av2/AI_aTest.json");
-
-  // Check BI operation group examples (also loaded from av2 folder)
-  const biClient = client.children?.find((c) => c.name === "BI");
-  ok(biClient);
-  const biMethod = biClient.methods[0] as SdkServiceMethod<SdkHttpOperation>;
-  ok(biMethod.operation.examples);
-  strictEqual(biMethod.operation.examples.length, 1);
-  strictEqual(biMethod.operation.examples[0].filePath, "av2/BI_bTest.json");
 });

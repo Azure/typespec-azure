@@ -3,6 +3,7 @@ import {
   EmitContext,
   emitFile,
   Enum,
+  getRelativePathFromDirectory,
   Interface,
   Model,
   ModelProperty,
@@ -14,6 +15,7 @@ import {
   Union,
 } from "@typespec/compiler";
 import { HttpOperation } from "@typespec/http";
+import { isAbsolute } from "path";
 import { stringify } from "yaml";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { defaultDecoratorsAllowList } from "./configs.js";
@@ -186,7 +188,6 @@ export async function createSdkContext<
     sdkPackage: undefined!,
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
-    examplesDir: context.options["examples-dir"],
     namespaceFlag: context.options["namespace"],
     apiVersion: context.options["api-version"],
     license: context.options["license"],
@@ -196,6 +197,15 @@ export async function createSdkContext<
     flattenUnionAsEnum: options?.flattenUnionAsEnum ?? true,
     enableLegacyHierarchyBuilding: options?.enableLegacyHierarchyBuilding ?? true,
   };
+  if (context.options["examples-dir"] && isAbsolute(context.options["examples-dir"])) {
+    sdkContext.examplesDir = getRelativePathFromDirectory(
+      context.program.projectRoot,
+      context.options["examples-dir"],
+      false,
+    );
+  } else {
+    sdkContext.examplesDir = context.options["examples-dir"];
+  }
   sdkContext.sdkPackage = diagnostics.pipe(createSdkPackage(sdkContext));
   for (const client of sdkContext.sdkPackage.clients) {
     diagnostics.pipe(await handleClientExamples(sdkContext, client));
