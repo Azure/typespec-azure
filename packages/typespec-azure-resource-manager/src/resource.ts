@@ -1294,7 +1294,7 @@ export function resolveResourceBaseType(type?: string | undefined): ResourceBase
 
 export const [getResourceFeature, setResourceFeature] = useStateMap<
   Model | Interface | Namespace,
-  string
+  EnumMember
 >(ArmStateKeys.armFeature);
 
 export const [getResourceFeatureSet, setResourceFeatureSet] = useStateMap<
@@ -1307,6 +1307,11 @@ export const [getResourceFeatureOptions, setResourceFeatureOptions] = useStateMa
   ArmFeatureOptions
 >(ArmStateKeys.armFeatureOptions);
 
+const commonFeatureOptions: ArmFeatureOptions = {
+  featureName: "Common",
+  fileName: "common",
+  description: "",
+};
 export function getFeatureOptions(program: Program, feature: EnumMember): ArmFeatureOptions {
   const defaultFeatureName: string = (feature.value ?? feature.name) as string;
   const defaultOptions: ArmFeatureOptions = {
@@ -1317,6 +1322,66 @@ export function getFeatureOptions(program: Program, feature: EnumMember): ArmFea
   return program.stateMap(ArmStateKeys.armFeatureOptions).get(feature) ?? defaultOptions;
 }
 
+/**
+ * Get the FeatureOptions for a given type, these could be inherited from the namespace or parent type
+ * @param program - The program to process.
+ * @param entity - The type entity to get feature options for.
+ * @returns The ArmFeatureOptions if found, otherwise undefined.
+ */
+export function getFeature(program: Program, entity: Type): ArmFeatureOptions {
+  switch (entity.kind) {
+    case "Namespace": {
+      const feature = getResourceFeature(program, entity);
+      if (feature === undefined) return commonFeatureOptions;
+      const options = getFeatureOptions(program, feature);
+      return options;
+    }
+    case "Interface":
+    case "Model": {
+      let feature = getResourceFeature(program, entity);
+      if (feature !== undefined) return getFeatureOptions(program, feature);
+      const namespace = entity.namespace;
+      if (namespace === undefined) return commonFeatureOptions;
+      feature = getResourceFeature(program, namespace);
+      if (feature === undefined) return commonFeatureOptions;
+      return getFeatureOptions(program, feature);
+    }
+    case "Operation": {
+      const opInterface = entity.interface;
+      if (opInterface !== undefined) {
+        return getFeature(program, opInterface);
+      }
+      const namespace = entity.namespace;
+      if (namespace === undefined) return commonFeatureOptions;
+      const feature = getResourceFeature(program, namespace);
+      if (feature === undefined) return commonFeatureOptions;
+      return getFeatureOptions(program, feature);
+    }
+    case "EnumMember": {
+      return getFeature(program, entity.enum);
+    }
+    case "UnionVariant": {
+      return getFeature(program, entity.union);
+    }
+    case "ModelProperty": {
+      if (entity.model === undefined) return commonFeatureOptions;
+      return getFeature(program, entity.model);
+    }
+    case "Enum":
+    case "Union":
+    case "Scalar": {
+      const namespace = entity.namespace;
+      if (namespace === undefined) return commonFeatureOptions;
+      const feature = getResourceFeature(program, namespace);
+      if (feature === undefined) return commonFeatureOptions;
+      return getFeatureOptions(program, feature);
+    }
+
+    default:
+      return commonFeatureOptions;
+  }
+}
+
 export const $feature: FeatureDecorator = (
   context: DecoratorContext,
   entity: Model | Interface | Namespace,
@@ -1324,7 +1389,7 @@ export const $feature: FeatureDecorator = (
 ) => {
   const { program } = context;
   const options = getFeatureOptions(program, featureName);
-  setResourceFeature(program, entity, options.featureName);
+  setResourceFeature(program, entity, featureName);
 };
 
 export const $features: FeaturesDecorator = (
