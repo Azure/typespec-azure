@@ -8,6 +8,7 @@ import {
   Model,
   ModelProperty,
   Namespace,
+  normalizePath,
   Operation,
   Program,
   resolvePath,
@@ -197,14 +198,18 @@ export async function createSdkContext<
     flattenUnionAsEnum: options?.flattenUnionAsEnum ?? true,
     enableLegacyHierarchyBuilding: options?.enableLegacyHierarchyBuilding ?? true,
   };
-  if (context.options["examples-dir"] && isAbsolute(context.options["examples-dir"])) {
-    sdkContext.examplesDir = getRelativePathFromDirectory(
-      context.program.projectRoot,
-      context.options["examples-dir"],
-      false,
-    );
-  } else {
-    sdkContext.examplesDir = context.options["examples-dir"];
+
+  if (context.options["examples-dir"]) {
+    const normalizeExamplesDir = normalizePath(context.options["examples-dir"]);
+    if (isAbsolute(normalizeExamplesDir)) {
+      sdkContext.examplesDir = getRelativePathFromDirectory(
+        context.program.projectRoot,
+        normalizeExamplesDir,
+        false,
+      );
+    } else {
+      sdkContext.examplesDir = normalizeExamplesDir;
+    }
   }
   sdkContext.sdkPackage = diagnostics.pipe(createSdkPackage(sdkContext));
   for (const client of sdkContext.sdkPackage.clients) {
