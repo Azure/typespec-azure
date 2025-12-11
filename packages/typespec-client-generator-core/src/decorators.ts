@@ -6,6 +6,7 @@ import {
   Enum,
   EnumMember,
   getDiscriminator,
+  getNamespaceFullName,
   ignoreDiagnostics,
   Interface,
   isErrorModel,
@@ -26,6 +27,7 @@ import {
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
 import { getHttpOperation } from "@typespec/http";
+import { $useDependency, getVersions } from "@typespec/versioning";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
@@ -188,7 +190,35 @@ export const $client: ClientDecorator = (
     serviceConfig?.kind === "Tuple" &&
     serviceConfig.values.every((v) => v.kind === "Namespace")
   ) {
+    if (target.kind === "Interface") {
+      reportDiagnostic(context.program, {
+        code: "invalid-client-service-multiple",
+        target: context.decoratorTarget,
+      });
+      return;
+    }
     service = serviceConfig.values;
+    // no explicit versioning dependency
+    if (
+      !target.decorators.some(
+        (d) =>
+          d.definition?.name === "@useDependency" &&
+          getNamespaceFullName(d.definition?.namespace) === "TypeSpec.Versioning",
+      )
+    ) {
+      const versionRecords = [];
+      // collect the latest version enum member from each service
+      for (const svc of service) {
+        const versions = getVersions(context.program, svc)[1]?.getVersions();
+        if (versions && versions.length > 0) {
+          versionRecords.push(versions[versions.length - 1].enumMember);
+        }
+      }
+      // set the versioning dependency
+      if (versionRecords.length > 0) {
+        context.call($useDependency, target, ...versionRecords);
+      }
+    }
   } else {
     service = findClientService(context.program, target);
   }
@@ -301,7 +331,12 @@ export function isOperationGroup(context: TCGCContext, type: Namespace | Interfa
   if (type.kind === "Interface" && !isTemplateDeclaration(type)) {
     return true;
   }
-  if (type.kind === "Namespace" && !type.decorators.some((t) => t.decorator.name === "$service")) {
+  if (
+    type.kind === "Namespace" &&
+    !type.decorators.some(
+      (d) => d.definition?.name === "@service" && d.definition?.namespace.name === "TypeSpec",
+    )
+  ) {
     return true;
   }
   return false;
@@ -729,7 +764,11 @@ export const $override = (
     // Apply the alternate type to the original parameter
     const overrideParam = overrideParams[index];
     overrideParam.decorators
-      .filter((d) => d.decorator.name === "$alternateType")
+      .filter(
+        (d) =>
+          d.definition?.name === "@alternateType" &&
+          getNamespaceFullName(d.definition?.namespace) === namespace,
+      )
       .map((d) =>
         context.call(
           $alternateType,

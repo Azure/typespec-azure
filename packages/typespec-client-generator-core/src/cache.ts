@@ -52,37 +52,40 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       context.program,
       clients[0]!.type as Namespace,
     );
-    for (const specificService of clients[0].service) {
-      if (context.__packageVersions.has(specificService)) {
-        continue;
+
+    if (versionDependencies) {
+      for (const specificService of clients[0].service) {
+        if (context.__packageVersions.has(specificService)) {
+          continue;
+        }
+
+        const versions = getVersions(context.program, specificService)[1]?.getVersions();
+        if (!versions) {
+          context.__packageVersions.set(specificService, []);
+          continue;
+        }
+
+        context.__packageVersionEnum.set(specificService, versions[0].enumMember.enum);
+
+        const versionDependency = versionDependencies?.get(specificService);
+
+        compilerAssert(
+          versionDependency !== undefined && "name" in versionDependency,
+          "Client with multiple services is missing version dependency declaration.",
+        );
+
+        let end = false;
+        context.__packageVersions.set(
+          specificService,
+          versions
+            .map((version) => version.value)
+            .filter((v) => {
+              if (end) return false;
+              if (v === versionDependency.value) end = true;
+              return true;
+            }),
+        );
       }
-
-      const versions = getVersions(context.program, specificService)[1]?.getVersions();
-      if (!versions) {
-        context.__packageVersions.set(specificService, []);
-        continue;
-      }
-
-      context.__packageVersionEnum.set(specificService, versions[0].enumMember.enum);
-
-      const versionDependency = versionDependencies?.get(specificService);
-
-      compilerAssert(
-        versionDependency !== undefined && "name" in versionDependency,
-        "Client with multiple services is missing version dependency declaration.",
-      );
-
-      let end = false;
-      context.__packageVersions.set(
-        specificService,
-        versions
-          .map((version) => version.value)
-          .filter((v) => {
-            if (end) return false;
-            if (v === versionDependency.value) end = true;
-            return true;
-          }),
-      );
     }
   } else if (clients.length > 0) {
     // single-service client
