@@ -139,18 +139,6 @@ namespace Azure.Core.Foundations {
    * Deletes any key properties from the model.
    */
   extern dec omitKeyProperties(entity: Model);
-
-  /**
-   * Identifies a property on a request model that serves as a linked operation parameter.
-   * @param name Property name on the target
-   */
-  extern dec requestParameter(entity: Model, name: valueof string);
-
-  /**
-   * Identifies a property on *all* non-error response models that serve as a linked operation parameter.
-   * @param name Property name on the target
-   */
-  extern dec responseProperty(entity: Model, name: valueof string);
 }
 
 namespace Azure.Core.Foundations.Private {
