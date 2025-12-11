@@ -2,27 +2,10 @@ import { json, MockApiDefinition, passOnSuccess, ScenarioMockApi } from "@typesp
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
-function createGetMockApiDefinition(route: string): MockApiDefinition {
+function createMockApiDefinition(route: string, method: "get" | "post"): MockApiDefinition {
   return {
     uri: `/azure/client-generator-core/convenient-api/${route}`,
-    method: "get",
-    request: {
-      query: {
-        name: "sample",
-      },
-    },
-    response: {
-      status: 200,
-      body: json({ name: "sample" }),
-    },
-    kind: "MockApiDefinition",
-  };
-}
-
-function createPostMockApiDefinition(route: string): MockApiDefinition {
-  return {
-    uri: `/azure/client-generator-core/convenient-api/${route}`,
-    method: "post",
+    method: method,
     request: {
       query: {
         name: "sample",
@@ -37,21 +20,21 @@ function createPostMockApiDefinition(route: string): MockApiDefinition {
 }
 
 Scenarios.Azure_ClientGenerator_Core_ConvenientApi_ConvenientNamespace = passOnSuccess([
-  createGetMockApiDefinition("convenientNamespace/operation1"),
-  createPostMockApiDefinition("convenientNamespace/operation2"),
+  createMockApiDefinition("convenientNamespace/operation1", "get"),
+  createMockApiDefinition("convenientNamespace/operation2", "post"),
 ]);
 
 Scenarios.Azure_ClientGenerator_Core_ConvenientApi_ProtocolNamespace = passOnSuccess([
-  createGetMockApiDefinition("protocolNamespace/operation1"),
-  createPostMockApiDefinition("protocolNamespace/operation2"),
+  createMockApiDefinition("protocolNamespace/operation1", "get"),
+  createMockApiDefinition("protocolNamespace/operation2", "post"),
 ]);
 
 Scenarios.Azure_ClientGenerator_Core_ConvenientApi_ConvenientInterfaceNs = passOnSuccess([
-  createGetMockApiDefinition("convenientInterface/operation1"),
-  createPostMockApiDefinition("convenientInterface/operation2"),
+  createMockApiDefinition("convenientInterface/operation1", "get"),
+  createMockApiDefinition("convenientInterface/operation2", "post"),
 ]);
 
 Scenarios.Azure_ClientGenerator_Core_ConvenientApi_ProtocolInterfaceNs = passOnSuccess([
-  createGetMockApiDefinition("protocolInterface/operation1"),
-  createPostMockApiDefinition("protocolInterface/operation2"),
+  createMockApiDefinition("protocolInterface/operation1", "get"),
+  createMockApiDefinition("protocolInterface/operation2", "post"),
 ]);
