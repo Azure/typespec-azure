@@ -12,6 +12,10 @@ using Azure.ClientGenerator.Core;
   "azure.clientgenerator.core.clientlocation.rootclient",
   "java"
 )
+@global.Azure.ClientGenerator.Core.clientNamespace(
+  "specs.azure.clientgenerator.core.clientlocation.rootclient",
+  "python"
+)
 namespace _Specs_.Azure.ClientGenerator.Core.ClientLocation.MoveToRootClient;
 
 // Scenario 1: Move an operation to root client
