@@ -5,6 +5,8 @@ import "@typespec/spector";
 using Azure.ClientGenerator.Core;
 using Spector;
 
+@@clientNamespace(Client.Structure.Service, "specs.client.structure.multiclient", "python");
+
 @scenarioDoc("""
   Include multiple clients in the same spec.
   ```ts

@@ -10,6 +10,7 @@ using Spector;
  * Describe changing names of types in a client with `@clientName`
  */
 @scenarioService("/client/naming")
+@clientNamespace("specs.client.naming.main", "python")
 namespace Client.Naming;
 
 @route("/property")

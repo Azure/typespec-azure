@@ -8,6 +8,7 @@ using Spector;
 @doc("Test for internal decorator.")
 @scenarioService("/azure/client-generator-core/usage")
 @global.Azure.ClientGenerator.Core.clientNamespace("azure.clientgenerator.core.usage", "java")
+@global.Azure.ClientGenerator.Core.clientNamespace("specs.azure.clientgenerator.core.usage", "python")
 namespace _Specs_.Azure.ClientGenerator.Core.Usage;
 
 @scenario
@@ -17,6 +18,7 @@ namespace _Specs_.Azure.ClientGenerator.Core.Usage;
   The other models' usage is additive to roundtrip, so they should be generated and exported as well.
   """)
 @global.Azure.ClientGenerator.Core.clientNamespace("azure.clientgenerator.core.usage", "java")
+@global.Azure.ClientGenerator.Core.clientNamespace("specs.azure.clientgenerator.core.usage", "python")
 namespace ModelInOperation {
   @doc("Usage additive to roundtrip.")
   @global.Azure.ClientGenerator.Core.usage(
