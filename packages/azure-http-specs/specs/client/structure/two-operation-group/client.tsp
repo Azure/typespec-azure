@@ -5,7 +5,10 @@ import "@typespec/spector";
 using Azure.ClientGenerator.Core;
 using Spector;
 
-@@clientNamespace(Client.Structure.TwoOperationGroup, "specs.client.structure.twooperationgroup", "python");
+@@clientNamespace(Client.Structure.TwoOperationGroup,
+  "specs.client.structure.twooperationgroup",
+  "python"
+);
 
 @scenarioDoc("""
   This is to show we can have more than one operation group in a client. The client side should be able to call the api like
