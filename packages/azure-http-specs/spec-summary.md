@@ -351,6 +351,7 @@ Test case 1: `@clientDefaultValue` for model property.
 This scenario tests that client default values are correctly applied to model properties.
 
 Expected input body:
+
 ```json
 {
   "name": "test"
@@ -358,6 +359,7 @@ Expected input body:
 ```
 
 Expected response body:
+
 ```json
 {
   "name": "test",
