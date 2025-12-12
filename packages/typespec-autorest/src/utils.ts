@@ -145,3 +145,51 @@ function standardizeOperationId(name: string) {
     .map((s) => capitalize(s))
     .join("_");
 }
+
+const allowedStringFormats = new Set([
+  // number format
+  "int32",
+  "int64",
+  "float",
+  "double",
+  "unixtime",
+  // OAS-defined formats
+  "byte",
+  "binary",
+  "date",
+  "date-time",
+  "password",
+  // Additional formats recognized by autorest
+  "char",
+  "time",
+  "date-time-rfc1123",
+  "date-time-rfc7231", // Support for https://github.com/Azure/autorest/issues/4740
+  "duration",
+  "uuid",
+  "base64url",
+  "url",
+  "odata-query",
+  "certificate",
+
+  // ajv supported format
+  "uri",
+  "uri-reference",
+  "uri-template",
+  "email",
+  "hostname",
+  "ipv4",
+  "ipv6",
+  "regex",
+  "json-pointer",
+  "relative-json-pointer",
+  // for arm id purpose
+  "arm-id",
+]);
+
+/**
+ * Check if the given format is supported by Autorest.
+ * Those formats are validated by https://github.com/Azure/azure-openapi-validator/blob/main/packages/rulesets/src/spectral/functions/schema-format.ts#L17
+ */
+export function isSupportedAutorestFormat(formatStr: string): boolean {
+  return allowedStringFormats.has(formatStr.toLowerCase());
+}

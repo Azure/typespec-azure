@@ -360,6 +360,7 @@ export const $lib = createTypeSpecLibrary({
       severity: "warning",
       messages: {
         default: paramMessage`'${"schema"}' format '${"format"}' is not supported in Autorest. It will not be emitted.`,
+        encoding: paramMessage`'${"schema"}' encoding format '${"format"}' is not supported in Autorest. It will not be emitted.`,
       },
     },
     "unsupported-auth": {
