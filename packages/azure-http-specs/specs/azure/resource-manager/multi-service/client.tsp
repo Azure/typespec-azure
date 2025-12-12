@@ -10,5 +10,4 @@ using Azure.ClientGenerator.Core;
 @client({
   service: [Microsoft.Compute, Microsoft.ComputeDisk],
 })
-@useDependency(Microsoft.Compute.Versions.v2025_04_01, Microsoft.ComputeDisk.Versions.v2025_01_02)
 namespace Azure.ResourceManager.MultiService;
