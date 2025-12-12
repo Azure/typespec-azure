@@ -13,8 +13,8 @@ import { HttpOperation, Visibility } from "@typespec/http";
 import { AdditionalInfo } from "@typespec/openapi";
 import type {
   OpenAPI2Document,
+  OpenAPI2Operation,
   OpenAPI2Parameter,
-  OpenAPI2PathItem,
   OpenAPI2Schema,
   OpenAPI2SecurityScheme,
   Refable,
@@ -200,7 +200,7 @@ export interface OpenApi2DocumentProxy {
    * @param op The operation to add examples to
    * @param examples The examples to add
    */
-  addExamples(op: Operation, examples: LoadedExample[]): void;
+  addExamples(examples: Map<string, Record<string, LoadedExample>>): void;
 
   /**
    * get the tags for an operation
@@ -224,7 +224,7 @@ export interface OpenApi2DocumentProxy {
    * Get or add the path associated with the given operation
    * @param op The operation to get or add the path for
    */
-  createOrAddPathItem(op: HttpOperation): OpenAPI2PathItem;
+  createOrGetEndpoint(op: HttpOperation): OpenAPI2Operation;
 
   /**
    * Get the file name for a given type

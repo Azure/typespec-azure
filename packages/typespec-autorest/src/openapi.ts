@@ -262,28 +262,6 @@ export async function getOpenAPIForService(
   const xml = await resolveXmlModule();
   const xmlStrategy = options.xmlStrategy;
 
-  /**const root: OpenAPI2Document = {
-    swagger: "2.0",
-    info: {
-      title: "(title)",
-      ...info,
-      version: context.version ?? info?.version ?? "0000-00-00",
-      "x-typespec-generated": [{ emitter: "@azure-tools/typespec-autorest" }],
-    },
-    schemes: ["https"],
-    ...resolveHost(program, service.type),
-    externalDocs: getExternalDocs(program, service.type),
-    produces: [], // Pre-initialize produces and consumes so that
-    consumes: [], // they show up at the top of the document
-    security: auth?.security,
-    securityDefinitions: auth?.securitySchemes ?? {},
-    tags: [],
-    paths: {},
-    "x-ms-paths": {},
-    definitions: {},
-    parameters: {},
-  };*/
-
   let currentEndpoint: OpenAPI2Operation;
   let currentConsumes: Set<string>;
   let currentProduces: Set<string>;
@@ -313,7 +291,7 @@ export async function getOpenAPIForService(
 
   const [exampleMap, diagnostics] = await loadExamples(program, options, context.version);
   program.reportDiagnostics(diagnostics);
-
+  proxy.addExamples(exampleMap);
   const routes = httpService.operations;
   reportIfNoRoutes(program, routes);
 
@@ -497,11 +475,7 @@ export async function getOpenAPIForService(
 
   function emitOperation(operation: HttpOperation) {
     const { operation: op, verb, parameters } = operation;
-    const currentPath = proxy.createOrAddPathItem(operation);
-    if (!currentPath[verb]) {
-      currentPath[verb] = {} as any;
-    }
-    currentEndpoint = currentPath[verb]!;
+    currentEndpoint = proxy.createOrGetEndpoint(operation);
     currentConsumes = new Set<string>();
     currentProduces = new Set<string>();
 
@@ -562,8 +536,8 @@ export async function getOpenAPIForService(
     const visibility = resolveRequestVisibility(program, operation.operation, verb);
     emitEndpointParameters(parameters, visibility);
     emitResponses(operation.responses);
-    applyEndpointConsumes();
-    applyEndpointProduces();
+    applyEndpointConsumes(op);
+    applyEndpointProduces(op);
 
     if (isDeprecated(program, op)) {
       currentEndpoint.deprecated = true;
@@ -590,15 +564,15 @@ export async function getOpenAPIForService(
     attachExtensions(op, currentEndpoint);
   }
 
-  function applyEndpointProduces() {
+  function applyEndpointProduces(op: Operation) {
     if (currentProduces.size > 0 && !checkLocalAndGlobalEqual(globalProduces, currentProduces)) {
-      currentEndpoint.produces = [...currentProduces];
+      proxy.addProduces([...currentProduces], op);
     }
   }
 
-  function applyEndpointConsumes() {
+  function applyEndpointConsumes(op: Operation) {
     if (currentConsumes.size > 0 && !checkLocalAndGlobalEqual(globalConsumes, currentConsumes)) {
-      currentEndpoint.consumes = [...currentConsumes];
+      proxy.addConsumes([...currentConsumes], op);
     }
   }
 
