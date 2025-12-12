@@ -26,8 +26,4 @@ using Versioning;
 @client({
   service: [Service.MultiService.ServiceA, Service.MultiService.ServiceB],
 })
-@useDependency(
-  Service.MultiService.ServiceA.VersionsA.av2,
-  Service.MultiService.ServiceB.VersionsB.bv2
-)
 namespace Service.MultiService.Combined;
