@@ -45,6 +45,7 @@ import {
   PagingOperation,
   Program,
   Scalar,
+  Service,
   StringLiteral,
   StringTemplate,
   Type,
@@ -55,7 +56,6 @@ import {
   compilerAssert,
   createDiagnosticCollector,
   explainStringTemplateNotSerializable,
-  getAllTags,
   getAnyExtensionFromPath,
   getDirectoryPath,
   getDiscriminator,
@@ -103,7 +103,6 @@ import {
 } from "@typespec/compiler";
 import { SyntaxKind } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
-import { TwoLevelMap } from "@typespec/compiler/utils";
 import {
   AuthenticationOptionReference,
   AuthenticationReference,
@@ -129,12 +128,12 @@ import {
   getStatusCodeDescription,
   getVisibilitySuffix,
   isHttpFile,
-  isSharedRoute,
   reportIfNoRoutes,
   resolveAuthentication,
   resolveRequestVisibility,
 } from "@typespec/http";
 import {
+  AdditionalInfo,
   checkDuplicateTypeName,
   getExtensions,
   getExternalDocs,
@@ -160,7 +159,6 @@ import {
   OpenAPI2Operation,
   OpenAPI2Parameter,
   OpenAPI2ParameterBase,
-  OpenAPI2PathItem,
   OpenAPI2PathParameter,
   OpenAPI2QueryParameter,
   OpenAPI2Response,
@@ -174,7 +172,13 @@ import {
   XmlObject,
   XmsPageable,
 } from "./openapi2-document.js";
-import type { AutorestEmitterResult, LoadedExample } from "./types.js";
+import {
+  LateBoundReference,
+  OpenApi2DocumentProxy,
+  ProcessedSchema,
+  type AutorestEmitterResult,
+  type LoadedExample,
+} from "./types.js";
 import { AutorestEmitterContext, getClientName, resolveOperationId } from "./utils.js";
 import { resolveXmlModule } from "./xml.js";
 
@@ -230,56 +234,10 @@ export interface AutorestDocumentEmitterOptions {
   readonly emitCommonTypesSchema?: "never" | "for-visibility-changes";
 
   readonly xmlStrategy: "xml-service" | "none";
-}
-
-/**
- * Represents a node that will hold a JSON reference. The value is computed
- * at the end so that we can defer decisions about the name that is
- * referenced.
- */
-class Ref {
-  value?: string;
-  toJSON() {
-    compilerAssert(this.value, "Reference value never set.");
-    return this.value;
-  }
-}
-
-/**
- * Represents a non-inlined schema that will be emitted as a definition.
- * Computation of the OpenAPI schema object is deferred.
- */
-interface PendingSchema {
-  /** The TYPESPEC type for the schema */
-  type: Type;
-
-  /** The visibility to apply when computing the schema */
-  visibility: Visibility;
-
   /**
-   * The JSON reference to use to point to this schema.
-   *
-   * Note that its value will not be computed until all schemas have been
-   * computed as we will add a suffix to the name if more than one schema
-   * must be emitted for the type for different visibilities.
+   * Determines whether output should be split into multiple files.  The only supported option for splitting is "legacy-feature-files",
    */
-  ref: Ref;
-
-  /**
-   * Determines the schema name if an override has been set
-   * @param name The default name of the schema
-   * @param visibility The visibility in which the schema is used
-   * @returns The name of the given schema in the given visibility context
-   */
-  getSchemaNameOverride?: (name: string, visibility: Visibility) => string;
-}
-
-/**
- * Represents a schema that is ready to emit as its OpenAPI representation
- * has been produced.
- */
-interface ProcessedSchema extends PendingSchema {
-  schema: OpenAPI2Schema | undefined;
+  readonly outputSplitting?: "legacy-feature-files";
 }
 
 type HttpParameterProperties = Extract<
@@ -290,8 +248,8 @@ type HttpParameterProperties = Extract<
 export async function getOpenAPIForService(
   context: AutorestEmitterContext,
   options: AutorestDocumentEmitterOptions,
-): Promise<AutorestEmitterResult> {
-  const { program, service } = context;
+): Promise<AutorestEmitterResult[]> {
+  const { program, service, proxy } = context;
   const typeNameOptions: TypeNameOptions = {
     // shorten type names by removing TypeSpec and service namespace
     namespaceFilter(ns) {
@@ -299,33 +257,13 @@ export async function getOpenAPIForService(
     },
   };
   const httpService = ignoreDiagnostics(getHttpService(program, service.type));
-  const info = resolveInfo(program, service.type);
+  proxy.addAdditionalInfo(resolveInfo(program, service.type));
   const auth = processAuth(service.type);
+  if (auth?.securitySchemes) proxy.addSecuritySchemes(auth.securitySchemes);
+  if (auth?.security) proxy.addSecurityRequirements(auth.security);
 
   const xml = await resolveXmlModule();
   const xmlStrategy = options.xmlStrategy;
-
-  const root: OpenAPI2Document = {
-    swagger: "2.0",
-    info: {
-      title: "(title)",
-      ...info,
-      version: context.version ?? info?.version ?? "0000-00-00",
-      "x-typespec-generated": [{ emitter: "@azure-tools/typespec-autorest" }],
-    },
-    schemes: ["https"],
-    ...resolveHost(program, service.type),
-    externalDocs: getExternalDocs(program, service.type),
-    produces: [], // Pre-initialize produces and consumes so that
-    consumes: [], // they show up at the top of the document
-    security: auth?.security,
-    securityDefinitions: auth?.securitySchemes ?? {},
-    tags: [],
-    paths: {},
-    "x-ms-paths": {},
-    definitions: {},
-    parameters: {},
-  };
 
   let currentEndpoint: OpenAPI2Operation;
   let currentConsumes: Set<string>;
@@ -337,19 +275,14 @@ export async function getOpenAPIForService(
 
   // Keep a map of all Types+Visibility combinations that were encountered
   // that need schema definitions.
-  const pendingSchemas = new TwoLevelMap<Type, Visibility, PendingSchema>();
+  const pendingSchemas = proxy.pendingSchemas;
 
   // Reuse a single ref object per Type+Visibility combination.
-  const refs = new TwoLevelMap<Type, Visibility, Ref>();
+  const refs = proxy.refs;
 
   // Keep track of inline types still in the process of having their schema computed
   // This is used to detect cycles in inline types, which is an
   const inProgressInlineTypes = new Set<Type>();
-
-  // Map model properties that represent shared parameters to their parameter
-  // definition that will go in #/parameters. Inlined parameters do not go in
-  // this map.
-  const params: Map<ModelProperty, OpenAPI2Parameter> = new Map();
 
   // Keep track of types that were processed indirectly and shouldn't be added if `omit-unreachable-types` is not set.
   // This include:
@@ -357,14 +290,11 @@ export async function getOpenAPIForService(
   // - Multipart models
   const indirectlyProcessedTypes: Set<Type> = new Set();
 
-  // De-dupe the per-endpoint tags that will be added into the #/tags
-  const tags: Set<string> = new Set();
-
   const operationIdsWithExample = new Set<string>();
 
   const [exampleMap, diagnostics] = await loadExamples(program, options, context.version);
   program.reportDiagnostics(diagnostics);
-
+  proxy.addExamples(exampleMap);
   const routes = httpService.operations;
   reportIfNoRoutes(program, routes);
 
@@ -382,7 +312,7 @@ export async function getOpenAPIForService(
         ct === "application/json" || (xmlEnabled && ct === "application/xml"),
     );
   if (allResponseContentTypes.length === 0) allResponseContentTypes = ["application/json"];
-  const globalProduces = new Set<string>(allResponseContentTypes);
+  proxy.addProduces(allResponseContentTypes);
 
   let allRequestContentTypes = routes
     .flatMap((route) => route.parameters)
@@ -391,7 +321,9 @@ export async function getOpenAPIForService(
       (ct) => !!ct && (ct === "application/json" || (xmlEnabled && ct === "application/xml")),
     );
   if (allRequestContentTypes.length === 0) allRequestContentTypes = ["application/json"];
-  const globalConsumes = new Set<string>(allRequestContentTypes);
+  proxy.addConsumes(allRequestContentTypes);
+  const globalProduces = proxy.getProduces();
+  const globalConsumes = proxy.getConsumes();
 
   const shouldEmitXml =
     xmlEnabled && (globalProduces.has("application/xml") || globalConsumes.has("application/xml"));
@@ -408,30 +340,31 @@ export async function getOpenAPIForService(
   emitSchemas(service.type);
   emitTags();
 
-  // Finalize global produces/consumes
   if (globalProduces.size > 0) {
-    root.produces = [...globalProduces.values()];
+    proxy.setProduces([...globalProduces.values()]);
   } else {
-    delete root.produces;
+    proxy.deleteProduces();
   }
   if (globalConsumes.size > 0) {
-    root.consumes = [...globalConsumes.values()];
+    proxy.setConsumes([...globalConsumes.values()]);
   } else {
-    delete root.consumes;
+    proxy.deleteConsumes();
   }
 
-  // Clean up empty entries
-  if (root["x-ms-paths"] && Object.keys(root["x-ms-paths"]).length === 0) {
-    delete root["x-ms-paths"];
+  const xMsPaths = proxy.getXMsPaths();
+  if (xMsPaths && Object.keys(xMsPaths).length === 0) {
+    proxy.deleteXmsPaths();
   }
-  if (root.security && Object.keys(root.security).length === 0) {
-    delete root["security"];
+  const rootSecurity = proxy.getSecurity();
+  if (rootSecurity && Object.keys(rootSecurity).length === 0) {
+    proxy.deleteSecurity();
   }
-  if (root.securityDefinitions && Object.keys(root.securityDefinitions).length === 0) {
-    delete root["securityDefinitions"];
+  const securityDefs = proxy.getSecurityDefinitions();
+  if (securityDefs && Object.keys(securityDefs).length === 0) {
+    proxy.deleteSecurityDefinitions();
   }
 
-  return {
+  return proxy.resolveDocuments(); /*{
     document: root,
     operationExamples: [...operationIdsWithExample]
       .map((operationId) => {
@@ -444,79 +377,33 @@ export async function getOpenAPIForService(
       })
       .filter((x) => x) as any,
     outputFile: context.outputFile,
-  };
+  };*/
 
-  function resolveHost(
-    program: Program,
-    namespace: Namespace,
-  ): Pick<OpenAPI2Document, "host" | "x-ms-parameterized-host" | "schemes"> {
-    const servers = getServers(program, namespace);
-    if (servers === undefined) {
-      return {};
+  function emitTags() {
+    for (const tag of proxy.getTags()) {
+      proxy.addTag([tag]);
     }
+  }
 
-    // If there is more than one server we then just make a custom host with a parameter asking for the full url.
-    if (servers.length > 1) {
-      return {
-        "x-ms-parameterized-host": {
-          hostTemplate: "{url}",
-          useSchemePrefix: false,
-          parameters: [
-            {
-              name: "url",
-              in: "path",
-              description: "Url",
-              type: "string",
-              format: "uri",
-              "x-ms-skip-url-encoding": true,
-            },
-          ],
-        },
-      };
-    }
-    const server = servers[0];
-    if (server.parameters.size === 0) {
-      const [scheme, host] = server.url.split("://");
-      return {
-        host,
-        schemes: [scheme],
-      };
-    }
-    const parameters: OpenAPI2PathParameter[] = [];
-    for (const prop of server.parameters.values()) {
-      const param = getOpenAPI2Parameter(
-        {
-          kind: "path",
-          path: [],
-          property: prop,
-          options: {
-            allowReserved: false,
-            explode: false,
-            style: "simple",
-            name: prop.name,
-          },
-        },
-        {
-          visibility: Visibility.Read,
-          ignoreMetadataAnnotations: false,
-        },
-      );
-      if (
-        prop.type.kind === "Scalar" &&
-        $(program).type.isAssignableTo(prop.type, $(program).builtin.url, prop.type)
-      ) {
-        param["x-ms-skip-url-encoding"] = true;
+  function canSharePropertyUsingReadonlyOrXMSMutability(prop: ModelProperty) {
+    const sharedVisibilities = ["Read", "Create", "Update"];
+    const lifecycle = getLifecycleVisibilityEnum(program);
+    const visibilities = getVisibilityForClass(program, prop, lifecycle);
+    // If the property does not have default visibility (all Lifecycle modifiers)
+    // then we have to look at the active modifiers to determine if it has any
+    // visibility other than read, create, or update, since those are compatible
+    // with x-ms-mutability.
+    if (visibilities.size !== lifecycle.members.size) {
+      for (const visibility of visibilities) {
+        if (!sharedVisibilities.includes(visibility.name)) {
+          return false;
+        }
       }
-      parameters.push(param);
     }
-
-    return {
-      "x-ms-parameterized-host": {
-        hostTemplate: server.url,
-        useSchemePrefix: false,
-        parameters,
-      },
-    };
+    // Otherwise, the property can be shared if it has default visibility or only
+    // shared visibilities, but not if it is _invisible_. The property is invisible
+    // if it has no active modifiers.
+    return visibilities.size !== 0;
   }
 
   function resolveXmsPageable(program: Program, operation: HttpOperation): XmsPageable | undefined {
@@ -538,13 +425,14 @@ export async function getOpenAPIForService(
     return undefined;
   }
 
-  function requiresXMsPaths(path: string, operation: Operation): boolean {
+  // part of endpoint implementation
+  /**function requiresXMsPaths(path: string, operation: Operation): boolean {
     const isShared = isSharedRoute(program, operation) ?? false;
     if (path.includes("?")) {
       return true;
     }
     return isShared;
-  }
+  }*/
 
   function getFinalStateVia(metadata: LroMetadata): XMSLongRunningFinalState | undefined {
     switch (metadata.finalStateVia) {
@@ -561,7 +449,9 @@ export async function getOpenAPIForService(
     }
   }
 
-  function getFinalStateSchema(metadata: LroMetadata): { "final-state-schema": Ref } | undefined {
+  function getFinalStateSchema(
+    metadata: LroMetadata,
+  ): { "final-state-schema": LateBoundReference } | undefined {
     if (
       metadata.finalResult !== undefined &&
       metadata.finalResult !== "void" &&
@@ -571,24 +461,25 @@ export async function getOpenAPIForService(
       const schemaOrRef = resolveExternalRef(metadata.finalResult);
 
       if (schemaOrRef !== undefined) {
-        const ref = new Ref();
+        const ref = new LateBoundReference();
         ref.value = schemaOrRef.$ref;
         return { "final-state-schema": ref };
       }
       const pending = pendingSchemas.getOrAdd(metadata.finalResult, Visibility.Read, () => ({
         type: model,
         visibility: Visibility.Read,
-        ref: refs.getOrAdd(model, Visibility.Read, () => new Ref()),
+        ref: refs.getOrAdd(model, Visibility.Read, () => new LateBoundReference()),
       }));
       return { "final-state-schema": pending.ref };
     }
     return undefined;
   }
 
-  /** Initialize the openapi PathItem object where this operation should be added. */
-  function initPathItem(operation: HttpOperation): OpenAPI2PathItem {
+  // part of proxy endpoint implementation
+  /*function initPathItem(operation: HttpOperation): OpenAPI2PathItem {
     let { path, operation: op, verb } = operation;
-    let pathsObject: Record<string, OpenAPI2PathItem> = root.paths;
+    let pathsObject: Record<string, OpenAPI2PathItem> = {};
+    if (proxy.createOrGetEndpoint)
 
     if (root.paths[path]?.[verb] === undefined && !path.includes("?")) {
       pathsObject = root.paths;
@@ -612,24 +503,20 @@ export async function getOpenAPIForService(
     }
 
     return pathsObject[path];
-  }
+  }*/
 
   function emitOperation(operation: HttpOperation) {
     const { operation: op, verb, parameters } = operation;
-    const currentPath = initPathItem(operation);
-    if (!currentPath[verb]) {
-      currentPath[verb] = {} as any;
-    }
-    currentEndpoint = currentPath[verb]!;
+    currentEndpoint = proxy.createOrGetEndpoint(operation);
     currentConsumes = new Set<string>();
     currentProduces = new Set<string>();
 
-    const currentTags = getAllTags(program, op);
+    const currentTags = proxy.getTags(op);
     if (currentTags) {
-      currentEndpoint.tags = currentTags;
+      currentEndpoint.tags = [...currentTags.values()];
       for (const tag of currentTags) {
         // Add to root tags if not already there
-        tags.add(tag);
+        proxy.addTag([tag], op);
       }
     }
 
@@ -681,8 +568,8 @@ export async function getOpenAPIForService(
     const visibility = resolveRequestVisibility(program, operation.operation, verb);
     emitEndpointParameters(parameters, visibility);
     emitResponses(operation.responses);
-    applyEndpointConsumes();
-    applyEndpointProduces();
+    applyEndpointConsumes(op);
+    applyEndpointProduces(op);
 
     if (isDeprecated(program, op)) {
       currentEndpoint.deprecated = true;
@@ -709,15 +596,15 @@ export async function getOpenAPIForService(
     attachExtensions(op, currentEndpoint);
   }
 
-  function applyEndpointProduces() {
+  function applyEndpointProduces(op: Operation) {
     if (currentProduces.size > 0 && !checkLocalAndGlobalEqual(globalProduces, currentProduces)) {
-      currentEndpoint.produces = [...currentProduces];
+      proxy.addProduces([...currentProduces], op);
     }
   }
 
-  function applyEndpointConsumes() {
+  function applyEndpointConsumes(op: Operation) {
     if (currentConsumes.size > 0 && !checkLocalAndGlobalEqual(globalConsumes, currentConsumes)) {
-      currentEndpoint.consumes = [...currentConsumes];
+      proxy.addConsumes([...currentConsumes], op);
     }
   }
 
@@ -1016,12 +903,13 @@ export async function getOpenAPIForService(
       const pending = pendingSchemas.getOrAdd(type, schemaContext.visibility, () => ({
         type,
         visibility: schemaContext.visibility,
-        ref: refs.getOrAdd(type, schemaContext.visibility, () => new Ref()),
+        ref: refs.getOrAdd(type, schemaContext.visibility, () => new LateBoundReference()),
         getSchemaNameOverride: schemaNameOverride,
       }));
       return { $ref: pending.ref };
     }
   }
+
   function getSchemaForInlineType(
     type: Type,
     name: string,
@@ -1060,16 +948,16 @@ export async function getOpenAPIForService(
       return ref;
     }
 
-    const parameter = params.get(property);
+    const parameter = proxy.getOrAddParamPlaceholder(property);
     if (parameter) {
       return parameter;
     }
 
-    const placeholder = {} as OpenAPI2Parameter;
+    let placeholder = {} as Refable<OpenAPI2Parameter>;
 
     // only parameters inherited by spreading from non-inlined type are shared in #/parameters
     if (spreadParam && property.model && !shouldInline(program, property.model)) {
-      params.set(property, placeholder);
+      placeholder = proxy.getOrAddParamPlaceholder(property);
       indirectlyProcessedTypes.add(property.model);
     }
 
@@ -1080,7 +968,7 @@ export async function getOpenAPIForService(
     const consumes: string[] = methodParams.body?.contentTypes ?? [];
 
     for (const httpProperty of methodParams.properties) {
-      const shared = params.get(httpProperty.property);
+      const shared = proxy.getOrAddParamPlaceholder(httpProperty.property);
       if (shared) {
         currentEndpoint.parameters.push(shared);
         continue;
@@ -1496,35 +1384,22 @@ export async function getOpenAPIForService(
     }
   }
 
-  function getOpenAPI2Parameter<T extends OpenAPI2Parameter["in"]>(
-    httpProp: HttpParameterProperties & { kind: T },
-    schemaContext: SchemaContext,
-  ): OpenAPI2Parameter & { in: T } {
-    const value = getOpenAPI2ParameterInternal(httpProp, schemaContext);
-    // Apply decorators to a copy of the parameter definition.  We use
-    // Object.assign here because applyIntrinsicDecorators returns a new object
-    // based on the target object and we need to apply its changes back to the
-    // original parameter.
-    Object.assign(
-      value,
-      applyIntrinsicDecorators(httpProp.property, {
-        type: (value as any).type,
-        format: (value as any).format,
-      }),
-    );
-    return value as any;
-  }
-
   function emitParameters() {
-    for (const [property, param] of params) {
+    for (const [property, param] of proxy.getParameters()) {
       // Add an extension which tells AutoRest that this is a shared operation
       // parameter definition
       if (param["x-ms-parameter-location"] === undefined) {
         param["x-ms-parameter-location"] = "method";
       }
 
-      const key = getParameterKey(program, property, param, root.parameters!, typeNameOptions);
-      root.parameters![key] = { ...param };
+      const key = getParameterKey(
+        program,
+        property,
+        param,
+        proxy.getParameterMap(),
+        typeNameOptions,
+      );
+      proxy.setParameter(key, property, param);
 
       const refedParam = param as any;
       for (const key of Object.keys(param)) {
@@ -1536,7 +1411,7 @@ export async function getOpenAPIForService(
   }
 
   function emitSchemas(serviceNamespace: Namespace) {
-    const processedSchemas = new TwoLevelMap<Type, Visibility, ProcessedSchema>();
+    const processedSchemas = proxy.processedSchemas;
     processSchemas();
     if (!options.omitUnreachableTypes) {
       processUnreferencedSchemas();
@@ -1558,16 +1433,16 @@ export async function getOpenAPIForService(
           name += getVisibilitySuffix(visibility, Visibility.Read);
         }
 
-        checkDuplicateTypeName(program, processed.type, name, root.definitions!);
-        processed.ref.value = "#/definitions/" + encodeURIComponent(name);
+        checkDuplicateTypeName(program, processed.type, name!, proxy.definitions!);
+        processed.ref.setLocalValue(name!, processed.type);
         if (processed.schema) {
           if (shouldEmitXml)
             attachXml(
               processed.type,
-              name,
+              name!,
               processed as ProcessedSchema & { schema: OpenAPI2Schema },
             );
-          root.definitions![name] = processed.schema;
+          proxy.definitions![name!] = processed.schema;
         }
       }
     }
@@ -1635,12 +1510,6 @@ export async function getOpenAPIForService(
       return true;
     }
     return false;
-  }
-
-  function emitTags() {
-    for (const tag of tags) {
-      root.tags!.push({ name: tag });
-    }
   }
 
   function getSchemaForType(
@@ -1863,6 +1732,7 @@ export async function getOpenAPIForService(
       description: getDoc(program, member),
     };
   }
+
   function getSchemaForUnionVariant(
     variant: UnionVariant,
     schemaContext: SchemaContext,
@@ -2098,27 +1968,6 @@ export async function getOpenAPIForService(
     return modelSchema;
   }
 
-  function canSharePropertyUsingReadonlyOrXMSMutability(prop: ModelProperty) {
-    const sharedVisibilities = ["Read", "Create", "Update"];
-    const lifecycle = getLifecycleVisibilityEnum(program);
-    const visibilities = getVisibilityForClass(program, prop, lifecycle);
-    // If the property does not have default visibility (all Lifecycle modifiers)
-    // then we have to look at the active modifiers to determine if it has any
-    // visibility other than read, create, or update, since those are compatible
-    // with x-ms-mutability.
-    if (visibilities.size !== lifecycle.members.size) {
-      for (const visibility of visibilities) {
-        if (!sharedVisibilities.includes(visibility.name)) {
-          return false;
-        }
-      }
-    }
-    // Otherwise, the property can be shared if it has default visibility or only
-    // shared visibilities, but not if it is _invisible_. The property is invisible
-    // if it has no active modifiers.
-    return visibilities.size !== 0;
-  }
-
   function resolveProperty(prop: ModelProperty, context: SchemaContext): OpenAPI2SchemaProperty {
     let propSchema;
     if (prop.type.kind === "Enum" && prop.defaultValue) {
@@ -2159,301 +2008,13 @@ export async function getOpenAPIForService(
     return applyIntrinsicDecorators(prop, propSchema);
   }
 
-  function attachExtensions(type: Type, emitObject: any) {
-    // Attach any OpenAPI extensions
-    const extensions = getExtensions(program, type);
-    if (
-      type.kind === "Model" &&
-      (isAzureResource(program, type) ||
-        getCustomResourceOptions(program, type)?.isAzureResource === true)
-    ) {
-      emitObject["x-ms-azure-resource"] = true;
-    }
-    if (getAsEmbeddingVector(program, type as Model) !== undefined) {
-      emitObject["x-ms-embedding-vector"] = true;
-    }
-    if (type.kind === "Model" && isArmExternalType(program, type) === true) {
-      emitObject["x-ms-external"] = true;
-    }
-    if (type.kind === "Model" && isSecret(program, type) === true) {
-      emitObject["x-ms-secret"] = true;
-    }
-    if (type.kind === "Scalar") {
-      const ext = getArmResourceIdentifierConfig(program, type);
-      if (ext) {
-        emitObject["x-ms-arm-id-details"] = ext;
-      }
-    }
-    if (extensions) {
-      for (const key of extensions.keys()) {
-        emitObject[key] = extensions.get(key);
-      }
-    }
-  }
-
-  function attachXml(
-    type: Type,
-    schemaName: string,
-    processed: ProcessedSchema & { schema: OpenAPI2Schema },
-  ) {
-    if (!xml.available) return;
-
-    const ns = xml.module.getNs(program, type);
-
-    if ("name" in type && type.name !== undefined && typeof type.name === "string") {
-      const xmlName = resolveEncodedName(
-        program,
-        type as Type & { name: string },
-        "application/xml",
-      );
-      if (xmlName && xmlName !== schemaName) setXmlField("name", xmlName);
-    }
-
-    if (ns) {
-      if (ns.namespace) setXmlField("namespace", ns.namespace);
-      if (ns.prefix) setXmlField("prefix", ns.prefix);
-    }
-
-    function setXmlField<K extends keyof XmlObject>(key: K, value: XmlObject[K]) {
-      processed.schema.xml ??= {};
-      processed.schema.xml[key] = value;
-    }
-  }
-
-  function attachPropertyXml(prop: ModelProperty, propSchema: OpenAPI2SchemaProperty) {
-    if (!xml.available) return;
-
-    if (xml.module.isAttribute(program, prop)) {
-      setXmlField("attribute", true);
-    }
-
-    if (prop.type.kind === "Model" && isArrayModelType(program, prop.type)) {
-      const wrapped = !xml.module.isUnwrapped(program, prop);
-
-      setXmlField("wrapped", wrapped);
-    }
-
-    let encode = getEncode(program, prop);
-
-    let resolvedEncodeType = encode?.type ?? prop.type;
-
-    while (
-      resolvedEncodeType.kind === "Scalar" &&
-      (encode = getEncode(program, resolvedEncodeType))
-    ) {
-      resolvedEncodeType = encode.type;
-    }
-
-    if (
-      resolvedEncodeType.kind === "Scalar" &&
-      $(program).scalar.extendsString(resolvedEncodeType)
-    ) {
-      if (xml.module.isUnwrapped(program, prop)) {
-        setXmlField("x-ms-text", true);
-      }
-    }
-
-    const xmlNs = xml.module.getNs(program, prop);
-
-    if (xmlNs) {
-      setXmlField("namespace", xmlNs.namespace);
-
-      if (xmlNs.prefix) setXmlField("prefix", xmlNs.prefix);
-    }
-
-    function setXmlField<K extends keyof XmlObject>(key: K, value: XmlObject[K]) {
-      propSchema.xml ??= {};
-      propSchema.xml[key] = value;
-    }
-  }
-
-  // Return any string literal values for type
-  function getStringValues(type: Type): string[] {
-    switch (type.kind) {
-      case "String":
-        return [type.value];
-      case "Union":
-        return [...type.variants.values()].flatMap((x) => getStringValues(x.type)).filter((x) => x);
-      case "EnumMember":
-        return typeof type.value !== "number" ? [type.value ?? type.name] : [];
-      case "UnionVariant":
-        return getStringValues(type.type);
-      default:
-        return [];
-    }
-  }
-
-  function applyIntrinsicDecorators(
-    typespecType: Model | Scalar | ModelProperty | Union,
-    target: OpenAPI2Schema,
-  ): OpenAPI2Schema {
-    const newTarget = { ...target };
-    const docStr = getDoc(program, typespecType);
-
-    if (docStr) {
-      newTarget.description = docStr;
-    }
-
-    const title = getSummary(program, typespecType);
-    if (title) {
-      target.title = title;
-    }
-
-    const formatStr = getFormat(program, typespecType);
-    if (formatStr) {
-      const allowedStringFormats = [
-        "char",
-        "binary",
-        "byte",
-        "certificate",
-        "date",
-        "time",
-        "date-time",
-        "date-time-rfc1123",
-        "date-time-rfc7231",
-        "duration",
-        "password",
-        "uuid",
-        "base64url",
-        "uri",
-        "url",
-        "arm-id",
-      ];
-      if (!allowedStringFormats.includes(formatStr.toLowerCase())) {
-        reportDiagnostic(program, {
-          code: "invalid-format",
-          format: { schema: "string", format: formatStr },
-          target: typespecType,
-        });
-      } else {
-        newTarget.format = formatStr;
-      }
-    }
-
-    const pattern = getPattern(program, typespecType);
-    if (pattern) {
-      newTarget.pattern = pattern;
-    }
-
-    const minLength = getMinLength(program, typespecType);
-    if (minLength !== undefined) {
-      newTarget.minLength = minLength;
-    }
-
-    const maxLength = getMaxLength(program, typespecType);
-    if (maxLength !== undefined) {
-      newTarget.maxLength = maxLength;
-    }
-
-    const minValue = getMinValue(program, typespecType);
-    if (minValue !== undefined) {
-      newTarget.minimum = minValue;
-    }
-
-    const maxValue = getMaxValue(program, typespecType);
-    if (maxValue !== undefined) {
-      newTarget.maximum = maxValue;
-    }
-
-    const minItems = getMinItems(program, typespecType);
-    if (!target.minItems && minItems !== undefined) {
-      newTarget.minItems = minItems;
-    }
-
-    const maxItems = getMaxItems(program, typespecType);
-    if (!target.maxItems && maxItems !== undefined) {
-      newTarget.maxItems = maxItems;
-    }
-
-    const uniqueItems =
-      (typespecType.kind === "ModelProperty" || typespecType.kind === "Model") &&
-      hasUniqueItems(program, typespecType);
-    if (uniqueItems && !target.uniqueItems) {
-      newTarget.uniqueItems = true;
-    }
-
-    if (isSecret(program, typespecType)) {
-      newTarget.format = "password";
-      newTarget["x-ms-secret"] = true;
-    }
-
-    if (
-      typespecType.kind === "ModelProperty" &&
-      shouldFlattenProperty(context.tcgcSdkContext, typespecType)
-    ) {
-      newTarget["x-ms-client-flatten"] = true;
-    }
-
-    attachExtensions(typespecType, newTarget);
-
-    return typespecType.kind === "Scalar" || typespecType.kind === "ModelProperty"
-      ? applyEncoding(typespecType, newTarget)
-      : newTarget;
-  }
-
-  function applyEncoding(
-    typespecType: Scalar | ModelProperty,
-    target: OpenAPI2Schema,
-  ): OpenAPI2Schema {
-    const encodeData = getEncode(program, typespecType);
-    if (encodeData) {
-      const newTarget = { ...target };
-      const newType = getSchemaForScalar(encodeData.type);
-      newTarget.type = newType.type;
-      // If the target already has a format it takes priority. (e.g. int32)
-      newTarget.format = mergeFormatAndEncoding(
-        newTarget.format,
-        encodeData.encoding,
-        newType.format,
-      );
-      return newTarget;
-    }
-    return target;
-  }
-  function mergeFormatAndEncoding(
-    format: string | undefined,
-    encoding: string | undefined,
-    encodeAsFormat: string | undefined,
-  ): string | undefined {
-    switch (format) {
-      case undefined:
-        return encodeAsFormat ?? encoding ?? format;
-      case "date-time":
-        switch (encoding) {
-          case "rfc3339":
-            return "date-time";
-          case "unixTimestamp":
-            return "unixtime";
-          case "rfc7231":
-            return "date-time-rfc7231";
-          default:
-            return encoding;
-        }
-      case "duration":
-        switch (encoding) {
-          case "ISO8601":
-            return "duration";
-          default:
-            return encodeAsFormat ?? encoding;
-        }
-      case "byte":
-        switch (encoding) {
-          case "base64":
-            return "byte";
-          default:
-            return encodeAsFormat ?? encoding ?? format;
-        }
-      default:
-        return encodeAsFormat ?? encoding ?? format;
-    }
-  }
-
   function applySummary(typespecType: Type, target: { title?: string }) {
     const summary = getSummary(program, typespecType);
     if (summary) {
       target.title = summary;
     }
   }
+
   function applyExternalDocs(typespecType: Type, target: { externalDocs?: OpenAPI2ExternalDocs }) {
     const externalDocs = getExternalDocs(program, typespecType);
     if (externalDocs) {
@@ -2810,6 +2371,334 @@ export async function getOpenAPIForService(
         compilerAssert(false, "Unreachable");
     }
   }
+
+  function applyIntrinsicDecorators(
+    typespecType: Model | Scalar | ModelProperty | Union,
+    target: OpenAPI2Schema,
+  ): OpenAPI2Schema {
+    const newTarget = { ...target };
+    const docStr = getDoc(program, typespecType);
+
+    if (docStr) {
+      newTarget.description = docStr;
+    }
+
+    const title = getSummary(program, typespecType);
+    if (title) {
+      target.title = title;
+    }
+
+    const formatStr = getFormat(program, typespecType);
+    if (formatStr) {
+      const allowedStringFormats = [
+        "char",
+        "binary",
+        "byte",
+        "certificate",
+        "date",
+        "time",
+        "date-time",
+        "date-time-rfc1123",
+        "date-time-rfc7231",
+        "duration",
+        "password",
+        "uuid",
+        "base64url",
+        "uri",
+        "url",
+        "arm-id",
+      ];
+      if (!allowedStringFormats.includes(formatStr.toLowerCase())) {
+        reportDiagnostic(program, {
+          code: "invalid-format",
+          format: { schema: "string", format: formatStr },
+          target: typespecType,
+        });
+      } else {
+        newTarget.format = formatStr;
+      }
+    }
+
+    const pattern = getPattern(program, typespecType);
+    if (pattern) {
+      newTarget.pattern = pattern;
+    }
+
+    const minLength = getMinLength(program, typespecType);
+    if (minLength !== undefined) {
+      newTarget.minLength = minLength;
+    }
+
+    const maxLength = getMaxLength(program, typespecType);
+    if (maxLength !== undefined) {
+      newTarget.maxLength = maxLength;
+    }
+
+    const minValue = getMinValue(program, typespecType);
+    if (minValue !== undefined) {
+      newTarget.minimum = minValue;
+    }
+
+    const maxValue = getMaxValue(program, typespecType);
+    if (maxValue !== undefined) {
+      newTarget.maximum = maxValue;
+    }
+
+    const minItems = getMinItems(program, typespecType);
+    if (!target.minItems && minItems !== undefined) {
+      newTarget.minItems = minItems;
+    }
+
+    const maxItems = getMaxItems(program, typespecType);
+    if (!target.maxItems && maxItems !== undefined) {
+      newTarget.maxItems = maxItems;
+    }
+
+    const uniqueItems =
+      (typespecType.kind === "ModelProperty" || typespecType.kind === "Model") &&
+      hasUniqueItems(program, typespecType);
+    if (uniqueItems && !target.uniqueItems) {
+      newTarget.uniqueItems = true;
+    }
+
+    if (isSecret(program, typespecType)) {
+      newTarget.format = "password";
+      newTarget["x-ms-secret"] = true;
+    }
+
+    if (
+      typespecType.kind === "ModelProperty" &&
+      shouldFlattenProperty(context.tcgcSdkContext, typespecType)
+    ) {
+      newTarget["x-ms-client-flatten"] = true;
+    }
+
+    attachExtensions(typespecType, newTarget);
+
+    return typespecType.kind === "Scalar" || typespecType.kind === "ModelProperty"
+      ? applyEncoding(typespecType, newTarget)
+      : newTarget;
+  }
+
+  function getOpenAPI2Parameter<T extends OpenAPI2Parameter["in"]>(
+    httpProp: HttpParameterProperties & { kind: T },
+    schemaContext: SchemaContext,
+  ): OpenAPI2Parameter & { in: T } {
+    const value = getOpenAPI2ParameterInternal(httpProp, schemaContext);
+    // Apply decorators to a copy of the parameter definition.  We use
+    // Object.assign here because applyIntrinsicDecorators returns a new object
+    // based on the target object and we need to apply its changes back to the
+    // original parameter.
+    Object.assign(
+      value,
+      applyIntrinsicDecorators(httpProp.property, {
+        type: (value as any).type,
+        format: (value as any).format,
+      }),
+    );
+    return value as any;
+  }
+
+  function resolveHost(
+    program: Program,
+    namespace: Namespace,
+  ): Pick<OpenAPI2Document, "host" | "x-ms-parameterized-host" | "schemes"> {
+    const servers = getServers(program, namespace);
+    if (servers === undefined) {
+      return {};
+    }
+
+    // If there is more than one server we then just make a custom host with a parameter asking for the full url.
+    if (servers.length > 1) {
+      return {
+        "x-ms-parameterized-host": {
+          hostTemplate: "{url}",
+          useSchemePrefix: false,
+          parameters: [
+            {
+              name: "url",
+              in: "path",
+              description: "Url",
+              type: "string",
+              format: "uri",
+              "x-ms-skip-url-encoding": true,
+            },
+          ],
+        },
+      };
+    }
+    const server = servers[0];
+    if (server.parameters.size === 0) {
+      const [scheme, host] = server.url.split("://");
+      return {
+        host,
+        schemes: [scheme],
+      };
+    }
+    const parameters: OpenAPI2PathParameter[] = [];
+    for (const prop of server.parameters.values()) {
+      const param = getOpenAPI2Parameter(
+        {
+          kind: "path",
+          path: [],
+          property: prop,
+          options: {
+            allowReserved: false,
+            explode: false,
+            style: "simple",
+            name: prop.name,
+          },
+        },
+        {
+          visibility: Visibility.Read,
+          ignoreMetadataAnnotations: false,
+        },
+      );
+      if (
+        prop.type.kind === "Scalar" &&
+        $(program).type.isAssignableTo(prop.type, $(program).builtin.url, prop.type)
+      ) {
+        param["x-ms-skip-url-encoding"] = true;
+      }
+      parameters.push(param);
+    }
+
+    return {
+      "x-ms-parameterized-host": {
+        hostTemplate: server.url,
+        useSchemePrefix: false,
+        parameters,
+      },
+    };
+  }
+
+  function attachExtensions(type: Type, emitObject: any) {
+    // Attach any OpenAPI extensions
+    const extensions = getExtensions(program, type);
+    if (
+      type.kind === "Model" &&
+      (isAzureResource(program, type) ||
+        getCustomResourceOptions(program, type)?.isAzureResource === true)
+    ) {
+      emitObject["x-ms-azure-resource"] = true;
+    }
+    if (getAsEmbeddingVector(program, type as Model) !== undefined) {
+      emitObject["x-ms-embedding-vector"] = true;
+    }
+    if (type.kind === "Model" && isArmExternalType(program, type) === true) {
+      emitObject["x-ms-external"] = true;
+    }
+    if (type.kind === "Model" && isSecret(program, type) === true) {
+      emitObject["x-ms-secret"] = true;
+    }
+    if (type.kind === "Scalar") {
+      const ext = getArmResourceIdentifierConfig(program, type);
+      if (ext) {
+        emitObject["x-ms-arm-id-details"] = ext;
+      }
+    }
+    if (extensions) {
+      for (const key of extensions.keys()) {
+        emitObject[key] = extensions.get(key);
+      }
+    }
+  }
+
+  function attachXml(
+    type: Type,
+    schemaName: string,
+    processed: ProcessedSchema & { schema: OpenAPI2Schema },
+  ) {
+    if (!xml.available) return;
+
+    const ns = xml.module.getNs(program, type);
+
+    if ("name" in type && type.name !== undefined && typeof type.name === "string") {
+      const xmlName = resolveEncodedName(
+        program,
+        type as Type & { name: string },
+        "application/xml",
+      );
+      if (xmlName && xmlName !== schemaName) setXmlField("name", xmlName);
+    }
+
+    if (ns) {
+      if (ns.namespace) setXmlField("namespace", ns.namespace);
+      if (ns.prefix) setXmlField("prefix", ns.prefix);
+    }
+
+    function setXmlField<K extends keyof XmlObject>(key: K, value: XmlObject[K]) {
+      processed.schema.xml ??= {};
+      processed.schema.xml[key] = value;
+    }
+  }
+
+  function attachPropertyXml(prop: ModelProperty, propSchema: OpenAPI2SchemaProperty) {
+    if (!xml.available) return;
+
+    if (xml.module.isAttribute(program, prop)) {
+      setXmlField("attribute", true);
+    }
+
+    if (prop.type.kind === "Model" && isArrayModelType(program, prop.type)) {
+      const wrapped = !xml.module.isUnwrapped(program, prop);
+
+      setXmlField("wrapped", wrapped);
+    }
+
+    let encode = getEncode(program, prop);
+
+    let resolvedEncodeType = encode?.type ?? prop.type;
+
+    while (
+      resolvedEncodeType.kind === "Scalar" &&
+      (encode = getEncode(program, resolvedEncodeType))
+    ) {
+      resolvedEncodeType = encode.type;
+    }
+
+    if (
+      resolvedEncodeType.kind === "Scalar" &&
+      $(program).scalar.extendsString(resolvedEncodeType)
+    ) {
+      if (xml.module.isUnwrapped(program, prop)) {
+        setXmlField("x-ms-text", true);
+      }
+    }
+
+    const xmlNs = xml.module.getNs(program, prop);
+
+    if (xmlNs) {
+      setXmlField("namespace", xmlNs.namespace);
+
+      if (xmlNs.prefix) setXmlField("prefix", xmlNs.prefix);
+    }
+
+    function setXmlField<K extends keyof XmlObject>(key: K, value: XmlObject[K]) {
+      propSchema.xml ??= {};
+      propSchema.xml[key] = value;
+    }
+  }
+
+  function applyEncoding(
+    typespecType: Scalar | ModelProperty,
+    target: OpenAPI2Schema,
+  ): OpenAPI2Schema {
+    const encodeData = getEncode(program, typespecType);
+    if (encodeData) {
+      const newTarget = { ...target };
+      const newType = getSchemaForScalar(encodeData.type);
+      newTarget.type = newType.type;
+      // If the target already has a format it takes priority. (e.g. int32)
+      newTarget.format = mergeFormatAndEncoding(
+        newTarget.format,
+        encodeData.encoding,
+        newType.format,
+      );
+      return newTarget;
+    }
+    return target;
+  }
 }
 
 class ErrorTypeFoundError extends Error {
@@ -2944,4 +2833,115 @@ function isHttpParameterProperty(
   httpProperty: HttpProperty,
 ): httpProperty is HttpParameterProperties {
   return ["header", "query", "path", "cookie"].includes(httpProperty.kind);
+}
+
+// Return any string literal values for type
+function getStringValues(type: Type): string[] {
+  switch (type.kind) {
+    case "String":
+      return [type.value];
+    case "Union":
+      return [...type.variants.values()].flatMap((x) => getStringValues(x.type)).filter((x) => x);
+    case "EnumMember":
+      return typeof type.value !== "number" ? [type.value ?? type.name] : [];
+    case "UnionVariant":
+      return getStringValues(type.type);
+    default:
+      return [];
+  }
+}
+
+function mergeFormatAndEncoding(
+  format: string | undefined,
+  encoding: string | undefined,
+  encodeAsFormat: string | undefined,
+): string | undefined {
+  switch (format) {
+    case undefined:
+      return encodeAsFormat ?? encoding ?? format;
+    case "date-time":
+      switch (encoding) {
+        case "rfc3339":
+          return "date-time";
+        case "unixTimestamp":
+          return "unixtime";
+        case "rfc7231":
+          return "date-time-rfc7231";
+        default:
+          return encoding;
+      }
+    case "duration":
+      switch (encoding) {
+        case "ISO8601":
+          return "duration";
+        default:
+          return encodeAsFormat ?? encoding;
+      }
+    case "byte":
+      switch (encoding) {
+        case "base64":
+          return "byte";
+        default:
+          return encodeAsFormat ?? encoding ?? format;
+      }
+    default:
+      return encodeAsFormat ?? encoding ?? format;
+  }
+}
+
+export function createDefaultDocumentProxy(
+  program: Program,
+  service: Service,
+  options: AutorestDocumentEmitterOptions,
+  version?: string,
+): OpenApi2DocumentProxy {
+  const root: OpenAPI2Document = {
+    swagger: "2.0",
+    info: {
+      title: "(title)",
+      version: version ?? "0000-00-00",
+      "x-typespec-generated": [{ emitter: "@azure-tools/typespec-autorest" }],
+    },
+    schemes: ["https"],
+    externalDocs: getExternalDocs(program, service.type),
+    produces: [], // Pre-initialize produces and consumes so that
+    consumes: [], // they show up at the top of the document
+    tags: [],
+    paths: {},
+    "x-ms-paths": {},
+    definitions: {},
+    parameters: {},
+  };
+  return {
+    addAdditionalInfo(info?: AdditionalInfo) {
+      if (info !== undefined) {
+        Object.assign(root.info, info);
+      }
+    },
+    addHostInfo(hostInfo: Pick<OpenAPI2Document, "host" | "x-ms-parameterized-host" | "schemes">) {
+      Object.assign(root, hostInfo);
+    },
+    addSecurityRequirements(requirements?: Record<string, string[]>[]) {
+      if (requirements !== undefined && requirements.length > 0) {
+        root.security = requirements;
+      }
+    },
+    addSecuritySchemes(schemes?: Record<string, OpenAPI2SecurityScheme>) {
+      if (schemes !== undefined && Object.keys(schemes).length > 0) {
+        root.securityDefinitions = schemes;
+      }
+    },
+    resolveDocuments() {
+      return Promise.resolve([
+        {
+          outputFile: "openapi.json",
+          document: root,
+        },
+      ]);
+    },
+  } as OpenApi2DocumentProxy;
+}
+
+function createFeatureDocumentProxy(): OpenApi2DocumentProxy {
+  return {} as OpenApi2DocumentProxy;
 }

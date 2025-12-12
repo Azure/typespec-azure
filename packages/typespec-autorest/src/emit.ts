@@ -30,6 +30,7 @@ import type {
   AutorestEmitterResult,
   AutorestServiceRecord,
   AutorestVersionedServiceRecord,
+  OpenApi2DocumentProxy,
 } from "./types.js";
 import { AutorestEmitterContext } from "./utils.js";
 
@@ -113,16 +114,40 @@ export function resolveAutorestOptions(
     emitLroOptions: resolvedOptions["emit-lro-options"],
     emitCommonTypesSchema: resolvedOptions["emit-common-types-schema"],
     xmlStrategy: resolvedOptions["xml-strategy"],
+    outputSplitting: resolvedOptions["output-splitting"],
   };
+}
+
+function getEmitterContext(
+  program: Program,
+  service: Service,
+  options: ResolvedAutorestEmitterOptions,
+  multiService: boolean = false,
+  version?: string,
+): AutorestEmitterContext {
+  const tcgcSdkContext = createTCGCContext(program, "@azure-tools/typespec-autorest");
+  tcgcSdkContext.enableLegacyHierarchyBuilding = true;
+  return {
+    program,
+    outputFile: resolveOutputFile(program, service, multiService, options, version),
+    service: service,
+    tcgcSdkContext,
+    proxy: getDocumentProxy(program, service, options),
+  };
+}
+
+function getDocumentProxy(
+  program: Program,
+  service: Service,
+  options: ResolvedAutorestEmitterOptions,
+): OpenApi2DocumentProxy {
+  return {} as OpenApi2DocumentProxy;
 }
 
 export async function getAllServicesAtAllVersions(
   program: Program,
   options: ResolvedAutorestEmitterOptions,
 ): Promise<AutorestServiceRecord[]> {
-  const tcgcSdkContext = createTCGCContext(program, "@azure-tools/typespec-autorest");
-  tcgcSdkContext.enableLegacyHierarchyBuilding = true;
-
   const services = listServices(program);
   if (services.length === 0) {
     services.push({ type: program.getGlobalNamespaceType() });
@@ -133,33 +158,27 @@ export async function getAllServicesAtAllVersions(
     const versions = getVersioningMutators(program, service.type);
 
     if (versions === undefined) {
-      const context: AutorestEmitterContext = {
-        program,
-        outputFile: resolveOutputFile(program, service, services.length > 1, options),
-        service: service,
-        tcgcSdkContext,
-      };
+      const context: AutorestEmitterContext = getEmitterContext(program, service, options);
 
-      const result = await getOpenAPIForService(context, options);
-      serviceRecords.push({
-        service,
-        versioned: false,
-        ...result,
-      });
+      const results = await getOpenAPIForService(context, options);
+      for (const result of results) {
+        serviceRecords.push({
+          service,
+          versioned: false,
+          ...result,
+        });
+      }
     } else if (versions.kind === "transient") {
-      const context: AutorestEmitterContext = {
-        program,
-        outputFile: resolveOutputFile(program, service, services.length > 1, options),
-        service: service,
-        tcgcSdkContext,
-      };
+      const context: AutorestEmitterContext = getEmitterContext(program, service, options);
 
-      const result = await getVersionSnapshotDocument(context, versions.mutator, options);
-      serviceRecords.push({
-        service,
-        versioned: false,
-        ...result,
-      });
+      const results = await getVersionSnapshotDocument(context, versions.mutator, options);
+      for (const result of results) {
+        serviceRecords.push({
+          service,
+          versioned: false,
+          ...result,
+        });
+      }
     } else {
       const filteredVersions = versions.snapshots.filter(
         (v) => !options.version || options.version === v.version?.value,
@@ -176,26 +195,22 @@ export async function getAllServicesAtAllVersions(
       serviceRecords.push(serviceRecord);
 
       for (const record of filteredVersions) {
-        const context: AutorestEmitterContext = {
+        const context: AutorestEmitterContext = getEmitterContext(
           program,
-          outputFile: resolveOutputFile(
-            program,
-            service,
-            services.length > 1,
-            options,
-            record.version?.value,
-          ),
           service,
-          version: record.version?.value,
-          tcgcSdkContext,
-        };
+          options,
+          services.length > 1,
+          record.version?.value,
+        );
 
-        const result = await getVersionSnapshotDocument(context, record.mutator, options);
-        serviceRecord.versions.push({
-          ...result,
-          service,
-          version: record.version!.value,
-        });
+        const results = await getVersionSnapshotDocument(context, record.mutator, options);
+        for (const result of results) {
+          serviceRecord.versions.push({
+            ...result,
+            service,
+            version: record.version!.value,
+          });
+        }
       }
     }
   }
