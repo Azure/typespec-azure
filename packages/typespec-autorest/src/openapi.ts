@@ -1390,6 +1390,12 @@ export async function getOpenAPIForService(
     }
   }
 
+  function isEncodingHandledByParameter(encoding: string | undefined): boolean {
+    return (
+      encoding === "ArrayEncoding.pipeDelimited" || encoding === "ArrayEncoding.spaceDelimited"
+    );
+  }
+
   function getCollectionFormat(
     type: ModelProperty,
     explode?: boolean,
@@ -1512,10 +1518,14 @@ export async function getOpenAPIForService(
     // original parameter.
     Object.assign(
       value,
-      applyIntrinsicDecorators(httpProp.property, {
-        type: (value as any).type,
-        format: (value as any).format,
-      }),
+      applyIntrinsicDecorators(
+        httpProp.property,
+        {
+          type: (value as any).type,
+          format: (value as any).format,
+        },
+        "parameter",
+      ),
     );
     return value as any;
   }
@@ -2291,6 +2301,7 @@ export async function getOpenAPIForService(
   function applyIntrinsicDecorators(
     typespecType: Model | Scalar | ModelProperty | Union,
     target: OpenAPI2Schema,
+    usage?: "parameter" | "body",
   ): OpenAPI2Schema {
     const newTarget = { ...target };
     const docStr = getDoc(program, typespecType);
@@ -2375,13 +2386,14 @@ export async function getOpenAPIForService(
     attachExtensions(typespecType, newTarget);
 
     return typespecType.kind === "Scalar" || typespecType.kind === "ModelProperty"
-      ? applyEncoding(typespecType, newTarget)
+      ? applyEncoding(typespecType, newTarget, usage ?? "body")
       : newTarget;
   }
 
   function applyEncoding(
     typespecType: Scalar | ModelProperty,
     target: OpenAPI2Schema,
+    usage: "parameter" | "body",
   ): OpenAPI2Schema {
     const encodeData = getEncode(program, typespecType);
     if (encodeData) {
@@ -2395,15 +2407,17 @@ export async function getOpenAPIForService(
         newType.format,
       );
       if (newFormat) {
-        if (!isSupportedAutorestFormat(newFormat)) {
-          reportDiagnostic(program, {
-            code: "unknown-format",
-            format: { schema: "string", format: newFormat },
-            messageId: "encoding",
-            target: typespecType,
-          });
-        } else {
-          newTarget.format = newFormat;
+        if (!(usage === "parameter" && isEncodingHandledByParameter(newFormat))) {
+          if (!isSupportedAutorestFormat(newFormat)) {
+            reportDiagnostic(program, {
+              code: "unknown-format",
+              format: { schema: "string", format: newFormat },
+              messageId: "encoding",
+              target: typespecType,
+            });
+          } else {
+            newTarget.format = newFormat;
+          }
         }
       }
       return newTarget;
