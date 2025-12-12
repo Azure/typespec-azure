@@ -34,6 +34,7 @@ import { getResponseAsBool } from "./decorators.js";
 import {
   CollectionFormat,
   SdkBodyParameter,
+  SdkClientType,
   SdkCookieParameter,
   SdkHeaderParameter,
   SdkHttpErrorResponse,
@@ -52,6 +53,7 @@ import {
 } from "./interfaces.js";
 import {
   compareModelProperties,
+  getActualClientType,
   getAvailableApiVersions,
   getClientDoc,
   getCorrespondingClientParam,
@@ -86,11 +88,12 @@ export function getSdkHttpOperation(
   context: TCGCContext,
   httpOperation: HttpOperation,
   methodParameters: SdkMethodParameter[],
+  client: SdkClientType<SdkHttpOperation>,
 ): [SdkHttpOperation, readonly Diagnostic[]] {
   const tk = $(context.program);
   const diagnostics = createDiagnosticCollector();
   const { responses, exceptions } = diagnostics.pipe(
-    getSdkHttpResponseAndExceptions(context, httpOperation),
+    getSdkHttpResponseAndExceptions(context, httpOperation, client),
   );
   if (getResponseAsBool(context, httpOperation.operation)) {
     // we make sure valid responses and 404 responses are booleans
@@ -117,7 +120,7 @@ export function getSdkHttpOperation(
         apiVersions: getAvailableApiVersions(
           context,
           httpOperation.operation,
-          httpOperation.operation,
+          getActualClientType(client.__raw),
         ),
         headers: [],
         __raw: (responses[0] || exceptions[0]).__raw,
@@ -497,6 +500,7 @@ export function getSdkHttpParameter(
 function getSdkHttpResponseAndExceptions(
   context: TCGCContext,
   httpOperation: HttpOperation,
+  client: SdkClientType<SdkHttpOperation>,
 ): [
   {
     responses: SdkHttpResponse[];
@@ -579,7 +583,7 @@ function getSdkHttpResponseAndExceptions(
       apiVersions: getAvailableApiVersions(
         context,
         httpOperation.operation,
-        httpOperation.operation,
+        getActualClientType(client.__raw),
       ),
       description: response.description,
     };

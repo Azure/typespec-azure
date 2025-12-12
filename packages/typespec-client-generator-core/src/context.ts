@@ -3,11 +3,12 @@ import {
   EmitContext,
   emitFile,
   Enum,
+  getRelativePathFromDirectory,
   Interface,
-  listServices,
   Model,
   ModelProperty,
   Namespace,
+  normalizePath,
   Operation,
   Program,
   resolvePath,
@@ -15,7 +16,7 @@ import {
   Union,
 } from "@typespec/compiler";
 import { HttpOperation } from "@typespec/http";
-import { getVersions } from "@typespec/versioning";
+import { isAbsolute } from "path";
 import { stringify } from "yaml";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { defaultDecoratorsAllowList } from "./configs.js";
@@ -42,13 +43,10 @@ import {
   BrandedSdkEmitterOptionsInterface,
   handleVersioningMutationForGlobalNamespace,
   parseEmitterName,
-  removeVersionsLargerThanExplicitlySpecified,
   TCGCEmitterOptions,
   TspLiteralType,
 } from "./internal-utils.js";
-import { reportDiagnostic } from "./lib.js";
 import { createSdkPackage } from "./package.js";
-import { listAllServiceNamespaces } from "./public-utils.js";
 
 interface CreateTCGCContextOptions {
   mutateNamespace?: boolean; // whether to mutate global namespace for versioning
@@ -93,12 +91,10 @@ export function createTCGCContext(
         // If we are not mutating the global namespace, return the original global namespace type.
         return program.getGlobalNamespaceType();
       }
-      let globalNamespace = this.__mutatedGlobalNamespace;
-      if (!globalNamespace) {
-        globalNamespace = handleVersioningMutationForGlobalNamespace(this);
-        this.__mutatedGlobalNamespace = globalNamespace;
+      if (!this.__mutatedGlobalNamespace) {
+        this.__mutatedGlobalNamespace = handleVersioningMutationForGlobalNamespace(this);
       }
-      return globalNamespace;
+      return this.__mutatedGlobalNamespace;
     },
     getApiVersionsForType(type): string[] {
       return this.__tspTypeToApiVersions.get(type) ?? [];
@@ -113,50 +109,18 @@ export function createTCGCContext(
       }
       this.__tspTypeToApiVersions.set(type, mergedApiVersions);
     },
-    getPackageVersions(): string[] {
-      if (this.__packageVersions) {
-        return this.__packageVersions;
-      }
-      const service = listServices(program)[0];
-      if (!service) {
-        this.__packageVersions = [];
-        return this.__packageVersions;
+    getPackageVersions(): Map<Namespace, string[]> {
+      if (!this.__packageVersions) {
+        prepareClientAndOperationCache(this);
       }
 
-      const versions = getVersions(program, service.type)[1]?.getVersions();
-      if (!versions) {
-        this.__packageVersions = [];
-        return this.__packageVersions;
-      }
-
-      removeVersionsLargerThanExplicitlySpecified(this, versions);
-
-      this.__packageVersions = versions.map((version) => version.value);
-
-      if (
-        this.apiVersion !== undefined &&
-        this.apiVersion !== "latest" &&
-        this.apiVersion !== "all" &&
-        !this.__packageVersions.includes(this.apiVersion)
-      ) {
-        reportDiagnostic(this.program, {
-          code: "api-version-undefined",
-          format: { version: this.apiVersion },
-          target: service.type,
-        });
-        this.apiVersion = this.__packageVersions[this.__packageVersions.length - 1];
-      }
-      return this.__packageVersions;
+      return this.__packageVersions!;
     },
-    getPackageVersionEnum(): Enum | undefined {
-      if (this.__packageVersionEnum) {
-        return this.__packageVersionEnum;
+    getPackageVersionEnum(): Map<Namespace, Enum | undefined> {
+      if (!this.__packageVersionEnum) {
+        prepareClientAndOperationCache(this);
       }
-      const namespaces = listAllServiceNamespaces(this);
-      if (namespaces.length === 0) {
-        return undefined;
-      }
-      return getVersions(this.program, namespaces[0])[1]?.getVersions()?.[0].enumMember.enum;
+      return this.__packageVersionEnum!;
     },
     getClients(): SdkClient[] {
       if (!this.__rawClientsOperationGroupsCache) {
@@ -225,7 +189,6 @@ export async function createSdkContext<
     sdkPackage: undefined!,
     generateProtocolMethods: generateProtocolMethods,
     generateConvenienceMethods: generateConvenienceMethods,
-    examplesDir: context.options["examples-dir"],
     namespaceFlag: context.options["namespace"],
     apiVersion: context.options["api-version"],
     license: context.options["license"],
@@ -235,6 +198,19 @@ export async function createSdkContext<
     flattenUnionAsEnum: options?.flattenUnionAsEnum ?? true,
     enableLegacyHierarchyBuilding: options?.enableLegacyHierarchyBuilding ?? true,
   };
+
+  if (context.options["examples-dir"]) {
+    const normalizeExamplesDir = normalizePath(context.options["examples-dir"]);
+    if (isAbsolute(normalizeExamplesDir)) {
+      sdkContext.examplesDir = getRelativePathFromDirectory(
+        context.program.projectRoot,
+        normalizeExamplesDir,
+        false,
+      );
+    } else {
+      sdkContext.examplesDir = normalizeExamplesDir;
+    }
+  }
   sdkContext.sdkPackage = diagnostics.pipe(createSdkPackage(sdkContext));
   for (const client of sdkContext.sdkPackage.clients) {
     diagnostics.pipe(await handleClientExamples(sdkContext, client));
