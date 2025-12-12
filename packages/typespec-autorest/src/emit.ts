@@ -114,6 +114,7 @@ export function resolveAutorestOptions(
     emitLroOptions: resolvedOptions["emit-lro-options"],
     emitCommonTypesSchema: resolvedOptions["emit-common-types-schema"],
     xmlStrategy: resolvedOptions["xml-strategy"],
+    outputSplitting: resolvedOptions["output-splitting"],
   };
 }
 
@@ -131,8 +132,16 @@ function getEmitterContext(
     outputFile: resolveOutputFile(program, service, multiService, options, version),
     service: service,
     tcgcSdkContext,
-    proxy: {} as OpenApi2DocumentProxy,
+    proxy: getDocumentProxy(program, service, options),
   };
+}
+
+function getDocumentProxy(
+  program: Program,
+  service: Service,
+  options: ResolvedAutorestEmitterOptions,
+): OpenApi2DocumentProxy {
+  return {} as OpenApi2DocumentProxy;
 }
 
 export async function getAllServicesAtAllVersions(

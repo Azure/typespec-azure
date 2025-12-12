@@ -164,6 +164,9 @@ export interface OpenApi2DocumentProxy {
   addAdditionalInfo(info?: AdditionalInfo): void;
   addSecuritySchemes(schemes: Record<string, OpenAPI2SecurityScheme>): void;
   addSecurityRequirements(requirements: Record<string, string[]>[]): void;
+  addHostInfo(
+    hostData: Pick<OpenAPI2Document, "host" | "x-ms-parameterized-host" | "schemes">,
+  ): void;
   /**
    * Resolve the logical OpenAPI document into a set of emitter results
    */

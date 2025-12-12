@@ -45,6 +45,7 @@ import {
   PagingOperation,
   Program,
   Scalar,
+  Service,
   StringLiteral,
   StringTemplate,
   Type,
@@ -131,6 +132,7 @@ import {
   resolveRequestVisibility,
 } from "@typespec/http";
 import {
+  AdditionalInfo,
   getExtensions,
   getExternalDocs,
   getOpenAPITypeName,
@@ -169,6 +171,7 @@ import {
 } from "./openapi2-document.js";
 import {
   LateBoundReference,
+  OpenApi2DocumentProxy,
   ProcessedSchema,
   type AutorestEmitterResult,
   type LoadedExample,
@@ -228,6 +231,10 @@ export interface AutorestDocumentEmitterOptions {
   readonly emitCommonTypesSchema?: "never" | "for-visibility-changes";
 
   readonly xmlStrategy: "xml-service" | "none";
+  /**
+   * Determines whether output should be split into multiple files.  The only supported option for splitting is "legacy-feature-files",
+   */
+  readonly outputSplitting?: "legacy-feature-files";
 }
 
 type HttpParameterProperties = Extract<
@@ -389,79 +396,6 @@ export async function getOpenAPIForService(
       .filter((x) => x) as any,
     outputFile: context.outputFile,
   };*/
-
-  function resolveHost(
-    program: Program,
-    namespace: Namespace,
-  ): Pick<OpenAPI2Document, "host" | "x-ms-parameterized-host" | "schemes"> {
-    const servers = getServers(program, namespace);
-    if (servers === undefined) {
-      return {};
-    }
-
-    // If there is more than one server we then just make a custom host with a parameter asking for the full url.
-    if (servers.length > 1) {
-      return {
-        "x-ms-parameterized-host": {
-          hostTemplate: "{url}",
-          useSchemePrefix: false,
-          parameters: [
-            {
-              name: "url",
-              in: "path",
-              description: "Url",
-              type: "string",
-              format: "uri",
-              "x-ms-skip-url-encoding": true,
-            },
-          ],
-        },
-      };
-    }
-    const server = servers[0];
-    if (server.parameters.size === 0) {
-      const [scheme, host] = server.url.split("://");
-      return {
-        host,
-        schemes: [scheme],
-      };
-    }
-    const parameters: OpenAPI2PathParameter[] = [];
-    for (const prop of server.parameters.values()) {
-      const param = getOpenAPI2Parameter(
-        {
-          kind: "path",
-          path: [],
-          property: prop,
-          options: {
-            allowReserved: false,
-            explode: false,
-            style: "simple",
-            name: prop.name,
-          },
-        },
-        {
-          visibility: Visibility.Read,
-          ignoreMetadataAnnotations: false,
-        },
-      );
-      if (
-        prop.type.kind === "Scalar" &&
-        $(program).type.isAssignableTo(prop.type, $(program).builtin.url, prop.type)
-      ) {
-        param["x-ms-skip-url-encoding"] = true;
-      }
-      parameters.push(param);
-    }
-
-    return {
-      "x-ms-parameterized-host": {
-        hostTemplate: server.url,
-        useSchemePrefix: false,
-        parameters,
-      },
-    };
-  }
 
   function resolveXmsPageable(program: Program, operation: HttpOperation): XmsPageable | undefined {
     if (isList(program, operation.operation)) {
@@ -1443,25 +1377,6 @@ export async function getOpenAPIForService(
     }
   }
 
-  function getOpenAPI2Parameter<T extends OpenAPI2Parameter["in"]>(
-    httpProp: HttpParameterProperties & { kind: T },
-    schemaContext: SchemaContext,
-  ): OpenAPI2Parameter & { in: T } {
-    const value = getOpenAPI2ParameterInternal(httpProp, schemaContext);
-    // Apply decorators to a copy of the parameter definition.  We use
-    // Object.assign here because applyIntrinsicDecorators returns a new object
-    // based on the target object and we need to apply its changes back to the
-    // original parameter.
-    Object.assign(
-      value,
-      applyIntrinsicDecorators(httpProp.property, {
-        type: (value as any).type,
-        format: (value as any).format,
-      }),
-    );
-    return value as any;
-  }
-
   // move to impl of
   /* function emitParameters() {
     for (const [property, param] of params) {
@@ -2110,295 +2025,6 @@ export async function getOpenAPIForService(
     return applyIntrinsicDecorators(prop, propSchema);
   }
 
-  function attachExtensions(type: Type, emitObject: any) {
-    // Attach any OpenAPI extensions
-    const extensions = getExtensions(program, type);
-    if (
-      type.kind === "Model" &&
-      (isAzureResource(program, type) ||
-        getCustomResourceOptions(program, type)?.isAzureResource === true)
-    ) {
-      emitObject["x-ms-azure-resource"] = true;
-    }
-    if (getAsEmbeddingVector(program, type as Model) !== undefined) {
-      emitObject["x-ms-embedding-vector"] = true;
-    }
-    if (type.kind === "Model" && isArmExternalType(program, type) === true) {
-      emitObject["x-ms-external"] = true;
-    }
-    if (type.kind === "Model" && isSecret(program, type) === true) {
-      emitObject["x-ms-secret"] = true;
-    }
-    if (type.kind === "Scalar") {
-      const ext = getArmResourceIdentifierConfig(program, type);
-      if (ext) {
-        emitObject["x-ms-arm-id-details"] = ext;
-      }
-    }
-    if (extensions) {
-      for (const key of extensions.keys()) {
-        emitObject[key] = extensions.get(key);
-      }
-    }
-  }
-
-  function attachXml(
-    type: Type,
-    schemaName: string,
-    processed: ProcessedSchema & { schema: OpenAPI2Schema },
-  ) {
-    if (!xml.available) return;
-
-    const ns = xml.module.getNs(program, type);
-
-    if ("name" in type && type.name !== undefined && typeof type.name === "string") {
-      const xmlName = resolveEncodedName(
-        program,
-        type as Type & { name: string },
-        "application/xml",
-      );
-      if (xmlName && xmlName !== schemaName) setXmlField("name", xmlName);
-    }
-
-    if (ns) {
-      if (ns.namespace) setXmlField("namespace", ns.namespace);
-      if (ns.prefix) setXmlField("prefix", ns.prefix);
-    }
-
-    function setXmlField<K extends keyof XmlObject>(key: K, value: XmlObject[K]) {
-      processed.schema.xml ??= {};
-      processed.schema.xml[key] = value;
-    }
-  }
-
-  function attachPropertyXml(prop: ModelProperty, propSchema: OpenAPI2SchemaProperty) {
-    if (!xml.available) return;
-
-    if (xml.module.isAttribute(program, prop)) {
-      setXmlField("attribute", true);
-    }
-
-    if (prop.type.kind === "Model" && isArrayModelType(program, prop.type)) {
-      const wrapped = !xml.module.isUnwrapped(program, prop);
-
-      setXmlField("wrapped", wrapped);
-    }
-
-    let encode = getEncode(program, prop);
-
-    let resolvedEncodeType = encode?.type ?? prop.type;
-
-    while (
-      resolvedEncodeType.kind === "Scalar" &&
-      (encode = getEncode(program, resolvedEncodeType))
-    ) {
-      resolvedEncodeType = encode.type;
-    }
-
-    if (
-      resolvedEncodeType.kind === "Scalar" &&
-      $(program).scalar.extendsString(resolvedEncodeType)
-    ) {
-      if (xml.module.isUnwrapped(program, prop)) {
-        setXmlField("x-ms-text", true);
-      }
-    }
-
-    const xmlNs = xml.module.getNs(program, prop);
-
-    if (xmlNs) {
-      setXmlField("namespace", xmlNs.namespace);
-
-      if (xmlNs.prefix) setXmlField("prefix", xmlNs.prefix);
-    }
-
-    function setXmlField<K extends keyof XmlObject>(key: K, value: XmlObject[K]) {
-      propSchema.xml ??= {};
-      propSchema.xml[key] = value;
-    }
-  }
-
-  // Return any string literal values for type
-  function getStringValues(type: Type): string[] {
-    switch (type.kind) {
-      case "String":
-        return [type.value];
-      case "Union":
-        return [...type.variants.values()].flatMap((x) => getStringValues(x.type)).filter((x) => x);
-      case "EnumMember":
-        return typeof type.value !== "number" ? [type.value ?? type.name] : [];
-      case "UnionVariant":
-        return getStringValues(type.type);
-      default:
-        return [];
-    }
-  }
-
-  function applyIntrinsicDecorators(
-    typespecType: Model | Scalar | ModelProperty | Union,
-    target: OpenAPI2Schema,
-  ): OpenAPI2Schema {
-    const newTarget = { ...target };
-    const docStr = getDoc(program, typespecType);
-
-    if (docStr) {
-      newTarget.description = docStr;
-    }
-
-    const title = getSummary(program, typespecType);
-    if (title) {
-      target.title = title;
-    }
-
-    const formatStr = getFormat(program, typespecType);
-    if (formatStr) {
-      const allowedStringFormats = [
-        "char",
-        "binary",
-        "byte",
-        "certificate",
-        "date",
-        "time",
-        "date-time",
-        "date-time-rfc1123",
-        "date-time-rfc7231",
-        "duration",
-        "password",
-        "uuid",
-        "base64url",
-        "uri",
-        "url",
-        "arm-id",
-      ];
-      if (!allowedStringFormats.includes(formatStr.toLowerCase())) {
-        reportDiagnostic(program, {
-          code: "invalid-format",
-          format: { schema: "string", format: formatStr },
-          target: typespecType,
-        });
-      } else {
-        newTarget.format = formatStr;
-      }
-    }
-
-    const pattern = getPattern(program, typespecType);
-    if (pattern) {
-      newTarget.pattern = pattern;
-    }
-
-    const minLength = getMinLength(program, typespecType);
-    if (minLength !== undefined) {
-      newTarget.minLength = minLength;
-    }
-
-    const maxLength = getMaxLength(program, typespecType);
-    if (maxLength !== undefined) {
-      newTarget.maxLength = maxLength;
-    }
-
-    const minValue = getMinValue(program, typespecType);
-    if (minValue !== undefined) {
-      newTarget.minimum = minValue;
-    }
-
-    const maxValue = getMaxValue(program, typespecType);
-    if (maxValue !== undefined) {
-      newTarget.maximum = maxValue;
-    }
-
-    const minItems = getMinItems(program, typespecType);
-    if (!target.minItems && minItems !== undefined) {
-      newTarget.minItems = minItems;
-    }
-
-    const maxItems = getMaxItems(program, typespecType);
-    if (!target.maxItems && maxItems !== undefined) {
-      newTarget.maxItems = maxItems;
-    }
-
-    const uniqueItems =
-      (typespecType.kind === "ModelProperty" || typespecType.kind === "Model") &&
-      hasUniqueItems(program, typespecType);
-    if (uniqueItems && !target.uniqueItems) {
-      newTarget.uniqueItems = true;
-    }
-
-    if (isSecret(program, typespecType)) {
-      newTarget.format = "password";
-      newTarget["x-ms-secret"] = true;
-    }
-
-    if (
-      typespecType.kind === "ModelProperty" &&
-      shouldFlattenProperty(context.tcgcSdkContext, typespecType)
-    ) {
-      newTarget["x-ms-client-flatten"] = true;
-    }
-
-    attachExtensions(typespecType, newTarget);
-
-    return typespecType.kind === "Scalar" || typespecType.kind === "ModelProperty"
-      ? applyEncoding(typespecType, newTarget)
-      : newTarget;
-  }
-
-  function applyEncoding(
-    typespecType: Scalar | ModelProperty,
-    target: OpenAPI2Schema,
-  ): OpenAPI2Schema {
-    const encodeData = getEncode(program, typespecType);
-    if (encodeData) {
-      const newTarget = { ...target };
-      const newType = getSchemaForScalar(encodeData.type);
-      newTarget.type = newType.type;
-      // If the target already has a format it takes priority. (e.g. int32)
-      newTarget.format = mergeFormatAndEncoding(
-        newTarget.format,
-        encodeData.encoding,
-        newType.format,
-      );
-      return newTarget;
-    }
-    return target;
-  }
-  function mergeFormatAndEncoding(
-    format: string | undefined,
-    encoding: string | undefined,
-    encodeAsFormat: string | undefined,
-  ): string | undefined {
-    switch (format) {
-      case undefined:
-        return encodeAsFormat ?? encoding ?? format;
-      case "date-time":
-        switch (encoding) {
-          case "rfc3339":
-            return "date-time";
-          case "unixTimestamp":
-            return "unixtime";
-          case "rfc7231":
-            return "date-time-rfc7231";
-          default:
-            return encoding;
-        }
-      case "duration":
-        switch (encoding) {
-          case "ISO8601":
-            return "duration";
-          default:
-            return encodeAsFormat ?? encoding;
-        }
-      case "byte":
-        switch (encoding) {
-          case "base64":
-            return "byte";
-          default:
-            return encodeAsFormat ?? encoding ?? format;
-        }
-      default:
-        return encodeAsFormat ?? encoding ?? format;
-    }
-  }
-
   function applySummary(typespecType: Type, target: { title?: string }) {
     const summary = getSummary(program, typespecType);
     if (summary) {
@@ -2761,6 +2387,334 @@ export async function getOpenAPIForService(
         compilerAssert(false, "Unreachable");
     }
   }
+
+  function applyIntrinsicDecorators(
+    typespecType: Model | Scalar | ModelProperty | Union,
+    target: OpenAPI2Schema,
+  ): OpenAPI2Schema {
+    const newTarget = { ...target };
+    const docStr = getDoc(program, typespecType);
+
+    if (docStr) {
+      newTarget.description = docStr;
+    }
+
+    const title = getSummary(program, typespecType);
+    if (title) {
+      target.title = title;
+    }
+
+    const formatStr = getFormat(program, typespecType);
+    if (formatStr) {
+      const allowedStringFormats = [
+        "char",
+        "binary",
+        "byte",
+        "certificate",
+        "date",
+        "time",
+        "date-time",
+        "date-time-rfc1123",
+        "date-time-rfc7231",
+        "duration",
+        "password",
+        "uuid",
+        "base64url",
+        "uri",
+        "url",
+        "arm-id",
+      ];
+      if (!allowedStringFormats.includes(formatStr.toLowerCase())) {
+        reportDiagnostic(program, {
+          code: "invalid-format",
+          format: { schema: "string", format: formatStr },
+          target: typespecType,
+        });
+      } else {
+        newTarget.format = formatStr;
+      }
+    }
+
+    const pattern = getPattern(program, typespecType);
+    if (pattern) {
+      newTarget.pattern = pattern;
+    }
+
+    const minLength = getMinLength(program, typespecType);
+    if (minLength !== undefined) {
+      newTarget.minLength = minLength;
+    }
+
+    const maxLength = getMaxLength(program, typespecType);
+    if (maxLength !== undefined) {
+      newTarget.maxLength = maxLength;
+    }
+
+    const minValue = getMinValue(program, typespecType);
+    if (minValue !== undefined) {
+      newTarget.minimum = minValue;
+    }
+
+    const maxValue = getMaxValue(program, typespecType);
+    if (maxValue !== undefined) {
+      newTarget.maximum = maxValue;
+    }
+
+    const minItems = getMinItems(program, typespecType);
+    if (!target.minItems && minItems !== undefined) {
+      newTarget.minItems = minItems;
+    }
+
+    const maxItems = getMaxItems(program, typespecType);
+    if (!target.maxItems && maxItems !== undefined) {
+      newTarget.maxItems = maxItems;
+    }
+
+    const uniqueItems =
+      (typespecType.kind === "ModelProperty" || typespecType.kind === "Model") &&
+      hasUniqueItems(program, typespecType);
+    if (uniqueItems && !target.uniqueItems) {
+      newTarget.uniqueItems = true;
+    }
+
+    if (isSecret(program, typespecType)) {
+      newTarget.format = "password";
+      newTarget["x-ms-secret"] = true;
+    }
+
+    if (
+      typespecType.kind === "ModelProperty" &&
+      shouldFlattenProperty(context.tcgcSdkContext, typespecType)
+    ) {
+      newTarget["x-ms-client-flatten"] = true;
+    }
+
+    attachExtensions(typespecType, newTarget);
+
+    return typespecType.kind === "Scalar" || typespecType.kind === "ModelProperty"
+      ? applyEncoding(typespecType, newTarget)
+      : newTarget;
+  }
+
+  function getOpenAPI2Parameter<T extends OpenAPI2Parameter["in"]>(
+    httpProp: HttpParameterProperties & { kind: T },
+    schemaContext: SchemaContext,
+  ): OpenAPI2Parameter & { in: T } {
+    const value = getOpenAPI2ParameterInternal(httpProp, schemaContext);
+    // Apply decorators to a copy of the parameter definition.  We use
+    // Object.assign here because applyIntrinsicDecorators returns a new object
+    // based on the target object and we need to apply its changes back to the
+    // original parameter.
+    Object.assign(
+      value,
+      applyIntrinsicDecorators(httpProp.property, {
+        type: (value as any).type,
+        format: (value as any).format,
+      }),
+    );
+    return value as any;
+  }
+
+  function resolveHost(
+    program: Program,
+    namespace: Namespace,
+  ): Pick<OpenAPI2Document, "host" | "x-ms-parameterized-host" | "schemes"> {
+    const servers = getServers(program, namespace);
+    if (servers === undefined) {
+      return {};
+    }
+
+    // If there is more than one server we then just make a custom host with a parameter asking for the full url.
+    if (servers.length > 1) {
+      return {
+        "x-ms-parameterized-host": {
+          hostTemplate: "{url}",
+          useSchemePrefix: false,
+          parameters: [
+            {
+              name: "url",
+              in: "path",
+              description: "Url",
+              type: "string",
+              format: "uri",
+              "x-ms-skip-url-encoding": true,
+            },
+          ],
+        },
+      };
+    }
+    const server = servers[0];
+    if (server.parameters.size === 0) {
+      const [scheme, host] = server.url.split("://");
+      return {
+        host,
+        schemes: [scheme],
+      };
+    }
+    const parameters: OpenAPI2PathParameter[] = [];
+    for (const prop of server.parameters.values()) {
+      const param = getOpenAPI2Parameter(
+        {
+          kind: "path",
+          path: [],
+          property: prop,
+          options: {
+            allowReserved: false,
+            explode: false,
+            style: "simple",
+            name: prop.name,
+          },
+        },
+        {
+          visibility: Visibility.Read,
+          ignoreMetadataAnnotations: false,
+        },
+      );
+      if (
+        prop.type.kind === "Scalar" &&
+        $(program).type.isAssignableTo(prop.type, $(program).builtin.url, prop.type)
+      ) {
+        param["x-ms-skip-url-encoding"] = true;
+      }
+      parameters.push(param);
+    }
+
+    return {
+      "x-ms-parameterized-host": {
+        hostTemplate: server.url,
+        useSchemePrefix: false,
+        parameters,
+      },
+    };
+  }
+
+  function attachExtensions(type: Type, emitObject: any) {
+    // Attach any OpenAPI extensions
+    const extensions = getExtensions(program, type);
+    if (
+      type.kind === "Model" &&
+      (isAzureResource(program, type) ||
+        getCustomResourceOptions(program, type)?.isAzureResource === true)
+    ) {
+      emitObject["x-ms-azure-resource"] = true;
+    }
+    if (getAsEmbeddingVector(program, type as Model) !== undefined) {
+      emitObject["x-ms-embedding-vector"] = true;
+    }
+    if (type.kind === "Model" && isArmExternalType(program, type) === true) {
+      emitObject["x-ms-external"] = true;
+    }
+    if (type.kind === "Model" && isSecret(program, type) === true) {
+      emitObject["x-ms-secret"] = true;
+    }
+    if (type.kind === "Scalar") {
+      const ext = getArmResourceIdentifierConfig(program, type);
+      if (ext) {
+        emitObject["x-ms-arm-id-details"] = ext;
+      }
+    }
+    if (extensions) {
+      for (const key of extensions.keys()) {
+        emitObject[key] = extensions.get(key);
+      }
+    }
+  }
+
+  function attachXml(
+    type: Type,
+    schemaName: string,
+    processed: ProcessedSchema & { schema: OpenAPI2Schema },
+  ) {
+    if (!xml.available) return;
+
+    const ns = xml.module.getNs(program, type);
+
+    if ("name" in type && type.name !== undefined && typeof type.name === "string") {
+      const xmlName = resolveEncodedName(
+        program,
+        type as Type & { name: string },
+        "application/xml",
+      );
+      if (xmlName && xmlName !== schemaName) setXmlField("name", xmlName);
+    }
+
+    if (ns) {
+      if (ns.namespace) setXmlField("namespace", ns.namespace);
+      if (ns.prefix) setXmlField("prefix", ns.prefix);
+    }
+
+    function setXmlField<K extends keyof XmlObject>(key: K, value: XmlObject[K]) {
+      processed.schema.xml ??= {};
+      processed.schema.xml[key] = value;
+    }
+  }
+
+  function attachPropertyXml(prop: ModelProperty, propSchema: OpenAPI2SchemaProperty) {
+    if (!xml.available) return;
+
+    if (xml.module.isAttribute(program, prop)) {
+      setXmlField("attribute", true);
+    }
+
+    if (prop.type.kind === "Model" && isArrayModelType(program, prop.type)) {
+      const wrapped = !xml.module.isUnwrapped(program, prop);
+
+      setXmlField("wrapped", wrapped);
+    }
+
+    let encode = getEncode(program, prop);
+
+    let resolvedEncodeType = encode?.type ?? prop.type;
+
+    while (
+      resolvedEncodeType.kind === "Scalar" &&
+      (encode = getEncode(program, resolvedEncodeType))
+    ) {
+      resolvedEncodeType = encode.type;
+    }
+
+    if (
+      resolvedEncodeType.kind === "Scalar" &&
+      $(program).scalar.extendsString(resolvedEncodeType)
+    ) {
+      if (xml.module.isUnwrapped(program, prop)) {
+        setXmlField("x-ms-text", true);
+      }
+    }
+
+    const xmlNs = xml.module.getNs(program, prop);
+
+    if (xmlNs) {
+      setXmlField("namespace", xmlNs.namespace);
+
+      if (xmlNs.prefix) setXmlField("prefix", xmlNs.prefix);
+    }
+
+    function setXmlField<K extends keyof XmlObject>(key: K, value: XmlObject[K]) {
+      propSchema.xml ??= {};
+      propSchema.xml[key] = value;
+    }
+  }
+
+  function applyEncoding(
+    typespecType: Scalar | ModelProperty,
+    target: OpenAPI2Schema,
+  ): OpenAPI2Schema {
+    const encodeData = getEncode(program, typespecType);
+    if (encodeData) {
+      const newTarget = { ...target };
+      const newType = getSchemaForScalar(encodeData.type);
+      newTarget.type = newType.type;
+      // If the target already has a format it takes priority. (e.g. int32)
+      newTarget.format = mergeFormatAndEncoding(
+        newTarget.format,
+        encodeData.encoding,
+        newType.format,
+      );
+      return newTarget;
+    }
+    return target;
+  }
 }
 
 class ErrorTypeFoundError extends Error {
@@ -2895,4 +2849,115 @@ function isHttpParameterProperty(
   httpProperty: HttpProperty,
 ): httpProperty is HttpParameterProperties {
   return ["header", "query", "path", "cookie"].includes(httpProperty.kind);
+}
+
+// Return any string literal values for type
+function getStringValues(type: Type): string[] {
+  switch (type.kind) {
+    case "String":
+      return [type.value];
+    case "Union":
+      return [...type.variants.values()].flatMap((x) => getStringValues(x.type)).filter((x) => x);
+    case "EnumMember":
+      return typeof type.value !== "number" ? [type.value ?? type.name] : [];
+    case "UnionVariant":
+      return getStringValues(type.type);
+    default:
+      return [];
+  }
+}
+
+function mergeFormatAndEncoding(
+  format: string | undefined,
+  encoding: string | undefined,
+  encodeAsFormat: string | undefined,
+): string | undefined {
+  switch (format) {
+    case undefined:
+      return encodeAsFormat ?? encoding ?? format;
+    case "date-time":
+      switch (encoding) {
+        case "rfc3339":
+          return "date-time";
+        case "unixTimestamp":
+          return "unixtime";
+        case "rfc7231":
+          return "date-time-rfc7231";
+        default:
+          return encoding;
+      }
+    case "duration":
+      switch (encoding) {
+        case "ISO8601":
+          return "duration";
+        default:
+          return encodeAsFormat ?? encoding;
+      }
+    case "byte":
+      switch (encoding) {
+        case "base64":
+          return "byte";
+        default:
+          return encodeAsFormat ?? encoding ?? format;
+      }
+    default:
+      return encodeAsFormat ?? encoding ?? format;
+  }
+}
+
+export function createDefaultDocumentProxy(
+  program: Program,
+  service: Service,
+  options: AutorestDocumentEmitterOptions,
+  version?: string,
+): OpenApi2DocumentProxy {
+  const root: OpenAPI2Document = {
+    swagger: "2.0",
+    info: {
+      title: "(title)",
+      version: version ?? "0000-00-00",
+      "x-typespec-generated": [{ emitter: "@azure-tools/typespec-autorest" }],
+    },
+    schemes: ["https"],
+    externalDocs: getExternalDocs(program, service.type),
+    produces: [], // Pre-initialize produces and consumes so that
+    consumes: [], // they show up at the top of the document
+    tags: [],
+    paths: {},
+    "x-ms-paths": {},
+    definitions: {},
+    parameters: {},
+  };
+  return {
+    addAdditionalInfo(info?: AdditionalInfo) {
+      if (info !== undefined) {
+        Object.assign(root.info, info);
+      }
+    },
+    addHostInfo(hostInfo: Pick<OpenAPI2Document, "host" | "x-ms-parameterized-host" | "schemes">) {
+      Object.assign(root, hostInfo);
+    },
+    addSecurityRequirements(requirements?: Record<string, string[]>[]) {
+      if (requirements !== undefined && requirements.length > 0) {
+        root.security = requirements;
+      }
+    },
+    addSecuritySchemes(schemes?: Record<string, OpenAPI2SecurityScheme>) {
+      if (schemes !== undefined && Object.keys(schemes).length > 0) {
+        root.securityDefinitions = schemes;
+      }
+    },
+    resolveDocuments() {
+      return Promise.resolve([
+        {
+          outputFile: "openapi.json",
+          document: root,
+        },
+      ]);
+    },
+  } as OpenApi2DocumentProxy;
+}
+
+function createFeatureDocumentProxy(): OpenApi2DocumentProxy {
+  return {} as OpenApi2DocumentProxy;
 }
