@@ -6,7 +6,7 @@ using Http;
 using Azure.ClientGenerator.Core;
 using Spector;
 
-@doc("Test for @clientDefaultValue decorator.")
+@doc("Test for `@clientDefaultValue` decorator.")
 @scenarioService("/azure/client-generator-core/client-default-value")
 @global.Azure.ClientGenerator.Core.clientNamespace(
   "azure.clientgenerator.core.clientdefaultvalue",
@@ -42,7 +42,7 @@ model ModelWithDefaultValues {
 @scenario
 @route("/model-property")
 @scenarioDoc("""
-  Test case 1: @clientDefaultValue for model property.
+  Test case 1: `@clientDefaultValue` for model property.
   This scenario tests that client default values are correctly applied to model properties.
   
   Expected input body:
@@ -68,7 +68,7 @@ op putModelProperty(@body body: ModelWithDefaultValues): ModelWithDefaultValues;
 @scenario
 @route("/operation-parameter")
 @scenarioDoc("""
-  Test case 2: @clientDefaultValue for operation parameter.
+  Test case 2: `@clientDefaultValue` for operation parameter.
   This scenario tests that client default values are correctly applied to operation parameters.
   
   Expected query parameter:
@@ -96,7 +96,7 @@ op getOperationParameter(
 @scenario
 @route("/path-parameter/{segment1}/{segment2}")
 @scenarioDoc("""
-  Test case 3: @clientDefaultValue for first path segment.
+  Test case 3: `@clientDefaultValue` for first path segment.
   This scenario has 2 path segments and tests client default value on the first segment.
   
   Expected path parameters:

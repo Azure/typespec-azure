@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-Add test cases for @clientDefaultValue decorator
+Add test cases for `@clientDefaultValue` decorator.
