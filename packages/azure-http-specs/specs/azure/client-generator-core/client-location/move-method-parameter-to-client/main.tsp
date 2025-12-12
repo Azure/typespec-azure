@@ -12,6 +12,10 @@ using Azure.ClientGenerator.Core;
   "azure.clientgenerator.core.clientlocation.parameter",
   "java"
 )
+@global.Azure.ClientGenerator.Core.clientNamespace(
+  "specs.azure.clientgenerator.core.clientlocation.parameter",
+  "python"
+)
 namespace _Specs_.Azure.ClientGenerator.Core.ClientLocation.MoveMethodParameterToClient;
 
 model Blob {

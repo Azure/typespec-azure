@@ -12,6 +12,10 @@ using Azure.ClientGenerator.Core;
   "azure.clientgenerator.core.clientlocation.newsubclient",
   "java"
 )
+@global.Azure.ClientGenerator.Core.clientNamespace(
+  "specs.azure.clientgenerator.core.clientlocation.newsubclient",
+  "python"
+)
 namespace _Specs_.Azure.ClientGenerator.Core.ClientLocation.MoveToNewSubClient;
 
 // Scenario 1: Move an operation to a new sub client (string name)
