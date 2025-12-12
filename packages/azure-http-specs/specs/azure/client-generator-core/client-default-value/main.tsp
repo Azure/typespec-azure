@@ -12,6 +12,10 @@ using Spector;
   "azure.clientgenerator.core.clientdefaultvalue",
   "java"
 )
+@global.Azure.ClientGenerator.Core.clientNamespace(
+  "specs.azure.clientgenerator.core.clientdefaultvalue",
+  "python"
+)
 namespace _Specs_.Azure.ClientGenerator.Core.ClientDefaultValue;
 
 @doc("Model with client default values on properties.")
