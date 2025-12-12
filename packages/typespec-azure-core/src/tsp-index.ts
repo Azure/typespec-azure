@@ -3,13 +3,7 @@ import type { AzureCoreFoundationsPrivateDecorators } from "../generated-defs/Az
 import type { AzureCoreDecorators } from "../generated-defs/Azure.Core.js";
 import type { AzureCoreTraitsDecorators } from "../generated-defs/Azure.Core.Traits.js";
 import type { AzureCoreTraitsPrivateDecorators } from "../generated-defs/Azure.Core.Traits.Private.js";
-import {
-  $items,
-  $nextPageOperation,
-  $pagedResult,
-  $requestParameter,
-  $responseProperty,
-} from "./decorators.js";
+import { $requestParameter, $responseProperty } from "./decorators.js";
 import { $finalLocation } from "./decorators/final-location.js";
 import { $finalOperation } from "./decorators/final-operation.js";
 import { $omitKeyProperties } from "./decorators/foundations/omit-key-properties.js";
@@ -33,6 +27,7 @@ import { $needsRoute } from "./decorators/private/needs-route.js";
 import { parameterizedNextLinkConfigDecorator } from "./decorators/private/parameterized-next-link-config.js";
 import { $spreadCustomParameters } from "./decorators/private/spread-custom-parameters.js";
 import { $spreadCustomResponseProperties } from "./decorators/private/spread-custom-response-properties.js";
+import { $uniqueItems } from "./decorators/unique-items.js";
 import { $useFinalStateVia } from "./decorators/use-final-state-via.js";
 import {
   $addTraitProperties,
@@ -56,8 +51,6 @@ export const $decorators = {
     lroStatus: $lroStatus,
     finalLocation: $finalLocation,
     pollingLocation: $pollingLocation,
-    pagedResult: $pagedResult,
-    items: $items,
     lroSucceeded: $lroSucceeded,
     lroCanceled: $lroCanceled,
     lroFailed: $lroFailed,
@@ -69,7 +62,7 @@ export const $decorators = {
     previewVersion: $previewVersion,
     finalOperation: $finalOperation,
     useFinalStateVia: $useFinalStateVia,
-    nextPageOperation: $nextPageOperation,
+    uniqueItems: $uniqueItems,
   } satisfies AzureCoreDecorators,
 
   "Azure.Core.Foundations": {

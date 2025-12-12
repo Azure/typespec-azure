@@ -11,22 +11,22 @@ options:
     emitter-output-dir: "{project-root}/.."
     output-file: "{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json"
   "@azure-tools/typespec-python":    
-    package-dir: "{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}"
-    namespace: "azure.{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
+    emitter-output-dir: "{output-dir}/{service-dir}/{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}"
+    namespace: "{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
     package-mode: dataplane
   "@azure-tools/typespec-csharp":
-    package-dir: "{{parameters.ServiceNamespace}}"
-    namespace: "{package-dir}"
+    emitter-output-dir: "{output-dir}/{service-dir}/{{parameters.ServiceNamespace}}"
+    namespace: "{{parameters.ServiceNamespace}}"
     clear-output-folder: true
     model-namespace: false
   "@azure-tools/typespec-ts":
-    package-dir: "{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}-rest"
+    emitter-output-dir: "{output-dir}/{service-dir}/{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}-rest"
     package-details:
       name: "@azure-rest/{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}"
       description: "{{parameters.ServiceNamespace}} Service"
     flavor: azure
   "@azure-tools/typespec-java":
-    package-dir: "{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}"
+    emitter-output-dir: "{output-dir}/{service-dir}/{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}"
     namespace: com.{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}
 linter:
   extends:

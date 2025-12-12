@@ -2,7 +2,8 @@
   "name": "azure-core_stand_alone",
   "version": "0.1.0",
   "type": "module",
-  "peerDependencies": {
+  "private": true,
+  "dependencies": {
     "@typespec/compiler": "latest",
     "@azure-tools/typespec-autorest": "latest",
     "@azure-tools/typespec-azure-core": "latest",
@@ -13,18 +14,5 @@
     "@typespec/openapi": "latest",
     "@typespec/rest": "latest",
     "@typespec/versioning": "latest"
-  },
-  "devDependencies": {
-    "@typespec/compiler": "latest",
-    "@azure-tools/typespec-autorest": "latest",
-    "@azure-tools/typespec-azure-core": "latest",
-    "@azure-tools/typespec-azure-resource-manager": "latest",
-    "@azure-tools/typespec-client-generator-core": "latest",
-    "@azure-tools/typespec-azure-rulesets": "latest",
-    "@typespec/http": "latest",
-    "@typespec/openapi": "latest",
-    "@typespec/rest": "latest",
-    "@typespec/versioning": "latest"
-  },
-  "private": true
+  }
 }

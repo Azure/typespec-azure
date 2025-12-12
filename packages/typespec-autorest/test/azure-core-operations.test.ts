@@ -28,7 +28,6 @@ https://westus.api.widget.contoso.com).
     endpoint: string,
   }
 )
-@useDependency(Azure.Core.Versions.v1_0_Preview_2)
 namespace Contoso.WidgetManager;
 
 alias ServiceTraits = SupportsRepeatableRequests &

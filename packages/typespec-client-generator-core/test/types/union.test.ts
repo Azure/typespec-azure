@@ -90,6 +90,33 @@ it("nullable with more types", async function () {
   deepStrictEqual(runner.context.sdkPackage.unions[0], nullableType);
 });
 
+it("nullable doc", async function () {
+  await runner.compileWithBuiltInService(`
+    @usage(Usage.input | Usage.output)
+    model TestModel {
+      prop: TestNullable;
+    }
+    
+    @doc("nullable doc")
+    union TestNullable {
+      null,
+      {
+        prop: string;
+      }
+    }
+  `);
+
+  const nullableUnion = getSdkTypeHelper(runner);
+  strictEqual(nullableUnion.kind, "nullable");
+  strictEqual(nullableUnion.name, "TestNullable");
+  strictEqual(nullableUnion.isGeneratedName, false);
+  strictEqual(nullableUnion.doc, "nullable doc");
+
+  strictEqual(nullableUnion.type.kind, "model");
+  strictEqual(nullableUnion.type.name, "TestModelProp");
+  strictEqual(nullableUnion.type.isGeneratedName, true);
+});
+
 it("record with nullable", async function () {
   await runner.compileWithBuiltInService(`
     @usage(Usage.input | Usage.output)
@@ -896,4 +923,252 @@ it("union with only one literal", async function () {
   strictEqual(values.length, 1);
   strictEqual(values[0].value, "A");
   deepStrictEqual(runner.context.sdkPackage.enums[0], sdkType);
+});
+
+it("default discriminated union", async function () {
+  await runner.compileWithBuiltInService(
+    `
+    @usage(Usage.input | Usage.output)
+    model Test {
+      pet: Pet;
+    }
+
+    @discriminated
+    union Pet { 
+      cat: Cat, 
+      dog: Dog 
+    }
+
+    model Cat { 
+      name: string; 
+      meow: boolean; 
+    }
+    
+    model Dog { 
+      name: string; 
+      bark: boolean; 
+    }
+  `,
+  );
+  const sdkType = getSdkTypeHelper(runner);
+  strictEqual(sdkType.kind, "union");
+  strictEqual(sdkType.name, "Pet");
+  strictEqual(sdkType.isGeneratedName, false);
+  strictEqual(sdkType.usage, UsageFlags.Input | UsageFlags.Output);
+  strictEqual(sdkType.access, "public");
+
+  // Test discriminatedOptions
+  ok(sdkType.discriminatedOptions);
+  strictEqual(sdkType.discriminatedOptions.envelope, "object");
+  strictEqual(sdkType.discriminatedOptions.discriminatorPropertyName, "kind");
+  strictEqual(sdkType.discriminatedOptions.envelopePropertyName, "value");
+
+  const variantTypes = sdkType.variantTypes;
+  strictEqual(variantTypes.length, 2);
+  strictEqual(variantTypes[0].kind, "model");
+  strictEqual(variantTypes[0].name, "Cat");
+  strictEqual(variantTypes[1].kind, "model");
+  strictEqual(variantTypes[1].name, "Dog");
+});
+
+it("discriminated union with custom discriminator property", async function () {
+  await runner.compileWithBuiltInService(
+    `
+    @usage(Usage.input | Usage.output)
+    model Test {
+      vehicle: Vehicle;
+    }
+
+    @discriminated(#{discriminatorPropertyName: "type"})
+    union Vehicle { 
+      car: Car, 
+      bike: Bike 
+    }
+
+    model Car { 
+      brand: string; 
+      doors: int32; 
+    }
+    
+    model Bike { 
+      brand: string; 
+      gears: int32; 
+    }
+  `,
+  );
+  const sdkType = getSdkTypeHelper(runner);
+  strictEqual(sdkType.kind, "union");
+  strictEqual(sdkType.name, "Vehicle");
+  strictEqual(sdkType.isGeneratedName, false);
+
+  // Test discriminatedOptions with custom discriminator
+  ok(sdkType.discriminatedOptions);
+  strictEqual(sdkType.discriminatedOptions.envelope, "object");
+  strictEqual(sdkType.discriminatedOptions.discriminatorPropertyName, "type");
+  strictEqual(sdkType.discriminatedOptions.envelopePropertyName, "value");
+
+  const variantTypes = sdkType.variantTypes;
+  strictEqual(variantTypes.length, 2);
+  strictEqual(variantTypes[0].kind, "model");
+  strictEqual(variantTypes[0].name, "Car");
+  strictEqual(variantTypes[1].kind, "model");
+  strictEqual(variantTypes[1].name, "Bike");
+});
+
+it("discriminated union with none envelope", async function () {
+  await runner.compileWithBuiltInService(
+    `
+    @usage(Usage.input | Usage.output)
+    model Test {
+      shape: Shape;
+    }
+
+    @discriminated(#{envelope: "none"})
+    union Shape { 
+      circle: Circle, 
+      square: Square 
+    }
+
+    model Circle { 
+      radius: float32; 
+    }
+    
+    model Square { 
+      side: float32; 
+    }
+  `,
+  );
+  const sdkType = getSdkTypeHelper(runner);
+  strictEqual(sdkType.kind, "union");
+  strictEqual(sdkType.name, "Shape");
+  strictEqual(sdkType.isGeneratedName, false);
+
+  // Test discriminatedOptions with none envelope
+  ok(sdkType.discriminatedOptions);
+  strictEqual(sdkType.discriminatedOptions.envelope, "none");
+  strictEqual(sdkType.discriminatedOptions.discriminatorPropertyName, "kind");
+  strictEqual(sdkType.discriminatedOptions.envelopePropertyName, undefined);
+
+  const variantTypes = sdkType.variantTypes;
+  strictEqual(variantTypes.length, 2);
+  strictEqual(variantTypes[0].kind, "model");
+  strictEqual(variantTypes[0].name, "Circle");
+  strictEqual(variantTypes[1].kind, "model");
+  strictEqual(variantTypes[1].name, "Square");
+});
+
+it("discriminated union with custom envelope property", async function () {
+  await runner.compileWithBuiltInService(
+    `
+    @usage(Usage.input | Usage.output)
+    model Test {
+      message: Message;
+    }
+
+    @discriminated(#{envelopePropertyName: "data"})
+    union Message { 
+      text: TextMessage, 
+      image: ImageMessage 
+    }
+
+    model TextMessage { 
+      content: string; 
+    }
+    
+    model ImageMessage { 
+      url: string; 
+      alt: string; 
+    }
+  `,
+  );
+  const sdkType = getSdkTypeHelper(runner);
+  strictEqual(sdkType.kind, "union");
+  strictEqual(sdkType.name, "Message");
+  strictEqual(sdkType.isGeneratedName, false);
+
+  // Test discriminatedOptions with custom envelope property
+  ok(sdkType.discriminatedOptions);
+  strictEqual(sdkType.discriminatedOptions.envelope, "object");
+  strictEqual(sdkType.discriminatedOptions.discriminatorPropertyName, "kind");
+  strictEqual(sdkType.discriminatedOptions.envelopePropertyName, "data");
+
+  const variantTypes = sdkType.variantTypes;
+  strictEqual(variantTypes.length, 2);
+  strictEqual(variantTypes[0].kind, "model");
+  strictEqual(variantTypes[0].name, "TextMessage");
+  strictEqual(variantTypes[1].kind, "model");
+  strictEqual(variantTypes[1].name, "ImageMessage");
+});
+
+it("regular union without discriminator has no discriminatedOptions", async function () {
+  await runner.compileWithBuiltInService(
+    `
+    @usage(Usage.input | Usage.output)
+    model Test {
+      value: string | int32 | boolean;
+    }
+  `,
+  );
+  const sdkType = getSdkTypeHelper(runner);
+  strictEqual(sdkType.kind, "union");
+  strictEqual(sdkType.name, "TestValue");
+  strictEqual(sdkType.isGeneratedName, true);
+
+  // Test that regular unions don't have discriminatedOptions
+  strictEqual(sdkType.discriminatedOptions, undefined);
+
+  const variantTypes = sdkType.variantTypes;
+  strictEqual(variantTypes.length, 3);
+  strictEqual(variantTypes[0].kind, "string");
+  strictEqual(variantTypes[1].kind, "int32");
+  strictEqual(variantTypes[2].kind, "boolean");
+});
+
+it("nullable discriminated union", async function () {
+  await runner.compileWithBuiltInService(
+    `
+    @usage(Usage.input | Usage.output)
+    model Test {
+      optionalPet: Pet | null;
+    }
+
+    @discriminated
+    union Pet { 
+      cat: Cat, 
+      dog: Dog 
+    }
+
+    model Cat { 
+      name: string; 
+      meow: boolean; 
+    }
+    
+    model Dog { 
+      name: string; 
+      bark: boolean; 
+    }
+  `,
+  );
+  const nullableType = getSdkTypeHelper(runner);
+  strictEqual(nullableType.kind, "nullable");
+  strictEqual(nullableType.name, "TestOptionalPet");
+  strictEqual(nullableType.isGeneratedName, true);
+
+  const unionType = nullableType.type;
+  strictEqual(unionType.kind, "union");
+  strictEqual(unionType.name, "Pet");
+  strictEqual(unionType.isGeneratedName, false);
+
+  // Test discriminatedOptions are preserved in nullable wrapper
+  ok(unionType.discriminatedOptions);
+  strictEqual(unionType.discriminatedOptions.envelope, "object");
+  strictEqual(unionType.discriminatedOptions.discriminatorPropertyName, "kind");
+  strictEqual(unionType.discriminatedOptions.envelopePropertyName, "value");
+
+  const variantTypes = unionType.variantTypes;
+  strictEqual(variantTypes.length, 2);
+  strictEqual(variantTypes[0].kind, "model");
+  strictEqual(variantTypes[0].name, "Cat");
+  strictEqual(variantTypes[1].kind, "model");
+  strictEqual(variantTypes[1].name, "Dog");
 });

@@ -1,5 +1,7 @@
 ---
 title: "Interfaces and Operations"
+description: "Interfaces and Operations exported by @azure-tools/typespec-azure-core"
+llmstxt: true
 ---
 
 ## Azure.Core
@@ -19,12 +21,12 @@ interface Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>
 | InterfaceTraits | Traits applicable to the operations.                                                    |
 | ErrorResponse   | Error response of the operations. If not specified, the default error response is used. |
 
-#### `ResourceOperations.ResourceCreateOrReplace` {#Azure.Core.ResourceOperations.ResourceCreateOrReplace}
+#### `ResourceOperations.ResourceCreateOrReplace` {#Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceCreateOrReplace}
 
 Create or replace operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.ResourceCreateOrReplace(apiVersion: string, resource: Resource): Azure.Core.Foundations.{ statusCode: 201 } | Azure.Core.Foundations.{ statusCode: 200 } | ErrorResponse
+op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceCreateOrReplace(apiVersion: string, resource: Resource): Azure.Core.Foundations.{ statusCode: 201 } | Azure.Core.Foundations.{ statusCode: 200 } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -34,12 +36,12 @@ op Azure.Core.ResourceOperations.ResourceCreateOrReplace(apiVersion: string, res
 | Resource | Resource type.                                 |
 | Traits   | Object describing the traits of the operation. |
 
-#### `ResourceOperations.LongRunningResourceCreateOrReplace` {#Azure.Core.ResourceOperations.LongRunningResourceCreateOrReplace}
+#### `ResourceOperations.LongRunningResourceCreateOrReplace` {#Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.LongRunningResourceCreateOrReplace}
 
 Long-running resource create or replace operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.LongRunningResourceCreateOrReplace(apiVersion: string, resource: Resource): Azure.Core.Foundations.{ statusCode: 201, operationLocation: TypeSpec.Rest.ResourceLocation } | Azure.Core.Foundations.{ statusCode: 200, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
+op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.LongRunningResourceCreateOrReplace(apiVersion: string, resource: Resource): Azure.Core.Foundations.{ statusCode: 201, operationLocation: TypeSpec.Rest.ResourceLocation } | Azure.Core.Foundations.{ statusCode: 200, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -49,12 +51,12 @@ op Azure.Core.ResourceOperations.LongRunningResourceCreateOrReplace(apiVersion: 
 | Resource | Resource type.                                 |
 | Traits   | Object describing the traits of the operation. |
 
-#### `ResourceOperations.ResourceCreateOrUpdate` {#Azure.Core.ResourceOperations.ResourceCreateOrUpdate}
+#### `ResourceOperations.ResourceCreateOrUpdate` {#Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceCreateOrUpdate}
 
 Create or update operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.ResourceCreateOrUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): Azure.Core.Foundations.{ statusCode: 201 } | Azure.Core.Foundations.{ statusCode: 200 } | ErrorResponse
+op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceCreateOrUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): Azure.Core.Foundations.{ statusCode: 201 } | Azure.Core.Foundations.{ statusCode: 200 } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -64,12 +66,12 @@ op Azure.Core.ResourceOperations.ResourceCreateOrUpdate(apiVersion: string, cont
 | Resource | Resource type.                                 |
 | Traits   | Object describing the traits of the operation. |
 
-#### `ResourceOperations.LongRunningResourceCreateOrUpdate` {#Azure.Core.ResourceOperations.LongRunningResourceCreateOrUpdate}
+#### `ResourceOperations.LongRunningResourceCreateOrUpdate` {#Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.LongRunningResourceCreateOrUpdate}
 
 Long-running resource create or update operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.LongRunningResourceCreateOrUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): Azure.Core.Foundations.{ statusCode: 201, operationLocation: TypeSpec.Rest.ResourceLocation } | Azure.Core.Foundations.{ statusCode: 200, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
+op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.LongRunningResourceCreateOrUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): Azure.Core.Foundations.{ statusCode: 201, operationLocation: TypeSpec.Rest.ResourceLocation } | Azure.Core.Foundations.{ statusCode: 200, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -79,12 +81,12 @@ op Azure.Core.ResourceOperations.LongRunningResourceCreateOrUpdate(apiVersion: s
 | Resource | Resource type.                                 |
 | Traits   | Object describing the traits of the operation. |
 
-#### `ResourceOperations.ResourceUpdate` {#Azure.Core.ResourceOperations.ResourceUpdate}
+#### `ResourceOperations.ResourceUpdate` {#Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceUpdate}
 
 Resource update operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.ResourceUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): Azure.Core.Foundations.{ statusCode: 200 } | ErrorResponse
+op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): Azure.Core.Foundations.{ statusCode: 200 } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -94,12 +96,12 @@ op Azure.Core.ResourceOperations.ResourceUpdate(apiVersion: string, contentType:
 | Resource | Resource type.                                 |
 | Traits   | Object describing the traits of the operation. |
 
-#### `ResourceOperations.ResourceCreateWithServiceProvidedName` {#Azure.Core.ResourceOperations.ResourceCreateWithServiceProvidedName}
+#### `ResourceOperations.ResourceCreateWithServiceProvidedName` {#Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceCreateWithServiceProvidedName}
 
 Resource create with service-provided name operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.ResourceCreateWithServiceProvidedName(apiVersion: string, resource: Resource): Azure.Core.{ statusCode: 201, location: TypeSpec.Rest.ResourceLocation } | ErrorResponse
+op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceCreateWithServiceProvidedName(apiVersion: string, resource: Resource): Azure.Core.{ statusCode: 201, location: TypeSpec.Rest.ResourceLocation } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -109,12 +111,12 @@ op Azure.Core.ResourceOperations.ResourceCreateWithServiceProvidedName(apiVersio
 | Resource | Resource type.                                 |
 | Traits   | Object describing the traits of the operation. |
 
-#### `ResourceOperations.LongRunningResourceCreateWithServiceProvidedName` {#Azure.Core.ResourceOperations.LongRunningResourceCreateWithServiceProvidedName}
+#### `ResourceOperations.LongRunningResourceCreateWithServiceProvidedName` {#Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.LongRunningResourceCreateWithServiceProvidedName}
 
 Long-running resource create with service-provided name operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.LongRunningResourceCreateWithServiceProvidedName(apiVersion: string, resource: Resource): Azure.Core.{ statusCode: 202, location: TypeSpec.Rest.ResourceLocation } | ErrorResponse
+op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.LongRunningResourceCreateWithServiceProvidedName(apiVersion: string, resource: Resource): Azure.Core.{ statusCode: 202, location: TypeSpec.Rest.ResourceLocation } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -124,12 +126,12 @@ op Azure.Core.ResourceOperations.LongRunningResourceCreateWithServiceProvidedNam
 | Resource | Resource type.                                 |
 | Traits   | Object describing the traits of the operation. |
 
-#### `ResourceOperations.ResourceRead` {#Azure.Core.ResourceOperations.ResourceRead}
+#### `ResourceOperations.ResourceRead` {#Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceRead}
 
 Resource read operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.ResourceRead(apiVersion: string): {} | ErrorResponse
+op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceRead(apiVersion: string): {} | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -139,12 +141,12 @@ op Azure.Core.ResourceOperations.ResourceRead(apiVersion: string): {} | ErrorRes
 | Resource | Resource type.                                 |
 | Traits   | Object describing the traits of the operation. |
 
-#### `ResourceOperations.ResourceDelete` {#Azure.Core.ResourceOperations.ResourceDelete}
+#### `ResourceOperations.ResourceDelete` {#Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceDelete}
 
 Resource delete operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.ResourceDelete(apiVersion: string): Azure.Core.{ statusCode: 204 } | ErrorResponse
+op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceDelete(apiVersion: string): Azure.Core.{ statusCode: 204 } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -154,12 +156,12 @@ op Azure.Core.ResourceOperations.ResourceDelete(apiVersion: string): Azure.Core.
 | Resource | Resource type.                                 |
 | Traits   | Object describing the traits of the operation. |
 
-#### `ResourceOperations.LongRunningResourceDelete` {#Azure.Core.ResourceOperations.LongRunningResourceDelete}
+#### `ResourceOperations.LongRunningResourceDelete` {#Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.LongRunningResourceDelete}
 
 Long-running resource delete operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.LongRunningResourceDelete(apiVersion: string): Azure.Core.Foundations.{ statusCode: 202, id: string, status: Azure.Core.Foundations.OperationState, error: Azure.Core.Foundations.Error, result: never, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
+op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.LongRunningResourceDelete(apiVersion: string): Azure.Core.Foundations.{ statusCode: 202, id: string, status: Azure.Core.Foundations.OperationState, error: Azure.Core.Foundations.Error, result: never, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -169,12 +171,12 @@ op Azure.Core.ResourceOperations.LongRunningResourceDelete(apiVersion: string): 
 | Resource | Resource type.                                 |
 | Traits   | Object describing the traits of the operation. |
 
-#### `ResourceOperations.ResourceList` {#Azure.Core.ResourceOperations.ResourceList}
+#### `ResourceOperations.ResourceList` {#Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceList}
 
 Resource list operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.ResourceList(apiVersion: string): Azure.Core.Foundations.CustomPage<Resource, Traits> | ErrorResponse
+op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceList(apiVersion: string): Azure.Core.Foundations.CustomPage<Resource, Traits> | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -184,12 +186,12 @@ op Azure.Core.ResourceOperations.ResourceList(apiVersion: string): Azure.Core.Fo
 | Resource | Resource type.                                 |
 | Traits   | Object describing the traits of the operation. |
 
-#### `ResourceOperations.ResourceAction` {#Azure.Core.ResourceOperations.ResourceAction}
+#### `ResourceOperations.ResourceAction` {#Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceAction}
 
 Resource action operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.ResourceAction(apiVersion: string): {} | ErrorResponse
+op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceAction(apiVersion: string): {} | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -201,12 +203,12 @@ op Azure.Core.ResourceOperations.ResourceAction(apiVersion: string): {} | ErrorR
 | Response   | Object describing the response of the operation.   |
 | Traits     | Object describing the traits of the operation.     |
 
-#### `ResourceOperations.ResourceCollectionAction` {#Azure.Core.ResourceOperations.ResourceCollectionAction}
+#### `ResourceOperations.ResourceCollectionAction` {#Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceCollectionAction}
 
 Resource collection action operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.ResourceCollectionAction(apiVersion: string): {} | ErrorResponse
+op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.ResourceCollectionAction(apiVersion: string): {} | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -218,12 +220,12 @@ op Azure.Core.ResourceOperations.ResourceCollectionAction(apiVersion: string): {
 | Response   | Object describing the response of the operation.   |
 | Traits     | Object describing the traits of the operation.     |
 
-#### `ResourceOperations.LongRunningResourceAction` {#Azure.Core.ResourceOperations.LongRunningResourceAction}
+#### `ResourceOperations.LongRunningResourceAction` {#Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.LongRunningResourceAction}
 
 Long-running resource action operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.LongRunningResourceAction(apiVersion: string): Azure.Core.{ statusCode: 202, id: string, status: Azure.Core.Foundations.OperationState, error: StatusError, result: StatusResult, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
+op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.LongRunningResourceAction(apiVersion: string): Azure.Core.{ statusCode: 202, id: string, status: Azure.Core.Foundations.OperationState, error: StatusError, result: StatusResult, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -236,12 +238,12 @@ op Azure.Core.ResourceOperations.LongRunningResourceAction(apiVersion: string): 
 | StatusError  | Object describing the status error of the operation.  |
 | Traits       | Object describing the traits of the operation.        |
 
-#### `ResourceOperations.LongRunningResourceCollectionAction` {#Azure.Core.ResourceOperations.LongRunningResourceCollectionAction}
+#### `ResourceOperations.LongRunningResourceCollectionAction` {#Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.LongRunningResourceCollectionAction}
 
 Long-running resource collection action operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.LongRunningResourceCollectionAction(apiVersion: string): Azure.Core.{ statusCode: 202, id: string, status: Azure.Core.Foundations.OperationState, error: StatusError, result: StatusResult, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
+op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.LongRunningResourceCollectionAction(apiVersion: string): Azure.Core.{ statusCode: 202, id: string, status: Azure.Core.Foundations.OperationState, error: StatusError, result: StatusResult, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
 ```
 
 ##### Template Parameters
@@ -254,12 +256,12 @@ op Azure.Core.ResourceOperations.LongRunningResourceCollectionAction(apiVersion:
 | StatusError  | Object describing the status error of the operation.  |
 | Traits       | Object describing the traits of the operation.        |
 
-#### `ResourceOperations.GetResourceOperationStatus` {#Azure.Core.ResourceOperations.GetResourceOperationStatus}
+#### `ResourceOperations.GetResourceOperationStatus` {#Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.GetResourceOperationStatus}
 
 Resource operation status operation template.
 
 ```typespec
-op Azure.Core.ResourceOperations.GetResourceOperationStatus(apiVersion: string): Azure.Core.ResourceOperationStatus<Resource, StatusResult, StatusError> | ErrorResponse
+op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.GetResourceOperationStatus(apiVersion: string): Azure.Core.ResourceOperationStatus<Resource, StatusResult, StatusError> | ErrorResponse
 ```
 
 ##### Template Parameters

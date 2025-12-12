@@ -7,93 +7,47 @@ import {
   resolvePath,
 } from "@typespec/compiler";
 import { unsafe_mutateSubgraphWithNamespace } from "@typespec/compiler/experimental";
-import {
-  BasicTestRunner,
-  createTester,
-  createTestHost,
-  createTestWrapper,
-} from "@typespec/compiler/testing";
+import { createTester, TesterInstance } from "@typespec/compiler/testing";
 import {
   getAllHttpServices,
   HttpOperation,
   HttpOperationParameter,
   HttpVerb,
 } from "@typespec/http";
-import { HttpTestLibrary } from "@typespec/http/testing";
-import { OpenAPITestLibrary } from "@typespec/openapi/testing";
-import { RestTestLibrary } from "@typespec/rest/testing";
 import { getVersioningMutators } from "@typespec/versioning";
-import { VersioningTestLibrary } from "@typespec/versioning/testing";
 import { strictEqual } from "assert";
-import { AzureCoreTestLibrary } from "../src/testing/index.js";
 
 export const Tester = createTester(resolvePath(import.meta.dirname, ".."), {
   libraries: [
     "@typespec/http",
     "@typespec/rest",
+    "@typespec/openapi",
     "@typespec/versioning",
     "@azure-tools/typespec-azure-core",
   ],
 })
-  .importLibraries()
+  .import(
+    "@typespec/http",
+    "@typespec/rest",
+    "@typespec/versioning",
+    "@azure-tools/typespec-azure-core",
+  )
   .using("Http", "Rest", "Versioning", "Azure.Core");
 
 export const TesterWithService = Tester.wrap((code) => {
   return `
-    @useDependency(Azure.Core.Versions.v1_0_Preview_2) @service namespace Azure.MyService;
+    @service namespace Azure.MyService;
     ${code}
   `;
 });
-export async function createAzureCoreTestHost() {
-  return createTestHost({
-    libraries: [
-      AzureCoreTestLibrary,
-      HttpTestLibrary,
-      RestTestLibrary,
-      VersioningTestLibrary,
-      OpenAPITestLibrary,
-    ],
-  });
-}
-const CommonCode = `
-  import "${AzureCoreTestLibrary.name}";
-  import "${HttpTestLibrary.name}";
-  import "${RestTestLibrary.name}";
-  import "${VersioningTestLibrary.name}";
-  import "${OpenAPITestLibrary.name}";
-  using Http;
-  using Rest;
-  using Versioning;
-  using Azure.Core;\n`;
-
-export function getRunnerPosOffset(pos: number): number {
-  return CommonCode.length + pos;
-}
-export async function createAzureCoreTestRunner(
-  options: {
-    omitServiceNamespace?: boolean;
-  } = {},
-): Promise<BasicTestRunner> {
-  const host = await createAzureCoreTestHost();
-  const serviceNamespace = options.omitServiceNamespace
-    ? ""
-    : `@useDependency(Azure.Core.Versions.v1_0_Preview_2) @service namespace Azure.MyService;\n`;
-  return createTestWrapper(host, {
-    autoImports: [],
-    wrapper: (code) => `${CommonCode}${serviceNamespace}${code}`,
-    compilerOptions: {
-      miscOptions: { "disable-linter": true },
-    },
-  });
-}
 
 export async function getOperations(
   code: string,
-): Promise<[HttpOperation[], readonly Diagnostic[], BasicTestRunner]> {
-  const runner = await createAzureCoreTestRunner();
-  await runner.compileAndDiagnose(code, { noEmit: true });
-  const [services] = getAllHttpServices(runner.program);
-  return [services[0].operations, runner.program.diagnostics, runner];
+): Promise<[HttpOperation[], readonly Diagnostic[], TesterInstance]> {
+  const tester = await TesterWithService.createInstance();
+  const [{ program }] = await tester.compileAndDiagnose(code);
+  const [services] = getAllHttpServices(program);
+  return [services[0].operations, program.diagnostics, tester];
 }
 
 export interface SimpleHttpOperation {

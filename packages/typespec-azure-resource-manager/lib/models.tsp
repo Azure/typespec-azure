@@ -1,6 +1,5 @@
 using Http;
 using Rest;
-using OpenAPI;
 using Azure.Core;
 using Azure.ResourceManager.Foundations;
 using Azure.ResourceManager.Private;
@@ -67,7 +66,6 @@ model ResourceNameParameter<
 model TrackedResource<Properties extends {}, PropertiesOptional extends valueof boolean = true>
   extends Foundations.TrackedResource {
   @doc("The resource-specific properties for this resource.")
-  @conditionalClientFlatten
   @armResourcePropertiesOptionality(PropertiesOptional)
   properties?: Properties;
 }
@@ -92,7 +90,6 @@ model TrackedResource<Properties extends {}, PropertiesOptional extends valueof 
 model ProxyResource<Properties extends {}, PropertiesOptional extends valueof boolean = true>
   extends Foundations.ProxyResource {
   @doc("The resource-specific properties for this resource.")
-  @conditionalClientFlatten
   @armResourcePropertiesOptionality(PropertiesOptional)
   properties?: Properties;
 }
@@ -123,7 +120,6 @@ model ProxyResource<Properties extends {}, PropertiesOptional extends valueof bo
 model ExtensionResource<Properties extends {}, PropertiesOptional extends valueof boolean = true>
   extends Foundations.ExtensionResource {
   @doc("The resource-specific properties for this resource.")
-  @conditionalClientFlatten
   @armResourcePropertiesOptionality(PropertiesOptional)
   properties?: Properties;
 }
@@ -307,6 +303,7 @@ alias ResourceKind = ResourceKindProperty;
 /**
  * Model representing the standard `kind` envelope property for a resource.
  * Spread this model into a resource model if the resource support ARM `kind`.
+ * @template Type The type of the kind property. Default is string. However you can pass a union with string values.
  *
  * @example
  *
@@ -318,11 +315,11 @@ alias ResourceKind = ResourceKindProperty;
  * ```
  */
 @doc("The resource kind property envelope.")
-model ResourceKindProperty {
+model ResourceKindProperty<Type extends string = string> {
   @doc("Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type.  If supported, the resource provider must validate and persist this value.")
   @pattern("^[-\\w\\._,\\(\\\\\\)]+$")
   @visibility(Lifecycle.Read, Lifecycle.Create)
-  kind?: string;
+  kind?: Type;
 }
 
 /**

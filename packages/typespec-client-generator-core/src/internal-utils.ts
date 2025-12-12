@@ -1,4 +1,10 @@
 import {
+  FinalStateValue,
+  getLroMetadata,
+  isPreviewVersion,
+  LroMetadata,
+} from "@azure-tools/typespec-azure-core";
+import {
   BooleanLiteral,
   compilerAssert,
   createDiagnosticCollector,
@@ -7,6 +13,7 @@ import {
   getDoc,
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
+  getSummary,
   getVisibilityForClass,
   ignoreDiagnostics,
   isNeverType,
@@ -37,20 +44,31 @@ import {
   getVersioningMutators,
   getVersions,
 } from "@typespec/versioning";
-import { getClientDocExplicit, getParamAlias } from "./decorators.js";
+import {
+  getAlternateType,
+  getClientDocExplicit,
+  getClientLocation,
+  getMarkAsLro,
+  getOverriddenClientMethod,
+  getParamAlias,
+} from "./decorators.js";
 import { getSdkHttpParameter, isSdkHttpParameter } from "./http.js";
 import {
   DecoratorInfo,
+  ExternalTypeInfo,
   SdkBuiltInType,
   SdkClient,
+  SdkClientType,
   SdkEnumType,
   SdkHeaderParameter,
-  SdkHttpResponse,
+  SdkMethodParameter,
   SdkOperationGroup,
+  SdkServiceOperation,
   SdkType,
   TCGCContext,
 } from "./interfaces.js";
 import { createDiagnostic, createStateSymbol } from "./lib.js";
+import { getSdkBasicServiceMethod } from "./methods.js";
 import {
   getCrossLanguageDefinitionId,
   getDefaultApiVersion,
@@ -91,6 +109,7 @@ export const clientKey = createStateSymbol("client");
 export const operationGroupKey = createStateSymbol("operationGroup");
 export const clientLocationKey = createStateSymbol("clientLocation");
 export const omitOperation = createStateSymbol("omitOperation");
+export const overrideKey = createStateSymbol("override");
 
 export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
   return (
@@ -294,6 +313,9 @@ interface DefaultSdkTypeBase<TKind> {
   deprecation?: string;
   kind: TKind;
   decorators: DecoratorInfo[];
+  external?: ExternalTypeInfo;
+  doc?: string;
+  summary?: string;
 }
 
 /**
@@ -306,12 +328,34 @@ export function getSdkTypeBaseHelper<TKind>(
   kind: TKind,
 ): [DefaultSdkTypeBase<TKind>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  return diagnostics.wrap({
+
+  const base: DefaultSdkTypeBase<TKind> = {
     __raw: type,
     deprecation: getDeprecationDetails(context.program, type)?.message,
     kind,
     decorators: diagnostics.pipe(getTypeDecorators(context, type)),
-  });
+    doc: getClientDoc(context, type),
+    summary: getSummary(context.program, type),
+  };
+  if (
+    type.kind === "ModelProperty" ||
+    type.kind === "Scalar" ||
+    type.kind === "Model" ||
+    type.kind === "Enum" ||
+    type.kind === "Union"
+  ) {
+    const external = getAlternateType(context, type);
+    // Only set external if it's an ExternalTypeInfo (has 'identity' but not 'kind' property), not a regular Type
+    if (
+      external &&
+      typeof external === "object" &&
+      "identity" in external &&
+      !("kind" in external)
+    ) {
+      base.external = external;
+    }
+  }
+  return diagnostics.wrap(base);
 }
 
 export function getNamespacePrefix(namespace: Namespace): string {
@@ -413,12 +457,6 @@ export function isContentTypeHeader(param: SdkHeaderParameter): boolean {
   return param.kind === "header" && param.serializedName.toLowerCase() === "content-type";
 }
 
-export function isMultipartOperation(context: TCGCContext, operation?: Operation): boolean {
-  if (!operation) return false;
-  const httpOperation = getHttpOperationWithCache(context, operation);
-  return httpOperation.parameters.body?.bodyKind === "multipart";
-}
-
 export function isHttpOperation(context: TCGCContext, obj: any): obj is HttpOperation {
   return obj?.kind === "Operation" && getHttpOperationWithCache(context, obj) !== undefined;
 }
@@ -431,26 +469,6 @@ export function getNonNullOptions(type: Union): Type[] {
 
 export function getNullOption(type: Union): Type | undefined {
   return [...type.variants.values()].map((x) => x.type).filter((t) => isNullType(t))[0];
-}
-
-export function getAllResponseBodiesAndNonBodyExists(responses: SdkHttpResponse[]): {
-  allResponseBodies: SdkType[];
-  nonBodyExists: boolean;
-} {
-  const allResponseBodies: SdkType[] = [];
-  let nonBodyExists = false;
-  for (const response of responses) {
-    if (response.type) {
-      allResponseBodies.push(response.type);
-    } else {
-      nonBodyExists = true;
-    }
-  }
-  return { allResponseBodies, nonBodyExists };
-}
-
-export function getAllResponseBodies(responses: SdkHttpResponse[]): SdkType[] {
-  return getAllResponseBodiesAndNonBodyExists(responses).allResponseBodies;
 }
 
 /**
@@ -525,9 +543,22 @@ export function filterApiVersionsInEnum(
   removeVersionsLargerThanExplicitlySpecified(context, sdkVersionsEnum.values);
   const defaultApiVersion = getDefaultApiVersion(context, client.service);
   if (!context.previewStringRegex.test(defaultApiVersion?.value || "")) {
-    sdkVersionsEnum.values = sdkVersionsEnum.values.filter(
-      (v) => typeof v.value === "string" && !context.previewStringRegex.test(v.value),
-    );
+    sdkVersionsEnum.values = sdkVersionsEnum.values.filter((v) => {
+      if (typeof v.value !== "string") {
+        return true;
+      }
+
+      // Check if the version has `@previewVersion` decorator
+      if (v.__raw && v.__raw.kind === "EnumMember") {
+        const enumMember = v.__raw;
+        if (isPreviewVersion(context.program, enumMember)) {
+          return false;
+        }
+      }
+
+      // Fall back to regex check for backward compatibility
+      return !context.previewStringRegex.test(v.value);
+    });
   }
 }
 
@@ -540,9 +571,10 @@ export function twoParamsEquivalent(
     return false;
   }
   return (
-    param1.name === param2.name ||
-    getParamAlias(context, param1) === param2.name ||
-    param1.name === getParamAlias(context, param2)
+    param1.type === param2.type &&
+    (param1.name === param2.name ||
+      getParamAlias(context, param1) === param2.name ||
+      param1.name === getParamAlias(context, param2))
   );
 }
 
@@ -591,17 +623,43 @@ export function isOnClient(
   operation?: Operation,
   versioning?: boolean,
 ): boolean {
-  const client = operation ? context.getClientForOperation(operation) : undefined;
+  const clientLocation = getClientLocation(context, type);
+  if (
+    operation &&
+    clientLocation === (getOverriddenClientMethod(context, operation) ?? operation)
+  ) {
+    // if the type has explicitly been moved to the operation, it is not on the client
+    return false;
+  }
   return (
     isSubscriptionId(context, type) ||
     (isApiVersion(context, type) && versioning) ||
-    Boolean(
-      client &&
-        context.__clientParametersCache
-          .get(client)
-          ?.find((x) => twoParamsEquivalent(context, x.__raw, type)),
-    )
+    (operation !== undefined && getCorrespondingClientParam(context, type, operation) !== undefined)
   );
+}
+
+export function getCorrespondingClientParam(
+  context: TCGCContext,
+  type: ModelProperty,
+  operation: Operation,
+): SdkMethodParameter | undefined {
+  const clientParams = [];
+  let client: SdkClient | SdkOperationGroup | undefined = context.getClientForOperation(operation);
+  while (client) {
+    const clientParamsForClient = context.__clientParametersCache.get(client);
+    if (clientParamsForClient) {
+      clientParams.push(...clientParamsForClient);
+    }
+    if (client.kind === "SdkClient") {
+      break;
+    }
+    client = client.parent;
+  }
+  const correspondingClientParam = clientParams?.find((x) =>
+    twoParamsEquivalent(context, x.__raw, type),
+  );
+  if (correspondingClientParam) return correspondingClientParam;
+  return undefined;
 }
 
 export function getValueTypeValue(
@@ -790,4 +848,83 @@ export function* filterMapValuesIterator<V>(
       yield value;
     }
   }
+}
+
+/**
+ * Find all entries in a scoped decorator state map where the target matches a specific value
+ */
+export function findEntriesWithTarget<TSource extends Type, TTarget>(
+  context: TCGCContext,
+  stateKey: symbol,
+  targetValue: TTarget,
+  sourceKind?: TSource["kind"],
+): TSource[] {
+  const results: TSource[] = [];
+
+  for (const [type, target] of listScopedDecoratorData(context, stateKey)) {
+    if (sourceKind && type.kind !== sourceKind) {
+      continue;
+    }
+    if (target === targetValue) {
+      results.push(type as TSource);
+    }
+  }
+  return results;
+}
+
+/**
+ * Retrieves Long Running Operation (LRO) metadata for a given operation.
+ *
+ * This function serves as a wrapper that:
+ * 1. First tries to get LRO metadata using the `getLroMetadata` function from the Azure Core library
+ * 2. If unavailable or undefined, it would check for the existence of a `getMarkAsLro` function
+ *    and return a mock LRO metadata object if the operation is marked as LRO
+ *
+ * @param context - The TypeSpec client generator context
+ * @param operation - The TypeSpec operation to check for LRO metadata
+ * @returns The LRO metadata for the operation if available, otherwise undefined
+ */
+export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
+  operation: Operation,
+  client: SdkClientType<TServiceOperation>,
+): LroMetadata | undefined {
+  const lroMetaData = getLroMetadata(context.program, operation);
+  if (lroMetaData) {
+    return lroMetaData;
+  }
+  if (getMarkAsLro(context, operation)) {
+    // we guard against this in the setting of `@markAsLro`
+    const sdkMethod = ignoreDiagnostics(getSdkBasicServiceMethod(context, operation, client));
+    let returnType: Model;
+    const sdkMethodResponseType = sdkMethod.response.type!;
+    switch (sdkMethodResponseType.kind) {
+      case "nullable":
+        returnType = sdkMethodResponseType.type.__raw! as Model;
+        break;
+      case "model":
+        returnType = sdkMethodResponseType.__raw! as Model;
+        break;
+      default:
+        throw new Error(
+          `LRO method ${operation.name} with @markAsLro must have a model return type.`,
+        );
+    }
+    return {
+      operation,
+      logicalResult: returnType,
+      finalStateVia: FinalStateValue.location,
+      pollingInfo: {
+        kind: "pollingOperationStep",
+        responseModel: returnType,
+        terminationStatus: {
+          kind: "status-code",
+        },
+      },
+      envelopeResult: returnType,
+      finalEnvelopeResult: returnType,
+      finalResult: returnType,
+    };
+  }
+  return undefined;
 }

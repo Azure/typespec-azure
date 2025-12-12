@@ -1,4 +1,12 @@
-import type { DecoratorContext, Model, ModelProperty, Operation, Type } from "@typespec/compiler";
+import type {
+  DecoratorContext,
+  Interface,
+  Model,
+  ModelProperty,
+  Operation,
+  Scalar,
+  Type,
+} from "@typespec/compiler";
 
 /**
  *
@@ -22,19 +30,6 @@ export type ResourceBaseParametersOfDecorator = (
   context: DecoratorContext,
   target: Model,
   propertyName: Model,
-) => void;
-
-/**
- * Please DO NOT USE in RestAPI specs.
- * Internal decorator that deprecated direct usage of `x-ms-client-flatten` OpenAPI extension.
- * It will programatically enabled/disable client flattening with
- *
- * @flattenProperty with autorest
- * emitter flags to maintain compatibility in swagger.
- */
-export type ConditionalClientFlattenDecorator = (
-  context: DecoratorContext,
-  target: ModelProperty,
 ) => void;
 
 /**
@@ -111,6 +106,23 @@ export type ArmResourceInternalDecorator = (
 ) => void;
 
 /**
+ * This decorator identifies Azure Resource Manager resource types that do not define
+ * the name identifier parameter and type
+ *
+ * @param target Azure Resource Manager resource type
+ * @param properties Azure Resource Manager resource properties
+ * @param type The resource type name, e.g. "virtualMachines"
+ * @param nameParameter The name of the resource name parameter, e.g. "virtualMachineName"
+ */
+export type ArmResourceWithParameterDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  properties: Model,
+  type: string,
+  nameParameter: string,
+) => void;
+
+/**
  * Provides default name decoration on resource name property with
  * camelcased and pluralized key and segment name
  */
@@ -174,19 +186,155 @@ export type ArmBodyRootDecorator = (
   isOptional: boolean,
 ) => void;
 
+/**
+ * designates a type as a legacy type and emits a warning diagnostic when used
+ */
+export type LegacyTypeDecorator = (
+  context: DecoratorContext,
+  target: Model | Operation | Interface | Scalar,
+) => void;
+
+/**
+ * Determines the built-in parent of a base resource
+ *
+ * @param parentType The parent type of the resource (Subscription, ResourceGroup, Tenant, Extension)
+ */
+export type ResourceParentTypeDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  parentType: "Subscription" | "ResourceGroup" | "Tenant" | "Extension",
+) => void;
+
+/**
+ * Marks a resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
+ *
+ * @param target The operation to associate the resourceType with
+ * @param resourceType The resource model
+ * @param operationType The type of operation being performed
+ * @param resourceName Optional. The name of the resource. If not provided, the resource type will be used
+ */
+export type LegacyResourceOperationDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  resourceType: Model,
+  operationType:
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
+  resourceName?: string,
+) => void;
+
+/**
+ * Marks an extension resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
+ *
+ * @param target The operation to associate the resourceType with
+ * @param targetResourceType The resource model for the target resource
+ * @param extensionResourceType The resource model for the extension resource
+ * @param operationType The type of operation being performed
+ * @param resourceName Optional. The name of the resource. If not provided, the scope and resource name will be used
+ */
+export type ExtensionResourceOperationDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  targetResourceType: Model,
+  extensionResourceType: Model,
+  operationType:
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
+  resourceName?: string,
+) => void;
+
+/**
+ * Marks an extension resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
+ *
+ * @param target The operation to associate the resourceType with
+ * @param targetResourceType The resource model for the target resource
+ * @param extensionResourceType The resource model for the extension resource
+ * @param operationType The type of operation being performed
+ * @param resourceName Optional. The name of the resource. If not provided, the scope and resource name will be used
+ */
+export type BuiltInResourceOperationDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  parentResourceType: Model,
+  builtInResourceType: Model,
+  operationType:
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
+  resourceName?: string,
+) => void;
+
+/**
+ * Marks a resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
+ *
+ * @param target The operation to associate the resourceType with
+ * @param resourceType The resource model
+ * @param operationType The type of operation being performed
+ * @param resourceName Optional. The name of the resource. If not provided, the resource type will be used
+ */
+export type LegacyExtensionResourceOperationDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  resourceType: Model,
+  operationType:
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
+  resourceName?: string,
+) => void;
+
+/**
+ * Validates that the specified common-types version is valid for the given resource type.
+ *
+ * @param target The resource model
+ * @param version The common-types version
+ * @param resourceName The name of the resource
+ */
+export type ValidateCommonTypesVersionForResourceDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  version: string,
+  resourceName: string,
+) => void;
+
 export type AzureResourceManagerPrivateDecorators = {
   resourceParameterBaseFor: ResourceParameterBaseForDecorator;
   resourceBaseParametersOf: ResourceBaseParametersOfDecorator;
-  conditionalClientFlatten: ConditionalClientFlattenDecorator;
   omitIfEmpty: OmitIfEmptyDecorator;
   assignProviderNameValue: AssignProviderNameValueDecorator;
   azureResourceBase: AzureResourceBaseDecorator;
   armUpdateProviderNamespace: ArmUpdateProviderNamespaceDecorator;
   assignUniqueProviderNameValue: AssignUniqueProviderNameValueDecorator;
   armResourceInternal: ArmResourceInternalDecorator;
+  armResourceWithParameter: ArmResourceWithParameterDecorator;
   defaultResourceKeySegmentName: DefaultResourceKeySegmentNameDecorator;
   enforceConstraint: EnforceConstraintDecorator;
   armRenameListByOperation: ArmRenameListByOperationDecorator;
   armResourcePropertiesOptionality: ArmResourcePropertiesOptionalityDecorator;
   armBodyRoot: ArmBodyRootDecorator;
+  legacyType: LegacyTypeDecorator;
+  resourceParentType: ResourceParentTypeDecorator;
+  legacyResourceOperation: LegacyResourceOperationDecorator;
+  extensionResourceOperation: ExtensionResourceOperationDecorator;
+  builtInResourceOperation: BuiltInResourceOperationDecorator;
+  legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorator;
+  validateCommonTypesVersionForResource: ValidateCommonTypesVersionForResourceDecorator;
 };

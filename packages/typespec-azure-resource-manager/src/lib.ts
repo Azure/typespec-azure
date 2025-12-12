@@ -3,12 +3,6 @@ import { createTypeSpecLibrary, paramMessage } from "@typespec/compiler";
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-azure-resource-manager",
   diagnostics: {
-    "single-arm-provider": {
-      severity: "error",
-      messages: {
-        default: "Only one @armProviderNamespace can be declared in a typespec spec at once.",
-      },
-    },
     "decorator-param-wrong-type": {
       severity: "error",
       messages: {
@@ -114,6 +108,27 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: paramMessage`The template parameter "${"sourceType"}" for "${"entity"}" does not extend the constraint type "${"constraintType"}". ${"actionMessage"}`,
+      },
+    },
+    "invalid-parameter-rename": {
+      severity: "warning",
+      messages: {
+        overwrite: paramMessage`The parameter "${"oldName"}" cannot be renamed to "${"newName"}, a parameter named "${"newName"}" already exists".`,
+        missing: paramMessage`The parameter "${"oldName"}" does not exist and so cannot be renamed.`,
+        notpath: paramMessage`The parameter "${"oldName"}" is not a path parameter and so cannot be renamed.`,
+      },
+    },
+    "legacy-type-usage": {
+      severity: "warning",
+      messages: {
+        default:
+          "This type is meant for conversion of legacy service APIs.  This type should not be used in new service APIs.",
+      },
+    },
+    "invalid-version-for-common-type": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`The specified common-types version '${"version"}'  is not valid for ${"resourceName"} resources. Please use version ${"requiredVersion"} or later of common-types.`,
       },
     },
   },

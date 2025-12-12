@@ -1,5 +1,7 @@
 ---
 title: Versioning
+description: Managing versioning for ARM services
+llmstxt: true
 ---
 
 This document explains how to manage versioning in TypeSpec projects, including how to add, remove, or modify resources, operations, and properties across API versions.
@@ -16,12 +18,10 @@ Define your API versions in an enum. For each version, specify dependencies and 
 /** Contoso API versions */
 enum Versions {
   /** 2021-10-01-preview version */
-  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v1,
 
   /** 2022-11-01-preview version */
-  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   v2,
 }

@@ -1,5 +1,7 @@
 ---
 title: 9. Customizing operations with traits
+description: Customizing operations with traits
+llmstxt: true
 ---
 
 For all standard lifecycle operations you can customize the operation parameters and response body by passing a special model type to the `Traits` parameter of the operation template, typically the second parameter of the operation template. You can also customize the whole set of resource operations by passing traits to the `ResourceOperations` interface.
@@ -75,12 +77,7 @@ alias MyQueryParams = QueryParametersTrait<
 op getWidget is Operations.ResourceRead<Widget, MyQueryParams>;
 
 // This will not get the `foo` parameter because it doesn't match the contexts
-op deleteWidget is Operations.ResourceDelete<
-  Widget,
-  QueryParametersTrait<{
-    @query foo: string;
-  }>
->;
+op deleteWidget is Operations.ResourceDelete<Widget, MyQueryParams>;
 ```
 
 ### `ListQueryParametersTrait<TParams>`
@@ -216,10 +213,7 @@ using Versioning;
 namespace Contoso.WidgetManager;
 
 enum Versions {
-  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
   v2022_08_31: "v20220831",
-
-  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
   v2022_11_30: "v20221130",
 }
 

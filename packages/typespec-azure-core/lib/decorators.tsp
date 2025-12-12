@@ -19,21 +19,9 @@ namespace Azure.Core {
    *   v3Preview
    * }
    * ```
-   * 
+   *
    */
   extern dec previewVersion(target: TypeSpec.Reflection.EnumMember);
-
-  /**
-   * Marks a Model as a paged collection.
-   */
-  #deprecated "Do not use this decorator. Use @list decorator on the operation instead."
-  extern dec pagedResult(entity: Model);
-
-  /**
-   * Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
-   */
-  #deprecated "Do not use this decorator. Use @pageItems instead."
-  extern dec items(entity: ModelProperty);
 
   /**
    * Used for custom StatusMonitor implementation.
@@ -141,12 +129,9 @@ namespace Azure.Core {
   );
 
   /**
-   * Identifies that an operation is used to retrieve the next page for paged operations.
-   * @param linkedOperation The linked Operation
-   * @param parameters Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will
-   * be passed to the linked operation request.
+   * Specifies that an array model or array-typed property should contain only unique items.
    */
-  extern dec nextPageOperation(entity: Operation, linkedOperation: Operation, parameters?: {});
+  extern dec uniqueItems(entity: ModelProperty | Model);
 }
 
 namespace Azure.Core.Foundations {

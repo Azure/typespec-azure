@@ -1,26 +1,20 @@
-import {
-  BasicTestRunner,
-  LinterRuleTester,
-  createLinterRuleTester,
-} from "@typespec/compiler/testing";
+import { TesterWithService } from "#test/test-host.js";
+import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { friendlyNameRule } from "../../src/rules/friendly-name.js";
-import { createAzureCoreTestRunner } from "../test-host.js";
 
-describe("typespec-azure-core: friendly-name rule", () => {
-  let runner: BasicTestRunner;
-  let tester: LinterRuleTester;
+let tester: LinterRuleTester;
 
-  beforeEach(async () => {
-    runner = await createAzureCoreTestRunner();
-    tester = createLinterRuleTester(runner, friendlyNameRule, "@azure-tools/typespec-azure-core");
-  });
+beforeEach(async () => {
+  const runner = await TesterWithService.createInstance();
+  tester = createLinterRuleTester(runner, friendlyNameRule, "@azure-tools/typespec-azure-core");
+});
 
-  describe("@friendlyName decorate template", () => {
-    it("valid", async () => {
-      await tester
-        .expect(
-          `
+describe("@friendlyName decorate template", () => {
+  it("valid", async () => {
+    await tester
+      .expect(
+        `
           @friendlyName("{name}Page", T)
           model Page<T> {
             size: int32;
@@ -41,14 +35,14 @@ describe("typespec-azure-core: friendly-name rule", () => {
 
           op update is updateTemplate<User>;
           `,
-        )
-        .toBeValid();
-    });
+      )
+      .toBeValid();
+  });
 
-    it("decorate non-template type", async () => {
-      await tester
-        .expect(
-          `
+  it("decorate non-template type", async () => {
+    await tester
+      .expect(
+        `
           @friendlyName("FriendlyEnum")
           enum TestEnum {
             Foo,
@@ -59,23 +53,23 @@ describe("typespec-azure-core: friendly-name rule", () => {
           model TestModel {
           }
           `,
-        )
-        .toEmitDiagnostics([
-          {
-            code: "@azure-tools/typespec-azure-core/friendly-name",
-            message: `@friendlyName should decorate template and use template parameter's properties in friendly name.`,
-          },
-          {
-            code: "@azure-tools/typespec-azure-core/friendly-name",
-            message: `@friendlyName should not decorate Enum.`,
-          },
-        ]);
-    });
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-core/friendly-name",
+          message: `@friendlyName should decorate template and use template parameter's properties in friendly name.`,
+        },
+        {
+          code: "@azure-tools/typespec-azure-core/friendly-name",
+          message: `@friendlyName should not decorate Enum.`,
+        },
+      ]);
+  });
 
-    it("friendly name without template parameter", async () => {
-      await tester
-        .expect(
-          `
+  it("friendly name without template parameter", async () => {
+    await tester
+      .expect(
+        `
           @friendlyName("FriendlyUpdate")
           op updateTemplate<T>(body: T): T;
 
@@ -85,13 +79,12 @@ describe("typespec-azure-core: friendly-name rule", () => {
 
           op update is updateTemplate<User>;
           `,
-        )
-        .toEmitDiagnostics([
-          {
-            code: "@azure-tools/typespec-azure-core/friendly-name",
-            message: `@friendlyName should decorate template and use template parameter's properties in friendly name.`,
-          },
-        ]);
-    });
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-azure-core/friendly-name",
+          message: `@friendlyName should decorate template and use template parameter's properties in friendly name.`,
+        },
+      ]);
   });
 });

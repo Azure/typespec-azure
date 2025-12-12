@@ -1,5 +1,7 @@
 ---
-title: 7. Defining child resources
+title: 7. Defining child resources\
+description: Defining child resources
+llmstxt: true
 ---
 
 Sometimes your resource types will need to have child resources that relate to their parent types. You can identify that a resource type is the child of another resource by using the `@parentResource` decorator.
@@ -16,9 +18,6 @@ model WidgetPart {
 
   /** The part number. */
   number: string;
-
-  /** The part name. */
-  partName: string;
 }
 ```
 
@@ -37,10 +36,10 @@ alias ServiceTraits = SupportsRepeatableRequests &
 alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
 
 /** Creates a WidgetPart */
-createWidgetPart is Operations.ResourceCreateWithServiceProvidedName<WidgetPart>;
+op createWidgetPart is Operations.ResourceCreateWithServiceProvidedName<WidgetPart>;
 
 /** Get a WidgetPart */
-getWidgetPart is Operations.ResourceRead<WidgetPart>;
+op getWidgetPart is Operations.ResourceRead<WidgetPart>;
 ```
 
 These operations will be defined under the route path:

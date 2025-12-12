@@ -7,11 +7,12 @@ import {
 } from "@typespec/compiler/testing";
 import { ok } from "assert";
 import { AutorestEmitterOptions } from "../src/lib.js";
-import { OpenAPI2Document } from "../src/openapi2-document.js";
+import { OpenAPI2Document, OpenAPI2Schema } from "../src/openapi2-document.js";
 
 export const ApiTester = createTester(resolvePath(import.meta.dirname, ".."), {
   libraries: [
     "@typespec/http",
+    "@typespec/xml",
     "@typespec/rest",
     "@typespec/openapi",
     "@azure-tools/typespec-autorest",
@@ -29,11 +30,12 @@ const defaultOptions = {
 };
 export const Tester = BasicTester.import(
   "@typespec/http",
+  "@typespec/xml",
   "@typespec/rest",
   "@typespec/openapi",
   "@typespec/versioning",
 )
-  .using("Http", "Rest", "OpenAPI", "Versioning")
+  .using("Http", "Xml", "Rest", "OpenAPI", "Versioning")
   .emit("@azure-tools/typespec-autorest", defaultOptions);
 
 /** Tester that will load Azure libraries. Only use if needed, will slow down the tests */
@@ -41,6 +43,7 @@ export const AzureTester = ApiTester.importLibraries()
   .using(
     "Versioning",
     "Http",
+    "Xml",
     "Rest",
     "OpenAPI",
     "Autorest",
@@ -137,6 +140,15 @@ export async function diagnoseOpenApiFor(code: string, options: AutorestEmitterO
       },
     },
   });
+}
+
+/**
+ * Get schema called Test for the given code
+ */
+export async function getTestSchema(code: string): Promise<OpenAPI2Schema> {
+  const schema = await compileOpenAPI(code);
+  ok(schema.definitions?.Test, "Test model not found in definitions");
+  return schema.definitions.Test;
 }
 
 export async function oapiForModel(name: string, modelDef: string) {

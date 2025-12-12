@@ -60,6 +60,7 @@ Available ruleSets:
 | `@azure-tools/typespec-azure-resource-manager/resource-name`                                                                                                                                             | Check the resource name.                                                                                                                                                                                                                              |
 | `@azure-tools/typespec-azure-resource-manager/retry-after`                                                                                                                                               | Check if retry-after header appears in response body.                                                                                                                                                                                                 |
 | [`@azure-tools/typespec-azure-resource-manager/unsupported-type`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/unsupported-type)                                   | Check for unsupported ARM types.                                                                                                                                                                                                                      |
+| [`@azure-tools/typespec-azure-resource-manager/secret-prop`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/secret-prop)                                             | RPC-v1-13: Check that property with names indicating sensitive information(e.g. contains auth, password, token, secret, etc.) are marked with @secret decorator.                                                                                      |
 | [`@azure-tools/typespec-azure-resource-manager/no-empty-model`](https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/no-empty-model)                                       | ARM Properties with type:object that don't reference a model definition are not allowed. ARM doesn't allow generic type definitions as this leads to bad customer experience.                                                                         |
 
 ## Decorators
@@ -71,6 +72,7 @@ Available ruleSets:
 - [`@armProviderNamespace`](#@armprovidernamespace)
 - [`@armProviderNameValue`](#@armprovidernamevalue)
 - [`@armResourceAction`](#@armresourceaction)
+- [`@armResourceCheckExistence`](#@armresourcecheckexistence)
 - [`@armResourceCollectionAction`](#@armresourcecollectionaction)
 - [`@armResourceCreateOrUpdate`](#@armresourcecreateorupdate)
 - [`@armResourceDelete`](#@armresourcedelete)
@@ -182,7 +184,7 @@ None
 #### `@armResourceAction`
 
 ```typespec
-@Azure.ResourceManager.armResourceAction(resourceType: Model)
+@Azure.ResourceManager.armResourceAction(resourceModel: Model, resourceName?: valueof string)
 ```
 
 ##### Target
@@ -191,9 +193,29 @@ None
 
 ##### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
+
+#### `@armResourceCheckExistence`
+
+Marks the operation as being a check existence (HEAD) operation
+
+```typespec
+@Azure.ResourceManager.armResourceCheckExistence(resourceModel: Model, resourceName?: valueof string)
+```
+
+##### Target
+
+`Operation`
+
+##### Parameters
+
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 #### `@armResourceCollectionAction`
 
@@ -214,7 +236,7 @@ None
 #### `@armResourceCreateOrUpdate`
 
 ```typespec
-@Azure.ResourceManager.armResourceCreateOrUpdate(resourceType: Model)
+@Azure.ResourceManager.armResourceCreateOrUpdate(resourceModel: Model, resourceName?: valueof string)
 ```
 
 ##### Target
@@ -223,14 +245,15 @@ None
 
 ##### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 #### `@armResourceDelete`
 
 ```typespec
-@Azure.ResourceManager.armResourceDelete(resourceType: Model)
+@Azure.ResourceManager.armResourceDelete(resourceModel: Model, resourceName?: valueof string)
 ```
 
 ##### Target
@@ -239,14 +262,15 @@ None
 
 ##### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 #### `@armResourceList`
 
 ```typespec
-@Azure.ResourceManager.armResourceList(resourceType: Model)
+@Azure.ResourceManager.armResourceList(resourceModel: Model, resourceName?: valueof string)
 ```
 
 ##### Target
@@ -255,9 +279,10 @@ None
 
 ##### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 #### `@armResourceOperations`
 
@@ -296,7 +321,7 @@ individually tagged
 #### `@armResourceRead`
 
 ```typespec
-@Azure.ResourceManager.armResourceRead(resourceType: Model)
+@Azure.ResourceManager.armResourceRead(resourceModel: Model, resourceName?: valueof string)
 ```
 
 ##### Target
@@ -305,14 +330,15 @@ individually tagged
 
 ##### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 #### `@armResourceUpdate`
 
 ```typespec
-@Azure.ResourceManager.armResourceUpdate(resourceType: Model)
+@Azure.ResourceManager.armResourceUpdate(resourceModel: Model, resourceName?: valueof string)
 ```
 
 ##### Target
@@ -321,9 +347,10 @@ individually tagged
 
 ##### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 #### `@armVirtualResource`
 
@@ -340,9 +367,9 @@ Azure.ResourceManager common types.
 
 ##### Parameters
 
-| Name     | Type             | Description |
-| -------- | ---------------- | ----------- |
-| provider | `valueof string` |             |
+| Name     | Type             | Description                                                         |
+| -------- | ---------------- | ------------------------------------------------------------------- |
+| provider | `valueof string` | Optional. The resource provider namespace for the virtual resource. |
 
 #### `@extensionResource`
 
@@ -377,7 +404,7 @@ The properties that are used as identifiers for the object needs to be provided 
 
 ##### Target
 
-`ModelProperty`
+`ModelProperty | unknown[]`
 
 ##### Parameters
 
@@ -429,9 +456,9 @@ This decorator sets the base type of the given resource.
 
 ##### Parameters
 
-| Name       | Type                                                                         | Description |
-| ---------- | ---------------------------------------------------------------------------- | ----------- |
-| baseTypeIt | `"Tenant" \| "Subscription" \| "ResourceGroup" \| "Location" \| "Extension"` |             |
+| Name       | Type                                                                         | Description                                                                                                            |
+| ---------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| baseTypeIt | `"Tenant" \| "Subscription" \| "ResourceGroup" \| "Location" \| "Extension"` | The built-in parent of the resource, this can be "Tenant", "Subscription", "ResourceGroup", "Location", or "Extension" |
 
 #### `@resourceGroupResource`
 
@@ -541,9 +568,28 @@ This allows sharing Azure Resource Manager resource types across specifications
 
 ### Azure.ResourceManager.Legacy
 
+- [`@armExternalType`](#@armexternaltype)
 - [`@armOperationRoute`](#@armoperationroute)
 - [`@customAzureResource`](#@customazureresource)
 - [`@externalTypeRef`](#@externaltyperef)
+- [`@renamePathParameter`](#@renamepathparameter)
+
+#### `@armExternalType`
+
+Signifies that a Resource is represented using a library type in generated SDKs.
+
+```typespec
+@Azure.ResourceManager.Legacy.armExternalType
+```
+
+##### Target
+
+The model to that is an external resource
+`Model`
+
+##### Parameters
+
+None
 
 #### `@armOperationRoute`
 
@@ -571,7 +617,7 @@ This decorator is used on resources that do not satisfy the definition of a reso
 but need to be identified as such.
 
 ```typespec
-@Azure.ResourceManager.Legacy.customAzureResource
+@Azure.ResourceManager.Legacy.customAzureResource(options?: valueof Azure.ResourceManager.Legacy.CustomResourceOptions)
 ```
 
 ##### Target
@@ -580,7 +626,9 @@ but need to be identified as such.
 
 ##### Parameters
 
-None
+| Name    | Type                                                      | Description                                          |
+| ------- | --------------------------------------------------------- | ---------------------------------------------------- |
+| options | [valueof `CustomResourceOptions`](#customresourceoptions) | Options for customizing the behavior of the resource |
 
 #### `@externalTypeRef`
 
@@ -599,3 +647,23 @@ Specify an external reference that should be used when emitting this type.
 | Name    | Type             | Description                                                   |
 | ------- | ---------------- | ------------------------------------------------------------- |
 | jsonRef | `valueof string` | External reference(e.g. "../../common.json#/definitions/Foo") |
+
+#### `@renamePathParameter`
+
+Renames a path parameter in an Azure Resource Manager operation.
+
+```typespec
+@Azure.ResourceManager.Legacy.renamePathParameter(sourceParameterName: valueof string, targetParameterName: valueof string)
+```
+
+##### Target
+
+The operation or interface to modify
+`Operation`
+
+##### Parameters
+
+| Name                | Type             | Description                         |
+| ------------------- | ---------------- | ----------------------------------- |
+| sourceParameterName | `valueof string` | The name of the parameter to rename |
+| targetParameterName | `valueof string` | The new name for the parameter      |

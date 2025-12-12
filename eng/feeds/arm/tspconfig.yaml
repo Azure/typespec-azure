@@ -3,33 +3,34 @@ emit:
 options:
   "@azure-tools/typespec-autorest":
     use-read-only-status-schema: true
-    emitter-output-dir: "{project-root}/.."
+    emitter-output-dir: "{project-root}"
     azure-resource-provider-folder: "resource-manager"
-    output-file: "{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json"
+    output-file: "{emitter-output-dir}/{version-status}/{version}/widget.json"
+    arm-types-dir: "{project-root}/../../../../common-types/resource-management"
   "@azure-tools/typespec-csharp":
-    package-dir: "Azure.ResourceManager.{{parameters.ServiceNamespace}}"
+    emitter-output-dir: "{output-dir}/{service-dir}/Azure.ResourceManager.{{parameters.ServiceNamespace}}"
     clear-output-folder: true
     model-namespace: false
-    namespace: "{package-dir}"
+    namespace: "Azure.ResourceManager.{{parameters.ServiceNamespace}}"
   "@azure-tools/typespec-python":
-    package-dir: "azure-mgmt-{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
+    emitter-output-dir: "{output-dir}/{service-dir}/azure-mgmt-{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
     namespace: "azure.mgmt.{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
     generate-test: true
     generate-sample: true
   "@azure-tools/typespec-java":
-    package-dir: "azure-resourcemanager-{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
+    emitter-output-dir: "{output-dir}/{service-dir}/azure-resourcemanager-{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
     namespace: "com.azure.resourcemanager.{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
     service-name: "{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
   "@azure-tools/typespec-ts":
-    package-dir: "arm-{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
+    emitter-output-dir: "{output-dir}/{service-dir}/arm-{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
     experimental-extensible-enums: true
     flavor: azure
     package-details:
-      name: "@azure/{package-dir}"
+      name: "@azure/arm-{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
   "@azure-tools/typespec-go":
     service-dir: "sdk/resourcemanager/{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
-    package-dir: "arm{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
-    module: "github.com/Azure/azure-sdk-for-go/{service-dir}/{package-dir}"
+    emitter-output-dir: "{output-dir}/{service-dir}/arm{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
+    module: "github.com/Azure/azure-sdk-for-go/{service-dir}/arm{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
     fix-const-stuttering: true
     generate-samples: true
     generate-fakes: true

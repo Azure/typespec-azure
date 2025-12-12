@@ -5,8 +5,7 @@ import { compileOpenAPI } from "../test-host.js";
 it("can share types with a library namespace", async () => {
   const openapi: any = await compileOpenAPI(
     `
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @armLibraryNamespace
+          @armLibraryNamespace
       namespace Microsoft.Library {
         model TestTrackedResource is TrackedResource<TestTrackedProperties> {
           @key("trackedResourceName")
@@ -31,8 +30,7 @@ it("can share types with a library namespace", async () => {
 
       @useLibraryNamespace(Microsoft.Library)
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test {
+          namespace Microsoft.Test {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -69,7 +67,7 @@ it("can share types with a library namespace", async () => {
 
 it("can use private links with common-types references", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
       @armProviderNamespace
       namespace Microsoft.PrivateLinkTest;
@@ -123,7 +121,7 @@ it("can use private links with common-types references", async () => {
 
 it("can use private endpoints with common-types references", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PrivateLinkTest;
@@ -165,7 +163,7 @@ it("can use private endpoints with common-types references", async () => {
 
 it("verify resolution of private endpoints and private links with v5 version", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PrivateLinkTest;
@@ -218,7 +216,7 @@ it("verify resolution of private endpoints and private links with v5 version", a
 
 it("can use ResourceNameParameter for custom name parameter definition", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PrivateLinkTest;
@@ -259,7 +257,7 @@ it("can use ResourceNameParameter for custom name parameter definition", async (
 
 it("can use ResourceNameParameter for default name parameter definition", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PrivateLinkTest;
@@ -300,40 +298,9 @@ it("can use ResourceNameParameter for default name parameter definition", async 
   ok(openapi.paths?.[privateEndpointGet]?.get?.parameters?.[1]);
 });
 
-it("can emit x-ms-client-flatten with optional configuration", async () => {
-  const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @armProviderNamespace
-      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-      namespace Microsoft.Contoso;
-      
-      model Employee is TrackedResource<EmployeeProperties> {
-        ...ResourceNameParameter<Employee>;
-      }
-      model EmployeeProperties {
-        age?: int32;
-        city?: string;
-        @visibility(Lifecycle.Read)
-        provisioningState?: ResourceProvisioningState;
-      }
-      @parentResource(Employee)
-      model Dependent is ProxyResource<DependentProperties> {
-        ...ResourceNameParameter<Dependent>;
-      }
-      model DependentProperties {
-        age?: int32;
-      }
-      `,
-    { preset: "azure", options: { "arm-resource-flattening": true } },
-  );
-
-  ok(openapi.definitions?.Employee?.properties?.properties?.["x-ms-client-flatten"]);
-  ok(openapi.definitions?.Dependent?.properties?.properties?.["x-ms-client-flatten"]);
-});
-
 it("no x-ms-client-flatten emitted with default configuration", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.Contoso;
@@ -369,7 +336,7 @@ it("no x-ms-client-flatten emitted with default configuration", async () => {
 });
 it("generates PATCH bodies for custom patch of common resource envelope mixins", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PatchTest;
@@ -415,6 +382,7 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
       interface AllProperties {
         get is ArmResourceRead<AllPropertiesResource>;
         put is ArmResourceCreateOrReplaceAsync<AllPropertiesResource>;
+         @patch(#{ implicitOptionality: true })
         update is ArmCustomPatchAsync<AllPropertiesResource, AllPropertiesResource>;
         delete is ArmResourceDeleteWithoutOkAsync<AllPropertiesResource>;
       }
@@ -422,6 +390,7 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
       interface AssignedOperations {
         get is ArmResourceRead<SystemAssignedResource>;
         put is ArmResourceCreateOrReplaceAsync<SystemAssignedResource>;
+        @patch(#{ implicitOptionality: true })
         update is ArmCustomPatchAsync<SystemAssignedResource, SystemAssignedResource>;
         delete is ArmResourceDeleteWithoutOkAsync<SystemAssignedResource>;
       }
@@ -463,7 +432,7 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
 });
 it("generates PATCH bodies for resource patch of common resource envelope mixins", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PatchTest;

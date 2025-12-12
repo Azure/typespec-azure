@@ -35,6 +35,21 @@ extern dec assignUniqueProviderNameValue(target: ModelProperty, resource: Model)
 extern dec armResourceInternal(target: Model, properties: Model);
 
 /**
+ * This decorator identifies Azure Resource Manager resource types that do not define
+ * the name identifier parameter and type
+ * @param target Azure Resource Manager resource type
+ * @param properties Azure Resource Manager resource properties
+ * @param type The resource type name, e.g. "virtualMachines"
+ * @param nameParameter The name of the resource name parameter, e.g. "virtualMachineName"
+ */
+extern dec armResourceWithParameter(
+  target: Model,
+  properties: Model,
+  type: valueof string,
+  nameParameter: valueof string
+);
+
+/**
  * Omit a property in the target model.
  * @internal
  * @param propertyName Name of the property to omit
@@ -81,14 +96,6 @@ extern dec enforceConstraint(target: Operation | Model, sourceType: Model, const
 extern dec azureResourceBase(target: Model);
 
 /**
- * Please DO NOT USE in RestAPI specs.
- * Internal decorator that deprecated direct usage of `x-ms-client-flatten` OpenAPI extension.
- * It will programatically enabled/disable client flattening with @flattenProperty with autorest
- * emitter flags to maintain compatibility in swagger.
- */
-extern dec conditionalClientFlatten(target: ModelProperty);
-
-/**
  * Marks the operation as being a collection action
  * @param resourceType Resource
  * @param parentTypeName: Parent type name.
@@ -111,3 +118,114 @@ extern dec armResourcePropertiesOptionality(target: ModelProperty, isOptional: v
 
 /** designates a parameter as an explicit bodyRoot and sets the optionality of the parameter */
 extern dec armBodyRoot(target: ModelProperty, isOptional: valueof boolean);
+
+/** designates a type as a legacy type and emits a warning diagnostic when used */
+extern dec legacyType(target: Model | Operation | Interface | Scalar);
+
+/** Determines the built-in parent of a base resource
+ * @param parentType The parent type of the resource (Subscription, ResourceGroup, Tenant, Extension)
+ */
+extern dec resourceParentType(
+  target: Model,
+  parentType: valueof "Subscription" | "ResourceGroup" | "Tenant" | "Extension"
+);
+
+/**
+ * Marks a resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
+ * @param target The operation to associate the resourceType with
+ * @param resourceType The resource model
+ * @param operationType The type of operation being performed
+ * @param resourceName Optional. The name of the resource. If not provided, the resource type will be used
+ */
+extern dec legacyResourceOperation(
+  target: Operation,
+  resourceType: Model,
+  operationType: valueof
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
+  resourceName?: valueof string
+);
+
+/**
+ * Marks an extension resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
+ * @param target The operation to associate the resourceType with
+ * @param targetResourceType The resource model for the target resource
+ * @param extensionResourceType The resource model for the extension resource
+ * @param operationType The type of operation being performed
+ * @param resourceName Optional. The name of the resource. If not provided, the scope and resource name will be used
+ */
+extern dec extensionResourceOperation(
+  target: Operation,
+  targetResourceType: Model,
+  extensionResourceType: Model,
+  operationType: valueof
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
+  resourceName?: valueof string
+);
+
+/**
+ * Marks an extension resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
+ * @param target The operation to associate the resourceType with
+ * @param targetResourceType The resource model for the target resource
+ * @param extensionResourceType The resource model for the extension resource
+ * @param operationType The type of operation being performed
+ * @param resourceName Optional. The name of the resource. If not provided, the scope and resource name will be used
+ */
+extern dec builtInResourceOperation(
+  target: Operation,
+  parentResourceType: Model,
+  builtInResourceType: Model,
+  operationType: valueof
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
+  resourceName?: valueof string
+);
+
+/**
+ * Marks a resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
+ * @param target The operation to associate the resourceType with
+ * @param resourceType The resource model
+ * @param operationType The type of operation being performed
+ * @param resourceName Optional. The name of the resource. If not provided, the resource type will be used
+ */
+extern dec legacyExtensionResourceOperation(
+  target: Operation,
+  resourceType: Model,
+  operationType: valueof
+    | "read"
+    | "createOrUpdate"
+    | "update"
+    | "delete"
+    | "list"
+    | "action"
+    | "checkExistence",
+  resourceName?: valueof string
+);
+
+/**
+ * Validates that the specified common-types version is valid for the given resource type.
+ * @param target The resource model
+ * @param version The common-types version
+ * @param resourceName The name of the resource
+ */
+extern dec validateCommonTypesVersionForResource(
+  target: Model,
+  version: valueof string,
+  resourceName: valueof string
+);

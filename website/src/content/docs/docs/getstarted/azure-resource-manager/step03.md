@@ -1,5 +1,7 @@
 ---
 title: 4. Defining Child Resource Types
+description: Defining ARM child resources
+llmstxt: true
 ---
 
 You can create parent/child relationships between resource types by using the `@parentResource` decorator when defining a resource type.

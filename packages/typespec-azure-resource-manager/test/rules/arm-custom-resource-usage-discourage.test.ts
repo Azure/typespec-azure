@@ -1,17 +1,18 @@
+import { Tester } from "#test/tester.js";
 import {
-  BasicTestRunner,
   LinterRuleTester,
+  TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { armCustomResourceUsageDiscourage } from "../../src/rules/arm-custom-resource-usage-discourage.js";
-import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
-let runner: BasicTestRunner;
+import { armCustomResourceUsageDiscourage } from "../../src/rules/arm-custom-resource-usage-discourage.js";
+
+let runner: TesterInstance;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await createAzureResourceManagerTestRunner();
+  runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
     armCustomResourceUsageDiscourage,
@@ -24,8 +25,7 @@ it("emits diagnostic when using @Azure.ResourceManager.Legacy.customAzureResourc
     .expect(
       `
         @armProviderNamespace
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        namespace Microsoft.Contoso;
+              namespace Microsoft.Contoso;
         
         @Azure.ResourceManager.Legacy.customAzureResource
         model Person {

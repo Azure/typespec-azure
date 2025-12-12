@@ -210,7 +210,7 @@ export const $lib = createTypeSpecLibrary({
     "multiple-response-types": {
       severity: "warning",
       messages: {
-        default: paramMessage`Multiple response types found in operation ${"operation"}. Only one response type is supported, so we will choose the first one ${"response"}`,
+        default: paramMessage`Multiple response types found in operation ${"operation"}. Some emitters might not support returning all of these response types`,
       },
     },
     "no-corresponding-method-param": {
@@ -246,7 +246,7 @@ export const $lib = createTypeSpecLibrary({
     "override-parameters-mismatch": {
       severity: "error",
       messages: {
-        default: paramMessage`Method "${"methodName"}" is not directly referencing the same parameters as in the original operation. The original method has parameters "${"originalParameters"}", while the override method has parameters "${"overrideParameters"}".`,
+        default: paramMessage`Method "${"methodName"}" has different parameters definition from the override operation. Please check the parameter defined in the override operation: "${"checkParameter"}".`,
       },
     },
     "duplicate-client-name": {
@@ -261,6 +261,13 @@ export const $lib = createTypeSpecLibrary({
       messages: {
         default: paramMessage`Client name: "${"name"}" is duplicated in language scope: "${"scope"}"`,
         nonDecorator: paramMessage`Client name: "${"name"}" is defined somewhere causing naming conflicts in language scope: "${"scope"}"`,
+      },
+    },
+    "client-name-ineffective": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Application of @clientName decorator to ${"name"} is not effective`,
+        override: paramMessage`Application of @clientName decorator to ${"name"} is not effective because it is applied to the override method. Please apply it on the original method definition "${"originalMethodName"}" instead.`,
       },
     },
     "example-loading": {
@@ -310,7 +317,7 @@ export const $lib = createTypeSpecLibrary({
     "unexpected-pageable-operation-return-type": {
       severity: "error",
       messages: {
-        default: `The response object for the pageable operation is either not a paging model, or is not correctly decorated with @nextLink and @items.`,
+        default: `The response object for the pageable operation is either not a paging model, or is not correctly decorated with @nextLink and @pageItems.`,
       },
     },
     "invalid-alternate-type": {
@@ -345,23 +352,10 @@ export const $lib = createTypeSpecLibrary({
           "Only encode of `ArrayEncoding.pipeDelimited` and `ArrayEncoding.spaceDelimited` is supported for collection format.",
       },
     },
-    "no-discriminated-unions": {
-      severity: "error",
-      messages: {
-        default:
-          "Discriminated unions are not supported. Please redefine the type using model with hierarchy and `@discriminator` decorator.",
-      },
-    },
     "non-head-bool-response-decorator": {
       severity: "warning",
       messages: {
         default: paramMessage`@responseAsBool decorator can only be used on HEAD operations. Will ignore decorator on ${"operationName"}.`,
-      },
-    },
-    "unsupported-http-file-body": {
-      severity: "error",
-      messages: {
-        default: "File body is not supported for HTTP operations. Please use bytes instead.",
       },
     },
     "require-versioned-service": {
@@ -395,6 +389,11 @@ export const $lib = createTypeSpecLibrary({
       messages: {
         default:
           "When there is `@client` or `@operationGroup` decorator, `@clientLocation` decorator will be ignored.",
+        operationToOperation:
+          "`@clientLocation` cannot be used to move an operation to another operation. Operations can only be moved to interfaces or namespaces.",
+        modelPropertyToClientInitialization: paramMessage`There is already a parameter called '${"parameterName"}' in the client initialization.`,
+        modelPropertyToString:
+          "`@clientLocation` can only move model properties to interfaces or namespaces.",
       },
     },
     "client-location-wrong-type": {
@@ -421,6 +420,36 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: "@hierarchyBuilding decorator causes recursive base type reference.",
+      },
+    },
+    "missing-scope": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@scope decorator should be applied with ${"decoratorName"} since it is highly likely this is language-specific`,
+      },
+    },
+    "external-library-version-mismatch": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`External library version mismatch. There are multiple versions of ${"libraryName"}: ${"versionA"} and ${"versionB"}. Please unify the versions.`,
+      },
+    },
+    "invalid-mark-as-lro-target": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@markAsLro decorator can only be applied to operations that return a model. We will ignore this decorator.`,
+      },
+    },
+    "mark-as-lro-ineffective": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@markAsLro decorator is ineffective since this operation already returns real LRO metadata. Please remove the @markAsLro decorator.`,
+      },
+    },
+    "api-version-undefined": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`The API version specified in the config: "${"version"}" is not defined in service versioning list. Fall back to the latest version.`,
       },
     },
   },

@@ -1,2 +1,3 @@
 export { $onEmit } from "./emitter.js";
-export { $lib, AutorestCanonicalEmitterOptions } from "./lib.js";
+export { $lib } from "./lib.js";
+export type { AutorestCanonicalEmitterOptions } from "./lib.js";

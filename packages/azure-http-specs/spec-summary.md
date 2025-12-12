@@ -57,6 +57,282 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_AlternateType_ExternalType_getModel
+
+- Endpoint: `get /azure/client-generator-core/alternate-type/external/model`
+
+Input: None
+Output: Feature object with geometry, properties, and optional id fields.
+Example response:
+
+```json
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-122.25, 37.87]
+  },
+  "properties": {
+    "name": "A single point of interest",
+    "category": "landmark",
+    "elevation": 100
+  },
+  "id": "feature-1"
+}
+```
+
+### Azure_ClientGenerator_Core_AlternateType_ExternalType_getProperty
+
+- Endpoint: `get /azure/client-generator-core/alternate-type/external/property`
+
+Input: None
+Output: ModelWithFeatureProperty object with feature and additionalProperty fields.
+Example response:
+
+```json
+{
+  "feature": {
+    "type": "Feature",
+    "geometry": {
+      "type": "Point",
+      "coordinates": [-122.25, 37.87]
+    },
+    "properties": {
+      "name": "A single point of interest",
+      "category": "landmark",
+      "elevation": 100
+    },
+    "id": "feature-1"
+  },
+  "additionalProperty": "extra"
+}
+```
+
+### Azure_ClientGenerator_Core_AlternateType_ExternalType_putModel
+
+- Endpoint: `put /azure/client-generator-core/alternate-type/external/model`
+
+Input: Feature object in request body.
+Example input:
+
+```json
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [-122.25, 37.87]
+  },
+  "properties": {
+    "name": "A single point of interest",
+    "category": "landmark",
+    "elevation": 100
+  },
+  "id": "feature-1"
+}
+```
+
+Output: None (204/empty response)
+
+### Azure_ClientGenerator_Core_AlternateType_ExternalType_putProperty
+
+- Endpoint: `put /azure/client-generator-core/alternate-type/external/property`
+
+Input: ModelWithFeatureProperty object in request body.
+Example input:
+
+```json
+{
+  "feature": {
+    "type": "Feature",
+    "geometry": {
+      "type": "Point",
+      "coordinates": [-122.25, 37.87]
+    },
+    "properties": {
+      "name": "A single point of interest",
+      "category": "landmark",
+      "elevation": 100
+    },
+    "id": "feature-1"
+  },
+  "additionalProperty": "extra"
+}
+```
+
+Output: None (204/empty response)
+
+### Azure_ClientGenerator_Core_ClientInitialization_HeaderParam
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/header-param/with-query`
+  - `get /azure/client-generator-core/client-initialization/header-param/with-body`
+
+Client for testing header parameter moved to client level.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+
+Expected client usage:
+
+```ts
+const client = new HeaderParamClient({
+  name: "test-name-value"
+});
+
+client.withQuery(id: "test-id");  // No need to pass name here
+client.withBody({ name: "test-name" });  // No need to pass name here
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_MixedParams
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/mixed-params/with-query`
+  - `get /azure/client-generator-core/client-initialization/mixed-params/with-body`
+
+  Client for testing a mix of client-level and method-level parameters.
+
+  Parameters elevated to client level:
+  - name: "test-name-value" (header parameter)
+
+  Parameters remaining at method level:
+  - region: "us-west" (query parameter)
+
+  Expected client usage:
+
+  ```ts
+  const client = new MixedParamsClient({
+    name: "test-name-value"
+  });
+
+  client.withQuery(region: "us-west", id: "test-id");  // region stays as method param
+  client.withBody( region: "us-west", body: { name: "test-name" });  // region stays as method param
+  ```
+
+### Azure_ClientGenerator_Core_ClientInitialization_MultipleParams
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/multiple-params/with-query`
+  - `get /azure/client-generator-core/client-initialization/multiple-params/with-body`
+
+Client for testing multiple parameters (header and query) moved to client level.
+
+Parameters elevated to client level:
+
+- name: "test-name-value" (header parameter)
+- region: "us-west" (query parameter)
+
+Expected client usage:
+
+```ts
+const client = new MultipleParamsClient({
+  name: "test-name-value",
+  region: "us-west"
+});
+
+client.withQuery(id: "test-id");  // No need to pass name or region here
+client.withBody({ name: "test-name" });  // No need to pass name or region here
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_ParamAlias
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/param-alias/{blob}/with-aliased-name`
+  - `get /azure/client-generator-core/client-initialization/param-alias/{blobName}/with-original-name`
+
+Client for testing the @paramAlias decorator for renaming parameters in client code.
+
+Parameters elevated to client level:
+
+- blobName: "sample-blob" (path parameter)
+
+Expected client usage:
+
+```ts
+// Elevated to client level via alias
+client.withAliasedName();
+
+// Elevated to client level via original name
+client.withOriginalName();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_ParentClient_ChildClient
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/child-client/{blobName}`
+
+Client for testing a path parameter (blobName) moved to client level, in child client.
+
+The child client can be initialized individually, or via its parent client.
+
+Parameters elevated to client level:
+
+- blobName: "sample-blob" (path parameter)
+
+Expected client usage:
+
+```ts
+// via ParentClient
+const client = new ParentClient.getChildClient({
+  blobName: "sample-blob"
+});
+
+// directly
+const client = new ChildClient({
+  blobName: "sample-blob"
+});
+
+// No need to pass blobName to any operations
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientInitialization_PathParam
+
+- Endpoints:
+  - `get /azure/client-generator-core/client-initialization/path/{blobName}/with-query`
+  - `get /azure/client-generator-core/client-initialization/path/{blobName}/get-standalone`
+  - `get /azure/client-generator-core/client-initialization/path/{blobName}`
+
+Client for testing a path parameter (blobName) moved to client level.
+
+Parameters elevated to client level:
+
+- blobName: "sample-blob" (path parameter)
+
+Expected client usage:
+
+```ts
+const client = new PathParamClient({
+  blobName: "sample-blob"
+});
+
+// No need to pass blobName to any operations
+client.withQuery(format: "text");
+client.getStandalone();
+client.deleteStandalone();
+```
+
+### Azure_ClientGenerator_Core_ClientLocation_MoveMethodParameterToClient
+
+- Endpoint: `get /azure/client-generator-core/client-location/blob`
+
+Test moving a method parameter to client.
+
+The parameter `storageAccount` from operation `getBlob` should be moved to the `MoveMethodParameterToClient` in the generated code.
+
+Expected request:
+
+- GET /blob?storageAccount=testaccount&container=testcontainer&blob=testblob.txt
+
+Expected response:
+
+- Status: 200
+- Body: {"id": "blob-001", "name": "testblob.txt", "size": 1024, "path": "/testcontainer/testblob.txt"}
+
 ### Azure_ClientGenerator_Core_ClientLocation_MoveToExistingSubClient
 
 - Endpoints:
@@ -180,12 +456,12 @@ Expected response body:
 }
 ```
 
-### Azure_ClientGenerator_Core_HierarchyBuilding_updateDog
+### Azure_ClientGenerator_Core_HierarchyBuilding_AnimalOperations_updateDogAsAnimal
 
-- Endpoint: `put /azure/client-generator-core/hierarchy-building/animal/dog`
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/dog/as-animal`
 
 Test operation that accepts Animal input and returns Animal output.
-This operation expects Dog data and validates the @hierarchyBuilding decorator when Dog is used.
+Service expects Dog data and returns Dog data.
 Due to @hierarchyBuilding(Pet), Dog should inherit from Pet rather than Animal directly.
 Expected request body:
 
@@ -209,12 +485,12 @@ Expected response body:
 }
 ```
 
-### Azure_ClientGenerator_Core_HierarchyBuilding_updatePet
+### Azure_ClientGenerator_Core_HierarchyBuilding_AnimalOperations_updatePetAsAnimal
 
-- Endpoint: `put /azure/client-generator-core/hierarchy-building/animal/pet`
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/pet/as-animal`
 
 Test operation that accepts Animal input and returns Animal output.
-This operation expects Pet data and validates that Pet type works correctly with the @hierarchyBuilding decorator.
+Service expects Pet data and returns Pet data.
 Expected request body:
 
 ```json
@@ -235,6 +511,123 @@ Expected response body:
 }
 ```
 
+### Azure_ClientGenerator_Core_HierarchyBuilding_DogOperations_updateDogAsDog
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/dog/as-dog`
+
+Test operation that accepts Dog input and returns Dog output.
+This operation validates Dog type directly.
+Expected request body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+### Azure_ClientGenerator_Core_HierarchyBuilding_PetOperations_updateDogAsPet
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/dog/as-pet`
+
+Test operation that accepts Pet input and returns Pet output.
+Service expects Dog data and returns Dog data.
+This validates that Dog can be used as Pet due to @hierarchyBuilding decorator.
+Expected request body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "dog",
+  "name": "Rex",
+  "trained": true,
+  "breed": "German Shepherd"
+}
+```
+
+### Azure_ClientGenerator_Core_HierarchyBuilding_PetOperations_updatePetAsPet
+
+- Endpoint: `put /azure/client-generator-core/hierarchy-building/pet/as-pet`
+
+Test operation that accepts Pet input and returns Pet output.
+This operation validates Pet type directly.
+Expected request body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy",
+  "trained": true
+}
+```
+
+Expected response body:
+
+```json
+{
+  "kind": "pet",
+  "name": "Buddy",
+  "trained": true
+}
+```
+
+### Azure_ClientGenerator_Core_NextLinkVerb_listItems
+
+- Endpoint: `post /azure/client-generator-core/next-link-verb/items`
+
+Test for @nextLinkVerb decorator with POST verb.
+This operation should use POST for both the initial request and the next link request.
+
+Expected initial request: POST /azure/client-generator-core/next-link-verb/items
+Expected response body:
+
+```json
+{
+  "items": [
+    {
+      "id": "test1"
+    }
+  ],
+  "nextLink": "http://localhost:3000/azure/client-generator-core/next-link-verb/items/page/2"
+}
+```
+
+Expected next link request: POST /azure/client-generator-core/next-link-verb/items/page/2
+Expected response body:
+
+```json
+{
+  "items": [
+    {
+      "id": "test2"
+    }
+  ]
+}
+```
+
 ### Azure_ClientGenerator_Core_Override_GroupParameters_group
 
 - Endpoint: `get /azure/client-generator-core/override/group`
@@ -247,11 +640,37 @@ param2: param2
 
 Expected response: 204 No Content
 
+### Azure_ClientGenerator_Core_Override_RemoveOptionalParameter_removeOptional
+
+- Endpoint: `get /azure/client-generator-core/override/remove-optional/{param1}`
+
+Verify that after `@override`, optional parameters can be removed from the client method signature.
+
+Expected path parameter:
+param1: param1
+
+Expected query parameter:
+param2: param2
+
+Expected response: 204 No Content
+
 ### Azure_ClientGenerator_Core_Override_ReorderParameters_reorder
 
 - Endpoint: `get /azure/client-generator-core/override/reorder/{param2}/{param1}`
 
 Verify that after `@override` the parameters are reordered correctly in the client method signature.
+
+Expected path parameter:
+param1: param1
+param2: param2
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_Override_RequireOptionalParameter_requireOptional
+
+- Endpoint: `get /azure/client-generator-core/override/require-optional/{param1}/{param2}`
+
+Verify that after `@override` an optional parameter can be made required in the client method signature.
 
 Expected path parameter:
 param1: param1
@@ -270,766 +689,6 @@ Expected response: 204 No Content
 This scenario contains 4 public operations. All should be generated and exported.
 'OrphanModel' is not used but specified as 'public' and 'input', so it should be generated in SDK. The 'orphanModelSerializable' operation verifies that the model can be serialized to JSON.
 The other models' usage is additive to roundtrip, so they should be generated and exported as well.
-
-### Azure_ClientGeneratorCore_ClientInitialization_DefaultClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/initialization-default/{resourceName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/initialization-default/{resourceName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/initialization-default/{resourceName}`
-
-Client for testing default initialization behavior (no initializedBy decorator).
-
-This client uses default initialization behavior.
-
-Parameters elevated to client level:
-
-- resourceName: "test-resource" (path parameter)
-
-Expected client usage:
-
-```ts
-const client = new DefaultClient.getDefaultClient({
-  resourceName: "test-resource"
-});
-
-// Operations don't need resourceName parameter
-client.withQuery(format: "text");
-client.getStandalone();
-client.deleteStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_DefaultNestedClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/nested-default-default/{resourceName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/nested-default-default/{resourceName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/nested-default-default/{resourceName}`
-
-Client for testing default -> default nested initialization.
-
-The parent client uses default initialization behavior,
-and the child client also uses default initialization behavior.
-
-Parameters elevated to client level:
-
-- resourceName: "test-resource" (path parameter)
-
-Expected client usage:
-
-```ts
-// via DefaultParentClient
-const client = new DefaultParentClient.getDefaultNestedClient({
-  resourceName: "test-resource"
-});
-
-// Operations don't need resourceName parameter
-client.withQuery(format: "text");
-client.getStandalone();
-client.deleteStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_FlexibleNestedClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/nested-default-both/{resourceName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/nested-default-both/{resourceName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/nested-default-both/{resourceName}`
-
-Client for testing default -> both nested initialization.
-
-The parent client uses default initialization behavior,
-and the child client supports both individual and parent initialization.
-
-Parameters elevated to client level:
-
-- resourceName: "test-resource" (path parameter)
-
-Expected client usage:
-
-```ts
-// via DefaultParentClient
-const client1 = new DefaultParentClient.getFlexibleNestedClient({
-  resourceName: "test-resource"
-});
-
-// directly
-const client2 = new FlexibleNestedClient({
-  resourceName: "test-resource"
-});
-
-// Operations don't need resourceName parameter
-client1.withQuery(format: "text");
-client2.getStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_IndividualNestedClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/nested-default-individual/{resourceName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/nested-default-individual/{resourceName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/nested-default-individual/{resourceName}`
-
-Client for testing default -> individual nested initialization.
-
-The parent client uses default initialization behavior,
-but the child client can only be initialized individually.
-
-Parameters elevated to client level:
-
-- resourceName: "test-resource" (path parameter)
-
-Expected client usage:
-
-```ts
-// via DefaultParentClient
-const client1 = new DefaultParentClient.getIndividualNestedClient({
-  resourceName: "test-resource"
-});
-
-// directly
-const client2 = new IndividualNestedClient({
-  resourceName: "test-resource"
-});
-
-// Operations don't need resourceName parameter
-client1.withQuery(format: "text");
-client2.getStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_DefaultParentClient_ParentOnlyNestedClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/nested-default-parent/{resourceName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/nested-default-parent/{resourceName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/nested-default-parent/{resourceName}`
-
-Client for testing default -> parent nested initialization.
-
-The parent client uses default initialization behavior,
-but the child client can only be initialized through its parent.
-
-Parameters elevated to client level:
-
-- resourceName: "test-resource" (path parameter)
-
-Expected client usage:
-
-```ts
-// via DefaultParentClient only
-const client = new DefaultParentClient.getParentOnlyNestedClient({
-  resourceName: "test-resource"
-});
-
-// Direct initialization should NOT be supported
-// const client = new ParentOnlyNestedClient(...); // This should not work
-
-// Operations don't need resourceName parameter
-client.withQuery(format: "text");
-client.getStandalone();
-client.deleteStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_FlexibleParentClient_DefaultNestedClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/nested-both-default/{resourceName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/nested-both-default/{resourceName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/nested-both-default/{resourceName}`
-
-Client for testing both -> default nested initialization.
-
-The parent client supports both individual and parent initialization,
-and the child client uses default initialization behavior.
-
-Parameters elevated to client level:
-
-- resourceName: "test-resource" (path parameter)
-
-Expected client usage:
-
-```ts
-// via FlexibleParentClient
-const client = new FlexibleParentClient.getDefaultNestedClient({
-  resourceName: "test-resource"
-});
-
-// Operations don't need resourceName parameter
-client.withQuery(format: "text");
-client.getStandalone();
-client.deleteStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_FlexibleParentClient_FlexibleNestedClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/nested-both-both/{resourceName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/nested-both-both/{resourceName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/nested-both-both/{resourceName}`
-
-Client for testing both -> both nested initialization.
-
-Both the parent and child clients support both individual and parent initialization,
-providing maximum flexibility for client initialization.
-
-Parameters elevated to client level:
-
-- resourceName: "test-resource" (path parameter)
-
-Expected client usage:
-
-```ts
-// via FlexibleParentClient
-const client1 = new FlexibleParentClient.getFlexibleNestedClient({
-  resourceName: "test-resource"
-});
-
-// directly
-const client2 = new FlexibleNestedClient({
-  resourceName: "test-resource"
-});
-
-// Operations don't need resourceName parameter
-client1.withQuery(format: "text");
-client2.getStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_FlexibleParentClient_IndividualNestedClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/nested-both-individual/{resourceName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/nested-both-individual/{resourceName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/nested-both-individual/{resourceName}`
-
-Client for testing both -> individual nested initialization.
-
-The parent client supports both individual and parent initialization,
-but the child client can only be initialized individually.
-
-Parameters elevated to client level:
-
-- resourceName: "test-resource" (path parameter)
-
-Expected client usage:
-
-```ts
-// via FlexibleParentClient
-const client1 = new FlexibleParentClient.getIndividualNestedClient({
-  resourceName: "test-resource"
-});
-
-// directly
-const client2 = new IndividualNestedClient({
-  resourceName: "test-resource"
-});
-
-// Operations don't need resourceName parameter
-client1.withQuery(format: "text");
-client2.getStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_FlexibleParentClient_ParentOnlyNestedClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/nested-both-parent/{resourceName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/nested-both-parent/{resourceName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/nested-both-parent/{resourceName}`
-
-Client for testing both -> parent nested initialization.
-
-The parent client supports both individual and parent initialization,
-but the child client can only be initialized through its parent.
-
-Parameters elevated to client level:
-
-- resourceName: "test-resource" (path parameter)
-
-Expected client usage:
-
-```ts
-// via FlexibleParentClient only
-const client = new FlexibleParentClient.getParentOnlyNestedClient({
-  resourceName: "test-resource"
-});
-
-// Direct initialization should NOT be supported
-// const client = new ParentOnlyNestedClient(...); // This should not work
-
-// Operations don't need resourceName parameter
-client.withQuery(format: "text");
-client.getStandalone();
-client.deleteStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_HeaderParam
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/header-param/with-query`
-  - `get /azure/client-generator-core/client-initialization/header-param/with-body`
-
-Client for testing header parameter moved to client level.
-
-Parameters elevated to client level:
-
-- name: "test-name-value" (header parameter)
-
-Expected client usage:
-
-```ts
-const client = new HeaderParamClient({
-  name: "test-name-value"
-});
-
-client.withQuery(id: "test-id");  // No need to pass name here
-client.withBody({ name: "test-name" });  // No need to pass name here
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_IndividuallyOnlyClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/initialization-individually/{resourceName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/initialization-individually/{resourceName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/initialization-individually/{resourceName}`
-
-Client for testing individually-only initialization.
-
-This client can ONLY be initialized directly, not through a parent client.
-
-Parameters elevated to client level:
-
-- resourceName: "test-resource" (path parameter)
-
-Expected client usage:
-
-```ts
-const client = new IndividuallyOnlyClient({
-  resourceName: "test-resource"
-});
-
-// Operations don't need resourceName parameter
-client.withQuery(format: "text");
-client.getStandalone();
-client.deleteStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_IndividuallyParentFlexibleClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/initialization-both/{resourceName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/initialization-both/{resourceName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/initialization-both/{resourceName}`
-
-Client for testing both individual and parent initialization.
-
-This client can be initialized both directly and through its parent client.
-
-Parameters elevated to client level:
-
-- resourceName: "test-resource" (path parameter)
-
-Expected client usage:
-
-```ts
-// Can be created directly
-const client = new IndividuallyParentFlexibleClient({
-  resourceName: "test-resource"
-});
-
-// Operations don't need resourceName parameter
-client.withQuery(format: "text");
-client.getStandalone();
-client.deleteStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_IndividualParentClient_DefaultNestedClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/nested-individual-default/{resourceName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/nested-individual-default/{resourceName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/nested-individual-default/{resourceName}`
-
-Client for testing individual -> default nested initialization.
-
-The parent client can only be initialized individually,
-and the child client uses default initialization behavior.
-
-Parameters elevated to client level:
-
-- resourceName: "test-resource" (path parameter)
-
-Expected client usage:
-
-```ts
-// via IndividualParentClient
-const client = new IndividualParentClient.getDefaultNestedClient({
-  resourceName: "test-resource"
-});
-
-// Operations don't need resourceName parameter
-client.withQuery(format: "text");
-client.getStandalone();
-client.deleteStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_IndividualParentClient_FlexibleNestedClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/nested-individual-both/{resourceName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/nested-individual-both/{resourceName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/nested-individual-both/{resourceName}`
-
-Client for testing individual -> both nested initialization.
-
-The parent client can only be initialized individually,
-and the child client supports both individual and parent initialization.
-
-Parameters elevated to client level:
-
-- resourceName: "test-resource" (path parameter)
-
-Expected client usage:
-
-```ts
-// via IndividualParentClient
-const client1 = new IndividualParentClient.getFlexibleNestedClient({
-  resourceName: "test-resource"
-});
-
-// directly
-const client2 = new FlexibleNestedClient({
-  resourceName: "test-resource"
-});
-
-// Operations don't need resourceName parameter
-client1.withQuery(format: "text");
-client2.getStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_IndividualParentClient_IndividualNestedClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/nested-individual-individual/{resourceName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/nested-individual-individual/{resourceName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/nested-individual-individual/{resourceName}`
-
-Client for testing individual -> individual nested initialization.
-
-Both the parent and child clients can only be initialized individually.
-
-Parameters elevated to client level:
-
-- resourceName: "test-resource" (path parameter)
-
-Expected client usage:
-
-```ts
-// via IndividualParentClient
-const client1 = new IndividualParentClient.getIndividualNestedClient({
-  resourceName: "test-resource"
-});
-
-// directly
-const client2 = new IndividualNestedClient({
-  resourceName: "test-resource"
-});
-
-// Operations don't need resourceName parameter
-client1.withQuery(format: "text");
-client2.getStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_IndividualParentClient_ParentOnlyNestedClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/nested-individual-parent/{resourceName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/nested-individual-parent/{resourceName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/nested-individual-parent/{resourceName}`
-
-Client for testing individual -> parent nested initialization.
-
-The parent client can only be initialized individually,
-but the child client can only be initialized through its parent.
-
-Parameters elevated to client level:
-
-- resourceName: "test-resource" (path parameter)
-
-Expected client usage:
-
-```ts
-// via IndividualParentClient only
-const client = new IndividualParentClient.getParentOnlyNestedClient({
-  resourceName: "test-resource"
-});
-
-// Direct initialization should NOT be supported
-// const client = new ParentOnlyNestedClient(...); // This should not work
-
-// Operations don't need resourceName parameter
-client.withQuery(format: "text");
-client.getStandalone();
-client.deleteStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_MixedParams
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/mixed-params/with-query`
-  - `get /azure/client-generator-core/client-initialization/mixed-params/with-body`
-
-  Client for testing a mix of client-level and method-level parameters.
-
-  Parameters elevated to client level:
-  - name: "test-name-value" (header parameter)
-
-  Parameters remaining at method level:
-  - region: "us-west" (query parameter)
-
-  Expected client usage:
-
-  ```ts
-  const client = new MixedParamsClient({
-    name: "test-name-value"
-  });
-
-  client.withQuery(region: "us-west", id: "test-id");  // region stays as method param
-  client.withBody( region: "us-west", body: { name: "test-name" });  // region stays as method param
-  ```
-
-### Azure_ClientGeneratorCore_ClientInitialization_MultipleParams
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/multiple-params/with-query`
-  - `get /azure/client-generator-core/client-initialization/multiple-params/with-body`
-
-Client for testing multiple parameters (header and query) moved to client level.
-
-Parameters elevated to client level:
-
-- name: "test-name-value" (header parameter)
-- region: "us-west" (query parameter)
-
-Expected client usage:
-
-```ts
-const client = new MultipleParamsClient({
-  name: "test-name-value",
-  region: "us-west"
-});
-
-client.withQuery(id: "test-id");  // No need to pass name or region here
-client.withBody({ name: "test-name" });  // No need to pass name or region here
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_ParamAlias
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/param-alias/{blob}/with-aliased-name`
-  - `get /azure/client-generator-core/client-initialization/param-alias/{blobName}/with-original-name`
-
-Client for testing the @paramAlias decorator for renaming parameters in client code.
-
-Parameters elevated to client level:
-
-- blobName: "sample-blob" (path parameter)
-
-Expected client usage:
-
-```ts
-// Elevated to client level via alias
-client.withAliasedName();
-
-// Elevated to client level via original name
-client.withOriginalName();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_ParentOnlyClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/initialization-parent-only/{resourceName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/initialization-parent-only/{resourceName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/initialization-parent-only/{resourceName}`
-
-Client for testing parent-only initialization.
-
-This client can ONLY be initialized through its parent client, not directly.
-
-Parameters elevated to client level:
-
-- resourceName: "test-resource" (path parameter)
-
-Expected client usage:
-
-```ts
-// Can only be created via parent client
-const client = new ParentOnlyClient.getParentOnlyClient({
-  resourceName: "test-resource"
-});
-
-// Direct initialization should NOT be supported
-// const client = new ParentOnlyClient(...); // This should not work
-
-// Operations don't need resourceName parameter
-client.withQuery(format: "text");
-client.getStandalone();
-client.deleteStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_ParentOnlyParentClient_DefaultNestedClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/nested-parent-default/{resourceName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/nested-parent-default/{resourceName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/nested-parent-default/{resourceName}`
-
-Client for testing parent -> default nested initialization.
-
-The parent client can only be initialized through its parent,
-and the child client uses default initialization behavior.
-
-Parameters elevated to client level:
-
-- resourceName: "test-resource" (path parameter)
-
-Expected client usage:
-
-```ts
-// via ParentOnlyParentClient
-const client = new ParentOnlyParentClient.getDefaultNestedClient({
-  resourceName: "test-resource"
-});
-
-// Operations don't need resourceName parameter
-client.withQuery(format: "text");
-client.getStandalone();
-client.deleteStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_ParentOnlyParentClient_FlexibleNestedClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/nested-parent-both/{resourceName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/nested-parent-both/{resourceName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/nested-parent-both/{resourceName}`
-
-Client for testing parent -> both nested initialization.
-
-The parent client can only be initialized through its parent,
-and the child client supports both individual and parent initialization.
-
-Parameters elevated to client level:
-
-- resourceName: "test-resource" (path parameter)
-
-Expected client usage:
-
-```ts
-// via ParentOnlyParentClient
-const client1 = new ParentOnlyParentClient.getFlexibleNestedClient({
-  resourceName: "test-resource"
-});
-
-// directly
-const client2 = new FlexibleNestedClient({
-  resourceName: "test-resource"
-});
-
-// Operations don't need resourceName parameter
-client1.withQuery(format: "text");
-client2.getStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_ParentOnlyParentClient_IndividualNestedClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/nested-parent-individual/{resourceName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/nested-parent-individual/{resourceName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/nested-parent-individual/{resourceName}`
-
-Client for testing parent -> individual nested initialization.
-
-The parent client can only be initialized through its parent,
-but the child client can only be initialized individually.
-
-Parameters elevated to client level:
-
-- resourceName: "test-resource" (path parameter)
-
-Expected client usage:
-
-```ts
-// via ParentOnlyParentClient
-const client1 = new ParentOnlyParentClient.getIndividualNestedClient({
-  resourceName: "test-resource"
-});
-
-// directly
-const client2 = new IndividualNestedClient({
-  resourceName: "test-resource"
-});
-
-// Operations don't need resourceName parameter
-client1.withQuery(format: "text");
-client2.getStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_ParentOnlyParentClient_ParentOnlyNestedClient
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/nested-parent-parent/{resourceName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/nested-parent-parent/{resourceName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/nested-parent-parent/{resourceName}`
-
-Client for testing parent -> parent nested initialization.
-
-Both the parent and child clients can only be initialized through their parents.
-
-Parameters elevated to client level:
-
-- resourceName: "test-resource" (path parameter)
-
-Expected client usage:
-
-```ts
-// via ParentOnlyParentClient only
-const client = new ParentOnlyParentClient.getParentOnlyNestedClient({
-  resourceName: "test-resource"
-});
-
-// Direct initialization should NOT be supported
-// const client = new ParentOnlyNestedClient(...); // This should not work
-
-// Operations don't need resourceName parameter
-client.withQuery(format: "text");
-client.getStandalone();
-client.deleteStandalone();
-```
-
-### Azure_ClientGeneratorCore_ClientInitialization_PathParam
-
-- Endpoints:
-  - `get /azure/client-generator-core/client-initialization/path/{blobName}/with-query`
-  - `get /azure/client-generator-core/client-initialization/path/{blobName}/get-standalone`
-  - `get /azure/client-generator-core/client-initialization/path/{blobName}`
-
-Client for testing a path parameter (blobName) moved to client level.
-
-Parameters elevated to client level:
-
-- blobName: "sample-blob" (path parameter)
-
-Expected client usage:
-
-```ts
-const client = new PathParamClient({
-  blobName: "sample-blob"
-});
-
-// No need to pass blobName to any operations
-client.withQuery(format: "text");
-client.getStandalone();
-client.deleteStandalone();
-```
 
 ### Azure_Core_Basic_createOrReplace
 
@@ -1987,6 +1646,347 @@ Expected response body:
 ```json
 {
   "succeeded": true
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_ResourceGroupResourceOperations_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation for resource group-scoped resource with client-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_ResourceGroupResourceOperations_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation for resource group-scoped resource with client-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource",
+  "name": "rg-resource",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources",
+  "location": "eastus",
+  "properties": {
+    "resourceGroupSetting": "test-setting",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_ResourceGroupResourceOperations_put
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation for resource group-scoped resource with client-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "location": "eastus",
+  "properties": {
+    "resourceGroupSetting": "test-setting"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources/rg-resource",
+  "name": "rg-resource",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/resourceGroupResources",
+  "location": "eastus",
+  "properties": {
+    "resourceGroupSetting": "test-setting",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_SubscriptionResourceOperations_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation for subscription-scoped resource with method-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_SubscriptionResourceOperations_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation for subscription-scoped resource with method-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource",
+  "name": "sub-resource",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResources",
+  "properties": {
+    "subscriptionSetting": "test-sub-setting",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_MixedSubscriptionPlacement_SubscriptionResourceOperations_put
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation for subscription-scoped resource with method-level subscriptionId in mixed scenario.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "properties": {
+    "subscriptionSetting": "test-sub-setting"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResources/sub-resource",
+  "name": "sub-resource",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResources",
+  "properties": {
+    "subscriptionSetting": "test-sub-setting",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_Operations
+
+- Endpoint: `get https://management.azure.com`
+
+Operations list GET operation for Azure.ResourceManager.MethodSubscriptionId.
+Expected path: /providers/Azure.ResourceManager.MethodSubscriptionId/operations
+Expected query parameter: api-version=2023-12-01-preview
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "name": "Azure.ResourceManager.MethodSubscriptionId/services/read",
+      "isDataAction": false,
+      "display": {
+        "provider": "Azure.ResourceManager.MethodSubscriptionId",
+        "resource": "services",
+        "operation": "Lists services",
+        "description": "Lists registered services"
+      }
+    }
+  ]
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource1Operations_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation for SubscriptionResource1 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource1Operations_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation for SubscriptionResource1 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1",
+  "name": "sub-resource-1",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s",
+  "properties": {
+    "description": "Valid subscription resource 1",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource1Operations_put
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation for SubscriptionResource1 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "properties": {
+    "description": "Valid subscription resource 1"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s/sub-resource-1",
+  "name": "sub-resource-1",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource1s",
+  "properties": {
+    "description": "Valid subscription resource 1",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource2Operations_delete
+
+- Endpoint: `delete https://management.azure.com`
+
+Resource DELETE operation for SubscriptionResource2 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2
+Expected query parameter: api-version=2023-12-01-preview
+Expected response status code: 204
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource2Operations_get
+
+- Endpoint: `get https://management.azure.com`
+
+Resource GET operation for SubscriptionResource2 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2
+Expected query parameter: api-version=2023-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2",
+  "name": "sub-resource-2",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s",
+  "properties": {
+    "configValue": "test-config",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
+}
+```
+
+### Azure_ResourceManager_MethodSubscriptionId_TwoSubscriptionResourcesMethodLevel_SubscriptionResource2Operations_put
+
+- Endpoint: `put https://management.azure.com`
+
+Resource PUT operation for SubscriptionResource2 with method-level subscriptionId.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "properties": {
+    "configValue": "test-config"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s/sub-resource-2",
+  "name": "sub-resource-2",
+  "type": "Azure.ResourceManager.MethodSubscriptionId/subscriptionResource2s",
+  "properties": {
+    "configValue": "test-config",
+    "provisioningState": "Succeeded"
+  },
+  "systemData": {
+    "createdBy": "AzureSDK",
+    "createdByType": "User",
+    "createdAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedBy": "AzureSDK",
+    "lastModifiedAt": "2023-01-01T00:00:00.000Z",
+    "lastModifiedByType": "User"
+  }
 }
 ```
 
@@ -3704,6 +3704,77 @@ Expected header parameters:
 - x-ms-client-request-id=<any uuid string>
   Expected response header:
 - x-ms-client-request-id=<uuid string same with request header>
+
+### Azure_Versioning_PreviewVersion_getWidget
+
+- Endpoint: `get /azure/versioning/previewVersion/widgets/{id}`
+
+Test @previewVersion decorator with stable operations.
+Should send a preview api-version and response should contain color field.
+
+Expected path parameter: id=widget-123
+Expected query parameter: api-version=2024-12-01-preview
+
+Expected response body:
+
+```json
+{
+  "id": "widget-123",
+  "name": "Sample Widget",
+  "color": "blue"
+}
+```
+
+### Azure_Versioning_PreviewVersion_listWidgets
+
+- Endpoint: `get /azure/versioning/previewVersion/widgets`
+
+Test @previewVersion decorator with version-specific query parameters.
+Request should send stable api-version and response should not contain color field.
+
+Expected query parameter: api-version=2024-06-01
+Expected query parameter: name=test (color not available in stable version)
+
+Expected response body:
+
+```json
+{
+  "widgets": [
+    {
+      "id": "widget-1",
+      "name": "test"
+    }
+  ]
+}
+```
+
+### Azure_Versioning_PreviewVersion_updateWidgetColor
+
+- Endpoint: `patch /azure/versioning/previewVersion/widgets/{id}/color`
+
+Test @previewVersion decorator with preview-only operations.
+Only available in preview API versions.
+
+Expected path parameter: id=widget-123
+Expected query parameter: api-version=2024-12-01-preview
+
+Expected input body:
+
+```json
+{
+  "color": "red"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "widget-123",
+  "name": "Sample Widget",
+  "color": "red"
+}
+```
 
 ### Client_AlternateApiVersion_Service_Header_headerApiVersion
 

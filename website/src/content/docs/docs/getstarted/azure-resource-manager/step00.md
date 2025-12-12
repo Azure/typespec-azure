@@ -1,5 +1,7 @@
 ---
 title: 1. Installing Tools
+description: Creating an ARM service
+llmstxt: true
 ---
 
 ## Installing IDE Tools
@@ -26,5 +28,5 @@ These lines import the libraries you will need to build your first service.
 using Http;
 using Rest;
 using Versioning;
-using Azure.Resource.Manager;
+using Azure.ResourceManager;
 ```

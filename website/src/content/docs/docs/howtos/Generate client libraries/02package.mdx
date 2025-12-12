@@ -1,5 +1,6 @@
 ---
 title: Common Behavior for Client Packages
+llmstxt: true
 ---
 
 import { ClientTabs, ClientTabItem } from "@components/client-tabs";
@@ -88,7 +89,12 @@ client.feed(Food(name="pork", "quantity="1"))
 ```
 
 ```typescript
-// TODO
+const client = new PetStoreClient();
+const food:Food = {
+    name: "food";
+    quantity: 3;
+}
+client.feed(food);
 ```
 
 ```java
@@ -120,6 +126,32 @@ public final class Food implements JsonSerializable<Food> {
     public String getName();
     public int getQuantity();
 }
+```
+
+```go
+// generated petstore_client.go
+
+func NewPetStoreClient() *PetStoreClient {
+	return &PetStoreClient{}
+}
+
+func (client *PetStoreClient) Feed(ctx context.Context, food Food, options *PetStoreClientFeedOptions) (PetStoreClientFeedResponse, error) {}
+
+// generated model.go
+type Food struct {
+	Name *string
+	Quantity *int32
+}
+
+// generated options.go
+type PetStoreClientFeedOptions struct {}
+
+// generated response.go
+type PetStoreClientFeedResponse struct {}
+
+// Usage Sample
+petStoreClient := NewPetStoreClient()
+petStoreClient.Feed(context.Background(), Food{Name:to.Ptr("name"), Quantity:to.Ptr(1)}, &PetStoreClientFeedOptions{})
 ```
 
 </ClientTabs>
@@ -161,7 +193,12 @@ namespace Customization;
 ```
 
 ```typescript
-// TODO
+const client = new PetStoreClient();
+const food: Food = {
+    name: "food";
+    quantity: 3;
+}
+client.feed(food);
 ```
 
 ```java
@@ -193,6 +230,11 @@ public final class Food implements JsonSerializable<Food> {
     public String getName();
     public int getQuantity();
 }
+```
+
+```go
+// NOT_SUPPORTED
+
 ```
 
 </ClientTabs>

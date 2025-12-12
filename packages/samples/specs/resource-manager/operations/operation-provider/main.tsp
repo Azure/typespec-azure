@@ -16,8 +16,6 @@ using Azure.Core;
 namespace Microsoft.OperationStatusSample;
 
 enum Versions {
-  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   `2022-11-01-preview`,
 }
@@ -116,5 +114,23 @@ interface ProviderOperations {
   appendLogAnalytics is ArmProviderActionAsync<
     Response = LogAnalyticsCollection,
     Scope = ExtensionResourceActionScope
+  >;
+
+  /** Sample operation to generate an extension resource based GET action */
+  @get
+  @list
+  @action
+  getLogAnalyticsByScope is ArmProviderActionSync<
+    Response = LogAnalyticsCollection,
+    Scope = ExtensionActionScope
+  >;
+
+  /** Operation to generate an extension resource based POST action */
+  @post
+  @list
+  @action("append")
+  appendLogAnalyticsByScope is ArmProviderActionAsync<
+    Response = LogAnalyticsCollection,
+    Scope = ExtensionActionScope
   >;
 }

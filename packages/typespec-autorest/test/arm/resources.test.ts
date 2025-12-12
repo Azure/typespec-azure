@@ -1,13 +1,12 @@
 import { deepEqual, deepStrictEqual, ok, strictEqual } from "assert";
-import { it } from "vitest";
+import { expect, it } from "vitest";
 import { compileOpenAPI } from "../test-host.js";
 
 it("emits correct paths for tenant resources", async () => {
   const openApi = await compileOpenAPI(
     `
         @armProviderNamespace
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        namespace Microsoft.Contoso;
+              namespace Microsoft.Contoso;
 
         @doc("Widget resource")
         model Widget is ProxyResource<WidgetProperties> {
@@ -97,8 +96,7 @@ it("emits correct paths for checkLocalName endpoints", async () => {
   const openApi = await compileOpenAPI(
     `
           @armProviderNamespace
-          @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-          namespace Microsoft.Contoso;
+                  namespace Microsoft.Contoso;
 
           @doc("Widget resource")
           model Widget is ProxyResource<WidgetProperties> {
@@ -146,8 +144,7 @@ it("emits correct paths for ArmResourceHead operation", async () => {
     `
         @armProviderNamespace
         @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        namespace Microsoft.Contoso;
+              namespace Microsoft.Contoso;
         @doc("Widget resource")
         model Widget is ProxyResource<WidgetProperties> {
           @doc("The name of the widget")
@@ -216,8 +213,7 @@ it("emits correct fixed union name parameter for resource", async () => {
   const openApi = await compileOpenAPI(
     `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Widget resource")
     model Widget is ProxyResource<WidgetProperties> {
@@ -270,6 +266,7 @@ it("emits correct fixed union name parameter for resource", async () => {
     },
     in: "path",
     name: "widgetName",
+    pattern: "^[a-zA-Z0-9-]{3,24}$",
     required: true,
     type: "string",
   });
@@ -279,8 +276,7 @@ it("emits a scalar string with decorator parameter for resource", async () => {
   const openApi = await compileOpenAPI(
     `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Widget resource")
     model Widget is ProxyResource<WidgetProperties> {
@@ -324,8 +320,7 @@ it("emits x-ms-azure-resource for resource with @azureResourceBase", async () =>
   const openApi = await compileOpenAPI(
     `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Widget resource")
     @Azure.ResourceManager.Private.azureResourceBase
@@ -338,12 +333,64 @@ it("emits x-ms-azure-resource for resource with @azureResourceBase", async () =>
   ok(openApi.definitions?.Widget["x-ms-azure-resource"]);
 });
 
+it("emits x-ms-external for resource with @armExternalType", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+    #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
+    @doc("Widget resource")
+    @Azure.ResourceManager.Legacy.armExternalType
+    model Widget {
+       name: string;
+    }
+`,
+    { preset: "azure" },
+  );
+  ok(openApi.definitions?.Widget["x-ms-external"]);
+});
+
+it("emits x-ms-azure-resource for resource with @customAzureResource and options", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+    #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
+    @doc("Widget resource")
+    @Azure.ResourceManager.Legacy.customAzureResource(#{isAzureResource: true})
+    model Widget {
+       name: string;
+    }
+`,
+    { preset: "azure" },
+  );
+  ok(openApi.definitions?.Widget["x-ms-azure-resource"]);
+});
+it("does not emit x-ms-azure-resource for resource with @customAzureResource", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+    #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
+    @doc("Widget resource")
+    @Azure.ResourceManager.Legacy.customAzureResource
+    model Widget {
+       name: string;
+    }
+`,
+    { preset: "azure" },
+  );
+  expect(openApi.definitions?.Widget["x-ms-azure-resource"]).toBeUndefined();
+});
+
 it("excludes properties marked @invisible from the resource payload", async () => {
   const openApi = await compileOpenAPI(
     `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.Contoso;
+      namespace Microsoft.Contoso;
 
     @doc("Widget resource")
     model Widget is ProxyResource<WidgetProperties> {
@@ -401,8 +448,7 @@ it("allows resources with multiple endpoints using LegacyOperations", async () =
   const openApi = await compileOpenAPI(
     `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.ContosoProviderhub;
+      namespace Microsoft.ContosoProviderhub;
 
     using Azure.ResourceManager.Legacy;
 
@@ -482,13 +528,12 @@ it("allows resources with multiple endpoints using LegacyOperations", async () =
       message: string;
     }
 
-    @armResourceOperations
-    interface OtherOps
-      extends Azure.ResourceManager.Legacy.LegacyOperations<
+    alias OtherOps
+      = Azure.ResourceManager.Legacy.LegacyOperations<
           ParentParameters = ParentScope,
           ResourceTypeParameter = InstanceScope,
           ErrorType = MyErrorType
-        > {}
+        >;
 
     alias BaseScope = {
       ...ApiVersionParameter;
@@ -569,8 +614,7 @@ it("allows action requests with optional body parameters", async () => {
   const openApi = await compileOpenAPI(
     `
     @armProviderNamespace
-    @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-    namespace Microsoft.ContosoProviderhub;
+      namespace Microsoft.ContosoProviderhub;
 
     /** A ContosoProviderHub resource */
     model Employee is TrackedResource<EmployeeProperties> {

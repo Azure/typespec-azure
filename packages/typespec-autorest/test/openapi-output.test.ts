@@ -761,8 +761,7 @@ describe("identifiers decorator", () => {
     const oapi: any = await compileOpenAPI(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
 
       model Bar {
         foo:Foo;
@@ -785,8 +784,7 @@ describe("identifiers decorator", () => {
     const oapi: any = await compileOpenAPI(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
 
       model Bar {
         foo:Foo;
@@ -823,8 +821,7 @@ describe("identifiers decorator", () => {
     const oapi: any = await compileOpenAPI(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
       
       model Pet {
         name: string;
@@ -843,8 +840,7 @@ describe("identifiers decorator", () => {
     const oapi: any = await compileOpenAPI(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
       
       model Pet {
         name: string;
@@ -879,8 +875,7 @@ describe("identifiers decorator", () => {
     const oapi: any = await compileOpenAPI(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;      
+          namespace Microsoft.Test;      
       model Pet {
         name: string;
         @key
@@ -900,8 +895,7 @@ describe("identifiers decorator", () => {
     const oapi: any = await compileOpenAPI(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
       
       model Pet {
         name: string;
@@ -921,8 +915,7 @@ describe("identifiers decorator", () => {
     const oapi: any = await compileOpenAPI(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
       
       model Pet {
         name: string;
@@ -941,8 +934,7 @@ describe("identifiers decorator", () => {
     const oapi: any = await compileOpenAPI(
       `
         @armProviderNamespace
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        namespace Microsoft.Test;
+              namespace Microsoft.Test;
       
         model Pet {
           dogs: Dog;
@@ -965,8 +957,7 @@ describe("identifiers decorator", () => {
     const oapi: any = await compileOpenAPI(
       `
         @armProviderNamespace
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        namespace Microsoft.Test
+              namespace Microsoft.Test
         {
         
           @route("/Pets")
@@ -993,8 +984,7 @@ describe("identifiers decorator", () => {
     const oapi: any = await compileOpenAPI(
       `
         @armProviderNamespace
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-        namespace Microsoft.Test;
+              namespace Microsoft.Test;
         
         model Pet {
           dogs: Dog;
@@ -1032,8 +1022,7 @@ describe("identifiers decorator", () => {
     const oapi: any = await compileOpenAPI(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
       
       model Pet {
         name: string;
@@ -1057,8 +1046,7 @@ describe("identifiers decorator", () => {
     const oapi: any = await compileOpenAPI(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+          namespace Microsoft.Test;
       
       model PetResource is TrackedResource<PetResourceProperties> {
         @key("petResourceName")

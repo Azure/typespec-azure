@@ -16,7 +16,6 @@ import {
   Operation,
   Program,
   Scalar,
-  SourceLocation,
   Type,
   Union,
   UnionVariant,
@@ -155,24 +154,6 @@ export function isCamelCaseNoAcronyms(name: string): boolean {
   return /^[^a-zA-Z0-9]?[a-z][a-z0-9]*([A-Z][a-z0-9]+)*[A-Z]?$/.test(name);
 }
 
-export function findLineStartAndIndent(location: SourceLocation): {
-  lineStart: number;
-  indent: string;
-} {
-  const text = location.file.text;
-  let pos = location.pos;
-  let indent = 0;
-  while (pos > 0 && text[pos - 1] !== "\n") {
-    if ([" ", "\t", "\n"].includes(text[pos - 1])) {
-      indent++;
-    } else {
-      indent = 0;
-    }
-    pos--;
-  }
-  return { lineStart: pos, indent: location.file.text.slice(pos, pos + indent) };
-}
-
 export function checkReferenceInDisallowedNamespace(
   context: LinterRuleContext<{ readonly default: CallableMessage<["ns"]> }>,
   origin: Type,
@@ -199,10 +180,10 @@ export function checkDecoratorsInDisallowedNamespace(
   type: Type & DecoratedType,
   disallowedNamespace: "Private" | "Legacy",
 ) {
-  if (getLocationContext(context.program, type).type !== "project") {
-    return;
-  }
   for (const decorator of type.decorators) {
+    if (decorator.node && getLocationContext(context.program, decorator.node).type !== "project") {
+      continue;
+    }
     if (
       decorator.definition &&
       isInDisallowedNamespace(decorator.definition, disallowedNamespace) &&
@@ -216,7 +197,7 @@ export function checkDecoratorsInDisallowedNamespace(
   }
 }
 
-function isInDisallowedNamespace(
+export function isInDisallowedNamespace(
   type: Type,
   disallowedNamespace: "Private" | "Legacy",
 ): type is Type & { namespace: Namespace } {

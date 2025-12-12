@@ -1,48 +1,34 @@
+import { Tester } from "#test/tester.js";
 import {
-  BasicTestRunner,
   LinterRuleTester,
+  TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
-import { beforeEach, describe, it } from "vitest";
+import { beforeEach, it } from "vitest";
+
 import { retryAfterRule } from "../../src/rules/retry-after.js";
-import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
-describe("typespec-azure-resource-manager: retry-after rule", () => {
-  let runner: BasicTestRunner;
-  let tester: LinterRuleTester;
+let runner: TesterInstance;
+let tester: LinterRuleTester;
 
-  beforeEach(async () => {
-    runner = await createAzureResourceManagerTestRunner();
-    tester = createLinterRuleTester(
-      runner,
-      retryAfterRule,
-      "@azure-tools/typespec-azure-resource-manager",
-    );
-  });
+beforeEach(async () => {
+  runner = await Tester.createInstance();
+  tester = createLinterRuleTester(
+    runner,
+    retryAfterRule,
+    "@azure-tools/typespec-azure-resource-manager",
+  );
+});
 
-  it("is valid if there is an interface called Operations extending Azure.ResourceManager.Operations", async () => {
-    await tester
-      .expect(
-        `
-        @service
+it("is valid if there is an interface called Operations extending Azure.ResourceManager.Operations", async () => {
+  await tester
+    .expect(
+      `
         @armProviderNamespace
-        @versioned(Versions)
         namespace Microsoft.Foo;
         
-        /** Contoso API versions */
-        enum Versions {
-          /** 2021-10-01-preview version */
-          @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-          @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-          @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
-          "2021-10-01-preview",
-        }
-        
         model FooResource is TrackedResource<{}> {
-          @key("foo")
-          @segment("foo")
-          @path
-          name: string;
+          ...ResourceNameParameter<FooResource>;
         }
         
         model UpdateFooResponse {
@@ -53,40 +39,42 @@ describe("typespec-azure-resource-manager: retry-after rule", () => {
         @armResourceOperations
         interface FooResources {
           @armResourceUpdate(FooResource)
-          @OpenAPI.extension("x-ms-long-running-operation", true)
           @patch(#{implicitOptionality: true})
           update(): UpdateFooResponse;
         }
       `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it("emit warnings for long running operation without retry after header in response", async () => {
-    await tester
-      .expect(
-        `
-        @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+it("emit warnings for long running operation without retry after header in response", async () => {
+  await tester
+    .expect(
+      `
         @armProviderNamespace
         namespace Microsoft.Foo;
    
         model FooResource is TrackedResource<{}> {
-          @key("foo") @segment("foo") @path
-          name: string;
+          ...ResourceNameParameter<FooResource>;
         }
-  
+
+        @Azure.Core.lroStatus
+        enum Status {
+          Failed,
+          Succeeded,
+          Canceled,
+        }
         @armResourceOperations
         interface FooResources {
-          @armResourceUpdate(FooResource)
-          @OpenAPI.extension("x-ms-long-running-operation", true)
-          @patch(#{implicitOptionality: true}) 
-          op update(): FooResource;
+          @Azure.Core.pollingOperation(FooResources.getOperationStatus)
+          @post op update(): FooResource;
+
+          op getOperationStatus(): {status: Status};
         }
       `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/retry-after",
-        message: `For long-running operations, the Retry-After header indicates how long the client should wait before polling the operation status, please add this header to the 201 or 202 response for this operation.`,
-      });
-  });
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/retry-after",
+      message: `For long-running operations, the Retry-After header indicates how long the client should wait before polling the operation status, please add this header to the 201 or 202 response for this operation.`,
+    });
 });
