@@ -146,7 +146,7 @@ function standardizeOperationId(name: string) {
     .join("_");
 }
 
-const allowedStringFormats = new Set([
+const allowedAutorestFormats = new Set([
   // number format
   "int32",
   "int64",
@@ -192,5 +192,5 @@ const allowedStringFormats = new Set([
  * Those formats are validated by https://github.com/Azure/azure-openapi-validator/blob/main/packages/rulesets/src/spectral/functions/schema-format.ts#L17
  */
 export function isSupportedAutorestFormat(formatStr: string): boolean {
-  return allowedStringFormats.has(formatStr.toLowerCase());
+  return allowedAutorestFormats.has(formatStr.toLowerCase());
 }
