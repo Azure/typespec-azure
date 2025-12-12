@@ -818,8 +818,8 @@ it("one client from multiple services", async () => {
     (p) => p.name === "apiVersion",
   );
   ok(apiVersionParam);
-  strictEqual(apiVersionParam.apiVersions.length, 2);
-  deepStrictEqual(apiVersionParam.apiVersions, ["av1", "av2"]);
+  strictEqual(apiVersionParam.apiVersions.length, 0);
+  strictEqual(apiVersionParam.clientDefaultValue, undefined);
   const aiClient = client.children!.find((c) => c.name === "AI");
   ok(aiClient);
 
@@ -993,8 +993,9 @@ it("one client from multiple services without version dependency", async () => {
     (p) => p.name === "apiVersion",
   );
   ok(apiVersionParam);
-  strictEqual(apiVersionParam.apiVersions.length, 2);
-  deepStrictEqual(apiVersionParam.apiVersions, ["av1", "av2"]);
+  strictEqual(apiVersionParam.apiVersions.length, 0);
+  strictEqual(apiVersionParam.clientDefaultValue, undefined);
+
   const aiClient = client.children!.find((c) => c.name === "AI");
   ok(aiClient);
 
@@ -1109,8 +1110,9 @@ it("one client from multiple services with `@clientLocation`", async () => {
     (p) => p.name === "apiVersion",
   );
   ok(apiVersionParam);
-  strictEqual(apiVersionParam.apiVersions.length, 2);
-  deepStrictEqual(apiVersionParam.apiVersions, ["av1", "av2"]);
+  strictEqual(apiVersionParam.apiVersions.length, 0);
+  strictEqual(apiVersionParam.clientDefaultValue, undefined);
+
   const aiClient = client.children!.find((c) => c.name === "AI");
   ok(aiClient);
 

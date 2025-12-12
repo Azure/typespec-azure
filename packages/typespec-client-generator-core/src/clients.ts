@@ -246,7 +246,15 @@ function addDefaultClientParameters<
     }
   }
   if (apiVersionParam) {
-    defaultClientParamters.push(apiVersionParam);
+    if (Array.isArray(client.__raw.service)) {
+      // for multi-service clients, keep apiVersions empty and no default value
+      const multipleServiceApiVersionParam = { ...apiVersionParam };
+      multipleServiceApiVersionParam.apiVersions = [];
+      multipleServiceApiVersionParam.clientDefaultValue = undefined;
+      defaultClientParamters.push(multipleServiceApiVersionParam);
+    } else {
+      defaultClientParamters.push(apiVersionParam);
+    }
   }
   let subId = context.__clientParametersCache
     .get(client.__raw)
