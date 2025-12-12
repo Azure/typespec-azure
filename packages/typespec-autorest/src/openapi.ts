@@ -2309,7 +2309,7 @@ export async function getOpenAPIForService(
     if (formatStr) {
       if (!isSupportedAutorestFormat(formatStr)) {
         reportDiagnostic(program, {
-          code: "invalid-format",
+          code: "unknown-format",
           format: { schema: "string", format: formatStr },
           target: typespecType,
         });
@@ -2397,7 +2397,7 @@ export async function getOpenAPIForService(
       if (newFormat) {
         if (!isSupportedAutorestFormat(newFormat)) {
           reportDiagnostic(program, {
-            code: "invalid-format",
+            code: "unknown-format",
             format: { schema: "string", format: newFormat },
             messageId: "encoding",
             target: typespecType,

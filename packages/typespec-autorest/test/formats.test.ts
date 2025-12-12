@@ -41,7 +41,7 @@ describe("typespec-autorest: format", () => {
       `,
     );
     expectDiagnostics(diagnostics, {
-      code: "@azure-tools/typespec-autorest/invalid-format",
+      code: "@azure-tools/typespec-autorest/unknown-format",
       message: "'string' format 'fake' is not supported in Autorest. It will not be emitted.",
     });
   });
@@ -56,7 +56,7 @@ describe("typespec-autorest: format", () => {
       `,
     );
     expectDiagnostics(diagnostics, {
-      code: "@azure-tools/typespec-autorest/invalid-format",
+      code: "@azure-tools/typespec-autorest/unknown-format",
       message:
         "'string' encoding format 'ArrayEncoding.commaDelimited' is not supported in Autorest. It will not be emitted.",
     });
