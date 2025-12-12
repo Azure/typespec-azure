@@ -13,6 +13,7 @@ using global.Azure.ClientGenerator.Core;
 namespace _Specs_.Azure.Payload.Pageable;
 
 @@clientNamespace(_Specs_.Azure.Payload.Pageable, "azure.payload.pageable", "java");
+@@clientNamespace(_Specs_.Azure.Payload.Pageable, "specs.azure.payload.pageable", "python");
 
 @doc("User model")
 model User {

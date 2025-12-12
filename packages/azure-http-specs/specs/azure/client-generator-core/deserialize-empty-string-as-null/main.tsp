@@ -12,6 +12,10 @@ using Spector;
   "azure.clientgenerator.core.deserialize.emptystringnull",
   "java"
 )
+@global.Azure.ClientGenerator.Core.clientNamespace(
+  "specs.azure.clientgenerator.core.emptystring",
+  "python"
+)
 namespace _Specs_.Azure.ClientGenerator.Core.DeserializeEmptyStringAsNull;
 
 @doc("This is a Model contains a string-like property of type url.")
