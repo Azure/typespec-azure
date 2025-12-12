@@ -153,6 +153,7 @@ const allowedStringFormats = new Set([
   "float",
   "double",
   "unixtime",
+  "decimal",
   // OAS-defined formats
   "byte",
   "binary",
