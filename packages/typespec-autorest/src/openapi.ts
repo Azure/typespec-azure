@@ -83,6 +83,7 @@ import {
   isDeprecated,
   isErrorModel,
   isErrorType,
+  isGlobalNamespace,
   isList,
   isNeverType,
   isNullType,
@@ -93,6 +94,7 @@ import {
   isTemplateDeclarationOrInstance,
   isVoidType,
   joinPaths,
+  navigateTypesInNamespace,
   normalizePath,
   reportDeprecated,
   resolveEncodedName,
@@ -126,16 +128,17 @@ import {
   getStatusCodeDescription,
   getVisibilitySuffix,
   isHttpFile,
-  isSharedRoute,
   reportIfNoRoutes,
   resolveAuthentication,
   resolveRequestVisibility,
 } from "@typespec/http";
 import {
   AdditionalInfo,
+  checkDuplicateTypeName,
   getExtensions,
   getExternalDocs,
   getOpenAPITypeName,
+  getParameterKey,
   isReadonlyProperty,
   resolveInfo,
   shouldInline,
@@ -333,32 +336,33 @@ export async function getOpenAPIForService(
 
   routes.forEach(emitOperation);
 
-  //emitParameters();
-  //emitSchemas(service.type);
+  emitParameters();
+  emitSchemas(service.type);
   emitTags();
 
-  // Finalize global produces/consumes (move to proxy impl)
-  /*if (globalProduces.size > 0) {
-    root.produces = [...globalProduces.values()];
+  if (globalProduces.size > 0) {
+    proxy.setProduces([...globalProduces.values()]);
   } else {
-    delete root.produces;
+    proxy.deleteProduces();
   }
   if (globalConsumes.size > 0) {
-    root.consumes = [...globalConsumes.values()];
+    proxy.setConsumes([...globalConsumes.values()]);
   } else {
-    delete root.consumes;
-  }*/
+    proxy.deleteConsumes();
+  }
 
-  // Clean up empty entries (move to proxy impl)
-  /*if (root["x-ms-paths"] && Object.keys(root["x-ms-paths"]).length === 0) {
-    delete root["x-ms-paths"];
+  const xMsPaths = proxy.getXMsPaths();
+  if (xMsPaths && Object.keys(xMsPaths).length === 0) {
+    proxy.deleteXmsPaths();
   }
-  if (root.security && Object.keys(root.security).length === 0) {
-    delete root["security"];
+  const rootSecurity = proxy.getSecurity();
+  if (rootSecurity && Object.keys(rootSecurity).length === 0) {
+    proxy.deleteSecurity();
   }
-  if (root.securityDefinitions && Object.keys(root.securityDefinitions).length === 0) {
-    delete root["securityDefinitions"];
-  }*/
+  const securityDefs = proxy.getSecurityDefinitions();
+  if (securityDefs && Object.keys(securityDefs).length === 0) {
+    proxy.deleteSecurityDefinitions();
+  }
 
   return proxy.resolveDocuments(); /*{
     document: root,
@@ -374,6 +378,33 @@ export async function getOpenAPIForService(
       .filter((x) => x) as any,
     outputFile: context.outputFile,
   };*/
+
+  function emitTags() {
+    for (const tag of proxy.getTags()) {
+      proxy.addTag([tag]);
+    }
+  }
+
+  function canSharePropertyUsingReadonlyOrXMSMutability(prop: ModelProperty) {
+    const sharedVisibilities = ["Read", "Create", "Update"];
+    const lifecycle = getLifecycleVisibilityEnum(program);
+    const visibilities = getVisibilityForClass(program, prop, lifecycle);
+    // If the property does not have default visibility (all Lifecycle modifiers)
+    // then we have to look at the active modifiers to determine if it has any
+    // visibility other than read, create, or update, since those are compatible
+    // with x-ms-mutability.
+    if (visibilities.size !== lifecycle.members.size) {
+      for (const visibility of visibilities) {
+        if (!sharedVisibilities.includes(visibility.name)) {
+          return false;
+        }
+      }
+    }
+    // Otherwise, the property can be shared if it has default visibility or only
+    // shared visibilities, but not if it is _invisible_. The property is invisible
+    // if it has no active modifiers.
+    return visibilities.size !== 0;
+  }
 
   function resolveXmsPageable(program: Program, operation: HttpOperation): XmsPageable | undefined {
     if (isList(program, operation.operation)) {
@@ -394,13 +425,14 @@ export async function getOpenAPIForService(
     return undefined;
   }
 
-  function requiresXMsPaths(path: string, operation: Operation): boolean {
+  // part of endpoint implementation
+  /**function requiresXMsPaths(path: string, operation: Operation): boolean {
     const isShared = isSharedRoute(program, operation) ?? false;
     if (path.includes("?")) {
       return true;
     }
     return isShared;
-  }
+  }*/
 
   function getFinalStateVia(metadata: LroMetadata): XMSLongRunningFinalState | undefined {
     switch (metadata.finalStateVia) {
@@ -443,11 +475,11 @@ export async function getOpenAPIForService(
     return undefined;
   }
 
-  /** Initialize the openapi PathItem object where this operation should be added.  add to implementation*/
-  /*
-  function initPathItem(operation: HttpOperation): OpenAPI2PathItem {
+  // part of proxy endpoint implementation
+  /*function initPathItem(operation: HttpOperation): OpenAPI2PathItem {
     let { path, operation: op, verb } = operation;
-    let pathsObject: Record<string, OpenAPI2PathItem> = proxy.createOrAddPathItem(operation);
+    let pathsObject: Record<string, OpenAPI2PathItem> = {};
+    if (proxy.createOrGetEndpoint)
 
     if (root.paths[path]?.[verb] === undefined && !path.includes("?")) {
       pathsObject = root.paths;
@@ -877,6 +909,7 @@ export async function getOpenAPIForService(
       return { $ref: pending.ref };
     }
   }
+
   function getSchemaForInlineType(
     type: Type,
     name: string,
@@ -1351,17 +1384,22 @@ export async function getOpenAPIForService(
     }
   }
 
-  // move to impl of
-  /* function emitParameters() {
-    for (const [property, param] of params) {
+  function emitParameters() {
+    for (const [property, param] of proxy.getParameters()) {
       // Add an extension which tells AutoRest that this is a shared operation
       // parameter definition
       if (param["x-ms-parameter-location"] === undefined) {
         param["x-ms-parameter-location"] = "method";
       }
 
-      const key = getParameterKey(program, property, param, root.parameters!, typeNameOptions);
-      root.parameters![key] = { ...param };
+      const key = getParameterKey(
+        program,
+        property,
+        param,
+        proxy.getParameterMap(),
+        typeNameOptions,
+      );
+      proxy.setParameter(key, property, param);
 
       const refedParam = param as any;
       for (const key of Object.keys(param)) {
@@ -1370,12 +1408,10 @@ export async function getOpenAPIForService(
 
       refedParam["$ref"] = "#/parameters/" + encodeURIComponent(key);
     }
-  }*/
+  }
 
-  // move to proxy impl
-  /*
   function emitSchemas(serviceNamespace: Namespace) {
-    const processedSchemas = new TwoLevelMap<Type, Visibility, ProcessedSchema>();
+    const processedSchemas = proxy.processedSchemas;
     processSchemas();
     if (!options.omitUnreachableTypes) {
       processUnreferencedSchemas();
@@ -1397,22 +1433,20 @@ export async function getOpenAPIForService(
           name += getVisibilitySuffix(visibility, Visibility.Read);
         }
 
-        checkDuplicateTypeName(program, processed.type, name, root.definitions!);
-        processed.ref.value = "#/definitions/" + encodeURIComponent(name);
+        checkDuplicateTypeName(program, processed.type, name!, proxy.definitions!);
+        processed.ref.setLocalValue(name!, processed.type);
         if (processed.schema) {
           if (shouldEmitXml)
             attachXml(
               processed.type,
-              name,
+              name!,
               processed as ProcessedSchema & { schema: OpenAPI2Schema },
             );
-          root.definitions![name] = processed.schema;
+          proxy.definitions![name!] = processed.schema;
         }
       }
     }
-    */
-  // move to proxy impl
-  /*
+
     function processSchemas() {
       // Process pending schemas. Note that getSchemaForType may pull in new
       // pending schemas so we iterate until there are no pending schemas
@@ -1456,17 +1490,18 @@ export async function getOpenAPIForService(
         { skipSubNamespaces },
       );
       processSchemas();
-    }*/
-
-  function shouldOmitThisUnreachableType(type: Type): boolean {
-    if (
-      options.versionEnumStrategy !== "include" &&
-      type.kind === "Enum" &&
-      isVersionEnum(program, type)
-    ) {
-      return true;
     }
-    return false;
+
+    function shouldOmitThisUnreachableType(type: Type): boolean {
+      if (
+        options.versionEnumStrategy !== "include" &&
+        type.kind === "Enum" &&
+        isVersionEnum(program, type)
+      ) {
+        return true;
+      }
+      return false;
+    }
   }
 
   function isVersionEnum(program: Program, enumObj: Enum): boolean {
@@ -1475,12 +1510,6 @@ export async function getOpenAPIForService(
       return true;
     }
     return false;
-  }
-
-  function emitTags() {
-    for (const tag of proxy.getTags()) {
-      proxy.addTag([tag]);
-    }
   }
 
   function getSchemaForType(
@@ -1703,6 +1732,7 @@ export async function getOpenAPIForService(
       description: getDoc(program, member),
     };
   }
+
   function getSchemaForUnionVariant(
     variant: UnionVariant,
     schemaContext: SchemaContext,
@@ -1938,27 +1968,6 @@ export async function getOpenAPIForService(
     return modelSchema;
   }
 
-  function canSharePropertyUsingReadonlyOrXMSMutability(prop: ModelProperty) {
-    const sharedVisibilities = ["Read", "Create", "Update"];
-    const lifecycle = getLifecycleVisibilityEnum(program);
-    const visibilities = getVisibilityForClass(program, prop, lifecycle);
-    // If the property does not have default visibility (all Lifecycle modifiers)
-    // then we have to look at the active modifiers to determine if it has any
-    // visibility other than read, create, or update, since those are compatible
-    // with x-ms-mutability.
-    if (visibilities.size !== lifecycle.members.size) {
-      for (const visibility of visibilities) {
-        if (!sharedVisibilities.includes(visibility.name)) {
-          return false;
-        }
-      }
-    }
-    // Otherwise, the property can be shared if it has default visibility or only
-    // shared visibilities, but not if it is _invisible_. The property is invisible
-    // if it has no active modifiers.
-    return visibilities.size !== 0;
-  }
-
   function resolveProperty(prop: ModelProperty, context: SchemaContext): OpenAPI2SchemaProperty {
     let propSchema;
     if (prop.type.kind === "Enum" && prop.defaultValue) {
@@ -2005,6 +2014,7 @@ export async function getOpenAPIForService(
       target.title = summary;
     }
   }
+
   function applyExternalDocs(typespecType: Type, target: { externalDocs?: OpenAPI2ExternalDocs }) {
     const externalDocs = getExternalDocs(program, typespecType);
     if (externalDocs) {

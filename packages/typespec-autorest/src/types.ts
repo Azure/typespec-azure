@@ -161,6 +161,20 @@ export interface ProcessedSchema extends PendingSchema {
 
 /** Abstracts away methods to create a OpenAPI 2.0 document ragardless of layout. */
 export interface OpenApi2DocumentProxy {
+  deleteSecurityDefinitions(): void;
+  getSecurityDefinitions(): any;
+  deleteSecurity(): void;
+  getSecurity(): any;
+  deleteXmsPaths(): void;
+  getXMsPaths(): any;
+  deleteConsumes(): void;
+  setConsumes(arg0: string[]): void;
+  deleteProduces(): void;
+  setProduces(arg0: string[]): void;
+  definitions: any;
+  processedSchemas: any;
+  getParameterMap(): Record<string, OpenAPI2Parameter>;
+  setParameter(key: string, property: ModelProperty, param: OpenAPI2Parameter): void;
   addAdditionalInfo(info?: AdditionalInfo): void;
   addSecuritySchemes(schemes: Record<string, OpenAPI2SecurityScheme>): void;
   addSecurityRequirements(requirements: Record<string, string[]>[]): void;
