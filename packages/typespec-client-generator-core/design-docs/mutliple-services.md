@@ -13,7 +13,6 @@ This scenario is common in Azure management services. For example, the compute t
 ```python
 client = ComputeManagementClient(credential=DefaultAzureCredential(), subscription_id="{subscription-id}")
 client.disks.list_by_resource_group(resource_group_name="myResourceGroup")
-client.resource_skus.list()
 client.virtual_machine_sizes.list(location="eastus")
 ```
 
