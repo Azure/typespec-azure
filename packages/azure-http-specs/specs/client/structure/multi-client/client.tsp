@@ -5,8 +5,6 @@ import "@typespec/spector";
 using Azure.ClientGenerator.Core;
 using Spector;
 
-@@clientNamespace(Client.Structure.MultiClient, "specs.client.structure.multiclient", "python");
-
 @scenarioDoc("""
   Include multiple clients in the same spec.
   ```ts
@@ -23,24 +21,24 @@ using Spector;
   ```
   """)
 @scenario
-namespace Client.Structure.MultiClient {
-  @client({
-    name: "ClientAClient",
-    service: Client.Structure.Service,
-  })
-  interface ClientA {
-    renamedOne is Client.Structure.Service.one;
-    renamedThree is Client.Structure.Service.Foo.three;
-    renamedFive is Client.Structure.Service.Bar.five;
-  }
+namespace Client.Structure.MultiClient;
 
-  @client({
-    name: "ClientBClient",
-    service: Client.Structure.Service,
-  })
-  interface ClientB {
-    renamedTwo is Client.Structure.Service.two;
-    renamedFour is Client.Structure.Service.Foo.four;
-    renamedSix is Client.Structure.Service.Bar.six;
-  }
+@client({
+  name: "ClientAClient",
+  service: Client.Structure.Service,
+})
+interface ClientA {
+  renamedOne is Client.Structure.Service.one;
+  renamedThree is Client.Structure.Service.Foo.three;
+  renamedFive is Client.Structure.Service.Bar.five;
+}
+
+@client({
+  name: "ClientBClient",
+  service: Client.Structure.Service,
+})
+interface ClientB {
+  renamedTwo is Client.Structure.Service.two;
+  renamedFour is Client.Structure.Service.Foo.four;
+  renamedSix is Client.Structure.Service.Bar.six;
 }
