@@ -11,7 +11,9 @@ using Spector;
 namespace AzureExampleBasicClient;
 
 @@clientNamespace(AzureExampleBasicClient, "azure.example.basic", "java");
+@@clientNamespace(AzureExampleBasicClient, "specs.azure.example.basic", "python");
 @@clientNamespace(_Specs_.Azure.Example.Basic, "azure.example.basic", "java");
+@@clientNamespace(_Specs_.Azure.Example.Basic, "specs.azure.example.basic", "python");
 
 @client({
   name: "AzureExampleClient",
