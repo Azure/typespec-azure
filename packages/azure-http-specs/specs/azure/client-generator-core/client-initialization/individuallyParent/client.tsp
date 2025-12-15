@@ -6,10 +6,17 @@ import "@typespec/http";
 using Spector;
 using Http;
 
-@route("/azure/client-generator-core/client-initialization")
-namespace _Specs_.Azure.ClientGenerator.Core.ClientInitialization;
+@route("/azure/client-generator-core/client-initialization/individually-parent")
+namespace _Specs_.Azure.ClientGenerator.Core.ClientInitialization.IndividuallyParent;
 
-using Service;
+@@global.Azure.ClientGenerator.Core.clientNamespace(_Specs_.Azure.ClientGenerator.Core.ClientInitialization.IndividuallyParent,
+  "azure.clientgenerator.core.clientinitialization",
+  "java"
+);
+@@global.Azure.ClientGenerator.Core.clientNamespace(Service,
+  "azure.clientgenerator.core.clientinitialization",
+  "java"
+);
 
 // Reusable option types for client initialization
 model PathParamClientOptions {

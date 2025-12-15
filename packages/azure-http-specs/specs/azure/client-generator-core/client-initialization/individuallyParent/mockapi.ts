@@ -6,7 +6,7 @@ export const Scenarios: Record<string, ScenarioMockApi> = {};
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultParentClient_IndividuallyParentNestedWithPathClient =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent/test-resource/with-query",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent/test-resource/with-query",
       method: "get",
       request: {
         query: {
@@ -19,7 +19,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultParentClient_In
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent/test-resource/get-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent/test-resource/get-standalone",
       method: "get",
       request: {},
       response: {
@@ -34,7 +34,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultParentClient_In
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent/test-resource",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent/test-resource",
       method: "delete",
       request: {},
       response: {
@@ -48,7 +48,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultParentClient_In
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultParentClient_IndividuallyParentNestedWithQueryClient =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-query/with-query",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-query/with-query",
       method: "get",
       request: {
         query: {
@@ -61,7 +61,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultParentClient_In
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-query/get-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-query/get-standalone",
       method: "get",
       request: {
         query: {
@@ -80,7 +80,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultParentClient_In
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-query/delete-resource",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-query/delete-resource",
       method: "delete",
       request: {
         query: {
@@ -98,7 +98,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultParentClient_In
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultParentClient_IndividuallyParentNestedWithHeaderClient =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-header/with-query",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-header/with-query",
       method: "get",
       request: {
         query: {
@@ -114,7 +114,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultParentClient_In
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-header/get-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-header/get-standalone",
       method: "get",
       request: {
         headers: {
@@ -127,7 +127,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultParentClient_In
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-header/delete-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-header/delete-standalone",
       method: "delete",
       request: {
         headers: {
@@ -145,7 +145,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultParentClient_In
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultParentClient_IndividuallyParentNestedWithMultipleClient =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-multiple/with-query",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-multiple/with-query",
       method: "get",
       request: {
         query: {
@@ -162,7 +162,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultParentClient_In
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-multiple/get-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-multiple/get-standalone",
       method: "get",
       request: {
         query: {
@@ -178,7 +178,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultParentClient_In
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-multiple/delete-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-multiple/delete-standalone",
       method: "delete",
       request: {
         query: {
@@ -199,7 +199,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultParentClient_In
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultParentClient_IndividuallyParentNestedWithMixedClient =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-mixed/with-query",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-mixed/with-query",
       method: "get",
       request: {
         query: {
@@ -216,7 +216,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultParentClient_In
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-mixed/get-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-mixed/get-standalone",
       method: "get",
       request: {
         query: {
@@ -232,7 +232,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultParentClient_In
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-mixed/delete-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-mixed/delete-standalone",
       method: "delete",
       request: {
         query: {
@@ -253,7 +253,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultParentClient_In
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClient_IndividuallyParentNestedWithPathClient =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent/test-resource/with-query",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent/test-resource/with-query",
       method: "get",
       request: {
         query: {
@@ -266,7 +266,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClie
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent/test-resource/get-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent/test-resource/get-standalone",
       method: "get",
       request: {},
       response: {
@@ -281,7 +281,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClie
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent/test-resource",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent/test-resource",
       method: "delete",
       request: {},
       response: {
@@ -294,7 +294,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClie
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClient_IndividuallyParentNestedWithQueryClient =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-query/with-query",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-query/with-query",
       method: "get",
       request: {
         query: {
@@ -307,7 +307,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClie
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-query/get-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-query/get-standalone",
       method: "get",
       request: {
         query: {
@@ -326,7 +326,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClie
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-query/delete-resource",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-query/delete-resource",
       method: "delete",
       request: {
         query: {
@@ -343,7 +343,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClie
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClient_IndividuallyParentNestedWithHeaderClient =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-header/with-query",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-header/with-query",
       method: "get",
       request: {
         query: {
@@ -359,7 +359,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClie
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-header/get-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-header/get-standalone",
       method: "get",
       request: {
         headers: {
@@ -372,7 +372,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClie
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-header/delete-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-header/delete-standalone",
       method: "delete",
       request: {
         headers: {
@@ -389,7 +389,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClie
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClient_IndividuallyParentNestedWithMultipleClient =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-multiple/with-query",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-multiple/with-query",
       method: "get",
       request: {
         query: {
@@ -406,7 +406,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClie
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-multiple/get-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-multiple/get-standalone",
       method: "get",
       request: {
         query: {
@@ -422,7 +422,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClie
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-multiple/delete-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-multiple/delete-standalone",
       method: "delete",
       request: {
         query: {
@@ -442,7 +442,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClie
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClient_IndividuallyParentNestedWithMixedClient =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-mixed/with-query",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-mixed/with-query",
       method: "get",
       request: {
         query: {
@@ -459,7 +459,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClie
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-mixed/get-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-mixed/get-standalone",
       method: "get",
       request: {
         query: {
@@ -475,7 +475,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClie
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-parent-mixed/delete-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-mixed/delete-standalone",
       method: "delete",
       request: {
         query: {

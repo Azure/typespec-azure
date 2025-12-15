@@ -6,7 +6,7 @@ export const Scenarios: Record<string, ScenarioMockApi> = {};
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_IndividuallyNestedWithPathClient =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually/test-resource/with-query",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually/test-resource/with-query",
       method: "get",
       request: {
         query: {
@@ -19,7 +19,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_Individu
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually/test-resource/get-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually/test-resource/get-standalone",
       method: "get",
       request: {},
       response: {
@@ -34,7 +34,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_Individu
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually/test-resource",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually/test-resource",
       method: "delete",
       request: {},
       response: {
@@ -48,7 +48,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_Individu
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_IndividuallyNestedWithQueryClient =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-query/with-query",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-query/with-query",
       method: "get",
       request: {
         query: {
@@ -61,7 +61,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_Individu
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-query/get-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-query/get-standalone",
       method: "get",
       request: {
         query: {
@@ -80,7 +80,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_Individu
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-query/delete-resource",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-query/delete-resource",
       method: "delete",
       request: {
         query: {
@@ -98,7 +98,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_Individu
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_IndividuallyNestedWithHeaderClient =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-header/with-query",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-header/with-query",
       method: "get",
       request: {
         query: {
@@ -114,7 +114,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_Individu
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-header/get-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-header/get-standalone",
       method: "get",
       request: {
         headers: {
@@ -127,7 +127,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_Individu
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-header/delete-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-header/delete-standalone",
       method: "delete",
       request: {
         headers: {
@@ -145,7 +145,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_Individu
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_IndividuallyNestedWithMultipleClient =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-multiple/with-query",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-multiple/with-query",
       method: "get",
       request: {
         query: {
@@ -162,7 +162,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_Individu
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-multiple/get-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-multiple/get-standalone",
       method: "get",
       request: {
         query: {
@@ -178,7 +178,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_Individu
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-multiple/delete-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-multiple/delete-standalone",
       method: "delete",
       request: {
         query: {
@@ -199,7 +199,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_Individu
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_IndividuallyNestedWithMixedClient =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-mixed/with-query",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-mixed/with-query",
       method: "get",
       request: {
         query: {
@@ -216,7 +216,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_Individu
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-mixed/get-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-mixed/get-standalone",
       method: "get",
       request: {
         query: {
@@ -232,7 +232,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_Individu
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-mixed/delete-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-mixed/delete-standalone",
       method: "delete",
       request: {
         query: {
@@ -253,7 +253,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_Individu
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithPathClient =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually/test-resource/with-query",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually/test-resource/with-query",
       method: "get",
       request: {
         query: {
@@ -266,7 +266,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually/test-resource/get-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually/test-resource/get-standalone",
       method: "get",
       request: {},
       response: {
@@ -281,7 +281,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually/test-resource",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually/test-resource",
       method: "delete",
       request: {},
       response: {
@@ -294,7 +294,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithQueryClient =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-query/with-query",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-query/with-query",
       method: "get",
       request: {
         query: {
@@ -307,7 +307,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-query/get-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-query/get-standalone",
       method: "get",
       request: {
         query: {
@@ -326,7 +326,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-query/delete-resource",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-query/delete-resource",
       method: "delete",
       request: {
         query: {
@@ -343,7 +343,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithHeaderClient =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-header/with-query",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-header/with-query",
       method: "get",
       request: {
         query: {
@@ -359,7 +359,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-header/get-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-header/get-standalone",
       method: "get",
       request: {
         headers: {
@@ -372,7 +372,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-header/delete-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-header/delete-standalone",
       method: "delete",
       request: {
         headers: {
@@ -389,7 +389,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithMultipleClient =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-multiple/with-query",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-multiple/with-query",
       method: "get",
       request: {
         query: {
@@ -406,7 +406,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-multiple/get-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-multiple/get-standalone",
       method: "get",
       request: {
         query: {
@@ -422,7 +422,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-multiple/delete-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-multiple/delete-standalone",
       method: "delete",
       request: {
         query: {
@@ -442,7 +442,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithMixedClient =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-mixed/with-query",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-mixed/with-query",
       method: "get",
       request: {
         query: {
@@ -459,7 +459,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-mixed/get-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-mixed/get-standalone",
       method: "get",
       request: {
         query: {
@@ -475,7 +475,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/nested-default-individually-mixed/delete-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-mixed/delete-standalone",
       method: "delete",
       request: {
         query: {

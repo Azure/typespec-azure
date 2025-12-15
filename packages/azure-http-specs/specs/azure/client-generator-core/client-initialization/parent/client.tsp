@@ -6,10 +6,17 @@ import "@typespec/http";
 using Spector;
 using Http;
 
-@route("/azure/client-generator-core/client-initialization")
-namespace _Specs_.Azure.ClientGenerator.Core.ClientInitialization;
+@route("/azure/client-generator-core/client-initialization/parent")
+namespace _Specs_.Azure.ClientGenerator.Core.ClientInitialization.Parent;
 
-using Service;
+@@global.Azure.ClientGenerator.Core.clientNamespace(_Specs_.Azure.ClientGenerator.Core.ClientInitialization.Parent,
+  "azure.clientgenerator.core.clientinitialization",
+  "java"
+);
+@@global.Azure.ClientGenerator.Core.clientNamespace(Service,
+  "azure.clientgenerator.core.clientinitialization",
+  "java"
+);
 
 // Reusable option types for client initialization
 model PathParamClientOptions {
@@ -70,6 +77,10 @@ namespace ParentClient {
     """)
   @scenario
   @global.Azure.ClientGenerator.Core.operationGroup
+  @global.Azure.ClientGenerator.Core.client({
+  name: "ParentNestedWithPathClient",
+  service: Service,
+  })
   @global.Azure.ClientGenerator.Core.clientInitialization({
     parameters: PathParamClientOptions,
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.parent,
@@ -106,6 +117,10 @@ namespace ParentClient {
     """)
   @scenario
   @global.Azure.ClientGenerator.Core.operationGroup
+  @global.Azure.ClientGenerator.Core.client({
+  name: "ParentNestedWithQueryClient",
+  service: Service,
+  })
   @global.Azure.ClientGenerator.Core.clientInitialization({
     parameters: DefaultQueryParamClientOptions,
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.parent,
@@ -142,6 +157,10 @@ namespace ParentClient {
     """)
   @scenario
   @global.Azure.ClientGenerator.Core.operationGroup
+  @global.Azure.ClientGenerator.Core.client({
+  name: "ParentNestedWithHeaderClient",
+  service: Service,
+  })
   @global.Azure.ClientGenerator.Core.clientInitialization({
     parameters: HeaderParamClientOptions,
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.parent,
@@ -180,6 +199,10 @@ namespace ParentClient {
     """)
   @scenario
   @global.Azure.ClientGenerator.Core.operationGroup
+  @global.Azure.ClientGenerator.Core.client({
+  name: "ParentNestedWithMultipleClient",
+  service: Service,
+  })
   @global.Azure.ClientGenerator.Core.clientInitialization({
     parameters: MultipleParamsClientOptions,
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.parent,
@@ -219,6 +242,10 @@ namespace ParentClient {
     """)
   @scenario
   @global.Azure.ClientGenerator.Core.operationGroup
+  @global.Azure.ClientGenerator.Core.client({
+  name: "ParentNestedWithMixedClient",
+  service: Service,
+  })
   @global.Azure.ClientGenerator.Core.clientInitialization({
     parameters: MixedParamsClientOptions,
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.parent,

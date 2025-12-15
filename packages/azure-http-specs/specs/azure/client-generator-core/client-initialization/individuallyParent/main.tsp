@@ -7,7 +7,7 @@ using Spector;
 using Azure.ClientGenerator.Core;
 
 @doc("Test for client initialization decorator - moving parameters from method to client level")
-@scenarioService("/azure/client-generator-core/client-initialization")
+@scenarioService("/azure/client-generator-core/client-initialization/individually-parent")
 namespace Service;
 
 // Common parameter types and models
