@@ -1250,7 +1250,7 @@ export function getSdkModelPropertyTypeBase(
   const onClient = isOnClient(context, type, operation, apiVersions.length > 0);
   let encode: ArrayKnownEncoding | undefined = undefined;
   // We only support array encoding at property level for now
-  if ($(context.program).array.is(type.type)) {
+  if ($(context.program).array.is(alternateType ?? type.type)) {
     const encodeData = getEncode(context.program, type);
     if (encodeData?.encoding === "ArrayEncoding.pipeDelimited") {
       encode = "pipeDelimited";
