@@ -952,3 +952,21 @@ it("should not set usage on original enum when inline alternateType is used", as
   strictEqual(sdkEnum?.kind, "enum");
   strictEqual(sdkEnum.usage, UsageFlags.None, "Status enum should have None usage");
 });
+
+it("array encoding with alternate type", async () => {
+  await runner.compileWithBuiltInService(`
+    @usage(Usage.input)
+    model Model1 {
+      @encode(ArrayEncoding.commaDelimited)
+      @alternateType(string[])
+        prop: string;
+      };
+  `);
+
+  const models = getAllModels(runner.context);
+  const model1 = models[0];
+  strictEqual(model1.kind, "model");
+  const prop = model1.properties[0];
+  strictEqual(prop.type.kind, "array");
+  strictEqual(prop.encode, "commaDelimited");
+});
