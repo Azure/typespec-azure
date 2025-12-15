@@ -497,6 +497,459 @@ In this example, instead of generating `MyModel` in the Python sdk, the emitter 
 
 - The referenced type should be compatible with the intended usage in the generated client library.
 
+## Client Default Values (Legacy)
+
+:::caution
+The `@clientDefaultValue` decorator is legacy functionality that should **only** be used to mitigate SDK breaking changes for brownfield services. **New services should NOT use this decorator.** Instead, use standard TypeSpec patterns for default values.
+:::
+
+The `@Azure.ClientGenerator.Core.Legacy.clientDefaultValue` decorator allows you to set a client-level default value for a model property or operation parameter. This is primarily intended for maintaining backward compatibility with existing SDK users who may rely on default values that were previously generated from Swagger definitions.
+
+### Model Property Default Values
+
+Use `@clientDefaultValue` on model properties when you need to specify a default value that will be used in the generated SDK code.
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+model RequestOptions {
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(30)
+  timeout?: int32;
+
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("standard")
+  tier?: string;
+
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(false)
+  enableRetry?: boolean;
+}
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="python">
+
+```python
+from typing import Optional
+from .. import _model_base
+from .._model_base import rest_field
+
+class RequestOptions(_model_base.Model):
+    """Request configuration options.
+
+    :param timeout: Request timeout in seconds. Defaults to 30.
+    :type timeout: int
+    :param tier: Service tier. Defaults to "standard".
+    :type tier: str
+    :param enableRetry: Whether to enable retry. Defaults to False.
+    :type enableRetry: bool
+    """
+
+    timeout: Optional[int] = rest_field(default=30)
+    """Request timeout in seconds."""
+
+    tier: Optional[str] = rest_field(default="standard")
+    """Service tier."""
+
+    enableRetry: Optional[bool] = rest_field(default=False)
+    """Whether to enable retry."""
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="csharp" >
+
+```csharp
+public partial class RequestOptions
+{
+    public RequestOptions()
+    {
+        Timeout = 30;
+        Tier = "standard";
+        EnableRetry = false;
+    }
+
+    public int? Timeout { get; set; }
+    public string Tier { get; set; }
+    public bool? EnableRetry { get; set; }
+}
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="typescript" >
+
+```typescript
+export interface RequestOptions {
+  /** Request timeout in seconds. Default: 30 */
+  timeout?: number;
+  /** Service tier. Default: "standard" */
+  tier?: string;
+  /** Whether to enable retry. Default: false */
+  enableRetry?: boolean;
+}
+
+export function requestOptionsSerializer(item: RequestOptions): any {
+  return {
+    timeout: item["timeout"] ?? 30,
+    tier: item["tier"] ?? "standard",
+    enableRetry: item["enableRetry"] ?? false,
+  };
+}
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="java" >
+
+```java
+@Fluent
+public final class RequestOptions implements JsonSerializable<RequestOptions> {
+    private Integer timeout = 30;
+    private String tier = "standard";
+    private Boolean enableRetry = false;
+
+    public RequestOptions() {
+    }
+
+    /**
+     * Get the timeout property: Request timeout in seconds.
+     *
+     * @return the timeout value.
+     */
+    public Integer getTimeout() {
+        return this.timeout;
+    }
+
+    /**
+     * Set the timeout property: Request timeout in seconds.
+     *
+     * @param timeout the timeout value to set.
+     * @return the RequestOptions object itself.
+     */
+    public RequestOptions setTimeout(Integer timeout) {
+        this.timeout = timeout;
+        return this;
+    }
+
+    /**
+     * Get the tier property: Service tier.
+     *
+     * @return the tier value.
+     */
+    public String getTier() {
+        return this.tier;
+    }
+
+    /**
+     * Set the tier property: Service tier.
+     *
+     * @param tier the tier value to set.
+     * @return the RequestOptions object itself.
+     */
+    public RequestOptions setTier(String tier) {
+        this.tier = tier;
+        return this;
+    }
+
+    /**
+     * Get the enableRetry property: Whether to enable retry.
+     *
+     * @return the enableRetry value.
+     */
+    public Boolean isEnableRetry() {
+        return this.enableRetry;
+    }
+
+    /**
+     * Set the enableRetry property: Whether to enable retry.
+     *
+     * @param enableRetry the enableRetry value to set.
+     * @return the RequestOptions object itself.
+     */
+    public RequestOptions setEnableRetry(Boolean enableRetry) {
+        this.enableRetry = enableRetry;
+        return this;
+    }
+}
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="go" >
+
+```go
+type RequestOptions struct {
+    // Timeout - Request timeout in seconds. Default: 30
+    Timeout *int32 `json:"timeout,omitempty"`
+
+    // Tier - Service tier. Default: "standard"
+    Tier *string `json:"tier,omitempty"`
+
+    // EnableRetry - Whether to enable retry. Default: false
+    EnableRetry *bool `json:"enableRetry,omitempty"`
+}
+
+func NewRequestOptions() *RequestOptions {
+    timeout := int32(30)
+    tier := "standard"
+    enableRetry := false
+    return &RequestOptions{
+        Timeout: &timeout,
+        Tier: &tier,
+        EnableRetry: &enableRetry,
+    }
+}
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+### Operation Parameter Default Values
+
+Use `@clientDefaultValue` on operation parameters when you need to specify a default value for query parameters, headers, or other operation inputs.
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+op getItems(
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(10)
+  @query
+  pageSize?: int32,
+
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("desc")
+  @query
+  sortOrder?: string,
+): Item[];
+
+op uploadFile(
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("application/octet-stream")
+  @header
+  contentType?: string,
+
+  @body
+  fileData: bytes,
+): void;
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="python">
+
+```python
+def get_items(
+    self,
+    *,
+    page_size: Optional[int] = 10,
+    sort_order: Optional[str] = "desc",
+    **kwargs: Any
+) -> List[Item]:
+    """Retrieve a list of items.
+
+    :keyword page_size: Number of items per page. Defaults to 10.
+    :paramtype page_size: int
+    :keyword sort_order: Sort order for results. Defaults to "desc".
+    :paramtype sort_order: str
+    :return: List of items
+    :rtype: list[Item]
+    """
+    # Implementation
+    pass
+
+def upload_file(
+    self,
+    file_data: bytes,
+    *,
+    content_type: Optional[str] = "application/octet-stream",
+    **kwargs: Any
+) -> None:
+    """Upload a file.
+
+    :param file_data: The file data to upload.
+    :type file_data: bytes
+    :keyword content_type: The content type. Defaults to "application/octet-stream".
+    :paramtype content_type: str
+    """
+    # Implementation
+    pass
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="csharp" >
+
+```csharp
+public virtual Response<IReadOnlyList<Item>> GetItems(
+    int? pageSize = 10,
+    string sortOrder = "desc",
+    CancellationToken cancellationToken = default)
+{
+    // Implementation
+}
+
+public virtual Response UploadFile(
+    BinaryData fileData,
+    string contentType = "application/octet-stream",
+    CancellationToken cancellationToken = default)
+{
+    // Implementation
+}
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="typescript" >
+
+```typescript
+export interface GetItemsOptions extends OperationOptions {
+  /** Number of items per page. Default: 10 */
+  pageSize?: number;
+  /** Sort order for results. Default: "desc" */
+  sortOrder?: string;
+}
+
+export interface UploadFileOptions extends OperationOptions {
+  /** The content type. Default: "application/octet-stream" */
+  contentType?: string;
+}
+
+export function getItems(context: Client, options: GetItemsOptions = {}): Promise<Item[]> {
+  const pageSize = options.pageSize ?? 10;
+  const sortOrder = options.sortOrder ?? "desc";
+  // Implementation
+}
+
+export function uploadFile(
+  context: Client,
+  fileData: Uint8Array,
+  options: UploadFileOptions = {},
+): Promise<void> {
+  const contentType = options.contentType ?? "application/octet-stream";
+  // Implementation
+}
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="java" >
+
+```java
+/**
+ * Retrieve a list of items.
+ *
+ * @param pageSize Number of items per page. Default is 10.
+ * @param sortOrder Sort order for results. Default is "desc".
+ * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
+ * @return the response.
+ */
+@ServiceMethod(returns = ReturnType.SINGLE)
+public Response<List<Item>> getItemsWithResponse(
+    Integer pageSize,
+    String sortOrder,
+    RequestOptions requestOptions) {
+    if (pageSize == null) {
+        pageSize = 10;
+    }
+    if (sortOrder == null) {
+        sortOrder = "desc";
+    }
+    // Implementation
+}
+
+/**
+ * Upload a file.
+ *
+ * @param fileData The file data to upload.
+ * @param contentType The content type. Default is "application/octet-stream".
+ * @param requestOptions The options to configure the HTTP request before HTTP client sends it.
+ * @return the response.
+ */
+@ServiceMethod(returns = ReturnType.SINGLE)
+public Response<Void> uploadFileWithResponse(
+    BinaryData fileData,
+    String contentType,
+    RequestOptions requestOptions) {
+    if (contentType == null) {
+        contentType = "application/octet-stream";
+    }
+    // Implementation
+}
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="go" >
+
+```go
+// GetItemsOptions contains optional parameters for the GetItems method.
+type GetItemsOptions struct {
+    // PageSize - Number of items per page. Default: 10
+    PageSize *int32
+    // SortOrder - Sort order for results. Default: "desc"
+    SortOrder *string
+}
+
+// GetItems retrieves a list of items.
+func (c *Client) GetItems(ctx context.Context, options *GetItemsOptions) ([]Item, error) {
+    if options == nil {
+        options = &GetItemsOptions{}
+    }
+    if options.PageSize == nil {
+        pageSize := int32(10)
+        options.PageSize = &pageSize
+    }
+    if options.SortOrder == nil {
+        sortOrder := "desc"
+        options.SortOrder = &sortOrder
+    }
+    // Implementation
+}
+
+// UploadFileOptions contains optional parameters for the UploadFile method.
+type UploadFileOptions struct {
+    // ContentType - The content type. Default: "application/octet-stream"
+    ContentType *string
+}
+
+// UploadFile uploads a file.
+func (c *Client) UploadFile(ctx context.Context, fileData []byte, options *UploadFileOptions) error {
+    if options == nil {
+        options = &UploadFileOptions{}
+    }
+    if options.ContentType == nil {
+        contentType := "application/octet-stream"
+        options.ContentType = &contentType
+    }
+    // Implementation
+}
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+### Language-Specific Scoping
+
+You can also scope the default value to specific languages using the `scope` parameter:
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+model Config {
+  // Apply default only for Python
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(false, "python")
+  enableCache?: boolean;
+
+  // Apply default for all languages except Java and Python
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(100, "!(java, python)")
+  maxRetries?: int32;
+}
+```
+
+</ClientTabItem>
+</ClientTabs>
+
 ## Models
 
 ### Models with additional properties of any type
