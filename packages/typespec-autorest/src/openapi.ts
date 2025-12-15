@@ -175,7 +175,12 @@ import {
   XmsPageable,
 } from "./openapi2-document.js";
 import type { AutorestEmitterResult, LoadedExample } from "./types.js";
-import { AutorestEmitterContext, getClientName, resolveOperationId } from "./utils.js";
+import {
+  AutorestEmitterContext,
+  getClientName,
+  isSupportedAutorestFormat,
+  resolveOperationId,
+} from "./utils.js";
 import { resolveXmlModule } from "./xml.js";
 
 interface SchemaContext {
@@ -1385,6 +1390,12 @@ export async function getOpenAPIForService(
     }
   }
 
+  function isEncodingHandledByParameter(encoding: string | undefined): boolean {
+    return (
+      encoding === "ArrayEncoding.pipeDelimited" || encoding === "ArrayEncoding.spaceDelimited"
+    );
+  }
+
   function getCollectionFormat(
     type: ModelProperty,
     explode?: boolean,
@@ -1507,10 +1518,14 @@ export async function getOpenAPIForService(
     // original parameter.
     Object.assign(
       value,
-      applyIntrinsicDecorators(httpProp.property, {
-        type: (value as any).type,
-        format: (value as any).format,
-      }),
+      applyIntrinsicDecorators(
+        httpProp.property,
+        {
+          type: (value as any).type,
+          format: (value as any).format,
+        },
+        "parameter",
+      ),
     );
     return value as any;
   }
@@ -2286,6 +2301,7 @@ export async function getOpenAPIForService(
   function applyIntrinsicDecorators(
     typespecType: Model | Scalar | ModelProperty | Union,
     target: OpenAPI2Schema,
+    usage?: "parameter" | "body",
   ): OpenAPI2Schema {
     const newTarget = { ...target };
     const docStr = getDoc(program, typespecType);
@@ -2300,28 +2316,11 @@ export async function getOpenAPIForService(
     }
 
     const formatStr = getFormat(program, typespecType);
+
     if (formatStr) {
-      const allowedStringFormats = [
-        "char",
-        "binary",
-        "byte",
-        "certificate",
-        "date",
-        "time",
-        "date-time",
-        "date-time-rfc1123",
-        "date-time-rfc7231",
-        "duration",
-        "password",
-        "uuid",
-        "base64url",
-        "uri",
-        "url",
-        "arm-id",
-      ];
-      if (!allowedStringFormats.includes(formatStr.toLowerCase())) {
+      if (!isSupportedAutorestFormat(formatStr)) {
         reportDiagnostic(program, {
-          code: "invalid-format",
+          code: "unknown-format",
           format: { schema: "string", format: formatStr },
           target: typespecType,
         });
@@ -2387,13 +2386,14 @@ export async function getOpenAPIForService(
     attachExtensions(typespecType, newTarget);
 
     return typespecType.kind === "Scalar" || typespecType.kind === "ModelProperty"
-      ? applyEncoding(typespecType, newTarget)
+      ? applyEncoding(typespecType, newTarget, usage ?? "body")
       : newTarget;
   }
 
   function applyEncoding(
     typespecType: Scalar | ModelProperty,
     target: OpenAPI2Schema,
+    usage: "parameter" | "body",
   ): OpenAPI2Schema {
     const encodeData = getEncode(program, typespecType);
     if (encodeData) {
@@ -2401,11 +2401,25 @@ export async function getOpenAPIForService(
       const newType = getSchemaForScalar(encodeData.type);
       newTarget.type = newType.type;
       // If the target already has a format it takes priority. (e.g. int32)
-      newTarget.format = mergeFormatAndEncoding(
+      const newFormat = mergeFormatAndEncoding(
         newTarget.format,
         encodeData.encoding,
         newType.format,
       );
+      if (newFormat) {
+        if (!(usage === "parameter" && isEncodingHandledByParameter(newFormat))) {
+          if (!isSupportedAutorestFormat(newFormat)) {
+            reportDiagnostic(program, {
+              code: "unknown-format",
+              format: { schema: "string", format: newFormat },
+              messageId: "encoding",
+              target: typespecType,
+            });
+          } else {
+            newTarget.format = newFormat;
+          }
+        }
+      }
       return newTarget;
     }
     return target;

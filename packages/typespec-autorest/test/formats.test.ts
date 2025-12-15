@@ -34,23 +34,32 @@ describe("typespec-autorest: format", () => {
   it("emits diagnostic for unsupported formats", async () => {
     const diagnostics = await diagnoseOpenApiFor(
       `
-      @service
-      namespace Test;
-
       model Widget {
         @format("fake")
         prop: string;
       }
-
-      op get(): void;
       `,
     );
-    expectDiagnostics(diagnostics, [
-      {
-        code: "@azure-tools/typespec-autorest/invalid-format",
-        message: "'string' format 'fake' is not supported in Autorest. It will not be emitted.",
-      },
-    ]);
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-autorest/unknown-format",
+      message: "'string' format 'fake' is not supported in Autorest. It will not be emitted.",
+    });
+  });
+
+  it("emits diagnostic for unsupported encoding", async () => {
+    const diagnostics = await diagnoseOpenApiFor(
+      `
+      model Widget {
+        @encode(ArrayEncoding.commaDelimited)
+        prop: string[];
+      }
+      `,
+    );
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-autorest/unknown-format",
+      message:
+        "'string' encoding format 'ArrayEncoding.commaDelimited' is not supported in Autorest. It will not be emitted.",
+    });
   });
 
   it("does not emit diagnostic for Azure.Core scalars", async () => {
