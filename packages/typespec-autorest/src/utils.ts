@@ -185,6 +185,9 @@ const allowedAutorestFormats = new Set([
   "relative-json-pointer",
   // for arm id purpose
   "arm-id",
+
+  // Custom exclusions
+  "duration-constant",
 ]);
 
 /**
