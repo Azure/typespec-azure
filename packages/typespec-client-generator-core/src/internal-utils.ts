@@ -39,13 +39,20 @@ import {
   unsafe_Realm,
 } from "@typespec/compiler/experimental";
 import { $ } from "@typespec/compiler/typekit";
-import { HttpOperation, HttpOperationResponseContent, HttpPayloadBody } from "@typespec/http";
+import {
+  Authentication,
+  HttpOperation,
+  HttpOperationResponseContent,
+  HttpPayloadBody,
+  HttpServer,
+} from "@typespec/http";
 import {
   getAddedOnVersions,
   getRemovedOnVersions,
   getVersioningMutators,
   getVersions,
 } from "@typespec/versioning";
+import assert from "assert";
 import {
   getAlternateType,
   getClientDocExplicit,
@@ -1017,4 +1024,115 @@ export function getActualClientType(client: SdkClient | SdkOperationGroup): Name
   if (client.type) return client.type;
   // Created operation group from `@clientLocation`. Only for single service.
   return client.service;
+}
+
+export function isSameServers(left: HttpServer[], right: HttpServer[]): boolean {
+  if (left.length !== right.length) {
+    return false;
+  }
+  for (let i = 0; i < left.length; i++) {
+    if (left[i].url !== right[i].url) {
+      return false;
+    }
+  }
+  return true;
+}
+
+export function isSameAuth(left: Authentication, right: Authentication): boolean {
+  if (left.options.length !== right.options.length) {
+    return false;
+  }
+  for (let i = 0; i < left.options.length; i++) {
+    if (left.options[i].schemes.length !== right.options[i].schemes.length) {
+      return false;
+    }
+    for (let j = 0; j < left.options[i].schemes.length; j++) {
+      const leftScheme = left.options[i].schemes[j];
+      const rightScheme = right.options[i].schemes[j];
+      if (leftScheme.type !== rightScheme.type) {
+        return false;
+      }
+      switch (leftScheme.type) {
+        case "http":
+          assert(rightScheme.type === "http");
+          if (leftScheme.scheme !== rightScheme.scheme) {
+            return false;
+          }
+          break;
+        case "apiKey":
+          assert(rightScheme.type === "apiKey");
+          if (leftScheme.name !== rightScheme.name || leftScheme.in !== rightScheme.in) {
+            return false;
+          }
+          break;
+        case "oauth2":
+          assert(rightScheme.type === "oauth2");
+          if (leftScheme.flows.length !== rightScheme.flows.length) {
+            return false;
+          }
+          for (let k = 0; k < leftScheme.flows.length; k++) {
+            const leftFlow = leftScheme.flows[k];
+            const rightFlow = rightScheme.flows[k];
+            if (leftFlow.type !== rightFlow.type) {
+              return false;
+            }
+            if (leftFlow.scopes.length !== rightFlow.scopes.length) {
+              return false;
+            }
+            for (let l = 0; l < leftFlow.scopes.length; l++) {
+              if (leftFlow.scopes[l].value !== rightFlow.scopes[l].value) {
+                return false;
+              }
+            }
+            switch (leftFlow.type) {
+              case "authorizationCode":
+                assert(rightFlow.type === "authorizationCode");
+                if (
+                  leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
+                  leftFlow.tokenUrl !== rightFlow.tokenUrl ||
+                  leftFlow.refreshUrl !== rightFlow.refreshUrl
+                ) {
+                  return false;
+                }
+                break;
+              case "clientCredentials":
+                assert(rightFlow.type === "clientCredentials");
+                if (
+                  leftFlow.tokenUrl !== rightFlow.tokenUrl ||
+                  leftFlow.refreshUrl !== rightFlow.refreshUrl
+                ) {
+                  return false;
+                }
+                break;
+              case "implicit":
+                assert(rightFlow.type === "implicit");
+                if (
+                  leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
+                  leftFlow.refreshUrl !== rightFlow.refreshUrl
+                ) {
+                  return false;
+                }
+                break;
+              case "password":
+                assert(rightFlow.type === "password");
+                if (
+                  leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
+                  leftFlow.refreshUrl !== rightFlow.refreshUrl
+                ) {
+                  return false;
+                }
+                break;
+            }
+          }
+          break;
+        case "openIdConnect":
+          assert(rightScheme.type === "openIdConnect");
+          if (leftScheme.openIdConnectUrl !== rightScheme.openIdConnectUrl) {
+            return false;
+          }
+          break;
+      }
+    }
+  }
+  return true;
 }

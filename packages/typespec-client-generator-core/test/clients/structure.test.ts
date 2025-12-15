@@ -1688,3 +1688,71 @@ it("error: client location to new operation group with multiple services", async
       "Cannot move operations from different services to a new operation group that doesn't exist.",
   });
 });
+
+it("error: inconsistent-multiple-service server", async () => {
+  const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+    `
+    @service
+    @server("https://servicea.example.com")
+    namespace ServiceA {
+    }
+    @service
+    @server("https://serviceb.example.com")
+    namespace ServiceB {
+    }`,
+    `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    namespace CombineClient {}
+  `,
+  );
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service",
+      message: "All services must have the same server and auth definitions.",
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/multiple-services",
+      message:
+        "Multiple services found. Only the first service will be used; others will be ignored.",
+    },
+  ]);
+});
+
+it("error: inconsistent-multiple-service-servers auth", async () => {
+  const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+    `
+    @service
+    @useAuth(BasicAuth)
+    namespace ServiceA {
+    }
+    @service
+    @useAuth(BearerAuth)
+    namespace ServiceB {
+    }`,
+    `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    namespace CombineClient {}
+  `,
+  );
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service",
+      message: "All services must have the same server and auth definitions.",
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/multiple-services",
+      message:
+        "Multiple services found. Only the first service will be used; others will be ignored.",
+    },
+  ]);
+});

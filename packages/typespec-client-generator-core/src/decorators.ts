@@ -26,7 +26,7 @@ import {
 } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
-import { getHttpOperation } from "@typespec/http";
+import { getAuthentication, getHttpOperation, getServers } from "@typespec/http";
 import { $useDependency, getVersions } from "@typespec/versioning";
 import {
   AccessDecorator,
@@ -75,6 +75,8 @@ import {
   findRootSourceProperty,
   getScopedDecoratorData,
   hasExplicitClientOrOperationGroup,
+  isSameAuth,
+  isSameServers,
   listAllUserDefinedNamespaces,
   negationScopesKey,
   omitOperation,
@@ -198,6 +200,41 @@ export const $client: ClientDecorator = (
       return;
     }
     service = serviceConfig.values;
+    // validate all services has same server definition
+    let servers = undefined;
+    let auth = undefined;
+    let isSame = true;
+    for (const svc of service) {
+      const currentServers = getServers(context.program, svc);
+      if (currentServers === undefined) continue;
+      if (servers === undefined) {
+        servers = currentServers;
+      } else {
+        isSame = isSameServers(servers, currentServers);
+        if (!isSame) {
+          break;
+        }
+      }
+    }
+    for (const svc of service) {
+      const currentAuth = getAuthentication(context.program, svc);
+      if (currentAuth === undefined) continue;
+      if (auth === undefined) {
+        auth = currentAuth;
+      } else {
+        isSame = isSameAuth(auth, currentAuth);
+        if (!isSame) {
+          break;
+        }
+      }
+    }
+    if (!isSame) {
+      reportDiagnostic(context.program, {
+        code: "inconsistent-multiple-service",
+        target: context.decoratorTarget,
+      });
+      return;
+    }
     // no explicit versioning dependency
     if (
       !target.decorators.some(

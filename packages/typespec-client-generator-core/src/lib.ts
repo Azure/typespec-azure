@@ -471,6 +471,12 @@ export const $lib = createTypeSpecLibrary({
         default: "`@client` with multiple services is only allowed on `Namespace`.",
       },
     },
+    "inconsistent-multiple-service": {
+      severity: "error",
+      messages: {
+        default: "All services must have the same server and auth definitions.",
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,
