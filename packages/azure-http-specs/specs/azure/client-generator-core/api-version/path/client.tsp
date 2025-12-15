@@ -16,3 +16,7 @@ namespace Customizations;
   "azure.clientgenerator.core.apiversion.path",
   "java"
 );
+@@clientNamespace(Client.AlternateApiVersion.Service.Path,
+  "specs.azure.clientgenerator.core.apiversion.path",
+  "python"
+);

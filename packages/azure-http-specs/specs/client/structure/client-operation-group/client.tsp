@@ -5,6 +5,11 @@ import "@typespec/spector";
 using Azure.ClientGenerator.Core;
 using Spector;
 
+@@clientNamespace(Client.Structure.Service,
+  "specs.client.structure.clientoperationgroup",
+  "python"
+);
+
 @scenarioDoc("""
   This is to show we can have multiple clients, with multiple operation groups in each client.
   

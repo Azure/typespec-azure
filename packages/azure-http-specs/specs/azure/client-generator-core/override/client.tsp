@@ -6,11 +6,16 @@ using Http;
 using global.Azure.ClientGenerator.Core;
 
 @clientNamespace("azure.clientgenerator.core.methodoverride", "java")
+@clientNamespace("specs.azure.clientgenerator.core.override", "python")
 namespace Customization;
 
 @@clientNamespace(_Specs_.Azure.ClientGenerator.Core.Override,
   "azure.clientgenerator.core.methodoverride",
   "java"
+);
+@@clientNamespace(_Specs_.Azure.ClientGenerator.Core.Override,
+  "specs.azure.clientgenerator.core.override",
+  "python"
 );
 
 op reorderCustomized(@path param1: string, @path param2: string): void;

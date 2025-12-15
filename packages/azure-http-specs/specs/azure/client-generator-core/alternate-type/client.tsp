@@ -7,6 +7,10 @@ using Azure.ClientGenerator.Core;
   "azure.clientgenerator.core.alternatetype",
   "java"
 );
+@@global.Azure.ClientGenerator.Core.clientNamespace(_Specs_.Azure.ClientGenerator.Core.AlternateType,
+  "specs.azure.clientgenerator.core.alternatetype",
+  "python"
+);
 
 @@alternateType(_Specs_.Azure.ClientGenerator.Core.AlternateType.ExternalType.Feature,
   {
