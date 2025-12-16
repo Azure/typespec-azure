@@ -345,7 +345,7 @@ it("should work with ARM action with @pageItems property", async () => {
         nextLink?: string;
       }
       @Azure.ClientGenerator.Core.Legacy.markAsPageable
-      op listEmployeesByDepartment is ArmResourceActionSync<Employee, {}, EmployeeListResult>;
+      op listEmployeesByDepartment is ArmResourceActionSync<Employee, void, EmployeeListResult>;
     `);
 
   const methods = armRunner.context.sdkPackage.clients[0].methods;
@@ -380,7 +380,7 @@ it("should work with ARM action with value property without @pageItems", async (
         nextLink?: string;
       }
       @Azure.ClientGenerator.Core.Legacy.markAsPageable
-      op getEmployees is ArmResourceActionSync<Employee, {}, EmployeeListResult>;
+      op getEmployees is ArmResourceActionSync<Employee, void, EmployeeListResult>;
     `);
 
   const methods = armRunner.context.sdkPackage.clients[0].methods;
@@ -411,11 +411,9 @@ it("should fail with ARM action with array property not named value without @pag
       }
       model EmployeeListResult {
         items: Employee[];
-        @nextLink
-        nextLink?: string;
       }
       @Azure.ClientGenerator.Core.Legacy.markAsPageable
-      op listEmployeeItems is ArmResourceActionSync<Employee, {}, EmployeeListResult>;
+      op listEmployeeItems is ArmResourceActionSync<Employee, void, EmployeeListResult>;
     `);
 
   strictEqual(diagnostics.length, 1);
