@@ -10,9 +10,11 @@ import {
   ignoreDiagnostics,
   Interface,
   isErrorModel,
+  isList,
   isNumeric,
   isService,
   isTemplateDeclaration,
+  markList,
   Model,
   ModelProperty,
   Namespace,
@@ -1559,8 +1561,7 @@ export const $markAsPageable: MarkAsPageableDecorator = (
     return;
   }
   // Check if already marked with @list decorator
-  const tk = $(context.program);
-  if (tk.operation.isList(target)) {
+  if (isList(context.program, target)) {
     reportDiagnostic(context.program, {
       code: "mark-as-pageable-ineffective",
       format: {
@@ -1570,8 +1571,8 @@ export const $markAsPageable: MarkAsPageableDecorator = (
     });
     return;
   }
-  // Apply the @list decorator to the operation
-  tk.operation.setList(target);
+  // Apply the @list decorator to the operation by calling markList
+  markList(context.program, target);
   setScopedDecoratorData(context, $markAsPageable, markAsPageableKey, target, true, scope);
 };
 
