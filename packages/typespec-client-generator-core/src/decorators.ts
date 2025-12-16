@@ -14,7 +14,6 @@ import {
   isNumeric,
   isService,
   isTemplateDeclaration,
-  markList,
   Model,
   ModelProperty,
   Namespace,
@@ -1539,6 +1538,8 @@ export function getMarkAsLro(context: TCGCContext, entity: Operation): boolean {
 }
 
 const markAsPageableKey = createStateSymbol("markAsPageable");
+// Use the same state symbol that the compiler uses for the @list decorator  
+const listStateKey = createStateSymbol("list");
 
 export const $markAsPageable: MarkAsPageableDecorator = (
   context: DecoratorContext,
@@ -1571,8 +1572,9 @@ export const $markAsPageable: MarkAsPageableDecorator = (
     });
     return;
   }
-  // Apply the @list decorator to the operation by calling markList
-  markList(context.program, target);
+  // Apply the @list decorator to the operation by directly setting the state
+  // This mimics what the markList function does internally
+  context.program.stateSet(listStateKey).add(target);
   setScopedDecoratorData(context, $markAsPageable, markAsPageableKey, target, true, scope);
 };
 
