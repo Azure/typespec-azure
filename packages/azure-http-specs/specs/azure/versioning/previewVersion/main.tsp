@@ -20,10 +20,6 @@ using global.Azure.Core;
   }
 )
 @global.Azure.ClientGenerator.Core.clientNamespace("azure.versioning.previewversion", "java")
-@global.Azure.ClientGenerator.Core.clientNamespace(
-  "specs.azure.versioning.previewversion",
-  "python"
-)
 namespace _Specs_.Azure.Versioning.PreviewVersion;
 
 @doc("Supported api versions including preview.")
