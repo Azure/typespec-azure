@@ -1,5 +1,6 @@
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
+  $decorators as typespecDecorators,
   compilerAssert,
   DecoratorContext,
   DecoratorFunction,
@@ -1569,6 +1570,9 @@ export const $markAsPageable: MarkAsPageableDecorator = (
       target: context.decoratorTarget,
     });
     return;
+  } else {
+    // Apply the @list decorator to the operation
+    context.call(typespecDecorators.TypeSpec.list, target);
   }
   // Store metadata that will be checked by TCGC to treat this operation as pageable
   setScopedDecoratorData(context, $markAsPageable, markAsPageableKey, target, true, scope);

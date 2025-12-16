@@ -23,7 +23,6 @@ import { $ } from "@typespec/compiler/typekit";
 import { createSdkClientType } from "./clients.js";
 import {
   getAccess,
-  getMarkAsPageable,
   getNextLinkVerb,
   getOverriddenClientMethod,
   getResponseAsBool,
@@ -170,7 +169,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   }
 
   // normal paging
-  if (isList(context.program, operation) || getMarkAsPageable(context, operation)) {
+  if (isList(context.program, operation)) {
     const pagingMetadata = $(context.program).operation.getPagingMetadata(
       getOverriddenClientMethod(context, operation) ?? operation,
     );
@@ -694,7 +693,7 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   client: SdkClientType<TServiceOperation>,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const lro = getTcgcLroMetadata(context, operation, client);
-  const paging = isList(context.program, operation) || getMarkAsPageable(context, operation);
+  const paging = isList(context.program, operation);
   if (lro && paging) {
     return getSdkLroPagingServiceMethod<TServiceOperation>(context, operation, client);
   } else if (paging) {

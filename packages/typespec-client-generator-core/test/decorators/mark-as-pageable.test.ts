@@ -44,6 +44,11 @@ it("should mark regular operation as pageable when decorated with @markAsPageabl
   const responseType = method.response.type;
   ok(responseType);
   strictEqual(responseType.kind, "array");
+
+  // Check paging metadata
+  ok(method.pagingMetadata);
+  strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
+  strictEqual(method.pagingMetadata.nextLinkVerb, "GET");
 });
 
 it("should apply @markAsPageable with language scope", async () => {
