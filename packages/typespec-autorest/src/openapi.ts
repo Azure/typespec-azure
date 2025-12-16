@@ -1392,7 +1392,9 @@ export async function getOpenAPIForService(
 
   function isEncodingHandledByParameter(encoding: string | undefined): boolean {
     return (
-      encoding === "ArrayEncoding.pipeDelimited" || encoding === "ArrayEncoding.spaceDelimited"
+      encoding === "ArrayEncoding.commaDelimited" ||
+      encoding === "ArrayEncoding.pipeDelimited" ||
+      encoding === "ArrayEncoding.spaceDelimited"
     );
   }
 
@@ -1406,6 +1408,9 @@ export async function getOpenAPIForService(
       }
       const encode = getEncode(context.program, type);
       if (encode) {
+        if (encode?.encoding === "ArrayEncoding.commaDelimited") {
+          return "csv";
+        }
         if (encode?.encoding === "ArrayEncoding.pipeDelimited") {
           return "pipes";
         }
@@ -2399,7 +2404,6 @@ export async function getOpenAPIForService(
     if (encodeData) {
       const newTarget = { ...target };
       const newType = getSchemaForScalar(encodeData.type);
-      newTarget.type = newType.type;
       // If the target already has a format it takes priority. (e.g. int32)
       const newFormat = mergeFormatAndEncoding(
         newTarget.format,
@@ -2416,6 +2420,7 @@ export async function getOpenAPIForService(
               target: typespecType,
             });
           } else {
+            newTarget.type = newType.type;
             newTarget.format = newFormat;
           }
         }
