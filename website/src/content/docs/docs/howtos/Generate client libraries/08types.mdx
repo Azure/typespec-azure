@@ -592,7 +592,9 @@ op getItems(
 <ClientTabItem lang="python">
 
 ```python
-TODO
+    def get_items(
+        self, *, page_size: int = 10, sort_order: str = "desc", **kwargs: Any
+    ) -> list[_models.Item]:
 ```
 
 </ClientTabItem>
