@@ -299,7 +299,32 @@ it("should not apply when scope does not match", async () => {
   strictEqual(method.kind, "basic");
 });
 
-it("should work with ARM ResourceListByParent", async () => {
+it("should warn when operation already has @list (ARM ResourceListByParent)", async () => {
+  const armRunner = await createSdkTestRunner({
+    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
+    autoUsings: ["Azure.ResourceManager", "Azure.Core"],
+    emitterName: "@azure-tools/typespec-csharp",
+  });
+
+  const diagnostics = await armRunner.diagnoseWithBuiltInAzureResourceManagerService(`
+      model Employee is TrackedResource<EmployeeProperties> {
+        ...ResourceNameParameter<Employee>;
+      }
+      model EmployeeProperties {
+        name: string;
+      }
+      @Azure.ClientGenerator.Core.Legacy.markAsPageable
+      op listEmployees is ArmResourceListByParent<Employee>;
+    `);
+
+  strictEqual(diagnostics.length, 1);
+  strictEqual(
+    diagnostics[0].code,
+    "@azure-tools/typespec-client-generator-core/mark-as-pageable-ineffective",
+  );
+});
+
+it("should work with ARM action with @pageItems property", async () => {
   const armRunner = await createSdkTestRunner({
     librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
     autoUsings: ["Azure.ResourceManager", "Azure.Core"],
@@ -313,8 +338,14 @@ it("should work with ARM ResourceListByParent", async () => {
       model EmployeeProperties {
         name: string;
       }
+      model EmployeeListResult {
+        @pageItems
+        employees: Employee[];
+        @nextLink
+        nextLink?: string;
+      }
       @Azure.ClientGenerator.Core.Legacy.markAsPageable
-      op listEmployees is ArmResourceListByParent<Employee>;
+      op listEmployeesByDepartment is ArmResourceActionSync<Employee, {}, EmployeeListResult>;
     `);
 
   const methods = armRunner.context.sdkPackage.clients[0].methods;
@@ -322,14 +353,14 @@ it("should work with ARM ResourceListByParent", async () => {
   
   const method = methods[0];
   strictEqual(method.kind, "paging");
-  strictEqual(method.name, "listEmployees");
+  strictEqual(method.name, "listEmployeesByDepartment");
   
   // Check paging metadata
   ok(method.pagingMetadata);
   strictEqual(method.pagingMetadata.nextLinkVerb, "GET");
 });
 
-it("should work with custom ARM list operation", async () => {
+it("should work with ARM action with value property without @pageItems", async () => {
   const armRunner = await createSdkTestRunner({
     librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
     autoUsings: ["Azure.ResourceManager", "Azure.Core"],
@@ -345,12 +376,11 @@ it("should work with custom ARM list operation", async () => {
       }
       model EmployeeListResult {
         value: Employee[];
+        @nextLink
         nextLink?: string;
       }
       @Azure.ClientGenerator.Core.Legacy.markAsPageable
-      @route("/employees")
-      @get
-      op listCustomEmployees(): EmployeeListResult;
+      op getEmployees is ArmResourceActionSync<Employee, {}, EmployeeListResult>;
     `);
 
   const methods = armRunner.context.sdkPackage.clients[0].methods;
@@ -358,9 +388,68 @@ it("should work with custom ARM list operation", async () => {
   
   const method = methods[0];
   strictEqual(method.kind, "paging");
-  strictEqual(method.name, "listCustomEmployees");
+  strictEqual(method.name, "getEmployees");
   
   // Check paging metadata
   ok(method.pagingMetadata);
   strictEqual(method.pagingMetadata.nextLinkVerb, "GET");
+});
+
+it("should fail with ARM action with array property not named value without @pageItems", async () => {
+  const armRunner = await createSdkTestRunner({
+    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
+    autoUsings: ["Azure.ResourceManager", "Azure.Core"],
+    emitterName: "@azure-tools/typespec-csharp",
+  });
+
+  const diagnostics = await armRunner.diagnoseWithBuiltInAzureResourceManagerService(`
+      model Employee is TrackedResource<EmployeeProperties> {
+        ...ResourceNameParameter<Employee>;
+      }
+      model EmployeeProperties {
+        name: string;
+      }
+      model EmployeeListResult {
+        items: Employee[];
+        @nextLink
+        nextLink?: string;
+      }
+      @Azure.ClientGenerator.Core.Legacy.markAsPageable
+      op listEmployeeItems is ArmResourceActionSync<Employee, {}, EmployeeListResult>;
+    `);
+
+  strictEqual(diagnostics.length, 1);
+  strictEqual(
+    diagnostics[0].code,
+    "@azure-tools/typespec-client-generator-core/invalid-mark-as-pageable-target",
+  );
+});
+
+it("should work with ARM ListSinglePage legacy operation", async () => {
+  const armRunner = await createSdkTestRunner({
+    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
+    autoUsings: ["Azure.ResourceManager", "Azure.Core"],
+    emitterName: "@azure-tools/typespec-csharp",
+  });
+
+  await armRunner.compileWithBuiltInAzureResourceManagerService(`
+      model Employee is TrackedResource<EmployeeProperties> {
+        ...ResourceNameParameter<Employee>;
+      }
+      model EmployeeProperties {
+        name: string;
+      }
+      @Azure.ClientGenerator.Core.Legacy.markAsPageable
+      op listSinglePageEmployees is ArmListSinglePageByParent<Employee>;
+    `);
+
+  const methods = armRunner.context.sdkPackage.clients[0].methods;
+  strictEqual(methods.length, 1);
+  
+  const method = methods[0];
+  strictEqual(method.kind, "paging");
+  strictEqual(method.name, "listSinglePageEmployees");
+  
+  // Check paging metadata
+  ok(method.pagingMetadata);
 });
