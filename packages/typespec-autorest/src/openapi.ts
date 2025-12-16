@@ -22,6 +22,7 @@ import {
   isAzureResource,
 } from "@azure-tools/typespec-azure-resource-manager";
 import {
+  getClientDefaultValue,
   getClientNameOverride,
   getLegacyHierarchyBuilding,
   getMarkAsLro,
@@ -87,6 +88,7 @@ import {
   isList,
   isNeverType,
   isNullType,
+  isNumeric,
   isRecordModelType,
   isSecret,
   isService,
@@ -2386,6 +2388,15 @@ export async function getOpenAPIForService(
       shouldFlattenProperty(context.tcgcSdkContext, typespecType)
     ) {
       newTarget["x-ms-client-flatten"] = true;
+    }
+
+    if (typespecType.kind === "ModelProperty") {
+      const clientDefault = getClientDefaultValue(context.tcgcSdkContext, typespecType);
+      if (clientDefault) {
+        newTarget["x-ms-client-default"] = isNumeric(clientDefault)
+          ? clientDefault.asNumber()
+          : clientDefault;
+      }
     }
 
     attachExtensions(typespecType, newTarget);
