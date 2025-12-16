@@ -330,6 +330,19 @@ format: "json" (default)
 
 Expected response: 204 No Content
 
+### Azure_ClientGenerator_Core_ClientDefaultValue_getHeaderParameter
+
+- Endpoint: `get /azure/client-generator-core/client-default-value/header-parameter`
+
+Test case 4: `@clientDefaultValue` for header parameters.
+This scenario tests that client default values are correctly applied to header parameters.
+
+Expected header parameters:
+Accept: "application/json;odata.metadata=none" (default)
+x-custom-header: "default-value" (default)
+
+Expected response: 204 No Content
+
 ### Azure_ClientGenerator_Core_ClientDefaultValue_getPathParameter
 
 - Endpoint: `get /azure/client-generator-core/client-default-value/path-parameter/{segment1}/{segment2}`
