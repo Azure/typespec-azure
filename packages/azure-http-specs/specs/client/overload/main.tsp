@@ -3,14 +3,12 @@ import "@typespec/spector";
 import "@azure-tools/typespec-client-generator-core";
 
 using Http;
-using Azure.ClientGenerator.Core;
 using Spector;
 
 /**
  * Test for overload operation in .NET.
  */
 @scenarioService("/client/overload")
-@clientNamespace("specs.client.overload", "python")
 namespace Client.Overload;
 
 model Resource {

@@ -2,10 +2,7 @@ import "./main.tsp";
 import "@azure-tools/typespec-client-generator-core";
 import "@typespec/spector";
 
-using Azure.ClientGenerator.Core;
 using Spector;
-
-@@clientNamespace(Client.Structure.Service, "specs.client.structure.service", "python");
 
 @@scenario(Client.Structure.Service);
 @@scenarioDoc(Client.Structure.Service,

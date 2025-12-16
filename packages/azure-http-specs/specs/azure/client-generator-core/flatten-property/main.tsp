@@ -12,10 +12,6 @@ using Spector;
   "azure.clientgenerator.core.flattenproperty",
   "java"
 )
-@global.Azure.ClientGenerator.Core.clientNamespace(
-  "specs.azure.clientgenerator.core.flattenproperty",
-  "python"
-)
 namespace _Specs_.Azure.ClientGenerator.Core.FlattenProperty;
 
 @doc("This is the model with one level of flattening.")

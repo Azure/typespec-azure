@@ -20,7 +20,6 @@ using Spector;
   }
 )
 @global.Azure.ClientGenerator.Core.clientNamespace("azure.core.lro.standard", "java")
-@global.Azure.ClientGenerator.Core.clientNamespace("specs.azure.core.lro.standard", "python")
 namespace _Specs_.Azure.Core.Lro.Standard;
 
 @doc("The API version.")
