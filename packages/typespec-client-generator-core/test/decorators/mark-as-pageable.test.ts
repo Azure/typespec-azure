@@ -15,7 +15,9 @@ it("should mark regular operation as pageable when decorated with @markAsPageabl
       @service
       namespace TestService {
         model ItemListResult {
+          @pageItems
           items: Item[];
+          @nextLink
           nextLink?: string;
         }
 
@@ -49,7 +51,9 @@ it("should apply @markAsPageable with language scope", async () => {
       @service
       namespace TestService {
         model ItemListResult {
+          @pageItems
           items: Item[];
+          @nextLink
           nextLink?: string;
         }
 
@@ -96,7 +100,9 @@ it("should work with complex model return types", async () => {
       @service
       namespace TestService {
         model PagedResult<T> {
+          @pageItems
           value: T[];
+          @nextLink
           nextLink?: string;
         }
 
@@ -130,7 +136,9 @@ it("should work with operations returning list in different response structures"
       @service
       namespace TestService {
         model ItemPage {
+          @pageItems
           data: Item[];
+          @continuationToken
           continuationToken?: string;
         }
 
@@ -159,11 +167,9 @@ it("should handle nested model responses", async () => {
       @service
       namespace TestService {
         model ResultWrapper {
-          result: ItemCollection;
-        }
-
-        model ItemCollection {
+          @pageItems
           items: Item[];
+          @nextLink
           nextPageToken?: string;
         }
 
@@ -195,7 +201,9 @@ it("should not apply when scope does not match", async () => {
       @service
       namespace TestService {
         model ItemListResult {
+          @pageItems
           items: Item[];
+          @nextLink
           nextLink?: string;
         }
 
