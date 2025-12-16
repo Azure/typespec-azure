@@ -51,6 +51,7 @@ import {
   FlattenPropertyDecorator,
   HierarchyBuildingDecorator,
   MarkAsLroDecorator,
+  MarkAsPageableDecorator,
   NextLinkVerbDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
@@ -1533,6 +1534,49 @@ export const $markAsLro: MarkAsLroDecorator = (
 
 export function getMarkAsLro(context: TCGCContext, entity: Operation): boolean {
   return getScopedDecoratorData(context, markAsLroKey, entity) ?? false;
+}
+
+const markAsPageableKey = createStateSymbol("markAsPageable");
+
+export const $markAsPageable: MarkAsPageableDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: LanguageScopes,
+) => {
+  const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, target));
+  const hasModelResponse = httpOperation.responses.filter(
+    (r) =>
+      r.type?.kind === "Model" && !(r.statusCodes === "*" || isErrorModel(context.program, r.type)),
+  )[0];
+  if (!hasModelResponse) {
+    reportDiagnostic(context.program, {
+      code: "invalid-mark-as-pageable-target",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+  // Check if already marked with @list decorator
+  const tk = $(context.program);
+  if (tk.operation.isList(target)) {
+    reportDiagnostic(context.program, {
+      code: "mark-as-pageable-ineffective",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+  // Apply the @list decorator to the operation
+  tk.operation.setList(target);
+  setScopedDecoratorData(context, $markAsPageable, markAsPageableKey, target, true, scope);
+};
+
+export function getMarkAsPageable(context: TCGCContext, entity: Operation): boolean {
+  return getScopedDecoratorData(context, markAsPageableKey, entity) ?? false;
 }
 
 const nextLinkVerbKey = createStateSymbol("nextLinkVerb");
