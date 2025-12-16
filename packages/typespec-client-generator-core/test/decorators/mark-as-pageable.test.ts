@@ -1,3 +1,6 @@
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
+import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
@@ -294,4 +297,70 @@ it("should not apply when scope does not match", async () => {
   const method = methods[0];
   // Should be basic method since scope is csharp but emitter is python
   strictEqual(method.kind, "basic");
+});
+
+it("should work with ARM ResourceListByParent", async () => {
+  const armRunner = await createSdkTestRunner({
+    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
+    autoUsings: ["Azure.ResourceManager", "Azure.Core"],
+    emitterName: "@azure-tools/typespec-csharp",
+  });
+
+  await armRunner.compileWithBuiltInAzureResourceManagerService(`
+      model Employee is TrackedResource<EmployeeProperties> {
+        ...ResourceNameParameter<Employee>;
+      }
+      model EmployeeProperties {
+        name: string;
+      }
+      @Azure.ClientGenerator.Core.Legacy.markAsPageable
+      op listEmployees is ArmResourceListByParent<Employee>;
+    `);
+
+  const methods = armRunner.context.sdkPackage.clients[0].methods;
+  strictEqual(methods.length, 1);
+  
+  const method = methods[0];
+  strictEqual(method.kind, "paging");
+  strictEqual(method.name, "listEmployees");
+  
+  // Check paging metadata
+  ok(method.pagingMetadata);
+  strictEqual(method.pagingMetadata.nextLinkVerb, "GET");
+});
+
+it("should work with custom ARM list operation", async () => {
+  const armRunner = await createSdkTestRunner({
+    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
+    autoUsings: ["Azure.ResourceManager", "Azure.Core"],
+    emitterName: "@azure-tools/typespec-csharp",
+  });
+
+  await armRunner.compileWithBuiltInAzureResourceManagerService(`
+      model Employee is TrackedResource<EmployeeProperties> {
+        ...ResourceNameParameter<Employee>;
+      }
+      model EmployeeProperties {
+        name: string;
+      }
+      model EmployeeListResult {
+        value: Employee[];
+        nextLink?: string;
+      }
+      @Azure.ClientGenerator.Core.Legacy.markAsPageable
+      @route("/employees")
+      @get
+      op listCustomEmployees(): EmployeeListResult;
+    `);
+
+  const methods = armRunner.context.sdkPackage.clients[0].methods;
+  strictEqual(methods.length, 1);
+  
+  const method = methods[0];
+  strictEqual(method.kind, "paging");
+  strictEqual(method.name, "listCustomEmployees");
+  
+  // Check paging metadata
+  ok(method.pagingMetadata);
+  strictEqual(method.pagingMetadata.nextLinkVerb, "GET");
 });

@@ -13,6 +13,7 @@ import {
   isErrorModel,
   isList,
   isNumeric,
+  isPageItemsProperty,
   isService,
   isTemplateDeclaration,
   Model,
@@ -1579,10 +1580,7 @@ export const $markAsPageable: MarkAsPageableDecorator = (
   
   // Check if any property has @pageItems decorator
   for (const [, prop] of responseModel.properties) {
-    // Check if the property is marked with @pageItems by checking the program state
-    // The @pageItems decorator uses a state symbol "pageItems"
-    const pageItemsStateKey = Symbol.for("TypeSpec.pageItems");
-    if (context.program.stateSet(pageItemsStateKey).has(prop)) {
+    if (isPageItemsProperty(context.program, prop)) {
       hasPageItemsProperty = true;
       break;
     }
