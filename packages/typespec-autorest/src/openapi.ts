@@ -2420,8 +2420,15 @@ export async function getOpenAPIForService(
               target: typespecType,
             });
           } else {
-            newTarget.type = newType.type;
             newTarget.format = newFormat;
+          }
+          newTarget.type = newType.type;
+          if (newTarget.type !== "array") {
+            delete newTarget.items;
+          }
+          if (newTarget.type !== "object") {
+            delete newTarget.additionalProperties;
+            delete newTarget.properties;
           }
         }
       }
