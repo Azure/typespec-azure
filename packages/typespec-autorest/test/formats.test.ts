@@ -1,7 +1,12 @@
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual } from "assert";
-import { describe, it } from "vitest";
-import { AzureTester, diagnoseOpenApiFor, openApiFor } from "./test-host.js";
+import { describe, expect, it } from "vitest";
+import {
+  AzureTester,
+  diagnoseOpenApiFor,
+  emitOpenApiWithDiagnostics,
+  openApiFor,
+} from "./test-host.js";
 
 describe("typespec-autorest: format", () => {
   it("allows supported formats", async () => {
@@ -46,8 +51,8 @@ describe("typespec-autorest: format", () => {
     });
   });
 
-  it("emits diagnostic for unsupported encoding", async () => {
-    const diagnostics = await diagnoseOpenApiFor(
+  it("emits diagnostic for unsupported encoding and update type to string", async () => {
+    const [openapi, diagnostics] = await emitOpenApiWithDiagnostics(
       `
       model Widget {
         @encode(ArrayEncoding.commaDelimited)
@@ -59,6 +64,9 @@ describe("typespec-autorest: format", () => {
       code: "@azure-tools/typespec-autorest/unknown-format",
       message:
         "'string' encoding format 'ArrayEncoding.commaDelimited' is not supported in Autorest. It will not be emitted.",
+    });
+    expect(openapi.definitions?.Widget?.properties?.prop).toEqual({
+      type: "string",
     });
   });
 
