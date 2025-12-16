@@ -8,12 +8,14 @@ Previously, TCGC [client](./client.md) only supported generating a client from a
 
 1. Merging multiple services' namespaces into one client
 
-This scenario is common in Azure management services. For example, the compute team maintains several services: `Compute`, `Disk`, `Gallery`, and `Sku`. These services share the same endpoint and credential but have different versions. Users expect a single SDK package to manage all these services, not multiple packages. According to Azure SDK guidelines, the package should expose a single client. Therefore, TCGC must support auto-merging operations and nested namespaces/interfaces from multiple services into one client.
+This scenario is common in Azure management services. For example, the compute team maintains several services: `Compute`, `Disk`, `Gallery`, and `Sku`. These services share the same endpoint and credential but have different versioning. When migrating these services into TypeSpec, services team wants to follow the existing way to generate SDK: geneate one SDK with a single client that could manage all these services with different versioning, instead of generate multiple SDKs for these multiple services. Therefore, TCGC must support auto-merging operations and nested namespaces/interfaces from multiple services with different versioning into one client.
+
+For example, given two services `Disk` and `Gallery`, with Python SDK, the generated client code should look like:
 
 ```python
 client = ComputeManagementClient(credential=DefaultAzureCredential(), subscription_id="{subscription-id}")
-client.disks.list_by_resource_group(resource_group_name="myResourceGroup")
-client.virtual_machine_sizes.list(location="eastus")
+client.disks.list_by_resource_group(resource_group_name="myResourceGroup") # this operation will use API version defined in Disk service
+client.galleries.list(location="eastus") # this operation will use API version defined in Gallery service
 ```
 
 ## First Step Design
