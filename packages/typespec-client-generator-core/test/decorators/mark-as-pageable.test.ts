@@ -197,6 +197,70 @@ it("should handle nested model responses", async () => {
   strictEqual(method.name, "listItems");
 });
 
+it("should apply @pageItems to 'value' property when not already decorated", async () => {
+  await basicRunner.compile(`
+      @service
+      namespace TestService {
+        model ItemListResult {
+          value: Item[];
+          @nextLink
+          nextLink?: string;
+        }
+
+        model Item {
+          id: string;
+          name: string;
+        }
+
+        @Azure.ClientGenerator.Core.Legacy.markAsPageable
+        @route("/items")
+        @get
+        op listItems(): ItemListResult;
+      }
+    `);
+
+  const methods = basicRunner.context.sdkPackage.clients[0].methods;
+  strictEqual(methods.length, 1);
+
+  const method = methods[0];
+  strictEqual(method.kind, "paging");
+  strictEqual(method.name, "listItems");
+  
+  // Check paging metadata
+  ok(method.pagingMetadata);
+  strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
+  strictEqual(method.pagingMetadata.nextLinkVerb, "GET");
+});
+
+it("should warn when model has no @pageItems property and no 'value' property", async () => {
+  const diagnostics = await basicRunner.diagnose(`
+      @service
+      namespace TestService {
+        model ItemListResult {
+          data: Item[];
+          @nextLink
+          nextLink?: string;
+        }
+
+        model Item {
+          id: string;
+          name: string;
+        }
+
+        @Azure.ClientGenerator.Core.Legacy.markAsPageable
+        @route("/items")
+        @get
+        op listItems(): ItemListResult;
+      }
+    `);
+
+  strictEqual(diagnostics.length, 1);
+  strictEqual(
+    diagnostics[0].code,
+    "@azure-tools/typespec-client-generator-core/invalid-mark-as-pageable-target",
+  );
+});
+
 it("should not apply when scope does not match", async () => {
   const pythonRunner = await createSdkTestRunner({
     emitterName: "@azure-tools/typespec-python",

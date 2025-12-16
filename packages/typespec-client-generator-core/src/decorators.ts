@@ -1550,7 +1550,7 @@ export const $markAsPageable: MarkAsPageableDecorator = (
     (r) =>
       r.type?.kind === "Model" && !(r.statusCodes === "*" || isErrorModel(context.program, r.type)),
   )[0];
-  if (!hasModelResponse) {
+  if (!hasModelResponse || hasModelResponse.type?.kind !== "Model") {
     reportDiagnostic(context.program, {
       code: "invalid-mark-as-pageable-target",
       format: {
@@ -1560,6 +1560,7 @@ export const $markAsPageable: MarkAsPageableDecorator = (
     });
     return;
   }
+  
   // Check if already marked with @list decorator
   if (isList(context.program, target)) {
     reportDiagnostic(context.program, {
@@ -1570,10 +1571,45 @@ export const $markAsPageable: MarkAsPageableDecorator = (
       target: context.decoratorTarget,
     });
     return;
-  } else {
-    // Apply the @list decorator to the operation
-    context.call(typespecDecorators.TypeSpec.list, target);
   }
+  
+  // Check the response model for @pageItems decorator
+  const responseModel = hasModelResponse.type as Model;
+  let hasPageItemsProperty = false;
+  
+  // Check if any property has @pageItems decorator
+  for (const [, prop] of responseModel.properties) {
+    // Check if the property is marked with @pageItems by checking the program state
+    // The @pageItems decorator uses a state symbol "pageItems"
+    const pageItemsStateKey = Symbol.for("TypeSpec.pageItems");
+    if (context.program.stateSet(pageItemsStateKey).has(prop)) {
+      hasPageItemsProperty = true;
+      break;
+    }
+  }
+  
+  if (!hasPageItemsProperty) {
+    // Try to find a property named "value" and apply @pageItems to it
+    const valueProperty = responseModel.properties.get("value");
+    if (valueProperty) {
+      // Apply @pageItems decorator to the value property
+      context.call(typespecDecorators.TypeSpec.pageItems, valueProperty);
+    } else {
+      // No @pageItems property and no "value" property found
+      reportDiagnostic(context.program, {
+        code: "invalid-mark-as-pageable-target",
+        format: {
+          operation: target.name,
+        },
+        target: context.decoratorTarget,
+      });
+      return;
+    }
+  }
+  
+  // Apply the @list decorator to the operation
+  context.call(typespecDecorators.TypeSpec.list, target);
+  
   // Store metadata that will be checked by TCGC to treat this operation as pageable
   setScopedDecoratorData(context, $markAsPageable, markAsPageableKey, target, true, scope);
 };

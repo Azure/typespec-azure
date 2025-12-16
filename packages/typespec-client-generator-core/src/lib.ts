@@ -449,7 +449,7 @@ export const $lib = createTypeSpecLibrary({
     "invalid-mark-as-pageable-target": {
       severity: "warning",
       messages: {
-        default: paramMessage`@markAsPageable decorator can only be applied to operations that return a model. We will ignore this decorator.`,
+        default: paramMessage`@markAsPageable decorator can only be applied to operations that return a model with a property decorated with @pageItems or a property named 'value'. We will ignore this decorator.`,
       },
     },
     "mark-as-pageable-ineffective": {
