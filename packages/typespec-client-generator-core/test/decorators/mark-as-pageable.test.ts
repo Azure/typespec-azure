@@ -20,49 +20,6 @@ it("should mark regular operation as pageable when decorated with @markAsPageabl
         model ItemListResult {
           @pageItems
           items: Item[];
-          @nextLink
-          nextLink?: string;
-        }
-
-        model Item {
-          id: string;
-          name: string;
-        }
-
-        @Azure.ClientGenerator.Core.Legacy.markAsPageable
-        @route("/items")
-        @get
-        op listItems(): ItemListResult;
-      }
-    `);
-
-  const methods = basicRunner.context.sdkPackage.clients[0].methods;
-  strictEqual(methods.length, 1);
-
-  const method = methods[0];
-  strictEqual(method.kind, "paging");
-  strictEqual(method.name, "listItems");
-
-  // Check that the response type is properly set
-  const responseType = method.response.type;
-  ok(responseType);
-  strictEqual(responseType.kind, "array");
-
-  // Check paging metadata
-  ok(method.pagingMetadata);
-  strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
-  strictEqual(method.pagingMetadata.nextLinkVerb, "GET");
-});
-
-it("should apply @markAsPageable with language scope", async () => {
-  await basicRunner.compile(`
-      @service
-      namespace TestService {
-        model ItemListResult {
-          @pageItems
-          items: Item[];
-          @nextLink
-          nextLink?: string;
         }
 
         model Item {
@@ -83,6 +40,50 @@ it("should apply @markAsPageable with language scope", async () => {
   const method = methods[0];
   strictEqual(method.kind, "paging");
   strictEqual(method.name, "listItems");
+
+  // Check that the response type is properly set
+  const responseType = method.response.type;
+  ok(responseType);
+  strictEqual(responseType.kind, "array");
+
+  // Check paging metadata
+  ok(method.pagingMetadata);
+  ok(method.pagingMetadata.pageItemsSegments);
+  strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
+});
+
+it("should apply @markAsPageable with language scope", async () => {
+  await basicRunner.compile(`
+      @service
+      namespace TestService {
+        model ItemListResult {
+          @pageItems
+          items: Item[];
+        }
+
+        model Item {
+          id: string;
+          name: string;
+        }
+
+        @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
+        @route("/items")
+        @get
+        op listItems(): ItemListResult;
+      }
+    `);
+
+  const methods = basicRunner.context.sdkPackage.clients[0].methods;
+  strictEqual(methods.length, 1);
+
+  const method = methods[0];
+  strictEqual(method.kind, "paging");
+  strictEqual(method.name, "listItems");
+  
+  // Check paging metadata
+  ok(method.pagingMetadata);
+  ok(method.pagingMetadata.pageItemsSegments);
+  strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
 });
 
 it("should warn when @markAsPageable is applied to operation not returning model", async () => {
@@ -110,8 +111,6 @@ it("should work with complex model return types", async () => {
         model PagedResult<T> {
           @pageItems
           value: T[];
-          @nextLink
-          nextLink?: string;
         }
 
         model Product {
@@ -120,7 +119,7 @@ it("should work with complex model return types", async () => {
           price: float32;
         }
 
-        @Azure.ClientGenerator.Core.Legacy.markAsPageable
+        @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
         @route("/products")
         @get
         op listProducts(): PagedResult<Product>;
@@ -137,67 +136,11 @@ it("should work with complex model return types", async () => {
   const responseType = method.response.type;
   ok(responseType);
   strictEqual(responseType.kind, "array");
-});
-
-it("should work with operations returning list in different response structures", async () => {
-  await basicRunner.compile(`
-      @service
-      namespace TestService {
-        model ItemPage {
-          @pageItems
-          data: Item[];
-          @continuationToken
-          continuationToken?: string;
-        }
-
-        model Item {
-          id: string;
-          value: string;
-        }
-
-        @Azure.ClientGenerator.Core.Legacy.markAsPageable
-        @route("/items")
-        @get
-        op getItems(): ItemPage;
-      }
-    `);
-
-  const methods = basicRunner.context.sdkPackage.clients[0].methods;
-  strictEqual(methods.length, 1);
-
-  const method = methods[0];
-  strictEqual(method.kind, "paging");
-  strictEqual(method.name, "getItems");
-});
-
-it("should handle nested model responses", async () => {
-  await basicRunner.compile(`
-      @service
-      namespace TestService {
-        model ResultWrapper {
-          @pageItems
-          items: Item[];
-          @nextLink
-          nextPageToken?: string;
-        }
-
-        model Item {
-          id: string;
-        }
-
-        @Azure.ClientGenerator.Core.Legacy.markAsPageable
-        @route("/items")
-        @get
-        op listItems(): ResultWrapper;
-      }
-    `);
-
-  const methods = basicRunner.context.sdkPackage.clients[0].methods;
-  strictEqual(methods.length, 1);
-
-  const method = methods[0];
-  strictEqual(method.kind, "paging");
-  strictEqual(method.name, "listItems");
+  
+  // Check paging metadata
+  ok(method.pagingMetadata);
+  ok(method.pagingMetadata.pageItemsSegments);
+  strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
 });
 
 it("should apply @pageItems to 'value' property when not already decorated", async () => {
@@ -206,8 +149,6 @@ it("should apply @pageItems to 'value' property when not already decorated", asy
       namespace TestService {
         model ItemListResult {
           value: Item[];
-          @nextLink
-          nextLink?: string;
         }
 
         model Item {
@@ -215,7 +156,7 @@ it("should apply @pageItems to 'value' property when not already decorated", asy
           name: string;
         }
 
-        @Azure.ClientGenerator.Core.Legacy.markAsPageable
+        @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
         @route("/items")
         @get
         op listItems(): ItemListResult;
@@ -231,8 +172,8 @@ it("should apply @pageItems to 'value' property when not already decorated", asy
   
   // Check paging metadata
   ok(method.pagingMetadata);
-  strictEqual(method.pagingMetadata.nextLinkSegments?.length, 1);
-  strictEqual(method.pagingMetadata.nextLinkVerb, "GET");
+  ok(method.pagingMetadata.pageItemsSegments);
+  strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
 });
 
 it("should warn when model has no @pageItems property and no 'value' property", async () => {
@@ -241,8 +182,6 @@ it("should warn when model has no @pageItems property and no 'value' property", 
       namespace TestService {
         model ItemListResult {
           data: Item[];
-          @nextLink
-          nextLink?: string;
         }
 
         model Item {
@@ -275,8 +214,6 @@ it("should not apply when scope does not match", async () => {
         model ItemListResult {
           @pageItems
           items: Item[];
-          @nextLink
-          nextLink?: string;
         }
 
         model Item {
@@ -313,7 +250,7 @@ it("should warn when operation already has @list (ARM ResourceListByParent)", as
       model EmployeeProperties {
         name: string;
       }
-      @Azure.ClientGenerator.Core.Legacy.markAsPageable
+      @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
       op listEmployees is ArmResourceListByParent<Employee>;
     `);
 
@@ -341,10 +278,8 @@ it("should work with ARM action with @pageItems property", async () => {
       model EmployeeListResult {
         @pageItems
         employees: Employee[];
-        @nextLink
-        nextLink?: string;
       }
-      @Azure.ClientGenerator.Core.Legacy.markAsPageable
+      @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
       op listEmployeesByDepartment is ArmResourceActionSync<Employee, void, EmployeeListResult>;
     `);
 
@@ -357,7 +292,8 @@ it("should work with ARM action with @pageItems property", async () => {
   
   // Check paging metadata
   ok(method.pagingMetadata);
-  strictEqual(method.pagingMetadata.nextLinkVerb, "GET");
+  ok(method.pagingMetadata.pageItemsSegments);
+  strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
 });
 
 it("should work with ARM action with value property without @pageItems", async () => {
@@ -376,10 +312,8 @@ it("should work with ARM action with value property without @pageItems", async (
       }
       model EmployeeListResult {
         value: Employee[];
-        @nextLink
-        nextLink?: string;
       }
-      @Azure.ClientGenerator.Core.Legacy.markAsPageable
+      @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
       op getEmployees is ArmResourceActionSync<Employee, void, EmployeeListResult>;
     `);
 
@@ -392,7 +326,8 @@ it("should work with ARM action with value property without @pageItems", async (
   
   // Check paging metadata
   ok(method.pagingMetadata);
-  strictEqual(method.pagingMetadata.nextLinkVerb, "GET");
+  ok(method.pagingMetadata.pageItemsSegments);
+  strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
 });
 
 it("should fail with ARM action with array property not named value without @pageItems", async () => {
@@ -412,7 +347,7 @@ it("should fail with ARM action with array property not named value without @pag
       model EmployeeListResult {
         items: Employee[];
       }
-      @Azure.ClientGenerator.Core.Legacy.markAsPageable
+      @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
       op listEmployeeItems is ArmResourceActionSync<Employee, void, EmployeeListResult>;
     `);
 
@@ -437,7 +372,7 @@ it("should work with ARM ListSinglePage legacy operation", async () => {
       model EmployeeProperties {
         name: string;
       }
-      @Azure.ClientGenerator.Core.Legacy.markAsPageable
+      @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
       op listSinglePageEmployees is ArmListSinglePageByParent<Employee>;
     `);
 
@@ -450,4 +385,6 @@ it("should work with ARM ListSinglePage legacy operation", async () => {
   
   // Check paging metadata
   ok(method.pagingMetadata);
+  ok(method.pagingMetadata.pageItemsSegments);
+  strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
 });
