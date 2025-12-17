@@ -130,9 +130,7 @@ op getPathParameter(
 @get
 op getHeaderParameter(
   #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Testing legacy decorator"
-  @global.Azure.ClientGenerator.Core.Legacy.clientDefaultValue(
-    "application/json;odata.metadata=none"
-  )
+  @global.Azure.ClientGenerator.Core.Legacy.clientDefaultValue("application/json;odata.metadata=none")
   @header("Accept")
   accept?: string,
 
