@@ -114,3 +114,28 @@ op getPathParameter(
 
   @path segment2: string,
 ): void;
+
+@scenario
+@route("/header-parameter")
+@scenarioDoc("""
+  Test case 4: `@clientDefaultValue` for header parameters.
+  This scenario tests that client default values are correctly applied to header parameters.
+  
+  Expected header parameters:
+  Accept: "application/json;odata.metadata=none" (default)
+  x-custom-header: "default-value" (default)
+  
+  Expected response: 204 No Content
+  """)
+@get
+op getHeaderParameter(
+  #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Testing legacy decorator"
+  @global.Azure.ClientGenerator.Core.Legacy.clientDefaultValue("application/json;odata.metadata=none")
+  @header("Accept")
+  accept?: string,
+
+  #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Testing legacy decorator"
+  @global.Azure.ClientGenerator.Core.Legacy.clientDefaultValue("default-value")
+  @header("x-custom-header")
+  customHeader?: string,
+): void;
