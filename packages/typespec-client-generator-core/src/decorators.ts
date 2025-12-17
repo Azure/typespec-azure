@@ -1,6 +1,5 @@
 import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
-  $decorators as typespecDecorators,
   compilerAssert,
   DecoratorContext,
   DecoratorFunction,
@@ -13,7 +12,6 @@ import {
   isErrorModel,
   isList,
   isNumeric,
-  isPageItemsProperty,
   isService,
   isTemplateDeclaration,
   Model,
@@ -1578,9 +1576,11 @@ export const $markAsPageable: MarkAsPageableDecorator = (
   const responseModel = hasModelResponse.type as Model;
   let hasPageItemsProperty = false;
   
-  // Check if any property has @pageItems decorator
+  // Check if any property has @pageItems decorator by checking the program state
+  // The @pageItems decorator uses a state symbol "TypeSpec.pageItems"
+  const pageItemsStateKey = Symbol.for("TypeSpec.pageItems");
   for (const [, prop] of responseModel.properties) {
-    if (isPageItemsProperty(context.program, prop)) {
+    if (context.program.stateSet(pageItemsStateKey).has(prop)) {
       hasPageItemsProperty = true;
       break;
     }
@@ -1590,8 +1590,8 @@ export const $markAsPageable: MarkAsPageableDecorator = (
     // Try to find a property named "value" and apply @pageItems to it
     const valueProperty = responseModel.properties.get("value");
     if (valueProperty) {
-      // Apply @pageItems decorator to the value property
-      context.call(typespecDecorators.TypeSpec.pageItems, valueProperty);
+      // Mark the value property as pageItems by setting the state
+      context.program.stateSet(pageItemsStateKey).add(valueProperty);
     } else {
       // No @pageItems property and no "value" property found
       reportDiagnostic(context.program, {
@@ -1605,8 +1605,10 @@ export const $markAsPageable: MarkAsPageableDecorator = (
     }
   }
   
-  // Apply the @list decorator to the operation
-  context.call(typespecDecorators.TypeSpec.list, target);
+  // Mark the operation as a list operation by setting the state
+  // The @list decorator uses a state symbol "TypeSpec.list"
+  const listStateKey = Symbol.for("TypeSpec.list");
+  context.program.stateMap(listStateKey).set(target, {});
   
   // Store metadata that will be checked by TCGC to treat this operation as pageable
   setScopedDecoratorData(context, $markAsPageable, markAsPageableKey, target, true, scope);
