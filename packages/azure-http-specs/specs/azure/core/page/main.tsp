@@ -20,7 +20,6 @@ using Spector;
   }
 )
 @global.Azure.ClientGenerator.Core.clientNamespace("azure.core.page", "java")
-@global.Azure.ClientGenerator.Core.clientNamespace("specs.azure.core.page", "python")
 namespace _Specs_.Azure.Core.Page;
 
 @doc("The version of the API.")
