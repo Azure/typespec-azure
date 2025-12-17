@@ -8,6 +8,7 @@ import {
   Namespace,
   Operation,
 } from "@typespec/compiler";
+import { unsafe_Realm } from "@typespec/compiler/experimental";
 import { getVersionDependencies, getVersions } from "@typespec/versioning";
 import { getClientLocation, getClientNameOverride, isInScope } from "./decorators.js";
 import { SdkClient, SdkOperationGroup, TCGCContext } from "./interfaces.js";
@@ -159,7 +160,10 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     const newOperationGroupWithService = new Map<string, Namespace>();
     listScopedDecoratorData(context, clientLocationKey).forEach((v, k) => {
       // only deal with mutated types or without mutation
-      if (!context.__mutatedRealm || context.__mutatedRealm.hasType(k)) {
+      if (
+        (!context.__mutatedRealm && !unsafe_Realm.realmForType.has(k)) ||
+        (context.__mutatedRealm && context.__mutatedRealm.hasType(k))
+      ) {
         if (typeof v === "string") {
           if (
             clients[0].subOperationGroups.some(
