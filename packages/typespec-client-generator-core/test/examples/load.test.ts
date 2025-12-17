@@ -469,3 +469,54 @@ it("multiple services without versioning", async () => {
   strictEqual(biMethod.operation.examples[0].filePath, "BI_bTest.json");
   strictEqual(biMethod.operation.examples[0].name, "Test operation from ServiceB");
 });
+
+it("multiple services without examples", async () => {
+  runner = await createSdkTestRunner({
+    emitterName: "@azure-tools/typespec-java",
+    "examples-dir": `./examples`,
+  });
+
+  await runner.compileWithCustomization(
+    `
+    @service
+    namespace ServiceA {
+      interface AI {
+        @route("/aTest")
+        aTest(): string;
+      }
+    }
+    @service
+    namespace ServiceB {
+      interface BI {
+        @route("/bTest")
+        bTest(): string;
+      }
+    }
+    `,
+    `
+    @client({
+      name: "CombineClient",
+      service: [ServiceA, ServiceB],
+    })
+    namespace CombineClient;
+    `,
+  );
+
+  const sdkPackage = runner.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  strictEqual(client.children?.length, 2);
+
+  // Check AI operation group examples
+  const aiClient = client.children?.find((c) => c.name === "AI");
+  ok(aiClient);
+  const aiMethod = aiClient.methods[0] as SdkServiceMethod<SdkHttpOperation>;
+  strictEqual(aiMethod.operation.examples, undefined);
+
+  // Check BI operation group examples
+  const biClient = client.children?.find((c) => c.name === "BI");
+  ok(biClient);
+  const biMethod = biClient.methods[0] as SdkServiceMethod<SdkHttpOperation>;
+  strictEqual(biMethod.operation.examples, undefined);
+});

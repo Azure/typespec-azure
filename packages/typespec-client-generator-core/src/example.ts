@@ -54,7 +54,6 @@ async function checkExamplesDirExists(host: CompilerHost, dir: string) {
  * Load all examples for a client
  *
  * @param context
- * @param apiVersion
  * @returns a map of all operations' examples, key is operation's operation id,
  * value is a map of examples, key is example's title, value is example's details
  */
