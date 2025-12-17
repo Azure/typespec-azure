@@ -2008,6 +2008,11 @@ You could define a single client that combines operations from multiple services
 
 3. **Operation Group Structure**: Operations and operation groups will be auto merged into the single client (based on operation, interfaces or namespaces from the original services).
 
+:::caution
+All services being merged must share the same endpoint and authentication method. If not, you will get diagnostics error.
+You need to ensue that there are no naming conflicts between the services being merged. If there are conflicts, you may need to rename the types in the original services to avoid collisions.
+:::
+
 <ClientTabs>
 
 ```typespec title="main.tsp"
