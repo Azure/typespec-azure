@@ -859,6 +859,10 @@ describe("data plane LRO templates", () => {
         errorMessage: string[];
       }
 
+      model UpdateFinalResult {
+        id2: string;
+      }
+
       @doc("Get operation progress")
       interface OperationProgress {
         @doc("Get operation progress")
@@ -875,7 +879,8 @@ describe("data plane LRO templates", () => {
     }
     assert.isTrue(response.isGeneratedName);
     const generatedName = response.name;
-    assert.strictEqual("UpdateFinalResult", generatedName);
+    // duplicate with existing model named "UpdateFinalResult" so the generated name will be "UpdateFinalResult1"
+    assert.strictEqual("UpdateFinalResult1", generatedName);
     const crossLanguageId = response.crossLanguageDefinitionId;
     assert.isFalse(crossLanguageId.includes(".."));
     const lroMetadata = method.lroMetadata;
@@ -884,7 +889,7 @@ describe("data plane LRO templates", () => {
     assert.exists(finalResponse);
     const finalResult = finalResponse.result;
     assert.exists(finalResult);
-    assert.strictEqual(finalResult.name, "UpdateFinalResult");
+    assert.strictEqual(finalResult.name, "UpdateFinalResult1");
   });
 });
 
