@@ -163,6 +163,19 @@ describe("query parameters", () => {
     it("with option", async () => {
       const param = await getQueryParam(`op test(@query myParam: string[]): void;`);
       expect(param).toMatchObject({
+        type: "array",
+        items: { type: "string" },
+        collectionFormat: "csv",
+      });
+    });
+
+    it("commaDelimited", async () => {
+      const param = await getQueryParam(
+        `op test(@query @encode(ArrayEncoding.commaDelimited) myParam: string[]): void;`,
+      );
+      expect(param).toMatchObject({
+        type: "array",
+        items: { type: "string" },
         collectionFormat: "csv",
       });
     });
@@ -172,6 +185,8 @@ describe("query parameters", () => {
         `op test(@query @encode(ArrayEncoding.pipeDelimited) myParam: string[]): void;`,
       );
       expect(param).toMatchObject({
+        type: "array",
+        items: { type: "string" },
         collectionFormat: "pipes",
       });
     });
@@ -181,6 +196,8 @@ describe("query parameters", () => {
         `op test(@query @encode(ArrayEncoding.spaceDelimited) myParam: string[]): void;`,
       );
       expect(param).toMatchObject({
+        type: "array",
+        items: { type: "string" },
         collectionFormat: "ssv",
       });
     });
@@ -189,9 +206,14 @@ describe("query parameters", () => {
       const diagnostics = await diagnoseOpenApiFor(
         `op test(@query @encode("tsv") myParam: string[]): void;`,
       );
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-autorest/invalid-multi-collection-format",
-      });
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-autorest/invalid-multi-collection-format",
+        },
+        {
+          code: "@azure-tools/typespec-autorest/unknown-format",
+        },
+      ]);
     });
   });
 
@@ -396,9 +418,14 @@ describe("header parameters", () => {
       const diagnostics = await diagnoseOpenApiFor(
         `op test(@header @encode("tsv") myParam: string[]): void;`,
       );
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-autorest/invalid-multi-collection-format",
-      });
+      expectDiagnostics(diagnostics, [
+        {
+          code: "@azure-tools/typespec-autorest/invalid-multi-collection-format",
+        },
+        {
+          code: "@azure-tools/typespec-autorest/unknown-format",
+        },
+      ]);
     });
   });
 });
