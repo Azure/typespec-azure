@@ -1,9 +1,27 @@
 import "@typespec/versioning";
 import "@typespec/http";
 import "@typespec/spector";
+
 using Versioning;
 using Http;
+using Spector;
 
+@scenario
+@scenarioDoc("""
+    Test that a client can expose operations from multiple services.
+    This scenario demonstrates creating a unified client that provides access to 
+    operations from different services using the @client decorator.
+    
+    ```ts
+    const client = new MultiServiceClient();
+    
+    // Call operation from first service - uses api-version av2
+    client.ai.aTest();
+  
+    // Call operation from second service - uses api-version bv2
+    client.bi.bTest();
+    ```
+  """)
 namespace Service.MultiService;
 
 /*
