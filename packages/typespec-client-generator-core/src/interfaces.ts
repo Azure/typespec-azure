@@ -15,6 +15,7 @@ import {
   Program,
   Type,
 } from "@typespec/compiler";
+import { unsafe_Realm } from "@typespec/compiler/experimental";
 import {
   HttpAuth,
   HttpOperation,
@@ -73,15 +74,16 @@ export interface TCGCContext {
   __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
   __pagedResultSet: Set<SdkType>;
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
-  __packageVersions?: string[]; // the package versions from the service versioning config and api version setting in tspconfig.
-  __packageVersionEnum?: Enum; // the enum type that contains all the package versions.
+  __mutatedRealm?: unsafe_Realm; // the realm that contains all mutated types for this instance
+  __packageVersions?: Map<Namespace, string[]>; // the package versions (for each service) from the service versioning config and api version setting in tspconfig.
+  __packageVersionEnum?: Map<Namespace, Enum | undefined>; // the enum type that contains all the package versions (for each service).
   __externalPackageToVersions?: Map<string, string>;
 
   getMutatedGlobalNamespace(): Namespace;
   getApiVersionsForType(type: Type): string[];
   setApiVersionsForType(type: Type, apiVersions: string[]): void;
-  getPackageVersions(): string[];
-  getPackageVersionEnum(): Enum | undefined;
+  getPackageVersions(service?: Namespace): Map<Namespace, string[]>;
+  getPackageVersionEnum(): Map<Namespace, Enum | undefined>;
   getClients(): SdkClient[];
   getClientOrOperationGroup(type: Namespace | Interface): SdkClient | SdkOperationGroup | undefined;
   getOperationsForClient(client: SdkClient | SdkOperationGroup): Operation[];
@@ -101,10 +103,8 @@ export interface SdkContext<
 export interface SdkClient {
   kind: "SdkClient";
   name: string;
-  service: Namespace;
+  service: Namespace | Namespace[];
   type: Namespace | Interface;
-  /** Unique ID for the current type. */
-  crossLanguageDefinitionId: string;
   subOperationGroups: SdkOperationGroup[];
 }
 

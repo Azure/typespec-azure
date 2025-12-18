@@ -102,13 +102,13 @@ export function isApiVersion(context: TCGCContext, type: ModelProperty): boolean
     return override;
   }
   // if the service is not versioning, then no api version parameter
-  const versionEnum = context.getPackageVersionEnum();
-  if (!versionEnum) {
+  const versionEnumSets = [...context.getPackageVersionEnum().values()];
+  if (versionEnumSets.length === 0) {
     return false;
   }
   // if the parameter type is the version enum or named as "apiVersion" or "api-version", then it is api version
   return (
-    type.type === versionEnum ||
+    versionEnumSets.some((versionEnum) => type.type === versionEnum) ||
     type.name.toLowerCase().includes("apiversion") ||
     type.name.toLowerCase().includes("api-version")
   );
