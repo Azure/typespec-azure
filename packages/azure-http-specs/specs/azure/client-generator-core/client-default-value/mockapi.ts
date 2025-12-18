@@ -53,3 +53,20 @@ Scenarios.Azure_ClientGenerator_Core_ClientDefaultValue_getPathParameter = passO
     kind: "MockApiDefinition",
   },
 ]);
+
+Scenarios.Azure_ClientGenerator_Core_ClientDefaultValue_getHeaderParameter = passOnSuccess([
+  {
+    uri: "/azure/client-generator-core/client-default-value/header-parameter",
+    method: "get",
+    request: {
+      headers: {
+        accept: "application/json;odata.metadata=none",
+        "x-custom-header": "default-value",
+      },
+    },
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+]);
