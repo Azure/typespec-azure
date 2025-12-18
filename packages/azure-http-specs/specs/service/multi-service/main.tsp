@@ -6,28 +6,12 @@ using Versioning;
 using Http;
 using Spector;
 
-@scenario
-@scenarioDoc("""
-    Test that a client can expose operations from multiple services.
-    This scenario demonstrates creating a unified client that provides access to 
-    operations from different services using the @client decorator.
-    
-    ```ts
-    const client = new MultiServiceClient();
-    
-    // Call operation from first service - uses api-version av2
-    client.ai.aTest();
-  
-    // Call operation from second service - uses api-version bv2
-    client.bi.bTest();
-    ```
-  """)
 namespace Service.MultiService;
 
 /*
  * First service definition in a multi-service package with versioning
  */
-@service
+@scenarioService("/service/multi-service/service-a")
 @versioned(VersionsA)
 namespace ServiceA {
   enum VersionsA {
@@ -36,9 +20,15 @@ namespace ServiceA {
   }
 
   interface AI {
-    /**
-     * Test operation aTest from ServiceA.
-     */
+    @scenario
+    @scenarioDoc("""
+        Test that a client can expose operations from multiple services. This operaton should be called like this: `client.ai.aTest(...)`.
+      
+        GET a Virtual Machine.
+        Expected path: /service/multi-service/service-a/aTest
+        Expected query parameter: api-version=av2
+        Expected 204 response.
+      """)
     @route("/aTest")
     aTest(@query("api-version") apiVersion: VersionsA): void;
   }
@@ -47,7 +37,7 @@ namespace ServiceA {
 /**
  * Second service definition in a multi-service package with versioning
  */
-@service
+@scenarioService("/service/multi-service/service-b")
 @versioned(VersionsB)
 namespace ServiceB {
   enum VersionsB {
@@ -56,9 +46,15 @@ namespace ServiceB {
   }
 
   interface BI {
-    /**
-     * Test operation bTest from ServiceB.
-     */
+    @scenario
+    @scenarioDoc("""
+        Test that a client can expose operations from multiple services. This operaton should be called like this: `client.bi.bTest(...)`.
+      
+        GET a Virtual Machine.
+        Expected path: /service/multi-service/service-b/bTest
+        Expected query parameter: api-version=bv2
+        Expected 204 response.
+      """)
     @route("/bTest")
     bTest(@query("api-version") apiVersion: VersionsB): void;
   }

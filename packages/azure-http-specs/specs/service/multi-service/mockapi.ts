@@ -3,7 +3,7 @@ import { passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
 Scenarios.Service_MultiService_ServiceA_AI_aTest = passOnSuccess({
-  uri: "/aTest",
+  uri: "/service/multi-service/service-a/aTest",
   method: "get",
   request: {
     query: {
@@ -15,7 +15,7 @@ Scenarios.Service_MultiService_ServiceA_AI_aTest = passOnSuccess({
 });
 
 Scenarios.Service_MultiService_ServiceB_BI_bTest = passOnSuccess({
-  uri: "/bTest",
+  uri: "/service/multi-service/service-b/bTest",
   method: "get",
   request: {
     query: {
