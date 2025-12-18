@@ -762,3 +762,997 @@ it("optional params propagated", async () => {
 `,
   );
 });
+
+it("one client from multiple services", async () => {
+  await runner.compileWithCustomization(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      interface AI {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      interface BI {
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+    `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombineClient;
+  `,
+  );
+  const sdkPackage = runner.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const aVersionsEnum = sdkPackage.enums.find((e) => e.name === "VersionsA");
+  ok(aVersionsEnum);
+  const bVersionsEnum = sdkPackage.enums.find((e) => e.name === "VersionsB");
+  ok(bVersionsEnum);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  // For root client of multiple services, the `apiVersions` will be empty.
+  strictEqual(client.apiVersions.length, 0);
+  strictEqual(client.children!.length, 2);
+  strictEqual(client.clientInitialization.parameters.length, 2);
+  ok(client.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+  const apiVersionParam = client.clientInitialization.parameters.find(
+    (p) => p.name === "apiVersion",
+  );
+  ok(apiVersionParam);
+  strictEqual(apiVersionParam.apiVersions.length, 0);
+  strictEqual(apiVersionParam.clientDefaultValue, undefined);
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+
+  // AI client should have api versions from ServiceA
+  strictEqual(aiClient.apiVersions.length, 2);
+  deepStrictEqual(aiClient.apiVersions, ["av1", "av2"]);
+  strictEqual(aiClient.clientInitialization.parameters.length, 2);
+  strictEqual(aiClient.clientInitialization.parameters[0].name, "endpoint");
+  strictEqual(aiClient.clientInitialization.parameters[1].name, "apiVersion");
+  const aiApiVersionParam = aiClient.clientInitialization.parameters[1];
+  strictEqual(aiApiVersionParam.isApiVersionParam, true);
+  strictEqual(aiApiVersionParam.onClient, true);
+  strictEqual(aiApiVersionParam.clientDefaultValue, "av2");
+
+  // AI client should have aTest method with VersionsA api version
+  strictEqual(aiClient.methods.length, 1);
+  const aiMethod = aiClient.methods[0];
+  strictEqual(aiMethod.name, "aTest");
+  strictEqual(aiMethod.parameters.length, 0);
+  const aiOperation = aiMethod.operation;
+  strictEqual(aiOperation.parameters.length, 1);
+  const aiOperationApiVersionParam = aiOperation.parameters.find((p) => p.isApiVersionParam);
+  ok(aiOperationApiVersionParam);
+  strictEqual(aiOperationApiVersionParam.correspondingMethodParams.length, 1);
+  strictEqual(aiOperationApiVersionParam.correspondingMethodParams[0], aiApiVersionParam);
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+
+  strictEqual(biClient.apiVersions.length, 2);
+  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
+  strictEqual(biClient.clientInitialization.parameters.length, 2);
+  strictEqual(biClient.clientInitialization.parameters[0].name, "endpoint");
+  strictEqual(biClient.clientInitialization.parameters[1].name, "apiVersion");
+  const biApiVersionParam = biClient.clientInitialization.parameters[1];
+  strictEqual(biApiVersionParam.isApiVersionParam, true);
+  strictEqual(biApiVersionParam.onClient, true);
+  strictEqual(biApiVersionParam.clientDefaultValue, "bv2");
+
+  // BI client should have bTest method with VersionsB api version
+  const biMethod = biClient.methods[0];
+  strictEqual(biMethod.name, "bTest");
+  strictEqual(biMethod.parameters.length, 0);
+  const biOperation = biMethod.operation;
+  strictEqual(biOperation.parameters.length, 1);
+  const biOperationApiVersionParam = biOperation.parameters.find((p) => p.isApiVersionParam);
+  ok(biOperationApiVersionParam);
+  strictEqual(biOperationApiVersionParam.correspondingMethodParams.length, 1);
+  strictEqual(biOperationApiVersionParam.correspondingMethodParams[0], biApiVersionParam);
+});
+
+it("one client from multiple services with no versioning", async () => {
+  await runner.compileWithCustomization(
+    `
+    @service
+    namespace ServiceA {
+      interface AI {
+        @route("/aTest")
+        aTest(): void;
+      }
+    }
+    @service
+    namespace ServiceB {
+      interface BI {
+        @route("/bTest")
+        bTest(): void;
+      }
+    }`,
+    `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    namespace CombineClient;
+  `,
+  );
+  const sdkPackage = runner.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  // For root client of multiple services, the `apiVersions` will be empty.
+  strictEqual(client.apiVersions.length, 0);
+  strictEqual(client.children!.length, 2);
+  strictEqual(client.clientInitialization.parameters.length, 1);
+  ok(client.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+
+  // AI client should have no api versions
+  strictEqual(aiClient.apiVersions.length, 0);
+  strictEqual(aiClient.clientInitialization.parameters.length, 1);
+  strictEqual(aiClient.clientInitialization.parameters[0].name, "endpoint");
+
+  // AI client should have aTest method with no api version
+  const aiMethod = aiClient.methods[0];
+  strictEqual(aiMethod.name, "aTest");
+  strictEqual(aiMethod.parameters.length, 0);
+  const aiOperation = aiMethod.operation;
+  strictEqual(aiOperation.parameters.length, 0);
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+
+  // BI client should have no api versions
+  strictEqual(biClient.apiVersions.length, 0);
+  strictEqual(biClient.clientInitialization.parameters.length, 1);
+  strictEqual(biClient.clientInitialization.parameters[0].name, "endpoint");
+
+  // BI client should have bTest method with no api version
+  const biMethod = biClient.methods[0];
+  strictEqual(biMethod.name, "bTest");
+  strictEqual(biMethod.parameters.length, 0);
+  const biOperation = biMethod.operation;
+  strictEqual(biOperation.parameters.length, 0);
+});
+
+it("one client from multiple services without version dependency", async () => {
+  await runner.compileWithCustomization(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      interface AI {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      interface BI {
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+    `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    namespace CombineClient;
+  `,
+  );
+  const sdkPackage = runner.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const aVersionsEnum = sdkPackage.enums.find((e) => e.name === "VersionsA");
+  ok(aVersionsEnum);
+  const bVersionsEnum = sdkPackage.enums.find((e) => e.name === "VersionsB");
+  ok(bVersionsEnum);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  // For root client of multiple services, the `apiVersions` will be empty.
+  strictEqual(client.apiVersions.length, 0);
+  strictEqual(client.children!.length, 2);
+  strictEqual(client.clientInitialization.parameters.length, 2);
+  ok(client.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+  const apiVersionParam = client.clientInitialization.parameters.find(
+    (p) => p.name === "apiVersion",
+  );
+  ok(apiVersionParam);
+  strictEqual(apiVersionParam.apiVersions.length, 0);
+  strictEqual(apiVersionParam.clientDefaultValue, undefined);
+
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+
+  // AI client should have api versions from ServiceA
+  strictEqual(aiClient.apiVersions.length, 2);
+  deepStrictEqual(aiClient.apiVersions, ["av1", "av2"]);
+  strictEqual(aiClient.clientInitialization.parameters.length, 2);
+  strictEqual(aiClient.clientInitialization.parameters[0].name, "endpoint");
+  strictEqual(aiClient.clientInitialization.parameters[1].name, "apiVersion");
+  const aiApiVersionParam = aiClient.clientInitialization.parameters[1];
+  strictEqual(aiApiVersionParam.isApiVersionParam, true);
+  strictEqual(aiApiVersionParam.onClient, true);
+  strictEqual(aiApiVersionParam.clientDefaultValue, "av2");
+
+  // AI client should have aTest method with VersionsA api version
+  strictEqual(aiClient.methods.length, 1);
+  const aiMethod = aiClient.methods[0];
+  strictEqual(aiMethod.name, "aTest");
+  strictEqual(aiMethod.parameters.length, 0);
+  const aiOperation = aiMethod.operation;
+  strictEqual(aiOperation.parameters.length, 1);
+  const aiOperationApiVersionParam = aiOperation.parameters.find((p) => p.isApiVersionParam);
+  ok(aiOperationApiVersionParam);
+  strictEqual(aiOperationApiVersionParam.correspondingMethodParams.length, 1);
+  strictEqual(aiOperationApiVersionParam.correspondingMethodParams[0], aiApiVersionParam);
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+
+  strictEqual(biClient.apiVersions.length, 2);
+  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
+  strictEqual(biClient.clientInitialization.parameters.length, 2);
+  strictEqual(biClient.clientInitialization.parameters[0].name, "endpoint");
+  strictEqual(biClient.clientInitialization.parameters[1].name, "apiVersion");
+  const biApiVersionParam = biClient.clientInitialization.parameters[1];
+  strictEqual(biApiVersionParam.isApiVersionParam, true);
+  strictEqual(biApiVersionParam.onClient, true);
+  strictEqual(biApiVersionParam.clientDefaultValue, "bv2");
+
+  // BI client should have bTest method with VersionsB api version
+  const biMethod = biClient.methods[0];
+  strictEqual(biMethod.name, "bTest");
+  strictEqual(biMethod.parameters.length, 0);
+  const biOperation = biMethod.operation;
+  strictEqual(biOperation.parameters.length, 1);
+  const biOperationApiVersionParam = biOperation.parameters.find((p) => p.isApiVersionParam);
+  ok(biOperationApiVersionParam);
+  strictEqual(biOperationApiVersionParam.correspondingMethodParams.length, 1);
+  strictEqual(biOperationApiVersionParam.correspondingMethodParams[0], biApiVersionParam);
+});
+
+it("one client from multiple services with `@clientLocation`", async () => {
+  await runner.compileWithCustomization(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      interface AI {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+      }
+
+      interface AI2 {
+        @route("/aTest2")
+        aTest2(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      interface BI {
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+    `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombineClient;
+
+    @@clientLocation(ServiceA.AI2.aTest2, ServiceA.AI);
+    @@clientLocation(ServiceB.BI.bTest, "BI2");
+  `,
+  );
+  const sdkPackage = runner.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const aVersionsEnum = sdkPackage.enums.find((e) => e.name === "VersionsA");
+  ok(aVersionsEnum);
+  const bVersionsEnum = sdkPackage.enums.find((e) => e.name === "VersionsB");
+  ok(bVersionsEnum);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  // For root client of multiple services, the `apiVersions` will be empty.
+  strictEqual(client.apiVersions.length, 0);
+  strictEqual(client.children!.length, 2);
+  strictEqual(client.clientInitialization.parameters.length, 2);
+  ok(client.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+  const apiVersionParam = client.clientInitialization.parameters.find(
+    (p) => p.name === "apiVersion",
+  );
+  ok(apiVersionParam);
+  strictEqual(apiVersionParam.apiVersions.length, 0);
+  strictEqual(apiVersionParam.clientDefaultValue, undefined);
+
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+
+  // AI client should have api versions from ServiceA
+  strictEqual(aiClient.apiVersions.length, 2);
+  deepStrictEqual(aiClient.apiVersions, ["av1", "av2"]);
+  strictEqual(aiClient.clientInitialization.parameters.length, 2);
+  strictEqual(aiClient.clientInitialization.parameters[0].name, "endpoint");
+  strictEqual(aiClient.clientInitialization.parameters[1].name, "apiVersion");
+  const aiApiVersionParam = aiClient.clientInitialization.parameters[1];
+  strictEqual(aiApiVersionParam.isApiVersionParam, true);
+  strictEqual(aiApiVersionParam.onClient, true);
+  strictEqual(aiApiVersionParam.clientDefaultValue, "av2");
+
+  // AI client should have aTest method with VersionsA api version
+  strictEqual(aiClient.methods.length, 2);
+  const aiMethod = aiClient.methods[0];
+  strictEqual(aiMethod.name, "aTest");
+  strictEqual(aiMethod.parameters.length, 0);
+  const aiOperation = aiMethod.operation;
+  strictEqual(aiOperation.parameters.length, 1);
+  const aiOperationApiVersionParam = aiOperation.parameters.find((p) => p.isApiVersionParam);
+  ok(aiOperationApiVersionParam);
+  strictEqual(aiOperationApiVersionParam.correspondingMethodParams.length, 1);
+  strictEqual(aiOperationApiVersionParam.correspondingMethodParams[0], aiApiVersionParam);
+
+  // AI client should have aTest2 method with VersionsA api version
+  const aiMethod2 = aiClient.methods[1];
+  strictEqual(aiMethod2.name, "aTest2");
+  strictEqual(aiMethod2.parameters.length, 0);
+  const aiOperation2 = aiMethod2.operation;
+  strictEqual(aiOperation2.parameters.length, 1);
+  const aiOperation2ApiVersionParam = aiOperation2.parameters.find((p) => p.isApiVersionParam);
+  ok(aiOperation2ApiVersionParam);
+  strictEqual(aiOperation2ApiVersionParam.correspondingMethodParams.length, 1);
+  strictEqual(aiOperation2ApiVersionParam.correspondingMethodParams[0], aiApiVersionParam);
+
+  const biClient = client.children!.find((c) => c.name === "BI2");
+  ok(biClient);
+
+  strictEqual(biClient.apiVersions.length, 2);
+  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
+  strictEqual(biClient.clientInitialization.parameters.length, 2);
+  strictEqual(biClient.clientInitialization.parameters[0].name, "endpoint");
+  strictEqual(biClient.clientInitialization.parameters[1].name, "apiVersion");
+  const biApiVersionParam = biClient.clientInitialization.parameters[1];
+  strictEqual(biApiVersionParam.isApiVersionParam, true);
+  strictEqual(biApiVersionParam.onClient, true);
+  strictEqual(biApiVersionParam.clientDefaultValue, "bv2");
+
+  // BI client should have bTest method with VersionsB api version
+  const biMethod = biClient.methods[0];
+  strictEqual(biMethod.name, "bTest");
+  strictEqual(biMethod.parameters.length, 0);
+  const biOperation = biMethod.operation;
+  strictEqual(biOperation.parameters.length, 1);
+  const biOperationApiVersionParam = biOperation.parameters.find((p) => p.isApiVersionParam);
+  ok(biOperationApiVersionParam);
+  strictEqual(biOperationApiVersionParam.correspondingMethodParams.length, 1);
+  strictEqual(biOperationApiVersionParam.correspondingMethodParams[0], biApiVersionParam);
+});
+
+it("one client from multiple services with api-version set to latest", async () => {
+  const runnerWithVersion = await createSdkTestRunner({
+    "api-version": "latest",
+    emitterName: "@azure-tools/typespec-python",
+  });
+  await runnerWithVersion.compileWithCustomization(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+        av3,
+      }
+      interface AI {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      interface BI {
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+    `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av3, ServiceB.VersionsB.bv2)
+    namespace CombineClient;
+  `,
+  );
+  const sdkPackage = runnerWithVersion.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  strictEqual(client.apiVersions.length, 0);
+  strictEqual(client.children!.length, 2);
+
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+  strictEqual(aiClient.apiVersions.length, 3);
+  deepStrictEqual(aiClient.apiVersions, ["av1", "av2", "av3"]);
+  const aiApiVersionParam = aiClient.clientInitialization.parameters.find(
+    (p) => p.isApiVersionParam,
+  );
+  ok(aiApiVersionParam);
+  strictEqual(aiApiVersionParam.clientDefaultValue, "av3");
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+  strictEqual(biClient.apiVersions.length, 2);
+  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
+  const biApiVersionParam = biClient.clientInitialization.parameters.find(
+    (p) => p.isApiVersionParam,
+  );
+  ok(biApiVersionParam);
+  strictEqual(biApiVersionParam.clientDefaultValue, "bv2");
+});
+
+it("one client from multiple services with api-version set to specific version bv1", async () => {
+  const runnerWithVersion = await createSdkTestRunner({
+    "api-version": "bv1",
+    emitterName: "@azure-tools/typespec-python",
+  });
+  await runnerWithVersion.compileWithCustomization(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+        av3,
+      }
+      interface AI {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+        bv3,
+      }
+      interface BI {
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): void;
+
+        @route("/bTest2")
+        @added(VersionsB.bv2)
+        bTest2(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+    `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av3, ServiceB.VersionsB.bv1)
+    namespace CombineClient;
+  `,
+  );
+  const sdkPackage = runnerWithVersion.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  strictEqual(client.apiVersions.length, 0);
+
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+  // ServiceA doesn't have bv1, so api-version="bv1" doesn't filter it
+  // It falls back to useDependency which specifies av3
+  strictEqual(aiClient.apiVersions.length, 0);
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+  // With api-version bv1, we should see only bv1 version
+  strictEqual(biClient.apiVersions.length, 1);
+  deepStrictEqual(biClient.apiVersions, ["bv1"]);
+  const biApiVersionParam = biClient.clientInitialization.parameters.find(
+    (p) => p.isApiVersionParam,
+  );
+  ok(biApiVersionParam);
+  strictEqual(biApiVersionParam.clientDefaultValue, "bv1");
+
+  // bTest2 should not be included since it was added in bv2
+  strictEqual(biClient.methods.length, 1);
+  strictEqual(biClient.methods[0].name, "bTest");
+});
+
+it("one client from multiple services with api-version set to all", async () => {
+  const runnerWithVersion = await createSdkTestRunner({
+    "api-version": "all",
+    emitterName: "@azure-tools/typespec-python",
+  });
+  await runnerWithVersion.compileWithCustomization(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+        av3,
+      }
+      interface AI {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+
+        @route("/aTest2")
+        @added(VersionsA.av2)
+        @removed(VersionsA.av3)
+        aTest2(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      interface BI {
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): void;
+
+        @route("/bTest2")
+        @added(VersionsB.bv2)
+        bTest2(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+    `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av3, ServiceB.VersionsB.bv2)
+    namespace CombineClient;
+  `,
+  );
+  const sdkPackage = runnerWithVersion.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  strictEqual(client.apiVersions.length, 0);
+
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+  strictEqual(aiClient.apiVersions.length, 3);
+  deepStrictEqual(aiClient.apiVersions, ["av1", "av2", "av3"]);
+  const aiApiVersionParam = aiClient.clientInitialization.parameters.find(
+    (p) => p.isApiVersionParam,
+  );
+  ok(aiApiVersionParam);
+  strictEqual(aiApiVersionParam.clientDefaultValue, "av3");
+
+  // With api-version all, both aTest and aTest2 should be included
+  strictEqual(aiClient.methods.length, 2);
+  const aTest = aiClient.methods.find((m) => m.name === "aTest");
+  ok(aTest);
+  deepStrictEqual(aTest.apiVersions, ["av1", "av2", "av3"]);
+  const aTest2 = aiClient.methods.find((m) => m.name === "aTest2");
+  ok(aTest2);
+  deepStrictEqual(aTest2.apiVersions, ["av2"]);
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+  strictEqual(biClient.apiVersions.length, 2);
+  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
+  const biApiVersionParam = biClient.clientInitialization.parameters.find(
+    (p) => p.isApiVersionParam,
+  );
+  ok(biApiVersionParam);
+  strictEqual(biApiVersionParam.clientDefaultValue, "bv2");
+
+  // Both bTest and bTest2 should be included
+  strictEqual(biClient.methods.length, 2);
+  const bTest = biClient.methods.find((m) => m.name === "bTest");
+  ok(bTest);
+  deepStrictEqual(bTest.apiVersions, ["bv1", "bv2"]);
+  const bTest2 = biClient.methods.find((m) => m.name === "bTest2");
+  ok(bTest2);
+  deepStrictEqual(bTest2.apiVersions, ["bv2"]);
+});
+
+it("one client from multiple services with different useDependency versions", async () => {
+  const runnerWithVersion = await createSdkTestRunner({
+    emitterName: "@azure-tools/typespec-python",
+  });
+  await runnerWithVersion.compileWithCustomization(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+        av3,
+      }
+      interface AI {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+        bv3,
+      }
+      interface BI {
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+    `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av1, ServiceB.VersionsB.bv3)
+    namespace CombineClient;
+  `,
+  );
+  const sdkPackage = runnerWithVersion.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  strictEqual(client.apiVersions.length, 0);
+
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+  // useDependency specifies av1, so only av1 should be included
+  strictEqual(aiClient.apiVersions.length, 1);
+  deepStrictEqual(aiClient.apiVersions, ["av1"]);
+  const aiApiVersionParam = aiClient.clientInitialization.parameters.find(
+    (p) => p.isApiVersionParam,
+  );
+  ok(aiApiVersionParam);
+  strictEqual(aiApiVersionParam.clientDefaultValue, "av1");
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+  // useDependency specifies bv3, so all versions up to bv3 should be included
+  strictEqual(biClient.apiVersions.length, 3);
+  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2", "bv3"]);
+  const biApiVersionParam = biClient.clientInitialization.parameters.find(
+    (p) => p.isApiVersionParam,
+  );
+  ok(biApiVersionParam);
+  strictEqual(biApiVersionParam.clientDefaultValue, "bv3");
+});
+
+it("one client from multiple services with models shared across services", async () => {
+  const runnerWithVersion = await createSdkTestRunner({
+    "api-version": "latest",
+    emitterName: "@azure-tools/typespec-python",
+  });
+  await runnerWithVersion.compileWithCustomization(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+
+      model SharedModel {
+        name: string;
+        @added(VersionsA.av2)
+        description?: string;
+      }
+
+      interface AI {
+        @route("/aTest")
+        aTest(@body body: SharedModel, @query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+
+      model SharedModel {
+        id: int32;
+        @added(VersionsB.bv2)
+        value?: string;
+      }
+
+      interface BI {
+        @route("/bTest")
+        bTest(@body body: SharedModel, @query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+    `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombineClient;
+  `,
+  );
+  const sdkPackage = runnerWithVersion.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+
+  // Both SharedModel types should exist - one from each service
+  const models = sdkPackage.models;
+  strictEqual(models.length, 2);
+
+  const sharedModelA = models.find((m) => m.namespace === "ServiceA");
+  ok(sharedModelA);
+  strictEqual(sharedModelA.name, "SharedModel");
+  strictEqual(sharedModelA.properties.length, 2);
+  const nameProperty = sharedModelA.properties.find((p) => p.name === "name");
+  ok(nameProperty);
+  const descriptionProperty = sharedModelA.properties.find((p) => p.name === "description");
+  ok(descriptionProperty);
+
+  const sharedModelB = models.find((m) => m.namespace === "ServiceB");
+  ok(sharedModelB);
+  strictEqual(sharedModelB.name, "SharedModel");
+  strictEqual(sharedModelB.properties.length, 2);
+  const idProperty = sharedModelB.properties.find((p) => p.name === "id");
+  ok(idProperty);
+  const valueProperty = sharedModelB.properties.find((p) => p.name === "value");
+  ok(valueProperty);
+
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+  strictEqual(aiClient.apiVersions.length, 2);
+  deepStrictEqual(aiClient.apiVersions, ["av1", "av2"]);
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+  strictEqual(biClient.apiVersions.length, 2);
+  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
+});
+
+it("error: multiple explicit clients with multiple services", async () => {
+  const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      interface AI {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      interface BI {
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+    `
+    @client(
+      {
+        name: "ClientA",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace ClientA {}
+
+    @client(
+      {
+        name: "ClientB",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace ClientB {}
+  `,
+  );
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/multiple-explicit-clients-multiple-services",
+      message: "Can not define multiple explicit clients with multiple services.",
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/multiple-explicit-clients-multiple-services",
+      message: "Can not define multiple explicit clients with multiple services.",
+    },
+  ]);
+});
+
+it("error: client location to new operation group with multiple services", async () => {
+  const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      @route("/aTest")
+      op aTest(@query("api-version") apiVersion: VersionsA): void;
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      @route("/bTest")
+      op bTest(@query("api-version") apiVersion: VersionsB): void;
+    }`,
+    `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombineClient {}
+
+    // Try to move operations from different services to a new operation group that doesn't exist
+    @@clientLocation(ServiceA.aTest, "NewOperationGroup");
+    @@clientLocation(ServiceB.bTest, "NewOperationGroup");
+  `,
+  );
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/client-location-new-operation-group-multi-service",
+    message:
+      "Cannot move operations from different services to a new operation group that doesn't exist.",
+  });
+});
+
+it("error: inconsistent-multiple-service server", async () => {
+  const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+    `
+    @service
+    @server("https://servicea.example.com")
+    namespace ServiceA {
+    }
+    @service
+    @server("https://serviceb.example.com")
+    namespace ServiceB {
+    }`,
+    `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    namespace CombineClient {}
+  `,
+  );
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service",
+      message: "All services must have the same server and auth definitions.",
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/multiple-services",
+      message:
+        "Multiple services found. Only the first service will be used; others will be ignored.",
+    },
+  ]);
+});
+
+it("error: inconsistent-multiple-service-servers auth", async () => {
+  const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+    `
+    @service
+    @useAuth(BasicAuth)
+    namespace ServiceA {
+    }
+    @service
+    @useAuth(BearerAuth)
+    namespace ServiceB {
+    }`,
+    `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    namespace CombineClient {}
+  `,
+  );
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service",
+      message: "All services must have the same server and auth definitions.",
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/multiple-services",
+      message:
+        "Multiple services found. Only the first service will be used; others will be ignored.",
+    },
+  ]);
+});

@@ -26,7 +26,7 @@ import {
 } from "./interfaces.js";
 import {
   createGeneratedName,
-  getAvailableApiVersions,
+  getActualClientType,
   getClientDoc,
   getTypeDecorators,
   getValueTypeValue,
@@ -66,8 +66,8 @@ function getEndpointTypeFromSingleServer<
         methodParameterSegments: [],
         type: getSdkBuiltInType(context, $(context.program).builtin.url),
         isApiVersionParam: false,
-        apiVersions: context.getApiVersionsForType(client.__raw.type ?? client.__raw.service),
-        crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.__raw.service)}.endpoint`,
+        apiVersions: client.apiVersions,
+        crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.endpoint`,
         decorators: [],
         access: "public",
         flatten: false,
@@ -92,8 +92,8 @@ function getEndpointTypeFromSingleServer<
       if (sdkParam.isApiVersionParam && apiVersionInfo.clientDefaultValue) {
         sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
       }
-      sdkParam.apiVersions = getAvailableApiVersions(context, param, client.__raw.type);
-      sdkParam.crossLanguageDefinitionId = `${getCrossLanguageDefinitionId(context, client.__raw.service)}.${param.name}`;
+      sdkParam.apiVersions = client.apiVersions;
+      sdkParam.crossLanguageDefinitionId = `${client.crossLanguageDefinitionId}.${param.name}`;
     } else {
       diagnostics.add(
         createDiagnostic({
@@ -133,7 +133,9 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
 ): [SdkEndpointParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const rawClient = client.__raw;
-  const servers = getServers(context.program, client.__raw.service);
+  // For multiple services, just take the first one to get servers
+  const service = Array.isArray(rawClient.service) ? rawClient.service[0] : rawClient.service;
+  const servers = getServers(context.program, service);
   const types: SdkEndpointType[] = [];
 
   if (servers === undefined) {
@@ -151,10 +153,11 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
       access: "public",
       usage: UsageFlags.None,
       variantTypes: types,
-      name: createGeneratedName(context, rawClient.service, "Endpoint"),
+      name: createGeneratedName(context, service, "Endpoint"),
       isGeneratedName: true,
-      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, rawClient.service)}.Endpoint`,
-      namespace: getClientNamespace(context, rawClient.service),
+      apiVersions: client.apiVersions,
+      crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.Endpoint`,
+      namespace: getClientNamespace(context, service),
       decorators: [],
     } as SdkUnionType<SdkEndpointType>;
   } else {
@@ -168,10 +171,11 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
     doc: "Service host",
     onClient: true,
     urlEncode: false,
-    apiVersions: context.getApiVersionsForType(rawClient.type ?? rawClient.service),
+    // Endpoint parameter's api versions are derived from the client
+    apiVersions: client.apiVersions,
     optional: false,
     isApiVersionParam: false,
-    crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, rawClient.service)}.endpoint`,
+    crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.endpoint`,
     decorators: [],
     access: "public",
     flatten: false,
@@ -191,6 +195,7 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
       name = override;
     }
   }
+  const clientType = getActualClientType(client);
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
@@ -198,15 +203,15 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     doc: client.type ? getClientDoc(context, client.type) : undefined,
     summary: client.type ? getSummary(context.program, client.type) : undefined,
     methods: [],
-    apiVersions: context.getApiVersionsForType(client.type ?? client.service),
-    namespace: getClientNamespace(context, client.type ?? client.service),
+    apiVersions: context.getApiVersionsForType(clientType),
+    namespace: getClientNamespace(context, clientType),
     clientInitialization: diagnostics.pipe(
       createSdkClientInitializationType(context, client, parent),
     ),
     decorators: client.type ? diagnostics.pipe(getTypeDecorators(context, client.type)) : [],
     parent,
     // if it is client, the crossLanguageDefinitionId is the ${namespace}, if it is operation group, the crosslanguageDefinitionId is the %{namespace}.%{operationGroupName}
-    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, client.type ?? client.service),
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, clientType),
   };
   // NOTE: getSdkMethods recursively calls createSdkClientType
   sdkClientType.methods = diagnostics.pipe(
@@ -225,7 +230,7 @@ function addDefaultClientParameters<
   const defaultClientParamters = [];
   // there will always be an endpoint property
   defaultClientParamters.push(diagnostics.pipe(getSdkEndpointParameter(context, client)));
-  const credentialParam = getSdkCredentialParameter(context, client.__raw);
+  const credentialParam = getSdkCredentialParameter(context, client);
   if (credentialParam) {
     defaultClientParamters.push(credentialParam);
   }
@@ -241,7 +246,15 @@ function addDefaultClientParameters<
     }
   }
   if (apiVersionParam) {
-    defaultClientParamters.push(apiVersionParam);
+    if (Array.isArray(client.__raw.service)) {
+      // for multi-service clients, keep apiVersions empty and no default value
+      const multipleServiceApiVersionParam = { ...apiVersionParam };
+      multipleServiceApiVersionParam.apiVersions = [];
+      multipleServiceApiVersionParam.clientDefaultValue = undefined;
+      defaultClientParamters.push(multipleServiceApiVersionParam);
+    } else {
+      defaultClientParamters.push(apiVersionParam);
+    }
   }
   let subId = context.__clientParametersCache
     .get(client.__raw)
