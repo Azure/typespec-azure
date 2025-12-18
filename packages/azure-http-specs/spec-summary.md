@@ -4223,7 +4223,6 @@ Tests that we can grow up an operation from accepting one required parameter to 
 
   Test that a client can expose operations from multiple services. This operaton should be called like this: `client.ai.aTest(...)`.
 
-  GET a Virtual Machine.
   Expected path: /service/multi-service/service-a/aTest
   Expected query parameter: api-version=av2
   Expected 204 response.
@@ -4234,7 +4233,6 @@ Tests that we can grow up an operation from accepting one required parameter to 
 
   Test that a client can expose operations from multiple services. This operaton should be called like this: `client.bi.bTest(...)`.
 
-  GET a Virtual Machine.
   Expected path: /service/multi-service/service-b/bTest
   Expected query parameter: api-version=bv2
   Expected 204 response.
