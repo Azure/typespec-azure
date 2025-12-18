@@ -4216,19 +4216,3 @@ With the above two calls, we test the following configurations from this service
 - A client generated from the second service spec can call the second deployment of a service with api version v2 with the updated changes
 
 Tests that we can grow up an operation from accepting one required parameter to accepting a required parameter and an optional parameter.
-
-### Service_MultiService_Combined_FirstService
-
-- Endpoint: `get /aTest`
-
-  Test operation aTest from ServiceA.
-
-  Call this operation with apiVersion set to `av2`.
-
-### Service_MultiService_Combined_SecondService
-
-- Endpoint: `get /bTest`
-
-  Test operation bTest from ServiceB.
-
-  Call this operation with apiVersion set to `bv2`.
