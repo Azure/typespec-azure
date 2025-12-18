@@ -35,7 +35,7 @@ Scenarios.Azure_ResourceManager_MultiService_Compute_VirtualMachines_get = passO
     method: "get",
     request: {
       query: {
-        "api-version": "2024-11-01",
+        "api-version": "2025-04-01",
       },
     },
     response: {
@@ -54,7 +54,7 @@ Scenarios.Azure_ResourceManager_MultiService_Compute_VirtualMachines_createOrUpd
       method: "put",
       request: {
         query: {
-          "api-version": "2024-11-01",
+          "api-version": "2025-04-01",
         },
         body: json({
           location: LOCATION,
@@ -77,7 +77,7 @@ Scenarios.Azure_ResourceManager_MultiService_ComputeDisk_Disks_get = passOnSucce
     method: "get",
     request: {
       query: {
-        "api-version": "2024-03-02",
+        "api-version": "2025-01-02",
       },
     },
     response: {
@@ -95,7 +95,7 @@ Scenarios.Azure_ResourceManager_MultiService_ComputeDisk_Disks_createOrUpdate = 
     method: "put",
     request: {
       query: {
-        "api-version": "2024-03-02",
+        "api-version": "2025-01-02",
       },
       body: json({
         location: LOCATION,
