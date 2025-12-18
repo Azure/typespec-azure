@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/azure-http-specs"
 ---
 
-Add test for combined multi service
+Add data plane test for combined multi service.

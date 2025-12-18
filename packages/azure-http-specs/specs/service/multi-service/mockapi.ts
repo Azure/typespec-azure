@@ -2,9 +2,9 @@ import { passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
-Scenarios.Service_MultiService_Combined_FirstService = passOnSuccess({
+Scenarios.Service_MultiService_ServiceA_AI_aTest = passOnSuccess({
   uri: "/aTest",
-  method: "post",
+  method: "get",
   request: {
     query: {
       "api-version": "av2",
@@ -14,9 +14,9 @@ Scenarios.Service_MultiService_Combined_FirstService = passOnSuccess({
   kind: "MockApiDefinition",
 });
 
-Scenarios.Service_MultiService_Combined_SecondService = passOnSuccess({
+Scenarios.Service_MultiService_ServiceB_BI_bTest = passOnSuccess({
   uri: "/bTest",
-  method: "post",
+  method: "get",
   request: {
     query: {
       "api-version": "bv2",
