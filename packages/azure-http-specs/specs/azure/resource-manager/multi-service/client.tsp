@@ -8,6 +8,9 @@ using Azure.ResourceManager;
 using Azure.ClientGenerator.Core;
 
 @client({
-  service: [Microsoft.Compute, Microsoft.ComputeDisk],
+  service: [
+    Azure.ResourceManager.MultiService.Compute,
+    Azure.ResourceManager.MultiService.ComputeDisk
+  ],
 })
-namespace Azure.ResourceManager.MultiService;
+namespace Azure.ResourceManager.MultiService.Combined;

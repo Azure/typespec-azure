@@ -1,21 +1,17 @@
-import "@typespec/rest";
 import "@typespec/versioning";
-import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
+import "@typespec/spector";
 
-using TypeSpec.Rest;
-using TypeSpec.Http;
-using Azure.Core;
-using Azure.ResourceManager;
 using TypeSpec.Versioning;
+using Spector;
 
 /**
  * Compute Client
  */
-@armProviderNamespace
+@armProviderNamespace("Microsoft.Compute")
 @service(#{ title: "Azure Compute resource management API." })
 @versioned(Versions)
-namespace Microsoft.Compute;
+namespace Azure.ResourceManager.MultiService.Compute;
 
 /**
  * The available API versions.
@@ -56,10 +52,58 @@ interface VirtualMachines {
   /**
    * Retrieves information about the model view or the instance view of a virtual machine.
    */
+  @scenario
+  @scenarioDoc("""
+    Test that a client can expose operations from multiple services. This operaton should be called like this: `client.virtualMachines.get(...)`.
+    
+    GET a Virtual Machine.
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm1
+    Expected query parameter: api-version=2024-11-01
+    
+    Expected response body:
+    ```json
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm1",
+      "name": "vm1",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "eastus",
+      "properties": {
+        "provisioningState": "Succeeded"
+      }
+    }
+    ```
+    """)
   get is ArmResourceRead<VirtualMachine>;
 
   /**
    * The operation to create or update a virtual machine. Please note some properties can be set only during virtual machine creation.
    */
+  @scenario
+  @scenarioDoc("""
+    Test that a client can expose operations from multiple services. This operaton should be called like this: `client.virtualMachines.createOrUpdate(...)`.
+    
+    PUT (create or update) a Virtual Machine.
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm1
+    Expected query parameter: api-version=2024-11-01
+    Expected request body:
+    ```json
+    {
+      "location": "eastus",
+      "properties": {}
+    }
+    ```
+    Expected response body:
+    ```json
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm1",
+      "name": "vm1",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "eastus",
+      "properties": {
+        "provisioningState": "Succeeded"
+      }
+    }
+    ```
+    """)
   createOrUpdate is ArmResourceCreateOrUpdateAsync<VirtualMachine>;
 }
