@@ -4217,22 +4217,24 @@ With the above two calls, we test the following configurations from this service
 
 Tests that we can grow up an operation from accepting one required parameter to accepting a required parameter and an optional parameter.
 
-### Service_MultiService
+### Service_MultiService_ServiceA_AI_aTest
 
-- Endpoints:
-  - `get /aTest`
-  - `get /bTest`
+- Endpoint: `get /service/multi-service/service-a/aTest`
 
-  Test that a client can expose operations from multiple services.
-  This scenario demonstrates creating a unified client that provides access to
-  operations from different services using the @client decorator.
+  Test that a client can expose operations from multiple services. This operaton should be called like this: `client.ai.aTest(...)`.
 
-  ```ts
-  const client = new MultiServiceClient();
+  GET a Virtual Machine.
+  Expected path: /service/multi-service/service-a/aTest
+  Expected query parameter: api-version=av2
+  Expected 204 response.
 
-  // Call operation from first service - uses api-version av2
-  client.ai.aTest();
+### Service_MultiService_ServiceB_BI_bTest
 
-  // Call operation from second service - uses api-version bv2
-  client.bi.bTest();
-  ```
+- Endpoint: `get /service/multi-service/service-b/bTest`
+
+  Test that a client can expose operations from multiple services. This operaton should be called like this: `client.bi.bTest(...)`.
+
+  GET a Virtual Machine.
+  Expected path: /service/multi-service/service-b/bTest
+  Expected query parameter: api-version=bv2
+  Expected 204 response.
