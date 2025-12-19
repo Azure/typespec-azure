@@ -1,5 +1,19 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.63.1
+
+### Features
+
+- [#3656](https://github.com/Azure/typespec-azure/pull/3656) Emit `x-ms-client-default` when using `@Azure.ClientGenerator.Core.Legacy.clientDefaultValue`
+
+### Bug Fixes
+
+- [#3666](https://github.com/Azure/typespec-azure/pull/3666) Allow explicit `ArrayEncoding.commaDelimited` on parameters
+- [#3666](https://github.com/Azure/typespec-azure/pull/3666) Fix using `ArrayEncoding.pipeDelimited` or `ArrayEncoding.spaceDelimited` on parameter would transform the type to string incorrectly
+- [#3666](https://github.com/Azure/typespec-azure/pull/3666) Don't include `items` when encoding change type to `string`
+- [#3644](https://github.com/Azure/typespec-azure/pull/3644) Ignore encoding resulting in format not explicitly supported by autorest
+
+
 ## 0.63.0
 
 ### Breaking Changes
