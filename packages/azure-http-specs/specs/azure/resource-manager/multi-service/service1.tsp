@@ -84,7 +84,7 @@ interface VirtualMachines {
     
     PUT (create or update) a Virtual Machine.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm1
-    Expected query parameter: api-version=2024-11-01
+    Expected query parameter: api-version=2025-04-01
     Expected request body:
     ```json
     {
