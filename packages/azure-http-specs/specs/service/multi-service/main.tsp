@@ -19,17 +19,18 @@ namespace ServiceA {
     av2,
   }
 
-  interface AI {
+  @route("foo")
+  interface Foo {
     @scenario
     @scenarioDoc("""
-        Test that a client can expose operations from multiple services. This operaton should be called like this: `client.ai.aTest(...)`.
+        Test that a client can expose operations from multiple services. This operaton should be called like this: `client.foo.test(...)`.
       
-        Expected path: /service/multi-service/service-a/aTest
+        Expected path: /service/multi-service/service-a/foo/test
         Expected query parameter: api-version=av2
         Expected 204 response.
       """)
-    @route("/aTest")
-    aTest(@query("api-version") apiVersion: VersionsA): void;
+    @route("/test")
+    test(@query("api-version") apiVersion: VersionsA): void;
   }
 }
 
@@ -44,16 +45,17 @@ namespace ServiceB {
     bv2,
   }
 
-  interface BI {
+  @route("bar")
+  interface Bar {
     @scenario
     @scenarioDoc("""
-        Test that a client can expose operations from multiple services. This operaton should be called like this: `client.bi.bTest(...)`.
+        Test that a client can expose operations from multiple services. This operaton should be called like this: `client.bar.test(...)`.
       
-        Expected path: /service/multi-service/service-b/bTest
+        Expected path: /service/multi-service/service-b/bar/test
         Expected query parameter: api-version=bv2
         Expected 204 response.
       """)
-    @route("/bTest")
-    bTest(@query("api-version") apiVersion: VersionsB): void;
+    @route("/test")
+    test(@query("api-version") apiVersion: VersionsB): void;
   }
 }
