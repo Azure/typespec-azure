@@ -1998,7 +1998,7 @@ Test that a client can expose operations from multiple services. This operaton s
 
 PUT (create or update) a Virtual Machine.
 Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm1
-Expected query parameter: api-version=2024-11-01
+Expected query parameter: api-version=2025-04-01
 Expected request body:
 
 ```json
@@ -2030,7 +2030,7 @@ Test that a client can expose operations from multiple services. This operaton s
 
 GET a Virtual Machine.
 Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm1
-Expected query parameter: api-version=2024-11-01
+Expected query parameter: api-version=2025-04-01
 
 Expected response body:
 
@@ -2054,7 +2054,7 @@ Test that a client can expose operations from multiple services. This operaton s
 
 PUT (create or update) a Disk resource.
 Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/disks/disk1
-Expected query parameter: api-version=2024-03-02
+Expected query parameter: api-version=2025-01-02
 Expected request body:
 
 ```json
@@ -2086,7 +2086,7 @@ Test that a client can expose operations from multiple services. This operaton s
 
 GET a Disk resource.
 Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/disks/disk1
-Expected query parameter: api-version=2024-03-02
+Expected query parameter: api-version=2025-01-02
 
 Expected response body:
 
