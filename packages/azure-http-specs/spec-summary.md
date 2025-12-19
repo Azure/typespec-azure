@@ -4328,3 +4328,23 @@ With the above two calls, we test the following configurations from this service
 - A client generated from the second service spec can call the second deployment of a service with api version v2 with the updated changes
 
 Tests that we can grow up an operation from accepting one required parameter to accepting a required parameter and an optional parameter.
+
+### Service_MultiService_ServiceA_Foo_test
+
+- Endpoint: `get /service/multi-service/service-a/foo/test`
+
+  Test that a client can expose operations from multiple services. This operaton should be called like this: `client.foo.test(...)`.
+
+  Expected path: /service/multi-service/service-a/foo/test
+  Expected query parameter: api-version=av2
+  Expected 204 response.
+
+### Service_MultiService_ServiceB_Bar_test
+
+- Endpoint: `get /service/multi-service/service-b/bar/test`
+
+  Test that a client can expose operations from multiple services. This operaton should be called like this: `client.bar.test(...)`.
+
+  Expected path: /service/multi-service/service-b/bar/test
+  Expected query parameter: api-version=bv2
+  Expected 204 response.
