@@ -87,7 +87,7 @@ interface Disks {
     
     PUT (create or update) a Disk resource.
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/disks/disk1
-    Expected query parameter: api-version=2024-03-02
+    Expected query parameter: api-version=2025-01-02
     Expected request body:
     ```json
     {
