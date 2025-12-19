@@ -1,5 +1,13 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.34
+
+### Features
+
+- [#3609](https://github.com/Azure/typespec-azure/pull/3609) Add data plane test for combined multi service.
+- [#3618](https://github.com/Azure/typespec-azure/pull/3618) Add ARM multiple services test case.
+
+
 ## 0.1.0-alpha.33
 
 ### Bump dependencies
