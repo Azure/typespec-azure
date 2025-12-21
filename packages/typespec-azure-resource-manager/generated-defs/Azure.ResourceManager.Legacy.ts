@@ -97,7 +97,7 @@ export type FeaturesDecorator = (
   context: DecoratorContext,
   target: Namespace,
   features: Enum,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Decorator to define options for a specific feature
@@ -109,7 +109,7 @@ export type FeatureOptionsDecorator = (
   context: DecoratorContext,
   target: EnumMember,
   options: ArmFeatureOptions,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Decorator to associate a feature with a model, interface, or namespace
@@ -121,7 +121,7 @@ export type FeatureDecorator = (
   context: DecoratorContext,
   target: Model | Interface | Namespace,
   featureName: EnumMember,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 export type AzureResourceManagerLegacyDecorators = {
   customAzureResource: CustomAzureResourceDecorator;

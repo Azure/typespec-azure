@@ -1418,7 +1418,7 @@ export const $features: FeaturesDecorator = (
     entity,
   );
   if (featureMap !== undefined) {
-    return featureMap;
+    return;
   }
   featureMap = new Map<string, ArmFeatureOptions>();
 
@@ -1431,7 +1431,6 @@ export const $features: FeaturesDecorator = (
     featureMap.set("Common", commonFeatureOptions);
   }
   setResourceFeatureSet(program, entity, featureMap);
-  return featureMap;
 };
 
 export const $featureOptions: FeatureOptionsDecorator = (
