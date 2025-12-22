@@ -547,3 +547,56 @@ it("verify legacy hierarchy building usage with unordered models", async () => {
   strictEqual(sportsCarModel.properties[0].name, "type");
   strictEqual(sportsCarModel.properties[1].name, "topSpeed");
 });
+
+it("handles envelope properties correctly", async () => {
+  await runner.compileWithBuiltInService(`
+      // Simulating Azure.ResourceManager.Foundations.ArmTagsProperty
+      model ArmTagsProperty {
+        tags?: Record<string>;
+      }
+
+      // Simulating a base model with tags defined directly
+      model TrackedResource {
+        id?: string;
+        name?: string;
+        tags?: Record<string>;
+        location?: string;
+      }
+
+      // Model using envelope to include tags property
+      model FooProperties {
+        something?: string;
+      }
+
+      model FooResource {
+        id?: string;
+        name?: string;
+        ...ArmTagsProperty;
+        location?: string;
+        properties?: FooProperties;
+      }
+
+      // This should NOT produce a diagnostic warning
+      @Legacy.hierarchyBuilding(TrackedResource)
+      model FooResourceWithHierarchy {
+        id?: string;
+        name?: string;
+        ...ArmTagsProperty;
+        location?: string;
+        properties?: FooProperties;
+      }
+
+      @route("/foo")
+      op getFoo(): FooResource;
+    `);
+
+  const models = runner.context.sdkPackage.models;
+  const trackedResource = models.find((m) => m.name === "TrackedResource");
+  const fooResourceWithHierarchy = models.find((m) => m.name === "FooResourceWithHierarchy");
+
+  ok(trackedResource);
+  ok(fooResourceWithHierarchy);
+
+  // FooResourceWithHierarchy should have TrackedResource as base
+  strictEqual(fooResourceWithHierarchy.baseModel?.name, "TrackedResource");
+});
