@@ -1529,8 +1529,15 @@ function isPropertySuperset(target: Model, value: Model): boolean {
     }
     const targetProperty = target.properties.get(name)!;
     const valueProperty = value.properties.get(name)!;
+    // Compare properties to handle envelope/spread semantics correctly
+    // Properties match if they come from the same source OR if they have the same type
+    // This ensures properties from envelopes (e.g., ...ArmTagsProperty) are recognized
+    // as equivalent to directly defined properties with the same name and type
     if (targetProperty.sourceProperty !== valueProperty.sourceProperty) {
-      return false;
+      // Different sources - check if they have the same type
+      if (targetProperty.type !== valueProperty.type) {
+        return false;
+      }
     }
   }
   return true;
