@@ -18,6 +18,7 @@ import {
 } from "@typespec/compiler";
 import { capitalize } from "@typespec/compiler/casing";
 import { getOperationId } from "@typespec/openapi";
+import { OpenApi2DocumentProxy } from "./types.js";
 
 export interface AutorestEmitterContext {
   readonly program: Program;
@@ -25,6 +26,8 @@ export interface AutorestEmitterContext {
   readonly outputFile: string;
   readonly tcgcSdkContext: TCGCContext;
   readonly version?: string;
+  readonly proxy?: OpenApi2DocumentProxy;
+  readonly multiService: boolean;
 }
 
 export function getClientName(context: AutorestEmitterContext, type: Type & { name: string }) {
