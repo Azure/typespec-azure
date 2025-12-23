@@ -563,19 +563,6 @@ it("handles envelope properties correctly", async () => {
         location?: string;
       }
 
-      // Model using envelope to include tags property
-      model FooProperties {
-        something?: string;
-      }
-
-      model FooResource {
-        id?: string;
-        name?: string;
-        ...ArmTagsProperty;
-        location?: string;
-        properties?: FooProperties;
-      }
-
       // This should NOT produce a diagnostic warning
       @Legacy.hierarchyBuilding(TrackedResource)
       model FooResourceWithHierarchy {
@@ -583,11 +570,10 @@ it("handles envelope properties correctly", async () => {
         name?: string;
         ...ArmTagsProperty;
         location?: string;
-        properties?: FooProperties;
       }
 
       @route("/foo")
-      op getFoo(): FooResource;
+      op getFoo(): FooResourceWithHierarchy;
     `);
 
   const models = runner.context.sdkPackage.models;
