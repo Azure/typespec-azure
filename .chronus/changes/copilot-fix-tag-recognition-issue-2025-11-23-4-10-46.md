@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Fix hierarchyBuilding decorator to recognize envelope properties
+Fix `@hierarchyBuilding` decorator to recognize envelope properties.
