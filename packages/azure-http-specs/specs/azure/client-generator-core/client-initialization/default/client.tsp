@@ -6,10 +6,10 @@ import "@typespec/http";
 using Spector;
 using Http;
 
-@route("/azure/client-generator-core/client-initialization")
-namespace _Specs_.Azure.ClientGenerator.Core.ClientInitialization;
+@route("/azure/client-generator-core/client-initialization/default")
+namespace _Specs_.Azure.ClientGenerator.Core.ClientInitialization.Default;
 
-@@global.Azure.ClientGenerator.Core.clientNamespace(_Specs_.Azure.ClientGenerator.Core.ClientInitialization,
+@@global.Azure.ClientGenerator.Core.clientNamespace(_Specs_.Azure.ClientGenerator.Core.ClientInitialization.Default,
   "azure.clientgenerator.core.clientinitialization",
   "java"
 );
@@ -44,6 +44,11 @@ model PathParamClientOptions {
 model ParamAliasClientOptions {
   @doc("Blob name for the client.")
   @global.Azure.ClientGenerator.Core.paramAlias("blob")
+  blobName: string;
+}
+
+model DefaultQueryParamClientOptions {
+  @doc("The blob name to use for operations")
   blobName: string;
 }
 
@@ -200,47 +205,40 @@ interface ParamAlias {
   withOriginalName is Service.ParamAlias.withOriginalName;
 }
 
-@global.Azure.ClientGenerator.Core.client({
-  name: "ParentClient",
-  service: Service,
-})
-namespace ParentClient {
+// Scenario 6: Query parameter moved to client level
   @scenarioDoc("""
-    Client for testing a path parameter (blobName) moved to client level, in child client.
+    Client for testing default -> default nested initialization.
     
-    The child client can be initialized individually, or via its parent client.
+    The parent client uses default initialization behavior,
+    and the child client uses default initialization behavior.
     
     Parameters elevated to client level:
-    - blobName: "sample-blob" (path parameter)
+    - blobName: "test-blob" (query parameter)
     
     Expected client usage:
     ```ts
-    // via ParentClient
-    const client = new ParentClient.getChildClient({
-      blobName: "sample-blob"
+    // via DefaultClient (default initialization)
+    const client = new DefaultClient.getDefaultNestedWithQueryClient({
+      blobName: "test-blob"
     });
     
-    // directly
-    const client = new ChildClient({
-      blobName: "sample-blob"
-    });
-    
-    // No need to pass blobName to any operations
-    client.withQuery(format: "text");  
+    // Operations don't need blobName parameter
+    client.withQuery();
     client.getStandalone();
     client.deleteStandalone();
     ```
     """)
   @scenario
-  @global.Azure.ClientGenerator.Core.operationGroup
+  @global.Azure.ClientGenerator.Core.client({
+  name: "QueryParamClient",
+  service: Service,
+})
   @global.Azure.ClientGenerator.Core.clientInitialization({
-    parameters: PathParamClientOptions,
-    initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
+    parameters: DefaultQueryParamClientOptions,
   })
-  @route("/child-client")
-  interface ChildClient {
-    withQuery is Service.ChildClient.withQuery;
-    getStandalone is Service.ChildClient.getStandalone;
-    deleteStandalone is Service.ChildClient.deleteStandalone;
+  @route("/query")
+  interface QueryParam {
+    withQuery is Service.QueryParam.withQuery;
+    getStandalone is Service.QueryParam.getStandalone;
+    deleteStandalone is Service.QueryParam.deleteStandalone;
   }
-}
