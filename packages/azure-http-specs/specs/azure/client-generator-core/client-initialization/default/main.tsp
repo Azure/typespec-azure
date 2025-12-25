@@ -7,7 +7,7 @@ using Spector;
 using Azure.ClientGenerator.Core;
 
 @doc("Test for client initialization decorator - moving parameters from method to client level")
-@scenarioService("/azure/client-generator-core/client-initialization")
+@scenarioService("/azure/client-generator-core/client-initialization/default")
 namespace Service;
 
 // Common parameter types and models
@@ -24,6 +24,11 @@ model RegionQueryParam {
 
 model Input {
   name: string;
+}
+
+model DefaultQueryParam {
+  @query
+  blobName: string;
 }
 
 // Scenario 1: Header parameter moved to client level
@@ -115,19 +120,19 @@ model BlobProperties {
   createdOn: utcDateTime;
 }
 
-// Scenario 6: Client initialization on child client
-@doc("Blob operations with path parameter that should be moved to client level, in child client")
-@route("/child-client")
-interface ChildClient {
-  @route("/{blobName}/with-query")
+// Scenario 6: Query parameter moved to client level
+@doc("Blob operations with query parameter that should be moved to client level")
+@route("/query")
+interface QueryParam {
+  @route("/with-query")
   @get
-  withQuery(@path blobName: string, @query format?: string): void;
+  withQuery(...DefaultQueryParam): void;
 
-  @route("/{blobName}/get-standalone")
+  @route("/get-standalone")
   @get
-  getStandalone(@path blobName: string): BlobProperties;
+  getStandalone(...DefaultQueryParam): BlobProperties;
 
-  @route("/{blobName}")
+  @route("/delete-resource")
   @delete
-  deleteStandalone(@path blobName: string): void;
+  deleteStandalone(...DefaultQueryParam): void;
 }
