@@ -41,8 +41,10 @@ model User {
 }
 
 @doc("The status result of exporting users.")
-model ExportUsersStatus is global.Azure.Core.Foundations.OperationStatus<global.Azure.Core.Page<User>>;
+model ExportUsersStatus
+  is global.Azure.Core.Foundations.OperationStatus<global.Azure.Core.Page<User>>;
 
+#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a custom LRO operation for testing"
 @scenario
 @doc("Export users")
 @summary("Exports a list of users.")
@@ -124,12 +126,12 @@ model ExportUsersStatus is global.Azure.Core.Foundations.OperationStatus<global.
   }
   ```
   """)
-#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a custom LRO operation for testing"
 @route("/users/{name}:export")
 @get
-op export(
-  @path name: string,
-  @query format: string,
-): AcceptedResponse &
-  global.Azure.Core.ResourceOperationStatus<User, ExportUsersStatus, global.Azure.Core.Foundations.Error> &
+op export(@path name: string, @query format: string): AcceptedResponse &
+  global.Azure.Core.ResourceOperationStatus<
+    User,
+    ExportUsersStatus,
+    global.Azure.Core.Foundations.Error
+  > &
   global.Azure.Core.Foundations.LongRunningStatusLocation<ExportUsersStatus>;

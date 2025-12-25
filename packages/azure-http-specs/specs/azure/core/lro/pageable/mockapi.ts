@@ -13,7 +13,7 @@ let exportPollCount = 0;
 
 function exportLroHandler(req: MockRequest) {
   req.expect.containsQueryParam("api-version", "2022-12-01-preview");
-  
+
   if (exportPollCount === 0) {
     // First poll - still in progress
     exportPollCount += 1;
