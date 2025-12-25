@@ -20,6 +20,7 @@ using Spector;
   }
 )
 @global.Azure.ClientGenerator.Core.clientNamespace("azure.core.lro.pageable", "java")
+@global.Azure.ClientGenerator.Core.clientNamespace("azure.core.lro.pageable", "python")
 namespace _Specs_.Azure.Core.Lro.Pageable;
 
 @doc("The API version.")
