@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.63.1
+
+### Features
+
+- [#3617](https://github.com/Azure/typespec-azure/pull/3617) Add support for a single client from multiple services
+
+
 ## 0.63.0
 
 ### Breaking Changes

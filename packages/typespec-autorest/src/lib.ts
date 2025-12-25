@@ -356,10 +356,11 @@ export const $lib = createTypeSpecLibrary({
         default: `Cookies are not supported in Swagger 2.0. Parameter was ignored.`,
       },
     },
-    "invalid-format": {
+    "unknown-format": {
       severity: "warning",
       messages: {
         default: paramMessage`'${"schema"}' format '${"format"}' is not supported in Autorest. It will not be emitted.`,
+        encoding: paramMessage`'${"schema"}' encoding format '${"format"}' is not supported in Autorest. It will not be emitted.`,
       },
     },
     "unsupported-auth": {
