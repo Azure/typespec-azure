@@ -206,39 +206,39 @@ interface ParamAlias {
 }
 
 // Scenario 6: Query parameter moved to client level
-  @scenarioDoc("""
-    Client for testing default -> default nested initialization.
-    
-    The parent client uses default initialization behavior,
-    and the child client uses default initialization behavior.
-    
-    Parameters elevated to client level:
-    - blobName: "test-blob" (query parameter)
-    
-    Expected client usage:
-    ```ts
-    // via DefaultClient (default initialization)
-    const client = new DefaultClient.getDefaultNestedWithQueryClient({
-      blobName: "test-blob"
-    });
-    
-    // Operations don't need blobName parameter
-    client.withQuery();
-    client.getStandalone();
-    client.deleteStandalone();
-    ```
-    """)
-  @scenario
-  @global.Azure.ClientGenerator.Core.client({
+@scenarioDoc("""
+  Client for testing default -> default nested initialization.
+  
+  The parent client uses default initialization behavior,
+  and the child client uses default initialization behavior.
+  
+  Parameters elevated to client level:
+  - blobName: "test-blob" (query parameter)
+  
+  Expected client usage:
+  ```ts
+  // via DefaultClient (default initialization)
+  const client = new DefaultClient.getDefaultNestedWithQueryClient({
+    blobName: "test-blob"
+  });
+  
+  // Operations don't need blobName parameter
+  client.withQuery();
+  client.getStandalone();
+  client.deleteStandalone();
+  ```
+  """)
+@scenario
+@global.Azure.ClientGenerator.Core.client({
   name: "QueryParamClient",
   service: Service,
 })
-  @global.Azure.ClientGenerator.Core.clientInitialization({
-    parameters: DefaultQueryParamClientOptions,
-  })
-  @route("/query")
-  interface QueryParam {
-    withQuery is Service.QueryParam.withQuery;
-    getStandalone is Service.QueryParam.getStandalone;
-    deleteStandalone is Service.QueryParam.deleteStandalone;
-  }
+@global.Azure.ClientGenerator.Core.clientInitialization({
+  parameters: DefaultQueryParamClientOptions,
+})
+@route("/query")
+interface QueryParam {
+  withQuery is Service.QueryParam.withQuery;
+  getStandalone is Service.QueryParam.getStandalone;
+  deleteStandalone is Service.QueryParam.deleteStandalone;
+}

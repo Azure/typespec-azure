@@ -1,4 +1,3 @@
-
 import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
@@ -183,51 +182,50 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_ParamAlias = passOnSuc
 ]);
 
 // Mock responses for QueryParam scenario
-Scenarios.Azure_ClientGenerator_Core_ClientInitialization_QueryParam =
-  passOnSuccess([
-    {
-      uri: "/azure/client-generator-core/client-initialization/default/query/with-query",
-      method: "get",
-      request: {
-        query: {
-          blobName: "test-blob",
-        },
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_QueryParam = passOnSuccess([
+  {
+    uri: "/azure/client-generator-core/client-initialization/default/query/with-query",
+    method: "get",
+    request: {
+      query: {
+        blobName: "test-blob",
       },
-      response: {
-        status: 204,
-      },
-      kind: "MockApiDefinition",
     },
-    {
-      uri: "/azure/client-generator-core/client-initialization/default/query/get-standalone",
-      method: "get",
-      request: {
-        query: {
-          blobName: "test-blob",
-        },
-      },
-      response: {
-        status: 200,
-        body: json({
-          name: "test-blob",
-          size: 42,
-          contentType: "text/plain",
-          createdOn: "2025-04-01T12:00:00Z",
-        }),
-      },
-      kind: "MockApiDefinition",
+    response: {
+      status: 204,
     },
-    {
-      uri: "/azure/client-generator-core/client-initialization/default/query/delete-resource",
-      method: "delete",
-      request: {
-        query: {
-          blobName: "test-blob",
-        },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/azure/client-generator-core/client-initialization/default/query/get-standalone",
+    method: "get",
+    request: {
+      query: {
+        blobName: "test-blob",
       },
-      response: {
-        status: 204,
-      },
-      kind: "MockApiDefinition",
     },
-  ]);
+    response: {
+      status: 200,
+      body: json({
+        name: "test-blob",
+        size: 42,
+        contentType: "text/plain",
+        createdOn: "2025-04-01T12:00:00Z",
+      }),
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    uri: "/azure/client-generator-core/client-initialization/default/query/delete-resource",
+    method: "delete",
+    request: {
+      query: {
+        blobName: "test-blob",
+      },
+    },
+    response: {
+      status: 204,
+    },
+    kind: "MockApiDefinition",
+  },
+]);
