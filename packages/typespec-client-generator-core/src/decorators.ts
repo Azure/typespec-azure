@@ -27,7 +27,8 @@ import {
 } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
-import { getHttpOperation } from "@typespec/http";
+import { getAuthentication, getHttpOperation, getServers } from "@typespec/http";
+import { $useDependency, getVersions } from "@typespec/versioning";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
@@ -76,6 +77,8 @@ import {
   findRootSourceProperty,
   getScopedDecoratorData,
   hasExplicitClientOrOperationGroup,
+  isSameAuth,
+  isSameServers,
   listAllUserDefinedNamespaces,
   negationScopesKey,
   omitOperation,
@@ -181,17 +184,85 @@ export const $client: ClientDecorator = (
   const explicitName =
     options?.kind === "Model" ? options?.properties.get("name")?.type : undefined;
   const name: string = explicitName?.kind === "String" ? explicitName.value : target.name;
-  let service = options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
+  let service: Namespace | Namespace[] | undefined = undefined;
+  const serviceConfig =
+    options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
 
-  if (service?.kind !== "Namespace") {
+  if (serviceConfig?.kind === "Namespace") {
+    service = serviceConfig;
+  } else if (
+    serviceConfig?.kind === "Tuple" &&
+    serviceConfig.values.every((v) => v.kind === "Namespace")
+  ) {
+    if (target.kind === "Interface") {
+      reportDiagnostic(context.program, {
+        code: "invalid-client-service-multiple",
+        target: context.decoratorTarget,
+      });
+      return;
+    }
+    service = serviceConfig.values;
+    // validate all services has same server definition
+    let servers = undefined;
+    let auth = undefined;
+    let isSame = true;
+    for (const svc of service) {
+      const currentServers = getServers(context.program, svc);
+      if (currentServers === undefined) continue;
+      if (servers === undefined) {
+        servers = currentServers;
+      } else {
+        isSame = isSameServers(servers, currentServers);
+        if (!isSame) {
+          break;
+        }
+      }
+    }
+    for (const svc of service) {
+      const currentAuth = getAuthentication(context.program, svc);
+      if (currentAuth === undefined) continue;
+      if (auth === undefined) {
+        auth = currentAuth;
+      } else {
+        isSame = isSameAuth(auth, currentAuth);
+        if (!isSame) {
+          break;
+        }
+      }
+    }
+    if (!isSame) {
+      reportDiagnostic(context.program, {
+        code: "inconsistent-multiple-service",
+        target: context.decoratorTarget,
+      });
+      return;
+    }
+    // no explicit versioning dependency
+    if (
+      !target.decorators.some(
+        (d) =>
+          d.definition?.name === "@useDependency" &&
+          getNamespaceFullName(d.definition?.namespace) === "TypeSpec.Versioning",
+      )
+    ) {
+      const versionRecords = [];
+      // collect the latest version enum member from each service
+      for (const svc of service) {
+        const versions = getVersions(context.program, svc)[1]?.getVersions();
+        if (versions && versions.length > 0) {
+          versionRecords.push(versions[versions.length - 1].enumMember);
+        }
+      }
+      // set the versioning dependency
+      if (versionRecords.length > 0) {
+        context.call($useDependency, target, ...versionRecords);
+      }
+    }
+  } else {
     service = findClientService(context.program, target);
   }
 
-  if (
-    service === undefined ||
-    service.kind !== "Namespace" ||
-    !judgeService(context.program, service)
-  ) {
+  if (service === undefined) {
     reportDiagnostic(context.program, {
       code: "client-service",
       format: { name },
@@ -205,7 +276,6 @@ export const $client: ClientDecorator = (
     name,
     service,
     type: target,
-    crossLanguageDefinitionId: `${getNamespaceFullName(service)}.${name}`,
     subOperationGroups: [],
   };
   setScopedDecoratorData(context, $client, clientKey, target, client, scope);
@@ -220,10 +290,7 @@ function judgeService(program: Program, type: Namespace): boolean {
   );
 }
 
-function findClientService(
-  program: Program,
-  client: Namespace | Interface,
-): Namespace | Interface | undefined {
+function findClientService(program: Program, client: Namespace | Interface): Namespace | undefined {
   let current: Namespace | undefined = client as any;
   while (current) {
     if (judgeService(program, current)) {
@@ -303,7 +370,12 @@ export function isOperationGroup(context: TCGCContext, type: Namespace | Interfa
   if (type.kind === "Interface" && !isTemplateDeclaration(type)) {
     return true;
   }
-  if (type.kind === "Namespace" && !type.decorators.some((t) => t.decorator.name === "$service")) {
+  if (
+    type.kind === "Namespace" &&
+    !type.decorators.some(
+      (d) => d.definition?.name === "@service" && d.definition?.namespace.name === "TypeSpec",
+    )
+  ) {
     return true;
   }
   return false;
@@ -731,7 +803,11 @@ export const $override = (
     // Apply the alternate type to the original parameter
     const overrideParam = overrideParams[index];
     overrideParam.decorators
-      .filter((d) => d.decorator.name === "$alternateType")
+      .filter(
+        (d) =>
+          d.definition?.name === "@alternateType" &&
+          getNamespaceFullName(d.definition?.namespace) === namespace,
+      )
       .map((d) =>
         context.call(
           $alternateType,

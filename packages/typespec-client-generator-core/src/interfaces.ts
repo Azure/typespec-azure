@@ -15,6 +15,7 @@ import {
   Program,
   Type,
 } from "@typespec/compiler";
+import { unsafe_Realm } from "@typespec/compiler/experimental";
 import {
   HttpAuth,
   HttpOperation,
@@ -73,15 +74,16 @@ export interface TCGCContext {
   __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
   __pagedResultSet: Set<SdkType>;
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
-  __packageVersions?: string[]; // the package versions from the service versioning config and api version setting in tspconfig.
-  __packageVersionEnum?: Enum; // the enum type that contains all the package versions.
+  __mutatedRealm?: unsafe_Realm; // the realm that contains all mutated types for this instance
+  __packageVersions?: Map<Namespace, string[]>; // the package versions (for each service) from the service versioning config and api version setting in tspconfig.
+  __packageVersionEnum?: Map<Namespace, Enum | undefined>; // the enum type that contains all the package versions (for each service).
   __externalPackageToVersions?: Map<string, string>;
 
   getMutatedGlobalNamespace(): Namespace;
   getApiVersionsForType(type: Type): string[];
   setApiVersionsForType(type: Type, apiVersions: string[]): void;
-  getPackageVersions(): string[];
-  getPackageVersionEnum(): Enum | undefined;
+  getPackageVersions(service?: Namespace): Map<Namespace, string[]>;
+  getPackageVersionEnum(): Map<Namespace, Enum | undefined>;
   getClients(): SdkClient[];
   getClientOrOperationGroup(type: Namespace | Interface): SdkClient | SdkOperationGroup | undefined;
   getOperationsForClient(client: SdkClient | SdkOperationGroup): Operation[];
@@ -101,10 +103,8 @@ export interface SdkContext<
 export interface SdkClient {
   kind: "SdkClient";
   name: string;
-  service: Namespace;
+  service: Namespace | Namespace[];
   type: Namespace | Interface;
-  /** Unique ID for the current type. */
-  crossLanguageDefinitionId: string;
   subOperationGroups: SdkOperationGroup[];
 }
 
@@ -197,8 +197,9 @@ export interface DecoratorInfo {
 /**
  * Represents a client in the package.
  */
-export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
-  extends DecoratedType {
+export interface SdkClientType<
+  TServiceOperation extends SdkServiceOperation,
+> extends DecoratedType {
   __raw: SdkClient | SdkOperationGroup;
   kind: "client";
   /** Name of the client. */
@@ -261,8 +262,9 @@ export type SdkType =
   | SdkCredentialType
   | SdkEndpointType;
 
-export interface SdkBuiltInType<TKind extends SdkBuiltInKinds = SdkBuiltInKinds>
-  extends SdkTypeBase {
+export interface SdkBuiltInType<
+  TKind extends SdkBuiltInKinds = SdkBuiltInKinds,
+> extends SdkTypeBase {
   kind: TKind;
   /** How to encode the type on wire. */
   encode?: string;
@@ -464,8 +466,9 @@ export interface SdkEnumType extends SdkTypeBase {
   isUnionAsEnum: boolean;
 }
 
-export interface SdkEnumValueType<TValueType extends SdkTypeBase = SdkBuiltInType>
-  extends SdkTypeBase {
+export interface SdkEnumValueType<
+  TValueType extends SdkTypeBase = SdkBuiltInType,
+> extends SdkTypeBase {
   kind: "enumvalue";
   name: string;
   value: string | number;
@@ -570,8 +573,9 @@ export interface SdkEndpointType extends SdkTypeBase {
   templateArguments: SdkPathParameter[];
 }
 
-export interface SdkModelPropertyTypeBase<TType extends SdkTypeBase = SdkType>
-  extends DecoratedType {
+export interface SdkModelPropertyTypeBase<
+  TType extends SdkTypeBase = SdkType,
+> extends DecoratedType {
   __raw?: ModelProperty;
   /** Parameter type. */
   type: TType;
@@ -663,8 +667,9 @@ export interface BinarySerializationOptions {
 /**
  * Endpoint parameter type for the client.
  */
-export interface SdkEndpointParameter
-  extends SdkModelPropertyTypeBase<SdkEndpointType | SdkUnionType<SdkEndpointType>> {
+export interface SdkEndpointParameter extends SdkModelPropertyTypeBase<
+  SdkEndpointType | SdkUnionType<SdkEndpointType>
+> {
   kind: "endpoint";
   /** Whether do url encode for the endpoint string. */
   urlEncode: boolean;
@@ -676,8 +681,9 @@ export interface SdkEndpointParameter
   serializedName?: string;
 }
 
-export interface SdkCredentialParameter
-  extends SdkModelPropertyTypeBase<SdkCredentialType | SdkUnionType<SdkCredentialType>> {
+export interface SdkCredentialParameter extends SdkModelPropertyTypeBase<
+  SdkCredentialType | SdkUnionType<SdkCredentialType>
+> {
   kind: "credential";
   /** Credential parameter is always on client level. */
   onClient: true;
@@ -914,8 +920,9 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
 
 export type SdkServiceOperation = SdkHttpOperation;
 
-interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
-  extends DecoratedType {
+interface SdkServiceMethodBase<
+  TServiceOperation extends SdkServiceOperation,
+> extends DecoratedType {
   __raw?: Operation;
   name: string;
   /** Whether the type has public or private accessibility */
@@ -947,8 +954,9 @@ interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
 /**
  * Basic method.
  */
-export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
-  extends SdkServiceMethodBase<TServiceOperation> {
+export interface SdkBasicServiceMethod<
+  TServiceOperation extends SdkServiceOperation,
+> extends SdkServiceMethodBase<TServiceOperation> {
   kind: "basic";
 }
 
@@ -989,7 +997,8 @@ export interface SdkPagingServiceMetadata<TServiceOperation extends SdkServiceOp
  * Paging method.
  */
 export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
-  extends SdkServiceMethodBase<TServiceOperation>,
+  extends
+    SdkServiceMethodBase<TServiceOperation>,
     SdkPagingServiceMethodOptions<TServiceOperation> {
   kind: "paging";
 }
@@ -1154,8 +1163,7 @@ export interface SdkLroServiceFinalResponse {
  * Long running method.
  */
 export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>
-  extends SdkServiceMethodBase<TServiceOperation>,
-    SdkLroServiceMethodOptions {
+  extends SdkServiceMethodBase<TServiceOperation>, SdkLroServiceMethodOptions {
   kind: "lro";
 }
 
@@ -1163,7 +1171,8 @@ export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperati
  * Long running method with paging.
  */
 export interface SdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
-  extends SdkServiceMethodBase<TServiceOperation>,
+  extends
+    SdkServiceMethodBase<TServiceOperation>,
     SdkLroServiceMethodOptions,
     SdkPagingServiceMethodOptions<TServiceOperation> {
   kind: "lropaging";

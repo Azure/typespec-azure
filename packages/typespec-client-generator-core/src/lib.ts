@@ -464,6 +464,31 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`The API version specified in the config: "${"version"}" is not defined in service versioning list. Fall back to the latest version.`,
       },
     },
+    "multiple-explicit-clients-multiple-services": {
+      severity: "error",
+      messages: {
+        default: "Can not define multiple explicit clients with multiple services.",
+      },
+    },
+    "client-location-new-operation-group-multi-service": {
+      severity: "error",
+      messages: {
+        default:
+          "Cannot move operations from different services to a new operation group that doesn't exist.",
+      },
+    },
+    "invalid-client-service-multiple": {
+      severity: "error",
+      messages: {
+        default: "`@client` with multiple services is only allowed on `Namespace`.",
+      },
+    },
+    "inconsistent-multiple-service": {
+      severity: "error",
+      messages: {
+        default: "All services must have the same server and auth definitions.",
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,
