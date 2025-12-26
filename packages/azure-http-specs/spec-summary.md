@@ -316,6 +316,72 @@ client.getStandalone();
 client.deleteStandalone();
 ```
 
+### Azure_ClientGenerator_Core_ClientDefaultValue_getOperationParameter
+
+- Endpoint: `get /azure/client-generator-core/client-default-value/operation-parameter`
+
+Test case 2: `@clientDefaultValue` for operation parameter.
+This scenario tests that client default values are correctly applied to operation parameters.
+
+Expected query parameter:
+name: "test"
+pageSize: 10 (default)
+format: "json" (default)
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_ClientDefaultValue_getHeaderParameter
+
+- Endpoint: `get /azure/client-generator-core/client-default-value/header-parameter`
+
+Test case 4: `@clientDefaultValue` for header parameters.
+This scenario tests that client default values are correctly applied to header parameters.
+
+Expected header parameters:
+Accept: "application/json;odata.metadata=none" (default)
+x-custom-header: "default-value" (default)
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_ClientDefaultValue_getPathParameter
+
+- Endpoint: `get /azure/client-generator-core/client-default-value/path-parameter/{segment1}/{segment2}`
+
+Test case 3: `@clientDefaultValue` for first path segment.
+This scenario has 2 path segments and tests client default value on the first segment.
+
+Expected path parameters:
+segment1: "default-segment1" (default)
+segment2: "segment2"
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_ClientDefaultValue_putModelProperty
+
+- Endpoint: `put /azure/client-generator-core/client-default-value/model-property`
+
+Test case 1: `@clientDefaultValue` for model property.
+This scenario tests that client default values are correctly applied to model properties.
+
+Expected input body:
+
+```json
+{
+  "name": "test"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "name": "test",
+  "timeout": 30,
+  "tier": "standard",
+  "retry": true
+}
+```
+
 ### Azure_ClientGenerator_Core_ClientLocation_MoveMethodParameterToClient
 
 - Endpoint: `get /azure/client-generator-core/client-location/blob`

@@ -1,4 +1,10 @@
-import type { DecoratorContext, Model, ModelProperty, Operation } from "@typespec/compiler";
+import type {
+  DecoratorContext,
+  DecoratorValidatorCallbacks,
+  Model,
+  ModelProperty,
+  Operation,
+} from "@typespec/compiler";
 
 export interface CustomResourceOptions {
   readonly isAzureResource?: boolean;
@@ -19,7 +25,7 @@ export type CustomAzureResourceDecorator = (
   context: DecoratorContext,
   target: Model,
   options?: CustomResourceOptions,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Specify an external reference that should be used when emitting this type.
@@ -30,7 +36,7 @@ export type ExternalTypeRefDecorator = (
   context: DecoratorContext,
   entity: Model | ModelProperty,
   jsonRef: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Signifies that an operation is an Azure Resource Manager operation
@@ -43,14 +49,17 @@ export type ArmOperationRouteDecorator = (
   context: DecoratorContext,
   target: Operation,
   route?: ArmOperationOptions,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Signifies that a Resource is represented using a library type in generated SDKs.
  *
  * @param target The model to that is an external resource
  */
-export type ArmExternalTypeDecorator = (context: DecoratorContext, target: Model) => void;
+export type ArmExternalTypeDecorator = (
+  context: DecoratorContext,
+  target: Model,
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Renames a path parameter in an Azure Resource Manager operation.
@@ -64,7 +73,7 @@ export type RenamePathParameterDecorator = (
   target: Operation,
   sourceParameterName: string,
   targetParameterName: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 export type AzureResourceManagerLegacyDecorators = {
   customAzureResource: CustomAzureResourceDecorator;
