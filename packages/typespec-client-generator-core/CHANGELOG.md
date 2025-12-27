@@ -1,5 +1,19 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.63.3
+
+### Bug Fixes
+
+- [#3700](https://github.com/Azure/typespec-azure/pull/3700) Fix wrong filtering of preview version value in version enum.
+
+
+## 0.63.2
+
+### Bug Fixes
+
+- [#3687](https://github.com/Azure/typespec-azure/pull/3687) Fix `@hierarchyBuilding` decorator to recognize envelope properties.
+
+
 ## 0.63.1
 
 ### Features
