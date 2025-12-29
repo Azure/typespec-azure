@@ -244,3 +244,26 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClie
       kind: "MockApiDefinition",
     },
   ]);
+
+// Mock responses for IndividuallyParentNestedWithParamAliasClient scenario
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClient_IndividuallyParentNestedWithParamAliasClient =
+  passOnSuccess([
+    {
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-param-alias/sample-blob/with-aliased-name",
+      method: "get",
+      request: {},
+      response: {
+        status: 204,
+      },
+      kind: "MockApiDefinition",
+    },
+    {
+      uri: "/azure/client-generator-core/client-initialization/individually-parent/nested-default-individually-parent-param-alias/sample-blob/with-original-name",
+      method: "get",
+      request: {},
+      response: {
+        status: 204,
+      },
+      kind: "MockApiDefinition",
+    },
+  ]);

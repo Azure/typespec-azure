@@ -116,6 +116,25 @@ interface NestedDefaultIndividuallyParentMixed {
   deleteStandalone(...NameHeaderParam, ...RegionQueryParam): void;
 }
 
+// Nested layer services for param alias
+@doc("Operations for nested default -> individually and parent param alias")
+@route("/nested-default-individually-parent-param-alias")
+interface NestedDefaultIndividuallyParentParamAlias {
+  @route("/{blob}/with-aliased-name")
+  @get
+  withAliasedName(
+    @path
+    blob: string,
+  ): void;
+
+  @route("/{blobName}/with-original-name")
+  @get
+  withOriginalName(
+    @path
+    blobName: string,
+  ): void;
+}
+
 @doc("Properties of a blob")
 model BlobProperties {
   name: string;

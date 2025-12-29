@@ -47,6 +47,12 @@ model MixedParamsClientOptions {
   name: string;
 }
 
+model ParamAliasClientOptions {
+  @doc("Blob name for the client.")
+  @global.Azure.ClientGenerator.Core.paramAlias("blob")
+  blobName: string;
+}
+
 @global.Azure.ClientGenerator.Core.client({
   name: "IndividuallyClient",
   service: Service,
@@ -235,4 +241,38 @@ interface IndividuallyNestedWithMixedClient {
   withQuery is Service.NestedDefaultIndividuallyMixed.withQuery;
   getStandalone is Service.NestedDefaultIndividuallyMixed.getStandalone;
   deleteStandalone is Service.NestedDefaultIndividuallyMixed.deleteStandalone;
+}
+
+// Scenario 6: Default -> Individually ParamAlias client
+@scenarioDoc("""
+  Client for testing default -> individually param alias nested initialization.
+  
+  The parent client uses default initialization behavior,
+  and the child client uses individually initialization with param alias.
+  
+  Parameters elevated to client level:
+  - blobName: "sample-blob" (path parameter with @paramAlias("blob"))
+  
+  Expected client usage:
+  ```ts
+  // directly (individually initialized)
+  const client = new IndividuallyNestedWithParamAliasClient({
+    blobName: "sample-blob"
+  });
+  
+  // Operations don't need blob/blobName parameter
+  client.withAliasedName();
+  client.withOriginalName();
+  ```
+  """)
+@scenario
+@global.Azure.ClientGenerator.Core.operationGroup
+@global.Azure.ClientGenerator.Core.clientInitialization({
+  parameters: ParamAliasClientOptions,
+  initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually,
+})
+@route("/nested-default-individually-param-alias")
+interface IndividuallyNestedWithParamAliasClient {
+  withAliasedName is Service.NestedDefaultIndividuallyParamAlias.withAliasedName;
+  withOriginalName is Service.NestedDefaultIndividuallyParamAlias.withOriginalName;
 }
