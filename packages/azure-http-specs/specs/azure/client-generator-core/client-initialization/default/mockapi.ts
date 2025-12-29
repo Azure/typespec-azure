@@ -3,7 +3,7 @@ import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
 // Mock responses for HeaderParam scenario
-Scenarios.Azure_ClientGenerator_Core_ClientInitialization_HeaderParam = passOnSuccess([
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_HeaderParam = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-initialization/default/header-param/with-query",
     method: "get",
@@ -39,7 +39,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_HeaderParam = passOnSu
 ]);
 
 // Mock responses for MultipleParams scenario
-Scenarios.Azure_ClientGenerator_Core_ClientInitialization_MultipleParams = passOnSuccess([
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_MultipleParams = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-initialization/default/multiple-params/with-query",
     method: "get",
@@ -79,7 +79,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_MultipleParams = passO
 ]);
 
 // Mock responses for MixedParams scenario
-Scenarios.Azure_ClientGenerator_Core_ClientInitialization_MixedParams = passOnSuccess([
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_MixedParams = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-initialization/default/mixed-params/with-query",
     method: "get",
@@ -119,7 +119,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_MixedParams = passOnSu
 ]);
 
 // Mock responses for PathParam scenario
-Scenarios.Azure_ClientGenerator_Core_ClientInitialization_PathParam = passOnSuccess([
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_PathParam = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-initialization/default/path/sample-blob/with-query",
     method: "get",
@@ -160,7 +160,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_PathParam = passOnSucc
 ]);
 
 // Mock responses for ParamAlias scenario
-Scenarios.Azure_ClientGenerator_Core_ClientInitialization_ParamAlias = passOnSuccess([
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_ParamAlias = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-initialization/default/param-alias/sample-blob/with-aliased-name",
     method: "get",
@@ -182,7 +182,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_ParamAlias = passOnSuc
 ]);
 
 // Mock responses for QueryParam scenario
-Scenarios.Azure_ClientGenerator_Core_ClientInitialization_QueryParam = passOnSuccess([
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_QueryParam = passOnSuccess([
   {
     uri: "/azure/client-generator-core/client-initialization/default/query/with-query",
     method: "get",
