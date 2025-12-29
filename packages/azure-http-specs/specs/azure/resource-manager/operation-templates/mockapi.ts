@@ -49,6 +49,36 @@ const checkNameAvailabilityResponse = {
   reason: "AlreadyExists",
   message: "Hostname 'checkName' already exists. Please select a different name.",
 };
+
+let postPagingLroPollCount = 0;
+const validProductListResult = {
+  value: [
+    {
+      id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/products/product1`,
+      name: "product1",
+      type: "Azure.ResourceManager.OperationTemplates/products",
+      location: "eastus",
+      properties: {
+        provisioningState: "Succeeded",
+        productId: "product1",
+      },
+    },
+  ],
+};
+const validProductListResultPage2 = {
+  value: [
+    {
+      id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/products/product2`,
+      name: "product2",
+      type: "Azure.ResourceManager.OperationTemplates/products",
+      location: "eastus",
+      properties: {
+        provisioningState: "Succeeded",
+        productId: "product2",
+      },
+    },
+  ],
+};
 let createOrReplacePollCount = 0;
 let postPollCount = 0;
 let deletePollCount = 0;
@@ -631,3 +661,95 @@ Scenarios.Azure_ResourceManager_OperationTemplates_OptionalBody_providerPost = w
   },
   kind: "MockApiDefinition",
 });
+
+Scenarios.Azure_ResourceManager_OperationTemplates_LroPaging_postPagingLro = passOnSuccess([
+  {
+    // LRO POST initial request
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/products/default/postPagingLro",
+    method: "post",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 202,
+      headers: {
+        location: dyn`${dynItem("baseUrl")}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location`,
+      },
+    },
+    handler: (req: MockRequest) => {
+      postPagingLroPollCount = 0;
+      return {
+        status: 202,
+        headers: {
+          location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location`,
+        },
+      };
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    // LRO POST poll intermediate/get final result
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/:operation_name",
+    method: "get",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        operation_name: "lro_paging_post_location", 
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200, 
+    },
+    handler: (req: MockRequest) => {
+      let response;
+      const operation_name = req.params["operation_name"];
+      if (operation_name === "lro_paging_post_location") {
+        // Polling Location header
+        if (postPagingLroPollCount > 0) {
+             response = {
+                 ...validProductListResult,
+                 nextLink: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location/nextPage`
+             };
+             return {
+                status: 200,
+                body: json(response),
+             };
+        } else {
+             postPagingLroPollCount += 1;
+             return {
+                status: 202,
+             };
+        }
+      }
+      return { status: 404 };
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    // LRO POST paging next page
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location/nextPage",
+    method: "get",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+      body: json(validProductListResultPage2),
+    },
+    kind: "MockApiDefinition",
+  },
+]);
