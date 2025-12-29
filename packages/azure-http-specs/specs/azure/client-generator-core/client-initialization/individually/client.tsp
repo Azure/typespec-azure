@@ -52,7 +52,7 @@ model MixedParamsClientOptions {
   service: Service,
 })
 
-// Scenario 6: Default -> Individually initialization with path parameter
+// Scenario 1: Default -> Individually initialization with path parameter
 @scenarioDoc("""
   Client for testing default -> individually nested initialization.
   
@@ -88,7 +88,7 @@ interface IndividuallyNestedWithPathClient {
   deleteStandalone is Service.NestedDefaultIndividuallyWithPath.deleteStandalone;
 }
 
-// Scenario 7: Default -> Individually initialization with query parameter
+// Scenario 2: Default -> Individually initialization with query parameter
 @scenarioDoc("""
   Client for testing default -> individually nested initialization.
   
@@ -124,7 +124,7 @@ interface IndividuallyNestedWithQueryClient {
   deleteStandalone is Service.NestedDefaultIndividuallyWithQuery.deleteStandalone;
 }
 
-// Scenario 8: Default -> Individually initialization with Header parameter
+// Scenario 3: Default -> Individually initialization with Header parameter
 @scenarioDoc("""
   Client for testing default -> individually header parameter nested initialization.
   
@@ -160,7 +160,7 @@ interface IndividuallyNestedWithHeaderClient {
   deleteStandalone is Service.NestedDefaultIndividuallyHeader.deleteStandalone;
 }
 
-// Scenario 15: Default -> Individually Multiple parameters client
+// Scenario 4: Default -> Individually Multiple parameters client
 @scenarioDoc("""
   Client for testing default -> individually multiple parameters nested initialization.
   
@@ -198,7 +198,7 @@ interface IndividuallyNestedWithMultipleClient {
   deleteStandalone is Service.NestedDefaultIndividuallyMultiple.deleteStandalone;
 }
 
-// Scenario 16: Default -> Individually Mixed parameters client
+// Scenario 5: Default -> Individually Mixed parameters client
 @scenarioDoc("""
   Client for testing default -> individually mixed parameters nested initialization.
   
