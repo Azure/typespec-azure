@@ -81,10 +81,7 @@ namespace IndividuallyParentClient {
     ```
     """)
   @scenario
-  @global.Azure.ClientGenerator.Core.client({
-    name: "IndividuallyParentNestedWithPathClient",
-    service: Service,
-  })
+  @global.Azure.ClientGenerator.Core.operationGroup
   @global.Azure.ClientGenerator.Core.clientInitialization({
     parameters: PathParamClientOptions,
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
@@ -125,10 +122,7 @@ namespace IndividuallyParentClient {
     ```
     """)
   @scenario
-  @global.Azure.ClientGenerator.Core.client({
-    name: "IndividuallyParentNestedWithQueryClient",
-    service: Service,
-  })
+  @global.Azure.ClientGenerator.Core.operationGroup
   @global.Azure.ClientGenerator.Core.clientInitialization({
     parameters: DefaultQueryParamClientOptions,
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
@@ -169,10 +163,7 @@ namespace IndividuallyParentClient {
     ```
     """)
   @scenario
-  @global.Azure.ClientGenerator.Core.client({
-    name: "IndividuallyParentNestedWithHeaderClient",
-    service: Service,
-  })
+  @global.Azure.ClientGenerator.Core.operationGroup
   @global.Azure.ClientGenerator.Core.clientInitialization({
     parameters: HeaderParamClientOptions,
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
@@ -216,10 +207,7 @@ namespace IndividuallyParentClient {
     ```
     """)
   @scenario
-  @global.Azure.ClientGenerator.Core.client({
-    name: "IndividuallyParentNestedWithMultipleClient",
-    service: Service,
-  })
+  @global.Azure.ClientGenerator.Core.operationGroup
   @global.Azure.ClientGenerator.Core.clientInitialization({
     parameters: MultipleParamsClientOptions,
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
@@ -263,10 +251,7 @@ namespace IndividuallyParentClient {
     ```
     """)
   @scenario
-  @global.Azure.ClientGenerator.Core.client({
-    name: "IndividuallyParentNestedWithMixedClient",
-    service: Service,
-  })
+  @global.Azure.ClientGenerator.Core.operationGroup
   @global.Azure.ClientGenerator.Core.clientInitialization({
     parameters: MixedParamsClientOptions,
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
