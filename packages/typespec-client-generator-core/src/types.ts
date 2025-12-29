@@ -90,7 +90,7 @@ import {
 } from "./interfaces.js";
 import {
   createGeneratedName,
-  filterApiVersionsInEnum,
+  filterPreviewVersion,
   getAvailableApiVersions,
   getClientDoc,
   getHttpBodyType,
@@ -119,7 +119,6 @@ import {
 } from "./public-utils.js";
 
 import { $ } from "@typespec/compiler/typekit";
-import { getVersions } from "@typespec/versioning";
 import { getNs, isAttribute, isUnwrapped } from "@typespec/xml";
 import { getSdkHttpParameter } from "./http.js";
 import { isMediaTypeJson, isMediaTypeTextPlain, isMediaTypeXml } from "./media-types.js";
@@ -1976,8 +1975,9 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
     }
     for (const service of services) {
       // versioned enums
-      const [_, versionMap] = getVersions(context.program, service);
-      if (versionMap && versionMap.getVersions()[0]) {
+      const versionEnum = context.getPackageVersionEnum().get(service);
+      const versions = context.getPackageVersions().get(service);
+      if (versionEnum) {
         // create sdk enum for versions enum
         let sdkVersionsEnum: SdkEnumType;
         const explicitApiVersions = getExplicitClientApiVersions(context, service);
@@ -1987,11 +1987,9 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
             getSdkEnumWithDiagnostics(context, explicitApiVersions),
           );
         } else {
-          sdkVersionsEnum = diagnostics.pipe(
-            getSdkEnumWithDiagnostics(context, versionMap.getVersions()[0].enumMember.enum),
-          );
+          sdkVersionsEnum = diagnostics.pipe(getSdkEnumWithDiagnostics(context, versionEnum));
         }
-        filterApiVersionsInEnum(context, client, sdkVersionsEnum);
+        filterPreviewVersion(context, sdkVersionsEnum, versions?.at(-1) || "");
         diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
       }
     }

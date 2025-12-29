@@ -1756,3 +1756,54 @@ it("error: inconsistent-multiple-service-servers auth", async () => {
     },
   ]);
 });
+
+it("multiple clients from single service", async () => {
+  await runner.compileWithCustomization(
+    `
+    @service
+    @versioned(Versions)
+    namespace TestService;
+
+    enum Versions {
+      v2022_11_01: "2022-11-01",
+      v2023_04_01_preview: "2023-04-01-preview",
+    }
+
+    @route("/foo")
+    op foo(): void;
+
+    @route("/bar")
+    op bar(): void;
+    `,
+    `
+    @client(
+      {
+        name: "ClientA",
+        service: TestService,
+      }
+    )
+    namespace ClientA{
+      op foo is TestService.foo;
+    }
+
+    @client(
+      {
+        name: "ClientB",
+        service: TestService,
+      }
+    )
+    namespace ClientB{
+      op bar is TestService.bar;
+    }
+  `,
+  );
+  const sdkPackage = runner.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 2);
+  const clientA = sdkPackage.clients.find((c) => c.name === "ClientA");
+  ok(clientA);
+  const clientB = sdkPackage.clients.find((c) => c.name === "ClientB");
+  ok(clientB);
+  const versionsEnum = sdkPackage.enums.find((e) => e.name === "Versions");
+  ok(versionsEnum);
+  strictEqual(versionsEnum.values.length, 2);
+});
