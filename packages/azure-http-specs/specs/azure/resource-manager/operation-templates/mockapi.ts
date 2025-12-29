@@ -700,14 +700,14 @@ Scenarios.Azure_ResourceManager_OperationTemplates_LroPaging_postPagingLro = pas
     request: {
       pathParams: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-        operation_name: "lro_paging_post_location", 
+        operation_name: "lro_paging_post_location",
       },
       query: {
         "api-version": "2023-12-01-preview",
       },
     },
     response: {
-      status: 200, 
+      status: 200,
     },
     handler: (req: MockRequest) => {
       let response;
@@ -715,19 +715,19 @@ Scenarios.Azure_ResourceManager_OperationTemplates_LroPaging_postPagingLro = pas
       if (operation_name === "lro_paging_post_location") {
         // Polling Location header
         if (postPagingLroPollCount > 0) {
-             response = {
-                 ...validProductListResult,
-                 nextLink: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location/nextPage`
-             };
-             return {
-                status: 200,
-                body: json(response),
-             };
+          response = {
+            ...validProductListResult,
+            nextLink: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location/nextPage`,
+          };
+          return {
+            status: 200,
+            body: json(response),
+          };
         } else {
-             postPagingLroPollCount += 1;
-             return {
-                status: 202,
-             };
+          postPagingLroPollCount += 1;
+          return {
+            status: 202,
+          };
         }
       }
       return { status: 404 };
