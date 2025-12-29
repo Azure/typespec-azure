@@ -80,7 +80,6 @@ import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js"
 import { getSdkBasicServiceMethod } from "./methods.js";
 import {
   getCrossLanguageDefinitionId,
-  getDefaultApiVersion,
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
@@ -552,19 +551,14 @@ export function removeVersionsLargerThanExplicitlySpecified(
   }
 }
 
-export function filterApiVersionsInEnum(
+export function filterPreviewVersion(
   context: TCGCContext,
-  client: SdkClient,
   sdkVersionsEnum: SdkEnumType,
+  defaultApiVersion: string,
 ): void {
   // if they explicitly set an api version, remove larger versions
   removeVersionsLargerThanExplicitlySpecified(context, sdkVersionsEnum.values);
-  const clientNamespaceType = getActualClientType(client);
-  const defaultApiVersion = getDefaultApiVersion(
-    context,
-    clientNamespaceType.kind === "Interface" ? clientNamespaceType.namespace! : clientNamespaceType,
-  );
-  if (!context.previewStringRegex.test(defaultApiVersion?.value || "")) {
+  if (!context.previewStringRegex.test(defaultApiVersion)) {
     sdkVersionsEnum.values = sdkVersionsEnum.values.filter((v) => {
       if (typeof v.value !== "string") {
         return true;
@@ -797,6 +791,7 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
         explicitClientNamespaces.push(k as Namespace);
         sdkClient.service.forEach((s) => explicitServices.add(s));
       } else {
+        explicitClientNamespaces.push(k as Namespace);
         explicitServices.add(sdkClient.service);
       }
     }
