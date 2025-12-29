@@ -3,120 +3,125 @@ import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
 // Mock responses for HeaderParam scenario
-Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_HeaderParam = passOnSuccess([
-  {
-    uri: "/azure/client-generator-core/client-initialization/default/header-param/with-query",
-    method: "get",
-    request: {
-      query: {
-        id: "test-id",
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_HeaderParam = passOnSuccess(
+  [
+    {
+      uri: "/azure/client-generator-core/client-initialization/default/header-param/with-query",
+      method: "get",
+      request: {
+        query: {
+          id: "test-id",
+        },
+        headers: {
+          name: "test-name-value",
+        },
       },
-      headers: {
-        name: "test-name-value",
+      response: {
+        status: 204,
       },
+      kind: "MockApiDefinition",
     },
-    response: {
-      status: 204,
-    },
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: "/azure/client-generator-core/client-initialization/default/header-param/with-body",
-    method: "post",
-    request: {
-      headers: {
-        name: "test-name-value",
+    {
+      uri: "/azure/client-generator-core/client-initialization/default/header-param/with-body",
+      method: "post",
+      request: {
+        headers: {
+          name: "test-name-value",
+        },
+        body: json({
+          name: "test-name",
+        }),
       },
-      body: json({
-        name: "test-name",
-      }),
+      response: {
+        status: 204,
+      },
+      kind: "MockApiDefinition",
     },
-    response: {
-      status: 204,
-    },
-    kind: "MockApiDefinition",
-  },
-]);
+  ],
+);
 
 // Mock responses for MultipleParams scenario
-Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_MultipleParams = passOnSuccess([
-  {
-    uri: "/azure/client-generator-core/client-initialization/default/multiple-params/with-query",
-    method: "get",
-    request: {
-      query: {
-        id: "test-id",
-        region: "us-west",
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_MultipleParams =
+  passOnSuccess([
+    {
+      uri: "/azure/client-generator-core/client-initialization/default/multiple-params/with-query",
+      method: "get",
+      request: {
+        query: {
+          id: "test-id",
+          region: "us-west",
+        },
+        headers: {
+          name: "test-name-value",
+        },
       },
-      headers: {
-        name: "test-name-value",
+      response: {
+        status: 204,
       },
+      kind: "MockApiDefinition",
     },
-    response: {
-      status: 204,
-    },
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: "/azure/client-generator-core/client-initialization/default/multiple-params/with-body",
-    method: "post",
-    request: {
-      query: {
-        region: "us-west",
+    {
+      uri: "/azure/client-generator-core/client-initialization/default/multiple-params/with-body",
+      method: "post",
+      request: {
+        query: {
+          region: "us-west",
+        },
+        headers: {
+          name: "test-name-value",
+        },
+        body: json({
+          name: "test-name",
+        }),
       },
-      headers: {
-        name: "test-name-value",
+      response: {
+        status: 204,
       },
-      body: json({
-        name: "test-name",
-      }),
+      kind: "MockApiDefinition",
     },
-    response: {
-      status: 204,
-    },
-    kind: "MockApiDefinition",
-  },
-]);
+  ]);
 
 // Mock responses for MixedParams scenario
-Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_MixedParams = passOnSuccess([
-  {
-    uri: "/azure/client-generator-core/client-initialization/default/mixed-params/with-query",
-    method: "get",
-    request: {
-      query: {
-        id: "test-id",
-        region: "us-west",
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_MixedParams = passOnSuccess(
+  [
+    {
+      uri: "/azure/client-generator-core/client-initialization/default/mixed-params/with-query",
+      method: "get",
+      request: {
+        query: {
+          id: "test-id",
+          region: "us-west",
+        },
+        headers: {
+          name: "test-name-value",
+        },
       },
-      headers: {
-        name: "test-name-value",
+      response: {
+        status: 204,
       },
+      kind: "MockApiDefinition",
     },
-    response: {
-      status: 204,
-    },
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: "/azure/client-generator-core/client-initialization/default/mixed-params/with-body",
-    method: "post",
-    request: {
-      query: {
-        region: "us-west",
+    {
+      uri: "/azure/client-generator-core/client-initialization/default/mixed-params/with-body",
+      method: "post",
+      request: {
+        query: {
+          region: "us-west",
+        },
+        headers: {
+          name: "test-name-value",
+        },
+        body: json({
+          name: "test-name",
+        }),
       },
-      headers: {
-        name: "test-name-value",
+      response: {
+        status: 204,
       },
-      body: json({
-        name: "test-name",
-      }),
+      kind: "MockApiDefinition",
     },
-    response: {
-      status: 204,
-    },
-    kind: "MockApiDefinition",
-  },
-]);
+  ],
+);
 
 // Mock responses for PathParam scenario
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_PathParam = passOnSuccess([
