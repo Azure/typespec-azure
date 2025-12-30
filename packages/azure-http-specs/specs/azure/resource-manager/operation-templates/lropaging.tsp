@@ -42,13 +42,13 @@ interface LroPaging {
     Expected verb: POST
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/products/default/postPagingLro
     Expected query parameter: api-version=2023-12-01-preview
-    Expected response: 202 Accepted with Location header.
+    Expected response: 202 Accepted with Location and Retry-After headers.
     
     Step 2: Polling Request
     Expected verb: GET
     Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location
     Expected query parameter: api-version=2023-12-01-preview
-    Expected response: 202 Accepted.
+    Expected response: 202 Accepted with Location and Retry-After headers.
     
     Step 3: Final Result Request
     Expected verb: GET

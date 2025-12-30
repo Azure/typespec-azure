@@ -5,7 +5,6 @@ import {
   MockRequest,
   passOnSuccess,
   ScenarioMockApi,
-  ValidationError,
   withServiceKeys,
 } from "@typespec/spec-api";
 
@@ -308,65 +307,74 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_export = passOnSuccess([
     kind: "MockApiDefinition",
   },
   {
-    // LRO POST poll intermediate/get final result
-    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/:operation_name",
+    // LRO POST poll intermediate/get final result - Location Header
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_location",
     method: "get",
     request: {
       pathParams: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-        operation_name: "lro_post_aao", // operation_name can be "lro_post_location" or "lro_post_aao", depending on the header you choose to poll. "lro_post_aao" here is just for passing e2e test
       },
       query: {
         "api-version": "2023-12-01-preview",
       },
     },
     response: {
-      status: 200, // This is for passing e2e test. For actual status code, see "handler" definition below
+      status: 200,
     },
     handler: (req: MockRequest) => {
-      let response;
-      const operation_name = req.params["operation_name"];
-      if (operation_name === "lro_post_location") {
-        response =
-          // first status will be 200, second and forward be 204
-          postPollCount > 0
-            ? {
-                status: 200,
-                body: json({
-                  content: "order1,product1,1",
-                }),
-              }
-            : { status: 202 };
-      } else if (operation_name === "lro_post_aao") {
-        const aaoResponse = {
-          id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_aao`,
-          name: "lro_post_aao",
-          startTime: "2024-11-08T01:41:53.5508583+00:00",
-        };
-        // first provisioningState will be "InProgress", second and forward be "Succeeded"
-        const responseBody =
-          postPollCount > 0
-            ? {
-                ...aaoResponse,
-                status: "Succeeded",
-                endTime: "2024-11-08T01:42:41.5354192+00:00",
-              }
-            : { ...aaoResponse, status: "InProgress" };
-
-        response = {
-          status: 200, // aao always returns 200 with response body
-          body: json(responseBody),
-        };
-      } else {
-        throw new ValidationError(
-          `Unexpected lro poll operation: ${operation_name}`,
-          undefined,
-          undefined,
-        );
-      }
+      const response =
+        // first status will be 200, second and forward be 204
+        postPollCount > 0
+          ? {
+              status: 200,
+              body: json({
+                content: "order1,product1,1",
+              }),
+            }
+          : { status: 202 };
 
       postPollCount += 1;
+      return response;
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    // LRO POST poll intermediate/get final result - Azure-AsyncOperation Header
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_aao",
+    method: "get",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+    },
+    handler: (req: MockRequest) => {
+      const aaoResponse = {
+        id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_aao`,
+        name: "lro_post_aao",
+        startTime: "2024-11-08T01:41:53.5508583+00:00",
+      };
+      // first provisioningState will be "InProgress", second and forward be "Succeeded"
+      const responseBody =
+        postPollCount > 0
+          ? {
+              ...aaoResponse,
+              status: "Succeeded",
+              endTime: "2024-11-08T01:42:41.5354192+00:00",
+            }
+          : { ...aaoResponse, status: "InProgress" };
 
+      const response = {
+        status: 200, // aao always returns 200 with response body
+        body: json(responseBody),
+      };
+
+      postPollCount += 1;
       return response;
     },
     kind: "MockApiDefinition",
@@ -679,6 +687,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_LroPaging_postPagingLro = pas
     response: {
       status: 202,
       headers: {
+        "retry-after": "0.1",
         location: dyn`${dynItem("baseUrl")}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location`,
       },
     },
@@ -687,6 +696,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_LroPaging_postPagingLro = pas
       return {
         status: 202,
         headers: {
+          "retry-after": "0.1",
           location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location`,
         },
       };
@@ -695,12 +705,11 @@ Scenarios.Azure_ResourceManager_OperationTemplates_LroPaging_postPagingLro = pas
   },
   {
     // LRO POST poll intermediate/get final result
-    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/:operation_name",
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location",
     method: "get",
     request: {
       pathParams: {
         subscriptionId: SUBSCRIPTION_ID_EXPECTED,
-        operation_name: "lro_paging_post_location",
       },
       query: {
         "api-version": "2023-12-01-preview",
@@ -710,27 +719,25 @@ Scenarios.Azure_ResourceManager_OperationTemplates_LroPaging_postPagingLro = pas
       status: 200,
     },
     handler: (req: MockRequest) => {
-      let response;
-      const operation_name = req.params["operation_name"];
-      if (operation_name === "lro_paging_post_location") {
-        // Polling Location header
-        if (postPagingLroPollCount > 0) {
-          response = {
-            ...validProductListResult,
-            nextLink: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location/nextPage`,
-          };
-          return {
-            status: 200,
-            body: json(response),
-          };
-        } else {
-          postPagingLroPollCount += 1;
-          return {
-            status: 202,
-          };
-        }
+      if (postPagingLroPollCount > 0) {
+        const response = {
+          ...validProductListResult,
+          nextLink: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location/nextPage`,
+        };
+        return {
+          status: 200,
+          body: json(response),
+        };
+      } else {
+        postPagingLroPollCount += 1;
+        return {
+          status: 202,
+          headers: {
+            "retry-after": "0.1",
+            location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location`,
+          },
+        };
       }
-      return { status: 404 };
     },
     kind: "MockApiDefinition",
   },
