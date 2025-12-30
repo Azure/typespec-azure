@@ -10,6 +10,7 @@ import {
   ignoreDiagnostics,
   Interface,
   isErrorModel,
+  isList,
   isNumeric,
   isService,
   isTemplateDeclaration,
@@ -52,6 +53,7 @@ import {
   FlattenPropertyDecorator,
   HierarchyBuildingDecorator,
   MarkAsLroDecorator,
+  MarkAsPageableDecorator,
   NextLinkVerbDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
@@ -1616,6 +1618,87 @@ export const $markAsLro: MarkAsLroDecorator = (
 
 export function getMarkAsLro(context: TCGCContext, entity: Operation): boolean {
   return getScopedDecoratorData(context, markAsLroKey, entity) ?? false;
+}
+
+const markAsPageableKey = createStateSymbol("markAsPageable");
+
+export const $markAsPageable: MarkAsPageableDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: LanguageScopes,
+) => {
+  const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, target));
+  const hasModelResponse = httpOperation.responses.filter(
+    (r) =>
+      r.type?.kind === "Model" && !(r.statusCodes === "*" || isErrorModel(context.program, r.type)),
+  )[0];
+  if (!hasModelResponse || hasModelResponse.type?.kind !== "Model") {
+    reportDiagnostic(context.program, {
+      code: "invalid-mark-as-pageable-target",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+  
+  // Check if already marked with @list decorator
+  if (isList(context.program, target)) {
+    reportDiagnostic(context.program, {
+      code: "mark-as-pageable-ineffective",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+  
+  // Check the response model for @pageItems decorator
+  const responseModel = hasModelResponse.type as Model;
+  let hasPageItemsProperty = false;
+  
+  // Check if any property has @pageItems decorator by checking the program state
+  // The @pageItems decorator uses a state symbol "TypeSpec.pageItems"
+  const pageItemsStateKey = Symbol.for("TypeSpec.pageItems");
+  for (const [, prop] of responseModel.properties) {
+    if (context.program.stateSet(pageItemsStateKey).has(prop)) {
+      hasPageItemsProperty = true;
+      break;
+    }
+  }
+  
+  if (!hasPageItemsProperty) {
+    // Try to find a property named "value" and apply @pageItems to it
+    const valueProperty = responseModel.properties.get("value");
+    if (valueProperty) {
+      // Mark the value property as pageItems by setting the state
+      context.program.stateSet(pageItemsStateKey).add(valueProperty);
+    } else {
+      // No @pageItems property and no "value" property found
+      reportDiagnostic(context.program, {
+        code: "invalid-mark-as-pageable-target",
+        format: {
+          operation: target.name,
+        },
+        target: context.decoratorTarget,
+      });
+      return;
+    }
+  }
+  
+  // Mark the operation as a list operation by setting the state
+  // The @list decorator uses a state symbol "TypeSpec.list"
+  const listStateKey = Symbol.for("TypeSpec.list");
+  context.program.stateMap(listStateKey).set(target, {});
+  
+  // Store metadata that will be checked by TCGC to treat this operation as pageable
+  setScopedDecoratorData(context, $markAsPageable, markAsPageableKey, target, true, scope);
+};
+
+export function getMarkAsPageable(context: TCGCContext, entity: Operation): boolean {
+  return getScopedDecoratorData(context, markAsPageableKey, entity) ?? false;
 }
 
 const nextLinkVerbKey = createStateSymbol("nextLinkVerb");
