@@ -24,7 +24,7 @@ model ProductProperties {
   provisioningState?: string;
 }
 
-model ProductListResult is Page<Product>
+model ProductListResult is Azure.Core.Page<Product>;
 
 @armResourceOperations
 interface LroPaging {
@@ -92,10 +92,5 @@ interface LroPaging {
     ```
     """)
   @list
-  postPagingLro is ArmResourceActionAsync<
-    Product,
-    void,
-    ProductListResult
-    >,
-  >;
+  postPagingLro is ArmResourceActionAsync<Product, void, ProductListResult>;
 }
