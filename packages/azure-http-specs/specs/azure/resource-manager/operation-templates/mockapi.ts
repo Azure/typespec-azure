@@ -687,7 +687,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_LroPaging_postPagingLro = pas
     response: {
       status: 202,
       headers: {
-        "retry-after": "0.1",
+        "retry-after": 1,
         location: dyn`${dynItem("baseUrl")}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location`,
       },
     },
@@ -696,7 +696,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_LroPaging_postPagingLro = pas
       return {
         status: 202,
         headers: {
-          "retry-after": "0.1",
+          "retry-after": 1,
           location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location`,
         },
       };
@@ -733,7 +733,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_LroPaging_postPagingLro = pas
         return {
           status: 202,
           headers: {
-            "retry-after": "0.1",
+            "retry-after": 1,
             location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location`,
           },
         };
