@@ -171,3 +171,37 @@ extern dec clientDefaultValue(
   value: valueof string | boolean | numeric,
   scope?: valueof string
 );
+
+/**
+ * Marks a Long Running Operation (LRO) to have no final state location tracking.
+ *
+ * When applied to an LRO operation, this decorator signals that the operation should
+ * not use any final state location mechanism (neither `Location`, `Azure-AsyncOperation`,
+ * nor `Operation-Location` headers). This forces the `finalStateVia` value to be undefined.
+ *
+ * This decorator is intended for backward compatibility with some language clients
+ * that require this specific behavior.
+ *
+ * This decorator is considered legacy functionality and should only be used when
+ * maintaining backward compatibility with existing language-specific implementations.
+ *
+ * @param target The LRO operation that should have null final state tracking
+ * @param scope Specifies the target language emitters that the decorator should apply.
+ * If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * @example Mark an LRO operation to have no final state tracking
+ * ```typespec
+ * @Azure.ClientGenerator.Core.Legacy.nullFinalStateVia
+ * @Azure.Core.lroPollLocation
+ * op startProcessing(): ProcessingStatus;
+ * ```
+ *
+ * @example Apply only for specific languages
+ * ```typespec
+ * @Azure.ClientGenerator.Core.Legacy.nullFinalStateVia("python")
+ * @Azure.Core.lroPollLocation
+ * op startProcessing(): ProcessingStatus;
+ * ```
+ */
+extern dec nullFinalStateVia(target: Operation, scope?: valueof string);

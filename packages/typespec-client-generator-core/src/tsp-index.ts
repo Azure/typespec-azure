@@ -18,6 +18,7 @@ import {
   $legacyHierarchyBuilding,
   $markAsLro,
   $nextLinkVerb,
+  $nullFinalStateVia,
   $operationGroup,
   $override,
   $paramAlias,
@@ -62,5 +63,6 @@ export const $decorators = {
     markAsLro: $markAsLro,
     nextLinkVerb: $nextLinkVerb,
     clientDefaultValue: $clientDefaultValue,
+    nullFinalStateVia: $nullFinalStateVia,
   } satisfies AzureClientGeneratorCoreLegacyDecorators,
 };
