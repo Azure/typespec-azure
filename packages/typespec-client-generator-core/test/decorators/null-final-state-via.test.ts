@@ -25,7 +25,7 @@ describe("typespec-client-generator-core: @nullFinalStateVia decorator", () => {
         }
 
         @Azure.ClientGenerator.Core.Legacy.nullFinalStateVia
-        @Azure.Core.lroPollLocation
+        @Azure.ClientGenerator.Core.Legacy.markAsLro
         @route("/jobs/{jobId}")
         @post
         op startJob(@path jobId: string): JobResult;
@@ -61,7 +61,7 @@ describe("typespec-client-generator-core: @nullFinalStateVia decorator", () => {
         }
 
         @Azure.ClientGenerator.Core.Legacy.nullFinalStateVia("csharp")
-        @Azure.Core.lroPollLocation
+        @Azure.ClientGenerator.Core.Legacy.markAsLro
         @route("/process")
         @post
         op processData(): ProcessingResponse;
@@ -96,7 +96,7 @@ describe("typespec-client-generator-core: @nullFinalStateVia decorator", () => {
         }
 
         @Azure.ClientGenerator.Core.Legacy.nullFinalStateVia("csharp")
-        @Azure.Core.lroPollLocation
+        @Azure.ClientGenerator.Core.Legacy.markAsLro
         @route("/process")
         @post
         op processData(): ProcessingResponse;
@@ -152,11 +152,12 @@ describe("typespec-client-generator-core: @nullFinalStateVia decorator", () => {
         model JobResult {
           id: string;
           status: "Running" | "Succeeded" | "Failed";
+          @header("Operation-Location") opLoc: string;
         }
 
         @Azure.ClientGenerator.Core.Legacy.nullFinalStateVia
-        @Azure.Core.finalStateVia("operation-location")
-        @Azure.Core.lroPollLocation
+        @Azure.Core.useFinalStateVia("operation-location")
+        @Azure.ClientGenerator.Core.Legacy.markAsLro
         @route("/jobs/{jobId}")
         @post
         op startJob(@path jobId: string): JobResult;
@@ -191,7 +192,7 @@ describe("typespec-client-generator-core: @nullFinalStateVia decorator", () => {
         }
 
         @Azure.ClientGenerator.Core.Legacy.nullFinalStateVia("!(java, python)")
-        @Azure.Core.lroPollLocation
+        @Azure.ClientGenerator.Core.Legacy.markAsLro
         @route("/process")
         @post
         op processData(): ProcessingResponse;
