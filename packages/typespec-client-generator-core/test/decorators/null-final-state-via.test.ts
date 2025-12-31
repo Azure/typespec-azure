@@ -112,7 +112,7 @@ describe("typespec-client-generator-core: @nullFinalStateVia decorator", () => {
     const metadata = method.lroMetadata;
     ok(metadata);
     // Should have finalStateVia since decorator is scoped to csharp and we're using python
-    strictEqual(metadata.finalStateVia, FinalStateValue.pollingLocationHeader);
+    strictEqual(metadata.finalStateVia, FinalStateValue.location);
   });
 
   it("should work with @markAsLro decorator", async () => {
@@ -207,6 +207,6 @@ describe("typespec-client-generator-core: @nullFinalStateVia decorator", () => {
     const metadata = method.lroMetadata;
     ok(metadata);
     // Should have finalStateVia since Java is excluded
-    strictEqual(metadata.finalStateVia, FinalStateValue.pollingLocationHeader);
+    strictEqual(metadata.finalStateVia, FinalStateValue.location);
   });
 });
