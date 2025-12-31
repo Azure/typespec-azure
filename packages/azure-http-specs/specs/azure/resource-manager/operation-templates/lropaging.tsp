@@ -24,13 +24,7 @@ model ProductProperties {
   provisioningState?: string;
 }
 
-model ProductListResult {
-  @pageItems
-  value: Product[];
-
-  @nextLink
-  nextLink?: url;
-}
+model ProductListResult is Page<Product>
 
 @armResourceOperations
 interface LroPaging {
@@ -98,13 +92,10 @@ interface LroPaging {
     ```
     """)
   @list
-  postPagingLro is ArmResourceActionAsyncBase<
+  postPagingLro is ArmResourceActionAsync<
     Product,
     void,
-    ArmResponse<ProductListResult> | ArmAcceptedLroResponse<
-      "Accepted. The header contains 'Location' header which can be used to monitor the progress of the operation.",
-      ArmLroLocationHeader<FinalResult = ProductListResult>
+    ProductListResult
     >,
-    BaseParameters = Azure.ResourceManager.Foundations.DefaultBaseParameters<Product>
   >;
 }
