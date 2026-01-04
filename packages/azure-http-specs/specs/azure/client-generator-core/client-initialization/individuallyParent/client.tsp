@@ -51,7 +51,7 @@ model MixedParamsClientOptions {
   name: "IndividuallyParentClient",
   service: Service,
 })
-namespace IndividuallyParentClient {
+namespace IndividuallyParent {
   // Scenario 6: Default -> Individually and Parent initialization with path parameter
   @scenarioDoc("""
     Client for testing default -> individually and parent nested initialization.
