@@ -7,9 +7,9 @@ using Spector;
 using Http;
 
 @route("/azure/client-generator-core/client-initialization/individually")
-namespace _Specs_.Azure.ClientGenerator.Core.ClientInitialization;
+namespace _Specs_.Azure.ClientGenerator.Core.ClientInitialization.IndividuallyClient;
 
-@@global.Azure.ClientGenerator.Core.clientNamespace(_Specs_.Azure.ClientGenerator.Core.ClientInitialization,
+@@global.Azure.ClientGenerator.Core.clientNamespace(_Specs_.Azure.ClientGenerator.Core.ClientInitialization.IndividuallyClient,
   "azure.clientgenerator.core.clientinitialization.individuallyclient",
   "java"
 );
@@ -53,11 +53,6 @@ model ParamAliasClientOptions {
   blobName: string;
 }
 
-@global.Azure.ClientGenerator.Core.client({
-  name: "IndividuallyClient",
-  service: Service,
-})
-namespace IndividuallyClient {
   // Scenario 1: Default -> Individually initialization with path parameter
   @scenarioDoc("""
     Client for testing default -> individually nested initialization.
@@ -82,13 +77,16 @@ namespace IndividuallyClient {
     ```
     """)
   @scenario
-  @global.Azure.ClientGenerator.Core.operationGroup
+  @global.Azure.ClientGenerator.Core.client({
+    name: "IndividuallyNestedWithPathClient",
+    service: Service,
+  })
   @global.Azure.ClientGenerator.Core.clientInitialization({
     parameters: PathParamClientOptions,
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually,
   })
   @route("/nested-default-individually")
-  interface IndividuallyNestedWithPath {
+  interface IndividuallyNestedWithPathClient {
     withQuery is Service.NestedDefaultIndividuallyWithPath.withQuery;
     getStandalone is Service.NestedDefaultIndividuallyWithPath.getStandalone;
     deleteStandalone is Service.NestedDefaultIndividuallyWithPath.deleteStandalone;
@@ -118,13 +116,16 @@ namespace IndividuallyClient {
     ```
     """)
   @scenario
-  @global.Azure.ClientGenerator.Core.operationGroup
+  @global.Azure.ClientGenerator.Core.client({
+    name: "IndividuallyNestedWithQueryClient",
+    service: Service,
+  })
   @global.Azure.ClientGenerator.Core.clientInitialization({
     parameters: DefaultQueryParamClientOptions,
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually,
   })
   @route("/nested-default-individually-query")
-  interface IndividuallyNestedWithQuery {
+  interface IndividuallyNestedWithQueryClient {
     withQuery is Service.NestedDefaultIndividuallyWithQuery.withQuery;
     getStandalone is Service.NestedDefaultIndividuallyWithQuery.getStandalone;
     deleteStandalone is Service.NestedDefaultIndividuallyWithQuery.deleteStandalone;
@@ -154,13 +155,16 @@ namespace IndividuallyClient {
     ```
     """)
   @scenario
-  @global.Azure.ClientGenerator.Core.operationGroup
+  @global.Azure.ClientGenerator.Core.client({
+    name: "IndividuallyNestedWithHeaderClient",
+    service: Service,
+  })
   @global.Azure.ClientGenerator.Core.clientInitialization({
     parameters: HeaderParamClientOptions,
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually,
   })
   @route("/nested-default-individually-header")
-  interface IndividuallyNestedWithHeader {
+  interface IndividuallyNestedWithHeaderClient {
     withQuery is Service.NestedDefaultIndividuallyHeader.withQuery;
     getStandalone is Service.NestedDefaultIndividuallyHeader.getStandalone;
     deleteStandalone is Service.NestedDefaultIndividuallyHeader.deleteStandalone;
@@ -192,13 +196,16 @@ namespace IndividuallyClient {
     ```
     """)
   @scenario
-  @global.Azure.ClientGenerator.Core.operationGroup
+  @global.Azure.ClientGenerator.Core.client({
+    name: "IndividuallyNestedWithMultipleClient",
+    service: Service,
+  })
   @global.Azure.ClientGenerator.Core.clientInitialization({
     parameters: MultipleParamsClientOptions,
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually,
   })
   @route("/nested-default-individually-multiple")
-  interface IndividuallyNestedWithMultiple {
+  interface IndividuallyNestedWithMultipleClient {
     withQuery is Service.NestedDefaultIndividuallyMultiple.withQuery;
     getStandalone is Service.NestedDefaultIndividuallyMultiple.getStandalone;
     deleteStandalone is Service.NestedDefaultIndividuallyMultiple.deleteStandalone;
@@ -231,13 +238,16 @@ namespace IndividuallyClient {
     ```
     """)
   @scenario
-  @global.Azure.ClientGenerator.Core.operationGroup
+  @global.Azure.ClientGenerator.Core.client({
+    name: "IndividuallyNestedWithMixedClient",
+    service: Service,
+  })
   @global.Azure.ClientGenerator.Core.clientInitialization({
     parameters: MixedParamsClientOptions,
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually,
   })
   @route("/nested-default-individually-mixed")
-  interface IndividuallyNestedWithMixed {
+  interface IndividuallyNestedWithMixedClient {
     withQuery is Service.NestedDefaultIndividuallyMixed.withQuery;
     getStandalone is Service.NestedDefaultIndividuallyMixed.getStandalone;
     deleteStandalone is Service.NestedDefaultIndividuallyMixed.deleteStandalone;
@@ -266,14 +276,16 @@ namespace IndividuallyClient {
     ```
     """)
   @scenario
-  @global.Azure.ClientGenerator.Core.operationGroup
+  @global.Azure.ClientGenerator.Core.client({
+    name: "IndividuallyNestedWithParamAliasClient",
+    service: Service,
+  })
   @global.Azure.ClientGenerator.Core.clientInitialization({
     parameters: ParamAliasClientOptions,
     initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually,
   })
   @route("/nested-default-individually-param-alias")
-  interface IndividuallyNestedWithParamAlias {
+  interface IndividuallyNestedWithParamAliasClient {
     withAliasedName is Service.NestedDefaultIndividuallyParamAlias.withAliasedName;
     withOriginalName is Service.NestedDefaultIndividuallyParamAlias.withOriginalName;
   }
-}

@@ -7,9 +7,9 @@ using Spector;
 using Http;
 
 @route("/azure/client-generator-core/client-initialization/individually-parent")
-namespace _Specs_.Azure.ClientGenerator.Core.ClientInitialization;
+namespace _Specs_.Azure.ClientGenerator.Core.ClientInitialization.IndividuallyParentClient;
 
-@@global.Azure.ClientGenerator.Core.clientNamespace(_Specs_.Azure.ClientGenerator.Core.ClientInitialization,
+@@global.Azure.ClientGenerator.Core.clientNamespace(_Specs_.Azure.ClientGenerator.Core.ClientInitialization.IndividuallyParentClient,
   "azure.clientgenerator.core.clientinitialization.individuallyparentclient",
   "java"
 );
