@@ -10,11 +10,11 @@ using Http;
 namespace _Specs_.Azure.ClientGenerator.Core.ClientInitialization;
 
 @@global.Azure.ClientGenerator.Core.clientNamespace(_Specs_.Azure.ClientGenerator.Core.ClientInitialization,
-  "azure.clientgenerator.core.clientinitialization",
+  "azure.clientgenerator.core.clientinitialization.individuallyparentclient",
   "java"
 );
 @@global.Azure.ClientGenerator.Core.clientNamespace(Service,
-  "azure.clientgenerator.core.clientinitialization",
+  "azure.clientgenerator.core.clientinitialization.individuallyparentclient",
   "java"
 );
 
@@ -47,18 +47,12 @@ model MixedParamsClientOptions {
   name: string;
 }
 
-model ParamAliasClientOptions {
-  @doc("Blob name for the client.")
-  @global.Azure.ClientGenerator.Core.paramAlias("blob")
-  blobName: string;
-}
-
 @global.Azure.ClientGenerator.Core.client({
   name: "IndividuallyParentClient",
   service: Service,
 })
 namespace IndividuallyParentClient {
-  // Scenario 1: Default -> Individually and Parent initialization with path parameter
+  // Scenario 6: Default -> Individually and Parent initialization with path parameter
   @scenarioDoc("""
     Client for testing default -> individually and parent nested initialization.
     
@@ -99,7 +93,7 @@ namespace IndividuallyParentClient {
     deleteStandalone is Service.NestedDefaultIndividuallyParentWithPath.deleteStandalone;
   }
 
-  // Scenario 2: Default -> Individually and Parent initialization with query parameter
+  // Scenario 7: Default -> Individually and Parent initialization with query parameter
   @scenarioDoc("""
     Client for testing default -> individually and parent nested initialization.
     
@@ -140,7 +134,7 @@ namespace IndividuallyParentClient {
     deleteStandalone is Service.NestedDefaultIndividuallyParentWithQuery.deleteStandalone;
   }
 
-  // Scenario 3: Default -> Individually and Parent initialization with Header parameter
+  // Scenario 8: Default -> Individually and Parent initialization with Header parameter
   @scenarioDoc("""
     Client for testing default -> individually and parent header parameter nested initialization.
     
@@ -181,7 +175,7 @@ namespace IndividuallyParentClient {
     deleteStandalone is Service.NestedDefaultIndividuallyParentHeader.deleteStandalone;
   }
 
-  // Scenario 4: Default -> Individually and Parent Multiple parameters client
+  // Scenario 15: Default -> Individually and Parent Multiple parameters client
   @scenarioDoc("""
     Client for testing default -> individually and parent multiple parameters nested initialization.
     
@@ -225,7 +219,7 @@ namespace IndividuallyParentClient {
     deleteStandalone is Service.NestedDefaultIndividuallyParentMultiple.deleteStandalone;
   }
 
-  // Scenario 5: Default -> Individually and Parent Mixed parameters client
+  // Scenario 16: Default -> Individually and Parent Mixed parameters client
   @scenarioDoc("""
     Client for testing default -> individually and parent mixed parameters nested initialization.
     
@@ -267,44 +261,5 @@ namespace IndividuallyParentClient {
     withQuery is Service.NestedDefaultIndividuallyParentMixed.withQuery;
     getStandalone is Service.NestedDefaultIndividuallyParentMixed.getStandalone;
     deleteStandalone is Service.NestedDefaultIndividuallyParentMixed.deleteStandalone;
-  }
-
-  // Scenario 6: Default -> Individually and Parent ParamAlias client
-  @scenarioDoc("""
-    Client for testing default -> individually and parent param alias nested initialization.
-    
-    The parent client uses default initialization behavior,
-    and the child client uses both individually and parent initialization with param alias.
-    
-    Parameters elevated to client level:
-    - blobName: "sample-blob" (path parameter with @paramAlias("blob"))
-    
-    Expected client usage:
-    ```ts
-    // via IndividuallyParentClient (individually | parent initialization)
-    const client = new IndividuallyParentClient.getIndividuallyParentNestedWithParamAliasClient({
-      blobName: "sample-blob"
-    });
-    
-    // directly (individually initialized)
-    const client = new IndividuallyParentNestedWithParamAliasClient({
-      blobName: "sample-blob"
-    });
-    
-    // Operations don't need blob/blobName parameter
-    client.withAliasedName();
-    client.withOriginalName();
-    ```
-    """)
-  @scenario
-  @global.Azure.ClientGenerator.Core.operationGroup
-  @global.Azure.ClientGenerator.Core.clientInitialization({
-    parameters: ParamAliasClientOptions,
-    initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
-  })
-  @route("/nested-default-individually-parent-param-alias")
-  interface IndividuallyParentNestedWithParamAliasClient {
-    withAliasedName is Service.NestedDefaultIndividuallyParentParamAlias.withAliasedName;
-    withOriginalName is Service.NestedDefaultIndividuallyParentParamAlias.withOriginalName;
   }
 }

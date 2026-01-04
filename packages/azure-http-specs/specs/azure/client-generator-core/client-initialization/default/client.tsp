@@ -10,11 +10,11 @@ using Http;
 namespace _Specs_.Azure.ClientGenerator.Core.ClientInitialization.DefaultClient;
 
 @@global.Azure.ClientGenerator.Core.clientNamespace(_Specs_.Azure.ClientGenerator.Core.ClientInitialization.DefaultClient,
-  "azure.clientgenerator.core.clientinitialization",
+  "azure.clientgenerator.core.clientinitialization.defaultclient",
   "java"
 );
 @@global.Azure.ClientGenerator.Core.clientNamespace(Service,
-  "azure.clientgenerator.core.clientinitialization",
+  "azure.clientgenerator.core.clientinitialization.defaultclient",
   "java"
 );
 
