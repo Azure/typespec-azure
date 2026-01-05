@@ -12,9 +12,9 @@ using Azure.ClientGenerator.Core;
     Azure.ResourceManager.MultiServiceOlderVersions.Compute,
     Azure.ResourceManager.MultiServiceOlderVersions.ComputeDisk
   ],
-  version: [
-    Azure.ResourceManager.MultiServiceOlderVersions.Compute.Versions.v2024_11_01,
-    Azure.ResourceManager.MultiServiceOlderVersions.ComputeDisk.Versions.v2024_03_02
-  ],
 })
+@useDependency(
+  Azure.ResourceManager.MultiServiceOlderVersions.Compute.Versions.v2024_11_01,
+  Azure.ResourceManager.MultiServiceOlderVersions.ComputeDisk.Versions.v2024_03_02
+)
 namespace Azure.ResourceManager.MultiServiceOlderVersions.Combined;

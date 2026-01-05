@@ -14,6 +14,7 @@ const virtualMachine = {
   location: LOCATION,
   properties: {
     provisioningState: "Succeeded",
+    size: "Standard_D2s_v3",
   },
 };
 
@@ -25,6 +26,7 @@ const disk = {
   location: LOCATION,
   properties: {
     provisioningState: "Succeeded",
+    diskSizeGB: 128,
   },
 };
 
@@ -59,7 +61,9 @@ Scenarios.Azure_ResourceManager_MultiServiceOlderVersions_Compute_VirtualMachine
         },
         body: json({
           location: LOCATION,
-          properties: {},
+          properties: {
+            size: "Standard_D2s_v3",
+          },
         }),
       },
       response: {
@@ -100,7 +104,9 @@ Scenarios.Azure_ResourceManager_MultiServiceOlderVersions_ComputeDisk_Disks_crea
         },
         body: json({
           location: LOCATION,
-          properties: {},
+          properties: {
+            diskSizeGB: 128,
+          },
         }),
       },
       response: {

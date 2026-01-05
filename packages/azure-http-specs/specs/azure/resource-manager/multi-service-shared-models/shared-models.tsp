@@ -21,23 +21,3 @@ model SharedMetadata {
    */
   tags?: Record<string>;
 }
-
-/**
- * Common error information shared across services.
- */
-model SharedErrorInfo {
-  /**
-   * Error code.
-   */
-  code: string;
-
-  /**
-   * Error message.
-   */
-  message: string;
-
-  /**
-   * Target of the error.
-   */
-  target?: string;
-}

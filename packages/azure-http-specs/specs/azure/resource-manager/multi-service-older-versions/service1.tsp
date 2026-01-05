@@ -45,6 +45,13 @@ model VirtualMachine is Azure.ResourceManager.TrackedResource<VirtualMachineProp
 model VirtualMachineProperties {
   @visibility(Lifecycle.Read)
   provisioningState?: ResourceProvisioningState;
+
+  /**
+   * Size of the virtual machine. Only available in version 2024-11-01.
+   */
+  @added(Versions.v2024_11_01)
+  @removed(Versions.v2025_04_01)
+  size?: string;
 }
 
 @armResourceOperations
@@ -68,7 +75,8 @@ interface VirtualMachines {
       "type": "Microsoft.Compute/virtualMachinesOld",
       "location": "eastus",
       "properties": {
-        "provisioningState": "Succeeded"
+        "provisioningState": "Succeeded",
+        "size": "Standard_D2s_v3"
       }
     }
     ```
@@ -89,7 +97,9 @@ interface VirtualMachines {
     ```json
     {
       "location": "eastus",
-      "properties": {}
+      "properties": {
+        "size": "Standard_D2s_v3"
+      }
     }
     ```
     Expected response body:
@@ -100,7 +110,8 @@ interface VirtualMachines {
       "type": "Microsoft.Compute/virtualMachinesOld",
       "location": "eastus",
       "properties": {
-        "provisioningState": "Succeeded"
+        "provisioningState": "Succeeded",
+        "size": "Standard_D2s_v3"
       }
     }
     ```

@@ -48,6 +48,13 @@ model Disk is Azure.ResourceManager.TrackedResource<DiskProperties> {
 model DiskProperties {
   @visibility(Lifecycle.Read)
   provisioningState?: ResourceProvisioningState;
+
+  /**
+   * Size of the disk in GB. Only available in version 2024-03-02.
+   */
+  @added(Versions.v2024_03_02)
+  @removed(Versions.v2025_01_02)
+  diskSizeGB?: int32;
 }
 
 @armResourceOperations
@@ -71,7 +78,8 @@ interface Disks {
       "type": "Microsoft.Compute/disksOld",
       "location": "eastus",
       "properties": {
-        "provisioningState": "Succeeded"
+        "provisioningState": "Succeeded",
+        "diskSizeGB": 128
       }
     }
     ```
@@ -92,7 +100,9 @@ interface Disks {
     ```json
     {
       "location": "eastus",
-      "properties": {}
+      "properties": {
+        "diskSizeGB": 128
+      }
     }
     ```
     Expected response body:
@@ -103,7 +113,8 @@ interface Disks {
       "type": "Microsoft.Compute/disksOld",
       "location": "eastus",
       "properties": {
-        "provisioningState": "Succeeded"
+        "provisioningState": "Succeeded",
+        "diskSizeGB": 128
       }
     }
     ```
