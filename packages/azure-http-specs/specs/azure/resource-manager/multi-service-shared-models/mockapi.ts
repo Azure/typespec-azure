@@ -41,26 +41,27 @@ const storageAccount = {
 };
 
 // Scenario: Get Virtual Machine
-Scenarios.Azure_ResourceManager_MultiServiceSharedModels_Compute_VirtualMachines_get = passOnSuccess([
-  {
-    uri: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Compute/virtualMachinesShared/vm-shared1`,
-    method: "get",
-    request: {
-      query: {
-        "api-version": "2025-05-01",
+Scenarios.Azure_ResourceManager_MultiServiceSharedModels_Compute_VirtualMachines_get =
+  passOnSuccess([
+    {
+      uri: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Compute/virtualMachinesShared/vm-shared1`,
+      method: "get",
+      request: {
+        query: {
+          "api-version": "2025-05-01",
+        },
       },
+      response: {
+        status: 200,
+        body: json(virtualMachine),
+      },
+      kind: "MockApiDefinition",
     },
-    response: {
-      status: 200,
-      body: json(virtualMachine),
-    },
-    kind: "MockApiDefinition",
-  },
-]);
+  ]);
 
 // Scenario: Create or Update Virtual Machine
-Scenarios.Azure_ResourceManager_MultiServiceSharedModels_Compute_VirtualMachines_createOrUpdate = passOnSuccess(
-  [
+Scenarios.Azure_ResourceManager_MultiServiceSharedModels_Compute_VirtualMachines_createOrUpdate =
+  passOnSuccess([
     {
       uri: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Compute/virtualMachinesShared/vm-shared1`,
       method: "put",
@@ -86,52 +87,53 @@ Scenarios.Azure_ResourceManager_MultiServiceSharedModels_Compute_VirtualMachines
       },
       kind: "MockApiDefinition",
     },
-  ],
-);
+  ]);
 
 // Scenario: Get Storage Account
-Scenarios.Azure_ResourceManager_MultiServiceSharedModels_Storage_StorageAccounts_get = passOnSuccess([
-  {
-    uri: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Storage/storageAccounts/account1`,
-    method: "get",
-    request: {
-      query: {
-        "api-version": "2025-02-01",
+Scenarios.Azure_ResourceManager_MultiServiceSharedModels_Storage_StorageAccounts_get =
+  passOnSuccess([
+    {
+      uri: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Storage/storageAccounts/account1`,
+      method: "get",
+      request: {
+        query: {
+          "api-version": "2025-02-01",
+        },
       },
+      response: {
+        status: 200,
+        body: json(storageAccount),
+      },
+      kind: "MockApiDefinition",
     },
-    response: {
-      status: 200,
-      body: json(storageAccount),
-    },
-    kind: "MockApiDefinition",
-  },
-]);
+  ]);
 
 // Scenario: Create or Update Storage Account
-Scenarios.Azure_ResourceManager_MultiServiceSharedModels_Storage_StorageAccounts_createOrUpdate = passOnSuccess([
-  {
-    uri: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Storage/storageAccounts/account1`,
-    method: "put",
-    request: {
-      query: {
-        "api-version": "2025-02-01",
-      },
-      body: json({
-        location: "westus",
-        properties: {
-          metadata: {
-            createdBy: "admin@example.com",
-            tags: {
-              department: "engineering",
+Scenarios.Azure_ResourceManager_MultiServiceSharedModels_Storage_StorageAccounts_createOrUpdate =
+  passOnSuccess([
+    {
+      uri: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Storage/storageAccounts/account1`,
+      method: "put",
+      request: {
+        query: {
+          "api-version": "2025-02-01",
+        },
+        body: json({
+          location: "westus",
+          properties: {
+            metadata: {
+              createdBy: "admin@example.com",
+              tags: {
+                department: "engineering",
+              },
             },
           },
-        },
-      }),
+        }),
+      },
+      response: {
+        status: 200,
+        body: json(storageAccount),
+      },
+      kind: "MockApiDefinition",
     },
-    response: {
-      status: 200,
-      body: json(storageAccount),
-    },
-    kind: "MockApiDefinition",
-  },
-]);
+  ]);
