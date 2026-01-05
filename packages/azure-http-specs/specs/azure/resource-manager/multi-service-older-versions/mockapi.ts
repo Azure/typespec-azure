@@ -8,9 +8,9 @@ const RESOURCE_GROUP = "test-rg";
 const LOCATION = "eastus";
 
 const virtualMachine = {
-  id: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Compute/virtualMachines/vm1`,
-  name: "vm1",
-  type: "Microsoft.Compute/virtualMachines",
+  id: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Compute/virtualMachinesOld/vm-old1`,
+  name: "vm-old1",
+  type: "Microsoft.Compute/virtualMachinesOld",
   location: LOCATION,
   properties: {
     provisioningState: "Succeeded",
@@ -19,9 +19,9 @@ const virtualMachine = {
 
 // Mock data for ComputeDisk (Disk)
 const disk = {
-  id: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Compute/disks/disk1`,
-  name: "disk1",
-  type: "Microsoft.Compute/disks",
+  id: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Compute/disksOld/disk-old1`,
+  name: "disk-old1",
+  type: "Microsoft.Compute/disksOld",
   location: LOCATION,
   properties: {
     provisioningState: "Succeeded",
@@ -31,7 +31,7 @@ const disk = {
 // Scenario: Get Virtual Machine
 Scenarios.Azure_ResourceManager_MultiServiceOlderVersions_Compute_VirtualMachines_get = passOnSuccess([
   {
-    uri: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Compute/virtualMachines/vm1`,
+    uri: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Compute/virtualMachinesOld/vm-old1`,
     method: "get",
     request: {
       query: {
@@ -50,7 +50,7 @@ Scenarios.Azure_ResourceManager_MultiServiceOlderVersions_Compute_VirtualMachine
 Scenarios.Azure_ResourceManager_MultiServiceOlderVersions_Compute_VirtualMachines_createOrUpdate = passOnSuccess(
   [
     {
-      uri: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Compute/virtualMachines/vm1`,
+      uri: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Compute/virtualMachinesOld/vm-old1`,
       method: "put",
       request: {
         query: {
@@ -73,7 +73,7 @@ Scenarios.Azure_ResourceManager_MultiServiceOlderVersions_Compute_VirtualMachine
 // Scenario: Get Disk
 Scenarios.Azure_ResourceManager_MultiServiceOlderVersions_ComputeDisk_Disks_get = passOnSuccess([
   {
-    uri: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Compute/disks/disk1`,
+    uri: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Compute/disksOld/disk-old1`,
     method: "get",
     request: {
       query: {
@@ -91,7 +91,7 @@ Scenarios.Azure_ResourceManager_MultiServiceOlderVersions_ComputeDisk_Disks_get 
 // Scenario: Create or Update Disk
 Scenarios.Azure_ResourceManager_MultiServiceOlderVersions_ComputeDisk_Disks_createOrUpdate = passOnSuccess([
   {
-    uri: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Compute/disks/disk1`,
+    uri: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Compute/disksOld/disk-old1`,
     method: "put",
     request: {
       query: {

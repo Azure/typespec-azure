@@ -7,9 +7,9 @@ const SUBSCRIPTION_ID = "00000000-0000-0000-0000-000000000000";
 const RESOURCE_GROUP = "test-rg";
 
 const virtualMachine = {
-  id: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Compute/virtualMachines/vm1`,
-  name: "vm1",
-  type: "Microsoft.Compute/virtualMachines",
+  id: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Compute/virtualMachinesShared/vm-shared1`,
+  name: "vm-shared1",
+  type: "Microsoft.Compute/virtualMachinesShared",
   location: "eastus",
   properties: {
     provisioningState: "Succeeded",
@@ -43,7 +43,7 @@ const storageAccount = {
 // Scenario: Get Virtual Machine
 Scenarios.Azure_ResourceManager_MultiServiceSharedModels_Compute_VirtualMachines_get = passOnSuccess([
   {
-    uri: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Compute/virtualMachines/vm1`,
+    uri: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Compute/virtualMachinesShared/vm-shared1`,
     method: "get",
     request: {
       query: {
@@ -62,7 +62,7 @@ Scenarios.Azure_ResourceManager_MultiServiceSharedModels_Compute_VirtualMachines
 Scenarios.Azure_ResourceManager_MultiServiceSharedModels_Compute_VirtualMachines_createOrUpdate = passOnSuccess(
   [
     {
-      uri: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Compute/virtualMachines/vm1`,
+      uri: `/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Compute/virtualMachinesShared/vm-shared1`,
       method: "put",
       request: {
         query: {

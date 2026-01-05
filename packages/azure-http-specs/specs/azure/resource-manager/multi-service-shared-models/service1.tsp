@@ -32,7 +32,7 @@ model VirtualMachine is Azure.ResourceManager.TrackedResource<VirtualMachineProp
   ...ResourceNameParameter<
     Resource = VirtualMachine,
     KeyName = "vmName",
-    SegmentName = "virtualMachines",
+    SegmentName = "virtualMachinesShared",
     NamePattern = ""
   >;
 }
@@ -57,15 +57,15 @@ interface VirtualMachines {
     Test that a client can expose operations from multiple services with shared models. This operation should be called like this: `client.virtualMachines.get(...)`.
     
     GET a Virtual Machine.
-    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm1
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachinesShared/vm-shared1
     Expected query parameter: api-version=2025-05-01
     
     Expected response body:
     ```json
     {
-      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm1",
-      "name": "vm1",
-      "type": "Microsoft.Compute/virtualMachines",
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachinesShared/vm-shared1",
+      "name": "vm-shared1",
+      "type": "Microsoft.Compute/virtualMachinesShared",
       "location": "eastus",
       "properties": {
         "provisioningState": "Succeeded",
@@ -90,7 +90,7 @@ interface VirtualMachines {
     Test that a client can expose operations from multiple services with shared models. This operation should be called like this: `client.virtualMachines.createOrUpdate(...)`.
     
     PUT (create or update) a Virtual Machine.
-    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm1
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachinesShared/vm-shared1
     Expected query parameter: api-version=2025-05-01
     Expected request body:
     ```json
@@ -109,9 +109,9 @@ interface VirtualMachines {
     Expected response body:
     ```json
     {
-      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachines/vm1",
-      "name": "vm1",
-      "type": "Microsoft.Compute/virtualMachines",
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachinesShared/vm-shared1",
+      "name": "vm-shared1",
+      "type": "Microsoft.Compute/virtualMachinesShared",
       "location": "eastus",
       "properties": {
         "provisioningState": "Succeeded",
