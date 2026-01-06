@@ -1,6 +1,4 @@
-import "@azure-tools/typespec-azure-resource-manager";
-
-using Azure.ResourceManager;
+namespace Azure.ResourceManager.MultiServiceSharedModels.Shared;
 
 /**
  * Common metadata shared across multiple services.

@@ -5,6 +5,7 @@ import "./shared-models.tsp";
 
 using TypeSpec.Versioning;
 using Spector;
+using Azure.ResourceManager.MultiServiceSharedModels.Shared;
 
 /**
  * Storage Client
