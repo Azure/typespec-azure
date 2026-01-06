@@ -36,7 +36,7 @@ import {
 import { createDiagnostic } from "./lib.js";
 import { createSdkMethods, getSdkMethodParameter } from "./methods.js";
 import { getCrossLanguageDefinitionId } from "./public-utils.js";
-import { getSdkBuiltInType, getSdkCredentialParameter } from "./types.js";
+import { getSdkBuiltInType, getSdkCredentialParameter, getTypeSpecBuiltInType } from "./types.js";
 
 function getEndpointTypeFromSingleServer<
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
@@ -252,10 +252,7 @@ function addDefaultClientParameters<
       const multipleServiceApiVersionParam = { ...apiVersionParam };
       multipleServiceApiVersionParam.apiVersions = [];
       multipleServiceApiVersionParam.clientDefaultValue = undefined;
-      multipleServiceApiVersionParam.type = getSdkBuiltInType(
-        context,
-        $(context.program).builtin.string,
-      );
+      multipleServiceApiVersionParam.type = getTypeSpecBuiltInType(context, "string");
       defaultClientParamters.push(multipleServiceApiVersionParam);
     } else {
       defaultClientParamters.push(apiVersionParam);
