@@ -248,9 +248,14 @@ function addDefaultClientParameters<
   if (apiVersionParam) {
     if (Array.isArray(client.__raw.service)) {
       // for multi-service clients, keep apiVersions empty and no default value
+      // and set the type to string instead of a specific enum
       const multipleServiceApiVersionParam = { ...apiVersionParam };
       multipleServiceApiVersionParam.apiVersions = [];
       multipleServiceApiVersionParam.clientDefaultValue = undefined;
+      multipleServiceApiVersionParam.type = getSdkBuiltInType(
+        context,
+        $(context.program).builtin.string,
+      );
       defaultClientParamters.push(multipleServiceApiVersionParam);
     } else {
       defaultClientParamters.push(apiVersionParam);

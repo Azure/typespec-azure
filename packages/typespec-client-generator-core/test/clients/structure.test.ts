@@ -820,6 +820,8 @@ it("one client from multiple services", async () => {
   ok(apiVersionParam);
   strictEqual(apiVersionParam.apiVersions.length, 0);
   strictEqual(apiVersionParam.clientDefaultValue, undefined);
+  // For multi-service clients, the api version param type should be string
+  strictEqual(apiVersionParam.type.kind, "string");
   const aiClient = client.children!.find((c) => c.name === "AI");
   ok(aiClient);
 
