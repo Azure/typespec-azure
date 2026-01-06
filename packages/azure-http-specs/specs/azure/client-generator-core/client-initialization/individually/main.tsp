@@ -22,10 +22,6 @@ model RegionQueryParam {
   region: string;
 }
 
-model Input {
-  name: string;
-}
-
 model DefaultQueryParam {
   @query
   blobName: string;
@@ -54,7 +50,7 @@ interface NestedDefaultIndividuallyWithPath {
 interface NestedDefaultIndividuallyWithQuery {
   @route("/with-query")
   @get
-  withQuery(...DefaultQueryParam): void;
+  withQuery(...DefaultQueryParam, @query format?: string): void;
 
   @route("/get-standalone")
   @get

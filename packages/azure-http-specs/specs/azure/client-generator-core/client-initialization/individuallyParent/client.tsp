@@ -60,21 +60,21 @@ namespace IndividuallyParent {
     and the child client uses both individually and parent initialization behavior.
     
     Parameters elevated to client level:
-    - resourceName: "test-resource" (path parameter)
+    - blobName: "test-resource" (path parameter)
     
     Expected client usage:
     ```ts
-    // via IndividuallyParentClient (individually | parent initialization)
-    const client = new IndividuallyParentClient.getIndividuallyParentNestedWithPathClient({
-      resourceName: "test-resource"
+    // via IndividuallyParentClient (parent initialization)
+    const client = IndividuallyParentClient.getIndividuallyParentNestedWithPathClient({
+      blobName: "test-resource"
     });
     
     // directly (individually initialized)
     const client = new IndividuallyParentNestedWithPathClient({
-      resourceName: "test-resource"
+      blobName: "test-resource"
     });
     
-    // Operations don't need resourceName parameter
+    // Operations don't need blobName parameter
     client.withQuery(format: "text");
     client.getStandalone();
     client.deleteStandalone();
@@ -105,8 +105,8 @@ namespace IndividuallyParent {
     
     Expected client usage:
     ```ts
-    // via IndividuallyParentClient (individually | parent initialization)
-    const client = new IndividuallyParentClient.getIndividuallyParentNestedWithQueryClient({
+    // via IndividuallyParentClient (parent initialization)
+    const client = IndividuallyParentClient.getIndividuallyParentNestedWithQueryClient({
       blobName: "test-blob"
     });
     
@@ -116,7 +116,7 @@ namespace IndividuallyParent {
     });
     
     // Operations don't need blobName parameter
-    client.withQuery();
+    client.withQuery(format: "text");
     client.getStandalone();
     client.deleteStandalone();
     ```
@@ -146,8 +146,8 @@ namespace IndividuallyParent {
     
     Expected client usage:
     ```ts
-    // via IndividuallyParentClient (individually | parent initialization)
-    const client = new IndividuallyParentClient.getIndividuallyParentNestedWithHeaderClient({
+    // via IndividuallyParentClient (parent initialization)
+    const client = IndividuallyParentClient.getIndividuallyParentNestedWithHeaderClient({
       name: "test-name-value"
     });
     
@@ -188,8 +188,8 @@ namespace IndividuallyParent {
     
     Expected client usage:
     ```ts
-    // via IndividuallyParentClient (individually | parent initialization)
-    const client = new IndividuallyParentClient.getIndividuallyParentNestedWithMultipleClient({
+    // via IndividuallyParentClient (parent initialization)
+    const client = IndividuallyParentClient.getIndividuallyParentNestedWithMultipleClient({
       name: "test-name-value",
       region: "us-west"
     });
@@ -234,8 +234,8 @@ namespace IndividuallyParent {
     
     Expected client usage:
     ```ts
-    // via IndividuallyParentClient (individually | parent initialization)
-    const client = new IndividuallyParentClient.getIndividuallyParentNestedWithMixedClient({
+    // via IndividuallyParentClient (parent initialization)
+    const client = IndividuallyParentClient.getIndividuallyParentNestedWithMixedClient({
       name: "test-name-value"
     });
     

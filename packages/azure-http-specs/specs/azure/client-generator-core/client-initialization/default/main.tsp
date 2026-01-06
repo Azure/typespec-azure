@@ -126,7 +126,7 @@ model BlobProperties {
 interface QueryParam {
   @route("/with-query")
   @get
-  withQuery(...DefaultQueryParam): void;
+  withQuery(...DefaultQueryParam, @query format?: string): void;
 
   @route("/get-standalone")
   @get

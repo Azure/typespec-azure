@@ -67,10 +67,10 @@ model ParamAliasClientOptions {
   ```ts
   // directly (individually initialized)
   const client = new IndividuallyNestedWithPathClient({
-    resourceName: "test-resource"
+    blobName: "test-resource"
   });
   
-  // Operations don't need resourceName parameter
+  // Operations don't need blobName parameter
   client.withQuery(format: "text");
   client.getStandalone();
   client.deleteStandalone();
@@ -110,7 +110,7 @@ interface IndividuallyNestedWithPathClient {
   });
   
   // Operations don't need blobName parameter
-  client.withQuery();
+  client.withQuery(format: "text");
   client.getStandalone();
   client.deleteStandalone();
   ```

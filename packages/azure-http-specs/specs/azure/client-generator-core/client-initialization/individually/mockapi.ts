@@ -52,6 +52,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
       request: {
         query: {
           blobName: "test-blob",
+          format: "text",
         },
       },
       response: {

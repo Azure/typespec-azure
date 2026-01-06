@@ -207,23 +207,19 @@ interface ParamAlias {
 
 // Scenario 6: Query parameter moved to client level
 @scenarioDoc("""
-  Client for testing default -> default nested initialization.
-  
-  The parent client uses default initialization behavior,
-  and the child client uses default initialization behavior.
+  Client for testing query parameter moved to client level.
   
   Parameters elevated to client level:
   - blobName: "test-blob" (query parameter)
   
   Expected client usage:
   ```ts
-  // via DefaultClient (default initialization)
-  const client = new DefaultClient.getDefaultNestedWithQueryClient({
+  const client = new QueryParamClient({
     blobName: "test-blob"
   });
   
   // Operations don't need blobName parameter
-  client.withQuery();
+  client.withQuery(format: "text");
   client.getStandalone();
   client.deleteStandalone();
   ```
