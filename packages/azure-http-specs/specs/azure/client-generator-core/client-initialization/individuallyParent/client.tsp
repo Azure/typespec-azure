@@ -60,18 +60,18 @@ namespace IndividuallyParent {
     and the child client uses both individually and parent initialization behavior.
     
     Parameters elevated to client level:
-    - blobName: "test-resource" (path parameter)
+    - blobName: "test-blob" (path parameter)
     
     Expected client usage:
     ```ts
     // via IndividuallyParentClient (parent initialization)
     const client = IndividuallyParentClient.getIndividuallyParentNestedWithPathClient({
-      blobName: "test-resource"
+      blobName: "test-blob"
     });
     
     // directly (individually initialized)
     const client = new IndividuallyParentNestedWithPathClient({
-      blobName: "test-resource"
+      blobName: "test-blob"
     });
     
     // Operations don't need blobName parameter

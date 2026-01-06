@@ -61,13 +61,13 @@ model ParamAliasClientOptions {
   and the child client uses individually initialization behavior.
   
   Parameters elevated to client level:
-  - blobName: "test-resource" (path parameter)
+  - blobName: "test-blob" (path parameter)
   
   Expected client usage:
   ```ts
   // directly (individually initialized)
   const client = new IndividuallyNestedWithPathClient({
-    blobName: "test-resource"
+    blobName: "test-blob"
   });
   
   // Operations don't need blobName parameter
