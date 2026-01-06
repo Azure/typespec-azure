@@ -6,7 +6,7 @@ export const Scenarios: Record<string, ScenarioMockApi> = {};
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithPathClient =
   passOnSuccess([
     {
-      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually/test-resource/with-query",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually/test-blob/with-query",
       method: "get",
       request: {
         query: {
@@ -19,13 +19,13 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually/test-resource/get-standalone",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually/test-blob/get-standalone",
       method: "get",
       request: {},
       response: {
         status: 200,
         body: json({
-          name: "test-resource",
+          name: "test-blob",
           size: 1024,
           contentType: "application/octet-stream",
           createdOn: "2023-01-01T12:00:00Z",
@@ -34,7 +34,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
       kind: "MockApiDefinition",
     },
     {
-      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually/test-resource",
+      uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually/test-blob",
       method: "delete",
       request: {},
       response: {
