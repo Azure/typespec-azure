@@ -785,6 +785,7 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   const explicitClientNamespaces: Namespace[] = [];
   const explicitServices = new Set<Namespace>();
   listScopedDecoratorData(context, clientKey).forEach((v, k) => {
+    // See all explicit clients that in TypeSpec program
     if (!unsafe_Realm.realmForType.has(k)) {
       const sdkClient = v as SdkClient;
       if (Array.isArray(sdkClient.service)) {
@@ -854,6 +855,7 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
   compilerAssert(subgraph.realm !== null, "Should have a realm after mutation");
   context.__mutatedRealm = subgraph.realm;
+  context.program = subgraph.realm.program;
   return subgraph.type;
 }
 
