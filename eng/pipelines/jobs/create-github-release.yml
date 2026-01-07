@@ -19,7 +19,7 @@ jobs:
         artifact: ${{ parameters.artifactName }}
         displayName: Download package manifest
 
-      - template: /eng/tsp-core/pipelines/templates/install.yml
+      - template: /eng/pipelines/templates/install.yml
 
       - script: |
           echo "Publish summary:"
