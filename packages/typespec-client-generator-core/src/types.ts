@@ -46,7 +46,6 @@ import { isStream } from "@typespec/streams";
 import {
   getAccess,
   getAccessOverride,
-  getAlternateType,
   getClientDefaultValue,
   getClientNamespace,
   getExplicitClientApiVersions,
@@ -86,6 +85,7 @@ import {
   SdkUnionType,
   TCGCContext,
   UsageFlags,
+  getScalarAlternateType,
   isSdkIntKind,
 } from "./interfaces.js";
 import {
@@ -1090,7 +1090,7 @@ export function getClientTypeWithDiagnostics(
       retval = getSdkTypeForIntrinsic(context, type);
       break;
     case "Scalar":
-      const scalarAlternateType = getAlternateType(context, type);
+      const scalarAlternateType = getScalarAlternateType(context, type);
       retval = diagnostics.pipe(
         getSdkDateTimeOrDurationOrBuiltInType(
           context,
@@ -1105,7 +1105,7 @@ export function getClientTypeWithDiagnostics(
       retval = diagnostics.pipe(getSdkUnionWithDiagnostics(context, type, operation));
       break;
     case "ModelProperty":
-      const alternateType = getAlternateType(context, type);
+      const alternateType = getScalarAlternateType(context, type);
       retval = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, alternateType ?? type.type, operation),
       );
@@ -1248,7 +1248,8 @@ export function getSdkModelPropertyTypeBase(
   const diagnostics = createDiagnosticCollector();
   // get api version info so we can cache info about its api versions before we get to property type level
   const apiVersions = getAvailableApiVersions(context, type, operation || type.model);
-  const alternateType = getAlternateType(context, type);
+  const alternateType = getScalarAlternateType(context, type);
+
   const propertyType = diagnostics.pipe(
     getClientTypeWithDiagnostics(context, alternateType ?? type.type, operation),
   );
