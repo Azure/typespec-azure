@@ -952,3 +952,26 @@ it("should not set usage on original enum when inline alternateType is used", as
   strictEqual(sdkEnum?.kind, "enum");
   strictEqual(sdkEnum.usage, UsageFlags.None, "Status enum should have None usage");
 });
+
+it("applied to union", async () => {
+  await runner.compileWithBuiltInService(`
+    @alternateType(unknown)
+    union Dfe<T> {
+      T,
+      int32,
+    }
+
+    @usage(Usage.input)
+    /** Employee move response */
+    model MoveResponse {
+      /** The status of the move */
+      movingStatus: Dfe<string>;
+    }
+    `);
+  const models = getAllModels(runner.context);
+  const moveResponse = models.find((m) => m.name === "MoveResponse");
+  strictEqual(moveResponse?.kind, "model");
+  
+  const movingStatusProperty = moveResponse?.properties.find((p) => p.name === "movingStatus");
+  strictEqual(movingStatusProperty?.type.kind, "unknown");
+});
