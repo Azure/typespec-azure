@@ -50,7 +50,7 @@ jobs:
 
       # Publish Next playground
       - task: AzureCLI@1
-        displayName: "Publish playground"
+        displayName: "Publish Azure playground"
         inputs:
           azureSubscription: "Azure SDK Engineering System"
           scriptLocation: inlineScript
@@ -59,8 +59,8 @@ jobs:
               --auth-mode login ^
               --destination $web ^
               --account-name "cadlplayground" ^
-              --destination-path / ^
-              --source "./packages/playground-website/dist/web/" ^
+              --destination-path cadl-azure/ ^
+              --source "./packages/typespec-azure-playground-website/dist/" ^
               --overwrite
 
     templateContext:
