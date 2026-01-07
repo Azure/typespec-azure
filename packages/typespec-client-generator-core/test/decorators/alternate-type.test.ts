@@ -686,7 +686,7 @@ describe("external types", () => {
       };
     `)
     )[1];
-    strictEqual(diagnostics.length, 1);
+    strictEqual(diagnostics.length, 3);
     strictEqual(
       diagnostics[0].code,
       "@azure-tools/typespec-client-generator-core/external-library-version-mismatch",

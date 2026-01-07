@@ -1081,6 +1081,13 @@ export function getClientTypeWithDiagnostics(
       retval = diagnostics.pipe(getSdkTupleWithDiagnostics(context, type, operation));
       break;
     case "Model":
+      const scalarAlternateTypeForModel = getScalarAlternateType(context, type);
+      if (scalarAlternateTypeForModel) {
+        retval = diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, scalarAlternateTypeForModel, operation),
+        );
+        break;
+      }
       retval = diagnostics.pipe(getSdkArrayOrDictWithDiagnostics(context, type, operation));
       if (retval === undefined) {
         retval = diagnostics.pipe(getSdkModelWithDiagnostics(context, type, operation));
@@ -1099,9 +1106,22 @@ export function getClientTypeWithDiagnostics(
       );
       break;
     case "Enum":
+      const scalarAlternateTypeForEnum = getScalarAlternateType(context, type);
+      if (scalarAlternateTypeForEnum) {
+        retval = diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, scalarAlternateTypeForEnum, operation),
+        );
+      }
       retval = diagnostics.pipe(getSdkEnumWithDiagnostics(context, type, operation));
       break;
     case "Union":
+      const scalarAlternateTypeForUnion = getScalarAlternateType(context, type);
+      if (scalarAlternateTypeForUnion) {
+        retval = diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, scalarAlternateTypeForUnion, operation),
+        );
+        break;
+      }
       retval = diagnostics.pipe(getSdkUnionWithDiagnostics(context, type, operation));
       break;
     case "ModelProperty":
