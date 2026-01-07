@@ -7,8 +7,6 @@ jobs:
 
     steps:
       - template: /eng/pipelines/templates/install.yml
-        parameters:
-          useDotNet: true
 
       - template: /eng/pipelines/templates/build.yml
 
