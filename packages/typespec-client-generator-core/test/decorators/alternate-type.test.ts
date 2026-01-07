@@ -975,3 +975,50 @@ it("applied to union", async () => {
   const movingStatusProperty = moveResponse?.properties.find((p) => p.name === "movingStatus");
   strictEqual(movingStatusProperty?.type.kind, "unknown");
 });
+
+it("applied to enum", async () => {
+  await runner.compileWithBuiltInService(`
+    @alternateType(unknown)
+    enum StatusEnum {
+      Active,
+      Inactive,
+      Pending,
+    }
+
+    @usage(Usage.input)
+    /** Employee status model */
+    model EmployeeStatus {
+      /** The status of the employee */
+      status: StatusEnum;
+    }
+    `);
+  const models = getAllModels(runner.context);
+  const employeeStatus = models.find((m) => m.name === "EmployeeStatus");
+  strictEqual(employeeStatus?.kind, "model");
+  
+  const statusProperty = employeeStatus?.properties.find((p) => p.name === "status");
+  strictEqual(statusProperty?.type.kind, "unknown");
+});
+
+it("applied to model", async () => {
+  await runner.compileWithBuiltInService(`
+    @alternateType(unknown)
+    model Address {
+      street: string;
+      city: string;
+    }
+
+    @usage(Usage.input)
+    /** Employee info model */
+    model EmployeeInfo {
+      /** The address of the employee */
+      address: Address;
+    }
+    `);
+  const models = getAllModels(runner.context);
+  const employeeInfo = models.find((m) => m.name === "EmployeeInfo");
+  strictEqual(employeeInfo?.kind, "model");
+  
+  const addressProperty = employeeInfo?.properties.find((p) => p.name === "address");
+  strictEqual(addressProperty?.type.kind, "unknown");
+});

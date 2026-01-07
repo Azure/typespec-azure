@@ -1111,6 +1111,7 @@ export function getClientTypeWithDiagnostics(
         retval = diagnostics.pipe(
           getClientTypeWithDiagnostics(context, scalarAlternateTypeForEnum, operation),
         );
+        break;
       }
       retval = diagnostics.pipe(getSdkEnumWithDiagnostics(context, type, operation));
       break;
