@@ -416,6 +416,18 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`@hierarchyBuilding decorator causes conflicts in inherited properties. Please check that the model ${"childModel"} has the same properties as ${"parentModel"} in the spec.`,
       },
     },
+    "legacy-hierarchy-building-missing-property": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@hierarchyBuilding decorator conflict: Model ${"childModel"} is missing property '${"propertyName"}' that is required by parent model ${"parentModel"}.`,
+      },
+    },
+    "legacy-hierarchy-building-type-mismatch": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@hierarchyBuilding decorator conflict: Property '${"propertyName"}' in model ${"childModel"} has type '${"childType"}', but parent model ${"parentModel"} expects type '${"parentType"}'.`,
+      },
+    },
     "legacy-hierarchy-building-circular-reference": {
       severity: "error",
       messages: {
