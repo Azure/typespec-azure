@@ -1,7 +1,20 @@
-// These schemas are all adapted from the TypeSpec definition here: 
+// These schemas are all adapted from the TypeSpec definition here:
 // https://github.com/Azure/azure-sdk-tools/blob/main/tools/apiview/parsers/apiview-treestyle-parser-schema/main.tsp
 
-import { AliasStatementNode, EnumStatementNode, InterfaceStatementNode, IntersectionExpressionNode, ModelExpressionNode, ModelStatementNode, ObjectLiteralNode, OperationStatementNode, ScalarStatementNode, SyntaxKind, UnionExpressionNode, UnionStatementNode } from "@typespec/compiler/ast";
+import {
+  AliasStatementNode,
+  EnumStatementNode,
+  InterfaceStatementNode,
+  IntersectionExpressionNode,
+  ModelExpressionNode,
+  ModelStatementNode,
+  ObjectLiteralNode,
+  OperationStatementNode,
+  ScalarStatementNode,
+  SyntaxKind,
+  UnionExpressionNode,
+  UnionStatementNode,
+} from "@typespec/compiler/ast";
 import { NamespaceModel } from "./namespace-model.js";
 import { NamespaceStack } from "./util.js";
 
@@ -15,9 +28,9 @@ export enum TokenKind {
   MemberName = 4,
   StringLiteral = 5,
   Literal = 6,
-  Comment = 7
+  Comment = 7,
 }
-  
+
 /** ReviewFile represents entire API review object. This will be processed to render review lines. */
 export interface CodeFile {
   Name: string;
@@ -33,8 +46,8 @@ export interface CodeFile {
   /** Add any system generated comments. Each comment is linked to review line ID */
   Diagnostics: CodeDiagnostic[] | undefined;
   /** Navigation items are used to create a tree view in the navigation panel. Each navigation item is linked to a review line ID. This is optional.
-  * If navigation items are not provided then navigation panel will be automatically generated using the review lines. Navigation items should be provided only if you want to customize the navigation panel.
-  */
+   * If navigation items are not provided then navigation panel will be automatically generated using the review lines. Navigation items should be provided only if you want to customize the navigation panel.
+   */
   Navigation: NavigationItem[] | undefined;
 }
 
@@ -45,14 +58,14 @@ export interface ReviewLineOptions {
   IsContextEndLine?: boolean;
   /** Set ID of related line to ensure current line is not visible when a related line is hidden.
    * One e.g. is a code line for class attribute should set class line's Line ID as related line ID.
-  */
+   */
   RelatedToLine?: string;
 }
 
 /** ReviewLine object corresponds to each line displayed on API review. If an empty line is required then add a code line object without any token. */
 export interface ReviewLine extends ReviewLineOptions {
-  /** lineId is only required if we need to support commenting on a line that contains this token. 
-   *  Usually code line for documentation or just punctuation is not required to have lineId. lineId should be a unique value within 
+  /** lineId is only required if we need to support commenting on a line that contains this token.
+   *  Usually code line for documentation or just punctuation is not required to have lineId. lineId should be a unique value within
    *  the review token file to use it assign to review comments as well as navigation Id within the review page.
    *  for e.g Azure.Core.HttpHeader.Common, azure.template.template_main
    */
@@ -60,7 +73,7 @@ export interface ReviewLine extends ReviewLineOptions {
   CrossLanguageId: string | undefined;
   /** list of tokens that constructs a line in API review */
   Tokens: ReviewToken[];
-  /** Add any child lines as children. For e.g. all classes and namespace level methods are added as a children of namespace(module) level code line. 
+  /** Add any child lines as children. For e.g. all classes and namespace level methods are added as a children of namespace(module) level code line.
    *  Similarly all method level code lines are added as children of it's class code line.*/
   Children: ReviewLine[];
 }
@@ -72,7 +85,7 @@ export interface ReviewTokenOptions {
    * For e.g. a param type which is class name in the same package
    */
   NavigateToId?: string;
-  /** set skipDiff to true if underlying token needs to be ignored from diff calculation. For e.g. package metadata or dependency versions 
+  /** set skipDiff to true if underlying token needs to be ignored from diff calculation. For e.g. package metadata or dependency versions
    *  are usually excluded when comparing two revisions to avoid reporting them as API changes*/
   SkipDiff?: boolean;
   /** This is set if API is marked as deprecated */
@@ -99,9 +112,9 @@ export enum CodeDiagnosticLevel {
   Info = 1,
   Warning = 2,
   Error = 3,
-  /** Fatal level diagnostic will block API review approval and it will show an error message to the user. Approver will have to 
-  * override fatal level system comments before approving a review.*/
-  Fatal = 4
+  /** Fatal level diagnostic will block API review approval and it will show an error message to the user. Approver will have to
+   * override fatal level system comments before approving a review.*/
+  Fatal = 4,
 }
 
 /** System comment object is to add system generated comment. It can be one of the 4 different types of system comments. */
@@ -138,7 +151,7 @@ export class NavigationItem {
       | UnionStatementNode
       | UnionExpressionNode
       | ObjectLiteralNode,
-      stack: NamespaceStack
+    stack: NamespaceStack,
   ) {
     let obj;
     switch (objNode.kind) {
@@ -160,20 +173,40 @@ export class NavigationItem {
         }
         const aliasItems = new Array<NavigationItem>();
         for (const node of objNode.aliases.values()) {
-            aliasItems.push(new NavigationItem(node, stack));
+          aliasItems.push(new NavigationItem(node, stack));
         }
         this.ChildItems = [];
         if (operationItems.length) {
-          this.ChildItems.push({ Text: "Operations", ChildItems: operationItems, Tags: { TypeKind: ApiViewNavigationKind.Method }, NavigationId: "" });
+          this.ChildItems.push({
+            Text: "Operations",
+            ChildItems: operationItems,
+            Tags: { TypeKind: ApiViewNavigationKind.Method },
+            NavigationId: "",
+          });
         }
         if (resourceItems.length) {
-          this.ChildItems.push({ Text: "Resources", ChildItems: resourceItems, Tags: { TypeKind: ApiViewNavigationKind.Class }, NavigationId: "" });
+          this.ChildItems.push({
+            Text: "Resources",
+            ChildItems: resourceItems,
+            Tags: { TypeKind: ApiViewNavigationKind.Class },
+            NavigationId: "",
+          });
         }
         if (modelItems.length) {
-          this.ChildItems.push({ Text: "Models", ChildItems: modelItems, Tags: { TypeKind: ApiViewNavigationKind.Class }, NavigationId: "" });
+          this.ChildItems.push({
+            Text: "Models",
+            ChildItems: modelItems,
+            Tags: { TypeKind: ApiViewNavigationKind.Class },
+            NavigationId: "",
+          });
         }
         if (aliasItems.length) {
-            this.ChildItems.push({ Text: "Aliases", ChildItems: aliasItems, Tags: { TypeKind: ApiViewNavigationKind.Class }, NavigationId: "" });
+          this.ChildItems.push({
+            Text: "Aliases",
+            ChildItems: aliasItems,
+            Tags: { TypeKind: ApiViewNavigationKind.Class },
+            NavigationId: "",
+          });
         }
         break;
       case SyntaxKind.ModelStatement:

@@ -6,19 +6,19 @@ export function reviewLineText(line: ReviewLine, indent: number): string {
   for (const token of line.Tokens) {
     tokenText += reviewTokenText(token, tokenText);
   }
-  const childrenText = line.Children.map(c => reviewLineText(c, indent + 2)).join("\n");
+  const childrenText = line.Children.map((c) => reviewLineText(c, indent + 2)).join("\n");
   if (childrenText !== "") {
     return `${indentString}${tokenText}\n${childrenText}`;
   } else {
     return `${indentString}${tokenText}`;
   }
 }
-  
+
 function reviewTokenText(token: ReviewToken, preview: string): string {
   const previewEndsInSpace = preview.endsWith(" ");
   const hasSuffixSpace = token.HasSuffixSpace !== undefined ? token.HasSuffixSpace : true;
   const suffixSpace = hasSuffixSpace ? " " : "";
-  const prefixSpace = (token.HasPrefixSpace && !previewEndsInSpace) ? " " : "";
+  const prefixSpace = token.HasPrefixSpace && !previewEndsInSpace ? " " : "";
   const value = token.Value;
   return `${prefixSpace}${value}${suffixSpace}`;
 }

@@ -1,4 +1,8 @@
-import { createTestLibrary, findTestPackageRoot, TypeSpecTestLibrary } from "@typespec/compiler/testing";
+import {
+  createTestLibrary,
+  findTestPackageRoot,
+  TypeSpecTestLibrary,
+} from "@typespec/compiler/testing";
 
 export const ApiViewTestLibrary: TypeSpecTestLibrary = createTestLibrary({
   name: "@azure-tools/typespec-apiview",

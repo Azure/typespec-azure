@@ -3,15 +3,15 @@
   "version": "0.7.2",
   "author": "Microsoft Corporation",
   "description": "Library for emitting APIView token files from TypeSpec",
-  "homepage": "https://github.com/Azure/azure-sdk-tools",
-  "readme": "https://github.com/Azure/azure-sdk-tools/blob/master/README.md",
+  "homepage": "https://azure.github.io/typespec-azure",
+  "readme": "https://github.com/Azure/typespec-azure/blob/main/packages/typespec-apiview/README.md",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Azure/azure-sdk-tools.git"
+    "url": "git+https://github.com/Azure/typespec-azure.git"
   },
   "bugs": {
-    "url": "https://github.com/Azure/azure-sdk-tools/issues"
+    "url": "https://github.com/Azure/typespec-azure/issues"
   },
   "keywords": [
     "typespec",
@@ -20,34 +20,31 @@
   "type": "module",
   "main": "dist/src/index.js",
   "exports": {
-    ".": "./dist/src/index.js",
-    "./testing": "./dist/src/testing/index.js"
-  },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./dist/src/index.d.ts"
-      ],
-      "testing": [
-        "./dist/src/testing/index.d.ts"
-      ]
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    },
+    "./testing": {
+      "types": "./dist/src/testing/index.d.ts",
+      "default": "./dist/src/testing/index.js"
     }
   },
   "tspMain": "dist/src/index.js",
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=20.0.0"
   },
   "scripts": {
-    "clean": "rimraf ./dist ./temp ./tsp-output",
-    "prebuild": "node -p \"'export const LIB_VERSION = ' + JSON.stringify(require('./package.json').version) + ';'\" > src/version.ts",
-    "purge": "rimraf ./node_modules ./package-lock.json",
-    "build": "npm run clean && npm run prebuild && tsc -p . && npm run lint-typespec-library",
+    "clean": "rimraf ./dist ./temp",
+    "build": "tsc -p . && npm run lint-typespec-library",
     "watch": "tsc -p . --watch",
+    "gen-extern-signature": "tspd --enable-experimental gen-extern-signature .",
     "lint-typespec-library": "tsp compile . --warn-as-error --import @typespec/library-linter --no-emit",
-    "test": "vitest",
-    "lint": "eslint . --ext .ts --max-warnings=0",
-    "lint:fix": "eslint . --fix --ext .ts",
-    "api-view": "node ./node_modules/@typespec/compiler/entrypoints/cli.js compile main.tsp --emit=@azure-tools/typespec-apiview"
+    "test": "vitest run",
+    "test:watch": "vitest -w",
+    "test:ui": "vitest --ui",
+    "test:ci": "vitest run --coverage --reporter=junit --reporter=default",
+    "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --fix"
   },
   "files": [
     "lib/*.tsp",
@@ -55,28 +52,23 @@
     "!dist/test/**"
   ],
   "peerDependencies": {
-    "@typespec/compiler": "^1.0.0",
-    "@typespec/versioning": ">=0.67 <1.0"
+    "@typespec/compiler": "workspace:^",
+    "@typespec/versioning": "workspace:^"
   },
   "devDependencies": {
-    "@azure-tools/typespec-azure-core": ">=0.53 <1.0",
-    "@types/node": "~18.11.19",
-    "@typespec/eslint-plugin": ">=0.67 <1.0",
-    "@typespec/library-linter": ">=0.67 <1.0",
-    "@typespec/prettier-plugin-typespec": ">=0.67 <1.0",
-    "@typespec/rest": ">=0.67 <1.0",
-    "@typespec/http": "^1.0.0",
-    "@vitest/coverage-v8": "^3.0.7",
-    "c8": "^9.1.0",
-    "cspell": "^8.8.1",
-    "eslint": "^9.11.1",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-unicorn": "^53.0.0",
-    "eslint-plugin-vitest": "^0.5.4",
-    "prettier": "~3.2.5",
-    "rimraf": "~5.0.7",
-    "source-map-support": "^0.5.19",
-    "typescript": "~5.4.5",
-    "vitest": "^3.0.7"
+    "@azure-tools/typespec-azure-core": "workspace:^",
+    "@types/node": "~25.0.2",
+    "@typespec/compiler": "workspace:^",
+    "@typespec/http": "workspace:^",
+    "@typespec/library-linter": "workspace:^",
+    "@typespec/rest": "workspace:^",
+    "@typespec/tspd": "workspace:^",
+    "@typespec/versioning": "workspace:^",
+    "@vitest/coverage-v8": "^4.0.15",
+    "@vitest/ui": "^4.0.15",
+    "c8": "^10.1.3",
+    "rimraf": "~6.1.2",
+    "typescript": "~5.9.2",
+    "vitest": "^4.0.15"
   }
 }

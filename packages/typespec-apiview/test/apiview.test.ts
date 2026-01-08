@@ -1,8 +1,8 @@
-import { apiViewFor, apiViewText, compare } from "./test-host.js";
-import { CodeFile, ReviewLine } from "../src/schemas.js";
-import { describe, it } from "vitest";
 import { fail } from "assert";
 import { isDeepStrictEqual } from "util";
+import { describe, it } from "vitest";
+import { CodeFile, ReviewLine } from "../src/schemas.js";
+import { apiViewFor, apiViewText, compare } from "./test-host.js";
 
 interface ReviewLineData {
   relatedToCount: number;
@@ -10,7 +10,6 @@ interface ReviewLineData {
 }
 
 describe("apiview: tests", () => {
-
   function validateReviewLineIds(definitionIds: Set<string>, line: ReviewLine) {
     // ensure that there are no repeated definition IDs.
     if (line.LineId !== undefined) {
@@ -36,14 +35,15 @@ describe("apiview: tests", () => {
 
   /** Validates that related lines point to a valid line. */
   function getRelatedLineMetadata(apiview: CodeFile): Map<string, ReviewLineData> {
-
-    function getReviewLinesMetadata(lines: ReviewLine[] | undefined): Map<string, ReviewLineData> | undefined {
+    function getReviewLinesMetadata(
+      lines: ReviewLine[] | undefined,
+    ): Map<string, ReviewLineData> | undefined {
       if (lines === undefined || lines.length === 0) return undefined;
       const mainMap = new Map<string, ReviewLineData>();
       let lastKey: string | undefined = undefined;
       for (const line of lines) {
         const related = line.RelatedToLine;
-        const lineId = line.LineId
+        const lineId = line.LineId;
         const isEndContext = line.IsContextEndLine;
         if (related) {
           lastKey = related;
@@ -79,18 +79,17 @@ describe("apiview: tests", () => {
     const countMap = getReviewLinesMetadata(apiview.ReviewLines);
     return countMap ?? new Map<string, ReviewLineData>();
   }
-  
+
   function compareCounts(lhs: Map<string, ReviewLineData>, rhs: Map<string, ReviewLineData>) {
     // ensure the keys are the same
     const lhsKeys = new Set([...lhs.keys()]);
     const rhsKeys = new Set([...rhs.keys()]);
     const combined = new Set([...lhsKeys, ...rhsKeys]);
-    if (combined.size != lhsKeys.size) {
+    if (combined.size !== lhsKeys.size) {
       fail(`Keys mismatch: ${JSON.stringify([...lhsKeys])} vs ${JSON.stringify([...rhsKeys])}`);
     }
     isDeepStrictEqual(lhs, rhs);
   }
-
 
   describe("models", () => {
     it("composition", async () => {
@@ -146,13 +145,16 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.Animal", { relatedToCount: 0, isContextEndCount: 1 }],
-        ["Azure.Test.Cat", { relatedToCount: 0, isContextEndCount: 1 }],
-        ["Azure.Test.Dog", { relatedToCount: 0, isContextEndCount: 1 }],
-        ["Azure.Test.Pet", { relatedToCount: 0, isContextEndCount: 1 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.Animal", { relatedToCount: 0, isContextEndCount: 1 }],
+          ["Azure.Test.Cat", { relatedToCount: 0, isContextEndCount: 1 }],
+          ["Azure.Test.Dog", { relatedToCount: 0, isContextEndCount: 1 }],
+          ["Azure.Test.Pet", { relatedToCount: 0, isContextEndCount: 1 }],
+        ]),
+      );
     });
 
     it("templated", async () => {
@@ -230,15 +232,18 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.ConstrainedComplex", { relatedToCount: 1, isContextEndCount: 1 }],
-        ["Azure.Test.ConstrainedSimple", { relatedToCount: 0, isContextEndCount: 1 }],
-        ["Azure.Test.ConstrainedWithDefault", { relatedToCount: 0, isContextEndCount: 1 }],
-        ["Azure.Test.Page", { relatedToCount: 0, isContextEndCount: 1 }],
-        ["Azure.Test.StringPage", { relatedToCount: 0, isContextEndCount: 1 }],
-        ["Azure.Test.Thing", { relatedToCount: 0, isContextEndCount: 1 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.ConstrainedComplex", { relatedToCount: 1, isContextEndCount: 1 }],
+          ["Azure.Test.ConstrainedSimple", { relatedToCount: 0, isContextEndCount: 1 }],
+          ["Azure.Test.ConstrainedWithDefault", { relatedToCount: 0, isContextEndCount: 1 }],
+          ["Azure.Test.Page", { relatedToCount: 0, isContextEndCount: 1 }],
+          ["Azure.Test.StringPage", { relatedToCount: 0, isContextEndCount: 1 }],
+          ["Azure.Test.Thing", { relatedToCount: 0, isContextEndCount: 1 }],
+        ]),
+      );
     });
 
     it("with default values", async () => {
@@ -269,11 +274,13 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.Foo", { relatedToCount: 0, isContextEndCount: 1 }],
-      ]));
-
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.Foo", { relatedToCount: 0, isContextEndCount: 1 }],
+        ]),
+      );
     });
   });
 
@@ -295,9 +302,7 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-      ]));
+      compareCounts(counts, new Map([["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }]]));
     });
 
     it("new scalar type", async () => {
@@ -317,9 +322,7 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-      ]));
+      compareCounts(counts, new Map([["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }]]));
     });
 
     it("templated", async () => {
@@ -341,10 +344,13 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.Unreal", { relatedToCount: 1, isContextEndCount: 0 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.Unreal", { relatedToCount: 1, isContextEndCount: 0 }],
+        ]),
+      );
     });
   });
 
@@ -374,10 +380,13 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.Animal", { relatedToCount: 0, isContextEndCount: 1 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.Animal", { relatedToCount: 0, isContextEndCount: 1 }],
+        ]),
+      );
     });
 
     it("templated alias", async () => {
@@ -405,10 +414,13 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.Animal", { relatedToCount: 0, isContextEndCount: 1 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.Animal", { relatedToCount: 0, isContextEndCount: 1 }],
+        ]),
+      );
     });
   });
 
@@ -438,10 +450,13 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.Animal", { relatedToCount: 0, isContextEndCount: 1 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.Animal", { relatedToCount: 0, isContextEndCount: 1 }],
+        ]),
+      );
     });
   });
 
@@ -467,10 +482,13 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.SomeEnum", { relatedToCount: 0, isContextEndCount: 1 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.SomeEnum", { relatedToCount: 0, isContextEndCount: 1 }],
+        ]),
+      );
     });
 
     it("string-backed values", async () => {
@@ -494,10 +512,13 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.SomeStringEnum", { relatedToCount: 0, isContextEndCount: 1 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.SomeStringEnum", { relatedToCount: 0, isContextEndCount: 1 }],
+        ]),
+      );
     });
 
     it("int-backed values", async () => {
@@ -521,10 +542,13 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.SomeIntEnum", { relatedToCount: 0, isContextEndCount: 1 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.SomeIntEnum", { relatedToCount: 0, isContextEndCount: 1 }],
+        ]),
+      );
     });
 
     it("spread labels", async () => {
@@ -551,11 +575,14 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.SomeEnum", { relatedToCount: 0, isContextEndCount: 1 }],
-        ["Azure.Test.SomeSpreadEnum", { relatedToCount: 0, isContextEndCount: 1 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.SomeEnum", { relatedToCount: 0, isContextEndCount: 1 }],
+          ["Azure.Test.SomeSpreadEnum", { relatedToCount: 0, isContextEndCount: 1 }],
+        ]),
+      );
     });
   });
 
@@ -610,13 +637,16 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.Cat", { relatedToCount: 0, isContextEndCount: 1 }],
-        ["Azure.Test.Dog", { relatedToCount: 0, isContextEndCount: 1 }],
-        ["Azure.Test.MyUnion", { relatedToCount: 0, isContextEndCount: 1 }],
-        ["Azure.Test.Snake", { relatedToCount: 0, isContextEndCount: 1 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.Cat", { relatedToCount: 0, isContextEndCount: 1 }],
+          ["Azure.Test.Dog", { relatedToCount: 0, isContextEndCount: 1 }],
+          ["Azure.Test.MyUnion", { relatedToCount: 0, isContextEndCount: 1 }],
+          ["Azure.Test.Snake", { relatedToCount: 0, isContextEndCount: 1 }],
+        ]),
+      );
     });
 
     it("unnamed union", async () => {
@@ -665,13 +695,16 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.Cat", { relatedToCount: 0, isContextEndCount: 1 }],
-        ["Azure.Test.Dog", { relatedToCount: 0, isContextEndCount: 1 }],
-        ["Azure.Test.Animals", { relatedToCount: 0, isContextEndCount: 1 }],
-        ["Azure.Test.Snake", { relatedToCount: 0, isContextEndCount: 1 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.Cat", { relatedToCount: 0, isContextEndCount: 1 }],
+          ["Azure.Test.Dog", { relatedToCount: 0, isContextEndCount: 1 }],
+          ["Azure.Test.Animals", { relatedToCount: 0, isContextEndCount: 1 }],
+          ["Azure.Test.Snake", { relatedToCount: 0, isContextEndCount: 1 }],
+        ]),
+      );
     });
   });
 
@@ -704,11 +737,14 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.NamedGetFoo", { relatedToCount: 1, isContextEndCount: 0 }],
-        ["Azure.Test.ResourceRead", { relatedToCount: 0, isContextEndCount: 1 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.NamedGetFoo", { relatedToCount: 1, isContextEndCount: 0 }],
+          ["Azure.Test.ResourceRead", { relatedToCount: 0, isContextEndCount: 1 }],
+        ]),
+      );
     });
 
     it("templated with deeply nested models", async () => {
@@ -760,11 +796,14 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.Foo", { relatedToCount: 0, isContextEndCount: 1 }],
-        ["Azure.Test.Temp", { relatedToCount: 0, isContextEndCount: 1 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.Foo", { relatedToCount: 0, isContextEndCount: 1 }],
+          ["Azure.Test.Temp", { relatedToCount: 0, isContextEndCount: 1 }],
+        ]),
+      );
     });
 
     it("templated with model types", async () => {
@@ -864,13 +903,16 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.GetFoo", { relatedToCount: 0, isContextEndCount: 1 }],
-        ["Azure.Test.NamedGetFoo", { relatedToCount: 1, isContextEndCount: 1 }],
-        ["Azure.Test.ResourceRead", { relatedToCount: 0, isContextEndCount: 1 }],
-        ["Azure.Test.FooParams", { relatedToCount: 0, isContextEndCount: 1 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.GetFoo", { relatedToCount: 0, isContextEndCount: 1 }],
+          ["Azure.Test.NamedGetFoo", { relatedToCount: 1, isContextEndCount: 1 }],
+          ["Azure.Test.ResourceRead", { relatedToCount: 0, isContextEndCount: 1 }],
+          ["Azure.Test.FooParams", { relatedToCount: 0, isContextEndCount: 1 }],
+        ]),
+      );
     });
 
     it("templated with mixed types", async () => {
@@ -950,13 +992,16 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.GetFoo", { relatedToCount: 0, isContextEndCount: 1 }],
-        ["Azure.Test.NamedGetFoo", { relatedToCount: 1, isContextEndCount: 1 }],
-        ["Azure.Test.ResourceRead", { relatedToCount: 0, isContextEndCount: 1 }],
-        ["Azure.Test.FooParams", { relatedToCount: 0, isContextEndCount: 1 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.GetFoo", { relatedToCount: 0, isContextEndCount: 1 }],
+          ["Azure.Test.NamedGetFoo", { relatedToCount: 1, isContextEndCount: 1 }],
+          ["Azure.Test.ResourceRead", { relatedToCount: 0, isContextEndCount: 1 }],
+          ["Azure.Test.FooParams", { relatedToCount: 0, isContextEndCount: 1 }],
+        ]),
+      );
     });
 
     it("templated with empty models", async () => {
@@ -997,12 +1042,15 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.GetFoo", { relatedToCount: 0, isContextEndCount: 1 }],
-        ["Azure.Test.NamedGetFoo", { relatedToCount: 1, isContextEndCount: 1 }],
-        ["Azure.Test.ResourceRead", { relatedToCount: 0, isContextEndCount: 1 }]
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.GetFoo", { relatedToCount: 0, isContextEndCount: 1 }],
+          ["Azure.Test.NamedGetFoo", { relatedToCount: 1, isContextEndCount: 1 }],
+          ["Azure.Test.ResourceRead", { relatedToCount: 0, isContextEndCount: 1 }],
+        ]),
+      );
     });
 
     it("with anonymous models", async () => {
@@ -1036,10 +1084,13 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.SomeOp", { relatedToCount: 0, isContextEndCount: 1 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.SomeOp", { relatedToCount: 0, isContextEndCount: 1 }],
+        ]),
+      );
     });
   });
 
@@ -1080,12 +1131,15 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.Foo", { relatedToCount: 0, isContextEndCount: 1 }],
-        ["Azure.Test.Foo.get", { relatedToCount: 2, isContextEndCount: 1 }],
-        ["Azure.Test.Foo.list", { relatedToCount: 2, isContextEndCount: 0 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.Foo", { relatedToCount: 0, isContextEndCount: 1 }],
+          ["Azure.Test.Foo.get", { relatedToCount: 2, isContextEndCount: 1 }],
+          ["Azure.Test.Foo.list", { relatedToCount: 2, isContextEndCount: 0 }],
+        ]),
+      );
     });
   });
 
@@ -1117,10 +1171,13 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.Bar", { relatedToCount: 5, isContextEndCount: 0 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.Bar", { relatedToCount: 5, isContextEndCount: 0 }],
+        ]),
+      );
     });
 
     it("short strings", async () => {
@@ -1142,10 +1199,13 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.Foo", { relatedToCount: 1, isContextEndCount: 0 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.Foo", { relatedToCount: 1, isContextEndCount: 0 }],
+        ]),
+      );
     });
   });
 
@@ -1193,10 +1253,13 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.Person", { relatedToCount: 0, isContextEndCount: 1 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.Person", { relatedToCount: 0, isContextEndCount: 1 }],
+        ]),
+      );
     });
   });
 
@@ -1226,10 +1289,13 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.Foo", { relatedToCount: 2, isContextEndCount: 1 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.Foo", { relatedToCount: 2, isContextEndCount: 1 }],
+        ]),
+      );
     });
 
     it("suppression on namespace", async () => {
@@ -1262,10 +1328,13 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.SubNamespace", { relatedToCount: 2, isContextEndCount: 1 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.SubNamespace", { relatedToCount: 2, isContextEndCount: 1 }],
+        ]),
+      );
     });
 
     it("suppression on operation", async () => {
@@ -1287,10 +1356,13 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-        ["Azure.Test.someOp", { relatedToCount: 1, isContextEndCount: 0 }],
-      ]));
+      compareCounts(
+        counts,
+        new Map([
+          ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
+          ["Azure.Test.someOp", { relatedToCount: 1, isContextEndCount: 0 }],
+        ]),
+      );
     });
   });
 
@@ -1318,9 +1390,7 @@ describe("apiview: tests", () => {
       compare(expect, actual, 6);
       validateLineIds(apiview);
       const counts = getRelatedLineMetadata(apiview);
-      compareCounts(counts, new Map([
-        ["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }],
-      ]));
+      compareCounts(counts, new Map([["Azure.Test", { relatedToCount: 3, isContextEndCount: 1 }]]));
     });
   });
 
@@ -1359,8 +1429,6 @@ describe("apiview: tests", () => {
     compare(expect, actual, 6);
     validateLineIds(apiview);
     const counts = getRelatedLineMetadata(apiview);
-    compareCounts(counts, new Map([
-      ["Azure.Test", { relatedToCount: 1, isContextEndCount: 1 }],
-    ]));
+    compareCounts(counts, new Map([["Azure.Test", { relatedToCount: 1, isContextEndCount: 1 }]]));
   });
 });

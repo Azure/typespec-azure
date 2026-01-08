@@ -27,6 +27,7 @@ words:
   - msbuild
   - MSRC
   - munge
+  - myconst
   - mylib
   - nostdlib
   - oapi

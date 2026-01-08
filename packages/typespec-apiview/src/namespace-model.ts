@@ -1,38 +1,35 @@
+import { Namespace, Program } from "@typespec/compiler";
 import {
-  Namespace,
-  Program,
-} from "@typespec/compiler";
-import {
-  Node,
   AliasStatementNode,
-  ModelStatementNode,
-  OperationStatementNode,
-  InterfaceStatementNode,
-  EnumStatementNode,
-  NamespaceStatementNode,
-  ModelExpressionNode,
-  IntersectionExpressionNode,
-  SyntaxKind,
-  BaseNode,
-  IdentifierNode,
-  ModelPropertyNode,
-  EnumMemberNode,
-  ModelSpreadPropertyNode,
-  EnumSpreadMemberNode,
-  DecoratorExpressionNode,
-  MemberExpressionNode,
-  UnionStatementNode,
-  UnionExpressionNode,
-  UnionVariantNode,
   AugmentDecoratorStatementNode,
-  ScalarStatementNode,
-  TypeReferenceNode,
-  JsNamespaceDeclarationNode,
-  DirectiveExpressionNode,
-  StringLiteralNode,
-  ObjectLiteralNode,
+  BaseNode,
   ConstStatementNode,
-  visitChildren
+  DecoratorExpressionNode,
+  DirectiveExpressionNode,
+  EnumMemberNode,
+  EnumSpreadMemberNode,
+  EnumStatementNode,
+  IdentifierNode,
+  InterfaceStatementNode,
+  IntersectionExpressionNode,
+  JsNamespaceDeclarationNode,
+  MemberExpressionNode,
+  ModelExpressionNode,
+  ModelPropertyNode,
+  ModelSpreadPropertyNode,
+  ModelStatementNode,
+  NamespaceStatementNode,
+  Node,
+  ObjectLiteralNode,
+  OperationStatementNode,
+  ScalarStatementNode,
+  StringLiteralNode,
+  SyntaxKind,
+  TypeReferenceNode,
+  UnionExpressionNode,
+  UnionStatementNode,
+  UnionVariantNode,
+  visitChildren,
 } from "@typespec/compiler/ast";
 export class NamespaceModel {
   kind = SyntaxKind.NamespaceStatement;
@@ -163,7 +160,11 @@ export class NamespaceModel {
   }
 }
 
-function findNodes<T extends SyntaxKind>(kind: T, program: Program, namespace: Namespace): (Node & { kind: T })[] {
+function findNodes<T extends SyntaxKind>(
+  kind: T,
+  program: Program,
+  namespace: Namespace,
+): (Node & { kind: T })[] {
   const nodes: Node[] = [];
   for (const file of program.sourceFiles.values()) {
     visitChildren(file, function visit(node) {
@@ -182,7 +183,10 @@ function inNamespace(node: Node, program: Program, namespace: Namespace): boolea
       case SyntaxKind.NamespaceStatement:
         return program.checker.getTypeForNode(n) === namespace;
       case SyntaxKind.TypeSpecScript:
-        if (n.inScopeNamespaces.length > 0 && inNamespace(n.inScopeNamespaces[0], program, namespace)) {
+        if (
+          n.inScopeNamespaces.length > 0 &&
+          inNamespace(n.inScopeNamespaces[0], program, namespace)
+        ) {
           return true;
         }
         return false;
@@ -215,6 +219,7 @@ export function generateId(obj: BaseNode | NamespaceModel | undefined): string |
         case SyntaxKind.MemberExpression:
           return generateId(node.target);
       }
+      break;
     case SyntaxKind.EnumMember:
       node = obj as EnumMemberNode;
       name = node.id.sv;

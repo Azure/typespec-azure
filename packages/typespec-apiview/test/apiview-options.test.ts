@@ -1,9 +1,7 @@
-import { expectDiagnostics } from "@typespec/compiler/testing";
-import { apiViewFor, apiViewText, compare, diagnosticsFor } from "./test-host.js";
 import { describe, it } from "vitest";
+import { apiViewFor, apiViewText, compare } from "./test-host.js";
 
 describe("apiview-options: tests", () => {
-
   it("omits namespaces that aren't proper subnamespaces", async () => {
     const input = `
     @TypeSpec.service( #{ title: "Test"} )
@@ -27,7 +25,7 @@ describe("apiview-options: tests", () => {
     namespace Azure.Test.Sub {
       model SubFoo {}
     }
-    `
+    `;
     const apiview = await apiViewFor(input, {});
     const actual = apiViewText(apiview);
     compare(expect, actual, 6);
@@ -53,9 +51,9 @@ describe("apiview-options: tests", () => {
     namespace Azure.Test {
       model Foo {}
     }
-    `
+    `;
     const apiview = await apiViewFor(input, {
-      "include-global-namespace": true
+      "include-global-namespace": true,
     });
     // TODO: Update once bug is fixed: https://github.com/microsoft/typespec/issues/3165
     const actual = apiViewText(apiview);

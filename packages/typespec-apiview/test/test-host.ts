@@ -1,19 +1,25 @@
-import { createTestHost, createTestWrapper } from "@typespec/compiler/testing";
-import { RestTestLibrary } from "@typespec/rest/testing";
-import { HttpTestLibrary } from "@typespec/http/testing";
-import { VersioningTestLibrary } from "@typespec/versioning/testing";
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { ApiViewTestLibrary } from "../src/testing/index.js";
 import "@azure-tools/typespec-apiview";
-import { ApiViewEmitterOptions } from "../src/lib.js";
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { Diagnostic, resolvePath } from "@typespec/compiler";
+import { createTestHost, createTestWrapper } from "@typespec/compiler/testing";
+import { HttpTestLibrary } from "@typespec/http/testing";
+import { RestTestLibrary } from "@typespec/rest/testing";
+import { VersioningTestLibrary } from "@typespec/versioning/testing";
 import { strictEqual } from "assert";
+import { ApiViewEmitterOptions } from "../src/lib.js";
 import { CodeFile } from "../src/schemas.js";
+import { ApiViewTestLibrary } from "../src/testing/index.js";
 import { reviewLineText } from "../src/util.js";
 
 export async function createApiViewTestHost() {
   return createTestHost({
-    libraries: [ApiViewTestLibrary, RestTestLibrary, HttpTestLibrary, VersioningTestLibrary, AzureCoreTestLibrary],
+    libraries: [
+      ApiViewTestLibrary,
+      RestTestLibrary,
+      HttpTestLibrary,
+      VersioningTestLibrary,
+      AzureCoreTestLibrary,
+    ],
   });
 }
 
@@ -21,10 +27,7 @@ export async function createApiViewTestRunner({
   withVersioning,
 }: { withVersioning?: boolean } = {}) {
   const host = await createApiViewTestHost();
-  const autoUsings = [
-    "TypeSpec.Rest",
-    "TypeSpec.Http",
-  ]
+  const autoUsings = ["TypeSpec.Rest", "TypeSpec.Http"];
   if (withVersioning) {
     autoUsings.push("TypeSpec.Versioning");
   }
@@ -32,12 +35,15 @@ export async function createApiViewTestRunner({
     autoUsings: autoUsings,
     compilerOptions: {
       emit: ["@azure-tools/typespec-apiview"],
-    }
+    },
   });
 }
 
-export async function diagnosticsFor(code: string, options: ApiViewEmitterOptions): Promise<readonly Diagnostic[]> {
-  const runner = await createApiViewTestRunner({withVersioning: true});
+export async function diagnosticsFor(
+  code: string,
+  options: ApiViewEmitterOptions,
+): Promise<readonly Diagnostic[]> {
+  const runner = await createApiViewTestRunner({ withVersioning: true });
   const outPath = resolvePath("/apiview.json");
   const diagnostics = await runner.diagnose(code, {
     noEmit: false,
@@ -45,8 +51,8 @@ export async function diagnosticsFor(code: string, options: ApiViewEmitterOption
     options: {
       "@azure-tools/typespec-apiview": {
         ...options,
-        "output-file": outPath,  
-      }
+        "output-file": outPath,
+      },
     },
     miscOptions: { "disable-linter": true },
   });
@@ -54,7 +60,7 @@ export async function diagnosticsFor(code: string, options: ApiViewEmitterOption
 }
 
 export async function apiViewFor(code: string, options: ApiViewEmitterOptions): Promise<CodeFile> {
-  const runner = await createApiViewTestRunner({withVersioning: true});
+  const runner = await createApiViewTestRunner({ withVersioning: true });
   const outPath = resolvePath("/apiview.json");
   await runner.compile(code, {
     noEmit: false,
@@ -62,8 +68,8 @@ export async function apiViewFor(code: string, options: ApiViewEmitterOptions): 
     options: {
       "@azure-tools/typespec-apiview": {
         ...options,
-        "output-file": outPath,  
-      }
+        "output-file": outPath,
+      },
     },
     miscOptions: { "disable-linter": true },
   });
@@ -74,7 +80,9 @@ export async function apiViewFor(code: string, options: ApiViewEmitterOptions): 
 }
 
 export function apiViewText(apiview: CodeFile): string[] {
-  return apiview.ReviewLines.map(l => reviewLineText(l, 0)).join("\n").split("\n");
+  return apiview.ReviewLines.map((l) => reviewLineText(l, 0))
+    .join("\n")
+    .split("\n");
 }
 
 function getBaseIndent(lines: string[]): number {
@@ -90,7 +98,7 @@ function getBaseIndent(lines: string[]): number {
 function trimLines(lines: string[]): string[] {
   const trimmed: string[] = [];
   const indent = getBaseIndent(lines);
-  
+
   // if first line is blank, skip it
   if (lines[0].trim() === "") {
     lines = lines.slice(1);
@@ -109,7 +117,7 @@ function trimLines(lines: string[]): string[] {
   // if last line is blank, skip it
   const lastLine = trimmed.pop();
   if (lastLine && lastLine.trim() !== "") {
-    trimmed.push(lastLine)
+    trimmed.push(lastLine);
   }
   return trimmed;
 }
@@ -120,6 +128,10 @@ export function compare(expect: string, lines: string[], offset: number) {
   const expectedLines = trimLines(expect.split("\n"));
   const actualLines = trimLines(lines.slice(offset));
   for (let x = 0; x < actualLines.length; x++) {
-    strictEqual(actualLines[x], expectedLines[x], `Actual differed from expected at line #${x + 1}\nACTUAL: '${actualLines[x]}'\nEXPECTED: '${expectedLines[x]}'`);
+    strictEqual(
+      actualLines[x],
+      expectedLines[x],
+      `Actual differed from expected at line #${x + 1}\nACTUAL: '${actualLines[x]}'\nEXPECTED: '${expectedLines[x]}'`,
+    );
   }
 }

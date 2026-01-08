@@ -4,9 +4,9 @@ import {
   getSourceLocation,
   Namespace,
   navigateProgram,
-  Program
+  Program,
 } from "@typespec/compiler";
-import { 
+import {
   AliasStatementNode,
   ArrayExpressionNode,
   ArrayLiteralNode,
@@ -48,12 +48,21 @@ import {
   UnionExpressionNode,
   UnionStatementNode,
   UnionVariantNode,
-  ValueOfExpressionNode
+  ValueOfExpressionNode,
 } from "@typespec/compiler/ast";
 import { generateId, NamespaceModel } from "./namespace-model.js";
-import { LIB_VERSION } from "./version.js";
-import { CodeDiagnostic, CodeDiagnosticLevel, CodeFile, NavigationItem, ReviewLine, ReviewToken, ReviewTokenOptions, TokenKind } from "./schemas.js";
+import {
+  CodeDiagnostic,
+  CodeDiagnosticLevel,
+  CodeFile,
+  NavigationItem,
+  ReviewLine,
+  ReviewToken,
+  ReviewTokenOptions,
+  TokenKind,
+} from "./schemas.js";
 import { NamespaceStack, reviewLineText } from "./util.js";
+import { LIB_VERSION } from "./version.js";
 
 export class ApiView {
   name: string;
@@ -86,8 +95,8 @@ export class ApiView {
       CrossLanguageId: "",
       Tokens: [],
       Children: [],
-    }
-    this.parentStack = []
+    };
+    this.parentStack = [];
     this.currentParent = undefined;
     this.emitHeader();
   }
@@ -122,12 +131,11 @@ export class ApiView {
   }
 
   private appendDebugInfo() {
-
     function processLines(lines: ReviewLine[]) {
       for (const line of lines) {
         const lineId = line.LineId;
         const relatedLineId = line.RelatedToLine;
-        const isContextEnd = line.IsContextEndLine
+        const isContextEnd = line.IsContextEndLine;
         let string = "";
         if (lineId && lineId !== "") {
           string += ` LINE_ID: ${lineId} `;
@@ -142,10 +150,10 @@ export class ApiView {
           line.Tokens.push({
             Kind: TokenKind.Comment,
             Value: `// ${string.trim()}`,
-          })
+          });
         }
         processLines(line.Children);
-      }  
+      }
     }
 
     processLines(this.reviewLines);
@@ -170,7 +178,7 @@ export class ApiView {
 
       const lineId = line.LineId;
       if (lineId === "Azure.Test.ConstrainedComplex") {
-        let test = "best";
+        // Debugging hook
       }
       const relatedTo = line.RelatedToLine;
       const isContextEnd = line.IsContextEndLine;
@@ -207,11 +215,11 @@ export class ApiView {
         // if currentContext isn't set and we encounter a relatedTo line, set the current context
         if (relatedTo) {
           currentContext = relatedTo;
-        // if currentContext isn't set but there's a lineId with childrent, set the current context
+          // if currentContext isn't set but there's a lineId with childrent, set the current context
         } else if (lineId && line.Children.length > 0) {
           currentContext = lineId;
           contextMatchFound = true;
-        // If a context end is found without a start, then ignore the contextEnd
+          // If a context end is found without a start, then ignore the contextEnd
         } else if (isContextEnd) {
           line.IsContextEndLine = false;
         }
@@ -251,12 +259,11 @@ export class ApiView {
       Diagnostics: this.diagnostics,
       Navigation: this.navigationItems,
     };
-
   }
 
   /** Outputs the APIView model to a string approximation of what will display on the web. */
   asString(): string {
-    return this.reviewLines.map(l => reviewLineText(l, 0)).join("\n");
+    return this.reviewLines.map((l) => reviewLineText(l, 0)).join("\n");
   }
 
   private token(kind: TokenKind, value: string, options?: ReviewTokenOptions) {
@@ -272,7 +279,7 @@ export class ApiView {
     try {
       const lastToken = this.currentLine.Tokens[this.currentLine.Tokens.length - 1];
       lastToken.HasSuffixSpace = false;
-    } catch (e) {
+    } catch {
       // no tokens, so nothing to do
       return;
     }
@@ -289,7 +296,7 @@ export class ApiView {
       CrossLanguageId: "",
       Tokens: [],
       Children: [],
-    }
+    };
   }
 
   private deindent() {
@@ -307,7 +314,7 @@ export class ApiView {
       CrossLanguageId: "",
       Tokens: [],
       Children: [],
-    }
+    };
   }
 
   /** Set the exact number of desired newlines. */
@@ -324,7 +331,7 @@ export class ApiView {
         }
       }
     }
-    if (newlineCount == count) {
+    if (newlineCount === count) {
       return;
     } else if (newlineCount > count) {
       const toRemove = newlineCount - count;
@@ -346,7 +353,7 @@ export class ApiView {
       const firstToken = this.currentLine.Tokens[0];
       firstToken.HasPrefixSpace = false;
     }
-    
+
     if (this.currentParent) {
       this.currentParent.Children.push(this.currentLine);
     } else {
@@ -357,7 +364,7 @@ export class ApiView {
       CrossLanguageId: "",
       Tokens: [],
       Children: [],
-    }
+    };
   }
 
   private getLastLine(): ReviewLine | undefined {
@@ -372,7 +379,7 @@ export class ApiView {
     return lastGrandchild ?? lastChild;
   }
 
-  /** 
+  /**
    * Places the provided token in the tree based on the provided characters.
    * param token The token to snap.
    * param characters The characters to snap to.
@@ -413,13 +420,22 @@ export class ApiView {
     }
   }
 
-  private lineMarker(options?: {value?: string, addCrossLanguageId?: boolean, relatedLineId?: string}) {
+  private lineMarker(options?: {
+    value?: string;
+    addCrossLanguageId?: boolean;
+    relatedLineId?: string;
+  }) {
     this.currentLine.LineId = options?.value ?? this.namespaceStack.value();
-    this.currentLine.CrossLanguageId = options?.addCrossLanguageId ? (options?.value ?? this.namespaceStack.value()) : undefined;
+    this.currentLine.CrossLanguageId = options?.addCrossLanguageId
+      ? (options?.value ?? this.namespaceStack.value())
+      : undefined;
     this.currentLine.RelatedToLine = options?.relatedLineId;
   }
 
-  private punctuation(value: string, options?: ReviewTokenOptions & {snapTo?: string, isContextEndLine?: boolean}) {
+  private punctuation(
+    value: string,
+    options?: ReviewTokenOptions & { snapTo?: string; isContextEndLine?: boolean },
+  ) {
     const snapTo = options?.snapTo;
     delete options?.snapTo;
     const isContextEndLine = options?.isContextEndLine;
@@ -429,7 +445,7 @@ export class ApiView {
       Kind: TokenKind.Punctuation,
       Value: value,
       ...options,
-    }
+    };
 
     if (snapTo) {
       this.snapToken(token, snapTo);
@@ -449,21 +465,26 @@ export class ApiView {
     this.token(TokenKind.Keyword, keyword, options);
   }
 
-  private typeDeclaration(typeName: string, typeId: string | undefined, addCrossLanguageId: boolean, options?: ReviewTokenOptions) {
+  private typeDeclaration(
+    typeName: string,
+    typeId: string | undefined,
+    addCrossLanguageId: boolean,
+    options?: ReviewTokenOptions,
+  ) {
     if (typeId) {
       if (this.typeDeclarations.has(typeId)) {
         throw new Error(`Duplication ID "${typeId}" for declaration will result in bugs.`);
       }
       this.typeDeclarations.add(typeId);
     }
-    this.lineMarker({value: typeId, addCrossLanguageId: true});
+    this.lineMarker({ value: typeId, addCrossLanguageId: true });
     this.token(TokenKind.TypeName, typeName, options);
   }
 
   private typeReference(typeName: string, options?: ReviewTokenOptions) {
     options = options ?? {};
     options.NavigateToId = options.NavigateToId ?? "__MISSING__";
-    this.token(TokenKind.TypeName, typeName, {...options});
+    this.token(TokenKind.TypeName, typeName, { ...options });
   }
 
   private member(name: string, options?: ReviewTokenOptions) {
@@ -476,7 +497,7 @@ export class ApiView {
       this.currentLine.Tokens.push({
         Kind: TokenKind.StringLiteral,
         Value: `\u0022${value}\u0022`,
-        ...options
+        ...options,
       });
     } else {
       this.punctuation(`"""`, options);
@@ -498,7 +519,7 @@ export class ApiView {
       Text: message,
       TargetId: targetId,
       Level: level,
-    })
+    });
   }
 
   private shouldEmitNamespace(name: string): boolean {
@@ -518,26 +539,26 @@ export class ApiView {
   private emitHeader() {
     const toolVersion = LIB_VERSION;
     const headerText = `// Package parsed using @azure-tools/typespec-apiview (version:${toolVersion})`;
-    this.literal(headerText, {SkipDiff: true});
+    this.literal(headerText, { SkipDiff: true });
     this.namespaceStack.push("GLOBAL");
     this.lineMarker();
     this.namespaceStack.pop();
     // TODO: Source URL?
-    this.blankLines(2)
+    this.blankLines(2);
   }
 
   private tokenize(node: BaseNode) {
     let obj;
-    let last = 0;  // track the final index of an array
+    let last = 0; // track the final index of an array
     let parentNamespace: string;
     switch (node.kind) {
       case SyntaxKind.AliasStatement:
         obj = node as AliasStatementNode;
         this.namespaceStack.push(obj.id.sv);
-        this.keyword("alias", {HasSuffixSpace: true});
+        this.keyword("alias", { HasSuffixSpace: true });
         this.typeDeclaration(obj.id.sv, this.namespaceStack.value(), true);
         this.tokenizeTemplateParameters(obj.templateParameters);
-        this.punctuation("=", {HasSuffixSpace: true, HasPrefixSpace: true});
+        this.punctuation("=", { HasSuffixSpace: true, HasPrefixSpace: true });
         this.tokenize(obj.value);
         this.namespaceStack.pop();
         break;
@@ -553,7 +574,7 @@ export class ApiView {
         obj.values.forEach((val, i) => {
           this.tokenize(val);
           if (i !== last) {
-            this.punctuation(",", {HasSuffixSpace: true});
+            this.punctuation(",", { HasSuffixSpace: true });
           }
         });
         this.punctuation("]");
@@ -570,13 +591,13 @@ export class ApiView {
           this.punctuation("(");
           this.tokenize(obj.targetType);
           if (obj.arguments.length) {
-            this.punctuation(",", {HasSuffixSpace: true});
+            this.punctuation(",", { HasSuffixSpace: true });
           }
           for (let x = 0; x < obj.arguments.length; x++) {
             const arg = obj.arguments[x];
             this.tokenize(arg);
             if (x !== last) {
-              this.punctuation(",", {HasSuffixSpace: true});
+              this.punctuation(",", { HasSuffixSpace: true });
             }
           }
           this.punctuation(")");
@@ -594,9 +615,9 @@ export class ApiView {
       case SyntaxKind.ConstStatement:
         obj = node as ConstStatementNode;
         this.namespaceStack.push(obj.id.sv);
-        this.keyword("const", {HasSuffixSpace: true});
+        this.keyword("const", { HasSuffixSpace: true });
         this.tokenizeIdentifier(obj.id, "declaration");
-        this.punctuation("=", {HasSuffixSpace: true, HasPrefixSpace: true});
+        this.punctuation("=", { HasSuffixSpace: true, HasPrefixSpace: true });
         this.tokenize(obj.value);
         this.namespaceStack.pop();
         break;
@@ -606,7 +627,7 @@ export class ApiView {
         this.namespaceStack.push(generateId(obj)!);
         this.punctuation("@");
         this.tokenizeIdentifier(obj.target, "keyword");
-        this.lineMarker({relatedLineId: parentNamespace});
+        this.lineMarker({ relatedLineId: parentNamespace });
         if (obj.arguments.length) {
           last = obj.arguments.length - 1;
           this.punctuation("(");
@@ -614,7 +635,7 @@ export class ApiView {
             const arg = obj.arguments[x];
             this.tokenize(arg);
             if (x !== last) {
-              this.punctuation(",", {HasSuffixSpace: true});
+              this.punctuation(",", { HasSuffixSpace: true });
             }
           }
           this.punctuation(")");
@@ -625,15 +646,15 @@ export class ApiView {
         obj = node as DirectiveExpressionNode;
         parentNamespace = this.namespaceStack.value();
         this.namespaceStack.push(generateId(node)!);
-        this.lineMarker({relatedLineId: parentNamespace});
-        this.keyword(`#${obj.target.sv}`, {HasSuffixSpace: true});
+        this.lineMarker({ relatedLineId: parentNamespace });
+        this.keyword(`#${obj.target.sv}`, { HasSuffixSpace: true });
         for (const arg of obj.arguments) {
           switch (arg.kind) {
             case SyntaxKind.StringLiteral:
-              this.stringLiteral(arg.value, {HasSuffixSpace: true});
+              this.stringLiteral(arg.value, { HasSuffixSpace: true });
               break;
             case SyntaxKind.Identifier:
-              this.stringLiteral(arg.sv, {HasSuffixSpace: true});
+              this.stringLiteral(arg.sv, { HasSuffixSpace: true });
               break;
           }
         }
@@ -646,9 +667,9 @@ export class ApiView {
         obj = node as EnumMemberNode;
         this.tokenizeDecoratorsAndDirectives(obj.decorators, obj.directives, false);
         this.tokenizeIdentifier(obj.id, "member");
-        this.lineMarker({addCrossLanguageId: true});
+        this.lineMarker({ addCrossLanguageId: true });
         if (obj.value) {
-          this.punctuation(":", {HasSuffixSpace: true});
+          this.punctuation(":", { HasSuffixSpace: true });
           this.tokenize(obj.value);
         }
         break;
@@ -668,7 +689,7 @@ export class ApiView {
       case SyntaxKind.Identifier:
         obj = node as IdentifierNode;
         const id = this.namespaceStack.value();
-        this.typeReference(obj.sv, {NavigateToId: id});
+        this.typeReference(obj.sv, { NavigateToId: id });
         break;
       case SyntaxKind.ImportStatement:
         throw new Error(`Case "ImportStatement" not implemented`);
@@ -678,7 +699,7 @@ export class ApiView {
           const opt = obj.options[x];
           this.tokenize(opt);
           if (x !== obj.options.length - 1) {
-            this.punctuation("&", {HasPrefixSpace: true, HasSuffixSpace: true});
+            this.punctuation("&", { HasPrefixSpace: true, HasSuffixSpace: true });
           }
         }
         break;
@@ -694,7 +715,7 @@ export class ApiView {
         break;
       case SyntaxKind.ModelExpression:
         this.indent();
-        this.tokenizeModelExpression(node as ModelExpressionNode, {isOperationSignature: false});
+        this.tokenizeModelExpression(node as ModelExpressionNode, { isOperationSignature: false });
         this.deindent();
         break;
       case SyntaxKind.ModelProperty:
@@ -727,7 +748,7 @@ export class ApiView {
         obj.properties.forEach((prop, i) => {
           this.tokenize(prop);
           if (i !== last) {
-            this.punctuation(",", {HasSuffixSpace: false});
+            this.punctuation(",", { HasSuffixSpace: false });
           }
           this.newline();
         });
@@ -737,7 +758,7 @@ export class ApiView {
       case SyntaxKind.ObjectLiteralProperty:
         obj = node as ObjectLiteralPropertyNode;
         this.tokenizeIdentifier(obj.id, "member");
-        this.punctuation(":", {HasSuffixSpace: true});
+        this.punctuation(":", { HasSuffixSpace: true });
         this.tokenize(obj.value);
         break;
       case SyntaxKind.ObjectLiteralSpreadProperty:
@@ -752,15 +773,15 @@ export class ApiView {
         this.punctuation("(");
         if (obj.parameters.properties.length) {
           this.indent();
-          this.tokenizeModelExpression(obj.parameters, {isOperationSignature: true});
-          this.deindent();  
+          this.tokenizeModelExpression(obj.parameters, { isOperationSignature: true });
+          this.deindent();
         }
-        this.punctuation("):", {HasSuffixSpace: true});
-        this.tokenizeReturnType(obj, {isExpanded: true});
+        this.punctuation("):", { HasSuffixSpace: true });
+        this.tokenizeReturnType(obj, { isExpanded: true });
         break;
       case SyntaxKind.OperationSignatureReference:
         obj = node as OperationSignatureReferenceNode;
-        this.keyword("is", {HasPrefixSpace: true, HasSuffixSpace: true});
+        this.keyword("is", { HasPrefixSpace: true, HasSuffixSpace: true });
         this.tokenize(obj.baseOperation);
         break;
       case SyntaxKind.Return:
@@ -776,22 +797,22 @@ export class ApiView {
         obj = node as TemplateParameterDeclarationNode;
         this.tokenize(obj.id);
         if (obj.constraint) {
-          this.keyword("extends", {HasSuffixSpace: true, HasPrefixSpace: true});
+          this.keyword("extends", { HasSuffixSpace: true, HasPrefixSpace: true });
           this.tokenize(obj.constraint);
         }
         if (obj.default) {
-          this.punctuation("=", {HasSuffixSpace: true, HasPrefixSpace: true});
+          this.punctuation("=", { HasSuffixSpace: true, HasPrefixSpace: true });
           this.tokenize(obj.default);
         }
         break;
       case SyntaxKind.TupleExpression:
         obj = node as TupleExpressionNode;
-        this.punctuation("[", {HasSuffixSpace: true});
+        this.punctuation("[", { HasSuffixSpace: true });
         for (let x = 0; x < obj.values.length; x++) {
           const val = obj.values[x];
           this.tokenize(val);
           if (x !== obj.values.length - 1) {
-            this.punctuation(",", {HasSuffixSpace: true});
+            this.punctuation(",", { HasSuffixSpace: true });
           }
         }
         this.punctuation("]");
@@ -807,7 +828,7 @@ export class ApiView {
           const opt = obj.options[x];
           this.tokenize(opt);
           if (x !== obj.options.length - 1) {
-            this.punctuation("|", {HasPrefixSpace: true, HasSuffixSpace: true});
+            this.punctuation("|", { HasPrefixSpace: true, HasSuffixSpace: true });
           }
         }
         break;
@@ -823,14 +844,14 @@ export class ApiView {
       case SyntaxKind.UsingStatement:
         throw new Error(`Case "UsingStatement" not implemented`);
       case SyntaxKind.ValueOfExpression:
-        this.keyword("valueof", {HasSuffixSpace: true});
+        this.keyword("valueof", { HasSuffixSpace: true });
         this.tokenize((node as ValueOfExpressionNode).target);
         break;
       case SyntaxKind.VoidKeyword:
         this.keyword("void");
         break;
       case SyntaxKind.TemplateArgument:
-        
+        break;
       case SyntaxKind.StringTemplateExpression:
         obj = node as StringTemplateExpressionNode;
         const stringValue = this.buildTemplateString(obj);
@@ -867,12 +888,12 @@ export class ApiView {
       case SyntaxKind.CallExpression:
         obj = node as CallExpressionNode;
         this.tokenize(obj.target);
-        this.punctuation("(", {HasSuffixSpace: false});
+        this.punctuation("(", { HasSuffixSpace: false });
         for (let x = 0; x < obj.arguments.length; x++) {
           const arg = obj.arguments[x];
           this.tokenize(arg);
           if (x !== obj.arguments.length - 1) {
-            this.punctuation(",", {HasSuffixSpace: true, snapTo: "}"});
+            this.punctuation(",", { HasSuffixSpace: true, snapTo: "}" });
           }
         }
         this.punctuation(")");
@@ -889,7 +910,9 @@ export class ApiView {
     }
 
     // if any argument is a ModelExpression, then we need to expand the template to multiple lines
-    const isExpanded = obj.arguments.some(arg => arg.argument.kind === SyntaxKind.ModelExpression);
+    const isExpanded = obj.arguments.some(
+      (arg) => arg.argument.kind === SyntaxKind.ModelExpression,
+    );
 
     this.punctuation("<");
     if (isExpanded) {
@@ -899,7 +922,7 @@ export class ApiView {
       const arg = obj.arguments[x];
       this.tokenizeTemplateArgument(arg);
       if (x !== obj.arguments.length - 1) {
-        this.punctuation(",", {HasSuffixSpace: true, snapTo: "}"});
+        this.punctuation(",", { HasSuffixSpace: true, snapTo: "}" });
         if (isExpanded && arg.argument.kind) {
           this.blankLines(0);
         }
@@ -934,6 +957,7 @@ export class ApiView {
           case SyntaxKind.MemberExpression:
             return this.getFullyQualifiedIdentifier(obj.target as MemberExpressionNode);
         }
+        break;
       default:
         throw new Error(`Unsupported expression kind: ${SyntaxKind[node.kind]}`);
       //unsupported ArrayExpressionNode | MemberExpressionNode | ModelExpressionNode | TupleExpressionNode | UnionExpressionNode | IntersectionExpressionNode | TypeReferenceNode | ValueOfExpressionNode | AnyKeywordNode;
@@ -953,19 +977,19 @@ export class ApiView {
   private tokenizeModelStatement(node: ModelStatementNode) {
     this.namespaceStack.push(node.id.sv);
     this.tokenizeDecoratorsAndDirectives(node.decorators, node.directives, false);
-    this.keyword("model", {HasSuffixSpace: true});
+    this.keyword("model", { HasSuffixSpace: true });
     this.tokenizeIdentifier(node.id, "declaration");
     if (node.extends) {
-      this.keyword("extends", {HasSuffixSpace: true, HasPrefixSpace: true});
+      this.keyword("extends", { HasSuffixSpace: true, HasPrefixSpace: true });
       this.tokenize(node.extends);
     }
     if (node.is) {
-      this.keyword("is", {HasPrefixSpace: true, HasSuffixSpace: true});
+      this.keyword("is", { HasPrefixSpace: true, HasSuffixSpace: true });
       this.tokenize(node.is);
     }
     this.tokenizeTemplateParameters(node.templateParameters);
     if (node.properties.length) {
-      this.punctuation("{", {HasPrefixSpace: true});
+      this.punctuation("{", { HasPrefixSpace: true });
       this.indent();
       for (const prop of node.properties) {
         const propName = this.getNameForNode(prop);
@@ -973,12 +997,12 @@ export class ApiView {
         this.tokenize(prop);
         this.punctuation(";");
         this.namespaceStack.pop();
-        this.newline()
+        this.newline();
       }
       this.deindent();
-      this.punctuation("}", {isContextEndLine: true});
+      this.punctuation("}", { isContextEndLine: true });
     } else {
-      this.punctuation("{}", {HasPrefixSpace: true});
+      this.punctuation("{}", { HasPrefixSpace: true });
     }
     this.namespaceStack.pop();
   }
@@ -986,41 +1010,41 @@ export class ApiView {
   private tokenizeScalarStatement(node: ScalarStatementNode) {
     this.namespaceStack.push(node.id.sv);
     this.tokenizeDecoratorsAndDirectives(node.decorators, node.directives, false);
-    this.keyword("scalar", {HasSuffixSpace: true});
+    this.keyword("scalar", { HasSuffixSpace: true });
     this.tokenizeIdentifier(node.id, "declaration");
     if (node.extends) {
-      this.keyword("extends", {HasSuffixSpace: true, HasPrefixSpace: true});
+      this.keyword("extends", { HasSuffixSpace: true, HasPrefixSpace: true });
       this.tokenize(node.extends);
     }
     this.tokenizeTemplateParameters(node.templateParameters);
-    this.newline()
+    this.newline();
     this.namespaceStack.pop();
   }
 
   private tokenizeInterfaceStatement(node: InterfaceStatementNode) {
     this.namespaceStack.push(node.id.sv);
     this.tokenizeDecoratorsAndDirectives(node.decorators, node.directives, false);
-    this.keyword("interface", {HasSuffixSpace: true});
+    this.keyword("interface", { HasSuffixSpace: true });
     this.tokenizeIdentifier(node.id, "declaration");
     this.tokenizeTemplateParameters(node.templateParameters);
-    this.punctuation("{", {HasPrefixSpace: true});
+    this.punctuation("{", { HasPrefixSpace: true });
     this.indent();
     for (let x = 0; x < node.operations.length; x++) {
       const op = node.operations[x];
       this.tokenizeOperationStatement(op, true);
-      this.blankLines(1)
+      this.blankLines(1);
     }
     this.deindent();
-    this.punctuation("}", {isContextEndLine: true});
+    this.punctuation("}", { isContextEndLine: true });
     this.namespaceStack.pop();
   }
 
   private tokenizeEnumStatement(node: EnumStatementNode) {
     this.namespaceStack.push(node.id.sv);
     this.tokenizeDecoratorsAndDirectives(node.decorators, node.directives, false);
-    this.keyword("enum", {HasSuffixSpace: true});
+    this.keyword("enum", { HasSuffixSpace: true });
     this.tokenizeIdentifier(node.id, "declaration");
-    this.punctuation("{", {HasPrefixSpace: true});
+    this.punctuation("{", { HasPrefixSpace: true });
     this.indent();
     for (const member of node.members) {
       const memberName = this.getNameForNode(member);
@@ -1028,19 +1052,19 @@ export class ApiView {
       this.tokenize(member);
       this.punctuation(",");
       this.namespaceStack.pop();
-      this.newline()
+      this.newline();
     }
     this.deindent();
-    this.punctuation("}", {isContextEndLine: true});
+    this.punctuation("}", { isContextEndLine: true });
     this.namespaceStack.pop();
   }
 
   private tokenizeUnionStatement(node: UnionStatementNode) {
     this.namespaceStack.push(node.id.sv);
     this.tokenizeDecoratorsAndDirectives(node.decorators, node.directives, false);
-    this.keyword("union", {HasSuffixSpace: true});
+    this.keyword("union", { HasSuffixSpace: true });
     this.tokenizeIdentifier(node.id, "declaration");
-    this.punctuation("{", {HasPrefixSpace: true});
+    this.punctuation("{", { HasPrefixSpace: true });
     this.indent();
     for (let x = 0; x < node.options.length; x++) {
       const variant = node.options[x];
@@ -1051,10 +1075,10 @@ export class ApiView {
       if (x !== node.options.length - 1) {
         this.punctuation(",");
       }
-      this.newline()
+      this.newline();
     }
     this.deindent();
-    this.punctuation("}", {isContextEndLine: true});
+    this.punctuation("}", { isContextEndLine: true });
     this.namespaceStack.pop();
   }
 
@@ -1062,9 +1086,9 @@ export class ApiView {
     this.tokenizeDecoratorsAndDirectives(node.decorators, node.directives, false);
     if (node.id !== undefined) {
       this.tokenizeIdentifier(node.id, "member");
-      this.punctuation(":", {HasSuffixSpace: true});
+      this.punctuation(":", { HasSuffixSpace: true });
     }
-    this.lineMarker({addCrossLanguageId: true});
+    this.lineMarker({ addCrossLanguageId: true });
     this.tokenize(node.value);
   }
 
@@ -1072,10 +1096,10 @@ export class ApiView {
     this.tokenizeDecoratorsAndDirectives(node.decorators, node.directives, inline);
     this.tokenizeIdentifier(node.id, "member");
     this.lineMarker();
-    this.punctuation(node.optional ? "?:" : ":", {HasSuffixSpace: true});
+    this.punctuation(node.optional ? "?:" : ":", { HasSuffixSpace: true });
     this.tokenize(node.value);
     if (node.default) {
-      this.punctuation("=", {HasSuffixSpace: true, HasPrefixSpace: true});
+      this.punctuation("=", { HasSuffixSpace: true, HasPrefixSpace: true });
       this.tokenize(node.default);
     }
   }
@@ -1083,61 +1107,65 @@ export class ApiView {
   /** Expands and tokenizes a model expression (anonymous model) */
   private tokenizeModelExpression(
     node: ModelExpressionNode,
-    options: {isOperationSignature: boolean}) {
-      const isOperationSignature = options.isOperationSignature;
+    options: { isOperationSignature: boolean },
+  ) {
+    const isOperationSignature = options.isOperationSignature;
 
-      // display {} for empty model or nothing for empty operation signature
-      if (!node.properties.length) {
-        if (!isOperationSignature) {
-          this.punctuation("{}", {HasPrefixSpace: true});
-        }
-        return;
+    // display {} for empty model or nothing for empty operation signature
+    if (!node.properties.length) {
+      if (!isOperationSignature) {
+        this.punctuation("{}", { HasPrefixSpace: true });
       }
+      return;
+    }
 
-      if (!isOperationSignature) {
-        this.punctuation("{");
-        this.indent();
-      }
-      this.namespaceStack.push("anonymous");
-      for (let x = 0; x < node.properties.length; x++) {
-        const prop = node.properties[x];
-        const propName = this.getNameForNode(prop);
-        this.namespaceStack.push(propName);
-        switch (prop.kind) {
-          case SyntaxKind.ModelProperty:
-            this.tokenizeModelProperty(prop, false);
-            break;
-          case SyntaxKind.ModelSpreadProperty:
-            this.tokenize(prop);
-        }
-        this.namespaceStack.pop();
-        if (isOperationSignature) {
-          if (x !== node.properties.length - 1) {
-            this.punctuation(",", {HasSuffixSpace: true, snapTo: "}"});
-          }
-        } else {
-          this.punctuation(";", {HasSuffixSpace: true, snapTo: "}"});
-        }
-        this.blankLines(0);
-      }
-      if (!isOperationSignature) {
-        this.deindent();
-        this.punctuation("}");
-        this.newline();
+    if (!isOperationSignature) {
+      this.punctuation("{");
+      this.indent();
+    }
+    this.namespaceStack.push("anonymous");
+    for (let x = 0; x < node.properties.length; x++) {
+      const prop = node.properties[x];
+      const propName = this.getNameForNode(prop);
+      this.namespaceStack.push(propName);
+      switch (prop.kind) {
+        case SyntaxKind.ModelProperty:
+          this.tokenizeModelProperty(prop, false);
+          break;
+        case SyntaxKind.ModelSpreadProperty:
+          this.tokenize(prop);
       }
       this.namespaceStack.pop();
+      if (isOperationSignature) {
+        if (x !== node.properties.length - 1) {
+          this.punctuation(",", { HasSuffixSpace: true, snapTo: "}" });
+        }
+      } else {
+        this.punctuation(";", { HasSuffixSpace: true, snapTo: "}" });
+      }
+      this.blankLines(0);
+    }
+    if (!isOperationSignature) {
+      this.deindent();
+      this.punctuation("}");
+      this.newline();
+    }
+    this.namespaceStack.pop();
   }
 
-  private tokenizeOperationStatement(node: OperationStatementNode, suppressOpKeyword: boolean = false) {
+  private tokenizeOperationStatement(
+    node: OperationStatementNode,
+    suppressOpKeyword: boolean = false,
+  ) {
     this.namespaceStack.push(node.id.sv);
     this.tokenizeDecoratorsAndDirectives(node.decorators, node.directives, false);
     if (!suppressOpKeyword) {
-      this.keyword("op", {HasSuffixSpace: true});
+      this.keyword("op", { HasSuffixSpace: true });
     }
     this.tokenizeIdentifier(node.id, "declaration");
     this.tokenizeTemplateParameters(node.templateParameters);
     this.tokenize(node.signature);
-    this.punctuation(";", {isContextEndLine: true});
+    this.punctuation(";", { isContextEndLine: true });
     this.namespaceStack.pop();
   }
 
@@ -1146,9 +1174,9 @@ export class ApiView {
     if (model.node.kind === SyntaxKind.NamespaceStatement) {
       this.tokenizeDecoratorsAndDirectives(model.node.decorators, model.node.directives, false);
     }
-    this.keyword("namespace", {HasSuffixSpace: true});
-    this.typeDeclaration(model.name, this.namespaceStack.value(), true, {HasSuffixSpace: true});
-    this.punctuation("{", {HasPrefixSpace: true});
+    this.keyword("namespace", { HasSuffixSpace: true });
+    this.typeDeclaration(model.name, this.namespaceStack.value(), true, { HasSuffixSpace: true });
+    this.punctuation("{", { HasPrefixSpace: true });
     this.indent();
     for (const node of model.augmentDecorators) {
       this.tokenize(node);
@@ -1172,12 +1200,12 @@ export class ApiView {
       this.blankLines(1);
     }
     for (const node of model.constants.values()) {
-        this.tokenize(node);
-        this.punctuation(";");
-        this.blankLines(0);
+      this.tokenize(node);
+      this.punctuation(";");
+      this.blankLines(0);
     }
     this.deindent();
-    this.punctuation("}", {isContextEndLine: true});
+    this.punctuation("}", { isContextEndLine: true });
     this.blankLines(1);
     this.namespaceStack.pop();
   }
@@ -1205,7 +1233,7 @@ export class ApiView {
         }
       }
       if (!inline) {
-        this.newline()
+        this.newline();
       }
     }
   }
@@ -1249,11 +1277,13 @@ export class ApiView {
       case SyntaxKind.Identifier:
         switch (style) {
           case "declaration":
-            this.typeDeclaration(node.sv, this.namespaceStack.value(), true, {HasSuffixSpace: false});
+            this.typeDeclaration(node.sv, this.namespaceStack.value(), true, {
+              HasSuffixSpace: false,
+            });
             break;
           case "reference":
             const defId = this.definitionIdFor(node.sv, this.packageName);
-            this.typeReference(node.sv, {NavigateToId: defId});
+            this.typeReference(node.sv, { NavigateToId: defId });
             break;
           case "member":
             this.member(this.getRawText(node));
@@ -1276,7 +1306,7 @@ export class ApiView {
         const param = nodes[x];
         this.tokenize(param);
         if (x !== nodes.length - 1) {
-          this.punctuation(",", {HasSuffixSpace: true});
+          this.punctuation(",", { HasSuffixSpace: true });
         }
       }
       this.punctuation(">");
@@ -1286,16 +1316,19 @@ export class ApiView {
   private tokenizeTemplateArgument(obj: TemplateArgumentNode) {
     if (obj.name) {
       this.text(obj.name.sv);
-      this.punctuation("=", {HasSuffixSpace: true, HasPrefixSpace: true});
+      this.punctuation("=", { HasSuffixSpace: true, HasPrefixSpace: true });
     }
     if (obj.argument.kind === SyntaxKind.ModelExpression) {
-      this.tokenizeModelExpression(obj.argument, {isOperationSignature: false});
+      this.tokenizeModelExpression(obj.argument, { isOperationSignature: false });
     } else {
       this.tokenize(obj.argument);
     }
   }
 
-  private tokenizeReturnType(node: OperationSignatureDeclarationNode, options: { isExpanded: boolean}) {
+  private tokenizeReturnType(
+    node: OperationSignatureDeclarationNode,
+    options: { isExpanded: boolean },
+  ) {
     if (options.isExpanded && node.parameters.properties.length) {
       const offset = this.currentLine.Tokens.length;
       this.tokenize(node.returnType);
