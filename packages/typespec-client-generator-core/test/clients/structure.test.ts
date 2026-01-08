@@ -1789,6 +1789,209 @@ it("one client from multiple services with operation group name conflict - merge
   ok(bTestMethod);
 });
 
+it("client location to existing operation group from different service", async () => {
+  await runner.compileWithCustomization(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      // Interface that will be the target for @clientLocation
+      interface Operations {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      @route("/bTest")
+      op bTest(@query("api-version") apiVersion: VersionsB): void;
+    }`,
+    `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombineClient {}
+
+    // Move operation from ServiceB to existing Operations group from ServiceA
+    @@clientLocation(ServiceB.bTest, "Operations");
+  `,
+  );
+  const sdkPackage = runner.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  
+  // Should have only 1 operation group
+  strictEqual(client.children!.length, 1);
+  
+  // The operation group should now be multi-service (merged)
+  const operations = client.children!.find((c) => c.name === "Operations");
+  ok(operations);
+  // Multi-service operation group should have empty apiVersions
+  strictEqual(operations.apiVersions.length, 0);
+  const apiVersionParam = operations.clientInitialization.parameters.find(p => p.isApiVersionParam);
+  ok(apiVersionParam);
+  strictEqual(apiVersionParam.type.kind, "string");
+  
+  // Should have both methods from both services
+  strictEqual(operations.methods.length, 2);
+  const aTestMethod = operations.methods.find((m) => m.name === "aTest");
+  ok(aTestMethod);
+  const bTestMethod = operations.methods.find((m) => m.name === "bTest");
+  ok(bTestMethod);
+});
+
+it("merged operation groups with nested operations", async () => {
+  await runner.compileWithCustomization(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      namespace Operations {
+        @route("/aTest1")
+        op aTest1(@query("api-version") apiVersion: VersionsA): void;
+        @route("/aTest2")
+        op aTest2(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      namespace Operations {
+        @route("/bTest1")
+        op bTest1(@query("api-version") apiVersion: VersionsB): void;
+        @route("/bTest2")
+        op bTest2(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+    `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombineClient;
+  `,
+  );
+  const sdkPackage = runner.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  
+  // Should have only 1 merged operation group
+  strictEqual(client.children!.length, 1);
+  
+  // The merged operation group should have operations from both namespaces
+  const operations = client.children!.find((c) => c.name === "Operations");
+  ok(operations);
+  // Multi-service operation group should have empty apiVersions
+  strictEqual(operations.apiVersions.length, 0);
+  const apiVersionParam = operations.clientInitialization.parameters.find(p => p.isApiVersionParam);
+  ok(apiVersionParam);
+  strictEqual(apiVersionParam.type.kind, "string");
+  
+  // Should have all 4 methods from both services
+  strictEqual(operations.methods.length, 4);
+  ok(operations.methods.find((m) => m.name === "aTest1"));
+  ok(operations.methods.find((m) => m.name === "aTest2"));
+  ok(operations.methods.find((m) => m.name === "bTest1"));
+  ok(operations.methods.find((m) => m.name === "bTest2"));
+});
+
+it("multiple merged operation groups in same client", async () => {
+  await runner.compileWithCustomization(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      interface Group1 {
+        @route("/a1")
+        opA1(@query("api-version") apiVersion: VersionsA): void;
+      }
+      interface Group2 {
+        @route("/a2")
+        opA2(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      interface Group1 {
+        @route("/b1")
+        opB1(@query("api-version") apiVersion: VersionsB): void;
+      }
+      interface Group2 {
+        @route("/b2")
+        opB2(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+    `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombineClient;
+  `,
+  );
+  const sdkPackage = runner.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  
+  // Should have 2 merged operation groups
+  strictEqual(client.children!.length, 2);
+  
+  // Check first merged group
+  const group1 = client.children!.find((c) => c.name === "Group1");
+  ok(group1);
+  strictEqual(group1.apiVersions.length, 0);
+  strictEqual(group1.methods.length, 2);
+  ok(group1.methods.find((m) => m.name === "opA1"));
+  ok(group1.methods.find((m) => m.name === "opB1"));
+  
+  // Check second merged group
+  const group2 = client.children!.find((c) => c.name === "Group2");
+  ok(group2);
+  strictEqual(group2.apiVersions.length, 0);
+  strictEqual(group2.methods.length, 2);
+  ok(group2.methods.find((m) => m.name === "opA2"));
+  ok(group2.methods.find((m) => m.name === "opB2"));
+});
+
 it("error: inconsistent-multiple-service server", async () => {
   const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
     `
