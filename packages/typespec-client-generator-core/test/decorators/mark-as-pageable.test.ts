@@ -434,7 +434,7 @@ it("should work with ARM ListSinglePage legacy operation", async () => {
   const methods = employeeClient.methods;
   strictEqual(methods.length, 2);
   
-  const method = methods[0];
+  const method = methods[1];
   strictEqual(method.kind, "paging");
   strictEqual(method.name, "listSinglePageEmployees");
   
