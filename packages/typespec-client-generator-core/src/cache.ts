@@ -114,8 +114,24 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
 
     if (Array.isArray(client.service)) {
       // Multiple services case will auto-merge all the services and add their nested operation groups
+      // Track operation group names to detect conflicts
+      const operationGroupNameMap = new Map<string, SdkOperationGroup[]>();
+      
       for (const specificService of client.service) {
         createFirstLevelOperationGroup(context, specificService, specificService);
+      }
+      
+      // Resolve name conflicts by appending service name to conflicting operation groups
+      for (const [name, operationGroups] of operationGroupNameMap.entries()) {
+        if (operationGroups.length > 1) {
+          // Multiple operation groups with the same name from different services
+          for (const og of operationGroups) {
+            const serviceName = Array.isArray(og.service) ? og.service[0].name : og.service.name;
+            const originalName = name;
+            const newName = `${originalName}_${serviceName}`;
+            og.groupPath = og.groupPath.replace(`.${originalName}`, `.${newName}`);
+          }
+        }
       }
     } else {
       // Single service case needs to use the client type since it could contain customizations
@@ -133,6 +149,14 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
           const og = createOperationGroup(context, subItem, `${client.name}`, service, client);
           if (og) {
             groups.push(og);
+            if (Array.isArray(client.service)) {
+              // Track for conflict detection
+              const ogName = getLibraryName(context, subItem);
+              if (!operationGroupNameMap.has(ogName)) {
+                operationGroupNameMap.set(ogName, []);
+              }
+              operationGroupNameMap.get(ogName)!.push(og);
+            }
           }
         }
         for (const subItem of type.interfaces.values()) {
@@ -143,6 +167,14 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
           const og = createOperationGroup(context, subItem, `${client.name}`, service, client);
           if (og) {
             groups.push(og);
+            if (Array.isArray(client.service)) {
+              // Track for conflict detection
+              const ogName = getLibraryName(context, subItem);
+              if (!operationGroupNameMap.has(ogName)) {
+                operationGroupNameMap.set(ogName, []);
+              }
+              operationGroupNameMap.get(ogName)!.push(og);
+            }
           }
         }
       }

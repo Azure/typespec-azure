@@ -2008,9 +2008,13 @@ You could define a single client that combines operations from multiple services
 
 3. **Operation Group Structure**: Operations and operation groups will be auto merged into the single client (based on operation, interfaces or namespaces from the original services).
 
+4. **Name Conflict Resolution**: If multiple services have nested namespaces or interfaces with the same name, TCGC will automatically resolve the conflict by appending the service name as a suffix (e.g., `Operations_ServiceA`, `Operations_ServiceB`).
+
+5. **@clientLocation with Multiple Services**: You can use `@clientLocation` to move operations from different services to the same operation group. The resulting operation group will have empty `apiVersions` and a `string` type for the API version parameter, allowing it to handle operations with different API versions.
+
 :::caution
 All services being merged must share the same endpoint and authentication method. If not, you will get diagnostics error.
-You need to ensue that there are no naming conflicts between the services being merged. If there are conflicts, you may need to rename the types in the original services to avoid collisions.
+TCGC automatically resolves operation group name conflicts, but you still need to ensure that there are no naming conflicts between models, enums, and other types in the services being merged. If there are conflicts, you may need to rename the types in the original services to avoid collisions.
 :::
 
 <ClientTabs>

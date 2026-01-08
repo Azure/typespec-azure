@@ -1719,6 +1719,68 @@ it("client location to new operation group with multiple services", async () => 
   ok(bTestMethod);
 });
 
+it("one client from multiple services with operation group name conflict", async () => {
+  await runner.compileWithCustomization(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      // Interface with same name in both services
+      interface Operations {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      // Interface with same name in both services
+      interface Operations {
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+    `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombineClient;
+  `,
+  );
+  const sdkPackage = runner.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  strictEqual(client.children!.length, 2);
+
+  // Operation groups should have service name suffix to avoid conflict
+  const operationsA = client.children!.find((c) => c.name === "Operations_ServiceA");
+  ok(operationsA);
+  strictEqual(operationsA.apiVersions.length, 2);
+  deepStrictEqual(operationsA.apiVersions, ["av1", "av2"]);
+  strictEqual(operationsA.methods.length, 1);
+  strictEqual(operationsA.methods[0].name, "aTest");
+
+  const operationsB = client.children!.find((c) => c.name === "Operations_ServiceB");
+  ok(operationsB);
+  strictEqual(operationsB.apiVersions.length, 2);
+  deepStrictEqual(operationsB.apiVersions, ["bv1", "bv2"]);
+  strictEqual(operationsB.methods.length, 1);
+  strictEqual(operationsB.methods[0].name, "bTest");
+});
+
 it("error: inconsistent-multiple-service server", async () => {
   const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
     `
