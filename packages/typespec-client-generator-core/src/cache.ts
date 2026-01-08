@@ -111,12 +111,11 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   // create operation groups for each client
   for (const client of clients) {
     const groups: SdkOperationGroup[] = [];
+    // Track operation group names to detect conflicts in multi-service scenarios
+    const operationGroupNameMap = new Map<string, SdkOperationGroup[]>();
 
     if (Array.isArray(client.service)) {
       // Multiple services case will auto-merge all the services and add their nested operation groups
-      // Track operation group names to detect conflicts
-      const operationGroupNameMap = new Map<string, SdkOperationGroup[]>();
-      
       for (const specificService of client.service) {
         createFirstLevelOperationGroup(context, specificService, specificService);
       }
@@ -127,9 +126,10 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
           // Multiple operation groups with the same name from different services
           for (const og of operationGroups) {
             const serviceName = Array.isArray(og.service) ? og.service[0].name : og.service.name;
-            const originalName = name;
-            const newName = `${originalName}_${serviceName}`;
-            og.groupPath = og.groupPath.replace(`.${originalName}`, `.${newName}`);
+            const pathParts = og.groupPath.split(".");
+            // Replace the last part (operation group name) with the disambiguated name
+            pathParts[pathParts.length - 1] = `${name}_${serviceName}`;
+            og.groupPath = pathParts.join(".");
           }
         }
       }
