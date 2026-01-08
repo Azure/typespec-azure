@@ -146,7 +146,7 @@ export type MarkAsPageableDecorator = (
   context: DecoratorContext,
   target: Operation,
   scope?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Specifies the HTTP verb for the next link operation in a paging scenario.

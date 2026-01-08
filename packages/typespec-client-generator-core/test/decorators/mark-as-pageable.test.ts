@@ -9,7 +9,7 @@ let basicRunner: SdkTestRunner;
 
 beforeEach(async () => {
   basicRunner = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-csharp",
+    emitterName: "@azure-typespec/http-client-csharp",
   });
 });
 
@@ -27,7 +27,7 @@ it("should mark regular operation as pageable when decorated with @markAsPageabl
           name: string;
         }
 
-        @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
+        @Azure.ClientGenerator.Core.Legacy.markAsPageable
         @route("/items")
         @get
         op listItems(): ItemListResult;
@@ -50,6 +50,7 @@ it("should mark regular operation as pageable when decorated with @markAsPageabl
   ok(method.pagingMetadata);
   ok(method.pagingMetadata.pageItemsSegments);
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
+  strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "items");
 });
 
 it("should apply @markAsPageable with language scope", async () => {
@@ -84,6 +85,7 @@ it("should apply @markAsPageable with language scope", async () => {
   ok(method.pagingMetadata);
   ok(method.pagingMetadata.pageItemsSegments);
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
+  strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "items");
 });
 
 it("should warn when @markAsPageable is applied to operation not returning model", async () => {
@@ -119,7 +121,7 @@ it("should work with complex model return types", async () => {
           price: float32;
         }
 
-        @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
+        @Azure.ClientGenerator.Core.Legacy.markAsPageable
         @route("/products")
         @get
         op listProducts(): PagedResult<Product>;
@@ -141,6 +143,7 @@ it("should work with complex model return types", async () => {
   ok(method.pagingMetadata);
   ok(method.pagingMetadata.pageItemsSegments);
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
+  strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "value");
 });
 
 it("should apply @pageItems to 'value' property when not already decorated", async () => {
@@ -174,6 +177,7 @@ it("should apply @pageItems to 'value' property when not already decorated", asy
   ok(method.pagingMetadata);
   ok(method.pagingMetadata.pageItemsSegments);
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
+  strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "value");
 });
 
 it("should warn when model has no @pageItems property and no 'value' property", async () => {
@@ -205,7 +209,7 @@ it("should warn when model has no @pageItems property and no 'value' property", 
 
 it("should not apply when scope does not match", async () => {
   const pythonRunner = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-python",
+    emitterName: "@azure-typespec/http-client-csharp",
   });
 
   await pythonRunner.compile(`
@@ -221,7 +225,7 @@ it("should not apply when scope does not match", async () => {
           name: string;
         }
 
-        @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
+        @Azure.ClientGenerator.Core.Legacy.markAsPageable("java")
         @route("/items")
         @get
         op listItems(): ItemListResult;
@@ -240,18 +244,26 @@ it("should warn when operation already has @list (ARM ResourceListByParent)", as
   const armRunner = await createSdkTestRunner({
     librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
     autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-    emitterName: "@azure-tools/typespec-csharp",
+    emitterName: "@azure-typespec/http-client-csharp-mgmt",
   });
 
-  const diagnostics = await armRunner.diagnoseWithBuiltInAzureResourceManagerService(`
+  const diagnostics = await armRunner.diagnose(`
+      @armProviderNamespace
+      @service(#{ title: "ContosoProviderHubClient" })
+      namespace Microsoft.ContosoProviderHub;
+
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
       }
       model EmployeeProperties {
-        name: string;
+        salary: int32;
       }
-      @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
-      op listEmployees is ArmResourceListByParent<Employee>;
+      @armResourceOperations
+      interface Employees {
+        op get is ArmResourceRead<Employee>;
+        @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
+        op listEmployees is ArmResourceListByParent<Employee>;
+      }
     `);
 
   strictEqual(diagnostics.length, 1);
@@ -265,7 +277,7 @@ it("should work with ARM action with @pageItems property", async () => {
   const armRunner = await createSdkTestRunner({
     librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
     autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-    emitterName: "@azure-tools/typespec-csharp",
+    emitterName: "@azure-typespec/http-client-csharp-mgmt",
   });
 
   await armRunner.compileWithBuiltInAzureResourceManagerService(`
@@ -273,34 +285,46 @@ it("should work with ARM action with @pageItems property", async () => {
         ...ResourceNameParameter<Employee>;
       }
       model EmployeeProperties {
-        name: string;
+        salary: int32;
       }
-      model EmployeeListResult {
+      model Equipment {
+        equipmentId: string;
+      }
+      model EquipmentListResult {
         @pageItems
-        employees: Employee[];
+        equipments: Equipment[];
       }
-      @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
-      op listEmployeesByDepartment is ArmResourceActionSync<Employee, void, EmployeeListResult>;
+      @armResourceOperations
+      interface Employees {
+        op get is ArmResourceRead<Employee>;
+        @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
+        op listEquipments is ArmResourceActionSync<Employee, void, EquipmentListResult>;
+      }
     `);
 
-  const methods = armRunner.context.sdkPackage.clients[0].methods;
-  strictEqual(methods.length, 1);
+  const rootClient = armRunner.context.sdkPackage.clients[0];
+  ok(rootClient);
+  const employeeClient = rootClient.children![0];
+  ok(employeeClient);
+  const methods = employeeClient.methods;
+  strictEqual(methods.length, 2);
   
-  const method = methods[0];
+  const method = methods[1];
   strictEqual(method.kind, "paging");
-  strictEqual(method.name, "listEmployeesByDepartment");
+  strictEqual(method.name, "listEquipments");
   
   // Check paging metadata
   ok(method.pagingMetadata);
   ok(method.pagingMetadata.pageItemsSegments);
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
+  strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "equipments");
 });
 
 it("should work with ARM action with value property without @pageItems", async () => {
   const armRunner = await createSdkTestRunner({
     librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
     autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-    emitterName: "@azure-tools/typespec-csharp",
+    emitterName: "@azure-typespec/http-client-csharp-mgmt",
   });
 
   await armRunner.compileWithBuiltInAzureResourceManagerService(`
@@ -308,47 +332,70 @@ it("should work with ARM action with value property without @pageItems", async (
         ...ResourceNameParameter<Employee>;
       }
       model EmployeeProperties {
-        name: string;
+        salary: int32;
       }
-      model EmployeeListResult {
-        value: Employee[];
+      model Equipment {
+        equipmentId: string;
       }
-      @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
-      op getEmployees is ArmResourceActionSync<Employee, void, EmployeeListResult>;
+      model EquipmentListResult {
+        value: Equipment[];
+      }
+      @armResourceOperations
+      interface Employees {
+        op get is ArmResourceRead<Employee>;
+        @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
+        op listEquipments is ArmResourceActionSync<Employee, void, EquipmentListResult>;
+      }
     `);
 
-  const methods = armRunner.context.sdkPackage.clients[0].methods;
-  strictEqual(methods.length, 1);
+  const rootClient = armRunner.context.sdkPackage.clients[0];
+  ok(rootClient);
+  const employeeClient = rootClient.children![0];
+  ok(employeeClient);
+  const methods = employeeClient.methods;
+  strictEqual(methods.length, 2);
   
-  const method = methods[0];
+  const method = methods[1];
   strictEqual(method.kind, "paging");
-  strictEqual(method.name, "getEmployees");
+  strictEqual(method.name, "listEquipments");
   
   // Check paging metadata
   ok(method.pagingMetadata);
   ok(method.pagingMetadata.pageItemsSegments);
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
+  strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "value");
 });
 
 it("should fail with ARM action with array property not named value without @pageItems", async () => {
   const armRunner = await createSdkTestRunner({
     librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
     autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-    emitterName: "@azure-tools/typespec-csharp",
+    emitterName: "@azure-typespec/http-client-csharp-mgmt",
   });
 
-  const diagnostics = await armRunner.diagnoseWithBuiltInAzureResourceManagerService(`
+  const diagnostics = await armRunner.diagnose(`
+      @armProviderNamespace
+      @service(#{ title: "ContosoProviderHubClient" })
+      namespace Microsoft.ContosoProviderHub;
+
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
       }
       model EmployeeProperties {
-        name: string;
+        salary: int32;
       }
-      model EmployeeListResult {
-        items: Employee[];
+      model Equipment {
+        equipmentId: string;
       }
-      @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
-      op listEmployeeItems is ArmResourceActionSync<Employee, void, EmployeeListResult>;
+      model EquipmentListResult {
+        equipments: Equipment[];
+      }
+      @armResourceOperations
+      interface Employees {
+        op get is ArmResourceRead<Employee>;
+        @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
+        op listEquipments is ArmResourceActionSync<Employee, void, EquipmentListResult>;
+      }
     `);
 
   strictEqual(diagnostics.length, 1);
@@ -362,7 +409,7 @@ it("should work with ARM ListSinglePage legacy operation", async () => {
   const armRunner = await createSdkTestRunner({
     librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
     autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-    emitterName: "@azure-tools/typespec-csharp",
+    emitterName: "@azure-typespec/http-client-csharp-mgmt",
   });
 
   await armRunner.compileWithBuiltInAzureResourceManagerService(`
@@ -372,12 +419,20 @@ it("should work with ARM ListSinglePage legacy operation", async () => {
       model EmployeeProperties {
         name: string;
       }
-      @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
-      op listSinglePageEmployees is ArmListSinglePageByParent<Employee>;
+      @armResourceOperations
+      interface Employees {
+        op get is ArmResourceRead<Employee>;
+        @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
+        op listSinglePageEmployees is Azure.ResourceManager.Legacy.ArmListSinglePageByParent<Employee>;
+      }
     `);
 
-  const methods = armRunner.context.sdkPackage.clients[0].methods;
-  strictEqual(methods.length, 1);
+  const rootClient = armRunner.context.sdkPackage.clients[0];
+  ok(rootClient);
+  const employeeClient = rootClient.children![0];
+  ok(employeeClient);
+  const methods = employeeClient.methods;
+  strictEqual(methods.length, 2);
   
   const method = methods[0];
   strictEqual(method.kind, "paging");
@@ -387,4 +442,5 @@ it("should work with ARM ListSinglePage legacy operation", async () => {
   ok(method.pagingMetadata);
   ok(method.pagingMetadata.pageItemsSegments);
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
+  strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "value");
 });
