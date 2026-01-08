@@ -69,6 +69,7 @@ export interface TCGCContext {
   >;
   __clientToOperationsCache?: Map<SdkClient | SdkOperationGroup, Operation[]>;
   __operationToClientCache?: Map<Operation, SdkClient | SdkOperationGroup>;
+  __mergedOperationGroupTypes?: WeakMap<SdkOperationGroup, (Namespace | Interface)[]>;
   __clientParametersCache: Map<SdkClient | SdkOperationGroup, SdkMethodParameter[]>;
   __clientApiVersionDefaultValueCache: Map<SdkClient | SdkOperationGroup, string | undefined>;
   __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;

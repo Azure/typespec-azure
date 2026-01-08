@@ -113,6 +113,8 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     const groups: SdkOperationGroup[] = [];
     // Track operation group names to detect conflicts in multi-service scenarios
     const operationGroupNameMap = new Map<string, SdkOperationGroup[]>();
+    // Track merged operation groups and their original types for later operations processing
+    const mergedOperationGroupTypes = new Map<SdkOperationGroup, (Namespace | Interface)[]>();
 
     if (Array.isArray(client.service)) {
       // Multiple services case will auto-merge all the services and add their nested operation groups
@@ -125,20 +127,26 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         if (operationGroups.length > 1) {
           // Multiple operation groups with the same name from different services - merge them
           const firstOg = operationGroups[0];
-          // Collect all services from the conflicting operation groups
+          // Collect all services and types from the conflicting operation groups
           const services: Namespace[] = [];
+          const types: (Namespace | Interface)[] = [];
           for (const og of operationGroups) {
             // At this point, og.service is always a single Namespace (not an array)
             // because these operation groups were created from individual services.
-            // The array case only happens for operation groups created via @clientLocation,
+            // The array case only happens for operation groups created via `@clientLocation`,
             // which are handled separately and won't be in this map.
             if (!Array.isArray(og.service)) {
               services.push(og.service);
+            }
+            if (og.type) {
+              types.push(og.type);
             }
           }
           
           // Update the first operation group to have multiple services
           firstOg.service = services;
+          // Store the merged types for later operations processing
+          mergedOperationGroupTypes.set(firstOg, types);
           
           // Remove duplicate operation groups from the groups array (keep only the first one)
           // Use a Set for efficient lookup of operation groups to remove
@@ -149,6 +157,14 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
             }
           }
         }
+      }
+      
+      // Store the merged operation group types mapping in the context for later use
+      if (!context.__mergedOperationGroupTypes) {
+        context.__mergedOperationGroupTypes = new WeakMap();
+      }
+      for (const [og, types] of mergedOperationGroupTypes.entries()) {
+        context.__mergedOperationGroupTypes.set(og, types);
       }
     } else {
       // Single service case needs to use the client type since it could contain customizations
@@ -214,14 +230,33 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         (context.__mutatedRealm && context.__mutatedRealm.hasType(k))
       ) {
         if (typeof v === "string") {
-          if (
-            clients[0].subOperationGroups.some(
-              (og) => og.type && getLibraryName(context, og.type) === v,
-            )
-          ) {
-            // do not create a new operation group if it already exists
-            return;
+          // Check if an operation group with this name already exists
+          const existingOg = clients[0].subOperationGroups.find(
+            (og) => og.type && getLibraryName(context, og.type) === v,
+          );
+          
+          if (existingOg) {
+            // Operation group already exists - check if moving this operation would create a multi-service situation
+            const operationService = Array.isArray(clients[0].service)
+              ? findService(clients[0].service, k as Operation)
+              : clients[0].service;
+            
+            // Check if the existing operation group's service matches the operation's service
+            const existingServices = Array.isArray(existingOg.service) 
+              ? existingOg.service 
+              : [existingOg.service];
+            
+            if (!existingServices.includes(operationService)) {
+              // This would create a multi-service operation group - merge the services
+              if (!Array.isArray(existingOg.service)) {
+                existingOg.service = [existingOg.service, operationService];
+              } else if (!existingOg.service.includes(operationService)) {
+                existingOg.service.push(operationService);
+              }
+            }
+            // Continue to process this operation (don't return early)
           }
+          
           const operationService = Array.isArray(clients[0].service)
             ? findService(clients[0].service, k as Operation)
             : clients[0].service;
@@ -261,8 +296,16 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     if (group.type) {
       // operations directly under the group
       const operations = [];
-      if (Array.isArray(group.service)) {
-        // multi-service client or operation group
+      
+      // Check if this is a merged operation group (has multiple services but still has a type)
+      const mergedTypes = context.__mergedOperationGroupTypes?.get(group);
+      if (mergedTypes && mergedTypes.length > 0) {
+        // For merged operation groups, get operations from all the merged types
+        for (const type of mergedTypes) {
+          operations.push(...type.operations.values());
+        }
+      } else if (group.kind === "SdkClient" && Array.isArray(group.service)) {
+        // multi-service client
         operations.push(...group.service.flatMap((service) => [...service.operations.values()]));
       } else {
         // single-service client or operation group
