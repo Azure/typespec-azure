@@ -125,6 +125,8 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         if (operationGroups.length > 1) {
           // Multiple operation groups with the same name from different services
           for (const og of operationGroups) {
+            // At this point, og.service is always a single Namespace (not an array)
+            // because these operation groups were created from individual services
             const serviceName = Array.isArray(og.service) ? og.service[0].name : og.service.name;
             const pathParts = og.groupPath.split(".");
             // Replace the last part (operation group name) with the disambiguated name
