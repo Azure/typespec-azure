@@ -5,6 +5,7 @@ import {
   DashboardFromAzureStorage,
   type CoverageFromAzureStorageOptions,
 } from "@typespec/spec-dashboard";
+import { scenarioTiers } from "./scenario-tiers.js";
 const options: CoverageFromAzureStorageOptions = {
   storageAccountName: "typespec",
   containerName: "coverage",
@@ -13,7 +14,6 @@ const options: CoverageFromAzureStorageOptions = {
     "@azure-tools/typespec-python",
     "@azure-tools/typespec-go",
     "@azure-typespec/http-client-csharp",
-    "@azure-tools/typespec-ts-rlc",
     "@azure-tools/typespec-ts-modular",
     "@azure-tools/typespec-java",
     "@azure-tools/typespec-cpp",
@@ -33,7 +33,6 @@ const options: CoverageFromAzureStorageOptions = {
         "@azure-tools/typespec-python",
         "@azure-tools/typespec-go",
         "@azure-typespec/http-client-csharp-mgmt",
-        "@azure-tools/typespec-ts-rlc",
         "@azure-tools/typespec-ts-modular",
         "@azure-tools/typespec-java",
         "@azure-tools/typespec-cpp",
@@ -45,6 +44,7 @@ const options: CoverageFromAzureStorageOptions = {
       packageName: "@typespec/http-specs",
     },
   ],
+  tiers: scenarioTiers,
 };
 ---
 
