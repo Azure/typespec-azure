@@ -1719,7 +1719,7 @@ it("client location to new operation group with multiple services", async () => 
   ok(bTestMethod);
 });
 
-it("one client from multiple services with operation group name conflict", async () => {
+it("one client from multiple services with operation group name conflict - merged", async () => {
   await runner.compileWithCustomization(
     `
     @service
@@ -1763,22 +1763,30 @@ it("one client from multiple services with operation group name conflict", async
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "CombineClient");
-  strictEqual(client.children!.length, 2);
+  // Should have only 1 merged operation group instead of 2 separate ones
+  strictEqual(client.children!.length, 1);
 
-  // Operation groups should have service name suffix to avoid conflict
-  const operationsA = client.children!.find((c) => c.name === "Operations_ServiceA");
-  ok(operationsA);
-  strictEqual(operationsA.apiVersions.length, 2);
-  deepStrictEqual(operationsA.apiVersions, ["av1", "av2"]);
-  strictEqual(operationsA.methods.length, 1);
-  strictEqual(operationsA.methods[0].name, "aTest");
-
-  const operationsB = client.children!.find((c) => c.name === "Operations_ServiceB");
-  ok(operationsB);
-  strictEqual(operationsB.apiVersions.length, 2);
-  deepStrictEqual(operationsB.apiVersions, ["bv1", "bv2"]);
-  strictEqual(operationsB.methods.length, 1);
-  strictEqual(operationsB.methods[0].name, "bTest");
+  // The merged operation group should have operations from both services
+  const operations = client.children!.find((c) => c.name === "Operations");
+  ok(operations);
+  // Multi-service operation group should have empty apiVersions
+  strictEqual(operations.apiVersions.length, 0);
+  strictEqual(operations.clientInitialization.parameters.length, 2);
+  strictEqual(operations.clientInitialization.parameters[0].name, "endpoint");
+  strictEqual(operations.clientInitialization.parameters[1].name, "apiVersion");
+  const apiVersionParam = operations.clientInitialization.parameters[1];
+  strictEqual(apiVersionParam.isApiVersionParam, true);
+  strictEqual(apiVersionParam.onClient, true);
+  strictEqual(apiVersionParam.clientDefaultValue, undefined);
+  // For multi-service operation groups, the api version param type should be string
+  strictEqual(apiVersionParam.type.kind, "string");
+  
+  // Should have both methods from both services
+  strictEqual(operations.methods.length, 2);
+  const aTestMethod = operations.methods.find((m) => m.name === "aTest");
+  ok(aTestMethod);
+  const bTestMethod = operations.methods.find((m) => m.name === "bTest");
+  ok(bTestMethod);
 });
 
 it("error: inconsistent-multiple-service server", async () => {

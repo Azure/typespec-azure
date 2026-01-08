@@ -120,18 +120,30 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         createFirstLevelOperationGroup(context, specificService, specificService);
       }
       
-      // Resolve name conflicts by appending service name to conflicting operation groups
+      // Merge operation groups with the same name from different services
       for (const [name, operationGroups] of operationGroupNameMap.entries()) {
         if (operationGroups.length > 1) {
-          // Multiple operation groups with the same name from different services
+          // Multiple operation groups with the same name from different services - merge them
+          const firstOg = operationGroups[0];
+          // Collect all services from the conflicting operation groups
+          const services: Namespace[] = [];
           for (const og of operationGroups) {
-            // At this point, og.service is always a single Namespace (not an array)
+            // At this point, og.service is always a single Namespace
             // because these operation groups were created from individual services
-            const serviceName = Array.isArray(og.service) ? og.service[0].name : og.service.name;
-            const pathParts = og.groupPath.split(".");
-            // Replace the last part (operation group name) with the disambiguated name
-            pathParts[pathParts.length - 1] = `${name}_${serviceName}`;
-            og.groupPath = pathParts.join(".");
+            if (!Array.isArray(og.service)) {
+              services.push(og.service);
+            }
+          }
+          
+          // Update the first operation group to have multiple services
+          firstOg.service = services;
+          
+          // Remove duplicate operation groups from the groups array (keep only the first one)
+          for (let i = 1; i < operationGroups.length; i++) {
+            const index = groups.indexOf(operationGroups[i]);
+            if (index > -1) {
+              groups.splice(index, 1);
+            }
           }
         }
       }
