@@ -1650,8 +1650,8 @@ it("error: multiple explicit clients with multiple services", async () => {
   ]);
 });
 
-it("error: client location to new operation group with multiple services", async () => {
-  const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+it("client location to new operation group with multiple services", async () => {
+  await runner.compileWithCustomization(
     `
     @service
     @versioned(VersionsA)
@@ -1683,16 +1683,40 @@ it("error: client location to new operation group with multiple services", async
     @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CombineClient {}
 
-    // Try to move operations from different services to a new operation group that doesn't exist
+    // Move operations from different services to a new operation group
     @@clientLocation(ServiceA.aTest, "NewOperationGroup");
     @@clientLocation(ServiceB.bTest, "NewOperationGroup");
   `,
   );
-  expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/client-location-new-operation-group-multi-service",
-    message:
-      "Cannot move operations from different services to a new operation group that doesn't exist.",
-  });
+  const sdkPackage = runner.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  // Root client of multiple services has empty apiVersions
+  strictEqual(client.apiVersions.length, 0);
+  
+  // Find the NewOperationGroup sub-client
+  const newOpGroup = client.children!.find((c) => c.name === "NewOperationGroup");
+  ok(newOpGroup);
+  
+  // Sub-client with operations from multiple services should have empty apiVersions
+  strictEqual(newOpGroup.apiVersions.length, 0);
+  strictEqual(newOpGroup.clientInitialization.parameters.length, 2);
+  strictEqual(newOpGroup.clientInitialization.parameters[0].name, "endpoint");
+  strictEqual(newOpGroup.clientInitialization.parameters[1].name, "apiVersion");
+  const apiVersionParam = newOpGroup.clientInitialization.parameters[1];
+  strictEqual(apiVersionParam.isApiVersionParam, true);
+  strictEqual(apiVersionParam.onClient, true);
+  strictEqual(apiVersionParam.clientDefaultValue, undefined);
+  // For multi-service operation groups, the api version param type should be string
+  strictEqual(apiVersionParam.type.kind, "string");
+  
+  // NewOperationGroup should have both operations
+  strictEqual(newOpGroup.methods.length, 2);
+  const aTestMethod = newOpGroup.methods.find((m) => m.name === "aTest");
+  ok(aTestMethod);
+  const bTestMethod = newOpGroup.methods.find((m) => m.name === "bTest");
+  ok(bTestMethod);
 });
 
 it("error: inconsistent-multiple-service server", async () => {

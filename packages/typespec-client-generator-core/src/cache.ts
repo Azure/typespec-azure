@@ -157,7 +157,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   // create operation group for `@clientLocation` of  string value
   // if no explicit `@client` or `@operationGroup`
   if (!hasExplicitClientOrOperationGroup(context)) {
-    const newOperationGroupWithService = new Map<string, Namespace>();
+    const newOperationGroupWithServices = new Map<string, Namespace[]>();
     listScopedDecoratorData(context, clientLocationKey).forEach((v, k) => {
       // only deal with mutated types or without mutation
       if (
@@ -173,38 +173,30 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
             // do not create a new operation group if it already exists
             return;
           }
-          if (newOperationGroupWithService.has(v)) {
-            if (
-              newOperationGroupWithService.has(v) &&
-              Array.isArray(clients[0].service) &&
-              findService(clients[0].service, k as Operation) !==
-                newOperationGroupWithService.get(v)
-            ) {
-              // multiple services case: need to ensure operations with same client location are from the same service
-              reportDiagnostic(context.program, {
-                code: "client-location-new-operation-group-multi-service",
-                target: k,
-              });
+          
+          const operationService = Array.isArray(clients[0].service)
+            ? findService(clients[0].service, k as Operation)
+            : clients[0].service;
+          
+          if (newOperationGroupWithServices.has(v)) {
+            // Add the service to the list if it's not already there
+            const services = newOperationGroupWithServices.get(v)!;
+            if (!services.includes(operationService)) {
+              services.push(operationService);
             }
-            return;
+          } else {
+            newOperationGroupWithServices.set(v, [operationService]);
           }
-
-          newOperationGroupWithService.set(
-            v,
-            Array.isArray(clients[0].service)
-              ? findService(clients[0].service, k as Operation)
-              : clients[0].service,
-          );
         }
       }
     });
 
-    if (newOperationGroupWithService.size > 0) {
-      newOperationGroupWithService.forEach((service, ogName) => {
+    if (newOperationGroupWithServices.size > 0) {
+      newOperationGroupWithServices.forEach((services, ogName) => {
         const og: SdkOperationGroup = {
           kind: "SdkOperationGroup",
           groupPath: `${clients[0].name}.${ogName}`,
-          service: service,
+          service: services.length === 1 ? services[0] : services,
           subOperationGroups: [],
           parent: clients[0],
         };
@@ -222,8 +214,8 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     if (group.type) {
       // operations directly under the group
       const operations = [];
-      if (group.kind === "SdkClient" && Array.isArray(group.service)) {
-        // multi-service client
+      if (Array.isArray(group.service)) {
+        // multi-service client or operation group
         operations.push(...group.service.flatMap((service) => [...service.operations.values()]));
       } else {
         // single-service client or operation group

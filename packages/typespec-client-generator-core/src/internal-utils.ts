@@ -1014,10 +1014,10 @@ export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation
   return undefined;
 }
 
-export function getActualClientType(client: SdkClient | SdkOperationGroup): Namespace | Interface {
+export function getActualClientType(client: SdkClient | SdkOperationGroup): Namespace | Interface | Namespace[] {
   if (client.kind === "SdkClient") return client.type;
   if (client.type) return client.type;
-  // Created operation group from `@clientLocation`. Only for single service.
+  // Created operation group from `@clientLocation`. May have single or multiple services.
   return client.service;
 }
 

@@ -196,6 +196,8 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     }
   }
   const clientType = getActualClientType(client);
+  // For multi-service operation groups, use the first service for namespace and cross language definition id
+  const typeForMetadata = Array.isArray(clientType) ? clientType[0] : clientType;
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
@@ -203,15 +205,15 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     doc: client.type ? getClientDoc(context, client.type) : undefined,
     summary: client.type ? getSummary(context.program, client.type) : undefined,
     methods: [],
-    apiVersions: context.getApiVersionsForType(clientType),
-    namespace: getClientNamespace(context, clientType),
+    apiVersions: Array.isArray(clientType) ? [] : context.getApiVersionsForType(clientType),
+    namespace: getClientNamespace(context, typeForMetadata),
     clientInitialization: diagnostics.pipe(
       createSdkClientInitializationType(context, client, parent),
     ),
     decorators: client.type ? diagnostics.pipe(getTypeDecorators(context, client.type)) : [],
     parent,
     // if it is client, the crossLanguageDefinitionId is the ${namespace}, if it is operation group, the crosslanguageDefinitionId is the %{namespace}.%{operationGroupName}
-    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, clientType),
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, typeForMetadata),
   };
   // NOTE: getSdkMethods recursively calls createSdkClientType
   sdkClientType.methods = diagnostics.pipe(

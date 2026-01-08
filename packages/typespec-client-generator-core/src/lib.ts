@@ -458,13 +458,6 @@ export const $lib = createTypeSpecLibrary({
         default: "Can not define multiple explicit clients with multiple services.",
       },
     },
-    "client-location-new-operation-group-multi-service": {
-      severity: "error",
-      messages: {
-        default:
-          "Cannot move operations from different services to a new operation group that doesn't exist.",
-      },
-    },
     "invalid-client-service-multiple": {
       severity: "error",
       messages: {
