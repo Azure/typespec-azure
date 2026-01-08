@@ -366,6 +366,52 @@ it("should work with ARM action with value property without @pageItems", async (
   strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "value");
 });
 
+it("should work with ARM action with value property without @pageItems wrapped in ArmResponse", async () => {
+  const armRunner = await createSdkTestRunner({
+    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
+    autoUsings: ["Azure.ResourceManager", "Azure.Core"],
+    emitterName: "@azure-typespec/http-client-csharp-mgmt",
+  });
+
+  await armRunner.compileWithBuiltInAzureResourceManagerService(`
+      model Employee is TrackedResource<EmployeeProperties> {
+        ...ResourceNameParameter<Employee>;
+      }
+      model EmployeeProperties {
+        salary: int32;
+      }
+      model Equipment {
+        equipmentId: string;
+      }
+      model EquipmentListResult {
+        value: Equipment[];
+      }
+      @armResourceOperations
+      interface Employees {
+        op get is ArmResourceRead<Employee>;
+        @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
+        op listEquipments is ArmResourceActionSync<Employee, void, ArmResponse<EquipmentListResult>>;
+      }
+    `);
+
+  const rootClient = armRunner.context.sdkPackage.clients[0];
+  ok(rootClient);
+  const employeeClient = rootClient.children![0];
+  ok(employeeClient);
+  const methods = employeeClient.methods;
+  strictEqual(methods.length, 2);
+
+  const method = methods[1];
+  strictEqual(method.kind, "paging");
+  strictEqual(method.name, "listEquipments");
+
+  // Check paging metadata
+  ok(method.pagingMetadata);
+  ok(method.pagingMetadata.pageItemsSegments);
+  strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
+  strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "value");
+});
+
 it("should fail with ARM action with array property not named value without @pageItems", async () => {
   const armRunner = await createSdkTestRunner({
     librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
