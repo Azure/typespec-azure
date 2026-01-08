@@ -13,9 +13,7 @@ import {
   Operation,
   PagingOperation,
   Program,
-  Scalar,
   Type,
-  Union,
 } from "@typespec/compiler";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import {
@@ -26,7 +24,6 @@ import {
   HttpVerb,
   Visibility,
 } from "@typespec/http";
-import { getAlternateType } from "./decorators.js";
 
 // Types for TCGC lib
 

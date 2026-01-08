@@ -971,7 +971,7 @@ it("applied to union", async () => {
   const models = getAllModels(runner.context);
   const moveResponse = models.find((m) => m.name === "MoveResponse");
   strictEqual(moveResponse?.kind, "model");
-  
+
   const movingStatusProperty = moveResponse?.properties.find((p) => p.name === "movingStatus");
   strictEqual(movingStatusProperty?.type.kind, "unknown");
 });
@@ -995,7 +995,7 @@ it("applied to enum", async () => {
   const models = getAllModels(runner.context);
   const employeeStatus = models.find((m) => m.name === "EmployeeStatus");
   strictEqual(employeeStatus?.kind, "model");
-  
+
   const statusProperty = employeeStatus?.properties.find((p) => p.name === "status");
   strictEqual(statusProperty?.type.kind, "unknown");
 });
@@ -1018,7 +1018,7 @@ it("applied to model", async () => {
   const models = getAllModels(runner.context);
   const employeeInfo = models.find((m) => m.name === "EmployeeInfo");
   strictEqual(employeeInfo?.kind, "model");
-  
+
   const addressProperty = employeeInfo?.properties.find((p) => p.name === "address");
   strictEqual(addressProperty?.type.kind, "unknown");
 });

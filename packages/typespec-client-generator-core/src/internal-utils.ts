@@ -365,10 +365,7 @@ export function getSdkTypeBaseHelper<TKind>(
   ) {
     const external = getAlternateType(context, type);
     // Only set external if it's an ExternalTypeInfo (has 'identity' but not 'kind' property), not a regular Type
-    if (
-      external &&
-      external.kind === "externalTypeInfo"
-    ) {
+    if (external && external.kind === "externalTypeInfo") {
       base.external = external;
     }
   }
