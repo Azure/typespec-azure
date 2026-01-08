@@ -27,8 +27,14 @@ import {
 } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
-import { getAuthentication, getHttpOperation, getServers, isBody, isBodyRoot } from "@typespec/http";
-import { $useDependency, getRenamedFromVersions, getVersions } from "@typespec/versioning";
+import {
+  getAuthentication,
+  getHttpOperation,
+  getServers,
+  isBody,
+  isBodyRoot,
+} from "@typespec/http";
+import { $useDependency, getVersions } from "@typespec/versioning";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
@@ -88,7 +94,6 @@ import {
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
-import { useStateSet } from "@typespec/compiler/utils";
 
 export const namespace = "Azure.ClientGenerator.Core";
 
@@ -1643,7 +1648,7 @@ export const $markAsPageable: MarkAsPageableDecorator = (
     });
     return;
   }
-  
+
   // Check if already marked with @list decorator
   if (isList(context.program, target)) {
     reportDiagnostic(context.program, {
@@ -1655,7 +1660,7 @@ export const $markAsPageable: MarkAsPageableDecorator = (
     });
     return;
   }
-  
+
   // Check the response model for @pageItems decorator
   const responseType = getRealResponseModel(context.program, modelResponse.type as Model);
   if (responseType.kind !== "Model") {
@@ -1668,7 +1673,7 @@ export const $markAsPageable: MarkAsPageableDecorator = (
     });
     return;
   }
-  
+
   // Check if any property has @pageItems decorator by checking the program state
   // The @pageItems decorator uses a state symbol "TypeSpec.pageItems"
   const pageItemsStateKey = Symbol.for("TypeSpec.pageItems");
@@ -1679,7 +1684,7 @@ export const $markAsPageable: MarkAsPageableDecorator = (
       break;
     }
   }
-  
+
   if (!itemsProperty) {
     // Try to find a property named "value"
     itemsProperty = responseType.properties.get("value");
@@ -1697,10 +1702,20 @@ export const $markAsPageable: MarkAsPageableDecorator = (
   }
 
   // Store metadata that will be checked by TCGC to treat this operation as pageable
-  setScopedDecoratorData(context, $markAsPageable, markAsPageableKey, target, { itemsProperty }, scope);
+  setScopedDecoratorData(
+    context,
+    $markAsPageable,
+    markAsPageableKey,
+    target,
+    { itemsProperty },
+    scope,
+  );
 };
 
-export function getMarkAsPageable(context: TCGCContext, entity: Operation): MarkAsPageableInfo | undefined {
+export function getMarkAsPageable(
+  context: TCGCContext,
+  entity: Operation,
+): MarkAsPageableInfo | undefined {
   return getScopedDecoratorData(context, markAsPageableKey, entity);
 }
 
@@ -1717,7 +1732,7 @@ function getRealResponseModel(program: Program, responseModel: Model): Type {
     }
   }
   if (bodyProperty) {
-      return bodyProperty.type;
+    return bodyProperty.type;
   }
   return responseModel;
 }

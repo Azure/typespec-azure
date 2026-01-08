@@ -263,17 +263,15 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
             : undefined,
       },
     });
-  } else { 
+  } else {
     const markAsPageableInfo = getMarkAsPageable(context, operation);
     if (markAsPageableInfo) {
-      const itemsProperty = ignoreDiagnostics(getSdkModelPropertyType(context, markAsPageableInfo.itemsProperty, operation));
+      const itemsProperty = ignoreDiagnostics(
+        getSdkModelPropertyType(context, markAsPageableInfo.itemsProperty, operation),
+      );
       // tcgc will let all paging method return a list of items
       baseServiceMethod.response.type = diagnostics.pipe(
-        getClientTypeWithDiagnostics(
-          context,
-          markAsPageableInfo.itemsProperty.type,
-          operation,
-        ),
+        getClientTypeWithDiagnostics(context, markAsPageableInfo.itemsProperty.type, operation),
       );
 
       return diagnostics.wrap({
@@ -282,8 +280,8 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
         pagingMetadata: {
           __raw: undefined, // because in this case it is not a real paging operation
           pageItemsSegments: [itemsProperty],
-        }
-      })
+        },
+      });
     } else {
       compilerAssert(false, "Unexpected operation should be paged if calling this function");
     }

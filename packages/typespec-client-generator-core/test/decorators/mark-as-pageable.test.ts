@@ -80,7 +80,7 @@ it("should apply @markAsPageable with language scope", async () => {
   const method = methods[0];
   strictEqual(method.kind, "paging");
   strictEqual(method.name, "listItems");
-  
+
   // Check paging metadata
   ok(method.pagingMetadata);
   ok(method.pagingMetadata.pageItemsSegments);
@@ -138,7 +138,7 @@ it("should work with complex model return types", async () => {
   const responseType = method.response.type;
   ok(responseType);
   strictEqual(responseType.kind, "array");
-  
+
   // Check paging metadata
   ok(method.pagingMetadata);
   ok(method.pagingMetadata.pageItemsSegments);
@@ -172,7 +172,7 @@ it("should apply @pageItems to 'value' property when not already decorated", asy
   const method = methods[0];
   strictEqual(method.kind, "paging");
   strictEqual(method.name, "listItems");
-  
+
   // Check paging metadata
   ok(method.pagingMetadata);
   ok(method.pagingMetadata.pageItemsSegments);
@@ -308,11 +308,11 @@ it("should work with ARM action with @pageItems property", async () => {
   ok(employeeClient);
   const methods = employeeClient.methods;
   strictEqual(methods.length, 2);
-  
+
   const method = methods[1];
   strictEqual(method.kind, "paging");
   strictEqual(method.name, "listEquipments");
-  
+
   // Check paging metadata
   ok(method.pagingMetadata);
   ok(method.pagingMetadata.pageItemsSegments);
@@ -354,11 +354,11 @@ it("should work with ARM action with value property without @pageItems", async (
   ok(employeeClient);
   const methods = employeeClient.methods;
   strictEqual(methods.length, 2);
-  
+
   const method = methods[1];
   strictEqual(method.kind, "paging");
   strictEqual(method.name, "listEquipments");
-  
+
   // Check paging metadata
   ok(method.pagingMetadata);
   ok(method.pagingMetadata.pageItemsSegments);
@@ -433,11 +433,11 @@ it("should work with ARM ListSinglePage legacy operation", async () => {
   ok(employeeClient);
   const methods = employeeClient.methods;
   strictEqual(methods.length, 2);
-  
+
   const method = methods[1];
   strictEqual(method.kind, "paging");
   strictEqual(method.name, "listSinglePageEmployees");
-  
+
   // Check paging metadata
   ok(method.pagingMetadata);
   ok(method.pagingMetadata.pageItemsSegments);
