@@ -57,7 +57,7 @@ jobs:
           inlineScript: |
             az storage blob upload-batch \
               --auth-mode login \
-              --destination $web \
+              --destination '$web' \
               --account-name "cadlplayground" \
               --destination-path cadl-azure/ \
               --source "./packages/typespec-azure-playground-website/dist/" \
