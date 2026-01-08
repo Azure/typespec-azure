@@ -1,9 +1,4 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig, mergeConfig } from "vitest/config";
+import { defaultTypeSpecVitestConfig } from "../../core/vitest.config";
 
-export default defineConfig({
-  test: {
-    globals: true,
-    environment: 'node',
-    include: ['src/**/*.test.ts'],
-  },
-});
+export default mergeConfig(defaultTypeSpecVitestConfig, defineConfig({}));

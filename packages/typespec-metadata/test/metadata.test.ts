@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { MetadataSnapshot, LanguagePackageMetadata, SpecMetadata } from './metadata.js';
+import type { MetadataSnapshot, LanguagePackageMetadata, SpecMetadata } from '../src/metadata.js';
 
 describe('MetadataSnapshot structure', () => {
   it('should have required top-level fields', () => {
