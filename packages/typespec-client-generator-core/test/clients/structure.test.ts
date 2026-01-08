@@ -820,6 +820,8 @@ it("one client from multiple services", async () => {
   ok(apiVersionParam);
   strictEqual(apiVersionParam.apiVersions.length, 0);
   strictEqual(apiVersionParam.clientDefaultValue, undefined);
+  // For multi-service clients, the api version param type should be string
+  strictEqual(apiVersionParam.type.kind, "string");
   const aiClient = client.children!.find((c) => c.name === "AI");
   ok(aiClient);
 
@@ -995,6 +997,8 @@ it("one client from multiple services without version dependency", async () => {
   ok(apiVersionParam);
   strictEqual(apiVersionParam.apiVersions.length, 0);
   strictEqual(apiVersionParam.clientDefaultValue, undefined);
+  // For multi-service clients, the api version param type should be string
+  strictEqual(apiVersionParam.type.kind, "string");
 
   const aiClient = client.children!.find((c) => c.name === "AI");
   ok(aiClient);
@@ -1112,6 +1116,8 @@ it("one client from multiple services with `@clientLocation`", async () => {
   ok(apiVersionParam);
   strictEqual(apiVersionParam.apiVersions.length, 0);
   strictEqual(apiVersionParam.clientDefaultValue, undefined);
+  // For multi-service clients, the api version param type should be string
+  strictEqual(apiVersionParam.type.kind, "string");
 
   const aiClient = client.children!.find((c) => c.name === "AI");
   ok(aiClient);
@@ -1633,10 +1639,6 @@ it("error: multiple explicit clients with multiple services", async () => {
   `,
   );
   expectDiagnostics(diagnostics, [
-    {
-      code: "@azure-tools/typespec-client-generator-core/multiple-explicit-clients-multiple-services",
-      message: "Can not define multiple explicit clients with multiple services.",
-    },
     {
       code: "@azure-tools/typespec-client-generator-core/multiple-explicit-clients-multiple-services",
       message: "Can not define multiple explicit clients with multiple services.",
