@@ -254,7 +254,8 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
                 existingOg.service.push(operationService);
               }
             }
-            // Continue to process this operation (don't return early)
+            // Operation will be moved to this existing operation group during operations processing
+            return;
           }
           
           const operationService = Array.isArray(clients[0].service)
@@ -304,9 +305,14 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         for (const type of mergedTypes) {
           operations.push(...type.operations.values());
         }
-      } else if (group.kind === "SdkClient" && Array.isArray(group.service)) {
-        // multi-service client
-        operations.push(...group.service.flatMap((service) => [...service.operations.values()]));
+      } else if (Array.isArray(group.service)) {
+        // multi-service client or operation group (created via @clientLocation)
+        // For clients, get operations from all services
+        // For operation groups without merged types, this handles @clientLocation case
+        if (group.kind === "SdkClient") {
+          operations.push(...group.service.flatMap((service) => [...service.operations.values()]));
+        }
+        // For operation groups created via @clientLocation, operations are added later via the clientLocation processing
       } else {
         // single-service client or operation group
         operations.push(...group.type.operations.values());
