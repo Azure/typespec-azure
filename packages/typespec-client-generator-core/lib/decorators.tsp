@@ -163,10 +163,10 @@ extern dec client(target: Namespace | Interface, options?: ClientOptions, scope?
  */
 model ClientOptions {
   /**
-   * The services that this client is generated for. If not specified, TCGC will look up the first parent namespace decorated with `@service` for the target.
+   * The service that this client is generated for. If not specified, TCGC will look up the first parent namespace decorated with `@service` for the target.
    * The namespace should be decorated with `@service`.
    */
-  service?: Namespace | Namespace[];
+  service?: Namespace;
 
   /**
    * The name of the client. If not specified, the default name will be `<Name of the target>Client`.
