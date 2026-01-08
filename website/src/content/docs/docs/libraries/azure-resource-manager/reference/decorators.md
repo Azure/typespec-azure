@@ -559,63 +559,6 @@ Specify an external reference that should be used when emitting this type.
 | ------- | ---------------- | ------------------------------------------------------------- |
 | jsonRef | `valueof string` | External reference(e.g. "../../common.json#/definitions/Foo") |
 
-### `@feature` {#@Azure.ResourceManager.Legacy.feature}
-
-Decorator to associate a feature with a model, interface, or namespace
-
-```typespec
-@Azure.ResourceManager.Legacy.feature(featureName: EnumMember)
-```
-
-#### Target
-
-The target to associate the feature with
-`Model | Interface | Namespace`
-
-#### Parameters
-
-| Name        | Type         | Description                              |
-| ----------- | ------------ | ---------------------------------------- |
-| featureName | `EnumMember` | The feature to associate with the target |
-
-### `@featureOptions` {#@Azure.ResourceManager.Legacy.featureOptions}
-
-Decorator to define options for a specific feature
-
-```typespec
-@Azure.ResourceManager.Legacy.featureOptions(options: valueof Azure.ResourceManager.Legacy.ArmFeatureOptions)
-```
-
-#### Target
-
-The enum member that represents the feature
-`EnumMember`
-
-#### Parameters
-
-| Name    | Type                                                                                          | Description                 |
-| ------- | --------------------------------------------------------------------------------------------- | --------------------------- |
-| options | [valueof `ArmFeatureOptions`](./data-types.md#Azure.ResourceManager.Legacy.ArmFeatureOptions) | The options for the feature |
-
-### `@features` {#@Azure.ResourceManager.Legacy.features}
-
-Decorator to define a set of features
-
-```typespec
-@Azure.ResourceManager.Legacy.features(features: Enum)
-```
-
-#### Target
-
-The service namespace
-`Namespace`
-
-#### Parameters
-
-| Name     | Type   | Description                         |
-| -------- | ------ | ----------------------------------- |
-| features | `Enum` | The enum that contains the features |
-
 ### `@renamePathParameter` {#@Azure.ResourceManager.Legacy.renamePathParameter}
 
 Renames a path parameter in an Azure Resource Manager operation.

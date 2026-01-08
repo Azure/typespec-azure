@@ -1,4 +1,3 @@
-import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
   Diagnostic,
   Enum,
@@ -103,13 +102,13 @@ export function isApiVersion(context: TCGCContext, type: ModelProperty): boolean
     return override;
   }
   // if the service is not versioning, then no api version parameter
-  const versionEnumSets = [...context.getPackageVersionEnum().values()];
-  if (versionEnumSets.length === 0) {
+  const versionEnum = context.getPackageVersionEnum();
+  if (!versionEnum) {
     return false;
   }
   // if the parameter type is the version enum or named as "apiVersion" or "api-version", then it is api version
   return (
-    versionEnumSets.some((versionEnum) => type.type === versionEnum) ||
+    type.type === versionEnum ||
     type.name.toLowerCase().includes("apiversion") ||
     type.name.toLowerCase().includes("api-version")
   );
@@ -457,27 +456,6 @@ function getContextPath(
               return result;
             }
           }
-        }
-      }
-    }
-
-    const lroMetadata = getLroMetadata(context.program, root);
-    if (lroMetadata) {
-      const anonymousCandidates = [
-        { lroResultType: lroMetadata.finalResult, label: "FinalResult" },
-        { lroResultType: lroMetadata.logicalResult, label: "LogicalResult" },
-        { lroResultType: lroMetadata.envelopeResult, label: "EnvelopeResult" },
-        { lroResultType: lroMetadata.finalEnvelopeResult, label: "FinalEnvelopeResult" },
-      ];
-
-      for (const { lroResultType, label } of anonymousCandidates) {
-        if (!lroResultType || lroResultType === "void") {
-          continue;
-        }
-        visited.clear();
-        result = [{ name: root.name, type: root }];
-        if (dfsModelProperties(typeToFind, lroResultType, label)) {
-          return result;
         }
       }
     }

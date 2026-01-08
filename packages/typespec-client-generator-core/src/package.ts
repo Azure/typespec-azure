@@ -14,11 +14,7 @@ import {
   SdkUnionType,
   TCGCContext,
 } from "./interfaces.js";
-import {
-  filterApiVersionsWithDecorators,
-  getActualClientType,
-  getTypeDecorators,
-} from "./internal-utils.js";
+import { filterApiVersionsWithDecorators, getTypeDecorators } from "./internal-utils.js";
 import { getLicenseInfo } from "./license.js";
 import { getCrossLanguagePackageId, getNamespaceFromType } from "./public-utils.js";
 import { getAllReferencedTypes, handleAllTypes } from "./types.js";
@@ -43,12 +39,7 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
     namespaces: [],
     licenseInfo: getLicenseInfo(context),
     metadata: {
-      apiVersion:
-        context.apiVersion === "all" && versions.size === 1
-          ? "all"
-          : versions.size === 1
-            ? [...versions.values()][0].at(-1)
-            : undefined,
+      apiVersion: context.apiVersion === "all" ? "all" : versions[versions.length - 1],
     },
   };
   organizeNamespaces(context, sdkPackage);
@@ -122,26 +113,22 @@ function populateApiVersionInformation(context: TCGCContext): void {
   if (context.__rawClientsOperationGroupsCache === undefined) {
     prepareClientAndOperationCache(context);
   }
-
-  // Get the package versions map once (this handles both single and multi-service scenarios)
-  const packageVersions = context.getPackageVersions();
-
-  for (const client of context.__rawClientsOperationGroupsCache!.values()) {
-    const clientType = getActualClientType(client);
-
-    // Multiple service case. Set empty result.
-    if (Array.isArray(client.service)) {
-      context.setApiVersionsForType(clientType, []);
-      context.__clientApiVersionDefaultValueCache.set(client, undefined);
-    } else {
-      const versions = filterApiVersionsWithDecorators(
+  for (const clientOperationGroup of context.__rawClientsOperationGroupsCache!.values()) {
+    context.setApiVersionsForType(
+      clientOperationGroup.type ?? clientOperationGroup.service,
+      filterApiVersionsWithDecorators(
         context,
-        clientType,
-        packageVersions.get(client.service) || [],
-      );
-      context.setApiVersionsForType(clientType, versions);
+        clientOperationGroup.type ?? clientOperationGroup.service,
+        context.getPackageVersions(),
+      ),
+    );
 
-      context.__clientApiVersionDefaultValueCache.set(client, versions[versions.length - 1]);
-    }
+    const clientApiVersions = context.getApiVersionsForType(
+      clientOperationGroup.type ?? clientOperationGroup.service,
+    );
+    context.__clientApiVersionDefaultValueCache.set(
+      clientOperationGroup,
+      clientApiVersions[clientApiVersions.length - 1],
+    );
   }
 }

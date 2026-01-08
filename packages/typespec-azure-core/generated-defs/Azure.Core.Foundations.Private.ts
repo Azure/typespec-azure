@@ -1,11 +1,4 @@
-import type {
-  DecoratorContext,
-  DecoratorValidatorCallbacks,
-  Model,
-  Operation,
-  Scalar,
-  Type,
-} from "@typespec/compiler";
+import type { DecoratorContext, Model, Operation, Scalar, Type } from "@typespec/compiler";
 
 /**
  * Provides a Model describing parameter customizations to spread into the target.
@@ -16,7 +9,7 @@ export type SpreadCustomParametersDecorator = (
   context: DecoratorContext,
   entity: Model,
   customizations: Model,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Provides a Model describing response property customizations to spread into the target.
@@ -27,7 +20,7 @@ export type SpreadCustomResponsePropertiesDecorator = (
   context: DecoratorContext,
   entity: Model,
   customizations: Model,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Checks the Resource parameter of an operation signature to ensure it's a valid resource type.
@@ -39,7 +32,7 @@ export type EnsureResourceTypeDecorator = (
   context: DecoratorContext,
   entity: Operation,
   resourceType: Type,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Identifies that a model should be treated as an embedding vector.
@@ -48,7 +41,7 @@ export type EmbeddingVectorDecorator = (
   context: DecoratorContext,
   entity: Model,
   type: Scalar,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Configuration for the armResourceIdentifier scalar
@@ -57,15 +50,12 @@ export type ArmResourceIdentifierConfigDecorator = (
   context: DecoratorContext,
   target: Scalar,
   options: Type,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Checks the Resource parameter of an operation signature to ensure it's a valid resource type.
  */
-export type NeedsRouteDecorator = (
-  context: DecoratorContext,
-  entity: Operation,
-) => DecoratorValidatorCallbacks | void;
+export type NeedsRouteDecorator = (context: DecoratorContext, entity: Operation) => void;
 
 /**
  * Issues a warning if an operation which derives from an operation templated marked with `@ensureVerb`
@@ -79,7 +69,7 @@ export type EnsureVerbDecorator = (
   entity: Operation,
   templateName: string,
   verb: string,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Sets the priority order of default final-state-via options for an operation
@@ -90,7 +80,7 @@ export type DefaultFinalStateViaDecorator = (
   context: DecoratorContext,
   target: Operation,
   states: readonly ("operation-location" | "location" | "azure-async-operation")[],
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Internal decorator marking a scalar as a next link that requires parameterization before use.
@@ -102,7 +92,7 @@ export type ParameterizedNextLinkConfigDecorator = (
   context: DecoratorContext,
   target: Scalar,
   parameters: Type,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 export type AzureCoreFoundationsPrivateDecorators = {
   spreadCustomParameters: SpreadCustomParametersDecorator;

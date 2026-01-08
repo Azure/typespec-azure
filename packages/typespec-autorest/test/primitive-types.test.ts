@@ -259,6 +259,8 @@ describe("typespec-autorest: primitives", () => {
         };
         deepStrictEqual(oapi.parameters.Test, expected);
       });
+      it("set format to 'http-date' when encoding is http-date", () =>
+        testEncode("utcDateTime", { type: "string", format: "http-date" }, "http-date"));
       it("set type to integer and format to 'unixtime' when encoding is unixTimestamp (unixTimestamp info is lost)", async () => {
         const expected: OpenAPI2Schema = { type: "integer", format: "unixtime" };
         await testEncode("utcDateTime", expected, "unixTimestamp", "int32");
@@ -273,6 +275,8 @@ describe("typespec-autorest: primitives", () => {
         testEncode("offsetDateTime", { type: "string", format: "date-time" }));
       it("set format to 'date-time-rfc7231' when encoding is rfc7231", () =>
         testEncode("offsetDateTime", { type: "string", format: "date-time-rfc7231" }, "rfc7231"));
+      it("set format to 'http-date' when encoding is http-date", () =>
+        testEncode("offsetDateTime", { type: "string", format: "http-date" }, "http-date"));
     });
 
     describe("duration", () => {

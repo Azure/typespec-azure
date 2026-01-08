@@ -95,10 +95,8 @@ async function emitAllServices(
       service,
       version: canonicalVersion,
       tcgcSdkContext,
-      multiService: services.length > 1,
     };
-    const results = await getOpenAPIForService(context, options);
-    const result = results[0];
+    const result = await getOpenAPIForService(context, options);
     const includedVersions = getVersion(program, service.type)
       ?.getVersions()
       ?.map((item) => item.value ?? item.name);

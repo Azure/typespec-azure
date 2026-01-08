@@ -63,7 +63,6 @@ import {
 import {
   createGeneratedName,
   findRootSourceProperty,
-  getActualClientType,
   getAvailableApiVersions,
   getClientDoc,
   getCorrespondingClientParam,
@@ -86,18 +85,16 @@ import {
   getSdkModelPropertyType,
   getSdkModelPropertyTypeBase,
 } from "./types.js";
-
 function getSdkServiceOperation<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
   methodParameters: SdkMethodParameter[],
-  client: SdkClientType<TServiceOperation>,
 ): [TServiceOperation, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const httpOperation = getHttpOperationWithCache(context, operation);
   if (httpOperation) {
     const sdkHttpOperation = diagnostics.pipe(
-      getSdkHttpOperation(context, httpOperation, methodParameters, client),
+      getSdkHttpOperation(context, httpOperation, methodParameters),
     ) as TServiceOperation;
     return diagnostics.wrap(sdkHttpOperation);
   }
@@ -365,7 +362,6 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
         context,
         metadata.__raw.operation,
         baseServiceMethod.parameters,
-        client,
       ),
     ),
   });
@@ -636,7 +632,7 @@ export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOpe
   const apiVersions = getAvailableApiVersions(
     context,
     operation,
-    getActualClientType(client.__raw),
+    client.__raw.type ?? client.__raw.service,
   );
 
   let clientParams = context.__clientParametersCache.get(client.__raw);
@@ -668,7 +664,7 @@ export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOpe
   }
 
   const serviceOperation = diagnostics.pipe(
-    getSdkServiceOperation<TServiceOperation>(context, operation, methodParameters, client),
+    getSdkServiceOperation<TServiceOperation>(context, operation, methodParameters),
   );
   const response = getSdkMethodResponse(context, operation, serviceOperation, client);
   const name = getLibraryName(context, operation);

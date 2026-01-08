@@ -118,33 +118,6 @@ export async function compileVersionedOpenAPI<K extends string>(
   return output;
 }
 
-export async function CompileOpenApiWithFeatures<F extends string>(
-  code: string,
-  features: F[],
-  options: CompileOpenAPIOptions = {},
-): Promise<Record<F, OpenAPI2Document>> {
-  const tester =
-    options?.tester ?? (await (options.preset === "azure" ? AzureTester : Tester).createInstance());
-  const [{ outputs }, diagnostics] = await tester.compileAndDiagnose(code, {
-    compilerOptions: {
-      options: {
-        "@azure-tools/typespec-autorest": {
-          ...defaultOptions,
-          "output-splitting": "legacy-feature-files",
-          "output-file": "{emitter-output-dir}/{feature}.json",
-        },
-      },
-    },
-  });
-  expectDiagnosticEmpty(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]));
-
-  const output: any = {};
-  for (const feature of features) {
-    output[feature] = JSON.parse(outputs[`${feature}.json`]);
-  }
-  return output;
-}
-
 /**
  * Deprecated use `compileOpenAPI` or `compileVersionedOpenAPI` instead
  */

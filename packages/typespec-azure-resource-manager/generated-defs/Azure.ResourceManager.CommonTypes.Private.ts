@@ -1,6 +1,5 @@
 import type {
   DecoratorContext,
-  DecoratorValidatorCallbacks,
   Enum,
   EnumValue,
   Model,
@@ -11,10 +10,7 @@ import type {
 /**
  * Marks an enum as representing the valid `common-types` versions.
  */
-export type ArmCommonTypesVersionsDecorator = (
-  context: DecoratorContext,
-  target: Enum,
-) => DecoratorValidatorCallbacks | void;
+export type ArmCommonTypesVersionsDecorator = (context: DecoratorContext, target: Enum) => void;
 
 /**
  *
@@ -36,15 +32,12 @@ export type ArmCommonParameterDecorator = (
       }
     | string,
   referenceFile?: string,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Signifies that a property can be treated as an inline type in emitters
  */
-export type InlineAzureTypeDecorator = (
-  context: DecoratorContext,
-  target: ModelProperty,
-) => DecoratorValidatorCallbacks | void;
+export type InlineAzureTypeDecorator = (context: DecoratorContext, target: ModelProperty) => void;
 
 /**
  *
@@ -66,7 +59,7 @@ export type ArmCommonDefinitionDecorator = (
       }
     | string,
   referenceFile?: string,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 export type AzureResourceManagerCommonTypesPrivateDecorators = {
   armCommonTypesVersions: ArmCommonTypesVersionsDecorator;

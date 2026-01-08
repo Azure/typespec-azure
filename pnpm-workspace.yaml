@@ -14,5 +14,3 @@ overrides:
 
 # Minimum age (in minutes) for a new dependency version to be able to be used.
 minimumReleaseAge: 2880 # 2 days
-minimumReleaseAgeExclude:
-  - "@alloy-js/*"

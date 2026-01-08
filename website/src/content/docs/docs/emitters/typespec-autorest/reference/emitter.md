@@ -156,9 +156,3 @@ Determine whether and how to emit schemas for common-types rather than referenci
 **Type:** `"xml-service" | "none"`
 
 Strategy for applying XML serialization metadata to schemas.
-
-### `output-splitting`
-
-**Type:** `"legacy-feature-files"`
-
-Determines whether output should be split into multiple files. The only supported option for splitting is "legacy-feature-files", which uses the typespec-azure-resource-manager `@feature` decorators to split into output files based on feature.

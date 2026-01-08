@@ -1,9 +1,10 @@
 import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { Namespace } from "@typespec/compiler";
+import { Interface } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
 import {
+  getClient,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
@@ -72,12 +73,7 @@ it("basic default version", async () => {
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v3");
-  deepStrictEqual(
-    runnerWithVersion.context
-      .getPackageVersions()
-      .get(sdkPackage.clients[0].__raw.type as Namespace),
-    ["v1", "v2", "v3"],
-  );
+  deepStrictEqual(runnerWithVersion.context.getPackageVersions(), ["v1", "v2", "v3"]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -178,12 +174,7 @@ it("basic latest version", async () => {
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v3");
-  deepStrictEqual(
-    runnerWithVersion.context
-      .getPackageVersions()
-      .get(sdkPackage.clients[0].__raw.type as Namespace),
-    ["v1", "v2", "v3"],
-  );
+  deepStrictEqual(runnerWithVersion.context.getPackageVersions(), ["v1", "v2", "v3"]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -283,12 +274,7 @@ it("basic v3 version", async () => {
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v3");
-  deepStrictEqual(
-    runnerWithVersion.context
-      .getPackageVersions()
-      .get(sdkPackage.clients[0].__raw.type as Namespace),
-    ["v1", "v2", "v3"],
-  );
+  deepStrictEqual(runnerWithVersion.context.getPackageVersions(), ["v1", "v2", "v3"]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -388,12 +374,7 @@ it("basic v2 version", async () => {
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v2");
-  deepStrictEqual(
-    runnerWithVersion.context
-      .getPackageVersions()
-      .get(sdkPackage.clients[0].__raw.type as Namespace),
-    ["v1", "v2"],
-  );
+  deepStrictEqual(runnerWithVersion.context.getPackageVersions(), ["v1", "v2"]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -496,12 +477,7 @@ it("basic v1 version", async () => {
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v1");
-  deepStrictEqual(
-    runnerWithVersion.context
-      .getPackageVersions()
-      .get(sdkPackage.clients[0].__raw.type as Namespace),
-    ["v1"],
-  );
+  deepStrictEqual(runnerWithVersion.context.getPackageVersions(), ["v1"]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -589,12 +565,7 @@ it("basic all version", async () => {
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "all");
-  deepStrictEqual(
-    runnerWithVersion.context
-      .getPackageVersions()
-      .get(sdkPackage.clients[0].__raw.type as Namespace),
-    ["v1", "v2", "v3"],
-  );
+  deepStrictEqual(runnerWithVersion.context.getPackageVersions(), ["v1", "v2", "v3"]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -1091,7 +1062,10 @@ it("multiple clients", async () => {
     "api-version": "v1",
     emitterName: "@azure-tools/typespec-python",
   });
-  await runnerWithVersion.compile(tsp);
+
+  let { A, B } = (await runnerWithVersion.compile(tsp)) as { A: Interface; B: Interface };
+  ok(getClient(runnerWithVersion.context, A));
+  strictEqual(getClient(runnerWithVersion.context, B), undefined);
 
   let clients = listClients(runnerWithVersion.context);
   strictEqual(clients.length, 1);
@@ -1106,7 +1080,12 @@ it("multiple clients", async () => {
     "api-version": "v2",
     emitterName: "@azure-tools/typespec-python",
   });
-  await runnerWithVersion.compile(tsp);
+
+  let result = (await runnerWithVersion.compile(tsp)) as { A: Interface; B: Interface };
+  A = result.A;
+  B = result.B;
+  ok(getClient(runnerWithVersion.context, A));
+  ok(getClient(runnerWithVersion.context, B));
 
   clients = listClients(runnerWithVersion.context);
   strictEqual(clients.length, 2);
@@ -1131,7 +1110,12 @@ it("multiple clients", async () => {
     "api-version": "v3",
     emitterName: "@azure-tools/typespec-python",
   });
-  await runnerWithVersion.compile(tsp);
+
+  result = (await runnerWithVersion.compile(tsp)) as { A: Interface; B: Interface };
+  A = result.A;
+  B = result.B;
+  ok(getClient(runnerWithVersion.context, A));
+  ok(getClient(runnerWithVersion.context, B));
 
   clients = listClients(runnerWithVersion.context);
   strictEqual(clients.length, 2);
@@ -1443,12 +1427,7 @@ it("version not exist", async () => {
 
   const sdkPackage = runnerWithVersion.context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v3");
-  deepStrictEqual(
-    runnerWithVersion.context
-      .getPackageVersions()
-      .get(sdkPackage.clients[0].__raw.type as Namespace),
-    ["v1", "v2", "v3"],
-  );
+  deepStrictEqual(runnerWithVersion.context.getPackageVersions(), ["v1", "v2", "v3"]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(

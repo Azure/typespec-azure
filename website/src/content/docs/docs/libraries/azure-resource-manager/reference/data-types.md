@@ -3406,24 +3406,6 @@ model Azure.ResourceManager.Foundations.TenantScope<Resource>
 
 ## Azure.ResourceManager.Legacy
 
-### `ArmFeatureOptions` {#Azure.ResourceManager.Legacy.ArmFeatureOptions}
-
-Options for defining a feature and the associated file
-
-```typespec
-model Azure.ResourceManager.Legacy.ArmFeatureOptions
-```
-
-#### Properties
-
-| Name            | Type     | Description                               |
-| --------------- | -------- | ----------------------------------------- |
-| featureName     | `string` | The feature name                          |
-| fileName        | `string` | The associated file name for the features |
-| description     | `string` | The feature description in Swagger        |
-| title?          | `string` | The feature title in Swagger              |
-| termsOfService? | `string` | The feature terms of service in Swagger   |
-
 ### `ArmOperationOptions` {#Azure.ResourceManager.Legacy.ArmOperationOptions}
 
 Route options for an operation

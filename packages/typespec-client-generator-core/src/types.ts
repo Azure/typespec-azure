@@ -66,7 +66,7 @@ import {
   SdkArrayType,
   SdkBuiltInKinds,
   SdkBuiltInType,
-  SdkClientType,
+  SdkClient,
   SdkConstantType,
   SdkCredentialParameter,
   SdkCredentialType,
@@ -76,11 +76,11 @@ import {
   SdkEnumType,
   SdkEnumValueType,
   SdkHeaderParameter,
-  SdkHttpOperation,
   SdkModelPropertyType,
   SdkModelPropertyTypeBase,
   SdkModelType,
   SdkNullableType,
+  SdkOperationGroup,
   SdkTupleType,
   SdkType,
   SdkUnionType,
@@ -90,7 +90,7 @@ import {
 } from "./interfaces.js";
 import {
   createGeneratedName,
-  filterPreviewVersion,
+  filterApiVersionsInEnum,
   getAvailableApiVersions,
   getClientDoc,
   getHttpBodyType,
@@ -119,6 +119,7 @@ import {
 } from "./public-utils.js";
 
 import { $ } from "@typespec/compiler/typekit";
+import { getVersions } from "@typespec/versioning";
 import { getNs, isAttribute, isUnwrapped } from "@typespec/xml";
 import { getSdkHttpParameter } from "./http.js";
 import { isMediaTypeJson, isMediaTypeTextPlain, isMediaTypeXml } from "./media-types.js";
@@ -790,7 +791,7 @@ function addDiscriminatorToModelType(
       onClient: false,
       apiVersions: discriminatorProperty
         ? getAvailableApiVersions(context, discriminatorProperty.__raw!, type)
-        : model.apiVersions,
+        : getAvailableApiVersions(context, type, type),
       isApiVersionParam: false,
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
@@ -1198,15 +1199,14 @@ function getSdkVisibility(context: TCGCContext, type: ModelProperty): Visibility
 
 function getSdkCredentialType(
   context: TCGCContext,
-  client: SdkClientType<SdkHttpOperation>,
+  client: SdkClient | SdkOperationGroup,
   authentication: Authentication,
 ): SdkCredentialType | SdkUnionType<SdkCredentialType> {
   const credentialTypes: SdkCredentialType[] = [];
   for (const option of authentication.options) {
     for (const scheme of option.schemes) {
       credentialTypes.push({
-        // Multiple services only deal with the first server config
-        __raw: Array.isArray(client.__raw.service) ? client.__raw.service[0] : client.__raw.service,
+        __raw: client.service,
         kind: "credential",
         scheme: scheme,
         decorators: [],
@@ -1214,19 +1214,16 @@ function getSdkCredentialType(
     }
   }
   if (credentialTypes.length > 1) {
-    // Multiple services only deal with the first server config
-    const service = Array.isArray(client.__raw.service)
-      ? client.__raw.service[0]
-      : client.__raw.service;
+    const namespace = getClientNamespace(context, client.service);
     return {
-      __raw: service,
+      __raw: client.service,
       kind: "union",
       variantTypes: credentialTypes,
-      name: createGeneratedName(context, service, "CredentialUnion"),
+      name: createGeneratedName(context, client.service, "CredentialUnion"),
       isGeneratedName: true,
-      namespace: client.namespace,
-      clientNamespace: client.namespace,
-      crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.CredentialUnion`,
+      namespace,
+      clientNamespace: namespace,
+      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.CredentialUnion`,
       decorators: [],
       access: "public",
       usage: UsageFlags.None,
@@ -1237,13 +1234,9 @@ function getSdkCredentialType(
 
 export function getSdkCredentialParameter(
   context: TCGCContext,
-  client: SdkClientType<SdkHttpOperation>,
+  client: SdkClient | SdkOperationGroup,
 ): SdkCredentialParameter | undefined {
-  // Multiple services only deal with the first server config
-  const service = Array.isArray(client.__raw.service)
-    ? client.__raw.service[0]
-    : client.__raw.service;
-  const auth = getAuthentication(context.program, service);
+  const auth = getAuthentication(context.program, client.service);
   if (!auth) return undefined;
   return {
     type: getSdkCredentialType(context, client, auth),
@@ -1251,11 +1244,11 @@ export function getSdkCredentialParameter(
     name: "credential",
     isGeneratedName: true,
     doc: "Credential used to authenticate requests to the service.",
-    apiVersions: client.apiVersions,
+    apiVersions: getAvailableApiVersions(context, client.service, client.type),
     onClient: true,
     optional: false,
     isApiVersionParam: false,
-    crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.credential`,
+    crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.credential`,
     decorators: [],
     access: "public",
     flatten: false,
@@ -1985,34 +1978,29 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       }
     }
     // server parameters
-    const services = Array.isArray(client.service) ? client.service : [client.service];
-    // Multiple services only deal with the first server config
-    const servers = getServers(context.program, services[0]);
+    const servers = getServers(context.program, client.service);
     if (servers !== undefined && servers[0].parameters !== undefined) {
       for (const param of servers[0].parameters.values()) {
         const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param));
         diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
       }
     }
-    for (const service of services) {
-      // versioned enums
-      const versionEnum = context.getPackageVersionEnum().get(service);
-      const versions = context.getPackageVersions().get(service);
-      if (versionEnum) {
-        // create sdk enum for versions enum
-        let sdkVersionsEnum: SdkEnumType;
-        const explicitApiVersions = getExplicitClientApiVersions(context, service);
-        if (explicitApiVersions) {
-          // add additional api versions to the enum
-          sdkVersionsEnum = diagnostics.pipe(
-            getSdkEnumWithDiagnostics(context, explicitApiVersions),
-          );
-        } else {
-          sdkVersionsEnum = diagnostics.pipe(getSdkEnumWithDiagnostics(context, versionEnum));
-        }
-        filterPreviewVersion(context, sdkVersionsEnum, versions?.at(-1) || "");
-        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
+    // versioned enums
+    const [_, versionMap] = getVersions(context.program, client.service);
+    if (versionMap && versionMap.getVersions()[0]) {
+      // create sdk enum for versions enum
+      let sdkVersionsEnum: SdkEnumType;
+      const explicitApiVersions = getExplicitClientApiVersions(context, client.service);
+      if (explicitApiVersions) {
+        // add additional api versions to the enum
+        sdkVersionsEnum = diagnostics.pipe(getSdkEnumWithDiagnostics(context, explicitApiVersions));
+      } else {
+        sdkVersionsEnum = diagnostics.pipe(
+          getSdkEnumWithDiagnostics(context, versionMap.getVersions()[0].enumMember.enum),
+        );
       }
+      filterApiVersionsInEnum(context, client, sdkVersionsEnum);
+      diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
     }
   }
   // update for orphan models/enums/unions

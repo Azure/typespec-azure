@@ -1,6 +1,5 @@
 import type {
   DecoratorContext,
-  DecoratorValidatorCallbacks,
   Enum,
   EnumMember,
   Model,
@@ -19,7 +18,7 @@ import type {
 export type LroStatusDecorator = (
   context: DecoratorContext,
   entity: Enum | Union | ModelProperty,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Identifies a ModelProperty as containing the final location for the operation result.
@@ -31,7 +30,7 @@ export type FinalLocationDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
   finalResult?: Type,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Identifies a model property as containing the location to poll for operation state.
@@ -44,7 +43,7 @@ export type PollingLocationDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
   options?: Type,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Decorator that marks a Version EnumMember as a preview version.
@@ -65,10 +64,7 @@ export type PollingLocationDecorator = (
  * }
  * ```
  */
-export type PreviewVersionDecorator = (
-  context: DecoratorContext,
-  target: EnumMember,
-) => DecoratorValidatorCallbacks | void;
+export type PreviewVersionDecorator = (context: DecoratorContext, target: EnumMember) => void;
 
 /**
  * Used for custom StatusMonitor implementation.
@@ -77,7 +73,7 @@ export type PreviewVersionDecorator = (
 export type LroSucceededDecorator = (
   context: DecoratorContext,
   entity: EnumMember | UnionVariant,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Used for custom StatusMonitor implementation.
@@ -86,7 +82,7 @@ export type LroSucceededDecorator = (
 export type LroCanceledDecorator = (
   context: DecoratorContext,
   entity: EnumMember | UnionVariant,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Used for custom StatusMonitor implementation.
@@ -95,27 +91,21 @@ export type LroCanceledDecorator = (
 export type LroFailedDecorator = (
   context: DecoratorContext,
   entity: EnumMember | UnionVariant,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Used for custom StatusMonitor implementation.
  * Identifies a model property of a StatusMonitor as containing the result
  * of a long-running operation that terminates successfully (Succeeded).
  */
-export type LroResultDecorator = (
-  context: DecoratorContext,
-  entity: ModelProperty,
-) => DecoratorValidatorCallbacks | void;
+export type LroResultDecorator = (context: DecoratorContext, entity: ModelProperty) => void;
 
 /**
  * Used for custom StatusMonitor implementation.
  * Identifies a model property of a StatusMonitor as containing the result
  * of a long-running operation that terminates unsuccessfully (Failed).
  */
-export type LroErrorResultDecorator = (
-  context: DecoratorContext,
-  entity: ModelProperty,
-) => DecoratorValidatorCallbacks | void;
+export type LroErrorResultDecorator = (context: DecoratorContext, entity: ModelProperty) => void;
 
 /**
  * Identifies an operation that is linked to the target operation.
@@ -131,7 +121,7 @@ export type OperationLinkDecorator = (
   linkedOperation: Operation,
   linkType: string,
   parameters?: Type,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Used to define how to call custom polling operations for long-running operations.
@@ -144,7 +134,7 @@ export type PollingOperationParameterDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
   targetParameter?: Type,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Identifies that an operation is a polling operation for an LRO.
@@ -158,7 +148,7 @@ export type PollingOperationDecorator = (
   entity: Operation,
   linkedOperation: Operation,
   parameters?: Type,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Identifies that an operation is the final operation for an LRO.
@@ -172,7 +162,7 @@ export type FinalOperationDecorator = (
   entity: Operation,
   linkedOperation: Operation,
   parameters?: Type,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Overrides the final state value for an operation
@@ -183,7 +173,7 @@ export type UseFinalStateViaDecorator = (
   context: DecoratorContext,
   entity: Operation,
   finalState: "original-uri" | "operation-location" | "location" | "azure-async-operation",
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Specifies that an array model or array-typed property should contain only unique items.
@@ -191,7 +181,7 @@ export type UseFinalStateViaDecorator = (
 export type UniqueItemsDecorator = (
   context: DecoratorContext,
   entity: ModelProperty | Model,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 export type AzureCoreDecorators = {
   lroStatus: LroStatusDecorator;

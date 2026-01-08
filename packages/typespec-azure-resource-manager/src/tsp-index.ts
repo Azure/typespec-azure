@@ -21,9 +21,6 @@ import {
   $armVirtualResource,
   $customAzureResource,
   $extensionResource,
-  $feature,
-  $featureOptions,
-  $features,
   $identifiers,
   $locationResource,
   $resourceBaseType,
@@ -68,8 +65,5 @@ export const $decorators = {
     armOperationRoute: $armOperationRoute,
     armExternalType: $armExternalType,
     renamePathParameter: $renamePathParameter,
-    feature: $feature,
-    features: $features,
-    featureOptions: $featureOptions,
   } satisfies AzureResourceManagerLegacyDecorators,
 };

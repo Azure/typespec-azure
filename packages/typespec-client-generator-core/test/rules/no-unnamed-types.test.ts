@@ -1,11 +1,8 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import {
   BasicTestRunner,
   createLinterRuleTester,
   LinterRuleTester,
 } from "@typespec/compiler/testing";
-import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { beforeEach, describe, it } from "vitest";
 import { noUnnamedTypesRule } from "../../src/rules/no-unnamed-types.rule.js";
 import { createSdkTestRunner } from "../test-host.js";
@@ -14,10 +11,7 @@ let runner: BasicTestRunner;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary, OpenAPITestLibrary],
-    autoImports: ["@azure-tools/typespec-azure-core"],
-  });
+  runner = await createSdkTestRunner();
   tester = createLinterRuleTester(
     runner,
     noUnnamedTypesRule,
@@ -238,49 +232,6 @@ describe("models", () => {
         `,
       )
       .toBeValid();
-  });
-
-  it("anonymous model caused by lro metadata", async () => {
-    const armRunner = await createSdkTestRunner({
-      librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
-      autoImports: ["@azure-tools/typespec-azure-resource-manager"],
-      autoUsings: ["Azure.ResourceManager", "Azure.Core", "Azure.Core.Traits"],
-    });
-    const armTester = createLinterRuleTester(
-      armRunner,
-      noUnnamedTypesRule,
-      "@azure-tools/typespec-client-generator-core",
-    );
-    await armTester
-      .expect(
-        `
-        @armProviderNamespace
-        @service
-        @versioned(Versions)
-        namespace TestClient;
-        enum Versions {
-          @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-          v1: "v1",
-        }
-        model Employee is TrackedResource<EmployeeProperties> {
-          ...ResourceNameParameter<Employee>;
-        }
-        model MoveRequest {
-          targetResourceGroup?: string;
-        }
-        model EmployeeProperties {
-          age?: int32;
-        }
-        op move is ArmResourceActionAsync<Employee, MoveRequest, {@body body: {id?: string}}>;
-        `,
-      )
-      .toEmitDiagnostics([
-        {
-          code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
-          severity: "warning",
-          message: `Anonymous model with generated name "MoveFinalResult" detected. Define this model separately with a proper name to improve code readability and reusability.`,
-        },
-      ]);
   });
 });
 

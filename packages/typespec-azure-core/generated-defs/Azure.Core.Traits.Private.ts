@@ -1,6 +1,5 @@
 import type {
   DecoratorContext,
-  DecoratorValidatorCallbacks,
   EnumMember,
   Interface,
   Model,
@@ -20,7 +19,7 @@ export type ApplyTraitOverrideDecorator = (
   context: DecoratorContext,
   target: Model,
   traitModel: Model,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * `@ensureAllQueryParams` checks the properties of `paramModel` to ensure they all are marked
@@ -33,7 +32,7 @@ export type EnsureAllQueryParamsDecorator = (
   context: DecoratorContext,
   target: Model,
   paramModel: Model,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * `@ensureAllHeaderParams` checks the properties of `paramModel` to ensure they all are marked
@@ -46,7 +45,7 @@ export type EnsureAllHeaderParamsDecorator = (
   context: DecoratorContext,
   target: Model,
   paramModel: Model,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Copies trait properties from `traitModel` into `target` which conform to the
@@ -62,7 +61,7 @@ export type AddTraitPropertiesDecorator = (
   traitModel: Model,
   traitLocation: EnumMember,
   traitContexts: Type,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * `@traitSource` stores the `traitName` of its original trait on the envelope property.
@@ -74,7 +73,7 @@ export type TraitSourceDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   traitName: string,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * `@ensureTraitsPresent` checks the envelope properties of `traitModel` to ensure all
@@ -89,7 +88,7 @@ export type EnsureTraitsPresentDecorator = (
   target: Interface | Operation,
   traitModel: Model,
   expectedTraits: Type,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 export type AzureCoreTraitsPrivateDecorators = {
   applyTraitOverride: ApplyTraitOverrideDecorator;

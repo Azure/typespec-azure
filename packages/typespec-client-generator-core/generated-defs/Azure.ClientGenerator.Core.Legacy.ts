@@ -1,6 +1,5 @@
 import type {
   DecoratorContext,
-  DecoratorValidatorCallbacks,
   Model,
   ModelProperty,
   Numeric,
@@ -53,7 +52,7 @@ export type HierarchyBuildingDecorator = (
   target: Model,
   value: Model,
   scope?: string,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Set whether a model property should be flattened or not.
@@ -76,7 +75,7 @@ export type FlattenPropertyDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   scope?: string,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Forces an operation to be treated as a Long Running Operation (LRO) by the SDK generators,
@@ -112,7 +111,7 @@ export type MarkAsLroDecorator = (
   context: DecoratorContext,
   target: Operation,
   scope?: string,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Specifies the HTTP verb for the next link operation in a paging scenario.
@@ -140,7 +139,7 @@ export type NextLinkVerbDecorator = (
   target: Operation,
   verb: Type,
   scope?: string,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 /**
  * Sets a client-level default value for a model property or operation parameter.
@@ -188,7 +187,7 @@ export type ClientDefaultValueDecorator = (
   target: ModelProperty,
   value: string | boolean | Numeric,
   scope?: string,
-) => DecoratorValidatorCallbacks | void;
+) => void;
 
 export type AzureClientGeneratorCoreLegacyDecorators = {
   hierarchyBuilding: HierarchyBuildingDecorator;

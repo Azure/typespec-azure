@@ -47,6 +47,7 @@ describe("@client", () => {
         name: "MyClient",
         service: MyClient,
         type: MyClient,
+        crossLanguageDefinitionId: "MyClient.MyClient",
         subOperationGroups: [],
       },
     ]);
@@ -67,6 +68,7 @@ describe("@client", () => {
         name: "MyClient",
         service: MyService,
         type: MyClient,
+        crossLanguageDefinitionId: "MyService.MyClient",
         subOperationGroups: [],
       },
     ]);
@@ -181,6 +183,7 @@ describe("listClients without @client", () => {
         name: "MyServiceClient",
         service: MyService,
         type: MyService,
+        crossLanguageDefinitionId: "MyService",
         subOperationGroups: [],
       },
     ]);
@@ -443,6 +446,7 @@ describe("@operationGroup", () => {
         name: "MyServiceClient",
         service: MyService,
         type: MyService,
+        crossLanguageDefinitionId: "MyService",
         subOperationGroups: [],
       },
     ]);
@@ -1460,4 +1464,32 @@ it("operations under namespace or interface without @client or @operationGroup",
   strictEqual(operationGroups.length, 1);
   const operationGroup = operationGroups[0];
   strictEqual(listOperationsInOperationGroup(runner.context, operationGroup).length, 1);
+});
+
+it("multiple @service with @client", async () => {
+  await runner.compile(`
+    @service
+    @client({ name: "MyService1Client" })
+    namespace MyService1 {
+      op foo(): void;
+    }
+
+    @service
+    @client({ name: "MyService2Client" })
+    namespace MyService2 {
+      op bar(): void;
+    }
+
+    @service
+    @client({ name: "MyService3Client" })
+    namespace MyService3 {
+      op bar(): void;
+    }
+  `);
+
+  const clients = listClients(runner.context);
+  deepStrictEqual(clients.length, 3);
+  deepStrictEqual(clients[0].name, "MyService1Client");
+  deepStrictEqual(clients[1].name, "MyService2Client");
+  deepStrictEqual(clients[2].name, "MyService3Client");
 });

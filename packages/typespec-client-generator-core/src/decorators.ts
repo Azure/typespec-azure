@@ -26,8 +26,7 @@ import {
 } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
-import { getAuthentication, getHttpOperation, getServers } from "@typespec/http";
-import { $useDependency, getVersions } from "@typespec/versioning";
+import { getHttpOperation } from "@typespec/http";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
@@ -75,8 +74,6 @@ import {
   findRootSourceProperty,
   getScopedDecoratorData,
   hasExplicitClientOrOperationGroup,
-  isSameAuth,
-  isSameServers,
   listAllUserDefinedNamespaces,
   negationScopesKey,
   omitOperation,
@@ -182,85 +179,17 @@ export const $client: ClientDecorator = (
   const explicitName =
     options?.kind === "Model" ? options?.properties.get("name")?.type : undefined;
   const name: string = explicitName?.kind === "String" ? explicitName.value : target.name;
-  let service: Namespace | Namespace[] | undefined = undefined;
-  const serviceConfig =
-    options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
+  let service = options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
 
-  if (serviceConfig?.kind === "Namespace") {
-    service = serviceConfig;
-  } else if (
-    serviceConfig?.kind === "Tuple" &&
-    serviceConfig.values.every((v) => v.kind === "Namespace")
-  ) {
-    if (target.kind === "Interface") {
-      reportDiagnostic(context.program, {
-        code: "invalid-client-service-multiple",
-        target: context.decoratorTarget,
-      });
-      return;
-    }
-    service = serviceConfig.values;
-    // validate all services has same server definition
-    let servers = undefined;
-    let auth = undefined;
-    let isSame = true;
-    for (const svc of service) {
-      const currentServers = getServers(context.program, svc);
-      if (currentServers === undefined) continue;
-      if (servers === undefined) {
-        servers = currentServers;
-      } else {
-        isSame = isSameServers(servers, currentServers);
-        if (!isSame) {
-          break;
-        }
-      }
-    }
-    for (const svc of service) {
-      const currentAuth = getAuthentication(context.program, svc);
-      if (currentAuth === undefined) continue;
-      if (auth === undefined) {
-        auth = currentAuth;
-      } else {
-        isSame = isSameAuth(auth, currentAuth);
-        if (!isSame) {
-          break;
-        }
-      }
-    }
-    if (!isSame) {
-      reportDiagnostic(context.program, {
-        code: "inconsistent-multiple-service",
-        target: context.decoratorTarget,
-      });
-      return;
-    }
-    // no explicit versioning dependency
-    if (
-      !target.decorators.some(
-        (d) =>
-          d.definition?.name === "@useDependency" &&
-          getNamespaceFullName(d.definition?.namespace) === "TypeSpec.Versioning",
-      )
-    ) {
-      const versionRecords = [];
-      // collect the latest version enum member from each service
-      for (const svc of service) {
-        const versions = getVersions(context.program, svc)[1]?.getVersions();
-        if (versions && versions.length > 0) {
-          versionRecords.push(versions[versions.length - 1].enumMember);
-        }
-      }
-      // set the versioning dependency
-      if (versionRecords.length > 0) {
-        context.call($useDependency, target, ...versionRecords);
-      }
-    }
-  } else {
+  if (service?.kind !== "Namespace") {
     service = findClientService(context.program, target);
   }
 
-  if (service === undefined) {
+  if (
+    service === undefined ||
+    service.kind !== "Namespace" ||
+    !judgeService(context.program, service)
+  ) {
     reportDiagnostic(context.program, {
       code: "client-service",
       format: { name },
@@ -274,6 +203,7 @@ export const $client: ClientDecorator = (
     name,
     service,
     type: target,
+    crossLanguageDefinitionId: `${getNamespaceFullName(service)}.${name}`,
     subOperationGroups: [],
   };
   setScopedDecoratorData(context, $client, clientKey, target, client, scope);
@@ -288,7 +218,10 @@ function judgeService(program: Program, type: Namespace): boolean {
   );
 }
 
-function findClientService(program: Program, client: Namespace | Interface): Namespace | undefined {
+function findClientService(
+  program: Program,
+  client: Namespace | Interface,
+): Namespace | Interface | undefined {
   let current: Namespace | undefined = client as any;
   while (current) {
     if (judgeService(program, current)) {
@@ -368,12 +301,7 @@ export function isOperationGroup(context: TCGCContext, type: Namespace | Interfa
   if (type.kind === "Interface" && !isTemplateDeclaration(type)) {
     return true;
   }
-  if (
-    type.kind === "Namespace" &&
-    !type.decorators.some(
-      (d) => d.definition?.name === "@service" && d.definition?.namespace.name === "TypeSpec",
-    )
-  ) {
+  if (type.kind === "Namespace" && !type.decorators.some((t) => t.decorator.name === "$service")) {
     return true;
   }
   return false;
@@ -801,11 +729,7 @@ export const $override = (
     // Apply the alternate type to the original parameter
     const overrideParam = overrideParams[index];
     overrideParam.decorators
-      .filter(
-        (d) =>
-          d.definition?.name === "@alternateType" &&
-          getNamespaceFullName(d.definition?.namespace) === namespace,
-      )
+      .filter((d) => d.decorator.name === "$alternateType")
       .map((d) =>
         context.call(
           $alternateType,
@@ -1521,15 +1445,8 @@ function isPropertySuperset(target: Model, value: Model): boolean {
     }
     const targetProperty = target.properties.get(name)!;
     const valueProperty = value.properties.get(name)!;
-    // Compare properties to handle envelope/spread semantics correctly
-    // Properties match if they come from the same source OR if they have the same type
-    // This ensures properties from envelopes (e.g., ...ArmTagsProperty) are recognized
-    // as equivalent to directly defined properties with the same name and type
     if (targetProperty.sourceProperty !== valueProperty.sourceProperty) {
-      // Different sources - check if they have the same type
-      if (targetProperty.type !== valueProperty.type) {
-        return false;
-      }
+      return false;
     }
   }
   return true;

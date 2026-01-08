@@ -301,7 +301,7 @@ scalar uuid extends string;
  * 129.144.50.56
  * ```
  */
-#suppress "@azure-tools/typespec-autorest/unknown-format" "Foundation."
+#suppress "@azure-tools/typespec-autorest/invalid-format" "Foundation."
 @format("ipV4Address")
 scalar ipV4Address extends string;
 
@@ -316,7 +316,7 @@ scalar ipV4Address extends string;
  * 2001:db8:3333:4444:CCCC:DDDD:EEEE:FFFF
  * ```
  */
-#suppress "@azure-tools/typespec-autorest/unknown-format" "Foundation."
+#suppress "@azure-tools/typespec-autorest/invalid-format" "Foundation."
 @format("ipV6Address")
 scalar ipV6Address extends string;
 
@@ -332,7 +332,7 @@ scalar ipV6Address extends string;
  * ETag: "675af34563dc-tr34"
  * ```
  */
-#suppress "@azure-tools/typespec-autorest/unknown-format" "Foundation."
+#suppress "@azure-tools/typespec-autorest/invalid-format" "Foundation."
 @format("eTag")
 scalar eTag extends string;
 
