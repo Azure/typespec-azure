@@ -782,6 +782,7 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   const explicitClientNamespaces: Namespace[] = [];
   const explicitServices = new Set<Namespace>();
   listScopedDecoratorData(context, clientKey).forEach((v, k) => {
+    // See all explicit clients that in TypeSpec program
     if (!unsafe_Realm.realmForType.has(k)) {
       const sdkClient = v as SdkClient;
       if (Array.isArray(sdkClient.service)) {
