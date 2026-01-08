@@ -173,11 +173,9 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
             // do not create a new operation group if it already exists
             return;
           }
-          
           const operationService = Array.isArray(clients[0].service)
             ? findService(clients[0].service, k as Operation)
             : clients[0].service;
-          
           if (newOperationGroupWithServices.has(v)) {
             // Add the service to the list if it's not already there
             const services = newOperationGroupWithServices.get(v)!;

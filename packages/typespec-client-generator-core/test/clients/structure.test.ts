@@ -1694,7 +1694,7 @@ it("client location to new operation group with multiple services", async () => 
   strictEqual(client.name, "CombineClient");
   // Root client of multiple services has empty apiVersions
   strictEqual(client.apiVersions.length, 0);
-  
+
   // Find the NewOperationGroup sub-client
   const newOpGroup = client.children!.find((c) => c.name === "NewOperationGroup");
   ok(newOpGroup);
