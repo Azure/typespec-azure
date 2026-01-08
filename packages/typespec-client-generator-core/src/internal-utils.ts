@@ -855,7 +855,6 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
   compilerAssert(subgraph.realm !== null, "Should have a realm after mutation");
   context.__mutatedRealm = subgraph.realm;
-  context.program = subgraph.realm.program;
   return subgraph.type;
 }
 
