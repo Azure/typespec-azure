@@ -46,6 +46,7 @@ import { isStream } from "@typespec/streams";
 import {
   getAccess,
   getAccessOverride,
+  getAlternateType,
   getClientDefaultValue,
   getClientNamespace,
   getExplicitClientApiVersions,
@@ -90,7 +91,6 @@ import {
 import {
   createGeneratedName,
   filterPreviewVersion,
-  getAlternateTypeIfNotExternal,
   getAvailableApiVersions,
   getClientDoc,
   getHttpBodyType,
@@ -160,6 +160,13 @@ export function addEncodeInfo(
   defaultContentType?: string,
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  const alternateType = getAlternateType(context, type);
+  if (
+    alternateType &&
+    (alternateType?.kind === "Scalar" || alternateType?.kind === "ModelProperty")
+  ) {
+    type = alternateType;
+  }
   const innerType = propertyType.kind === "nullable" ? propertyType.type : propertyType;
   const encodeData = getEncode(context.program, type);
   if (innerType.kind === "duration") {
@@ -1081,11 +1088,9 @@ export function getClientTypeWithDiagnostics(
       retval = diagnostics.pipe(getSdkTupleWithDiagnostics(context, type, operation));
       break;
     case "Model":
-      const modelAlternateType = getAlternateTypeIfNotExternal(context, type);
+      const modelAlternateType = getSdkTypeFromAlternateType(context, type, operation);
       if (modelAlternateType) {
-        retval = diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, modelAlternateType, operation),
-        );
+        retval = modelAlternateType;
         break;
       }
       retval = diagnostics.pipe(getSdkArrayOrDictWithDiagnostics(context, type, operation));
@@ -1097,7 +1102,7 @@ export function getClientTypeWithDiagnostics(
       retval = getSdkTypeForIntrinsic(context, type);
       break;
     case "Scalar":
-      const scalarAlternateType = getAlternateTypeIfNotExternal(context, type);
+      const scalarAlternateType = getAlternateType(context, type);
       retval = diagnostics.pipe(
         getSdkDateTimeOrDurationOrBuiltInType(
           context,
@@ -1106,38 +1111,27 @@ export function getClientTypeWithDiagnostics(
       );
       break;
     case "Enum":
-      const enumAlternateType = getAlternateTypeIfNotExternal(context, type);
+      const enumAlternateType = getSdkTypeFromAlternateType(context, type, operation);
       if (enumAlternateType) {
-        retval = diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, enumAlternateType, operation),
-        );
+        retval = enumAlternateType;
         break;
       }
       retval = diagnostics.pipe(getSdkEnumWithDiagnostics(context, type, operation));
       break;
     case "Union":
-      const unionAlternateType = getAlternateTypeIfNotExternal(context, type);
+      const unionAlternateType = getSdkTypeFromAlternateType(context, type, operation);
       if (unionAlternateType) {
-        retval = diagnostics.pipe(
-          getClientTypeWithDiagnostics(context, unionAlternateType, operation),
-        );
+        retval = unionAlternateType;
         break;
       }
       retval = diagnostics.pipe(getSdkUnionWithDiagnostics(context, type, operation));
       break;
     case "ModelProperty":
-      const alternateType = getAlternateTypeIfNotExternal(context, type);
-      retval = diagnostics.pipe(
-        getClientTypeWithDiagnostics(context, alternateType ?? type.type, operation),
-      );
-      const encodeType =
-        alternateType?.kind === "Scalar" || alternateType?.kind === "ModelProperty"
-          ? alternateType
-          : type;
-      if (alternateType?.kind === "Scalar") {
-        diagnostics.pipe(addEncodeInfo(context, encodeType, retval));
-      }
-
+      const alternateType = getSdkTypeFromAlternateType(context, type, operation);
+      retval =
+        alternateType ||
+        diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
+      addEncodeInfo(context, type, retval);
       break;
     case "UnionVariant":
       const unionType = diagnostics.pipe(
@@ -1276,16 +1270,10 @@ export function getSdkModelPropertyTypeBase(
   const diagnostics = createDiagnosticCollector();
   // get api version info so we can cache info about its api versions before we get to property type level
   const apiVersions = getAvailableApiVersions(context, type, operation || type.model);
-  const alternateType = getAlternateTypeIfNotExternal(context, type);
-
-  const propertyType = diagnostics.pipe(
-    getClientTypeWithDiagnostics(context, alternateType ?? type.type, operation),
-  );
-  const encodedType =
-    alternateType?.kind === "Scalar" || alternateType?.kind === "ModelProperty"
-      ? alternateType
-      : type;
-  diagnostics.pipe(addEncodeInfo(context, encodedType, propertyType));
+  const propertyType =
+    getSdkTypeFromAlternateType(context, type, operation) ||
+    diagnostics.pipe(getClientTypeWithDiagnostics(context, type.type, operation));
+  diagnostics.pipe(addEncodeInfo(context, type, propertyType));
   const name = getPropertyNames(context, type)[0];
   const onClient = isOnClient(context, type, operation, apiVersions.length > 0);
   let encode: ArrayKnownEncoding | undefined = undefined;
@@ -2261,4 +2249,16 @@ function hasExplicitlyDefinedJsonSerializationInfo(context: TCGCContext, type: T
     }
   }
   return false;
+}
+
+function getSdkTypeFromAlternateType(
+  context: TCGCContext,
+  type: Enum | Model | ModelProperty | Scalar | Union,
+  operation?: Operation,
+): SdkType | undefined {
+  const alternateType = getAlternateType(context, type);
+  if (!alternateType || alternateType?.kind === "externalTypeInfo") {
+    return undefined;
+  }
+  return ignoreDiagnostics(getClientTypeWithDiagnostics(context, alternateType, operation));
 }
