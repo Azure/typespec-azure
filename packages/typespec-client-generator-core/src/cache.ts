@@ -128,8 +128,10 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
           // Collect all services from the conflicting operation groups
           const services: Namespace[] = [];
           for (const og of operationGroups) {
-            // At this point, og.service is always a single Namespace
-            // because these operation groups were created from individual services
+            // At this point, og.service is always a single Namespace (not an array)
+            // because these operation groups were created from individual services.
+            // The array case only happens for operation groups created via @clientLocation,
+            // which are handled separately and won't be in this map.
             if (!Array.isArray(og.service)) {
               services.push(og.service);
             }
@@ -139,10 +141,11 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
           firstOg.service = services;
           
           // Remove duplicate operation groups from the groups array (keep only the first one)
-          for (let i = 1; i < operationGroups.length; i++) {
-            const index = groups.indexOf(operationGroups[i]);
-            if (index > -1) {
-              groups.splice(index, 1);
+          // Use a Set for efficient lookup of operation groups to remove
+          const operationGroupsToRemove = new Set(operationGroups.slice(1));
+          for (let i = groups.length - 1; i >= 0; i--) {
+            if (operationGroupsToRemove.has(groups[i])) {
+              groups.splice(i, 1);
             }
           }
         }
