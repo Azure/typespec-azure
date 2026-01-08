@@ -40,6 +40,7 @@ export function normalizeOptions(
   const sanitizedOutput = rawOptions?.outputFile?.trim();
   return {
     format,
-    outputFile: sanitizedOutput && sanitizedOutput.length > 0 ? sanitizedOutput : FALLBACK_FILENAMES[format],
+    outputFile:
+      sanitizedOutput && sanitizedOutput.length > 0 ? sanitizedOutput : FALLBACK_FILENAMES[format],
   };
 }

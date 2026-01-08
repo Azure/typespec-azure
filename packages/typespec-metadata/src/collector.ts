@@ -1,4 +1,10 @@
-import { getDoc, getNamespaceFullName, getSummary, type Namespace, type Program } from "@typespec/compiler";
+import {
+  getDoc,
+  getNamespaceFullName,
+  getSummary,
+  type Namespace,
+  type Program,
+} from "@typespec/compiler";
 import { LanguagePackageMetadata, SpecMetadata, SpecNamespaceMetadata } from "./metadata.js";
 
 const PACKAGE_NAME_KEYS = ["package-name", "packageName", "package"];
@@ -12,10 +18,10 @@ function fillVars(value: unknown, data: Record<string, unknown>): unknown {
   if (typeof value !== "string") {
     return value;
   }
-  
+
   let prev: string | undefined;
   let current = value;
-  
+
   while (prev !== current) {
     prev = current;
     current = current.replace(/\{([^{}]+)\}/g, (match, key) => {
@@ -23,16 +29,18 @@ function fillVars(value: unknown, data: Record<string, unknown>): unknown {
       return replacement !== undefined && replacement !== null ? String(replacement) : match;
     });
   }
-  
+
   return current;
 }
 
 /**
  * Extract parameters from compiler options for variable substitution.
  */
-function extractParameters(optionMap: Record<string, Record<string, unknown>>): Record<string, unknown> {
+function extractParameters(
+  optionMap: Record<string, Record<string, unknown>>,
+): Record<string, unknown> {
   const params: Record<string, unknown> = {};
-  
+
   // Check if parameters are defined at the root level
   for (const [key, value] of Object.entries(optionMap)) {
     if (key === "parameters" && typeof value === "object" && value !== null) {
@@ -45,7 +53,7 @@ function extractParameters(optionMap: Record<string, Record<string, unknown>>): 
       }
     }
   }
-  
+
   return params;
 }
 
@@ -66,29 +74,35 @@ interface LanguageParserResult {
   namespace?: string;
 }
 
-type LanguageParser = (options: Record<string, unknown>, params: Record<string, unknown>) => LanguageParserResult;
+type LanguageParser = (
+  options: Record<string, unknown>,
+  params: Record<string, unknown>,
+) => LanguageParserResult;
 
 /**
  * Python-specific metadata parser.
  * Handles package-name and namespace, with fallback conversion between them.
  * Strips implementation-specific suffixes like ._generated from namespaces.
  */
-function parsePython(options: Record<string, unknown>, params: Record<string, unknown>): LanguageParserResult {
+function parsePython(
+  options: Record<string, unknown>,
+  params: Record<string, unknown>,
+): LanguageParserResult {
   let packageName = options["package-name"] ?? options["package_name"];
   let namespace = options["namespace"];
-  
+
   // Strip implementation-specific suffixes from namespace
   if (namespace) {
     namespace = String(namespace).replace(/\._generated$/, "");
   }
-  
+
   // Fallback: derive namespace from package-name
   if (packageName && !namespace) {
     namespace = String(packageName).replace(/-/g, ".");
   } else if (namespace && !packageName) {
     packageName = String(namespace).replace(/\./g, "-");
   }
-  
+
   return {
     packageName: packageName ? String(fillVars(packageName, params)) : undefined,
     namespace: namespace ? String(fillVars(namespace, params)) : undefined,
@@ -99,16 +113,19 @@ function parsePython(options: Record<string, unknown>, params: Record<string, un
  * Java-specific metadata parser.
  * Strips 'com.' prefix from namespace if present for package name derivation.
  */
-function parseJava(options: Record<string, unknown>, params: Record<string, unknown>): LanguageParserResult {
+function parseJava(
+  options: Record<string, unknown>,
+  params: Record<string, unknown>,
+): LanguageParserResult {
   let packageName = options["package-name"] ?? options["package_name"];
-  let namespace = options["namespace"];
-  
+  const namespace = options["namespace"];
+
   if (namespace && !packageName) {
     const ns = String(namespace);
     const stripped = ns.startsWith("com.") ? ns.substring(4) : ns;
     packageName = stripped.replace(/\./g, "-");
   }
-  
+
   return {
     packageName: packageName ? String(fillVars(packageName, params)) : undefined,
     namespace: namespace ? String(fillVars(namespace, params)) : undefined,
@@ -119,16 +136,19 @@ function parseJava(options: Record<string, unknown>, params: Record<string, unkn
  * C#-specific metadata parser.
  * Package name and namespace are typically identical.
  */
-function parseCSharp(options: Record<string, unknown>, params: Record<string, unknown>): LanguageParserResult {
+function parseCSharp(
+  options: Record<string, unknown>,
+  params: Record<string, unknown>,
+): LanguageParserResult {
   let packageName = options["package-name"] ?? options["package_name"];
   let namespace = options["namespace"];
-  
+
   if (packageName && !namespace) {
     namespace = packageName;
   } else if (namespace && !packageName) {
     packageName = namespace;
   }
-  
+
   return {
     packageName: packageName ? String(fillVars(packageName, params)) : undefined,
     namespace: namespace ? String(fillVars(namespace, params)) : undefined,
@@ -139,23 +159,26 @@ function parseCSharp(options: Record<string, unknown>, params: Record<string, un
  * TypeScript-specific metadata parser.
  * Extracts from package-details if available.
  */
-function parseTypeScript(options: Record<string, unknown>, params: Record<string, unknown>): LanguageParserResult {
+function parseTypeScript(
+  options: Record<string, unknown>,
+  params: Record<string, unknown>,
+): LanguageParserResult {
   const packageDetails = options["package-details"];
   let packageName: unknown;
   let namespace: unknown;
-  
+
   if (packageDetails && typeof packageDetails === "object") {
     const details = packageDetails as Record<string, unknown>;
     packageName = details["name"];
     namespace = details["namespace"];
   }
-  
+
   if (packageName && !namespace) {
     namespace = packageName;
   } else if (namespace && !packageName) {
     packageName = namespace;
   }
-  
+
   return {
     packageName: packageName ? String(fillVars(packageName, params)) : undefined,
     namespace: namespace ? String(fillVars(namespace, params)) : undefined,
@@ -166,16 +189,20 @@ function parseTypeScript(options: Record<string, unknown>, params: Record<string
  * Go-specific metadata parser.
  * Extracts from module path, looking for azure-sdk-for-go suffix.
  */
-function parseGo(options: Record<string, unknown>, params: Record<string, unknown>): LanguageParserResult {
+function parseGo(
+  options: Record<string, unknown>,
+  params: Record<string, unknown>,
+): LanguageParserResult {
   let packageName = options["package-name"] ?? options["package_name"];
   let namespace = options["namespace"];
   const module = options["module"];
-  
+
   if (module) {
     const modulePath = String(fillVars(module, params));
     const sdkIndex = modulePath.indexOf("azure-sdk-for-go/");
-    const after = sdkIndex >= 0 ? modulePath.substring(sdkIndex + "azure-sdk-for-go/".length) : modulePath;
-    
+    const after =
+      sdkIndex >= 0 ? modulePath.substring(sdkIndex + "azure-sdk-for-go/".length) : modulePath;
+
     if (!packageName) {
       packageName = after;
     }
@@ -183,7 +210,7 @@ function parseGo(options: Record<string, unknown>, params: Record<string, unknow
       namespace = after;
     }
   }
-  
+
   return {
     packageName: packageName ? String(fillVars(packageName, params)) : undefined,
     namespace: namespace ? String(fillVars(namespace, params)) : undefined,
@@ -194,16 +221,19 @@ function parseGo(options: Record<string, unknown>, params: Record<string, unknow
  * Rust-specific metadata parser.
  * Uses crate-name as the primary identifier.
  */
-function parseRust(options: Record<string, unknown>, params: Record<string, unknown>): LanguageParserResult {
+function parseRust(
+  options: Record<string, unknown>,
+  params: Record<string, unknown>,
+): LanguageParserResult {
   let packageName = options["crate-name"];
   let namespace = options["namespace"];
-  
+
   if (packageName && !namespace) {
     namespace = packageName;
   } else if (namespace && !packageName) {
     packageName = namespace;
   }
-  
+
   return {
     packageName: packageName ? String(fillVars(packageName, params)) : undefined,
     namespace: namespace ? String(fillVars(namespace, params)) : undefined,
@@ -228,20 +258,23 @@ export interface LanguageCollectionResult {
   sourceConfigPath?: string;
 }
 
-export async function collectLanguagePackages(program: Program, baseOutputDir: string): Promise<LanguageCollectionResult> {
+export async function collectLanguagePackages(
+  program: Program,
+  baseOutputDir: string,
+): Promise<LanguageCollectionResult> {
   const optionMap = program.compilerOptions.options ?? {};
   const params = extractParameters(optionMap);
-  
+
   // Extract default service-dir from config file parameters
   let defaultServiceDir: string | undefined;
   const configFile = (program.compilerOptions as any).configFile;
-  if (configFile?.parameters && 'service-dir' in configFile.parameters) {
-    const serviceDirParam = configFile.parameters['service-dir'];
-    if (serviceDirParam && typeof serviceDirParam === 'object' && 'default' in serviceDirParam) {
+  if (configFile?.parameters && "service-dir" in configFile.parameters) {
+    const serviceDirParam = configFile.parameters["service-dir"];
+    if (serviceDirParam && typeof serviceDirParam === "object" && "default" in serviceDirParam) {
       defaultServiceDir = String(serviceDirParam.default);
     }
   }
-  
+
   return {
     languages: buildLanguageMetadata(optionMap, params, baseOutputDir, defaultServiceDir),
     sourceConfigPath: program.compilerOptions.config,
@@ -271,23 +304,20 @@ export function buildSpecMetadata(program: Program): SpecMetadata {
 function isServiceNamespace(ns: Namespace): boolean {
   const fullName = getNamespaceFullName(ns);
   const name = ns.name;
-  
+
   // Filter out standard framework namespaces by exact name match
-  const excludedNamespaces = [
-    "TypeSpec",
-    "Azure",
-  ];
-  
+  const excludedNamespaces = ["TypeSpec", "Azure"];
+
   // Exclude if it's exactly one of the framework namespaces (not a child namespace)
   if (excludedNamespaces.includes(fullName)) {
     return false;
   }
-  
+
   // Also exclude if it's a simple name match (top-level only)
   if (excludedNamespaces.includes(name) && !fullName.includes(".")) {
     return false;
   }
-  
+
   return true;
 }
 
@@ -308,17 +338,23 @@ function buildLanguageMetadata(
     "@azure-tools/typespec-js",
     "@azure-tools/typespec-swift",
   ];
-  
+
   const languagesDict: Record<string, LanguagePackageMetadata> = {};
-  
+
   for (const [emitterName, emitterOptions] of Object.entries(optionMap)) {
     if (includedEmitters.includes(emitterName)) {
-      const metadata = createLanguageMetadata(emitterName, emitterOptions ?? {}, params, baseOutputDir, defaultServiceDir);
+      const metadata = createLanguageMetadata(
+        emitterName,
+        emitterOptions ?? {},
+        params,
+        baseOutputDir,
+        defaultServiceDir,
+      );
       const language = inferLanguageFromEmitterName(emitterName);
       languagesDict[language] = metadata;
     }
   }
-  
+
   return languagesDict;
 }
 
@@ -330,22 +366,23 @@ function createLanguageMetadata(
   defaultServiceDir?: string,
 ): LanguagePackageMetadata {
   const normalizedOptions = normalizeOptionsObject(emitterOptions);
-  
+
   // Extract common options
-  const outputDirRaw = normalizedOptions["emitter-output-dir"] ?? normalizedOptions["emitterOutputDir"];
+  const outputDirRaw =
+    normalizedOptions["emitter-output-dir"] ?? normalizedOptions["emitterOutputDir"];
   const flavor = normalizedOptions["flavor"];
   const languageServiceDir = normalizedOptions["service-dir"];
-  
+
   // Use language-specific service-dir if present, otherwise use default
   const serviceDir = languageServiceDir ? String(languageServiceDir) : defaultServiceDir;
-  
+
   // Use language-specific parser if available
   let packageName: string | undefined;
   let namespace: string | undefined;
-  
+
   const normalizedEmitterName = emitterName.toLowerCase();
   const parser = LANGUAGE_PARSERS[normalizedEmitterName];
-  
+
   if (parser) {
     const result = parser(normalizedOptions, params);
     packageName = result.packageName;
@@ -355,26 +392,26 @@ function createLanguageMetadata(
     packageName = extractOption(normalizedOptions, PACKAGE_NAME_KEYS);
     namespace = extractOption(normalizedOptions, NAMESPACE_KEYS);
   }
-  
+
   // Convert outputDir to use {output-dir} placeholder
   let relativeOutputDir: string | undefined;
   if (outputDirRaw) {
     const absolutePath = String(outputDirRaw);
-    const normalizedBase = baseOutputDir.replace(/\\/g, '/').replace(/\/$/, '');
-    const normalizedPath = absolutePath.replace(/\\/g, '/');
-    
+    const normalizedBase = baseOutputDir.replace(/\\/g, "/").replace(/\/$/, "");
+    const normalizedPath = absolutePath.replace(/\\/g, "/");
+
     // Replace the base output directory with {output-dir} placeholder
-    if (normalizedPath.startsWith(normalizedBase + '/')) {
+    if (normalizedPath.startsWith(normalizedBase + "/")) {
       const relativePart = normalizedPath.substring(normalizedBase.length + 1);
       relativeOutputDir = `{output-dir}/${relativePart}`;
     } else if (normalizedPath === normalizedBase) {
-      relativeOutputDir = '{output-dir}';
+      relativeOutputDir = "{output-dir}";
     } else {
       // If it doesn't start with base, keep as-is
       relativeOutputDir = absolutePath;
     }
   }
-  
+
   return {
     emitterName,
     packageName,
@@ -385,10 +422,14 @@ function createLanguageMetadata(
   };
 }
 
-function createNamespaceMetadata(program: Program, namespaceType: Namespace): SpecNamespaceMetadata {
+function createNamespaceMetadata(
+  program: Program,
+  namespaceType: Namespace,
+): SpecNamespaceMetadata {
   const doc = trimOrUndefined(getDoc(program, namespaceType));
   const summary = trimOrUndefined(getSummary(program, namespaceType));
-  const name = trimOrUndefined(getNamespaceFullName(namespaceType)) ?? namespaceType.name ?? "(global)";
+  const name =
+    trimOrUndefined(getNamespaceFullName(namespaceType)) ?? namespaceType.name ?? "(global)";
 
   return {
     name,
@@ -397,7 +438,9 @@ function createNamespaceMetadata(program: Program, namespaceType: Namespace): Sp
   };
 }
 
-function normalizeOptionsObject(options: Record<string, unknown> | undefined): Record<string, unknown> {
+function normalizeOptionsObject(
+  options: Record<string, unknown> | undefined,
+): Record<string, unknown> {
   if (!options) {
     return {};
   }

@@ -1,10 +1,14 @@
-import { emitFile, type EmitContext, NoTarget, resolvePath } from "@typespec/compiler";
+import { emitFile, NoTarget, resolvePath, type EmitContext } from "@typespec/compiler";
 import { stringify as stringifyYaml } from "yaml";
 import packageJson from "../package.json" with { type: "json" };
-import { collectLanguagePackages, buildSpecMetadata } from "./collector.js";
-import type { MetadataSnapshot } from "./metadata.js";
-import { type MetadataEmitterOptions, normalizeOptions, type NormalizedMetadataEmitterOptions } from "./options.js";
+import { buildSpecMetadata, collectLanguagePackages } from "./collector.js";
 import { reportDiagnostic } from "./lib.js";
+import type { MetadataSnapshot } from "./metadata.js";
+import {
+  normalizeOptions,
+  type MetadataEmitterOptions,
+  type NormalizedMetadataEmitterOptions,
+} from "./options.js";
 
 const SNAPSHOT_VERSION = packageJson.version ?? "0.0.0";
 
@@ -13,7 +17,7 @@ export async function $onEmit(context: EmitContext<MetadataEmitterOptions>): Pro
   const specMetadata = buildSpecMetadata(context.program);
 
   // Get the common tsp-output directory (parent of this emitter's output dir)
-  const commonOutputDir = context.emitterOutputDir.split(/[\/\\]/).slice(0, -2).join('/');
+  const commonOutputDir = context.emitterOutputDir.split(/[/\\]/).slice(0, -2).join("/");
 
   let languageResult: Awaited<ReturnType<typeof collectLanguagePackages>>;
   try {
@@ -44,11 +48,12 @@ async function writeSnapshot(
   options: NormalizedMetadataEmitterOptions,
   snapshot: MetadataSnapshot,
 ): Promise<void> {
-  const serialized = options.format === "json" 
-    ? JSON.stringify(snapshot, null, 2) + "\n" 
-    : stringifyYaml(snapshot, {
-        lineWidth: 0,
-      });
+  const serialized =
+    options.format === "json"
+      ? JSON.stringify(snapshot, null, 2) + "\n"
+      : stringifyYaml(snapshot, {
+          lineWidth: 0,
+        });
   const outputPath = resolvePath(context.emitterOutputDir, options.outputFile);
   await emitFile(context.program, {
     path: outputPath,
