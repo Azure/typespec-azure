@@ -45,7 +45,7 @@
     "test:ci": "vitest run --coverage  --reporter=junit --reporter=default"
   },
   "dependencies": {
-    "yaml": "^2.8.2"
+    "yaml": "~2.8.2"
   },
   "peerDependencies": {
     "@typespec/compiler": "workspace:^"
