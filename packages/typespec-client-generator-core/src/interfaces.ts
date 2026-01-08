@@ -228,6 +228,7 @@ interface ExternalType {
 }
 
 export interface ExternalTypeInfo {
+  kind: "externalTypeInfo";
   identity: string;
   package?: string;
   minVersion?: string;

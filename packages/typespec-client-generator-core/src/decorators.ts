@@ -926,6 +926,7 @@ export const $alternateType: AlternateTypeDecorator = (
       .map((x) => x.value)[0];
 
     alternateInput = {
+      kind: "externalTypeInfo",
       identity,
       package: packageName,
       minVersion,
@@ -946,15 +947,6 @@ export const $alternateType: AlternateTypeDecorator = (
   setScopedDecoratorData(context, $alternateType, alternateTypeKey, source, alternateInput, scope);
 };
 
-export function getAlternateType(
-  context: TCGCContext,
-  source: ModelProperty | Scalar,
-): Scalar | undefined;
-export function getAlternateType(
-  context: TCGCContext,
-  source: ModelProperty | Scalar | Model | Enum | Union,
-): ExternalTypeInfo | undefined;
-
 /**
  * Get the alternate type for a source type in a specific scope.
  *
@@ -971,7 +963,7 @@ export function getAlternateType(
     alternateTypeKey,
     source,
   );
-  if (retval !== undefined && "identity" in retval && !("kind" in retval)) {
+  if (retval !== undefined && retval.kind === "externalTypeInfo") {
     if (!context.__externalPackageToVersions) {
       context.__externalPackageToVersions = new Map();
     }
