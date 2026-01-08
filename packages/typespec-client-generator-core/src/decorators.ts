@@ -957,8 +957,8 @@ export const $alternateType: AlternateTypeDecorator = (
 export function getAlternateType(
   context: TCGCContext,
   source: ModelProperty | Scalar | Model | Enum | Union,
-): Scalar | ExternalTypeInfo | undefined {
-  const retval: Scalar | ExternalTypeInfo | undefined = getScopedDecoratorData(
+): Type | ExternalTypeInfo | undefined {
+  const retval: Type | ExternalTypeInfo | undefined = getScopedDecoratorData(
     context,
     alternateTypeKey,
     source,

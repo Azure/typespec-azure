@@ -1367,14 +1367,3 @@ export interface SdkModelExampleValue extends SdkExampleValueBase {
   value: Record<string, SdkExampleValue>;
   additionalPropertiesValue?: Record<string, SdkExampleValue>;
 }
-
-export function getScalarAlternateType(
-  context: TCGCContext,
-  type: Enum | Model | ModelProperty | Scalar | Union,
-): Scalar | undefined {
-  const alternateType = getAlternateType(context, type);
-  if (alternateType?.kind === "externalTypeInfo") {
-    return undefined;
-  }
-  return alternateType;
-}

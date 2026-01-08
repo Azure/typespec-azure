@@ -9,6 +9,7 @@ import {
   compilerAssert,
   createDiagnosticCollector,
   Diagnostic,
+  Enum,
   getDeprecationDetails,
   getDoc,
   getLifecycleVisibilityEnum,
@@ -28,6 +29,7 @@ import {
   NumericLiteral,
   Operation,
   Program,
+  Scalar,
   StringLiteral,
   Type,
   Union,
@@ -1128,4 +1130,15 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
     }
   }
   return true;
+}
+
+export function getAlternateTypeIfNotExternal(
+  context: TCGCContext,
+  type: Enum | Model | ModelProperty | Scalar | Union,
+): Type | undefined {
+  const alternateType = getAlternateType(context, type);
+  if (alternateType?.kind === "externalTypeInfo") {
+    return undefined;
+  }
+  return alternateType;
 }
