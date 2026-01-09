@@ -1532,7 +1532,9 @@ const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
 /**
  * Collects all properties from a model and its base models up to (but not including) the stopModel.
  * @param model The model to collect properties from
- * @param stopModel Optional model to stop at (properties from this model and its bases are not included)
+ * @param stopModel Optional model to stop at. When provided, properties from this model and its ancestors
+ *                  are excluded from the collection. Only properties from the model and intermediate base
+ *                  models between the model and stopModel are included.
  * @returns A map of property names to properties
  */
 function collectPropertiesIncludingBase(

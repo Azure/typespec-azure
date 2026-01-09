@@ -1863,7 +1863,6 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
       // Keep properties from the target and intermediate models
       // Collect properties to filter: properties from the new base model and its bases
       const propertiesToFilter = new Set<string>();
-      
       // Walk through the inheritance chain starting from the new base model
       let currentModel: Model | undefined = legacyHierarchyBuilding;
       while (currentModel) {
