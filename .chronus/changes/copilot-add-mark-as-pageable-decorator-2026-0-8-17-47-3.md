@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-add `@markAsPageable` decorator.
+Add `@markAsPageable` decorator.

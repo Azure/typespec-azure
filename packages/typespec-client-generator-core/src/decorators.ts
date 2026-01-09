@@ -1638,7 +1638,7 @@ export const $markAsPageable: MarkAsPageableDecorator = (
     (r) =>
       r.type?.kind === "Model" && !(r.statusCodes === "*" || isErrorModel(context.program, r.type)),
   )[0];
-  if (!modelResponse || modelResponse.type?.kind !== "Model") {
+  if (!modelResponse) {
     reportDiagnostic(context.program, {
       code: "invalid-mark-as-pageable-target",
       format: {
