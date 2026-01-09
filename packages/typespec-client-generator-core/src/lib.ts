@@ -446,6 +446,18 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`@markAsLro decorator is ineffective since this operation already returns real LRO metadata. Please remove the @markAsLro decorator.`,
       },
     },
+    "invalid-mark-as-pageable-target": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@markAsPageable decorator can only be applied to operations that return a model with a property decorated with @pageItems or a property named 'value'. We will ignore this decorator.`,
+      },
+    },
+    "mark-as-pageable-ineffective": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@markAsPageable decorator is ineffective since this operation is already marked as pageable with @list decorator. Please remove the @markAsPageable decorator.`,
+      },
+    },
     "api-version-undefined": {
       severity: "warning",
       messages: {
