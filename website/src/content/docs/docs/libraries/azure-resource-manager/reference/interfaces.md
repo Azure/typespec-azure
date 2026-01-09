@@ -1482,7 +1482,7 @@ op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfiguration
 #### `NspConfigurationOperations.Read` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.Read}
 
 ```typespec
-op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.Read(provider: "Microsoft.ThisWillBeReplaced", networkSecurityPerimeterConfigurationName: string): Response | Error
+op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.Read(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
@@ -1497,6 +1497,49 @@ op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfiguration
 | Response             | Optional. The success response for the read operation                                                                    |
 | Error                | Optional. The error response, if non-standard.                                                                           |
 | OverrideResourceName | Optional. The name of the network security perimeter configuration resource being operated on.                           |
+
+#### `NspConfigurationOperations.Action` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.Action}
+
+```typespec
+op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.Action(provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Error
+```
+
+##### Template Parameters
+
+| Name                 | Description                                                                                                              |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| ParentResource       | the parent resource of the NspConfiguration                                                                              |
+| Request              | The request body type                                                                                                    |
+| Response             | The success response for the read operation                                                                              |
+| Resource             | the NspConfiguration resource being read                                                                                 |
+| BaseParameters       | Optional. Allows overriding the operation parameters                                                                     |
+| KeyName              | Optional. The NSP configuration resource name parameter. By default, this is `networkSecurityPerimeterConfigurationName` |
+| Parameters           | Optional. Additional parameters after the path parameters                                                                |
+| Error                | Optional. The error response, if non-standard.                                                                           |
+| OverrideResourceName | Optional. The name of the network security perimeter configuration resource being operated on.                           |
+| OptionalRequestBody  | Optional. Indicates if the request body is optional.                                                                     |
+
+#### `NspConfigurationOperations.ActionAsync` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.ActionAsync}
+
+```typespec
+op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.ActionAsync(provider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Response | Error
+```
+
+##### Template Parameters
+
+| Name                 | Description                                                                                                              |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| ParentResource       | the parent resource of the NspConfiguration                                                                              |
+| Request              | The request body type                                                                                                    |
+| Response             | The success response for the read operation                                                                              |
+| Resource             | the NspConfiguration resource being read                                                                                 |
+| BaseParameters       | Optional. Allows overriding the operation parameters                                                                     |
+| KeyName              | Optional. The NSP configuration resource name parameter. By default, this is `networkSecurityPerimeterConfigurationName` |
+| Parameters           | Optional. Additional parameters after the path parameters                                                                |
+| LroHeaders           | Optional. The LRO headers for the accepted response                                                                      |
+| Error                | Optional. The error response, if non-standard.                                                                           |
+| OverrideResourceName | Optional. The name of the network security perimeter configuration resource being operated on.                           |
+| OptionalRequestBody  | Optional. Indicates if the request body is optional.                                                                     |
 
 #### Examples
 
