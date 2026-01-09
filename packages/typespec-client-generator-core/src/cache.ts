@@ -299,7 +299,9 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       const operations = [];
       
       // Check if this is a merged operation group (has multiple services but still has a type)
-      const mergedTypes = context.__mergedOperationGroupTypes?.get(group);
+      const mergedTypes = group.kind === "SdkOperationGroup" 
+        ? context.__mergedOperationGroupTypes?.get(group)
+        : undefined;
       if (mergedTypes && mergedTypes.length > 0) {
         // For merged operation groups, get operations from all the merged types
         for (const type of mergedTypes) {
