@@ -44,7 +44,6 @@ import {
 } from "@typespec/http";
 import { isStream } from "@typespec/streams";
 import {
-  collectPropertiesIncludingBase,
   getAccess,
   getAccessOverride,
   getAlternateType,
@@ -1862,15 +1861,21 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
 
       // Filter out properties from the new base model (legacyHierarchyBuilding) and its bases
       // Keep properties from the target and intermediate models
-      // Use collectPropertiesIncludingBase to get properties that should remain on the model
-      const propertiesToKeep = collectPropertiesIncludingBase(
-        sdkType.__raw as Model,
-        legacyHierarchyBuilding,
-      );
+      // Collect properties to filter: properties from the new base model and its bases
+      const propertiesToFilter = new Set<string>();
+      // Walk through the inheritance chain starting from the new base model
+      let currentModel: Model | undefined = legacyHierarchyBuilding;
+      while (currentModel) {
+        // Add all properties from the new base and its ancestors
+        for (const propName of currentModel.properties.keys()) {
+          propertiesToFilter.add(propName);
+        }
+        currentModel = currentModel.baseModel;
+      }
 
-      // Filter to only keep properties that should be defined on this model
+      // Filter out properties that should be inherited from the new base model
       sdkType.properties = sdkType.properties.filter((property) => {
-        return property.discriminator || propertiesToKeep.has(property.__raw!.name);
+        return property.discriminator || !propertiesToFilter.has(property.__raw!.name);
       });
     }
   }
