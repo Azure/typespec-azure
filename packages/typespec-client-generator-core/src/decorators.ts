@@ -1597,7 +1597,8 @@ export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
     for (const conflict of conflicts) {
       if (conflict.reason === "missing") {
         reportDiagnostic(context.program, {
-          code: "legacy-hierarchy-building-missing-property",
+          code: "legacy-hierarchy-building-conflict",
+          messageId: "property-missing",
           format: {
             childModel: target.name,
             parentModel: value.name,
@@ -1607,7 +1608,8 @@ export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
         });
       } else if (conflict.reason === "type-mismatch") {
         reportDiagnostic(context.program, {
-          code: "legacy-hierarchy-building-type-mismatch",
+          code: "legacy-hierarchy-building-conflict",
+          messageId: "type-mismatch",
           format: {
             childModel: target.name,
             parentModel: value.name,
@@ -1619,16 +1621,6 @@ export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
         });
       }
     }
-    // Still keep the old generic diagnostic for backwards compatibility with old specs 
-    // that might be filtering on this code
-    reportDiagnostic(context.program, {
-      code: "legacy-hierarchy-building-conflict",
-      format: {
-        childModel: target.name,
-        parentModel: value.name,
-      },
-      target: context.decoratorTarget,
-    });
     return;
   }
 

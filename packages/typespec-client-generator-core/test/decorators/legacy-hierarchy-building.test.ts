@@ -326,15 +326,10 @@ it("conflicting inheritance", async () => {
     `);
 
   // Should warn about missing property with specific details
-  expectDiagnostics(diagnostics, [
-    {
-      code: "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-missing-property",
-      message: "@hierarchyBuilding decorator conflict: Model C is missing property 'propB' that is required by parent model B.",
-    },
-    {
-      code: "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
-    }
-  ]);
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
+    message: "@hierarchyBuilding decorator conflict: Model C is missing property 'propB' that is required by parent model B.",
+  });
 });
 
 it("inheritance override with template models", async () => {
