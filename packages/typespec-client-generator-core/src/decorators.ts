@@ -1531,13 +1531,19 @@ const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
 
 /**
  * Collects all properties from a model and its base models up to (but not including) the stopModel.
+ * This function returns properties that should be defined on the target model when using @hierarchyBuilding.
+ * 
+ * For example, with @hierarchyBuilding(C) on model A that extends B which extends C:
+ * - Returns properties from A and B (but not C)
+ * - These are the properties that should be explicitly defined on A after hierarchy building
+ * 
  * @param model The model to collect properties from
  * @param stopModel Optional model to stop at. When provided, properties from this model and its ancestors
  *                  are excluded from the collection. Only properties from the model and intermediate base
  *                  models between the model and stopModel are included.
- * @returns A map of property names to properties
+ * @returns A map of property names to properties that should be defined on the target model
  */
-function collectPropertiesIncludingBase(
+export function collectPropertiesIncludingBase(
   model: Model,
   stopModel?: Model,
 ): Map<string, ModelProperty> {
@@ -1559,16 +1565,22 @@ function collectPropertiesIncludingBase(
 }
 
 function isPropertySuperset(target: Model, value: Model): boolean {
-  // Collect all properties from target including inherited ones
-  const targetProperties = collectPropertiesIncludingBase(target);
+  // Collect properties that should be defined on target (excluding those from value)
+  // This includes properties from target and intermediate base models
+  const targetPropertiesToDefine = collectPropertiesIncludingBase(target, value);
+  
+  // Collect all properties from value and its bases
+  const valueProperties = collectPropertiesIncludingBase(value);
 
   // Check if all properties in value exist in target (including inherited properties)
-  for (const name of value.properties.keys()) {
-    if (!targetProperties.has(name)) {
+  // We need to check against the full inheritance chain of target
+  const allTargetProperties = collectPropertiesIncludingBase(target);
+  for (const name of valueProperties.keys()) {
+    if (!allTargetProperties.has(name)) {
       return false;
     }
-    const targetProperty = targetProperties.get(name)!;
-    const valueProperty = value.properties.get(name)!;
+    const targetProperty = allTargetProperties.get(name)!;
+    const valueProperty = valueProperties.get(name)!;
     // Compare properties to handle envelope/spread semantics correctly
     // Properties match if they come from the same source OR if they have the same type
     // This ensures properties from envelopes (e.g., ...ArmTagsProperty) are recognized
