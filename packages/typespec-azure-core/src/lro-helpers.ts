@@ -11,6 +11,8 @@ import {
   ignoreDiagnostics,
   type IntrinsicType,
   isNeverType,
+  isUnknownType,
+  isVoidType,
   type Model,
   type ModelProperty,
   type Operation,
@@ -268,10 +270,10 @@ export interface LroMetadata {
   /** The model representing important data returned on a success - clients will want to return this model. If undefined,
    *  then clients would want to return nothing.
    */
-  finalResult?: Model | "void";
+  finalResult?: Model | IntrinsicType | "void";
 
   /** The TypeSpec type of the object that contains the 'finalResult'. */
-  finalEnvelopeResult?: Model | "void";
+  finalEnvelopeResult?: Model | IntrinsicType | "void";
 
   /** The path to the field in the 'finalEnvelopeResult' that contains the 'finalResult'. */
   finalResultPath?: string;
@@ -406,8 +408,10 @@ function createLroMetadata(
       ? context.finalStep.target.name
       : undefined;
 
-  let finalResult: Model | "void" = model.kind === "Model" ? model : "void";
-  let finalEnvelopeResult: Model | "void" = model.kind === "Model" ? model : "void";
+  let finalResult: Model | IntrinsicType | "void" =
+    model.kind === "Model" || (model.kind === "Intrinsic" && !isVoidType(model)) ? model : "void";
+  let finalEnvelopeResult: Model | IntrinsicType | "void" =
+    model.kind === "Model" || (model.kind === "Intrinsic" && !isVoidType(model)) ? model : "void";
   if (context.finalStep && context.finalStep.kind === "pollingSuccessProperty") {
     finalEnvelopeResult = context.pollingStep.responseModel;
   } else if (context.finalStep && context.finalStep.kind === "noPollingResult") {
@@ -866,11 +870,18 @@ function getTargetModelInformation(
   program: Program,
   modelOrLink: OperationLink | Model | IntrinsicType,
 ): [Model | IntrinsicType, ModelProperty | undefined] | undefined {
-  if (modelOrLink.kind === "Intrinsic") return undefined;
+  if (modelOrLink.kind === "Intrinsic") {
+    if (!isUnknownType(modelOrLink)) return undefined;
+    return [modelOrLink, undefined];
+  }
   if (modelOrLink.kind === "link") {
     if (modelOrLink.property === undefined) return undefined;
     const linkModel = resolveOperationLocation(program, modelOrLink.property);
-    if (linkModel === undefined || linkModel.kind === "Intrinsic") return undefined;
+    if (linkModel === undefined) return undefined;
+    if (linkModel.kind === "Intrinsic") {
+      if (!isUnknownType(linkModel)) return undefined;
+      return [linkModel, modelOrLink.property];
+    }
     modelOrLink = linkModel;
   }
 
@@ -884,7 +895,10 @@ function getTargetModelInformation(
     if (result !== undefined) return [result, finalLinkProps[0]];
   }
 
-  if (resultProps && !isNeverType(resultProps.type) && resultProps.type.kind === "Model") {
+  if (
+    (resultProps && !isNeverType(resultProps.type) && resultProps.type.kind === "Model") ||
+    (resultProps?.type.kind === "Intrinsic" && isUnknownType(resultProps.type))
+  ) {
     return [resultProps.type, resultProps];
   }
 

@@ -64,7 +64,7 @@ export interface StatusMonitorPollingLocationInfo extends PollingLocationBase {
   info: StatusMonitorMetadata;
 }
 
-/** Metadata for the STatusMonitor */
+/** Metadata for the StatusMonitor */
 export interface StatusMonitorMetadata {
   /** The model type of the status monitor */
   monitorType: Model;
@@ -183,7 +183,7 @@ function extractStatusMonitorLocationInfo(
   if (statusMonitor === undefined) return undefined;
   statusMonitor.successProperty = finalPropertyValue;
   baseInfo.finalResult =
-    finalPropertyValue?.type?.kind === "Model"
+    finalPropertyValue?.type?.kind === "Model" || finalPropertyValue?.type?.kind === "Intrinsic"
       ? finalPropertyValue.type
       : $(program).intrinsic.void;
   return {

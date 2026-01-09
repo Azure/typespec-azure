@@ -501,7 +501,7 @@ op ArmResourceDeleteSync<
 op ArmResourceActionAsyncBase<
   Resource extends Foundations.SimpleResource,
   Request,
-  Response extends {} | void,
+  Response extends TypeSpec.Reflection.Model | unknown | void,
   BaseParameters extends TypeSpec.Reflection.Model,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
@@ -531,7 +531,7 @@ op ArmResourceActionAsyncBase<
 op ArmResourceActionAsync<
   Resource extends Foundations.SimpleResource,
   Request,
-  Response extends {} | void,
+  Response extends TypeSpec.Reflection.Model | unknown | void,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
@@ -766,7 +766,7 @@ op ArmProviderActionSync<
 @Private.armUpdateProviderNamespace
 op ArmProviderActionAsync<
   Request extends {} | void = void,
-  Response extends {} | void = void,
+  Response extends TypeSpec.Reflection.Model | unknown | void = void,
   Scope extends {} = TenantActionScope,
   Parameters extends {} = {},
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
