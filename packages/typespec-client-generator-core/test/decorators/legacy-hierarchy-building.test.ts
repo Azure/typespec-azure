@@ -586,3 +586,52 @@ it("handles envelope properties correctly", async () => {
   // FooResourceWithHierarchy should have TrackedResource as base
   strictEqual(fooResourceWithHierarchy.baseModel?.name, "TrackedResource");
 });
+
+it("multiple layer inheritance replacement - issue scenario", async () => {
+  await runner.compileWithBuiltInService(`
+      model C {
+        c?: string;
+      }
+
+      model B extends C {
+        b?: string;
+      }
+
+      @Legacy.hierarchyBuilding(C)
+      model A extends B {
+        a?: string;
+      }
+
+      @route("/test")
+      op test(): A;
+    `);
+
+  const models = runner.context.sdkPackage.models;
+  const modelA = models.find((m) => m.name === "A");
+  const modelB = models.find((m) => m.name === "B");
+  const modelC = models.find((m) => m.name === "C");
+
+  ok(modelA);
+  ok(modelB);
+  ok(modelC);
+
+  // A should inherit from C instead of B due to @Legacy.hierarchyBuilding
+  strictEqual(modelA.baseModel?.name, "C");
+  strictEqual(modelB.baseModel?.name, "C");
+
+  // Verify properties:
+  // A should have properties: a (own) and b (from B, since B is skipped in hierarchy)
+  strictEqual(modelA.properties.length, 2);
+  const propA = modelA.properties.find((p) => p.name === "a");
+  const propB = modelA.properties.find((p) => p.name === "b");
+  ok(propA);
+  ok(propB);
+
+  // B should have property b
+  strictEqual(modelB.properties.length, 1);
+  strictEqual(modelB.properties[0].name, "b");
+
+  // C should have property c
+  strictEqual(modelC.properties.length, 1);
+  strictEqual(modelC.properties[0].name, "c");
+});

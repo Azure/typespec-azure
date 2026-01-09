@@ -1859,11 +1859,24 @@ function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Di
         currBaseModel = currBaseModel.baseModel;
       }
 
-      // Filter out legacy hierarchy building properties
+      // Filter out properties from the new base model (legacyHierarchyBuilding) and its bases
+      // Keep properties from the target and intermediate models
+      // Collect properties to filter: properties from the new base model and its bases
+      const propertiesToFilter = new Set<string>();
+      
+      // Walk through the inheritance chain starting from the new base model
+      let currentModel: Model | undefined = legacyHierarchyBuilding;
+      while (currentModel) {
+        // Add all properties from the new base and its ancestors
+        for (const propName of currentModel.properties.keys()) {
+          propertiesToFilter.add(propName);
+        }
+        currentModel = currentModel.baseModel;
+      }
+
+      // Filter out properties that should be inherited from the new base model
       sdkType.properties = sdkType.properties.filter((property) => {
-        return (
-          property.discriminator || !legacyHierarchyBuilding.properties.has(property.__raw!.name)
-        );
+        return property.discriminator || !propertiesToFilter.has(property.__raw!.name);
       });
     }
   }
