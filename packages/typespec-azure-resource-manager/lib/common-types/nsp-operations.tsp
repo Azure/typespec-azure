@@ -44,8 +44,11 @@ model NspConfigurationResource<
  * The name parameter for a network security perimeter configuration.
  * @template KeyName The name of the network security perimeter configuration resource name parameter.
  */
-model NspConfigurationNameParameter<KeyName extends valueof string> {
+@Versioning.added(Versions.v5)
+@Http.Private.includeInapplicableMetadataInPayload(false)
+model NspConfigurationNameParameter<KeyName extends valueof string = "networkSecurityPerimeterConfigurationName"> {
   /** The name for a network security perimeter configuration */
+  @path
   @segment("networkSecurityPerimeterConfigurations")
   @key(KeyName)
   @minLength(1)
@@ -168,7 +171,7 @@ interface NspConfigurationOperations<
     ParentResource extends Foundations.SimpleResource,
     Resource extends NetworkSecurityPerimeterConfiguration = NspConfigurationResourceModel,
     BaseParameters = DefaultBaseParameters<ParentResource>,
-    KeyName extends valueof string = NspConfigurationKeyName,
+    KeyName extends valueof string = "${NspConfigurationKeyName}",
     Parameters extends {} = {},
     Response extends {} = ArmResponse<Resource>,
     Error extends {} = ErrorResponse,
@@ -184,12 +187,14 @@ interface NspConfigurationOperations<
   /**
    * @dev GET a network security perimeter configuration for a particular resource
    * @template ParentResource the parent resource of the NspConfiguration
+   * @template Request The request body type
+   * @template Response The success response for the read operation
    * @template Resource the NspConfiguration resource being read
    * @template BaseParameters Optional. Allows overriding the operation parameters
-   * @template Request Optional. The request body type
+  
    * @template KeyName Optional. The NSP configuration resource name parameter. By default, this is `networkSecurityPerimeterConfigurationName`
    * @template Parameters Optional. Additional parameters after the path parameters
-   * @template Response Optional. The success response for the read operation
+   
    * @template Error Optional. The error response, if non-standard.
    * @template OverrideResourceName Optional. The name of the network security perimeter configuration resource being operated on.
    * @template OptionalRequestBody Optional. Indicates if the request body is optional.
@@ -204,12 +209,12 @@ interface NspConfigurationOperations<
   @builtInResourceOperation(ParentResource, Resource, "action", OverrideResourceName)
   Action<
     ParentResource extends Foundations.SimpleResource,
+    Request,
+    Response,
     Resource extends NetworkSecurityPerimeterConfiguration = NspConfigurationResourceModel,
     BaseParameters = DefaultBaseParameters<ParentResource>,
-    Request extends TypeSpec.Reflection.Model = Resource,
-    KeyName extends valueof string = NspConfigurationKeyName,
-    Parameters extends {} = {},
-    Response extends TypeSpec.Reflection.Model = ArmResponse<Resource>,
+    KeyName extends valueof string = "${NspConfigurationKeyName}",
+    Parameters extends TypeSpec.Reflection.Model = {},
     Error extends TypeSpec.Reflection.Model = ErrorResponse,
     OverrideResourceName extends valueof string = "${ResourceName}",
     OptionalRequestBody extends valueof boolean = false
@@ -226,12 +231,12 @@ interface NspConfigurationOperations<
   /**
    * @dev GET a network security perimeter configuration for a particular resource
    * @template ParentResource the parent resource of the NspConfiguration
+   * @template Request The request body type
+   * @template Response The success response for the read operation
    * @template Resource the NspConfiguration resource being read
    * @template BaseParameters Optional. Allows overriding the operation parameters
-   * @template Request Optional. The request body type
    * @template KeyName Optional. The NSP configuration resource name parameter. By default, this is `networkSecurityPerimeterConfigurationName`
    * @template Parameters Optional. Additional parameters after the path parameters
-   * @template Response Optional. The success response for the read operation
    * @template LroHeaders Optional. The LRO headers for the accepted response
    * @template Error Optional. The error response, if non-standard.
    * @template OverrideResourceName Optional. The name of the network security perimeter configuration resource being operated on.
@@ -247,12 +252,12 @@ interface NspConfigurationOperations<
   @builtInResourceOperation(ParentResource, Resource, "action", OverrideResourceName)
   ActionAsync<
     ParentResource extends Foundations.SimpleResource,
+    Request extends TypeSpec.Reflection.Model,
+    Response extends TypeSpec.Reflection.Model,
     Resource extends NetworkSecurityPerimeterConfiguration = NspConfigurationResourceModel,
     BaseParameters = DefaultBaseParameters<ParentResource>,
-    Request extends TypeSpec.Reflection.Model = Resource,
-    KeyName extends valueof string = NspConfigurationKeyName,
+    KeyName extends valueof string = "${NspConfigurationKeyName}",
     Parameters extends {} = {},
-    Response extends TypeSpec.Reflection.Model = ArmResponse<Resource>,
     LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
       Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
       Response,
