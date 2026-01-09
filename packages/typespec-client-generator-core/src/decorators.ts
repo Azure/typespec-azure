@@ -1530,7 +1530,7 @@ interface PropertyConflict {
 
 function isPropertySuperset(program: Program, target: Model, value: Model): PropertyConflict[] {
   const conflicts: PropertyConflict[] = [];
-  
+
   // Check if all properties in value exist in target
   for (const name of value.properties.keys()) {
     if (!target.properties.has(name)) {
@@ -1542,7 +1542,7 @@ function isPropertySuperset(program: Program, target: Model, value: Model): Prop
     }
     const targetProperty = target.properties.get(name)!;
     const valueProperty = value.properties.get(name)!;
-    
+
     // Compare properties to handle envelope/spread semantics correctly
     // Properties match if they come from the same source OR if they have the same type
     // This ensures properties from envelopes (e.g., ...ArmTagsProperty) are recognized
