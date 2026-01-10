@@ -1529,14 +1529,28 @@ export function getClientLocation(
 
 const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
 
-function isPropertySuperset(target: Model, value: Model): boolean {
+interface PropertyConflict {
+  propertyName: string;
+  reason: "missing" | "type-mismatch";
+  targetType?: string;
+  valueType?: string;
+}
+
+function isPropertySuperset(program: Program, target: Model, value: Model): PropertyConflict[] {
+  const conflicts: PropertyConflict[] = [];
+
   // Check if all properties in value exist in target
   for (const name of value.properties.keys()) {
     if (!target.properties.has(name)) {
-      return false;
+      conflicts.push({
+        propertyName: name,
+        reason: "missing",
+      });
+      continue;
     }
     const targetProperty = target.properties.get(name)!;
     const valueProperty = value.properties.get(name)!;
+
     // Compare properties to handle envelope/spread semantics correctly
     // Properties match if they come from the same source OR if they have the same type
     // This ensures properties from envelopes (e.g., ...ArmTagsProperty) are recognized
@@ -1544,11 +1558,39 @@ function isPropertySuperset(target: Model, value: Model): boolean {
     if (targetProperty.sourceProperty !== valueProperty.sourceProperty) {
       // Different sources - check if they have the same type
       if (targetProperty.type !== valueProperty.type) {
-        return false;
+        conflicts.push({
+          propertyName: name,
+          reason: "type-mismatch",
+          targetType: getTypeName(targetProperty.type),
+          valueType: getTypeName(valueProperty.type),
+        });
       }
     }
   }
-  return true;
+  return conflicts;
+}
+
+function getTypeName(type: Type): string {
+  switch (type.kind) {
+    case "Model":
+      return type.name || "(anonymous model)";
+    case "Scalar":
+      return type.name;
+    case "Union":
+      return type.name || "(anonymous union)";
+    case "Enum":
+      return type.name;
+    case "String":
+      return `"${type.value}"`;
+    case "Number":
+      return type.value.toString();
+    case "Boolean":
+      return type.value.toString();
+    case "Tuple":
+      return "(tuple)";
+    default:
+      return type.kind;
+  }
 }
 
 export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
@@ -1558,15 +1600,35 @@ export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
   scope?: LanguageScopes,
 ) => {
   // Validate that target has all properties from value
-  if (!isPropertySuperset(target, value)) {
-    reportDiagnostic(context.program, {
-      code: "legacy-hierarchy-building-conflict",
-      format: {
-        childModel: target.name,
-        parentModel: value.name,
-      },
-      target: context.decoratorTarget,
-    });
+  const conflicts = isPropertySuperset(context.program, target, value);
+  if (conflicts.length > 0) {
+    for (const conflict of conflicts) {
+      if (conflict.reason === "missing") {
+        reportDiagnostic(context.program, {
+          code: "legacy-hierarchy-building-conflict",
+          messageId: "property-missing",
+          format: {
+            childModel: target.name,
+            parentModel: value.name,
+            propertyName: conflict.propertyName,
+          },
+          target: context.decoratorTarget,
+        });
+      } else if (conflict.reason === "type-mismatch") {
+        reportDiagnostic(context.program, {
+          code: "legacy-hierarchy-building-conflict",
+          messageId: "type-mismatch",
+          format: {
+            childModel: target.name,
+            parentModel: value.name,
+            propertyName: conflict.propertyName,
+            childType: conflict.targetType!,
+            parentType: conflict.valueType!,
+          },
+          target: context.decoratorTarget,
+        });
+      }
+    }
     return;
   }
 
