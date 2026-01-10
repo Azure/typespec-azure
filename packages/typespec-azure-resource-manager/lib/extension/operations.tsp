@@ -29,7 +29,7 @@ op ListByTarget<
   TargetResource extends Foundations.SimpleResource,
   ExtensionResource extends Foundations.SimpleResource,
   Parameters extends {} = {},
-  Response extends TypeSpec.Reflection.Model = ArmResponse<ResourceListResult<ExtensionResource>>,
+  Response extends {} = ArmResponse<ResourceListResult<ExtensionResource>>,
   Error extends {} = ErrorResponse,
   OverrideResourceName extends valueof string = ""
 > is ArmReadOperation<
@@ -57,7 +57,7 @@ op Read<
   TargetResource extends SimpleResource,
   ExtensionResource extends SimpleResource,
   Parameters extends {} = {},
-  Response extends TypeSpec.Reflection.Model = ArmResponse<ExtensionResource>,
+  Response extends {} = ArmResponse<ExtensionResource>,
   Error extends {} = ErrorResponse,
   OverrideResourceName extends valueof string = ""
 > is ArmReadOperation<

@@ -456,7 +456,7 @@ op ArmResourceDeleteAsync<
 op ArmResourceDeleteWithoutOkAsync<
   Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<FinalResult = void> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,

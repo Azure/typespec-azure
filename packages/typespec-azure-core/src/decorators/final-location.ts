@@ -1,9 +1,9 @@
 import {
+  IntrinsicType,
   isNeverType,
   isUnknownType,
   isVoidType,
   type DecoratorContext,
-  type IntrinsicType,
   type Model,
   type ModelProperty,
   type Type,

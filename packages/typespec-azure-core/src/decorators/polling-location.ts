@@ -1,12 +1,13 @@
 import {
   createDiagnosticCollector,
-  type DecoratorContext,
   Diagnostic,
   getEffectiveModelType,
   ignoreDiagnostics,
-  type IntrinsicType,
   isNeverType,
+  isUnknownType,
   isVoidType,
+  type DecoratorContext,
+  type IntrinsicType,
   type Model,
   type ModelProperty,
   type Program,
@@ -218,7 +219,8 @@ export function extractStatusMonitorInfo(
     lroStates: states,
     errorType: errorProperty?.type.kind === "Model" ? errorProperty.type : undefined,
     successType:
-      successProperty?.type?.kind === "Intrinsic" || successProperty?.type?.kind === "Model"
+      (successProperty?.type && isUnknownType(successProperty.type)) ||
+      successProperty?.type?.kind === "Model"
         ? successProperty.type
         : $(program).intrinsic.void,
     terminationInfo: {

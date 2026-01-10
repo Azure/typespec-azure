@@ -18,6 +18,7 @@ import {
   Model,
   ModelProperty,
   Operation,
+  UnknownType,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { createSdkClientType } from "./clients.js";
@@ -402,12 +403,14 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     return undefined;
   }
 
-  let finalEnvelopeResult: SdkModelType | "void" | undefined = undefined;
+  let finalEnvelopeResult: SdkModelType | "void" | SdkType | undefined = undefined;
   const diagnostics = createDiagnosticCollector();
   if (rawMetadata.finalEnvelopeResult === "void") {
     finalEnvelopeResult = "void";
-  } else if (rawMetadata.finalEnvelopeResult) {
+  } else if (rawMetadata.finalEnvelopeResult?.kind === "Model") {
     finalEnvelopeResult = getSdkModel(context, rawMetadata.finalEnvelopeResult);
+  } else if (rawMetadata.finalEnvelopeResult) {
+    finalEnvelopeResult = getSdkBuiltInType(context, rawMetadata.finalEnvelopeResult);
   }
   return {
     __raw: rawMetadata,
@@ -565,7 +568,7 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
       getClientTypeWithDiagnostics(context, rawMetadata.finalEnvelopeResult),
     ) as SdkModelType;
     const result = diagnostics.pipe(
-      getClientTypeWithDiagnostics(context, rawMetadata.finalResult as Model),
+      getClientTypeWithDiagnostics(context, rawMetadata.finalResult as Model | UnknownType),
     ) as SdkModelType;
     const resultPath = rawMetadata.finalResultPath;
     // find the property inside the envelope result using the final result path
