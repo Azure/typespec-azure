@@ -111,11 +111,60 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   // create operation groups for each client
   for (const client of clients) {
     const groups: SdkOperationGroup[] = [];
+    // Track operation group names to detect conflicts in multi-service scenarios
+    const operationGroupNameMap = new Map<string, SdkOperationGroup[]>();
+    // Track merged operation groups and their original types for later operations processing
+    const mergedOperationGroupTypes = new Map<SdkOperationGroup, (Namespace | Interface)[]>();
 
     if (Array.isArray(client.service)) {
       // Multiple services case will auto-merge all the services and add their nested operation groups
       for (const specificService of client.service) {
         createFirstLevelOperationGroup(context, specificService, specificService);
+      }
+      
+      // Merge operation groups with the same name from different services
+      for (const [name, operationGroups] of operationGroupNameMap.entries()) {
+        if (operationGroups.length > 1) {
+          // Multiple operation groups with the same name from different services - merge them
+          const firstOg = operationGroups[0];
+          // Collect all services and types from the conflicting operation groups
+          const services: Namespace[] = [];
+          const types: (Namespace | Interface)[] = [];
+          for (const og of operationGroups) {
+            // At this point, og.service is always a single Namespace (not an array)
+            // because these operation groups were created from individual services.
+            // The array case only happens for operation groups created via `@clientLocation`,
+            // which are handled separately and won't be in this map.
+            if (!Array.isArray(og.service)) {
+              services.push(og.service);
+            }
+            if (og.type) {
+              types.push(og.type);
+            }
+          }
+          
+          // Update the first operation group to have multiple services
+          firstOg.service = services;
+          // Store the merged types for later operations processing
+          mergedOperationGroupTypes.set(firstOg, types);
+          
+          // Remove duplicate operation groups from the groups array (keep only the first one)
+          // Use a Set for efficient lookup of operation groups to remove
+          const operationGroupsToRemove = new Set(operationGroups.slice(1));
+          for (let i = groups.length - 1; i >= 0; i--) {
+            if (operationGroupsToRemove.has(groups[i])) {
+              groups.splice(i, 1);
+            }
+          }
+        }
+      }
+      
+      // Store the merged operation group types mapping in the context for later use
+      if (!context.__mergedOperationGroupTypes) {
+        context.__mergedOperationGroupTypes = new WeakMap();
+      }
+      for (const [og, types] of mergedOperationGroupTypes.entries()) {
+        context.__mergedOperationGroupTypes.set(og, types);
       }
     } else {
       // Single service case needs to use the client type since it could contain customizations
@@ -133,6 +182,14 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
           const og = createOperationGroup(context, subItem, `${client.name}`, service, client);
           if (og) {
             groups.push(og);
+            if (Array.isArray(client.service)) {
+              // Track for conflict detection
+              const ogName = getLibraryName(context, subItem);
+              if (!operationGroupNameMap.has(ogName)) {
+                operationGroupNameMap.set(ogName, []);
+              }
+              operationGroupNameMap.get(ogName)!.push(og);
+            }
           }
         }
         for (const subItem of type.interfaces.values()) {
@@ -143,6 +200,14 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
           const og = createOperationGroup(context, subItem, `${client.name}`, service, client);
           if (og) {
             groups.push(og);
+            if (Array.isArray(client.service)) {
+              // Track for conflict detection
+              const ogName = getLibraryName(context, subItem);
+              if (!operationGroupNameMap.has(ogName)) {
+                operationGroupNameMap.set(ogName, []);
+              }
+              operationGroupNameMap.get(ogName)!.push(og);
+            }
           }
         }
       }
@@ -157,7 +222,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   // create operation group for `@clientLocation` of  string value
   // if no explicit `@client` or `@operationGroup`
   if (!hasExplicitClientOrOperationGroup(context)) {
-    const newOperationGroupWithService = new Map<string, Namespace>();
+    const newOperationGroupWithServices = new Map<string, Namespace[]>();
     listScopedDecoratorData(context, clientLocationKey).forEach((v, k) => {
       // only deal with mutated types or without mutation
       if (
@@ -165,46 +230,56 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         (context.__mutatedRealm && context.__mutatedRealm.hasType(k))
       ) {
         if (typeof v === "string") {
-          if (
-            clients[0].subOperationGroups.some(
-              (og) => og.type && getLibraryName(context, og.type) === v,
-            )
-          ) {
-            // do not create a new operation group if it already exists
-            return;
-          }
-          if (newOperationGroupWithService.has(v)) {
-            if (
-              newOperationGroupWithService.has(v) &&
-              Array.isArray(clients[0].service) &&
-              findService(clients[0].service, k as Operation) !==
-                newOperationGroupWithService.get(v)
-            ) {
-              // multiple services case: need to ensure operations with same client location are from the same service
-              reportDiagnostic(context.program, {
-                code: "client-location-new-operation-group-multi-service",
-                target: k,
-              });
-            }
-            return;
-          }
-
-          newOperationGroupWithService.set(
-            v,
-            Array.isArray(clients[0].service)
-              ? findService(clients[0].service, k as Operation)
-              : clients[0].service,
+          // Check if an operation group with this name already exists
+          const existingOg = clients[0].subOperationGroups.find(
+            (og) => og.type && getLibraryName(context, og.type) === v,
           );
+          
+          if (existingOg) {
+            // Operation group already exists - check if moving this operation would create a multi-service situation
+            const operationService = Array.isArray(clients[0].service)
+              ? findService(clients[0].service, k as Operation)
+              : clients[0].service;
+            
+            // Check if the existing operation group's service matches the operation's service
+            const existingServices = Array.isArray(existingOg.service) 
+              ? existingOg.service 
+              : [existingOg.service];
+            
+            if (!existingServices.includes(operationService)) {
+              // This would create a multi-service operation group - merge the services
+              if (!Array.isArray(existingOg.service)) {
+                existingOg.service = [existingOg.service, operationService];
+              } else if (!existingOg.service.includes(operationService)) {
+                existingOg.service.push(operationService);
+              }
+            }
+            // Operation will be moved to this existing operation group during operations processing
+            return;
+          }
+          
+          const operationService = Array.isArray(clients[0].service)
+            ? findService(clients[0].service, k as Operation)
+            : clients[0].service;
+          if (newOperationGroupWithServices.has(v)) {
+            // Add the service to the list if it's not already there
+            const services = newOperationGroupWithServices.get(v)!;
+            if (!services.includes(operationService)) {
+              services.push(operationService);
+            }
+          } else {
+            newOperationGroupWithServices.set(v, [operationService]);
+          }
         }
       }
     });
 
-    if (newOperationGroupWithService.size > 0) {
-      newOperationGroupWithService.forEach((service, ogName) => {
+    if (newOperationGroupWithServices.size > 0) {
+      newOperationGroupWithServices.forEach((services, ogName) => {
         const og: SdkOperationGroup = {
           kind: "SdkOperationGroup",
           groupPath: `${clients[0].name}.${ogName}`,
-          service: service,
+          service: services.length === 1 ? services[0] : services,
           subOperationGroups: [],
           parent: clients[0],
         };
@@ -222,9 +297,24 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     if (group.type) {
       // operations directly under the group
       const operations = [];
-      if (group.kind === "SdkClient" && Array.isArray(group.service)) {
-        // multi-service client
-        operations.push(...group.service.flatMap((service) => [...service.operations.values()]));
+      
+      // Check if this is a merged operation group (has multiple services but still has a type)
+      const mergedTypes = group.kind === "SdkOperationGroup" 
+        ? context.__mergedOperationGroupTypes?.get(group)
+        : undefined;
+      if (mergedTypes && mergedTypes.length > 0) {
+        // For merged operation groups, get operations from all the merged types
+        for (const type of mergedTypes) {
+          operations.push(...type.operations.values());
+        }
+      } else if (Array.isArray(group.service)) {
+        // multi-service client or operation group (created via @clientLocation)
+        // For clients, get operations from all services
+        // For operation groups without merged types, this handles @clientLocation case
+        if (group.kind === "SdkClient") {
+          operations.push(...group.service.flatMap((service) => [...service.operations.values()]));
+        }
+        // For operation groups created via @clientLocation, operations are added later via the clientLocation processing
       } else {
         // single-service client or operation group
         operations.push(...group.type.operations.values());
