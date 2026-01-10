@@ -19,6 +19,7 @@ import {
   $markAsLro,
   $markAsPageable,
   $nextLinkVerb,
+  $nullFinalStateVia,
   $operationGroup,
   $override,
   $paramAlias,
@@ -64,5 +65,6 @@ export const $decorators = {
     markAsPageable: $markAsPageable,
     nextLinkVerb: $nextLinkVerb,
     clientDefaultValue: $clientDefaultValue,
+    nullFinalStateVia: $nullFinalStateVia,
   } satisfies AzureClientGeneratorCoreLegacyDecorators,
 };

@@ -25,6 +25,7 @@ import {
   getAccess,
   getMarkAsPageable,
   getNextLinkVerb,
+  getNullFinalStateVia,
   getOverriddenClientMethod,
   getResponseAsBool,
   listOperationGroups,
@@ -411,7 +412,7 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
   }
   return {
     __raw: rawMetadata,
-    finalStateVia: rawMetadata.finalStateVia,
+    finalStateVia: getNullFinalStateVia(context, operation) ? undefined : rawMetadata.finalStateVia,
     finalResponse: getFinalResponse(),
     finalStep: getSdkLroServiceFinalStep(context, rawMetadata.finalStep),
     pollingStep: {

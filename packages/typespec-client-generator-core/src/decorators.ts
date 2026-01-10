@@ -61,6 +61,7 @@ import {
   MarkAsLroDecorator,
   MarkAsPageableDecorator,
   NextLinkVerbDecorator,
+  NullFinalStateViaDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
   AccessFlags,
@@ -1792,6 +1793,26 @@ export function getClientDefaultValue(
   entity: ModelProperty,
 ): string | boolean | Numeric | undefined {
   return getScopedDecoratorData(context, clientDefaultValueKey, entity);
+}
+
+const nullFinalStateViaKey = createStateSymbol("nullFinalStateVia");
+
+export const $nullFinalStateVia: NullFinalStateViaDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: LanguageScopes,
+) => {
+  setScopedDecoratorData(context, $nullFinalStateVia, nullFinalStateViaKey, target, true, scope);
+};
+
+/**
+ * Check if an operation is decorated with @nullFinalStateVia.
+ * @param context TCGCContext
+ * @param entity Operation to check for nullFinalStateVia decorator
+ * @returns True if the decorator is applied, false otherwise.
+ */
+export function getNullFinalStateVia(context: TCGCContext, entity: Operation): boolean {
+  return getScopedDecoratorData(context, nullFinalStateViaKey, entity) ?? false;
 }
 
 /**

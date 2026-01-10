@@ -1017,8 +1017,8 @@ interface SdkLroServiceMethodOptions {
 export interface SdkLroServiceMetadata {
   /** LRO metadata from TypeSpec core library */
   __raw: LroMetadata;
-  /** Legacy `finalStateVia` value */
-  finalStateVia: FinalStateValue;
+  /** Legacy `finalStateVia` value. Undefined when @nullFinalStateVia is applied. */
+  finalStateVia?: FinalStateValue;
   /** Polling step metadata */
   pollingStep: SdkLroServicePollingStep;
   /** Final step metadata */
