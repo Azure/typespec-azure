@@ -233,7 +233,7 @@ model EmbeddingVector<Element extends numeric = float32> is Array<Element>;
  */
 model StatusMonitorPollingOptions<
   PollingModel extends TypeSpec.Reflection.Model | void = never,
-  FinalResult extends TypeSpec.Reflection.Model | void = never,
+  FinalResult extends TypeSpec.Reflection.Model | unknown | void = never,
   FinalProperty extends TypeSpec.Reflection.ModelProperty | string = never
 > extends StatusMonitorOptions {
   /** The kind of polling options */
@@ -267,7 +267,7 @@ model PollingOptions {
   pollingModel?: TypeSpec.Reflection.Model | void;
 
   /** The type that is returned when polling terminates successfully. */
-  finalResult?: TypeSpec.Reflection.Model | void;
+  finalResult?: TypeSpec.Reflection.Model | unknown | void;
 }
 
 /** The available kinds of polling options */

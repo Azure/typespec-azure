@@ -1033,8 +1033,8 @@ export interface SdkLroServiceMetadata {
   pollingInfo: SdkPollingOperationStep;
   envelopeResult: SdkModelType;
   logicalPath?: string;
-  finalResult?: SdkModelType | "void";
-  finalEnvelopeResult?: SdkModelType | "void";
+  finalResult?: SdkModelType | SdkType | "void";
+  finalEnvelopeResult?: SdkModelType | SdkType | "void";
   finalResultPath?: string;
 }
 

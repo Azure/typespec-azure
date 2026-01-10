@@ -95,7 +95,7 @@ Available ruleSets:
 Identifies a ModelProperty as containing the final location for the operation result.
 
 ```typespec
-@Azure.Core.finalLocation(finalResult?: Model | void)
+@Azure.Core.finalLocation(finalResult?: Model | unknown | void)
 ```
 
 ##### Target
@@ -104,9 +104,9 @@ Identifies a ModelProperty as containing the final location for the operation re
 
 ##### Parameters
 
-| Name        | Type            | Description                                                                                                                                                        |
-| ----------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| finalResult | `Model \| void` | Sets the expected return value for the final result. Overrides<br />any value provided in the decorated property, if the property uses ResourceLocation<Resource>. |
+| Name        | Type                       | Description                                                                                                                                                        |
+| ----------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| finalResult | `Model \| unknown \| void` | Sets the expected return value for the final result. Overrides<br />any value provided in the decorated property, if the property uses ResourceLocation<Resource>. |
 
 #### `@finalOperation`
 

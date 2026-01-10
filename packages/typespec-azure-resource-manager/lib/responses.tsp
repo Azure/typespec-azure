@@ -198,7 +198,7 @@ model ArmOperationStatus<
 model ArmAsyncOperationHeader<
   StatusMonitor extends {} = ArmOperationStatus,
   UrlValue extends string = string,
-  FinalResult extends {} | void = never
+  FinalResult extends TypeSpec.Reflection.Model | unknown | void = never
 > {
   /** A link to the status monitor */
   @header("Azure-AsyncOperation")
@@ -228,7 +228,7 @@ model ArmAsyncOperationHeader<
  */
 model ArmLroLocationHeader<
   LroPollingOptions extends Azure.Core.PollingOptions = Azure.Core.StatusMonitorPollingOptions<PollingModel = ArmOperationStatus>,
-  FinalResult extends {} | void = void,
+  FinalResult extends TypeSpec.Reflection.Model | unknown | void = void,
   UrlValue extends string = string
 > {
   /** The Location header contains the URL where the status of the long running operation can be checked. */
@@ -255,7 +255,7 @@ model ArmLroLocationHeader<
  */
 model ArmCombinedLroHeaders<
   StatusMonitor extends {} = ArmOperationStatus,
-  FinalResult extends {} | void = void,
+  FinalResult extends TypeSpec.Reflection.Model | unknown | void = void,
   PollingUrlValue extends string = ResourceLocation<StatusMonitor>,
   FinalUrlValue extends string = string
 > {

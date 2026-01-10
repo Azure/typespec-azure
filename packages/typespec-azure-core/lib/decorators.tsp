@@ -75,7 +75,7 @@ namespace Azure.Core {
    * @param finalResult Sets the expected return value for the final result.  Overrides
    * any value provided in the decorated property, if the property uses ResourceLocation<Resource>.
    */
-  extern dec finalLocation(entity: ModelProperty, finalResult?: Model | void);
+  extern dec finalLocation(entity: ModelProperty, finalResult?: Model | unknown | void);
 
   /**
    * Identifies an operation that is linked to the target operation.
