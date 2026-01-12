@@ -465,6 +465,7 @@ it("poll widget", async () => {
   strictEqual(methodResponse.kind, "method");
   strictEqual(methodResponse.type, widgetModel);
   strictEqual(createOrUpdate.response.resultSegments?.length, 1);
+  strictEqual(createOrUpdate.lroMetadata.finalResponse?.envelopeResult.kind, "model");
   strictEqual(
     createOrUpdate.response.resultSegments[0],
     createOrUpdate.lroMetadata.finalResponse?.envelopeResult.properties[3],
