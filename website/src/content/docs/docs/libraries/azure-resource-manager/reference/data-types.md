@@ -2004,7 +2004,7 @@ model Azure.ResourceManager.CommonTypes.Operation
 
 ### `OperationDisplay` {#Azure.ResourceManager.CommonTypes.OperationDisplay}
 
-Localized display information for and operation.
+Localized display information for an operation.
 
 ```typespec
 model Azure.ResourceManager.CommonTypes.OperationDisplay
