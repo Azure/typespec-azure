@@ -205,9 +205,8 @@ export interface DecoratorInfo {
 /**
  * Represents a client in the package.
  */
-export interface SdkClientType<
-  TServiceOperation extends SdkServiceOperation,
-> extends DecoratedType {
+export interface SdkClientType<TServiceOperation extends SdkServiceOperation>
+  extends DecoratedType {
   __raw: SdkClient | SdkOperationGroup;
   kind: "client";
   /** Name of the client. */
@@ -270,9 +269,8 @@ export type SdkType =
   | SdkCredentialType
   | SdkEndpointType;
 
-export interface SdkBuiltInType<
-  TKind extends SdkBuiltInKinds = SdkBuiltInKinds,
-> extends SdkTypeBase {
+export interface SdkBuiltInType<TKind extends SdkBuiltInKinds = SdkBuiltInKinds>
+  extends SdkTypeBase {
   kind: TKind;
   /** How to encode the type on wire. */
   encode?: string;
@@ -474,9 +472,8 @@ export interface SdkEnumType extends SdkTypeBase {
   isUnionAsEnum: boolean;
 }
 
-export interface SdkEnumValueType<
-  TValueType extends SdkTypeBase = SdkBuiltInType,
-> extends SdkTypeBase {
+export interface SdkEnumValueType<TValueType extends SdkTypeBase = SdkBuiltInType>
+  extends SdkTypeBase {
   kind: "enumvalue";
   name: string;
   value: string | number;
@@ -581,9 +578,8 @@ export interface SdkEndpointType extends SdkTypeBase {
   templateArguments: SdkPathParameter[];
 }
 
-export interface SdkModelPropertyTypeBase<
-  TType extends SdkTypeBase = SdkType,
-> extends DecoratedType {
+export interface SdkModelPropertyTypeBase<TType extends SdkTypeBase = SdkType>
+  extends DecoratedType {
   __raw?: ModelProperty;
   /** Parameter type. */
   type: TType;
@@ -675,9 +671,8 @@ export interface BinarySerializationOptions {
 /**
  * Endpoint parameter type for the client.
  */
-export interface SdkEndpointParameter extends SdkModelPropertyTypeBase<
-  SdkEndpointType | SdkUnionType<SdkEndpointType>
-> {
+export interface SdkEndpointParameter
+  extends SdkModelPropertyTypeBase<SdkEndpointType | SdkUnionType<SdkEndpointType>> {
   kind: "endpoint";
   /** Whether do url encode for the endpoint string. */
   urlEncode: boolean;
@@ -689,9 +684,8 @@ export interface SdkEndpointParameter extends SdkModelPropertyTypeBase<
   serializedName?: string;
 }
 
-export interface SdkCredentialParameter extends SdkModelPropertyTypeBase<
-  SdkCredentialType | SdkUnionType<SdkCredentialType>
-> {
+export interface SdkCredentialParameter
+  extends SdkModelPropertyTypeBase<SdkCredentialType | SdkUnionType<SdkCredentialType>> {
   kind: "credential";
   /** Credential parameter is always on client level. */
   onClient: true;
@@ -928,9 +922,8 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
 
 export type SdkServiceOperation = SdkHttpOperation;
 
-interface SdkServiceMethodBase<
-  TServiceOperation extends SdkServiceOperation,
-> extends DecoratedType {
+interface SdkServiceMethodBase<TServiceOperation extends SdkServiceOperation>
+  extends DecoratedType {
   __raw?: Operation;
   name: string;
   /** Whether the type has public or private accessibility */
@@ -962,9 +955,8 @@ interface SdkServiceMethodBase<
 /**
  * Basic method.
  */
-export interface SdkBasicServiceMethod<
-  TServiceOperation extends SdkServiceOperation,
-> extends SdkServiceMethodBase<TServiceOperation> {
+export interface SdkBasicServiceMethod<TServiceOperation extends SdkServiceOperation>
+  extends SdkServiceMethodBase<TServiceOperation> {
   kind: "basic";
 }
 
@@ -1005,8 +997,7 @@ export interface SdkPagingServiceMetadata<TServiceOperation extends SdkServiceOp
  * Paging method.
  */
 export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
-  extends
-    SdkServiceMethodBase<TServiceOperation>,
+  extends SdkServiceMethodBase<TServiceOperation>,
     SdkPagingServiceMethodOptions<TServiceOperation> {
   kind: "paging";
 }
@@ -1171,7 +1162,8 @@ export interface SdkLroServiceFinalResponse {
  * Long running method.
  */
 export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>
-  extends SdkServiceMethodBase<TServiceOperation>, SdkLroServiceMethodOptions {
+  extends SdkServiceMethodBase<TServiceOperation>,
+    SdkLroServiceMethodOptions {
   kind: "lro";
 }
 
@@ -1179,8 +1171,7 @@ export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperati
  * Long running method with paging.
  */
 export interface SdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
-  extends
-    SdkServiceMethodBase<TServiceOperation>,
+  extends SdkServiceMethodBase<TServiceOperation>,
     SdkLroServiceMethodOptions,
     SdkPagingServiceMethodOptions<TServiceOperation> {
   kind: "lropaging";

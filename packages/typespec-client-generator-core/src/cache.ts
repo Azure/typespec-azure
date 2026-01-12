@@ -157,8 +157,8 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         } else {
           // Conflict detected, update the existing operation group to have multiple services
           existingOg.services.push(og.services[0]);
-          // eslint-disable-next-line @typescript-eslint/no-deprecated
-          existingOg.service = existingOg.services; // Update deprecated property
+
+          existingOg.service = existingOg.services; // eslint-disable-line @typescript-eslint/no-deprecated
           existingOg.subOperationGroups.push(...og.subOperationGroups);
           if (existingOg.type !== undefined) {
             mergedOperationGroupTypes.set(existingOg, [existingOg.type!]);
@@ -209,8 +209,8 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
             if (!existingOg.services.includes(operationService)) {
               // This would create a multi-service operation group - merge the services
               existingOg.services.push(operationService);
-              // eslint-disable-next-line @typescript-eslint/no-deprecated
-              existingOg.service = existingOg.services; // Update deprecated property
+
+              existingOg.service = existingOg.services; // eslint-disable-line @typescript-eslint/no-deprecated
             }
             // Operation will be moved to this existing operation group during operations processing
             context.__rawClientsOperationGroupsCache!.set(v, existingOg);
@@ -235,7 +235,6 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         const og: SdkOperationGroup = {
           kind: "SdkOperationGroup",
           groupPath: `${clients[0].name}.${ogName}`,
-          // eslint-disable-next-line @typescript-eslint/no-deprecated
           service: services.length === 1 ? services[0] : services,
           services,
           subOperationGroups: [],
@@ -427,7 +426,6 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
       {
         kind: "SdkClient",
         name: clientName,
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
         service: service,
         services: [service],
         type: service,
@@ -459,8 +457,8 @@ function createOperationGroup(
     operationGroup = getScopedDecoratorData(context, operationGroupKey, type);
     if (operationGroup) {
       operationGroup.groupPath = `${groupPathPrefix}.${getLibraryName(context, type)}`;
-      // eslint-disable-next-line @typescript-eslint/no-deprecated
-      operationGroup.service = service;
+
+      operationGroup.service = service; // eslint-disable-line @typescript-eslint/no-deprecated
       operationGroup.services = [service];
       operationGroup.subOperationGroups = [];
       operationGroup.parent = parent;
@@ -483,7 +481,6 @@ function createOperationGroup(
         kind: "SdkOperationGroup",
         type,
         groupPath: `${groupPathPrefix}.${getLibraryName(context, type)}`,
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
         service: service,
         services: [service],
         subOperationGroups: [],
