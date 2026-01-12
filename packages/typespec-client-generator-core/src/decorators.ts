@@ -280,7 +280,7 @@ export const $client: ClientDecorator = (
   const client: SdkClient = {
     kind: "SdkClient",
     name,
-    // eslint-disable-next-line deprecation/deprecation
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     service: services.length === 1 ? services[0] : services,
     services,
     type: target,
