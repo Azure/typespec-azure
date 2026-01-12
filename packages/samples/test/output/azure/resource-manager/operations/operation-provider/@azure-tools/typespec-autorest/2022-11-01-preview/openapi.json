@@ -481,6 +481,58 @@
         }
       }
     },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.OperationStatusSample/postVmArrayResponse": {
+      "post": {
+        "operationId": "ProviderOperations_PostVmArrayResponse",
+        "tags": [
+          "ProviderOperations"
+        ],
+        "description": "AN array of operation results",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/LogAnalyticsOperationResult"
+              }
+            }
+          },
+          "202": {
+            "description": "Resource operation accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
+    },
     "/subscriptions/{subscriptionId}/providers/Microsoft.OperationStatusSample/postVmSizes": {
       "post": {
         "operationId": "ProviderOperations_PostVmSizes",
@@ -642,6 +694,53 @@
         },
         "x-ms-long-running-operation": true
       }
+    },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.OperationStatusSample/postVmUnknownResponse": {
+      "post": {
+        "operationId": "ProviderOperations_PostVmUnknownResponse",
+        "tags": [
+          "ProviderOperations"
+        ],
+        "description": "An unknown response",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "schema": {}
+          },
+          "202": {
+            "description": "Resource operation accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      }
     }
   },
   "definitions": {
@@ -687,6 +786,12 @@
         "output"
       ]
     },
+    "LogAnalyticsOperationResultArray": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/LogAnalyticsOperationResult"
+      }
+    },
     "VmSize": {
       "type": "object",
       "description": "Represents a virtual machine size",
@@ -720,7 +825,8 @@
       "required": [
         "value"
       ]
-    }
+    },
+    "unknown": {}
   },
   "parameters": {
     "Azure.ResourceManager.ResourceUriParameter": {
