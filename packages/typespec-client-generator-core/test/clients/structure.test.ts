@@ -1698,7 +1698,7 @@ it("client location to new operation group with multiple services", async () => 
   // Find the NewOperationGroup sub-client
   const newOpGroup = client.children!.find((c) => c.name === "NewOperationGroup");
   ok(newOpGroup);
-  
+
   // Sub-client with operations from multiple services should have empty apiVersions
   strictEqual(newOpGroup.apiVersions.length, 0);
   strictEqual(newOpGroup.clientInitialization.parameters.length, 2);
@@ -1710,7 +1710,7 @@ it("client location to new operation group with multiple services", async () => 
   strictEqual(apiVersionParam.clientDefaultValue, undefined);
   // For multi-service operation groups, the api version param type should be string
   strictEqual(apiVersionParam.type.kind, "string");
-  
+
   // NewOperationGroup should have both operations
   strictEqual(newOpGroup.methods.length, 2);
   const aTestMethod = newOpGroup.methods.find((m) => m.name === "aTest");
@@ -1780,7 +1780,7 @@ it("one client from multiple services with operation group name conflict - merge
   strictEqual(apiVersionParam.clientDefaultValue, undefined);
   // For multi-service operation groups, the api version param type should be string
   strictEqual(apiVersionParam.type.kind, "string");
-  
+
   // Should have both methods from both services
   strictEqual(operations.methods.length, 2);
   const aTestMethod = operations.methods.find((m) => m.name === "aTest");
@@ -1833,19 +1833,21 @@ it("client location to existing operation group from different service", async (
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "CombineClient");
-  
+
   // Should have only 1 operation group
   strictEqual(client.children!.length, 1);
-  
+
   // The operation group should now be multi-service (merged)
   const operations = client.children!.find((c) => c.name === "Operations");
   ok(operations);
   // Multi-service operation group should have empty apiVersions
   strictEqual(operations.apiVersions.length, 0);
-  const apiVersionParam = operations.clientInitialization.parameters.find(p => p.isApiVersionParam);
+  const apiVersionParam = operations.clientInitialization.parameters.find(
+    (p) => p.isApiVersionParam,
+  );
   ok(apiVersionParam);
   strictEqual(apiVersionParam.type.kind, "string");
-  
+
   // Should have both methods from both services
   strictEqual(operations.methods.length, 2);
   const aTestMethod = operations.methods.find((m) => m.name === "aTest");
@@ -1900,19 +1902,21 @@ it("merged operation groups with nested operations", async () => {
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "CombineClient");
-  
+
   // Should have only 1 merged operation group
   strictEqual(client.children!.length, 1);
-  
+
   // The merged operation group should have operations from both namespaces
   const operations = client.children!.find((c) => c.name === "Operations");
   ok(operations);
   // Multi-service operation group should have empty apiVersions
   strictEqual(operations.apiVersions.length, 0);
-  const apiVersionParam = operations.clientInitialization.parameters.find(p => p.isApiVersionParam);
+  const apiVersionParam = operations.clientInitialization.parameters.find(
+    (p) => p.isApiVersionParam,
+  );
   ok(apiVersionParam);
   strictEqual(apiVersionParam.type.kind, "string");
-  
+
   // Should have all 4 methods from both services
   strictEqual(operations.methods.length, 4);
   ok(operations.methods.find((m) => m.name === "aTest1"));
@@ -1971,10 +1975,10 @@ it("multiple merged operation groups in same client", async () => {
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "CombineClient");
-  
+
   // Should have 2 merged operation groups
   strictEqual(client.children!.length, 2);
-  
+
   // Check first merged group
   const group1 = client.children!.find((c) => c.name === "Group1");
   ok(group1);
@@ -1982,7 +1986,7 @@ it("multiple merged operation groups in same client", async () => {
   strictEqual(group1.methods.length, 2);
   ok(group1.methods.find((m) => m.name === "opA1"));
   ok(group1.methods.find((m) => m.name === "opB1"));
-  
+
   // Check second merged group
   const group2 = client.children!.find((c) => c.name === "Group2");
   ok(group2);

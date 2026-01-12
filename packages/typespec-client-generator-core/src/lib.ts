@@ -403,13 +403,6 @@ export const $lib = createTypeSpecLibrary({
           "`@clientLocation` could only move operation to the interface or namespace belong to the root namespace with `@service`.",
       },
     },
-    "client-location-duplicate": {
-      severity: "warning",
-      messages: {
-        default:
-          "`@clientLocation`'s target should not duplicate with defined namespace or interface under `@service` namespace.",
-      },
-    },
     "legacy-hierarchy-building-conflict": {
       severity: "warning",
       messages: {

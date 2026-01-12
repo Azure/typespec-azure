@@ -45,7 +45,7 @@ describe("@client", () => {
       {
         kind: "SdkClient",
         name: "MyClient",
-        service: MyClient,
+        services: [MyClient],
         type: MyClient,
         subOperationGroups: [],
       },
@@ -65,7 +65,7 @@ describe("@client", () => {
       {
         kind: "SdkClient",
         name: "MyClient",
-        service: MyService,
+        services: [MyService],
         type: MyClient,
         subOperationGroups: [],
       },
@@ -179,7 +179,7 @@ describe("listClients without @client", () => {
       {
         kind: "SdkClient",
         name: "MyServiceClient",
-        service: MyService,
+        services: [MyService],
         type: MyService,
         subOperationGroups: [],
       },
@@ -206,7 +206,7 @@ describe("@operationGroup", () => {
         kind: "SdkOperationGroup",
         type: MyGroup,
         groupPath: "MyClient.MyGroup",
-        service: MyClient,
+        services: [MyClient],
         subOperationGroups: [],
         parent: client,
       },
@@ -231,7 +231,7 @@ describe("@operationGroup", () => {
         kind: "SdkOperationGroup",
         type: MyGroup,
         groupPath: "MyClient.MyGroup",
-        service: MyClient,
+        services: [MyClient],
         subOperationGroups: [],
         parent: client,
       },
@@ -441,7 +441,7 @@ describe("@operationGroup", () => {
       {
         kind: "SdkClient",
         name: "MyServiceClient",
-        service: MyService,
+        services: [MyService],
         type: MyService,
         subOperationGroups: [],
       },
@@ -757,7 +757,7 @@ describe("listOperationGroups without @client and @operationGroup", () => {
       kind: "SdkOperationGroup",
       type: MyGroup,
       groupPath: "MyClient.MyGroup",
-      service: MyClient,
+      services: [MyClient],
       subOperationGroups: [],
       parent: client,
     });

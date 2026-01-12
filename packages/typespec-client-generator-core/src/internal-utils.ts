@@ -124,7 +124,7 @@ export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean
   const explicitClients = listScopedDecoratorData(context, clientKey);
   let multiServices = false;
   explicitClients.forEach((value) => {
-    if (Array.isArray((value as SdkClient).service)) {
+    if ((value as SdkClient).services.length > 1) {
       multiServices = true;
     }
   });
@@ -787,13 +787,8 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   listScopedDecoratorData(context, clientKey).forEach((v, k) => {
     if (!unsafe_Realm.realmForType.has(k)) {
       const sdkClient = v as SdkClient;
-      if (Array.isArray(sdkClient.service)) {
-        explicitClientNamespaces.push(k as Namespace);
-        sdkClient.service.forEach((s) => explicitServices.add(s));
-      } else {
-        explicitClientNamespaces.push(k as Namespace);
-        explicitServices.add(sdkClient.service);
-      }
+      explicitClientNamespaces.push(k as Namespace);
+      sdkClient.services.forEach((s) => explicitServices.add(s));
     }
   });
 
@@ -1014,11 +1009,11 @@ export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation
   return undefined;
 }
 
-export function getActualClientType(client: SdkClient | SdkOperationGroup): Namespace | Interface | Namespace[] {
+export function getActualClientType(client: SdkClient | SdkOperationGroup): Namespace | Interface {
   if (client.kind === "SdkClient") return client.type;
   if (client.type) return client.type;
-  // Created operation group from `@clientLocation`. May have single or multiple services.
-  return client.service;
+  // Created operation group from `@clientLocation`. May have single or multiple services. Choose the first service for multi-service case.
+  return client.services[0];
 }
 
 export function isSameServers(left: HttpServer[], right: HttpServer[]): boolean {

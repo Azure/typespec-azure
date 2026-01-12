@@ -134,7 +134,7 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
   const diagnostics = createDiagnosticCollector();
   const rawClient = client.__raw;
   // For multiple services, just take the first one to get servers
-  const service = Array.isArray(rawClient.service) ? rawClient.service[0] : rawClient.service;
+  const service = rawClient.services[0];
   const servers = getServers(context.program, service);
   const types: SdkEndpointType[] = [];
 
@@ -250,7 +250,7 @@ function addDefaultClientParameters<
     }
   }
   if (apiVersionParam) {
-    if (Array.isArray(client.__raw.service)) {
+    if (client.__raw.services.length > 1) {
       // for multi-service clients, keep apiVersions empty and no default value
       // and set the type to string instead of a specific enum
       const multipleServiceApiVersionParam = { ...apiVersionParam };

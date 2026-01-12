@@ -69,7 +69,6 @@ export interface TCGCContext {
   >;
   __clientToOperationsCache?: Map<SdkClient | SdkOperationGroup, Operation[]>;
   __operationToClientCache?: Map<Operation, SdkClient | SdkOperationGroup>;
-  __mergedOperationGroupTypes?: WeakMap<SdkOperationGroup, (Namespace | Interface)[]>;
   __clientParametersCache: Map<SdkClient | SdkOperationGroup, SdkMethodParameter[]>;
   __clientApiVersionDefaultValueCache: Map<SdkClient | SdkOperationGroup, string | undefined>;
   __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
@@ -104,7 +103,7 @@ export interface SdkContext<
 export interface SdkClient {
   kind: "SdkClient";
   name: string;
-  service: Namespace | Namespace[];
+  services: Namespace[];
   type: Namespace | Interface;
   subOperationGroups: SdkOperationGroup[];
 }
@@ -114,7 +113,7 @@ export interface SdkOperationGroup {
   type?: Namespace | Interface;
   subOperationGroups: SdkOperationGroup[];
   groupPath: string;
-  service: Namespace | Namespace[];
+  services: Namespace[];
   /** Parent operation group or client. */
   parent?: SdkClient | SdkOperationGroup;
 }

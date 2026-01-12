@@ -246,7 +246,7 @@ namespace CombineClient;
 ```
 
 The resulting `SharedGroup` operation group will have:
+
 - `apiVersions: []`
 - API version parameter with `type.kind === "string"`
 - Operations from both ServiceA and ServiceB
-```

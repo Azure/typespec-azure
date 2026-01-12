@@ -1184,7 +1184,7 @@ function getSdkCredentialType(
     for (const scheme of option.schemes) {
       credentialTypes.push({
         // Multiple services only deal with the first server config
-        __raw: Array.isArray(client.__raw.service) ? client.__raw.service[0] : client.__raw.service,
+        __raw: client.__raw.services[0],
         kind: "credential",
         scheme: scheme,
         decorators: [],
@@ -1193,9 +1193,7 @@ function getSdkCredentialType(
   }
   if (credentialTypes.length > 1) {
     // Multiple services only deal with the first server config
-    const service = Array.isArray(client.__raw.service)
-      ? client.__raw.service[0]
-      : client.__raw.service;
+    const service = client.__raw.services[0];
     return {
       __raw: service,
       kind: "union",
@@ -1218,9 +1216,7 @@ export function getSdkCredentialParameter(
   client: SdkClientType<SdkHttpOperation>,
 ): SdkCredentialParameter | undefined {
   // Multiple services only deal with the first server config
-  const service = Array.isArray(client.__raw.service)
-    ? client.__raw.service[0]
-    : client.__raw.service;
+  const service = client.__raw.services[0];
   const auth = getAuthentication(context.program, service);
   if (!auth) return undefined;
   return {
@@ -1964,16 +1960,15 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       }
     }
     // server parameters
-    const services = Array.isArray(client.service) ? client.service : [client.service];
     // Multiple services only deal with the first server config
-    const servers = getServers(context.program, services[0]);
+    const servers = getServers(context.program, client.services[0]);
     if (servers !== undefined && servers[0].parameters !== undefined) {
       for (const param of servers[0].parameters.values()) {
         const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param));
         diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
       }
     }
-    for (const service of services) {
+    for (const service of client.services) {
       // versioned enums
       const versionEnum = context.getPackageVersionEnum().get(service);
       const versions = context.getPackageVersions().get(service);

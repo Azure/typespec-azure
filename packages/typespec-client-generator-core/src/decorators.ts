@@ -182,12 +182,12 @@ export const $client: ClientDecorator = (
   const explicitName =
     options?.kind === "Model" ? options?.properties.get("name")?.type : undefined;
   const name: string = explicitName?.kind === "String" ? explicitName.value : target.name;
-  let service: Namespace | Namespace[] | undefined = undefined;
+  let services: Namespace[];
   const serviceConfig =
     options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
 
   if (serviceConfig?.kind === "Namespace") {
-    service = serviceConfig;
+    services = [serviceConfig];
   } else if (
     serviceConfig?.kind === "Tuple" &&
     serviceConfig.values.every((v) => v.kind === "Namespace")
@@ -199,12 +199,12 @@ export const $client: ClientDecorator = (
       });
       return;
     }
-    service = serviceConfig.values;
+    services = serviceConfig.values;
     // validate all services has same server definition
     let servers = undefined;
     let auth = undefined;
     let isSame = true;
-    for (const svc of service) {
+    for (const svc of services) {
       const currentServers = getServers(context.program, svc);
       if (currentServers === undefined) continue;
       if (servers === undefined) {
@@ -216,7 +216,7 @@ export const $client: ClientDecorator = (
         }
       }
     }
-    for (const svc of service) {
+    for (const svc of services) {
       const currentAuth = getAuthentication(context.program, svc);
       if (currentAuth === undefined) continue;
       if (auth === undefined) {
@@ -245,7 +245,7 @@ export const $client: ClientDecorator = (
     ) {
       const versionRecords = [];
       // collect the latest version enum member from each service
-      for (const svc of service) {
+      for (const svc of services) {
         const versions = getVersions(context.program, svc)[1]?.getVersions();
         if (versions && versions.length > 0) {
           versionRecords.push(versions[versions.length - 1].enumMember);
@@ -257,22 +257,22 @@ export const $client: ClientDecorator = (
       }
     }
   } else {
-    service = findClientService(context.program, target);
-  }
-
-  if (service === undefined) {
-    reportDiagnostic(context.program, {
-      code: "client-service",
-      format: { name },
-      target: context.decoratorTarget,
-    });
-    return;
+    const service = findClientService(context.program, target);
+    if (service === undefined) {
+      reportDiagnostic(context.program, {
+        code: "client-service",
+        format: { name },
+        target: context.decoratorTarget,
+      });
+      return;
+    }
+    services = [service];
   }
 
   const client: SdkClient = {
     kind: "SdkClient",
     name,
-    service,
+    services,
     type: target,
     subOperationGroups: [],
   };
