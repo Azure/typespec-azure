@@ -399,6 +399,25 @@ it("without polymorphism", async () => {
   // C should inherit from B instead of A due to @Legacy.hierarchyBuilding
   strictEqual(cModel.baseModel?.name, "B");
   strictEqual(bModel.baseModel?.name, "A");
+
+  // Verify properties on each model
+  // A should have property: kind
+  strictEqual(aModel.properties.length, 1);
+  strictEqual(aModel.properties[0].name, "kind");
+
+  // B should have properties: kind, foo
+  strictEqual(bModel.properties.length, 2);
+  const bKind = bModel.properties.find((p) => p.name === "kind");
+  const bFoo = bModel.properties.find((p) => p.name === "foo");
+  ok(bKind);
+  ok(bFoo);
+
+  // C should have properties: kind, bar (foo is inherited from B)
+  strictEqual(cModel.properties.length, 2);
+  const cKind = cModel.properties.find((p) => p.name === "kind");
+  const cBar = cModel.properties.find((p) => p.name === "bar");
+  ok(cKind);
+  ok(cBar);
 });
 
 it("verify respectLegacyHierarchyBuilding: false flag", async () => {
@@ -587,7 +606,7 @@ it("handles envelope properties correctly", async () => {
   strictEqual(fooResourceWithHierarchy.baseModel?.name, "TrackedResource");
 });
 
-it("multiple layer inheritance replacement - issue scenario", async () => {
+it("multiple layer inheritance replacement", async () => {
   await runner.compileWithBuiltInService(`
       model C {
         c?: string;
