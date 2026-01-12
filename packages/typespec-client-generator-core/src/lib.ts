@@ -414,7 +414,7 @@ export const $lib = createTypeSpecLibrary({
       severity: "warning",
       messages: {
         "property-missing": paramMessage`@hierarchyBuilding decorator conflict: Model ${"childModel"} is missing property '${"propertyName"}' that is required by parent model ${"parentModel"}.`,
-        "type-mismatch": paramMessage`@hierarchyBuilding decorator conflict: Property '${"propertyName"}' in model ${"childModel"} has type '${"childType"}', but parent model ${"parentModel"} expects type '${"parentType"}'.`,
+        "type-mismatch": paramMessage`@hierarchyBuilding decorator conflict: Property '${"propertyName"}' in model ${"childModel"} has a different type than parent model ${"parentModel"} expects.`,
       },
     },
     "legacy-hierarchy-building-circular-reference": {

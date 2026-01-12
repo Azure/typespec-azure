@@ -1524,8 +1524,6 @@ const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
 interface PropertyConflict {
   propertyName: string;
   reason: "missing" | "type-mismatch";
-  targetType?: string;
-  valueType?: string;
 }
 
 function isPropertySuperset(program: Program, target: Model, value: Model): PropertyConflict[] {
@@ -1553,36 +1551,11 @@ function isPropertySuperset(program: Program, target: Model, value: Model): Prop
         conflicts.push({
           propertyName: name,
           reason: "type-mismatch",
-          targetType: getTypeName(targetProperty.type),
-          valueType: getTypeName(valueProperty.type),
         });
       }
     }
   }
   return conflicts;
-}
-
-function getTypeName(type: Type): string {
-  switch (type.kind) {
-    case "Model":
-      return type.name || "(anonymous model)";
-    case "Scalar":
-      return type.name;
-    case "Union":
-      return type.name || "(anonymous union)";
-    case "Enum":
-      return type.name;
-    case "String":
-      return `"${type.value}"`;
-    case "Number":
-      return type.value.toString();
-    case "Boolean":
-      return type.value.toString();
-    case "Tuple":
-      return "(tuple)";
-    default:
-      return type.kind;
-  }
 }
 
 export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
@@ -1614,8 +1587,6 @@ export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
             childModel: target.name,
             parentModel: value.name,
             propertyName: conflict.propertyName,
-            childType: conflict.targetType!,
-            parentType: conflict.valueType!,
           },
           target: context.decoratorTarget,
         });
