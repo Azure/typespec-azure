@@ -39,7 +39,7 @@ export function validateFinalState(
   finalState: FinalStateValue,
 ): FinalStateValue | undefined {
   if (finalState === FinalStateValue.originalUri) {
-    if (operation.verb !== "put") {
+    if (operation.verb !== "put" && operation.verb !== "patch") {
       reportDiagnostic(program, {
         code: "invalid-final-state",
         target: operation.operation,
