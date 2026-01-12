@@ -6,15 +6,15 @@ import "@typespec/http";
 using Spector;
 using Http;
 
-@route("/azure/client-generator-core/client-initialization")
-namespace _Specs_.Azure.ClientGenerator.Core.ClientInitialization;
+@route("/azure/client-generator-core/client-initialization/default")
+namespace _Specs_.Azure.ClientGenerator.Core.ClientInitialization.DefaultClient;
 
-@@global.Azure.ClientGenerator.Core.clientNamespace(_Specs_.Azure.ClientGenerator.Core.ClientInitialization,
-  "azure.clientgenerator.core.clientinitialization",
+@@global.Azure.ClientGenerator.Core.clientNamespace(_Specs_.Azure.ClientGenerator.Core.ClientInitialization.DefaultClient,
+  "azure.clientgenerator.core.clientinitialization.defaultclient",
   "java"
 );
 @@global.Azure.ClientGenerator.Core.clientNamespace(Service,
-  "azure.clientgenerator.core.clientinitialization",
+  "azure.clientgenerator.core.clientinitialization.defaultclient",
   "java"
 );
 
@@ -44,6 +44,11 @@ model PathParamClientOptions {
 model ParamAliasClientOptions {
   @doc("Blob name for the client.")
   @global.Azure.ClientGenerator.Core.paramAlias("blob")
+  blobName: string;
+}
+
+model DefaultQueryParamClientOptions {
+  @doc("The blob name to use for operations")
   blobName: string;
 }
 
@@ -200,47 +205,36 @@ interface ParamAlias {
   withOriginalName is Service.ParamAlias.withOriginalName;
 }
 
+// Scenario 6: Query parameter moved to client level
+@scenarioDoc("""
+  Client for testing query parameter moved to client level.
+  
+  Parameters elevated to client level:
+  - blobName: "test-blob" (query parameter)
+  
+  Expected client usage:
+  ```ts
+  const client = new QueryParamClient({
+    blobName: "test-blob"
+  });
+  
+  // Operations don't need blobName parameter
+  client.withQuery(format: "text");
+  client.getStandalone();
+  client.deleteStandalone();
+  ```
+  """)
+@scenario
 @global.Azure.ClientGenerator.Core.client({
-  name: "ParentClient",
+  name: "QueryParamClient",
   service: Service,
 })
-namespace ParentClient {
-  @scenarioDoc("""
-    Client for testing a path parameter (blobName) moved to client level, in child client.
-    
-    The child client can be initialized individually, or via its parent client.
-    
-    Parameters elevated to client level:
-    - blobName: "sample-blob" (path parameter)
-    
-    Expected client usage:
-    ```ts
-    // via ParentClient
-    const client = new ParentClient.getChildClient({
-      blobName: "sample-blob"
-    });
-    
-    // directly
-    const client = new ChildClient({
-      blobName: "sample-blob"
-    });
-    
-    // No need to pass blobName to any operations
-    client.withQuery(format: "text");  
-    client.getStandalone();
-    client.deleteStandalone();
-    ```
-    """)
-  @scenario
-  @global.Azure.ClientGenerator.Core.operationGroup
-  @global.Azure.ClientGenerator.Core.clientInitialization({
-    parameters: PathParamClientOptions,
-    initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
-  })
-  @route("/child-client")
-  interface ChildClient {
-    withQuery is Service.ChildClient.withQuery;
-    getStandalone is Service.ChildClient.getStandalone;
-    deleteStandalone is Service.ChildClient.deleteStandalone;
-  }
+@global.Azure.ClientGenerator.Core.clientInitialization({
+  parameters: DefaultQueryParamClientOptions,
+})
+@route("/query")
+interface QueryParam {
+  withQuery is Service.QueryParam.withQuery;
+  getStandalone is Service.QueryParam.getStandalone;
+  deleteStandalone is Service.QueryParam.deleteStandalone;
 }
