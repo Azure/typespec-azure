@@ -1929,6 +1929,26 @@ model Azure.ResourceManager.CommonTypes.NetworkSecurityProfile
 | diagnosticSettingsVersion? | `int32`                                    | Current diagnostic settings version     |
 | enabledLogCategories?      | `string[]`                                 | List of log categories that are enabled |
 
+### `NspConfigurationNameParameter` {#Azure.ResourceManager.CommonTypes.NspConfigurationNameParameter}
+
+The name parameter for a network security perimeter configuration.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.NspConfigurationNameParameter<KeyName>
+```
+
+#### Template Parameters
+
+| Name    | Description                                                                       |
+| ------- | --------------------------------------------------------------------------------- |
+| KeyName | The name of the network security perimeter configuration resource name parameter. |
+
+#### Properties
+
+| Name                                      | Type     | Description                                             |
+| ----------------------------------------- | -------- | ------------------------------------------------------- |
+| networkSecurityPerimeterConfigurationName | `string` | The name for a network security perimeter configuration |
+
 ### `NspConfigurationResource` {#Azure.ResourceManager.CommonTypes.NspConfigurationResource}
 
 Network security perimeter (NSP) configuration resource. Providers must instantiate an instance of this resource in their

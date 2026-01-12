@@ -1643,10 +1643,6 @@ it("error: multiple explicit clients with multiple services", async () => {
       code: "@azure-tools/typespec-client-generator-core/multiple-explicit-clients-multiple-services",
       message: "Can not define multiple explicit clients with multiple services.",
     },
-    {
-      code: "@azure-tools/typespec-client-generator-core/multiple-explicit-clients-multiple-services",
-      message: "Can not define multiple explicit clients with multiple services.",
-    },
   ]);
 });
 

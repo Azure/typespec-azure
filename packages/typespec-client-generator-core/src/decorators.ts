@@ -10,6 +10,7 @@ import {
   ignoreDiagnostics,
   Interface,
   isErrorModel,
+  isList,
   isNumeric,
   isService,
   isTemplateDeclaration,
@@ -26,7 +27,13 @@ import {
 } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
-import { getAuthentication, getHttpOperation, getServers } from "@typespec/http";
+import {
+  getAuthentication,
+  getHttpOperation,
+  getServers,
+  isBody,
+  isBodyRoot,
+} from "@typespec/http";
 import { $useDependency, getVersions } from "@typespec/versioning";
 import {
   AccessDecorator,
@@ -52,6 +59,7 @@ import {
   FlattenPropertyDecorator,
   HierarchyBuildingDecorator,
   MarkAsLroDecorator,
+  MarkAsPageableDecorator,
   NextLinkVerbDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
@@ -1618,6 +1626,117 @@ export const $markAsLro: MarkAsLroDecorator = (
 
 export function getMarkAsLro(context: TCGCContext, entity: Operation): boolean {
   return getScopedDecoratorData(context, markAsLroKey, entity) ?? false;
+}
+
+const markAsPageableKey = createStateSymbol("markAsPageable");
+
+export const $markAsPageable: MarkAsPageableDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: LanguageScopes,
+) => {
+  const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, target));
+  const modelResponse = httpOperation.responses.filter(
+    (r) =>
+      r.type?.kind === "Model" && !(r.statusCodes === "*" || isErrorModel(context.program, r.type)),
+  )[0];
+  if (!modelResponse) {
+    reportDiagnostic(context.program, {
+      code: "invalid-mark-as-pageable-target",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+
+  // Check if already marked with @list decorator
+  if (isList(context.program, target)) {
+    reportDiagnostic(context.program, {
+      code: "mark-as-pageable-ineffective",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+
+  // Check the response model for @pageItems decorator
+  const responseType = getRealResponseModel(context.program, modelResponse.type as Model);
+  if (responseType.kind !== "Model") {
+    reportDiagnostic(context.program, {
+      code: "invalid-mark-as-pageable-target",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+
+  // Check if any property has @pageItems decorator by checking the program state
+  // The @pageItems decorator uses a state symbol "TypeSpec.pageItems"
+  const pageItemsStateKey = Symbol.for("TypeSpec.pageItems");
+  let itemsProperty: ModelProperty | undefined = undefined;
+  for (const [, prop] of responseType.properties) {
+    if (context.program.stateSet(pageItemsStateKey).has(prop)) {
+      itemsProperty = prop;
+      break;
+    }
+  }
+
+  if (!itemsProperty) {
+    // Try to find a property named "value"
+    itemsProperty = responseType.properties.get("value");
+    if (!itemsProperty) {
+      // No @pageItems property and no "value" property found
+      reportDiagnostic(context.program, {
+        code: "invalid-mark-as-pageable-target",
+        format: {
+          operation: target.name,
+        },
+        target: context.decoratorTarget,
+      });
+      return;
+    }
+  }
+
+  // Store metadata that will be checked by TCGC to treat this operation as pageable
+  setScopedDecoratorData(
+    context,
+    $markAsPageable,
+    markAsPageableKey,
+    target,
+    { itemsProperty },
+    scope,
+  );
+};
+
+export function getMarkAsPageable(
+  context: TCGCContext,
+  entity: Operation,
+): MarkAsPageableInfo | undefined {
+  return getScopedDecoratorData(context, markAsPageableKey, entity);
+}
+
+export interface MarkAsPageableInfo {
+  itemsProperty: ModelProperty;
+}
+
+function getRealResponseModel(program: Program, responseModel: Model): Type {
+  let bodyProperty: ModelProperty | undefined = undefined;
+  for (const prop of responseModel.properties.values()) {
+    if (isBody(program, prop) || isBodyRoot(program, prop)) {
+      bodyProperty = prop;
+      break;
+    }
+  }
+  if (bodyProperty) {
+    return bodyProperty.type;
+  }
+  return responseModel;
 }
 
 const nextLinkVerbKey = createStateSymbol("nextLinkVerb");
