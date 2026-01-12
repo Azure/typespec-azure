@@ -1,5 +1,50 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.63.3
+
+### Bug Fixes
+
+- [#3700](https://github.com/Azure/typespec-azure/pull/3700) Fix wrong filtering of preview version value in version enum.
+
+
+## 0.63.2
+
+### Bug Fixes
+
+- [#3687](https://github.com/Azure/typespec-azure/pull/3687) Fix `@hierarchyBuilding` decorator to recognize envelope properties.
+
+
+## 0.63.1
+
+### Features
+
+- [#3617](https://github.com/Azure/typespec-azure/pull/3617) Add support for a single client from multiple services
+
+
+## 0.63.0
+
+### Breaking Changes
+
+- [#3493](https://github.com/Azure/typespec-azure/pull/3493) Add `optional` property to `SdkMethodResponse` to distinguish responses without body from nullable body types.
+- [#3495](https://github.com/Azure/typespec-azure/pull/3495) Filter read-only parameters from `SdkServiceMethod` parameters. Read-only parameters (those with `@visibility(Lifecycle.Read))` are now correctly excluded from method signatures since they cannot be set by the user.
+
+### Features
+
+- [#3625](https://github.com/Azure/typespec-azure/pull/3625) Add `@clientDefaultValue` decorator in Legacy namespace to support brownfield services that need to maintain backward compatibility with existing SDK default values from Swagger definitions.
+- [#3583](https://github.com/Azure/typespec-azure/pull/3583) Support array encode on model property.
+- [#3494](https://github.com/Azure/typespec-azure/pull/3494) Add `methodParameterSegments` property to replace `correspondingMethodParams` with complete path segments.
+- [#3596](https://github.com/Azure/typespec-azure/pull/3596) Extend `@scope` decorator usage to `ModelProperty` targets.
+- [#3496](https://github.com/Azure/typespec-azure/pull/3496) Support `@convenientAPI` and `@protocolAPI` decorators at namespace/interface level to enable decorator inheritance for all contained operations with explicit override support at the operation level.
+
+### Bump dependencies
+
+- [#3546](https://github.com/Azure/typespec-azure/pull/3546) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3498](https://github.com/Azure/typespec-azure/pull/3498) Fix incorrect usage flags being set on types when `@alternateType` is applied to operation parameters. When a parameter has `@alternateType`, the original type should not receive usage flags since it's being replaced by the alternate type. This fix ensures the usage value correctly reflects that the original type is not used (Usage = 0/None).
+
+
 ## 0.62.0
 
 ### Features

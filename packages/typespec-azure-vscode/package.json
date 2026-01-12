@@ -3,13 +3,13 @@
   "displayName": "typespec azure",
   "description": "the extension for azure typespec",
   "publisher": "typespec",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Azure/typespec-azure.git"
   },
   "engines": {
-    "vscode": "^1.106.0"
+    "vscode": "^1.107.0"
   },
   "extensionDependencies": [
     "typespec.typespec-vscode"
@@ -35,9 +35,9 @@
     "lint:fix": "eslint . --fix "
   },
   "devDependencies": {
-    "@types/node": "~24.10.1",
-    "@types/vscode": "~1.106.1",
-    "@vscode/vsce": "~3.7.0",
+    "@types/node": "~25.0.2",
+    "@types/vscode": "~1.107.0",
+    "@vscode/vsce": "~3.7.1",
     "esbuild": "^0.27.0",
     "typescript": "~5.9.2"
   }

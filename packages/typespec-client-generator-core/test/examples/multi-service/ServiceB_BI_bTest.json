@@ -1,0 +1,12 @@
+{
+  "operationId": "BI_bTest",
+  "title": "Test operation from ServiceB",
+  "parameters": {
+    "api-version": "bv2"
+  },
+  "responses": {
+    "200": {
+      "body": "ServiceB response"
+    }
+  }
+}

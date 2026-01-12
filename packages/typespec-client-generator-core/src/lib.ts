@@ -446,16 +446,47 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`@markAsLro decorator is ineffective since this operation already returns real LRO metadata. Please remove the @markAsLro decorator.`,
       },
     },
+    "invalid-mark-as-pageable-target": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@markAsPageable decorator can only be applied to operations that return a model with a property decorated with @pageItems or a property named 'value'. We will ignore this decorator.`,
+      },
+    },
+    "mark-as-pageable-ineffective": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@markAsPageable decorator is ineffective since this operation is already marked as pageable with @list decorator. Please remove the @markAsPageable decorator.`,
+      },
+    },
     "api-version-undefined": {
       severity: "warning",
       messages: {
         default: paramMessage`The API version specified in the config: "${"version"}" is not defined in service versioning list. Fall back to the latest version.`,
       },
     },
-    "multiple-services-require-use-dependency": {
+    "multiple-explicit-clients-multiple-services": {
       severity: "error",
       messages: {
-        default: paramMessage`When using multiple services, you must use @useDependency to specify the versions of sub-services that the main service depends on. Found services: ${"services"}`,
+        default: "Can not define multiple explicit clients with multiple services.",
+      },
+    },
+    "client-location-new-operation-group-multi-service": {
+      severity: "error",
+      messages: {
+        default:
+          "Cannot move operations from different services to a new operation group that doesn't exist.",
+      },
+    },
+    "invalid-client-service-multiple": {
+      severity: "error",
+      messages: {
+        default: "`@client` with multiple services is only allowed on `Namespace`.",
+      },
+    },
+    "inconsistent-multiple-service": {
+      severity: "error",
+      messages: {
+        default: "All services must have the same server and auth definitions.",
       },
     },
   },

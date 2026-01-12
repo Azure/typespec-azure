@@ -23,6 +23,7 @@ import { $ } from "@typespec/compiler/typekit";
 import { createSdkClientType } from "./clients.js";
 import {
   getAccess,
+  getMarkAsPageable,
   getNextLinkVerb,
   getOverriddenClientMethod,
   getResponseAsBool,
@@ -63,6 +64,7 @@ import {
 import {
   createGeneratedName,
   findRootSourceProperty,
+  getActualClientType,
   getAvailableApiVersions,
   getClientDoc,
   getCorrespondingClientParam,
@@ -85,16 +87,18 @@ import {
   getSdkModelPropertyType,
   getSdkModelPropertyTypeBase,
 } from "./types.js";
+
 function getSdkServiceOperation<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   operation: Operation,
   methodParameters: SdkMethodParameter[],
+  client: SdkClientType<TServiceOperation>,
 ): [TServiceOperation, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const httpOperation = getHttpOperationWithCache(context, operation);
   if (httpOperation) {
     const sdkHttpOperation = diagnostics.pipe(
-      getSdkHttpOperation(context, httpOperation, methodParameters),
+      getSdkHttpOperation(context, httpOperation, methodParameters, client),
     ) as TServiceOperation;
     return diagnostics.wrap(sdkHttpOperation);
   }
@@ -260,7 +264,27 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       },
     });
   } else {
-    compilerAssert(false, "Unexpected operation should be paged if calling this function");
+    const markAsPageableInfo = getMarkAsPageable(context, operation);
+    if (markAsPageableInfo) {
+      const itemsProperty = ignoreDiagnostics(
+        getSdkModelPropertyType(context, markAsPageableInfo.itemsProperty, operation),
+      );
+      // tcgc will let all paging method return a list of items
+      baseServiceMethod.response.type = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, markAsPageableInfo.itemsProperty.type, operation),
+      );
+
+      return diagnostics.wrap({
+        ...baseServiceMethod,
+        kind: "paging",
+        pagingMetadata: {
+          __raw: undefined, // because in this case it is not a real paging operation
+          pageItemsSegments: [itemsProperty],
+        },
+      });
+    } else {
+      compilerAssert(false, "Unexpected operation should be paged if calling this function");
+    }
   }
 }
 
@@ -362,6 +386,7 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
         context,
         metadata.__raw.operation,
         baseServiceMethod.parameters,
+        client,
       ),
     ),
   });
@@ -632,7 +657,7 @@ export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOpe
   const apiVersions = getAvailableApiVersions(
     context,
     operation,
-    client.__raw.type ?? client.__raw.service,
+    getActualClientType(client.__raw),
   );
 
   let clientParams = context.__clientParametersCache.get(client.__raw);
@@ -664,7 +689,7 @@ export function getSdkBasicServiceMethod<TServiceOperation extends SdkServiceOpe
   }
 
   const serviceOperation = diagnostics.pipe(
-    getSdkServiceOperation<TServiceOperation>(context, operation, methodParameters),
+    getSdkServiceOperation<TServiceOperation>(context, operation, methodParameters, client),
   );
   const response = getSdkMethodResponse(context, operation, serviceOperation, client);
   const name = getLibraryName(context, operation);
@@ -693,7 +718,7 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   client: SdkClientType<TServiceOperation>,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const lro = getTcgcLroMetadata(context, operation, client);
-  const paging = isList(context.program, operation);
+  const paging = isList(context.program, operation) || getMarkAsPageable(context, operation);
   if (lro && paging) {
     return getSdkLroPagingServiceMethod<TServiceOperation>(context, operation, client);
   } else if (paging) {

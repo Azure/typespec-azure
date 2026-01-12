@@ -4,7 +4,13 @@ import { getHttpOperation } from "@typespec/http";
 import { ok, strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
 import { ArmLifecycleOperationKind } from "../src/operations.js";
-import { ArmResourceDetails, getArmResources } from "../src/resource.js";
+import {
+  ArmResourceDetails,
+  getArmResources,
+  getFeature,
+  getResourceFeature,
+  getResourceFeatureSet,
+} from "../src/resource.js";
 import { Tester } from "./tester.js";
 
 function assertLifecycleOperation(
@@ -457,6 +463,248 @@ describe("ARM resource model:", () => {
     armIds.forEach(function (id) {
       const armIdProp = getResourcePropertyProperties(foo, id);
       strictEqual((armIdProp?.type as Model).name, "armResourceIdentifier");
+    });
+  });
+  describe("features support", () => {
+    it("sets standard features and feature options", async () => {
+      const [result, diagnostics] = await Tester.compileAndDiagnose(t.code`
+
+@Azure.ResourceManager.Legacy.features(Features)
+@versioned(Versions)
+@armProviderNamespace("Microsoft.Test")
+namespace ${t.namespace("MSTest")};
+/** Contoso API versions */
+enum Versions {
+  /** 2021-10-01-preview version */
+  v2025_11_19_preview: "2025-11-19-preview",
+}
+enum Features {
+  /** Feature A */
+  FeatureA: "FeatureA",
+  /** Feature B */
+  FeatureB: "FeatureB",
+}
+      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      model ${t.model("FooResource")} is TrackedResource<FooResourceProperties> {
+         ...ResourceNameParameter<FooResource>;
+      }
+      model FooResourceProperties { 
+      ...DefaultProvisioningStateProperty;
+      }
+
+      @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+      model ${t.model("BarResource")} is ProxyResource<BarResourceProperties> {
+          ...ResourceNameParameter<BarResource>;
+      }
+      model BarResourceProperties { 
+      ...DefaultProvisioningStateProperty;
+      }
+      `);
+      expectDiagnosticEmpty(diagnostics);
+      const features = getResourceFeatureSet(result.program, result.MSTest);
+      expect(features).toBeDefined();
+      ok(features);
+      const keys = Array.from(features.keys());
+      expect(keys).toEqual(["FeatureA", "FeatureB", "Common"]);
+      expect(features?.get("FeatureA")).toEqual({
+        featureName: "FeatureA",
+        fileName: "featureA",
+        description: "",
+      });
+      expect(features?.get("FeatureB")).toEqual({
+        featureName: "FeatureB",
+        fileName: "featureB",
+        description: "",
+      });
+      expect(features?.get("Common")).toEqual({
+        featureName: "Common",
+        fileName: "common",
+        description: "",
+      });
+
+      const fooFeature = getResourceFeature(result.program, result.FooResource);
+      expect(fooFeature?.name).toMatch("FeatureA");
+      const barFeature = getResourceFeature(result.program, result.BarResource);
+      expect(barFeature?.name).toMatch("FeatureB");
+    });
+    it("allows customizing features and feature options", async () => {
+      const [result, diagnostics] = await Tester.compileAndDiagnose(t.code`
+
+@Azure.ResourceManager.Legacy.features(Features)
+@versioned(Versions)
+@armProviderNamespace("Microsoft.Test")
+namespace ${t.namespace("MSTest")};
+/** Contoso API versions */
+enum Versions {
+  /** 2021-10-01-preview version */
+  v2025_11_19_preview: "2025-11-19-preview",
+}
+enum Features {
+  /** Feature A */
+  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureA", fileName: "feature-a", description: "The data for feature A"})
+  FeatureA: "Feature A",
+  /** Feature B */
+  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureB", fileName: "feature-b", description: "The data for feature B"})
+  FeatureB: "Feature B",
+
+  /** Common feature */
+  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "Common", fileName: "common", description: "The data in common for all features", title: "Common types for FeatureA and FeatureB", termsOfService: "MIT License"})
+  Common: "Common",
+}
+      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      model ${t.model("FooResource")} is TrackedResource<FooResourceProperties> {
+         ...ResourceNameParameter<FooResource>;
+      }
+      model FooResourceProperties { 
+      ...DefaultProvisioningStateProperty;
+      }
+
+      @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+      model ${t.model("BarResource")} is ProxyResource<BarResourceProperties> {
+          ...ResourceNameParameter<BarResource>;
+      }
+      model BarResourceProperties { 
+      ...DefaultProvisioningStateProperty;
+      }
+      `);
+      expectDiagnosticEmpty(diagnostics);
+      const features = getResourceFeatureSet(result.program, result.MSTest);
+      expect(features).toBeDefined();
+      ok(features);
+      const keys = Array.from(features.keys());
+      expect(keys).toEqual(["FeatureA", "FeatureB", "Common"]);
+      expect(features?.get("FeatureA")).toEqual({
+        featureName: "FeatureA",
+        fileName: "feature-a",
+        description: "The data for feature A",
+      });
+      expect(features?.get("FeatureB")).toEqual({
+        featureName: "FeatureB",
+        fileName: "feature-b",
+        description: "The data for feature B",
+      });
+      expect(features?.get("Common")).toEqual({
+        featureName: "Common",
+        fileName: "common",
+        description: "The data in common for all features",
+        title: "Common types for FeatureA and FeatureB",
+        termsOfService: "MIT License",
+      });
+
+      const fooFeature = getResourceFeature(result.program, result.FooResource);
+      expect(fooFeature?.name).toMatch("FeatureA");
+      const barFeature = getResourceFeature(result.program, result.BarResource);
+      expect(barFeature?.name).toMatch("FeatureB");
+    });
+    it("reports correct features for child types", async () => {
+      const [result, diagnostics] = await Tester.compileAndDiagnose(t.code`
+
+@Azure.ResourceManager.Legacy.features(Features)
+@versioned(Versions)
+@armProviderNamespace("Microsoft.Test")
+namespace ${t.namespace("MSTest")};
+/** Contoso API versions */
+enum Versions {
+  /** 2021-10-01-preview version */
+  v2025_11_19_preview: "2025-11-19-preview",
+}
+enum Features {
+  /** Feature A */
+  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureA", fileName: "feature-a", description: "The data for feature A"})
+  FeatureA: "Feature A",
+  /** Feature B */
+  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureB", fileName: "feature-b", description: "The data for feature B"})
+  FeatureB: "Feature B",
+}
+      @secret
+      scalar secretString extends string;
+
+      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      model ${t.model("FooResource")} is TrackedResource<FooResourceProperties> {
+         ...ResourceNameParameter<FooResource>;
+      }
+      
+      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      model ${t.model("FooResourceProperties")} { 
+        ...DefaultProvisioningStateProperty;
+        password: secretString;
+      }
+
+      @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+      model ${t.model("BarResource")} is ProxyResource<BarResourceProperties> {
+          ...ResourceNameParameter<BarResource>;
+      }
+      model ${t.model("BarResourceProperties")} { 
+        ...DefaultProvisioningStateProperty;
+        password: secretString;
+      }
+
+      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      @armResourceOperations
+      interface ${t.interface("Foos")} extends Azure.ResourceManager.TrackedResourceOperations<FooResource, FooResourceProperties> {}
+
+      @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+      @armResourceOperations
+      interface ${t.interface("Bars")} extends Azure.ResourceManager.TrackedResourceOperations<BarResource, BarResourceProperties> {}
+      `);
+      const featureAObject = {
+        featureName: "FeatureA",
+        fileName: "feature-a",
+        description: "The data for feature A",
+      };
+      const featureBObject = {
+        featureName: "FeatureB",
+        fileName: "feature-b",
+        description: "The data for feature B",
+      };
+
+      const defaultObject = {
+        featureName: "Common",
+        fileName: "common",
+        description: "",
+      };
+      expectDiagnosticEmpty(diagnostics);
+      const features = getResourceFeatureSet(result.program, result.MSTest);
+      expect(features).toBeDefined();
+      ok(features);
+      const keys = Array.from(features.keys());
+      expect(keys).toEqual(["FeatureA", "FeatureB", "Common"]);
+      expect(features?.get("FeatureA")).toEqual(featureAObject);
+      expect(features?.get("FeatureB")).toEqual(featureBObject);
+      expect(features?.get("Common")).toEqual(defaultObject);
+
+      const fooFeature = getFeature(result.program, result.FooResource);
+      expect(fooFeature).toMatchObject(featureAObject);
+      const fooPropertiesFeature = getFeature(result.program, result.FooResourceProperties);
+      expect(fooPropertiesFeature).toMatchObject(featureAObject);
+      const fooPasswordProperty = result.FooResourceProperties.properties.get("password");
+      expect(fooPasswordProperty).toBeDefined();
+      const fooPasswordFeature = getFeature(result.program, fooPasswordProperty!);
+      expect(fooPasswordFeature).toMatchObject(featureAObject);
+      const fooPasswordTypeFeature = getFeature(result.program, fooPasswordProperty!.type);
+      expect(fooPasswordTypeFeature).toMatchObject(defaultObject);
+      const foosFeature = getFeature(result.program, result.Foos);
+      expect(foosFeature).toMatchObject(featureAObject);
+      for (const op of [...result.Foos.operations.values()]) {
+        const opFeature = getFeature(result.program, op);
+        expect(opFeature).toMatchObject(featureAObject);
+      }
+      const barFeature = getFeature(result.program, result.BarResource);
+      expect(barFeature).toMatchObject(featureBObject);
+      const barPropertiesFeature = getFeature(result.program, result.BarResourceProperties);
+      expect(barPropertiesFeature).toMatchObject(defaultObject);
+      const barPasswordProperty = result.BarResourceProperties.properties.get("password");
+      expect(barPasswordProperty).toBeDefined();
+      const barPasswordFeature = getFeature(result.program, barPasswordProperty!);
+      expect(barPasswordFeature).toMatchObject(defaultObject);
+      const barPasswordTypeFeature = getFeature(result.program, barPasswordProperty!.type);
+      expect(barPasswordTypeFeature).toMatchObject(defaultObject);
+      const barsFeature = getFeature(result.program, result.Bars);
+      expect(barsFeature).toMatchObject(featureBObject);
+      for (const op of [...result.Bars.operations.values()]) {
+        const opFeature = getFeature(result.program, op);
+        expect(opFeature).toMatchObject(featureBObject);
+      }
     });
   });
   describe("network security perimeter", () => {
@@ -1203,4 +1451,33 @@ it("recognizes resource with customResource identifier", async () => {
     }
 `);
   expectDiagnosticEmpty(diagnostics);
+});
+
+describe("multiple services", () => {
+  it("assign resources to the correct service", async () => {
+    const { program } = await Tester.compile(`
+    @armProviderNamespace
+    namespace Microsoft.ServiceA {
+      model ResA is TrackedResource<{}> {
+        @key @segment("foos") @path name: string;
+      }
+    }
+
+    @armProviderNamespace
+    namespace Microsoft.ServiceB {
+      model ResB is TrackedResource<{}> {
+        @key @segment("foos") @path name: string;
+      }
+    }
+  `);
+
+    const resources = getArmResources(program);
+    expect(resources).toHaveLength(2);
+
+    const [ResA, ResB] = resources;
+    expect(ResA.name).toEqual("ResA");
+    expect(ResA.armProviderNamespace).toEqual("Microsoft.ServiceA");
+    expect(ResB.name).toEqual("ResB");
+    expect(ResB.armProviderNamespace).toEqual("Microsoft.ServiceB");
+  });
 });

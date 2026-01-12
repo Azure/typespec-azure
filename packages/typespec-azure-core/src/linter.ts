@@ -24,6 +24,7 @@ import { noQueryExplodeRule } from "./rules/no-query-explode.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noRpcPathParamsRule } from "./rules/no-rpc-path-params.js";
 import { noStringDiscriminatorRule } from "./rules/no-string-discriminator.js";
+import { noUnnamedUnionRule } from "./rules/no-unnamed-union.js";
 import { nonBreakingVersioningRule } from "./rules/non-breaking-versioning.js";
 import { apiVersionRule } from "./rules/operation-missing-api-version.js";
 import { preventFormatRule } from "./rules/prevent-format.js";
@@ -60,6 +61,7 @@ const rules = [
   noResponseBodyRule,
   noRpcPathParamsRule,
   noOpenAPIRule,
+  noUnnamedUnionRule,
   noHeaderExplodeRule,
   preventFormatRule,
   noMultipleDiscriminatorRule,

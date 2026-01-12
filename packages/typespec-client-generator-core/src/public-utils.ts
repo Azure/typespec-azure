@@ -1,3 +1,4 @@
+import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
   Diagnostic,
   Enum,
@@ -16,7 +17,6 @@ import {
   ignoreDiagnostics,
   isGlobalNamespace,
   isService,
-  listServices,
   resolveEncodedName,
 } from "@typespec/compiler";
 import {
@@ -90,48 +90,6 @@ export function getDefaultApiVersion(
   }
 }
 
-function getVersionEnumForService(context: TCGCContext, type: ModelProperty): Enum | undefined {
-  if (context.__packageVersionEnum) {
-    return context.__packageVersionEnum;
-  }
-
-  // Try to find the service from the model property's namespace hierarchy
-  // For server parameters where type is an enum, start from the enum's namespace
-  // For operation parameters, start from the model's namespace
-  let namespace: Namespace | undefined;
-  if (type.type.kind === "Enum") {
-    namespace = type.type.namespace;
-  } else {
-    namespace = getNamespaceFromType(type.model);
-  }
-
-  // Walk up the namespace hierarchy to find a versioned namespace (could be service or library)
-  while (namespace) {
-    const versions = getVersions(context.program, namespace)[1]?.getVersions();
-    if (versions?.length) {
-      const versionEnum = versions[0].enumMember.enum;
-      context.__packageVersionEnum = versionEnum;
-      return versionEnum;
-    }
-    namespace = namespace.namespace;
-  }
-
-  // Fallback: check if any service in the program has versioning
-  // This handles cases where a parameter is defined in a non-versioned namespace
-  // but is used in a versioned service (e.g., interface extends scenarios)
-  const services = listServices(context.program);
-  for (const service of services) {
-    const versions = getVersions(context.program, service.type)[1]?.getVersions();
-    if (versions?.length) {
-      const versionEnum = versions[0].enumMember.enum;
-      context.__packageVersionEnum = versionEnum;
-      return versionEnum;
-    }
-  }
-
-  return undefined;
-}
-
 /**
  * Return whether a parameter is the Api Version parameter of a client
  * @param program
@@ -145,13 +103,13 @@ export function isApiVersion(context: TCGCContext, type: ModelProperty): boolean
     return override;
   }
   // if the service is not versioning, then no api version parameter
-  const versionEnum = getVersionEnumForService(context, type);
-  if (!versionEnum) {
+  const versionEnumSets = [...context.getPackageVersionEnum().values()];
+  if (versionEnumSets.length === 0) {
     return false;
   }
   // if the parameter type is the version enum or named as "apiVersion" or "api-version", then it is api version
   return (
-    type.type === versionEnum ||
+    versionEnumSets.some((versionEnum) => type.type === versionEnum) ||
     type.name.toLowerCase().includes("apiversion") ||
     type.name.toLowerCase().includes("api-version")
   );
@@ -499,6 +457,27 @@ function getContextPath(
               return result;
             }
           }
+        }
+      }
+    }
+
+    const lroMetadata = getLroMetadata(context.program, root);
+    if (lroMetadata) {
+      const anonymousCandidates = [
+        { lroResultType: lroMetadata.finalResult, label: "FinalResult" },
+        { lroResultType: lroMetadata.logicalResult, label: "LogicalResult" },
+        { lroResultType: lroMetadata.envelopeResult, label: "EnvelopeResult" },
+        { lroResultType: lroMetadata.finalEnvelopeResult, label: "FinalEnvelopeResult" },
+      ];
+
+      for (const { lroResultType, label } of anonymousCandidates) {
+        if (!lroResultType || lroResultType === "void") {
+          continue;
+        }
+        visited.clear();
+        result = [{ name: root.name, type: root }];
+        if (dfsModelProperties(typeToFind, lroResultType, label)) {
+          return result;
         }
       }
     }

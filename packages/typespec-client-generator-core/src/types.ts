@@ -47,11 +47,13 @@ import {
   getAccess,
   getAccessOverride,
   getAlternateType,
+  getClientDefaultValue,
   getClientNamespace,
   getExplicitClientApiVersions,
   getLegacyHierarchyBuilding,
   getOverriddenClientMethod,
   getUsageOverride,
+  isInScope,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
@@ -64,7 +66,7 @@ import {
   SdkArrayType,
   SdkBuiltInKinds,
   SdkBuiltInType,
-  SdkClient,
+  SdkClientType,
   SdkConstantType,
   SdkCredentialParameter,
   SdkCredentialType,
@@ -74,11 +76,11 @@ import {
   SdkEnumType,
   SdkEnumValueType,
   SdkHeaderParameter,
+  SdkHttpOperation,
   SdkModelPropertyType,
   SdkModelPropertyTypeBase,
   SdkModelType,
   SdkNullableType,
-  SdkOperationGroup,
   SdkTupleType,
   SdkType,
   SdkUnionType,
@@ -88,7 +90,7 @@ import {
 } from "./interfaces.js";
 import {
   createGeneratedName,
-  filterApiVersionsInEnum,
+  filterPreviewVersion,
   getAvailableApiVersions,
   getClientDoc,
   getHttpBodyType,
@@ -117,7 +119,6 @@ import {
 } from "./public-utils.js";
 
 import { $ } from "@typespec/compiler/typekit";
-import { getVersions } from "@typespec/versioning";
 import { getNs, isAttribute, isUnwrapped } from "@typespec/xml";
 import { getSdkHttpParameter } from "./http.js";
 import { isMediaTypeJson, isMediaTypeTextPlain, isMediaTypeXml } from "./media-types.js";
@@ -782,7 +783,7 @@ function addDiscriminatorToModelType(
       onClient: false,
       apiVersions: discriminatorProperty
         ? getAvailableApiVersions(context, discriminatorProperty.__raw!, type)
-        : getAvailableApiVersions(context, type, type),
+        : model.apiVersions,
       isApiVersionParam: false,
       isMultipartFileInput: false, // discriminator property cannot be a file
       flatten: false, // discriminator properties can not be flattened
@@ -1175,14 +1176,15 @@ function getSdkVisibility(context: TCGCContext, type: ModelProperty): Visibility
 
 function getSdkCredentialType(
   context: TCGCContext,
-  client: SdkClient | SdkOperationGroup,
+  client: SdkClientType<SdkHttpOperation>,
   authentication: Authentication,
 ): SdkCredentialType | SdkUnionType<SdkCredentialType> {
   const credentialTypes: SdkCredentialType[] = [];
   for (const option of authentication.options) {
     for (const scheme of option.schemes) {
       credentialTypes.push({
-        __raw: client.service,
+        // Multiple services only deal with the first server config
+        __raw: Array.isArray(client.__raw.service) ? client.__raw.service[0] : client.__raw.service,
         kind: "credential",
         scheme: scheme,
         decorators: [],
@@ -1190,16 +1192,19 @@ function getSdkCredentialType(
     }
   }
   if (credentialTypes.length > 1) {
-    const namespace = getClientNamespace(context, client.service);
+    // Multiple services only deal with the first server config
+    const service = Array.isArray(client.__raw.service)
+      ? client.__raw.service[0]
+      : client.__raw.service;
     return {
-      __raw: client.service,
+      __raw: service,
       kind: "union",
       variantTypes: credentialTypes,
-      name: createGeneratedName(context, client.service, "CredentialUnion"),
+      name: createGeneratedName(context, service, "CredentialUnion"),
       isGeneratedName: true,
-      namespace,
-      clientNamespace: namespace,
-      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.CredentialUnion`,
+      namespace: client.namespace,
+      clientNamespace: client.namespace,
+      crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.CredentialUnion`,
       decorators: [],
       access: "public",
       usage: UsageFlags.None,
@@ -1210,9 +1215,13 @@ function getSdkCredentialType(
 
 export function getSdkCredentialParameter(
   context: TCGCContext,
-  client: SdkClient | SdkOperationGroup,
+  client: SdkClientType<SdkHttpOperation>,
 ): SdkCredentialParameter | undefined {
-  const auth = getAuthentication(context.program, client.service);
+  // Multiple services only deal with the first server config
+  const service = Array.isArray(client.__raw.service)
+    ? client.__raw.service[0]
+    : client.__raw.service;
+  const auth = getAuthentication(context.program, service);
   if (!auth) return undefined;
   return {
     type: getSdkCredentialType(context, client, auth),
@@ -1220,11 +1229,11 @@ export function getSdkCredentialParameter(
     name: "credential",
     isGeneratedName: true,
     doc: "Credential used to authenticate requests to the service.",
-    apiVersions: getAvailableApiVersions(context, client.service, client.type),
+    apiVersions: client.apiVersions,
     onClient: true,
     optional: false,
     isApiVersionParam: false,
-    crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.service)}.credential`,
+    crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.credential`,
     decorators: [],
     access: "public",
     flatten: false,
@@ -1260,6 +1269,7 @@ export function getSdkModelPropertyTypeBase(
       encode = "newlineDelimited";
     }
   }
+  const clientDefaultValue = getClientDefaultValue(context, type);
   return diagnostics.wrap({
     __raw: type,
     doc: getClientDoc(context, type),
@@ -1281,6 +1291,7 @@ export function getSdkModelPropertyTypeBase(
     access: getAccess(context, type),
     flatten: shouldFlattenProperty(context, type),
     encode,
+    ...(clientDefaultValue !== undefined && { clientDefaultValue }),
   });
 }
 
@@ -1335,7 +1346,8 @@ function addPropertiesToModelType(
     if (
       isStatusCode(context.program, property) ||
       isNeverOrVoidType(property.type) ||
-      hasNoneVisibility(context, property)
+      hasNoneVisibility(context, property) ||
+      !isInScope(context, property)
     ) {
       continue;
     }
@@ -1353,6 +1365,10 @@ function addMultipartPropertiesToModelType(
 ): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   for (const part of body.parts) {
+    // skip properties that are out of scope
+    if (!isInScope(context, part.property!)) {
+      continue;
+    }
     const clientProperty = diagnostics.pipe(
       getSdkModelPropertyType(context, part.property!, operation),
     );
@@ -1568,7 +1584,7 @@ function updateTypesFromOperation(
     if (httpOperation.parameters.body?.property === param) continue;
     // if it is a stream model, skip
     if (param.type.kind === "Model" && isStream(program, param.type)) continue;
-    const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param.type, operation));
+    const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param, operation));
     if (generateConvenient) {
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
     }
@@ -1577,9 +1593,7 @@ function updateTypesFromOperation(
   }
   for (const param of httpOperation.parameters.parameters) {
     if (isNeverOrVoidType(param.param.type)) continue;
-    const sdkType = diagnostics.pipe(
-      getClientTypeWithDiagnostics(context, param.param.type, operation),
-    );
+    const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param.param, operation));
     if (generateConvenient) {
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
     }
@@ -1589,8 +1603,11 @@ function updateTypesFromOperation(
   const httpBody = httpOperation.parameters.body;
   if (httpBody && !isNeverOrVoidType(httpBody.type)) {
     const spread = isHttpBodySpread(httpBody);
+    // If the body has a property (from @body decorator), use it to check for alternateType
+    // Otherwise use the body type directly
+    const bodyTypeOrProperty = httpBody.property ?? getHttpBodyType(httpBody);
     const sdkType = diagnostics.pipe(
-      getClientTypeWithDiagnostics(context, getHttpBodyType(httpBody), operation),
+      getClientTypeWithDiagnostics(context, bodyTypeOrProperty, operation),
     );
 
     const multipartRequest = httpBody.bodyKind === "multipart";
@@ -1947,29 +1964,34 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       }
     }
     // server parameters
-    const servers = getServers(context.program, client.service);
+    const services = Array.isArray(client.service) ? client.service : [client.service];
+    // Multiple services only deal with the first server config
+    const servers = getServers(context.program, services[0]);
     if (servers !== undefined && servers[0].parameters !== undefined) {
       for (const param of servers[0].parameters.values()) {
         const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param));
         diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
       }
     }
-    // versioned enums
-    const [_, versionMap] = getVersions(context.program, client.service);
-    if (versionMap && versionMap.getVersions()[0]) {
-      // create sdk enum for versions enum
-      let sdkVersionsEnum: SdkEnumType;
-      const explicitApiVersions = getExplicitClientApiVersions(context, client.service);
-      if (explicitApiVersions) {
-        // add additional api versions to the enum
-        sdkVersionsEnum = diagnostics.pipe(getSdkEnumWithDiagnostics(context, explicitApiVersions));
-      } else {
-        sdkVersionsEnum = diagnostics.pipe(
-          getSdkEnumWithDiagnostics(context, versionMap.getVersions()[0].enumMember.enum),
-        );
+    for (const service of services) {
+      // versioned enums
+      const versionEnum = context.getPackageVersionEnum().get(service);
+      const versions = context.getPackageVersions().get(service);
+      if (versionEnum) {
+        // create sdk enum for versions enum
+        let sdkVersionsEnum: SdkEnumType;
+        const explicitApiVersions = getExplicitClientApiVersions(context, service);
+        if (explicitApiVersions) {
+          // add additional api versions to the enum
+          sdkVersionsEnum = diagnostics.pipe(
+            getSdkEnumWithDiagnostics(context, explicitApiVersions),
+          );
+        } else {
+          sdkVersionsEnum = diagnostics.pipe(getSdkEnumWithDiagnostics(context, versionEnum));
+        }
+        filterPreviewVersion(context, sdkVersionsEnum, versions?.at(-1) || "");
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
       }
-      filterApiVersionsInEnum(context, client, sdkVersionsEnum);
-      diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
     }
   }
   // update for orphan models/enums/unions

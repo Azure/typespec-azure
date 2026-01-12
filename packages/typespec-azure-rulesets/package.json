@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-rulesets",
-  "version": "0.62.0",
+  "version": "0.63.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec ruleset for Azure specs",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -54,15 +54,15 @@
     "@azure-tools/typespec-azure-core": "workspace:^",
     "@azure-tools/typespec-azure-resource-manager": "workspace:^",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
-    "@types/node": "~24.10.1",
+    "@types/node": "~25.0.2",
     "@typespec/compiler": "workspace:^",
     "@typespec/tspd": "workspace:^",
-    "@vitest/coverage-v8": "^4.0.4",
-    "@vitest/ui": "^4.0.4",
+    "@vitest/coverage-v8": "^4.0.15",
+    "@vitest/ui": "^4.0.15",
     "c8": "^10.1.3",
     "change-case": "~5.4.4",
     "rimraf": "~6.1.2",
     "typescript": "~5.9.2",
-    "vitest": "^4.0.4"
+    "vitest": "^4.0.15"
   }
 }

@@ -1,5 +1,25 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.34
+
+### Features
+
+- [#3609](https://github.com/Azure/typespec-azure/pull/3609) Add data plane test for combined multi service.
+- [#3618](https://github.com/Azure/typespec-azure/pull/3618) Add ARM multiple services test case.
+
+
+## 0.1.0-alpha.33
+
+### Bump dependencies
+
+- [#3546](https://github.com/Azure/typespec-azure/pull/3546) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3517](https://github.com/Azure/typespec-azure/pull/3517) Fix /azure/resource-manager/operation-templates createOrReplace LRO to return the final result as per spec (changed to spread instead of enveloped, HTTP 201 for the first response and 200 for subsequent).
+- [#3598](https://github.com/Azure/typespec-azure/pull/3598) Fix client-initialization scenario namespace from `ClientGeneratorCore` to `ClientGenerator.Core` to align with dashboard hierarchy.
+
+
 ## 0.1.0-alpha.32
 
 ### Features
