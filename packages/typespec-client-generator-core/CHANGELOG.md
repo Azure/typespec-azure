@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.63.4
+
+### Bug Fixes
+
+- [#3728](https://github.com/Azure/typespec-azure/pull/3728) Allow alternate types for models, enums, and unions
+
+
 ## 0.63.3
 
 ### Bug Fixes
