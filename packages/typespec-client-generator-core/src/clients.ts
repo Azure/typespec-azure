@@ -196,7 +196,7 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     }
   }
   const clientType = getActualClientType(client);
-  // For multi-service operation groups (created via `@clientLocation`), use the first service for namespace
+  // For multi-service operation groups, use the first service for namespace
   // and cross language definition id. This follows the same pattern as multi-service root clients where
   // metadata is derived from the first service in the array.
   const typeForMetadata = Array.isArray(clientType) ? clientType[0] : clientType;
