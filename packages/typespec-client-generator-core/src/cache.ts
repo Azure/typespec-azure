@@ -157,6 +157,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         } else {
           // Conflict detected, update the existing operation group to have multiple services
           existingOg.services.push(og.services[0]);
+          existingOg.service = existingOg.services; // Update deprecated property
           existingOg.subOperationGroups.push(...og.subOperationGroups);
           if (existingOg.type !== undefined) {
             mergedOperationGroupTypes.set(existingOg, [existingOg.type!]);
@@ -207,6 +208,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
             if (!existingOg.services.includes(operationService)) {
               // This would create a multi-service operation group - merge the services
               existingOg.services.push(operationService);
+              existingOg.service = existingOg.services; // Update deprecated property
             }
             // Operation will be moved to this existing operation group during operations processing
             context.__rawClientsOperationGroupsCache!.set(v, existingOg);
@@ -231,6 +233,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         const og: SdkOperationGroup = {
           kind: "SdkOperationGroup",
           groupPath: `${clients[0].name}.${ogName}`,
+          service: services.length === 1 ? services[0] : services,
           services,
           subOperationGroups: [],
           parent: clients[0],
@@ -421,6 +424,7 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
       {
         kind: "SdkClient",
         name: clientName,
+        service: service,
         services: [service],
         type: service,
         subOperationGroups: [],
@@ -451,6 +455,7 @@ function createOperationGroup(
     operationGroup = getScopedDecoratorData(context, operationGroupKey, type);
     if (operationGroup) {
       operationGroup.groupPath = `${groupPathPrefix}.${getLibraryName(context, type)}`;
+      operationGroup.service = service;
       operationGroup.services = [service];
       operationGroup.subOperationGroups = [];
       operationGroup.parent = parent;
@@ -473,6 +478,7 @@ function createOperationGroup(
         kind: "SdkOperationGroup",
         type,
         groupPath: `${groupPathPrefix}.${getLibraryName(context, type)}`,
+        service: service,
         services: [service],
         subOperationGroups: [],
         parent,

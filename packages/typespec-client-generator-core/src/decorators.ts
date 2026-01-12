@@ -272,6 +272,7 @@ export const $client: ClientDecorator = (
   const client: SdkClient = {
     kind: "SdkClient",
     name,
+    service: services.length === 1 ? services[0] : services,
     services,
     type: target,
     subOperationGroups: [],
