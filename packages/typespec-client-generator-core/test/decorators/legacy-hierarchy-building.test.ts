@@ -399,6 +399,25 @@ it("without polymorphism", async () => {
   // C should inherit from B instead of A due to @Legacy.hierarchyBuilding
   strictEqual(cModel.baseModel?.name, "B");
   strictEqual(bModel.baseModel?.name, "A");
+
+  // Verify properties on each model
+  // A should have property: kind
+  strictEqual(aModel.properties.length, 1);
+  strictEqual(aModel.properties[0].name, "kind");
+
+  // B should have properties: kind, foo
+  strictEqual(bModel.properties.length, 2);
+  const bKind = bModel.properties.find((p) => p.name === "kind");
+  const bFoo = bModel.properties.find((p) => p.name === "foo");
+  ok(bKind);
+  ok(bFoo);
+
+  // C should have properties: kind, bar (foo is inherited from B)
+  strictEqual(cModel.properties.length, 2);
+  const cKind = cModel.properties.find((p) => p.name === "kind");
+  const cBar = cModel.properties.find((p) => p.name === "bar");
+  ok(cKind);
+  ok(cBar);
 });
 
 it("verify respectLegacyHierarchyBuilding: false flag", async () => {
@@ -585,4 +604,53 @@ it("handles envelope properties correctly", async () => {
 
   // FooResourceWithHierarchy should have TrackedResource as base
   strictEqual(fooResourceWithHierarchy.baseModel?.name, "TrackedResource");
+});
+
+it("multiple layer inheritance replacement", async () => {
+  await runner.compileWithBuiltInService(`
+      model C {
+        c?: string;
+      }
+
+      model B extends C {
+        b?: string;
+      }
+
+      @Legacy.hierarchyBuilding(C)
+      model A extends B {
+        a?: string;
+      }
+
+      @route("/test")
+      op test(): A;
+    `);
+
+  const models = runner.context.sdkPackage.models;
+  const modelA = models.find((m) => m.name === "A");
+  const modelB = models.find((m) => m.name === "B");
+  const modelC = models.find((m) => m.name === "C");
+
+  ok(modelA);
+  ok(modelB);
+  ok(modelC);
+
+  // A should inherit from C instead of B due to @Legacy.hierarchyBuilding
+  strictEqual(modelA.baseModel?.name, "C");
+  strictEqual(modelB.baseModel?.name, "C");
+
+  // Verify properties:
+  // A should have properties: a (own) and b (from B, since B is skipped in hierarchy)
+  strictEqual(modelA.properties.length, 2);
+  const propA = modelA.properties.find((p) => p.name === "a");
+  const propB = modelA.properties.find((p) => p.name === "b");
+  ok(propA);
+  ok(propB);
+
+  // B should have property b
+  strictEqual(modelB.properties.length, 1);
+  strictEqual(modelB.properties[0].name, "b");
+
+  // C should have property c
+  strictEqual(modelC.properties.length, 1);
+  strictEqual(modelC.properties[0].name, "c");
 });

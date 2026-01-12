@@ -1529,13 +1529,45 @@ export function getClientLocation(
 
 const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
 
+/**
+ * Collects all properties from a model and its base models up to (but not including) the stopModel.
+ * @param model The model to collect properties from
+ * @param stopModel Optional model to stop at. When provided, properties from this model and its ancestors
+ *                  are excluded from the collection. Only properties from the model and intermediate base
+ *                  models between the model and stopModel are included.
+ * @returns A map of property names to properties
+ */
+function collectPropertiesIncludingBase(
+  model: Model,
+  stopModel?: Model,
+): Map<string, ModelProperty> {
+  const properties = new Map<string, ModelProperty>();
+
+  // Walk up the inheritance chain
+  let current: Model | undefined = model;
+  while (current && current !== stopModel) {
+    // Add properties from current model (properties defined earlier in the chain override later ones)
+    for (const [name, prop] of current.properties) {
+      if (!properties.has(name)) {
+        properties.set(name, prop);
+      }
+    }
+    current = current.baseModel;
+  }
+
+  return properties;
+}
+
 function isPropertySuperset(target: Model, value: Model): boolean {
-  // Check if all properties in value exist in target
+  // Collect all properties from target including inherited ones
+  const targetProperties = collectPropertiesIncludingBase(target);
+
+  // Check if all properties in value exist in target (including inherited properties)
   for (const name of value.properties.keys()) {
-    if (!target.properties.has(name)) {
+    if (!targetProperties.has(name)) {
       return false;
     }
-    const targetProperty = target.properties.get(name)!;
+    const targetProperty = targetProperties.get(name)!;
     const valueProperty = value.properties.get(name)!;
     // Compare properties to handle envelope/spread semantics correctly
     // Properties match if they come from the same source OR if they have the same type
