@@ -157,8 +157,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         } else {
           // Conflict detected, update the existing operation group to have multiple services
           existingOg.services.push(og.services[0]);
-
-          existingOg.service = existingOg.services; // eslint-disable-line @typescript-eslint/no-deprecated
+          existingOg.service = existingOg.services[0]; // eslint-disable-line @typescript-eslint/no-deprecated
           existingOg.subOperationGroups.push(...og.subOperationGroups);
           if (existingOg.type !== undefined) {
             mergedOperationGroupTypes.set(existingOg, [existingOg.type!]);
@@ -209,8 +208,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
             if (!existingOg.services.includes(operationService)) {
               // This would create a multi-service operation group - merge the services
               existingOg.services.push(operationService);
-
-              existingOg.service = existingOg.services; // eslint-disable-line @typescript-eslint/no-deprecated
+              existingOg.service = existingOg.services[0]; // eslint-disable-line @typescript-eslint/no-deprecated
             }
             // Operation will be moved to this existing operation group during operations processing
             context.__rawClientsOperationGroupsCache!.set(v, existingOg);
@@ -235,7 +233,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         const og: SdkOperationGroup = {
           kind: "SdkOperationGroup",
           groupPath: `${clients[0].name}.${ogName}`,
-          service: services.length === 1 ? services[0] : services,
+          service: services[0],
           services,
           subOperationGroups: [],
           parent: clients[0],

@@ -120,7 +120,7 @@ export interface SdkOperationGroup {
   /**
    * @deprecated Use `services` instead. This property will be removed in a future release.
    */
-  service: Namespace | Namespace[];
+  service: Namespace;
   services: Namespace[];
   /** Parent operation group or client. */
   parent?: SdkClient | SdkOperationGroup;
