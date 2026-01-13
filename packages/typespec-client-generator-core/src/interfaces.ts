@@ -103,7 +103,11 @@ export interface SdkContext<
 export interface SdkClient {
   kind: "SdkClient";
   name: string;
+  /**
+   * @deprecated Use `services` instead. This property will be removed in a future release.
+   */
   service: Namespace | Namespace[];
+  services: Namespace[];
   type: Namespace | Interface;
   subOperationGroups: SdkOperationGroup[];
 }
@@ -113,7 +117,11 @@ export interface SdkOperationGroup {
   type?: Namespace | Interface;
   subOperationGroups: SdkOperationGroup[];
   groupPath: string;
+  /**
+   * @deprecated Use `services` instead. This property will be removed in a future release.
+   */
   service: Namespace;
+  services: Namespace[];
   /** Parent operation group or client. */
   parent?: SdkClient | SdkOperationGroup;
 }

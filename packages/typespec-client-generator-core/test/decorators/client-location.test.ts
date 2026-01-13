@@ -89,8 +89,8 @@ describe("Operation", () => {
     strictEqual(rootClient.methods[0].name, "test");
   });
 
-  it("@clientLocation client-location-duplicate", async () => {
-    const [_, diagnostics] = await runner.compileAndDiagnose(
+  it("@clientLocation to an exist og with string target", async () => {
+    await runner.compile(
       `
     @service
     namespace TestService;
@@ -111,23 +111,20 @@ describe("Operation", () => {
   `,
     );
 
-    expectDiagnostics(diagnostics, {
-      code: "@azure-tools/typespec-client-generator-core/client-location-duplicate",
-    });
     const sdkPackage = runner.context.sdkPackage;
     const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
     ok(rootClient);
     strictEqual(rootClient.children?.length, 2);
     const aClient = rootClient.children.find((c) => c.name === "A");
     ok(aClient);
-    strictEqual(aClient.methods.length, 2);
+    strictEqual(aClient.methods.length, 1);
     strictEqual(aClient.methods[0].name, "a1");
-    strictEqual(aClient.methods[1].name, "a2");
 
     const bClient = rootClient.children.find((c) => c.name === "B");
     ok(bClient);
-    strictEqual(bClient.methods.length, 1);
-    strictEqual(bClient.methods[0].name, "b");
+    strictEqual(bClient.methods.length, 2);
+    strictEqual(bClient.methods[0].name, "a2");
+    strictEqual(bClient.methods[1].name, "b");
   });
 
   it("move an operation to another operation group", async () => {
