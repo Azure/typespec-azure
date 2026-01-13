@@ -482,8 +482,16 @@ export async function getOpenAPIForService(
       metadata.finalResult !== "void" &&
       metadata.finalResult.name.length > 0
     ) {
-      const model: Model = metadata.finalResult;
+      const model: Model | IntrinsicType = metadata.finalResult;
       const schemaOrRef = resolveExternalRef(metadata.finalResult);
+      let overrideName: ((name: string, visibility: Visibility) => string) | undefined = undefined;
+      if (model.kind === "Model" && isArrayModelType(program, model)) {
+        const itemType = getModelOrScalarTypeIfNullable(model.indexer?.value);
+        if (itemType?.kind === "Model" && itemType.name.length > 0) {
+          overrideName = (n: string, v: Visibility) =>
+            `${n.replaceAll(/[[\]]/g, "")}${getVisibilitySuffix(v, Visibility.Read)}Array`;
+        }
+      }
 
       if (schemaOrRef !== undefined) {
         const ref = proxy.createExternalRef(schemaOrRef.$ref);
@@ -492,6 +500,7 @@ export async function getOpenAPIForService(
       const pending = pendingSchemas.getOrAdd(metadata.finalResult, Visibility.Read, () => ({
         type: model,
         visibility: Visibility.Read,
+        getSchemaNameOverride: overrideName,
         ref: refs.getOrAdd(model, Visibility.Read, () => proxy.createLocalRef(model)),
       }));
       return { "final-state-schema": pending.ref };
