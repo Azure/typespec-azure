@@ -1,5 +1,24 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.35
+
+### Features
+
+- [#3635](https://github.com/Azure/typespec-azure/pull/3635) Add test cases for `@clientDefaultValue` decorator.
+- [#3713](https://github.com/Azure/typespec-azure/pull/3713) Add multi-service test scenarios for older API versions and shared models.
+- [#3695](https://github.com/Azure/typespec-azure/pull/3695) Add Spector tests for pageable long-running operations (LROs)
+- [#3663](https://github.com/Azure/typespec-azure/pull/3663) Add test case for @clientDefaultValue on header parameters
+
+### Bump dependencies
+
+- [#3677](https://github.com/Azure/typespec-azure/pull/3677) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3642](https://github.com/Azure/typespec-azure/pull/3642) update client generator namespace for python
+- [#3582](https://github.com/Azure/typespec-azure/pull/3582) update tests for client-location
+
+
 ## 0.1.0-alpha.34
 
 ### Features

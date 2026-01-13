@@ -1,5 +1,17 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.64.0
+
+### Features
+
+- [#3622](https://github.com/Azure/typespec-azure/pull/3622) Add support for multiple output files in typespec-autorest
+- [#3746](https://github.com/Azure/typespec-azure/pull/3746) #3693 Allow array and unknown result for async operations
+
+### Bump dependencies
+
+- [#3677](https://github.com/Azure/typespec-azure/pull/3677) Upgrade dependencies
+
+
 ## 0.63.1
 
 ### Features
