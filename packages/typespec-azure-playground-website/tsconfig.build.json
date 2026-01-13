@@ -4,7 +4,7 @@
     { "path": "../../core/packages/compiler/tsconfig.json" },
     { "path": "../../core/packages/openapi/tsconfig.json" },
     { "path": "../../core/packages/rest/tsconfig.json" },
-    { "path": "../typespec-azure-resource-manager/tsconfig.build.json" }
+    { "path": "../typespec-azure-resource-manager/tsconfig.json" }
   ],
   "compilerOptions": {
     "outDir": "dist-dev",
@@ -18,6 +18,10 @@
     "skipLibCheck": true,
     "jsx": "react-jsx"
   },
-  "include": ["src/**/*.ts", "generated-defs/**/*.ts"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "samples/dist/samples.ts"
+  ],
   "exclude": ["**/*.test.*"]
 }
