@@ -2,6 +2,7 @@ import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
   Diagnostic,
   Enum,
+  EnumMember,
   Interface,
   Model,
   ModelProperty,
@@ -240,7 +241,7 @@ export function getWireName(context: TCGCContext, type: Type & { name: string })
  */
 export function getCrossLanguageDefinitionId(
   context: TCGCContext,
-  type: Union | Model | Enum | Scalar | ModelProperty | Operation | Namespace | Interface,
+  type: Union | Model | Enum | Scalar | ModelProperty | Operation | Namespace | Interface | EnumMember,
   operation?: Operation,
   appendNamespace: boolean = true,
 ): string {
@@ -288,6 +289,11 @@ export function getCrossLanguageDefinitionId(
     case "Operation":
       if (type.interface) {
         retval = `${getCrossLanguageDefinitionId(context, type.interface, undefined, false)}.${retval}`;
+      }
+      break;
+    case "EnumMember":
+      if (type.enum) {
+        retval = `${getCrossLanguageDefinitionId(context, type.enum, operation, false)}.${retval}`;
       }
       break;
   }
