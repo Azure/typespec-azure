@@ -1761,7 +1761,7 @@ function updateTypesFromOperation(
   return diagnostics.wrap(undefined);
 
   function updateUsageOrAccessForLroComponent(
-    model: Model | "void" | undefined,
+    model: Model | "void" | IntrinsicType | undefined,
     usage: UsageFlags,
   ) {
     if (model === undefined || model === "void") return;

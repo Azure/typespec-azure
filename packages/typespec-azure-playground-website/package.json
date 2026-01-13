@@ -69,23 +69,23 @@
     "@typespec/streams": "workspace:^",
     "@typespec/versioning": "workspace:^",
     "@typespec/xml": "workspace:^",
-    "@vitejs/plugin-react": "~5.1.0",
-    "es-module-shims": "~2.6.0",
+    "@vitejs/plugin-react": "~5.1.2",
+    "es-module-shims": "~2.7.0",
     "react": "~18.3.1",
     "react-dom": "~18.3.1",
-    "vite": "^7.0.5"
+    "vite": "^7.2.7"
   },
   "devDependencies": {
-    "@playwright/test": "^1.51.1",
-    "@types/node": "~24.10.1",
+    "@playwright/test": "^1.57.0",
+    "@types/node": "~25.0.2",
     "@types/react-dom": "~19.2.2",
     "@typespec/bundler": "workspace:^",
     "@typespec/playground": "workspace:^",
-    "@vitest/coverage-v8": "^4.0.4",
-    "@vitest/ui": "^4.0.4",
+    "@vitest/coverage-v8": "^4.0.15",
+    "@vitest/ui": "^4.0.15",
     "cross-env": "~10.1.0",
     "rimraf": "~6.1.2",
     "typescript": "~5.9.2",
-    "vitest": "^4.0.4"
+    "vitest": "^4.0.15"
   }
 }

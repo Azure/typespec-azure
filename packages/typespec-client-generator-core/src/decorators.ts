@@ -10,6 +10,7 @@ import {
   ignoreDiagnostics,
   Interface,
   isErrorModel,
+  isList,
   isNumeric,
   isService,
   isTemplateDeclaration,
@@ -26,7 +27,13 @@ import {
 } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
-import { getAuthentication, getHttpOperation, getServers } from "@typespec/http";
+import {
+  getAuthentication,
+  getHttpOperation,
+  getServers,
+  isBody,
+  isBodyRoot,
+} from "@typespec/http";
 import { $useDependency, getVersions } from "@typespec/versioning";
 import {
   AccessDecorator,
@@ -52,6 +59,7 @@ import {
   FlattenPropertyDecorator,
   HierarchyBuildingDecorator,
   MarkAsLroDecorator,
+  MarkAsPageableDecorator,
   NextLinkVerbDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
@@ -1513,11 +1521,22 @@ export function getClientLocation(
 
 const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
 
-function isPropertySuperset(target: Model, value: Model): boolean {
+interface PropertyConflict {
+  propertyName: string;
+  reason: "missing" | "type-mismatch";
+}
+
+function isPropertySuperset(program: Program, target: Model, value: Model): PropertyConflict[] {
+  const conflicts: PropertyConflict[] = [];
+
   // Check if all properties in value exist in target
   for (const name of value.properties.keys()) {
     if (!target.properties.has(name)) {
-      return false;
+      conflicts.push({
+        propertyName: name,
+        reason: "missing",
+      });
+      continue;
     }
     const targetProperty = target.properties.get(name)!;
     const valueProperty = value.properties.get(name)!;
@@ -1528,11 +1547,14 @@ function isPropertySuperset(target: Model, value: Model): boolean {
     if (targetProperty.sourceProperty !== valueProperty.sourceProperty) {
       // Different sources - check if they have the same type
       if (targetProperty.type !== valueProperty.type) {
-        return false;
+        conflicts.push({
+          propertyName: name,
+          reason: "type-mismatch",
+        });
       }
     }
   }
-  return true;
+  return conflicts;
 }
 
 export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
@@ -1542,15 +1564,33 @@ export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
   scope?: LanguageScopes,
 ) => {
   // Validate that target has all properties from value
-  if (!isPropertySuperset(target, value)) {
-    reportDiagnostic(context.program, {
-      code: "legacy-hierarchy-building-conflict",
-      format: {
-        childModel: target.name,
-        parentModel: value.name,
-      },
-      target: context.decoratorTarget,
-    });
+  const conflicts = isPropertySuperset(context.program, target, value);
+  if (conflicts.length > 0) {
+    for (const conflict of conflicts) {
+      if (conflict.reason === "missing") {
+        reportDiagnostic(context.program, {
+          code: "legacy-hierarchy-building-conflict",
+          messageId: "property-missing",
+          format: {
+            childModel: target.name,
+            parentModel: value.name,
+            propertyName: conflict.propertyName,
+          },
+          target: context.decoratorTarget,
+        });
+      } else if (conflict.reason === "type-mismatch") {
+        reportDiagnostic(context.program, {
+          code: "legacy-hierarchy-building-conflict",
+          messageId: "type-mismatch",
+          format: {
+            childModel: target.name,
+            parentModel: value.name,
+            propertyName: conflict.propertyName,
+          },
+          target: context.decoratorTarget,
+        });
+      }
+    }
     return;
   }
 
@@ -1608,6 +1648,117 @@ export const $markAsLro: MarkAsLroDecorator = (
 
 export function getMarkAsLro(context: TCGCContext, entity: Operation): boolean {
   return getScopedDecoratorData(context, markAsLroKey, entity) ?? false;
+}
+
+const markAsPageableKey = createStateSymbol("markAsPageable");
+
+export const $markAsPageable: MarkAsPageableDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: LanguageScopes,
+) => {
+  const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, target));
+  const modelResponse = httpOperation.responses.filter(
+    (r) =>
+      r.type?.kind === "Model" && !(r.statusCodes === "*" || isErrorModel(context.program, r.type)),
+  )[0];
+  if (!modelResponse) {
+    reportDiagnostic(context.program, {
+      code: "invalid-mark-as-pageable-target",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+
+  // Check if already marked with @list decorator
+  if (isList(context.program, target)) {
+    reportDiagnostic(context.program, {
+      code: "mark-as-pageable-ineffective",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+
+  // Check the response model for @pageItems decorator
+  const responseType = getRealResponseModel(context.program, modelResponse.type as Model);
+  if (responseType.kind !== "Model") {
+    reportDiagnostic(context.program, {
+      code: "invalid-mark-as-pageable-target",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+
+  // Check if any property has @pageItems decorator by checking the program state
+  // The @pageItems decorator uses a state symbol "TypeSpec.pageItems"
+  const pageItemsStateKey = Symbol.for("TypeSpec.pageItems");
+  let itemsProperty: ModelProperty | undefined = undefined;
+  for (const [, prop] of responseType.properties) {
+    if (context.program.stateSet(pageItemsStateKey).has(prop)) {
+      itemsProperty = prop;
+      break;
+    }
+  }
+
+  if (!itemsProperty) {
+    // Try to find a property named "value"
+    itemsProperty = responseType.properties.get("value");
+    if (!itemsProperty) {
+      // No @pageItems property and no "value" property found
+      reportDiagnostic(context.program, {
+        code: "invalid-mark-as-pageable-target",
+        format: {
+          operation: target.name,
+        },
+        target: context.decoratorTarget,
+      });
+      return;
+    }
+  }
+
+  // Store metadata that will be checked by TCGC to treat this operation as pageable
+  setScopedDecoratorData(
+    context,
+    $markAsPageable,
+    markAsPageableKey,
+    target,
+    { itemsProperty },
+    scope,
+  );
+};
+
+export function getMarkAsPageable(
+  context: TCGCContext,
+  entity: Operation,
+): MarkAsPageableInfo | undefined {
+  return getScopedDecoratorData(context, markAsPageableKey, entity);
+}
+
+export interface MarkAsPageableInfo {
+  itemsProperty: ModelProperty;
+}
+
+function getRealResponseModel(program: Program, responseModel: Model): Type {
+  let bodyProperty: ModelProperty | undefined = undefined;
+  for (const prop of responseModel.properties.values()) {
+    if (isBody(program, prop) || isBodyRoot(program, prop)) {
+      bodyProperty = prop;
+      break;
+    }
+  }
+  if (bodyProperty) {
+    return bodyProperty.type;
+  }
+  return responseModel;
 }
 
 const nextLinkVerbKey = createStateSymbol("nextLinkVerb");

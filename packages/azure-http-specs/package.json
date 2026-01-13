@@ -47,7 +47,7 @@
     "@azure-tools/typespec-azure-resource-manager": "workspace:^",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@types/multer": "^2.0.0",
-    "@types/node": "~24.10.1",
+    "@types/node": "~25.0.2",
     "@typespec/openapi": "workspace:^",
     "@typespec/openapi3": "workspace:^",
     "concurrently": "^9.1.2",

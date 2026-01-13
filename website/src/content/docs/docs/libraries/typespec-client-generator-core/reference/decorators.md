@@ -1342,6 +1342,50 @@ The operation that should be treated as a Long Running Operation
 op startDeployment(@path deploymentId: string): DeploymentResult | ErrorResponse;
 ```
 
+### `@markAsPageable` {#@Azure.ClientGenerator.Core.Legacy.markAsPageable}
+
+Forces an operation to be treated as a pageable operation by the SDK generators,
+even when the operation does not follow standard paging patterns on the service side.
+
+NOTE: When used, you will need to verify the operation and add tests for the generated code
+to make sure the end-to-end works for library users, since there is a risk that forcing
+this operation to be pageable will result in errors.
+
+When applied, TCGC will treat the operation as pageable and SDK generators should:
+
+- Generate paging mechanisms (iterators/async iterators)
+- Return appropriate pageable-specific return types
+- Handle the operation as a collection that may require multiple requests
+
+This decorator is considered legacy functionality and should only be used when
+standard TypeSpec paging patterns are not feasible.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.markAsPageable(scope?: valueof string)
+```
+
+#### Target
+
+The operation that should be treated as a pageable operation
+`Operation`
+
+#### Parameters
+
+| Name  | Type             | Description                                                                                                                                                                                                                                                     |
+| ----- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+
+#### Examples
+
+##### Force a regular operation to be treated as pageable for backward compatibility
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.markAsPageable
+@route("/items")
+@get
+op listItems(): ItemListResult;
+```
+
 ### `@nextLinkVerb` {#@Azure.ClientGenerator.Core.Legacy.nextLinkVerb}
 
 Specifies the HTTP verb for the next link operation in a paging scenario.
