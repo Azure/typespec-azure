@@ -19,7 +19,7 @@ import {
   getActualClientType,
   getTypeDecorators,
 } from "./internal-utils.js";
-import { createDiagnostic } from "./lib.js";
+import { reportDiagnostic } from "./lib.js";
 import { getLicenseInfo } from "./license.js";
 import { getCrossLanguagePackageId, getNamespaceFromType } from "./public-utils.js";
 import { getAllReferencedTypes, handleAllTypes } from "./types.js";
@@ -53,7 +53,7 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
     },
   };
   organizeNamespaces(context, sdkPackage);
-  diagnostics.pipe(validateClientInitializationParameters(context, sdkPackage));
+  validateClientInitializationParameters(context, sdkPackage);
   return diagnostics.wrap(sdkPackage);
 }
 
@@ -155,32 +155,19 @@ function populateApiVersionInformation(context: TCGCContext): void {
 function validateClientInitializationParameters<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   sdkPackage: SdkPackage<TServiceOperation>,
-): readonly Diagnostic[] {
-  const diagnostics: Diagnostic[] = [];
-
-  // Process all top-level clients
+): void {
+  // Process all top-level clients - don't recurse since each client already checks its sub-clients
   for (const client of sdkPackage.clients) {
-    diagnostics.push(...validateClientInitializationParametersRecursive(context, client));
+    validateClientInitializationParametersForClient(context, client);
   }
-
-  return diagnostics;
 }
 
 /**
- * Recursively validates client initialization parameters for a client and all its children.
+ * Validates client initialization parameters for a single client (including its sub-clients' operations).
  */
-function validateClientInitializationParametersRecursive<
+function validateClientInitializationParametersForClient<
   TServiceOperation extends SdkServiceOperation,
->(context: TCGCContext, client: SdkClientType<TServiceOperation>): Diagnostic[] {
-  const diagnostics: Diagnostic[] = [];
-
-  // Get the raw entity (Namespace or Interface) to report diagnostics on
-  const target = client.__raw.type;
-  if (!target) {
-    // If there's no target, skip validation for this client
-    return diagnostics;
-  }
-
+>(context: TCGCContext, client: SdkClientType<TServiceOperation>): void {
   // Collect all operation parameters from this client and all sub-clients
   const allOperationParameterNames = new Set<string>();
   collectOperationParameterNames(client, allOperationParameterNames);
@@ -194,27 +181,19 @@ function validateClientInitializationParametersRecursive<
 
     // Check if this parameter is used in any operation
     if (!allOperationParameterNames.has(param.name)) {
-      diagnostics.push(
-        createDiagnostic({
-          code: "unused-client-initialization-parameter",
-          target: target,
-          format: {
-            parameterName: param.name,
-            clientName: client.name,
-          },
-        }),
-      );
+      // Get the raw entity (Namespace or Interface) to report diagnostics on
+      // Use the raw type if available, otherwise use the raw model from clientInitialization
+      const target = client.__raw.type || client.clientInitialization.__raw || context.program.getGlobalNamespaceType();
+      reportDiagnostic(context.program, {
+        code: "unused-client-initialization-parameter",
+        target: target,
+        format: {
+          parameterName: param.name,
+          clientName: client.name,
+        },
+      });
     }
   }
-
-  // Recursively validate sub-clients
-  if (client.children) {
-    for (const child of client.children) {
-      diagnostics.push(...validateClientInitializationParametersRecursive(context, child));
-    }
-  }
-
-  return diagnostics;
 }
 
 /**
@@ -226,11 +205,6 @@ function collectOperationParameterNames<TServiceOperation extends SdkServiceOper
 ): void {
   // Collect parameters from all methods in this client
   for (const method of client.methods) {
-    if (method.kind === "clientaccessor") {
-      // Client accessors don't have operations, skip them
-      continue;
-    }
-
     // Check operation parameters
     if (method.operation && method.operation.kind === "http") {
       for (const param of method.operation.parameters) {
