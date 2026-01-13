@@ -246,7 +246,12 @@ export function getCrossLanguageDefinitionId(
   appendNamespace: boolean = true,
 ): string {
   let retval = type.name || "anonymous";
-  let namespace = type.kind === "ModelProperty" ? type.model?.namespace : type.namespace;
+  let namespace =
+    type.kind === "ModelProperty"
+      ? type.model?.namespace
+      : type.kind === "EnumMember"
+        ? type.enum?.namespace
+        : type.namespace;
   switch (type.kind) {
     // Enum and Scalar will always have a name
     case "Union":
