@@ -1,5 +1,11 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.63.1
+
+### Bug Fixes
+
+- Align `unknown-format` rule name change
+
 ## 0.63.0
 
 ### Features
