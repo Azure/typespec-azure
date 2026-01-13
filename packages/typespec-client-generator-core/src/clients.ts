@@ -217,6 +217,18 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
   sdkClientType.methods = diagnostics.pipe(
     createSdkMethods<TServiceOperation>(context, client, sdkClientType),
   );
+  // Check if the client is empty (has no methods)
+  if (sdkClientType.methods.length === 0 && client.type) {
+    diagnostics.add(
+      createDiagnostic({
+        code: "empty-client",
+        target: client.type,
+        format: {
+          name: sdkClientType.name,
+        },
+      }),
+    );
+  }
   addDefaultClientParameters(context, sdkClientType);
   // update initialization model properties
 

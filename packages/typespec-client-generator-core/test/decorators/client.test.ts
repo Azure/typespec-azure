@@ -1461,3 +1461,61 @@ it("operations under namespace or interface without @client or @operationGroup",
   const operationGroup = operationGroups[0];
   strictEqual(listOperationsInOperationGroup(runner.context, operationGroup).length, 1);
 });
+
+describe("empty client diagnostic", () => {
+  it("should emit diagnostic for empty client", async () => {
+    const diagnostics = await runner.diagnose(`
+      @service
+      namespace MyService {
+        @operationGroup
+        interface SubClient {
+          op test(): void;
+        }
+      }
+    `);
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/empty-client",
+    });
+  });
+
+  it("should not emit diagnostic for client with operations", async () => {
+    const diagnostics = await runner.diagnose(`
+      @service
+      namespace MyService {
+        op test(): void;
+      }
+    `);
+
+    expectDiagnosticEmpty(diagnostics);
+  });
+
+  it("should emit diagnostic for empty interface client", async () => {
+    const diagnostics = await runner.diagnose(`
+      @service
+      namespace MyService;
+
+      @client({service: MyService})
+      interface MyClient {
+      }
+    `);
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/empty-client",
+    });
+  });
+
+  it("should not emit diagnostic for interface client with operations", async () => {
+    const diagnostics = await runner.diagnose(`
+      @service
+      namespace MyService;
+
+      @client({service: MyService})
+      interface MyClient {
+        op test(): void;
+      }
+    `);
+
+    expectDiagnosticEmpty(diagnostics);
+  });
+});
