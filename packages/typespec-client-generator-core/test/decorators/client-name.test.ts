@@ -681,3 +681,25 @@ it("duplicate model client name with positive and negation scopes", async () => 
     },
   ]);
 });
+
+it("no conflict with non-overlapping positive and negation scopes", async () => {
+  const diagnostics = await runner.diagnose(
+    `
+    @service
+    namespace Contoso.WidgetManager;
+    
+    @clientName("Foo", "csharp")
+    model ModelOne {
+      id: int32;
+    }
+
+    @clientName("Foo", "!csharp")
+    model ModelTwo {
+      prop1: string;
+    }
+    `,
+  );
+
+  // Should have no diagnostics since csharp is excluded from ModelTwo
+  expectDiagnostics(diagnostics, []);
+});
