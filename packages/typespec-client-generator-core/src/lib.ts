@@ -490,6 +490,12 @@ export const $lib = createTypeSpecLibrary({
         default: "All services must have the same server and auth definitions.",
       },
     },
+    "unused-client-initialization-parameter": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`Client initialization parameter '${"parameterName"}' is not used in any operations of client '${"clientName"}' or its sub-clients.`,
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,

@@ -19,6 +19,7 @@ import {
   getActualClientType,
   getTypeDecorators,
 } from "./internal-utils.js";
+import { createDiagnostic } from "./lib.js";
 import { getLicenseInfo } from "./license.js";
 import { getCrossLanguagePackageId, getNamespaceFromType } from "./public-utils.js";
 import { getAllReferencedTypes, handleAllTypes } from "./types.js";
@@ -52,6 +53,7 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
     },
   };
   organizeNamespaces(context, sdkPackage);
+  diagnostics.pipe(validateClientInitializationParameters(context, sdkPackage));
   return diagnostics.wrap(sdkPackage);
 }
 
@@ -142,6 +144,124 @@ function populateApiVersionInformation(context: TCGCContext): void {
       context.setApiVersionsForType(clientType, versions);
 
       context.__clientApiVersionDefaultValueCache.set(client, versions[versions.length - 1]);
+    }
+  }
+}
+
+/**
+ * Validates that all client initialization parameters are actually used in at least one operation
+ * of the client or its sub-clients.
+ */
+function validateClientInitializationParameters<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
+  sdkPackage: SdkPackage<TServiceOperation>,
+): readonly Diagnostic[] {
+  const diagnostics: Diagnostic[] = [];
+
+  // Process all top-level clients
+  for (const client of sdkPackage.clients) {
+    diagnostics.push(...validateClientInitializationParametersRecursive(context, client));
+  }
+
+  return diagnostics;
+}
+
+/**
+ * Recursively validates client initialization parameters for a client and all its children.
+ */
+function validateClientInitializationParametersRecursive<
+  TServiceOperation extends SdkServiceOperation,
+>(context: TCGCContext, client: SdkClientType<TServiceOperation>): Diagnostic[] {
+  const diagnostics: Diagnostic[] = [];
+
+  // Get the raw entity (Namespace or Interface) to report diagnostics on
+  const target = client.__raw.type;
+  if (!target) {
+    // If there's no target, skip validation for this client
+    return diagnostics;
+  }
+
+  // Collect all operation parameters from this client and all sub-clients
+  const allOperationParameterNames = new Set<string>();
+  collectOperationParameterNames(client, allOperationParameterNames);
+
+  // Check each client initialization parameter
+  for (const param of client.clientInitialization.parameters) {
+    // Skip built-in parameters like endpoint and credential
+    if (param.kind === "endpoint" || param.kind === "credential") {
+      continue;
+    }
+
+    // Check if this parameter is used in any operation
+    if (!allOperationParameterNames.has(param.name)) {
+      diagnostics.push(
+        createDiagnostic({
+          code: "unused-client-initialization-parameter",
+          target: target,
+          format: {
+            parameterName: param.name,
+            clientName: client.name,
+          },
+        }),
+      );
+    }
+  }
+
+  // Recursively validate sub-clients
+  if (client.children) {
+    for (const child of client.children) {
+      diagnostics.push(...validateClientInitializationParametersRecursive(context, child));
+    }
+  }
+
+  return diagnostics;
+}
+
+/**
+ * Collects all parameter names used in operations of a client and all its sub-clients.
+ */
+function collectOperationParameterNames<TServiceOperation extends SdkServiceOperation>(
+  client: SdkClientType<TServiceOperation>,
+  parameterNames: Set<string>,
+): void {
+  // Collect parameters from all methods in this client
+  for (const method of client.methods) {
+    if (method.kind === "clientaccessor") {
+      // Client accessors don't have operations, skip them
+      continue;
+    }
+
+    // Check operation parameters
+    if (method.operation && method.operation.kind === "http") {
+      for (const param of method.operation.parameters) {
+        // Check correspondingMethodParams to find the client initialization parameter
+        if (param.correspondingMethodParams) {
+          for (const methodParam of param.correspondingMethodParams) {
+            if (methodParam.kind === "method" && methodParam.onClient) {
+              parameterNames.add(methodParam.name);
+            }
+          }
+        }
+      }
+
+      // Also check body parameter
+      if (method.operation.bodyParam) {
+        const bodyParam = method.operation.bodyParam;
+        if (bodyParam.correspondingMethodParams) {
+          for (const methodParam of bodyParam.correspondingMethodParams) {
+            if (methodParam.kind === "method" && methodParam.onClient) {
+              parameterNames.add(methodParam.name);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Recursively collect from sub-clients
+  if (client.children) {
+    for (const child of client.children) {
+      collectOperationParameterNames(child, parameterNames);
     }
   }
 }
