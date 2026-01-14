@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.64.1
+
+### Bug Fixes
+
+- [#3767](https://github.com/Azure/typespec-azure/pull/3767) Fix enum type exclusion in protocol methods when `@convenientAPI(false)`.
+- [#3768](https://github.com/Azure/typespec-azure/pull/3768) Refine diagnostic for LRO and paging metadata generation.
+
+
 ## 0.64.0
 
 ### Features

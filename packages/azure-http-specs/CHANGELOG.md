@@ -1,5 +1,12 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.36
+
+### Bug Fixes
+
+- [#3770](https://github.com/Azure/typespec-azure/pull/3770) Fix missing api-version in nextLink of lropaging test scenario.
+
+
 ## 0.1.0-alpha.35
 
 ### Features
