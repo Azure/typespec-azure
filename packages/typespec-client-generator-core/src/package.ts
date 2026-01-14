@@ -1,4 +1,9 @@
-import { createDiagnosticCollector, Diagnostic, ignoreDiagnostics } from "@typespec/compiler";
+import {
+  createDiagnosticCollector,
+  Diagnostic,
+  getNamespaceFullName,
+  ignoreDiagnostics,
+} from "@typespec/compiler";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { createSdkClientType } from "./clients.js";
 import { listClients } from "./decorators.js";
@@ -32,6 +37,17 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   const allReferencedTypes = getAllReferencedTypes(context);
   const versions = context.getPackageVersions();
+  
+  // Create apiVersions map for multiple services
+  const apiVersionsMap = new Map<string, string>();
+  for (const [namespace, versionList] of versions.entries()) {
+    const fullName = getNamespaceFullName(namespace);
+    const latestVersion = versionList.at(-1);
+    if (latestVersion) {
+      apiVersionsMap.set(fullName, latestVersion);
+    }
+  }
+  
   const sdkPackage: SdkPackage<TServiceOperation> = {
     clients: listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c))),
     models: allReferencedTypes.filter((x): x is SdkModelType => x.kind === "model"),
@@ -49,6 +65,7 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
           : versions.size === 1
             ? [...versions.values()][0].at(-1)
             : undefined,
+      apiVersions: apiVersionsMap,
     },
   };
   organizeNamespaces(context, sdkPackage);
