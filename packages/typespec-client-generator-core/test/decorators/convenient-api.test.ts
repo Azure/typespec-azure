@@ -1,4 +1,4 @@
-import { Enum, Operation } from "@typespec/compiler";
+import { Operation } from "@typespec/compiler";
 import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { shouldGenerateConvenient, shouldGenerateProtocol } from "../../src/decorators.js";
@@ -349,7 +349,7 @@ describe("@protocolAPI and @convenientAPI with scope", () => {
 
 describe("@convenientAPI(false) with enum parameters", () => {
   it("enum in query parameter should have Input usage even with convenientAPI(false)", async () => {
-    const { IncludeEnum } = (await runner.compile(`
+    await runner.compile(`
       @service
       namespace TestService {
         enum IncludeEnum {
@@ -370,7 +370,7 @@ describe("@convenientAPI(false) with enum parameters", () => {
           @query(#{explode: true}) include?: IncludeEnum[],
         ): ItemResult;
       }
-    `)) as { IncludeEnum: Enum };
+    `);
 
     const sdkPackage = runner.context.sdkPackage;
     ok(sdkPackage.enums);
@@ -383,7 +383,7 @@ describe("@convenientAPI(false) with enum parameters", () => {
   });
 
   it("enum in header parameter should have Input usage even with convenientAPI(false)", async () => {
-    const { StatusEnum } = (await runner.compile(`
+    await runner.compile(`
       @service
       namespace TestService {
         enum StatusEnum {
@@ -401,7 +401,7 @@ describe("@convenientAPI(false) with enum parameters", () => {
           @header status: StatusEnum,
         ): Response;
       }
-    `)) as { StatusEnum: Enum };
+    `);
 
     const sdkPackage = runner.context.sdkPackage;
     ok(sdkPackage.enums);
@@ -414,7 +414,7 @@ describe("@convenientAPI(false) with enum parameters", () => {
   });
 
   it("enum in path parameter should have Input usage even with convenientAPI(false)", async () => {
-    const { ResourceType } = (await runner.compile(`
+    await runner.compile(`
       @service
       namespace TestService {
         enum ResourceType {
@@ -433,7 +433,7 @@ describe("@convenientAPI(false) with enum parameters", () => {
           @path id: string,
         ): Resource;
       }
-    `)) as { ResourceType: Enum };
+    `);
 
     const sdkPackage = runner.context.sdkPackage;
     ok(sdkPackage.enums);
