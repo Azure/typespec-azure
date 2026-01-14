@@ -1615,9 +1615,9 @@ function updateTypesFromOperation(
   for (const param of httpOperation.parameters.parameters) {
     if (isNeverOrVoidType(param.param.type)) continue;
     const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param.param, operation));
-    if (generateConvenient) {
-      diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
-    }
+    // Always update input usage for HTTP operation parameters (header, query, path)
+    // even when generateConvenient is false, so that types like enums are included
+    diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
     const access = getAccessOverride(context, operation) ?? "public";
     diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
   }
