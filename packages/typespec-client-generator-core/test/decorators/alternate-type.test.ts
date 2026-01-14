@@ -686,7 +686,7 @@ describe("external types", () => {
       };
     `)
     )[1];
-    strictEqual(diagnostics.length, 1);
+    strictEqual(diagnostics.length, 3);
     strictEqual(
       diagnostics[0].code,
       "@azure-tools/typespec-client-generator-core/external-library-version-mismatch",
@@ -951,4 +951,74 @@ it("should not set usage on original enum when inline alternateType is used", as
   const sdkEnum = runner.context.__referencedTypeCache.get(Status);
   strictEqual(sdkEnum?.kind, "enum");
   strictEqual(sdkEnum.usage, UsageFlags.None, "Status enum should have None usage");
+});
+
+it("applied to union", async () => {
+  await runner.compileWithBuiltInService(`
+    @alternateType(unknown)
+    union Dfe<T> {
+      T,
+      int32,
+    }
+
+    @usage(Usage.input)
+    /** Employee move response */
+    model MoveResponse {
+      /** The status of the move */
+      movingStatus: Dfe<string>;
+    }
+    `);
+  const models = getAllModels(runner.context);
+  const moveResponse = models.find((m) => m.name === "MoveResponse");
+  strictEqual(moveResponse?.kind, "model");
+
+  const movingStatusProperty = moveResponse?.properties.find((p) => p.name === "movingStatus");
+  strictEqual(movingStatusProperty?.type.kind, "unknown");
+});
+
+it("applied to enum", async () => {
+  await runner.compileWithBuiltInService(`
+    @alternateType(unknown)
+    enum StatusEnum {
+      Active,
+      Inactive,
+      Pending,
+    }
+
+    @usage(Usage.input)
+    /** Employee status model */
+    model EmployeeStatus {
+      /** The status of the employee */
+      status: StatusEnum;
+    }
+    `);
+  const models = getAllModels(runner.context);
+  const employeeStatus = models.find((m) => m.name === "EmployeeStatus");
+  strictEqual(employeeStatus?.kind, "model");
+
+  const statusProperty = employeeStatus?.properties.find((p) => p.name === "status");
+  strictEqual(statusProperty?.type.kind, "unknown");
+});
+
+it("applied to model", async () => {
+  await runner.compileWithBuiltInService(`
+    @alternateType(unknown)
+    model Address {
+      street: string;
+      city: string;
+    }
+
+    @usage(Usage.input)
+    /** Employee info model */
+    model EmployeeInfo {
+      /** The address of the employee */
+      address: Address;
+    }
+    `);
+  const models = getAllModels(runner.context);
+  const employeeInfo = models.find((m) => m.name === "EmployeeInfo");
+  strictEqual(employeeInfo?.kind, "model");
+
+  const addressProperty = employeeInfo?.properties.find((p) => p.name === "address");
+  strictEqual(addressProperty?.type.kind, "unknown");
 });

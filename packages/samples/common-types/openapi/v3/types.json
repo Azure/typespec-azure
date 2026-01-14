@@ -265,7 +265,7 @@
     },
     "OperationDisplay": {
       "type": "object",
-      "description": "Localized display information for and operation.",
+      "description": "Localized display information for an operation.",
       "properties": {
         "provider": {
           "type": "string",

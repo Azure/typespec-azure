@@ -403,17 +403,11 @@ export const $lib = createTypeSpecLibrary({
           "`@clientLocation` could only move operation to the interface or namespace belong to the root namespace with `@service`.",
       },
     },
-    "client-location-duplicate": {
-      severity: "warning",
-      messages: {
-        default:
-          "`@clientLocation`'s target should not duplicate with defined namespace or interface under `@service` namespace.",
-      },
-    },
     "legacy-hierarchy-building-conflict": {
       severity: "warning",
       messages: {
-        default: paramMessage`@hierarchyBuilding decorator causes conflicts in inherited properties. Please check that the model ${"childModel"} has the same properties as ${"parentModel"} in the spec.`,
+        "property-missing": paramMessage`@hierarchyBuilding decorator conflict: Model ${"childModel"} is missing property '${"propertyName"}' that is required by parent model ${"parentModel"}.`,
+        "type-mismatch": paramMessage`@hierarchyBuilding decorator conflict: Property '${"propertyName"}' in model ${"childModel"} has a different type than parent model ${"parentModel"} expects.`,
       },
     },
     "legacy-hierarchy-building-circular-reference": {
@@ -468,13 +462,6 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: "Can not define multiple explicit clients with multiple services.",
-      },
-    },
-    "client-location-new-operation-group-multi-service": {
-      severity: "error",
-      messages: {
-        default:
-          "Cannot move operations from different services to a new operation group that doesn't exist.",
       },
     },
     "invalid-client-service-multiple": {

@@ -136,14 +136,14 @@ function populateApiVersionInformation(context: TCGCContext): void {
     const clientType = getActualClientType(client);
 
     // Multiple service case. Set empty result.
-    if (Array.isArray(client.service)) {
+    if (client.services.length > 1) {
       context.setApiVersionsForType(clientType, []);
       context.__clientApiVersionDefaultValueCache.set(client, undefined);
     } else {
       const versions = filterApiVersionsWithDecorators(
         context,
         clientType,
-        packageVersions.get(client.service) || [],
+        packageVersions.get(client.services[0]) || [],
       );
       context.setApiVersionsForType(clientType, versions);
 

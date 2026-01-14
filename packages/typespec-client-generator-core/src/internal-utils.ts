@@ -124,7 +124,7 @@ export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean
   const explicitClients = listScopedDecoratorData(context, clientKey);
   let multiServices = false;
   explicitClients.forEach((value) => {
-    if (Array.isArray((value as SdkClient).service)) {
+    if ((value as SdkClient).services.length > 1) {
       multiServices = true;
     }
   });
@@ -363,12 +363,7 @@ export function getSdkTypeBaseHelper<TKind>(
   ) {
     const external = getAlternateType(context, type);
     // Only set external if it's an ExternalTypeInfo (has 'identity' but not 'kind' property), not a regular Type
-    if (
-      external &&
-      typeof external === "object" &&
-      "identity" in external &&
-      !("kind" in external)
-    ) {
+    if (external && external.kind === "externalTypeInfo") {
       base.external = external;
     }
   }
@@ -788,13 +783,8 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
     // See all explicit clients that in TypeSpec program
     if (!unsafe_Realm.realmForType.has(k)) {
       const sdkClient = v as SdkClient;
-      if (Array.isArray(sdkClient.service)) {
-        explicitClientNamespaces.push(k as Namespace);
-        sdkClient.service.forEach((s) => explicitServices.add(s));
-      } else {
-        explicitClientNamespaces.push(k as Namespace);
-        explicitServices.add(sdkClient.service);
-      }
+      explicitClientNamespaces.push(k as Namespace);
+      sdkClient.services.forEach((s) => explicitServices.add(s));
     }
   });
 
@@ -1018,8 +1008,8 @@ export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation
 export function getActualClientType(client: SdkClient | SdkOperationGroup): Namespace | Interface {
   if (client.kind === "SdkClient") return client.type;
   if (client.type) return client.type;
-  // Created operation group from `@clientLocation`. Only for single service.
-  return client.service;
+  // Created operation group from `@clientLocation`. May have single or multiple services. Choose the first service for multi-service case.
+  return client.services[0];
 }
 
 export function isSameServers(left: HttpServer[], right: HttpServer[]): boolean {
