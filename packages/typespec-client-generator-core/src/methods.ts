@@ -268,7 +268,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
   } else {
     const markAsPageableInfo = getMarkAsPageable(context, operation);
     if (markAsPageableInfo) {
-      const itemsProperty = ignoreDiagnostics(
+      const itemsProperty = diagnostics.pipe(
         getSdkModelPropertyType(context, markAsPageableInfo.itemsProperty, operation),
       );
       // tcgc will let all paging method return a list of items
@@ -454,9 +454,9 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
         return {
           kind: "pollingSuccessProperty",
           responseModel: getSdkModel(context, step.responseModel),
-          target: ignoreDiagnostics(getSdkModelPropertyType(context, step.target)),
+          target: diagnostics.pipe(getSdkModelPropertyType(context, step.target)),
           sourceProperty: step.sourceProperty
-            ? ignoreDiagnostics(getSdkModelPropertyType(context, step.sourceProperty))
+            ? diagnostics.pipe(getSdkModelPropertyType(context, step.sourceProperty))
             : undefined,
         };
       }
@@ -515,7 +515,8 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     }
     return {
       kind: "reference",
-      operation: diagnostics.pipe(getSdkBasicServiceMethod(context, reference.operation, client))
+      // since these operations may not be included in the client customization, we ignore diagnostics here
+      operation: ignoreDiagnostics(getSdkBasicServiceMethod(context, reference.operation, client))
         .operation,
       parameterMap: reference.parameterMap,
       parameters,
