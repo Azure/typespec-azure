@@ -1565,6 +1565,86 @@ it("error: duplicate model names across services in multi-service client", async
   ]);
 });
 
+it("fix duplicate model names across services using @clientName in client.tsp", async () => {
+  // When models have the same name across services, use @clientName in client.tsp
+  // to rename one of them and avoid the naming conflict
+  const runnerWithVersion = await createSdkTestRunner({
+    "api-version": "latest",
+    emitterName: "@azure-tools/typespec-python",
+  });
+  await runnerWithVersion.compileWithCustomization(
+    `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+
+      model SharedModel {
+        name: string;
+        @added(VersionsA.av2)
+        description?: string;
+      }
+
+      interface AI {
+        @route("/aTest")
+        aTest(@body body: SharedModel, @query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+
+      model SharedModel {
+        id: int32;
+        @added(VersionsB.bv2)
+        value?: string;
+      }
+
+      interface BI {
+        @route("/bTest")
+        bTest(@body body: SharedModel, @query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+    `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombineClient;
+
+    // Rename ServiceB's SharedModel to avoid naming conflict
+    @@clientName(ServiceB.SharedModel, "SharedModelB");
+  `,
+  );
+
+  const sdkPackage = runnerWithVersion.context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+
+  // Both models should exist with different names
+  const models = sdkPackage.models;
+  strictEqual(models.length, 2);
+
+  const sharedModelA = models.find((m) => m.name === "SharedModel");
+  ok(sharedModelA);
+  strictEqual(sharedModelA.namespace, "ServiceA");
+
+  const sharedModelB = models.find((m) => m.name === "SharedModelB");
+  ok(sharedModelB);
+  strictEqual(sharedModelB.namespace, "ServiceB");
+});
+
 it("error: multiple explicit clients with multiple services", async () => {
   const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
     `
