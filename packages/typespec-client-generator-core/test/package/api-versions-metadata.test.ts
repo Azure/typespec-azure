@@ -108,7 +108,7 @@ it("service without versioning should have empty apiVersions map", async () => {
   strictEqual(sdkPackage.metadata.apiVersions.size, 0);
 });
 
-it("apiVersion 'all' should populate apiVersions with latest version", async () => {
+it("apiVersion 'all' should populate apiVersions with 'all'", async () => {
   const runnerWithAll = await createSdkTestRunner({
     emitterName: "@azure-tools/typespec-python",
     "api-version": "all",
@@ -135,8 +135,8 @@ it("apiVersion 'all' should populate apiVersions with latest version", async () 
   // Check deprecated apiVersion property
   strictEqual(sdkPackage.metadata.apiVersion, "all");
   
-  // Check new apiVersions map still has the latest version
+  // Check new apiVersions map should also have "all" to be consistent
   ok(sdkPackage.metadata.apiVersions);
   strictEqual(sdkPackage.metadata.apiVersions.size, 1);
-  strictEqual(sdkPackage.metadata.apiVersions.get("WidgetService"), "v3");
+  strictEqual(sdkPackage.metadata.apiVersions.get("WidgetService"), "all");
 });

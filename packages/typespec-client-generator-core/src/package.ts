@@ -44,7 +44,12 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
     const fullName = getNamespaceFullName(namespace);
     const latestVersion = versionList.at(-1);
     if (latestVersion) {
-      apiVersionsMap.set(fullName, latestVersion);
+      // When apiVersion config is "all" for single service, store "all" in the map as well
+      const versionValue = 
+        context.apiVersion === "all" && versions.size === 1
+          ? "all"
+          : latestVersion;
+      apiVersionsMap.set(fullName, versionValue);
     }
   }
   
