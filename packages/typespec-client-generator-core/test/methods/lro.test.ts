@@ -1235,3 +1235,71 @@ describe("getLroMetadata", () => {
     );
   });
 });
+
+it("versioned LRO with customization", async () => {
+  const runnerWithCore = await createSdkTestRunner({
+    librariesToAdd: [AzureCoreTestLibrary],
+    autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+    emitterName: "@azure-tools/typespec-java",
+  });
+  await runnerWithCore.compileWithCustomization(
+    `
+    @service
+    @versioned(Versions)
+    namespace TestService;
+
+    enum Versions {
+      v1,
+      v2,
+    }
+
+    alias TestOperations = ResourceOperations<NoConditionalRequests & NoClientRequestId & NoRepeatableRequests>;
+
+    @resource("id")
+    model TestResult {
+      @key
+      id: string;
+
+      @lroStatus
+      status: JobStatus;
+    }
+
+    @lroStatus
+    union JobStatus {
+      string,
+      NotStarted: "notStarted",
+      Running: "running",
+
+      @lroSucceeded
+      Succeeded: "succeeded",
+
+      @lroFailed
+      Failed: "failed",
+
+      Canceled: "canceled",
+    }
+
+    @get
+    op get is TestOperations.ResourceRead<TestResult>;
+
+    @pollingOperation(get)
+    op create is TestOperations.LongRunningResourceCreateOrReplace<TestResult>;
+    `,
+    `
+    @client({
+      service: TestService,
+    })
+    namespace TestClient;
+      
+    op test is TestService.create;
+    `,
+  );
+  strictEqual(runnerWithCore.context.diagnostics.length, 0);
+  const client = runnerWithCore.context.sdkPackage.clients[0];
+  strictEqual(client.methods.length, 1);
+  const method = client.methods[0];
+  strictEqual(method.name, "test");
+  strictEqual(method.kind, "lro");
+  const lroMetadata = method.lroMetadata;
+  ok(lroMetadata);
+});
