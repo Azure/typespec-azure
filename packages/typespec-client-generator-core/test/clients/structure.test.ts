@@ -1497,12 +1497,10 @@ it("one client from multiple services with different useDependency versions", as
   strictEqual(biApiVersionParam.clientDefaultValue, "bv3");
 });
 
-it("one client from multiple services with models shared across services", async () => {
-  const runnerWithVersion = await createSdkTestRunner({
-    "api-version": "latest",
-    emitterName: "@azure-tools/typespec-python",
-  });
-  await runnerWithVersion.compileWithCustomization(
+it("error: duplicate model names across services in multi-service client", async () => {
+  // Models with the same name across different services will collide when generated
+  // into the same namespace during multi-service generation
+  const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
     `
     @service
     @versioned(VersionsA)
@@ -1553,42 +1551,18 @@ it("one client from multiple services with models shared across services", async
     namespace CombineClient;
   `,
   );
-  const sdkPackage = runnerWithVersion.context.sdkPackage;
-  strictEqual(sdkPackage.clients.length, 1);
-  const client = sdkPackage.clients[0];
-  strictEqual(client.name, "CombineClient");
-
-  // Both SharedModel types should exist - one from each service
-  const models = sdkPackage.models;
-  strictEqual(models.length, 2);
-
-  const sharedModelA = models.find((m) => m.namespace === "ServiceA");
-  ok(sharedModelA);
-  strictEqual(sharedModelA.name, "SharedModel");
-  strictEqual(sharedModelA.properties.length, 2);
-  const nameProperty = sharedModelA.properties.find((p) => p.name === "name");
-  ok(nameProperty);
-  const descriptionProperty = sharedModelA.properties.find((p) => p.name === "description");
-  ok(descriptionProperty);
-
-  const sharedModelB = models.find((m) => m.namespace === "ServiceB");
-  ok(sharedModelB);
-  strictEqual(sharedModelB.name, "SharedModel");
-  strictEqual(sharedModelB.properties.length, 2);
-  const idProperty = sharedModelB.properties.find((p) => p.name === "id");
-  ok(idProperty);
-  const valueProperty = sharedModelB.properties.find((p) => p.name === "value");
-  ok(valueProperty);
-
-  const aiClient = client.children!.find((c) => c.name === "AI");
-  ok(aiClient);
-  strictEqual(aiClient.apiVersions.length, 2);
-  deepStrictEqual(aiClient.apiVersions, ["av1", "av2"]);
-
-  const biClient = client.children!.find((c) => c.name === "BI");
-  ok(biClient);
-  strictEqual(biClient.apiVersions.length, 2);
-  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message:
+        'Client name: "SharedModel" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message:
+        'Client name: "SharedModel" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+    },
+  ]);
 });
 
 it("error: multiple explicit clients with multiple services", async () => {

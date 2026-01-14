@@ -18,6 +18,7 @@ import {
   filterApiVersionsWithDecorators,
   getActualClientType,
   getTypeDecorators,
+  validateCrossNamespaceNamesWithFlag,
 } from "./internal-utils.js";
 import { getLicenseInfo } from "./license.js";
 import { getCrossLanguagePackageId, getNamespaceFromType } from "./public-utils.js";
@@ -27,6 +28,11 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
 ): [SdkPackage<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+
+  // Validate cross-namespace names if namespace flag is set (flattens namespaces)
+  // Can't validate in $onValidate bc we don't have access to the namespace flag
+  validateCrossNamespaceNamesWithFlag(context, diagnostics);
+
   populateApiVersionInformation(context);
   diagnostics.pipe(handleAllTypes(context));
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));

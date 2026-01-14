@@ -1132,3 +1132,100 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
   }
   return true;
 }
+
+/**
+ * Validates that there are no duplicate type names across namespaces when the namespace flag
+ * is used (which flattens all namespaces to a single namespace).
+ *
+ * This should be called during package creation when the namespaceFlag is set.
+ *
+ * @param context The TCGC context
+ * @param diagnostics The diagnostic collector to add errors to
+ */
+export function validateCrossNamespaceNamesWithFlag(
+  context: TCGCContext,
+  diagnostics: ReturnType<typeof createDiagnosticCollector>,
+): void {
+  // Only relevant when namespaceFlag flattens namespaces
+  if (!context.namespaceFlag) return;
+
+  // Track all type names globally: name -> types with that name
+  const allTypeNames = new Map<string, Type[]>();
+
+  // Collect all types across all USER-DEFINED namespaces only
+  const userNamespaces = listAllUserDefinedNamespaces(context);
+  for (const ns of userNamespaces) {
+    collectTypesFromNamespace(context.program, ns, allTypeNames);
+  }
+
+  // Report duplicates
+  for (const [name, types] of allTypeNames) {
+    if (types.length > 1) {
+      for (const type of types) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "duplicate-client-name",
+            messageId: "nonDecorator",
+            format: { name, scope: "AllScopes" },
+            target: type,
+          }),
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Collect top-level types from a single namespace (non-recursive).
+ * Only collects user-defined types.
+ */
+function collectTypesFromNamespace(
+  program: Program,
+  namespace: Namespace,
+  allTypeNames: Map<string, Type[]>,
+): void {
+  // Collect models
+  for (const model of namespace.models.values()) {
+    if (model.name && $(program).type.isUserDefined(model)) {
+      const existing = allTypeNames.get(model.name) ?? [];
+      existing.push(model);
+      allTypeNames.set(model.name, existing);
+    }
+  }
+
+  // Collect enums
+  for (const enumType of namespace.enums.values()) {
+    if (enumType.name && $(program).type.isUserDefined(enumType)) {
+      const existing = allTypeNames.get(enumType.name) ?? [];
+      existing.push(enumType);
+      allTypeNames.set(enumType.name, existing);
+    }
+  }
+
+  // Collect unions
+  for (const unionType of namespace.unions.values()) {
+    if (unionType.name && $(program).type.isUserDefined(unionType)) {
+      const existing = allTypeNames.get(unionType.name) ?? [];
+      existing.push(unionType);
+      allTypeNames.set(unionType.name, existing);
+    }
+  }
+
+  // Collect interfaces
+  for (const iface of namespace.interfaces.values()) {
+    if (iface.name && $(program).type.isUserDefined(iface)) {
+      const existing = allTypeNames.get(iface.name) ?? [];
+      existing.push(iface);
+      allTypeNames.set(iface.name, existing);
+    }
+  }
+
+  // Collect scalars
+  for (const scalar of namespace.scalars.values()) {
+    if (scalar.name && $(program).type.isUserDefined(scalar)) {
+      const existing = allTypeNames.get(scalar.name) ?? [];
+      existing.push(scalar);
+      allTypeNames.set(scalar.name, existing);
+    }
+  }
+}

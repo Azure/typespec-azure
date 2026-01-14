@@ -1,11 +1,278 @@
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
-import { beforeEach, it } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 
 let runner: SdkTestRunner;
 
 beforeEach(async () => {
   runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
+});
+
+describe("multi-service duplicate name validation", () => {
+  // In multi-service scenarios, models/enums/unions with the same name in different services
+  // ARE duplicates because they will be generated into the same namespace during multi-service generation.
+
+  it("error for same model name across services in multi-service client", async () => {
+    // Same-named models in different services will collide when generated
+    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+      `
+      @service
+      @versioned(VersionsA)
+      namespace ServiceA {
+        enum VersionsA { v1 }
+        model Foo { a: string; }
+      }
+      @service
+      @versioned(VersionsB)
+      namespace ServiceB {
+        enum VersionsB { v1 }
+        model Foo { b: string; }
+      }
+      `,
+      `
+      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+      @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
+      namespace CombineClient;
+      `,
+    );
+
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        message:
+          'Client name: "Foo" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+      },
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        message:
+          'Client name: "Foo" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+      },
+    ]);
+  });
+
+  it("error for same enum name across services in multi-service client", async () => {
+    // Same-named enums in different services will collide when generated
+    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+      `
+      @service
+      @versioned(VersionsA)
+      namespace ServiceA {
+        enum VersionsA { v1 }
+        enum Status { Active, Inactive }
+      }
+      @service
+      @versioned(VersionsB)
+      namespace ServiceB {
+        enum VersionsB { v1 }
+        enum Status { Pending, Complete }
+      }
+      `,
+      `
+      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+      @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
+      namespace CombineClient;
+      `,
+    );
+
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        message:
+          'Client name: "Status" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+      },
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        message:
+          'Client name: "Status" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+      },
+    ]);
+  });
+
+  it("error for same union name across services in multi-service client", async () => {
+    // Same-named unions in different services will collide when generated
+    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+      `
+      @service
+      @versioned(VersionsA)
+      namespace ServiceA {
+        enum VersionsA { v1 }
+        union MyUnion { string, int32 }
+      }
+      @service
+      @versioned(VersionsB)
+      namespace ServiceB {
+        enum VersionsB { v1 }
+        union MyUnion { boolean, float32 }
+      }
+      `,
+      `
+      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+      @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
+      namespace CombineClient;
+      `,
+    );
+
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        message:
+          'Client name: "MyUnion" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+      },
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        message:
+          'Client name: "MyUnion" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+      },
+    ]);
+  });
+
+  it("no error for different names across services", async () => {
+    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+      `
+      @service
+      @versioned(VersionsA)
+      namespace ServiceA {
+        enum VersionsA { v1 }
+        model FooA { a: string; }
+      }
+      @service
+      @versioned(VersionsB)
+      namespace ServiceB {
+        enum VersionsB { v1 }
+        model FooB { b: string; }
+      }
+      `,
+      `
+      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+      @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
+      namespace CombineClient;
+      `,
+    );
+
+    expectDiagnosticEmpty(diagnostics);
+  });
+
+  it("error for @clientName same name across services in multi-service client", async () => {
+    // @clientName causing same name across services will collide when generated
+    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+      `
+      @service
+      @versioned(VersionsA)
+      namespace ServiceA {
+        enum VersionsA { v1 }
+        @clientName("SharedName")
+        model ModelA { a: string; }
+      }
+      @service
+      @versioned(VersionsB)
+      namespace ServiceB {
+        enum VersionsB { v1 }
+        @clientName("SharedName")
+        model ModelB { b: string; }
+      }
+      `,
+      `
+      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+      @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
+      namespace CombineClient;
+      `,
+    );
+
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        message: 'Client name: "SharedName" is duplicated in language scope: "AllScopes"',
+      },
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        message: 'Client name: "SharedName" is duplicated in language scope: "AllScopes"',
+      },
+    ]);
+  });
+
+  it("error for nested namespace type with same name in multi-service client", async () => {
+    // Nested namespaces in different services will also collide when generated
+    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+      `
+      @service
+      @versioned(VersionsA)
+      namespace ServiceA {
+        enum VersionsA { v1 }
+        namespace Sub {
+          model Nested { a: string; }
+        }
+      }
+      @service
+      @versioned(VersionsB)
+      namespace ServiceB {
+        enum VersionsB { v1 }
+        namespace Sub {
+          model Nested { b: string; }
+        }
+      }
+      `,
+      `
+      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+      @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
+      namespace CombineClient;
+      `,
+    );
+
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        message:
+          'Client name: "Nested" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+      },
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        message:
+          'Client name: "Nested" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+      },
+    ]);
+  });
+
+  it("no error for same model name in single-service (different namespaces)", async () => {
+    // In single-service mode, same names in different namespaces are OK
+    const diagnostics = await runner.diagnose(
+      `
+      @service
+      namespace MyService {
+        namespace SubA {
+          model Foo { a: string; }
+        }
+        namespace SubB {
+          model Foo { b: string; }
+        }
+      }
+      `,
+    );
+
+    expectDiagnosticEmpty(diagnostics);
+  });
+
+  it("error for duplicate model name within same service namespace", async () => {
+    // Within the same service namespace, duplicate names ARE an error
+    const diagnostics = await runner.diagnose(
+      `
+      @service
+      namespace MyService {
+        model Foo { a: string; }
+        @clientName("Foo")
+        model Bar { b: string; }
+      }
+      `,
+    );
+
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      },
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      },
+    ]);
+  });
 });
 
 it("no duplicate operation with @clientLocation", async () => {
@@ -192,7 +459,7 @@ it("duplicate operation error for other languages", async () => {
     `
     @service
     namespace StorageService;
-      
+
     interface StorageTasks {
       @route("/list")
       op list(): void;
@@ -215,4 +482,86 @@ it("duplicate operation error for other languages", async () => {
       message: 'Client name: "list" is duplicated in language scope: "AllScopes"',
     },
   ]);
+});
+
+describe("namespace flag duplicate name validation", () => {
+  it("cross-namespace collision with namespace flag", async () => {
+    const runnerWithNamespace = await createSdkTestRunner({
+      emitterName: "@azure-tools/typespec-python",
+      namespace: "Flattened",
+    });
+    await runnerWithNamespace.compile(`
+      @service
+      namespace MyService {
+        namespace SubA {
+          model Foo { a: string; }
+        }
+        namespace SubB {
+          model Foo { b: string; }
+        }
+      }
+    `);
+
+    // When namespace flag is set, cross-namespace collisions should be reported
+    expectDiagnostics(runnerWithNamespace.context.diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        message:
+          'Client name: "Foo" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+      },
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        message:
+          'Client name: "Foo" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+      },
+    ]);
+  });
+
+  it("no collision without namespace flag", async () => {
+    // Without namespace flag, same names in different namespaces are OK
+    await runner.compile(`
+      @service
+      namespace MyService {
+        namespace SubA {
+          model Foo { a: string; }
+        }
+        namespace SubB {
+          model Foo { b: string; }
+        }
+      }
+    `);
+
+    expectDiagnosticEmpty(runner.context.diagnostics);
+  });
+
+  it("cross-namespace enum collision with namespace flag", async () => {
+    const runnerWithNamespace = await createSdkTestRunner({
+      emitterName: "@azure-tools/typespec-python",
+      namespace: "Flattened",
+    });
+    await runnerWithNamespace.compile(`
+      @service
+      namespace MyService {
+        namespace SubA {
+          enum Status { Active }
+        }
+        namespace SubB {
+          enum Status { Pending }
+        }
+      }
+    `);
+
+    expectDiagnostics(runnerWithNamespace.context.diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        message:
+          'Client name: "Status" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+      },
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        message:
+          'Client name: "Status" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+      },
+    ]);
+  });
 });

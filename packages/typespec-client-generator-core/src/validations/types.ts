@@ -16,9 +16,10 @@ import { AugmentDecoratorStatementNode, DecoratorExpressionNode } from "@typespe
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import { DuplicateTracker } from "@typespec/compiler/utils";
 import { getClientNameOverride } from "../decorators.js";
-import { TCGCContext } from "../interfaces.js";
+import { SdkClient, TCGCContext } from "../interfaces.js";
 import {
   AllScopes,
+  clientKey,
   clientLocationKey,
   clientNameKey,
   hasExplicitClientOrOperationGroup,
@@ -31,10 +32,30 @@ export function validateTypes(context: TCGCContext) {
 }
 
 /**
+ * Get all service namespaces from multi-service clients.
+ * Uses listScopedDecoratorData directly instead of listClients to avoid
+ * the cache cleanup that removes empty multi-service clients.
+ * Returns empty array if no multi-service clients exist.
+ */
+function getMultiServiceNamespaces(context: TCGCContext): Namespace[] {
+  const namespaceSet = new Set<Namespace>();
+  // Directly query @client decorator data to find multi-service clients
+  listScopedDecoratorData(context, clientKey).forEach((clientData: SdkClient) => {
+    if (clientData.services && clientData.services.length > 1) {
+      for (const ns of clientData.services) {
+        namespaceSet.add(ns);
+      }
+    }
+  });
+  return [...namespaceSet];
+}
+
+/**
  * Validate naming with `@clientName` and `@clientLocation` decorators.
  *
  * This function checks for duplicate client names for types considering the impact of `@clientName` for all possible scopes.
  * It also handles the movement of operations to new clients based on the `@clientLocation` decorators.
+ * For multi-service clients, it validates names across ALL service namespaces together.
  *
  * @param tcgcContext The context for the TypeSpec Client Generator.
  */
@@ -42,6 +63,17 @@ function validateClientNames(tcgcContext: TCGCContext) {
   const languageScopes = getDefinedLanguageScopes(tcgcContext.program);
   // If no `@client` or `@operationGroup` decorators are defined, we consider `@clientLocation`
   const needToConsiderClientLocation = !hasExplicitClientOrOperationGroup(tcgcContext);
+
+  // Detect multi-service scenario
+  const multiServiceNamespaces = getMultiServiceNamespaces(tcgcContext);
+  const isMultiService = multiServiceNamespaces.length > 0;
+
+  // Ensure we always run validation at least once (with AllScopes) for multi-service scenarios
+  // even if no @clientName/@clientLocation decorators are defined
+  if (languageScopes.size === 0 && isMultiService) {
+    languageScopes.add(AllScopes);
+  }
+
   // Check all possible language scopes
   for (const scope of languageScopes) {
     // Gather all moved operations and their targets
@@ -80,14 +112,21 @@ function validateClientNames(tcgcContext: TCGCContext) {
       }
     }
 
-    // Validate client names for the current scope
-    validateClientNamesPerNamespace(
-      tcgcContext,
-      scope,
-      moved,
-      movedTo,
-      tcgcContext.program.getGlobalNamespaceType(),
-    );
+    if (isMultiService) {
+      // For multi-service: validate types across ALL service namespaces together
+      // because they will be generated into the same namespace during multi-service generation.
+      // Same-named types across different services will collide.
+      validateClientNamesAcrossNamespaces(tcgcContext, scope, moved, movedTo, multiServiceNamespaces);
+    } else {
+      // For single-service: existing per-namespace validation
+      validateClientNamesPerNamespace(
+        tcgcContext,
+        scope,
+        moved,
+        movedTo,
+        tcgcContext.program.getGlobalNamespaceType(),
+      );
+    }
 
     // Validate client names for new client's operations
     [...newClients.values()].map((operations) => {
@@ -191,6 +230,116 @@ function validateClientNamesPerNamespace(
   }
 }
 
+/**
+ * Collect all types from a namespace and its nested namespaces recursively.
+ */
+function collectTypesFromNamespace(
+  namespace: Namespace,
+  models: Model[],
+  enums: Enum[],
+  unions: Union[],
+  scalars: Scalar[],
+) {
+  models.push(...namespace.models.values());
+  enums.push(...namespace.enums.values());
+  unions.push(...namespace.unions.values());
+  scalars.push(...namespace.scalars.values());
+
+  // Recursively collect from nested namespaces
+  for (const nestedNs of namespace.namespaces.values()) {
+    collectTypesFromNamespace(nestedNs, models, enums, unions, scalars);
+  }
+}
+
+/**
+ * Validate client names across multiple service namespaces for multi-service clients.
+ * Types with the same name across different services will collide when generated
+ * into the same namespace.
+ */
+function validateClientNamesAcrossNamespaces(
+  tcgcContext: TCGCContext,
+  scope: string | typeof AllScopes,
+  moved: Set<Operation>,
+  movedTo: Map<Namespace | Interface, Operation[]>,
+  serviceNamespaces: Namespace[],
+) {
+  // Collect all types from all service namespaces
+  const allModels: Model[] = [];
+  const allEnums: Enum[] = [];
+  const allUnions: Union[] = [];
+  const allScalars: Scalar[] = [];
+
+  for (const serviceNs of serviceNamespaces) {
+    collectTypesFromNamespace(serviceNs, allModels, allEnums, allUnions, allScalars);
+  }
+
+  // Validate models, enums, and unions together across all services
+  validateClientNamesCore(tcgcContext, scope, [...allModels, ...allEnums, ...allUnions]);
+
+  // Validate scalars across all services
+  validateClientNamesCore(tcgcContext, scope, allScalars);
+
+  // Also validate within each service namespace for operations, interfaces, properties, etc.
+  // These are scoped to their containers and don't need cross-service validation
+  for (const serviceNs of serviceNamespaces) {
+    validateClientNamesPerNamespaceOperationsOnly(tcgcContext, scope, moved, movedTo, serviceNs);
+  }
+}
+
+/**
+ * Validate only operations and their containers within a namespace.
+ * Used for multi-service validation where types are validated separately across all services.
+ */
+function validateClientNamesPerNamespaceOperationsOnly(
+  tcgcContext: TCGCContext,
+  scope: string | typeof AllScopes,
+  moved: Set<Operation>,
+  movedTo: Map<Namespace | Interface, Operation[]>,
+  namespace: Namespace,
+) {
+  // Check for duplicate client names for operations
+  validateClientNamesCore(
+    tcgcContext,
+    scope,
+    adjustOperations(namespace.operations.values(), moved, movedTo, namespace),
+  );
+
+  // Check for duplicate client names for operations in interfaces
+  for (const item of namespace.interfaces.values()) {
+    validateClientNamesCore(
+      tcgcContext,
+      scope,
+      adjustOperations(item.operations.values(), moved, movedTo, item),
+    );
+  }
+
+  // Check for duplicate client names for interfaces
+  validateClientNamesCore(tcgcContext, scope, namespace.interfaces.values());
+
+  // Check for duplicate client names for namespaces
+  validateClientNamesCore(tcgcContext, scope, namespace.namespaces.values());
+
+  // Check for duplicate client names for model properties (within each model)
+  for (const model of namespace.models.values()) {
+    validateClientNamesCore(tcgcContext, scope, model.properties.values());
+  }
+
+  // Check for duplicate client names for enum members (within each enum)
+  for (const item of namespace.enums.values()) {
+    validateClientNamesCore(tcgcContext, scope, item.members.values());
+  }
+
+  // Check for duplicate client names for union variants (within each union)
+  for (const item of namespace.unions.values()) {
+    validateClientNamesCore(tcgcContext, scope, item.variants.values());
+  }
+
+  // Recurse into nested namespaces
+  for (const item of namespace.namespaces.values()) {
+    validateClientNamesPerNamespaceOperationsOnly(tcgcContext, scope, moved, movedTo, item);
+  }
+}
+
 function validateClientNamesCore(
   tcgcContext: TCGCContext,
   scope: string | typeof AllScopes,
@@ -212,6 +361,35 @@ function validateClientNamesCore(
     Type | [Type, DecoratorExpressionNode | AugmentDecoratorStatementNode]
   >();
 
+  trackItemsInDuplicateTracker(tcgcContext, scope, items, duplicateTracker);
+
+  reportDuplicateClientNames(tcgcContext.program, duplicateTracker, scope);
+}
+
+/**
+ * Track items in the duplicate tracker.
+ * This is extracted so it can be reused for cross-namespace validation.
+ */
+function trackItemsInDuplicateTracker(
+  tcgcContext: TCGCContext,
+  scope: string | typeof AllScopes,
+  items: Iterable<
+    | Namespace
+    | Scalar
+    | Operation
+    | Interface
+    | Model
+    | Enum
+    | Union
+    | ModelProperty
+    | EnumMember
+    | UnionVariant
+  >,
+  duplicateTracker: DuplicateTracker<
+    string,
+    Type | [Type, DecoratorExpressionNode | AugmentDecoratorStatementNode]
+  >,
+) {
   for (const item of items) {
     const clientName = getClientNameOverride(tcgcContext, item, scope);
     if (clientName !== undefined) {
@@ -225,8 +403,6 @@ function validateClientNamesCore(
       }
     }
   }
-
-  reportDuplicateClientNames(tcgcContext.program, duplicateTracker, scope);
 }
 
 function reportDuplicateClientNames(
