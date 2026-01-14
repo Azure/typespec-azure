@@ -515,7 +515,7 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     }
     return {
       kind: "reference",
-      // since these operations may not defined in the spec, we ignore diagnostics here
+      // since these operations may not be included in the client customization, we ignore diagnostics here
       operation: ignoreDiagnostics(getSdkBasicServiceMethod(context, reference.operation, client))
         .operation,
       parameterMap: reference.parameterMap,
