@@ -116,7 +116,13 @@ function validateClientNames(tcgcContext: TCGCContext) {
       // For multi-service: validate types across ALL service namespaces together
       // because they will be generated into the same namespace during multi-service generation.
       // Same-named types across different services will collide.
-      validateClientNamesAcrossNamespaces(tcgcContext, scope, moved, movedTo, multiServiceNamespaces);
+      validateClientNamesAcrossNamespaces(
+        tcgcContext,
+        scope,
+        moved,
+        movedTo,
+        multiServiceNamespaces,
+      );
     } else {
       // For single-service: existing per-namespace validation
       validateClientNamesPerNamespace(
