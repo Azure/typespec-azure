@@ -255,6 +255,11 @@ function validateClientNamesPerNamespace(
 
 /**
  * Collect all types from a namespace and its nested namespaces recursively.
+ *
+ * TODO: This currently collects ALL types in the namespace, including types that may not
+ * be used by the client. Ideally we should only validate types that are actually referenced
+ * by the client's operations. This would require running after SDK type resolution or
+ * implementing usage tracking at the TypeSpec level.
  */
 function collectTypesFromNamespace(
   namespace: Namespace,
