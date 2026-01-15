@@ -722,7 +722,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_LroPaging_postPagingLro = pas
       if (postPagingLroPollCount > 0) {
         const response = {
           ...validProductListResult,
-          nextLink: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location/nextPage`,
+          nextLink: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location/nextPage?api-version=2023-12-01-preview`,
         };
         return {
           status: 200,
