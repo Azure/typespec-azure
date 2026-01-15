@@ -1,20 +1,16 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import { it } from "vitest";
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithBuiltInService } from "../tester.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
 it("head operation marked as void", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     @responseAsBool
     @head
     op headOperation(): void;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.kind, "basic");
   const operation = method.operation;
@@ -38,7 +34,7 @@ it("head operation marked as void", async () => {
 });
 
 it("head operation marked as void with error model", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     @error
     model Error {
       code: int32;
@@ -49,7 +45,8 @@ it("head operation marked as void with error model", async () => {
     @head
     op headOperation(): void | Error;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.kind, "basic");
   const operation = method.operation;
@@ -73,12 +70,13 @@ it("head operation marked as void with error model", async () => {
 });
 
 it("head operation with explicitly marked valid response", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     @responseAsBool
     @head
     op headOperation(): boolean;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.kind, "basic");
   const operation = method.operation;
@@ -95,8 +93,9 @@ it("head operation with explicitly marked valid response", async () => {
   strictEqual(fourOFourResponse.type.valueType.kind, "boolean");
   strictEqual(method.response.type?.kind, "boolean");
 });
+
 it("head operation with explicitly marked 404", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     @error
     model Error {
       code: int32;
@@ -112,7 +111,8 @@ it("head operation with explicitly marked 404", async () => {
     @head
     op headOperation(): void | FourOFourError | Error;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.kind, "basic");
   const operation = method.operation;
@@ -130,8 +130,9 @@ it("head operation with explicitly marked 404", async () => {
   strictEqual(fourOFourResponse.type.value, false);
   strictEqual(fourOFourResponse.type.valueType.kind, "boolean");
 });
+
 it("non-head operation", async () => {
-  const diagnostics = await runner.diagnose(`
+  const diagnostics = await SimpleTester.diagnose(`
     @responseAsBool
     @get
     op getOperation(): boolean;

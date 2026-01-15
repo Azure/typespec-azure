@@ -1,252 +1,228 @@
-import { Model } from "@typespec/compiler";
-import { expectDiagnostics, t } from "@typespec/compiler/testing";
+import { Model, ModelProperty, Operation } from "@typespec/compiler";
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
-import { describe, it } from "vitest";
+import { beforeEach, describe, it } from "vitest";
 import { getAccess } from "../../src/decorators.js";
-import {
-  createSdkContextForTester,
-  SimpleTester,
-  SimpleTesterWithBuiltInService,
-} from "../tester.js";
+import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+
+let runner: SdkTestRunner;
+
+beforeEach(async () => {
+  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
+});
 
 describe("namespace access override", () => {
   it("should inherit access from parent namespace", async () => {
-    const { Test, program } = await SimpleTester.compile(t.code`
+    const { Test } = (await runner.compile(`
       @access(Access.public)
       @service(#{title: "Test Service"}) namespace TestService;
-      ${t.model("Test")}
+      @test
       model Test {
         prop: string;
       }
-    `);
+    `)) as { Test: Operation };
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
-    const actual = getAccess(context, Test);
+    const actual = getAccess(runner.context, Test);
     strictEqual(actual, "public");
   });
 
   it("should tag anonymous models with default access", async () => {
-    const { Test, prop, program } = await SimpleTester.compile(t.code`
+    const { Test, prop } = (await runner.compile(`
       @access(Access.public)
       @service(#{title: "Test Service"}) namespace TestService;
-      ${t.model("Test")}
+      @test
       model Test {
-        ${t.modelProperty("prop")}
+        @test
         prop: {
             foo: string;
         }
       }
-    `);
+    `)) as { Test: Operation; prop: ModelProperty };
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
-    const actual = getAccess(context, Test);
-    const actualAnonymous = getAccess(context, prop.type as Model);
+    const actual = getAccess(runner.context, Test);
+    const actualAnonymous = getAccess(runner.context, prop.type as Model);
     strictEqual(actual, "public");
     strictEqual(actualAnonymous, "public");
   });
 
   it("should tag as internal anonymous models with default access", async () => {
-    const { Test, prop, program } = await SimpleTester.compile(t.code`
+    const { Test, prop } = (await runner.compile(`
       @access(Access.internal)
       @service(#{title: "Test Service"}) namespace TestService;
-      ${t.model("Test")}
+      @test
       model Test {
-        ${t.modelProperty("prop")}
+        @test
         prop: {
             foo: string;
         }
       }
-    `);
+    `)) as { Test: Operation; prop: ModelProperty };
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
-    const actual = getAccess(context, Test);
-    const actualAnonymous = getAccess(context, prop.type as Model);
+    const actual = getAccess(runner.context, Test);
+    const actualAnonymous = getAccess(runner.context, prop.type as Model);
     strictEqual(actual, "internal");
     strictEqual(actualAnonymous, "internal");
   });
 
   it("should honor the granular override over the namespace one", async () => {
-    const { Test, program } = await SimpleTester.compile(t.code`
+    const { Test } = (await runner.compile(`
       @access(Access.public)
       @service(#{title: "Test Service"}) namespace TestService;
       @access(Access.internal)
-      ${t.model("Test")}
+      @test
       model Test {
         prop: string;
       }
-    `);
+    `)) as { Test: Operation };
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
-    const actual = getAccess(context, Test);
+    const actual = getAccess(runner.context, Test);
     strictEqual(actual, "internal");
   });
 
   it("locally mark an operation as internal", async () => {
-    const { test, program } = await SimpleTester.compile(t.code`
+    const { test } = (await runner.compile(`
       @access(Access.public)
       @service(#{title: "Test Service"}) namespace TestService;
+      @test
       @access(Access.internal)
-      op ${t.op("test")}(): void;
-    `);
+      op test(): void;
+    `)) as { test: Operation };
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
-    const actual = getAccess(context, test);
+    const actual = getAccess(runner.context, test);
     strictEqual(actual, "internal");
   });
 
   it("locally mark an operation as public", async () => {
-    const { test, program } = await SimpleTester.compile(t.code`
+    const { test } = (await runner.compile(`
       @access(Access.public)
       @service(#{title: "Test Service"}) namespace TestService;
-      op ${t.op("test")}(): void;
-    `);
+      @test
+      op test(): void;
+    `)) as { test: Operation };
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
-    const actual = getAccess(context, test);
+    const actual = getAccess(runner.context, test);
     strictEqual(actual, "public");
   });
 
   it("mark an operation as internal through the namespace", async () => {
-    const { test, program } = await SimpleTester.compile(t.code`
+    const { test } = (await runner.compile(`
       @access(Access.internal)
       @service(#{title: "Test Service"}) namespace TestService;
-      op ${t.op("test")}(): void;
-    `);
+      @test
+      op test(): void;
+    `)) as { test: Operation };
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
-    const actual = getAccess(context, test);
+    const actual = getAccess(runner.context, test);
     strictEqual(actual, "internal");
   });
 });
 
 it("default calculated value of operation is undefined, default value of calculated model is undefined", async () => {
-  const { test, Test, program } = await SimpleTester.compile(t.code`
-    ${t.model("Test")}
+  const { test, Test } = (await runner.compile(`
+    @test
     model Test{}
 
-    op ${t.op("test")}(): void;
-  `);
+    @test
+    op test(): void;
+  `)) as { test: Operation; Test: Model };
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
-  strictEqual(getAccess(context, test), "public");
-  strictEqual(getAccess(context, Test), "public");
+  strictEqual(getAccess(runner.context, test), "public");
+  strictEqual(getAccess(runner.context, Test), "public");
 });
 
 it("model access calculated by operation", async () => {
-  const { Test, func, program } = await SimpleTester.compile(t.code`
+  const { Test, func } = (await runner.compile(`
     @service
-    namespace MyService {
-      ${t.model("Test")}
+    @test namespace MyService {
+      @test
       model Test {
         prop: string;
       }
+      @test
       @access(Access.internal)
-      op ${t.op("func")}(
+      op func(
         @body body: Test
       ): void;
     }
-  `);
+  `)) as { Test: Model; func: Operation };
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
-  let actual = getAccess(context, Test);
+  let actual = getAccess(runner.context, Test);
   strictEqual(actual, "internal");
-  actual = getAccess(context, func);
+  actual = getAccess(runner.context, func);
   strictEqual(actual, "internal");
 });
 
 it("override calculated model with public access", async () => {
-  const { Test, func, program } = await SimpleTester.compile(t.code`
+  const { Test, func } = (await runner.compile(`
     @service
-    namespace MyService {
+    @test namespace MyService {
+      @test
       @access(Access.public)
-      ${t.model("Test")}
       model Test {
         prop: string;
       }
+      @test
       @access(Access.internal)
-      op ${t.op("func")}(
+      op func(
         @body body: Test
       ): void;
     }
-  `);
+  `)) as { Test: Model; func: Operation };
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
-  let actual = getAccess(context, Test);
+  let actual = getAccess(runner.context, Test);
   strictEqual(actual, "public");
-  actual = getAccess(context, func);
+  actual = getAccess(runner.context, func);
   strictEqual(actual, "internal");
 });
 
 it("override calculated model with internal access", async () => {
-  const { Test, func, program } = await SimpleTester.compile(t.code`
+  const { Test, func } = (await runner.compile(`
     @service
-    namespace MyService {
+    @test namespace MyService {
+      @test
       @access(Access.internal) // This is an incorrect usage. We will have linter to ban.
-      ${t.model("Test")}
       model Test {
         prop: string;
       }
-      op ${t.op("func")}(
+      @test
+      op func(
         @body body: Test
       ): void;
     }
-    `);
+    `)) as { Test: Model; func: Operation };
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
-  strictEqual(getAccess(context, Test), "internal");
-  strictEqual(getAccess(context, func), "public");
+  strictEqual(getAccess(runner.context, Test), "internal");
+  strictEqual(getAccess(runner.context, func), "public");
 });
 
 it("access propagation", async () => {
-  const { Fish, Shark, Salmon, SawShark, Origin, program } = await SimpleTester.compile(t.code`
+  const { Fish, Shark, Salmon, SawShark, Origin } = (await runner.compile(`
     @service
-    namespace MyService {
+    @test namespace MyService {
       @discriminator("kind")
-      ${t.model("Fish")}
+      @test
       model Fish {
         age: int32;
       }
 
       @discriminator("sharktype")
-      ${t.model("Shark")}
+      @test
       model Shark extends Fish {
         kind: "shark";
         origin: Origin;
       }
 
-      ${t.model("Salmon")}
+      @test
       model Salmon extends Fish {
         kind: "salmon";
       }
 
-      ${t.model("SawShark")}
+      @test
       model SawShark extends Shark {
         sharktype: "saw";
       }
 
-      ${t.model("Origin")}
+      @test
       model Origin {
         country: string;
         city: string;
@@ -257,95 +233,106 @@ it("access propagation", async () => {
       @access(Access.internal)
       op getModel(): Fish;
     }
-  `);
+  `)) as { Fish: Model; Shark: Model; Salmon: Model; SawShark: Model; Origin: Model };
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
-  let actual = getAccess(context, Fish);
+  let actual = getAccess(runner.context, Fish);
   strictEqual(actual, "internal");
-  actual = getAccess(context, Shark);
+  actual = getAccess(runner.context, Shark);
   strictEqual(actual, "internal");
-  actual = getAccess(context, Salmon);
+  actual = getAccess(runner.context, Salmon);
   strictEqual(actual, "internal");
-  actual = getAccess(context, SawShark);
+  actual = getAccess(runner.context, SawShark);
   strictEqual(actual, "internal");
-  actual = getAccess(context, Origin);
+  actual = getAccess(runner.context, Origin);
   strictEqual(actual, "internal");
 });
 
 it("complicated access propagation", async () => {
-  const { Test1, Test2, Test3, Test4, Test5, Test6, func1, func2, func3, func4, func5, program } =
-    await SimpleTester.compile(t.code`
+  const { Test1, Test2, Test3, Test4, Test5, Test6, func1, func2, func3, func4, func5 } =
+    (await runner.compile(`
       @service
-      namespace MyService {
-        ${t.model("Test1")}
+      @test namespace MyService {
+        @test
         model Test1 {
           prop: Test2;
         }
-        ${t.model("Test2")}
+        @test
         model Test2 {
           prop: string;
         }
+        @test
         @access(Access.internal)
         @route("/func1")
-        op ${t.op("func1")}(
+        op func1(
           @body body: Test1
         ): void;
 
-        ${t.model("Test3")}
+        @test
         model Test3 {
           prop: string;
         }
+        @test
         @access(Access.internal)
         @route("/func2")
-        op ${t.op("func2")}(
+        op func2(
           @body body: Test3
         ): void;
+        @test
         @route("/func3")
-        op ${t.op("func3")}(
+        op func3(
           @body body: Test3
         ): void;
 
-        ${t.model("Test4")}
+        @test
         model Test4 {
           prop: Test5;
         }
-        ${t.model("Test5")}
+        @test
         model Test5 {
           prop: Test6;
         }
-        ${t.model("Test6")}
+        @test
         model Test6 {
           prop: string;
         }
+        @test
         @access(Access.internal)
         @route("/func4")
-        op ${t.op("func4")}(
+        op func4(
           @body body: Test4
         ): void;
+        @test
         @route("/func5")
-        op ${t.op("func5")}(
+        op func5(
           @body body: Test6
         ): void;
       }
-    `);
+    `)) as {
+      Test1: Model;
+      Test2: Model;
+      Test3: Model;
+      Test4: Model;
+      Test5: Model;
+      Test6: Model;
+      func1: Operation;
+      func2: Operation;
+      func3: Operation;
+      func4: Operation;
+      func5: Operation;
+    };
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
-  strictEqual(getAccess(context, func1), "internal");
-  strictEqual(getAccess(context, func2), "internal");
-  strictEqual(getAccess(context, func3), "public");
-  strictEqual(getAccess(context, func4), "internal");
-  strictEqual(getAccess(context, func5), "public");
+  strictEqual(getAccess(runner.context, func1), "internal");
+  strictEqual(getAccess(runner.context, func2), "internal");
+  strictEqual(getAccess(runner.context, func3), "public");
+  strictEqual(getAccess(runner.context, func4), "internal");
+  strictEqual(getAccess(runner.context, func5), "public");
 
-  strictEqual(getAccess(context, Test1), "internal");
-  strictEqual(getAccess(context, Test2), "internal");
-  strictEqual(getAccess(context, Test3), "public");
-  strictEqual(getAccess(context, Test4), "internal");
-  strictEqual(getAccess(context, Test5), "internal");
-  strictEqual(getAccess(context, Test6), "public");
+  strictEqual(getAccess(runner.context, Test1), "internal");
+  strictEqual(getAccess(runner.context, Test2), "internal");
+  strictEqual(getAccess(runner.context, Test3), "public");
+  strictEqual(getAccess(runner.context, Test4), "internal");
+  strictEqual(getAccess(runner.context, Test5), "internal");
+  strictEqual(getAccess(runner.context, Test6), "public");
 });
 
 it("access propagation for properties, base models and sub models", async () => {
@@ -365,35 +352,34 @@ it("access propagation for properties, base models and sub models", async () => 
     func2,
     func3,
     func4,
-    program,
-  } = await SimpleTester.compile(t.code`
+  } = (await runner.compile(`
     @service
-    namespace MyService {
+    @test namespace MyService {
       @discriminator("kind")
-      ${t.model("Fish")}
+      @test
       model Fish {
         age: int32;
       }
 
-      ${t.model("Origin")}
+      @test
       model Origin {
         country: string;
         city: string;
         manufacture: string;
       }
 
-      ${t.model("Salmon")}
+      @test
       model Salmon extends Fish {
         kind: "salmon";
         origin: Origin;
       }
 
-      ${t.model("BaseModel")}
+      @test
       model BaseModel {
         base: string;
       }
 
-      ${t.model("ModelA")}
+      @test
       model ModelA extends BaseModel {
         prop1: ModelB;
         prop2: ModelC[];
@@ -402,79 +388,96 @@ it("access propagation for properties, base models and sub models", async () => 
         prop5: ModelE | ModelF;
       }
 
-      ${t.model("ModelB")}
+      @test
       model ModelB {
         prop: string;
       }
 
-      ${t.model("ModelC")}
+      @test
       model ModelC {
         prop: string;
       }
 
-      ${t.model("ModelD")}
+      @test
       model ModelD {
         prop: string;
       }
 
-      ${t.model("ModelE")}
+      @test
       model ModelE {
         prop: string;
       }
 
-      ${t.model("ModelF")}
+      @test
       model ModelF {
         prop: string;
       }
 
-      ${t.enum("EnumA")}
+      @test
       enum EnumA {
         one,
         two,
         three,
       }
 
+      @test
       @access(Access.internal)
       @route("/func1")
-      op ${t.op("func1")}(
+      op func1(
         @body body: Fish
       ): void;
+      @test
       @route("/func2")
-      op ${t.op("func2")}(
+      op func2(
         @body body: Fish
       ): void;
 
+      @test
       @access(Access.internal)
       @route("/func3")
-      op ${t.op("func3")}(
+      op func3(
         @body body: ModelA
       ): void;
+      @test
       @route("/func4")
-      op ${t.op("func4")}(
+      op func4(
         @body body: ModelA
       ): void;
     }
-  `);
+  `)) as {
+    Fish: Model;
+    Salmon: Model;
+    Origin: Model;
+    BaseModel: Model;
+    ModelA: Model;
+    ModelB: Model;
+    ModelC: Model;
+    ModelD: Model;
+    ModelE: Model;
+    ModelF: Model;
+    EnumA: Model;
+    func1: Operation;
+    func2: Operation;
+    func3: Operation;
+    func4: Operation;
+  };
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
-  strictEqual(getAccess(context, func1), "internal");
-  strictEqual(getAccess(context, func2), "public");
-  strictEqual(getAccess(context, func3), "internal");
-  strictEqual(getAccess(context, func4), "public");
+  strictEqual(getAccess(runner.context, func1), "internal");
+  strictEqual(getAccess(runner.context, func2), "public");
+  strictEqual(getAccess(runner.context, func3), "internal");
+  strictEqual(getAccess(runner.context, func4), "public");
 
-  strictEqual(getAccess(context, Fish), "public");
-  strictEqual(getAccess(context, Salmon), "public");
-  strictEqual(getAccess(context, Origin), "public");
-  strictEqual(getAccess(context, BaseModel), "public");
-  strictEqual(getAccess(context, ModelA), "public");
-  strictEqual(getAccess(context, ModelB), "public");
-  strictEqual(getAccess(context, ModelC), "public");
-  strictEqual(getAccess(context, ModelD), "public");
-  strictEqual(getAccess(context, ModelE), "public");
-  strictEqual(getAccess(context, ModelF), "public");
-  strictEqual(getAccess(context, EnumA), "public");
+  strictEqual(getAccess(runner.context, Fish), "public");
+  strictEqual(getAccess(runner.context, Salmon), "public");
+  strictEqual(getAccess(runner.context, Origin), "public");
+  strictEqual(getAccess(runner.context, BaseModel), "public");
+  strictEqual(getAccess(runner.context, ModelA), "public");
+  strictEqual(getAccess(runner.context, ModelB), "public");
+  strictEqual(getAccess(runner.context, ModelC), "public");
+  strictEqual(getAccess(runner.context, ModelD), "public");
+  strictEqual(getAccess(runner.context, ModelE), "public");
+  strictEqual(getAccess(runner.context, ModelF), "public");
+  strictEqual(getAccess(runner.context, EnumA), "public");
 });
 
 it("access propagation with override", async () => {
@@ -492,91 +495,110 @@ it("access propagation with override", async () => {
     func6,
     func7,
     func8,
-    program,
-  } = await SimpleTester.compile(t.code`
+  } = (await runner.compile(`
       @service
-      namespace MyService {
-        ${t.model("Test1")}
+      @test namespace MyService {
+        @test
         model Test1 {
         }
+        @test
         @access(Access.internal)
         @route("/func1")
-        op ${t.op("func1")}(
+        op func1(
           @body body: Test1
         ): void;
 
-        ${t.model("Test2")}
+        @test
         model Test2 {
         }
+        @test
         @route("/func2")
-        op ${t.op("func2")}(
+        op func2(
           @body body: Test2
         ): void;
 
-        ${t.model("Test3")}
+        @test
         model Test3 {
         }
+        @test
         @access(Access.public)
         @route("/func3")
-        op ${t.op("func3")}(
+        op func3(
           @body body: Test3
         ): void;
 
 
-        ${t.model("Test4")}
+        @test
         model Test4 {
         }
+        @test
         @access(Access.internal)
         @route("/func4")
-        op ${t.op("func4")}(
+        op func4(
           @body body: Test4
         ): void;
+        @test
         @route("/func5")
-        op ${t.op("func5")}(
+        op func5(
           @body body: Test4
         ): void;
 
-        ${t.model("Test5")}
+        @test
         model Test5 {
         }
+        @test
         @access(Access.internal)
         @route("/func6")
-        op ${t.op("func6")}(
+        op func6(
           @body body: Test5
         ): void;
+        @test
         @route("/func7")
-        op ${t.op("func7")}(
+        op func7(
           @body body: Test5
         ): void;
+        @test
         @access(Access.public)
         @route("/func8")
-        op ${t.op("func8")}(
+        op func8(
           @body body: Test5
         ): void;
       }
-    `);
+    `)) as {
+    Test1: Model;
+    Test2: Model;
+    Test3: Model;
+    Test4: Model;
+    Test5: Model;
+    func1: Operation;
+    func2: Operation;
+    func3: Operation;
+    func4: Operation;
+    func5: Operation;
+    func6: Operation;
+    func7: Operation;
+    func8: Operation;
+  };
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
-  strictEqual(getAccess(context, func1), "internal");
-  strictEqual(getAccess(context, func2), "public");
-  strictEqual(getAccess(context, func3), "public");
-  strictEqual(getAccess(context, func4), "internal");
-  strictEqual(getAccess(context, func5), "public");
-  strictEqual(getAccess(context, func6), "internal");
-  strictEqual(getAccess(context, func7), "public");
-  strictEqual(getAccess(context, func8), "public");
+  strictEqual(getAccess(runner.context, func1), "internal");
+  strictEqual(getAccess(runner.context, func2), "public");
+  strictEqual(getAccess(runner.context, func3), "public");
+  strictEqual(getAccess(runner.context, func4), "internal");
+  strictEqual(getAccess(runner.context, func5), "public");
+  strictEqual(getAccess(runner.context, func6), "internal");
+  strictEqual(getAccess(runner.context, func7), "public");
+  strictEqual(getAccess(runner.context, func8), "public");
 
-  strictEqual(getAccess(context, Test1), "internal");
-  strictEqual(getAccess(context, Test2), "public");
-  strictEqual(getAccess(context, Test3), "public");
-  strictEqual(getAccess(context, Test4), "public");
-  strictEqual(getAccess(context, Test5), "public");
+  strictEqual(getAccess(runner.context, Test1), "internal");
+  strictEqual(getAccess(runner.context, Test2), "public");
+  strictEqual(getAccess(runner.context, Test3), "public");
+  strictEqual(getAccess(runner.context, Test4), "public");
+  strictEqual(getAccess(runner.context, Test5), "public");
 });
 
 it("access propagation with nullable", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+  await runner.compileWithBuiltInService(
+    `
     model RunStep {
       id: string;
       lastError: RunStepError | null;
@@ -602,38 +624,34 @@ it("access propagation with nullable", async () => {
       @path runId: string,
     ): RunStep[];
     @@access(listRunSteps, Access.internal);
-  `);
-
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
-  const models = context.sdkPackage.models;
+    `,
+  );
+  const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
   strictEqual(models[0].access, "public");
   strictEqual(models[1].access, "public");
 });
 
 it("access conflict from operation", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+  await runner.compileWithBuiltInService(
+    `
     @access(Access.internal)
     model A {}
 
     op test(@body body: A): void;
-  `);
-
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
-  const models = context.sdkPackage.models;
+    `,
+  );
+  const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].access, "public");
-  expectDiagnostics(context.diagnostics, {
+  expectDiagnostics(runner.context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/conflict-access-override",
   });
 });
 
 it("access conflict from propagation", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+  await runner.compileWithBuiltInService(
+    `
     model A {
       prop: B;
     }
@@ -642,22 +660,20 @@ it("access conflict from propagation", async () => {
     model B {}
 
     op test(@body body: A): void;
-  `);
-
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
-  const models = context.sdkPackage.models;
+    `,
+  );
+  const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
   strictEqual(models[0].access, "public");
   strictEqual(models[1].access, "public");
-  expectDiagnostics(context.diagnostics, {
+  expectDiagnostics(runner.context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/conflict-access-override",
   });
 });
 
 it("access conflict from other override", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+  await runner.compileWithBuiltInService(
+    `
     model A {
       prop: B;
     }
@@ -671,23 +687,21 @@ it("access conflict from other override", async () => {
     }
 
     op test(@body body: A): void;
-  `);
-
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
-  const models = context.sdkPackage.models;
+    `,
+  );
+  const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 3);
   strictEqual(models[0].access, "public");
   strictEqual(models[1].access, "public");
   strictEqual(models[2].access, "internal");
-  expectDiagnostics(context.diagnostics, {
+  expectDiagnostics(runner.context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/conflict-access-override",
   });
 });
 
 it("access conflict from multiple override", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+  await runner.compileWithBuiltInService(
+    `
     model A {
       x: X;
     }
@@ -705,22 +719,24 @@ it("access conflict from multiple override", async () => {
 
     @access(Access.internal)
     op two(): B;
-  `);
-
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
-  const models = context.sdkPackage.models;
+    `,
+  );
+  const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
   strictEqual(models.find((m) => m.name === "B")?.access, "internal");
   strictEqual(models.find((m) => m.name === "X")?.access, "public");
-  expectDiagnostics(context.diagnostics, {
+  expectDiagnostics(runner.context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/conflict-access-override",
   });
 });
 
 it("disableUsageAccessPropagationToBase true with override", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+  runner = await createSdkTestRunner(
+    { emitterName: "@azure-tools/typespec-python" },
+    { disableUsageAccessPropagationToBase: true },
+  );
+  await runner.compileWithBuiltInService(
+    `
     model BaseClassThatsPruned {
       id: int32;
     }
@@ -733,14 +749,9 @@ it("disableUsageAccessPropagationToBase true with override", async () => {
     }
     @@usage(DerivedOne, Usage.output);
     @@access(DerivedOne, Access.public);
-  `);
-
-  const context = await createSdkContextForTester(
-    program,
-    { emitterName: "@azure-tools/typespec-python" },
-    { disableUsageAccessPropagationToBase: true },
+  `,
   );
-  const models = context.sdkPackage.models;
+  const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
   strictEqual(models[0].access, "public");
   strictEqual(models[0].name, "DerivedOne");
@@ -749,28 +760,28 @@ it("disableUsageAccessPropagationToBase true with override", async () => {
 });
 
 it("disableUsageAccessPropagationToBase true", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
-    model BaseClassThatsPruned {
-      id: int32;
-    }
-    model DerivedOne extends BaseClassThatsPruned {
-      name: string;
-      prop: UsedByProperty;
-    }
-    model UsedByProperty {
-      prop: string;
-    }
-
-    @access(Access.internal)
-    op test(): DerivedOne;
-  `);
-
-  const context = await createSdkContextForTester(
-    program,
+  runner = await createSdkTestRunner(
     { emitterName: "@azure-tools/typespec-python" },
     { disableUsageAccessPropagationToBase: true },
   );
-  const models = context.sdkPackage.models;
+  await runner.compileWithBuiltInService(
+    `
+        model BaseClassThatsPruned {
+          id: int32;
+        }
+        model DerivedOne extends BaseClassThatsPruned {
+          name: string;
+          prop: UsedByProperty;
+        }
+        model UsedByProperty {
+          prop: string;
+        }
+
+        @access(Access.internal)
+        op test(): DerivedOne;
+      `,
+  );
+  const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 2);
   strictEqual(models[0].access, "internal");
   strictEqual(models[0].name, "DerivedOne");
@@ -779,7 +790,12 @@ it("disableUsageAccessPropagationToBase true", async () => {
 });
 
 it("disableUsageAccessPropagationToBase true property propagation", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+  runner = await createSdkTestRunner(
+    { emitterName: "@azure-tools/typespec-python" },
+    { disableUsageAccessPropagationToBase: true },
+  );
+  await runner.compileWithBuiltInService(
+    `
     model BaseClassThatsPruned {
       id: int32;
       foo: UsedByBaseProperty;
@@ -797,14 +813,9 @@ it("disableUsageAccessPropagationToBase true property propagation", async () => 
 
     @access(Access.internal)
     op test(): DerivedOne;
-  `);
-
-  const context = await createSdkContextForTester(
-    program,
-    { emitterName: "@azure-tools/typespec-python" },
-    { disableUsageAccessPropagationToBase: true },
+  `,
   );
-  const models = context.sdkPackage.models;
+  const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 3);
   strictEqual(models[0].access, "internal");
   strictEqual(models[0].name, "DerivedOne");
@@ -815,7 +826,12 @@ it("disableUsageAccessPropagationToBase true property propagation", async () => 
 });
 
 it("disableUsageAccessPropagationToBase true discriminator propagation", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+  runner = await createSdkTestRunner(
+    { emitterName: "@azure-tools/typespec-python" },
+    { disableUsageAccessPropagationToBase: true },
+  );
+  await runner.compileWithBuiltInService(
+    `
     @discriminator("kind")
     model Fish {
       age: int32;
@@ -844,14 +860,9 @@ it("disableUsageAccessPropagationToBase true discriminator propagation", async (
     @get
     @access(Access.internal)
     op getModel(): Fish;
-  `);
-
-  const context = await createSdkContextForTester(
-    program,
-    { emitterName: "@azure-tools/typespec-python" },
-    { disableUsageAccessPropagationToBase: true },
+  `,
   );
-  const models = context.sdkPackage.models;
+  const models = runner.context.sdkPackage.models;
   strictEqual(models.length, 5);
   strictEqual(models[0].access, "internal");
   strictEqual(models[0].name, "Fish");
@@ -867,7 +878,7 @@ it("disableUsageAccessPropagationToBase true discriminator propagation", async (
 
 describe("model property access", () => {
   it("normal model property", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+    await runner.compileWithBuiltInService(`
       model Test {
         prop: string;
       }
@@ -875,27 +886,21 @@ describe("model property access", () => {
       op test(@body body: Test): void;
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
-    const models = context.sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models[0].properties[0].access, "public");
   });
 
   it("normal parameter", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+    await runner.compileWithBuiltInService(`
       op test(a: string): void;
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
-    const parameters = context.sdkPackage.clients[0].methods[0].parameters;
+    const parameters = runner.context.sdkPackage.clients[0].methods[0].parameters;
     strictEqual(parameters[0].access, "public");
   });
 
   it("model property with override", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+    await runner.compileWithBuiltInService(`
       model Test {
         @access(Access.internal)
         prop: string;
@@ -904,27 +909,21 @@ describe("model property access", () => {
       op test(@body body: Test): void;
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
-    const models = context.sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models[0].properties[0].access, "internal");
   });
 
   it("parameter with override", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+    await runner.compileWithBuiltInService(`
       op test(@access(Access.internal) a: string): void;
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
-    const parameters = context.sdkPackage.clients[0].methods[0].parameters;
+    const parameters = runner.context.sdkPackage.clients[0].methods[0].parameters;
     strictEqual(parameters[0].access, "internal");
   });
 
   it("model property with override propagation", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+    await runner.compileWithBuiltInService(`
       model Foo {
         @access(Access.internal)
         foo: Bar;
@@ -944,10 +943,7 @@ describe("model property access", () => {
       op test(@body body: Foo): Baz;
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
-    const models = context.sdkPackage.models;
+    const models = runner.context.sdkPackage.models;
     strictEqual(models[0].properties[0].access, "internal");
     strictEqual(models[0].properties[1].access, "internal");
     strictEqual(models[1].access, "internal");

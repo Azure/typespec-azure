@@ -1,17 +1,11 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { getClientDocExplicit } from "../../src/decorators.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithBuiltInService } from "../tester.js";
 
 it("@clientDoc model with append mode", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
       @doc("Original model documentation")
       @clientDoc("Additional client documentation", DocumentationMode.append)
       @usage(Usage.input)
@@ -20,7 +14,7 @@ it("@clientDoc model with append mode", async () => {
       }
     `);
 
-  const sdkContext = runner.context;
+  const sdkContext = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
   const model = sdkContext.sdkPackage.models[0];
 
   // Check doc data is stored correctly
@@ -34,14 +28,14 @@ it("@clientDoc model with append mode", async () => {
 });
 
 it("@clientDoc method with replace mode", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
       @doc("Original operation documentation")
       @clientDoc("Client-specific documentation", DocumentationMode.replace)
       @get
       op test(): string;
     `);
 
-  const sdkContext = runner.context;
+  const sdkContext = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
   const method = sdkContext.sdkPackage.clients[0].methods[0];
 
   // Check doc data is stored correctly
@@ -55,7 +49,7 @@ it("@clientDoc method with replace mode", async () => {
 });
 
 it("@clientDoc property with append mode", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
       @usage(Usage.input)
       model TestModel {
         @doc("Original property documentation")
@@ -64,7 +58,7 @@ it("@clientDoc property with append mode", async () => {
       }
     `);
 
-  const sdkContext = runner.context;
+  const sdkContext = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
   const model = sdkContext.sdkPackage.models[0];
   const property = model.properties[0];
 
@@ -79,7 +73,7 @@ it("@clientDoc property with append mode", async () => {
 });
 
 it("@clientDoc enum with append mode", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
       @doc("Original enum documentation")
       @clientDoc("Client enum documentation", DocumentationMode.append)
       @usage(Usage.input)
@@ -90,7 +84,7 @@ it("@clientDoc enum with append mode", async () => {
       }
     `);
 
-  const sdkContext = runner.context;
+  const sdkContext = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
   const enumType = sdkContext.sdkPackage.enums[0];
 
   // Check doc data is stored correctly
@@ -104,7 +98,7 @@ it("@clientDoc enum with append mode", async () => {
 });
 
 it("@clientDoc enum member with replace mode", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     @usage(Usage.input)
       enum Colors {
         @doc("Original enum member doc")
@@ -115,7 +109,7 @@ it("@clientDoc enum member with replace mode", async () => {
       }
     `);
 
-  const sdkContext = runner.context;
+  const sdkContext = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
   const enumType = sdkContext.sdkPackage.enums[0];
   const enumMember = enumType.values[0];
 
@@ -130,7 +124,7 @@ it("@clientDoc enum member with replace mode", async () => {
 });
 
 it("@clientMode with scope", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
       @doc("Original documentation")
       @clientDoc("Python documentation", DocumentationMode.replace, "python")
       @clientDoc("JavaScript documentation", DocumentationMode.replace, "javascript")
@@ -140,7 +134,7 @@ it("@clientMode with scope", async () => {
       }
     `);
 
-  const sdkContext = runner.context;
+  const sdkContext = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
   const model = sdkContext.sdkPackage.models[0];
 
   // Since our test runner uses python emitter, we should see the Python documentation
@@ -154,7 +148,7 @@ it("@clientMode with scope", async () => {
 });
 
 it("reports error when an invalid mode is used", async () => {
-  const diagnostics = await runner.diagnose(`
+  const diagnostics = await SimpleTester.diagnose(`
       enum InvalidMode {
         invalid: "invalid"
       }
@@ -174,7 +168,7 @@ it("reports error when an invalid mode is used", async () => {
 });
 
 it("reports error when an invalid mode value is used", async () => {
-  const diagnostics = await runner.diagnose(`
+  const diagnostics = await SimpleTester.diagnose(`
       enum CustomMode {
         custom: "custom"
       }
