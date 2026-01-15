@@ -149,7 +149,7 @@ namespace My.Service;
 /** Api versions */
 enum Versions {
   /** 2024-04-01-preview api version */
-      V2024_04_01_PREVIEW: "2024-04-01-preview",
+  V2024_04_01_PREVIEW: "2024-04-01-preview",
 }
 
 ${x}
