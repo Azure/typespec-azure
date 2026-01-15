@@ -383,35 +383,6 @@ function validateClientNamesCore(
     Type | [Type, DecoratorExpressionNode | AugmentDecoratorStatementNode]
   >();
 
-  trackItemsInDuplicateTracker(tcgcContext, scope, items, duplicateTracker);
-
-  reportDuplicateClientNames(tcgcContext.program, duplicateTracker, scope);
-}
-
-/**
- * Track items in the duplicate tracker.
- * This is extracted so it can be reused for cross-namespace validation.
- */
-function trackItemsInDuplicateTracker(
-  tcgcContext: TCGCContext,
-  scope: string | typeof AllScopes,
-  items: Iterable<
-    | Namespace
-    | Scalar
-    | Operation
-    | Interface
-    | Model
-    | Enum
-    | Union
-    | ModelProperty
-    | EnumMember
-    | UnionVariant
-  >,
-  duplicateTracker: DuplicateTracker<
-    string,
-    Type | [Type, DecoratorExpressionNode | AugmentDecoratorStatementNode]
-  >,
-) {
   for (const item of items) {
     const clientName = getClientNameOverride(tcgcContext, item, scope);
     if (clientName !== undefined) {
@@ -425,6 +396,8 @@ function trackItemsInDuplicateTracker(
       }
     }
   }
+
+  reportDuplicateClientNames(tcgcContext.program, duplicateTracker, scope);
 }
 
 function reportDuplicateClientNames(
