@@ -229,9 +229,6 @@ function validateClientNamesPerNamespace(
   // Check for duplicate client names for interfaces
   validateClientNamesCore(tcgcContext, scope, namespace.interfaces.values());
 
-  // Check for duplicate client names for scalars
-  validateClientNamesCore(tcgcContext, scope, namespace.scalars.values());
-
   // Check for duplicate client names for namespaces
   validateClientNamesCore(tcgcContext, scope, namespace.namespaces.values());
 
@@ -264,16 +261,14 @@ function collectTypesFromNamespace(
   models: Model[],
   enums: Enum[],
   unions: Union[],
-  scalars: Scalar[],
 ) {
   models.push(...namespace.models.values());
   enums.push(...namespace.enums.values());
   unions.push(...namespace.unions.values());
-  scalars.push(...namespace.scalars.values());
 
   // Recursively collect from nested namespaces
   for (const nestedNs of namespace.namespaces.values()) {
-    collectTypesFromNamespace(nestedNs, models, enums, unions, scalars);
+    collectTypesFromNamespace(nestedNs, models, enums, unions);
   }
 }
 
@@ -293,17 +288,13 @@ function validateClientNamesAcrossNamespaces(
   const allModels: Model[] = [];
   const allEnums: Enum[] = [];
   const allUnions: Union[] = [];
-  const allScalars: Scalar[] = [];
 
   for (const serviceNs of serviceNamespaces) {
-    collectTypesFromNamespace(serviceNs, allModels, allEnums, allUnions, allScalars);
+    collectTypesFromNamespace(serviceNs, allModels, allEnums, allUnions);
   }
 
   // Validate models, enums, and unions together across all services
   validateClientNamesCore(tcgcContext, scope, [...allModels, ...allEnums, ...allUnions]);
-
-  // Validate scalars across all services
-  validateClientNamesCore(tcgcContext, scope, allScalars);
 
   // Also validate within each service namespace for operations, interfaces, properties, etc.
   // These are scoped to their containers and don't need cross-service validation
