@@ -37,7 +37,7 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   const allReferencedTypes = getAllReferencedTypes(context);
   const versions = context.getPackageVersions();
-  
+
   // Create apiVersions map for multiple services
   const apiVersionsMap = new Map<string, string>();
   for (const [namespace, versionList] of versions.entries()) {
@@ -45,14 +45,12 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
     const latestVersion = versionList.at(-1);
     if (latestVersion) {
       // When apiVersion config is "all" for single service, store "all" in the map as well
-      const versionValue = 
-        context.apiVersion === "all" && versions.size === 1
-          ? "all"
-          : latestVersion;
+      const versionValue =
+        context.apiVersion === "all" && versions.size === 1 ? "all" : latestVersion;
       apiVersionsMap.set(fullName, versionValue);
     }
   }
-  
+
   const sdkPackage: SdkPackage<TServiceOperation> = {
     clients: listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c))),
     models: allReferencedTypes.filter((x): x is SdkModelType => x.kind === "model"),

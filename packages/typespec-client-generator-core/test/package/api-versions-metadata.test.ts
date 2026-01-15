@@ -1,5 +1,4 @@
-import { Namespace } from "@typespec/compiler";
-import { deepStrictEqual, ok, strictEqual } from "assert";
+import { ok, strictEqual } from "assert";
 import { beforeEach, it } from "vitest";
 import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
 
@@ -27,10 +26,10 @@ it("single service with versioning should populate apiVersions map", async () =>
   `);
 
   const sdkPackage = runner.context.sdkPackage;
-  
+
   // Check deprecated apiVersion property still works
   strictEqual(sdkPackage.metadata.apiVersion, "v3");
-  
+
   // Check new apiVersions map
   ok(sdkPackage.metadata.apiVersions);
   strictEqual(sdkPackage.metadata.apiVersions.size, 1);
@@ -77,10 +76,10 @@ it("multiple services should populate apiVersions map with all services", async 
   );
 
   const sdkPackage = runner.context.sdkPackage;
-  
+
   // For multi-service, deprecated apiVersion should be undefined
   strictEqual(sdkPackage.metadata.apiVersion, undefined);
-  
+
   // Check new apiVersions map has both services
   ok(sdkPackage.metadata.apiVersions);
   strictEqual(sdkPackage.metadata.apiVersions.size, 2);
@@ -99,10 +98,10 @@ it("service without versioning should have empty apiVersions map", async () => {
   `);
 
   const sdkPackage = runner.context.sdkPackage;
-  
+
   // Check deprecated apiVersion property
   strictEqual(sdkPackage.metadata.apiVersion, undefined);
-  
+
   // Check new apiVersions map - service without versions won't have an entry in the map
   ok(sdkPackage.metadata.apiVersions);
   strictEqual(sdkPackage.metadata.apiVersions.size, 0);
@@ -131,10 +130,10 @@ it("apiVersion 'all' should populate apiVersions with 'all'", async () => {
   `);
 
   const sdkPackage = runnerWithAll.context.sdkPackage;
-  
+
   // Check deprecated apiVersion property
   strictEqual(sdkPackage.metadata.apiVersion, "all");
-  
+
   // Check new apiVersions map should also have "all" to be consistent
   ok(sdkPackage.metadata.apiVersions);
   strictEqual(sdkPackage.metadata.apiVersions.size, 1);
