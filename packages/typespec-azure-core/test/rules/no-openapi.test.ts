@@ -40,21 +40,6 @@ describe("@extension", () => {
         message: `Azure specs should not be using decorator "$extension" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter.`,
       });
   });
-
-  // https://github.com/Azure/typespec-azure/issues/687
-  it("include x-ms-identifiers key", async () => {
-    await tester
-      .expect(
-        `model foo {
-          @OpenAPI.extension("x-ms-identifiers", #["prop"])
-          items: Bar;
-        }
-        model Bar { prop: string;}`,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-core/no-openapi",
-      });
-  });
 });
 
 // Can't test as autorest is depending on azure.core

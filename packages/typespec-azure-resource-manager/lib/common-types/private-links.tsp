@@ -37,7 +37,6 @@ model PrivateLinkResourceProperties {
 @added(Versions.v6)
 model PrivateLinkResourceListResult {
   /** Array of private link resources */
-  @OpenAPI.extension("x-ms-identifiers", #["id"])
   @pageItems
   value?: PrivateLinkResource[];
 
@@ -57,7 +56,6 @@ model PrivateEndpointConnection extends Resource {
 @added(Versions.v6)
 model PrivateEndpointConnectionListResult {
   /** Array of private endpoint connections. */
-  @OpenAPI.extension("x-ms-identifiers", #["id"])
   @pageItems
   value?: PrivateEndpointConnection[];
 
@@ -182,7 +180,6 @@ model PrivateLinkResourceParameter<Segment extends valueof string = "privateLink
 @removed(Versions.v6)
 model PrivateLinkResourceListResultV5 {
   /** Array of private link resources */
-  @OpenAPI.extension("x-ms-identifiers", #["id"])
   @pageItems
   value?: CommonTypes.PrivateLinkResource[];
 }
@@ -226,7 +223,6 @@ model PrivateLinkResourceListResultV5 {
 @removed(Versions.v6)
 model PrivateEndpointConnectionListResultV5 {
   /** Array of private endpoint connections. */
-  @OpenAPI.extension("x-ms-identifiers", #["id"])
   @pageItems
   value?: CommonTypes.PrivateEndpointConnection[];
 }

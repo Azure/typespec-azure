@@ -2462,10 +2462,6 @@ export async function getOpenAPIForService(
         }),
       };
 
-      if (!ifArrayItemContainsIdentifier(program, typespecType as any)) {
-        array["x-ms-identifiers"] = [];
-      }
-
       return applyIntrinsicDecorators(typespecType, array);
     }
     return undefined;

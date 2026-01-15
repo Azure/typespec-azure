@@ -216,8 +216,7 @@
           "items": {
             "$ref": "#/definitions/ProvisioningIssue"
           },
-          "readOnly": true,
-          "x-ms-identifiers": []
+          "readOnly": true
         },
         "networkSecurityPerimeter": {
           "$ref": "#/definitions/NetworkSecurityPerimeter"
@@ -295,10 +294,7 @@
           "description": "List of Access Rules",
           "items": {
             "$ref": "#/definitions/AccessRule"
-          },
-          "x-ms-identifiers": [
-            "name"
-          ]
+          }
         },
         "diagnosticSettingsVersion": {
           "type": "integer",
@@ -364,8 +360,7 @@
           "items": {
             "$ref": "#/definitions/AccessRule"
           },
-          "readOnly": true,
-          "x-ms-identifiers": []
+          "readOnly": true
         }
       }
     },

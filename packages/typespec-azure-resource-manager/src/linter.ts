@@ -23,7 +23,6 @@ import { coreOperationsRule } from "./rules/core-operations.js";
 import { envelopePropertiesRules } from "./rules/envelope-properties.js";
 import { improperSubscriptionListOperationRule } from "./rules/improper-subscription-list-operation.js";
 import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
-import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
 import { deleteOperationMissingRule } from "./rules/no-resource-delete-operation.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
@@ -59,7 +58,6 @@ const rules = [
   armResourceInvalidActionVerbRule,
   improperSubscriptionListOperationRule,
   lroLocationHeaderRule,
-  missingXmsIdentifiersRule,
   noResponseBodyRule,
   operationsInterfaceMissingRule,
   patchEnvelopePropertiesRules,
