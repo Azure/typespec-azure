@@ -11,8 +11,6 @@ import {
 } from "@azure-tools/typespec-azure-core";
 import {
   getArmCommonTypeOpenAPIRef,
-  getArmIdentifiers,
-  getArmKeyIdentifiers,
   getCustomResourceOptions,
   getExternalTypeRef,
   getFeature,
@@ -1753,10 +1751,6 @@ export async function getOpenAPIForService(
     }
   }
 
-  function ifArmIdentifiersDefault(armIdentifiers: string[]) {
-    return armIdentifiers.every((identifier) => identifier === "id" || identifier === "name");
-  }
-
   function getSchemaForEnumMember(member: EnumMember): OpenAPI2Schema {
     const value = member.value ?? member.name;
     const type = typeof value === "number" ? "number" : "string";
@@ -2053,7 +2047,6 @@ export async function getOpenAPIForService(
             context,
           )
         : getSchemaOrRef(prop.type, context);
-      applyArmIdentifiersDecorator(prop.type, propSchema, prop);
     }
 
     if (shouldEmitXml && xml.available) {
@@ -2469,58 +2462,13 @@ export async function getOpenAPIForService(
         }),
       };
 
-      const armKeyIdentifiers = getArmKeyIdentifiers(program, typespecType);
-      if (
-        isArrayTypeArmProviderNamespace(typespecType, namespace) &&
-        hasValidArmIdentifiers(armKeyIdentifiers)
-      ) {
-        array["x-ms-identifiers"] = armKeyIdentifiers;
+      if (!ifArrayItemContainsIdentifier(program, typespecType as any)) {
+        array["x-ms-identifiers"] = [];
       }
 
       return applyIntrinsicDecorators(typespecType, array);
     }
     return undefined;
-  }
-
-  function applyArmIdentifiersDecorator(
-    typespecType: Type,
-    schema: OpenAPI2Schema,
-    property: ModelProperty,
-  ) {
-    const armIdentifiers = getArmIdentifiers(program, property);
-    if (
-      typespecType.kind !== "Model" ||
-      !isArrayModelType(program, typespecType) ||
-      !armIdentifiers
-    ) {
-      return;
-    }
-
-    schema["x-ms-identifiers"] = armIdentifiers;
-  }
-
-  function hasValidArmIdentifiers(armIdentifiers: string[] | undefined) {
-    return (
-      armIdentifiers !== undefined &&
-      armIdentifiers.length > 0 &&
-      !ifArmIdentifiersDefault(armIdentifiers)
-    );
-  }
-
-  function isArrayTypeArmProviderNamespace(typespecType?: Model, namespace?: Namespace): boolean {
-    if (typespecType === undefined) {
-      return false;
-    }
-
-    if (isArmProviderNamespace(program, namespace)) {
-      return true;
-    }
-
-    if (typespecType.indexer?.value.kind === "Model") {
-      return isArmProviderNamespace(program, typespecType.indexer.value.namespace);
-    }
-
-    return false;
   }
 
   function getSchemaForScalar(scalar: Scalar): OpenAPI2Schema {

@@ -6,7 +6,7 @@ title: missing-x-ms-identifiers
 @azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers
 ```
 
-Array of models must explicity define which keys are used as identifiers using the `@identifiers` decorator.
+Array of models must explicity define which keys are used as identifiers using the `@OpenAPI.extension("x-ms-identifiers", ...)` decorator.
 
 #### ❌ Incorrect
 
@@ -25,7 +25,7 @@ model ResourceProperties {
 
 ```tsp
 model ResourceProperties {
-  @identifiers(#["city", "street"])
+  @OpenAPI.extension("x-ms-identifiers", #["city", "street"])
   array: Address[];
 }
 ```

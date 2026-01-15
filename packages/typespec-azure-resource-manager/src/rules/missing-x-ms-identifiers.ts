@@ -2,14 +2,13 @@ import {
   ArrayModelType,
   ModelProperty,
   Program,
-  createAddDecoratorCodeFix,
   createRule,
   getProperty,
   isArrayModelType,
   paramMessage,
 } from "@typespec/compiler";
+import { getExtensions } from "@typespec/openapi";
 import { isArmCommonType } from "../common-types.js";
-import { getArmIdentifiers, getArmKeyIdentifiers } from "../resource.js";
 
 export const missingXmsIdentifiersRule = createRule({
   name: "missing-x-ms-identifiers",
@@ -17,8 +16,8 @@ export const missingXmsIdentifiersRule = createRule({
   severity: "warning",
   url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/missing-x-ms-identifiers",
   messages: {
-    default: `Missing identifying properties of objects in the array item, please add @identifiers(#["<prop>"]) to specify it. If there are no appropriate identifying properties, please add @identifiers(#[]).`,
-    notArray: paramMessage`Value passed to @identifiers(...) was a "${"valueType"}". Pass an array of property name.`,
+    default: `Missing x-ms-identifiers. Decorate the property with @OpenAPI.extension("x-ms-identifiers", #["<identifying-property-name>"]). If there are no appropriate identifying properties, please add @OpenAPI.extension("x-ms-identifiers", #[]).`,
+    notArray: paramMessage`Value passed to @OpenAPI.extension("x-ms-identifiers", ...) was a "${"valueType"}". Pass an array of property name.`,
     missingProperty: paramMessage`Property "${"propertyName"}" is not found in "${"targetModelName"}". Make sure value of x-ms-identifiers extension are valid property name of the array element.`,
   },
   create(context) {
@@ -29,7 +28,6 @@ export const missingXmsIdentifiersRule = createRule({
           if (isArrayMissingIdentifier(context.program, type, property)) {
             context.reportDiagnostic({
               target: property,
-              codefixes: [createAddDecoratorCodeFix(property, "identifiers", [`#["<prop>"]`])],
             });
           }
         }
@@ -50,48 +48,42 @@ export const missingXmsIdentifiersRule = createRule({
         return false;
       }
 
-      if (getProperty(elementType, "id") || getProperty(elementType, "name")) {
+      if (getProperty(elementType, "id")) {
         return false;
       }
 
-      const armIdentifiers = getArmIdentifiers(program, property);
-      const armKeyIdentifiers = getArmKeyIdentifiers(program, array);
-      const identifiers = armIdentifiers ?? armKeyIdentifiers;
-
-      if (identifiers === undefined) {
+      const xmsIdentifiers = getExtensions(program, property ?? array).get("x-ms-identifiers");
+      if (xmsIdentifiers === undefined) {
         return true;
       }
 
-      for (const propIdentifier of identifiers) {
-        if (typeof propIdentifier === "string") {
-          const props = propIdentifier.replace(/^\//, "").split("/");
-          let element = elementType;
-          for (const prop of props) {
-            if (element === undefined || element.kind !== "Model") {
-              context.reportDiagnostic({
-                messageId: "missingProperty",
-                format: { propertyName: prop, targetModelName: element?.name },
-                target: property,
-              });
-              return false;
-            }
-            const propertyValue = getProperty(element, prop);
-            if (propertyValue === undefined) {
-              context.reportDiagnostic({
-                messageId: "missingProperty",
-                format: { propertyName: prop, targetModelName: elementType.name },
-                target: property,
-              });
-            }
+      if (Array.isArray(xmsIdentifiers)) {
+        for (const propIdentifier of xmsIdentifiers) {
+          if (typeof propIdentifier === "string") {
+            const props = propIdentifier.replace(/^\//, "").split("/");
+            let element = elementType;
+            for (const prop of props) {
+              const propertyValue = getProperty(element, prop);
+              if (propertyValue === undefined) {
+                context.reportDiagnostic({
+                  messageId: "missingProperty",
+                  format: { propertyName: prop, targetModelName: elementType.name },
+                  target: property,
+                });
+              }
 
-            element = propertyValue?.type as ArrayModelType;
+              const propertyType = propertyValue?.type as ArrayModelType;
+              if (propertyType !== undefined && propertyType.kind === "Model") {
+                element = propertyType;
+              }
+            }
+          } else {
+            context.reportDiagnostic({
+              messageId: "notArray",
+              format: { valueType: typeof propIdentifier },
+              target: property,
+            });
           }
-        } else {
-          context.reportDiagnostic({
-            messageId: "notArray",
-            format: { valueType: typeof propIdentifier },
-            target: property,
-          });
         }
       }
 

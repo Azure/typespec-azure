@@ -35,7 +35,7 @@ it("emit warning for array of model without x-ms-identifiers", async () => {
     )
     .toEmitDiagnostics({
       code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
-      message: `Missing identifying properties of objects in the array item, please add @identifiers(#["<prop>"]) to specify it. If there are no appropriate identifying properties, please add @identifiers(#[]).`,
+      message: `Missing x-ms-identifiers. Decorate the property with @OpenAPI.extension("x-ms-identifiers", #["<identifying-property-name>"]). If there are no appropriate identifying properties, please add @OpenAPI.extension("x-ms-identifiers", #[]).`,
     });
 });
 
@@ -44,7 +44,7 @@ it("emit diagnostic when x-ms-identifiers property names are not found in the ta
     .expect(
       `
         model Foo {
-          @identifiers(#["not-a-prop"])
+          @OpenAPI.extension("x-ms-identifiers", #["not-a-prop"])
           bar: Bar[];
         }
 
@@ -59,12 +59,12 @@ it("emit diagnostic when x-ms-identifiers property names are not found in the ta
     });
 });
 
-it(`doesn't emit diagnostic if @identifiers(...) is specified`, async () => {
+it(`doesn't emit diagnostic if @OpenAPI.extension("x-ms-identifiers", ...) is specified`, async () => {
   await tester
     .expect(
       `
         model Foo {
-          @identifiers(#["customName"])
+          @OpenAPI.extension("x-ms-identifiers", #["customName"])
           bar: Bar[];
         }
 
@@ -81,7 +81,7 @@ it(`doesn't emit diagnostic if x-ms-identifiers property is defined in a base cl
     .expect(
       `
         model Foo {
-          @identifiers(#["name"])
+          @OpenAPI.extension("x-ms-identifiers", #["name"])
           bar: Child[];
         }
 
@@ -109,106 +109,4 @@ it(`doesn't emit diagnostic if element is a primitive type`, async () => {
         `,
     )
     .toBeValid();
-});
-
-it("allow x-ms-identifiers from keys", async () => {
-  await tester
-    .expect(
-      `
-        model Pet {
-          pet: Dog[];
-        }
- 
-        model Dog {
-          food: Food;
-        }
-        
-        model Food {
-          @key
-          brand: string;
-        }
-        `,
-    )
-    .toBeValid();
-});
-
-it("allow x-ms-identifiers from keys on default identifiers", async () => {
-  await tester
-    .expect(
-      `
-        model Pet {
-          pet: Dog[];
-        }
- 
-        model Dog {
-          name: string;
-        }
-        `,
-    )
-    .toBeValid();
-});
-
-it("allow x-ms-identifiers from identifiers decorator", async () => {
-  await tester
-    .expect(
-      `
-        model Pet {
-          @identifiers(#["name"])
-          pet: Dog[];
-        }
- 
-        model Dog {
-          name: string;
-        }
-        `,
-    )
-    .toBeValid();
-});
-
-it("emit diagnostic if a section is not found", async () => {
-  await tester
-    .expect(
-      `
-        model Pet {
-          @identifiers(#["food/brand"])
-          pet: Dog[];
-        }
- 
-        model Dog {
-          food: string;
-          brand: string;
-        }
-        `,
-    )
-    .toEmitDiagnostics({
-      code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
-      message: `Property "brand" is not found in "string". Make sure value of x-ms-identifiers extension are valid property name of the array element.`,
-    });
-});
-
-describe("codefix", () => {
-  it("adds @identifiers decorator", async () => {
-    await tester
-      .expect(
-        `
-        model Foo {
-          bar: Bar[];
-        }
-
-        model Bar {
-          customName: string;
-        }
-        `,
-      )
-      .applyCodeFix("add-decorator-identifiers").toEqual(`
-        model Foo {
-          @identifiers(#["<prop>"])
-          bar: Bar[];
-        }
-
-        model Bar {
-          customName: string;
-        }
-      `);
-  });
 });
