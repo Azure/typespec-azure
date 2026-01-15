@@ -1,16 +1,10 @@
 import { ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import { describe, it } from "vitest";
+import { createSdkContextForTester, SimpleTester } from "../tester.js";
 
 describe("@apiVersion", () => {
   it("override parameter to be api version", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace MyService;
       op get(
@@ -19,7 +13,10 @@ describe("@apiVersion", () => {
           version: string
         ): string;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const sdkPackage = context.sdkPackage;
     // there will be no api version param on client, bc the service isn't versioned
     const apiVersionClientParam = sdkPackage.clients[0].clientInitialization.parameters.find(
       (x) => x.name === "version",
@@ -33,7 +30,7 @@ describe("@apiVersion", () => {
   });
 
   it("override api version param defaults to latest api version", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service(#{
         title: "Contoso Widget Manager",
       })
@@ -51,7 +48,10 @@ describe("@apiVersion", () => {
         version: string
       ): string;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const sdkPackage = context.sdkPackage;
 
     const apiVersionClientParam = sdkPackage.clients[0].clientInitialization.parameters.find(
       (x) => x.name === "version",
@@ -72,7 +72,7 @@ describe("@apiVersion", () => {
   });
 
   it("override parameter to not be api version", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace MyService;
       op get(
@@ -80,7 +80,10 @@ describe("@apiVersion", () => {
         @query "api-version": string
       ): string;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const sdkPackage = context.sdkPackage;
     const apiVersionClientParam = sdkPackage.clients[0].clientInitialization.parameters.find(
       (x) => x.name === "api-version",
     );
