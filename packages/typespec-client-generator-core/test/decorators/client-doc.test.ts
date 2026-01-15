@@ -2,7 +2,11 @@ import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { getClientDocExplicit } from "../../src/decorators.js";
-import { createSdkContextForTester, SimpleTester, SimpleTesterWithBuiltInService } from "../tester.js";
+import {
+  createSdkContextForTester,
+  SimpleTester,
+  SimpleTesterWithBuiltInService,
+} from "../tester.js";
 
 it("@clientDoc model with append mode", async () => {
   const { program } = await SimpleTesterWithBuiltInService.compile(`
@@ -14,7 +18,9 @@ it("@clientDoc model with append mode", async () => {
       }
     `);
 
-  const sdkContext = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const model = sdkContext.sdkPackage.models[0];
 
   // Check doc data is stored correctly
@@ -35,7 +41,9 @@ it("@clientDoc method with replace mode", async () => {
       op test(): string;
     `);
 
-  const sdkContext = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const method = sdkContext.sdkPackage.clients[0].methods[0];
 
   // Check doc data is stored correctly
@@ -58,7 +66,9 @@ it("@clientDoc property with append mode", async () => {
       }
     `);
 
-  const sdkContext = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const model = sdkContext.sdkPackage.models[0];
   const property = model.properties[0];
 
@@ -84,7 +94,9 @@ it("@clientDoc enum with append mode", async () => {
       }
     `);
 
-  const sdkContext = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const enumType = sdkContext.sdkPackage.enums[0];
 
   // Check doc data is stored correctly
@@ -109,7 +121,9 @@ it("@clientDoc enum member with replace mode", async () => {
       }
     `);
 
-  const sdkContext = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const enumType = sdkContext.sdkPackage.enums[0];
   const enumMember = enumType.values[0];
 
@@ -134,7 +148,9 @@ it("@clientMode with scope", async () => {
       }
     `);
 
-  const sdkContext = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkContext = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const model = sdkContext.sdkPackage.models[0];
 
   // Since our test runner uses python emitter, we should see the Python documentation
