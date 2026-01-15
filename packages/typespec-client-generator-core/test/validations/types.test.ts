@@ -354,12 +354,77 @@ it("duplicate operation with @clientLocation to existed clients", async () => {
   ]);
 });
 
+it("duplicate operation with @clientLocation string to existing namespace", async () => {
+  // When using a string that matches an existing namespace name,
+  // the operation should be moved to that namespace for validation
+  const diagnostics = await runner.diagnose(
+    `
+    @service
+    namespace Contoso.WidgetManager;
+
+    interface A {
+      @clientLocation("Test")
+      @route("/a")
+      op a(): void;
+
+      @route("/b")
+      op b(): void;
+    }
+
+    namespace Test {
+      @route("/c")
+      @clientName("a")
+      op c(): void;
+    }
+    `,
+  );
+
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message: 'Client name: "a" is duplicated in language scope: "AllScopes"',
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message:
+        'Client name: "a" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+    },
+  ]);
+});
+
+it("no duplicate operation with @clientLocation string to existing namespace", async () => {
+  // When using a string that matches an existing namespace name,
+  // the operation should be moved to that namespace - no conflict if names are different
+  const diagnostics = await runner.diagnose(
+    `
+    @service
+    namespace Contoso.WidgetManager;
+
+    interface A {
+      @clientLocation("Test")
+      @route("/a")
+      op a(): void;
+
+      @route("/b")
+      op b(): void;
+    }
+
+    namespace Test {
+      @route("/c")
+      op c(): void;
+    }
+    `,
+  );
+
+  expectDiagnosticEmpty(diagnostics);
+});
+
 it("duplicate operation with @clientLocation to existed clients with scope", async () => {
   const diagnostics = await runner.diagnose(
     `
     @service
     namespace Contoso.WidgetManager;
-      
+
     interface A {
       @clientLocation(B, "go")
       @route("/a")

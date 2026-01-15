@@ -23,6 +23,7 @@ import {
   clientLocationKey,
   clientNameKey,
   hasExplicitClientOrOperationGroup,
+  listAllUserDefinedNamespaces,
   listScopedDecoratorData,
 } from "../internal-utils.js";
 import { reportDiagnostic } from "../lib.js";
@@ -74,6 +75,14 @@ function validateClientNames(tcgcContext: TCGCContext) {
     languageScopes.add(AllScopes);
   }
 
+  // Build a map of namespace names to their types for resolving string targets
+  const namedNamespaces = new Map<string, Namespace>();
+  for (const ns of listAllUserDefinedNamespaces(tcgcContext)) {
+    if (ns.name) {
+      namedNamespaces.set(ns.name, ns);
+    }
+  }
+
   // Check all possible language scopes
   for (const scope of languageScopes) {
     // Gather all moved operations and their targets
@@ -94,14 +103,25 @@ function validateClientNames(tcgcContext: TCGCContext) {
         if (type.kind === "Operation") {
           moved.add(type);
           if (typeof target === "string") {
-            // Move to new clients
-            if (!newClients.has(target)) {
-              newClients.set(target, [type]);
+            // Check if the string target matches an existing namespace
+            const existingNamespace = namedNamespaces.get(target);
+            if (existingNamespace) {
+              // Move to existing namespace referenced by name
+              if (!movedTo.has(existingNamespace)) {
+                movedTo.set(existingNamespace, [type]);
+              } else {
+                movedTo.get(existingNamespace)!.push(type);
+              }
             } else {
-              newClients.get(target)!.push(type);
+              // Move to new clients (string doesn't match any existing namespace)
+              if (!newClients.has(target)) {
+                newClients.set(target, [type]);
+              } else {
+                newClients.get(target)!.push(type);
+              }
             }
           } else {
-            // Move to existing clients
+            // Move to existing clients (target is already a Namespace or Interface)
             if (!movedTo.has(target)) {
               movedTo.set(target, [type]);
             } else {
