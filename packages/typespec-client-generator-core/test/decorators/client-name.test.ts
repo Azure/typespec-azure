@@ -1,18 +1,16 @@
-import { Model, Operation } from "@typespec/compiler";
+import { Model, Operation, Program } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { getClientNameOverride } from "../../src/decorators.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import {
+  createSdkContextForTester,
+  SimpleTester,
+  TcgcTester,
+} from "../tester.js";
 
 it("carry over", async () => {
-  const { Test1, Test2, func1, func2 } = (await runner.compile(`
+  const { program, Test1, Test2, func1, func2 } = (await SimpleTester.compile(`
   @service
   @test namespace MyService {
     @test
@@ -31,17 +29,30 @@ it("carry over", async () => {
     @route("/func2")
     op func2 is func1;
       }
-    `)) as { Test1: Model; Test2: Model; func1: Operation; func2: Operation };
+    `)) as { program: Program; Test1: Model; Test2: Model; func1: Operation; func2: Operation };
 
-  strictEqual(getClientNameOverride(runner.context, Test1), "Test1Rename");
-  strictEqual(getClientNameOverride(runner.context, Test2), undefined);
-  strictEqual(getClientNameOverride(runner.context, func1), "func1Rename");
-  strictEqual(getClientNameOverride(runner.context, func2), undefined);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(getClientNameOverride(context, Test1), "Test1Rename");
+  strictEqual(getClientNameOverride(context, Test2), undefined);
+  strictEqual(getClientNameOverride(context, func1), "func1Rename");
+  strictEqual(getClientNameOverride(context, func2), undefined);
 });
 
 it("augment carry over", async () => {
-  const { Test1, Test2, func1, func2 } = (await runner.compileWithCustomization(
-    `
+  const { program, Test1, Test2, func1, func2 } = (await TcgcTester.compile({
+    "main.tsp": `
+      import "@typespec/http";
+      import "@typespec/rest";
+      import "@typespec/versioning";
+      import "@azure-tools/typespec-client-generator-core";
+      import "./client.tsp";
+      using TypeSpec.Http;
+      using TypeSpec.Rest;
+      using TypeSpec.Versioning;
+      using Azure.ClientGenerator.Core;
+
       @service
       @test namespace MyService {
         @test
@@ -59,18 +70,31 @@ it("augment carry over", async () => {
         op func2 is func1;
       }
     `,
-    `
+    "client.tsp": `
+      import "@typespec/http";
+      import "@typespec/rest";
+      import "@typespec/versioning";
+      import "@azure-tools/typespec-client-generator-core";
+      import "./main.tsp";
+      using TypeSpec.Http;
+      using TypeSpec.Rest;
+      using TypeSpec.Versioning;
+      using Azure.ClientGenerator.Core;
+
       namespace Customizations;
 
       @@clientName(MyService.Test1, "Test1Rename");
       @@clientName(MyService.func1, "func1Rename");
     `,
-  )) as { Test1: Model; Test2: Model; func1: Operation; func2: Operation };
+  })) as { program: Program; Test1: Model; Test2: Model; func1: Operation; func2: Operation };
 
-  strictEqual(getClientNameOverride(runner.context, Test1), "Test1Rename");
-  strictEqual(getClientNameOverride(runner.context, Test2), undefined);
-  strictEqual(getClientNameOverride(runner.context, func1), "func1Rename");
-  strictEqual(getClientNameOverride(runner.context, func2), undefined);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(getClientNameOverride(context, Test1), "Test1Rename");
+  strictEqual(getClientNameOverride(context, Test2), undefined);
+  strictEqual(getClientNameOverride(context, func1), "func1Rename");
+  strictEqual(getClientNameOverride(context, func2), undefined);
 });
 
 it("@clientName with scope of versioning", async () => {
@@ -94,28 +118,44 @@ it("@clientName with scope of versioning", async () => {
 
   // java
   {
-    const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-    await runner.compile(testCode);
-    strictEqual(runner.context.sdkPackage.models[0].name, "TestJava");
+    const { program } = await SimpleTester.compile(testCode);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+    strictEqual(context.sdkPackage.models[0].name, "TestJava");
   }
 
   // csharp
   {
-    const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
-    await runner.compile(testCode);
-    strictEqual(runner.context.sdkPackage.models[0].name, "TestCSharp");
+    const { program } = await SimpleTester.compile(testCode);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(context.sdkPackage.models[0].name, "TestCSharp");
   }
 
   // python
   {
-    const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-    await runner.compile(testCode);
-    strictEqual(runner.context.sdkPackage.models[0].name, "Test");
+    const { program } = await SimpleTester.compile(testCode);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(context.sdkPackage.models[0].name, "Test");
   }
 });
 
 it("augmented @clientName with scope of versioning", async () => {
-  const testCode = `
+  const mainCode = `
+    import "@typespec/http";
+    import "@typespec/rest";
+    import "@typespec/versioning";
+    import "@azure-tools/typespec-client-generator-core";
+    import "./client.tsp";
+    using TypeSpec.Http;
+    using TypeSpec.Rest;
+    using TypeSpec.Versioning;
+    using Azure.ClientGenerator.Core;
+
     @service(#{
       title: "Contoso Widget Manager",
     })
@@ -133,6 +173,16 @@ it("augmented @clientName with scope of versioning", async () => {
   `;
 
   const customization = `
+    import "@typespec/http";
+    import "@typespec/rest";
+    import "@typespec/versioning";
+    import "@azure-tools/typespec-client-generator-core";
+    import "./main.tsp";
+    using TypeSpec.Http;
+    using TypeSpec.Rest;
+    using TypeSpec.Versioning;
+    using Azure.ClientGenerator.Core;
+
     namespace Customizations;
 
     @@clientName(Contoso.WidgetManager.Test, "TestCSharp", "csharp");
@@ -141,28 +191,43 @@ it("augmented @clientName with scope of versioning", async () => {
 
   // java
   {
-    const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-    await runner.compileWithCustomization(testCode, customization);
-    strictEqual(runner.context.sdkPackage.models[0].name, "TestJava");
+    const { program } = await TcgcTester.compile({
+      "main.tsp": mainCode,
+      "client.tsp": customization,
+    });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+    strictEqual(context.sdkPackage.models[0].name, "TestJava");
   }
 
   // csharp
   {
-    const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
-    await runner.compileWithCustomization(testCode, customization);
-    strictEqual(runner.context.sdkPackage.models[0].name, "TestCSharp");
+    const { program } = await TcgcTester.compile({
+      "main.tsp": mainCode,
+      "client.tsp": customization,
+    });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    strictEqual(context.sdkPackage.models[0].name, "TestCSharp");
   }
 
   // python
   {
-    const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-    await runner.compileWithCustomization(testCode, customization);
-    strictEqual(runner.context.sdkPackage.models[0].name, "Test");
+    const { program } = await TcgcTester.compile({
+      "main.tsp": mainCode,
+      "client.tsp": customization,
+    });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(context.sdkPackage.models[0].name, "Test");
   }
 });
 
 it("decorator on template parameter", async function () {
-  await runner.compileAndDiagnose(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace MyService;
     
@@ -185,11 +250,14 @@ it("decorator on template parameter", async function () {
     
   `);
 
-  strictEqual(runner.context.sdkPackage.clients[0].methods[0].parameters[0].name, "body");
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(context.sdkPackage.clients[0].methods[0].parameters[0].name, "body");
 });
 
 it("apply with @client decorator to namespace client", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     @client
     @clientName("MyServiceClient")
@@ -197,11 +265,14 @@ it("apply with @client decorator to namespace client", async () => {
     op test(): void;
   `);
 
-  strictEqual(runner.context.sdkPackage.clients[0].name, "MyServiceClient");
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(context.sdkPackage.clients[0].name, "MyServiceClient");
 });
 
 it("apply with @client decorator to interface client", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace MyService;
 
@@ -212,11 +283,14 @@ it("apply with @client decorator to interface client", async () => {
     }
   `);
 
-  strictEqual(runner.context.sdkPackage.clients[0].name, "MyInterfaceClient");
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(context.sdkPackage.clients[0].name, "MyInterfaceClient");
 });
 
 it("apply with @operationGroup decorator to interface client", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace MyService;
 
@@ -227,8 +301,11 @@ it("apply with @operationGroup decorator to interface client", async () => {
     }
   `);
 
-  strictEqual(runner.context.sdkPackage.clients.length, 1);
-  const myServiceClient = runner.context.sdkPackage.clients[0];
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(context.sdkPackage.clients.length, 1);
+  const myServiceClient = context.sdkPackage.clients[0];
   strictEqual(myServiceClient.name, "MyServiceClient");
   ok(myServiceClient.children);
   strictEqual(myServiceClient.children.length, 1);
@@ -237,7 +314,7 @@ it("apply with @operationGroup decorator to interface client", async () => {
 });
 
 it("overrides client name from @client definition", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace MyService;
 
@@ -248,11 +325,14 @@ it("overrides client name from @client definition", async () => {
     }
   `);
 
-  strictEqual(runner.context.sdkPackage.clients[0].name, "MyInterfaceClient");
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(context.sdkPackage.clients[0].name, "MyInterfaceClient");
 });
 
 it("empty client name", async () => {
-  const diagnostics = await runner.diagnose(`
+  const diagnostics = await SimpleTester.diagnose(`
     @service
     namespace MyService;
     
@@ -269,7 +349,7 @@ it("empty client name", async () => {
 });
 
 it("duplicate model client name with a random language scope", async () => {
-  const diagnostics = await runner.diagnose(
+  const diagnostics = await SimpleTester.diagnose(
     `
     @service
     namespace Contoso.WidgetManager;
@@ -300,7 +380,7 @@ it("duplicate model client name with a random language scope", async () => {
 });
 
 it("duplicate model, enum, union client name with all language scopes", async () => {
-  const diagnostics = await runner.diagnose(
+  const diagnostics = await SimpleTester.diagnose(
     `
     @service
     namespace Contoso.WidgetManager;
@@ -335,7 +415,7 @@ it("duplicate model, enum, union client name with all language scopes", async ()
 });
 
 it("duplicate operation with all language scopes", async () => {
-  const diagnostics = await runner.diagnose(
+  const diagnostics = await SimpleTester.diagnose(
     `
     @service
     namespace Contoso.WidgetManager;
@@ -363,7 +443,7 @@ it("duplicate operation with all language scopes", async () => {
 });
 
 it("duplicate operation in interface with all language scopes", async () => {
-  const diagnostics = await runner.diagnose(
+  const diagnostics = await SimpleTester.diagnose(
     `
     @service
     namespace Contoso.WidgetManager;
@@ -393,7 +473,7 @@ it("duplicate operation in interface with all language scopes", async () => {
 });
 
 it("duplicate scalar with all language scopes", async () => {
-  const diagnostics = await runner.diagnose(
+  const diagnostics = await SimpleTester.diagnose(
     `
     @service
     namespace Contoso.WidgetManager;
@@ -419,7 +499,7 @@ it("duplicate scalar with all language scopes", async () => {
 });
 
 it("duplicate interface with all language scopes", async () => {
-  const diagnostics = await runner.diagnose(
+  const diagnostics = await SimpleTester.diagnose(
     `
     @service
     namespace Contoso.WidgetManager;
@@ -449,7 +529,7 @@ it("duplicate interface with all language scopes", async () => {
 });
 
 it("duplicate model property with all language scopes", async () => {
-  const diagnostics = await runner.diagnose(
+  const diagnostics = await SimpleTester.diagnose(
     `
     @service
     namespace Contoso.WidgetManager;
@@ -476,7 +556,7 @@ it("duplicate model property with all language scopes", async () => {
 });
 
 it("duplicate enum member with all language scopes", async () => {
-  const diagnostics = await runner.diagnose(
+  const diagnostics = await SimpleTester.diagnose(
     `
     @service
     namespace Contoso.WidgetManager;
@@ -503,7 +583,7 @@ it("duplicate enum member with all language scopes", async () => {
 });
 
 it("duplicate union variant with all language scopes", async () => {
-  const diagnostics = await runner.diagnose(
+  const diagnostics = await SimpleTester.diagnose(
     `
       @service
       namespace Contoso.WidgetManager;
@@ -530,7 +610,7 @@ it("duplicate union variant with all language scopes", async () => {
 });
 
 it("duplicate namespace with all language scopes", async () => {
-  const diagnostics = await runner.diagnose(
+  const diagnostics = await SimpleTester.diagnose(
     `
       @service
       namespace A{
@@ -555,7 +635,7 @@ it("duplicate namespace with all language scopes", async () => {
 });
 
 it("duplicate enum and model within nested namespace for all language scopes", async () => {
-  const diagnostics = await runner.diagnose(
+  const diagnostics = await SimpleTester.diagnose(
     `
       @service
       namespace A{
@@ -588,7 +668,7 @@ it("duplicate enum and model within nested namespace for all language scopes", a
 });
 
 it("duplicate model with model only generation for all language scopes", async () => {
-  const diagnostics = await runner.diagnose(
+  const diagnostics = await SimpleTester.diagnose(
     `
       model Foo {}
 
@@ -611,7 +691,7 @@ it("duplicate model with model only generation for all language scopes", async (
 });
 
 it("duplicate model client name with multiple language scopes", async () => {
-  const diagnostics = await runner.diagnose(
+  const diagnostics = await SimpleTester.diagnose(
     `
     @service
     namespace Contoso.WidgetManager;
