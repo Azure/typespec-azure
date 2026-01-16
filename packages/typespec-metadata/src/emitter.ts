@@ -14,7 +14,7 @@ const SNAPSHOT_VERSION = packageJson.version ?? "0.0.0";
 
 export async function $onEmit(context: EmitContext<MetadataEmitterOptions>): Promise<void> {
   const options = normalizeOptions(context.options);
-  const specMetadata = buildSpecMetadata(context.program);
+  const typespecMetadata = buildSpecMetadata(context.program);
 
   // Get the common tsp-output directory (parent of this emitter's output dir)
   const commonOutputDir = context.emitterOutputDir.split(/[/\\]/).slice(0, -2).join("/");
@@ -35,7 +35,7 @@ export async function $onEmit(context: EmitContext<MetadataEmitterOptions>): Pro
   const snapshot: MetadataSnapshot = {
     emitterVersion: SNAPSHOT_VERSION,
     generatedAt: new Date().toISOString(),
-    spec: specMetadata,
+    typespec: typespecMetadata,
     languages: languageResult.languages,
     sourceConfigPath: languageResult.sourceConfigPath,
   };

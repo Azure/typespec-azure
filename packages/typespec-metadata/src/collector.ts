@@ -1,11 +1,11 @@
 import {
   getDoc,
   getNamespaceFullName,
-  getSummary,
+  getService,
   type Namespace,
   type Program,
 } from "@typespec/compiler";
-import { LanguagePackageMetadata, SpecMetadata, SpecNamespaceMetadata } from "./metadata.js";
+import { LanguagePackageMetadata, TypeSpecMetadata } from "./metadata.js";
 
 const PACKAGE_NAME_KEYS = ["package-name", "packageName", "package"];
 const NAMESPACE_KEYS = ["namespace", "namespace-name", "namespaceName"];
@@ -281,20 +281,45 @@ export async function collectLanguagePackages(
   };
 }
 
-export function buildSpecMetadata(program: Program): SpecMetadata {
+export function buildSpecMetadata(program: Program): TypeSpecMetadata {
   const globalNamespace = program.getGlobalNamespaceType();
-  const discoveredNamespaces = Array.from(globalNamespace.namespaces.values())
-    .filter((ns) => isServiceNamespace(ns))
-    .map((ns) => createNamespaceMetadata(program, ns));
 
-  if (discoveredNamespaces.length === 0) {
-    discoveredNamespaces.push(createNamespaceMetadata(program, globalNamespace));
-  }
+  // Recursively collect all service namespaces
+  const allServiceNamespaces = collectAllServiceNamespaces(globalNamespace);
+
+  // Select the primary namespace (prefer @service decorated namespaces)
+  const primaryNamespace = selectPrimaryNamespace(allServiceNamespaces, program) ?? globalNamespace;
+
+  const namespaceName =
+    trimOrUndefined(getNamespaceFullName(primaryNamespace)) ?? primaryNamespace.name ?? "(global)";
+  const doc = trimOrUndefined(getDoc(program, primaryNamespace));
+
+  // Determine if this is data plane or management plane
+  // Check if namespace uses Azure.ResourceManager (management plane)
+  const isManagementPlane = checkIfManagementPlane(program, primaryNamespace);
 
   return {
-    namespaces: discoveredNamespaces,
-    summary: discoveredNamespaces.find((ns) => !!ns.summary)?.summary,
+    namespace: namespaceName,
+    documentation: doc,
+    type: isManagementPlane ? "management" : "data",
   };
+}
+
+/**
+ * Recursively collects all service namespaces from a given namespace.
+ */
+function collectAllServiceNamespaces(ns: Namespace): Namespace[] {
+  const result: Namespace[] = [];
+
+  for (const childNs of ns.namespaces.values()) {
+    if (isServiceNamespace(childNs)) {
+      result.push(childNs);
+      // Recursively collect from children
+      result.push(...collectAllServiceNamespaces(childNs));
+    }
+  }
+
+  return result;
 }
 
 /**
@@ -319,6 +344,92 @@ function isServiceNamespace(ns: Namespace): boolean {
   }
 
   return true;
+}
+
+/**
+ * Selects the primary namespace from a list of service namespaces.
+ * Prefers namespaces with @service decorator, then non-helper namespaces.
+ */
+function selectPrimaryNamespace(namespaces: Namespace[], program: Program): Namespace | undefined {
+  if (namespaces.length === 0) {
+    return undefined;
+  }
+
+  // Names that indicate helper/customization namespaces (lower priority)
+  const helperNamePatterns = [
+    "Customizations",
+    "Customization",
+    "Internal",
+    "Private",
+    "Helpers",
+    "Traits",
+    "Common",
+  ];
+
+  // First priority: namespaces with @service decorator
+  const serviceNamespaces = namespaces.filter((ns) => {
+    const service = getService(program, ns);
+    return service !== undefined;
+  });
+
+  if (serviceNamespaces.length > 0) {
+    // If there are multiple @service namespaces, prefer non-helper ones
+    const nonHelperServices = serviceNamespaces.filter((ns) => {
+      const name = ns.name;
+      return !helperNamePatterns.some((pattern) =>
+        name.toLowerCase().includes(pattern.toLowerCase()),
+      );
+    });
+    return nonHelperServices.length > 0 ? nonHelperServices[0] : serviceNamespaces[0];
+  }
+
+  // Second priority: filter out helper namespaces
+  const nonHelperNamespaces = namespaces.filter((ns) => {
+    const name = ns.name;
+    return !helperNamePatterns.some((pattern) =>
+      name.toLowerCase().includes(pattern.toLowerCase()),
+    );
+  });
+
+  const candidateNamespaces = nonHelperNamespaces.length > 0 ? nonHelperNamespaces : namespaces;
+
+  // Among candidates, prefer the deepest namespace (most specific)
+  // Depth is indicated by the number of dots in the full name
+  let deepestNamespace = candidateNamespaces[0];
+  let maxDepth = getNamespaceFullName(deepestNamespace).split(".").length;
+
+  for (const ns of candidateNamespaces.slice(1)) {
+    const fullName = getNamespaceFullName(ns);
+    const depth = fullName.split(".").length;
+
+    if (depth > maxDepth) {
+      maxDepth = depth;
+      deepestNamespace = ns;
+    }
+  }
+
+  return deepestNamespace;
+}
+
+/**
+ * Checks if a namespace represents a management plane service.
+ * Management plane services typically use Azure.ResourceManager.
+ */
+function checkIfManagementPlane(program: Program, ns: Namespace): boolean {
+  // Check if the namespace or any of its imports reference Azure.ResourceManager
+  const globalNs = program.getGlobalNamespaceType();
+
+  // Look for Azure.ResourceManager namespace
+  if (globalNs.namespaces.has("Azure")) {
+    const azureNs = globalNs.namespaces.get("Azure");
+    if (azureNs?.namespaces.has("ResourceManager")) {
+      // If Azure.ResourceManager exists in the program, it's likely management plane
+      return true;
+    }
+  }
+
+  // Default to data plane
+  return false;
 }
 
 function buildLanguageMetadata(
@@ -419,22 +530,6 @@ function createLanguageMetadata(
     outputDir: relativeOutputDir,
     flavor: flavor ? String(flavor) : undefined,
     serviceDir,
-  };
-}
-
-function createNamespaceMetadata(
-  program: Program,
-  namespaceType: Namespace,
-): SpecNamespaceMetadata {
-  const doc = trimOrUndefined(getDoc(program, namespaceType));
-  const summary = trimOrUndefined(getSummary(program, namespaceType));
-  const name =
-    trimOrUndefined(getNamespaceFullName(namespaceType)) ?? namespaceType.name ?? "(global)";
-
-  return {
-    name,
-    summary,
-    documentation: doc,
   };
 }
 
