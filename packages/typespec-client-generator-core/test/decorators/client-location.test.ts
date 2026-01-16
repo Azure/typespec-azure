@@ -880,7 +880,7 @@ describe("Parameter", () => {
           subscriptionId: Azure.Core.uuid,
 
           ...ResourceGroupParameter,
-          ...Azure.ResourceManager.Foundations.DefaultProviderNamespace,
+          ...Azure.ResourceManager.ProviderNamespace<Employee>,
           #suppress "@azure-tools/typespec-azure-core/documentation-required" "customization"
           employeeName: string,
         ): Employee;
