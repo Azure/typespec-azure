@@ -1,19 +1,17 @@
 import { Enum, Model } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { getUsage } from "../../src/decorators.js";
 import { UsageFlags } from "../../src/interfaces.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import {
+  createSdkContextForTester,
+  SimpleTester,
+  SimpleTesterWithBuiltInService,
+} from "../tester.js";
 
 it("defaults calculated usage", async () => {
-  const { Model1, Model2, Model3, Model4 } = (await runner.compile(`
+  const result = await SimpleTester.compile(`
     @service
     @test namespace MyService {
       @test
@@ -40,19 +38,25 @@ it("defaults calculated usage", async () => {
       @route("/func3")
       op func3(@body body: Model3): Model3;
     }
-  `)) as { Model1: Model; Model2: Model; Model3: Model; Model4: Model };
+  `);
+  const { Model1, Model2, Model3, Model4 } = result as unknown as {
+    Model1: Model;
+    Model2: Model;
+    Model3: Model;
+    Model4: Model;
+  };
 
-  strictEqual(getUsage(runner.context, Model1), UsageFlags.Input | UsageFlags.Json);
-  strictEqual(getUsage(runner.context, Model2), UsageFlags.Output | UsageFlags.Json);
-  strictEqual(
-    getUsage(runner.context, Model3),
-    UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
-  );
-  strictEqual(getUsage(runner.context, Model4), UsageFlags.None);
+  const context = await createSdkContextForTester(result.program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(getUsage(context, Model1), UsageFlags.Input | UsageFlags.Json);
+  strictEqual(getUsage(context, Model2), UsageFlags.Output | UsageFlags.Json);
+  strictEqual(getUsage(context, Model3), UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+  strictEqual(getUsage(context, Model4), UsageFlags.None);
 });
 
 it("usage override", async () => {
-  const { Model1, Model2, Model3, Model4, Enum1, Enum2 } = (await runner.compile(`
+  const result = await SimpleTester.compile(`
     @service
     @test namespace MyService {
       @test
@@ -93,7 +97,8 @@ it("usage override", async () => {
       @route("/func2")
       op func2(): Model3;
     }
-  `)) as {
+  `);
+  const { Model1, Model2, Model3, Model4, Enum1, Enum2 } = result as unknown as {
     Model1: Model;
     Model2: Model;
     Model3: Model;
@@ -102,22 +107,19 @@ it("usage override", async () => {
     Enum2: Enum;
   };
 
-  strictEqual(getUsage(runner.context, Model1), UsageFlags.Input | UsageFlags.Output);
-  strictEqual(
-    getUsage(runner.context, Model2),
-    UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
-  );
-  strictEqual(
-    getUsage(runner.context, Model3),
-    UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
-  );
-  strictEqual(getUsage(runner.context, Model4), UsageFlags.None);
-  strictEqual(getUsage(runner.context, Enum1), UsageFlags.Input | UsageFlags.Output);
-  strictEqual(getUsage(runner.context, Enum2), UsageFlags.None);
+  const context = await createSdkContextForTester(result.program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(getUsage(context, Model1), UsageFlags.Input | UsageFlags.Output);
+  strictEqual(getUsage(context, Model2), UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+  strictEqual(getUsage(context, Model3), UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+  strictEqual(getUsage(context, Model4), UsageFlags.None);
+  strictEqual(getUsage(context, Enum1), UsageFlags.Input | UsageFlags.Output);
+  strictEqual(getUsage(context, Enum2), UsageFlags.None);
 });
 
 it("wrong usage value", async () => {
-  const diagnostics = await runner.diagnose(`
+  const diagnostics = await SimpleTester.diagnose(`
     @test
     @usage(1)
     model Model1{}
@@ -129,7 +131,7 @@ it("wrong usage value", async () => {
 });
 
 it("usage propagation", async () => {
-  const { Fish, Shark, Salmon, SawShark, Origin } = (await runner.compile(`
+  const result = await SimpleTester.compile(`
     @service
     @test namespace MyService {
       @discriminator("kind")
@@ -166,29 +168,27 @@ it("usage propagation", async () => {
       @get
       op getModel(): Fish;
     }
-  `)) as { Fish: Model; Shark: Model; Salmon: Model; SawShark: Model; Origin: Model };
+  `);
+  const { Fish, Shark, Salmon, SawShark, Origin } = result as unknown as {
+    Fish: Model;
+    Shark: Model;
+    Salmon: Model;
+    SawShark: Model;
+    Origin: Model;
+  };
 
-  strictEqual(
-    getUsage(runner.context, Fish),
-    UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
-  );
-  strictEqual(
-    getUsage(runner.context, Shark),
-    UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
-  );
-  strictEqual(getUsage(runner.context, Salmon), UsageFlags.Output | UsageFlags.Json);
-  strictEqual(
-    getUsage(runner.context, SawShark),
-    UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
-  );
-  strictEqual(
-    getUsage(runner.context, Origin),
-    UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
-  );
+  const context = await createSdkContextForTester(result.program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(getUsage(context, Fish), UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+  strictEqual(getUsage(context, Shark), UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+  strictEqual(getUsage(context, Salmon), UsageFlags.Output | UsageFlags.Json);
+  strictEqual(getUsage(context, SawShark), UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+  strictEqual(getUsage(context, Origin), UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
 });
 
 it("usage and convenience", async () => {
-  const { Fish } = (await runner.compile(`
+  const result1 = await SimpleTester.compile(`
     @service
     @test namespace MyService {
       @test
@@ -204,11 +204,15 @@ it("usage and convenience", async () => {
       @convenientAPI(false)
       op getModel(): Fish;
     }
-  `)) as { Fish: Model };
+  `);
+  const { Fish } = result1 as unknown as { Fish: Model };
 
-  strictEqual(getUsage(runner.context, Fish), UsageFlags.Input | UsageFlags.Json);
+  const context1 = await createSdkContextForTester(result1.program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(getUsage(context1, Fish), UsageFlags.Input | UsageFlags.Json);
 
-  const { Dog } = (await runner.compile(`
+  const result2 = await SimpleTester.compile(`
     @service
     @test namespace MyService {
       @test
@@ -224,13 +228,17 @@ it("usage and convenience", async () => {
       @convenientAPI(true)
       op getModel(): Dog;
     }
-  `)) as { Dog: Model };
+  `);
+  const { Dog } = result2 as unknown as { Dog: Model };
 
-  strictEqual(getUsage(runner.context, Dog), UsageFlags.Output | UsageFlags.Json);
+  const context2 = await createSdkContextForTester(result2.program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(getUsage(context2, Dog), UsageFlags.Output | UsageFlags.Json);
 });
 
 it("patch usage", async () => {
-  const { PatchModel, JsonMergePatchModel } = (await runner.compile(`
+  const result = await SimpleTester.compile(`
     @service
     @test namespace MyService {
       @test
@@ -251,17 +259,24 @@ it("patch usage", async () => {
       @route("/jsonMergePatch")
       op jsonMergePatchModel(@body body: JsonMergePatchModel, @header contentType: "application/merge-patch+json"): void;
     }
-  `)) as { PatchModel: Model; JsonMergePatchModel: Model };
+  `);
+  const { PatchModel, JsonMergePatchModel } = result as unknown as {
+    PatchModel: Model;
+    JsonMergePatchModel: Model;
+  };
 
-  strictEqual(getUsage(runner.context, PatchModel), UsageFlags.Input | UsageFlags.Json);
+  const context = await createSdkContextForTester(result.program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(getUsage(context, PatchModel), UsageFlags.Input | UsageFlags.Json);
   strictEqual(
-    getUsage(runner.context, JsonMergePatchModel),
+    getUsage(context, JsonMergePatchModel),
     UsageFlags.JsonMergePatch | UsageFlags.Input | UsageFlags.Json,
   );
 });
 
 it("@usage Input and Output on Namespace", async () => {
-  const { OrphanModel, InputModel, OutputModel, RoundtripModel } = (await runner.compile(`
+  const result = await SimpleTester.compile(`
     @service
     @test
     @usage(Usage.input | Usage.output)
@@ -292,25 +307,35 @@ it("@usage Input and Output on Namespace", async () => {
       @route("/two")
       op two(@body body: RoundtripModel): RoundtripModel;
     }
-  `)) as { OrphanModel: Model; InputModel: Model; OutputModel: Model; RoundtripModel: Model };
-  strictEqual(getUsage(runner.context, OrphanModel), UsageFlags.Input | UsageFlags.Output);
+  `);
+  const { OrphanModel, InputModel, OutputModel, RoundtripModel } = result as unknown as {
+    OrphanModel: Model;
+    InputModel: Model;
+    OutputModel: Model;
+    RoundtripModel: Model;
+  };
+
+  const context = await createSdkContextForTester(result.program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(getUsage(context, OrphanModel), UsageFlags.Input | UsageFlags.Output);
   // this is set to input and output because of the namespace override
   strictEqual(
-    getUsage(runner.context, InputModel),
+    getUsage(context, InputModel),
     UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
   );
   strictEqual(
-    getUsage(runner.context, OutputModel),
+    getUsage(context, OutputModel),
     UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
   );
   strictEqual(
-    getUsage(runner.context, RoundtripModel),
+    getUsage(context, RoundtripModel),
     UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
   );
 });
 
 it("@usage namespace override", async () => {
-  const { OrphanModel, OrphanModelWithOverride } = (await runner.compile(`
+  const result = await SimpleTester.compile(`
     @service
     @test
     @usage(Usage.input)
@@ -326,16 +351,21 @@ it("@usage namespace override", async () => {
         prop: string;
       }
     }
-  `)) as { OrphanModel: Model; OrphanModelWithOverride: Model };
-  strictEqual(getUsage(runner.context, OrphanModel), UsageFlags.Input);
-  strictEqual(
-    getUsage(runner.context, OrphanModelWithOverride),
-    UsageFlags.Input | UsageFlags.Output,
-  );
+  `);
+  const { OrphanModel, OrphanModelWithOverride } = result as unknown as {
+    OrphanModel: Model;
+    OrphanModelWithOverride: Model;
+  };
+
+  const context = await createSdkContextForTester(result.program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(getUsage(context, OrphanModel), UsageFlags.Input);
+  strictEqual(getUsage(context, OrphanModelWithOverride), UsageFlags.Input | UsageFlags.Output);
 });
 
 it("usage additive from operation", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @usage(Usage.output)
       model A {}
@@ -343,14 +373,17 @@ it("usage additive from operation", async () => {
       op test(@body body: A): void;
       `,
   );
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   // Should have Input + Json (from operation) + Output (from @usage)
   strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
 });
 
 it("usage additive from propagation", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       model A {
         prop: B;
@@ -362,7 +395,10 @@ it("usage additive from propagation", async () => {
       op test(@body body: A): void;
       `,
   );
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   // A should have Input + Json from operation
   strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Json);
@@ -371,7 +407,7 @@ it("usage additive from propagation", async () => {
 });
 
 it("usage additive from multiple sources", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       model A {
         prop: B;
@@ -387,7 +423,10 @@ it("usage additive from multiple sources", async () => {
       op test(@body body: A): void;
       `,
   );
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   // A should have Input + Json from operation
   strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Json);
@@ -398,7 +437,7 @@ it("usage additive from multiple sources", async () => {
 });
 
 it("usage additive from spread", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       model A {
         x: X;
@@ -417,7 +456,10 @@ it("usage additive from spread", async () => {
       op two(): B;
       `,
   );
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   strictEqual(
     models.find((m) => m.name === "B")?.usage,
@@ -431,7 +473,7 @@ it("usage additive from spread", async () => {
 });
 
 it("orphan model in group", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @access(Access.public)
       @usage(Usage.output)
@@ -446,7 +488,10 @@ it("orphan model in group", async () => {
       }
     `,
   );
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   strictEqual(models[0].usage, UsageFlags.Output);
   strictEqual(models[0].access, "public");
@@ -455,11 +500,7 @@ it("orphan model in group", async () => {
 });
 
 it("disableUsageAccessPropagationToBase true with override", async () => {
-  runner = await createSdkTestRunner(
-    { emitterName: "@azure-tools/typespec-python" },
-    { disableUsageAccessPropagationToBase: true },
-  );
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       model BaseClassThatsPruned {
         id: int32;
@@ -474,7 +515,12 @@ it("disableUsageAccessPropagationToBase true with override", async () => {
       @@usage(DerivedOne, Usage.output);
     `,
   );
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(
+    program,
+    { emitterName: "@azure-tools/typespec-python" },
+    { disableUsageAccessPropagationToBase: true },
+  );
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   strictEqual(models[0].usage, UsageFlags.Output);
   strictEqual(models[0].name, "DerivedOne");
@@ -483,11 +529,7 @@ it("disableUsageAccessPropagationToBase true with override", async () => {
 });
 
 it("disableUsageAccessPropagationToBase true", async () => {
-  runner = await createSdkTestRunner(
-    { emitterName: "@azure-tools/typespec-python" },
-    { disableUsageAccessPropagationToBase: true },
-  );
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       model BaseClassThatsPruned {
         id: int32;
@@ -503,7 +545,12 @@ it("disableUsageAccessPropagationToBase true", async () => {
       op test(): DerivedOne;
     `,
   );
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(
+    program,
+    { emitterName: "@azure-tools/typespec-python" },
+    { disableUsageAccessPropagationToBase: true },
+  );
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   strictEqual(models[0].usage, UsageFlags.Output | UsageFlags.Json);
   strictEqual(models[0].name, "DerivedOne");
@@ -512,11 +559,7 @@ it("disableUsageAccessPropagationToBase true", async () => {
 });
 
 it("disableUsageAccessPropagationToBase true property propagation", async () => {
-  runner = await createSdkTestRunner(
-    { emitterName: "@azure-tools/typespec-python" },
-    { disableUsageAccessPropagationToBase: true },
-  );
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       model BaseClassThatsPruned {
         id: int32;
@@ -536,7 +579,12 @@ it("disableUsageAccessPropagationToBase true property propagation", async () => 
       op test(): DerivedOne;
     `,
   );
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(
+    program,
+    { emitterName: "@azure-tools/typespec-python" },
+    { disableUsageAccessPropagationToBase: true },
+  );
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   strictEqual(models[0].usage, UsageFlags.Output | UsageFlags.Json);
   strictEqual(models[0].name, "DerivedOne");
@@ -547,11 +595,7 @@ it("disableUsageAccessPropagationToBase true property propagation", async () => 
 });
 
 it("disableUsageAccessPropagationToBase true discriminator propagation", async () => {
-  runner = await createSdkTestRunner(
-    { emitterName: "@azure-tools/typespec-python" },
-    { disableUsageAccessPropagationToBase: true },
-  );
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @discriminator("kind")
       model Fish {
@@ -582,7 +626,12 @@ it("disableUsageAccessPropagationToBase true discriminator propagation", async (
       op getModel(): Fish;
     `,
   );
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(
+    program,
+    { emitterName: "@azure-tools/typespec-python" },
+    { disableUsageAccessPropagationToBase: true },
+  );
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 5);
   strictEqual(models[0].usage, UsageFlags.Output | UsageFlags.Json);
   strictEqual(models[0].name, "Fish");
@@ -597,11 +646,7 @@ it("disableUsageAccessPropagationToBase true discriminator propagation", async (
 });
 
 it("disableUsageAccessPropagationToBase true discriminator without ref propagation", async () => {
-  runner = await createSdkTestRunner(
-    { emitterName: "@azure-tools/typespec-python" },
-    { disableUsageAccessPropagationToBase: true },
-  );
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @discriminator("kind")
       model Fish {
@@ -626,7 +671,12 @@ it("disableUsageAccessPropagationToBase true discriminator without ref propagati
       op getSalmon(): Salmon;
     `,
   );
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(
+    program,
+    { emitterName: "@azure-tools/typespec-python" },
+    { disableUsageAccessPropagationToBase: true },
+  );
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   strictEqual(models[0].usage, UsageFlags.Output | UsageFlags.Json);
   strictEqual(models[0].name, "Shark");
