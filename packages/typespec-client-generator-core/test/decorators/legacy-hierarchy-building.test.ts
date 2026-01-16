@@ -1,17 +1,15 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-});
+import { it } from "vitest";
+import {
+  AzureCoreTester,
+  createSdkContextForTester,
+  SimpleTester,
+  SimpleTesterWithBuiltInService,
+} from "../tester.js";
 
 it("three-level inheritance chain", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
       @discriminator("kind")
       model A {
         kind: string;
@@ -37,7 +35,8 @@ it("three-level inheritance chain", async () => {
       op test(): A;
     `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const models = context.sdkPackage.models;
   const modelA = models.find((m) => m.name === "A");
   const modelB = models.find((m) => m.name === "B");
   const modelC = models.find((m) => m.name === "C");
@@ -78,7 +77,7 @@ it("three-level inheritance chain", async () => {
 });
 
 it("four-level inheritance chain", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
       @discriminator("type")
       model Vehicle {
         type: string;
@@ -116,7 +115,8 @@ it("four-level inheritance chain", async () => {
       op getVehicle(): Vehicle;
     `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const models = context.sdkPackage.models;
   const vehicleModel = models.find((m) => m.name === "Vehicle");
   const motorVehicleModel = models.find((m) => m.name === "MotorVehicle");
   const carModel = models.find((m) => m.name === "Car");
@@ -167,7 +167,7 @@ it("four-level inheritance chain", async () => {
 });
 
 it("nested property inheritance", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     @discriminator("kind")
     model Salmon {
       properties: {
@@ -195,7 +195,8 @@ it("nested property inheritance", async () => {
     op getSalmon(): Salmon;
   `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 6);
   const salmonModel = models.find((m) => m.name === "Salmon");
   const kingSalmonModel = models.find((m) => m.name === "KingSalmon");
@@ -254,7 +255,7 @@ it("nested property inheritance", async () => {
 });
 
 it("circular inheritance", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
       @service
       namespace TestService;
 
@@ -272,14 +273,15 @@ it("circular inheritance", async () => {
       }
     `);
 
-  expectDiagnostics(runner.context.diagnostics, {
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-circular-reference",
     message: "@hierarchyBuilding decorator causes recursive base type reference.",
   });
 });
 
 it("another circular inheritance", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
       @service
       namespace TestService;
 
@@ -297,14 +299,15 @@ it("another circular inheritance", async () => {
       }
     `);
 
-  expectDiagnostics(runner.context.diagnostics, {
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-circular-reference",
     message: "@hierarchyBuilding decorator causes recursive base type reference.",
   });
 });
 
 it("conflicting inheritance", async () => {
-  const [_, diagnostics] = await runner.compileAndDiagnose(`
+  const { program, diagnostics } = await SimpleTester.diagnose(`
       @service
       namespace TestService;
 
@@ -325,6 +328,7 @@ it("conflicting inheritance", async () => {
       op test(): C;
     `);
 
+  await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
   // Should warn about missing property with specific details
   expectDiagnostics(diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
@@ -334,7 +338,7 @@ it("conflicting inheritance", async () => {
 });
 
 it("inheritance override with template models", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
       @discriminator("type")
       model Container<T> {
         type: string;
@@ -355,7 +359,8 @@ it("inheritance override with template models", async () => {
       op getContainer(): Container<string>;
     `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const models = context.sdkPackage.models;
   const specialContainerModel = models.find((m) => m.name === "SpecialContainer");
 
   ok(specialContainerModel);
@@ -364,7 +369,7 @@ it("inheritance override with template models", async () => {
 });
 
 it("without polymorphism", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
       model A {
         kind: string;
       }
@@ -388,7 +393,8 @@ it("without polymorphism", async () => {
       op test(): C;
     `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   const aModel = models.find((m) => m.name === "A");
   const bModel = models.find((m) => m.name === "B");
@@ -404,13 +410,7 @@ it("without polymorphism", async () => {
 });
 
 it("verify respectLegacyHierarchyBuilding: false flag", async () => {
-  const runnerWithoutLegacyHierarchyBuilding = await createSdkTestRunner(
-    {
-      emitterName: "@azure-tools/typespec-java",
-    },
-    { enableLegacyHierarchyBuilding: false },
-  );
-  await runnerWithoutLegacyHierarchyBuilding.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
       @discriminator("type")
       model Vehicle {
         type: string;
@@ -429,8 +429,14 @@ it("verify respectLegacyHierarchyBuilding: false flag", async () => {
       op getVehicle(): Vehicle;
     `);
 
+  const context = await createSdkContextForTester(
+    program,
+    { emitterName: "@azure-tools/typespec-java" },
+    { enableLegacyHierarchyBuilding: false },
+  );
+
   // Should not apply legacy hierarchy building
-  const models = runnerWithoutLegacyHierarchyBuilding.context.sdkPackage.models;
+  const models = context.sdkPackage.models;
   const vehicleModel = models.find((m) => m.name === "Vehicle");
   const carModel = models.find((m) => m.name === "Car");
   const sportsCarModel = models.find((m) => m.name === "SportsCar");
@@ -443,13 +449,7 @@ it("verify respectLegacyHierarchyBuilding: false flag", async () => {
 });
 
 it("verify diagnostic gets raised for usage", async () => {
-  const runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-
-  const result = await runnerWithCore.diagnose(
+  const { diagnostics } = await AzureCoreTester.diagnose(
     `        
           namespace MyService {
         @discriminator("kind")
@@ -482,7 +482,7 @@ it("verify diagnostic gets raised for usage", async () => {
       },
     },
   );
-  expectDiagnostics(result, [
+  expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-azure-core/no-legacy-usage",
       message:
@@ -492,7 +492,7 @@ it("verify diagnostic gets raised for usage", async () => {
 });
 
 it("verify legacy hierarchy building usage with unordered models", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
       @discriminator("type")
       model Vehicle {
         type: string;
@@ -528,7 +528,8 @@ it("verify legacy hierarchy building usage with unordered models", async () => {
       op getVehicle(): Vehicle;
     `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const models = context.sdkPackage.models;
   const vehicleModel = models.find((m) => m.name === "Vehicle");
   const motorVehicleModel = models.find((m) => m.name === "MotorVehicle");
   const carModel = models.find((m) => m.name === "Car");
@@ -551,7 +552,7 @@ it("verify legacy hierarchy building usage with unordered models", async () => {
 });
 
 it("handles envelope properties correctly", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
       // Simulating Azure.ResourceManager.Foundations.ArmTagsProperty
       model ArmTagsProperty {
         tags?: Record<string>;
@@ -578,7 +579,8 @@ it("handles envelope properties correctly", async () => {
       op getFoo(): FooResourceWithHierarchy;
     `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const models = context.sdkPackage.models;
   const trackedResource = models.find((m) => m.name === "TrackedResource");
   const fooResourceWithHierarchy = models.find((m) => m.name === "FooResourceWithHierarchy");
 

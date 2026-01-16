@@ -1,27 +1,79 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { expectDiagnostics } from "@typespec/compiler/testing";
-import { XmlTestLibrary } from "@typespec/xml/testing";
+import { resolvePath } from "@typespec/compiler";
+import { createTester, expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { afterEach, beforeEach, describe, it } from "vitest";
+import { describe, it } from "vitest";
 import { SdkEnumValueType } from "../../src/interfaces.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import {
+  AzureCoreTester,
+  createSdkContextForTester,
+  TcgcTester,
+} from "../tester.js";
 
-let runner: SdkTestRunner;
+/**
+ * Tester for TCGC tests with XML library support.
+ */
+const XmlTester = createTester(resolvePath(import.meta.dirname, "../.."), {
+  libraries: [
+    "@typespec/http",
+    "@typespec/rest",
+    "@typespec/versioning",
+    "@typespec/xml",
+    "@azure-tools/typespec-client-generator-core",
+  ],
+})
+  .import(
+    "@typespec/http",
+    "@typespec/rest",
+    "@typespec/versioning",
+    "@typespec/xml",
+    "@azure-tools/typespec-client-generator-core",
+  )
+  .using("Http", "Rest", "Versioning", "Xml", "Azure.ClientGenerator.Core");
 
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-});
-afterEach(async () => {
-  for (const modelsOrEnums of [runner.context.sdkPackage.models, runner.context.sdkPackage.enums]) {
-    for (const item of modelsOrEnums) {
-      ok(item.name !== "");
-    }
-  }
-});
+/**
+ * Tester with a built-in simple service namespace and XML support.
+ */
+const XmlTesterWithBuiltInService = XmlTester.wrap(
+  (x) => `
+@service
+namespace TestService;
+
+${x}
+`,
+);
+
+/**
+ * Tester with Azure Core and a built-in service namespace.
+ */
+const AzureCoreServiceTester = AzureCoreTester.wrap(
+  (x) => `
+@service
+namespace TestService;
+
+${x}
+`,
+);
+
+/**
+ * Simple tester with built-in service for decorator listing tests.
+ */
+const SimpleTesterWithBuiltInServiceForDecorators = TcgcTester.import(
+  "@typespec/http",
+  "@typespec/rest",
+  "@typespec/versioning",
+  "@azure-tools/typespec-client-generator-core",
+)
+  .using("Http", "Rest", "Versioning", "Azure.ClientGenerator.Core")
+  .wrap(
+    (x) => `
+@service(#{title: "Test Service"})
+namespace TestService;
+
+${x}
+`,
+  );
 it("no arg", async function () {
-  runner = await createSdkTestRunner({}, { additionalDecorators: ["TypeSpec\\.@error"] });
-
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInServiceForDecorators.compile(`
     @error
     model Blob {
       id: string;
@@ -30,19 +82,20 @@ it("no arg", async function () {
     op test(): Blob;
   `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(
+    program,
+    { emitterName: "@azure-tools/typespec-java" },
+    { additionalDecorators: ["TypeSpec\\.@error"] },
+  );
+
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   deepStrictEqual(models[0].decorators, [{ name: "TypeSpec.@error", arguments: {} }]);
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("basic arg type", async function () {
-  runner = await createSdkTestRunner(
-    {},
-    { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] },
-  );
-
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInServiceForDecorators.compile(`
     model Blob {
       @clientName("ID")
       id: string;
@@ -51,7 +104,13 @@ it("basic arg type", async function () {
     op test(): Blob;
   `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(
+    program,
+    { emitterName: "@azure-tools/typespec-java" },
+    { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] },
+  );
+
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   deepStrictEqual(models[0].properties[0].decorators, [
     {
@@ -61,13 +120,11 @@ it("basic arg type", async function () {
       },
     },
   ]);
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("enum member arg type", async function () {
-  runner = await createSdkTestRunner({}, { additionalDecorators: ["TypeSpec\\.@encode"] });
-
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInServiceForDecorators.compile(`
     model Blob {
       @encode(BytesKnownEncoding.base64url)
       value: bytes;
@@ -76,48 +133,59 @@ it("enum member arg type", async function () {
     op test(): Blob;
   `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(
+    program,
+    { emitterName: "@azure-tools/typespec-java" },
+    { additionalDecorators: ["TypeSpec\\.@encode"] },
+  );
+
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].properties[0].decorators[0].name, "TypeSpec.@encode");
   const encodeInfo = models[0].properties[0].decorators[0].arguments[
     "encodingOrEncodeAs"
   ] as SdkEnumValueType;
   strictEqual((encodeInfo.value as any).value, "base64url");
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 // This is not valid anymore as its getting value objects
 it.skip("decorator arg type not supported", async function () {
-  runner = await createSdkTestRunner({}, { additionalDecorators: ["TypeSpec\\.@service"] });
-
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInServiceForDecorators.compile(`
     op test(): void;
   `);
 
-  deepStrictEqual(runner.context.sdkPackage.clients[0].decorators, [
+  const context = await createSdkContextForTester(
+    program,
+    { emitterName: "@azure-tools/typespec-java" },
+    { additionalDecorators: ["TypeSpec\\.@service"] },
+  );
+
+  deepStrictEqual(context.sdkPackage.clients[0].decorators, [
     {
       name: "TypeSpec.@service",
       arguments: { options: undefined },
     },
   ]);
-  expectDiagnostics(runner.context.diagnostics, {
+  expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/unsupported-generic-decorator-arg-type",
   });
 });
 
 it("multiple same decorators", async function () {
-  runner = await createSdkTestRunner(
-    {},
-    { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] },
-  );
-
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInServiceForDecorators.compile(`
     @clientName("testForPython", "python")
     @clientName("testForJava", "java")
     op test(): void;
   `);
 
-  deepStrictEqual(runner.context.sdkPackage.clients[0].methods[0].decorators, [
+  const context = await createSdkContextForTester(
+    program,
+    { emitterName: "@azure-tools/typespec-java" },
+    { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] },
+  );
+
+  deepStrictEqual(context.sdkPackage.clients[0].methods[0].decorators, [
     {
       name: "Azure.ClientGenerator.Core.@clientName",
       arguments: {
@@ -133,16 +201,21 @@ it("multiple same decorators", async function () {
       },
     },
   ]);
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("decorators on a namespace", async function () {
-  runner = await createSdkTestRunner({}, { additionalDecorators: ["TypeSpec\\.@service"] });
-
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInServiceForDecorators.compile(`
     op test(): void;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+
+  const context = await createSdkContextForTester(
+    program,
+    { emitterName: "@azure-tools/typespec-java" },
+    { additionalDecorators: ["TypeSpec\\.@service"] },
+  );
+
+  const sdkPackage = context.sdkPackage;
   const namespace = sdkPackage.namespaces[0];
   ok(namespace);
   strictEqual(namespace.name, "TestService");
@@ -158,17 +231,12 @@ it("decorators on a namespace", async function () {
       },
     },
   ]);
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 describe("xml scenario", () => {
   it("@attribute", async function () {
-    runner = await createSdkTestRunner({
-      librariesToAdd: [XmlTestLibrary],
-      autoUsings: ["TypeSpec.Xml"],
-    });
-
-    await runner.compileWithBuiltInService(`
+    const { program } = await XmlTesterWithBuiltInService.compile(`
       model Blob {
         @attribute id: string;
       }
@@ -176,7 +244,11 @@ describe("xml scenario", () => {
       op test(): Blob;
     `);
 
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     deepStrictEqual(models[0].properties[0].decorators, [
       {
@@ -187,12 +259,7 @@ describe("xml scenario", () => {
   });
 
   it("@name", async function () {
-    runner = await createSdkTestRunner({
-      librariesToAdd: [XmlTestLibrary],
-      autoUsings: ["TypeSpec.Xml"],
-    });
-
-    await runner.compileWithBuiltInService(`
+    const { program } = await XmlTesterWithBuiltInService.compile(`
       @name("XmlBook")
       model Book {
         @name("XmlId") id: string;
@@ -202,7 +269,11 @@ describe("xml scenario", () => {
       op test(): Book;
     `);
 
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     deepStrictEqual(models[0].decorators, [
       {
@@ -219,12 +290,7 @@ describe("xml scenario", () => {
   });
 
   it("@ns", async function () {
-    runner = await createSdkTestRunner({
-      librariesToAdd: [XmlTestLibrary],
-      autoUsings: ["TypeSpec.Xml"],
-    });
-
-    await runner.compileWithBuiltInService(`
+    const { program } = await XmlTesterWithBuiltInService.compile(`
       @ns("https://example.com/ns1", "ns1")
       model Foo {
         @ns("https://example.com/ns1", "ns1")
@@ -237,7 +303,11 @@ describe("xml scenario", () => {
       op test(): Foo;
     `);
 
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     deepStrictEqual(models[0].decorators, [
       {
@@ -269,12 +339,7 @@ describe("xml scenario", () => {
   });
 
   it("@nsDeclarations", async function () {
-    runner = await createSdkTestRunner({
-      librariesToAdd: [XmlTestLibrary],
-      autoUsings: ["TypeSpec.Xml"],
-    });
-
-    await runner.compileWithBuiltInService(`
+    const { program } = await XmlTesterWithBuiltInService.compile(`
       @Xml.nsDeclarations
       enum Namespaces {
         ns1: "https://example.com/ns1",
@@ -293,7 +358,11 @@ describe("xml scenario", () => {
       op test(): Foo;
     `);
 
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].decorators[0].name, "TypeSpec.Xml.@ns");
     const modelArg = models[0].decorators[0].arguments["ns"] as SdkEnumValueType;
@@ -309,12 +378,7 @@ describe("xml scenario", () => {
   });
 
   it("@unwrapped", async function () {
-    runner = await createSdkTestRunner({
-      librariesToAdd: [XmlTestLibrary],
-      autoUsings: ["TypeSpec.Xml"],
-    });
-
-    await runner.compileWithBuiltInService(`
+    const { program } = await XmlTesterWithBuiltInService.compile(`
       model Pet {
         @unwrapped tags: string[];
       }
@@ -322,7 +386,11 @@ describe("xml scenario", () => {
       op test(): Pet;
     `);
 
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     deepStrictEqual(models[0].properties[0].decorators, [
       {
@@ -335,18 +403,17 @@ describe("xml scenario", () => {
 
 describe("azure scenario", () => {
   it("@useFinalStateVia", async function () {
-    runner = await createSdkTestRunner({
-      librariesToAdd: [AzureCoreTestLibrary],
-      autoUsings: ["Azure.Core"],
-    });
-
-    await runner.compileWithBuiltInService(`
+    const { program } = await AzureCoreServiceTester.compile(`
       @useFinalStateVia("original-uri")
       @put
       op test(): void;
     `);
 
-    const methods = runner.context.sdkPackage.clients[0].methods;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+
+    const methods = context.sdkPackage.clients[0].methods;
     strictEqual(methods.length, 1);
     deepStrictEqual(methods[0].decorators, [
       {
@@ -361,12 +428,7 @@ describe("azure scenario", () => {
 
 describe("csharp only decorator", () => {
   it("@useSystemTextJsonConverter", async function () {
-    runner = await createSdkTestRunner(
-      {},
-      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@useSystemTextJsonConverter"] },
-    );
-
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithBuiltInServiceForDecorators.compile(`
         @useSystemTextJsonConverter("csharp")
         model A {
           id: string;
@@ -375,7 +437,13 @@ describe("csharp only decorator", () => {
         op test(): A;
       `);
 
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(
+      program,
+      { emitterName: "@azure-tools/typespec-java" },
+      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@useSystemTextJsonConverter"] },
+    );
+
+    const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     deepStrictEqual(models[0].decorators, [
       {
@@ -383,6 +451,6 @@ describe("csharp only decorator", () => {
         arguments: { scope: "csharp" },
       },
     ]);
-    expectDiagnostics(runner.context.diagnostics, []);
+    expectDiagnostics(context.diagnostics, []);
   });
 });

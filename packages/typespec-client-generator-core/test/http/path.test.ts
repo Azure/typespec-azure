@@ -1,19 +1,14 @@
 import { strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import { it } from "vitest";
+import { createSdkContextForTester, SimpleTesterWithBuiltInService } from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
-
 it("optional path parameter", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     op myOp(@path path?: string): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceOperation = method.operation;
   strictEqual(serviceOperation.path, "{path}");
@@ -33,10 +28,11 @@ it("optional path parameter", async () => {
 });
 
 it("required path parameter", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     op myOp(@path path: string): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceOperation = method.operation;
   strictEqual(serviceOperation.path, "/{path}");
