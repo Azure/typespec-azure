@@ -1,17 +1,11 @@
 import { strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { describe, it } from "vitest";
 import { SdkClientType, SdkServiceOperation } from "../../src/interfaces.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import { createSdkContextForTester, SimpleTesterWithBuiltInService } from "../tester.js";
 
 describe("normal namespace", () => {
   it("namespace on model", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithBuiltInService.compile(
       `
       model Test {
         prop: string;
@@ -20,11 +14,14 @@ describe("normal namespace", () => {
       op test(): Test;
       `,
     );
-    strictEqual(runner.context.sdkPackage.models[0].namespace, "TestService");
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(context.sdkPackage.models[0].namespace, "TestService");
   });
 
   it("namespace on enum", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithBuiltInService.compile(
       `
       enum Test {
         A
@@ -33,11 +30,14 @@ describe("normal namespace", () => {
       op test(): Test;
       `,
     );
-    strictEqual(runner.context.sdkPackage.enums[0].namespace, "TestService");
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(context.sdkPackage.enums[0].namespace, "TestService");
   });
 
   it("namespace on union", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithBuiltInService.compile(
       `
       union Test {
         string, int32
@@ -46,11 +46,14 @@ describe("normal namespace", () => {
       op test(param: Test): void;
       `,
     );
-    strictEqual(runner.context.sdkPackage.unions[0].namespace, "TestService");
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(context.sdkPackage.unions[0].namespace, "TestService");
   });
 
   it("namespace on union as enum", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithBuiltInService.compile(
       `
       union Test {
         "A", "B"
@@ -59,11 +62,14 @@ describe("normal namespace", () => {
       op test(param: Test): void;
       `,
     );
-    strictEqual(runner.context.sdkPackage.enums[0].namespace, "TestService");
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(context.sdkPackage.enums[0].namespace, "TestService");
   });
 
   it("namespace on union with null", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithBuiltInService.compile(
       `
       union Test {
         string, null
@@ -72,35 +78,42 @@ describe("normal namespace", () => {
       op test(param: Test): void;
       `,
     );
-    strictEqual(runner.context.sdkPackage.unions[0].namespace, "TestService");
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(context.sdkPackage.unions[0].namespace, "TestService");
   });
 
   it("namespace on namespace", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithBuiltInService.compile(
       `
       namespace Inner {
         op test(): void;
       }
       `,
     );
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     strictEqual(
-      (runner.context.sdkPackage.clients[0].children![0] as SdkClientType<SdkServiceOperation>)
-        .namespace,
+      (context.sdkPackage.clients[0].children![0] as SdkClientType<SdkServiceOperation>).namespace,
       "TestService.Inner",
     );
   });
 
   it("namespace on interface", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithBuiltInService.compile(
       `
       interface Inner {
         op test(): void;
       }
       `,
     );
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     strictEqual(
-      (runner.context.sdkPackage.clients[0].children![0] as SdkClientType<SdkServiceOperation>)
-        .namespace,
+      (context.sdkPackage.clients[0].children![0] as SdkClientType<SdkServiceOperation>).namespace,
       "TestService",
     );
   });
@@ -108,7 +121,7 @@ describe("normal namespace", () => {
 
 describe("namespace override", () => {
   it("namespace override on model", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithBuiltInService.compile(
       `
       @clientNamespace("MyNamespace")
       model Test {
@@ -118,11 +131,14 @@ describe("namespace override", () => {
       op test(): Test;
       `,
     );
-    strictEqual(runner.context.sdkPackage.models[0].namespace, "MyNamespace");
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(context.sdkPackage.models[0].namespace, "MyNamespace");
   });
 
   it("namespace override on enum", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithBuiltInService.compile(
       `
       @clientNamespace("MyNamespace")
       enum Test {
@@ -132,11 +148,14 @@ describe("namespace override", () => {
       op test(): Test;
       `,
     );
-    strictEqual(runner.context.sdkPackage.enums[0].namespace, "MyNamespace");
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(context.sdkPackage.enums[0].namespace, "MyNamespace");
   });
 
   it("namespace override on union", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithBuiltInService.compile(
       `
       @clientNamespace("MyNamespace")
       union Test {
@@ -146,11 +165,14 @@ describe("namespace override", () => {
       op test(param: Test): void;
       `,
     );
-    strictEqual(runner.context.sdkPackage.unions[0].namespace, "MyNamespace");
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(context.sdkPackage.unions[0].namespace, "MyNamespace");
   });
 
   it("namespace override on union as enum", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithBuiltInService.compile(
       `
       @clientNamespace("MyNamespace")
       union Test {
@@ -160,11 +182,14 @@ describe("namespace override", () => {
       op test(param: Test): void;
       `,
     );
-    strictEqual(runner.context.sdkPackage.enums[0].namespace, "MyNamespace");
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(context.sdkPackage.enums[0].namespace, "MyNamespace");
   });
 
   it("namespace override on union with null", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithBuiltInService.compile(
       `
       @clientNamespace("MyNamespace")
       union Test {
@@ -174,11 +199,14 @@ describe("namespace override", () => {
       op test(param: Test): void;
       `,
     );
-    strictEqual(runner.context.sdkPackage.unions[0].namespace, "MyNamespace");
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(context.sdkPackage.unions[0].namespace, "MyNamespace");
   });
 
   it("namespace override on namespace", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithBuiltInService.compile(
       `
       namespace Inner {
         op test(): void;
@@ -187,15 +215,17 @@ describe("namespace override", () => {
       @@clientNamespace(Inner, "MyNamespace");
       `,
     );
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     strictEqual(
-      (runner.context.sdkPackage.clients[0].children![0] as SdkClientType<SdkServiceOperation>)
-        .namespace,
+      (context.sdkPackage.clients[0].children![0] as SdkClientType<SdkServiceOperation>).namespace,
       "MyNamespace",
     );
   });
 
   it("namespace override on interface", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithBuiltInService.compile(
       `
       interface Inner {
         op test(): void;
@@ -204,15 +234,17 @@ describe("namespace override", () => {
       @@clientNamespace(Inner, "MyNamespace");
       `,
     );
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     strictEqual(
-      (runner.context.sdkPackage.clients[0].children![0] as SdkClientType<SdkServiceOperation>)
-        .namespace,
+      (context.sdkPackage.clients[0].children![0] as SdkClientType<SdkServiceOperation>).namespace,
       "MyNamespace",
     );
   });
 
   it("namespace override propagation", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithBuiltInService.compile(
       `
       namespace Inner {
         model Baz {
@@ -231,20 +263,22 @@ describe("namespace override", () => {
       @@clientNamespace(Inner, "MyNamespace");
       `,
     );
-    strictEqual(runner.context.sdkPackage.clients[0].namespace, "TestService"); // root namespace
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    strictEqual(context.sdkPackage.clients[0].namespace, "TestService"); // root namespace
     strictEqual(
-      (runner.context.sdkPackage.clients[0].children![0] as SdkClientType<SdkServiceOperation>)
-        .namespace,
+      (context.sdkPackage.clients[0].children![0] as SdkClientType<SdkServiceOperation>).namespace,
       "MyNamespace",
     ); // Inner namespace with override
     strictEqual(
       (
-        (runner.context.sdkPackage.clients[0].children![0] as SdkClientType<SdkServiceOperation>)
+        (context.sdkPackage.clients[0].children![0] as SdkClientType<SdkServiceOperation>)
           .children![0] as SdkClientType<SdkServiceOperation>
       ).namespace,
       "MyNamespace.Test",
     ); // Test namespace affected by Inner namespace override
-    strictEqual(runner.context.sdkPackage.models[0].namespace, "MyNamespace");
-    strictEqual(runner.context.sdkPackage.models[1].namespace, "MyNamespace.Test");
+    strictEqual(context.sdkPackage.models[0].namespace, "MyNamespace");
+    strictEqual(context.sdkPackage.models[1].namespace, "MyNamespace.Test");
   });
 });
