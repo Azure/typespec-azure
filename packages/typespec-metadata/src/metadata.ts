@@ -1,17 +1,10 @@
-export interface SpecNamespaceMetadata {
+export interface TypeSpecMetadata {
   /** Fully-qualified namespace, e.g. Contoso.Example. */
-  name: string;
-  /** Summary from @summary decorator. */
-  summary?: string;
+  namespace: string;
   /** Documentation from @doc decorator. */
   documentation?: string;
-}
-
-export interface SpecMetadata {
-  /** Ordered list of root namespaces discovered in the program. */
-  namespaces: SpecNamespaceMetadata[];
-  /** Optional high-level summary derived from the first namespace with a summary. */
-  summary?: string;
+  /** Type of service: 'data' for data plane, 'management' for management plane. */
+  type: "data" | "management";
 }
 
 export interface LanguagePackageMetadata {
@@ -34,8 +27,8 @@ export interface MetadataSnapshot {
   emitterVersion: string;
   /** ISO timestamp to simplify debugging when metadata was produced. */
   generatedAt: string;
-  /** TypeSpec-level metadata (namespaces, descriptions, etc.). */
-  spec: SpecMetadata;
+  /** TypeSpec-level metadata (namespace, documentation, type). */
+  typespec: TypeSpecMetadata;
   /** Per-language package metadata extracted from tspconfig, keyed by language. */
   languages: Record<string, LanguagePackageMetadata>;
   /** Absolute tspconfig path when available. */

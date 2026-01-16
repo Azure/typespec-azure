@@ -1,20 +1,25 @@
 import { describe, expect, it } from "vitest";
-import type { LanguagePackageMetadata, MetadataSnapshot, SpecMetadata } from "../src/metadata.js";
+import type {
+  LanguagePackageMetadata,
+  MetadataSnapshot,
+  TypeSpecMetadata,
+} from "../src/metadata.js";
 
 describe("MetadataSnapshot structure", () => {
   it("should have required top-level fields", () => {
     const snapshot: MetadataSnapshot = {
       emitterVersion: "0.1.0",
       generatedAt: new Date().toISOString(),
-      spec: {
-        namespaces: [],
+      typespec: {
+        namespace: "MyService",
+        type: "data",
       },
       languages: {},
     };
 
     expect(snapshot).toHaveProperty("emitterVersion");
     expect(snapshot).toHaveProperty("generatedAt");
-    expect(snapshot).toHaveProperty("spec");
+    expect(snapshot).toHaveProperty("typespec");
     expect(snapshot).toHaveProperty("languages");
   });
 
@@ -22,8 +27,9 @@ describe("MetadataSnapshot structure", () => {
     const snapshot: MetadataSnapshot = {
       emitterVersion: "0.1.0",
       generatedAt: new Date().toISOString(),
-      spec: {
-        namespaces: [],
+      typespec: {
+        namespace: "MyService",
+        type: "data",
       },
       languages: {},
     };
@@ -35,8 +41,9 @@ describe("MetadataSnapshot structure", () => {
     const snapshot: MetadataSnapshot = {
       emitterVersion: "0.1.0",
       generatedAt: new Date().toISOString(),
-      spec: {
-        namespaces: [],
+      typespec: {
+        namespace: "MyService",
+        type: "data",
       },
       languages: {},
       sourceConfigPath: "C:/path/to/tspconfig.yaml",
@@ -46,35 +53,27 @@ describe("MetadataSnapshot structure", () => {
   });
 });
 
-describe("SpecMetadata structure", () => {
-  it("should contain namespaces array", () => {
-    const spec: SpecMetadata = {
-      namespaces: [
-        {
-          name: "MyService",
-        },
-      ],
+describe("TypeSpecMetadata structure", () => {
+  it("should contain namespace and type", () => {
+    const typespec: TypeSpecMetadata = {
+      namespace: "MyService",
+      type: "data",
     };
 
-    expect(spec.namespaces).toHaveLength(1);
-    expect(spec.namespaces[0].name).toBe("MyService");
+    expect(typespec.namespace).toBe("MyService");
+    expect(typespec.type).toBe("data");
   });
 
-  it("should support optional summary and documentation", () => {
-    const spec: SpecMetadata = {
-      namespaces: [
-        {
-          name: "MyService",
-          summary: "My service summary",
-          documentation: "My service documentation",
-        },
-      ],
-      summary: "Overall summary",
+  it("should support optional documentation", () => {
+    const typespec: TypeSpecMetadata = {
+      namespace: "MyService",
+      documentation: "My service documentation",
+      type: "management",
     };
 
-    expect(spec.namespaces[0].summary).toBe("My service summary");
-    expect(spec.namespaces[0].documentation).toBe("My service documentation");
-    expect(spec.summary).toBe("Overall summary");
+    expect(typespec.namespace).toBe("MyService");
+    expect(typespec.documentation).toBe("My service documentation");
+    expect(typespec.type).toBe("management");
   });
 });
 
@@ -173,14 +172,11 @@ describe("Complete snapshot example", () => {
     const snapshot: MetadataSnapshot = {
       emitterVersion: "0.1.0",
       generatedAt: "2026-01-07T18:00:00.000Z",
-      spec: {
-        namespaces: [
-          {
-            name: "KeyVault",
-            documentation:
-              "The key vault client performs cryptographic key operations and vault operations against the Key Vault service.",
-          },
-        ],
+      typespec: {
+        namespace: "KeyVault",
+        documentation:
+          "The key vault client performs cryptographic key operations and vault operations against the Key Vault service.",
+        type: "data",
       },
       languages: {
         python: {
@@ -215,7 +211,8 @@ describe("Complete snapshot example", () => {
     // Validate structure
     expect(snapshot.emitterVersion).toBeTruthy();
     expect(snapshot.generatedAt).toBeTruthy();
-    expect(snapshot.spec.namespaces).toHaveLength(1);
+    expect(snapshot.typespec.namespace).toBe("KeyVault");
+    expect(snapshot.typespec.type).toBe("data");
     expect(Object.keys(snapshot.languages)).toHaveLength(3);
     expect(snapshot.sourceConfigPath).toBeTruthy();
 
