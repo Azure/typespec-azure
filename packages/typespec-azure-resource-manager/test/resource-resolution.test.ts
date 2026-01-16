@@ -3746,4 +3746,50 @@ model MoveResponse {
     expect(ResB.resourceName).toEqual("ResB");
     expect(ResB.providerNamespace).toEqual("Microsoft.ServiceB");
   });
+
+  // Regression test for https://github.com/Azure/typespec-azure/issues/3776
+  it("specifying provider namespace name should be respected in routes", async () => {
+    const { program } = await Tester.compile(`
+      @service
+      @armProviderNamespace("Provider.A")
+      namespace Microsoft.ServiceA {
+        model ResA is TrackedResource<{}> {
+          @key @segment("foos") @path name: string;
+        }
+        
+        @armResourceOperations
+        interface ResAOperations {
+          get is ArmResourceRead<ResA>;
+        }
+      }
+
+      @service
+      @armProviderNamespace("Provider.B")
+      namespace Microsoft.ServiceB {
+        model ResB is TrackedResource<{}> {
+          @key @segment("foos") @path name: string;
+        }
+
+        @armResourceOperations
+        interface ResBOperations {
+          get is ArmResourceRead<ResB>;
+        }
+      }
+    `);
+
+    const provider = resolveArmResources(program);
+    ok(provider.resources);
+    expect(provider.resources).toHaveLength(2);
+    const [ResA, ResB] = provider.resources;
+    expect(ResA.resourceName).toEqual("ResA");
+    expect(ResA.providerNamespace).toEqual("Provider.A");
+    expect(ResA.resourceInstancePath).toEqual(
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Provider.A/foos/{name}",
+    );
+    expect(ResB.resourceName).toEqual("ResB");
+    expect(ResB.providerNamespace).toEqual("Provider.B");
+    expect(ResB.resourceInstancePath).toEqual(
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Provider.B/foos/{name}",
+    );
+  });
 });
