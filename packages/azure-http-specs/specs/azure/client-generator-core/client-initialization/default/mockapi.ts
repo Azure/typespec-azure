@@ -194,6 +194,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_QueryPar
     request: {
       query: {
         blobName: "test-blob",
+        format: "text",
       },
     },
     response: {
@@ -226,7 +227,6 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_DefaultClient_QueryPar
     request: {
       query: {
         blobName: "test-blob",
-        format: "text",
       },
     },
     response: {

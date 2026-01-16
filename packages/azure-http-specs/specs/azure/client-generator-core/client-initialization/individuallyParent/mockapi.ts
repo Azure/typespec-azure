@@ -246,7 +246,6 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClie
     },
   ]);
 
-// Mock responses for IndividuallyParentNestedWithParamAliasClient scenario
 Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyParentClient_IndividuallyParent_IndividuallyParentNestedWithParamAliasClient =
   passOnSuccess([
     {
