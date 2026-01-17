@@ -511,6 +511,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_exportArray = passOnSucce
           : {
               status: 202,
               headers: {
+                "retry-after": 1,
                 location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_location`,
               },
             };
