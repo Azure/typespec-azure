@@ -161,6 +161,72 @@ Example input:
 
 Output: None (204/empty response)
 
+### Azure_ClientGenerator_Core_ClientDefaultValue_getHeaderParameter
+
+- Endpoint: `get /azure/client-generator-core/client-default-value/header-parameter`
+
+Test case 4: `@clientDefaultValue` for header parameters.
+This scenario tests that client default values are correctly applied to header parameters.
+
+Expected header parameters:
+Accept: "application/json;odata.metadata=none" (default)
+x-custom-header: "default-value" (default)
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_ClientDefaultValue_getOperationParameter
+
+- Endpoint: `get /azure/client-generator-core/client-default-value/operation-parameter`
+
+Test case 2: `@clientDefaultValue` for operation parameter.
+This scenario tests that client default values are correctly applied to operation parameters.
+
+Expected query parameter:
+name: "test"
+pageSize: 10 (default)
+format: "json" (default)
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_ClientDefaultValue_getPathParameter
+
+- Endpoint: `get /azure/client-generator-core/client-default-value/path-parameter/{segment1}/{segment2}`
+
+Test case 3: `@clientDefaultValue` for first path segment.
+This scenario has 2 path segments and tests client default value on the first segment.
+
+Expected path parameters:
+segment1: "default-segment1" (default)
+segment2: "segment2"
+
+Expected response: 204 No Content
+
+### Azure_ClientGenerator_Core_ClientDefaultValue_putModelProperty
+
+- Endpoint: `put /azure/client-generator-core/client-default-value/model-property`
+
+Test case 1: `@clientDefaultValue` for model property.
+This scenario tests that client default values are correctly applied to model properties.
+
+Expected input body:
+
+```json
+{
+  "name": "test"
+}
+```
+
+Expected response body:
+
+```json
+{
+  "name": "test",
+  "timeout": 30,
+  "tier": "standard",
+  "retry": true
+}
+```
+
 ### Azure_ClientGenerator_Core_ClientInitialization_HeaderParam
 
 - Endpoints:
@@ -316,75 +382,9 @@ client.getStandalone();
 client.deleteStandalone();
 ```
 
-### Azure_ClientGenerator_Core_ClientDefaultValue_getOperationParameter
+### Azure_ClientGenerator_Core_ClientLocation_MoveMethodParameterToClient_BlobOperations
 
-- Endpoint: `get /azure/client-generator-core/client-default-value/operation-parameter`
-
-Test case 2: `@clientDefaultValue` for operation parameter.
-This scenario tests that client default values are correctly applied to operation parameters.
-
-Expected query parameter:
-name: "test"
-pageSize: 10 (default)
-format: "json" (default)
-
-Expected response: 204 No Content
-
-### Azure_ClientGenerator_Core_ClientDefaultValue_getHeaderParameter
-
-- Endpoint: `get /azure/client-generator-core/client-default-value/header-parameter`
-
-Test case 4: `@clientDefaultValue` for header parameters.
-This scenario tests that client default values are correctly applied to header parameters.
-
-Expected header parameters:
-Accept: "application/json;odata.metadata=none" (default)
-x-custom-header: "default-value" (default)
-
-Expected response: 204 No Content
-
-### Azure_ClientGenerator_Core_ClientDefaultValue_getPathParameter
-
-- Endpoint: `get /azure/client-generator-core/client-default-value/path-parameter/{segment1}/{segment2}`
-
-Test case 3: `@clientDefaultValue` for first path segment.
-This scenario has 2 path segments and tests client default value on the first segment.
-
-Expected path parameters:
-segment1: "default-segment1" (default)
-segment2: "segment2"
-
-Expected response: 204 No Content
-
-### Azure_ClientGenerator_Core_ClientDefaultValue_putModelProperty
-
-- Endpoint: `put /azure/client-generator-core/client-default-value/model-property`
-
-Test case 1: `@clientDefaultValue` for model property.
-This scenario tests that client default values are correctly applied to model properties.
-
-Expected input body:
-
-```json
-{
-  "name": "test"
-}
-```
-
-Expected response body:
-
-```json
-{
-  "name": "test",
-  "timeout": 30,
-  "tier": "standard",
-  "retry": true
-}
-```
-
-### Azure_ClientGenerator_Core_ClientLocation_MoveMethodParameterToClient
-
-- Endpoint: `get /azure/client-generator-core/client-location/blob`
+- Endpoint: `get /azure/client-generator-core/client-location/move-method-parameter-to-client/blob`
 
 Test moving a method parameter to client.
 
@@ -399,12 +399,11 @@ Expected response:
 - Status: 200
 - Body: {"id": "blob-001", "name": "testblob.txt", "size": 1024, "path": "/testcontainer/testblob.txt"}
 
-### Azure_ClientGenerator_Core_ClientLocation_MoveToExistingSubClient
+### Azure_ClientGenerator_Core_ClientLocation_MoveToExistingSubClient_UserOperations
 
 - Endpoints:
-  - `get /azure/client-generator-core/client-location/admin`
-  - `get /azure/client-generator-core/client-location/user`
-  - `get /azure/client-generator-core/client-location/user`
+  - `get /azure/client-generator-core/client-location/move-to-existing-sub-client/user`
+  - `get /azure/client-generator-core/client-location/move-to-existing-sub-client/user`
 
 Test moving an operation from one sub client to another existing sub client.
 
@@ -415,11 +414,11 @@ Expected client structure:
 - Interface UserOperations should contain only operation `getUser`
 - Interface AdminOperations should contain operations `getAdminInfo` and `deleteUser` (moved from UserOperations)
 
-### Azure_ClientGenerator_Core_ClientLocation_MoveToNewSubClient
+### Azure_ClientGenerator_Core_ClientLocation_MoveToNewSubClient_ProductOperations
 
 - Endpoints:
-  - `get /azure/client-generator-core/client-location/products`
-  - `get /azure/client-generator-core/client-location/products/archive`
+  - `get /azure/client-generator-core/client-location/move-to-new-sub-client/products`
+  - `get /azure/client-generator-core/client-location/move-to-new-sub-client/products/archive`
 
 Test moving an operation to a new sub client specified by string name.
 
@@ -430,11 +429,11 @@ Expected client structure:
 - Interface ProductOperations should contain only operation `listProducts`
 - A new sub client "ArchiveOperations" should be created containing operation `archiveProduct`
 
-### Azure_ClientGenerator_Core_ClientLocation_MoveToRootClient
+### Azure_ClientGenerator_Core_ClientLocation_MoveToRootClient_ResourceOperations
 
 - Endpoints:
-  - `get /azure/client-generator-core/client-location/resource`
-  - `get /azure/client-generator-core/client-location/health`
+  - `get /azure/client-generator-core/client-location/move-to-root-client/resource`
+  - `get /azure/client-generator-core/client-location/move-to-root-client/health`
 
 Test moving an operation to the root client.
 
@@ -2168,6 +2167,280 @@ Expected response body:
 }
 ```
 
+### Azure_ResourceManager_MultiServiceOlderVersions_Compute_VirtualMachines_createOrUpdate
+
+- Endpoint: `put https://management.azure.com`
+
+Test that a client can expose operations from multiple services using older API versions. This operation should be called like this: `client.virtualMachines.createOrUpdate(...)`.
+
+PUT (create or update) a Virtual Machine.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachinesOld/vm-old1
+Expected query parameter: api-version=2024-11-01
+Expected request body:
+
+```json
+{
+  "location": "eastus",
+  "properties": {
+    "size": "Standard_D2s_v3"
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachinesOld/vm-old1",
+  "name": "vm-old1",
+  "type": "Microsoft.Compute/virtualMachinesOld",
+  "location": "eastus",
+  "properties": {
+    "provisioningState": "Succeeded",
+    "size": "Standard_D2s_v3"
+  }
+}
+```
+
+### Azure_ResourceManager_MultiServiceOlderVersions_Compute_VirtualMachines_get
+
+- Endpoint: `get https://management.azure.com`
+
+Test that a client can expose operations from multiple services using older API versions. This operation should be called like this: `client.virtualMachines.get(...)`.
+
+GET a Virtual Machine.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachinesOld/vm-old1
+Expected query parameter: api-version=2024-11-01
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachinesOld/vm-old1",
+  "name": "vm-old1",
+  "type": "Microsoft.Compute/virtualMachinesOld",
+  "location": "eastus",
+  "properties": {
+    "provisioningState": "Succeeded",
+    "size": "Standard_D2s_v3"
+  }
+}
+```
+
+### Azure_ResourceManager_MultiServiceOlderVersions_ComputeDisk_Disks_createOrUpdate
+
+- Endpoint: `put https://management.azure.com`
+
+Test that a client can expose operations from multiple services using older API versions. This operation should be called like this: `client.disks.createOrUpdate(...)`.
+
+PUT (create or update) a Disk resource.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/disksOld/disk-old1
+Expected query parameter: api-version=2024-03-02
+Expected request body:
+
+```json
+{
+  "location": "eastus",
+  "properties": {
+    "diskSizeGB": 128
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/disksOld/disk-old1",
+  "name": "disk-old1",
+  "type": "Microsoft.Compute/disksOld",
+  "location": "eastus",
+  "properties": {
+    "provisioningState": "Succeeded",
+    "diskSizeGB": 128
+  }
+}
+```
+
+### Azure_ResourceManager_MultiServiceOlderVersions_ComputeDisk_Disks_get
+
+- Endpoint: `get https://management.azure.com`
+
+Test that a client can expose operations from multiple services using older API versions. This operation should be called like this: `client.disks.get(...)`.
+
+GET a Disk resource.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/disksOld/disk-old1
+Expected query parameter: api-version=2024-03-02
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/disksOld/disk-old1",
+  "name": "disk-old1",
+  "type": "Microsoft.Compute/disksOld",
+  "location": "eastus",
+  "properties": {
+    "provisioningState": "Succeeded",
+    "diskSizeGB": 128
+  }
+}
+```
+
+### Azure_ResourceManager_MultiServiceSharedModels_Compute_VirtualMachines_createOrUpdate
+
+- Endpoint: `put https://management.azure.com`
+
+Test that a client can expose operations from multiple services with shared models. This operation should be called like this: `client.virtualMachines.createOrUpdate(...)`.
+
+PUT (create or update) a Virtual Machine.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachinesShared/vm-shared1
+Expected query parameter: api-version=2025-05-01
+Expected request body:
+
+```json
+{
+  "location": "eastus",
+  "properties": {
+    "metadata": {
+      "createdBy": "user@example.com",
+      "tags": {
+        "environment": "production"
+      }
+    }
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachinesShared/vm-shared1",
+  "name": "vm-shared1",
+  "type": "Microsoft.Compute/virtualMachinesShared",
+  "location": "eastus",
+  "properties": {
+    "provisioningState": "Succeeded",
+    "metadata": {
+      "createdAt": "2025-01-01T00:00:00Z",
+      "createdBy": "user@example.com",
+      "tags": {
+        "environment": "production"
+      }
+    }
+  }
+}
+```
+
+### Azure_ResourceManager_MultiServiceSharedModels_Compute_VirtualMachines_get
+
+- Endpoint: `get https://management.azure.com`
+
+Test that a client can expose operations from multiple services with shared models. This operation should be called like this: `client.virtualMachines.get(...)`.
+
+GET a Virtual Machine.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachinesShared/vm-shared1
+Expected query parameter: api-version=2025-05-01
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Compute/virtualMachinesShared/vm-shared1",
+  "name": "vm-shared1",
+  "type": "Microsoft.Compute/virtualMachinesShared",
+  "location": "eastus",
+  "properties": {
+    "provisioningState": "Succeeded",
+    "metadata": {
+      "createdAt": "2025-01-01T00:00:00Z",
+      "createdBy": "user@example.com",
+      "tags": {
+        "environment": "production"
+      }
+    }
+  }
+}
+```
+
+### Azure_ResourceManager_MultiServiceSharedModels_Storage_StorageAccounts_createOrUpdate
+
+- Endpoint: `put https://management.azure.com`
+
+Test that a client can expose operations from multiple services with shared models. This operation should be called like this: `client.storageAccounts.createOrUpdate(...)`.
+
+PUT (create or update) a Storage Account.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/account1
+Expected query parameter: api-version=2025-02-01
+Expected request body:
+
+```json
+{
+  "location": "westus",
+  "properties": {
+    "metadata": {
+      "createdBy": "admin@example.com",
+      "tags": {
+        "department": "engineering"
+      }
+    }
+  }
+}
+```
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/account1",
+  "name": "account1",
+  "type": "Microsoft.Storage/storageAccounts",
+  "location": "westus",
+  "properties": {
+    "provisioningState": "Succeeded",
+    "metadata": {
+      "createdAt": "2025-01-02T00:00:00Z",
+      "createdBy": "admin@example.com",
+      "tags": {
+        "department": "engineering"
+      }
+    }
+  }
+}
+```
+
+### Azure_ResourceManager_MultiServiceSharedModels_Storage_StorageAccounts_get
+
+- Endpoint: `get https://management.azure.com`
+
+Test that a client can expose operations from multiple services with shared models. This operation should be called like this: `client.storageAccounts.get(...)`.
+
+GET a Storage Account.
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/account1
+Expected query parameter: api-version=2025-02-01
+
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Storage/storageAccounts/account1",
+  "name": "account1",
+  "type": "Microsoft.Storage/storageAccounts",
+  "location": "westus",
+  "properties": {
+    "provisioningState": "Succeeded",
+    "metadata": {
+      "createdAt": "2025-01-02T00:00:00Z",
+      "createdBy": "admin@example.com",
+      "tags": {
+        "department": "engineering"
+      }
+    }
+  }
+}
+```
+
 ### Azure_ResourceManager_NonResource_NonResourceOperations_create
 
 - Endpoint: `put https://management.azure.com/subscriptions/{subscriptionId}/providers/Microsoft.NonResource/locations/{location}/otherParameters/{parameter}`
@@ -2503,6 +2776,148 @@ Expected response body:
 ```json
 {
   "content": "order1,product1,1"
+}
+```
+
+### Azure_ResourceManager_OperationTemplates_Lro_exportArray
+
+- Endpoint: `post https://management.azure.com`
+
+Subscription-scoped POST operation returning an array.
+Service returns both Location and Azure-AsyncOperation header on initial request.
+final-state-via: location
+
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/exportArray
+Expected query parameter: api-version=2023-12-01-preview
+Expected request body:
+
+```json
+{
+  "format": "csv"
+}
+```
+
+Expected response status code: 202
+Expected response headers:
+
+- Azure-AsyncOperation={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao
+- Location={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_location
+  Expected no response body
+
+Whether you do polling through AAO, Location or combined, first one will respond with provisioning state "InProgress", second one with "Succeeded".
+
+AAO first poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao
+Expected status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao",
+  "name": "lro_exportarray_aao",
+  "status": "InProgress",
+  "startTime": "2024-11-08T01:41:53.5508583+00:00"
+}
+```
+
+AAO second poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao
+Expected status code: 200
+Expected response body:
+
+```json
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao",
+  "name": "lro_exportarray_aao",
+  "status": "Succeeded",
+  "startTime": "2024-11-08T01:41:53.5508583+00:00",
+  "endTime": "2024-11-08T01:42:41.5354192+00:00"
+}
+```
+
+Location first poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_location
+Expected status code: 202
+Expected no response body
+
+Location second poll.
+Expected verb: GET
+Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_location
+Expected status code: 200
+Expected response body:
+
+```json
+[{ "content": "order1,product1,1" }, { "content": "order2,product2,2" }]
+```
+
+### Azure_ResourceManager_OperationTemplates_LroPaging_postPagingLro
+
+- Endpoint: `post https://management.azure.com`
+
+Resource POST operation that returns a LRO with paging.
+
+Step 1: Initial Request
+Expected verb: POST
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/products/default/postPagingLro
+Expected query parameter: api-version=2023-12-01-preview
+Expected response: 202 Accepted with Location and Retry-After headers.
+
+Step 2: Polling Request
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location
+Expected query parameter: api-version=2023-12-01-preview
+Expected response: 202 Accepted with Location and Retry-After headers.
+
+Step 3: Final Result Request
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location
+Expected query parameter: api-version=2023-12-01-preview
+Expected response: 200 OK with a paged result. The response body contains a "nextLink" field.
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/products/product1",
+      "name": "product1",
+      "type": "Azure.ResourceManager.OperationTemplates/products",
+      "location": "eastus",
+      "properties": {
+        "provisioningState": "Succeeded",
+        "productId": "product1"
+      }
+    }
+  ],
+  "nextLink": "..."
+}
+```
+
+Step 4: Next Page Request
+Expected verb: GET
+Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_paging_post_location/nextPage
+Expected query parameter: api-version=2023-12-01-preview
+Expected response: 200 OK with the second page of results.
+Expected response body:
+
+```json
+{
+  "value": [
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/products/product2",
+      "name": "product2",
+      "type": "Azure.ResourceManager.OperationTemplates/products",
+      "location": "eastus",
+      "properties": {
+        "provisioningState": "Succeeded",
+        "productId": "product2"
+      }
+    }
+  ]
 }
 ```
 
