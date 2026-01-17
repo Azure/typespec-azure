@@ -462,6 +462,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_exportArray = passOnSucce
     response: {
       status: 202,
       headers: {
+        "retry-after": 1,
         location: dyn`${dynItem("baseUrl")}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_location`,
         "azure-asyncoperation": dyn`${dynItem("baseUrl")}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao`,
       },
@@ -471,6 +472,7 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_exportArray = passOnSucce
       return {
         status: 202,
         headers: {
+          "retry-after": 1,
           location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_location`,
           "azure-asyncoperation": `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao`,
         },
@@ -499,11 +501,19 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_exportArray = passOnSucce
         exportArrayPollCount > 0
           ? {
               status: 200,
+              headers: {
+                location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_location`,
+              },
               body: json({
                 value: ["order1,product1,1", "order2,product2,2"],
               }),
             }
-          : { status: 202 };
+          : {
+              status: 202,
+              headers: {
+                location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_location`,
+              },
+            };
 
       exportArrayPollCount += 1;
       return response;
@@ -541,10 +551,23 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_exportArray = passOnSucce
             }
           : { ...aaoResponse, status: "InProgress" };
 
-      const response = {
-        status: 200, // aao always returns 200 with response body
-        body: json(responseBody),
-      };
+      const response =
+        exportArrayPollCount > 0
+          ? {
+              status: 200,
+              headers: {
+                location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_location`,
+              },
+              body: json(responseBody),
+            }
+          : {
+              status: 200,
+              headers: {
+                "retry-after": 1,
+                "azure-asyncoperation": `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao`,
+              },
+              body: json(responseBody),
+            };
 
       exportArrayPollCount += 1;
       return response;
