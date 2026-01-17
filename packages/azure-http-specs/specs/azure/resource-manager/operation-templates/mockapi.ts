@@ -441,6 +441,118 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_delete = passOnSuccess([
   },
 ]);
 
+let exportArrayPollCount = 0;
+
+Scenarios.Azure_ResourceManager_OperationTemplates_Lro_exportArray = passOnSuccess([
+  {
+    // LRO POST initial request
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/exportArray",
+    method: "post",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+      body: json({
+        format: "csv",
+      }),
+    },
+    response: {
+      status: 202,
+      headers: {
+        location: dyn`${dynItem("baseUrl")}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_location`,
+        "azure-asyncoperation": dyn`${dynItem("baseUrl")}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao`,
+      },
+    },
+    handler: (req: MockRequest) => {
+      exportArrayPollCount = 0;
+      return {
+        status: 202,
+        headers: {
+          location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_location`,
+          "azure-asyncoperation": `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao`,
+        },
+      };
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    // LRO POST poll intermediate/get final result - Location Header
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_location",
+    method: "get",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+    },
+    handler: (req: MockRequest) => {
+      const response =
+        // first status will be 202, second and forward be 200 with array
+        exportArrayPollCount > 0
+          ? {
+              status: 200,
+              body: json({
+                value: ["order1,product1,1", "order2,product2,2"],
+              }),
+            }
+          : { status: 202 };
+
+      exportArrayPollCount += 1;
+      return response;
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    // LRO POST poll intermediate/get final result - Azure-AsyncOperation Header
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao",
+    method: "get",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+    },
+    handler: (req: MockRequest) => {
+      const aaoResponse = {
+        id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao`,
+        name: "lro_exportarray_aao",
+        startTime: "2024-11-08T01:41:53.5508583+00:00",
+      };
+      // first provisioningState will be "InProgress", second and forward be "Succeeded"
+      const responseBody =
+        exportArrayPollCount > 0
+          ? {
+              ...aaoResponse,
+              status: "Succeeded",
+              endTime: "2024-11-08T01:42:41.5354192+00:00",
+            }
+          : { ...aaoResponse, status: "InProgress" };
+
+      const response = {
+        status: 200, // aao always returns 200 with response body
+        body: json(responseBody),
+      };
+
+      exportArrayPollCount += 1;
+      return response;
+    },
+    kind: "MockApiDefinition",
+  },
+]);
+
 // Optional Body scenarios
 const validWidget = {
   id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/widgets/widget1`,
