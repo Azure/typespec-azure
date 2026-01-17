@@ -504,9 +504,10 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_exportArray = passOnSucce
               headers: {
                 location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_location`,
               },
-              body: json({
-                value: ["order1,product1,1", "order2,product2,2"],
-              }),
+              body: json([
+                { content: "order1,product1,1" },
+                { content: "order2,product2,2" },
+              ]),
             }
           : {
               status: 202,

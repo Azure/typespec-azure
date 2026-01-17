@@ -36,11 +36,6 @@ model ExportResult {
   content: string;
 }
 
-model ExportResultArray {
-  @doc("Array of exported order content.")
-  value: string[];
-}
-
 @armResourceOperations
 interface Lro {
   @scenario
@@ -313,17 +308,18 @@ interface Lro {
     Expected status code: 200
     Expected response body:
     ```json
-    {
-      "value": ["order1,product1,1", "order2,product2,2"]
-    }
+    [
+      {"content": "order1,product1,1"},
+      {"content": "order2,product2,2"}
+    ]
     ```
     """)
   exportArray is ArmProviderActionAsync<
     ExportRequest,
-    ExportResultArray,
+    ExportResult[],
     SubscriptionActionScope,
     {},
-    LroHeaders = ArmCombinedLroHeaders<FinalResult = ExportResultArray> &
+    LroHeaders = ArmCombinedLroHeaders<FinalResult = ExportResult[]> &
       Azure.Core.Foundations.RetryAfterHeader
   >;
 }
