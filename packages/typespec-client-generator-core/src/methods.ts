@@ -284,7 +284,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
         kind: "paging",
         pagingMetadata: {
           __raw: undefined, // because in this case it is not a real paging operation
-          pageItemsSegments: [itemsProperty],
+          pageItemsSegments: baseServiceMethod.response.resultSegments,
         },
       });
     } else {
