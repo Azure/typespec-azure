@@ -428,6 +428,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`External library version mismatch. There are multiple versions of ${"libraryName"}: ${"versionA"} and ${"versionB"}. Please unify the versions.`,
       },
     },
+    "external-type-on-model-property": {
+      severity: "warning",
+      messages: {
+        default: `@alternateType with external type information cannot be applied to model properties. Please apply it to the type definition itself (Scalar, Model, Enum, or Union) instead.`,
+      },
+    },
     "invalid-mark-as-lro-target": {
       severity: "warning",
       messages: {

@@ -904,6 +904,13 @@ export const $alternateType: AlternateTypeDecorator = (
   let alternateInput: Type | ExternalTypeInfo = alternate;
   if (alternate.kind === "Model" && isExternalType(alternate)) {
     // This means we're dealing with external type
+    if (source.kind === "ModelProperty") {
+      reportDiagnostic(context.program, {
+        code: "external-type-on-model-property",
+        target: source,
+      });
+      return;
+    }
     if (!scope) {
       reportDiagnostic(context.program, {
         code: "missing-scope",
