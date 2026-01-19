@@ -92,6 +92,12 @@ it("should apply @markAsPageable with language scope", async () => {
   ok(method.pagingMetadata.pageItemsSegments);
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
   strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "items");
+
+  // Check that response.resultSegments is populated (issue fix)
+  ok(method.response.resultSegments);
+  strictEqual(method.response.resultSegments.length, 1);
+  strictEqual(method.response.resultSegments[0].name, "items");
+  strictEqual(method.response.resultSegments, method.pagingMetadata.pageItemsSegments);
 });
 
 it("should warn when @markAsPageable is applied to operation not returning model", async () => {
@@ -150,6 +156,12 @@ it("should work with complex model return types", async () => {
   ok(method.pagingMetadata.pageItemsSegments);
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
   strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "value");
+
+  // Check that response.resultSegments is populated (issue fix)
+  ok(method.response.resultSegments);
+  strictEqual(method.response.resultSegments.length, 1);
+  strictEqual(method.response.resultSegments[0].name, "value");
+  strictEqual(method.response.resultSegments, method.pagingMetadata.pageItemsSegments);
 });
 
 it("should apply @pageItems to 'value' property when not already decorated", async () => {
@@ -184,6 +196,12 @@ it("should apply @pageItems to 'value' property when not already decorated", asy
   ok(method.pagingMetadata.pageItemsSegments);
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
   strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "value");
+
+  // Check that response.resultSegments is populated (issue fix)
+  ok(method.response.resultSegments);
+  strictEqual(method.response.resultSegments.length, 1);
+  strictEqual(method.response.resultSegments[0].name, "value");
+  strictEqual(method.response.resultSegments, method.pagingMetadata.pageItemsSegments);
 });
 
 it("should warn when model has no @pageItems property and no 'value' property", async () => {
@@ -324,6 +342,12 @@ it("should work with ARM action with @pageItems property", async () => {
   ok(method.pagingMetadata.pageItemsSegments);
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
   strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "equipments");
+
+  // Check that response.resultSegments is populated (issue fix)
+  ok(method.response.resultSegments);
+  strictEqual(method.response.resultSegments.length, 1);
+  strictEqual(method.response.resultSegments[0].name, "equipments");
+  strictEqual(method.response.resultSegments, method.pagingMetadata.pageItemsSegments);
 });
 
 it("should work with ARM action with value property without @pageItems", async () => {
@@ -370,6 +394,12 @@ it("should work with ARM action with value property without @pageItems", async (
   ok(method.pagingMetadata.pageItemsSegments);
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
   strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "value");
+
+  // Check that response.resultSegments is populated (issue fix)
+  ok(method.response.resultSegments);
+  strictEqual(method.response.resultSegments.length, 1);
+  strictEqual(method.response.resultSegments[0].name, "value");
+  strictEqual(method.response.resultSegments, method.pagingMetadata.pageItemsSegments);
 });
 
 it("should work with ARM action with value property without @pageItems wrapped in ArmResponse", async () => {
@@ -416,6 +446,12 @@ it("should work with ARM action with value property without @pageItems wrapped i
   ok(method.pagingMetadata.pageItemsSegments);
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
   strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "value");
+
+  // Check that response.resultSegments is populated (issue fix)
+  ok(method.response.resultSegments);
+  strictEqual(method.response.resultSegments.length, 1);
+  strictEqual(method.response.resultSegments[0].name, "value");
+  strictEqual(method.response.resultSegments, method.pagingMetadata.pageItemsSegments);
 });
 
 it("should fail with ARM action with array property not named value without @pageItems", async () => {
@@ -495,4 +531,10 @@ it("should work with ARM ListSinglePage legacy operation", async () => {
   ok(method.pagingMetadata.pageItemsSegments);
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
   strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "value");
+
+  // Check that response.resultSegments is populated (issue fix)
+  ok(method.response.resultSegments);
+  strictEqual(method.response.resultSegments.length, 1);
+  strictEqual(method.response.resultSegments[0].name, "value");
+  strictEqual(method.response.resultSegments, method.pagingMetadata.pageItemsSegments);
 });
