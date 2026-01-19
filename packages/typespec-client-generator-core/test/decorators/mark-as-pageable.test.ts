@@ -52,7 +52,7 @@ it("should mark regular operation as pageable when decorated with @markAsPageabl
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
   strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "items");
 
-  // Check that response.resultSegments is populated (issue fix)
+  // Check that response.resultSegments is populated
   ok(method.response.resultSegments);
   strictEqual(method.response.resultSegments.length, 1);
   strictEqual(method.response.resultSegments[0].name, "items");
@@ -93,7 +93,7 @@ it("should apply @markAsPageable with language scope", async () => {
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
   strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "items");
 
-  // Check that response.resultSegments is populated (issue fix)
+  // Check that response.resultSegments is populated
   ok(method.response.resultSegments);
   strictEqual(method.response.resultSegments.length, 1);
   strictEqual(method.response.resultSegments[0].name, "items");
@@ -157,7 +157,7 @@ it("should work with complex model return types", async () => {
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
   strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "value");
 
-  // Check that response.resultSegments is populated (issue fix)
+  // Check that response.resultSegments is populated
   ok(method.response.resultSegments);
   strictEqual(method.response.resultSegments.length, 1);
   strictEqual(method.response.resultSegments[0].name, "value");
@@ -197,7 +197,7 @@ it("should apply @pageItems to 'value' property when not already decorated", asy
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
   strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "value");
 
-  // Check that response.resultSegments is populated (issue fix)
+  // Check that response.resultSegments is populated
   ok(method.response.resultSegments);
   strictEqual(method.response.resultSegments.length, 1);
   strictEqual(method.response.resultSegments[0].name, "value");
@@ -343,7 +343,7 @@ it("should work with ARM action with @pageItems property", async () => {
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
   strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "equipments");
 
-  // Check that response.resultSegments is populated (issue fix)
+  // Check that response.resultSegments is populated
   ok(method.response.resultSegments);
   strictEqual(method.response.resultSegments.length, 1);
   strictEqual(method.response.resultSegments[0].name, "equipments");
@@ -395,7 +395,7 @@ it("should work with ARM action with value property without @pageItems", async (
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
   strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "value");
 
-  // Check that response.resultSegments is populated (issue fix)
+  // Check that response.resultSegments is populated
   ok(method.response.resultSegments);
   strictEqual(method.response.resultSegments.length, 1);
   strictEqual(method.response.resultSegments[0].name, "value");
@@ -447,7 +447,7 @@ it("should work with ARM action with value property without @pageItems wrapped i
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
   strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "value");
 
-  // Check that response.resultSegments is populated (issue fix)
+  // Check that response.resultSegments is populated
   ok(method.response.resultSegments);
   strictEqual(method.response.resultSegments.length, 1);
   strictEqual(method.response.resultSegments[0].name, "value");
@@ -532,7 +532,7 @@ it("should work with ARM ListSinglePage legacy operation", async () => {
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
   strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "value");
 
-  // Check that response.resultSegments is populated (issue fix)
+  // Check that response.resultSegments is populated
   ok(method.response.resultSegments);
   strictEqual(method.response.resultSegments.length, 1);
   strictEqual(method.response.resultSegments[0].name, "value");
