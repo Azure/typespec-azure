@@ -1,15 +1,9 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
+import { it } from "vitest";
+import { AzureCoreTester, createSdkContextForTester, SimpleTester } from "../tester.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
 it("models only package", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @usage(Usage.input | Usage.output)
     namespace EventGridClient {
       model CloudEvent {
@@ -17,19 +11,17 @@ it("models only package", async () => {
       }
     }
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
   strictEqual(sdkPackage.models[0].name, "CloudEvent");
   strictEqual(sdkPackage.clients.length, 0);
 });
 
 it("with azure and versioning decorators", async () => {
-  const runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runnerWithCore.compile(`
+  const { program } = await AzureCoreTester.compile(`
     @usage(Usage.input | Usage.output)
     @versioned(ServiceApiVersions)
     namespace EventGridClient {
@@ -59,7 +51,10 @@ it("with azure and versioning decorators", async () => {
       }
     }
   `);
-  const sdkPackage = runnerWithCore.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 2);
   const cloudEventModel = sdkPackage.models.find((x) => x.name === "CloudEvent");
   ok(cloudEventModel);
