@@ -42,10 +42,7 @@
           "description": "Array of private endpoint connections.",
           "items": {
             "$ref": "#/definitions/PrivateEndpointConnection"
-          },
-          "x-ms-identifiers": [
-            "id"
-          ]
+          }
         }
       }
     },
@@ -162,10 +159,7 @@
           "description": "Array of private link resources",
           "items": {
             "$ref": "#/definitions/PrivateLinkResource"
-          },
-          "x-ms-identifiers": [
-            "id"
-          ]
+          }
         }
       }
     },

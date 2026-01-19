@@ -5,5 +5,3 @@ import "../../node_modules/@azure-tools/typespec-azure-resource-manager/lib/comm
 using OpenAPI;
 
 namespace Azure.ResourceManager.CommonTypes;
-
-@@extension(ManagedOnBehalfOfConfiguration.moboBrokerResources, "x-ms-identifiers", #["id"]);

@@ -157,7 +157,6 @@ model NetworkSecurityPerimeterConfigurationProperties {
 
   /** List of provisioning issues, if any */
   @visibility(Lifecycle.Read)
-  @Azure.ResourceManager.identifiers(#[])
   provisioningIssues?: ProvisioningIssue[];
 
   networkSecurityPerimeter?: NetworkSecurityPerimeter;
@@ -197,7 +196,6 @@ model ProvisioningIssueProperties {
 
   /** Access rules that can be added to the network security profile (NSP) to remediate the issue. */
   @visibility(Lifecycle.Read)
-  @Azure.ResourceManager.identifiers(#[])
   suggestedAccessRules?: AccessRule[];
 }
 
@@ -220,7 +218,6 @@ model NetworkSecurityProfile {
   accessRulesVersion?: int32;
 
   /** List of Access Rules */
-  @Azure.ResourceManager.identifiers(#["name"])
   accessRules?: AccessRule[];
 
   /** Current diagnostic settings version */

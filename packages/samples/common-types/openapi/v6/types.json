@@ -162,11 +162,7 @@
           "items": {
             "$ref": "#/definitions/ErrorDetail"
           },
-          "readOnly": true,
-          "x-ms-identifiers": [
-            "message",
-            "target"
-          ]
+          "readOnly": true
         },
         "additionalInfo": {
           "type": "array",
@@ -174,8 +170,7 @@
           "items": {
             "$ref": "#/definitions/ErrorAdditionalInfo"
           },
-          "readOnly": true,
-          "x-ms-identifiers": []
+          "readOnly": true
         }
       }
     },
@@ -278,10 +273,7 @@
           "description": "The Operation items on this page",
           "items": {
             "$ref": "#/definitions/Operation"
-          },
-          "x-ms-identifiers": [
-            "name"
-          ]
+          }
         },
         "nextLink": {
           "type": "string",

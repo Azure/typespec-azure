@@ -15,7 +15,6 @@ export const ArmStateKeys = {
   armLibraryNamespaces: azureResourceManagerCreateStateSymbol("armLibraryNamespaces"),
   usesArmLibraryNamespaces: azureResourceManagerCreateStateSymbol("usesArmLibraryNamespaces"),
   armCommonTypesVersion: azureResourceManagerCreateStateSymbol("armCommonTypesVersion"),
-  armIdentifiers: azureResourceManagerCreateStateSymbol("armIdentifiers"),
   externalTypeRef: azureResourceManagerCreateStateSymbol("externalTypeRef"),
   armResourceOperationData: azureResourceManagerCreateStateSymbol("armResourceOperationData"),
   resourceOperationList: azureResourceManagerCreateStateSymbol("resourceOperationList"),
