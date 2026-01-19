@@ -705,3 +705,166 @@ it("wrong initializedBy value type", async () => {
     code: "invalid-argument",
   });
 });
+
+it("should warn on unused client initialization parameter", async () => {
+  const diagnostics = await runner.diagnose(`
+    @service
+    namespace MyService {
+      model ClientInitialization {
+        unusedParam: string;
+      }
+
+      @@clientInitialization(MyService, {parameters: ClientInitialization});
+
+      @route("/test")
+      op testOp(@query query: string): void;
+    }
+  `);
+
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/unused-client-initialization-parameter",
+  });
+});
+
+it("should not warn when client initialization parameter is used", async () => {
+  const diagnostics = await runner.diagnose(`
+    @service
+    namespace MyService {
+      model ClientInitialization {
+        blobName: string;
+      }
+
+      @@clientInitialization(MyService, {parameters: ClientInitialization});
+
+      @route("/test")
+      op testOp(@path blobName: string): void;
+    }
+  `);
+
+  expectDiagnostics(diagnostics, []);
+});
+
+it("should warn on multiple unused client initialization parameters", async () => {
+  const diagnostics = await runner.diagnose(`
+    @service
+    namespace MyService {
+      model ClientInitialization {
+        unusedParam1: string;
+        unusedParam2: string;
+        usedParam: string;
+      }
+
+      @@clientInitialization(MyService, {parameters: ClientInitialization});
+
+      @route("/test")
+      op testOp(@path usedParam: string): void;
+    }
+  `);
+
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/unused-client-initialization-parameter",
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/unused-client-initialization-parameter",
+    },
+  ]);
+});
+
+it("should not warn when parameter is used in subclient with @operationGroup", async () => {
+  const diagnostics = await runner.diagnose(`
+    @service
+    namespace MyService {
+      model ClientInitialization {
+        blobName: string;
+      }
+
+      @@clientInitialization(MyService, {parameters: ClientInitialization});
+
+      @operationGroup
+      interface SubClient {
+        @route("/blob")
+        op download(@path blobName: string): void;
+      }
+
+      @route("/main")
+      op mainOp(@query query: string): void;
+    }
+  `);
+
+  expectDiagnostics(diagnostics, []);
+});
+
+it("should not warn when parameter is used in subclient with @client", async () => {
+  const diagnostics = await runner.diagnose(`
+    @service
+    namespace MyService {
+      model ClientInitialization {
+        blobName: string;
+      }
+
+      @@clientInitialization(MyService, {parameters: ClientInitialization});
+
+      @client({name: "SubClient"})
+      namespace SubNamespace {
+        @route("/blob")
+        op download(@path blobName: string): void;
+      }
+
+      @route("/main")
+      op mainOp(@query query: string): void;
+    }
+  `);
+
+  expectDiagnostics(diagnostics, []);
+});
+
+it("should warn when parameter is not used in subclient operations", async () => {
+  const diagnostics = await runner.diagnose(`
+    @service
+    namespace MyService {
+      model ClientInitialization {
+        unusedParam: string;
+      }
+
+      @@clientInitialization(MyService, {parameters: ClientInitialization});
+
+      @operationGroup
+      interface SubClient {
+        @route("/blob")
+        op download(@query query: string): void;
+      }
+
+      @route("/main")
+      op mainOp(@query query: string): void;
+    }
+  `);
+
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/unused-client-initialization-parameter",
+  });
+});
+
+it("should work with @clientLocation decorator", async () => {
+  const diagnostics = await runner.diagnose(`
+    @service
+    namespace MyService {
+      model ClientInitialization {
+        blobName: string;
+      }
+
+      @@clientInitialization(MyService, {parameters: ClientInitialization});
+
+      model BlobParams {
+        @path blobName: string;
+      }
+
+      @route("/blob")
+      op download(...BlobParams): void;
+
+      @@clientLocation(download, MyService);
+    }
+  `);
+
+  expectDiagnostics(diagnostics, []);
+});
