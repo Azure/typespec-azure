@@ -1,20 +1,13 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { SdkHttpOperation, SdkServiceMethod, UsageFlags } from "../../src/interfaces.js";
 import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import { AzureCoreTester, createSdkContextForTester, SimpleTester, SimpleTesterWithBuiltInService } from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
-
 it("plain model with no decorators", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
 
@@ -24,7 +17,8 @@ it("plain model with no decorators", async () => {
 
     op myOp(...Input): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "myOp");
   strictEqual(method.kind, "basic");
@@ -63,7 +57,7 @@ it("plain model with no decorators", async () => {
 });
 
 it("alias with no decorators", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
 
@@ -73,7 +67,8 @@ it("alias with no decorators", async () => {
 
     op myOp(...BodyParameter): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
   const method = getServiceMethodOfClient(sdkPackage);
@@ -112,7 +107,7 @@ it("alias with no decorators", async () => {
 });
 
 it("rest template spreading of multiple models", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service(#{
       title: "Pet Store Service",
     })
@@ -144,7 +139,8 @@ it("rest template spreading of multiple models", async () => {
       extends ExtensionResourceCreateOrUpdate<Checkup, Pet, PetStoreError>,
         ExtensionResourceList<Checkup, Pet, PetStoreError> {}
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 4);
   deepStrictEqual(
     sdkPackage.models.map((x) => x.name).sort(),
@@ -183,12 +179,7 @@ it("rest template spreading of multiple models", async () => {
 });
 
 it("multi layer template with discriminated model spread", async () => {
-  const runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runnerWithCore.compile(`
+  const { program } = await AzureCoreTester.compile(`
     @versioned(MyVersions)
     @server("http://localhost:3000", "endpoint")
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
@@ -243,7 +234,8 @@ it("multi layer template with discriminated model spread", async () => {
       deleteDataConnection is Operations.ResourceDelete<DataConnection>;
     }
   `);
-  const sdkPackage = runnerWithCore.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const sdkPackage = context.sdkPackage;
   const nonCoreModels = sdkPackage.models.filter((x) => !isAzureCoreModel(x));
   strictEqual(nonCoreModels.length, 2);
 
@@ -294,7 +286,7 @@ it("multi layer template with discriminated model spread", async () => {
 });
 
 it("model with @body decorator", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     model Shelf {
       name: string;
       theme?: string;
@@ -305,8 +297,8 @@ it("model with @body decorator", async () => {
     }
     op createShelf(...CreateShelfRequest): Shelf;
   `);
-  const method = getServiceMethodOfClient(runner.context.sdkPackage);
-  const models = runner.context.sdkPackage.models;
+  const method = getServiceMethodOfClient(context.sdkPackage);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const shelfModel = models.find((x) => x.name === "Shelf");
   ok(shelfModel);
@@ -352,7 +344,7 @@ it("model with @body decorator", async () => {
 });
 
 it("formdata model with multipartBody decorator in spread model", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
 
     model DocumentTranslateContent {
       @header contentType: "multipart/form-data";
@@ -361,7 +353,7 @@ it("formdata model with multipartBody decorator in spread model", async () => {
     alias Intersected = DocumentTranslateContent & {};
     op test(...Intersected): void;
   `);
-  const method = getServiceMethodOfClient(runner.context.sdkPackage);
+  const method = getServiceMethodOfClient(context.sdkPackage);
   const documentMethodParam = method.parameters.find((x) => x.name === "testRequest");
   ok(documentMethodParam);
   strictEqual(documentMethodParam.kind, "method");
@@ -371,7 +363,7 @@ it("formdata model with multipartBody decorator in spread model", async () => {
   strictEqual(op.bodyParam.name, "testRequest");
   deepStrictEqual(op.bodyParam.correspondingMethodParams, [documentMethodParam]);
 
-  const anonymousModel = runner.context.sdkPackage.models[0];
+  const anonymousModel = context.sdkPackage.models[0];
   strictEqual(anonymousModel.properties.length, 1);
   strictEqual(anonymousModel.properties[0].kind, "property");
   strictEqual(anonymousModel.properties[0].isMultipartFileInput, true);
@@ -381,11 +373,11 @@ it("formdata model with multipartBody decorator in spread model", async () => {
 });
 
 it("anonymous model with @body should not be spread", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     op test(@body body: {prop: string}): void;
   `);
-  const method = getServiceMethodOfClient(runner.context.sdkPackage);
-  const models = runner.context.sdkPackage.models;
+  const method = getServiceMethodOfClient(context.sdkPackage);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models.find((x) => x.name === "TestRequest");
   ok(model);
@@ -423,14 +415,14 @@ it("anonymous model with @body should not be spread", async () => {
 });
 
 it("anonymous model from spread with @bodyRoot should not be spread", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     model Test {
       prop: string;
     }
     op test(@bodyRoot body: {...Test}): void;
   `);
-  const method = getServiceMethodOfClient(runner.context.sdkPackage);
-  const models = runner.context.sdkPackage.models;
+  const method = getServiceMethodOfClient(context.sdkPackage);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models.find((x) => x.name === "TestRequest");
   ok(model);
@@ -468,12 +460,13 @@ it("anonymous model from spread with @bodyRoot should not be spread", async () =
 });
 
 it("implicit spread", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
     op myOp(a: string, b: string): void;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
   const method = getServiceMethodOfClient(sdkPackage);
@@ -514,12 +507,13 @@ it("implicit spread", async () => {
 });
 
 it("implicit spread with metadata", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
     op myOp(@header a: string, b: string): void;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
   const method = getServiceMethodOfClient(sdkPackage);
@@ -569,7 +563,7 @@ it("implicit spread with metadata", async () => {
 });
 
 it("explicit spread", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
     model Test {
@@ -578,7 +572,8 @@ it("explicit spread", async () => {
     }
     op myOp(...Test): void;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
   const method = getServiceMethodOfClient(sdkPackage);
@@ -619,7 +614,7 @@ it("explicit spread", async () => {
 });
 
 it("explicit spread with metadata", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
     model Test {
@@ -629,7 +624,8 @@ it("explicit spread with metadata", async () => {
     }
     op myOp(...Test): void;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
   const method = getServiceMethodOfClient(sdkPackage);
@@ -679,7 +675,7 @@ it("explicit spread with metadata", async () => {
 });
 
 it("explicit multiple spread", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
     model Test1 {
@@ -692,7 +688,8 @@ it("explicit multiple spread", async () => {
     }
     op myOp(...Test1, ...Test2): void;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
   const method = getServiceMethodOfClient(sdkPackage);
@@ -733,7 +730,7 @@ it("explicit multiple spread", async () => {
 });
 
 it("explicit multiple spread with metadata", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
     model Test1 {
@@ -745,7 +742,8 @@ it("explicit multiple spread with metadata", async () => {
     }
     op myOp(...Test1, ...Test2): void;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
   const method = getServiceMethodOfClient(sdkPackage);
@@ -795,7 +793,7 @@ it("explicit multiple spread with metadata", async () => {
 });
 
 it("spread idempotent", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
     alias FooAlias = {
@@ -805,16 +803,17 @@ it("spread idempotent", async () => {
     };
     op test(...FooAlias): void;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
-  getAllModels(runner.context);
+  getAllModels(context);
 
   strictEqual(sdkPackage.models[0].name, "TestRequest");
   strictEqual(sdkPackage.models[0].usage, UsageFlags.Spread | UsageFlags.Json);
 });
 
 it("model used as simple spread", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
       model Test {
@@ -822,9 +821,10 @@ it("model used as simple spread", async () => {
       }
       op test(...Test): void;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
-  getAllModels(runner.context);
+  getAllModels(context);
 
   strictEqual(sdkPackage.models[0].name, "Test");
   strictEqual(sdkPackage.models[0].usage, UsageFlags.Spread | UsageFlags.Json);
@@ -832,7 +832,7 @@ it("model used as simple spread", async () => {
 });
 
 it("model used as simple spread and output", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
       model Test {
@@ -840,9 +840,10 @@ it("model used as simple spread and output", async () => {
       }
       op test(...Test): Test;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
-  getAllModels(runner.context);
+  getAllModels(context);
 
   strictEqual(sdkPackage.models[0].name, "Test");
   strictEqual(sdkPackage.models[0].usage, UsageFlags.Spread | UsageFlags.Output | UsageFlags.Json);
@@ -850,7 +851,7 @@ it("model used as simple spread and output", async () => {
 });
 
 it("model used as simple spread and other operation's output", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
       model Test {
@@ -861,9 +862,10 @@ it("model used as simple spread and other operation's output", async () => {
       @route("/another")
       op another(): Test;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
-  getAllModels(runner.context);
+  getAllModels(context);
 
   strictEqual(sdkPackage.models[0].name, "Test");
   strictEqual(sdkPackage.models[0].usage, UsageFlags.Spread | UsageFlags.Output | UsageFlags.Json);
@@ -871,7 +873,7 @@ it("model used as simple spread and other operation's output", async () => {
 });
 
 it("model used as simple spread and other operation's input", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
       model Test {
@@ -882,9 +884,10 @@ it("model used as simple spread and other operation's input", async () => {
       @route("/another")
       op another(@body body: Test): void;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
-  getAllModels(runner.context);
+  getAllModels(context);
 
   strictEqual(sdkPackage.models[0].name, "Test");
   strictEqual(sdkPackage.models[0].usage, UsageFlags.Spread | UsageFlags.Input | UsageFlags.Json);
@@ -892,7 +895,7 @@ it("model used as simple spread and other operation's input", async () => {
 });
 
 it("model used as simple spread with versioning", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @server("http://localhost:3000", "endpoint")
     @service
     @versioned(ServiceApiVersions)
@@ -922,9 +925,10 @@ it("model used as simple spread with versioning", async () => {
     @post
     op ref3(@body body: Ref): void;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 2);
-  getAllModels(runner.context);
+  getAllModels(context);
 
   strictEqual(sdkPackage.models[0].name, "Test");
   strictEqual(sdkPackage.models[0].usage, UsageFlags.Spread | UsageFlags.Input | UsageFlags.Json);

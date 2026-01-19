@@ -1,15 +1,9 @@
 import { ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import { it } from "vitest";
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithBuiltInService } from "../tester.js";
 
 it("basic file input", async () => {
-  await runner.compile(
+  const { program } = await SimpleTester.compile(
     `
       @service
       namespace TestService {
@@ -17,7 +11,10 @@ it("basic file input", async () => {
       }
     `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "uploadFile");
   const fileMethodParam = method.parameters.find((p) => p.name === "file");
@@ -28,7 +25,7 @@ it("basic file input", async () => {
   ok(bodyParam);
   strictEqual(bodyParam.type.kind, "model");
   strictEqual(bodyParam.type.serializationOptions.binary?.isFile, true);
-  const fileModel = runner.context.sdkPackage.models.find((m) => m.name === "File");
+  const fileModel = context.sdkPackage.models.find((m) => m.name === "File");
   ok(fileModel);
   strictEqual(fileModel.properties.length, 3);
   const contentType = fileModel.properties.find((p) => p.name === "contentType")!;
@@ -38,7 +35,7 @@ it("basic file input", async () => {
 });
 
 it("file input with content type", async () => {
-  await runner.compile(
+  const { program } = await SimpleTester.compile(
     `
       @service
       namespace TestService {
@@ -46,7 +43,10 @@ it("file input with content type", async () => {
       }
     `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "uploadFile");
   const fileMethodParam = method.parameters.find((p) => p.name === "file");
@@ -64,7 +64,7 @@ it("file input with content type", async () => {
 });
 
 it("basic file output", async () => {
-  await runner.compile(
+  const { program } = await SimpleTester.compile(
     `
       @service
       namespace TestService {
@@ -72,7 +72,10 @@ it("basic file output", async () => {
       }
     `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "downloadFile");
   const httpOperation = method.operation;
@@ -91,7 +94,7 @@ it("basic file output", async () => {
 });
 
 it("self-defined file", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       model SpecFile extends File<"application/json" | "application/yaml", string> {
         // Provide a header that contains the name of the file when created or updated
@@ -104,7 +107,10 @@ it("self-defined file", async () => {
       
     `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const sdkPackage = context.sdkPackage;
   // model
   const specFile = sdkPackage.models.find((m) => m.name === "SpecFile");
   ok(specFile);
