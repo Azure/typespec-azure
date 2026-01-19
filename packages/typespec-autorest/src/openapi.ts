@@ -18,7 +18,6 @@ import {
   getResourceFeatureSet,
   isArmCommonType,
   isArmExternalType,
-  isArmProviderNamespace,
   isAzureResource,
 } from "@azure-tools/typespec-azure-resource-manager";
 import {

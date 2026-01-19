@@ -1,5 +1,5 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { deepStrictEqual, notStrictEqual, ok, strictEqual } from "assert";
+import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { compileOpenAPI, diagnoseOpenApiFor, oapiForModel } from "./test-host.js";
 

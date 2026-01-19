@@ -1,7 +1,6 @@
 import { getAllProperties } from "@azure-tools/typespec-azure-core";
 import {
   $tag,
-  getProperty as compilerGetProperty,
   DecoratorContext,
   Enum,
   EnumMember,
