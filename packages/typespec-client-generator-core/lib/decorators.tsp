@@ -734,7 +734,7 @@ model ExternalType {
  * @@alternateType(MyModel.field, {
  *   identity: "ExternalType",
  * }, "rust");
- * 
+ *
  * // Correct: Apply external type to the type definition instead
  * @alternateType({
  *   identity: "ExternalType",
