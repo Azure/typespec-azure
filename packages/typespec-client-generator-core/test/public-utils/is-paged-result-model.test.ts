@@ -76,3 +76,34 @@ it("paged model use template list", async () => {
     isPagedResultModel(runner.context, sdkPackage.models.filter((m) => m.name === "PagedTest")[0]),
   );
 });
+
+it("paged model with @markAsPageable decorator", async () => {
+  await runner.compile(`
+    @service
+    namespace TestService {
+      model ItemListResult {
+        @pageItems
+        items: Item[];
+      }
+
+      model Item {
+        id: string;
+        name: string;
+      }
+
+      @Azure.ClientGenerator.Core.Legacy.markAsPageable
+      @route("/items")
+      @get
+      op listItems(): ItemListResult;
+    }
+  `);
+
+  const sdkPackage = runner.context.sdkPackage;
+  ok(
+    isPagedResultModel(
+      runner.context,
+      sdkPackage.models.filter((m) => m.name === "ItemListResult")[0],
+    ),
+  );
+});
+
