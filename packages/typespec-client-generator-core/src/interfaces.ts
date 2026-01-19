@@ -72,7 +72,6 @@ export interface TCGCContext {
   __clientParametersCache: Map<SdkClient | SdkOperationGroup, SdkMethodParameter[]>;
   __clientApiVersionDefaultValueCache: Map<SdkClient | SdkOperationGroup, string | undefined>;
   __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
-  __pagedResultSet: Set<SdkType>;
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
   __mutatedRealm?: unsafe_Realm; // the realm that contains all mutated types for this instance
   __packageVersions?: Map<Namespace, string[]>; // the package versions (for each service) from the service versioning config and api version setting in tspconfig.
