@@ -890,10 +890,14 @@ export function getSdkModelWithDiagnostics(
     // add properties from intermediate models that are being skipped.
     // This handles multi-layer inheritance replacement where we need to "collapse"
     // properties from skipped models into the target model.
-    if (legacyHierarchyBuildingModel && type.baseModel && type.baseModel !== legacyHierarchyBuildingModel) {
+    if (
+      legacyHierarchyBuildingModel &&
+      type.baseModel &&
+      type.baseModel !== legacyHierarchyBuildingModel
+    ) {
       // Collect property names that already exist on the target (via spread or direct definition)
       const existingPropertyNames = new Set<string>(type.properties.keys());
-      
+
       let currentBaseModel: Model | undefined = type.baseModel;
       while (currentBaseModel && currentBaseModel !== legacyHierarchyBuildingModel) {
         // Only add properties that don't already exist on the target
@@ -905,7 +909,9 @@ export function getSdkModelWithDiagnostics(
             !hasNoneVisibility(context, property) &&
             isInScope(context, property)
           ) {
-            const clientProperty = diagnostics.pipe(getSdkModelPropertyType(context, property, operation));
+            const clientProperty = diagnostics.pipe(
+              getSdkModelPropertyType(context, property, operation),
+            );
             sdkType.properties.push(clientProperty);
             existingPropertyNames.add(property.name);
           }

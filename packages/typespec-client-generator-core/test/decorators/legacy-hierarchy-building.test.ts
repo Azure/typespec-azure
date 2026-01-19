@@ -620,11 +620,16 @@ it("multi-layer inheritance replacement", async () => {
 
   // Filter out unrelated diagnostics (like deprecation warnings)
   const relevantDiagnostics = diagnostics.filter(
-    (d) => d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict"
+    (d) =>
+      d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
   );
 
   // No conflict diagnostics should be reported - the decorator should apply successfully
-  strictEqual(relevantDiagnostics.length, 0, `Expected no conflict diagnostics but got: ${relevantDiagnostics.map(d => d.message).join(", ")}`);
+  strictEqual(
+    relevantDiagnostics.length,
+    0,
+    `Expected no conflict diagnostics but got: ${relevantDiagnostics.map((d) => d.message).join(", ")}`,
+  );
 
   const models = runner.context.sdkPackage.models;
   const modelA = models.find((m) => m.name === "A");
