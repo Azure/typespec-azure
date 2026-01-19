@@ -1494,8 +1494,18 @@ public partial class Foo : IUtf8JsonSerializable, IJsonModel<Foo>
 <ClientTabItem lang="typescript" >
 
 ```typescript
-// Please note that this feature is not supported right now, and the model will be generated un-flattened.
-// Please comment and follow work status on: https://github.com/Azure/autorest.typescript/issues/2164
+export interface Foo {
+  name: string;
+}
+export function _fooPropSerializer(item: Foo): any {
+  return { name: item["name"] };
+}
+
+export function _fooPropDeserializer(item: any) {
+  return {
+    name: item["name"],
+  };
+}
 ```
 
 </ClientTabItem>
@@ -2586,7 +2596,19 @@ TODO
 <ClientTabItem lang="typescript" >
 
 ```typescript
-TODO;
+export interface Test {
+  prop: string;
+}
+
+export function testSerializer(item: Test): any {
+  return { prop: item["prop"] };
+}
+
+export function testDeserializer(item: any): Test {
+  return {
+    prop: item["prop"],
+  };
+}
 ```
 
 </ClientTabItem>
