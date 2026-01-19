@@ -1,5 +1,39 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.64.1
+
+### Bug Fixes
+
+- [#3767](https://github.com/Azure/typespec-azure/pull/3767) Fix enum type exclusion in protocol methods when `@convenientAPI(false)`.
+- [#3768](https://github.com/Azure/typespec-azure/pull/3768) Refine diagnostic for LRO and paging metadata generation.
+
+
+## 0.64.0
+
+### Features
+
+- [#3660](https://github.com/Azure/typespec-azure/pull/3660) Add `@markAsPageable` decorator.
+- [#3746](https://github.com/Azure/typespec-azure/pull/3746) #3693 Allow array and unknown result for async operations
+
+### Bump dependencies
+
+- [#3677](https://github.com/Azure/typespec-azure/pull/3677) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3716](https://github.com/Azure/typespec-azure/pull/3716) Fix api-version parameter type to string for multi-service clients instead of using a specific enum type.
+- [#3723](https://github.com/Azure/typespec-azure/pull/3723) Improve `@hierarchyBuilding` decorator diagnostic messages to include specific property names and conflict details when there are inherited property conflicts
+- [#3717](https://github.com/Azure/typespec-azure/pull/3717) Remove mutation for validation.
+- [#3611](https://github.com/Azure/typespec-azure/pull/3611) Generate names for anonymous models in LroMetadata.
+
+
+## 0.63.4
+
+### Bug Fixes
+
+- [#3728](https://github.com/Azure/typespec-azure/pull/3728) Allow alternate types for models, enums, and unions
+
+
 ## 0.63.3
 
 ### Bug Fixes

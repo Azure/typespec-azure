@@ -934,6 +934,7 @@ export const $alternateType: AlternateTypeDecorator = (
       .map((x) => x.value)[0];
 
     alternateInput = {
+      kind: "externalTypeInfo",
       identity,
       package: packageName,
       minVersion,
@@ -954,15 +955,6 @@ export const $alternateType: AlternateTypeDecorator = (
   setScopedDecoratorData(context, $alternateType, alternateTypeKey, source, alternateInput, scope);
 };
 
-export function getAlternateType(
-  context: TCGCContext,
-  source: ModelProperty | Scalar,
-): Scalar | undefined;
-export function getAlternateType(
-  context: TCGCContext,
-  source: ModelProperty | Scalar | Model | Enum | Union,
-): ExternalTypeInfo | undefined;
-
 /**
  * Get the alternate type for a source type in a specific scope.
  *
@@ -979,7 +971,7 @@ export function getAlternateType(
     alternateTypeKey,
     source,
   );
-  if (retval !== undefined && "identity" in retval && !("kind" in retval)) {
+  if (retval !== undefined && retval.kind === "externalTypeInfo") {
     if (!context.__externalPackageToVersions) {
       context.__externalPackageToVersions = new Map();
     }
@@ -1576,11 +1568,14 @@ function isPropertySuperset(target: Model, value: Model): boolean {
     if (targetProperty.sourceProperty !== valueProperty.sourceProperty) {
       // Different sources - check if they have the same type
       if (targetProperty.type !== valueProperty.type) {
-        return false;
+        conflicts.push({
+          propertyName: name,
+          reason: "type-mismatch",
+        });
       }
     }
   }
-  return true;
+  return conflicts;
 }
 
 export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
@@ -1590,15 +1585,33 @@ export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
   scope?: LanguageScopes,
 ) => {
   // Validate that target has all properties from value
-  if (!isPropertySuperset(target, value)) {
-    reportDiagnostic(context.program, {
-      code: "legacy-hierarchy-building-conflict",
-      format: {
-        childModel: target.name,
-        parentModel: value.name,
-      },
-      target: context.decoratorTarget,
-    });
+  const conflicts = isPropertySuperset(context.program, target, value);
+  if (conflicts.length > 0) {
+    for (const conflict of conflicts) {
+      if (conflict.reason === "missing") {
+        reportDiagnostic(context.program, {
+          code: "legacy-hierarchy-building-conflict",
+          messageId: "property-missing",
+          format: {
+            childModel: target.name,
+            parentModel: value.name,
+            propertyName: conflict.propertyName,
+          },
+          target: context.decoratorTarget,
+        });
+      } else if (conflict.reason === "type-mismatch") {
+        reportDiagnostic(context.program, {
+          code: "legacy-hierarchy-building-conflict",
+          messageId: "type-mismatch",
+          format: {
+            childModel: target.name,
+            parentModel: value.name,
+            propertyName: conflict.propertyName,
+          },
+          target: context.decoratorTarget,
+        });
+      }
+    }
     return;
   }
 

@@ -229,6 +229,7 @@ interface ExternalType {
 }
 
 export interface ExternalTypeInfo {
+  kind: "externalTypeInfo";
   identity: string;
   package?: string;
   minVersion?: string;
@@ -1033,8 +1034,8 @@ export interface SdkLroServiceMetadata {
   pollingInfo: SdkPollingOperationStep;
   envelopeResult: SdkModelType;
   logicalPath?: string;
-  finalResult?: SdkModelType | "void";
-  finalEnvelopeResult?: SdkModelType | "void";
+  finalResult?: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown"> | "void";
+  finalEnvelopeResult?: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown"> | "void";
   finalResultPath?: string;
 }
 
@@ -1152,9 +1153,9 @@ interface SdkNoPollingSuccessProperty extends SdkLogicalOperationStep {
  */
 export interface SdkLroServiceFinalResponse {
   /** Intact response type */
-  envelopeResult: SdkModelType;
+  envelopeResult: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown">;
   /** Meaningful result type */
-  result: SdkModelType;
+  result: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown">;
   /** An array of properties to fetch {result} from the {envelopeResult} model. */
   resultSegments?: SdkModelPropertyType[];
 }
