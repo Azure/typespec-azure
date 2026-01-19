@@ -168,12 +168,7 @@ export function addEncodeInfo(
     type = alternateType;
   }
   const innerType = propertyType.kind === "nullable" ? propertyType.type : propertyType;
-  let encodeData = getEncode(context.program, type);
-  // If encode is not found on the property, check the source property
-  // This happens when properties are derived (e.g., with implicitOptionality)
-  if (!encodeData && type.kind === "ModelProperty" && type.sourceProperty) {
-    encodeData = getEncode(context.program, type.sourceProperty);
-  }
+  const encodeData = getEncode(context.program, type);
   if (innerType.kind === "duration") {
     if (!encodeData) return diagnostics.wrap(undefined);
     innerType.encode = encodeData.encoding as DurationKnownEncoding;
@@ -1278,23 +1273,17 @@ export function getSdkModelPropertyTypeBase(
   const name = getPropertyNames(context, type)[0];
   const onClient = isOnClient(context, type, operation, apiVersions.length > 0);
   let encode: ArrayKnownEncoding | undefined = undefined;
+
+  const encodeData = getEncode(context.program, type);
   // We only support array encoding at property level for now
-  if ($(context.program).array.is(type.type)) {
-    let encodeData = getEncode(context.program, type);
-    // If encode is not found on the property, check the source property
-    // This happens when properties are derived (e.g., with implicitOptionality)
-    if (!encodeData && type.sourceProperty) {
-      encodeData = getEncode(context.program, type.sourceProperty);
-    }
-    if (encodeData?.encoding === "ArrayEncoding.pipeDelimited") {
-      encode = "pipeDelimited";
-    } else if (encodeData?.encoding === "ArrayEncoding.spaceDelimited") {
-      encode = "spaceDelimited";
-    } else if (encodeData?.encoding === "ArrayEncoding.commaDelimited") {
-      encode = "commaDelimited";
-    } else if (encodeData?.encoding === "ArrayEncoding.newlineDelimited") {
-      encode = "newlineDelimited";
-    }
+  if (encodeData?.encoding === "ArrayEncoding.pipeDelimited") {
+    encode = "pipeDelimited";
+  } else if (encodeData?.encoding === "ArrayEncoding.spaceDelimited") {
+    encode = "spaceDelimited";
+  } else if (encodeData?.encoding === "ArrayEncoding.commaDelimited") {
+    encode = "commaDelimited";
+  } else if (encodeData?.encoding === "ArrayEncoding.newlineDelimited") {
+    encode = "newlineDelimited";
   }
   const clientDefaultValue = getClientDefaultValue(context, type);
   return diagnostics.wrap({

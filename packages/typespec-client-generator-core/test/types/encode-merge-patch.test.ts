@@ -38,7 +38,8 @@ it("encode propagated to merge patch model properties for arrays", async () => {
 
   const optionalColorsProp = widgetModel?.properties.find((p) => p.name === "optionalColors");
   strictEqual(optionalColorsProp?.encode, "spaceDelimited");
-  strictEqual(optionalColorsProp?.type.kind, "array");
+  strictEqual(optionalColorsProp?.type.kind, "nullable");
+  strictEqual(optionalColorsProp?.type.type.kind, "array");
 });
 
 it("encode propagated to merge patch model properties for datetime", async () => {
@@ -67,15 +68,12 @@ it("encode propagated to merge patch model properties for datetime", async () =>
 
   const requiredTimeProp = eventModel?.properties.find((p) => p.name === "requiredTime");
   strictEqual(requiredTimeProp?.type.kind, "utcDateTime");
-  if (requiredTimeProp?.type.kind === "utcDateTime") {
-    strictEqual(requiredTimeProp.type.encode, "rfc3339");
-  }
+  strictEqual(requiredTimeProp.type.encode, "rfc3339");
 
   const optionalTimeProp = eventModel?.properties.find((p) => p.name === "optionalTime");
-  strictEqual(optionalTimeProp?.type.kind, "utcDateTime");
-  if (optionalTimeProp?.type.kind === "utcDateTime") {
-    strictEqual(optionalTimeProp.type.encode, "rfc7231");
-  }
+  strictEqual(optionalTimeProp?.type.kind, "nullable");
+  strictEqual(optionalTimeProp?.type.type.kind, "utcDateTime");
+  strictEqual(optionalTimeProp.type.type.encode, "rfc7231");
 });
 
 it("encode propagated to merge patch model properties for duration", async () => {
@@ -104,14 +102,11 @@ it("encode propagated to merge patch model properties for duration", async () =>
 
   const requiredDurationProp = taskModel?.properties.find((p) => p.name === "requiredDuration");
   strictEqual(requiredDurationProp?.type.kind, "duration");
-  if (requiredDurationProp?.type.kind === "duration") {
-    strictEqual(requiredDurationProp.type.encode, "seconds");
-    strictEqual(requiredDurationProp.type.wireType.kind, "float32");
-  }
+  strictEqual(requiredDurationProp.type.encode, "seconds");
+  strictEqual(requiredDurationProp.type.wireType.kind, "float32");
 
   const optionalDurationProp = taskModel?.properties.find((p) => p.name === "optionalDuration");
-  strictEqual(optionalDurationProp?.type.kind, "duration");
-  if (optionalDurationProp?.type.kind === "duration") {
-    strictEqual(optionalDurationProp.type.encode, "ISO8601");
-  }
+  strictEqual(optionalDurationProp?.type.kind, "nullable");
+  strictEqual(optionalDurationProp?.type.type.kind, "duration");
+  strictEqual(optionalDurationProp.type.type.encode, "ISO8601");
 });
