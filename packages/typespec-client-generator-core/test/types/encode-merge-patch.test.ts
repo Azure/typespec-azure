@@ -21,22 +21,21 @@ it("encode propagated to merge patch model properties for arrays", async () => {
       }
 
       @route("/widgets")
-      @patch(#{implicitOptionality: true})
+      @patch
       op update(
-        @body widget: Widget,
-        @header contentType: "application/merge-patch+json",
+        @body widget: MergePatchUpdate<Widget>,
       ): Widget;
     }
   `);
 
   const models = runner.context.sdkPackage.models;
-  const widgetModel = models.find((m) => m.name === "Widget");
+  const widgetModel = models.find((m) => m.name === "WidgetMergePatchUpdate");
   strictEqual(widgetModel?.kind, "model");
-  
+
   const requiredColorsProp = widgetModel?.properties.find((p) => p.name === "requiredColors");
   strictEqual(requiredColorsProp?.encode, "commaDelimited");
   strictEqual(requiredColorsProp?.type.kind, "array");
-  
+
   const optionalColorsProp = widgetModel?.properties.find((p) => p.name === "optionalColors");
   strictEqual(optionalColorsProp?.encode, "spaceDelimited");
   strictEqual(optionalColorsProp?.type.kind, "array");
@@ -55,24 +54,23 @@ it("encode propagated to merge patch model properties for datetime", async () =>
       }
 
       @route("/events")
-      @patch(#{implicitOptionality: true})
+      @patch
       op update(
-        @body event: Event,
-        @header contentType: "application/merge-patch+json",
+        @body event: MergePatchUpdate<Event>,
       ): Event;
     }
   `);
 
   const models = runner.context.sdkPackage.models;
-  const eventModel = models.find((m) => m.name === "Event");
+  const eventModel = models.find((m) => m.name === "EventMergePatchUpdate");
   strictEqual(eventModel?.kind, "model");
-  
+
   const requiredTimeProp = eventModel?.properties.find((p) => p.name === "requiredTime");
   strictEqual(requiredTimeProp?.type.kind, "utcDateTime");
   if (requiredTimeProp?.type.kind === "utcDateTime") {
     strictEqual(requiredTimeProp.type.encode, "rfc3339");
   }
-  
+
   const optionalTimeProp = eventModel?.properties.find((p) => p.name === "optionalTime");
   strictEqual(optionalTimeProp?.type.kind, "utcDateTime");
   if (optionalTimeProp?.type.kind === "utcDateTime") {
@@ -93,30 +91,27 @@ it("encode propagated to merge patch model properties for duration", async () =>
       }
 
       @route("/tasks")
-      @patch(#{implicitOptionality: true})
+      @patch
       op update(
-        @body task: Task,
-        @header contentType: "application/merge-patch+json",
+        @body task: MergePatchUpdate<Task>,
       ): Task;
     }
   `);
 
   const models = runner.context.sdkPackage.models;
-  const taskModel = models.find((m) => m.name === "Task");
+  const taskModel = models.find((m) => m.name === "TaskMergePatchUpdate");
   strictEqual(taskModel?.kind, "model");
-  
+
   const requiredDurationProp = taskModel?.properties.find((p) => p.name === "requiredDuration");
   strictEqual(requiredDurationProp?.type.kind, "duration");
   if (requiredDurationProp?.type.kind === "duration") {
     strictEqual(requiredDurationProp.type.encode, "seconds");
     strictEqual(requiredDurationProp.type.wireType.kind, "float32");
   }
-  
+
   const optionalDurationProp = taskModel?.properties.find((p) => p.name === "optionalDuration");
   strictEqual(optionalDurationProp?.type.kind, "duration");
   if (optionalDurationProp?.type.kind === "duration") {
     strictEqual(optionalDurationProp.type.encode, "ISO8601");
   }
 });
-
-
