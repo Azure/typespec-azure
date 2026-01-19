@@ -588,3 +588,68 @@ it("handles envelope properties correctly", async () => {
   // FooResourceWithHierarchy should have TrackedResource as base
   strictEqual(fooResourceWithHierarchy.baseModel?.name, "TrackedResource");
 });
+
+it("multi-layer inheritance replacement", async () => {
+  // This test verifies that @hierarchyBuilding works when skipping multiple
+  // inheritance layers. Model A extends B extends C, but we want A to inherit
+  // directly from C, with B's properties collapsed into A.
+  const [_, diagnostics] = await runner.compileAndDiagnose(`
+      @service
+      namespace TestService;
+      
+      model C {
+        c?: string;
+      }
+      model B extends C {
+        b?: string;
+      }
+      @Legacy.hierarchyBuilding(C)
+      model A extends B {
+        a?: string;
+      }
+
+      @route("/testA")
+      op testA(): A;
+
+      @route("/testB")
+      op testB(): B;
+
+      @route("/testC")
+      op testC(): C;
+    `);
+
+  // Filter out unrelated diagnostics (like deprecation warnings)
+  const relevantDiagnostics = diagnostics.filter(
+    (d) => d.code === "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict"
+  );
+
+  // No conflict diagnostics should be reported - the decorator should apply successfully
+  strictEqual(relevantDiagnostics.length, 0, `Expected no conflict diagnostics but got: ${relevantDiagnostics.map(d => d.message).join(", ")}`);
+
+  const models = runner.context.sdkPackage.models;
+  const modelA = models.find((m) => m.name === "A");
+  const modelB = models.find((m) => m.name === "B");
+  const modelC = models.find((m) => m.name === "C");
+
+  ok(modelA);
+  ok(modelB);
+  ok(modelC);
+
+  // A should inherit from C instead of B due to @Legacy.hierarchyBuilding
+  strictEqual(modelA.baseModel?.name, "C");
+  strictEqual(modelB.baseModel?.name, "C");
+
+  // Verify properties are correctly set
+  // A should have property 'a' (its own) and 'b' (from B which is being skipped)
+  strictEqual(modelA.properties.length, 2);
+  ok(modelA.properties.find((p) => p.name === "a"));
+  ok(modelA.properties.find((p) => p.name === "b"));
+
+  // B should have property 'b' (its own)
+  strictEqual(modelB.properties.length, 1);
+  ok(modelB.properties.find((p) => p.name === "b"));
+
+  // C should have property 'c' (its own)
+  strictEqual(modelC.properties.length, 1);
+  ok(modelC.properties.find((p) => p.name === "c"));
+});

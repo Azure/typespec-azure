@@ -883,7 +883,37 @@ export function getSdkModelWithDiagnostics(
       // handle normal model properties
       diagnostics.pipe(addPropertiesToModelType(context, type, sdkType, operation));
     }
-    const rawBaseModel = getLegacyHierarchyBuilding(context, type) || type.baseModel;
+    const legacyHierarchyBuildingModel = getLegacyHierarchyBuilding(context, type);
+    const rawBaseModel = legacyHierarchyBuildingModel || type.baseModel;
+
+    // If legacy hierarchy building is specified and different from the original base,
+    // add properties from intermediate models that are being skipped.
+    // This handles multi-layer inheritance replacement where we need to "collapse"
+    // properties from skipped models into the target model.
+    if (legacyHierarchyBuildingModel && type.baseModel && type.baseModel !== legacyHierarchyBuildingModel) {
+      // Collect property names that already exist on the target (via spread or direct definition)
+      const existingPropertyNames = new Set<string>(type.properties.keys());
+      
+      let current: Model | undefined = type.baseModel;
+      while (current && current !== legacyHierarchyBuildingModel) {
+        // Only add properties that don't already exist on the target
+        for (const property of current.properties.values()) {
+          if (
+            !existingPropertyNames.has(property.name) &&
+            !isStatusCode(context.program, property) &&
+            !isNeverOrVoidType(property.type) &&
+            !hasNoneVisibility(context, property) &&
+            isInScope(context, property)
+          ) {
+            const clientProperty = diagnostics.pipe(getSdkModelPropertyType(context, property, operation));
+            sdkType.properties.push(clientProperty);
+            existingPropertyNames.add(property.name);
+          }
+        }
+        current = current.baseModel;
+      }
+    }
+
     if (rawBaseModel) {
       sdkType.baseModel = context.__referencedTypeCache.get(rawBaseModel) as
         | SdkModelType
