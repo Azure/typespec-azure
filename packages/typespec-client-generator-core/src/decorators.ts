@@ -1526,19 +1526,47 @@ interface PropertyConflict {
   reason: "missing" | "type-mismatch";
 }
 
+/**
+ * Collects all properties from a model's inheritance chain.
+ * Walks up the inheritance chain starting from the model and collects
+ * all properties.
+ * @param model - The model to start collecting properties from
+ * @returns Map of property names to their ModelProperty
+ */
+function getAllPropertiesInChain(model: Model): Map<string, ModelProperty> {
+  const properties = new Map<string, ModelProperty>();
+  let currentModel: Model | undefined = model;
+
+  while (currentModel) {
+    // Child model properties take precedence over parent properties with the same name.
+    // Since we walk from child to parent, we only add properties that haven't been seen yet.
+    for (const [name, prop] of currentModel.properties) {
+      if (!properties.has(name)) {
+        properties.set(name, prop);
+      }
+    }
+    currentModel = currentModel.baseModel;
+  }
+
+  return properties;
+}
+
 function isPropertySuperset(program: Program, target: Model, value: Model): PropertyConflict[] {
   const conflicts: PropertyConflict[] = [];
 
-  // Check if all properties in value exist in target
+  // Collect all properties from target's inheritance chain (including inherited properties)
+  const targetProperties = getAllPropertiesInChain(target);
+
+  // Check if all properties in value exist in target's collected properties
   for (const name of value.properties.keys()) {
-    if (!target.properties.has(name)) {
+    if (!targetProperties.has(name)) {
       conflicts.push({
         propertyName: name,
         reason: "missing",
       });
       continue;
     }
-    const targetProperty = target.properties.get(name)!;
+    const targetProperty = targetProperties.get(name)!;
     const valueProperty = value.properties.get(name)!;
     // Compare properties to handle envelope/spread semantics correctly
     // Properties match if they come from the same source OR if they have the same type
