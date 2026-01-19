@@ -1,15 +1,9 @@
 import { ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import { it } from "vitest";
+import { createSdkContextForTester, SimpleTester, TcgcTester } from "../tester.js";
 
 it("single service with versioning should populate apiVersions map", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service(#{
       title: "Widget Service",
     })
@@ -25,7 +19,10 @@ it("single service with versioning should populate apiVersions map", async () =>
     op test(): void;
   `);
 
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const sdkPackage = context.sdkPackage;
 
   // Check deprecated apiVersion property still works
   strictEqual(sdkPackage.metadata.apiVersion, "v3");
@@ -37,8 +34,7 @@ it("single service with versioning should populate apiVersions map", async () =>
 });
 
 it("multiple services should populate apiVersions map with all services", async () => {
-  await runner.compileWithCustomization(
-    `
+  const mainCode = `
       @service
       @versioned(VersionsA)
       namespace ServiceA {
@@ -62,8 +58,8 @@ it("multiple services should populate apiVersions map with all services", async 
           @route("/bTest")
           bTest(@query("api-version") apiVersion: VersionsB): void;
         }
-      }`,
-    `
+      }`;
+  const clientCode = `
       @client(
         {
           name: "CombineClient",
@@ -72,10 +68,16 @@ it("multiple services should populate apiVersions map with all services", async 
       )
       @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
       namespace CombineClient;
-    `,
-  );
+    `;
+  const { program } = await TcgcTester.compile({
+    "main.tsp": mainCode,
+    "client.tsp": `import "./main.tsp"; ${clientCode}`,
+  });
 
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const sdkPackage = context.sdkPackage;
 
   // For multi-service, deprecated apiVersion should be undefined
   strictEqual(sdkPackage.metadata.apiVersion, undefined);
@@ -88,7 +90,7 @@ it("multiple services should populate apiVersions map with all services", async 
 });
 
 it("service without versioning should have empty apiVersions map", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service(#{
       title: "Widget Service",
     })
@@ -97,7 +99,10 @@ it("service without versioning should have empty apiVersions map", async () => {
     op test(): void;
   `);
 
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const sdkPackage = context.sdkPackage;
 
   // Check deprecated apiVersion property
   strictEqual(sdkPackage.metadata.apiVersion, undefined);
@@ -108,12 +113,7 @@ it("service without versioning should have empty apiVersions map", async () => {
 });
 
 it("apiVersion 'all' should populate apiVersions with 'all'", async () => {
-  const runnerWithAll = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-python",
-    "api-version": "all",
-  });
-
-  await runnerWithAll.compile(`
+  const { program } = await SimpleTester.compile(`
     @service(#{
       title: "Widget Service",
     })
@@ -129,7 +129,11 @@ it("apiVersion 'all' should populate apiVersions with 'all'", async () => {
     op test(): void;
   `);
 
-  const sdkPackage = runnerWithAll.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+    "api-version": "all",
+  });
+  const sdkPackage = context.sdkPackage;
 
   // Check deprecated apiVersion property
   strictEqual(sdkPackage.metadata.apiVersion, "all");

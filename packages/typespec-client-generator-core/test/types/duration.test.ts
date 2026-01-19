@@ -1,22 +1,10 @@
-import { ok, strictEqual } from "assert";
-import { afterEach, beforeEach, it } from "vitest";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import { strictEqual } from "assert";
+import { it } from "vitest";
+import { createSdkContextForTester, SimpleTesterWithBuiltInService } from "../tester.js";
 import { getSdkTypeHelper } from "./utils.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-});
-afterEach(async () => {
-  for (const modelsOrEnums of [runner.context.sdkPackage.models, runner.context.sdkPackage.enums]) {
-    for (const item of modelsOrEnums) {
-      ok(item.name !== "");
-    }
-  }
-});
 it("default", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
     @usage(Usage.input | Usage.output)
     model Test {
@@ -24,13 +12,16 @@ it("default", async function () {
     }
   `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "duration");
   strictEqual(sdkType.wireType.kind, "string");
   strictEqual(sdkType.encode, "ISO8601");
 });
 it("iso8601", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -39,14 +30,17 @@ it("iso8601", async function () {
       }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "duration");
   strictEqual(sdkType.wireType.kind, "string");
   strictEqual(sdkType.encode, "ISO8601");
 });
 
 it("int32 seconds", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -55,14 +49,17 @@ it("int32 seconds", async function () {
       }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "duration");
   strictEqual(sdkType.wireType.kind, "int32");
   strictEqual(sdkType.encode, "seconds");
 });
 
 it("float seconds", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -71,14 +68,17 @@ it("float seconds", async function () {
       }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "duration");
   strictEqual(sdkType.wireType.kind, "float");
   strictEqual(sdkType.encode, "seconds");
 });
 
 it("nullable float seconds", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -87,7 +87,10 @@ it("nullable float seconds", async function () {
       }
     `,
   );
-  const nullableType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const nullableType = getSdkTypeHelper(context);
   strictEqual(nullableType.kind, "nullable");
 
   const sdkType = nullableType.type;
@@ -97,7 +100,7 @@ it("nullable float seconds", async function () {
 });
 
 it("float seconds decorated scalar", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @doc("doc")
       @summary("title")
@@ -110,7 +113,10 @@ it("float seconds decorated scalar", async function () {
       }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "array");
   strictEqual(sdkType.valueType.kind, "duration");
   strictEqual(sdkType.valueType.name, "Float32Duration");

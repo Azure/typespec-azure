@@ -1,27 +1,27 @@
-import { Model, Operation } from "@typespec/compiler";
+import { Model, Operation, Program } from "@typespec/compiler";
 import { ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { describe, it } from "vitest";
 import { getAccess } from "../../src/decorators.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import {
+  createSdkContextForTester,
+  SimpleTester,
+  SimpleTesterWithBuiltInService,
+} from "../tester.js";
 
 it("emitter with same scope as decorator", async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
-  const { func } = (await runner.compile(`
+  const { program, func } = (await SimpleTester.compile(`
     @test
     @access(Access.internal, "csharp")
     op func(
       @query("createdAt")
       createdAt: utcDateTime;
     ): void;
-  `)) as { func: Operation };
+  `)) as { program: Program; func: Operation };
 
-  const actual = getAccess(runner.context, func);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-csharp",
+  });
+  const actual = getAccess(context, func);
   strictEqual(actual, "internal");
 });
 
@@ -34,19 +34,27 @@ it("emitter different scope from decorator", async () => {
       createdAt: utcDateTime;
     ): void;
   `;
-  const { func } = (await runner.compile(code)) as { func: Operation };
-  strictEqual(getAccess(runner.context, func), "public");
+  const { program, func } = (await SimpleTester.compile(code)) as {
+    program: Program;
+    func: Operation;
+  };
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(getAccess(context, func), "public");
 
-  const runnerWithCsharp = await createSdkTestRunner({
+  const { program: programCsharp, func: funcCsharp } = (await SimpleTester.compile(code)) as {
+    program: Program;
+    func: Operation;
+  };
+  const contextCsharp = await createSdkContextForTester(programCsharp, {
     emitterName: "@azure-tools/typespec-csharp",
   });
-  const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
-  strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "internal");
+  strictEqual(getAccess(contextCsharp, funcCsharp), "internal");
 });
 
 it("emitter first in decorator scope list", async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-  const { func } = (await runner.compile(`
+  const { program, func } = (await SimpleTester.compile(`
     @test
     @access(Access.internal, "java")
     @access(Access.internal, "csharp")
@@ -54,15 +62,17 @@ it("emitter first in decorator scope list", async () => {
       @query("createdAt")
       createdAt: utcDateTime;
     ): void;
-  `)) as { func: Operation };
+  `)) as { program: Program; func: Operation };
 
-  const actual = getAccess(runner.context, func);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const actual = getAccess(context, func);
   strictEqual(actual, "internal");
 });
 
 it("emitter second in decorator scope list", async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
-  const { func } = (await runner.compile(`
+  const { program, func } = (await SimpleTester.compile(`
     @test
     @access(Access.internal, "java")
     @access(Access.internal, "csharp")
@@ -70,9 +80,12 @@ it("emitter second in decorator scope list", async () => {
       @query("createdAt")
       createdAt: utcDateTime;
     ): void;
-  `)) as { func: Operation };
+  `)) as { program: Program; func: Operation };
 
-  const actual = getAccess(runner.context, func);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-csharp",
+  });
+  const actual = getAccess(context, func);
   strictEqual(actual, "internal");
 });
 
@@ -86,21 +99,27 @@ it("emitter excluded from decorator scope list", async () => {
       createdAt: utcDateTime;
     ): void;
   `;
-  const { func } = (await runner.compile(code)) as { func: Operation };
+  const { program, func } = (await SimpleTester.compile(code)) as {
+    program: Program;
+    func: Operation;
+  };
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
 
-  strictEqual(getAccess(runner.context, func), "public");
-  const runnerWithJava = await createSdkTestRunner({
+  strictEqual(getAccess(context, func), "public");
+  const { program: programJava, func: funcJava } = (await SimpleTester.compile(code)) as {
+    program: Program;
+    func: Operation;
+  };
+  const contextJava = await createSdkContextForTester(programJava, {
     emitterName: "@azure-tools/typespec-java",
   });
-  const { func: funcJava } = (await runnerWithJava.compile(code)) as { func: Operation };
-  strictEqual(getAccess(runnerWithJava.context, funcJava), "internal");
+  strictEqual(getAccess(contextJava, funcJava), "internal");
 });
 
 it("no scope decorator", async () => {
-  const runnerWithCSharp = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-csharp",
-  });
-  await runnerWithCSharp.compile(`
+  const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         model Test {
@@ -112,7 +131,10 @@ it("no scope decorator", async () => {
       }
     `);
 
-  const sdkPackage = runnerWithCSharp.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-csharp",
+  });
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
   const model = sdkPackage.models.find((x) => x.name === "Test");
   ok(client);
@@ -130,14 +152,23 @@ it("first non-scoped decorator then scoped decorator", async () => {
     ): void;
   `;
 
-  const { func } = (await runner.compile(code)) as { func: Operation };
-  strictEqual(getAccess(runner.context, func), "internal");
+  const { program, func } = (await SimpleTester.compile(code)) as {
+    program: Program;
+    func: Operation;
+  };
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(getAccess(context, func), "internal");
 
-  const runnerWithCsharp = await createSdkTestRunner({
+  const { program: programCsharp, func: funcCsharp } = (await SimpleTester.compile(code)) as {
+    program: Program;
+    func: Operation;
+  };
+  const contextCsharp = await createSdkContextForTester(programCsharp, {
     emitterName: "@azure-tools/typespec-csharp",
   });
-  const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
-  strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "public");
+  strictEqual(getAccess(contextCsharp, funcCsharp), "public");
 });
 
 it("first scoped decorator then non-scoped decorator", async () => {
@@ -151,14 +182,23 @@ it("first scoped decorator then non-scoped decorator", async () => {
     ): void;
   `;
 
-  const { func } = (await runner.compile(code)) as { func: Operation };
-  strictEqual(getAccess(runner.context, func), "internal");
+  const { program, func } = (await SimpleTester.compile(code)) as {
+    program: Program;
+    func: Operation;
+  };
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(getAccess(context, func), "internal");
 
-  const runnerWithCsharp = await createSdkTestRunner({
+  const { program: programCsharp, func: funcCsharp } = (await SimpleTester.compile(code)) as {
+    program: Program;
+    func: Operation;
+  };
+  const contextCsharp = await createSdkContextForTester(programCsharp, {
     emitterName: "@azure-tools/typespec-csharp",
   });
-  const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
-  strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "public");
+  strictEqual(getAccess(contextCsharp, funcCsharp), "public");
 });
 
 it("first non-scoped augmented decorator then scoped augmented decorator", async () => {
@@ -173,14 +213,23 @@ it("first non-scoped augmented decorator then scoped augmented decorator", async
     @@access(func, Access.internal, "csharp"); 
   `;
 
-  const { func } = (await runner.compile(code)) as { func: Operation };
-  strictEqual(getAccess(runner.context, func), "public");
+  const { program, func } = (await SimpleTester.compile(code)) as {
+    program: Program;
+    func: Operation;
+  };
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(getAccess(context, func), "public");
 
-  const runnerWithCsharp = await createSdkTestRunner({
+  const { program: programCsharp, func: funcCsharp } = (await SimpleTester.compile(code)) as {
+    program: Program;
+    func: Operation;
+  };
+  const contextCsharp = await createSdkContextForTester(programCsharp, {
     emitterName: "@azure-tools/typespec-csharp",
   });
-  const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
-  strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "internal");
+  strictEqual(getAccess(contextCsharp, funcCsharp), "internal");
 });
 
 it("first scoped augmented decorator then non-scoped augmented decorator", async () => {
@@ -195,14 +244,23 @@ it("first scoped augmented decorator then non-scoped augmented decorator", async
     @@access(func, Access.public);
   `;
 
-  const { func } = (await runner.compile(code)) as { func: Operation };
-  strictEqual(getAccess(runner.context, func), "public");
+  const { program, func } = (await SimpleTester.compile(code)) as {
+    program: Program;
+    func: Operation;
+  };
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(getAccess(context, func), "public");
 
-  const runnerWithCsharp = await createSdkTestRunner({
+  const { program: programCsharp, func: funcCsharp } = (await SimpleTester.compile(code)) as {
+    program: Program;
+    func: Operation;
+  };
+  const contextCsharp = await createSdkContextForTester(programCsharp, {
     emitterName: "@azure-tools/typespec-csharp",
   });
-  const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
-  strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "internal");
+  strictEqual(getAccess(contextCsharp, funcCsharp), "internal");
 });
 
 it("two scoped decorators", async () => {
@@ -216,14 +274,23 @@ it("two scoped decorators", async () => {
     ): void;
   `;
 
-  const { func } = (await runner.compile(code)) as { func: Operation };
-  strictEqual(getAccess(runner.context, func), "internal");
+  const { program, func } = (await SimpleTester.compile(code)) as {
+    program: Program;
+    func: Operation;
+  };
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(getAccess(context, func), "internal");
 
-  const runnerWithCsharp = await createSdkTestRunner({
+  const { program: programCsharp, func: funcCsharp } = (await SimpleTester.compile(code)) as {
+    program: Program;
+    func: Operation;
+  };
+  const contextCsharp = await createSdkContextForTester(programCsharp, {
     emitterName: "@azure-tools/typespec-csharp",
   });
-  const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
-  strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "internal");
+  strictEqual(getAccess(contextCsharp, funcCsharp), "internal");
 });
 
 it("two non-scoped decorators", async () => {
@@ -237,14 +304,23 @@ it("two non-scoped decorators", async () => {
     ): void;
   `;
 
-  const { func } = (await runner.compile(code)) as { func: Operation };
-  strictEqual(getAccess(runner.context, func), "internal");
+  const { program, func } = (await SimpleTester.compile(code)) as {
+    program: Program;
+    func: Operation;
+  };
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(getAccess(context, func), "internal");
 
-  const runnerWithCsharp = await createSdkTestRunner({
+  const { program: programCsharp, func: funcCsharp } = (await SimpleTester.compile(code)) as {
+    program: Program;
+    func: Operation;
+  };
+  const contextCsharp = await createSdkContextForTester(programCsharp, {
     emitterName: "@azure-tools/typespec-csharp",
   });
-  const { func: funcCsharp } = (await runnerWithCsharp.compile(code)) as { func: Operation };
-  strictEqual(getAccess(runnerWithCsharp.context, funcCsharp), "internal");
+  strictEqual(getAccess(contextCsharp, funcCsharp), "internal");
 });
 
 it("csv scope list", async () => {
@@ -257,23 +333,34 @@ it("csv scope list", async () => {
       }
       `;
   }
-  const pythonRunner = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-python",
-  });
-  const javaRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-  const csharpRunner = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-csharp",
-  });
 
   const testCode = getCodeTemplate("python,csharp");
-  const { Test: TestPython } = (await pythonRunner.compile(testCode)) as { Test: Model };
-  strictEqual(getAccess(pythonRunner.context, TestPython), "internal");
+  const { program: programPython, Test: TestPython } = (await SimpleTester.compile(testCode)) as {
+    program: Program;
+    Test: Model;
+  };
+  const contextPython = await createSdkContextForTester(programPython, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(getAccess(contextPython, TestPython), "internal");
 
-  const { Test: TestCSharp } = (await csharpRunner.compile(testCode)) as { Test: Model };
-  strictEqual(getAccess(csharpRunner.context, TestCSharp), "internal");
+  const { program: programCsharp, Test: TestCSharp } = (await SimpleTester.compile(testCode)) as {
+    program: Program;
+    Test: Model;
+  };
+  const contextCsharp = await createSdkContextForTester(programCsharp, {
+    emitterName: "@azure-tools/typespec-csharp",
+  });
+  strictEqual(getAccess(contextCsharp, TestCSharp), "internal");
 
-  const { Test: TestJava } = (await javaRunner.compile(testCode)) as { Test: Model };
-  strictEqual(getAccess(javaRunner.context, TestJava), "public");
+  const { program: programJava, Test: TestJava } = (await SimpleTester.compile(testCode)) as {
+    program: Program;
+    Test: Model;
+  };
+  const contextJava = await createSdkContextForTester(programJava, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  strictEqual(getAccess(contextJava, TestJava), "public");
 });
 
 it("csv scope list augment", async () => {
@@ -288,30 +375,38 @@ it("csv scope list augment", async () => {
       @@access(Test, Access.internal, "${language}");
       `;
   }
-  const pythonRunner = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-python",
-  });
-  const javaRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-  const csharpRunner = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-csharp",
-  });
 
   const testCode = getCodeTemplate("python,csharp");
-  const { Test: TestPython } = (await pythonRunner.compile(testCode)) as { Test: Model };
-  strictEqual(getAccess(pythonRunner.context, TestPython), "internal");
+  const { program: programPython, Test: TestPython } = (await SimpleTester.compile(testCode)) as {
+    program: Program;
+    Test: Model;
+  };
+  const contextPython = await createSdkContextForTester(programPython, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(getAccess(contextPython, TestPython), "internal");
 
-  const { Test: TestCSharp } = (await csharpRunner.compile(testCode)) as { Test: Model };
-  strictEqual(getAccess(csharpRunner.context, TestCSharp), "internal");
+  const { program: programCsharp, Test: TestCSharp } = (await SimpleTester.compile(testCode)) as {
+    program: Program;
+    Test: Model;
+  };
+  const contextCsharp = await createSdkContextForTester(programCsharp, {
+    emitterName: "@azure-tools/typespec-csharp",
+  });
+  strictEqual(getAccess(contextCsharp, TestCSharp), "internal");
 
-  const { Test: TestJava } = (await javaRunner.compile(testCode)) as { Test: Model };
-  strictEqual(getAccess(javaRunner.context, TestJava), "public");
+  const { program: programJava, Test: TestJava } = (await SimpleTester.compile(testCode)) as {
+    program: Program;
+    Test: Model;
+  };
+  const contextJava = await createSdkContextForTester(programJava, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  strictEqual(getAccess(contextJava, TestJava), "public");
 });
 
 it("include operation from csharp client", async () => {
-  const runnerWithCSharp = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-csharp",
-  });
-  await runnerWithCSharp.compile(`
+  const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         model Test {
@@ -324,7 +419,10 @@ it("include operation from csharp client", async () => {
       }
     `);
 
-  const sdkPackage = runnerWithCSharp.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-csharp",
+  });
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
   const model = sdkPackage.models.find((x) => x.name === "Test");
   ok(client);
@@ -332,10 +430,7 @@ it("include operation from csharp client", async () => {
 });
 
 it("include operation from only csharp client", async () => {
-  const runnerWithCSharp = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-python",
-  });
-  await runnerWithCSharp.compile(`
+  const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         model Test {
@@ -353,7 +448,10 @@ it("include operation from only csharp client", async () => {
       }
     `);
 
-  const sdkPackage = runnerWithCSharp.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   ok(client);
   strictEqual(client.methods.length, 1);
@@ -361,10 +459,7 @@ it("include operation from only csharp client", async () => {
 });
 
 it("exclude operation from csharp client", async () => {
-  const runnerWithCSharp = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-csharp",
-  });
-  await runnerWithCSharp.compile(`
+  const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         model Test {
@@ -377,7 +472,10 @@ it("exclude operation from csharp client", async () => {
       }
     `);
 
-  const sdkPackage = runnerWithCSharp.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-csharp",
+  });
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients.find((x) => x.methods.find((m) => m.name === "func"));
   const model = sdkPackage.models.find((x) => x.name === "Test");
   strictEqual(client, undefined);
@@ -386,10 +484,7 @@ it("exclude operation from csharp client", async () => {
 
 describe("negation", () => {
   it("single scope negation", async () => {
-    const runnerWithCSharp = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-csharp",
-    });
-    await runnerWithCSharp.compile(`
+    const { program } = await SimpleTester.compile(`
         @service
         namespace MyService {
           @clientName("TestRenamed", "!csharp")
@@ -402,16 +497,16 @@ describe("negation", () => {
         }
       `);
 
-    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const sdkPackage = context.sdkPackage;
     const testModel = sdkPackage.models.find((x) => x.name === "Test");
     ok(testModel);
   });
 
   it("multiple scopes negation", async () => {
-    const runnerWithCSharp = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-csharp",
-    });
-    await runnerWithCSharp.compile(`
+    const { program } = await SimpleTester.compile(`
         @service
         namespace MyService {
           @clientName("TestRenamed", "!(csharp, java)")
@@ -424,16 +519,16 @@ describe("negation", () => {
         }
       `);
 
-    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const sdkPackage = context.sdkPackage;
     const testModel = sdkPackage.models.find((x) => x.name === "Test");
     ok(testModel);
   });
 
   it("non-negation scope", async () => {
-    const runnerWithCSharp = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-csharp",
-    });
-    await runnerWithCSharp.compile(`
+    const { program } = await SimpleTester.compile(`
         @service
         namespace MyService {
           @clientName("TestRenamed", "!(python, java)")
@@ -446,16 +541,16 @@ describe("negation", () => {
         }
       `);
 
-    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const sdkPackage = context.sdkPackage;
     const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
     ok(testModel);
   });
 
   it("allow combination of negation scope and normal scope", async () => {
-    const runnerWithCSharp = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-csharp",
-    });
-    await runnerWithCSharp.compile(`
+    const { program } = await SimpleTester.compile(`
         @service
         namespace MyService {
           @clientName("TestRenamed", "csharp, !java")
@@ -468,16 +563,16 @@ describe("negation", () => {
         }
       `);
 
-    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const sdkPackage = context.sdkPackage;
     const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
     ok(testModel);
   });
 
   it("allow combination of negation scope and normal scope for the same scope", async () => {
-    const runnerWithCSharp = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-csharp",
-    });
-    await runnerWithCSharp.compile(`
+    const { program } = await SimpleTester.compile(`
         @service
         namespace MyService {
           @clientName("TestRenamed", "!csharp, csharp")
@@ -490,16 +585,16 @@ describe("negation", () => {
         }
       `);
 
-    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const sdkPackage = context.sdkPackage;
     const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
     ok(testModel);
   });
 
   it("allow combination of negation scope and normal scope for the same multiple scopes", async () => {
-    const runnerWithCSharp = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-csharp",
-    });
-    await runnerWithCSharp.compile(`
+    const { program } = await SimpleTester.compile(`
         @service
         namespace MyService {
           @clientName("TestRenamed", "!csharp, csharp, python, !python, java")
@@ -512,16 +607,16 @@ describe("negation", () => {
         }
       `);
 
-    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const sdkPackage = context.sdkPackage;
     const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
     ok(testModel);
   });
 
   it("allow multiple separated negation scopes", async () => {
-    const runnerWithCSharp = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-csharp",
-    });
-    await runnerWithCSharp.compile(`
+    const { program } = await SimpleTester.compile(`
         @service
         namespace MyService {
           @clientName("TestRenamed", "!csharp, !java")
@@ -534,16 +629,16 @@ describe("negation", () => {
         }
       `);
 
-    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const sdkPackage = context.sdkPackage;
     const testModel = sdkPackage.models.find((x) => x.name === "Test");
     ok(testModel);
   });
 
   it("negation scope override normal scope", async () => {
-    const runnerWithCSharp = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-csharp",
-    });
-    await runnerWithCSharp.compile(`
+    const { program } = await SimpleTester.compile(`
         @service
         namespace MyService {
           @clientName("TestRenamedAgain", "!python, !java")
@@ -557,7 +652,10 @@ describe("negation", () => {
         }
       `);
 
-    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const sdkPackage = context.sdkPackage;
     const testModel = sdkPackage.models.find((x) => x.name === "TestRenamedAgain");
     ok(testModel);
   });
@@ -579,28 +677,25 @@ describe("negation", () => {
           ): void;
         }
       `;
-    const runnerWithCSharp = await createSdkTestRunner({
+    const { program: programCsharp } = await SimpleTester.compile(tsp);
+    const contextCsharp = await createSdkContextForTester(programCsharp, {
       emitterName: "@azure-tools/typespec-csharp",
     });
-    await runnerWithCSharp.compile(tsp);
-    const csharpSdkPackage = runnerWithCSharp.context.sdkPackage;
+    const csharpSdkPackage = contextCsharp.sdkPackage;
     const csharpTestModel = csharpSdkPackage.models.find((x) => x.name === "TestRenamedAgain");
     ok(csharpTestModel);
 
-    const runnerWithPython = await createSdkTestRunner({
+    const { program: programPython } = await SimpleTester.compile(tsp);
+    const contextPython = await createSdkContextForTester(programPython, {
       emitterName: "@azure-tools/typespec-python",
     });
-    await runnerWithPython.compile(tsp);
-    const pythonSdkPackage = runnerWithPython.context.sdkPackage;
+    const pythonSdkPackage = contextPython.sdkPackage;
     const pythonTestModel = pythonSdkPackage.models.find((x) => x.name === "Test");
     ok(pythonTestModel);
   });
 
   it("negation scope override negation scope", async () => {
-    const runnerWithCSharp = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-csharp",
-    });
-    await runnerWithCSharp.compile(`
+    const { program } = await SimpleTester.compile(`
         @service
         namespace MyService {
           @clientName("TestRenamedAgain", "!python, !java")
@@ -614,16 +709,16 @@ describe("negation", () => {
         }
       `);
 
-    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const sdkPackage = context.sdkPackage;
     const testModel = sdkPackage.models.find((x) => x.name === "TestRenamedAgain");
     ok(testModel);
   });
 
   it("negation scope override normal scope with the same scope", async () => {
-    const runnerWithCSharp = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-csharp",
-    });
-    await runnerWithCSharp.compile(`
+    const { program } = await SimpleTester.compile(`
         @service
         namespace MyService {
           @clientName("TestRenamedAgain", "!csharp")
@@ -637,16 +732,16 @@ describe("negation", () => {
         }
       `);
 
-    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const sdkPackage = context.sdkPackage;
     const testModel = sdkPackage.models.find((x) => x.name === "TestRenamed");
     ok(testModel);
   });
 
   it("normal scope override negation scope with the same scope", async () => {
-    const runnerWithCSharp = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-csharp",
-    });
-    await runnerWithCSharp.compile(`
+    const { program } = await SimpleTester.compile(`
         @service
         namespace MyService {
           @clientName("TestRenamedAgain", "csharp")
@@ -660,18 +755,15 @@ describe("negation", () => {
         }
       `);
 
-    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const sdkPackage = context.sdkPackage;
     const testModel = sdkPackage.models.find((x) => x.name === "TestRenamedAgain");
     ok(testModel);
   });
 
   it("negation scope override", async () => {
-    const runnerWithCSharp = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-csharp",
-    });
-    const runnerWithJava = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-java",
-    });
     const spec = `
         @service
         namespace MyService {
@@ -685,8 +777,11 @@ describe("negation", () => {
           ): void;
         }
       `;
-    await runnerWithCSharp.compile(spec);
-    const csharpSdkPackage = runnerWithCSharp.context.sdkPackage;
+    const { program: programCsharp } = await SimpleTester.compile(spec);
+    const contextCsharp = await createSdkContextForTester(programCsharp, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const csharpSdkPackage = contextCsharp.sdkPackage;
     const csharpSdkClient = csharpSdkPackage.clients.find((x) =>
       x.methods.find((m) => m.name === "func"),
     );
@@ -694,8 +789,11 @@ describe("negation", () => {
     ok(csharpSdkClient);
     ok(csharpSdkModel);
 
-    await runnerWithJava.compile(spec);
-    const javaSdkPackage = runnerWithJava.context.sdkPackage;
+    const { program: programJava } = await SimpleTester.compile(spec);
+    const contextJava = await createSdkContextForTester(programJava, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+    const javaSdkPackage = contextJava.sdkPackage;
     const javaSdkClient = javaSdkPackage.clients.find((x) =>
       x.methods.find((m) => m.name === "func"),
     );
@@ -707,10 +805,7 @@ describe("negation", () => {
 
 describe("model property scope", () => {
   it("include property for matching scope", async () => {
-    const runnerWithCSharp = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-csharp",
-    });
-    await runnerWithCSharp.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithBuiltInService.compile(`
       model TestModel {
         @scope("csharp")
         csharpProp: string;
@@ -721,7 +816,10 @@ describe("model property scope", () => {
       ): void;
     `);
 
-    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const sdkPackage = context.sdkPackage;
     const model = sdkPackage.models.find((x) => x.name === "TestModel");
     ok(model);
     const csharpProp = model.properties.find((x) => x.name === "csharpProp");
@@ -731,10 +829,7 @@ describe("model property scope", () => {
   });
 
   it("exclude property from non-matching scope", async () => {
-    const runnerWithPython = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-python",
-    });
-    await runnerWithPython.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithBuiltInService.compile(`
       model TestModel {
         @scope("csharp")
         csharpProp: string;
@@ -745,7 +840,10 @@ describe("model property scope", () => {
       ): void;
     `);
 
-    const sdkPackage = runnerWithPython.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const sdkPackage = context.sdkPackage;
     const model = sdkPackage.models.find((x) => x.name === "TestModel");
     ok(model);
     const csharpProp = model.properties.find((x) => x.name === "csharpProp");
@@ -755,10 +853,7 @@ describe("model property scope", () => {
   });
 
   it("exclude property with negation scope", async () => {
-    const runnerWithCSharp = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-csharp",
-    });
-    await runnerWithCSharp.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithBuiltInService.compile(`
       model TestModel {
         @scope("!csharp")
         internalProp: string;
@@ -769,7 +864,10 @@ describe("model property scope", () => {
       ): void;
     `);
 
-    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const sdkPackage = context.sdkPackage;
     const model = sdkPackage.models.find((x) => x.name === "TestModel");
     ok(model);
     const internalProp = model.properties.find((x) => x.name === "internalProp");
@@ -779,10 +877,7 @@ describe("model property scope", () => {
   });
 
   it("include all properties without scope decorator", async () => {
-    const runnerWithCSharp = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-csharp",
-    });
-    await runnerWithCSharp.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithBuiltInService.compile(`
       model TestModel {
         prop1: string;
         prop2: int32;
@@ -792,17 +887,17 @@ describe("model property scope", () => {
       ): void;
     `);
 
-    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const sdkPackage = context.sdkPackage;
     const model = sdkPackage.models.find((x) => x.name === "TestModel");
     ok(model);
     strictEqual(model.properties.length, 2);
   });
 
   it("multiple properties with different scopes", async () => {
-    const runnerWithCSharp = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-csharp",
-    });
-    await runnerWithCSharp.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithBuiltInService.compile(`
       model TestModel {
         @scope("csharp")
         csharpProp: string;
@@ -817,7 +912,10 @@ describe("model property scope", () => {
       ): void;
     `);
 
-    const sdkPackage = runnerWithCSharp.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const sdkPackage = context.sdkPackage;
     const model = sdkPackage.models.find((x) => x.name === "TestModel");
     ok(model);
     const csharpProp = model.properties.find((x) => x.name === "csharpProp");

@@ -1,35 +1,32 @@
 import { Operation } from "@typespec/compiler";
 import { strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { describe, it } from "vitest";
 import { shouldGenerateProtocol } from "../../src/decorators.js";
-import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "../test-host.js";
+import {
+  createSdkContextForTester,
+  SimpleTester,
+  SimpleTesterWithBuiltInService,
+} from "../tester.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
-async function protocolAPITestHelper(
-  runner: SdkTestRunner,
-  protocolValue: boolean,
-  globalValue: boolean,
-): Promise<void> {
+async function protocolAPITestHelper(protocolValue: boolean, globalValue: boolean): Promise<void> {
   const testCode = `
     @protocolAPI(${protocolValue})
     @test
     op test(): void;
   `;
-  const { test } = await runner.compileWithBuiltInService(testCode);
+  const result = await SimpleTesterWithBuiltInService.compile(testCode);
+  const program = result.program;
+  const test = (result as unknown as { test: Operation }).test;
 
-  const actual = shouldGenerateProtocol(
-    await createSdkContextTestHelper(runner.context.program, {
-      generateProtocolMethods: globalValue,
-      generateConvenienceMethods: false,
-    }),
-    test as Operation,
-  );
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+    "generate-protocol-methods": globalValue,
+    "generate-convenience-methods": false,
+  });
 
-  const method = runner.context.sdkPackage.clients[0].methods[0];
+  const actual = shouldGenerateProtocol(context, test);
+
+  const method = context.sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "test");
   strictEqual(method.kind, "basic");
   strictEqual(actual, protocolValue);
@@ -37,16 +34,16 @@ async function protocolAPITestHelper(
 }
 describe("@protocolAPI", () => {
   it("generateProtocolMethodsTrue, operation marked protocolAPI true", async () => {
-    await protocolAPITestHelper(runner, true, true);
+    await protocolAPITestHelper(true, true);
   });
   it("generateProtocolMethodsTrue, operation marked protocolAPI false", async () => {
-    await protocolAPITestHelper(runner, false, true);
+    await protocolAPITestHelper(false, true);
   });
   it("generateProtocolMethodsFalse, operation marked protocolAPI true", async () => {
-    await protocolAPITestHelper(runner, true, false);
+    await protocolAPITestHelper(true, false);
   });
   it("generateProtocolMethodsFalse, operation marked protocolAPI false", async () => {
-    await protocolAPITestHelper(runner, false, false);
+    await protocolAPITestHelper(false, false);
   });
 });
 
@@ -67,14 +64,18 @@ describe("@protocolAPI on interface", () => {
         }
       }
     `;
-    const { test1, test2 } = (await runner.compile(testCode)) as {
-      test1: Operation;
-      test2: Operation;
-    };
+    const result = await SimpleTester.compile(testCode);
+    const program = result.program;
+    const test1 = (result as unknown as { test1: Operation }).test1;
+    const test2 = (result as unknown as { test2: Operation }).test2;
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
 
     // Test the core functionality - shouldGenerateProtocol should return false
-    strictEqual(shouldGenerateProtocol(runner.context, test1), false);
-    strictEqual(shouldGenerateProtocol(runner.context, test2), false);
+    strictEqual(shouldGenerateProtocol(context, test1), false);
+    strictEqual(shouldGenerateProtocol(context, test2), false);
   });
 });
 
@@ -92,15 +93,19 @@ describe("@protocolAPI on namespace", () => {
         op test2(): void;
       }
     `;
-    const { test1, test2 } = (await runner.compile(testCode)) as {
-      test1: Operation;
-      test2: Operation;
-    };
+    const result = await SimpleTester.compile(testCode);
+    const program = result.program;
+    const test1 = (result as unknown as { test1: Operation }).test1;
+    const test2 = (result as unknown as { test2: Operation }).test2;
 
-    strictEqual(shouldGenerateProtocol(runner.context, test1), false);
-    strictEqual(shouldGenerateProtocol(runner.context, test2), false);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
 
-    const methods = runner.context.sdkPackage.clients[0].methods;
+    strictEqual(shouldGenerateProtocol(context, test1), false);
+    strictEqual(shouldGenerateProtocol(context, test2), false);
+
+    const methods = context.sdkPackage.clients[0].methods;
     strictEqual(methods.length, 2);
     strictEqual(methods[0].generateProtocol, false);
     strictEqual(methods[1].generateProtocol, false);

@@ -1,59 +1,85 @@
-import { Diagnostic, ModelProperty } from "@typespec/compiler";
+import { ModelProperty } from "@typespec/compiler";
 import { strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { getParamAlias } from "../../src/decorators.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import { createSdkContextForTester, TcgcTester } from "../tester.js";
 
 it("basic", async () => {
-  const { blobName } = (await runner.compileWithCustomization(
-    `
-    @service
-    namespace MyService;
+  const result = await TcgcTester.compile({
+    "service.tsp": `
+      import "@typespec/http";
+      import "@typespec/rest";
+      import "@azure-tools/typespec-client-generator-core";
+      using TypeSpec.Http;
+      using TypeSpec.Rest;
+      using Azure.ClientGenerator.Core;
 
-    op download(@path blob: string): void;
-    op upload(@path blobName: string): void;
+      @service
+      namespace MyService;
+
+      op download(@path blob: string): void;
+      op upload(@path blobName: string): void;
     `,
-    `
-    namespace MyCustomizations;
+    "main.tsp": `
+      import "@azure-tools/typespec-client-generator-core";
+      import "./service.tsp";
+      using Azure.ClientGenerator.Core;
 
-    model MyClientInitialization {
-      @paramAlias("blob")
-      @test
-      blobName: string;
-    }
+      namespace MyCustomizations;
 
-    @@clientInitialization(MyService, {parameters: MyCustomizations.MyClientInitialization});
+      model MyClientInitialization {
+        @paramAlias("blob")
+        @test
+        blobName: string;
+      }
+
+      @@clientInitialization(MyService, {parameters: MyCustomizations.MyClientInitialization});
     `,
-  )) as { blobName: ModelProperty };
-  strictEqual(getParamAlias(runner.context, blobName), "blob");
+  });
+  const { program } = result;
+  const blobName = (result as unknown as { blobName: ModelProperty }).blobName;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  strictEqual(getParamAlias(context, blobName), "blob");
 });
 
 it("multiple lint warning", async () => {
-  const [{ blobClientName }, diagnostics] = (await runner.compileAndDiagnoseWithCustomization(
-    `
-    namespace My.Service;
+  const [result, diagnostics] = await TcgcTester.compileAndDiagnose({
+    "service.tsp": `
+      import "@typespec/http";
+      import "@typespec/rest";
+      import "@azure-tools/typespec-client-generator-core";
+      using TypeSpec.Http;
+      using TypeSpec.Rest;
+      using Azure.ClientGenerator.Core;
 
-    op originalName(blobClientName: string): void;
-    op firstParamAlias(blobName: string): void;
-    op secondParamAlias(bName: string): void;
-    `,
-    `
-    namespace My.Customizations;
+      namespace My.Service;
 
-    model ClientInitOptions {
-      @paramAlias("blobName")
-      @paramAlias("bName")
-      @test blobClientName: string;
-    }
-    @@clientInitialization(My.Service, ClientInitOptions);
+      op originalName(blobClientName: string): void;
+      op firstParamAlias(blobName: string): void;
+      op secondParamAlias(bName: string): void;
     `,
-  )) as [{ blobClientName: ModelProperty }, diagnostics: Diagnostic[]];
+    "main.tsp": `
+      import "@azure-tools/typespec-client-generator-core";
+      import "./service.tsp";
+      using Azure.ClientGenerator.Core;
+
+      namespace My.Customizations;
+
+      model ClientInitOptions {
+        @paramAlias("blobName")
+        @paramAlias("bName")
+        @test blobClientName: string;
+      }
+      @@clientInitialization(My.Service, ClientInitOptions);
+    `,
+  });
+  const { program } = result;
+  const blobClientName = (result as unknown as { blobClientName: ModelProperty }).blobClientName;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   strictEqual(diagnostics.length, 1);
   strictEqual(
     diagnostics[0].code,
@@ -63,5 +89,5 @@ it("multiple lint warning", async () => {
     diagnostics[0].message,
     "Multiple param aliases applied to 'blobClientName'. Only the first one 'bName' will be used.",
   );
-  strictEqual(getParamAlias(runner.context, blobClientName), "bName");
+  strictEqual(getParamAlias(context, blobClientName), "bName");
 });

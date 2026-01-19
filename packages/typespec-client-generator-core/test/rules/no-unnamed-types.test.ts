@@ -1,23 +1,17 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import {
-  BasicTestRunner,
   createLinterRuleTester,
   LinterRuleTester,
+  TesterInstance,
 } from "@typespec/compiler/testing";
-import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { beforeEach, describe, it } from "vitest";
 import { noUnnamedTypesRule } from "../../src/rules/no-unnamed-types.rule.js";
-import { createSdkTestRunner } from "../test-host.js";
+import { ArmTester, AzureCoreTester } from "../tester.js";
 
-let runner: BasicTestRunner;
+let runner: TesterInstance;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary, OpenAPITestLibrary],
-    autoImports: ["@azure-tools/typespec-azure-core"],
-  });
+  runner = await AzureCoreTester.createInstance();
   tester = createLinterRuleTester(
     runner,
     noUnnamedTypesRule,
@@ -241,11 +235,7 @@ describe("models", () => {
   });
 
   it("anonymous model caused by lro metadata", async () => {
-    const armRunner = await createSdkTestRunner({
-      librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
-      autoImports: ["@azure-tools/typespec-azure-resource-manager"],
-      autoUsings: ["Azure.ResourceManager", "Azure.Core", "Azure.Core.Traits"],
-    });
+    const armRunner = await ArmTester.createInstance();
     const armTester = createLinterRuleTester(
       armRunner,
       noUnnamedTypesRule,

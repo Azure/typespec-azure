@@ -1,30 +1,20 @@
 import { ok, strictEqual } from "assert";
-import { afterEach, beforeEach, describe, it } from "vitest";
+import { describe, it } from "vitest";
 import { SdkBasicServiceMethod, SdkBuiltInType, SdkHttpOperation } from "../../src/interfaces.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-});
-afterEach(async () => {
-  for (const modelsOrEnums of [runner.context.sdkPackage.models, runner.context.sdkPackage.enums]) {
-    for (const item of modelsOrEnums) {
-      ok(item.name !== "");
-    }
-  }
-});
+import { createSdkContextForTester, SimpleTester } from "../tester.js";
 
 describe("bytes SdkMethodParameter", () => {
   it("should use service operation parameter encoding", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace TestClient {
         op send(@body body: bytes, @header contentType: "application/octet-stream"): void;
       }
     `);
-    const client = runner.context.sdkPackage.clients[0];
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+    const client = context.sdkPackage.clients[0];
     ok(client);
     const method = client.methods[0];
     ok(method);

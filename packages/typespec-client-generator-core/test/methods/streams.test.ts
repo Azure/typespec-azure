@@ -1,25 +1,53 @@
-import { EventsTestLibrary } from "@typespec/events/testing";
-import { SSETestLibrary } from "@typespec/sse/testing";
-import { StreamsTestLibrary } from "@typespec/streams/testing";
+import { resolvePath } from "@typespec/compiler";
+import { createTester } from "@typespec/compiler/testing";
 import { deepStrictEqual, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import { describe, it } from "vitest";
+import { createSdkContextForTester } from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
-let runner: SdkTestRunner;
+const StreamsTester = createTester(resolvePath(import.meta.dirname, "../.."), {
+  libraries: [
+    "@typespec/http",
+    "@typespec/rest",
+    "@typespec/versioning",
+    "@typespec/streams",
+    "@typespec/sse",
+    "@typespec/events",
+    "@azure-tools/typespec-client-generator-core",
+  ],
+})
+  .import(
+    "@typespec/http",
+    "@typespec/rest",
+    "@typespec/versioning",
+    "@typespec/http/streams",
+    "@typespec/streams",
+    "@typespec/sse",
+    "@azure-tools/typespec-client-generator-core",
+  )
+  .using(
+    "Http",
+    "Rest",
+    "Versioning",
+    "TypeSpec.Http.Streams",
+    "TypeSpec.Streams",
+    "TypeSpec.SSE",
+    "TypeSpec.Events",
+    "Azure.ClientGenerator.Core",
+  );
 
-beforeEach(async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [StreamsTestLibrary, SSETestLibrary, EventsTestLibrary],
-    autoImports: [`@typespec/http/streams`, "@typespec/streams", "@typespec/sse"],
-    autoUsings: ["TypeSpec.Http.Streams", "TypeSpec.Streams", "TypeSpec.SSE", "TypeSpec.Events"],
-    emitterName: "@azure-tools/typespec-python",
-  });
-});
+const StreamsTesterWithBuiltInService = StreamsTester.wrap(
+  (x) => `
+@service
+namespace TestService;
+
+${x}
+`,
+);
 
 describe("stream request", () => {
   it("http stream request", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         @route("/")
         op get(stream: HttpStream<Thing, "application/jsonl", string>): void;
@@ -27,7 +55,10 @@ describe("stream request", () => {
         model Thing { id: string }
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.parameters[0].type.kind, "model");
@@ -37,7 +68,7 @@ describe("stream request", () => {
   });
 
   it("json stream request", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         @route("/")
         op get(stream: JsonlStream<Thing>): void;
@@ -45,7 +76,10 @@ describe("stream request", () => {
         model Thing { id: string }
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.parameters[0].type.kind, "model");
@@ -55,7 +89,7 @@ describe("stream request", () => {
   });
 
   it("custom stream request", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         @streamOf(Thing)
         model CustomStream {
@@ -69,7 +103,10 @@ describe("stream request", () => {
         model Thing { id: string }
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.parameters[0].type.kind, "model");
@@ -79,7 +116,7 @@ describe("stream request", () => {
   });
 
   it("spread stream request", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         @route("/")
         op get(...JsonlStream<Thing>): void;
@@ -87,7 +124,10 @@ describe("stream request", () => {
         model Thing { id: string }
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.parameters[1].type.kind, "bytes");
@@ -96,7 +136,7 @@ describe("stream request", () => {
   });
 
   it("sse request", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         model UserConnect {
           username: string;
@@ -128,7 +168,10 @@ describe("stream request", () => {
         op subscribeToChannel(stream: SSEStream<ChannelEvents>): void;
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.parameters[0].type.kind, "model");
@@ -140,7 +183,7 @@ describe("stream request", () => {
 
 describe("stream response", () => {
   it("http stream response", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         @route("/")
         op get(): HttpStream<Thing, "application/jsonl", string>;
@@ -148,7 +191,10 @@ describe("stream response", () => {
         model Thing { id: string }
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.response.type?.kind, "bytes");
@@ -159,7 +205,7 @@ describe("stream response", () => {
   });
 
   it("json stream response", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         @route("/")
         op get(): JsonlStream<Thing>;
@@ -167,7 +213,10 @@ describe("stream response", () => {
         model Thing { id: string }
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.response.type?.kind, "bytes");
@@ -178,7 +227,7 @@ describe("stream response", () => {
   });
 
   it("custom stream response", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         @streamOf(Thing)
         model CustomStream {
@@ -192,7 +241,10 @@ describe("stream response", () => {
         model Thing { id: string }
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.response.type?.kind, "bytes");
@@ -203,7 +255,7 @@ describe("stream response", () => {
   });
 
   it("intersection stream response", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         @route("/")
         op get(): JsonlStream<Thing> & { @statusCode statusCode: 204; };
@@ -211,7 +263,10 @@ describe("stream response", () => {
         model Thing { id: string }
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.response.type?.kind, "bytes");
@@ -222,7 +277,7 @@ describe("stream response", () => {
   });
 
   it("sse response", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         model UserConnect {
           username: string;
@@ -254,7 +309,10 @@ describe("stream response", () => {
         op subscribeToChannel(): SSEStream<ChannelEvents>;
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.response.type?.kind, "bytes");

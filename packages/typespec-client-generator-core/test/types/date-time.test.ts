@@ -1,22 +1,10 @@
-import { ok, strictEqual } from "assert";
-import { afterEach, beforeEach, it } from "vitest";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import { strictEqual } from "assert";
+import { it } from "vitest";
+import { createSdkContextForTester, SimpleTesterWithBuiltInService } from "../tester.js";
 import { getSdkTypeHelper } from "./utils.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-});
-afterEach(async () => {
-  for (const modelsOrEnums of [runner.context.sdkPackage.models, runner.context.sdkPackage.enums]) {
-    for (const item of modelsOrEnums) {
-      ok(item.name !== "");
-    }
-  }
-});
 it("default", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -24,14 +12,17 @@ it("default", async function () {
       }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "utcDateTime");
   strictEqual(sdkType.wireType.kind, "string");
   strictEqual(sdkType.encode, "rfc3339");
 });
 
 it("rfc3339", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
         @usage(Usage.input | Usage.output)
         model Test {
@@ -40,14 +31,17 @@ it("rfc3339", async function () {
         }
       `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "utcDateTime");
   strictEqual(sdkType.wireType.kind, "string");
   strictEqual(sdkType.encode, "rfc3339");
 });
 
 it("rfc7231", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -56,7 +50,10 @@ it("rfc7231", async function () {
       }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "utcDateTime");
   strictEqual(sdkType.wireType.kind, "string");
   strictEqual(sdkType.encode, "rfc7231");
@@ -64,7 +61,7 @@ it("rfc7231", async function () {
 
 // TODO -- uncomment or modify when https://github.com/microsoft/typespec/issues/4042 is resolved.
 it.skip("unixTimestamp32", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
     @usage(Usage.input | Usage.output)
     model Test {
@@ -72,7 +69,10 @@ it.skip("unixTimestamp32", async () => {
     }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "utcDateTime");
   strictEqual(sdkType.wireType.kind, "int32");
   strictEqual(sdkType.encode, "unixTimestamp");
@@ -81,7 +81,7 @@ it.skip("unixTimestamp32", async () => {
 });
 
 it("unixTimestamp", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -90,14 +90,17 @@ it("unixTimestamp", async function () {
       }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "utcDateTime");
   strictEqual(sdkType.wireType.kind, "int64");
   strictEqual(sdkType.encode, "unixTimestamp");
 });
 
 it("encode propagation", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @doc("doc")
       @summary("title")
@@ -112,7 +115,10 @@ it("encode propagation", async function () {
       }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "utcDateTime");
   strictEqual(sdkType.name, "extraLayerDateTime");
   strictEqual(sdkType.wireType.kind, "int64");
@@ -131,7 +137,7 @@ it("encode propagation", async function () {
 });
 
 it("nullable unixTimestamp", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -140,7 +146,10 @@ it("nullable unixTimestamp", async function () {
       }
     `,
   );
-  const nullableType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const nullableType = getSdkTypeHelper(context);
   strictEqual(nullableType.kind, "nullable");
 
   const sdkType = nullableType.type;
@@ -150,7 +159,7 @@ it("nullable unixTimestamp", async function () {
 });
 
 it("unixTimestamp array", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @doc("doc")
       @summary("title")
@@ -163,7 +172,10 @@ it("unixTimestamp array", async function () {
       }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "array");
   strictEqual(sdkType.valueType.kind, "utcDateTime");
   strictEqual(sdkType.valueType.name, "unixTimestampDateTime");

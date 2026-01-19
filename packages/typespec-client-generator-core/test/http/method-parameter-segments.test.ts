@@ -1,19 +1,16 @@
 import { ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import { it } from "vitest";
+import { createSdkContextForTester, SimpleTesterWithBuiltInService } from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
-
 it("simple path parameter - direct mapping", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     op myOp(@path path: string): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceOperation = method.operation;
 
@@ -32,10 +29,13 @@ it("simple path parameter - direct mapping", async () => {
 });
 
 it("query parameter - direct mapping", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     op myOp(@query q: string): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceOperation = method.operation;
 
@@ -54,10 +54,13 @@ it("query parameter - direct mapping", async () => {
 });
 
 it("header parameter - direct mapping", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     op myOp(@header h: string): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceOperation = method.operation;
 
@@ -76,10 +79,13 @@ it("header parameter - direct mapping", async () => {
 });
 
 it("body parameter - direct mapping", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     op myOp(@body body: string): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceOperation = method.operation;
 
@@ -97,13 +103,16 @@ it("body parameter - direct mapping", async () => {
 });
 
 it("nested property path - property access", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     model Input {
       @query q: string;
     }
     op myOp(input: Input): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceOperation = method.operation;
 
@@ -124,14 +133,17 @@ it("nested property path - property access", async () => {
 });
 
 it("spread body - multiple paths", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     model Input {
       key1: string;
       key2: string;
     }
     op myOp(...Input): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceOperation = method.operation;
 
@@ -155,7 +167,7 @@ it("spread body - multiple paths", async () => {
 });
 
 it("deeply nested property path", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     model Level2 {
       @query q: string;
     }
@@ -164,7 +176,10 @@ it("deeply nested property path", async () => {
     }
     op myOp(input: Level1): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceOperation = method.operation;
 
