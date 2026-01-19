@@ -276,6 +276,9 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
         getClientTypeWithDiagnostics(context, markAsPageableInfo.itemsProperty.type, operation),
       );
 
+      // Set resultSegments to match the behavior of normal paging operations
+      baseServiceMethod.response.resultSegments = [itemsProperty];
+
       return diagnostics.wrap({
         ...baseServiceMethod,
         kind: "paging",

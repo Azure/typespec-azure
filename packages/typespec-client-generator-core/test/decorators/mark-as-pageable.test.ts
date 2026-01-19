@@ -51,6 +51,12 @@ it("should mark regular operation as pageable when decorated with @markAsPageabl
   ok(method.pagingMetadata.pageItemsSegments);
   strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
   strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "items");
+
+  // Check that response.resultSegments is populated (issue fix)
+  ok(method.response.resultSegments);
+  strictEqual(method.response.resultSegments.length, 1);
+  strictEqual(method.response.resultSegments[0].name, "items");
+  strictEqual(method.response.resultSegments, method.pagingMetadata.pageItemsSegments);
 });
 
 it("should apply @markAsPageable with language scope", async () => {
