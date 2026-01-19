@@ -1,0 +1,18 @@
+{
+  "extends": "../../core/tsconfig.base.json",
+  "composite": true,
+  "references": [
+    { "path": "../../core/packages/compiler/tsconfig.json" },
+    { "path": "../typespec-azure-core/tsconfig.build.json" },
+    { "path": "../typespec-client-generator-core/tsconfig.build.json" },
+    { "path": "../typespec-azure-resource-manager/tsconfig.build.json" }
+  ],
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": ".",
+    "tsBuildInfoFile": "temp/tsconfig.tsbuildinfo",
+    "verbatimModuleSyntax": true
+  },
+  "include": ["src/**/*.ts", "generated-defs/**/*.ts"],
+  "exclude": ["**/*.test.*"]
+}

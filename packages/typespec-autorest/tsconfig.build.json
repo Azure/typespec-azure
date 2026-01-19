@@ -1,0 +1,19 @@
+{
+  "extends": "../../core/tsconfig.base.json",
+  "composite": true,
+  "references": [
+    { "path": "../../core/packages/compiler/tsconfig.json" },
+    { "path": "../../core/packages/http/tsconfig.json" },
+    { "path": "../../core/packages/rest/tsconfig.json" },
+    { "path": "../../core/packages/openapi/tsconfig.json" },
+    { "path": "../typespec-azure-core/tsconfig.build.json" },
+    { "path": "../typespec-azure-resource-manager/tsconfig.build.json" }
+  ],
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": ".",
+    "tsBuildInfoFile": "temp/tsconfig.tsbuildinfo"
+  },
+  "include": ["src/**/*.ts", "generated-defs/**/*.ts"],
+  "exclude": ["**/*.test.*"]
+}
