@@ -894,10 +894,10 @@ export function getSdkModelWithDiagnostics(
       // Collect property names that already exist on the target (via spread or direct definition)
       const existingPropertyNames = new Set<string>(type.properties.keys());
       
-      let current: Model | undefined = type.baseModel;
-      while (current && current !== legacyHierarchyBuildingModel) {
+      let currentBaseModel: Model | undefined = type.baseModel;
+      while (currentBaseModel && currentBaseModel !== legacyHierarchyBuildingModel) {
         // Only add properties that don't already exist on the target
-        for (const property of current.properties.values()) {
+        for (const property of currentBaseModel.properties.values()) {
           if (
             !existingPropertyNames.has(property.name) &&
             !isStatusCode(context.program, property) &&
@@ -910,7 +910,7 @@ export function getSdkModelWithDiagnostics(
             existingPropertyNames.add(property.name);
           }
         }
-        current = current.baseModel;
+        currentBaseModel = currentBaseModel.baseModel;
       }
     }
 

@@ -1535,16 +1535,17 @@ interface PropertyConflict {
  */
 function getAllPropertiesInChain(model: Model): Map<string, ModelProperty> {
   const properties = new Map<string, ModelProperty>();
-  let current: Model | undefined = model;
+  let currentModel: Model | undefined = model;
 
-  while (current) {
-    // Add properties from current model (later properties don't override earlier ones)
-    for (const [name, prop] of current.properties) {
+  while (currentModel) {
+    // Child model properties take precedence over parent properties with the same name.
+    // Since we walk from child to parent, we only add properties that haven't been seen yet.
+    for (const [name, prop] of currentModel.properties) {
       if (!properties.has(name)) {
         properties.set(name, prop);
       }
     }
-    current = current.baseModel;
+    currentModel = currentModel.baseModel;
   }
 
   return properties;
