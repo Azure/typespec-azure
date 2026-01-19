@@ -7,6 +7,7 @@ import {
   ScenarioMockApi,
   withServiceKeys,
 } from "@typespec/spec-api";
+import { pngFile } from "../../../helper.js";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
@@ -80,6 +81,7 @@ const validProductListResultPage2 = {
 };
 let createOrReplacePollCount = 0;
 let postPollCount = 0;
+let postBinaryPollCount = 0;
 let deletePollCount = 0;
 
 // operation list
@@ -375,6 +377,119 @@ Scenarios.Azure_ResourceManager_OperationTemplates_Lro_export = passOnSuccess([
       };
 
       postPollCount += 1;
+      return response;
+    },
+    kind: "MockApiDefinition",
+  },
+]);
+
+Scenarios.Azure_ResourceManager_OperationTemplates_Lro_exportBinary = passOnSuccess([
+  {
+    // LRO POST binary initial request
+    uri: "/subscriptions/:subscriptionId/resourceGroups/:resourceGroup/providers/Azure.ResourceManager.OperationTemplates/orders/:orderName/exportBinary",
+    method: "post",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+        resourceGroup: RESOURCE_GROUP_EXPECTED,
+        orderName: "order1",
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+      body: json({
+        sourceId: "source1",
+      }),
+    },
+    response: {
+      status: 202,
+      headers: {
+        location: dyn`${dynItem("baseUrl")}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_binary_location`,
+        "azure-asyncoperation": dyn`${dynItem("baseUrl")}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_binary_aao`,
+      },
+    },
+    handler: (req: MockRequest) => {
+      postBinaryPollCount = 0;
+      return {
+        status: 202,
+        headers: {
+          location: `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_binary_location`,
+          "azure-asyncoperation": `${req.baseUrl}/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_binary_aao`,
+        },
+      };
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    // LRO POST binary poll intermediate/get final result - Location Header
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_binary_location",
+    method: "get",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+    },
+    handler: (req: MockRequest) => {
+      const response =
+        // first status will be 202, second and forward be 200 with binary content
+        postBinaryPollCount > 0
+          ? {
+              status: 200,
+              body: {
+                contentType: "application/octet-stream",
+                rawContent: pngFile,
+              },
+            }
+          : { status: 202 };
+
+      postBinaryPollCount += 1;
+      return response;
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    // LRO POST binary poll intermediate/get final result - Azure-AsyncOperation Header
+    uri: "/subscriptions/:subscriptionId/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_binary_aao",
+    method: "get",
+    request: {
+      pathParams: {
+        subscriptionId: SUBSCRIPTION_ID_EXPECTED,
+      },
+      query: {
+        "api-version": "2023-12-01-preview",
+      },
+    },
+    response: {
+      status: 200,
+    },
+    handler: (req: MockRequest) => {
+      const aaoResponse = {
+        id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_binary_aao`,
+        name: "lro_post_binary_aao",
+        startTime: "2024-11-08T01:41:53.5508583+00:00",
+      };
+      // first provisioningState will be "InProgress", second and forward be "Succeeded"
+      const responseBody =
+        postBinaryPollCount > 0
+          ? {
+              ...aaoResponse,
+              status: "Succeeded",
+              endTime: "2024-11-08T01:42:41.5354192+00:00",
+            }
+          : { ...aaoResponse, status: "InProgress" };
+
+      const response = {
+        status: 200, // aao always returns 200 with response body
+        body: json(responseBody),
+      };
+
+      postBinaryPollCount += 1;
       return response;
     },
     kind: "MockApiDefinition",

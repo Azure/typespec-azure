@@ -4,6 +4,7 @@ import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 import "@typespec/spector";
 
+using Http;
 using Rest;
 using Spector;
 
@@ -34,6 +35,19 @@ model ExportRequest {
 model ExportResult {
   @doc("Content of the exported order.")
   content: string;
+}
+
+model ExportBinaryRequest {
+  @doc("Source identifier for binary export.")
+  sourceId: string;
+}
+
+model ExportBinaryResult {
+  @header contentType: "application/octet-stream";
+
+  @doc("Binary content of the exported data.")
+  @body
+  data: bytes;
 }
 
 @armResourceOperations
@@ -215,6 +229,79 @@ interface Lro {
     ExportRequest,
     ExportResult,
     LroHeaders = ArmCombinedLroHeaders<FinalResult = ExportResult> &
+      Azure.Core.Foundations.RetryAfterHeader
+  >;
+
+  @scenario
+  @scenarioDoc("""
+    Resource POST operation that returns binary data.
+    Service returns both Location and Azure-AsyncOperation header on initial request.
+    final-state-via: location
+    
+    Expected verb: POST
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Azure.ResourceManager.OperationTemplates/orders/order1/exportBinary
+    Expected query parameter: api-version=2023-12-01-preview
+    Expected request body:
+    ```json
+    {
+      "sourceId": "source1"
+    }
+    ```
+    Expected response status code: 202
+    Expected response headers: 
+      - Azure-AsyncOperation={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_binary_aao
+      - Location={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_binary_location
+    Expected no response body
+    
+    Whether you do polling through AAO, Location or combined, first one will respond with provisioning state "InProgress", second one with "Succeeded".
+    
+    AAO first poll.
+    Expected verb: GET
+    Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_binary_aao
+    Expected status code: 200
+    Expected response body:
+    ```json
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_binary_aao",
+      "name": "lro_post_binary_aao",
+      "status" : "InProgress",
+      "startTime": "2024-11-08T01:41:53.5508583+00:00"
+    }
+    ```
+    
+    AAO second poll.
+    Expected verb: GET
+    Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_binary_aao
+    Expected status code: 200
+    Expected response body:
+    ```json
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_binary_aao",
+      "name": "lro_post_binary_aao",
+      "status" : "Succeeded",
+      "startTime": "2024-11-08T01:41:53.5508583+00:00",
+      "endTime": "2024-11-08T01:42:41.5354192+00:00"
+    }
+    ```
+    
+    Location first poll.
+    Expected verb: GET
+    Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_binary_location
+    Expected status code: 202
+    Expected no response body
+    
+    Location second poll.
+    Expected verb: GET
+    Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_post_binary_location
+    Expected status code: 200
+    Expected response header: Content-Type=application/octet-stream
+    Expected response body: binary content (image.png file)
+    """)
+  exportBinary is ArmResourceActionAsync<
+    Order,
+    ExportBinaryRequest,
+    ExportBinaryResult,
+    LroHeaders = ArmCombinedLroHeaders<FinalResult = ExportBinaryResult> &
       Azure.Core.Foundations.RetryAfterHeader
   >;
 
