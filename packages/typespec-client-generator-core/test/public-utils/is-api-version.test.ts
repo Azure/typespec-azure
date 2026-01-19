@@ -1,48 +1,45 @@
 import { ignoreDiagnostics, Operation } from "@typespec/compiler";
 import { getHttpOperation, getServers } from "@typespec/http";
 import { ok } from "assert";
-import { beforeEach, it } from "vitest";
-import { isApiVersion } from "../../src/public-utils.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-import { getServiceNamespace } from "../utils.js";
+import { it } from "vitest";
+import { isApiVersion, listAllServiceNamespaces } from "../../src/public-utils.js";
+import { createSdkContextForTester, SimpleTester, VersionedServiceTester } from "../tester.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
 it("is api version query", async () => {
-  const { func } = (await runner.compileWithVersionedService(`
+  const { program, func } = (await VersionedServiceTester.compile(`
     @test op func(@query("api-version") myApiVersion: string): void;
-  `)) as { func: Operation };
+  `)) as { program: any; func: Operation };
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
 
-  const queryParam = ignoreDiagnostics(getHttpOperation(runner.context.program, func)).parameters
+  const queryParam = ignoreDiagnostics(getHttpOperation(context.program, func)).parameters
     .parameters[0];
-  ok(isApiVersion(runner.context, queryParam.param));
+  ok(isApiVersion(context, queryParam.param));
 });
 
 it("is api version path", async () => {
-  const { func } = (await runner.compileWithVersionedService(`
+  const { program, func } = (await VersionedServiceTester.compile(`
     @test op func(@path apiVersion: string): void;
-  `)) as { func: Operation };
+  `)) as { program: any; func: Operation };
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
 
-  const pathParam = ignoreDiagnostics(getHttpOperation(runner.context.program, func)).parameters
+  const pathParam = ignoreDiagnostics(getHttpOperation(context.program, func)).parameters
     .parameters[0];
-  ok(isApiVersion(runner.context, pathParam.param));
+  ok(isApiVersion(context, pathParam.param));
 });
 
 it("not api version param", async () => {
-  const { func } = (await runner.compile(`
+  const { program, func } = (await SimpleTester.compile(`
     @test op func(@path foo: string): void;
-  `)) as { func: Operation };
+  `)) as { program: any; func: Operation };
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
 
-  const pathParam = ignoreDiagnostics(getHttpOperation(runner.context.program, func)).parameters
+  const pathParam = ignoreDiagnostics(getHttpOperation(context.program, func)).parameters
     .parameters[0];
-  ok(!isApiVersion(runner.context, pathParam.param));
+  ok(!isApiVersion(context, pathParam.param));
 });
 
 it("api version in host param", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service(#{
       title: "ApiVersion",
     })
@@ -63,15 +60,16 @@ it("api version in host param", async () => {
       v1_0: "v1.0",
     }
   `);
-  const serviceNamespace = getServiceNamespace(runner);
-  const server = getServers(runner.context.program, serviceNamespace)?.[0];
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const serviceNamespace = listAllServiceNamespaces(context)[0];
+  const server = getServers(context.program, serviceNamespace)?.[0];
   const hostParam = server?.parameters.get("ApiVersion");
 
-  ok(hostParam && isApiVersion(runner.context, hostParam));
+  ok(hostParam && isApiVersion(context, hostParam));
 });
 
 it("api version in host param with versioning", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     @versioned(Versions)
     @server(
@@ -89,9 +87,10 @@ it("api version in host param with versioning", async () => {
       v2: "v2",
     }
   `);
-  const serviceNamespace = getServiceNamespace(runner);
-  const server = getServers(runner.context.program, serviceNamespace)?.[0];
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const serviceNamespace = listAllServiceNamespaces(context)[0];
+  const server = getServers(context.program, serviceNamespace)?.[0];
   const hostParam = server?.parameters.get("version");
 
-  ok(hostParam && isApiVersion(runner.context, hostParam));
+  ok(hostParam && isApiVersion(context, hostParam));
 });

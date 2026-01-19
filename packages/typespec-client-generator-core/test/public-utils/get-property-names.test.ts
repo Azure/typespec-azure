@@ -2,12 +2,11 @@ import { Model } from "@typespec/compiler";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { getCrossLanguageDefinitionId, getPropertyNames } from "../../src/public-utils.js";
-import { createSdkTestRunner } from "../test-host.js";
+import { createSdkContextForTester, SimpleTester } from "../tester.js";
 
 it("property language projected name", async () => {
   async function helper(emitterName: string, expectedLibraryName: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { MyModel } = (await runner.compile(`
+    const { program, MyModel } = (await SimpleTester.compile(`
       @test
       model MyModel {
         @clientName("MadeForCS", "csharp")
@@ -16,14 +15,15 @@ it("property language projected name", async () => {
         @clientName("made_for_python", "python")
         wasMadeFor?: string;
       }
-    `)) as { MyModel: Model };
+    `)) as { program: any; MyModel: Model };
+    const context = await createSdkContextForTester(program, { emitterName });
     const wasMadeFor = MyModel.properties.get("wasMadeFor");
     ok(wasMadeFor);
-    deepStrictEqual(getPropertyNames(runner.context, wasMadeFor), [
+    deepStrictEqual(getPropertyNames(context, wasMadeFor), [
       expectedLibraryName,
       "wasMadeFor",
     ]);
-    strictEqual(getCrossLanguageDefinitionId(runner.context, wasMadeFor), "MyModel.wasMadeFor");
+    strictEqual(getCrossLanguageDefinitionId(context, wasMadeFor), "MyModel.wasMadeFor");
   }
   await helper("@azure-tools/typespec-csharp", "MadeForCS");
   await helper("@azure-tools/typespec-java", "MadeForJava");
@@ -32,8 +32,7 @@ it("property language projected name", async () => {
 });
 it("property language projected name augmented", async () => {
   async function helper(emitterName: string, expectedLibraryName: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { MyModel } = (await runner.compile(`
+    const { program, MyModel } = (await SimpleTester.compile(`
       @test
       model MyModel {
         @clientName("MadeForCS", "csharp")
@@ -42,10 +41,11 @@ it("property language projected name augmented", async () => {
         @clientName("made_for_python", "python")
         wasMadeFor?: string;
       }
-    `)) as { MyModel: Model };
+    `)) as { program: any; MyModel: Model };
+    const context = await createSdkContextForTester(program, { emitterName });
     const wasMadeFor = MyModel.properties.get("wasMadeFor");
     ok(wasMadeFor);
-    deepStrictEqual(getPropertyNames(runner.context, wasMadeFor), [
+    deepStrictEqual(getPropertyNames(context, wasMadeFor), [
       expectedLibraryName,
       "wasMadeFor",
     ]);
@@ -57,17 +57,17 @@ it("property language projected name augmented", async () => {
 });
 it("property client projected name", async () => {
   async function helper(emitterName: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { MyModel } = (await runner.compile(`
+    const { program, MyModel } = (await SimpleTester.compile(`
       @test
       model MyModel {
         @clientName("NameForAllLanguage")
         wasMadeFor?: string;
       }
-    `)) as { MyModel: Model };
+    `)) as { program: any; MyModel: Model };
+    const context = await createSdkContextForTester(program, { emitterName });
     const wasMadeFor = MyModel.properties.get("wasMadeFor");
     ok(wasMadeFor);
-    deepStrictEqual(getPropertyNames(runner.context, wasMadeFor), [
+    deepStrictEqual(getPropertyNames(context, wasMadeFor), [
       "NameForAllLanguage",
       "wasMadeFor",
     ]);
@@ -79,17 +79,17 @@ it("property client projected name", async () => {
 });
 it("property no projected name", async () => {
   async function helper(emitterName: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { MyModel } = (await runner.compile(`
+    const { program, MyModel } = (await SimpleTester.compile(`
       @test
       model MyModel {
         @encodedName("application/json", "madeFor")
         wasMadeFor?: string;
       }
-    `)) as { MyModel: Model };
+    `)) as { program: any; MyModel: Model };
+    const context = await createSdkContextForTester(program, { emitterName });
     const wasMadeFor = MyModel.properties.get("wasMadeFor");
     ok(wasMadeFor);
-    deepStrictEqual(getPropertyNames(runner.context, wasMadeFor), ["wasMadeFor", "madeFor"]);
+    deepStrictEqual(getPropertyNames(context, wasMadeFor), ["wasMadeFor", "madeFor"]);
   }
   await helper("@azure-tools/typespec-csharp");
   await helper("@azure-tools/typespec-java");
@@ -98,8 +98,7 @@ it("property no projected name", async () => {
 });
 it("property with projected client and json name", async () => {
   async function helper(emitterName: string, expectedLibraryName: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { MyModel } = (await runner.compile(`
+    const { program, MyModel } = (await SimpleTester.compile(`
       @test
       model MyModel {
         @clientName("MadeForCS", "csharp")
@@ -109,10 +108,11 @@ it("property with projected client and json name", async () => {
         @encodedName("application/json", "madeFor")
         wasMadeFor?: string;
       }
-    `)) as { MyModel: Model };
+    `)) as { program: any; MyModel: Model };
+    const context = await createSdkContextForTester(program, { emitterName });
     const wasMadeFor = MyModel.properties.get("wasMadeFor");
     ok(wasMadeFor);
-    deepStrictEqual(getPropertyNames(runner.context, wasMadeFor), [expectedLibraryName, "madeFor"]);
+    deepStrictEqual(getPropertyNames(context, wasMadeFor), [expectedLibraryName, "madeFor"]);
   }
 
   await helper("@azure-tools/typespec-csharp", "MadeForCS");
@@ -122,18 +122,18 @@ it("property with projected client and json name", async () => {
 });
 it("property with projected language and json name", async () => {
   async function helper(emitterName: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { MyModel } = (await runner.compile(`
+    const { program, MyModel } = (await SimpleTester.compile(`
       @test
       model MyModel {
         @clientName("propName")
         @encodedName("application/json", "madeFor")
         wasMadeFor?: string;
       }
-    `)) as { MyModel: Model };
+    `)) as { program: any; MyModel: Model };
+    const context = await createSdkContextForTester(program, { emitterName });
     const wasMadeFor = MyModel.properties.get("wasMadeFor");
     ok(wasMadeFor);
-    deepStrictEqual(getPropertyNames(runner.context, wasMadeFor), ["propName", "madeFor"]);
+    deepStrictEqual(getPropertyNames(context, wasMadeFor), ["propName", "madeFor"]);
   }
 
   await helper("@azure-tools/typespec-csharp");

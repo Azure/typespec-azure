@@ -86,7 +86,7 @@ export const AzureCoreTester = createTester(resolvePath(import.meta.dirname, "..
     "@azure-tools/typespec-azure-core",
     "@azure-tools/typespec-client-generator-core",
   )
-  .using("Http", "Rest", "Versioning", "Azure.Core", "Azure.ClientGenerator.Core");
+  .using("Http", "Rest", "Versioning", "Azure.Core", "Azure.Core.Traits", "Azure.ClientGenerator.Core");
 
 /**
  * Tester with a built-in Azure Core service namespace.

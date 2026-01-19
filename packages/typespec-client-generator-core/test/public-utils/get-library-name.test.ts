@@ -1,22 +1,16 @@
 import { Model, ModelProperty, Operation } from "@typespec/compiler";
 import { ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { getLibraryName } from "../../src/public-utils.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithBuiltInService } from "../tester.js";
 
 it("operation client projected name", async () => {
   async function helper(emitterName: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { func } = (await runner.compile(`
+    const { program, func } = (await SimpleTester.compile(`
       @test @clientName("rightName") op func(@query("api-version") myApiVersion: string): void;
-    `)) as { func: Operation };
-    strictEqual(getLibraryName(runner.context, func), "rightName");
+    `)) as { program: any; func: Operation };
+    const context = await createSdkContextForTester(program, { emitterName });
+    strictEqual(getLibraryName(context, func), "rightName");
   }
   await helper("@azure-tools/typespec-csharp");
   await helper("@azure-tools/typespec-java");
@@ -26,16 +20,16 @@ it("operation client projected name", async () => {
 
 it("operation language projected name", async () => {
   async function helper(emitterName: string, expected: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { func } = (await runner.compile(`
+    const { program, func } = (await SimpleTester.compile(`
       @test
       @clientName("madeForCS", "csharp")
       @clientName("madeForJava", "java")
       @clientName("madeForTS", "javascript")
       @clientName("made_for_python", "python")
       op func(@query("api-version") myApiVersion: string): void;
-    `)) as { func: Operation };
-    strictEqual(getLibraryName(runner.context, func), expected);
+    `)) as { program: any; func: Operation };
+    const context = await createSdkContextForTester(program, { emitterName });
+    strictEqual(getLibraryName(context, func), expected);
   }
   await helper("@azure-tools/typespec-csharp", "madeForCS");
   await helper("@azure-tools/typespec-java", "madeForJava");
@@ -45,8 +39,7 @@ it("operation language projected name", async () => {
 
 it("operation language projected name augmented", async () => {
   async function helper(emitterName: string, expected: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { func } = (await runner.compile(`
+    const { program, func } = (await SimpleTester.compile(`
       @test
       op func(@query("api-version") myApiVersion: string): void;
 
@@ -54,8 +47,9 @@ it("operation language projected name augmented", async () => {
       @@clientName(func, "madeForJava", "java");
       @@clientName(func, "madeForTS", "javascript");
       @@clientName(func, "made_for_python", "python");
-    `)) as { func: Operation };
-    strictEqual(getLibraryName(runner.context, func), expected);
+    `)) as { program: any; func: Operation };
+    const context = await createSdkContextForTester(program, { emitterName });
+    strictEqual(getLibraryName(context, func), expected);
   }
   await helper("@azure-tools/typespec-csharp", "madeForCS");
   await helper("@azure-tools/typespec-java", "madeForJava");
@@ -65,13 +59,13 @@ it("operation language projected name augmented", async () => {
 
 it("operation json projected name", async () => {
   async function helper(emitterName: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { func } = (await runner.compile(`
+    const { program, func } = (await SimpleTester.compile(`
       @test
       @encodedName("application/json", "NotToUseMeAsName") // Should be ignored
       op func(@query("api-version") myApiVersion: string): void;
-    `)) as { func: Operation };
-    strictEqual(getLibraryName(runner.context, func), "func");
+    `)) as { program: any; func: Operation };
+    const context = await createSdkContextForTester(program, { emitterName });
+    strictEqual(getLibraryName(context, func), "func");
   }
   await helper("@azure-tools/typespec-csharp");
   await helper("@azure-tools/typespec-java");
@@ -81,12 +75,12 @@ it("operation json projected name", async () => {
 
 it("operation no projected name", async () => {
   async function helper(emitterName: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { func } = (await runner.compile(`
+    const { program, func } = (await SimpleTester.compile(`
       @test
       op func(@query("api-version") myApiVersion: string): void;
-    `)) as { func: Operation };
-    strictEqual(getLibraryName(runner.context, func), "func");
+    `)) as { program: any; func: Operation };
+    const context = await createSdkContextForTester(program, { emitterName });
+    strictEqual(getLibraryName(context, func), "func");
   }
   await helper("@azure-tools/typespec-csharp");
   await helper("@azure-tools/typespec-java");
@@ -96,15 +90,15 @@ it("operation no projected name", async () => {
 
 it("model client projected name", async () => {
   async function helper(emitterName: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { MyModel } = (await runner.compile(`
+    const { program, MyModel } = (await SimpleTester.compile(`
       @test
       @clientName("RightName")
       model MyModel {
         prop: string
       }
-    `)) as { MyModel: Model };
-    strictEqual(getLibraryName(runner.context, MyModel), "RightName");
+    `)) as { program: any; MyModel: Model };
+    const context = await createSdkContextForTester(program, { emitterName });
+    strictEqual(getLibraryName(context, MyModel), "RightName");
   }
   await helper("@azure-tools/typespec-csharp");
   await helper("@azure-tools/typespec-java");
@@ -114,8 +108,7 @@ it("model client projected name", async () => {
 
 it("model language projected name", async () => {
   async function helper(emitterName: string, expected: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { MyModel } = (await runner.compile(`
+    const { program, MyModel } = (await SimpleTester.compile(`
       @test
       @clientName("CsharpModel", "csharp")
       @clientName("JavaModel", "java")
@@ -124,8 +117,9 @@ it("model language projected name", async () => {
       model MyModel {
         prop: string
       }
-    `)) as { MyModel: Model };
-    strictEqual(getLibraryName(runner.context, MyModel), expected);
+    `)) as { program: any; MyModel: Model };
+    const context = await createSdkContextForTester(program, { emitterName });
+    strictEqual(getLibraryName(context, MyModel), expected);
   }
   await helper("@azure-tools/typespec-csharp", "CsharpModel");
   await helper("@azure-tools/typespec-java", "JavaModel");
@@ -135,8 +129,7 @@ it("model language projected name", async () => {
 
 it("model language projected name augmented", async () => {
   async function helper(emitterName: string, expected: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { MyModel } = (await runner.compile(`
+    const { program, MyModel } = (await SimpleTester.compile(`
       @test
       model MyModel {
         prop: string
@@ -146,8 +139,9 @@ it("model language projected name augmented", async () => {
       @@clientName(MyModel, "JavaModel", "java");
       @@clientName(MyModel, "JavascriptModel", "javascript");
       @@clientName(MyModel, "PythonModel", "python");
-    `)) as { MyModel: Model };
-    strictEqual(getLibraryName(runner.context, MyModel), expected);
+    `)) as { program: any; MyModel: Model };
+    const context = await createSdkContextForTester(program, { emitterName });
+    strictEqual(getLibraryName(context, MyModel), expected);
   }
   await helper("@azure-tools/typespec-csharp", "CsharpModel");
   await helper("@azure-tools/typespec-java", "JavaModel");
@@ -157,15 +151,15 @@ it("model language projected name augmented", async () => {
 
 it("model json projected name", async () => {
   async function helper(emitterName: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { MyModel } = (await runner.compile(`
+    const { program, MyModel } = (await SimpleTester.compile(`
       @test
       @encodedName("application/json", "NotToUseMeAsName") // Should be ignored
       model MyModel {
         prop: string
       }
-    `)) as { MyModel: Model };
-    strictEqual(getLibraryName(runner.context, MyModel), "MyModel");
+    `)) as { program: any; MyModel: Model };
+    const context = await createSdkContextForTester(program, { emitterName });
+    strictEqual(getLibraryName(context, MyModel), "MyModel");
   }
   await helper("@azure-tools/typespec-csharp");
   await helper("@azure-tools/typespec-java");
@@ -175,14 +169,14 @@ it("model json projected name", async () => {
 
 it("model no projected name", async () => {
   async function helper(emitterName: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { MyModel } = (await runner.compile(`
+    const { program, MyModel } = (await SimpleTester.compile(`
       @test
       model MyModel {
         prop: string
       }
-    `)) as { MyModel: Model };
-    strictEqual(getLibraryName(runner.context, MyModel), "MyModel");
+    `)) as { program: any; MyModel: Model };
+    const context = await createSdkContextForTester(program, { emitterName });
+    strictEqual(getLibraryName(context, MyModel), "MyModel");
   }
   await helper("@azure-tools/typespec-csharp");
   await helper("@azure-tools/typespec-java");
@@ -192,15 +186,15 @@ it("model no projected name", async () => {
 
 it("model friendly name", async () => {
   async function helper(emitterName: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { MyModel } = (await runner.compile(`
+    const { program, MyModel } = (await SimpleTester.compile(`
       @test
       @friendlyName("FriendlyName")
       model MyModel {
         prop: string
       }
-    `)) as { MyModel: Model };
-    strictEqual(getLibraryName(runner.context, MyModel), "FriendlyName");
+    `)) as { program: any; MyModel: Model };
+    const context = await createSdkContextForTester(program, { emitterName });
+    strictEqual(getLibraryName(context, MyModel), "FriendlyName");
   }
   await helper("@azure-tools/typespec-csharp");
   await helper("@azure-tools/typespec-java");
@@ -210,15 +204,15 @@ it("model friendly name", async () => {
 
 it("model friendly name augmented", async () => {
   async function helper(emitterName: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { MyModel } = (await runner.compile(`
+    const { program, MyModel } = (await SimpleTester.compile(`
       @test
       model MyModel {
         prop: string
       }
       @@friendlyName(MyModel, "FriendlyName");
-    `)) as { MyModel: Model };
-    strictEqual(getLibraryName(runner.context, MyModel), "FriendlyName");
+    `)) as { program: any; MyModel: Model };
+    const context = await createSdkContextForTester(program, { emitterName });
+    strictEqual(getLibraryName(context, MyModel), "FriendlyName");
   }
   await helper("@azure-tools/typespec-csharp");
   await helper("@azure-tools/typespec-java");
@@ -228,8 +222,7 @@ it("model friendly name augmented", async () => {
 
 it("should return language specific name when both language specific name and friendly name exist", async () => {
   async function helper(expected: string, emitterName: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { MyModel } = (await runner.compile(`
+    const { program, MyModel } = (await SimpleTester.compile(`
       @test
       @friendlyName("FriendlyName")
       @clientName("CsharpModel", "csharp")
@@ -239,8 +232,9 @@ it("should return language specific name when both language specific name and fr
       model MyModel {
         prop: string
       }
-    `)) as { MyModel: Model };
-    strictEqual(getLibraryName(runner.context, MyModel), expected);
+    `)) as { program: any; MyModel: Model };
+    const context = await createSdkContextForTester(program, { emitterName });
+    strictEqual(getLibraryName(context, MyModel), expected);
   }
   await helper("CsharpModel", "@azure-tools/typespec-csharp");
   await helper("JavaModel", "@azure-tools/typespec-java");
@@ -250,16 +244,16 @@ it("should return language specific name when both language specific name and fr
 
 it("should return client name when both client name and friendly name exist", async () => {
   async function helper(expected: string, emitterName: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { MyModel } = (await runner.compile(`
+    const { program, MyModel } = (await SimpleTester.compile(`
       @test
       @friendlyName("FriendlyName")
       @clientName("clientName")
       model MyModel {
         prop: string
       }
-    `)) as { MyModel: Model };
-    strictEqual(getLibraryName(runner.context, MyModel), expected);
+    `)) as { program: any; MyModel: Model };
+    const context = await createSdkContextForTester(program, { emitterName });
+    strictEqual(getLibraryName(context, MyModel), expected);
   }
   await helper("clientName", "@azure-tools/typespec-csharp");
   await helper("clientName", "@azure-tools/typespec-java");
@@ -269,16 +263,16 @@ it("should return client name when both client name and friendly name exist", as
 
 it("parameter client projected name", async () => {
   async function helper(emitterName: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { param } = (await runner.compile(`
+    const { program, param } = (await SimpleTester.compile(`
       op func(
         @test
         @clientName("rightName")
         @query("param")
         param: string
       ): void;
-    `)) as { param: ModelProperty };
-    strictEqual(getLibraryName(runner.context, param), "rightName");
+    `)) as { program: any; param: ModelProperty };
+    const context = await createSdkContextForTester(program, { emitterName });
+    strictEqual(getLibraryName(context, param), "rightName");
   }
   await helper("@azure-tools/typespec-csharp");
   await helper("@azure-tools/typespec-java");
@@ -288,8 +282,7 @@ it("parameter client projected name", async () => {
 
 it("parameter language projected name", async () => {
   async function helper(emitterName: string, expected: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { param } = (await runner.compile(`
+    const { program, param } = (await SimpleTester.compile(`
       op func(
         @test
         @clientName("csharpParam", "csharp")
@@ -299,8 +292,9 @@ it("parameter language projected name", async () => {
         @query("param")
         param: string
       ): void;
-    `)) as { param: ModelProperty };
-    strictEqual(getLibraryName(runner.context, param), expected);
+    `)) as { program: any; param: ModelProperty };
+    const context = await createSdkContextForTester(program, { emitterName });
+    strictEqual(getLibraryName(context, param), expected);
   }
   await helper("@azure-tools/typespec-csharp", "csharpParam");
   await helper("@azure-tools/typespec-java", "javaParam");
@@ -310,16 +304,16 @@ it("parameter language projected name", async () => {
 
 it("parameter json projected name", async () => {
   async function helper(emitterName: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { param } = (await runner.compile(`
+    const { program, param } = (await SimpleTester.compile(`
       op func(
         @test
         @encodedName("application/json", "ShouldBeIgnored")
         @query("param")
         param: string
       ): void;
-    `)) as { param: ModelProperty };
-    strictEqual(getLibraryName(runner.context, param), "param");
+    `)) as { program: any; param: ModelProperty };
+    const context = await createSdkContextForTester(program, { emitterName });
+    strictEqual(getLibraryName(context, param), "param");
   }
   await helper("@azure-tools/typespec-csharp");
   await helper("@azure-tools/typespec-java");
@@ -329,15 +323,15 @@ it("parameter json projected name", async () => {
 
 it("parameter no projected name", async () => {
   async function helper(emitterName: string) {
-    const runner = await createSdkTestRunner({ emitterName });
-    const { param } = (await runner.compile(`
+    const { program, param } = (await SimpleTester.compile(`
       op func(
         @test
         @query("param")
         param: string
       ): void;
-    `)) as { param: ModelProperty };
-    strictEqual(getLibraryName(runner.context, param), "param");
+    `)) as { program: any; param: ModelProperty };
+    const context = await createSdkContextForTester(program, { emitterName });
+    strictEqual(getLibraryName(context, param), "param");
   }
   await helper("@azure-tools/typespec-csharp");
   await helper("@azure-tools/typespec-java");
@@ -346,7 +340,7 @@ it("parameter no projected name", async () => {
 });
 
 it("template without @friendlyName renaming", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     op GetResourceOperationStatus<
       Resource extends TypeSpec.Reflection.Model
     >(): ResourceOperationStatus<Resource>;
@@ -362,14 +356,15 @@ it("template without @friendlyName renaming", async () => {
 
     op getStatus is GetResourceOperationStatus<User>;
     `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const model = models.filter((x) => x.name === "ResourceOperationStatusUser")[0];
   ok(model);
 });
 
 it("template without @friendlyName renaming for union as enum", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     union DependencyOfOrigins {
       serviceExplicitlyCreated: "ServiceExplicitlyCreated",
       userExplicitlyCreated: "UserExplicitlyCreated",
@@ -389,7 +384,8 @@ it("template without @friendlyName renaming for union as enum", async () => {
 
     op test(): DependencyOfRelationshipProperties;
     `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const model = models.filter(
     (x) => x.name === "RelationshipOriginInformationDependencyOfOrigins",
@@ -398,7 +394,7 @@ it("template without @friendlyName renaming for union as enum", async () => {
 });
 
 it("template without @friendlyName renaming with naming conflict", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     model Test<T> {
       prop: T;
     }
@@ -411,7 +407,8 @@ it("template without @friendlyName renaming with naming conflict", async () => {
 
     op test(): Instance;
     `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 4);
   const model = models.filter((x) => x.name === "Instance")[0];
   ok(model);
