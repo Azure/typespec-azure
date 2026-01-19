@@ -297,6 +297,7 @@ it("model with @body decorator", async () => {
     }
     op createShelf(...CreateShelfRequest): Shelf;
   `);
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
   const method = getServiceMethodOfClient(context.sdkPackage);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -353,6 +354,7 @@ it("formdata model with multipartBody decorator in spread model", async () => {
     alias Intersected = DocumentTranslateContent & {};
     op test(...Intersected): void;
   `);
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
   const method = getServiceMethodOfClient(context.sdkPackage);
   const documentMethodParam = method.parameters.find((x) => x.name === "testRequest");
   ok(documentMethodParam);
@@ -376,6 +378,7 @@ it("anonymous model with @body should not be spread", async () => {
   const { program } = await SimpleTesterWithBuiltInService.compile(`
     op test(@body body: {prop: string}): void;
   `);
+  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
   const method = getServiceMethodOfClient(context.sdkPackage);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);

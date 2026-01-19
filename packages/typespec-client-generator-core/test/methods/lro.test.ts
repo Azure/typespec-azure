@@ -280,7 +280,7 @@ describe("data plane LRO templates", () => {
           body: T;
         };
     `);
-
+      const context = await createSdkContextForTester(program);
       const inputModel = context.sdkPackage.models.find(
         (m) => m.name === "GenerationOptions",
       );
@@ -987,7 +987,7 @@ describe("Arm LRO templates", () => {
   });
 
   it("ArmResourceDeleteWithoutOkAsync", async () => {
-    const { program } = await LroVersionedServiceTester.compile(`
+    const { program } = await ArmVersionedServiceTester.compile(`
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
       }
@@ -1046,7 +1046,7 @@ describe("Arm LRO templates", () => {
   });
 
   it("ArmResourceActionAsync", async () => {
-    const { program } = await LroVersionedServiceTester.compile(`
+    const { program } = await ArmVersionedServiceTester.compile(`
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
       }
