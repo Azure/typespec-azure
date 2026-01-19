@@ -168,7 +168,12 @@ export function addEncodeInfo(
     type = alternateType;
   }
   const innerType = propertyType.kind === "nullable" ? propertyType.type : propertyType;
-  const encodeData = getEncode(context.program, type);
+  let encodeData = getEncode(context.program, type);
+  // If encode is not found on the property, check the source property
+  // This happens when properties are derived (e.g., with implicitOptionality)
+  if (!encodeData && type.kind === "ModelProperty" && type.sourceProperty) {
+    encodeData = getEncode(context.program, type.sourceProperty);
+  }
   if (innerType.kind === "duration") {
     if (!encodeData) return diagnostics.wrap(undefined);
     innerType.encode = encodeData.encoding as DurationKnownEncoding;
@@ -1275,7 +1280,12 @@ export function getSdkModelPropertyTypeBase(
   let encode: ArrayKnownEncoding | undefined = undefined;
   // We only support array encoding at property level for now
   if ($(context.program).array.is(type.type)) {
-    const encodeData = getEncode(context.program, type);
+    let encodeData = getEncode(context.program, type);
+    // If encode is not found on the property, check the source property
+    // This happens when properties are derived (e.g., with implicitOptionality)
+    if (!encodeData && type.sourceProperty) {
+      encodeData = getEncode(context.program, type.sourceProperty);
+    }
     if (encodeData?.encoding === "ArrayEncoding.pipeDelimited") {
       encode = "pipeDelimited";
     } else if (encodeData?.encoding === "ArrayEncoding.spaceDelimited") {
