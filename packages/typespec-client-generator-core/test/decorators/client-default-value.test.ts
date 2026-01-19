@@ -20,7 +20,9 @@ it("sets client default value for a model property with numeric value", async ()
     @route("/func1")
     op func1(@body body: RequestOptions): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
 
   const models = getAllModels(context);
   strictEqual(models.length, 1);
@@ -47,7 +49,9 @@ it("sets client default value for a model property with string value", async () 
     @route("/func1")
     op func1(@body body: Config): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
 
   const models = getAllModels(context);
   strictEqual(models.length, 1);
@@ -74,7 +78,9 @@ it("sets client default value for a model property with boolean value", async ()
     @route("/func1")
     op func1(@body body: Settings): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
 
   const models = getAllModels(context);
   strictEqual(models.length, 1);
@@ -104,7 +110,9 @@ it("does not set client default value for property without decorator", async () 
       op func1(@body body: Config): void;
     }
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
 
   const models = getAllModels(context);
   strictEqual(models.length, 1);
@@ -152,7 +160,9 @@ it("applies decorator with language scope", async () => {
     @route("/func1")
     op func1(@body body: Config): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
 
   const models = getAllModels(context);
   strictEqual(models.length, 1);
@@ -179,7 +189,9 @@ it("applies decorator with different language scope should not apply", async () 
     @route("/func1")
     op func1(@body body: Config): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
 
   const models = getAllModels(context);
   strictEqual(models.length, 1);
@@ -241,7 +253,9 @@ it("sets client default value for multiple properties", async () => {
     @route("/func1")
     op func1(@body body: RequestOptions): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
 
   const models = getAllModels(context);
   strictEqual(models.length, 1);
@@ -275,7 +289,9 @@ it("sets client default value for operation parameters", async () => {
       @query sortOrder?: string
     ): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
 
   const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
@@ -302,7 +318,9 @@ it("mixed with @alternateType", async () => {
       
     ): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
 
   const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];

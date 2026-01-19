@@ -7,7 +7,9 @@ it("optional body parameter", async () => {
   const { program } = await SimpleTesterWithBuiltInService.compile(`
     op myOp(@body body?: string): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceOperation = method.operation;
@@ -27,7 +29,9 @@ it("required body parameter", async () => {
   const { program } = await SimpleTesterWithBuiltInService.compile(`
     op myOp(@body body: string): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceOperation = method.operation;
@@ -47,7 +51,9 @@ it("spread body always required", async () => {
   const { program } = await SimpleTesterWithBuiltInService.compile(`
     op myOp(foo?: string, bar?: string): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceOperation = method.operation;

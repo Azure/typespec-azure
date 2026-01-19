@@ -3,11 +3,7 @@ import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { getClientNameOverride } from "../../src/decorators.js";
-import {
-  createSdkContextForTester,
-  SimpleTester,
-  TcgcTester,
-} from "../tester.js";
+import { createSdkContextForTester, SimpleTester, TcgcTester } from "../tester.js";
 
 it("carry over", async () => {
   const { program, Test1, Test2, func1, func2 } = (await SimpleTester.compile(`

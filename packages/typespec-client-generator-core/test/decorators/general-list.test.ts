@@ -3,11 +3,7 @@ import { createTester, expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { SdkEnumValueType } from "../../src/interfaces.js";
-import {
-  AzureCoreTester,
-  createSdkContextForTester,
-  TcgcTester,
-} from "../tester.js";
+import { AzureCoreTester, createSdkContextForTester, TcgcTester } from "../tester.js";
 
 /**
  * Tester for TCGC tests with XML library support.

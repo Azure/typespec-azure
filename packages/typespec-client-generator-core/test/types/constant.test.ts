@@ -1,29 +1,20 @@
-import { ok, strictEqual } from "assert";
-import { afterEach, beforeEach, it } from "vitest";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import { strictEqual } from "assert";
+import { it } from "vitest";
+import { createSdkContextForTester, SimpleTesterWithBuiltInService } from "../tester.js";
 import { getSdkTypeHelper } from "./utils.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-});
-afterEach(async () => {
-  for (const modelsOrEnums of [runner.context.sdkPackage.models, runner.context.sdkPackage.enums]) {
-    for (const item of modelsOrEnums) {
-      ok(item.name !== "");
-    }
-  }
-});
 it("string", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       prop: "json";
     }
   `);
 
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "constant");
   strictEqual(sdkType.valueType.kind, "string");
   strictEqual(sdkType.value, "json");
@@ -31,14 +22,17 @@ it("string", async function () {
   strictEqual(sdkType.isGeneratedName, true);
 });
 it("boolean", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       @test prop: true;
     }
   `);
 
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "constant");
   strictEqual(sdkType.valueType.kind, "boolean");
   strictEqual(sdkType.value, true);
@@ -46,14 +40,17 @@ it("boolean", async function () {
   strictEqual(sdkType.isGeneratedName, true);
 });
 it("number", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       @test prop: 4;
     }
   `);
 
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "constant");
   strictEqual(sdkType.valueType.kind, "int32");
   strictEqual(sdkType.value, 4);

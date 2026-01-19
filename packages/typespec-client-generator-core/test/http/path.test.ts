@@ -7,7 +7,9 @@ it("optional path parameter", async () => {
   const { program } = await SimpleTesterWithBuiltInService.compile(`
     op myOp(@path path?: string): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceOperation = method.operation;
@@ -31,7 +33,9 @@ it("required path parameter", async () => {
   const { program } = await SimpleTesterWithBuiltInService.compile(`
     op myOp(@path path: string): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceOperation = method.operation;

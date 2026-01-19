@@ -3,8 +3,8 @@ import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { InitializedByFlags } from "../../src/interfaces.js";
 import {
-  AzureCoreTester,
   ArmTester,
+  AzureCoreTester,
   createSdkContextForTester,
   SimpleTester,
   SimpleTesterWithBuiltInService,
@@ -26,7 +26,9 @@ it("normal client", async () => {
     op pet(): void;
     `,
   );
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -70,7 +72,9 @@ it("arm client with operation groups", async () => {
     }
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -132,7 +136,9 @@ it("client with sub clients", async () => {
     }
     `,
   );
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -240,7 +246,9 @@ it("client with sub client and sub client has extra initialization paramters", a
     }
     `,
   });
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -323,7 +331,9 @@ it("client with sub client and sub client can also be initialized individually",
     );
     `,
   });
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -397,7 +407,9 @@ it("client with sub client and sub client can also be initialized individually w
     @@clientInitialization(ContainerClient.Blob, {parameters: BlobClientInitialization, initializedBy: InitializedBy.individually | InitializedBy.parent});
     `,
   });
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -451,7 +463,9 @@ it("first level client could not be initialized by parent", async () => {
       @@clientInitialization(MyService, {initializedBy: InitializedBy.parent});
       `,
   });
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/invalid-initialized-by",
     message:
@@ -469,7 +483,9 @@ it("sub client could not only be initialized individually", async () => {
     }
     `,
   );
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/invalid-initialized-by",
     message:
@@ -509,7 +525,9 @@ it("single with core", async () => {
 
     op delete is Operations.ResourceDelete<User>;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -581,7 +599,9 @@ it("multiple with core", async () => {
 
     op delete is Operations.ResourceDelete<User>;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -620,7 +640,9 @@ it("namespace", async () => {
     namespace My.Service;
     op func(): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const clientOne = sdkPackage.clients.filter((c) => c.name === "ServiceClient")[0];
@@ -635,7 +657,9 @@ it("model-only namespace should be filtered out", async () => {
       model B {}
     }
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 0);
   strictEqual(sdkPackage.models.length, 1);
@@ -652,7 +676,9 @@ it("empty namespace with empty subclient", async () => {
       interface Baz {}
     }
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 0);
 });
@@ -665,7 +691,9 @@ it("explicit clients with only models should not be filtered out", async () => {
       model B {}
     }
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 });
@@ -677,7 +705,9 @@ it("operationGroup", async () => {
       op func(): void;
     }
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
@@ -718,7 +748,9 @@ it("operationGroup2", async () => {
       two(): void;
     }
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
@@ -859,7 +891,9 @@ it("one client from multiple services", async () => {
     namespace CombineClient;
   `,
   });
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const aVersionsEnum = sdkPackage.enums.find((e) => e.name === "VersionsA");
@@ -972,7 +1006,9 @@ it("one client from multiple services with no versioning", async () => {
     namespace CombineClient;
   `,
   });
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -1064,7 +1100,9 @@ it("one client from multiple services without version dependency", async () => {
     namespace CombineClient;
   `,
   });
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const aVersionsEnum = sdkPackage.enums.find((e) => e.name === "VersionsA");
@@ -1197,7 +1235,9 @@ it("one client from multiple services with `@clientLocation`", async () => {
     @@clientLocation(ServiceB.BI.bTest, "BI2");
   `,
   });
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const aVersionsEnum = sdkPackage.enums.find((e) => e.name === "VersionsA");
@@ -1618,7 +1658,9 @@ it("one client from multiple services with different useDependency versions", as
     namespace CombineClient;
   `,
   });
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -1874,7 +1916,9 @@ it("client location to new operation group with multiple services", async () => 
     @@clientLocation(ServiceB.bTest, "NewOperationGroup");
   `,
   });
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -1959,7 +2003,9 @@ it("one client from multiple services with operation group name conflict - merge
     namespace CombineClient;
   `,
   });
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -2043,7 +2089,9 @@ it("client location to existing operation group from different service", async (
     @@clientLocation(ServiceB.bTest, "Operations");
   `,
   });
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -2126,7 +2174,9 @@ it("merged operation groups with nested operations", async () => {
     namespace CombineClient;
   `,
   });
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -2213,7 +2263,9 @@ it("multiple merged operation groups in same client", async () => {
     namespace CombineClient;
   `,
   });
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -2386,7 +2438,9 @@ it("multiple clients from single service", async () => {
     }
   `,
   });
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 2);
   const clientA = sdkPackage.clients.find((c) => c.name === "ClientA");

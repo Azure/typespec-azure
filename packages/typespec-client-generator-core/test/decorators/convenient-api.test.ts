@@ -3,7 +3,11 @@ import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { shouldGenerateConvenient, shouldGenerateProtocol } from "../../src/decorators.js";
 import { UsageFlags } from "../../src/interfaces.js";
-import { createSdkContextForTester, SimpleTester, SimpleTesterWithBuiltInService } from "../tester.js";
+import {
+  createSdkContextForTester,
+  SimpleTester,
+  SimpleTesterWithBuiltInService,
+} from "../tester.js";
 
 async function convenientAPITestHelper(
   convenientValue: boolean,

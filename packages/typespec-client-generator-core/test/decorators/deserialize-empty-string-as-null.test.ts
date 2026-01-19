@@ -1,7 +1,11 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual } from "assert";
 import { describe, it } from "vitest";
-import { createSdkContextForTester, SimpleTester, SimpleTesterWithBuiltInService } from "../tester.js";
+import {
+  createSdkContextForTester,
+  SimpleTester,
+  SimpleTesterWithBuiltInService,
+} from "../tester.js";
 
 describe("deserialized empty string as null", () => {
   it("Apply the decorator to model properties of type 'string' and a Scalar type derived from 'string'", async function () {
@@ -19,7 +23,9 @@ describe("deserialized empty string as null", () => {
         op test(): A;
       `);
 
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
 
     for (const prop of [models[0].properties[0], models[0].properties[1]]) {
@@ -46,7 +52,9 @@ describe("deserialized empty string as null", () => {
         op test(): A;
       `);
 
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     const prop = models[0].properties[0];
     deepStrictEqual(prop.decorators, [

@@ -35,7 +35,9 @@ it("three-level inheritance chain", async () => {
       op test(): A;
     `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const models = context.sdkPackage.models;
   const modelA = models.find((m) => m.name === "A");
   const modelB = models.find((m) => m.name === "B");
@@ -115,7 +117,9 @@ it("four-level inheritance chain", async () => {
       op getVehicle(): Vehicle;
     `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const models = context.sdkPackage.models;
   const vehicleModel = models.find((m) => m.name === "Vehicle");
   const motorVehicleModel = models.find((m) => m.name === "MotorVehicle");
@@ -195,7 +199,9 @@ it("nested property inheritance", async () => {
     op getSalmon(): Salmon;
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const models = context.sdkPackage.models;
   strictEqual(models.length, 6);
   const salmonModel = models.find((m) => m.name === "Salmon");
@@ -273,7 +279,9 @@ it("circular inheritance", async () => {
       }
     `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-circular-reference",
     message: "@hierarchyBuilding decorator causes recursive base type reference.",
@@ -299,7 +307,9 @@ it("another circular inheritance", async () => {
       }
     `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-circular-reference",
     message: "@hierarchyBuilding decorator causes recursive base type reference.",
@@ -359,7 +369,9 @@ it("inheritance override with template models", async () => {
       op getContainer(): Container<string>;
     `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const models = context.sdkPackage.models;
   const specialContainerModel = models.find((m) => m.name === "SpecialContainer");
 
@@ -393,7 +405,9 @@ it("without polymorphism", async () => {
       op test(): C;
     `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   const aModel = models.find((m) => m.name === "A");
@@ -528,7 +542,9 @@ it("verify legacy hierarchy building usage with unordered models", async () => {
       op getVehicle(): Vehicle;
     `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const models = context.sdkPackage.models;
   const vehicleModel = models.find((m) => m.name === "Vehicle");
   const motorVehicleModel = models.find((m) => m.name === "MotorVehicle");
@@ -579,7 +595,9 @@ it("handles envelope properties correctly", async () => {
       op getFoo(): FooResourceWithHierarchy;
     `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const models = context.sdkPackage.models;
   const trackedResource = models.find((m) => m.name === "TrackedResource");
   const fooResourceWithHierarchy = models.find((m) => m.name === "FooResourceWithHierarchy");

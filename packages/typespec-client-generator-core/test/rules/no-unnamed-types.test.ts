@@ -5,7 +5,7 @@ import {
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { noUnnamedTypesRule } from "../../src/rules/no-unnamed-types.rule.js";
-import { AzureCoreTester, ArmTester } from "../tester.js";
+import { ArmTester, AzureCoreTester } from "../tester.js";
 
 let runner: TesterInstance;
 let tester: LinterRuleTester;

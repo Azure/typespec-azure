@@ -1,21 +1,9 @@
 import { ok, strictEqual } from "assert";
-import { afterEach, beforeEach, it } from "vitest";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import { it } from "vitest";
+import { createSdkContextForTester, SimpleTester } from "../tester.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-});
-afterEach(async () => {
-  for (const modelsOrEnums of [runner.context.sdkPackage.models, runner.context.sdkPackage.enums]) {
-    for (const item of modelsOrEnums) {
-      ok(item.name !== "");
-    }
-  }
-});
 it("model with tupled properties", async function () {
-  await runner.compileAndDiagnose(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace MyService;
     @usage(Usage.input | Usage.output)
@@ -25,7 +13,10 @@ it("model with tupled properties", async function () {
     }
   `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const scopes = models[0].properties.find((x) => x.name === "scopes");
   ok(scopes);

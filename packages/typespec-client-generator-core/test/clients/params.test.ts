@@ -1,4 +1,4 @@
-import { ApiKeyAuth, OAuth2Flow, Oauth2Auth } from "@typespec/http";
+import { ApiKeyAuth, Oauth2Auth, OAuth2Flow } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
 import {
@@ -8,8 +8,8 @@ import {
   SdkEndpointType,
 } from "../../src/interfaces.js";
 import {
-  AzureCoreTester,
   ArmServiceTester,
+  AzureCoreTester,
   createSdkContextForTester,
   SimpleTester,
   TcgcTester,
@@ -54,7 +54,9 @@ it("name", async () => {
         namespace NotMyClient;
         op myOp(): void;
       `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   strictEqual(sdkPackage.clients[0].name, "MyClient");
@@ -69,7 +71,9 @@ it("initialization default endpoint no credential", async () => {
         namespace My.Service;
         op myOp(): void;
       `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -104,7 +108,9 @@ it("initialization default endpoint with apikey auth", async () => {
         namespace My.Service;
         op myOp(): void;
       `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -150,7 +156,9 @@ it("initialization default endpoint with bearer auth", async () => {
           scopes: ["https://security.microsoft.com/.default"];
         }
       `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -204,7 +212,9 @@ it("initialization default endpoint with union auth", async () => {
           scopes: ["https://security.microsoft.com/.default"];
         }
       `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -268,7 +278,9 @@ it("initialization one server parameter with apikey auth", async () => {
         namespace My.Service;
         op myOp(): void;
       `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -332,7 +344,9 @@ it("initialization multiple server parameters with apikey auth", async () => {
           v1_0: "v1.0",
         }
       `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -417,7 +431,9 @@ it("non-versioning service with api version param in endpoint", async () => {
         namespace My.Service;
         op myOp(): void;
       `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -481,7 +497,9 @@ it("endpoint with path param default value", async () => {
         namespace MyService;
         op myOp(): void;
       `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -529,7 +547,9 @@ it("service with no default api version, method with no api version param", asyn
         op withoutApiVersion(): OkResponse;
         `),
   );
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
@@ -554,7 +574,9 @@ it("service with no default api version, method with api version param", async (
       op withQueryApiVersion(@query("api-version") apiVersion: string): OkResponse;
         `),
   );
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -595,7 +617,9 @@ it("service with default api version, method without api version param", async (
       op withoutApiVersion(): OkResponse;
       `),
   );
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
@@ -621,7 +645,9 @@ it("service with default api version, method with api version param", async () =
       op withQueryApiVersion(@query("api-version") apiVersion: string): OkResponse;
     `),
   );
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
@@ -671,7 +697,9 @@ it("service with default api version, method with path api version param", async
       op withPathApiVersion(@path apiVersion: string): OkResponse;
     `),
   );
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
@@ -740,7 +768,9 @@ it("endpoint template argument with default value of enum member", async () => {
       ClientOperationGroup: "client-operation-group",
     }
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -786,7 +816,9 @@ it("client level signatures by default", async () => {
       }
     }
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0].children?.[0];
   ok(client);
@@ -843,7 +875,9 @@ it("optional client param with some methods using, some not", async () => {
   `,
   });
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const clientOptionalParamsClient = sdkPackage.clients[0];
   strictEqual(clientOptionalParamsClient.children?.length, 2);
@@ -948,7 +982,9 @@ it("child client with own initialization params should not inherit parent params
   `,
   });
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const parentClient = sdkPackage.clients[0];
 

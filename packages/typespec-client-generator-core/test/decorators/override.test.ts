@@ -2,11 +2,7 @@ import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/tes
 import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { UsageFlags } from "../../src/interfaces.js";
-import {
-  AzureCoreTester,
-  createSdkContextForTester,
-  SimpleTester,
-} from "../tester.js";
+import { AzureCoreTester, createSdkContextForTester, SimpleTester } from "../tester.js";
 
 it("basic", async () => {
   const { program } = await SimpleTester.compile({

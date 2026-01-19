@@ -24,7 +24,9 @@ it("marks a model property to be flattened with suppression of deprecation warni
     @route("/func1")
     op func1(@body body: Model1): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const models = getAllModels(context);
   strictEqual(models.length, 2);
   const model1 = models.find((x) => x.name === "Model1")!;
@@ -52,7 +54,9 @@ it("doesn't mark a un-flattened model property", async () => {
       op func1(@body body: Model1): void;
     }
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const models = getAllModels(context);
   strictEqual(models.length, 2);
   const model1 = models.find((x) => x.name === "Model1")!;
@@ -155,7 +159,9 @@ it("body parameter of model type should have been flattened", async () => {
     @@Legacy.flattenProperty(func1::parameters.body);
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
 

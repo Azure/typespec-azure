@@ -390,10 +390,7 @@ describe("@operationGroup", () => {
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
     });
-    strictEqual(
-      getCrossLanguageDefinitionId(context, one),
-      "MyClient.SubNamespace.Widgets.one",
-    );
+    strictEqual(getCrossLanguageDefinitionId(context, one), "MyClient.SubNamespace.Widgets.one");
   });
 
   it("crossLanguagePackageId", async () => {

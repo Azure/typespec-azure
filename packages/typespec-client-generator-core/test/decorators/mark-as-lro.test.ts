@@ -28,7 +28,9 @@ it("should mark regular operation as LRO when decorated with @markAsLro", async 
       }
     `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-csharp" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-csharp",
+  });
   const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
 
@@ -68,11 +70,11 @@ it("should apply @markAsLro with language scope", async () => {
       }
     `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-csharp" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-csharp",
+  });
   strictEqual(context.sdkPackage.models.length, 2);
-  const processingResponse = context.sdkPackage.models.find(
-    (m) => m.name === "ProcessingResponse",
-  );
+  const processingResponse = context.sdkPackage.models.find((m) => m.name === "ProcessingResponse");
   ok(processingResponse);
 
   const methods = context.sdkPackage.clients[0].methods;
@@ -141,7 +143,9 @@ it("should work with complex model return types", async () => {
       }
     `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-csharp" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-csharp",
+  });
   const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
 
@@ -172,7 +176,9 @@ it("should work with ArmResourceRead", async () => {
       >;
     `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
   const method = methods[0];
@@ -205,7 +211,9 @@ it("Extension.Read", async () => {
     >;
     `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
   const method = methods[0];
