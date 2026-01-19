@@ -275,7 +275,9 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       // Set resultSegments to match the behavior of normal paging operations
       baseServiceMethod.response.resultSegments = [itemsProperty];
 
-      context.__pagedResultSet.add(responseType);
+      if (responseType) {
+        context.__pagedResultSet.add(responseType);
+      }
       // tcgc will let all paging method return a list of items
       baseServiceMethod.response.type = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, markAsPageableInfo.itemsProperty.type, operation),
