@@ -492,7 +492,7 @@ it("single with core", async () => {
   )[0];
   strictEqual(apiVersionParam.name, "apiVersion");
   strictEqual(apiVersionParam.onClient, true);
-  strictEqual(apiVersionParam.optional, false);
+  strictEqual(apiVersionParam.optional, true);
   strictEqual(apiVersionParam.kind, "method");
   strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01-preview");
 });
@@ -562,7 +562,7 @@ it("multiple with core", async () => {
   )[0];
   strictEqual(apiVersionParam.name, "apiVersion");
   strictEqual(apiVersionParam.onClient, true);
-  strictEqual(apiVersionParam.optional, false);
+  strictEqual(apiVersionParam.optional, true);
   strictEqual(apiVersionParam.kind, "method");
   strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01");
 });

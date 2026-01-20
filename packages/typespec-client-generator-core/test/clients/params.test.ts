@@ -376,7 +376,7 @@ it("initialization multiple server parameters with apikey auth", async () => {
   strictEqual(apiVersionParam.allowReserved, false);
   strictEqual(apiVersionParam.name, "apiVersion");
   strictEqual(apiVersionParam.onClient, true);
-  strictEqual(apiVersionParam.optional, false);
+  strictEqual(apiVersionParam.optional, true);
   strictEqual(apiVersionParam.kind, "path");
   deepStrictEqual(client.apiVersions, ["v1.0"]);
 
@@ -457,7 +457,7 @@ it("non-versioning service with api version param in endpoint", async () => {
   strictEqual(apiVersionParam.clientDefaultValue, "v1");
   strictEqual(apiVersionParam.name, "apiVersion");
   strictEqual(apiVersionParam.onClient, true);
-  strictEqual(apiVersionParam.optional, false);
+  strictEqual(apiVersionParam.optional, true);
   strictEqual(apiVersionParam.kind, "path");
 });
 
@@ -640,7 +640,7 @@ it("service with default api version, method with api version param", async () =
   const clientApiVersionParam = client.clientInitialization.parameters[1];
   strictEqual(clientApiVersionParam.name, "apiVersion");
   strictEqual(clientApiVersionParam.onClient, true);
-  strictEqual(clientApiVersionParam.optional, false);
+  strictEqual(clientApiVersionParam.optional, true);
   strictEqual(clientApiVersionParam.kind, "method");
   strictEqual(clientApiVersionParam.clientDefaultValue, "2022-12-01-preview");
   strictEqual(clientApiVersionParam.isApiVersionParam, true);
@@ -660,7 +660,7 @@ it("service with default api version, method with api version param", async () =
   const apiVersionParam = withApiVersion.operation.parameters[0];
   strictEqual(apiVersionParam.kind, "query");
   strictEqual(apiVersionParam.isApiVersionParam, true);
-  strictEqual(apiVersionParam.optional, false);
+  strictEqual(apiVersionParam.optional, true);
   strictEqual(apiVersionParam.onClient, true);
   strictEqual(apiVersionParam.type.kind, "string");
   strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01-preview");
@@ -694,7 +694,7 @@ it("service with default api version, method with path api version param", async
   const clientApiVersionParam = client.clientInitialization.parameters[1];
   strictEqual(clientApiVersionParam.name, "apiVersion");
   strictEqual(clientApiVersionParam.onClient, true);
-  strictEqual(clientApiVersionParam.optional, false);
+  strictEqual(clientApiVersionParam.optional, true);
   strictEqual(clientApiVersionParam.kind, "method");
   strictEqual(clientApiVersionParam.clientDefaultValue, "2022-12-01-preview");
   strictEqual(clientApiVersionParam.isApiVersionParam, true);
@@ -716,7 +716,7 @@ it("service with default api version, method with path api version param", async
   strictEqual(apiVersionParam.serializedName, "apiVersion");
   strictEqual(apiVersionParam.name, "apiVersion");
   strictEqual(apiVersionParam.isApiVersionParam, true);
-  strictEqual(apiVersionParam.optional, false);
+  strictEqual(apiVersionParam.optional, true);
   strictEqual(apiVersionParam.onClient, true);
   strictEqual(apiVersionParam.type.kind, "string");
   strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01-preview");
