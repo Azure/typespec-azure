@@ -1,14 +1,18 @@
-import { Model, ModelProperty, Operation } from "@typespec/compiler";
+import { t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { getLibraryName } from "../../src/public-utils.js";
-import { createSdkContextForTester, SimpleTester, SimpleTesterWithBuiltInService } from "../tester.js";
+import {
+  createSdkContextForTester,
+  SimpleTester,
+  SimpleTesterWithBuiltInService,
+} from "../tester.js";
 
 it("operation client projected name", async () => {
   async function helper(emitterName: string) {
-    const { program, func } = (await SimpleTester.compile(`
-      @test @clientName("rightName") op func(@query("api-version") myApiVersion: string): void;
-    `)) as { program: any; func: Operation };
+    const { program, func } = await SimpleTester.compile(t.code`
+      @clientName("rightName") op ${t.op("func")}(@query("api-version") myApiVersion: string): void;
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     strictEqual(getLibraryName(context, func), "rightName");
   }
@@ -20,14 +24,13 @@ it("operation client projected name", async () => {
 
 it("operation language projected name", async () => {
   async function helper(emitterName: string, expected: string) {
-    const { program, func } = (await SimpleTester.compile(`
-      @test
+    const { program, func } = await SimpleTester.compile(t.code`
       @clientName("madeForCS", "csharp")
       @clientName("madeForJava", "java")
       @clientName("madeForTS", "javascript")
       @clientName("made_for_python", "python")
-      op func(@query("api-version") myApiVersion: string): void;
-    `)) as { program: any; func: Operation };
+      op ${t.op("func")}(@query("api-version") myApiVersion: string): void;
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     strictEqual(getLibraryName(context, func), expected);
   }
@@ -39,15 +42,14 @@ it("operation language projected name", async () => {
 
 it("operation language projected name augmented", async () => {
   async function helper(emitterName: string, expected: string) {
-    const { program, func } = (await SimpleTester.compile(`
-      @test
-      op func(@query("api-version") myApiVersion: string): void;
+    const { program, func } = await SimpleTester.compile(t.code`
+      op ${t.op("func")}(@query("api-version") myApiVersion: string): void;
 
       @@clientName(func, "madeForCS", "csharp");
       @@clientName(func, "madeForJava", "java");
       @@clientName(func, "madeForTS", "javascript");
       @@clientName(func, "made_for_python", "python");
-    `)) as { program: any; func: Operation };
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     strictEqual(getLibraryName(context, func), expected);
   }
@@ -59,11 +61,10 @@ it("operation language projected name augmented", async () => {
 
 it("operation json projected name", async () => {
   async function helper(emitterName: string) {
-    const { program, func } = (await SimpleTester.compile(`
-      @test
+    const { program, func } = await SimpleTester.compile(t.code`
       @encodedName("application/json", "NotToUseMeAsName") // Should be ignored
-      op func(@query("api-version") myApiVersion: string): void;
-    `)) as { program: any; func: Operation };
+      op ${t.op("func")}(@query("api-version") myApiVersion: string): void;
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     strictEqual(getLibraryName(context, func), "func");
   }
@@ -75,10 +76,9 @@ it("operation json projected name", async () => {
 
 it("operation no projected name", async () => {
   async function helper(emitterName: string) {
-    const { program, func } = (await SimpleTester.compile(`
-      @test
-      op func(@query("api-version") myApiVersion: string): void;
-    `)) as { program: any; func: Operation };
+    const { program, func } = await SimpleTester.compile(t.code`
+      op ${t.op("func")}(@query("api-version") myApiVersion: string): void;
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     strictEqual(getLibraryName(context, func), "func");
   }
@@ -90,13 +90,12 @@ it("operation no projected name", async () => {
 
 it("model client projected name", async () => {
   async function helper(emitterName: string) {
-    const { program, MyModel } = (await SimpleTester.compile(`
-      @test
+    const { program, MyModel } = await SimpleTester.compile(t.code`
       @clientName("RightName")
-      model MyModel {
+      model ${t.model("MyModel")} {
         prop: string
       }
-    `)) as { program: any; MyModel: Model };
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     strictEqual(getLibraryName(context, MyModel), "RightName");
   }
@@ -108,16 +107,15 @@ it("model client projected name", async () => {
 
 it("model language projected name", async () => {
   async function helper(emitterName: string, expected: string) {
-    const { program, MyModel } = (await SimpleTester.compile(`
-      @test
+    const { program, MyModel } = await SimpleTester.compile(t.code`
       @clientName("CsharpModel", "csharp")
       @clientName("JavaModel", "java")
       @clientName("JavascriptModel", "javascript")
       @clientName("PythonModel", "python")
-      model MyModel {
+      model ${t.model("MyModel")} {
         prop: string
       }
-    `)) as { program: any; MyModel: Model };
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     strictEqual(getLibraryName(context, MyModel), expected);
   }
@@ -129,9 +127,8 @@ it("model language projected name", async () => {
 
 it("model language projected name augmented", async () => {
   async function helper(emitterName: string, expected: string) {
-    const { program, MyModel } = (await SimpleTester.compile(`
-      @test
-      model MyModel {
+    const { program, MyModel } = await SimpleTester.compile(t.code`
+      model ${t.model("MyModel")} {
         prop: string
       }
 
@@ -139,7 +136,7 @@ it("model language projected name augmented", async () => {
       @@clientName(MyModel, "JavaModel", "java");
       @@clientName(MyModel, "JavascriptModel", "javascript");
       @@clientName(MyModel, "PythonModel", "python");
-    `)) as { program: any; MyModel: Model };
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     strictEqual(getLibraryName(context, MyModel), expected);
   }
@@ -151,13 +148,12 @@ it("model language projected name augmented", async () => {
 
 it("model json projected name", async () => {
   async function helper(emitterName: string) {
-    const { program, MyModel } = (await SimpleTester.compile(`
-      @test
+    const { program, MyModel } = await SimpleTester.compile(t.code`
       @encodedName("application/json", "NotToUseMeAsName") // Should be ignored
-      model MyModel {
+      model ${t.model("MyModel")} {
         prop: string
       }
-    `)) as { program: any; MyModel: Model };
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     strictEqual(getLibraryName(context, MyModel), "MyModel");
   }
@@ -169,12 +165,11 @@ it("model json projected name", async () => {
 
 it("model no projected name", async () => {
   async function helper(emitterName: string) {
-    const { program, MyModel } = (await SimpleTester.compile(`
-      @test
-      model MyModel {
+    const { program, MyModel } = await SimpleTester.compile(t.code`
+      model ${t.model("MyModel")} {
         prop: string
       }
-    `)) as { program: any; MyModel: Model };
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     strictEqual(getLibraryName(context, MyModel), "MyModel");
   }
@@ -186,13 +181,12 @@ it("model no projected name", async () => {
 
 it("model friendly name", async () => {
   async function helper(emitterName: string) {
-    const { program, MyModel } = (await SimpleTester.compile(`
-      @test
+    const { program, MyModel } = await SimpleTester.compile(t.code`
       @friendlyName("FriendlyName")
-      model MyModel {
+      model ${t.model("MyModel")} {
         prop: string
       }
-    `)) as { program: any; MyModel: Model };
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     strictEqual(getLibraryName(context, MyModel), "FriendlyName");
   }
@@ -204,13 +198,12 @@ it("model friendly name", async () => {
 
 it("model friendly name augmented", async () => {
   async function helper(emitterName: string) {
-    const { program, MyModel } = (await SimpleTester.compile(`
-      @test
-      model MyModel {
+    const { program, MyModel } = await SimpleTester.compile(t.code`
+      model ${t.model("MyModel")} {
         prop: string
       }
       @@friendlyName(MyModel, "FriendlyName");
-    `)) as { program: any; MyModel: Model };
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     strictEqual(getLibraryName(context, MyModel), "FriendlyName");
   }
@@ -222,17 +215,16 @@ it("model friendly name augmented", async () => {
 
 it("should return language specific name when both language specific name and friendly name exist", async () => {
   async function helper(expected: string, emitterName: string) {
-    const { program, MyModel } = (await SimpleTester.compile(`
-      @test
+    const { program, MyModel } = await SimpleTester.compile(t.code`
       @friendlyName("FriendlyName")
       @clientName("CsharpModel", "csharp")
       @clientName("JavaModel", "java")
       @clientName("JavascriptModel", "javascript")
       @clientName("PythonModel", "python")
-      model MyModel {
+      model ${t.model("MyModel")} {
         prop: string
       }
-    `)) as { program: any; MyModel: Model };
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     strictEqual(getLibraryName(context, MyModel), expected);
   }
@@ -244,14 +236,13 @@ it("should return language specific name when both language specific name and fr
 
 it("should return client name when both client name and friendly name exist", async () => {
   async function helper(expected: string, emitterName: string) {
-    const { program, MyModel } = (await SimpleTester.compile(`
-      @test
+    const { program, MyModel } = await SimpleTester.compile(t.code`
       @friendlyName("FriendlyName")
       @clientName("clientName")
-      model MyModel {
+      model ${t.model("MyModel")} {
         prop: string
       }
-    `)) as { program: any; MyModel: Model };
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     strictEqual(getLibraryName(context, MyModel), expected);
   }
@@ -263,14 +254,13 @@ it("should return client name when both client name and friendly name exist", as
 
 it("parameter client projected name", async () => {
   async function helper(emitterName: string) {
-    const { program, param } = (await SimpleTester.compile(`
+    const { program, param } = await SimpleTester.compile(t.code`
       op func(
-        @test
         @clientName("rightName")
         @query("param")
-        param: string
+        ${t.modelProperty("param")}: string
       ): void;
-    `)) as { program: any; param: ModelProperty };
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     strictEqual(getLibraryName(context, param), "rightName");
   }
@@ -282,17 +272,16 @@ it("parameter client projected name", async () => {
 
 it("parameter language projected name", async () => {
   async function helper(emitterName: string, expected: string) {
-    const { program, param } = (await SimpleTester.compile(`
+    const { program, param } = await SimpleTester.compile(t.code`
       op func(
-        @test
         @clientName("csharpParam", "csharp")
         @clientName("javaParam", "java")
         @clientName("javascriptParam", "javascript")
         @clientName("python_param", "python")
         @query("param")
-        param: string
+        ${t.modelProperty("param")}: string
       ): void;
-    `)) as { program: any; param: ModelProperty };
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     strictEqual(getLibraryName(context, param), expected);
   }
@@ -304,14 +293,13 @@ it("parameter language projected name", async () => {
 
 it("parameter json projected name", async () => {
   async function helper(emitterName: string) {
-    const { program, param } = (await SimpleTester.compile(`
+    const { program, param } = await SimpleTester.compile(t.code`
       op func(
-        @test
         @encodedName("application/json", "ShouldBeIgnored")
         @query("param")
-        param: string
+        ${t.modelProperty("param")}: string
       ): void;
-    `)) as { program: any; param: ModelProperty };
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     strictEqual(getLibraryName(context, param), "param");
   }
@@ -323,13 +311,12 @@ it("parameter json projected name", async () => {
 
 it("parameter no projected name", async () => {
   async function helper(emitterName: string) {
-    const { program, param } = (await SimpleTester.compile(`
+    const { program, param } = await SimpleTester.compile(t.code`
       op func(
-        @test
         @query("param")
-        param: string
+        ${t.modelProperty("param")}: string
       ): void;
-    `)) as { program: any; param: ModelProperty };
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     strictEqual(getLibraryName(context, param), "param");
   }
@@ -356,7 +343,9 @@ it("template without @friendlyName renaming", async () => {
 
     op getStatus is GetResourceOperationStatus<User>;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const model = models.filter((x) => x.name === "ResourceOperationStatusUser")[0];
@@ -384,7 +373,9 @@ it("template without @friendlyName renaming for union as enum", async () => {
 
     op test(): DependencyOfRelationshipProperties;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const model = models.filter(
@@ -407,7 +398,9 @@ it("template without @friendlyName renaming with naming conflict", async () => {
 
     op test(): Instance;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const models = context.sdkPackage.models;
   strictEqual(models.length, 4);
   const model = models.filter((x) => x.name === "Instance")[0];

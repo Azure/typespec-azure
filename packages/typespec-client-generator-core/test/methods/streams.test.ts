@@ -23,6 +23,7 @@ const StreamsTester = createTester(resolvePath(import.meta.dirname, "../.."), {
     "@typespec/http/streams",
     "@typespec/streams",
     "@typespec/sse",
+    "@typespec/events",
     "@azure-tools/typespec-client-generator-core",
   )
   .using(

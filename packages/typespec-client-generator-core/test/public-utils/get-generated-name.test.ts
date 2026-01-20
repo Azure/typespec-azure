@@ -1,18 +1,24 @@
-import { Model, ModelProperty, Operation } from "@typespec/compiler";
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import { Model } from "@typespec/compiler";
+import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { UsageFlags } from "../../src/interfaces.js";
 import { getGeneratedName, getHttpOperationWithCache } from "../../src/public-utils.js";
 import { getSdkUnion } from "../../src/types.js";
-import { createSdkContextForTester, SimpleTester, SimpleTesterWithBuiltInService } from "../tester.js";
+import {
+  createSdkContextForTester,
+  SimpleTester,
+  SimpleTesterWithBuiltInService,
+} from "../tester.js";
 
 describe("simple anonymous model", () => {
   it("should handle anonymous model used by operation body", async () => {
     const { program } = await SimpleTesterWithBuiltInService.compile(`
       op test(@body body: {name: string}): void;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "TestRequest");
@@ -24,7 +30,9 @@ describe("simple anonymous model", () => {
     const { program } = await SimpleTesterWithBuiltInService.compile(`
         op test(): {name: string};
       `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "TestResponse");
@@ -36,7 +44,9 @@ describe("simple anonymous model", () => {
     const { program } = await SimpleTesterWithBuiltInService.compile(`
       op test(@body body: {name: string}): {name: string};
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 2);
     ok(
@@ -66,7 +76,9 @@ describe("simple anonymous model", () => {
       }
       op test(): A;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 2);
     ok(
@@ -91,7 +103,9 @@ describe("simple anonymous model", () => {
         op test(@body body: A): void;
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 2);
     ok(
@@ -116,7 +130,9 @@ describe("simple anonymous model", () => {
         op test(@body body: A): A;
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 2);
     ok(
@@ -140,7 +156,9 @@ describe("anonymous model with array or dict", () => {
         op test(@body body: A): void;
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 2);
     ok(
@@ -159,7 +177,9 @@ describe("anonymous model with array or dict", () => {
         op test(@body body: {name: string}[]): void;
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "TestRequest");
@@ -173,7 +193,9 @@ describe("anonymous model with array or dict", () => {
         op test(@body body: Record<{name: string}>): void;
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "TestRequest");
@@ -190,7 +212,9 @@ describe("anonymous model with array or dict", () => {
         op test(@body body: A): void;
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 3);
     ok(
@@ -226,7 +250,9 @@ describe("anonymous model in base or derived model", () => {
         op test(@body body: A): void;
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 3);
     ok(
@@ -264,7 +290,9 @@ describe("anonymous model in base or derived model", () => {
         op test(@body body: Fish): void;
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 5);
     ok(
@@ -302,7 +330,9 @@ describe("recursively handle anonymous model", () => {
         op test(@body body: A): void;
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 3);
     ok(
@@ -335,7 +365,9 @@ describe("recursively handle anonymous model", () => {
         op test(@body body: A): void;
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 4);
     ok(
@@ -365,7 +397,9 @@ describe("recursively handle anonymous model", () => {
         op test(@body body: A): void;
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 3);
     ok(
@@ -388,7 +422,9 @@ describe("recursively handle anonymous model", () => {
         op test(@body body: A): void;
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 2);
     ok(
@@ -415,7 +451,9 @@ describe("recursively handle anonymous model", () => {
         op test(@body body: A): void;
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 3);
     ok(
@@ -445,7 +483,9 @@ describe("recursively handle anonymous model", () => {
         op test(@body body: A): void;
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 3);
     ok(
@@ -477,7 +517,9 @@ describe("recursively handle anonymous model", () => {
         op test(@body body: A): void;
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 2);
     ok(
@@ -501,7 +543,9 @@ describe("union model's name", () => {
         op test(@body body: A): void;
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     const unionEnum = models[0].properties[0].type;
@@ -538,7 +582,9 @@ describe("union model's name", () => {
         op test(@body body: A): void;
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     const diagnostics = context.diagnostics;
     ok(diagnostics);
@@ -568,7 +614,9 @@ describe("union model's name", () => {
         op test(@body body: A): void;
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 2);
     const test1 = models.find(
@@ -612,7 +660,9 @@ describe("anonymous model used in multiple operations", () => {
         op op3(@body body: B): boolean;
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 3);
     ok(
@@ -638,7 +688,9 @@ describe("orphan model with anonymous model", () => {
         }
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 2);
     strictEqual(models[0].properties[0].crossLanguageDefinitionId, "TestService.A.pForA");
@@ -664,7 +716,9 @@ describe("orphan model with anonymous model", () => {
         }
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     const unionEnum = models[0].properties[0].type;
@@ -690,7 +744,9 @@ describe("corner case", () => {
         op test(...RequestParameter): void;
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "TestRequest");
@@ -703,7 +759,9 @@ describe("corner case", () => {
         op test(foo: string, bar: string): void;
       `,
     );
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
     strictEqual(models[0].name, "TestRequest");
@@ -711,21 +769,22 @@ describe("corner case", () => {
   });
 
   it("anonymous union in response header", async () => {
-    const { program, repeatabilityResult } = (await SimpleTester.compile(`
+    const { program, repeatabilityResult } = await SimpleTester.compile(t.code`
       @service
-      @test namespace MyService {
+      namespace MyService {
         model ResponseWithAnonymousUnion {
           @header("Repeatability-Result")
-          @test
-          repeatabilityResult?: "accepted" | "rejected";
+          ${t.modelProperty("repeatabilityResult")}: "accepted" | "rejected";
 
           test: string;
         }
 
         op test(): ResponseWithAnonymousUnion;
       }
-    `)) as { program: any; repeatabilityResult: ModelProperty };
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    `);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
 
     strictEqual(repeatabilityResult.type.kind, "Union");
     const unionEnum = getSdkUnion(context, repeatabilityResult.type);
@@ -740,21 +799,22 @@ describe("corner case", () => {
   });
 
   it("anonymous union in request header", async () => {
-    const { program, repeatabilityResult } = (await SimpleTester.compile(`
+    const { program, repeatabilityResult } = await SimpleTester.compile(t.code`
       @service
-      @test namespace MyService {
+      namespace MyService {
         model RequestParameterWithAnonymousUnion {
           @header("Repeatability-Result")
-          @test
-          repeatabilityResult?: "accepted" | "rejected";
+          ${t.modelProperty("repeatabilityResult")}: "accepted" | "rejected";
 
           test: string;
         }
 
         op test(...RequestParameterWithAnonymousUnion): void;
       }
-    `)) as { program: any; repeatabilityResult: ModelProperty };
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    `);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
 
     strictEqual(repeatabilityResult.type.kind, "Union");
     const unionEnum = getSdkUnion(context, repeatabilityResult.type);
@@ -769,21 +829,22 @@ describe("corner case", () => {
   });
 
   it("anonymous union with base type", async () => {
-    const { program, repeatabilityResult } = (await SimpleTester.compile(`
+    const { program, repeatabilityResult } = await SimpleTester.compile(t.code`
       @service
-      @test namespace MyService {
+      namespace MyService {
         model RequestParameterWithAnonymousUnion {
           @header("Repeatability-Result")
-          @test
-          repeatabilityResult?: "accepted" | "rejected" | string;
+          ${t.modelProperty("repeatabilityResult")}: "accepted" | "rejected" | string;
 
           test: string;
         }
 
         op test(...RequestParameterWithAnonymousUnion): void;
       }
-    `)) as { program: any; repeatabilityResult: ModelProperty };
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    `);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
 
     strictEqual(repeatabilityResult.type.kind, "Union");
     const stringType = getSdkUnion(context, repeatabilityResult.type);
@@ -803,39 +864,38 @@ describe("corner case", () => {
   });
 
   it("anonymous model naming in multi layer operation group", async () => {
-    const { program, TestModel } = (await SimpleTester.compile(`
+    const { program, TestModel } = await SimpleTester.compile(t.code`
       @service
       namespace MyService {
         namespace Test {
           namespace InnerTest {
-            @test
-            model TestModel {
+            model ${t.model("TestModel")} {
               anonymousProp: {prop: string}
             }
             op test(): TestModel;
           }
         }
       }
-    `)) as { program: any; TestModel: Model };
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    `);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
 
     context.__generatedNames?.clear();
-    const name = getGeneratedName(
-      context,
-      [...TestModel.properties.values()][0].type as Model,
-    );
+    const name = getGeneratedName(context, [...TestModel.properties.values()][0].type as Model);
     strictEqual(name, "TestModelAnonymousProp");
   });
 
   it("anonymous model in response", async () => {
-    const { program, test } = (await SimpleTester.compile(`
+    const { program, test } = await SimpleTester.compile(t.code`
       @service
       namespace MyService {
-        @test
-        op test(): {@header header: string, prop: string};
+        op ${t.op("test")}(): {@header header: string, prop: string};
       }
-    `)) as { program: any; test: Operation };
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    `);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
 
     const httpOperation = getHttpOperationWithCache(context, test);
     const name = getGeneratedName(
@@ -864,7 +924,9 @@ describe("corner case", () => {
         @route("/bar")
         op bar(): TestResponse1;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
 
     const models = context.sdkPackage.models;
     strictEqual(models.length, 3);
@@ -892,7 +954,9 @@ describe("corner case", () => {
       }
       op test(@bodyRoot body: {@body body: Test}): void;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const sdkPackage = context.sdkPackage;
     strictEqual(sdkPackage.models.length, 2);
     const testModel = sdkPackage.models.find((m) => m.name === "Test");

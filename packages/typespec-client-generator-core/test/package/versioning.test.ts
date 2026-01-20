@@ -69,10 +69,11 @@ it("basic default version", async () => {
   });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v3");
-  deepStrictEqual(
-    context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace),
-    ["v1", "v2", "v3"],
-  );
+  deepStrictEqual(context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace), [
+    "v1",
+    "v2",
+    "v3",
+  ]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -172,10 +173,11 @@ it("basic latest version", async () => {
   });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v3");
-  deepStrictEqual(
-    context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace),
-    ["v1", "v2", "v3"],
-  );
+  deepStrictEqual(context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace), [
+    "v1",
+    "v2",
+    "v3",
+  ]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -274,10 +276,11 @@ it("basic v3 version", async () => {
   });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v3");
-  deepStrictEqual(
-    context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace),
-    ["v1", "v2", "v3"],
-  );
+  deepStrictEqual(context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace), [
+    "v1",
+    "v2",
+    "v3",
+  ]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -376,10 +379,10 @@ it("basic v2 version", async () => {
   });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v2");
-  deepStrictEqual(
-    context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace),
-    ["v1", "v2"],
-  );
+  deepStrictEqual(context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace), [
+    "v1",
+    "v2",
+  ]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -481,10 +484,9 @@ it("basic v1 version", async () => {
   });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v1");
-  deepStrictEqual(
-    context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace),
-    ["v1"],
-  );
+  deepStrictEqual(context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace), [
+    "v1",
+  ]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -571,10 +573,11 @@ it("basic all version", async () => {
   });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "all");
-  deepStrictEqual(
-    context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace),
-    ["v1", "v2", "v3"],
-  );
+  deepStrictEqual(context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace), [
+    "v1",
+    "v2",
+    "v3",
+  ]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -741,7 +744,7 @@ it("add method", async () => {
   const { program } = await VersionedServiceTester.compile(`
     @route("/v1")
     @post
-    @added(Versions.v2)
+    @added(ServiceVersions.v2)
     op v2(@header headerV2: string): void;
   `);
 
@@ -770,7 +773,7 @@ it("add parameter", async () => {
   const { program } = await VersionedServiceTester.compile(`
     @route("/v1")
     @post
-    op v1(@added(Versions.v2) @header headerV2: string): void;
+    op v1(@added(ServiceVersions.v2) @header headerV2: string): void;
   `);
 
   const context = await createSdkContextForTester(program, {
@@ -868,7 +871,7 @@ it("add client", async () => {
         endpoint: url,
       }
     )
-    namespace Versioning;
+    namespace VersioningService;
     enum Versions {
       v1: "v1",
       v2: "v2",
@@ -889,7 +892,7 @@ it("add client", async () => {
   });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
-  const versioningClient = sdkPackage.clients.find((x) => x.name === "VersioningClient");
+  const versioningClient = sdkPackage.clients.find((x) => x.name === "VersioningServiceClient");
   ok(versioningClient);
   strictEqual(versioningClient.methods.length, 1);
   strictEqual(versioningClient.children?.length, 1);
@@ -936,7 +939,7 @@ it("default latest GA version with preview", async () => {
         endpoint: url,
       }
     )
-    namespace Versioning;
+    namespace VersioningService;
     enum Versions {
       v2022_10_01_preview: "2022-10-01-preview",
       v2024_10_01: "2024-10-01",
@@ -973,7 +976,7 @@ it("default latest preview version with GA", async () => {
         endpoint: url,
       }
     )
-    namespace Versioning;
+    namespace VersioningService;
     enum Versions {
       v2024_10_01: "2024-10-01",
       v2024_11_01_preview: "2024-11-01-preview",
@@ -1011,7 +1014,7 @@ it("specify api version with preview filter", async () => {
         endpoint: url,
       }
     )
-    namespace Versioning;
+    namespace VersioningService;
     enum Versions {
       v2023_10_01: "2023-10-01",
       v2023_11_01_preview: "2023-11-01-preview",
@@ -1361,7 +1364,7 @@ it("do not filter preview versions when default API version is preview", async (
 });
 
 it("version not exist", async () => {
-  const { program, diagnostics } = await SimpleTester.diagnose(`
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(`
     @service(#{
       title: "Contoso Widget Manager",
     })
@@ -1422,10 +1425,11 @@ it("version not exist", async () => {
 
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v3");
-  deepStrictEqual(
-    context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace),
-    ["v1", "v2", "v3"],
-  );
+  deepStrictEqual(context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace), [
+    "v1",
+    "v2",
+    "v3",
+  ]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(

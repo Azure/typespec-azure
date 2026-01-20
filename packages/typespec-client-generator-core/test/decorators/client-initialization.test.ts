@@ -10,12 +10,13 @@ import {
 } from "../tester.js";
 
 it("change client initialization", async () => {
-  const { program } = await TcgcTester.compile(
-    `
+  const { program } = await TcgcTester.compile({
+    "main.tsp": `
       import "@typespec/http";
       import "@typespec/rest";
       import "@typespec/versioning";
       import "@azure-tools/typespec-client-generator-core";
+      import "./client.tsp";
 
       using Http;
       using Rest;
@@ -27,8 +28,7 @@ it("change client initialization", async () => {
 
       op download(@path blobName: string): void;
       `,
-    {
-      "client.tsp": `
+    "client.tsp": `
       import "./main.tsp";
       using Azure.ClientGenerator.Core;
 
@@ -40,8 +40,7 @@ it("change client initialization", async () => {
 
       @@clientInitialization(MyService, {parameters: MyCustomizations.MyClientInitialization});
       `,
-    },
-  );
+  });
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
   });
@@ -82,12 +81,13 @@ it("change client initialization", async () => {
 });
 
 it("backward compatibility", async () => {
-  const { program } = await TcgcTester.compile(
-    `
+  const { program } = await TcgcTester.compile({
+    "main.tsp": `
       import "@typespec/http";
       import "@typespec/rest";
       import "@typespec/versioning";
       import "@azure-tools/typespec-client-generator-core";
+      import "./client.tsp";
 
       using Http;
       using Rest;
@@ -99,8 +99,7 @@ it("backward compatibility", async () => {
 
       op download(@path blobName: string): void;
       `,
-    {
-      "client.tsp": `
+    "client.tsp": `
       import "./main.tsp";
       using Azure.ClientGenerator.Core;
 
@@ -112,8 +111,7 @@ it("backward compatibility", async () => {
 
       @@clientInitialization(MyService, MyCustomizations.MyClientInitialization);
       `,
-    },
-  );
+  });
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
   });
@@ -204,12 +202,13 @@ it("client accessor", async () => {
 });
 
 it("subclient", async () => {
-  const { program } = await TcgcTester.compile(
-    `
+  const { program } = await TcgcTester.compile({
+    "main.tsp": `
       import "@typespec/http";
       import "@typespec/rest";
       import "@typespec/versioning";
       import "@azure-tools/typespec-client-generator-core";
+      import "./client.tsp";
 
       using Http;
       using Rest;
@@ -228,8 +227,7 @@ it("subclient", async () => {
         }
       }
       `,
-    {
-      "client.tsp": `
+    "client.tsp": `
       import "./main.tsp";
       using Azure.ClientGenerator.Core;
 
@@ -240,8 +238,7 @@ it("subclient", async () => {
       @@clientInitialization(StorageClient, {parameters: ClientInitialization});
       @@clientInitialization(StorageClient.BlobClient, {parameters: ClientInitialization});
       `,
-    },
-  );
+  });
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
   });
@@ -316,12 +313,13 @@ it("subclient", async () => {
 });
 
 it("some methods don't have client initialization params", async () => {
-  const { program } = await TcgcTester.compile(
-    `
+  const { program } = await TcgcTester.compile({
+    "main.tsp": `
       import "@typespec/http";
       import "@typespec/rest";
       import "@typespec/versioning";
       import "@azure-tools/typespec-client-generator-core";
+      import "./client.tsp";
 
       using Http;
       using Rest;
@@ -334,8 +332,7 @@ it("some methods don't have client initialization params", async () => {
       op download(@path blobName: string, @header header: int32): void;
       op noClientParams(@query query: int32): void;
       `,
-    {
-      "client.tsp": `
+    "client.tsp": `
       import "./main.tsp";
       using Azure.ClientGenerator.Core;
 
@@ -347,8 +344,7 @@ it("some methods don't have client initialization params", async () => {
 
       @@clientInitialization(MyService, {parameters: MyCustomizations.MyClientInitialization});
       `,
-    },
-  );
+  });
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
   });
@@ -401,12 +397,13 @@ it("some methods don't have client initialization params", async () => {
 });
 
 it("multiple client params", async () => {
-  const { program } = await TcgcTester.compile(
-    `
+  const { program } = await TcgcTester.compile({
+    "main.tsp": `
       import "@typespec/http";
       import "@typespec/rest";
       import "@typespec/versioning";
       import "@azure-tools/typespec-client-generator-core";
+      import "./client.tsp";
 
       using Http;
       using Rest;
@@ -418,8 +415,7 @@ it("multiple client params", async () => {
 
       op download(@path blobName: string, @path containerName: string): void;
       `,
-    {
-      "client.tsp": `
+    "client.tsp": `
       import "./main.tsp";
       using Azure.ClientGenerator.Core;
 
@@ -432,8 +428,7 @@ it("multiple client params", async () => {
 
       @@clientInitialization(MyService, {parameters: MyCustomizations.MyClientInitialization});
       `,
-    },
-  );
+  });
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
   });
@@ -575,12 +570,13 @@ it("@operationGroup with same model on parent client", async () => {
 });
 
 it("redefine client structure", async () => {
-  const { program } = await TcgcTester.compile(
-    `
+  const { program } = await TcgcTester.compile({
+    "main.tsp": `
       import "@typespec/http";
       import "@typespec/rest";
       import "@typespec/versioning";
       import "@azure-tools/typespec-client-generator-core";
+      import "./client.tsp";
 
       using Http;
       using Rest;
@@ -593,8 +589,7 @@ it("redefine client structure", async () => {
       op uploadContainer(@path containerName: string): void;
       op uploadBlob(@path containerName: string, @path blobName: string): void;
       `,
-    {
-      "client.tsp": `
+    "client.tsp": `
     import "./main.tsp";
     using Azure.ClientGenerator.Core;
 
@@ -622,8 +617,7 @@ it("redefine client structure", async () => {
     }
     
     `,
-    },
-  );
+  });
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
   });
@@ -705,12 +699,13 @@ it("redefine client structure", async () => {
 });
 
 it("@paramAlias", async () => {
-  const { program } = await TcgcTester.compile(
-    `
+  const { program } = await TcgcTester.compile({
+    "main.tsp": `
     import "@typespec/http";
     import "@typespec/rest";
     import "@typespec/versioning";
     import "@azure-tools/typespec-client-generator-core";
+    import "./client.tsp";
 
     using Http;
     using Rest;
@@ -723,8 +718,7 @@ it("@paramAlias", async () => {
     op download(@path blob: string): void;
     op upload(@path blobName: string): void;
     `,
-    {
-      "client.tsp": `
+    "client.tsp": `
     import "./main.tsp";
     using Azure.ClientGenerator.Core;
 
@@ -737,8 +731,7 @@ it("@paramAlias", async () => {
 
     @@clientInitialization(MyService, {parameters: MyCustomizations.MyClientInitialization});
     `,
-    },
-  );
+  });
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
   });

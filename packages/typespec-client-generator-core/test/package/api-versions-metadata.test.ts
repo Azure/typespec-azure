@@ -35,6 +35,11 @@ it("single service with versioning should populate apiVersions map", async () =>
 
 it("multiple services should populate apiVersions map with all services", async () => {
   const mainCode = `
+      import "@typespec/http";
+      import "@typespec/versioning";
+      import "./client.tsp";
+      using TypeSpec.Http;
+      using TypeSpec.Versioning;
       @service
       @versioned(VersionsA)
       namespace ServiceA {
@@ -60,6 +65,10 @@ it("multiple services should populate apiVersions map with all services", async 
         }
       }`;
   const clientCode = `
+      import "@typespec/versioning";
+      import "@azure-tools/typespec-client-generator-core";
+      using TypeSpec.Versioning;
+      using Azure.ClientGenerator.Core;
       @client(
         {
           name: "CombineClient",

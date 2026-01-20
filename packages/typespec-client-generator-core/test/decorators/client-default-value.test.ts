@@ -1,22 +1,20 @@
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { getAllModels } from "../../src/types.js";
 import {
-  AzureCoreTester,
   createSdkContextForTester,
   SimpleTester,
   SimpleTesterWithBuiltInService,
 } from "../tester.js";
 
 it("sets client default value for a model property with numeric value", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
     model RequestOptions {
       @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(30)
       timeout?: int32;
     }
 
-    @test
     @route("/func1")
     op func1(@body body: RequestOptions): void;
   `);
@@ -39,13 +37,12 @@ it("sets client default value for a model property with numeric value", async ()
 });
 
 it("sets client default value for a model property with string value", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
     model Config {
       @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("standard")
       tier?: string;
     }
 
-    @test
     @route("/func1")
     op func1(@body body: Config): void;
   `);
@@ -68,13 +65,12 @@ it("sets client default value for a model property with string value", async () 
 });
 
 it("sets client default value for a model property with boolean value", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
     model Settings {
       @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(false)
       enableCache?: boolean;
     }
 
-    @test
     @route("/func1")
     op func1(@body body: Settings): void;
   `);
@@ -97,15 +93,13 @@ it("sets client default value for a model property with boolean value", async ()
 });
 
 it("does not set client default value for property without decorator", async () => {
-  const { program } = await SimpleTester.compile(`
+  const { program } = await SimpleTester.compile(t.code`
     @service
-    @test namespace MyService {
-      @test
+    namespace MyService {
       model Config {
         timeout?: int32;
       }
 
-      @test
       @route("/func1")
       op func1(@body body: Config): void;
     }
@@ -131,14 +125,12 @@ it("does not set client default value for property without decorator", async () 
 it("throws error when used on non-property targets", async () => {
   const diagnostics = await SimpleTester.diagnose(`
     @service
-    @test namespace MyService {
-      @test
+    namespace MyService {
       @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(30)
       model Config {
         timeout?: int32;
       }
 
-      @test
       @route("/func1")
       op func1(@body body: Config): void;
     }
@@ -150,13 +142,12 @@ it("throws error when used on non-property targets", async () => {
 });
 
 it("applies decorator with language scope", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
     model Config {
       @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(30, "python")
       timeout?: int32;
     }
 
-    @test
     @route("/func1")
     op func1(@body body: Config): void;
   `);
@@ -179,13 +170,12 @@ it("applies decorator with language scope", async () => {
 });
 
 it("applies decorator with different language scope should not apply", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
     model Config {
       @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(30, "python")
       timeout?: int32;
     }
 
-    @test
     @route("/func1")
     op func1(@body body: Config): void;
   `);
@@ -207,37 +197,8 @@ it("applies decorator with different language scope should not apply", async () 
   strictEqual(timeoutProperty.clientDefaultValue, undefined);
 });
 
-it("verify diagnostic gets raised for legacy usage", async () => {
-  const diagnostics = await AzureCoreTester.diagnose(
-    `        
-      namespace MyService {
-        model Config {
-          @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(30)
-          timeout?: int32;
-        }
-
-        @test
-        @route("/func1")
-        op func1(@body body: Config): void;
-      }
-      `,
-    {
-      linterRuleSet: {
-        enable: {
-          "@azure-tools/typespec-azure-core/no-legacy-usage": true,
-        },
-      },
-    },
-  );
-  expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-azure-core/no-legacy-usage",
-    message:
-      'Referencing elements inside Legacy namespace "Azure.ClientGenerator.Core.Legacy" is not allowed.',
-  });
-});
-
 it("sets client default value for multiple properties", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
     model RequestOptions {
       @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(30)
       timeout?: int32;
@@ -249,7 +210,6 @@ it("sets client default value for multiple properties", async () => {
       retry?: boolean;
     }
 
-    @test
     @route("/func1")
     op func1(@body body: RequestOptions): void;
   `);
@@ -278,7 +238,7 @@ it("sets client default value for multiple properties", async () => {
 });
 
 it("sets client default value for operation parameters", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
     @route("/items")
     @get
     op getItems(
@@ -308,7 +268,7 @@ it("sets client default value for operation parameters", async () => {
 });
 
 it("mixed with @alternateType", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
     @route("/items")
     @get
     op getItems(

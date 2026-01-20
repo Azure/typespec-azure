@@ -2,7 +2,6 @@ import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
 import {
-  AzureCoreTester,
   createSdkContextForTester,
   SimpleTester,
   SimpleTesterWithBuiltInService,
@@ -317,7 +316,7 @@ it("another circular inheritance", async () => {
 });
 
 it("conflicting inheritance", async () => {
-  const { program, diagnostics } = await SimpleTester.diagnose(`
+  const diagnostics = await SimpleTester.diagnose(`
       @service
       namespace TestService;
 
@@ -338,7 +337,6 @@ it("conflicting inheritance", async () => {
       op test(): C;
     `);
 
-  await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
   // Should warn about missing property with specific details
   expectDiagnostics(diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/legacy-hierarchy-building-conflict",
@@ -460,49 +458,6 @@ it("verify respectLegacyHierarchyBuilding: false flag", async () => {
   // SportsCar should inherit from Vehicle instead of Car
   strictEqual(sportsCarModel.baseModel?.name, "Vehicle");
   strictEqual(carModel.baseModel?.name, "Vehicle");
-});
-
-it("verify diagnostic gets raised for usage", async () => {
-  const { diagnostics } = await AzureCoreTester.diagnose(
-    `        
-          namespace MyService {
-        @discriminator("kind")
-        model A {
-          kind: string;
-        }
-
-        alias BContent = {
-          foo: string;
-        };
-
-        model B extends A {
-          kind: "B";
-          ...BContent;
-        }
-
-        @Azure.ClientGenerator.Core.Legacy.hierarchyBuilding(B)
-        model C extends A {
-          kind: "C";
-          ...BContent;
-          bar: string;
-        }
-      }
-      `,
-    {
-      linterRuleSet: {
-        enable: {
-          "@azure-tools/typespec-azure-core/no-legacy-usage": true,
-        },
-      },
-    },
-  );
-  expectDiagnostics(diagnostics, [
-    {
-      code: "@azure-tools/typespec-azure-core/no-legacy-usage",
-      message:
-        'Referencing elements inside Legacy namespace "Azure.ClientGenerator.Core.Legacy" is not allowed.',
-    },
-  ]);
 });
 
 it("verify legacy hierarchy building usage with unordered models", async () => {

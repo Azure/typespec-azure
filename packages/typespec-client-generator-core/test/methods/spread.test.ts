@@ -3,7 +3,12 @@ import { it } from "vitest";
 import { SdkHttpOperation, SdkServiceMethod, UsageFlags } from "../../src/interfaces.js";
 import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
-import { AzureCoreTester, createSdkContextForTester, SimpleTester, SimpleTesterWithBuiltInService } from "../tester.js";
+import {
+  AzureCoreTester,
+  createSdkContextForTester,
+  SimpleTester,
+  SimpleTesterWithBuiltInService,
+} from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
 it("plain model with no decorators", async () => {
@@ -17,7 +22,9 @@ it("plain model with no decorators", async () => {
 
     op myOp(...Input): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "myOp");
@@ -67,7 +74,9 @@ it("alias with no decorators", async () => {
 
     op myOp(...BodyParameter): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
@@ -139,7 +148,9 @@ it("rest template spreading of multiple models", async () => {
       extends ExtensionResourceCreateOrUpdate<Checkup, Pet, PetStoreError>,
         ExtensionResourceList<Checkup, Pet, PetStoreError> {}
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 4);
   deepStrictEqual(
@@ -234,7 +245,9 @@ it("multi layer template with discriminated model spread", async () => {
       deleteDataConnection is Operations.ResourceDelete<DataConnection>;
     }
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const sdkPackage = context.sdkPackage;
   const nonCoreModels = sdkPackage.models.filter((x) => !isAzureCoreModel(x));
   strictEqual(nonCoreModels.length, 2);
@@ -297,7 +310,9 @@ it("model with @body decorator", async () => {
     }
     op createShelf(...CreateShelfRequest): Shelf;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const method = getServiceMethodOfClient(context.sdkPackage);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -354,7 +369,9 @@ it("formdata model with multipartBody decorator in spread model", async () => {
     alias Intersected = DocumentTranslateContent & {};
     op test(...Intersected): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const method = getServiceMethodOfClient(context.sdkPackage);
   const documentMethodParam = method.parameters.find((x) => x.name === "testRequest");
   ok(documentMethodParam);
@@ -378,7 +395,9 @@ it("anonymous model with @body should not be spread", async () => {
   const { program } = await SimpleTesterWithBuiltInService.compile(`
     op test(@body body: {prop: string}): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const method = getServiceMethodOfClient(context.sdkPackage);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -424,6 +443,9 @@ it("anonymous model from spread with @bodyRoot should not be spread", async () =
     }
     op test(@bodyRoot body: {...Test}): void;
   `);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const method = getServiceMethodOfClient(context.sdkPackage);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -468,7 +490,9 @@ it("implicit spread", async () => {
     namespace My.Service;
     op myOp(a: string, b: string): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
@@ -515,7 +539,9 @@ it("implicit spread with metadata", async () => {
     namespace My.Service;
     op myOp(@header a: string, b: string): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
@@ -575,7 +601,9 @@ it("explicit spread", async () => {
     }
     op myOp(...Test): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
@@ -627,7 +655,9 @@ it("explicit spread with metadata", async () => {
     }
     op myOp(...Test): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
@@ -691,7 +721,9 @@ it("explicit multiple spread", async () => {
     }
     op myOp(...Test1, ...Test2): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
@@ -745,7 +777,9 @@ it("explicit multiple spread with metadata", async () => {
     }
     op myOp(...Test1, ...Test2): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
@@ -806,7 +840,9 @@ it("spread idempotent", async () => {
     };
     op test(...FooAlias): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
   getAllModels(context);
@@ -824,7 +860,9 @@ it("model used as simple spread", async () => {
       }
       op test(...Test): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
   getAllModels(context);
@@ -843,7 +881,9 @@ it("model used as simple spread and output", async () => {
       }
       op test(...Test): Test;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
   getAllModels(context);
@@ -865,7 +905,9 @@ it("model used as simple spread and other operation's output", async () => {
       @route("/another")
       op another(): Test;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
   getAllModels(context);
@@ -887,7 +929,9 @@ it("model used as simple spread and other operation's input", async () => {
       @route("/another")
       op another(@body body: Test): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
   getAllModels(context);
@@ -928,7 +972,9 @@ it("model used as simple spread with versioning", async () => {
     @post
     op ref3(@body body: Ref): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 2);
   getAllModels(context);

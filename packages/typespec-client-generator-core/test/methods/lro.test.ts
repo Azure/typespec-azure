@@ -5,11 +5,11 @@ import { SdkClientType, SdkHttpOperation, UsageFlags } from "../../src/interface
 import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
 import {
-  AzureCoreTester,
-  AzureCoreServiceTester,
   ArmTester,
+  AzureCoreBaseTester,
+  AzureCoreServiceTester,
+  AzureCoreTester,
   createSdkContextForTester,
-  TcgcTester,
 } from "../tester.js";
 import { hasFlag } from "../utils.js";
 
@@ -87,9 +87,7 @@ describe("data plane LRO templates", () => {
       strictEqual(metadata.finalStateVia, FinalStateValue.originalUri);
       assert.isUndefined(metadata.finalStep);
 
-      const pollingModel = context.sdkPackage.models.find(
-        (m) => m.name === "OperationStatusError",
-      );
+      const pollingModel = context.sdkPackage.models.find((m) => m.name === "OperationStatusError");
       ok(pollingModel);
       assert.isTrue(
         hasFlag(pollingModel.usage, UsageFlags.LroPolling),
@@ -148,9 +146,7 @@ describe("data plane LRO templates", () => {
       strictEqual(metadata.finalStateVia, FinalStateValue.operationLocation);
       strictEqual(metadata.finalStep?.kind, "noPollingResult");
 
-      const pollingModel = context.sdkPackage.models.find(
-        (m) => m.name === "OperationStatusError",
-      );
+      const pollingModel = context.sdkPackage.models.find((m) => m.name === "OperationStatusError");
       ok(pollingModel);
       assert.isTrue(
         hasFlag(pollingModel.usage, UsageFlags.LroPolling),
@@ -281,9 +277,7 @@ describe("data plane LRO templates", () => {
         };
     `);
       const context = await createSdkContextForTester(program);
-      const inputModel = context.sdkPackage.models.find(
-        (m) => m.name === "GenerationOptions",
-      );
+      const inputModel = context.sdkPackage.models.find((m) => m.name === "GenerationOptions");
       ok(inputModel);
 
       const methods = context.sdkPackage.clients[0].methods;
@@ -327,9 +321,7 @@ describe("data plane LRO templates", () => {
       );
       strictEqual(metadata.pollingStep.responseBody, pollingModel);
 
-      const returnModel = context.sdkPackage.models.find(
-        (m) => m.name === "GenerationResult",
-      );
+      const returnModel = context.sdkPackage.models.find((m) => m.name === "GenerationResult");
       ok(returnModel);
       strictEqual(metadata.finalResponse?.envelopeResult, pollingModel);
       strictEqual(metadata.finalResponse?.result, returnModel);
@@ -408,9 +400,7 @@ describe("data plane LRO templates", () => {
       const lroMetadata = lroMethod.lroMetadata;
       ok(lroMetadata);
       // find the model
-      const envelopeResult = context.sdkPackage.models.find(
-        (m) => m.name === "OperationDetails",
-      );
+      const envelopeResult = context.sdkPackage.models.find((m) => m.name === "OperationDetails");
       const resultProperty = envelopeResult?.properties.find((p) => p.name === "longRunningResult");
       ok(lroMetadata.finalResponse?.resultSegments);
       strictEqual(resultProperty, lroMetadata.finalResponse?.resultSegments[0]);
@@ -605,9 +595,7 @@ describe("data plane LRO templates", () => {
         op poll(): TestClient.PollResponse;
       }`);
     const context = await createSdkContextForTester(program);
-    const method = context.sdkPackage.clients[0].methods.find(
-      (m) => m.name === "longRunning",
-    );
+    const method = context.sdkPackage.clients[0].methods.find((m) => m.name === "longRunning");
     ok(method);
     strictEqual(method.kind, "lro");
 
@@ -633,13 +621,14 @@ describe("data plane LRO templates", () => {
   });
 
   it("LRO final envelope result correctly marked when only used in ignored polling operation", async () => {
-    const { program } = await TcgcTester.compile({
+    const { program } = await AzureCoreBaseTester.compile({
       "main.tsp": `
 import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-client-generator-core";
+import "./client.tsp";
 using TypeSpec.Http;
 using TypeSpec.Rest;
 using TypeSpec.Versioning;
@@ -775,7 +764,9 @@ interface DocumentIntelligenceClient {
 }
       `,
     });
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
     const models = context.sdkPackage.models;
     strictEqual(models.length, 4);
     const analyzeOperationModel = models.find((m) => m.name === "AnalyzeOperation");
@@ -912,7 +903,7 @@ interface DocumentIntelligenceClient {
 });
 
 describe("Arm LRO templates", () => {
-  it("ArmResourceCreateOrReplaceAsync", async () => {
+  it("ArmResourceCreateOrReplaceAsync", { timeout: 30000 }, async () => {
     const { program } = await ArmVersionedServiceTester.compile(`
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
@@ -1141,7 +1132,9 @@ it("customized lro delete", async () => {
       name?: string;
     }
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
   strictEqual(sdkPackage.enums.length, 2);
@@ -1193,14 +1186,18 @@ describe("getLroMetadata", () => {
   `;
   it("filter-out-core-models true", async () => {
     const { program } = await AzureCoreTester.compile(lroCode);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
     const models = context.sdkPackage.models.filter((x) => !isAzureCoreModel(x));
     strictEqual(models.length, 1);
     deepStrictEqual(models[0].name, "ExportedUser");
   });
   it("filter-out-core-models false", async () => {
     const { program } = await AzureCoreTester.compile(lroCode);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
     const models = getAllModels(context);
     strictEqual(models.length, 8);
     // there should only be one non-core model
@@ -1221,13 +1218,14 @@ describe("getLroMetadata", () => {
 });
 
 it("versioned LRO with customization", async () => {
-  const { program } = await TcgcTester.compile({
+  const { program } = await AzureCoreBaseTester.compile({
     "main.tsp": `
 import "@typespec/http";
 import "@typespec/rest";
 import "@typespec/versioning";
 import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-client-generator-core";
+import "./client.tsp";
 using TypeSpec.Http;
 using TypeSpec.Rest;
 using TypeSpec.Versioning;
@@ -1289,7 +1287,9 @@ namespace TestClient;
 op test is TestService.create;
     `,
   });
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   strictEqual(context.diagnostics.length, 0);
   const client = context.sdkPackage.clients[0];
   strictEqual(client.methods.length, 1);

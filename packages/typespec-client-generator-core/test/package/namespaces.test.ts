@@ -215,6 +215,9 @@ describe("no namespace flag", () => {
 
   it("restructure client hierarchy with renaming of client name and client namespace name", async () => {
     const mainCode = `
+        import "@typespec/http";
+        import "./client.tsp";
+        using TypeSpec.Http;
         @service(#{
           title: "Pet Store",
         })
@@ -227,6 +230,8 @@ describe("no namespace flag", () => {
         op pet(): void;
       `;
     const clientCode = `
+        import "@azure-tools/typespec-client-generator-core";
+        using Azure.ClientGenerator.Core;
         namespace PetStoreRenamed; // this namespace will be the namespace of the clients and operation groups defined in this customization file
   
         @client({
@@ -419,6 +424,9 @@ describe("namespace config flag", () => {
   });
   it("restructure client hierarchy with namespace flag, renaming of client name, and client namespace name", async () => {
     const mainCode = `
+      import "@typespec/http";
+      import "./client.tsp";
+      using TypeSpec.Http;
       @service(#{
         title: "Pet Store",
       })
@@ -431,6 +439,8 @@ describe("namespace config flag", () => {
       op pet(): void;
     `;
     const clientCode = `
+      import "@azure-tools/typespec-client-generator-core";
+      using Azure.ClientGenerator.Core;
       namespace PetStoreRenamed;
 
       @client({
@@ -563,6 +573,9 @@ describe("namespace config flag", () => {
   });
   it("Separate namespace references", async () => {
     const mainCode = `
+      import "@typespec/http";
+      import "./client.tsp";
+      using TypeSpec.Http;
       @service
       namespace Client.ClientNamespace;
 
@@ -580,6 +593,8 @@ describe("namespace config flag", () => {
 
     `;
     const clientCode = `
+      import "@azure-tools/typespec-client-generator-core";
+      using Azure.ClientGenerator.Core;
       namespace ClientNameSpaceClient;
 
       @client({
@@ -612,6 +627,7 @@ describe("namespace config flag", () => {
 
 it("customization with models from original namespace", async () => {
   const mainCode = `
+      import "./client.tsp";
       @service
       namespace Original {
         model MyModel {
@@ -620,6 +636,8 @@ it("customization with models from original namespace", async () => {
       }
     `;
   const clientCode = `
+      import "@azure-tools/typespec-client-generator-core";
+      using Azure.ClientGenerator.Core;
       @client({service: Original, name: "MyClient"})
       namespace Customization {
         op foo(): void;

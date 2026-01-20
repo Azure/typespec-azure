@@ -47,17 +47,17 @@ ${x}
 export const VersionedServiceTester = SimpleTester.wrap(
   (x) => `
 @service
-@versioned(Versions)
+@versioned(ServiceVersions)
 @server(
   "{endpoint}/versioning/api-version:{version}",
   "Testserver endpoint",
   {
     endpoint: url,
-    version: Versions,
+    version: ServiceVersions,
   }
 )
-namespace Versioning;
-enum Versions {
+namespace VersioningService;
+enum ServiceVersions {
   v1: "v1",
   v2: "v2",
 }
@@ -86,7 +86,78 @@ export const AzureCoreTester = createTester(resolvePath(import.meta.dirname, "..
     "@azure-tools/typespec-azure-core",
     "@azure-tools/typespec-client-generator-core",
   )
-  .using("Http", "Rest", "Versioning", "Azure.Core", "Azure.Core.Traits", "Azure.ClientGenerator.Core");
+  .using(
+    "Http",
+    "Rest",
+    "Versioning",
+    "Azure.Core",
+    "Azure.Core.Traits",
+    "Azure.ClientGenerator.Core",
+  );
+
+/**
+ * Base tester for TCGC tests with Azure Core libraries loaded but no auto-imports/usings.
+ * Use this for multi-file tests where files have explicit imports.
+ */
+export const AzureCoreBaseTester = createTester(resolvePath(import.meta.dirname, ".."), {
+  libraries: [
+    "@typespec/http",
+    "@typespec/rest",
+    "@typespec/versioning",
+    "@typespec/openapi",
+    "@azure-tools/typespec-azure-core",
+    "@azure-tools/typespec-client-generator-core",
+  ],
+});
+
+/**
+ * Helper to create multi-file test input for main.tsp + client.tsp scenarios.
+ * Automatically adds common imports and usings to both files.
+ *
+ * @example
+ * ```ts
+ * const { program } = await TcgcTester.compile(
+ *   createTcgcMultiFileInput({
+ *     "main.tsp": `
+ *       @service
+ *       namespace MyService;
+ *       op test(): void;
+ *     `,
+ *     "client.tsp": `
+ *       @client({ name: "MyClient", service: MyService })
+ *       namespace MyClient {}
+ *     `,
+ *   })
+ * );
+ * ```
+ */
+export function createTcgcMultiFileInput(files: { "main.tsp": string; "client.tsp": string }): {
+  "main.tsp": string;
+  "client.tsp": string;
+} {
+  return {
+    "main.tsp": `
+import "@typespec/http";
+import "@typespec/rest";
+import "@typespec/versioning";
+import "@azure-tools/typespec-client-generator-core";
+import "./client.tsp";
+using TypeSpec.Http;
+using TypeSpec.Rest;
+using TypeSpec.Versioning;
+using Azure.ClientGenerator.Core;
+
+${files["main.tsp"]}
+`,
+    "client.tsp": `
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+using Azure.ClientGenerator.Core;
+
+${files["client.tsp"]}
+`,
+  };
+}
 
 /**
  * Tester with a built-in Azure Core service namespace.

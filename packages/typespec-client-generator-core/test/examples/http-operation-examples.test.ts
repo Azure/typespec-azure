@@ -1,33 +1,28 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": `./examples`,
-  });
-});
+import { createSdkContextForTester, SimpleTester } from "../tester.js";
 
 it("simple case", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/simple.json",
     `${__dirname}/http-operation-examples/simple.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op simple(): void;
     }
   `);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+    "examples-dir": "./examples",
+  });
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   strictEqual(operation.examples[0].kind, "http");
@@ -41,15 +36,16 @@ it("simple case", async () => {
     responses: {},
   });
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("parameters", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/parameters.json",
     `${__dirname}/http-operation-examples/parameters.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       @route("/{b}")
@@ -65,10 +61,13 @@ it("parameters", async () => {
       ): void;
     }
   `);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+    "examples-dir": "./examples",
+  });
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   strictEqual(operation.examples[0].kind, "http");
@@ -105,15 +104,16 @@ it("parameters", async () => {
   strictEqual(parameters[6].value.value, "renamePath");
   strictEqual(parameters[6].value.type.kind, "string");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("body with encoded name", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/bodyWithEncodedName.json",
     `${__dirname}/http-operation-examples/bodyWithEncodedName.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op encodedname(
@@ -121,10 +121,13 @@ it("body with encoded name", async () => {
       ): void;
     }
   `);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+    "examples-dir": "./examples",
+  });
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   strictEqual(operation.examples[0].kind, "http");
@@ -137,24 +140,28 @@ it("body with encoded name", async () => {
   strictEqual(parameters[0].value.value, "body");
   strictEqual(parameters[0].value.type.kind, "string");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("body fallback", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/parameters.json",
     `${__dirname}/http-operation-examples/bodyFallback.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op bodyTest(prop: string): void;
     }
   `);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+    "examples-dir": "./examples",
+  });
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   strictEqual(operation.examples[0].kind, "http");
@@ -168,24 +175,28 @@ it("body fallback", async () => {
   strictEqual(parameters[0].value.value["prop"].value, "body");
   strictEqual(parameters[0].value.type.kind, "model");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("body fallback client name", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/parameters.json",
     `${__dirname}/http-operation-examples/bodyFallbackClientName.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op bodyTest(@body @clientName("test") prop: string): void;
     }
   `);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+    "examples-dir": "./examples",
+  });
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   strictEqual(operation.examples[0].kind, "http");
@@ -198,15 +209,16 @@ it("body fallback client name", async () => {
   strictEqual(parameters[0].value.value, "body");
   strictEqual(parameters[0].value.type.kind, "string");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("parameters diagnostic", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/parametersDiagnostic.json",
     `${__dirname}/http-operation-examples/parametersDiagnostic.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       @route("/{b}")
@@ -218,10 +230,13 @@ it("parameters diagnostic", async () => {
       ): void;
     }
   `);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+    "examples-dir": "./examples",
+  });
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   strictEqual(operation.examples[0].kind, "http");
@@ -230,18 +245,19 @@ it("parameters diagnostic", async () => {
   ok(parameters);
   strictEqual(parameters.length, 0);
 
-  expectDiagnostics(runner.context.diagnostics, {
+  expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
     message: `Value in example file 'parametersDiagnostic.json' does not follow its definition:\n{"test":"a"}`,
   });
 });
 
 it("responses", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/responses.json",
     `${__dirname}/http-operation-examples/responses.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op responses(): {
@@ -257,10 +273,13 @@ it("responses", async () => {
       };
     }
   `);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+    "examples-dir": "./examples",
+  });
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   strictEqual(operation.examples[0].kind, "http");
@@ -295,15 +314,16 @@ it("responses", async () => {
   strictEqual(createdResponse.headers[0].value.kind, "string");
   strictEqual(createdResponse.headers[0].value.type.kind, "string");
 
-  expectDiagnostics(runner.context.diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("responses diagnostic", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/responsesDiagnostic.json",
     `${__dirname}/http-operation-examples/responsesDiagnostic.json`,
   );
-  await runner.compile(`
+  const { program } = await instance.compile(`
     @service
     namespace TestClient {
       op responsesDiagnostic(): {
@@ -319,10 +339,13 @@ it("responses diagnostic", async () => {
       };
     }
   `);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+    "examples-dir": "./examples",
+  });
 
-  const operation = (
-    runner.context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
-  ).operation;
+  const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
+    .operation;
   ok(operation);
   strictEqual(operation.examples?.length, 1);
   strictEqual(operation.examples[0].kind, "http");
@@ -338,7 +361,7 @@ it("responses diagnostic", async () => {
   strictEqual(createdResponse.bodyValue, undefined);
   strictEqual(createdResponse.headers.length, 0);
 
-  expectDiagnostics(runner.context.diagnostics, [
+  expectDiagnostics(context.diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/example-value-no-mapping",
       message: `Value in example file 'responsesDiagnostic.json' does not follow its definition:\n{"a":"test"}`,

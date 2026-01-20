@@ -1,4 +1,5 @@
 import { Namespace } from "@typespec/compiler";
+import { t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { getDefaultApiVersion, listAllServiceNamespaces } from "../../src/public-utils.js";
@@ -14,7 +15,9 @@ it("get single", async () => {
     @service
     namespace MyService {};
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const serviceNamespace = listAllServiceNamespaces(context)[0];
   const defaultApiVersion = getDefaultApiVersion(context, serviceNamespace);
   ok(defaultApiVersion);
@@ -31,9 +34,11 @@ it("get multiple date incorrect ordering", async () => {
 
     @versioned(Versions)
     @service
-    @test namespace MyService {};
+    namespace MyService {};
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const serviceNamespace = listAllServiceNamespaces(context)[0];
   const defaultApiVersion = getDefaultApiVersion(context, serviceNamespace);
   ok(defaultApiVersion);
@@ -50,9 +55,11 @@ it("get multiple date correct ordering", async () => {
 
     @versioned(Versions)
     @service
-    @test namespace MyService {};
+    namespace MyService {};
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const serviceNamespace = listAllServiceNamespaces(context)[0];
   const defaultApiVersion = getDefaultApiVersion(context, serviceNamespace);
   ok(defaultApiVersion);
@@ -69,9 +76,11 @@ it("get multiple semantic incorrect", async () => {
 
     @versioned(Versions)
     @service
-    @test namespace MyService {};
+    namespace MyService {};
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const serviceNamespace = listAllServiceNamespaces(context)[0];
   const defaultApiVersion = getDefaultApiVersion(context, serviceNamespace);
   ok(defaultApiVersion);
@@ -88,9 +97,11 @@ it("get multiple semantic correct", async () => {
 
     @versioned(Versions)
     @service
-    @test namespace MyService {};
+    namespace MyService {};
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const serviceNamespace = listAllServiceNamespaces(context)[0];
   const defaultApiVersion = getDefaultApiVersion(context, serviceNamespace);
   ok(defaultApiVersion);
@@ -100,9 +111,11 @@ it("get multiple semantic correct", async () => {
 it("get undefined", async () => {
   const { program } = await SimpleTester.compile(`
     @service
-    @test namespace MyService {};
+    namespace MyService {};
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const serviceNamespace = listAllServiceNamespaces(context)[0];
   ok(!getDefaultApiVersion(context, serviceNamespace));
 });
@@ -114,15 +127,17 @@ it("get empty", async () => {
 
     @versioned(Versions)
     @service
-    @test namespace MyService {};
+    namespace MyService {};
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const serviceNamespace = listAllServiceNamespaces(context)[0];
   ok(!getDefaultApiVersion(context, serviceNamespace));
 });
 
 it("get with all", async () => {
-  const { program, MyService } = (await SimpleTester.compile(`
+  const { program, MyService } = await SimpleTester.compile(t.code`
     enum Versions {
       v1_0_0: "1.0",
       v1_0_1: "1.0.1",
@@ -130,8 +145,8 @@ it("get with all", async () => {
     }
     @versioned(Versions)
     @service
-    @test namespace MyService {};
-  `)) as { program: any; MyService: Namespace };
+    namespace ${t.namespace("MyService")} {};
+  `);
   const context = await createSdkContextForTester(program, {
     "api-version": "all",
     emitterName: "@azure-tools/typespec-python",
@@ -142,7 +157,7 @@ it("get with all", async () => {
 });
 
 it("get with latest", async () => {
-  const { program, MyService } = (await SimpleTester.compile(`
+  const { program, MyService } = await SimpleTester.compile(t.code`
     enum Versions {
       v1_0_0: "1.0",
       v1_0_1: "1.0.1",
@@ -151,8 +166,8 @@ it("get with latest", async () => {
 
     @versioned(Versions)
     @service
-    @test namespace MyService {};
-  `)) as { program: any; MyService: Namespace };
+    namespace ${t.namespace("MyService")} {};
+  `);
   const context = await createSdkContextForTester(program, {
     "api-version": "latest",
     emitterName: "@azure-tools/typespec-python",
@@ -163,7 +178,7 @@ it("get with latest", async () => {
 });
 
 it("get with specific version", async () => {
-  const { program, MyService } = (await SimpleTester.compile(`
+  const { program, MyService } = await SimpleTester.compile(t.code`
     enum Versions {
       v1_0_0: "1.0",
       v1_0_1: "1.0.1",
@@ -172,8 +187,8 @@ it("get with specific version", async () => {
 
     @versioned(Versions)
     @service
-    @test namespace MyService {};
-  `)) as { program: any; MyService: Namespace };
+    namespace ${t.namespace("MyService")} {};
+  `);
   const context = await createSdkContextForTester(program, {
     "api-version": "1.0.1",
     emitterName: "@azure-tools/typespec-python",

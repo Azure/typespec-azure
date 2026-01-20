@@ -1,4 +1,4 @@
-import { Model, Union } from "@typespec/compiler";
+import { t } from "@typespec/compiler/testing";
 import { deepEqual, deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { SdkEnumType, SdkModelType, SdkUnionType, UsageFlags } from "../../src/interfaces.js";
@@ -302,7 +302,7 @@ it("crossLanguageDefinitionId", async () => {
 });
 
 it("enum with deprecated annotation", async () => {
-  const { program } = await SimpleTester.compile(`
+  const [{ program }] = await SimpleTester.compileAndDiagnose(`
     @service
     namespace MyService;
     #deprecated "no longer support"
@@ -348,20 +348,20 @@ it("orphan enum", async () => {
 });
 
 it("union as enum rename", async () => {
-  const { program, TestUnion } = (await TcgcTester.compile({
-    "main.tsp": `
+  const { program, TestUnion } = await TcgcTester.compile({
+    "main.tsp": t.code`
       import "@typespec/http";
       import "@typespec/rest";
       import "@typespec/versioning";
       import "@azure-tools/typespec-client-generator-core";
+      import "./client.tsp";
       using Http;
       using Rest;
       using Versioning;
       using Azure.ClientGenerator.Core;
       @service
       namespace N {
-        @test
-        union TestUnion{
+        union ${t.union("TestUnion")}{
           @clientName("ARename")
           "A",
           "B": "B_v",
@@ -385,7 +385,7 @@ it("union as enum rename", async () => {
       @@clientName(N.TestUnion, "TestUnionRename");
       @@clientName(N.TestUnion.B, "BRename");
     `,
-  })) as { program: any; TestUnion: Union };
+  });
 
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-java",
@@ -400,12 +400,10 @@ it("union as enum rename", async () => {
 });
 
 it("union as enum with hierarchy", async () => {
-  const { program, Test } = (await SimpleTester.compile(
-    `
+  const { program, Test } = await SimpleTester.compile(t.code`
       @service
       namespace N {
-        @test
-        union Test{
+        union ${t.union("Test")}{
           A,
           B,
           C,
@@ -427,8 +425,7 @@ it("union as enum with hierarchy", async () => {
         }
         op x(body: Test): void;
       }
-    `,
-  )) as { program: any; Test: Union };
+    `);
 
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-java",
@@ -452,12 +449,10 @@ it("union as enum with hierarchy", async () => {
 });
 
 it("union as enum with hierarchy without flatten", async () => {
-  const { program, Foo } = (await SimpleTester.compile(
-    `
+  const { program, Foo } = await SimpleTester.compile(t.code`
       @service
       namespace N {
-        @test
-        union Foo {
+        union ${t.union("Foo")} {
           "bar",
           Baz,
           string,
@@ -470,8 +465,7 @@ it("union as enum with hierarchy without flatten", async () => {
 
         op test(@body test: Foo): void;
       }
-    `,
-  )) as { program: any; Foo: Union };
+    `);
 
   const context = await createSdkContextForTester(
     program,
@@ -487,12 +481,10 @@ it("union as enum with hierarchy without flatten", async () => {
 });
 
 it("nullable union as enum with hierarchy without flatten", async () => {
-  const { program, Test } = (await SimpleTester.compile(
-    `
+  const { program, Test } = await SimpleTester.compile(t.code`
       @service
       namespace N {
-        @test
-        union Test{
+        union ${t.union("Test")}{
           A,
           B,
           C,
@@ -514,8 +506,7 @@ it("nullable union as enum with hierarchy without flatten", async () => {
         }
         op x(body: Test): void;
       }
-    `,
-  )) as { program: any; Test: Union };
+    `);
 
   const context = await createSdkContextForTester(
     program,
@@ -564,8 +555,7 @@ it("nullable union as enum with hierarchy without flatten", async () => {
 });
 
 it("anonymous union as enum with hierarchy", async () => {
-  const { program, Test } = (await SimpleTester.compile(
-    `
+  const { program, Test } = await SimpleTester.compile(t.code`
     @service
     namespace N {
       enum LR {
@@ -577,14 +567,12 @@ it("anonymous union as enum with hierarchy", async () => {
         down,
       }
       
-      @test
-      model Test {
+      model ${t.model("Test")} {
         color: LR | UD;
       }
       op read(@body body: Test): void;
     }
-  `,
-  )) as { program: any; Test: Model };
+  `);
 
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-java",
@@ -613,8 +601,7 @@ it("anonymous union as enum with hierarchy", async () => {
 });
 
 it("anonymous union as enum with hierarchy without flatten", async () => {
-  const { program, Test } = (await SimpleTester.compile(
-    `
+  const { program, Test } = await SimpleTester.compile(t.code`
       @service
       namespace N {
         enum LR {
@@ -626,14 +613,12 @@ it("anonymous union as enum with hierarchy without flatten", async () => {
           down,
         }
         
-        @test
-        model Test {
+        model ${t.model("Test")} {
           color: LR | UD;
         }
         op read(@body body: Test): void;
       }
-    `,
-  )) as { program: any; Test: Model };
+    `);
 
   const context = await createSdkContextForTester(
     program,

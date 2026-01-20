@@ -1,31 +1,26 @@
-import { Model, Operation, Program } from "@typespec/compiler";
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { getClientNameOverride } from "../../src/decorators.js";
 import { createSdkContextForTester, SimpleTester, TcgcTester } from "../tester.js";
 
 it("carry over", async () => {
-  const { program, Test1, Test2, func1, func2 } = (await SimpleTester.compile(`
+  const { program, Test1, Test2, func1, func2 } = await SimpleTester.compile(t.code`
   @service
-  @test namespace MyService {
-    @test
+  namespace ${t.namespace("MyService")} {
     @clientName("Test1Rename")
-    model Test1{}
+    model ${t.model("Test1")}{}
 
-    @test
-    model Test2 is Test1{}
+    model ${t.model("Test2")} is Test1{}
 
-    @test
     @route("/func1")
     @clientName("func1Rename")
-    op func1(): void;
+    op ${t.op("func1")}(): void;
 
-    @test
     @route("/func2")
-    op func2 is func1;
+    op ${t.op("func2")} is func1;
       }
-    `)) as { program: Program; Test1: Model; Test2: Model; func1: Operation; func2: Operation };
+    `);
 
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
@@ -37,8 +32,8 @@ it("carry over", async () => {
 });
 
 it("augment carry over", async () => {
-  const { program, Test1, Test2, func1, func2 } = (await TcgcTester.compile({
-    "main.tsp": `
+  const { program, Test1, Test2, func1, func2 } = await TcgcTester.compile({
+    "main.tsp": t.code`
       import "@typespec/http";
       import "@typespec/rest";
       import "@typespec/versioning";
@@ -50,20 +45,16 @@ it("augment carry over", async () => {
       using Azure.ClientGenerator.Core;
 
       @service
-      @test namespace MyService {
-        @test
-        model Test1{}
+      namespace ${t.namespace("MyService")} {
+        model ${t.model("Test1")}{}
 
-        @test
-        model Test2 is Test1{}
+        model ${t.model("Test2")} is Test1{}
 
-        @test
         @route("/func1")
-        op func1(): void;
+        op ${t.op("func1")}(): void;
 
-        @test
         @route("/func2")
-        op func2 is func1;
+        op ${t.op("func2")} is func1;
       }
     `,
     "client.tsp": `
@@ -82,7 +73,7 @@ it("augment carry over", async () => {
       @@clientName(MyService.Test1, "Test1Rename");
       @@clientName(MyService.func1, "func1Rename");
     `,
-  })) as { program: Program; Test1: Model; Test2: Model; func1: Operation; func2: Operation };
+  });
 
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",

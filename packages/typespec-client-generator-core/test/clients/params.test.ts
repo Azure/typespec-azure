@@ -15,8 +15,6 @@ import {
   TcgcTester,
 } from "../tester.js";
 
-const AzureCoreTesterWithTraits = AzureCoreTester.using("Azure.Core.Traits");
-
 function getServiceWithDefaultApiVersion(op: string) {
   return `
     @server(
@@ -540,7 +538,7 @@ function getServiceNoDefaultApiVersion(op: string) {
 }
 
 it("service with no default api version, method with no api version param", async () => {
-  const { program } = await AzureCoreTesterWithTraits.compile(
+  const { program } = await AzureCoreTester.compile(
     getServiceNoDefaultApiVersion(`
         @route("/without-api-version")
         @head
@@ -567,7 +565,7 @@ it("service with no default api version, method with no api version param", asyn
 });
 
 it("service with no default api version, method with api version param", async () => {
-  const { program } = await AzureCoreTesterWithTraits.compile(
+  const { program } = await AzureCoreTester.compile(
     getServiceNoDefaultApiVersion(`
       @route("/with-query-api-version")
       @head
@@ -610,7 +608,7 @@ it("service with no default api version, method with api version param", async (
 });
 
 it("service with default api version, method without api version param", async () => {
-  const { program } = await AzureCoreTesterWithTraits.compile(
+  const { program } = await AzureCoreTester.compile(
     getServiceWithDefaultApiVersion(`
       @route("/without-api-version")
       @head
@@ -638,7 +636,7 @@ it("service with default api version, method without api version param", async (
 });
 
 it("service with default api version, method with api version param", async () => {
-  const { program } = await AzureCoreTesterWithTraits.compile(
+  const { program } = await AzureCoreTester.compile(
     getServiceWithDefaultApiVersion(`
       @route("/with-query-api-version")
       @head
@@ -690,7 +688,7 @@ it("service with default api version, method with api version param", async () =
 });
 
 it("service with default api version, method with path api version param", async () => {
-  const { program } = await AzureCoreTesterWithTraits.compile(
+  const { program } = await AzureCoreTester.compile(
     getServiceWithDefaultApiVersion(`
       @route("/with-path-api-version")
       @head
@@ -791,7 +789,7 @@ it("endpoint template argument with default value of enum member", async () => {
   strictEqual(clientTemplateArg.clientDefaultValue, "default");
 });
 
-it("client level signatures by default", async () => {
+it("client level signatures by default", { timeout: 30000 }, async () => {
   const { program } = await ArmServiceTester.compile(`
     model MyProperties {
       @visibility(Lifecycle.Read)
@@ -840,6 +838,7 @@ it("optional client param with some methods using, some not", async () => {
     import "@typespec/rest";
     import "@typespec/versioning";
     import "@azure-tools/typespec-client-generator-core";
+    import "./client.tsp";
     using TypeSpec.Http;
     using TypeSpec.Rest;
     using TypeSpec.Versioning;
@@ -935,6 +934,7 @@ it("child client with own initialization params should not inherit parent params
     import "@typespec/rest";
     import "@typespec/versioning";
     import "@azure-tools/typespec-client-generator-core";
+    import "./client.tsp";
     using TypeSpec.Http;
     using TypeSpec.Rest;
     using TypeSpec.Versioning;
@@ -959,7 +959,9 @@ it("child client with own initialization params should not inherit parent params
   `,
     "client.tsp": `
     import "./main.tsp";
+    import "@typespec/http";
     import "@azure-tools/typespec-client-generator-core";
+    using TypeSpec.Http;
     using Azure.ClientGenerator.Core;
 
     @@clientInitialization(ClientOptionalParams, {

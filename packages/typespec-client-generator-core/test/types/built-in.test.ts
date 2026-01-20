@@ -1,25 +1,24 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { ok, strictEqual } from "assert";
-import { afterEach, beforeEach, it } from "vitest";
-import { SdkBuiltInType } from "../../src/interfaces.js";
+import { it } from "vitest";
+import { SdkBuiltInType, SdkContext } from "../../src/interfaces.js";
 import { getAllModels } from "../../src/types.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import {
+  AzureCoreServiceTester,
+  createSdkContextForTester,
+  SimpleTesterWithBuiltInService,
+} from "../tester.js";
 import { getSdkTypeHelper } from "./utils.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-});
-afterEach(async () => {
-  for (const modelsOrEnums of [runner.context.sdkPackage.models, runner.context.sdkPackage.enums]) {
+function assertModelsAndEnumsHaveNames(context: SdkContext) {
+  for (const modelsOrEnums of [context.sdkPackage.models, context.sdkPackage.enums]) {
     for (const item of modelsOrEnums) {
       ok(item.name !== "");
     }
   }
-});
+}
+
 it("string", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
     @usage(Usage.input | Usage.output)
     model Test {
@@ -27,14 +26,18 @@ it("string", async function () {
     }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "string");
   strictEqual(sdkType.crossLanguageDefinitionId, "TypeSpec.string");
   strictEqual(sdkType.baseType, undefined);
+  assertModelsAndEnumsHaveNames(context);
 });
 
 it("boolean", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -42,10 +45,14 @@ it("boolean", async function () {
       }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "boolean");
   strictEqual(sdkType.crossLanguageDefinitionId, "TypeSpec.boolean");
   strictEqual(sdkType.baseType, undefined);
+  assertModelsAndEnumsHaveNames(context);
 });
 
 it("integers", async function () {
@@ -61,7 +68,7 @@ it("integers", async function () {
     "integer",
   ];
   for (const type of types) {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithBuiltInService.compile(
       `
         @usage(Usage.input | Usage.output)
         model Test {
@@ -69,17 +76,21 @@ it("integers", async function () {
         }
       `,
     );
-    const sdkType = getSdkTypeHelper(runner) as SdkBuiltInType;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+    const sdkType = getSdkTypeHelper(context) as SdkBuiltInType;
     strictEqual(sdkType.kind, type);
     strictEqual(sdkType?.crossLanguageDefinitionId, `TypeSpec.${type}`);
     strictEqual(sdkType?.baseType, undefined);
+    assertModelsAndEnumsHaveNames(context);
   }
 });
 
 it("floats", async function () {
   const types = ["numeric", "float", "float32", "float64"];
   for (const type of types) {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithBuiltInService.compile(
       `
         @usage(Usage.input | Usage.output)
         model Test {
@@ -87,15 +98,19 @@ it("floats", async function () {
         }
       `,
     );
-    const sdkType = getSdkTypeHelper(runner) as SdkBuiltInType;
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+    const sdkType = getSdkTypeHelper(context) as SdkBuiltInType;
     strictEqual(sdkType.kind, type);
     strictEqual(sdkType.crossLanguageDefinitionId, `TypeSpec.${type}`);
     strictEqual(sdkType.baseType, undefined);
+    assertModelsAndEnumsHaveNames(context);
   }
 });
 
 it("decimal", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -103,14 +118,18 @@ it("decimal", async function () {
       }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "decimal");
   strictEqual(sdkType.crossLanguageDefinitionId, "TypeSpec.decimal");
   strictEqual(sdkType.baseType, undefined);
+  assertModelsAndEnumsHaveNames(context);
 });
 
 it("decimal128", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -118,14 +137,18 @@ it("decimal128", async function () {
       }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "decimal128");
   strictEqual(sdkType.crossLanguageDefinitionId, "TypeSpec.decimal128");
   strictEqual(sdkType.baseType, undefined);
+  assertModelsAndEnumsHaveNames(context);
 });
 
 it("unknown", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -133,12 +156,16 @@ it("unknown", async function () {
       }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "unknown");
+  assertModelsAndEnumsHaveNames(context);
 });
 
 it("null", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -146,12 +173,16 @@ it("null", async function () {
       }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "unknown");
+  assertModelsAndEnumsHaveNames(context);
 });
 
 it("bytes", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -159,14 +190,18 @@ it("bytes", async function () {
       }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "bytes");
   strictEqual(sdkType.encode, "base64");
   strictEqual(sdkType.baseType, undefined);
+  assertModelsAndEnumsHaveNames(context);
 });
 
 it("bytes base64", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -175,14 +210,18 @@ it("bytes base64", async function () {
       }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "bytes");
   strictEqual(sdkType.encode, "base64");
   strictEqual(sdkType.baseType, undefined);
+  assertModelsAndEnumsHaveNames(context);
 });
 
 it("bytes base64url", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -191,14 +230,18 @@ it("bytes base64url", async function () {
       }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "bytes");
   strictEqual(sdkType.encode, "base64url");
   strictEqual(sdkType.baseType, undefined);
+  assertModelsAndEnumsHaveNames(context);
 });
 
 it("bytes base64url scalar", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @encode(BytesKnownEncoding.base64url)
       scalar Base64UrlBytes extends bytes;
@@ -209,7 +252,10 @@ it("bytes base64url scalar", async function () {
       }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "array");
   strictEqual(sdkType.valueType.kind, "bytes");
   strictEqual(sdkType.valueType.name, "Base64UrlBytes");
@@ -218,15 +264,11 @@ it("bytes base64url scalar", async function () {
   strictEqual(sdkType.valueType.baseType?.kind, "bytes");
   strictEqual(sdkType.valueType.baseType.encode, "base64");
   strictEqual(sdkType.valueType.baseType.baseType, undefined);
+  assertModelsAndEnumsHaveNames(context);
 });
 
 it("armId from Core", async function () {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runner.compileWithBuiltInAzureCoreService(
+  const { program } = await AzureCoreServiceTester.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -238,21 +280,20 @@ it("armId from Core", async function () {
       }
     `,
   );
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const models = context.sdkPackage.models;
   const type = models[0].properties[0].type;
   strictEqual(type.kind, "string");
   strictEqual(type.name, "armResourceIdentifier");
   strictEqual(type.crossLanguageDefinitionId, "Azure.Core.armResourceIdentifier");
   strictEqual(type.baseType?.kind, "string");
+  assertModelsAndEnumsHaveNames(context);
 });
 
 it("format should not alter typespec types", async function () {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runner.compileWithBuiltInAzureCoreService(
+  const { program } = await AzureCoreServiceTester.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -263,22 +304,21 @@ it("format should not alter typespec types", async function () {
       }
     `,
   );
-  const model = runner.context.sdkPackage.models[0];
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const model = context.sdkPackage.models[0];
   const urlScalarProperty = model.properties.find((x) => x.name === "urlScalar");
   const urlFormatProperty = model.properties.find((x) => x.name === "urlFormatProperty");
   ok(urlScalarProperty);
   ok(urlFormatProperty);
   strictEqual(urlScalarProperty.type.kind, "url");
   strictEqual(urlFormatProperty.type.kind, "string");
+  assertModelsAndEnumsHaveNames(context);
 });
 
 it("etag from core", async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runner.compileWithBuiltInAzureCoreService(`
+  const { program } = await AzureCoreServiceTester.compile(`
     @resource("users")
     @doc("Details about a user.")
     model User {
@@ -293,9 +333,10 @@ it("etag from core", async () => {
     @doc("Gets status.")
     op getStatus is GetResourceOperationStatus<User>;
     `);
-  const userModel = runner.context.sdkPackage.models.find(
-    (x) => x.kind === "model" && x.name === "User",
-  );
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const userModel = context.sdkPackage.models.find((x) => x.kind === "model" && x.name === "User");
   ok(userModel);
   strictEqual(userModel.properties.length, 2);
   const etagProperty = userModel.properties.find((x) => x.name === "etag");
@@ -305,10 +346,11 @@ it("etag from core", async () => {
   strictEqual(etagProperty.type.encode, undefined);
   strictEqual(etagProperty.type.crossLanguageDefinitionId, "Azure.Core.eTag");
   strictEqual(etagProperty.type.baseType?.kind, "string");
+  assertModelsAndEnumsHaveNames(context);
 });
 
 it("multiple layers of inheritance of scalars", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       scalar Base extends string;
       scalar Derived extends Base;
@@ -319,7 +361,10 @@ it("multiple layers of inheritance of scalars", async () => {
       }
       `,
   );
-  const models = getAllModels(runner.context);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const models = getAllModels(context);
   strictEqual(models[0].kind, "model");
   const type = models[0].properties[0].type;
   strictEqual(type.kind, "string");
@@ -332,10 +377,11 @@ it("multiple layers of inheritance of scalars", async () => {
   strictEqual(type.baseType.baseType.name, "string");
   strictEqual(type.baseType.baseType.crossLanguageDefinitionId, "TypeSpec.string");
   strictEqual(type.baseType.baseType.baseType, undefined);
+  assertModelsAndEnumsHaveNames(context);
 });
 
 it("with doc", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @doc("doc")
       @summary("title")
@@ -347,7 +393,10 @@ it("with doc", async () => {
       }
     `,
   );
-  const models = getAllModels(runner.context);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const models = getAllModels(context);
   strictEqual(models[0].kind, "model");
   const type = models[0].properties[0].type;
   strictEqual(type.kind, "string");
@@ -355,10 +404,11 @@ it("with doc", async () => {
   strictEqual(type.doc, "doc");
   strictEqual(type.summary, "title");
   strictEqual(type.crossLanguageDefinitionId, "TestService.TestScalar");
+  assertModelsAndEnumsHaveNames(context);
 });
 
 it("integer model property encoded as string", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -367,14 +417,18 @@ it("integer model property encoded as string", async function () {
       }
       `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "safeint");
   strictEqual(sdkType.encode, "string");
   strictEqual(sdkType.baseType, undefined);
+  assertModelsAndEnumsHaveNames(context);
 });
 
 it("integer scalar encoded as string", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithBuiltInService.compile(
     `
       @encode(string)
       scalar int32EncodedAsString extends int32;
@@ -385,8 +439,12 @@ it("integer scalar encoded as string", async function () {
       }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "int32");
   strictEqual(sdkType.encode, "string");
   strictEqual(sdkType.baseType?.kind, "int32");
+  assertModelsAndEnumsHaveNames(context);
 });

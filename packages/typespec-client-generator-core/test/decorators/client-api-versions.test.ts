@@ -5,7 +5,7 @@ import { UsageFlags } from "../../src/interfaces.js";
 import { createSdkContextForTester, SimpleTester } from "../tester.js";
 
 it("add older api versions", async () => {
-  const { program, diagnostics } = await SimpleTester.diagnose(`
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(`
     @service
     @versioned(Versions)
     namespace My.Service {

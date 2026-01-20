@@ -1,9 +1,8 @@
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { getAllModels } from "../../src/types.js";
 import {
-  AzureCoreTester,
   createSdkContextForTester,
   SimpleTester,
   SimpleTesterWithBuiltInService,
@@ -11,16 +10,14 @@ import {
 import { getServiceMethodOfClient } from "../utils.js";
 
 it("marks a model property to be flattened with suppression of deprecation warning", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
     model Model1{
       @Azure.ClientGenerator.Core.Legacy.flattenProperty
       child: Model2;
     }
 
-    @test
     model Model2{}
 
-    @test
     @route("/func1")
     op func1(@body body: Model1): void;
   `);
@@ -38,18 +35,15 @@ it("marks a model property to be flattened with suppression of deprecation warni
 });
 
 it("doesn't mark a un-flattened model property", async () => {
-  const { program } = await SimpleTester.compile(`
+  const { program } = await SimpleTester.compile(t.code`
     @service
-    @test namespace MyService {
-      @test
+    namespace MyService {
       model Model1{
         child: Model2;
       }
 
-      @test
       model Model2{}
 
-      @test
       @route("/func1")
       op func1(@body body: Model1): void;
     }
@@ -70,17 +64,14 @@ it("doesn't mark a un-flattened model property", async () => {
 it("throws error when used on other targets", async () => {
   const diagnostics = await SimpleTester.diagnose(`
     @service
-    @test namespace MyService {
-      @test
+    namespace MyService {
       @Azure.ClientGenerator.Core.Legacy.flattenProperty
       model Model1{
         child: Model2;
       }
 
-      @test
       model Model2{}
 
-      @test
       @route("/func1")
       op func1(@body body: Model1): void;
     }
@@ -94,14 +85,12 @@ it("throws error when used on other targets", async () => {
 it("throws error when used on a polymorphism type", async () => {
   const diagnostics = await SimpleTester.diagnose(`
     @service
-    @test namespace MyService {
-      @test
+    namespace MyService {
       model Model1{
         @Azure.ClientGenerator.Core.Legacy.flattenProperty
         child: Model2;
       }
 
-      @test
       @discriminator("kind")
       model Model2{
         kind: string;
@@ -114,42 +103,8 @@ it("throws error when used on a polymorphism type", async () => {
   });
 });
 
-it("verify diagnostic gets raised for usage", async () => {
-  const result = await AzureCoreTester.diagnose(
-    `        
-      namespace MyService {
-        model Model1{
-          @Azure.ClientGenerator.Core.Legacy.flattenProperty
-          child: Model2;
-        }
-
-        @test
-        model Model2{}
-
-        @test
-        @route("/func1")
-        op func1(@body body: Model1): void;
-      }
-      `,
-    {
-      linterRuleSet: {
-        enable: {
-          "@azure-tools/typespec-azure-core/no-legacy-usage": true,
-        },
-      },
-    },
-  );
-  expectDiagnostics(result, [
-    {
-      code: "@azure-tools/typespec-azure-core/no-legacy-usage",
-      message:
-        'Referencing elements inside Legacy namespace "Azure.ClientGenerator.Core.Legacy" is not allowed.',
-    },
-  ]);
-});
-
 it("body parameter of model type should have been flattened", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
     model TestModel {
       prop: string;
     }

@@ -1,4 +1,4 @@
-import { Model, Operation, Program } from "@typespec/compiler";
+import { t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { getAccess } from "../../src/decorators.js";
@@ -9,14 +9,13 @@ import {
 } from "../tester.js";
 
 it("emitter with same scope as decorator", async () => {
-  const { program, func } = (await SimpleTester.compile(`
-    @test
+  const { program, func } = await SimpleTester.compile(t.code`
     @access(Access.internal, "csharp")
-    op func(
+    op ${t.op("func")}(
       @query("createdAt")
       createdAt: utcDateTime;
     ): void;
-  `)) as { program: Program; func: Operation };
+  `);
 
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-csharp",
@@ -26,27 +25,20 @@ it("emitter with same scope as decorator", async () => {
 });
 
 it("emitter different scope from decorator", async () => {
-  const code = `
-    @test
+  const code = t.code`
     @access(Access.internal, "csharp")
-    op func(
+    op ${t.op("func")}(
       @query("createdAt")
       createdAt: utcDateTime;
     ): void;
   `;
-  const { program, func } = (await SimpleTester.compile(code)) as {
-    program: Program;
-    func: Operation;
-  };
+  const { program, func } = await SimpleTester.compile(code);
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
   });
   strictEqual(getAccess(context, func), "public");
 
-  const { program: programCsharp, func: funcCsharp } = (await SimpleTester.compile(code)) as {
-    program: Program;
-    func: Operation;
-  };
+  const { program: programCsharp, func: funcCsharp } = await SimpleTester.compile(code);
   const contextCsharp = await createSdkContextForTester(programCsharp, {
     emitterName: "@azure-tools/typespec-csharp",
   });
@@ -54,15 +46,14 @@ it("emitter different scope from decorator", async () => {
 });
 
 it("emitter first in decorator scope list", async () => {
-  const { program, func } = (await SimpleTester.compile(`
-    @test
+  const { program, func } = await SimpleTester.compile(t.code`
     @access(Access.internal, "java")
     @access(Access.internal, "csharp")
-    op func(
+    op ${t.op("func")}(
       @query("createdAt")
       createdAt: utcDateTime;
     ): void;
-  `)) as { program: Program; func: Operation };
+  `);
 
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-java",
@@ -72,15 +63,14 @@ it("emitter first in decorator scope list", async () => {
 });
 
 it("emitter second in decorator scope list", async () => {
-  const { program, func } = (await SimpleTester.compile(`
-    @test
+  const { program, func } = await SimpleTester.compile(t.code`
     @access(Access.internal, "java")
     @access(Access.internal, "csharp")
-    op func(
+    op ${t.op("func")}(
       @query("createdAt")
       createdAt: utcDateTime;
     ): void;
-  `)) as { program: Program; func: Operation };
+  `);
 
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-csharp",
@@ -90,28 +80,21 @@ it("emitter second in decorator scope list", async () => {
 });
 
 it("emitter excluded from decorator scope list", async () => {
-  const code = `
-    @test
+  const code = t.code`
     @access(Access.internal, "java")
     @access(Access.internal, "csharp")
-    op func(
+    op ${t.op("func")}(
       @query("createdAt")
       createdAt: utcDateTime;
     ): void;
   `;
-  const { program, func } = (await SimpleTester.compile(code)) as {
-    program: Program;
-    func: Operation;
-  };
+  const { program, func } = await SimpleTester.compile(code);
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
   });
 
   strictEqual(getAccess(context, func), "public");
-  const { program: programJava, func: funcJava } = (await SimpleTester.compile(code)) as {
-    program: Program;
-    func: Operation;
-  };
+  const { program: programJava, func: funcJava } = await SimpleTester.compile(code);
   const contextJava = await createSdkContextForTester(programJava, {
     emitterName: "@azure-tools/typespec-java",
   });
@@ -142,29 +125,22 @@ it("no scope decorator", async () => {
 });
 
 it("first non-scoped decorator then scoped decorator", async () => {
-  const code = `
-    @test
+  const code = t.code`
     @access(Access.public, "csharp")
     @access(Access.internal)
-    op func(
+    op ${t.op("func")}(
       @query("createdAt")
       createdAt: utcDateTime;
     ): void;
   `;
 
-  const { program, func } = (await SimpleTester.compile(code)) as {
-    program: Program;
-    func: Operation;
-  };
+  const { program, func } = await SimpleTester.compile(code);
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
   });
   strictEqual(getAccess(context, func), "internal");
 
-  const { program: programCsharp, func: funcCsharp } = (await SimpleTester.compile(code)) as {
-    program: Program;
-    func: Operation;
-  };
+  const { program: programCsharp, func: funcCsharp } = await SimpleTester.compile(code);
   const contextCsharp = await createSdkContextForTester(programCsharp, {
     emitterName: "@azure-tools/typespec-csharp",
   });
@@ -172,29 +148,22 @@ it("first non-scoped decorator then scoped decorator", async () => {
 });
 
 it("first scoped decorator then non-scoped decorator", async () => {
-  const code = `
-    @test
+  const code = t.code`
     @access(Access.internal)
     @access(Access.public, "csharp")
-    op func(
+    op ${t.op("func")}(
       @query("createdAt")
       createdAt: utcDateTime;
     ): void;
   `;
 
-  const { program, func } = (await SimpleTester.compile(code)) as {
-    program: Program;
-    func: Operation;
-  };
+  const { program, func } = await SimpleTester.compile(code);
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
   });
   strictEqual(getAccess(context, func), "internal");
 
-  const { program: programCsharp, func: funcCsharp } = (await SimpleTester.compile(code)) as {
-    program: Program;
-    func: Operation;
-  };
+  const { program: programCsharp, func: funcCsharp } = await SimpleTester.compile(code);
   const contextCsharp = await createSdkContextForTester(programCsharp, {
     emitterName: "@azure-tools/typespec-csharp",
   });
@@ -202,9 +171,8 @@ it("first scoped decorator then non-scoped decorator", async () => {
 });
 
 it("first non-scoped augmented decorator then scoped augmented decorator", async () => {
-  const code = `
-    @test
-    op func(
+  const code = t.code`
+    op ${t.op("func")}(
       @query("createdAt")
       createdAt: utcDateTime;
     ): void;
@@ -213,19 +181,13 @@ it("first non-scoped augmented decorator then scoped augmented decorator", async
     @@access(func, Access.internal, "csharp"); 
   `;
 
-  const { program, func } = (await SimpleTester.compile(code)) as {
-    program: Program;
-    func: Operation;
-  };
+  const { program, func } = await SimpleTester.compile(code);
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
   });
   strictEqual(getAccess(context, func), "public");
 
-  const { program: programCsharp, func: funcCsharp } = (await SimpleTester.compile(code)) as {
-    program: Program;
-    func: Operation;
-  };
+  const { program: programCsharp, func: funcCsharp } = await SimpleTester.compile(code);
   const contextCsharp = await createSdkContextForTester(programCsharp, {
     emitterName: "@azure-tools/typespec-csharp",
   });
@@ -233,9 +195,8 @@ it("first non-scoped augmented decorator then scoped augmented decorator", async
 });
 
 it("first scoped augmented decorator then non-scoped augmented decorator", async () => {
-  const code = `
-    @test
-    op func(
+  const code = t.code`
+    op ${t.op("func")}(
       @query("createdAt")
       createdAt: utcDateTime;
     ): void;
@@ -244,19 +205,13 @@ it("first scoped augmented decorator then non-scoped augmented decorator", async
     @@access(func, Access.public);
   `;
 
-  const { program, func } = (await SimpleTester.compile(code)) as {
-    program: Program;
-    func: Operation;
-  };
+  const { program, func } = await SimpleTester.compile(code);
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
   });
   strictEqual(getAccess(context, func), "public");
 
-  const { program: programCsharp, func: funcCsharp } = (await SimpleTester.compile(code)) as {
-    program: Program;
-    func: Operation;
-  };
+  const { program: programCsharp, func: funcCsharp } = await SimpleTester.compile(code);
   const contextCsharp = await createSdkContextForTester(programCsharp, {
     emitterName: "@azure-tools/typespec-csharp",
   });
@@ -264,29 +219,22 @@ it("first scoped augmented decorator then non-scoped augmented decorator", async
 });
 
 it("two scoped decorators", async () => {
-  const code = `
-    @test
+  const code = t.code`
     @access(Access.internal, "csharp")
     @access(Access.internal, "python")
-    op func(
+    op ${t.op("func")}(
       @query("createdAt")
       createdAt: utcDateTime;
     ): void;
   `;
 
-  const { program, func } = (await SimpleTester.compile(code)) as {
-    program: Program;
-    func: Operation;
-  };
+  const { program, func } = await SimpleTester.compile(code);
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
   });
   strictEqual(getAccess(context, func), "internal");
 
-  const { program: programCsharp, func: funcCsharp } = (await SimpleTester.compile(code)) as {
-    program: Program;
-    func: Operation;
-  };
+  const { program: programCsharp, func: funcCsharp } = await SimpleTester.compile(code);
   const contextCsharp = await createSdkContextForTester(programCsharp, {
     emitterName: "@azure-tools/typespec-csharp",
   });
@@ -294,29 +242,22 @@ it("two scoped decorators", async () => {
 });
 
 it("two non-scoped decorators", async () => {
-  const code = `
-    @test
+  const code = t.code`
     @access(Access.internal)
     @access(Access.public)
-    op func(
+    op ${t.op("func")}(
       @query("createdAt")
       createdAt: utcDateTime;
     ): void;
   `;
 
-  const { program, func } = (await SimpleTester.compile(code)) as {
-    program: Program;
-    func: Operation;
-  };
+  const { program, func } = await SimpleTester.compile(code);
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
   });
   strictEqual(getAccess(context, func), "internal");
 
-  const { program: programCsharp, func: funcCsharp } = (await SimpleTester.compile(code)) as {
-    program: Program;
-    func: Operation;
-  };
+  const { program: programCsharp, func: funcCsharp } = await SimpleTester.compile(code);
   const contextCsharp = await createSdkContextForTester(programCsharp, {
     emitterName: "@azure-tools/typespec-csharp",
   });
@@ -325,38 +266,28 @@ it("two non-scoped decorators", async () => {
 
 it("csv scope list", async () => {
   function getCodeTemplate(language: string) {
-    return `
-      @test
+    return t.code`
       @access(Access.internal, "${language}")
-      model Test {
+      model ${t.model("Test")} {
         prop: string;
       }
       `;
   }
 
   const testCode = getCodeTemplate("python,csharp");
-  const { program: programPython, Test: TestPython } = (await SimpleTester.compile(testCode)) as {
-    program: Program;
-    Test: Model;
-  };
+  const { program: programPython, Test: TestPython } = await SimpleTester.compile(testCode);
   const contextPython = await createSdkContextForTester(programPython, {
     emitterName: "@azure-tools/typespec-python",
   });
   strictEqual(getAccess(contextPython, TestPython), "internal");
 
-  const { program: programCsharp, Test: TestCSharp } = (await SimpleTester.compile(testCode)) as {
-    program: Program;
-    Test: Model;
-  };
+  const { program: programCsharp, Test: TestCSharp } = await SimpleTester.compile(testCode);
   const contextCsharp = await createSdkContextForTester(programCsharp, {
     emitterName: "@azure-tools/typespec-csharp",
   });
   strictEqual(getAccess(contextCsharp, TestCSharp), "internal");
 
-  const { program: programJava, Test: TestJava } = (await SimpleTester.compile(testCode)) as {
-    program: Program;
-    Test: Model;
-  };
+  const { program: programJava, Test: TestJava } = await SimpleTester.compile(testCode);
   const contextJava = await createSdkContextForTester(programJava, {
     emitterName: "@azure-tools/typespec-java",
   });
@@ -365,9 +296,8 @@ it("csv scope list", async () => {
 
 it("csv scope list augment", async () => {
   function getCodeTemplate(language: string) {
-    return `
-      @test
-      model Test {
+    return t.code`
+      model ${t.model("Test")} {
         prop: string;
       }
 
@@ -377,28 +307,19 @@ it("csv scope list augment", async () => {
   }
 
   const testCode = getCodeTemplate("python,csharp");
-  const { program: programPython, Test: TestPython } = (await SimpleTester.compile(testCode)) as {
-    program: Program;
-    Test: Model;
-  };
+  const { program: programPython, Test: TestPython } = await SimpleTester.compile(testCode);
   const contextPython = await createSdkContextForTester(programPython, {
     emitterName: "@azure-tools/typespec-python",
   });
   strictEqual(getAccess(contextPython, TestPython), "internal");
 
-  const { program: programCsharp, Test: TestCSharp } = (await SimpleTester.compile(testCode)) as {
-    program: Program;
-    Test: Model;
-  };
+  const { program: programCsharp, Test: TestCSharp } = await SimpleTester.compile(testCode);
   const contextCsharp = await createSdkContextForTester(programCsharp, {
     emitterName: "@azure-tools/typespec-csharp",
   });
   strictEqual(getAccess(contextCsharp, TestCSharp), "internal");
 
-  const { program: programJava, Test: TestJava } = (await SimpleTester.compile(testCode)) as {
-    program: Program;
-    Test: Model;
-  };
+  const { program: programJava, Test: TestJava } = await SimpleTester.compile(testCode);
   const contextJava = await createSdkContextForTester(programJava, {
     emitterName: "@azure-tools/typespec-java",
   });
@@ -663,14 +584,12 @@ describe("negation", () => {
   it("normal scope incrementally add", async () => {
     const tsp = `
         @service
-        @test namespace MyService {
-          @test
+        namespace MyService {
           @clientName("TestRenamedAgain", "csharp")
           @clientName("TestRenamed", "!python, !java")
           model Test {
             prop: string;
           }
-          @test
           @access(Access.internal)
           op func(
             @body body: Test

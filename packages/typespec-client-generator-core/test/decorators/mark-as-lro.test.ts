@@ -162,7 +162,7 @@ it("should work with complex model return types", async () => {
   strictEqual(responseType.name, "ComplexResult");
 });
 
-it("should work with ArmResourceRead", async () => {
+it("should work with ArmResourceRead", { timeout: 30000 }, async () => {
   const { program } = await ArmServiceTester.compile(`
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;

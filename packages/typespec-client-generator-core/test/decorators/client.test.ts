@@ -1,12 +1,12 @@
-import { ignoreDiagnostics, Interface, Namespace, Operation, Program } from "@typespec/compiler";
+import { ignoreDiagnostics } from "@typespec/compiler";
 import {
   createLinterRuleTester,
   expectDiagnosticEmpty,
   expectDiagnostics,
-  LinterRuleTester,
+  t,
 } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { describe, it } from "vitest";
 import {
   getClient,
   getOperationGroup,
@@ -17,33 +17,21 @@ import {
 import { SdkClientType, SdkHttpOperation } from "../../src/interfaces.js";
 import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../../src/public-utils.js";
 import { requireClientSuffixRule } from "../../src/rules/require-client-suffix.rule.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 import {
   AzureCoreTester,
   createSdkContextForTester,
   SimpleTester,
   SimpleTesterWithBuiltInService,
+  TcgcTester,
 } from "../tester.js";
-
-let runner: SdkTestRunner;
-let tester: LinterRuleTester;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-  tester = createLinterRuleTester(
-    runner,
-    requireClientSuffixRule,
-    "@azure-tools/typespec-client-generator-core",
-  );
-});
 
 describe("@client", () => {
   it("mark an namespace as a client", async () => {
-    const { program, MyClient } = (await SimpleTester.compile(`
+    const { program, MyClient } = await SimpleTester.compile(t.code`
         @client
         @service
-        @test namespace MyClient;
-      `)) as { program: Program; MyClient: Namespace };
+        namespace ${t.namespace("MyClient")};
+      `);
 
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
@@ -62,12 +50,12 @@ describe("@client", () => {
   });
 
   it("mark an interface as a client", async () => {
-    const { program, MyService, MyClient } = (await SimpleTester.compile(`
+    const { program, MyService, MyClient } = await SimpleTester.compile(t.code`
         @service
-        @test namespace MyService;
+        namespace ${t.namespace("MyService")};
         @client({service: MyService})
-        @test interface MyClient {}
-      `)) as { program: Program; MyService: Namespace; MyClient: Interface };
+        interface ${t.interface("MyClient")} {}
+      `);
 
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
@@ -86,12 +74,18 @@ describe("@client", () => {
   });
 
   it("emit diagnostic if the client namespace doesn't ends with client", async () => {
+    const instance = await SimpleTester.createInstance();
+    const tester = createLinterRuleTester(
+      instance,
+      requireClientSuffixRule,
+      "@azure-tools/typespec-client-generator-core",
+    );
     await tester
       .expect(
         `
         @client
         @service
-        @test namespace MyService;
+        namespace MyService;
       `,
       )
       .toEmitDiagnostics([
@@ -104,12 +98,18 @@ describe("@client", () => {
   });
 
   it("emit diagnostic if the client explicit name doesn't ends with Client", async () => {
+    const instance = await SimpleTester.createInstance();
+    const tester = createLinterRuleTester(
+      instance,
+      requireClientSuffixRule,
+      "@azure-tools/typespec-client-generator-core",
+    );
     await tester
       .expect(
         `
         @client({name: "MySDK"})
         @service
-        @test namespace MyService;
+        namespace MyService;
       `,
       )
       .toEmitDiagnostics([
@@ -187,13 +187,12 @@ describe("@client", () => {
 
 describe("listClients without @client", () => {
   it("use service namespace if there is not clients and append Client to service name", async () => {
-    const { program, MyService } = (await SimpleTester.compile(`
+    const { program, MyService } = await SimpleTester.compile(t.code`
         @service
-        @test
-        namespace MyService;
+        namespace ${t.namespace("MyService")};
 
         op test(): void;
-      `)) as { program: Program; MyService: Namespace };
+      `);
 
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
@@ -214,14 +213,14 @@ describe("listClients without @client", () => {
 
 describe("@operationGroup", () => {
   it("mark an namespace as an operation group", async () => {
-    const { program, MyClient, MyGroup } = (await SimpleTester.compile(`
+    const { program, MyClient, MyGroup } = await SimpleTester.compile(t.code`
         @client
         @service
-        @test namespace MyClient;
+        namespace ${t.namespace("MyClient")};
 
         @operationGroup
-        @test namespace MyGroup {}
-      `)) as { program: Program; MyClient: Namespace; MyGroup: Namespace };
+        namespace ${t.namespace("MyGroup")} {}
+      `);
 
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
@@ -243,14 +242,13 @@ describe("@operationGroup", () => {
   });
 
   it("mark an interface as an operationGroup", async () => {
-    const { program, MyClient, MyGroup } = (await SimpleTester.compile(`
+    const { program, MyClient, MyGroup } = await SimpleTester.compile(t.code`
         @client
         @service
-        @test namespace MyClient;
+        namespace ${t.namespace("MyClient")};
         @operationGroup
-        @test
-        interface MyGroup {}
-      `)) as { program: Program; MyClient: Namespace; MyGroup: Interface };
+        interface ${t.interface("MyGroup")} {}
+      `);
 
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
@@ -272,20 +270,20 @@ describe("@operationGroup", () => {
   });
 
   it("list operations at root of client outside of operation group", async () => {
-    const { program, MyClient } = (await SimpleTester.compile(`
+    const { program, MyClient } = await SimpleTester.compile(t.code`
         @client
         @service
-        @test namespace MyClient;
+        namespace ${t.namespace("MyClient")};
 
         @route("/root1") op atRoot1(): void;       
         @route("/root2") op atRoot2(): void;
 
         @operationGroup
-        @test interface MyGroup {
+        interface MyGroup {
           @route("/one") inOpGroup1(): void;
           @route("/two") inOpGroup2(): void;
         }
-      `)) as { program: Program; MyClient: Namespace };
+      `);
 
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
@@ -298,20 +296,20 @@ describe("@operationGroup", () => {
   });
 
   it("list operations in an operation group", async () => {
-    const { program, MyGroup } = (await SimpleTester.compile(`
+    const { program, MyGroup } = await SimpleTester.compile(t.code`
         @client
         @service
-        @test namespace MyClient;
+        namespace MyClient;
 
         @route("/root1") op atRoot1(): void;
         @route("/root2") op atRoot2(): void;
 
         @operationGroup
-        @test interface MyGroup {
+        interface ${t.interface("MyGroup")} {
           @route("/one") inOpGroup1(): void;
           @route("/two") inOpGroup2(): void;
         }
-      `)) as { program: Program; MyGroup: Interface };
+      `);
 
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
@@ -326,13 +324,13 @@ describe("@operationGroup", () => {
   });
 
   it("crossLanguageDefinitionId basic", async () => {
-    const { program, one } = (await SimpleTester.compile(`
+    const { program, one } = await SimpleTester.compile(t.code`
         @client
         @service
-        @test namespace MyClient;
+        namespace MyClient;
 
-        @test op one(): void;
-      `)) as { program: Program; one: Operation };
+        op ${t.op("one")}(): void;
+      `);
 
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
@@ -341,15 +339,15 @@ describe("@operationGroup", () => {
   });
 
   it("crossLanguageDefinitionId with interface", async () => {
-    const { program, one } = (await SimpleTester.compile(`
+    const { program, one } = await SimpleTester.compile(t.code`
         @client
         @service
-        @test namespace MyClient;
+        namespace MyClient;
 
         interface Widgets {
-          @test op one(): void;
+          op ${t.op("one")}(): void;
         }
-      `)) as { program: Program; one: Operation };
+      `);
 
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
@@ -358,15 +356,15 @@ describe("@operationGroup", () => {
   });
 
   it("crossLanguageDefinitionId with subnamespace", async () => {
-    const { program, one } = (await SimpleTester.compile(`
+    const { program, one } = await SimpleTester.compile(t.code`
         @client
         @service
-        @test namespace MyClient;
+        namespace MyClient;
 
         namespace Widgets {
-          @test op one(): void;
+          op ${t.op("one")}(): void;
         }
-      `)) as { program: Program; one: Operation };
+      `);
 
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
@@ -375,17 +373,17 @@ describe("@operationGroup", () => {
   });
 
   it("crossLanguageDefinitionId with subnamespace and interface", async () => {
-    const { program, one } = (await SimpleTester.compile(`
+    const { program, one } = await SimpleTester.compile(t.code`
         @client
         @service
-        @test namespace MyClient;
+        namespace MyClient;
 
         namespace SubNamespace {
           interface Widgets {
-            @test op one(): void;
+            op ${t.op("one")}(): void;
           }
         }
-      `)) as { program: Program; one: Operation };
+      `);
 
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
@@ -401,7 +399,7 @@ describe("@operationGroup", () => {
 
         namespace SubNamespace {
           interface Widgets {
-            @test op one(): void;
+            op one(): void;
           }
         }
       `);
@@ -482,12 +480,11 @@ describe("@operationGroup", () => {
   });
 
   it("use service namespace if there is not clients and append Client to service name", async () => {
-    const { program, MyService } = (await SimpleTester.compile(`
+    const { program, MyService } = await SimpleTester.compile(t.code`
         @service
-        @test
-        namespace MyService;
+        namespace ${t.namespace("MyService")};
         op foo(): void;
-      `)) as { program: Program; MyService: Namespace };
+      `);
 
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
@@ -529,14 +526,26 @@ describe("@operationGroup", () => {
   });
 
   it("@operationGroup with different scope", async () => {
-    const testCode = [
-      `
+    const mainCode = `
+        import "@typespec/http";
+        import "@typespec/rest";
+        import "@typespec/versioning";
+        import "@azure-tools/typespec-client-generator-core";
+        import "./client.tsp";
+        
+        using Http;
+        using Rest;
+        using Versioning;
+        using Azure.ClientGenerator.Core;
+
         @service(#{
           title: "DeviceUpdateClient",
         })
         namespace Azure.IoT.DeviceUpdate;
-      `,
-      `
+      `;
+    const clientCode = `
+        using Azure.ClientGenerator.Core;
+        
         @client({name: "DeviceUpdateClient", service: Azure.IoT.DeviceUpdate}, "python")
         namespace Customizations;
 
@@ -547,42 +556,47 @@ describe("@operationGroup", () => {
         @operationGroup("python")
         interface SubClientOnlyForPython {
         }
-      `,
-    ];
+      `;
 
     // java should only have one root client
     {
-      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-      const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
-        testCode[0],
-        testCode[1],
-      );
+      const [{ program }, diagnostics] = await TcgcTester.compileAndDiagnose({
+        "main.tsp": mainCode,
+        "client.tsp": clientCode,
+      });
       expectDiagnosticEmpty(diagnostics);
-      const client = listClients(runner.context)[0];
-      strictEqual(listOperationGroups(runner.context, client).length, 0);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-java",
+      });
+      const client = listClients(context)[0];
+      strictEqual(listOperationGroups(context, client).length, 0);
     }
 
     // python should have one sub client
     {
-      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-      const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
-        testCode[0],
-        testCode[1],
-      );
+      const [{ program }, diagnostics] = await TcgcTester.compileAndDiagnose({
+        "main.tsp": mainCode,
+        "client.tsp": clientCode,
+      });
       expectDiagnosticEmpty(diagnostics);
-      const client = listClients(runner.context)[0];
-      strictEqual(listOperationGroups(runner.context, client).length, 1);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-python",
+      });
+      const client = listClients(context)[0];
+      strictEqual(listOperationGroups(context, client).length, 1);
     }
 
     // csharp should have no client
     {
-      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
-      const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
-        testCode[0],
-        testCode[1],
-      );
+      const [{ program }, diagnostics] = await TcgcTester.compileAndDiagnose({
+        "main.tsp": mainCode,
+        "client.tsp": clientCode,
+      });
       expectDiagnosticEmpty(diagnostics);
-      const client = listClients(runner.context);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      const client = listClients(context);
       strictEqual(client.length, 0);
     }
   });
@@ -592,12 +606,12 @@ describe("listOperationGroups without @client and @operationGroup", () => {
   it("list operations in namespace or interface", async () => {
     const { program } = await SimpleTester.compile(`
         @service
-        @test namespace MyClient;
+        namespace MyClient;
 
         @route("/root1") op atRoot1(): void;
         @route("/root2") op atRoot2(): void;
 
-        @test interface MyGroup {
+        interface MyGroup {
           @route("/one") inOpGroup1(): void;
           @route("/two") inOpGroup2(): void;
         }
@@ -627,59 +641,51 @@ describe("listOperationGroups without @client and @operationGroup", () => {
   });
 
   it("namespace and interface hierarchy", async () => {
-    const { program, A, AA, AAB, AG, AAG, AABGroup1 } = (await SimpleTester.compile(`
+    const { program, A, AA, AAB, AG, AAG, AABGroup1 } = await SimpleTester.compile(t.code`
         @service
         @route("/a")
-        @test namespace A {
+        namespace ${t.namespace("A")} {
           @route("/o1") op a_o1(): void;
           @route("/o2") op a_o2(): void;
 
           @route("/g")
-          @test interface AG {
+          interface ${t.interface("AG")} {
             @route("/o1") a_g_o1(): void;
             @route("/o2") a_g_o2(): void;
           }
 
           @route("/a")
-          @test namespace AA {
+          namespace ${t.namespace("AA")} {
             @route("/o1") op aa_o1(): void;
             @route("/o2") op aa_o2(): void;
 
             @route("/g")
-            @test interface AAG {
+            interface ${t.interface("AAG")} {
               @route("/o1") aa_g_o1(): void;
               @route("/o2") aa_g_o2(): void;
             }
 
             @route("/a")
-            @test namespace AAA{};
+            namespace AAA{};
 
             @route("/b")
-            @test namespace AAB{
+            namespace ${t.namespace("AAB")}{
               @route("/o1") op aab_o1(): void;
               @route("/o2") op aab_o2(): void;
 
               @route("/g1")
-              @test interface AABGroup1 {
+              interface ${t.interface("AABGroup1")} {
                 @route("/o1") aab_g1_o1(): void;
                 @route("/o2") aab_g1_o2(): void;
               }
 
               @route("/g2")
-              @test interface AABGroup2 {
+              interface AABGroup2 {
               }
             };
           }
         };
-      `)) as {
-      program: Program;
-      A: Namespace;
-      AA: Namespace;
-      AAB: Namespace;
-      AG: Interface;
-      AAG: Interface;
-      AABGroup1: Interface;
-    };
+      `);
 
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
@@ -807,16 +813,16 @@ describe("listOperationGroups without @client and @operationGroup", () => {
   });
 
   it("interface without operation", async () => {
-    const { program, MyGroup, MyClient } = (await SimpleTester.compile(`
+    const { program, MyGroup, MyClient } = await SimpleTester.compile(t.code`
         @service
-        @test namespace MyClient;
+        namespace ${t.namespace("MyClient")};
 
         @route("/root1") op atRoot1(): void;
 
-        @test interface MyGroup {
+        interface ${t.interface("MyGroup")} {
           @route("/root2") op atRoot2(): void;
         }
-      `)) as { program: Program; MyGroup: Interface; MyClient: Namespace };
+      `);
 
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
@@ -841,7 +847,6 @@ describe("listOperationGroups without @client and @operationGroup", () => {
   it("empty namespaces and interfaces", async () => {
     const { program } = await SimpleTester.compile(`
         @service
-        @test
         namespace MyService {
           namespace A {
             namespace B {
@@ -1064,67 +1069,105 @@ describe("client hierarchy", () => {
   });
 
   it("rename client name", async () => {
-    await runner.compileWithCustomization(
-      `
+    const [{ program }, diagnostics] = await TcgcTester.compileAndDiagnose({
+      "main.tsp": `
+        import "@typespec/http";
+        import "@typespec/rest";
+        import "@azure-tools/typespec-client-generator-core";
+        import "./client.tsp";
+        
+        using Http;
+        using Rest;
+        using Azure.ClientGenerator.Core;
+        
         @service
         namespace A {
           op x(): void;
         }
       `,
-      `
+      "client.tsp": `
+        using Azure.ClientGenerator.Core;
+        
         namespace Customizations;
 
         @@clientName(A, "Test1Client");
       `,
-    );
+    });
+    expectDiagnosticEmpty(diagnostics);
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const clients = listClients(context);
     deepStrictEqual(clients.length, 1);
 
     const client1 = clients.find((x) => x.name === "Test1Client");
     ok(client1);
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, client1).map((x) => x.name),
+      listOperationsInOperationGroup(context, client1).map((x) => x.name),
       ["x"],
     );
-    deepStrictEqual(listOperationGroups(runner.context, client1).length, 0);
+    deepStrictEqual(listOperationGroups(context, client1).length, 0);
   });
 
   it("rename client name - diagnostics", async () => {
-    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
-      `
+    const [{ program }, diagnostics] = await TcgcTester.compileAndDiagnose({
+      "main.tsp": `
+        import "@typespec/http";
+        import "@typespec/rest";
+        import "@azure-tools/typespec-client-generator-core";
+        import "./client.tsp";
+        
+        using Http;
+        using Rest;
+        using Azure.ClientGenerator.Core;
+        
         @service
         namespace A {
           op x(): void;
         }
       `,
-      `
+      "client.tsp": `
+        using Azure.ClientGenerator.Core;
+        
         @@client(A, {
           name: "Test1Client",
           service: A
         });
       `,
-    );
+    });
 
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/wrong-client-decorator",
     });
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const clients = listClients(context);
     deepStrictEqual(clients.length, 1);
 
     const client1 = clients.find((x) => x.name === "AClient");
     ok(client1);
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, client1).map((x) => x.name),
+      listOperationsInOperationGroup(context, client1).map((x) => x.name),
       ["x"],
     );
-    deepStrictEqual(listOperationGroups(runner.context, client1).length, 0);
+    deepStrictEqual(listOperationGroups(context, client1).length, 0);
   });
 
   it("split into two clients", async () => {
-    await runner.compileWithCustomization(
-      `
+    const [{ program }, diagnostics] = await TcgcTester.compileAndDiagnose({
+      "main.tsp": `
+        import "@typespec/http";
+        import "@typespec/rest";
+        import "@azure-tools/typespec-client-generator-core";
+        import "./client.tsp";
+        
+        using Http;
+        using Rest;
+        using Azure.ClientGenerator.Core;
+        
         @service
         namespace A {
           @route("/b")
@@ -1137,7 +1180,9 @@ describe("client hierarchy", () => {
             op y(): void;
           }
         }`,
-      `
+      "client.tsp": `
+        using Azure.ClientGenerator.Core;
+        
         namespace Customizations;
         
         @client({name: "Test1Client", service: A})
@@ -1150,31 +1195,44 @@ describe("client hierarchy", () => {
           y is A.C.y;
         }
       `,
-    );
+    });
+    expectDiagnosticEmpty(diagnostics);
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const clients = listClients(context);
     deepStrictEqual(clients.length, 2);
 
     const client1 = clients.find((x) => x.name === "Test1Client");
     ok(client1);
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, client1).map((x) => x.name),
+      listOperationsInOperationGroup(context, client1).map((x) => x.name),
       ["x"],
     );
-    deepStrictEqual(listOperationGroups(runner.context, client1).length, 0);
+    deepStrictEqual(listOperationGroups(context, client1).length, 0);
 
     const client2 = clients.find((x) => x.name === "Test2Client");
     ok(client2);
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, client2).map((x) => x.name),
+      listOperationsInOperationGroup(context, client2).map((x) => x.name),
       ["y"],
     );
-    deepStrictEqual(listOperationGroups(runner.context, client2).length, 0);
+    deepStrictEqual(listOperationGroups(context, client2).length, 0);
   });
 
   it("split into two clients - diagnostics", async () => {
-    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
-      `
+    const [{ program }, diagnostics] = await TcgcTester.compileAndDiagnose({
+      "main.tsp": `
+        import "@typespec/http";
+        import "@typespec/rest";
+        import "@azure-tools/typespec-client-generator-core";
+        import "./client.tsp";
+        
+        using Http;
+        using Rest;
+        using Azure.ClientGenerator.Core;
+        
         @service
         namespace A {
           @route("/b")
@@ -1187,7 +1245,9 @@ describe("client hierarchy", () => {
             op y(): void;
           }
         }`,
-      `
+      "client.tsp": `
+        using Azure.ClientGenerator.Core;
+        
         @@client(A.B, {
           name: "Test1Client",
         });
@@ -1196,7 +1256,7 @@ describe("client hierarchy", () => {
           name: "Test2Client",
         });
       `,
-    );
+    });
 
     expectDiagnostics(diagnostics, [
       {
@@ -1207,40 +1267,52 @@ describe("client hierarchy", () => {
       },
     ]);
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const clients = listClients(context);
     strictEqual(clients.length, 1);
 
     const client = clients.find((x) => x.name === "AClient");
     ok(client);
-    strictEqual(listOperationsInOperationGroup(runner.context, client).length, 0);
+    strictEqual(listOperationsInOperationGroup(context, client).length, 0);
 
-    const clientOgs = listOperationGroups(runner.context, client);
+    const clientOgs = listOperationGroups(context, client);
     strictEqual(clientOgs.length, 2);
 
     const og1 = clientOgs.find((x) => x.type?.name === "B");
     ok(og1);
     strictEqual(og1.subOperationGroups.length, 0);
-    strictEqual(listOperationGroups(runner.context, og1).length, 0);
+    strictEqual(listOperationGroups(context, og1).length, 0);
     strictEqual(og1.groupPath, "AClient.B");
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, og1).map((x) => x.name),
+      listOperationsInOperationGroup(context, og1).map((x) => x.name),
       ["x"],
     );
 
     const og2 = clientOgs.find((x) => x.type?.name === "C");
     ok(og2);
     strictEqual(og2.subOperationGroups.length, 0);
-    strictEqual(listOperationGroups(runner.context, og2).length, 0);
+    strictEqual(listOperationGroups(context, og2).length, 0);
     strictEqual(og2.groupPath, "AClient.C");
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, og2).map((x) => x.name),
+      listOperationsInOperationGroup(context, og2).map((x) => x.name),
       ["y"],
     );
   });
 
   it("one client and two operation groups", async () => {
-    await runner.compileWithCustomization(
-      `
+    const [{ program }, diagnostics] = await TcgcTester.compileAndDiagnose({
+      "main.tsp": `
+        import "@typespec/http";
+        import "@typespec/rest";
+        import "@azure-tools/typespec-client-generator-core";
+        import "./client.tsp";
+        
+        using Http;
+        using Rest;
+        using Azure.ClientGenerator.Core;
+        
         @service
         namespace PetStore {
           @route("/feed")
@@ -1249,7 +1321,9 @@ describe("client hierarchy", () => {
           @route("/pet")
           op pet(): void;
         }`,
-      `
+      "client.tsp": `
+        using Azure.ClientGenerator.Core;
+        
         @client({
           name: "PetStoreClient",
           service: PetStore
@@ -1266,42 +1340,55 @@ describe("client hierarchy", () => {
           pet is PetStore.pet
         }
       `,
-    );
+    });
+    expectDiagnosticEmpty(diagnostics);
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const clients = listClients(context);
     strictEqual(clients.length, 1);
 
     const client = clients.find((x) => x.name === "PetStoreClient");
     ok(client);
-    strictEqual(listOperationsInOperationGroup(runner.context, client).length, 0);
+    strictEqual(listOperationsInOperationGroup(context, client).length, 0);
 
-    const clientOgs = listOperationGroups(runner.context, client);
+    const clientOgs = listOperationGroups(context, client);
     strictEqual(clientOgs.length, 2);
 
     const og1 = clientOgs.find((x) => x.type?.name === "OpGrp1");
     ok(og1);
     strictEqual(og1.subOperationGroups.length, 0);
-    strictEqual(listOperationGroups(runner.context, og1).length, 0);
+    strictEqual(listOperationGroups(context, og1).length, 0);
     strictEqual(og1.groupPath, "PetStoreClient.OpGrp1");
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, og1).map((x) => x.name),
+      listOperationsInOperationGroup(context, og1).map((x) => x.name),
       ["feed"],
     );
 
     const og2 = clientOgs.find((x) => x.type?.name === "OpGrp2");
     ok(og2);
     strictEqual(og2.subOperationGroups.length, 0);
-    strictEqual(listOperationGroups(runner.context, og2).length, 0);
+    strictEqual(listOperationGroups(context, og2).length, 0);
     strictEqual(og2.groupPath, "PetStoreClient.OpGrp2");
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, og2).map((x) => x.name),
+      listOperationsInOperationGroup(context, og2).map((x) => x.name),
       ["pet"],
     );
   });
 
   it("operation group - diagnostics", async () => {
-    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
-      `
+    const [{ program }, diagnostics] = await TcgcTester.compileAndDiagnose({
+      "main.tsp": `
+        import "@typespec/http";
+        import "@typespec/rest";
+        import "@azure-tools/typespec-client-generator-core";
+        import "./client.tsp";
+        
+        using Http;
+        using Rest;
+        using Azure.ClientGenerator.Core;
+        
         @service
         namespace A {
           @route("/b")
@@ -1314,42 +1401,47 @@ describe("client hierarchy", () => {
             op y(): void;
           }
         }`,
-      `
+      "client.tsp": `
+        using Azure.ClientGenerator.Core;
+        
         @@operationGroup(A.B);
       `,
-    );
+    });
 
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/wrong-client-decorator",
     });
 
-    const clients = listClients(runner.context);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const clients = listClients(context);
     strictEqual(clients.length, 1);
 
     const client = clients.find((x) => x.name === "AClient");
     ok(client);
-    strictEqual(listOperationsInOperationGroup(runner.context, client).length, 0);
+    strictEqual(listOperationsInOperationGroup(context, client).length, 0);
 
-    const clientOgs = listOperationGroups(runner.context, client);
+    const clientOgs = listOperationGroups(context, client);
     strictEqual(clientOgs.length, 2);
 
     const og1 = clientOgs.find((x) => x.type?.name === "B");
     ok(og1);
     strictEqual(og1.subOperationGroups.length, 0);
-    strictEqual(listOperationGroups(runner.context, og1).length, 0);
+    strictEqual(listOperationGroups(context, og1).length, 0);
     strictEqual(og1.groupPath, "AClient.B");
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, og1).map((x) => x.name),
+      listOperationsInOperationGroup(context, og1).map((x) => x.name),
       ["x"],
     );
 
     const og2 = clientOgs.find((x) => x.type?.name === "C");
     ok(og2);
     strictEqual(og2.subOperationGroups.length, 0);
-    strictEqual(listOperationGroups(runner.context, og2).length, 0);
+    strictEqual(listOperationGroups(context, og2).length, 0);
     strictEqual(og2.groupPath, "AClient.C");
     deepStrictEqual(
-      listOperationsInOperationGroup(runner.context, og2).map((x) => x.name),
+      listOperationsInOperationGroup(context, og2).map((x) => x.name),
       ["y"],
     );
   });
@@ -1471,7 +1563,7 @@ describe("client hierarchy", () => {
   });
 
   it("triple-nested with core and versioning", async () => {
-    const { program } = await AzureCoreTester.using("Azure.Core.Traits").compile(
+    const { program } = await AzureCoreTester.compile(
       `
       @service
       @versioned(StorageVersions)

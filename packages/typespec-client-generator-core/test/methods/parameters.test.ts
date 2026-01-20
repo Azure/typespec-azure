@@ -9,8 +9,8 @@ import {
   SdkServiceMethod,
 } from "../../src/interfaces.js";
 import {
-  AzureCoreTester,
   ArmTester,
+  AzureCoreTester,
   createSdkContextForTester,
   SimpleTester,
   SimpleTesterWithBuiltInService,
@@ -24,7 +24,9 @@ it("path basic", async () => {
 
     op myOp(@path path: string): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "myOp");
@@ -73,7 +75,9 @@ it("path basic with null", async () => {
 
     op myOp(@path path: string | null): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const methodParam = method.parameters[0];
@@ -97,7 +101,9 @@ it("path defined in model", async () => {
       name: string;
     }
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "pathInModel");
@@ -135,7 +141,9 @@ it("header basic", async () => {
 
     op myOp(@header header: string): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "myOp");
@@ -182,7 +190,9 @@ it("header basic with null", async () => {
 
     op myOp(@header header: string | null): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const methodParam = method.parameters[0];
@@ -200,7 +210,9 @@ it("header collection format via explode:true on array", async () => {
 
     op myOp(@header(#{explode: true}) header: string[]): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -218,7 +230,9 @@ it("header collection format via explode:false on array", async () => {
 
     op myOp(@header header: string[]): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -236,7 +250,9 @@ it("header collection format via explode:true on non-array", async () => {
 
     op myOp(@header(#{explode: true}) header: string): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -254,7 +270,9 @@ it("header collection format via encode: ArrayEncoding.pipeDelimited on array", 
 
     op myOp(@header @encode(ArrayEncoding.pipeDelimited) header: string[]): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -272,7 +290,9 @@ it("header collection format via encode: ArrayEncoding.spaceDelimited on array",
 
     op myOp(@header @encode(ArrayEncoding.spaceDelimited) header: string[]): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -290,7 +310,9 @@ it("header collection format wrong encode", async () => {
 
     op myOp(@header @encode("tsv") header: string[]): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -312,7 +334,9 @@ it("query basic", async () => {
 
     op myOp(@query query: string): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "myOp");
@@ -357,7 +381,9 @@ it("query basic with null", async () => {
 
     op myOp(@query query: string | null): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const methodParam = method.parameters[0];
@@ -375,7 +401,9 @@ it("query collection format via explode:true on non-array", async () => {
     
     op myOp(@query(#{explode: true}) query: string): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -393,7 +421,9 @@ it("query collection format for csv via explode:false on array", async () => {
     
     op myOp(@query query: string[]): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -411,7 +441,9 @@ it("query collection format for csv via explode:true on array", async () => {
     
     op myOp(@query(#{explode: true}) query: string[]): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -429,7 +461,9 @@ it("query collection format for csv via encode: ArrayEncoding.pipeDelimited on a
     
     op myOp(@query @encode(ArrayEncoding.pipeDelimited) query: string[]): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -447,7 +481,9 @@ it("query collection format for csv via encode: ArrayEncoding.spaceDelimited on 
     
     op myOp(@query @encode(ArrayEncoding.spaceDelimited) query: string[]): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -465,7 +501,9 @@ it("query collection format wrong encode", async () => {
 
     op myOp(@query @encode("tsv") query: string[]): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -487,7 +525,9 @@ it("cookie basic", async () => {
 
     op myOp(@cookie(#{name: "token"}) auth: string): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -510,7 +550,9 @@ it("body basic", async () => {
 
     op myOp(@body body: Input): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(sdkPackage.models.length, 1);
@@ -572,7 +614,9 @@ it("body basic with null", async () => {
 
     op myOp(@body body: Input | null): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const methodBodyParam = method.parameters.find((x) => x.name === "body");
@@ -595,7 +639,9 @@ it("body optional", async () => {
 
     op myOp(@body body?: Input): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(sdkPackage.models.length, 1);
@@ -659,7 +705,9 @@ it("parameter grouping", async () => {
 
     op myOp(options: RequestOptions): void;
     `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
@@ -740,7 +788,9 @@ describe("content type", () => {
     const { program } = await SimpleTesterWithBuiltInService.compile(`
       @patch(#{implicitOptionality: true}) op patchNull(@body body: string): void;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
@@ -786,7 +836,9 @@ describe("content type", () => {
       }
       @post op default(@body body: DefaultDatetimeProperty): void;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
 
@@ -822,7 +874,9 @@ describe("content type", () => {
     const { program } = await SimpleTesterWithBuiltInService.compile(`
       @patch(#{implicitOptionality: true}) op patchNull(@body body?: string): void;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
@@ -859,7 +913,9 @@ it("ensure accept is a constant if only one possibility (json)", async () => {
     }
     @get op default(): DefaultDatetimeProperty;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
 
@@ -900,7 +956,9 @@ it("ensure accept is a constant if only one possibility (non-json)", async () =>
       value: bytes;
     };
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
 
@@ -948,7 +1006,9 @@ it("lro rpc case", async () => {
       op longRunningRpc is Azure.Core.LongRunningRpcOperation<GenerationOptions, GenerationResponse, GenerationResult>;
     `),
   );
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
 
@@ -979,7 +1039,9 @@ it("never void parameter or response", async () => {
     };
     op test is TestTemplate<void, void, void, void, void>;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.parameters.length, 0);
@@ -997,7 +1059,9 @@ describe("uri template related", () => {
       @route("template-only/{param}")
       op templateOnly(param: string): void;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/template-only/{param}");
@@ -1013,7 +1077,9 @@ describe("uri template related", () => {
       @route("explicit/{param}")
       op explicit(@path param: string): void;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/explicit/{param}");
@@ -1029,7 +1095,9 @@ describe("uri template related", () => {
       @route("annotation-only")
       op annotationOnly(@path param: string): void;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/annotation-only/{param}");
@@ -1045,7 +1113,9 @@ describe("uri template related", () => {
       @route("template/{+param}")
       op template(param: string): void;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/template/{param}");
@@ -1061,7 +1131,9 @@ describe("uri template related", () => {
       @route("annotation")
       op annotation(@path(#{ allowReserved: true }) param: string): void;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/annotation/{param}");
@@ -1089,7 +1161,9 @@ describe("uri template related", () => {
       @route("fragment{#param}")
       op fragment(param: string): void;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const sdkPackage = context.sdkPackage;
 
     let method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
@@ -1150,7 +1224,9 @@ describe("uri template related", () => {
       @route("fragment{#param*}")
       op fragment(param: string): void;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const sdkPackage = context.sdkPackage;
 
     let method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
@@ -1199,7 +1275,9 @@ describe("uri template related", () => {
       @route("template-only{?param}")
       op templateOnly(param: string): void;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/template-only");
@@ -1214,7 +1292,9 @@ describe("uri template related", () => {
       @route("explicit{?param}")
       op explicit(@query param: string): void;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/explicit");
@@ -1229,7 +1309,9 @@ describe("uri template related", () => {
       @route("annotation-only")
       op annotationOnly(@query param: string): void;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/annotation-only");
@@ -1247,7 +1329,9 @@ describe("uri template related", () => {
       @route("explode{?param*}")
       op explode(param: string): void;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const sdkPackage = context.sdkPackage;
 
     let method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
@@ -1269,7 +1353,9 @@ describe("uri template related", () => {
     const { program } = await SimpleTesterWithBuiltInService.compile(`
       op explode(@body @encodedName("application/json", "test") param: string): void;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const sdkPackage = context.sdkPackage;
 
     const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
@@ -1280,7 +1366,9 @@ describe("uri template related", () => {
     const { program } = await SimpleTesterWithBuiltInService.compile(`
       op explode(@body param: string): void;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const sdkPackage = context.sdkPackage;
 
     const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
@@ -1291,7 +1379,9 @@ describe("uri template related", () => {
     const { program } = await SimpleTesterWithBuiltInService.compile(`
       op explode(param: string): void;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const sdkPackage = context.sdkPackage;
 
     const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
@@ -1305,7 +1395,9 @@ describe("method parameter not used in operation", () => {
       @autoRoute
       op test(@path param: "test"): void;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.parameters.length, 0);
@@ -1318,14 +1410,16 @@ describe("method parameter not used in operation", () => {
       @autoRoute
       op test(@path("param-wire") param: string): void;
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.parameters.length, 1);
     strictEqual(method.operation.parameters.length, 1);
   });
 
-  it("singleton resource", async () => {
+  it("singleton resource", { timeout: 30000 }, async () => {
     const { program } = await ArmTester.compile(`
       @armProviderNamespace
       @server("http://localhost:3000", "endpoint")
@@ -1354,7 +1448,9 @@ describe("method parameter not used in operation", () => {
         createOrUpdate is ArmResourceCreateOrReplaceAsync<SingletonTrackedResource>;
       }
     `);
-    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     deepStrictEqual(
@@ -1371,7 +1467,9 @@ it("isOverride false", async () => {
   const { program } = await SimpleTesterWithBuiltInService.compile(`
     op test(): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.isOverride, false);
@@ -1390,7 +1488,9 @@ it("isOverride true", async () => {
 
     @@override(test, testOverride);
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.isOverride, true);
@@ -1406,7 +1506,9 @@ it("readonly parameters should be filtered from method parameters", async () => 
 
     op upload(...Image): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-python",
+  });
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");

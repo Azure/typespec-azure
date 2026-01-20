@@ -1,4 +1,4 @@
-import { Model } from "@typespec/compiler";
+import { t } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { getCrossLanguageDefinitionId, getPropertyNames } from "../../src/public-utils.js";
@@ -6,23 +6,19 @@ import { createSdkContextForTester, SimpleTester } from "../tester.js";
 
 it("property language projected name", async () => {
   async function helper(emitterName: string, expectedLibraryName: string) {
-    const { program, MyModel } = (await SimpleTester.compile(`
-      @test
-      model MyModel {
+    const { program, MyModel } = await SimpleTester.compile(t.code`
+      model ${t.model("MyModel")} {
         @clientName("MadeForCS", "csharp")
         @clientName("MadeForJava", "java")
         @clientName("MadeForTS", "javascript")
         @clientName("made_for_python", "python")
         wasMadeFor?: string;
       }
-    `)) as { program: any; MyModel: Model };
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     const wasMadeFor = MyModel.properties.get("wasMadeFor");
     ok(wasMadeFor);
-    deepStrictEqual(getPropertyNames(context, wasMadeFor), [
-      expectedLibraryName,
-      "wasMadeFor",
-    ]);
+    deepStrictEqual(getPropertyNames(context, wasMadeFor), [expectedLibraryName, "wasMadeFor"]);
     strictEqual(getCrossLanguageDefinitionId(context, wasMadeFor), "MyModel.wasMadeFor");
   }
   await helper("@azure-tools/typespec-csharp", "MadeForCS");
@@ -32,23 +28,19 @@ it("property language projected name", async () => {
 });
 it("property language projected name augmented", async () => {
   async function helper(emitterName: string, expectedLibraryName: string) {
-    const { program, MyModel } = (await SimpleTester.compile(`
-      @test
-      model MyModel {
+    const { program, MyModel } = await SimpleTester.compile(t.code`
+      model ${t.model("MyModel")} {
         @clientName("MadeForCS", "csharp")
         @clientName("MadeForJava", "java")
         @clientName("MadeForTS", "javascript")
         @clientName("made_for_python", "python")
         wasMadeFor?: string;
       }
-    `)) as { program: any; MyModel: Model };
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     const wasMadeFor = MyModel.properties.get("wasMadeFor");
     ok(wasMadeFor);
-    deepStrictEqual(getPropertyNames(context, wasMadeFor), [
-      expectedLibraryName,
-      "wasMadeFor",
-    ]);
+    deepStrictEqual(getPropertyNames(context, wasMadeFor), [expectedLibraryName, "wasMadeFor"]);
   }
   await helper("@azure-tools/typespec-csharp", "MadeForCS");
   await helper("@azure-tools/typespec-java", "MadeForJava");
@@ -57,20 +49,16 @@ it("property language projected name augmented", async () => {
 });
 it("property client projected name", async () => {
   async function helper(emitterName: string) {
-    const { program, MyModel } = (await SimpleTester.compile(`
-      @test
-      model MyModel {
+    const { program, MyModel } = await SimpleTester.compile(t.code`
+      model ${t.model("MyModel")} {
         @clientName("NameForAllLanguage")
         wasMadeFor?: string;
       }
-    `)) as { program: any; MyModel: Model };
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     const wasMadeFor = MyModel.properties.get("wasMadeFor");
     ok(wasMadeFor);
-    deepStrictEqual(getPropertyNames(context, wasMadeFor), [
-      "NameForAllLanguage",
-      "wasMadeFor",
-    ]);
+    deepStrictEqual(getPropertyNames(context, wasMadeFor), ["NameForAllLanguage", "wasMadeFor"]);
   }
   await helper("@azure-tools/typespec-csharp");
   await helper("@azure-tools/typespec-java");
@@ -79,13 +67,12 @@ it("property client projected name", async () => {
 });
 it("property no projected name", async () => {
   async function helper(emitterName: string) {
-    const { program, MyModel } = (await SimpleTester.compile(`
-      @test
-      model MyModel {
+    const { program, MyModel } = await SimpleTester.compile(t.code`
+      model ${t.model("MyModel")} {
         @encodedName("application/json", "madeFor")
         wasMadeFor?: string;
       }
-    `)) as { program: any; MyModel: Model };
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     const wasMadeFor = MyModel.properties.get("wasMadeFor");
     ok(wasMadeFor);
@@ -98,9 +85,8 @@ it("property no projected name", async () => {
 });
 it("property with projected client and json name", async () => {
   async function helper(emitterName: string, expectedLibraryName: string) {
-    const { program, MyModel } = (await SimpleTester.compile(`
-      @test
-      model MyModel {
+    const { program, MyModel } = await SimpleTester.compile(t.code`
+      model ${t.model("MyModel")} {
         @clientName("MadeForCS", "csharp")
         @clientName("MadeForJava", "java")
         @clientName("MadeForTS", "javascript")
@@ -108,7 +94,7 @@ it("property with projected client and json name", async () => {
         @encodedName("application/json", "madeFor")
         wasMadeFor?: string;
       }
-    `)) as { program: any; MyModel: Model };
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     const wasMadeFor = MyModel.properties.get("wasMadeFor");
     ok(wasMadeFor);
@@ -122,14 +108,13 @@ it("property with projected client and json name", async () => {
 });
 it("property with projected language and json name", async () => {
   async function helper(emitterName: string) {
-    const { program, MyModel } = (await SimpleTester.compile(`
-      @test
-      model MyModel {
+    const { program, MyModel } = await SimpleTester.compile(t.code`
+      model ${t.model("MyModel")} {
         @clientName("propName")
         @encodedName("application/json", "madeFor")
         wasMadeFor?: string;
       }
-    `)) as { program: any; MyModel: Model };
+    `);
     const context = await createSdkContextForTester(program, { emitterName });
     const wasMadeFor = MyModel.properties.get("wasMadeFor");
     ok(wasMadeFor);

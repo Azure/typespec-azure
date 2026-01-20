@@ -1,5 +1,5 @@
-import { Model, ModelProperty, Operation, Program } from "@typespec/compiler";
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import { Model } from "@typespec/compiler";
+import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { getAccess } from "../../src/decorators.js";
@@ -11,14 +11,13 @@ import {
 
 describe("namespace access override", () => {
   it("should inherit access from parent namespace", async () => {
-    const { program, Test } = (await SimpleTester.compile(`
+    const { program, Test } = await SimpleTester.compile(t.code`
       @access(Access.public)
       @service(#{title: "Test Service"}) namespace TestService;
-      @test
-      model Test {
+      model ${t.model("Test")} {
         prop: string;
       }
-    `)) as { program: Program; Test: Operation };
+    `);
 
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
@@ -28,17 +27,15 @@ describe("namespace access override", () => {
   });
 
   it("should tag anonymous models with default access", async () => {
-    const { program, Test, prop } = (await SimpleTester.compile(`
+    const { program, Test, prop } = await SimpleTester.compile(t.code`
       @access(Access.public)
       @service(#{title: "Test Service"}) namespace TestService;
-      @test
-      model Test {
-        @test
-        prop: {
+      model ${t.model("Test")} {
+        ${t.modelProperty("prop")}: {
             foo: string;
         }
       }
-    `)) as { program: Program; Test: Operation; prop: ModelProperty };
+    `);
 
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
@@ -50,17 +47,15 @@ describe("namespace access override", () => {
   });
 
   it("should tag as internal anonymous models with default access", async () => {
-    const { program, Test, prop } = (await SimpleTester.compile(`
+    const { program, Test, prop } = await SimpleTester.compile(t.code`
       @access(Access.internal)
       @service(#{title: "Test Service"}) namespace TestService;
-      @test
-      model Test {
-        @test
-        prop: {
+      model ${t.model("Test")} {
+        ${t.modelProperty("prop")}: {
             foo: string;
         }
       }
-    `)) as { program: Program; Test: Operation; prop: ModelProperty };
+    `);
 
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
@@ -72,15 +67,14 @@ describe("namespace access override", () => {
   });
 
   it("should honor the granular override over the namespace one", async () => {
-    const { program, Test } = (await SimpleTester.compile(`
+    const { program, Test } = await SimpleTester.compile(t.code`
       @access(Access.public)
       @service(#{title: "Test Service"}) namespace TestService;
       @access(Access.internal)
-      @test
-      model Test {
+      model ${t.model("Test")} {
         prop: string;
       }
-    `)) as { program: Program; Test: Operation };
+    `);
 
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
@@ -90,13 +84,12 @@ describe("namespace access override", () => {
   });
 
   it("locally mark an operation as internal", async () => {
-    const { program, test } = (await SimpleTester.compile(`
+    const { program, test } = await SimpleTester.compile(t.code`
       @access(Access.public)
       @service(#{title: "Test Service"}) namespace TestService;
-      @test
       @access(Access.internal)
-      op test(): void;
-    `)) as { program: Program; test: Operation };
+      op ${t.op("test")}(): void;
+    `);
 
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
@@ -106,12 +99,11 @@ describe("namespace access override", () => {
   });
 
   it("locally mark an operation as public", async () => {
-    const { program, test } = (await SimpleTester.compile(`
+    const { program, test } = await SimpleTester.compile(t.code`
       @access(Access.public)
       @service(#{title: "Test Service"}) namespace TestService;
-      @test
-      op test(): void;
-    `)) as { program: Program; test: Operation };
+      op ${t.op("test")}(): void;
+    `);
 
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
@@ -121,12 +113,11 @@ describe("namespace access override", () => {
   });
 
   it("mark an operation as internal through the namespace", async () => {
-    const { program, test } = (await SimpleTester.compile(`
+    const { program, test } = await SimpleTester.compile(t.code`
       @access(Access.internal)
       @service(#{title: "Test Service"}) namespace TestService;
-      @test
-      op test(): void;
-    `)) as { program: Program; test: Operation };
+      op ${t.op("test")}(): void;
+    `);
 
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
@@ -137,13 +128,11 @@ describe("namespace access override", () => {
 });
 
 it("default calculated value of operation is undefined, default value of calculated model is undefined", async () => {
-  const { program, test, Test } = (await SimpleTester.compile(`
-    @test
-    model Test{}
+  const { program, test, Test } = await SimpleTester.compile(t.code`
+    model ${t.model("Test")}{}
 
-    @test
-    op test(): void;
-  `)) as { program: Program; test: Operation; Test: Model };
+    op ${t.op("test")}(): void;
+  `);
 
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
@@ -153,20 +142,18 @@ it("default calculated value of operation is undefined, default value of calcula
 });
 
 it("model access calculated by operation", async () => {
-  const { program, Test, func } = (await SimpleTester.compile(`
+  const { program, Test, func } = await SimpleTester.compile(t.code`
     @service
-    @test namespace MyService {
-      @test
-      model Test {
+    namespace MyService {
+      model ${t.model("Test")} {
         prop: string;
       }
-      @test
       @access(Access.internal)
-      op func(
+      op ${t.op("func")}(
         @body body: Test
       ): void;
     }
-  `)) as { program: Program; Test: Model; func: Operation };
+  `);
 
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
@@ -178,21 +165,19 @@ it("model access calculated by operation", async () => {
 });
 
 it("override calculated model with public access", async () => {
-  const { program, Test, func } = (await SimpleTester.compile(`
+  const { program, Test, func } = await SimpleTester.compile(t.code`
     @service
-    @test namespace MyService {
-      @test
+    namespace MyService {
       @access(Access.public)
-      model Test {
+      model ${t.model("Test")} {
         prop: string;
       }
-      @test
       @access(Access.internal)
-      op func(
+      op ${t.op("func")}(
         @body body: Test
       ): void;
     }
-  `)) as { program: Program; Test: Model; func: Operation };
+  `);
 
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
@@ -204,20 +189,18 @@ it("override calculated model with public access", async () => {
 });
 
 it("override calculated model with internal access", async () => {
-  const { program, Test, func } = (await SimpleTester.compile(`
+  const { program, Test, func } = await SimpleTester.compile(t.code`
     @service
-    @test namespace MyService {
-      @test
+    namespace MyService {
       @access(Access.internal) // This is an incorrect usage. We will have linter to ban.
-      model Test {
+      model ${t.model("Test")} {
         prop: string;
       }
-      @test
-      op func(
+      op ${t.op("func")}(
         @body body: Test
       ): void;
     }
-    `)) as { program: Program; Test: Model; func: Operation };
+    `);
 
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
@@ -227,34 +210,29 @@ it("override calculated model with internal access", async () => {
 });
 
 it("access propagation", async () => {
-  const { program, Fish, Shark, Salmon, SawShark, Origin } = (await SimpleTester.compile(`
+  const { program, Fish, Shark, Salmon, SawShark, Origin } = await SimpleTester.compile(t.code`
     @service
-    @test namespace MyService {
+    namespace MyService {
       @discriminator("kind")
-      @test
-      model Fish {
+      model ${t.model("Fish")} {
         age: int32;
       }
 
       @discriminator("sharktype")
-      @test
-      model Shark extends Fish {
+      model ${t.model("Shark")} extends Fish {
         kind: "shark";
         origin: Origin;
       }
 
-      @test
-      model Salmon extends Fish {
+      model ${t.model("Salmon")} extends Fish {
         kind: "salmon";
       }
 
-      @test
-      model SawShark extends Shark {
+      model ${t.model("SawShark")} extends Shark {
         sharktype: "saw";
       }
 
-      @test
-      model Origin {
+      model ${t.model("Origin")} {
         country: string;
         city: string;
         manufacture: string;
@@ -264,14 +242,7 @@ it("access propagation", async () => {
       @access(Access.internal)
       op getModel(): Fish;
     }
-  `)) as {
-    program: Program;
-    Fish: Model;
-    Shark: Model;
-    Salmon: Model;
-    SawShark: Model;
-    Origin: Model;
-  };
+  `);
 
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
@@ -290,78 +261,54 @@ it("access propagation", async () => {
 
 it("complicated access propagation", async () => {
   const { program, Test1, Test2, Test3, Test4, Test5, Test6, func1, func2, func3, func4, func5 } =
-    (await SimpleTester.compile(`
+    await SimpleTester.compile(t.code`
       @service
-      @test namespace MyService {
-        @test
-        model Test1 {
+      namespace MyService {
+        model ${t.model("Test1")} {
           prop: Test2;
         }
-        @test
-        model Test2 {
+        model ${t.model("Test2")} {
           prop: string;
         }
-        @test
         @access(Access.internal)
         @route("/func1")
-        op func1(
+        op ${t.op("func1")}(
           @body body: Test1
         ): void;
 
-        @test
-        model Test3 {
+        model ${t.model("Test3")} {
           prop: string;
         }
-        @test
         @access(Access.internal)
         @route("/func2")
-        op func2(
+        op ${t.op("func2")}(
           @body body: Test3
         ): void;
-        @test
         @route("/func3")
-        op func3(
+        op ${t.op("func3")}(
           @body body: Test3
         ): void;
 
-        @test
-        model Test4 {
+        model ${t.model("Test4")} {
           prop: Test5;
         }
-        @test
-        model Test5 {
+        model ${t.model("Test5")} {
           prop: Test6;
         }
-        @test
-        model Test6 {
+        model ${t.model("Test6")} {
           prop: string;
         }
-        @test
         @access(Access.internal)
         @route("/func4")
-        op func4(
+        op ${t.op("func4")}(
           @body body: Test4
         ): void;
-        @test
         @route("/func5")
-        op func5(
+        op ${t.op("func5")}(
           @body body: Test6
         ): void;
       }
-    `)) as {
-      program: Program;
-      Test1: Model;
-      Test2: Model;
-      Test3: Model;
-      Test4: Model;
-      Test5: Model;
-      Test6: Model;
-      func1: Operation;
-      func2: Operation;
-      func3: Operation;
-      func4: Operation;
-      func5: Operation;
-    };
+    `);
 
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
@@ -398,35 +345,30 @@ it("access propagation for properties, base models and sub models", async () => 
     func2,
     func3,
     func4,
-  } = (await SimpleTester.compile(`
+  } = await SimpleTester.compile(t.code`
     @service
-    @test namespace MyService {
+    namespace MyService {
       @discriminator("kind")
-      @test
-      model Fish {
+      model ${t.model("Fish")} {
         age: int32;
       }
 
-      @test
-      model Origin {
+      model ${t.model("Origin")} {
         country: string;
         city: string;
         manufacture: string;
       }
 
-      @test
-      model Salmon extends Fish {
+      model ${t.model("Salmon")} extends Fish {
         kind: "salmon";
         origin: Origin;
       }
 
-      @test
-      model BaseModel {
+      model ${t.model("BaseModel")} {
         base: string;
       }
 
-      @test
-      model ModelA extends BaseModel {
+      model ${t.model("ModelA")} extends BaseModel {
         prop1: ModelB;
         prop2: ModelC[];
         prop3: Record<ModelD>;
@@ -434,80 +376,53 @@ it("access propagation for properties, base models and sub models", async () => 
         prop5: ModelE | ModelF;
       }
 
-      @test
-      model ModelB {
+      model ${t.model("ModelB")} {
         prop: string;
       }
 
-      @test
-      model ModelC {
+      model ${t.model("ModelC")} {
         prop: string;
       }
 
-      @test
-      model ModelD {
+      model ${t.model("ModelD")} {
         prop: string;
       }
 
-      @test
-      model ModelE {
+      model ${t.model("ModelE")} {
         prop: string;
       }
 
-      @test
-      model ModelF {
+      model ${t.model("ModelF")} {
         prop: string;
       }
 
-      @test
-      enum EnumA {
+      enum ${t.enum("EnumA")} {
         one,
         two,
         three,
       }
 
-      @test
       @access(Access.internal)
       @route("/func1")
-      op func1(
+      op ${t.op("func1")}(
         @body body: Fish
       ): void;
-      @test
       @route("/func2")
-      op func2(
+      op ${t.op("func2")}(
         @body body: Fish
       ): void;
 
-      @test
       @access(Access.internal)
       @route("/func3")
-      op func3(
+      op ${t.op("func3")}(
         @body body: ModelA
       ): void;
-      @test
       @route("/func4")
-      op func4(
+      op ${t.op("func4")}(
         @body body: ModelA
       ): void;
     }
-  `)) as {
-    program: Program;
-    Fish: Model;
-    Salmon: Model;
-    Origin: Model;
-    BaseModel: Model;
-    ModelA: Model;
-    ModelB: Model;
-    ModelC: Model;
-    ModelD: Model;
-    ModelE: Model;
-    ModelF: Model;
-    EnumA: Model;
-    func1: Operation;
-    func2: Operation;
-    func3: Operation;
-    func4: Operation;
-  };
+  `);
 
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
@@ -546,91 +461,63 @@ it("access propagation with override", async () => {
     func6,
     func7,
     func8,
-  } = (await SimpleTester.compile(`
+  } = await SimpleTester.compile(t.code`
       @service
-      @test namespace MyService {
-        @test
-        model Test1 {
+      namespace MyService {
+        model ${t.model("Test1")} {
         }
-        @test
         @access(Access.internal)
         @route("/func1")
-        op func1(
+        op ${t.op("func1")}(
           @body body: Test1
         ): void;
 
-        @test
-        model Test2 {
+        model ${t.model("Test2")} {
         }
-        @test
         @route("/func2")
-        op func2(
+        op ${t.op("func2")}(
           @body body: Test2
         ): void;
 
-        @test
-        model Test3 {
+        model ${t.model("Test3")} {
         }
-        @test
         @access(Access.public)
         @route("/func3")
-        op func3(
+        op ${t.op("func3")}(
           @body body: Test3
         ): void;
 
 
-        @test
-        model Test4 {
+        model ${t.model("Test4")} {
         }
-        @test
         @access(Access.internal)
         @route("/func4")
-        op func4(
+        op ${t.op("func4")}(
           @body body: Test4
         ): void;
-        @test
         @route("/func5")
-        op func5(
+        op ${t.op("func5")}(
           @body body: Test4
         ): void;
 
-        @test
-        model Test5 {
+        model ${t.model("Test5")} {
         }
-        @test
         @access(Access.internal)
         @route("/func6")
-        op func6(
+        op ${t.op("func6")}(
           @body body: Test5
         ): void;
-        @test
         @route("/func7")
-        op func7(
+        op ${t.op("func7")}(
           @body body: Test5
         ): void;
-        @test
         @access(Access.public)
         @route("/func8")
-        op func8(
+        op ${t.op("func8")}(
           @body body: Test5
         ): void;
       }
-    `)) as {
-    program: Program;
-    Test1: Model;
-    Test2: Model;
-    Test3: Model;
-    Test4: Model;
-    Test5: Model;
-    func1: Operation;
-    func2: Operation;
-    func3: Operation;
-    func4: Operation;
-    func5: Operation;
-    func6: Operation;
-    func7: Operation;
-    func8: Operation;
-  };
+    `);
 
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",

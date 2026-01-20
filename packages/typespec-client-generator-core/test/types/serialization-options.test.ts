@@ -5,7 +5,7 @@ import { it } from "vitest";
 import { createSdkContextForTester, SimpleTesterWithBuiltInService } from "../tester.js";
 
 // XML tester with XML library support
-const XmlTester = createTester(resolvePath(import.meta.dirname, ".."), {
+const XmlTester = createTester(resolvePath(import.meta.dirname, "../.."), {
   libraries: [
     "@typespec/http",
     "@typespec/rest",

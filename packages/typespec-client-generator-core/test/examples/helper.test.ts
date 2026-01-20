@@ -1,38 +1,31 @@
-import { Operation } from "@typespec/compiler";
+import { t } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { getHttpOperationExamples, getHttpOperationWithCache } from "../../src/public-utils.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": `./examples`,
-  });
-});
+import { createSdkContextForTester, SimpleTester } from "../tester.js";
 
 it("getHttpOperationExamples", async () => {
-  await runner.host.addRealTypeSpecFile(
+  const instance = await SimpleTester.createInstance();
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getOne.json",
     `${__dirname}/helper/getOne.json`,
   );
-  await runner.host.addRealTypeSpecFile(
+  await instance.fs.addRealTypeSpecFile(
     "./examples/getTwo.json",
     `${__dirname}/helper/getTwo.json`,
   );
-  const { get } = await runner.compile(`
+  const { program, get } = await instance.compile(t.code`
     @service
     namespace TestClient {
-      @test
-      op get(): string;
+      op ${t.op("get")}(): string;
     }
   `);
 
-  const examples = getHttpOperationExamples(
-    runner.context,
-    getHttpOperationWithCache(runner.context, get as Operation),
-  );
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-java",
+    "examples-dir": "./examples",
+  });
+
+  const examples = getHttpOperationExamples(context, getHttpOperationWithCache(context, get));
   strictEqual(examples.length, 2);
 });

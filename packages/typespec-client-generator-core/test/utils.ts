@@ -5,8 +5,6 @@ import {
   SdkPackage,
   SdkServiceMethod,
 } from "../src/interfaces.js";
-import { listAllServiceNamespaces } from "../src/public-utils.js";
-import { SdkTestRunner } from "./test-host.js";
 
 export function hasFlag<T extends number>(value: T, flag: T): boolean {
   return (value & flag) !== 0;
@@ -55,8 +53,4 @@ export function getServiceMethodOfClient(
   const method = client.methods[methodIndex];
   strictEqual(["basic", "paging", "lro", "lropaging"].includes(method.kind), true);
   return method as SdkServiceMethod<SdkHttpOperation>;
-}
-
-export function getServiceNamespace(runner: SdkTestRunner) {
-  return listAllServiceNamespaces(runner.context)[0];
 }
