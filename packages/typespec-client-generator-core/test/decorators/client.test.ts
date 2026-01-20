@@ -78,7 +78,9 @@ describe("@client", () => {
         `
         @client
         @service
-        @test namespace MyService;
+        @test namespace MyService {
+          op test(): void;
+        }
       `,
       )
       .toEmitDiagnostics([
@@ -96,7 +98,9 @@ describe("@client", () => {
         `
         @client({name: "MySDK"})
         @service
-        @test namespace MyService;
+        @test namespace MyService {
+          op test(): void;
+        }
       `,
       )
       .toEmitDiagnostics([
@@ -474,7 +478,9 @@ describe("@operationGroup", () => {
         @service(#{
           title: "DeviceUpdateClient",
         })
-        namespace Azure.IoT.DeviceUpdate;
+        namespace Azure.IoT.DeviceUpdate {
+          op test(): void;
+        }
       `,
       `
         @client({name: "DeviceUpdateClient", service: Azure.IoT.DeviceUpdate}, "python")
@@ -482,10 +488,12 @@ describe("@operationGroup", () => {
 
         @operationGroup("java")
         interface SubClientOnlyForJava {
+          op javaOp(): void;
         }
 
         @operationGroup("python")
         interface SubClientOnlyForPython {
+          op pythonOp(): void;
         }
       `,
     ];
@@ -514,7 +522,7 @@ describe("@operationGroup", () => {
       strictEqual(listOperationGroups(runner.context, client).length, 1);
     }
 
-    // csharp should have no client
+    // csharp should have one client (default from service namespace since no explicit @client for csharp)
     {
       const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
       const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
@@ -522,8 +530,9 @@ describe("@operationGroup", () => {
         testCode[1],
       );
       expectDiagnosticEmpty(diagnostics);
-      const client = listClients(runner.context);
-      strictEqual(client.length, 0);
+      const clients = listClients(runner.context);
+      strictEqual(clients.length, 1);
+      strictEqual(listOperationGroups(runner.context, clients[0]).length, 0);
     }
   });
 });
@@ -1463,14 +1472,11 @@ it("operations under namespace or interface without @client or @operationGroup",
 });
 
 describe("empty client diagnostic", () => {
-  it("should emit diagnostic for empty client", async () => {
+  it("should emit diagnostic for empty namespace client", async () => {
     const diagnostics = await runner.diagnose(`
+      @client
       @service
       namespace MyService {
-        @operationGroup
-        interface SubClient {
-          op test(): void;
-        }
       }
     `);
 
@@ -1490,13 +1496,29 @@ describe("empty client diagnostic", () => {
     expectDiagnosticEmpty(diagnostics);
   });
 
+  it("should not emit diagnostic for client with operation groups", async () => {
+    const diagnostics = await runner.diagnose(`
+      @service
+      namespace MyService {
+        @operationGroup
+        interface SubClient {
+          op test(): void;
+        }
+      }
+    `);
+
+    expectDiagnosticEmpty(diagnostics);
+  });
+
   it("should emit diagnostic for empty interface client", async () => {
     const diagnostics = await runner.diagnose(`
       @service
-      namespace MyService;
+      namespace MyService {
+        op serviceOp(): void;
 
-      @client({service: MyService})
-      interface MyClient {
+        @client({service: MyService})
+        interface MyClient {
+        }
       }
     `);
 
@@ -1508,11 +1530,13 @@ describe("empty client diagnostic", () => {
   it("should not emit diagnostic for interface client with operations", async () => {
     const diagnostics = await runner.diagnose(`
       @service
-      namespace MyService;
+      namespace MyService {
+        @route("/service") op serviceOp(): void;
 
-      @client({service: MyService})
-      interface MyClient {
-        op test(): void;
+        @client({service: MyService})
+        interface MyClient {
+          @route("/test") op test(): void;
+        }
       }
     `);
 
