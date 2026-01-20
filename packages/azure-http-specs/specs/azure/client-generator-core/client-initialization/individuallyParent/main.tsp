@@ -19,7 +19,7 @@ model PathParamClientOptions {
   blobName: string;
 }
 
-model DefaultQueryParamClientOptions {
+model BlobQueryParamClientOptions {
   @doc("The blob name to use for operations")
   blobName: string;
 }
@@ -60,7 +60,7 @@ model RegionQueryParam {
   region: string;
 }
 
-model DefaultQueryParam {
+model BlobQueryParam {
   @query
   blobName: string;
 }
@@ -149,22 +149,22 @@ interface IndividuallyParentNestedWithPathClient {
 @doc("Operations for nested default -> individually and parent with query parameters")
 @global.Azure.ClientGenerator.Core.operationGroup
 @global.Azure.ClientGenerator.Core.clientInitialization({
-  parameters: DefaultQueryParamClientOptions,
+  parameters: BlobQueryParamClientOptions,
   initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
 })
 @route("/nested-default-individually-parent-query")
 interface IndividuallyParentNestedWithQueryClient {
   @route("/with-query")
   @get
-  withQuery(...DefaultQueryParam, @query format?: string): void;
+  withQuery(...BlobQueryParam, @query format?: string): void;
 
   @route("/get-standalone")
   @get
-  getStandalone(...DefaultQueryParam): BlobProperties;
+  getStandalone(...BlobQueryParam): BlobProperties;
 
   @route("/delete-resource")
   @delete
-  deleteStandalone(...DefaultQueryParam): void;
+  deleteStandalone(...BlobQueryParam): void;
 }
 
 // Nested layer services for default -> header parameters
