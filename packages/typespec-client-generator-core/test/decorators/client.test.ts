@@ -1542,4 +1542,52 @@ describe("empty client diagnostic", () => {
 
     expectDiagnosticEmpty(diagnostics);
   });
+
+  it("should not emit diagnostic when operation is moved into client via @clientLocation", async () => {
+    const diagnostics = await runner.diagnose(`
+      @service
+      namespace MyService {
+        interface Source {
+          @route("/moved")
+          @clientLocation(Target)
+          op movedOp(): void;
+        }
+
+        interface Target {
+        }
+      }
+    `);
+
+    expectDiagnosticEmpty(diagnostics);
+  });
+
+  it("should not emit diagnostic when operation is moved into root client via @clientLocation", async () => {
+    const diagnostics = await runner.diagnose(`
+      @service
+      namespace MyService {
+        interface Source {
+          @route("/moved")
+          @clientLocation(MyService)
+          op movedOp(): void;
+        }
+      }
+    `);
+
+    expectDiagnosticEmpty(diagnostics);
+  });
+
+  it("should not emit diagnostic when operation is moved into new operation group via @clientLocation string", async () => {
+    const diagnostics = await runner.diagnose(`
+      @service
+      namespace MyService {
+        interface Source {
+          @route("/moved")
+          @clientLocation("NewTarget")
+          op movedOp(): void;
+        }
+      }
+    `);
+
+    expectDiagnosticEmpty(diagnostics);
+  });
 });
