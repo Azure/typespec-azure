@@ -16,7 +16,7 @@ llmstxt: true
 | Full Update (PATCH)   | Yes         | No\*     | `update is ArmCustomPatchSync<Resource, PatchRequest>;`          |
 | Delete                | Yes         | Yes      | `delete is ArmResourceDeleteSync<Resource>;`                     |
 | List by ResourceGroup | Yes         | Yes      | `listByResourceGroup is ArmResourceListByParent<Resource>;`      |
-| List by Subscription  | Yes         | Yes      | `listBySubscription is ArmResourceListBySubscription<Resource>;` |
+| List by Subscription  | Yes         | Yes      | `listBySubscription is ArmListBySubscription<Resource>;` |
 
 \* Arm requires that, at minimum, a TrackedResource can update Tags. A Full PATCH of all updateable resource properties is preferred.
 
@@ -122,7 +122,7 @@ Arm Resource list operations return a list of Tracked or Proxy Resources at a pa
 | Operation          | TypeSpec                                                            |
 | ------------------ | ------------------------------------------------------------------- |
 | ListByParent       | `listByWidget is ArmResourceListByParent<ResourceType>`             |
-| ListBySubscription | `listBySubscription is ArmResourceListBySubscription<ResourceType>` |
+| ListBySubscription | `listBySubscription is ArmListBySubscription<ResourceType>` |
 
 ### Resource Actions (POST)
 
