@@ -1,4 +1,7 @@
+import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
+import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
+import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { beforeEach, describe, it } from "vitest";
 import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
 
@@ -270,6 +273,106 @@ describe("multi-service duplicate name validation", () => {
       },
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      },
+    ]);
+  });
+
+  it("error for user-defined type conflicting with Azure.ResourceManager type", async () => {
+    // User-defined types should not conflict with ARM library types like ExtensionResource.
+    // Both the user's ExtensionResource and ARM's ExtensionResource would be generated
+    // into the SDK, causing naming conflicts.
+    const runnerWithArm = await createSdkTestRunner({
+      librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
+      autoUsings: ["Azure.ResourceManager", "Azure.Core"],
+      emitterName: "@azure-tools/typespec-java",
+    });
+
+    const diagnostics = await runnerWithArm.diagnose(`
+      @armProviderNamespace("My.Service")
+      @server("http://localhost:3000", "endpoint")
+      @service(#{title: "My.Service"})
+      @versioned(Versions)
+      @armCommonTypesVersion(CommonTypes.Versions.v5)
+      namespace My.Service;
+
+      /** Api versions */
+      enum Versions {
+        /** 2024-04-01-preview api version */
+        V2024_04_01_PREVIEW: "2024-04-01-preview",
+      }
+
+      // User defines a model with the same name as ARM's ExtensionResource
+      // This will conflict with ARM's ExtensionResource in generated code
+      // Adding @clientName to force validation to run with a language scope
+      @clientName("ExtensionResource")
+      model MyExtensionResource {
+        name: string;
+        value: int32;
+      }
+
+      model TestTrackedResource is TrackedResource<TestTrackedResourceProperties> {
+        ...ResourceNameParameter<TestTrackedResource>;
+      }
+
+      model TestTrackedResourceProperties {
+        description?: string;
+        // Reference the user's ExtensionResource
+        extension?: MyExtensionResource;
+      }
+
+      @armResourceOperations
+      interface Tests {
+        get is ArmResourceRead<TestTrackedResource>;
+      }
+    `);
+
+    // Debug: Print all diagnostics
+    console.log("Diagnostics count:", diagnostics.length);
+    for (const d of diagnostics) {
+      console.log("Diagnostic:", d.code, d.message);
+    }
+
+    // Check for Azure.ResourceManager namespace
+    const globalNs = runnerWithArm.program.getGlobalNamespaceType();
+    const azureNs = globalNs.namespaces.get("Azure");
+    console.log("Azure namespace exists:", !!azureNs);
+    if (azureNs) {
+      const armNs = azureNs.namespaces.get("ResourceManager");
+      console.log("Azure.ResourceManager namespace exists:", !!armNs);
+      if (armNs) {
+        console.log("ARM models count:", armNs.models.size);
+        const armModelNames = [...armNs.models.keys()];
+        console.log("Has ExtensionResource in ARM:", armModelNames.includes("ExtensionResource"));
+      }
+    }
+
+    // Check for My.Service namespace and user's ExtensionResource
+    const myNs = globalNs.namespaces.get("My");
+    console.log("My namespace exists:", !!myNs);
+    if (myNs) {
+      const serviceNs = myNs.namespaces.get("Service");
+      console.log("My.Service namespace exists:", !!serviceNs);
+      if (serviceNs) {
+        console.log("Service models count:", serviceNs.models.size);
+        console.log("Service model names:", [...serviceNs.models.keys()]);
+        console.log(
+          "Has ExtensionResource in My.Service:",
+          serviceNs.models.has("ExtensionResource"),
+        );
+      }
+    }
+
+    // Should report duplicate because user's ExtensionResource conflicts with ARM's ExtensionResource
+    expectDiagnostics(diagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        message:
+          'Client name: "ExtensionResource" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+      },
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        message:
+          'Client name: "ExtensionResource" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
       },
     ]);
   });
