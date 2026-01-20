@@ -4,6 +4,7 @@ import { validateClients } from "./validations/clients.js";
 import { validateHttp } from "./validations/http.js";
 import { validateMethods } from "./validations/methods.js";
 import { validatePackage } from "./validations/package.js";
+import { validateTypes } from "./validations/types.js";
 
 export function $onValidate(program: Program) {
   const tcgcContext = createTCGCContext(program, "@azure-tools/typespec-client-generator-core", {
@@ -14,6 +15,8 @@ export function $onValidate(program: Program) {
   validateClients(tcgcContext);
   validateMethods(tcgcContext);
   validateHttp(tcgcContext);
-  // Note: Type name validation (validateTypes) is now done in createSdkContext
-  // where we have access to emitter options/flags
+  // Basic client name validation within namespaces
+  validateTypes(tcgcContext);
+  // Note: Cross-namespace collision validation (multi-service and Azure library conflicts)
+  // is done in createSdkContext where we have access to sdkPackage and emitter options
 }

@@ -28,8 +28,16 @@ import {
 } from "../internal-utils.js";
 import { reportDiagnostic } from "../lib.js";
 
-export function validateTypes(context: SdkContext) {
-  validateClientNames(context);
+export function validateTypes(context: TCGCContext) {
+  validateClientNamesWithinNamespaces(context);
+}
+
+/**
+ * Validate cross-namespace collisions for multi-service and Azure library conflicts.
+ * This runs in createSdkContext where we have access to sdkPackage and emitter options.
+ */
+export function validateNamespaceCollisions(context: SdkContext) {
+  validateCrossNamespaceClientNames(context);
 }
 
 /**
@@ -56,16 +64,107 @@ function getMultiServiceNamespaces(context: TCGCContext): Namespace[] {
 }
 
 /**
- * Validate naming with `@clientName` and `@clientLocation` decorators.
- *
- * This function checks for duplicate client names for types considering the impact of `@clientName` for all possible scopes.
+ * Validate basic client name duplicates within namespaces.
+ * This checks for duplicate client names for types considering the impact of `@clientName` for all possible scopes.
  * It also handles the movement of operations to new clients based on the `@clientLocation` decorators.
- * For multi-service clients, it validates names across ALL service namespaces together since combining
- * multiple services into one client means types from all services will be in the same client.
  *
- * @param sdkContext The SDK context (includes emitter options like namespaceFlag).
+ * This runs in $onValidate and doesn't require SdkContext.
+ *
+ * @param tcgcContext The TCGC context.
  */
-function validateClientNames(sdkContext: SdkContext) {
+function validateClientNamesWithinNamespaces(tcgcContext: TCGCContext) {
+  const languageScopes = getDefinedLanguageScopes(tcgcContext.program);
+  // If no `@client` or `@operationGroup` decorators are defined, we consider `@clientLocation`
+  const needToConsiderClientLocation = !hasExplicitClientOrOperationGroup(tcgcContext);
+
+  // Ensure we always run validation at least once (with AllScopes)
+  if (languageScopes.size === 0) {
+    languageScopes.add(AllScopes);
+  }
+
+  // Build a map of namespace names to their types for resolving string targets
+  const namedNamespaces = new Map<string, Namespace>();
+  for (const ns of listAllUserDefinedNamespaces(tcgcContext)) {
+    if (ns.name) {
+      namedNamespaces.set(ns.name, ns);
+    }
+  }
+
+  // Check all possible language scopes
+  for (const scope of languageScopes) {
+    // Gather all moved operations and their targets
+    const moved = new Set<Operation>();
+    const movedTo = new Map<Namespace | Interface, Operation[]>();
+    const newClients = new Map<string, Operation[]>();
+    if (needToConsiderClientLocation) {
+      // Cache all `@clientName` overrides for the current scope
+      for (const [type, target] of listScopedDecoratorData(
+        tcgcContext,
+        clientLocationKey,
+        scope,
+      ).entries()) {
+        if (unsafe_Realm.realmForType.has(type)) {
+          // Skip `@clientName` on versioning types
+          continue;
+        }
+        if (type.kind === "Operation") {
+          moved.add(type);
+          if (typeof target === "string") {
+            // Check if the string target matches an existing namespace
+            const existingNamespace = namedNamespaces.get(target);
+            if (existingNamespace) {
+              // Move to existing namespace referenced by name
+              if (!movedTo.has(existingNamespace)) {
+                movedTo.set(existingNamespace, [type]);
+              } else {
+                movedTo.get(existingNamespace)!.push(type);
+              }
+            } else {
+              // Move to new clients (string doesn't match any existing namespace)
+              if (!newClients.has(target)) {
+                newClients.set(target, [type]);
+              } else {
+                newClients.get(target)!.push(type);
+              }
+            }
+          } else {
+            // Move to existing clients (target is already a Namespace or Interface)
+            if (!movedTo.has(target)) {
+              movedTo.set(target, [type]);
+            } else {
+              movedTo.get(target)!.push(type);
+            }
+          }
+        }
+      }
+    }
+
+    // Per-namespace validation for client name duplicates
+    validateClientNamesPerNamespace(
+      tcgcContext,
+      scope,
+      moved,
+      movedTo,
+      tcgcContext.program.getGlobalNamespaceType(),
+    );
+
+    // Validate client names for new client's operations
+    [...newClients.values()].map((operations) => {
+      validateClientNamesCore(tcgcContext, scope, operations);
+    });
+  }
+}
+
+/**
+ * Validate cross-namespace collisions for multi-service clients and Azure library type conflicts.
+ * This requires SdkContext because:
+ * 1. Multi-service validation needs to check types across namespaces
+ * 2. Azure library conflict detection needs sdkPackage to check only used types
+ * 3. API version enum exclusion needs UsageFlags from sdkPackage
+ *
+ * @param sdkContext The SDK context (includes sdkPackage and emitter options).
+ */
+function validateCrossNamespaceClientNames(sdkContext: SdkContext) {
   const languageScopes = getDefinedLanguageScopes(sdkContext.program);
   // If no `@client` or `@operationGroup` decorators are defined, we consider `@clientLocation`
   const needToConsiderClientLocation = !hasExplicitClientOrOperationGroup(sdkContext);
@@ -80,10 +179,13 @@ function validateClientNames(sdkContext: SdkContext) {
   const azureLibraryNamespaces = getAzureLibraryNamespaces(sdkContext.program);
   const hasAzureLibrary = azureLibraryNamespaces.length > 0;
 
-  // Ensure we always run validation at least once (with AllScopes) for:
-  // - Multi-service scenarios (types across services may collide in the combined client)
-  // - Azure library scenarios (user types may conflict with Azure.Core or Azure.ResourceManager types)
-  if (languageScopes.size === 0 && (isMultiService || hasAzureLibrary)) {
+  // Only run if there's cross-namespace validation to do
+  if (!isMultiService && !hasAzureLibrary) {
+    return;
+  }
+
+  // Ensure we always run validation at least once (with AllScopes)
+  if (languageScopes.size === 0) {
     languageScopes.add(AllScopes);
   }
 
@@ -142,10 +244,9 @@ function validateClientNames(sdkContext: SdkContext) {
 
   // Check all possible language scopes
   for (const scope of languageScopes) {
-    // Gather all moved operations and their targets
+    // Gather all moved operations and their targets (needed for multi-service validation)
     const moved = new Set<Operation>();
     const movedTo = new Map<Namespace | Interface, Operation[]>();
-    const newClients = new Map<string, Operation[]>();
     if (needToConsiderClientLocation) {
       // Cache all `@clientName` overrides for the current scope
       for (const [type, target] of listScopedDecoratorData(
@@ -168,13 +269,6 @@ function validateClientNames(sdkContext: SdkContext) {
                 movedTo.set(existingNamespace, [type]);
               } else {
                 movedTo.get(existingNamespace)!.push(type);
-              }
-            } else {
-              // Move to new clients (string doesn't match any existing namespace)
-              if (!newClients.has(target)) {
-                newClients.set(target, [type]);
-              } else {
-                newClients.get(target)!.push(type);
               }
             }
           } else {
@@ -201,21 +295,7 @@ function validateClientNames(sdkContext: SdkContext) {
         multiServiceNamespaces,
         apiVersionEnumNames,
       );
-    } else {
-      // For single-service: per-namespace validation
-      validateClientNamesPerNamespace(
-        sdkContext,
-        scope,
-        moved,
-        movedTo,
-        sdkContext.program.getGlobalNamespaceType(),
-      );
     }
-
-    // Validate client names for new client's operations
-    [...newClients.values()].map((operations) => {
-      validateClientNamesCore(sdkContext, scope, operations);
-    });
 
     // Check for Azure library type conflicts (only for types actually used by the client)
     if (azureTypeNames !== undefined && usedTypes !== undefined) {
