@@ -21,6 +21,7 @@ import { stringify } from "yaml";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { defaultDecoratorsAllowList } from "./configs.js";
 import { handleClientExamples } from "./example.js";
+import { validateTypes } from "./validations/types.js";
 import {
   getKnownScalars,
   SdkArrayType,
@@ -216,6 +217,9 @@ export async function createSdkContext<
     diagnostics.pipe(await handleClientExamples(sdkContext, client));
   }
   sdkContext.diagnostics = sdkContext.diagnostics.concat(diagnostics.diagnostics);
+
+  // Validate type names for duplicates (done here to have access to emitter options/flags)
+  validateTypes(sdkContext);
 
   if (options?.exportTCGCoutput) {
     await exportTCGCOutput(sdkContext);

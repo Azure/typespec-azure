@@ -39,16 +39,20 @@ export function validateTypes(context: TCGCContext) {
  * Returns empty array if no multi-service clients exist.
  */
 function getMultiServiceNamespaces(context: TCGCContext): Namespace[] {
-  const namespaceSet = new Set<Namespace>();
+  // Use a map keyed by namespace name to deduplicate, as versioning can create
+  // different namespace instances with the same name
+  const namespaceMap = new Map<string, Namespace>();
   // Directly query @client decorator data to find multi-service clients
   listScopedDecoratorData(context, clientKey).forEach((clientData: SdkClient) => {
     if (clientData.services && clientData.services.length > 1) {
       for (const ns of clientData.services) {
-        namespaceSet.add(ns);
+        if (ns.name && !namespaceMap.has(ns.name)) {
+          namespaceMap.set(ns.name, ns);
+        }
       }
     }
   });
-  return [...namespaceSet];
+  return [...namespaceMap.values()];
 }
 
 /**
@@ -215,28 +219,18 @@ function validateClientNamesPerNamespace(
     ...namespace.unions.values(),
   ];
 
-  // Also collect types from Azure.ResourceManager namespace if it exists
-  // to detect naming conflicts with ARM library types
-  const armNamespace = getAzureResourceManagerNamespace(tcgcContext.program);
-  if (armNamespace) {
-    typesToValidate.push(...armNamespace.models.values());
-    typesToValidate.push(...armNamespace.enums.values());
-    typesToValidate.push(...armNamespace.unions.values());
-  }
-
-  // DEBUG
-  // eslint-disable-next-line no-console
-  console.log(
-    `DEBUG validateClientNamesPerNamespace: ns=${namespace.name}, types=${typesToValidate.length}, scope=${String(scope)}`,
-  );
-  // eslint-disable-next-line no-console
-  console.log(
-    `DEBUG types:`,
-    typesToValidate.map((t) => t.name),
-  );
-
   // Check for duplicate client names for models, enums, and unions
   validateClientNamesCore(tcgcContext, scope, typesToValidate);
+
+  // Check for duplicate client names for scalars
+  validateClientNamesCore(tcgcContext, scope, namespace.scalars.values());
+
+  // Check for ARM type conflicts separately
+  // Only check if user types with @clientName conflict with ARM library types
+  const armNamespace = getAzureResourceManagerNamespace(tcgcContext.program);
+  if (armNamespace) {
+    validateArmTypeConflicts(tcgcContext, scope, typesToValidate, armNamespace);
+  }
 
   // Check for duplicate client names for operations
   validateClientNamesCore(
@@ -315,6 +309,76 @@ function getAzureResourceManagerNamespace(program: Program): Namespace | undefin
   const azureNs = globalNs.namespaces.get("Azure");
   if (!azureNs) return undefined;
   return azureNs.namespaces.get("ResourceManager");
+}
+
+/**
+ * Collect all ARM type names from the Azure.ResourceManager namespace.
+ * This includes models, enums, and unions from all nested namespaces.
+ */
+function collectArmTypeNames(namespace: Namespace): Set<string> {
+  const names = new Set<string>();
+
+  for (const model of namespace.models.values()) {
+    if (model.name) {
+      names.add(model.name);
+    }
+  }
+  for (const enumType of namespace.enums.values()) {
+    if (enumType.name) {
+      names.add(enumType.name);
+    }
+  }
+  for (const union of namespace.unions.values()) {
+    if (union.name) {
+      names.add(union.name);
+    }
+  }
+
+  // Recursively collect from nested namespaces
+  for (const nestedNs of namespace.namespaces.values()) {
+    const nestedNames = collectArmTypeNames(nestedNs);
+    for (const name of nestedNames) {
+      names.add(name);
+    }
+  }
+
+  return names;
+}
+
+/**
+ * Validate that user-defined types with @clientName don't conflict with ARM library types.
+ * This is a targeted check that only reports conflicts when:
+ * 1. A user type has an explicit @clientName decorator
+ * 2. The client name matches an ARM library type name
+ *
+ * This avoids false positives from ARM's own internal type duplicates.
+ */
+function validateArmTypeConflicts(
+  tcgcContext: TCGCContext,
+  scope: string | typeof AllScopes,
+  userTypes: (Model | Enum | Union)[],
+  armNamespace: Namespace,
+) {
+  const armTypeNames = collectArmTypeNames(armNamespace);
+
+  for (const userType of userTypes) {
+    // Only check types that have an explicit @clientName decorator
+    const clientName = getClientNameOverride(tcgcContext, userType, scope);
+    if (clientName !== undefined && armTypeNames.has(clientName)) {
+      // User type with @clientName conflicts with an ARM type
+      const clientNameDecorator = userType.decorators.find(
+        (x) => x.definition?.name === "@clientName",
+      );
+      if (clientNameDecorator?.node !== undefined) {
+        const scopeStr = scope === AllScopes ? "AllScopes" : scope;
+        reportDiagnostic(tcgcContext.program, {
+          code: "duplicate-client-name",
+          format: { name: clientName, scope: scopeStr },
+          target: clientNameDecorator.node,
+        });
+      }
+    }
+  }
 }
 
 /**
@@ -425,12 +489,6 @@ function validateClientNamesCore(
 
   for (const item of items) {
     const clientName = getClientNameOverride(tcgcContext, item, scope);
-    // eslint-disable-next-line no-console
-    if (item.name === "ExtensionResource" || item.name === "MyExtensionResource") {
-      console.log(
-        `DEBUG validateClientNamesCore: name=${item.name}, clientName=${clientName}, scope=${String(scope)}`,
-      );
-    }
     if (clientName !== undefined) {
       const clientNameDecorator = item.decorators.find((x) => x.definition?.name === "@clientName");
       if (clientNameDecorator?.node !== undefined) {

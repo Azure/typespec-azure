@@ -77,24 +77,26 @@ export async function createSdkTestRunner(
 
   // diagnose
   sdkTestRunner.diagnose = async (code, compileOptions?) => {
-    const result = await baseDiagnose(code, compileOptions);
+    await baseDiagnose(code, compileOptions);
     sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
       sdkContextOption,
     );
-    return result;
+    // Return all diagnostics from the program (includes validation from createSdkContext)
+    return sdkTestRunner.program.diagnostics;
   };
 
   // compile and diagnose
   sdkTestRunner.compileAndDiagnose = async (code, compileOptions?) => {
-    const result = await baseCompileAndDiagnose(code, compileOptions);
+    const [types] = await baseCompileAndDiagnose(code, compileOptions);
     sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
       sdkContextOption,
     );
-    return result;
+    // Return all diagnostics from the program (includes validation from createSdkContext)
+    return [types, sdkTestRunner.program.diagnostics];
   };
 
   // compile with dummy service definition
@@ -227,13 +229,14 @@ export async function createSdkTestRunner(
   sdkTestRunner.compileAndDiagnoseWithCustomization = async (mainCode, clientCode) => {
     host.addTypeSpecFile("./main.tsp", `${mainAutoCode}${mainCode}`);
     host.addTypeSpecFile("./client.tsp", `${clientAutoCode}${clientCode}`);
-    const result = await host.compileAndDiagnose("./client.tsp");
+    const [types] = await host.compileAndDiagnose("./client.tsp");
     sdkTestRunner.context = await createSdkContextTestHelper(
       sdkTestRunner.program,
       options,
       sdkContextOption,
     );
-    return result;
+    // Return all diagnostics from the program (includes validation from createSdkContext)
+    return [types, sdkTestRunner.program.diagnostics];
   };
 
   return sdkTestRunner;

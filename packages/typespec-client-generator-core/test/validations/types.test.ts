@@ -301,9 +301,7 @@ describe("multi-service duplicate name validation", () => {
         V2024_04_01_PREVIEW: "2024-04-01-preview",
       }
 
-      // User defines a model with the same name as ARM's ExtensionResource
-      // This will conflict with ARM's ExtensionResource in generated code
-      // Adding @clientName to force validation to run with a language scope
+      // User defines a model with @clientName that conflicts with ARM's ExtensionResource
       @clientName("ExtensionResource")
       model MyExtensionResource {
         name: string;
@@ -326,53 +324,13 @@ describe("multi-service duplicate name validation", () => {
       }
     `);
 
-    // Debug: Print all diagnostics
-    console.log("Diagnostics count:", diagnostics.length);
-    for (const d of diagnostics) {
-      console.log("Diagnostic:", d.code, d.message);
-    }
-
-    // Check for Azure.ResourceManager namespace
-    const globalNs = runnerWithArm.program.getGlobalNamespaceType();
-    const azureNs = globalNs.namespaces.get("Azure");
-    console.log("Azure namespace exists:", !!azureNs);
-    if (azureNs) {
-      const armNs = azureNs.namespaces.get("ResourceManager");
-      console.log("Azure.ResourceManager namespace exists:", !!armNs);
-      if (armNs) {
-        console.log("ARM models count:", armNs.models.size);
-        const armModelNames = [...armNs.models.keys()];
-        console.log("Has ExtensionResource in ARM:", armModelNames.includes("ExtensionResource"));
-      }
-    }
-
-    // Check for My.Service namespace and user's ExtensionResource
-    const myNs = globalNs.namespaces.get("My");
-    console.log("My namespace exists:", !!myNs);
-    if (myNs) {
-      const serviceNs = myNs.namespaces.get("Service");
-      console.log("My.Service namespace exists:", !!serviceNs);
-      if (serviceNs) {
-        console.log("Service models count:", serviceNs.models.size);
-        console.log("Service model names:", [...serviceNs.models.keys()]);
-        console.log(
-          "Has ExtensionResource in My.Service:",
-          serviceNs.models.has("ExtensionResource"),
-        );
-      }
-    }
-
-    // Should report duplicate because user's ExtensionResource conflicts with ARM's ExtensionResource
+    // Should report a single diagnostic because user's @clientName("ExtensionResource")
+    // conflicts with ARM's ExtensionResource type
     expectDiagnostics(diagnostics, [
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
-          'Client name: "ExtensionResource" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
-      },
-      {
-        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-        message:
-          'Client name: "ExtensionResource" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+          'Client name: "ExtensionResource" is duplicated in language scope: "AllScopes"',
       },
     ]);
   });
