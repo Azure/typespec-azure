@@ -87,6 +87,41 @@ function validateClientNames(sdkContext: SdkContext) {
     languageScopes.add(AllScopes);
   }
 
+  // Pre-compute Azure library type names once (O(A) where A = types in Azure libraries)
+  // This avoids recomputing for each scope
+  let azureTypeNames: Set<string> | undefined;
+  if (hasAzureLibrary) {
+    azureTypeNames = new Set<string>();
+    for (const ns of azureLibraryNamespaces) {
+      const names = collectTypeNamesFromNamespace(ns);
+      for (const name of names) {
+        azureTypeNames.add(name);
+      }
+    }
+  }
+
+  // Pre-compute used types from sdkPackage once (O(U) where U = used types)
+  // These are the only types we need to check for Azure library conflicts
+  let usedTypes: Set<Type> | undefined;
+  if (hasAzureLibrary) {
+    usedTypes = new Set<Type>();
+    for (const model of sdkContext.sdkPackage.models) {
+      if (model.__raw) {
+        usedTypes.add(model.__raw);
+      }
+    }
+    for (const enumType of sdkContext.sdkPackage.enums) {
+      if (enumType.__raw) {
+        usedTypes.add(enumType.__raw);
+      }
+    }
+    for (const unionType of sdkContext.sdkPackage.unions) {
+      if (unionType.__raw) {
+        usedTypes.add(unionType.__raw);
+      }
+    }
+  }
+
   // Build a map of namespace names to their types for resolving string targets
   const namedNamespaces = new Map<string, Namespace>();
   for (const ns of listAllUserDefinedNamespaces(sdkContext)) {
@@ -172,8 +207,8 @@ function validateClientNames(sdkContext: SdkContext) {
     });
 
     // Check for Azure library type conflicts (only for types actually used by the client)
-    if (azureLibraryNamespaces.length > 0) {
-      validateAzureLibraryTypeConflicts(sdkContext, scope, azureLibraryNamespaces);
+    if (azureTypeNames !== undefined && usedTypes !== undefined) {
+      validateAzureLibraryTypeConflicts(sdkContext, scope, azureTypeNames, usedTypes);
     }
   }
 }
@@ -367,39 +402,16 @@ function collectTypeNamesFromNamespace(namespace: Namespace): Set<string> {
  * 3. The type is actually used by the client (present in sdkPackage)
  *
  * This avoids false positives from Azure's own internal type duplicates and unused types.
+ *
+ * Time complexity: O(U) where U = number of used types in sdkPackage
+ * Space complexity: O(1) - only uses pre-computed sets passed in, no new allocations
  */
 function validateAzureLibraryTypeConflicts(
   sdkContext: SdkContext,
   scope: string | typeof AllScopes,
-  azureNamespaces: Namespace[],
+  azureTypeNames: Set<string>,
+  usedTypes: Set<Type>,
 ) {
-  // Collect all type names from all Azure library namespaces
-  const azureTypeNames = new Set<string>();
-  for (const ns of azureNamespaces) {
-    const names = collectTypeNamesFromNamespace(ns);
-    for (const name of names) {
-      azureTypeNames.add(name);
-    }
-  }
-
-  // Build a set of used TypeSpec types from the sdkPackage
-  const usedTypes = new Set<Type>();
-  for (const model of sdkContext.sdkPackage.models) {
-    if (model.__raw) {
-      usedTypes.add(model.__raw);
-    }
-  }
-  for (const enumType of sdkContext.sdkPackage.enums) {
-    if (enumType.__raw) {
-      usedTypes.add(enumType.__raw);
-    }
-  }
-  for (const unionType of sdkContext.sdkPackage.unions) {
-    if (unionType.__raw) {
-      usedTypes.add(unionType.__raw);
-    }
-  }
-
   // Check only used types for conflicts
   for (const userType of usedTypes) {
     if (userType.kind !== "Model" && userType.kind !== "Enum" && userType.kind !== "Union") {
