@@ -97,6 +97,16 @@ interface ProviderOperations {
     Response = ArmCombinedLroHeaders,
     Scope = SubscriptionActionScope
   >;
+  /** AN array of operation results */
+  postVmArrayResponse is ArmProviderActionAsync<
+    Response = LogAnalyticsOperationResult[],
+    Scope = SubscriptionActionScope
+  >;
+  /** An unknown response */
+  postVmUnknownResponse is ArmProviderActionAsync<
+    Response = unknown,
+    Scope = SubscriptionActionScope
+  >;
 
   /** Sample operation to generate an extension resource based GET action */
   @get

@@ -184,3 +184,55 @@ it("array with encode", async () => {
   strictEqual(modelProp.type.kind, "array");
   strictEqual(modelProp.encode, "commaDelimited");
 });
+
+it("array with encode for enum array", async () => {
+  await runner.compileWithBuiltInService(`
+    enum Color {
+      Red,
+      Green,
+      Blue,
+    }
+
+    model Foo {
+      @encode(ArrayEncoding.commaDelimited)
+      prop: Color[];
+    }
+
+    op get(): Foo;
+  `);
+  const model = runner.context.sdkPackage.models[0];
+  strictEqual(model.kind, "model");
+  strictEqual(model.name, "Foo");
+  strictEqual(model.properties.length, 1);
+  const modelProp = model.properties[0];
+  strictEqual(modelProp.type.kind, "array");
+  strictEqual(modelProp.encode, "commaDelimited");
+  strictEqual(modelProp.type.valueType.kind, "enum");
+});
+
+it("array with encode for union as enum array", async () => {
+  await runner.compileWithBuiltInService(`
+    union Color {
+      Red: "red",
+      Green: "green",
+      Blue: "blue",
+      string,
+    }
+
+    model Foo {
+      @encode(ArrayEncoding.commaDelimited)
+      prop: Color[];
+    }
+
+    op get(): Foo;
+  `);
+  const model = runner.context.sdkPackage.models[0];
+  strictEqual(model.kind, "model");
+  strictEqual(model.name, "Foo");
+  strictEqual(model.properties.length, 1);
+  const modelProp = model.properties[0];
+  strictEqual(modelProp.type.kind, "array");
+  strictEqual(modelProp.encode, "commaDelimited");
+  strictEqual(modelProp.type.valueType.kind, "enum");
+  strictEqual(modelProp.type.valueType.isUnionAsEnum, true);
+});

@@ -131,7 +131,7 @@ namespace Azure.ResourceManager.CommonTypes;
 @@armCommonDefinition(Operation, "Operation", Azure.ResourceManager.CommonTypes.Versions.v6);
 
 /**
- * Localized display information for and operation.
+ * Localized display information for an operation.
  */
 @@armCommonDefinition(OperationDisplay,
   "OperationDisplay",

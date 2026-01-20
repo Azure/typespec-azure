@@ -1,7 +1,8 @@
 import { Operation } from "@typespec/compiler";
-import { strictEqual } from "assert";
+import { ok, strictEqual } from "assert";
 import { beforeEach, describe, it } from "vitest";
 import { shouldGenerateConvenient, shouldGenerateProtocol } from "../../src/decorators.js";
+import { UsageFlags } from "../../src/interfaces.js";
 import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "../test-host.js";
 
 let runner: SdkTestRunner;
@@ -343,5 +344,104 @@ describe("@protocolAPI and @convenientAPI with scope", () => {
       strictEqual(shouldGenerateConvenient(runner.context, test1), true);
       strictEqual(shouldGenerateConvenient(runner.context, test2), true);
     }
+  });
+});
+
+describe("@convenientAPI(false) with enum parameters", () => {
+  it("enum in query parameter should have Input usage even with convenientAPI(false)", async () => {
+    await runner.compile(`
+      @service
+      namespace TestService {
+        enum IncludeEnum {
+          file_search_call_results: "file_search_call.results",
+          web_search_call_results: "web_search_call.results",
+        }
+
+        model ItemResult {
+          id: string;
+          content: string;
+        }
+
+        @route("/conversations/{conversation_id}/items/{item_id}")
+        @convenientAPI(false)
+        op getConversationItem(
+          @path conversation_id: string,
+          @path item_id: string,
+          @query(#{explode: true}) include?: IncludeEnum[],
+        ): ItemResult;
+      }
+    `);
+
+    const sdkPackage = runner.context.sdkPackage;
+    ok(sdkPackage.enums);
+    const includeEnum = sdkPackage.enums.find((e) => e.name === "IncludeEnum");
+    ok(includeEnum, "IncludeEnum should be in the enums list");
+    ok(
+      includeEnum.usage & UsageFlags.Input,
+      "IncludeEnum should have Input usage even with convenientAPI(false)",
+    );
+  });
+
+  it("enum in header parameter should have Input usage even with convenientAPI(false)", async () => {
+    await runner.compile(`
+      @service
+      namespace TestService {
+        enum StatusEnum {
+          active: "active",
+          inactive: "inactive",
+        }
+
+        model Response {
+          data: string;
+        }
+
+        @route("/data")
+        @convenientAPI(false)
+        op getData(
+          @header status: StatusEnum,
+        ): Response;
+      }
+    `);
+
+    const sdkPackage = runner.context.sdkPackage;
+    ok(sdkPackage.enums);
+    const statusEnum = sdkPackage.enums.find((e) => e.name === "StatusEnum");
+    ok(statusEnum, "StatusEnum should be in the enums list");
+    ok(
+      statusEnum.usage & UsageFlags.Input,
+      "StatusEnum should have Input usage even with convenientAPI(false)",
+    );
+  });
+
+  it("enum in path parameter should have Input usage even with convenientAPI(false)", async () => {
+    await runner.compile(`
+      @service
+      namespace TestService {
+        enum ResourceType {
+          users: "users",
+          groups: "groups",
+        }
+
+        model Resource {
+          id: string;
+        }
+
+        @route("/resources/{type}/{id}")
+        @convenientAPI(false)
+        op getResource(
+          @path type: ResourceType,
+          @path id: string,
+        ): Resource;
+      }
+    `);
+
+    const sdkPackage = runner.context.sdkPackage;
+    ok(sdkPackage.enums);
+    const resourceType = sdkPackage.enums.find((e) => e.name === "ResourceType");
+    ok(resourceType, "ResourceType should be in the enums list");
+    ok(
+      resourceType.usage & UsageFlags.Input,
+      "ResourceType should have Input usage even with convenientAPI(false)",
+    );
   });
 });

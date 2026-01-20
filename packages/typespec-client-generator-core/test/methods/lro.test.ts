@@ -816,6 +816,81 @@ describe("data plane LRO templates", () => {
     );
     strictEqual(lroMetadata.pollingStep.responseBody, analyzeOperationModel);
   });
+
+  // https://github.com/Azure/typespec-azure/issues/2325
+  it("LroMetadata synthetic anonymous ResourceOperationStatus", async () => {
+    await runner.compileWithVersionedService(`
+      alias ServiceTraits = NoRepeatableRequests &
+        NoConditionalRequests &
+        NoClientRequestId;
+
+      alias apiOperations = Azure.Core.ResourceOperations<ServiceTraits>;
+
+      @doc("Create an instruction.")
+      @pollingOperation(
+        OperationProgress.getOperationResult
+      )
+      op update is apiOperations.LongRunningResourceCreateOrUpdate<Instruction>;
+
+      @resource("instruction")
+      model Instruction {
+        @key
+        @visibility(Lifecycle.Read)
+        id: string;
+
+        @visibility(Lifecycle.Update)
+        instructionId: string;
+      }
+
+      @doc("Operation Response Model")
+      @resource("operation")
+      model OperationResultQuery {
+        @doc("The operation status.")
+        @visibility(Lifecycle.Read)
+        status: Foundations.OperationState;
+
+        @doc("The operation id.")
+        @key("operationId")
+        @visibility(Lifecycle.Read)
+        operationId: string;
+
+        @doc("The error message.")
+        @visibility(Lifecycle.Read)
+        errorMessage: string[];
+      }
+
+      model UpdateFinalResult {
+        id2: string;
+      }
+
+      @doc("Get operation progress")
+      interface OperationProgress {
+        @doc("Get operation progress")
+        getOperationResult is apiOperations.ResourceRead<OperationResultQuery>;
+      }
+    `);
+    const method = runner.context.sdkPackage.clients[0].methods.find((m) => m.name === "update");
+    assert.exists(method);
+    strictEqual(method.kind, "lro");
+    const response = method.response.type;
+    assert.strictEqual(response?.kind, "model");
+    if (!response || response.kind !== "model") {
+      assert.fail("Expected final response to be a model.");
+    }
+    assert.isTrue(response.isGeneratedName);
+    const generatedName = response.name;
+    // duplicate with existing model named "UpdateFinalResult" so the generated name will be "UpdateFinalResult1"
+    assert.strictEqual("UpdateFinalResult1", generatedName);
+    const crossLanguageId = response.crossLanguageDefinitionId;
+    assert.isFalse(crossLanguageId.includes(".."));
+    const lroMetadata = method.lroMetadata;
+    assert.exists(lroMetadata);
+    const finalResponse = lroMetadata.finalResponse;
+    assert.exists(finalResponse);
+    const finalResult = finalResponse.result;
+    assert.exists(finalResult);
+    assert.strictEqual(finalResult.name, "UpdateFinalResult1");
+  });
 });
 
 describe("Arm LRO templates", () => {
@@ -1159,4 +1234,72 @@ describe("getLroMetadata", () => {
       ].sort(),
     );
   });
+});
+
+it("versioned LRO with customization", async () => {
+  const runnerWithCore = await createSdkTestRunner({
+    librariesToAdd: [AzureCoreTestLibrary],
+    autoUsings: ["Azure.Core", "Azure.Core.Traits"],
+    emitterName: "@azure-tools/typespec-java",
+  });
+  await runnerWithCore.compileWithCustomization(
+    `
+    @service
+    @versioned(Versions)
+    namespace TestService;
+
+    enum Versions {
+      v1,
+      v2,
+    }
+
+    alias TestOperations = ResourceOperations<NoConditionalRequests & NoClientRequestId & NoRepeatableRequests>;
+
+    @resource("id")
+    model TestResult {
+      @key
+      id: string;
+
+      @lroStatus
+      status: JobStatus;
+    }
+
+    @lroStatus
+    union JobStatus {
+      string,
+      NotStarted: "notStarted",
+      Running: "running",
+
+      @lroSucceeded
+      Succeeded: "succeeded",
+
+      @lroFailed
+      Failed: "failed",
+
+      Canceled: "canceled",
+    }
+
+    @get
+    op get is TestOperations.ResourceRead<TestResult>;
+
+    @pollingOperation(get)
+    op create is TestOperations.LongRunningResourceCreateOrReplace<TestResult>;
+    `,
+    `
+    @client({
+      service: TestService,
+    })
+    namespace TestClient;
+      
+    op test is TestService.create;
+    `,
+  );
+  strictEqual(runnerWithCore.context.diagnostics.length, 0);
+  const client = runnerWithCore.context.sdkPackage.clients[0];
+  strictEqual(client.methods.length, 1);
+  const method = client.methods[0];
+  strictEqual(method.name, "test");
+  strictEqual(method.kind, "lro");
+  const lroMetadata = method.lroMetadata;
+  ok(lroMetadata);
 });
