@@ -1209,13 +1209,4 @@ function collectTypesFromNamespace(
       allTypeNames.set(iface.name, existing);
     }
   }
-
-  // Collect scalars
-  for (const scalar of namespace.scalars.values()) {
-    if (scalar.name && $(program).type.isUserDefined(scalar)) {
-      const existing = allTypeNames.get(scalar.name) ?? [];
-      existing.push(scalar);
-      allTypeNames.set(scalar.name, existing);
-    }
-  }
 }
