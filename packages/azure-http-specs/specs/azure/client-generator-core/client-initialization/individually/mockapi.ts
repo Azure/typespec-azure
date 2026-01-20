@@ -3,7 +3,7 @@ import { json, passOnSuccess, ScenarioMockApi } from "@typespec/spec-api";
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
 // Mock responses for IndividuallyClient scenarios
-Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithPathClient =
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithPath =
   passOnSuccess([
     {
       uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually/test-blob/with-query",
@@ -44,7 +44,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
     },
   ]);
 
-Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithQueryClient =
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithQuery =
   passOnSuccess([
     {
       uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-query/with-query",
@@ -94,7 +94,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
     },
   ]);
 
-Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithHeaderClient =
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithHeader =
   passOnSuccess([
     {
       uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-header/with-query",
@@ -140,7 +140,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
     },
   ]);
 
-Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithMultipleClient =
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithMultiple =
   passOnSuccess([
     {
       uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-multiple/with-query",
@@ -193,7 +193,7 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
     },
   ]);
 
-Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithMixedClient =
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithMixed =
   passOnSuccess([
     {
       uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-mixed/with-query",
@@ -246,8 +246,8 @@ Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_Ind
     },
   ]);
 
-// Mock responses for IndividuallyNestedWithParamAliasClient scenario
-Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithParamAliasClient =
+// Mock responses for IndividuallyNestedWithParamAlias scenario
+Scenarios.Azure_ClientGenerator_Core_ClientInitialization_IndividuallyClient_IndividuallyNestedWithParamAlias =
   passOnSuccess([
     {
       uri: "/azure/client-generator-core/client-initialization/individually/nested-default-individually-param-alias/sample-blob/with-aliased-name",

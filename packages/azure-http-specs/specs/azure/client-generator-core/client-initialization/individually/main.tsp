@@ -99,7 +99,7 @@ model BlobQueryParam {
   initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually,
 })
 @route("/nested-default-individually")
-interface NestedDefaultIndividuallyWithPath {
+interface IndividuallyNestedWithPath {
   @route("/{blobName}/with-query")
   @get
   withQuery(@path blobName: string, @query format?: string): void;
@@ -147,7 +147,7 @@ interface NestedDefaultIndividuallyWithPath {
   initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually,
 })
 @route("/nested-default-individually-query")
-interface NestedDefaultIndividuallyWithQuery {
+interface IndividuallyNestedWithQuery {
   @route("/with-query")
   @get
   withQuery(...BlobQueryParam, @query format?: string): void;
@@ -195,7 +195,7 @@ interface NestedDefaultIndividuallyWithQuery {
   initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually,
 })
 @route("/nested-default-individually-header")
-interface NestedDefaultIndividuallyHeader {
+interface IndividuallyNestedWithHeader {
   @route("/with-query")
   @get
   withQuery(...NameHeaderParam, @query format?: string): void;
@@ -245,7 +245,7 @@ interface NestedDefaultIndividuallyHeader {
   initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually,
 })
 @route("/nested-default-individually-multiple")
-interface NestedDefaultIndividuallyMultiple {
+interface IndividuallyNestedWithMultiple {
   @route("/with-query")
   @get
   withQuery(...NameHeaderParam, ...RegionQueryParam, @query format?: string): void;
@@ -296,7 +296,7 @@ interface NestedDefaultIndividuallyMultiple {
   initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually,
 })
 @route("/nested-default-individually-mixed")
-interface NestedDefaultIndividuallyMixed {
+interface IndividuallyNestedWithMixed {
   @route("/with-query")
   @get
   withQuery(...NameHeaderParam, ...RegionQueryParam, @query format?: string): void;
@@ -343,7 +343,7 @@ interface NestedDefaultIndividuallyMixed {
   initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually,
 })
 @route("/nested-default-individually-param-alias")
-interface NestedDefaultIndividuallyParamAlias {
+interface IndividuallyNestedWithParamAlias {
   @route("/{blob}/with-aliased-name")
   @get
   withAliasedName(
