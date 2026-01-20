@@ -106,4 +106,3 @@ it("paged model with @markAsPageable decorator", async () => {
     ),
   );
 });
-
