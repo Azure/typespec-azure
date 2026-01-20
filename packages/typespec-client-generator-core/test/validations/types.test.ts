@@ -255,6 +255,38 @@ describe("multi-service duplicate name validation", () => {
     expectDiagnosticEmpty(diagnostics);
   });
 
+  it("no error for same API version enum name across services in multi-service client", async () => {
+    // API version enums (e.g., "Versions") commonly have the same name across services
+    // and that's expected and allowed - they're identified by UsageFlags.ApiVersionEnum
+    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
+      `
+      @service
+      @versioned(Versions)
+      namespace ServiceA {
+        enum Versions { v1 }
+        model FooA { a: string; }
+        @route("/a") op getA(): FooA;
+      }
+      @service
+      @versioned(Versions)
+      namespace ServiceB {
+        enum Versions { v1 }
+        model FooB { b: string; }
+        @route("/b") op getB(): FooB;
+      }
+      `,
+      `
+      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+      @useDependency(ServiceA.Versions.v1, ServiceB.Versions.v1)
+      namespace CombineClient;
+      `,
+    );
+
+    // Should not report errors for "Versions" enums being duplicated
+    // because they are API version enums
+    expectDiagnosticEmpty(diagnostics);
+  });
+
   it("error for duplicate model name within same service namespace", async () => {
     // Within the same service namespace, duplicate names ARE an error
     const diagnostics = await runner.diagnose(
@@ -330,8 +362,7 @@ describe("multi-service duplicate name validation", () => {
     expectDiagnostics(diagnostics, [
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-        message:
-          'Client name: "ExtensionResource" is duplicated in language scope: "AllScopes"',
+        message: 'Client name: "ExtensionResource" is duplicated in language scope: "AllScopes"',
       },
     ]);
   });

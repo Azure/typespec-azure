@@ -16,7 +16,7 @@ import { AugmentDecoratorStatementNode, DecoratorExpressionNode } from "@typespe
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import { DuplicateTracker } from "@typespec/compiler/utils";
 import { getClientNameOverride } from "../decorators.js";
-import { SdkClient, SdkContext, TCGCContext } from "../interfaces.js";
+import { SdkClient, SdkContext, TCGCContext, UsageFlags } from "../interfaces.js";
 import {
   AllScopes,
   clientKey,
@@ -122,6 +122,16 @@ function validateClientNames(sdkContext: SdkContext) {
     }
   }
 
+  // Pre-compute API version enum names to exclude from duplicate name validation
+  // API version enums (e.g., "Versions") commonly have the same name across services and that's OK
+  // We store names instead of Type references because versioning can create different type instances
+  const apiVersionEnumNames = new Set<string>();
+  for (const enumType of sdkContext.sdkPackage.enums) {
+    if ((enumType.usage & UsageFlags.ApiVersionEnum) !== 0) {
+      apiVersionEnumNames.add(enumType.name);
+    }
+  }
+
   // Build a map of namespace names to their types for resolving string targets
   const namedNamespaces = new Map<string, Namespace>();
   for (const ns of listAllUserDefinedNamespaces(sdkContext)) {
@@ -189,6 +199,7 @@ function validateClientNames(sdkContext: SdkContext) {
         moved,
         movedTo,
         multiServiceNamespaces,
+        apiVersionEnumNames,
       );
     } else {
       // For single-service: per-namespace validation
@@ -267,7 +278,6 @@ function validateClientNamesPerNamespace(
 
   // Check for duplicate client names for scalars
   validateClientNamesCore(tcgcContext, scope, namespace.scalars.values());
-
 
   // Check for duplicate client names for operations
   validateClientNamesCore(
@@ -447,6 +457,7 @@ function validateClientNamesAcrossNamespaces(
   moved: Set<Operation>,
   movedTo: Map<Namespace | Interface, Operation[]>,
   serviceNamespaces: Namespace[],
+  apiVersionEnumNames: Set<string>,
 ) {
   // Collect all types from all service namespaces
   const allModels: Model[] = [];
@@ -457,8 +468,12 @@ function validateClientNamesAcrossNamespaces(
     collectTypesFromNamespace(serviceNs, allModels, allEnums, allUnions);
   }
 
+  // Filter out API version enums - they commonly have the same name (e.g., "Versions")
+  // across services and that's expected/allowed
+  const filteredEnums = allEnums.filter((e) => !e.name || !apiVersionEnumNames.has(e.name));
+
   // Validate models, enums, and unions together across all services
-  validateClientNamesCore(tcgcContext, scope, [...allModels, ...allEnums, ...allUnions]);
+  validateClientNamesCore(tcgcContext, scope, [...allModels, ...filteredEnums, ...allUnions]);
 
   // Also validate within each service namespace for operations, interfaces, properties, etc.
   // These are scoped to their containers and don't need cross-service validation

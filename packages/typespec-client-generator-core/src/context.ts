@@ -21,7 +21,6 @@ import { stringify } from "yaml";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { defaultDecoratorsAllowList } from "./configs.js";
 import { handleClientExamples } from "./example.js";
-import { validateTypes } from "./validations/types.js";
 import {
   getKnownScalars,
   SdkArrayType,
@@ -48,6 +47,7 @@ import {
   TspLiteralType,
 } from "./internal-utils.js";
 import { createSdkPackage } from "./package.js";
+import { validateTypes } from "./validations/types.js";
 
 interface CreateTCGCContextOptions {
   mutateNamespace?: boolean; // whether to mutate global namespace for versioning
