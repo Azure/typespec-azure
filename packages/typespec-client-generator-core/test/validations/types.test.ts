@@ -13,10 +13,11 @@ beforeEach(async () => {
 
 describe("multi-service duplicate name validation", () => {
   // In multi-service scenarios, models/enums/unions with the same name in different services
-  // ARE duplicates because they will be generated into the same namespace during multi-service generation.
+  // ARE duplicates because combining multiple services into one client means all types
+  // will be in the same client.
 
   it("error for same model name across services in multi-service client", async () => {
-    // Same-named models in different services will collide when generated
+    // Same-named models in different services will collide when combined into one client
     const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
       `
       @service
@@ -54,7 +55,7 @@ describe("multi-service duplicate name validation", () => {
   });
 
   it("error for same enum name across services in multi-service client", async () => {
-    // Same-named enums in different services will collide when generated
+    // Same-named enums in different services will collide when combined into one client
     const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
       `
       @service
@@ -92,7 +93,7 @@ describe("multi-service duplicate name validation", () => {
   });
 
   it("error for same union name across services in multi-service client", async () => {
-    // Same-named unions in different services will collide when generated
+    // Same-named unions in different services will collide when combined into one client
     const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
       `
       @service
@@ -156,7 +157,7 @@ describe("multi-service duplicate name validation", () => {
   });
 
   it("error for @clientName same name across services in multi-service client", async () => {
-    // @clientName causing same name across services will collide when generated
+    // @clientName causing same name across services will collide when combined into one client
     const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
       `
       @service
@@ -194,7 +195,7 @@ describe("multi-service duplicate name validation", () => {
   });
 
   it("error for nested namespace type with same name in multi-service client", async () => {
-    // Nested namespaces in different services will also collide when generated
+    // Nested namespaces in different services will also collide when combined into one client
     const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
       `
       @service

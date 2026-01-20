@@ -1498,8 +1498,7 @@ it("one client from multiple services with different useDependency versions", as
 });
 
 it("error: duplicate model names across services in multi-service client", async () => {
-  // Models with the same name across different services will collide when generated
-  // into the same namespace during multi-service generation
+  // Models with the same name across different services will collide when combined into one client
   const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
     `
     @service

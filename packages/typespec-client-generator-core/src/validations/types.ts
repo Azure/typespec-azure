@@ -16,7 +16,7 @@ import { AugmentDecoratorStatementNode, DecoratorExpressionNode } from "@typespe
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import { DuplicateTracker } from "@typespec/compiler/utils";
 import { getClientNameOverride } from "../decorators.js";
-import { SdkClient, TCGCContext } from "../interfaces.js";
+import { SdkClient, SdkContext, TCGCContext } from "../interfaces.js";
 import {
   AllScopes,
   clientKey,
@@ -28,7 +28,7 @@ import {
 } from "../internal-utils.js";
 import { reportDiagnostic } from "../lib.js";
 
-export function validateTypes(context: TCGCContext) {
+export function validateTypes(context: SdkContext) {
   validateClientNames(context);
 }
 
@@ -60,25 +60,27 @@ function getMultiServiceNamespaces(context: TCGCContext): Namespace[] {
  *
  * This function checks for duplicate client names for types considering the impact of `@clientName` for all possible scopes.
  * It also handles the movement of operations to new clients based on the `@clientLocation` decorators.
- * For multi-service clients, it validates names across ALL service namespaces together.
+ * For multi-service clients, it validates names across ALL service namespaces together since combining
+ * multiple services into one client means types from all services will be in the same client.
  *
- * @param tcgcContext The context for the TypeSpec Client Generator.
+ * @param sdkContext The SDK context (includes emitter options like namespaceFlag).
  */
-function validateClientNames(tcgcContext: TCGCContext) {
-  const languageScopes = getDefinedLanguageScopes(tcgcContext.program);
+function validateClientNames(sdkContext: SdkContext) {
+  const languageScopes = getDefinedLanguageScopes(sdkContext.program);
   // If no `@client` or `@operationGroup` decorators are defined, we consider `@clientLocation`
-  const needToConsiderClientLocation = !hasExplicitClientOrOperationGroup(tcgcContext);
+  const needToConsiderClientLocation = !hasExplicitClientOrOperationGroup(sdkContext);
 
-  // Detect multi-service scenario
-  const multiServiceNamespaces = getMultiServiceNamespaces(tcgcContext);
+  // Detect multi-service scenario.
+  // Multi-service (@client with multiple services) inherently combines types from all services
+  // into a single client, so cross-namespace validation is needed.
+  const multiServiceNamespaces = getMultiServiceNamespaces(sdkContext);
   const isMultiService = multiServiceNamespaces.length > 0;
 
   // Check if Azure.ResourceManager namespace exists (ARM library is being used)
-  const hasArmNamespace =
-    getAzureResourceManagerNamespace(tcgcContext.program) !== undefined;
+  const hasArmNamespace = getAzureResourceManagerNamespace(sdkContext.program) !== undefined;
 
   // Ensure we always run validation at least once (with AllScopes) for:
-  // - Multi-service scenarios (types across services may collide)
+  // - Multi-service scenarios (types across services may collide in the combined client)
   // - ARM scenarios (user types may conflict with ARM library types)
   if (languageScopes.size === 0 && (isMultiService || hasArmNamespace)) {
     languageScopes.add(AllScopes);
@@ -86,7 +88,7 @@ function validateClientNames(tcgcContext: TCGCContext) {
 
   // Build a map of namespace names to their types for resolving string targets
   const namedNamespaces = new Map<string, Namespace>();
-  for (const ns of listAllUserDefinedNamespaces(tcgcContext)) {
+  for (const ns of listAllUserDefinedNamespaces(sdkContext)) {
     if (ns.name) {
       namedNamespaces.set(ns.name, ns);
     }
@@ -101,7 +103,7 @@ function validateClientNames(tcgcContext: TCGCContext) {
     if (needToConsiderClientLocation) {
       // Cache all `@clientName` overrides for the current scope
       for (const [type, target] of listScopedDecoratorData(
-        tcgcContext,
+        sdkContext,
         clientLocationKey,
         scope,
       ).entries()) {
@@ -143,29 +145,29 @@ function validateClientNames(tcgcContext: TCGCContext) {
 
     if (isMultiService) {
       // For multi-service: validate types across ALL service namespaces together
-      // because they will be generated into the same namespace during multi-service generation.
+      // because they will be in the same client.
       // Same-named types across different services will collide.
       validateClientNamesAcrossNamespaces(
-        tcgcContext,
+        sdkContext,
         scope,
         moved,
         movedTo,
         multiServiceNamespaces,
       );
     } else {
-      // For single-service: existing per-namespace validation
+      // For single-service: per-namespace validation
       validateClientNamesPerNamespace(
-        tcgcContext,
+        sdkContext,
         scope,
         moved,
         movedTo,
-        tcgcContext.program.getGlobalNamespaceType(),
+        sdkContext.program.getGlobalNamespaceType(),
       );
     }
 
     // Validate client names for new client's operations
     [...newClients.values()].map((operations) => {
-      validateClientNamesCore(tcgcContext, scope, operations);
+      validateClientNamesCore(sdkContext, scope, operations);
     });
   }
 }
