@@ -307,6 +307,27 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       const hasOperations = context.__clientToOperationsCache!.get(group)!.length > 0;
       const hasSubGroups = group.subOperationGroups?.length > 0;
 
+      // If the group is empty but originally had operations that were moved via @clientLocation,
+      // emit an empty-client diagnostic
+      if (!hasOperations && !hasSubGroups && group.type) {
+        const originalOperations = [...group.type.operations.values()];
+        const hasMovedOperations = originalOperations.some((op) => {
+          const clientLocation = getClientLocation(context, op);
+          return clientLocation !== undefined && clientLocation !== group.type;
+        });
+        if (hasMovedOperations) {
+          const name =
+            group.kind === "SdkClient" ? group.name : getLibraryName(context, group.type);
+          reportDiagnostic(context.program, {
+            code: "empty-client",
+            target: group.type,
+            format: {
+              name,
+            },
+          });
+        }
+      }
+
       return hasOperations || hasSubGroups;
     };
 

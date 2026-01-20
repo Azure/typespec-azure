@@ -13,7 +13,7 @@ it("no duplicate operation with @clientLocation", async () => {
     `
     @service
     namespace StorageService;
-      
+
     interface StorageTasks {
       @clientLocation("StorageTasksReport")
       @route("/list")
@@ -27,7 +27,11 @@ it("no duplicate operation with @clientLocation", async () => {
     `,
   );
 
-  expectDiagnosticEmpty(diagnostics);
+  // StorageTasks becomes empty because all operations are moved out via @clientLocation
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/empty-client",
+    message: `Client "StorageTasks" has no operations. Clients should contain at least one operation.`,
+  });
 });
 
 it("no duplicate operation with @clientLocation another", async () => {
@@ -128,7 +132,7 @@ it("duplicate operation with @clientLocation to new clients", async () => {
     `
     @service
     namespace Contoso.WidgetManager;
-      
+
     interface A {
       @clientLocation("B")
       @route("/a")
@@ -151,6 +155,10 @@ it("duplicate operation with @clientLocation to new clients", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message: 'Client name: "a" is duplicated in language scope: "AllScopes"',
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/empty-client",
+      message: `Client "A" has no operations. Clients should contain at least one operation.`,
     },
   ]);
 });

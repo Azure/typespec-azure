@@ -1543,11 +1543,16 @@ describe("empty client diagnostic", () => {
     expectDiagnosticEmpty(diagnostics);
   });
 
-  it("should not emit diagnostic when operation is moved into client via @clientLocation", async () => {
+  it("should not emit diagnostic for target when operation is moved into it via @clientLocation", async () => {
+    // Target was originally empty but receives an operation via @clientLocation
+    // Source still has an operation, so no empty-client diagnostic
     const diagnostics = await runner.diagnose(`
       @service
       namespace MyService {
         interface Source {
+          @route("/stay")
+          op stayOp(): void;
+
           @route("/moved")
           @clientLocation(Target)
           op movedOp(): void;
@@ -1561,7 +1566,30 @@ describe("empty client diagnostic", () => {
     expectDiagnosticEmpty(diagnostics);
   });
 
-  it("should not emit diagnostic when operation is moved into root client via @clientLocation", async () => {
+  it("should emit diagnostic when @clientLocation moves all operations out of a client", async () => {
+    const diagnostics = await runner.diagnose(`
+      @service
+      namespace MyService {
+        interface Source {
+          @route("/moved")
+          @clientLocation(Target)
+          op movedOp(): void;
+        }
+
+        interface Target {
+          @route("/target")
+          op targetOp(): void;
+        }
+      }
+    `);
+
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/empty-client",
+      message: `Client "Source" has no operations. Clients should contain at least one operation.`,
+    });
+  });
+
+  it("should emit diagnostic when @clientLocation moves all operations to root client", async () => {
     const diagnostics = await runner.diagnose(`
       @service
       namespace MyService {
@@ -1573,10 +1601,13 @@ describe("empty client diagnostic", () => {
       }
     `);
 
-    expectDiagnosticEmpty(diagnostics);
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/empty-client",
+      message: `Client "Source" has no operations. Clients should contain at least one operation.`,
+    });
   });
 
-  it("should not emit diagnostic when operation is moved into new operation group via @clientLocation string", async () => {
+  it("should emit diagnostic when @clientLocation moves all operations to new operation group", async () => {
     const diagnostics = await runner.diagnose(`
       @service
       namespace MyService {
@@ -1588,6 +1619,9 @@ describe("empty client diagnostic", () => {
       }
     `);
 
-    expectDiagnosticEmpty(diagnostics);
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-client-generator-core/empty-client",
+      message: `Client "Source" has no operations. Clients should contain at least one operation.`,
+    });
   });
 });
