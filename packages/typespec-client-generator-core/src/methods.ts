@@ -271,6 +271,13 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       const itemsProperty = diagnostics.pipe(
         getSdkModelPropertyType(context, markAsPageableInfo.itemsProperty, operation),
       );
+
+      // Set resultSegments to match the behavior of normal paging operations
+      baseServiceMethod.response.resultSegments = [itemsProperty];
+
+      if (responseType) {
+        context.__pagedResultSet.add(responseType);
+      }
       // tcgc will let all paging method return a list of items
       baseServiceMethod.response.type = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, markAsPageableInfo.itemsProperty.type, operation),
@@ -281,7 +288,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
         kind: "paging",
         pagingMetadata: {
           __raw: undefined, // because in this case it is not a real paging operation
-          pageItemsSegments: [itemsProperty],
+          pageItemsSegments: baseServiceMethod.response.resultSegments,
         },
       });
     } else {
