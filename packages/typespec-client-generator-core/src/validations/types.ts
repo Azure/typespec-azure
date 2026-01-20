@@ -170,6 +170,11 @@ function validateClientNames(sdkContext: SdkContext) {
     [...newClients.values()].map((operations) => {
       validateClientNamesCore(sdkContext, scope, operations);
     });
+
+    // Check for Azure library type conflicts (only for types actually used by the client)
+    if (azureLibraryNamespaces.length > 0) {
+      validateAzureLibraryTypeConflicts(sdkContext, scope, azureLibraryNamespaces);
+    }
   }
 }
 
@@ -228,12 +233,6 @@ function validateClientNamesPerNamespace(
   // Check for duplicate client names for scalars
   validateClientNamesCore(tcgcContext, scope, namespace.scalars.values());
 
-  // Check for Azure library type conflicts separately
-  // Only check if user types with @clientName conflict with Azure library types
-  const azureNamespaces = getAzureLibraryNamespaces(tcgcContext.program);
-  if (azureNamespaces.length > 0) {
-    validateAzureLibraryTypeConflicts(tcgcContext, scope, typesToValidate, azureNamespaces);
-  }
 
   // Check for duplicate client names for operations
   validateClientNamesCore(
@@ -365,13 +364,13 @@ function collectTypeNamesFromNamespace(namespace: Namespace): Set<string> {
  * This is a targeted check that only reports conflicts when:
  * 1. A user type has an explicit @clientName decorator
  * 2. The client name matches an Azure library type name (from Azure.Core or Azure.ResourceManager)
+ * 3. The type is actually used by the client (present in sdkPackage)
  *
- * This avoids false positives from Azure's own internal type duplicates.
+ * This avoids false positives from Azure's own internal type duplicates and unused types.
  */
 function validateAzureLibraryTypeConflicts(
-  tcgcContext: TCGCContext,
+  sdkContext: SdkContext,
   scope: string | typeof AllScopes,
-  userTypes: (Model | Enum | Union)[],
   azureNamespaces: Namespace[],
 ) {
   // Collect all type names from all Azure library namespaces
@@ -383,9 +382,31 @@ function validateAzureLibraryTypeConflicts(
     }
   }
 
-  for (const userType of userTypes) {
+  // Build a set of used TypeSpec types from the sdkPackage
+  const usedTypes = new Set<Type>();
+  for (const model of sdkContext.sdkPackage.models) {
+    if (model.__raw) {
+      usedTypes.add(model.__raw);
+    }
+  }
+  for (const enumType of sdkContext.sdkPackage.enums) {
+    if (enumType.__raw) {
+      usedTypes.add(enumType.__raw);
+    }
+  }
+  for (const unionType of sdkContext.sdkPackage.unions) {
+    if (unionType.__raw) {
+      usedTypes.add(unionType.__raw);
+    }
+  }
+
+  // Check only used types for conflicts
+  for (const userType of usedTypes) {
+    if (userType.kind !== "Model" && userType.kind !== "Enum" && userType.kind !== "Union") {
+      continue;
+    }
     // Only check types that have an explicit @clientName decorator
-    const clientName = getClientNameOverride(tcgcContext, userType, scope);
+    const clientName = getClientNameOverride(sdkContext, userType, scope);
     if (clientName !== undefined && azureTypeNames.has(clientName)) {
       // User type with @clientName conflicts with an Azure library type
       const clientNameDecorator = userType.decorators.find(
@@ -393,7 +414,7 @@ function validateAzureLibraryTypeConflicts(
       );
       if (clientNameDecorator?.node !== undefined) {
         const scopeStr = scope === AllScopes ? "AllScopes" : scope;
-        reportDiagnostic(tcgcContext.program, {
+        reportDiagnostic(sdkContext.program, {
           code: "duplicate-client-name",
           format: { name: clientName, scope: scopeStr },
           target: clientNameDecorator.node,
