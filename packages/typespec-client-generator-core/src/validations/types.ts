@@ -76,13 +76,14 @@ function validateClientNames(sdkContext: SdkContext) {
   const multiServiceNamespaces = getMultiServiceNamespaces(sdkContext);
   const isMultiService = multiServiceNamespaces.length > 0;
 
-  // Check if Azure.ResourceManager namespace exists (ARM library is being used)
-  const hasArmNamespace = getAzureResourceManagerNamespace(sdkContext.program) !== undefined;
+  // Check if any Azure library namespace exists (Azure.Core or Azure.ResourceManager)
+  const azureLibraryNamespaces = getAzureLibraryNamespaces(sdkContext.program);
+  const hasAzureLibrary = azureLibraryNamespaces.length > 0;
 
   // Ensure we always run validation at least once (with AllScopes) for:
   // - Multi-service scenarios (types across services may collide in the combined client)
-  // - ARM scenarios (user types may conflict with ARM library types)
-  if (languageScopes.size === 0 && (isMultiService || hasArmNamespace)) {
+  // - Azure library scenarios (user types may conflict with Azure.Core or Azure.ResourceManager types)
+  if (languageScopes.size === 0 && (isMultiService || hasAzureLibrary)) {
     languageScopes.add(AllScopes);
   }
 
@@ -227,11 +228,11 @@ function validateClientNamesPerNamespace(
   // Check for duplicate client names for scalars
   validateClientNamesCore(tcgcContext, scope, namespace.scalars.values());
 
-  // Check for ARM type conflicts separately
-  // Only check if user types with @clientName conflict with ARM library types
-  const armNamespace = getAzureResourceManagerNamespace(tcgcContext.program);
-  if (armNamespace) {
-    validateArmTypeConflicts(tcgcContext, scope, typesToValidate, armNamespace);
+  // Check for Azure library type conflicts separately
+  // Only check if user types with @clientName conflict with Azure library types
+  const azureNamespaces = getAzureLibraryNamespaces(tcgcContext.program);
+  if (azureNamespaces.length > 0) {
+    validateAzureLibraryTypeConflicts(tcgcContext, scope, typesToValidate, azureNamespaces);
   }
 
   // Check for duplicate client names for operations
@@ -302,22 +303,34 @@ function collectTypesFromNamespace(
 }
 
 /**
- * Get the Azure.ResourceManager namespace if it exists in the program.
- * This is used to detect naming conflicts between user-defined types
- * and ARM library types.
+ * Get Azure library namespaces (Azure.Core and Azure.ResourceManager) if they exist.
+ * These are used to detect naming conflicts between user-defined types
+ * and built-in Azure library types.
  */
-function getAzureResourceManagerNamespace(program: Program): Namespace | undefined {
+function getAzureLibraryNamespaces(program: Program): Namespace[] {
+  const namespaces: Namespace[] = [];
   const globalNs = program.getGlobalNamespaceType();
   const azureNs = globalNs.namespaces.get("Azure");
-  if (!azureNs) return undefined;
-  return azureNs.namespaces.get("ResourceManager");
+  if (!azureNs) return namespaces;
+
+  const coreNs = azureNs.namespaces.get("Core");
+  if (coreNs) {
+    namespaces.push(coreNs);
+  }
+
+  const armNs = azureNs.namespaces.get("ResourceManager");
+  if (armNs) {
+    namespaces.push(armNs);
+  }
+
+  return namespaces;
 }
 
 /**
- * Collect all ARM type names from the Azure.ResourceManager namespace.
+ * Collect all type names from a namespace recursively.
  * This includes models, enums, and unions from all nested namespaces.
  */
-function collectArmTypeNames(namespace: Namespace): Set<string> {
+function collectTypeNamesFromNamespace(namespace: Namespace): Set<string> {
   const names = new Set<string>();
 
   for (const model of namespace.models.values()) {
@@ -338,7 +351,7 @@ function collectArmTypeNames(namespace: Namespace): Set<string> {
 
   // Recursively collect from nested namespaces
   for (const nestedNs of namespace.namespaces.values()) {
-    const nestedNames = collectArmTypeNames(nestedNs);
+    const nestedNames = collectTypeNamesFromNamespace(nestedNs);
     for (const name of nestedNames) {
       names.add(name);
     }
@@ -348,26 +361,33 @@ function collectArmTypeNames(namespace: Namespace): Set<string> {
 }
 
 /**
- * Validate that user-defined types with @clientName don't conflict with ARM library types.
+ * Validate that user-defined types with @clientName don't conflict with Azure library types.
  * This is a targeted check that only reports conflicts when:
  * 1. A user type has an explicit @clientName decorator
- * 2. The client name matches an ARM library type name
+ * 2. The client name matches an Azure library type name (from Azure.Core or Azure.ResourceManager)
  *
- * This avoids false positives from ARM's own internal type duplicates.
+ * This avoids false positives from Azure's own internal type duplicates.
  */
-function validateArmTypeConflicts(
+function validateAzureLibraryTypeConflicts(
   tcgcContext: TCGCContext,
   scope: string | typeof AllScopes,
   userTypes: (Model | Enum | Union)[],
-  armNamespace: Namespace,
+  azureNamespaces: Namespace[],
 ) {
-  const armTypeNames = collectArmTypeNames(armNamespace);
+  // Collect all type names from all Azure library namespaces
+  const azureTypeNames = new Set<string>();
+  for (const ns of azureNamespaces) {
+    const names = collectTypeNamesFromNamespace(ns);
+    for (const name of names) {
+      azureTypeNames.add(name);
+    }
+  }
 
   for (const userType of userTypes) {
     // Only check types that have an explicit @clientName decorator
     const clientName = getClientNameOverride(tcgcContext, userType, scope);
-    if (clientName !== undefined && armTypeNames.has(clientName)) {
-      // User type with @clientName conflicts with an ARM type
+    if (clientName !== undefined && azureTypeNames.has(clientName)) {
+      // User type with @clientName conflicts with an Azure library type
       const clientNameDecorator = userType.decorators.find(
         (x) => x.definition?.name === "@clientName",
       );
