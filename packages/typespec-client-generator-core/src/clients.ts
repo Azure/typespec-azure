@@ -261,8 +261,12 @@ function addDefaultClientParameters<
       multipleServiceApiVersionParam.apiVersions = [];
       multipleServiceApiVersionParam.clientDefaultValue = undefined;
       multipleServiceApiVersionParam.type = getTypeSpecBuiltInType(context, "string");
+      // API version parameters at the client level should always be optional
+      multipleServiceApiVersionParam.optional = true;
       defaultClientParamters.push(multipleServiceApiVersionParam);
     } else {
+      // API version parameters at the client level should always be optional
+      apiVersionParam.optional = true;
       defaultClientParamters.push(apiVersionParam);
     }
   }
