@@ -36,6 +36,7 @@ versionPolicies:
     type: lockstep
     step: minor
     packages:
+      - "@azure-tools/typespec-apiview"
       - "@azure-tools/typespec-autorest"
       - "@azure-tools/typespec-azure-core"
       - "@azure-tools/typespec-azure-portal-core"
