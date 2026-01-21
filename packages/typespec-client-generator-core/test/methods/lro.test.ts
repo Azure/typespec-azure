@@ -12,7 +12,10 @@ import {
   createClientCustomizationInput,
   createSdkContextForTester,
 } from "../tester.js";
-import { hasFlag } from "../utils.js";
+
+function hasFlag<T extends number>(value: T, flag: T): boolean {
+  return (value & flag) !== 0;
+}
 
 const LroVersionedServiceTester = AzureCoreTester.wrap(
   (x) => `

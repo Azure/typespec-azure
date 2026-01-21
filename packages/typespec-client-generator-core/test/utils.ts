@@ -6,40 +6,6 @@ import {
   SdkServiceMethod,
 } from "../src/interfaces.js";
 
-export function hasFlag<T extends number>(value: T, flag: T): boolean {
-  return (value & flag) !== 0;
-}
-
-export function getServiceWithDefaultApiVersion(op: string) {
-  return `
-  @server(
-    "{endpoint}",
-    "Testserver endpoint",
-    {
-      /**
-       * Need to be set as 'http://localhost:3000' in client.
-       */
-      endpoint: url,
-    }
-  )
-  @service
-  @versioned(Versions)
-  namespace Server.Versions.Versioned;
-
-  /**
-   * The version of the API.
-   */
-  enum Versions {
-    /**
-     * The version 2022-12-01-preview.
-     */
-      v2022_12_01_preview: "2022-12-01-preview",
-  }
-
-  ${op}
-  `;
-}
-
 export function getServiceMethodOfClient(
   sdkPackage: SdkPackage<SdkHttpOperation>,
   numMethods: number = 1,

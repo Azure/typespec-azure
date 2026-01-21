@@ -10,12 +10,12 @@ import {
 } from "../../src/interfaces.js";
 import {
   ArmTesterWithService,
-  AzureCoreTester,
+  AzureCoreTesterWithService,
   createSdkContextForTester,
   SimpleTester,
   SimpleTesterWithService,
 } from "../tester.js";
-import { getServiceMethodOfClient, getServiceWithDefaultApiVersion } from "../utils.js";
+import { getServiceMethodOfClient } from "../utils.js";
 
 it("path basic", async () => {
   const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
@@ -932,8 +932,8 @@ it("ensure accept is a constant if only one possibility (non-json)", async () =>
 });
 
 it("lro rpc case", async () => {
-  const { program } = await AzureCoreTester.compile(
-    getServiceWithDefaultApiVersion(`
+  const { program } = await AzureCoreTesterWithService.compile(
+    `
       model GenerationOptions {
         prompt: string;
       }
@@ -946,7 +946,7 @@ it("lro rpc case", async () => {
       
       @route("/generations:submit")
       op longRunningRpc is Azure.Core.LongRunningRpcOperation<GenerationOptions, GenerationResponse, GenerationResult>;
-    `),
+    `,
   );
   const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;

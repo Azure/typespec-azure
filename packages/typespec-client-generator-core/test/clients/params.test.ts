@@ -10,12 +10,12 @@ import {
 import {
   ArmTesterWithService,
   AzureCoreTester,
+  AzureCoreTesterWithService,
   createClientCustomizationInput,
   createSdkContextForTester,
   SimpleBaseTester,
   SimpleTester,
 } from "../tester.js";
-import { getServiceWithDefaultApiVersion } from "../utils.js";
 
 it("name", async () => {
   const { program } = await SimpleTester.compile(`
@@ -558,12 +558,12 @@ it("service with no default api version, method with api version param", async (
 });
 
 it("service with default api version, method without api version param", async () => {
-  const { program } = await AzureCoreTester.compile(
-    getServiceWithDefaultApiVersion(`
+  const { program } = await AzureCoreTesterWithService.compile(
+    `
       @route("/without-api-version")
       @head
       op withoutApiVersion(): OkResponse;
-      `),
+      `,
   );
   const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
@@ -577,19 +577,16 @@ it("service with default api version, method without api version param", async (
   strictEqual(withoutApiVersion.kind, "basic");
   strictEqual(withoutApiVersion.parameters.length, 0);
   strictEqual(withoutApiVersion.operation.parameters.length, 0);
-  strictEqual(
-    withoutApiVersion.crossLanguageDefinitionId,
-    "Server.Versions.Versioned.withoutApiVersion",
-  );
+  strictEqual(withoutApiVersion.crossLanguageDefinitionId, "My.Service.withoutApiVersion");
 });
 
 it("service with default api version, method with api version param", async () => {
-  const { program } = await AzureCoreTester.compile(
-    getServiceWithDefaultApiVersion(`
+  const { program } = await AzureCoreTesterWithService.compile(
+    `
       @route("/with-query-api-version")
       @head
       op withQueryApiVersion(@query("api-version") apiVersion: string): OkResponse;
-    `),
+    `,
   );
   const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
@@ -604,7 +601,7 @@ it("service with default api version, method with api version param", async () =
   strictEqual(clientApiVersionParam.onClient, true);
   strictEqual(clientApiVersionParam.optional, false);
   strictEqual(clientApiVersionParam.kind, "method");
-  strictEqual(clientApiVersionParam.clientDefaultValue, "2022-12-01-preview");
+  strictEqual(clientApiVersionParam.clientDefaultValue, "v1");
   strictEqual(clientApiVersionParam.isApiVersionParam, true);
   strictEqual(clientApiVersionParam.type.kind, "string");
   strictEqual(client.methods.length, 1);
@@ -612,10 +609,7 @@ it("service with default api version, method with api version param", async () =
   const withApiVersion = client.methods[0];
   strictEqual(withApiVersion.name, "withQueryApiVersion");
   strictEqual(withApiVersion.kind, "basic");
-  strictEqual(
-    withApiVersion.crossLanguageDefinitionId,
-    "Server.Versions.Versioned.withQueryApiVersion",
-  );
+  strictEqual(withApiVersion.crossLanguageDefinitionId, "My.Service.withQueryApiVersion");
   strictEqual(withApiVersion.parameters.length, 0);
   strictEqual(withApiVersion.operation.parameters.length, 1);
 
@@ -625,7 +619,7 @@ it("service with default api version, method with api version param", async () =
   strictEqual(apiVersionParam.optional, false);
   strictEqual(apiVersionParam.onClient, true);
   strictEqual(apiVersionParam.type.kind, "string");
-  strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01-preview");
+  strictEqual(apiVersionParam.clientDefaultValue, "v1");
   strictEqual(apiVersionParam.correspondingMethodParams.length, 1);
   strictEqual(
     apiVersionParam.correspondingMethodParams[0],
@@ -634,12 +628,12 @@ it("service with default api version, method with api version param", async () =
 });
 
 it("service with default api version, method with path api version param", async () => {
-  const { program } = await AzureCoreTester.compile(
-    getServiceWithDefaultApiVersion(`
+  const { program } = await AzureCoreTesterWithService.compile(
+    `
       @route("/with-path-api-version")
       @head
       op withPathApiVersion(@path apiVersion: string): OkResponse;
-    `),
+    `,
   );
   const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
@@ -654,7 +648,7 @@ it("service with default api version, method with path api version param", async
   strictEqual(clientApiVersionParam.onClient, true);
   strictEqual(clientApiVersionParam.optional, false);
   strictEqual(clientApiVersionParam.kind, "method");
-  strictEqual(clientApiVersionParam.clientDefaultValue, "2022-12-01-preview");
+  strictEqual(clientApiVersionParam.clientDefaultValue, "v1");
   strictEqual(clientApiVersionParam.isApiVersionParam, true);
   strictEqual(clientApiVersionParam.type.kind, "string");
   strictEqual(client.methods.length, 1);
@@ -662,10 +656,7 @@ it("service with default api version, method with path api version param", async
   const withApiVersion = client.methods[0];
   strictEqual(withApiVersion.name, "withPathApiVersion");
   strictEqual(withApiVersion.kind, "basic");
-  strictEqual(
-    withApiVersion.crossLanguageDefinitionId,
-    "Server.Versions.Versioned.withPathApiVersion",
-  );
+  strictEqual(withApiVersion.crossLanguageDefinitionId, "My.Service.withPathApiVersion");
   strictEqual(withApiVersion.parameters.length, 0);
   strictEqual(withApiVersion.operation.parameters.length, 1);
 
@@ -677,7 +668,7 @@ it("service with default api version, method with path api version param", async
   strictEqual(apiVersionParam.optional, false);
   strictEqual(apiVersionParam.onClient, true);
   strictEqual(apiVersionParam.type.kind, "string");
-  strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01-preview");
+  strictEqual(apiVersionParam.clientDefaultValue, "v1");
   strictEqual(apiVersionParam.correspondingMethodParams.length, 1);
   strictEqual(
     apiVersionParam.correspondingMethodParams[0],
