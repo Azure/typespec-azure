@@ -6,7 +6,7 @@ TypeSpec uses a versioning library that models the changes in each new version o
 This works well when APIs evolve according to versioning guidelines, without breaking changes. For the most part, this means that this system is very good at
 modeling differences between stable api-versions for Azure APIs, but can be cumbersome when describing differences between preview APIs.
 
-Additionally, in Azure. preview APIs have a limited lifespan and limited support in SDKs and other tooling. For this reason and others, specs should only have a _signle active preview_ at any point during the spec development process.
+Additionally, in Azure. preview APIs have a limited lifespan and limited support in SDKs and other tooling. For this reason and others, specs should only have a _single active preview_ at any point during the spec development process.
 
 At the same time, Azure ResourceManager teams may need to maintain OpenAPI files for preview versions until they are retired, some reasons for this include:
 

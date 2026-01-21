@@ -8,7 +8,7 @@ This includes:
 ## Making Changes to your TypeSpec spec
 
 - Rename the latest preview version to match the new preview version, in all instances in the spec
-  - In vscode, highlight the version name and select `rename symbol` from the context menu to rename the version througholut your spec
+  - In vscode, highlight the version name and select `rename symbol` from the context menu to rename the version throughout your spec
   - In any editor, search and replace the latest preview version in the spec with the new preview version
 - Update the version value of this version to match the new api-version string
 - Update any version documentation to use the new version
