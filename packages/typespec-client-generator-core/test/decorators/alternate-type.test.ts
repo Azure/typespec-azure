@@ -887,6 +887,36 @@ describe("external types", () => {
     // The key check: it should NOT have external property set
     strictEqual(identityProperty?.type.external, undefined);
   });
+
+  it("should warn when external type is applied to model property", async () => {
+    const diagnostics = (
+      await runner.compileAndDiagnose(`
+      @service
+      namespace MyService {
+        model FieldName {}
+
+        model FieldWithExternalType {
+          name: FieldName;
+        }
+
+        @route("/test")
+        op test(@body body: FieldWithExternalType): void;
+
+        @@alternateType(FieldWithExternalType.name,
+          {
+            identity: "crate::models::HandWrittenType",
+          },
+          "rust"
+        );
+      };
+    `)
+    )[1];
+    strictEqual(diagnostics.length, 1);
+    strictEqual(
+      diagnostics[0].code,
+      "@azure-tools/typespec-client-generator-core/external-type-on-model-property",
+    );
+  });
 });
 
 it("should not set usage on original enum when parameter has alternateType", async () => {
