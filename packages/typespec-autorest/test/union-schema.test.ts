@@ -3,7 +3,7 @@ import { deepStrictEqual, strictEqual } from "assert";
 import { describe, expect, it } from "vitest";
 import { compileOpenAPI, diagnoseOpenApiFor, openApiFor } from "./test-host.js";
 
-describe("typespec-autorest: union schema", () => {
+describe("union as enum", () => {
   it("union of mixed types emit diagnostic", async () => {
     const diagnostics = await diagnoseOpenApiFor(
       `
@@ -154,5 +154,64 @@ describe("typespec-autorest: union schema", () => {
       );
       strictEqual(res.definitions.Foo.description, "FooUnion");
     });
+  });
+
+  it("overrides x-ms-enum.name with @clientName", async () => {
+    const res: any = await compileOpenAPI(
+      `
+        @clientName("RenamedFoo")
+        union Foo {
+          foo: "foo",
+          bar: "bar"
+        }
+
+        model FooResponse {
+          foo: Foo;
+        }`,
+      { preset: "azure" },
+    );
+    const schema = res.definitions.RenamedFoo;
+    deepStrictEqual(schema["x-ms-enum"].name, "RenamedFoo");
+  });
+});
+
+describe("other unions", () => {
+  it("emit a warning", async () => {
+    const diagnostics = await diagnoseOpenApiFor(`
+      model Pet {
+        name: string | int32;
+      }
+    `);
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-autorest/union-unsupported",
+      message:
+        "Unions cannot be emitted to OpenAPI v2 unless all options are literals of the same type.",
+    });
+  });
+
+  it("produce an empty schema", async () => {
+    const res = await compileOpenAPI(
+      `
+      model Pet {
+        #suppress "@azure-tools/typespec-autorest/union-unsupported" test
+        name: string | int32;
+      };
+      `,
+    );
+    expect(res.definitions?.Pet.properties?.name).toEqual({});
+  });
+
+  it("produce an empty schema (when a template)", async () => {
+    const res = await compileOpenAPI(`
+      model Pet {
+        name: MyUnion<int32>;
+      }
+        
+      #suppress "@azure-tools/typespec-autorest/union-unsupported" test
+      union MyUnion<T> {
+        T, string
+      }
+    `);
+    expect(res.definitions?.Pet.properties?.name).toEqual({});
   });
 });

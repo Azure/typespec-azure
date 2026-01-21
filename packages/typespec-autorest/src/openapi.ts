@@ -148,7 +148,6 @@ import {
   getParameterKey,
   isReadonlyProperty,
   resolveInfo,
-  shouldInline,
 } from "@typespec/openapi";
 import { getVersionsForEnum } from "@typespec/versioning";
 import { ArmFeatureOptions } from "../../typespec-azure-resource-manager/generated-defs/Azure.ResourceManager.Legacy.js";
@@ -194,6 +193,7 @@ import {
   getClientName,
   isSupportedAutorestFormat,
   resolveOperationId,
+  shouldInline,
 } from "./utils.js";
 import { resolveXmlModule } from "./xml.js";
 
