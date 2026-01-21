@@ -29,7 +29,7 @@ describe("getValueTypeValue", () => {
         prop: string = "default";
       }
     `);
-    const context = await createSdkContextForTester(program);
+    await createSdkContextForTester(program);
 
     strictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), "default");
   });
@@ -40,7 +40,7 @@ describe("getValueTypeValue", () => {
         prop: boolean = false;
       }
     `);
-    const context = await createSdkContextForTester(program);
+    await createSdkContextForTester(program);
 
     strictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), false);
   });
@@ -51,7 +51,7 @@ describe("getValueTypeValue", () => {
         prop: boolean | null = null;
       }
     `);
-    const context = await createSdkContextForTester(program);
+    await createSdkContextForTester(program);
 
     strictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), null);
   });
@@ -62,7 +62,7 @@ describe("getValueTypeValue", () => {
         prop: int32 = 1;
       }
     `);
-    const context = await createSdkContextForTester(program);
+    await createSdkContextForTester(program);
 
     strictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), 1);
   });
@@ -73,7 +73,7 @@ describe("getValueTypeValue", () => {
         prop: float32 = 1.234;
       }
     `);
-    const context = await createSdkContextForTester(program);
+    await createSdkContextForTester(program);
 
     strictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), 1.234);
   });
@@ -89,7 +89,7 @@ describe("getValueTypeValue", () => {
         B: "B",
       }
     `);
-    const context = await createSdkContextForTester(program);
+    await createSdkContextForTester(program);
 
     strictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), "A");
   });
@@ -105,7 +105,7 @@ describe("getValueTypeValue", () => {
         B,
       }
     `);
-    const context = await createSdkContextForTester(program);
+    await createSdkContextForTester(program);
 
     strictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), "A");
   });
@@ -116,7 +116,7 @@ describe("getValueTypeValue", () => {
         prop: string[] = #["a", "b"];
       }
     `);
-    const context = await createSdkContextForTester(program);
+    await createSdkContextForTester(program);
 
     deepStrictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), ["a", "b"]);
   });
@@ -132,7 +132,7 @@ describe("getValueTypeValue", () => {
         y: int32;
       }
     `);
-    const context = await createSdkContextForTester(program);
+    await createSdkContextForTester(program);
 
     deepStrictEqual(getValueTypeValue(Test.properties.get("prop")?.defaultValue!), {
       x: 0,

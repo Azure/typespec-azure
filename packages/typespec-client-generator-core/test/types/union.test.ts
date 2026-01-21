@@ -662,7 +662,7 @@ it("nullable union with anonymous model ref self", async function () {
 });
 
 it("nullable union circular", async function () {
-  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(`
+  const [{ program }] = await SimpleTester.compileAndDiagnose(`
     @service
     namespace Test {
       union Test {
