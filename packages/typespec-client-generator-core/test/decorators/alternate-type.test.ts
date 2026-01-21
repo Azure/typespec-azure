@@ -889,8 +889,7 @@ describe("external types", () => {
   });
 
   it("should warn when external type is applied to model property", async () => {
-    const diagnostics = (
-      await runner.compileAndDiagnose(`
+    const diagnostics = await SimpleTester.diagnose(`
       @service
       namespace MyService {
         model FieldName {}
@@ -909,8 +908,7 @@ describe("external types", () => {
           "rust"
         );
       };
-    `)
-    )[1];
+    `);
     strictEqual(diagnostics.length, 1);
     strictEqual(
       diagnostics[0].code,
