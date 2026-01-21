@@ -1,25 +1,17 @@
-import { Operation } from "@typespec/compiler";
+import { t } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { shouldGenerateProtocol } from "../../src/decorators.js";
-import {
-  createSdkContextForTester,
-  SimpleTester,
-  SimpleTesterWithBuiltInService,
-} from "../tester.js";
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
 async function protocolAPITestHelper(protocolValue: boolean, globalValue: boolean): Promise<void> {
-  const testCode = `
-    @protocolAPI(${protocolValue})
+  const { program, test } = await SimpleTesterWithService.compile(t.code`
+    @protocolAPI(${protocolValue.toString()})
     @test
-    op test(): void;
-  `;
-  const result = await SimpleTesterWithBuiltInService.compile(testCode);
-  const program = result.program;
-  const test = (result as unknown as { test: Operation }).test;
+    op ${t.op("test")}(): void;
+  `);
 
   const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
     "generate-protocol-methods": globalValue,
     "generate-convenience-methods": false,
   });
@@ -49,29 +41,20 @@ describe("@protocolAPI", () => {
 
 describe("@protocolAPI on interface", () => {
   it("applies protocolAPI false to all operations in interface", async () => {
-    const testCode = `
+    const { program, test1, test2 } = await SimpleTester.compile(t.code`
       @service
       namespace MyService {
         @protocolAPI(false)
         @operationGroup
         interface MyOperations {
-          @test("test1")
           @route("/test1")
-          op test1(): void;
-          @test("test2")
+          op ${t.op("test1")}(): void;
           @route("/test2")
-          op test2(): void;
+          op ${t.op("test2")}(): void;
         }
       }
-    `;
-    const result = await SimpleTester.compile(testCode);
-    const program = result.program;
-    const test1 = (result as unknown as { test1: Operation }).test1;
-    const test2 = (result as unknown as { test2: Operation }).test2;
-
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    `);
+    const context = await createSdkContextForTester(program);
 
     // Test the core functionality - shouldGenerateProtocol should return false
     strictEqual(shouldGenerateProtocol(context, test1), false);
@@ -81,26 +64,20 @@ describe("@protocolAPI on interface", () => {
 
 describe("@protocolAPI on namespace", () => {
   it("applies protocolAPI false to all operations in namespace", async () => {
-    const testCode = `
+    const { program, test1, test2 } = await SimpleTester.compile(t.code`
       @service
       @protocolAPI(false)
       namespace TestService2 {
         @test("test1")
         @route("/test1")
-        op test1(): void;
+        op ${t.op("test1")}(): void;
         @test("test2")
         @route("/test2")
-        op test2(): void;
+        op ${t.op("test2")}(): void;
       }
-    `;
-    const result = await SimpleTester.compile(testCode);
-    const program = result.program;
-    const test1 = (result as unknown as { test1: Operation }).test1;
-    const test2 = (result as unknown as { test2: Operation }).test2;
+    `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
 
     strictEqual(shouldGenerateProtocol(context, test1), false);
     strictEqual(shouldGenerateProtocol(context, test2), false);

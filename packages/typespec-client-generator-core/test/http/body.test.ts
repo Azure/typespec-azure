@@ -1,15 +1,13 @@
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { createSdkContextForTester, SimpleTesterWithBuiltInService } from "../tester.js";
+import { createSdkContextForTester, SimpleTesterWithService } from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
 it("optional body parameter", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     op myOp(@body body?: string): void;
     `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceOperation = method.operation;
@@ -26,12 +24,10 @@ it("optional body parameter", async () => {
 });
 
 it("required body parameter", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     op myOp(@body body: string): void;
     `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceOperation = method.operation;
@@ -48,12 +44,10 @@ it("required body parameter", async () => {
 });
 
 it("spread body always required", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     op myOp(foo?: string, bar?: string): void;
     `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceOperation = method.operation;

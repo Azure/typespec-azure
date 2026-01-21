@@ -16,10 +16,7 @@ it("SdkStringExample", async () => {
       op getString(): string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -46,10 +43,7 @@ it("SdkStringExample diagnostic", async () => {
       op getStringDiagnostic(): string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -76,10 +70,7 @@ it("SdkStringExample from constant", async () => {
       op getStringFromConstant(): "test";
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -106,10 +97,7 @@ it("SdkStringExample from constant diagnostic", async () => {
       op getStringFromConstantDiagnostic(): "test";
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -139,10 +127,7 @@ it("SdkStringExample from enum", async () => {
       op getStringFromEnum(): TestEnum;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -172,10 +157,7 @@ it("SdkStringExample from extensible enum", async () => {
       op getStringFromExtensibleEnum(): {@body body: TestEnum};
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -205,10 +187,7 @@ it("SdkStringExample from enum diagnostic", async () => {
       op getStringFromEnumDiagnostic(): TestEnum;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -238,10 +217,7 @@ it("SdkStringExample from enum value", async () => {
       op getStringFromEnumValue(): TestEnum.one;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -271,10 +247,7 @@ it("SdkStringExample from enum value diagnostic", async () => {
       op getStringFromEnumValueDiagnostic(): TestEnum.one;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -301,10 +274,7 @@ it("SdkStringExample from datetime", async () => {
       op getStringFromDataTime(): utcDateTime;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -332,10 +302,7 @@ it("SdkStringExample from duration", async () => {
       op getStringFromDuration(): duration;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -363,10 +330,7 @@ it("SdkNumberExample", async () => {
       op getNumber(): float32;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -393,10 +357,7 @@ it("SdkNumberExample diagnostic", async () => {
       op getNumberDiagnostic(): float32;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -427,10 +388,7 @@ it("SdkNumberExample from datetime", async () => {
       op getNumberFromDateTime(): timestamp;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -461,10 +419,7 @@ it("SdkNumberExample from duration", async () => {
       op getNumberFromDuration(): delta;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -492,10 +447,7 @@ it("SdkBooleanExample", async () => {
       op getBoolean(): boolean;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -522,10 +474,7 @@ it("SdkBooleanExample diagnostic", async () => {
       op getBooleanDiagnostic(): boolean;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -552,10 +501,7 @@ it("SdkNumberExample string conversion", async () => {
       op getNumberStringConversion(): float32;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -583,10 +529,7 @@ it("SdkBooleanExample string conversion", async () => {
       op getBooleanStringConversion(): boolean;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -618,10 +561,7 @@ it("SdkNumberExample parameter string conversion", async () => {
       ): string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -668,10 +608,7 @@ it("SdkBooleanExample parameter string conversion", async () => {
       ): string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -721,10 +658,7 @@ it("SdkStringConversionExample invalid diagnostic", async () => {
       ): string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -760,10 +694,7 @@ it("SdkNullExample", async () => {
       op getNull(): {@body body: string | null};
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -791,10 +722,7 @@ it("SdkAnyExample", async () => {
       op getAny(): unknown;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -820,10 +748,7 @@ it("SdkUnionExample", async () => {
       op getUnion(): {@body body: string | int32};
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -848,10 +773,7 @@ it("SdkArrayExample", async () => {
       op getArray(): string[];
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -888,10 +810,7 @@ it("SdkArrayExample diagnostic", async () => {
       op getArrayDiagnostic(): string[];
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -918,10 +837,7 @@ it("SdkDictionaryExample", async () => {
       op getDictionary(): Record<string>;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -958,10 +874,7 @@ it("SdkDictionaryExample diagnostic", async () => {
       op getDictionaryDiagnostic(): Record<string>;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -996,10 +909,7 @@ it("SdkModelExample", async () => {
       op getModel(): Test;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -1043,10 +953,7 @@ it("SdkModelExample diagnostic", async () => {
       op getModelDiagnostic(): Test;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -1097,10 +1004,7 @@ it("SdkModelExample from discriminated types", async () => {
       op getModelDiscriminator(): Shark;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -1179,10 +1083,7 @@ it("SdkModelExample from discriminated types with string kind fallback", async (
       op getModelDiscriminator(): Fish;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -1220,10 +1121,7 @@ it("SdkModelExample from discriminated types with string kind with extra propert
       op getModelDiscriminator(): Fish;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -1269,10 +1167,7 @@ it("SdkModelExample from discriminated types with enum kind fallback", async () 
       op getModelDiscriminator(): Fish;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -1316,10 +1211,7 @@ it("SdkModelExample from discriminated types with enum kind with wrong kind fall
       op getModelDiscriminator(): Fish;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -1363,10 +1255,7 @@ it("SdkModelExample from discriminated types with union kind fallback", async ()
       op getModelDiscriminator(): Fish;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -1407,10 +1296,7 @@ it("SdkModelExample with additional properties", async () => {
       op getModelAdditionalProperties(): Test;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -1462,10 +1348,7 @@ it("SdkModelExample with extra paramters", async () => {
       op getModelWithExtraParamter(): Test;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -1511,10 +1394,7 @@ it("unknown type with null example value", async () => {
       op getUnknownNull(): Test;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -1562,10 +1442,7 @@ it("unexpected null value", async () => {
       op getUnexpectedNull(): Test;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;

@@ -7,10 +7,10 @@ import { isAzureCoreTspModel } from "../../src/internal-utils.js";
 import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
 import {
-  AzureCoreServiceTester,
+  AzureCoreTesterWithService,
   createSdkContextForTester,
   SimpleTester,
-  SimpleTesterWithBuiltInService,
+  SimpleTesterWithService,
 } from "../tester.js";
 
 it("basic", async () => {
@@ -28,9 +28,7 @@ it("basic", async () => {
       op test(@body input: InputModel): OutputModel;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const modelNames = models.map((model) => model.name).sort();
@@ -48,9 +46,7 @@ it("models in Record", async () => {
       op test(@body input: Record<InnerModel>): void;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const modelNames = models.map((model) => model.name).sort();
@@ -72,9 +68,7 @@ it("models in Array", async () => {
       op test(@body input: InnerModel[]): void;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const modelNames = models.map((model) => model.name).sort();
@@ -100,9 +94,7 @@ it("embedded models", async () => {
       op test(@body input: InputModel): void;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const modelNames = models.map((model) => model.name).sort();
@@ -128,9 +120,7 @@ it("base model", async () => {
       op test(@body input: InputModel): void;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const modelNames = models.map((model) => model.name).sort();
@@ -142,7 +132,7 @@ it("base model", async () => {
 });
 
 it("derived model", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model InputModel {
       prop: string
     }
@@ -153,9 +143,7 @@ it("derived model", async () => {
 
     op test(@body input: DerivedModel): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const modelNames = models.map((model) => model.name).sort();
@@ -167,16 +155,14 @@ it("derived model", async () => {
 });
 
 it("recursive model", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model RecursiveModel {
       prop: RecursiveModel
     }
       
     op test(@body input: RecursiveModel): RecursiveModel;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const recursiveModel = models[0];
@@ -194,7 +180,7 @@ it("recursive model", async () => {
 });
 
 it("discriminator model", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @discriminator("kind")
     model Fish {
       age: int32;
@@ -223,9 +209,7 @@ it("discriminator model", async () => {
     @get
     op getModel(): Fish;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 5);
   const fish = models.find((x) => x.name === "Fish");
@@ -258,7 +242,7 @@ it("discriminator model", async () => {
 });
 
 it("handle derived model with discriminator first", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Salmon extends Fish {
       kind: "salmon";
       friends?: Fish[];
@@ -274,9 +258,7 @@ it("handle derived model with discriminator first", async () => {
     @get
     op getSalmon(): Salmon;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const fish = models.find((x) => x.name === "Fish");
@@ -309,7 +291,7 @@ it("handle derived model with discriminator first", async () => {
 });
 
 it("single discriminated model", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @discriminator("kind")
     model Fish {
       age: int32;
@@ -318,9 +300,7 @@ it("single discriminated model", async () => {
     @get
     op getModel(): Fish;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const fish = models.find((x) => x.name === "Fish");
@@ -339,7 +319,7 @@ it("single discriminated model", async () => {
 });
 
 it("enum discriminator model", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     enum DogKind {
       Golden: "golden",
     }
@@ -358,9 +338,7 @@ it("enum discriminator model", async () => {
     @get
     op getExtensibleModel(): Dog;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
 
@@ -392,7 +370,7 @@ it("enum discriminator model", async () => {
 });
 
 it("anonymous model contains template", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
 
     model Name {
       name: string;
@@ -403,9 +381,7 @@ it("anonymous model contains template", async () => {
 
     op test(): {prop: ModelTemplate<Name>};
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   const modelNames = models.map((model) => model.name).sort();
@@ -413,7 +389,7 @@ it("anonymous model contains template", async () => {
 });
 
 it("union to extensible enum values", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     union PetKind {
       @doc("Cat")
       Cat: "cat",
@@ -426,9 +402,7 @@ it("union to extensible enum values", async () => {
     @put
     op putPet(@body petKind: PetKind): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   strictEqual(context.sdkPackage.enums.length, 1);
   const petKind = context.sdkPackage.enums[0];
   strictEqual(petKind.name, "PetKind");
@@ -458,7 +432,7 @@ it("union to extensible enum values", async () => {
 });
 
 it("template variable of anonymous union", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     interface GetAndSend<Type> {
       get(): {
         prop: Type;
@@ -470,9 +444,7 @@ it("template variable of anonymous union", async () => {
     @route("/string-extensible")
     interface StringExtensible extends GetAndSend<string | "b" | "c"> {}
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 2);
   strictEqual(sdkPackage.enums.length, 1);
@@ -489,7 +461,7 @@ it("template variable of anonymous union", async () => {
 });
 
 it("property of anonymous union as enum", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Pet {
       kind: string | "cat" | "dog";
     }
@@ -498,9 +470,7 @@ it("property of anonymous union as enum", async () => {
     @put
     op putPet(@body pet: Pet): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const pet = models.find((x) => x.name === "Pet");
@@ -515,7 +485,7 @@ it("property of anonymous union as enum", async () => {
 });
 
 it("request/response header with enum value", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model RepeatableResponse {
       @visibility(Lifecycle.Read)
       @header("Repeatability-Result")
@@ -523,9 +493,7 @@ it("request/response header with enum value", async () => {
     }
     op foo(@header("Repeatability-Result") repeatabilityResult?: "accepted" | "rejected"): RepeatableResponse;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 0);
   strictEqual(sdkPackage.enums.length, 2);
@@ -542,7 +510,7 @@ it("request/response header with enum value", async () => {
 });
 
 it("enum discriminator model without base discriminator property", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     enum DogKind {
       Golden: "golden",
     }
@@ -560,9 +528,7 @@ it("enum discriminator model without base discriminator property", async () => {
     @get
     op getExtensibleModel(): Dog;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
 
@@ -592,7 +558,7 @@ it("enum discriminator model without base discriminator property", async () => {
 });
 
 it("discriminator", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @discriminator("kind")
     model Fish {
       age: int32;
@@ -622,9 +588,7 @@ it("discriminator", async () => {
     @get
     op getModel(): Fish;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 5);
   const shark = models.find((x) => x.name === "Shark");
@@ -638,7 +602,7 @@ it("discriminator", async () => {
 });
 
 it("union discriminator", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     union KindType {
       string,
       shark: "shark",
@@ -663,9 +627,7 @@ it("union discriminator", async () => {
     @get
     op getModel(): Fish;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   const fish = models.find((x) => x.name === "Fish");
@@ -695,7 +657,7 @@ it("union discriminator", async () => {
 });
 
 it("string discriminator map to enum value", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     union KindType {
       string,
       shark: "shark",
@@ -721,9 +683,7 @@ it("string discriminator map to enum value", async () => {
     @get
     op getModel(): Fish;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   const fish = models.find((x) => x.name === "Fish");
@@ -753,7 +713,7 @@ it("string discriminator map to enum value", async () => {
 });
 
 it("discriminator rename", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @discriminator("kind")
     model Fish {
       @clientName("type")
@@ -772,9 +732,7 @@ it("discriminator rename", async () => {
     @get
     op getModel(): Fish;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const fish = models.find((x) => x.name === "Fish");
@@ -791,7 +749,7 @@ it("discriminator rename", async () => {
 });
 
 it("discriminator with encodedName", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @discriminator("odataType")
     model CharFilter {
       @encodedName("application/json", "@odata.type")
@@ -802,9 +760,7 @@ it("discriminator with encodedName", async () => {
     @get
     op getModel(): CharFilter;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const discriminatorProperty = models[0].discriminatorProperty;
@@ -815,7 +771,7 @@ it("discriminator with encodedName", async () => {
 });
 
 it("filterOutCoreModels true", async () => {
-  const { program } = await AzureCoreServiceTester.compile(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     @resource("users")
     @doc("Details about a user.")
     model User {
@@ -831,9 +787,7 @@ it("filterOutCoreModels true", async () => {
     @doc("Creates or updates a User")
     op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models.filter((x) => !isAzureCoreModel(x));
   strictEqual(models.length, 1);
   strictEqual(models[0].name, "User");
@@ -847,7 +801,7 @@ it("filterOutCoreModels true", async () => {
 });
 
 it("filterOutCoreModels false", async () => {
-  const { program } = await AzureCoreServiceTester.compile(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     @resource("users")
     @doc("Details about a user.")
     model User {
@@ -863,9 +817,7 @@ it("filterOutCoreModels false", async () => {
     @doc("Creates or updates a User")
     op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models.sort((a, b) => a.name.localeCompare(b.name));
   strictEqual(models.length, 4);
   strictEqual(models[0].name, "Error");
@@ -879,7 +831,7 @@ it("filterOutCoreModels false", async () => {
 });
 
 it("lro core filterOutCoreModels true", async () => {
-  const { program } = await AzureCoreServiceTester.compile(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     @resource("users")
     @doc("Details about a user.")
     model User {
@@ -896,9 +848,7 @@ it("lro core filterOutCoreModels true", async () => {
     @pollingOperation(My.Service.getStatus)
     op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models.filter((x) => !isAzureCoreModel(x));
   strictEqual(models.length, 1);
   strictEqual(models[0].name, "User");
@@ -906,7 +856,7 @@ it("lro core filterOutCoreModels true", async () => {
 });
 
 it("lro core filterOutCoreModels false", async () => {
-  const { program } = await AzureCoreServiceTester.compile(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     @resource("users")
     @doc("Details about a user.")
     model User {
@@ -923,9 +873,7 @@ it("lro core filterOutCoreModels false", async () => {
     @pollingOperation(My.Service.getStatus)
     op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models.sort((a, b) => a.name.localeCompare(b.name));
   strictEqual(models.length, 5);
   strictEqual(models[0].name, "Error");
@@ -944,15 +892,13 @@ it("lro core filterOutCoreModels false", async () => {
 });
 
 it("model with core property", async () => {
-  const { program } = await AzureCoreServiceTester.compile(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     @usage(Usage.input)
     model MyError {
       innerError: Azure.Core.Foundations.Error;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   const myError = models.find((x) => x.name === "MyError");
@@ -975,9 +921,7 @@ it("no models filter core", async () => {
     @service
     namespace MyService { }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 0);
 });
@@ -987,23 +931,19 @@ it("no models don't filter core", async () => {
     @service
     namespace MyService { }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 0);
 });
 
 it("input usage", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model InputModel {
       prop: string
     }
     op operation(@body input: InputModel): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Json);
@@ -1012,15 +952,13 @@ it("input usage", async () => {
 });
 
 it("output usage", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model OutputModel {
       prop: string
     }
     op operation(): OutputModel;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].usage, UsageFlags.Output | UsageFlags.Json);
@@ -1030,15 +968,13 @@ it("output usage", async () => {
 });
 
 it("roundtrip usage", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model RoundtripModel {
       prop: string
     }
     op operation(@body input: RoundtripModel): RoundtripModel;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
@@ -1049,7 +985,7 @@ it("roundtrip usage", async () => {
 });
 
 it("readonly usage", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model ResultModel {
       name: string;
     }
@@ -1065,9 +1001,7 @@ it("readonly usage", async () => {
       @body body: RoundTripModel;
     };
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   strictEqual(
@@ -1081,7 +1015,7 @@ it("readonly usage", async () => {
 });
 
 it("propagation", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @discriminator("kind")
     model Fish {
       age: int32;
@@ -1108,9 +1042,7 @@ it("propagation", async () => {
     }
     op operation(@body input: Shark): Shark;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 4);
   for (const model of models) {
@@ -1148,7 +1080,7 @@ it("propagation", async () => {
 });
 
 it("propagation from subtype", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @discriminator("kind")
     model Fish {
       age: int32;
@@ -1172,9 +1104,7 @@ it("propagation from subtype", async () => {
     }
     op operation(@body input: Salmon): Salmon;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   for (const model of models) {
@@ -1214,7 +1144,7 @@ it("propagation from subtype", async () => {
 });
 
 it("propagation from subtype of type with another discriminated property", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @discriminator("kind")
     model Fish {
       age: int32;
@@ -1245,9 +1175,7 @@ it("propagation from subtype of type with another discriminated property", async
     }
     op operation(@body input: Salmon): Salmon;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 6);
   for (const model of models) {
@@ -1294,7 +1222,7 @@ it("propagation from subtype of type with another discriminated property", async
 });
 
 it("unnamed model", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Test {
       prop1: {innerProp1: string};
       prop2: {innerProp2: string};
@@ -1303,9 +1231,7 @@ it("unnamed model", async () => {
       @body body: Test
     ): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   const propreties: string[] = [];
@@ -1319,7 +1245,7 @@ it("unnamed model", async () => {
 });
 
 it("model access transitive closure", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Test {
       prop: string;
     }
@@ -1328,9 +1254,7 @@ it("model access transitive closure", async () => {
       @body body: Test
     ): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
 
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -1338,7 +1262,7 @@ it("model access transitive closure", async () => {
 });
 
 it("complicated access transitive closure", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Test1 {
       prop: Test2;
     }
@@ -1389,9 +1313,7 @@ it("complicated access transitive closure", async () => {
       @body body: Test6
     ): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 6);
 
@@ -1421,7 +1343,7 @@ it("complicated access transitive closure", async () => {
 });
 
 it("additionalProperties of same type", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model AdditionalPropertiesModel extends Record<string> {
       prop: string;
@@ -1440,9 +1362,7 @@ it("additionalProperties of same type", async () => {
       prop: string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 4);
   const AdditionalPropertiesModel = models.find((x) => x.name === "AdditionalPropertiesModel");
@@ -1465,7 +1385,7 @@ it("additionalProperties of same type", async () => {
 });
 
 it("additionalProperties usage", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model AdditionalPropertiesModel extends Record<Test> {
     }
 
@@ -1487,9 +1407,7 @@ it("additionalProperties usage", async () => {
     @route("test2")
     op test2(@body input: AdditionalPropertiesModel3): AdditionalPropertiesModel3;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 5);
   const AdditionalPropertiesModel = models.find((x) => x.name === "AdditionalPropertiesModel");
@@ -1522,7 +1440,7 @@ it("additionalProperties usage", async () => {
 });
 
 it("additionalProperties of different types", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model AdditionalPropertiesModel {
       prop: string;
@@ -1535,9 +1453,7 @@ it("additionalProperties of different types", async () => {
       ...Record<boolean | float32>;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const AdditionalPropertiesModel = models.find((x) => x.name === "AdditionalPropertiesModel");
@@ -1562,9 +1478,7 @@ it("crossLanguageDefinitionId", async () => {
       model OutputModel {}
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const inputModel = models.find((x) => x.name === "InputModel");
@@ -1576,7 +1490,7 @@ it("crossLanguageDefinitionId", async () => {
 });
 
 it("template model", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Catalog is TrackedResource<CatalogProperties> {
       @pattern("^[A-Za-z0-9_-]{1,50}$")
@@ -1607,9 +1521,7 @@ it("template model", async () => {
       deploymentDateUtc?: utcDateTime;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 4);
   const catalog = models.find((x) => x.name === "Catalog");
@@ -1620,7 +1532,7 @@ it("template model", async () => {
 });
 
 it("model with deprecated annotation", async () => {
-  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(`
+  const [{ program }] = await SimpleTester.compileAndDiagnose(`
     @service
     namespace MyService;
     #deprecated "no longer support"
@@ -1630,9 +1542,7 @@ it("model with deprecated annotation", async () => {
       @body body: Test
     ): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
 
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -1649,9 +1559,7 @@ it("orphan model", async () => {
       model Model2{}
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
 
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -1686,15 +1594,13 @@ it("model with client hierarchy", async () => {
       }
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
 });
 
 it("error model", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @error
     model ApiError {
       code: string;
@@ -1702,9 +1608,7 @@ it("error model", async () => {
 
     op test(): ApiError;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = getAllModels(context);
   strictEqual(models.length, 1);
   const model = models[0];
@@ -1713,7 +1617,7 @@ it("error model", async () => {
 });
 
 it("error model inheritance", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model ValidResponse {
       prop: string;
     };
@@ -1742,9 +1646,7 @@ it("error model inheritance", async () => {
 
     op test(): ValidResponse | FourZeroFourError | FiveHundredError;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = getAllModels(context);
   strictEqual(models.length, 5);
   const errorModels = models.filter(
@@ -1776,9 +1678,7 @@ it("never or void property", async () => {
       }
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
 
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -1805,9 +1705,7 @@ it("xml usage", async () => {
       op test2(@header("content-type") contentType: "application/xml", @body body: Input): void;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
 
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
@@ -1824,7 +1722,7 @@ it("xml usage", async () => {
 });
 
 it("check bodyParam for @multipartBody", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Address {
       city: string;
     }
@@ -1837,9 +1735,7 @@ it("check bodyParam for @multipartBody", async function () {
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const formDataMethod = context.sdkPackage.clients[0].methods[0];
   strictEqual(formDataMethod.kind, "basic");
   strictEqual(formDataMethod.name, "upload");
@@ -1876,16 +1772,14 @@ it("check bodyParam for @multipartBody", async function () {
 });
 
 it("check multipartOptions for property of base model", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model MultiPartRequest{
         fileProperty: HttpPart<File>;
     }
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   const fileModel = models.find((x) => x.name === "File");
   ok(fileModel);
@@ -1897,7 +1791,7 @@ it("check multipartOptions for property of base model", async function () {
 });
 
 it("remove property with none visibility", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Test{
         prop: string;
         @invisible(Lifecycle)
@@ -1906,16 +1800,14 @@ it("remove property with none visibility", async function () {
     @post
     op do(@body body: Test): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].properties.length, 1);
 });
 
 it("header property on body root model visibility", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model InputModel {
       @visibility(Lifecycle.Read)
       @header("x-name")
@@ -1923,9 +1815,7 @@ it("header property on body root model visibility", async function () {
     }
     op foo(@bodyRoot body: InputModel): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
   const inputModel = sdkPackage.models[0];
@@ -1940,7 +1830,7 @@ it("header property on body root model visibility", async function () {
 });
 
 it("discriminator from template", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @discriminator("kind")
     model Base {
       kind: string;
@@ -1956,9 +1846,7 @@ it("discriminator from template", async function () {
 
     op test(): One;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const base = models.find((x) => x.name === "Base");
@@ -1985,7 +1873,7 @@ it("discriminator from template", async function () {
 });
 
 it("model sequence", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model A {
       prop: string;
     }
@@ -2013,9 +1901,7 @@ it("model sequence", async function () {
       baz(): C;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   strictEqual(models.map((x) => x.name).join(","), "A,C,B");

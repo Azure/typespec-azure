@@ -21,7 +21,7 @@ it("no duplicate operation with @clientLocation", async () => {
     `,
   );
 
-  await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  await createSdkContextForTester(program);
   expectDiagnosticEmpty(diagnostics);
 });
 
@@ -43,7 +43,7 @@ it("no duplicate operation with @clientLocation another", async () => {
     `,
   );
 
-  await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  await createSdkContextForTester(program);
   expectDiagnosticEmpty(diagnostics);
 });
 
@@ -70,7 +70,7 @@ it("duplicate operation with @clientLocation to existed clients", async () => {
     `,
   );
 
-  await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  await createSdkContextForTester(program);
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
@@ -107,7 +107,7 @@ it("duplicate operation with @clientLocation to existed clients with scope", asy
     `,
   );
 
-  await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  await createSdkContextForTester(program);
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
@@ -140,7 +140,7 @@ it("duplicate operation with @clientLocation to new clients", async () => {
     `,
   );
 
-  await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  await createSdkContextForTester(program);
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
@@ -202,7 +202,7 @@ it("duplicate operation error for other languages", async () => {
     `,
   );
 
-  await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  await createSdkContextForTester(program);
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",

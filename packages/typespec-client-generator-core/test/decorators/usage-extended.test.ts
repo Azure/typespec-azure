@@ -1,19 +1,17 @@
 import { strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { UsageFlags } from "../../src/interfaces.js";
-import { createSdkContextForTester, SimpleTesterWithBuiltInService } from "../tester.js";
+import { createSdkContextForTester, SimpleTesterWithService } from "../tester.js";
 
 describe("@usage decorator with extended values", () => {
   it("should support json usage", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       @usage(Usage.json)
       model TestModel {
         prop: string;
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
 
     const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
@@ -24,15 +22,13 @@ describe("@usage decorator with extended values", () => {
   });
 
   it("should support xml usage", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       @usage(Usage.xml)
       model TestModel {
         prop: string;
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
 
     const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
@@ -43,15 +39,13 @@ describe("@usage decorator with extended values", () => {
   });
 
   it("should support combined usage flags", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       @usage(Usage.input | Usage.json | Usage.xml)
       model TestModel {
         prop: string;
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
 
     const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
@@ -65,7 +59,7 @@ describe("@usage decorator with extended values", () => {
   });
 
   it("should add usage to existing operation-calculated usage", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       @usage(Usage.input | Usage.xml)
       model TestModel {
         prop: string;
@@ -73,9 +67,7 @@ describe("@usage decorator with extended values", () => {
 
       op test(): TestModel;
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
 
     const models = context.sdkPackage.models;
     strictEqual(models.length, 1);
@@ -88,7 +80,7 @@ describe("@usage decorator with extended values", () => {
   });
 
   it("should propagate extended usage to properties", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       model NestedModel {
         nestedProp: string;
       }
@@ -99,9 +91,7 @@ describe("@usage decorator with extended values", () => {
         nested: NestedModel;
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
 
     const models = context.sdkPackage.models;
     strictEqual(models.length, 2);

@@ -1,6 +1,11 @@
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { createSdkContextForTester, SimpleTester, TcgcTester } from "../tester.js";
+import {
+  createClientCustomizationInput,
+  createSdkContextForTester,
+  SimpleBaseTester,
+  SimpleTester,
+} from "../tester.js";
 
 it("single service with versioning should populate apiVersions map", async () => {
   const { program } = await SimpleTester.compile(`
@@ -19,9 +24,7 @@ it("single service with versioning should populate apiVersions map", async () =>
     op test(): void;
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
 
   // Check deprecated apiVersion property still works
@@ -34,12 +37,9 @@ it("single service with versioning should populate apiVersions map", async () =>
 });
 
 it("multiple services should populate apiVersions map with all services", async () => {
-  const mainCode = `
-      import "@typespec/http";
-      import "@typespec/versioning";
-      import "./client.tsp";
-      using TypeSpec.Http;
-      using TypeSpec.Versioning;
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
       @service
       @versioned(VersionsA)
       namespace ServiceA {
@@ -63,12 +63,8 @@ it("multiple services should populate apiVersions map with all services", async 
           @route("/bTest")
           bTest(@query("api-version") apiVersion: VersionsB): void;
         }
-      }`;
-  const clientCode = `
-      import "@typespec/versioning";
-      import "@azure-tools/typespec-client-generator-core";
-      using TypeSpec.Versioning;
-      using Azure.ClientGenerator.Core;
+      }`,
+      `
       @client(
         {
           name: "CombineClient",
@@ -77,15 +73,11 @@ it("multiple services should populate apiVersions map with all services", async 
       )
       @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
       namespace CombineClient;
-    `;
-  const { program } = await TcgcTester.compile({
-    "main.tsp": mainCode,
-    "client.tsp": `import "./main.tsp"; ${clientCode}`,
-  });
+    `,
+    ),
+  );
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
 
   // For multi-service, deprecated apiVersion should be undefined
@@ -108,9 +100,7 @@ it("service without versioning should have empty apiVersions map", async () => {
     op test(): void;
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
 
   // Check deprecated apiVersion property
@@ -139,7 +129,6 @@ it("apiVersion 'all' should populate apiVersions with 'all'", async () => {
   `);
 
   const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
     "api-version": "all",
   });
   const sdkPackage = context.sdkPackage;

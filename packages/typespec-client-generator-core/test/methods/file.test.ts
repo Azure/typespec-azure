@@ -1,6 +1,6 @@
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { createSdkContextForTester, SimpleTester, SimpleTesterWithBuiltInService } from "../tester.js";
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
 it("basic file input", async () => {
   const { program } = await SimpleTester.compile(
@@ -11,9 +11,7 @@ it("basic file input", async () => {
       }
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "uploadFile");
@@ -43,9 +41,7 @@ it("file input with content type", async () => {
       }
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "uploadFile");
@@ -72,9 +68,7 @@ it("basic file output", async () => {
       }
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "downloadFile");
@@ -94,7 +88,7 @@ it("basic file output", async () => {
 });
 
 it("self-defined file", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
       model SpecFile extends File<"application/json" | "application/yaml", string> {
         // Provide a header that contains the name of the file when created or updated
@@ -107,9 +101,7 @@ it("self-defined file", async () => {
       
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   // model
   const specFile = sdkPackage.models.find((m) => m.name === "SpecFile");

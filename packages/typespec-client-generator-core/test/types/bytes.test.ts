@@ -11,9 +11,7 @@ describe("bytes SdkMethodParameter", () => {
         op send(@body body: bytes, @header contentType: "application/octet-stream"): void;
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-java",
-    });
+    const context = await createSdkContextForTester(program);
     const client = context.sdkPackage.clients[0];
     ok(client);
     const method = client.methods[0];

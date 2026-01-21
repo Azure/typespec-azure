@@ -22,7 +22,7 @@ it("API version in header", async () => {
       apiVersion: string
     ): string;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   const apiVersionParameter = client.clientInitialization.parameters.find(
@@ -60,7 +60,7 @@ it("API version in query", async () => {
       apiVersion: string
     ): string;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   const apiVersionParameter = client.clientInitialization.parameters.find(
@@ -98,7 +98,7 @@ it("API version in path", async () => {
       apiVersion: string
     ): string;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   const apiVersionParameter = client.clientInitialization.parameters.find(
@@ -143,7 +143,7 @@ it("API version mix", async () => {
       apiVersion: string
     ): string;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   const apiVersionParameter = client.clientInitialization.parameters.find(

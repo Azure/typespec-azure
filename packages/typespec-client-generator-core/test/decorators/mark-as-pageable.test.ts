@@ -1,6 +1,11 @@
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { ArmServiceTester, ArmTester, createSdkContextForTester, SimpleTester } from "../tester.js";
+import {
+  ArmTester,
+  ArmTesterWithService,
+  createSdkContextForTester,
+  SimpleTester,
+} from "../tester.js";
 
 it("should mark regular operation as pageable when decorated with @markAsPageable", async () => {
   const { program } = await SimpleTester.compile(`
@@ -23,9 +28,7 @@ it("should mark regular operation as pageable when decorated with @markAsPageabl
       }
     `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-typespec/http-client-csharp",
-  });
+  const context = await createSdkContextForTester(program);
   const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
 
@@ -67,7 +70,7 @@ it("should apply @markAsPageable with language scope", async () => {
     `);
 
   const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-typespec/http-client-csharp",
+    emitterName: "@azure-typespec/typespec-csharp",
   });
   const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
@@ -123,9 +126,7 @@ it("should work with complex model return types", async () => {
       }
     `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-typespec/http-client-csharp",
-  });
+  const context = await createSdkContextForTester(program);
   const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
 
@@ -165,7 +166,7 @@ it("should apply @pageItems to 'value' property when not already decorated", asy
     `);
 
   const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-typespec/http-client-csharp",
+    emitterName: "@azure-typespec/typespec-csharp",
   });
   const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
@@ -229,9 +230,7 @@ it("should not apply when scope does not match", async () => {
       }
     `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-typespec/http-client-csharp",
-  });
+  const context = await createSdkContextForTester(program);
   const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
 
@@ -268,7 +267,7 @@ it("should warn when operation already has @list (ARM ResourceListByParent)", as
 });
 
 it("should work with ARM action with @pageItems property", async () => {
-  const { program } = await ArmServiceTester.compile(`
+  const { program } = await ArmTesterWithService.compile(`
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
       }
@@ -312,7 +311,7 @@ it("should work with ARM action with @pageItems property", async () => {
 });
 
 it("should work with ARM action with value property without @pageItems", async () => {
-  const { program } = await ArmServiceTester.compile(`
+  const { program } = await ArmTesterWithService.compile(`
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
       }
@@ -355,7 +354,7 @@ it("should work with ARM action with value property without @pageItems", async (
 });
 
 it("should work with ARM action with value property without @pageItems wrapped in ArmResponse", async () => {
-  const { program } = await ArmServiceTester.compile(`
+  const { program } = await ArmTesterWithService.compile(`
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
       }
@@ -431,7 +430,7 @@ it("should fail with ARM action with array property not named value without @pag
 });
 
 it("should work with ARM ListSinglePage legacy operation", async () => {
-  const { program } = await ArmServiceTester.compile(`
+  const { program } = await ArmTesterWithService.compile(`
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
       }

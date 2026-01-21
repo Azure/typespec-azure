@@ -7,8 +7,9 @@ import { getAllModels } from "../../src/types.js";
 import {
   ArmTester,
   AzureCoreBaseTester,
-  AzureCoreServiceTester,
   AzureCoreTester,
+  AzureCoreTesterWithService,
+  createClientCustomizationInput,
   createSdkContextForTester,
 } from "../tester.js";
 import { hasFlag } from "../utils.js";
@@ -337,7 +338,7 @@ describe("data plane LRO templates", () => {
   });
   describe("Custom LRO", () => {
     it("@lroResult with client name and/or encoded name", async () => {
-      const { program } = await AzureCoreServiceTester.compile(`
+      const { program } = await AzureCoreTesterWithService.compile(`
         op CustomLongRunningOperation<
           TParams extends TypeSpec.Reflection.Model,
           TResponse extends TypeSpec.Reflection.Model
@@ -621,21 +622,9 @@ describe("data plane LRO templates", () => {
   });
 
   it("LRO final envelope result correctly marked when only used in ignored polling operation", async () => {
-    const { program } = await AzureCoreBaseTester.compile({
-      "main.tsp": `
-import "@typespec/http";
-import "@typespec/rest";
-import "@typespec/versioning";
-import "@azure-tools/typespec-azure-core";
-import "@azure-tools/typespec-client-generator-core";
-import "./client.tsp";
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
-using Azure.Core;
-using Azure.Core.Traits;
-using Azure.ClientGenerator.Core;
-
+    const { program } = await AzureCoreBaseTester.compile(
+      createClientCustomizationInput(
+        `
 @server("http://localhost:3000", "endpoint")
 @service
 namespace DocumentIntelligence;
@@ -749,11 +738,7 @@ namespace DocumentIntelligence;
     AnalyzeOperation
   >;
       `,
-      "client.tsp": `
-import "./main.tsp";
-import "@azure-tools/typespec-client-generator-core";
-using Azure.ClientGenerator.Core;
-
+        `
 namespace ClientCustomizations;
 @client({
   name: "DocumentIntelligenceClient",
@@ -763,10 +748,11 @@ interface DocumentIntelligenceClient {
   analyzeDocument is DocumentIntelligence.analyzeDocument;
 }
       `,
-    });
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-java",
-    });
+        ["@azure-tools/typespec-azure-core"],
+        ["Azure.Core", "Azure.Core.Traits"],
+      ),
+    );
+    const context = await createSdkContextForTester(program);
     const models = context.sdkPackage.models;
     strictEqual(models.length, 4);
     const analyzeOperationModel = models.find((m) => m.name === "AnalyzeOperation");
@@ -903,7 +889,7 @@ interface DocumentIntelligenceClient {
 });
 
 describe("Arm LRO templates", () => {
-  it("ArmResourceCreateOrReplaceAsync", { timeout: 30000 }, async () => {
+  it("ArmResourceCreateOrReplaceAsync", async () => {
     const { program } = await ArmVersionedServiceTester.compile(`
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
@@ -1132,9 +1118,7 @@ it("customized lro delete", async () => {
       name?: string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
   strictEqual(sdkPackage.enums.length, 2);
@@ -1186,18 +1170,14 @@ describe("getLroMetadata", () => {
   `;
   it("filter-out-core-models true", async () => {
     const { program } = await AzureCoreTester.compile(lroCode);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-java",
-    });
+    const context = await createSdkContextForTester(program);
     const models = context.sdkPackage.models.filter((x) => !isAzureCoreModel(x));
     strictEqual(models.length, 1);
     deepStrictEqual(models[0].name, "ExportedUser");
   });
   it("filter-out-core-models false", async () => {
     const { program } = await AzureCoreTester.compile(lroCode);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-java",
-    });
+    const context = await createSdkContextForTester(program);
     const models = getAllModels(context);
     strictEqual(models.length, 8);
     // there should only be one non-core model
@@ -1218,21 +1198,9 @@ describe("getLroMetadata", () => {
 });
 
 it("versioned LRO with customization", async () => {
-  const { program } = await AzureCoreBaseTester.compile({
-    "main.tsp": `
-import "@typespec/http";
-import "@typespec/rest";
-import "@typespec/versioning";
-import "@azure-tools/typespec-azure-core";
-import "@azure-tools/typespec-client-generator-core";
-import "./client.tsp";
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
-using Azure.Core;
-using Azure.Core.Traits;
-using Azure.ClientGenerator.Core;
-
+  const { program } = await AzureCoreBaseTester.compile(
+    createClientCustomizationInput(
+      `
 @service
 @versioned(Versions)
 namespace TestService;
@@ -1274,11 +1242,7 @@ op get is TestOperations.ResourceRead<TestResult>;
 @pollingOperation(get)
 op create is TestOperations.LongRunningResourceCreateOrReplace<TestResult>;
     `,
-    "client.tsp": `
-import "./main.tsp";
-import "@azure-tools/typespec-client-generator-core";
-using Azure.ClientGenerator.Core;
-
+      `
 @client({
   service: TestService,
 })
@@ -1286,10 +1250,11 @@ namespace TestClient;
 
 op test is TestService.create;
     `,
-  });
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+      ["@azure-tools/typespec-azure-core"],
+      ["Azure.Core", "Azure.Core.Traits"],
+    ),
+  );
+  const context = await createSdkContextForTester(program);
   strictEqual(context.diagnostics.length, 0);
   const client = context.sdkPackage.clients[0];
   strictEqual(client.methods.length, 1);

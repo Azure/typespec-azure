@@ -2,11 +2,7 @@ import { t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { getLibraryName } from "../../src/public-utils.js";
-import {
-  createSdkContextForTester,
-  SimpleTester,
-  SimpleTesterWithBuiltInService,
-} from "../tester.js";
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
 it("operation client projected name", async () => {
   async function helper(emitterName: string) {
@@ -327,7 +323,7 @@ it("parameter no projected name", async () => {
 });
 
 it("template without @friendlyName renaming", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     op GetResourceOperationStatus<
       Resource extends TypeSpec.Reflection.Model
     >(): ResourceOperationStatus<Resource>;
@@ -343,9 +339,7 @@ it("template without @friendlyName renaming", async () => {
 
     op getStatus is GetResourceOperationStatus<User>;
     `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const model = models.filter((x) => x.name === "ResourceOperationStatusUser")[0];
@@ -353,7 +347,7 @@ it("template without @friendlyName renaming", async () => {
 });
 
 it("template without @friendlyName renaming for union as enum", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     union DependencyOfOrigins {
       serviceExplicitlyCreated: "ServiceExplicitlyCreated",
       userExplicitlyCreated: "UserExplicitlyCreated",
@@ -373,9 +367,7 @@ it("template without @friendlyName renaming for union as enum", async () => {
 
     op test(): DependencyOfRelationshipProperties;
     `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const model = models.filter(
@@ -385,7 +377,7 @@ it("template without @friendlyName renaming for union as enum", async () => {
 });
 
 it("template without @friendlyName renaming with naming conflict", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Test<T> {
       prop: T;
     }
@@ -398,9 +390,7 @@ it("template without @friendlyName renaming with naming conflict", async () => {
 
     op test(): Instance;
     `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 4);
   const model = models.filter((x) => x.name === "Instance")[0];

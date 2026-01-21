@@ -1,15 +1,11 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual } from "assert";
 import { describe, it } from "vitest";
-import {
-  createSdkContextForTester,
-  SimpleTester,
-  SimpleTesterWithBuiltInService,
-} from "../tester.js";
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
 describe("deserialized empty string as null", () => {
   it("Apply the decorator to model properties of type 'string' and a Scalar type derived from 'string'", async function () {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
         scalar stringlike extends string;
 
         model A {
@@ -23,9 +19,13 @@ describe("deserialized empty string as null", () => {
         op test(): A;
       `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(
+      program,
+      {},
+      {
+        additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"],
+      },
+    );
     const models = context.sdkPackage.models;
 
     for (const prop of [models[0].properties[0], models[0].properties[1]]) {
@@ -40,7 +40,7 @@ describe("deserialized empty string as null", () => {
   });
 
   it("Apply decorator to model properties of indirectly derived from 'string'", async function () {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
         scalar l1 extends string;
         scalar l2 extends l1;
 
@@ -52,9 +52,13 @@ describe("deserialized empty string as null", () => {
         op test(): A;
       `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(
+      program,
+      {},
+      {
+        additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"],
+      },
+    );
     const models = context.sdkPackage.models;
     const prop = models[0].properties[0];
     deepStrictEqual(prop.decorators, [

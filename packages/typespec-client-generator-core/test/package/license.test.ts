@@ -11,9 +11,7 @@ describe("typespec-client-generator-core: license", () => {
       }
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const licenseInfo = context.sdkPackage.licenseInfo;
     strictEqual(licenseInfo, undefined);
   });
@@ -26,7 +24,6 @@ describe("typespec-client-generator-core: license", () => {
     `);
 
     const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
       license: { name: "MIT License" },
     });
     const licenseInfo = context.sdkPackage.licenseInfo;
@@ -48,7 +45,6 @@ describe("typespec-client-generator-core: license", () => {
     `);
 
     const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
       license: { name: "MIT License", company: "Microsoft Cooperation" },
     });
     const licenseInfo = context.sdkPackage.licenseInfo;
@@ -74,7 +70,6 @@ describe("typespec-client-generator-core: license", () => {
     `);
 
     const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
       license: {
         name: "MIT License",
         header: `Copyright (c) Microsoft Corporation. All rights reserved.\n
@@ -104,7 +99,6 @@ Licensed under the MIT License. See LICENSE in the project root for license info
     `);
 
     const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
       license: {
         name: "Test License",
         company: "Microsoft Cooperation",

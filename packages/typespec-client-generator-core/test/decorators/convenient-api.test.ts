@@ -3,23 +3,17 @@ import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { shouldGenerateConvenient, shouldGenerateProtocol } from "../../src/decorators.js";
 import { UsageFlags } from "../../src/interfaces.js";
-import {
-  createSdkContextForTester,
-  SimpleTester,
-  SimpleTesterWithBuiltInService,
-} from "../tester.js";
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
 async function convenientAPITestHelper(
   convenientValue: boolean,
   globalValue: boolean,
 ): Promise<void> {
-  const { program, test } = await SimpleTesterWithBuiltInService.compile(t.code`
+  const { program, test } = await SimpleTesterWithService.compile(t.code`
     @convenientAPI(${String(convenientValue)})
     op ${t.op("test")}(): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
 
   const actual = shouldGenerateConvenient(
     await createSdkContextForTester(program, {
@@ -51,21 +45,25 @@ describe("@convenientAPI", () => {
   });
 
   it("mark an operation as convenientAPI default, pass in sdkContext with generateConvenienceMethods false", async () => {
-    const { program, test } = await SimpleTesterWithBuiltInService.compile(t.code`
+    const { program, test } = await SimpleTesterWithService.compile(
+      t.code`
       @convenientAPI
       op ${t.op("test")}(): void;
-    `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
-
-    const actual = shouldGenerateConvenient(
-      await createSdkContextForTester(program, {
-        "generate-protocol-methods": false,
-        "generate-convenience-methods": false,
-      }),
-      test,
+    `,
+      {
+        compilerOptions: {
+          options: {
+            "@azure-tools/typespec-python": {
+              "generate-protocol-methods": false,
+              "generate-convenience-methods": false,
+            },
+          },
+        },
+      },
     );
+    const context = await createSdkContextForTester(program);
+
+    const actual = shouldGenerateConvenient(context, test);
     strictEqual(actual, true);
     const method = context.sdkPackage.clients[0].methods[0];
     strictEqual(method.name, "test");
@@ -89,9 +87,7 @@ describe("@convenientAPI on interface", () => {
         }
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
 
     // Test the core functionality - shouldGenerateConvenient should return false
     strictEqual(shouldGenerateConvenient(context, test1), false);
@@ -113,9 +109,7 @@ describe("@convenientAPI on interface", () => {
         }
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
 
     // Test the override behavior
     strictEqual(shouldGenerateConvenient(context, test1), true);
@@ -136,9 +130,7 @@ describe("@convenientAPI on namespace", () => {
         op ${t.op("test2")}(): void;
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
 
     strictEqual(shouldGenerateConvenient(context, test1), false);
     strictEqual(shouldGenerateConvenient(context, test2), false);
@@ -161,9 +153,7 @@ describe("@convenientAPI on namespace", () => {
         op ${t.op("test2")}(): void;
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
 
     strictEqual(shouldGenerateConvenient(context, test1), true);
     strictEqual(shouldGenerateConvenient(context, test2), false);
@@ -183,9 +173,7 @@ describe("@convenientAPI on namespace", () => {
         op ${t.op("test1")}(): void;
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
 
     strictEqual(shouldGenerateConvenient(context, test1), false);
 
@@ -197,7 +185,7 @@ describe("@convenientAPI on namespace", () => {
 
 describe("@convenientAPI with interface in namespace", () => {
   it("operation inherits from interface when namespace has no decorator", async () => {
-    const { program, test1 } = await SimpleTesterWithBuiltInService.compile(t.code`
+    const { program, test1 } = await SimpleTesterWithService.compile(t.code`
       namespace MyService {
         @convenientAPI(false)
         interface MyOperations {
@@ -205,15 +193,13 @@ describe("@convenientAPI with interface in namespace", () => {
         }
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
 
     strictEqual(shouldGenerateConvenient(context, test1), false);
   });
 
   it("interface decorator takes precedence over namespace decorator", async () => {
-    const { program, test1 } = await SimpleTesterWithBuiltInService.compile(t.code`
+    const { program, test1 } = await SimpleTesterWithService.compile(t.code`
       @convenientAPI(true)
       namespace MyService {
         @convenientAPI(false)
@@ -222,15 +208,13 @@ describe("@convenientAPI with interface in namespace", () => {
         }
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
 
     strictEqual(shouldGenerateConvenient(context, test1), false);
   });
 
   it("operation decorator takes precedence over interface and namespace", async () => {
-    const { program, test1 } = await SimpleTesterWithBuiltInService.compile(t.code`
+    const { program, test1 } = await SimpleTesterWithService.compile(t.code`
       @convenientAPI(false)
       namespace MyService {
         @convenientAPI(false)
@@ -240,9 +224,7 @@ describe("@convenientAPI with interface in namespace", () => {
         }
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
 
     strictEqual(shouldGenerateConvenient(context, test1), true);
   });
@@ -258,7 +240,7 @@ describe("@protocolAPI and @convenientAPI with scope", () => {
 
     // java should get protocolAPI=true and convenientAPI=false
     {
-      const { program, test } = await SimpleTesterWithBuiltInService.compile(testCode);
+      const { program, test } = await SimpleTesterWithService.compile(testCode);
       const context = await createSdkContextForTester(program, {
         emitterName: "@azure-tools/typespec-java",
       });
@@ -280,7 +262,7 @@ describe("@protocolAPI and @convenientAPI with scope", () => {
 
     // csharp should get protocolAPI=false and convenientAPI=true
     {
-      const { program, test } = await SimpleTesterWithBuiltInService.compile(testCode);
+      const { program, test } = await SimpleTesterWithService.compile(testCode);
       const context = await createSdkContextForTester(program, {
         emitterName: "@azure-tools/typespec-csharp",
       });
@@ -361,9 +343,7 @@ describe("@convenientAPI(false) with enum parameters", () => {
         ): ItemResult;
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
 
     const sdkPackage = context.sdkPackage;
     ok(sdkPackage.enums);
@@ -395,9 +375,7 @@ describe("@convenientAPI(false) with enum parameters", () => {
         ): Response;
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
 
     const sdkPackage = context.sdkPackage;
     ok(sdkPackage.enums);
@@ -430,9 +408,7 @@ describe("@convenientAPI(false) with enum parameters", () => {
         ): Resource;
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
 
     const sdkPackage = context.sdkPackage;
     ok(sdkPackage.enums);

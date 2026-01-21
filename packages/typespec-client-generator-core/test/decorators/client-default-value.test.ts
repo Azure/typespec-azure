@@ -3,13 +3,14 @@ import { ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { getAllModels } from "../../src/types.js";
 import {
+  AzureCoreTester,
   createSdkContextForTester,
   SimpleTester,
-  SimpleTesterWithBuiltInService,
+  SimpleTesterWithService,
 } from "../tester.js";
 
 it("sets client default value for a model property with numeric value", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+  const { program } = await SimpleTesterWithService.compile(t.code`
     model RequestOptions {
       @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(30)
       timeout?: int32;
@@ -18,9 +19,7 @@ it("sets client default value for a model property with numeric value", async ()
     @route("/func1")
     op func1(@body body: RequestOptions): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
 
   const models = getAllModels(context);
   strictEqual(models.length, 1);
@@ -37,7 +36,7 @@ it("sets client default value for a model property with numeric value", async ()
 });
 
 it("sets client default value for a model property with string value", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+  const { program } = await SimpleTesterWithService.compile(t.code`
     model Config {
       @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("standard")
       tier?: string;
@@ -46,9 +45,7 @@ it("sets client default value for a model property with string value", async () 
     @route("/func1")
     op func1(@body body: Config): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
 
   const models = getAllModels(context);
   strictEqual(models.length, 1);
@@ -65,7 +62,7 @@ it("sets client default value for a model property with string value", async () 
 });
 
 it("sets client default value for a model property with boolean value", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+  const { program } = await SimpleTesterWithService.compile(t.code`
     model Settings {
       @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(false)
       enableCache?: boolean;
@@ -74,9 +71,7 @@ it("sets client default value for a model property with boolean value", async ()
     @route("/func1")
     op func1(@body body: Settings): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
 
   const models = getAllModels(context);
   strictEqual(models.length, 1);
@@ -104,9 +99,7 @@ it("does not set client default value for property without decorator", async () 
       op func1(@body body: Config): void;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
 
   const models = getAllModels(context);
   strictEqual(models.length, 1);
@@ -142,7 +135,7 @@ it("throws error when used on non-property targets", async () => {
 });
 
 it("applies decorator with language scope", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+  const { program } = await SimpleTesterWithService.compile(t.code`
     model Config {
       @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(30, "python")
       timeout?: int32;
@@ -151,9 +144,7 @@ it("applies decorator with language scope", async () => {
     @route("/func1")
     op func1(@body body: Config): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
 
   const models = getAllModels(context);
   strictEqual(models.length, 1);
@@ -170,7 +161,7 @@ it("applies decorator with language scope", async () => {
 });
 
 it("applies decorator with different language scope should not apply", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+  const { program } = await SimpleTesterWithService.compile(t.code`
     model Config {
       @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(30, "python")
       timeout?: int32;
@@ -180,7 +171,7 @@ it("applies decorator with different language scope should not apply", async () 
     op func1(@body body: Config): void;
   `);
   const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
+    emitterName: "@azure-tools/typespec-csharp",
   });
 
   const models = getAllModels(context);
@@ -197,8 +188,39 @@ it("applies decorator with different language scope should not apply", async () 
   strictEqual(timeoutProperty.clientDefaultValue, undefined);
 });
 
+it("verify diagnostic gets raised for legacy usage", async () => {
+  const diagnostics = await AzureCoreTester.diagnose(
+    `
+      namespace MyService {
+        model Config {
+          @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(30)
+          timeout?: int32;
+        }
+
+        @test
+        @route("/func1")
+        op func1(@body body: Config): void;
+      }
+      `,
+    {
+      compilerOptions: {
+        linterRuleSet: {
+          enable: {
+            "@azure-tools/typespec-azure-core/no-legacy-usage": true,
+          },
+        },
+      },
+    },
+  );
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-azure-core/no-legacy-usage",
+    message:
+      'Referencing elements inside Legacy namespace "Azure.ClientGenerator.Core.Legacy" is not allowed.',
+  });
+});
+
 it("sets client default value for multiple properties", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+  const { program } = await SimpleTesterWithService.compile(t.code`
     model RequestOptions {
       @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(30)
       timeout?: int32;
@@ -213,9 +235,7 @@ it("sets client default value for multiple properties", async () => {
     @route("/func1")
     op func1(@body body: RequestOptions): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
 
   const models = getAllModels(context);
   strictEqual(models.length, 1);
@@ -238,7 +258,7 @@ it("sets client default value for multiple properties", async () => {
 });
 
 it("sets client default value for operation parameters", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+  const { program } = await SimpleTesterWithService.compile(t.code`
     @route("/items")
     @get
     op getItems(
@@ -249,9 +269,7 @@ it("sets client default value for operation parameters", async () => {
       @query sortOrder?: string
     ): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
 
   const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
@@ -268,7 +286,7 @@ it("sets client default value for operation parameters", async () => {
 });
 
 it("mixed with @alternateType", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+  const { program } = await SimpleTesterWithService.compile(t.code`
     @route("/items")
     @get
     op getItems(
@@ -278,9 +296,7 @@ it("mixed with @alternateType", async () => {
       
     ): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
 
   const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];

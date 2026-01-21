@@ -18,9 +18,7 @@ it("multiple-services", async () => {
     `,
   );
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
 
   expectDiagnostics(diagnostics, [
     {
@@ -48,9 +46,7 @@ it("require-versioned-service", async () => {
       `,
   );
 
-  await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  await createSdkContextForTester(program);
 
   expectDiagnostics(diagnostics, [
     {
@@ -75,9 +71,7 @@ it("missing-service-versions", async () => {
     `,
   );
 
-  await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  await createSdkContextForTester(program);
 
   expectDiagnostics(diagnostics, [
     {

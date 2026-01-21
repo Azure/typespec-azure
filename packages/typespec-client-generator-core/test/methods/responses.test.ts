@@ -1,15 +1,11 @@
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { SdkHttpOperation, SdkMethodResponse, SdkServiceMethod } from "../../src/interfaces.js";
-import {
-  createSdkContextForTester,
-  SimpleTester,
-  SimpleTesterWithBuiltInService,
-} from "../tester.js";
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
 it("basic returning void", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @error
     model Error {
@@ -19,9 +15,7 @@ it("basic returning void", async () => {
     @delete op delete(@path id: string): void | Error;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(sdkPackage.models.length, 1);
@@ -47,7 +41,7 @@ it("basic returning void", async () => {
 });
 
 it("basic returning void and error model has status code", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @error
     model Error {
@@ -58,9 +52,7 @@ it("basic returning void and error model has status code", async () => {
     @delete op delete(@path id: string): void | Error;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(sdkPackage.models.length, 1);
@@ -86,16 +78,14 @@ it("basic returning void and error model has status code", async () => {
 });
 
 it("basic returning compiler NotFoundResponse error", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @error
     model NotFoundErrorResponse is NotFoundResponse;
     @get op get(): void | NotFoundErrorResponse;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   const getMethod = client.methods[0];
@@ -109,7 +99,7 @@ it("basic returning compiler NotFoundResponse error", async () => {
 });
 
 it("basic returning model", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     model Widget {
       @visibility(Lifecycle.Read, Lifecycle.Update)
@@ -128,9 +118,7 @@ it("basic returning model", async () => {
     @post op create(...Widget): Widget | Error;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(sdkPackage.models.length, 3);
@@ -164,7 +152,7 @@ it("basic returning model", async () => {
 });
 
 it("Headers and body", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     model Widget {
       @header id: string;
@@ -174,9 +162,7 @@ it("Headers and body", async () => {
     op operation(): Widget;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(sdkPackage.models.length, 1);
@@ -208,7 +194,7 @@ it("Headers and body", async () => {
 });
 
 it("Headers and body with null", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     model Widget {
       weight: int32;
@@ -217,9 +203,7 @@ it("Headers and body with null", async () => {
     op operation(): {@header id: string | null, @body body: Widget | null};
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceResponses = method.operation.responses;
@@ -232,7 +216,7 @@ it("Headers and body with null", async () => {
 });
 
 it("Distinguish nullable body from optional response", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     model Widget {
       weight: int32;
@@ -247,9 +231,7 @@ it("Distinguish nullable body from optional response", async () => {
     op operationWithOptionalResponse(): Widget | NoContentResponse;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const methods = [...sdkPackage.clients[0].methods];
 
@@ -269,7 +251,7 @@ it("Distinguish nullable body from optional response", async () => {
 });
 
 it("OkResponse with NoContentResponse", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     model Widget {
       weight: int32;
@@ -278,9 +260,7 @@ it("OkResponse with NoContentResponse", async () => {
     op operation(): Widget | NoContentResponse;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceResponses = method.operation.responses;
@@ -300,14 +280,12 @@ it("OkResponse with NoContentResponse", async () => {
 });
 
 it("NoContentResponse", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @delete op delete(@path id: string): NoContentResponse;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(sdkPackage.models.length, 0);
@@ -328,14 +306,12 @@ it("NoContentResponse", async () => {
 });
 
 it("binary return type", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     op get(): {@header contentType: "image/jpeg"; @body image: bytes;};
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceResponse = method.operation.responses[0];
@@ -345,7 +321,7 @@ it("binary return type", async () => {
 });
 
 it("protocol response usage", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     model Test {
       prop: string;
@@ -355,9 +331,7 @@ it("protocol response usage", async () => {
     op get(): Test;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 0);
   const method = getServiceMethodOfClient(sdkPackage);
@@ -366,7 +340,7 @@ it("protocol response usage", async () => {
 });
 
 it("response model with property with none visibility", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Test{
         prop: string;
         @invisible(Lifecycle)
@@ -374,9 +348,7 @@ it("response model with property with none visibility", async function () {
     }
     op get(): Test;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const models = sdkPackage.models;
   strictEqual(models.length, 1);
@@ -388,15 +360,13 @@ it("response model with property with none visibility", async function () {
 });
 
 it("rename for response header", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Test{
         prop: string;
     }
     op get(): {@header @clientName("xRename") x: string};
     `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
   const header = method.operation.responses[0].headers[0];
@@ -411,9 +381,7 @@ it("content type shall be included in response headers", async () => {
       op get(): OkResponse & {@header("Content-Type") contentType: string; @bodyRoot body: bytes};
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const client = context.sdkPackage.clients[0];
   ok(client);
   const method = client.methods[0];
@@ -437,9 +405,7 @@ it("description shall be included in response", async () => {
       }
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const client = context.sdkPackage.clients[0];
   ok(client);
   const method = client.methods[0];
@@ -464,9 +430,7 @@ it("response body with non-read visibility", async () => {
       op get(): Test;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
@@ -479,7 +443,7 @@ it("response body with non-read visibility", async () => {
 });
 
 it("response body of scalar with encode", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @encode(BytesKnownEncoding.base64url)
     scalar base64urlBytes extends bytes;
@@ -487,9 +451,7 @@ it("response body of scalar with encode", async () => {
     op get(): {@header contentType: "application/json", @body body: base64urlBytes;};
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const serviceResponse = method.operation.responses[0];
@@ -511,9 +473,7 @@ it("multiple response types for one status code", async () => {
       op doStuff(): One | Two;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 2);
   const oneModel = sdkPackage.models.find((m) => m.name === "One");
@@ -555,9 +515,7 @@ it("multiple response types for one status code plus additional model for other 
       };
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 2);
   const oneModel = sdkPackage.models.find((m) => m.name === "One");

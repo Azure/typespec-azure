@@ -2,11 +2,11 @@ import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { SdkArrayType, SdkMethodResponse, UsageFlags } from "../../src/interfaces.js";
-import { createSdkContextForTester, SimpleTester, SimpleTesterWithBuiltInService } from "../tester.js";
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 import { getSdkTypeHelper } from "./utils.js";
 
 it("primitive union", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -14,7 +14,7 @@ it("primitive union", async function () {
       }
     `,
   );
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "union");
   strictEqual(sdkType.name, "TestName");
@@ -31,14 +31,14 @@ it("primitive union", async function () {
 });
 
 it("nullable", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       name: float32 | null;
     }
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const nullableType = getSdkTypeHelper(context);
   strictEqual(nullableType.kind, "nullable");
   strictEqual(nullableType.name, "TestName");
@@ -54,14 +54,14 @@ it("nullable", async function () {
 });
 
 it("nullable with more types", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       name: string | float32 | null;
     }
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const nullableType = getSdkTypeHelper(context);
   strictEqual(nullableType.kind, "nullable");
   strictEqual(nullableType.name, "TestName");
@@ -80,7 +80,7 @@ it("nullable with more types", async function () {
 });
 
 it("nullable doc", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model TestModel {
       prop: TestNullable;
@@ -95,7 +95,7 @@ it("nullable doc", async function () {
     }
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const nullableUnion = getSdkTypeHelper(context);
   strictEqual(nullableUnion.kind, "nullable");
   strictEqual(nullableUnion.name, "TestNullable");
@@ -108,14 +108,14 @@ it("nullable doc", async function () {
 });
 
 it("record with nullable", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       name: Record<float32 | null>;
     }
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "dict");
   const elementType = sdkType.valueType;
@@ -131,14 +131,14 @@ it("record with nullable", async function () {
 });
 
 it("record with nullable with more types", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       name: Record<string | float32 | null>;
     }
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "dict");
   const elementType = sdkType.valueType;
@@ -159,14 +159,14 @@ it("record with nullable with more types", async function () {
 });
 
 it("array with nullable", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       name: (float32 | null)[];
     }
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "array");
   const elementType = sdkType.valueType;
@@ -182,14 +182,14 @@ it("array with nullable", async function () {
 });
 
 it("array with nullable with more types", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       name: (string | float32 | null)[];
     }
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "array");
   const elementType = sdkType.valueType;
@@ -209,7 +209,7 @@ it("array with nullable with more types", async function () {
 });
 
 it("additional property is nullable", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model TestExtends extends Record<string|null> {
       name: string;
@@ -227,7 +227,7 @@ it("additional property is nullable", async function () {
     }
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
 
@@ -287,7 +287,7 @@ it("additional property is nullable", async function () {
 });
 
 it("additional property nullable with more types", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model TestExtends extends Record<string|float32|null> {
       name: string;
@@ -305,7 +305,7 @@ it("additional property nullable with more types", async function () {
     }
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
 
@@ -384,14 +384,14 @@ it("additional property nullable with more types", async function () {
 });
 
 it("model with simple union property", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model ModelWithSimpleUnionProperty {
       prop: int32 | int32[];
     }
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "union");
   strictEqual(sdkType.usage, UsageFlags.Input | UsageFlags.Output);
@@ -408,7 +408,7 @@ it("model with simple union property", async function () {
 });
 
 it("model with named union", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model BaseModel {
       name: string;
@@ -433,7 +433,7 @@ it("model with named union", async function () {
     }
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 4);
   const modelWithNamedUnionProperty = models.find(
@@ -467,7 +467,7 @@ it("model with named union", async function () {
 });
 
 it("model with nullable named union", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model BaseModel {
       name: string;
@@ -493,7 +493,7 @@ it("model with nullable named union", async function () {
     }
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 4);
   const modelWithNamedUnionProperty = models.find(
@@ -531,7 +531,7 @@ it("model with nullable named union", async function () {
 });
 
 it("model with nullable enum property", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     enum PetKind {
       dog, cat, bird
     }
@@ -541,7 +541,7 @@ it("model with nullable enum property", async function () {
     }
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const nullableType = getSdkTypeHelper(context);
   strictEqual(nullableType.kind, "nullable");
   strictEqual(nullableType.usage, UsageFlags.Input | UsageFlags.Output);
@@ -560,14 +560,14 @@ it("model with nullable enum property", async function () {
 });
 
 it("model with nullable union as enum", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Home {
       pet: "dog" | "cat" | "bird" | string | null;
     }
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const nullableType = getSdkTypeHelper(context);
   strictEqual(nullableType.kind, "nullable");
   strictEqual(nullableType.name, "HomePet");
@@ -588,7 +588,7 @@ it("model with nullable union as enum", async function () {
 });
 
 it("model with nullable model property", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model PropertyModel {
       internalProp: string;
@@ -600,7 +600,7 @@ it("model with nullable model property", async function () {
     }
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const model = models.find((x) => x.kind === "model" && x.name === "Test");
@@ -621,7 +621,7 @@ it("model with nullable model property", async function () {
 });
 
 it("nullable union with anonymous model ref self", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     union A {
       null,
       {
@@ -633,7 +633,7 @@ it("nullable union with anonymous model ref self", async function () {
     op post(@body body: A): { @body body: A }; 
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   const unions = context.sdkPackage.unions;
 
@@ -674,14 +674,14 @@ it("nullable union circular", async function () {
     }
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/union-circular",
   });
 });
 
 it("complicated union circular", async function () {
-  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace Test {
       union A {
@@ -703,7 +703,7 @@ it("complicated union circular", async function () {
     }
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const diagnostic = {
     code: "@azure-tools/typespec-client-generator-core/union-circular",
   };
@@ -712,7 +712,7 @@ it("complicated union circular", async function () {
 });
 
 it("mix types", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model ModelType {
       name: string;
@@ -729,7 +729,7 @@ it("mix types", async function () {
     }
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   const model = models.find((x) => x.kind === "model" && x.name === "Test");
@@ -777,7 +777,7 @@ it("mix types", async function () {
 });
 
 it("usage", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     union UnionAsEnum {
       "A",
       "B",
@@ -804,7 +804,7 @@ it("usage", async function () {
     ): void;
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const foo = models.find((x) => x.name === "Foo");
@@ -827,7 +827,7 @@ it("usage", async function () {
 });
 
 it("usage override", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     @access(Access.public)
     union UnionAsEnum {
@@ -860,7 +860,7 @@ it("usage override", async function () {
     ): void;
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const foo = models.find((x) => x.name === "Foo");
@@ -882,7 +882,7 @@ it("usage override", async function () {
 });
 
 it("usage override for orphan union as enum", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     union UnionAsEnum {
       "A",
@@ -899,7 +899,7 @@ it("usage override for orphan union as enum", async function () {
     }
   `);
 
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const enums = context.sdkPackage.enums;
   strictEqual(enums.length, 2);
   const unionAsEnum = enums.find((x) => x.name === "UnionAsEnum");
@@ -913,7 +913,7 @@ it("usage override for orphan union as enum", async function () {
 });
 
 it("union with only one literal", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @usage(Usage.input | Usage.output)
     model Test {
@@ -925,7 +925,7 @@ it("union with only one literal", async function () {
     }
   `,
   );
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "enum");
   strictEqual(sdkType.name, "TestUnion");
@@ -936,7 +936,7 @@ it("union with only one literal", async function () {
 });
 
 it("default discriminated union", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @usage(Usage.input | Usage.output)
     model Test {
@@ -960,7 +960,7 @@ it("default discriminated union", async function () {
     }
   `,
   );
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "union");
   strictEqual(sdkType.name, "Pet");
@@ -983,7 +983,7 @@ it("default discriminated union", async function () {
 });
 
 it("discriminated union with custom discriminator property", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @usage(Usage.input | Usage.output)
     model Test {
@@ -1007,7 +1007,7 @@ it("discriminated union with custom discriminator property", async function () {
     }
   `,
   );
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "union");
   strictEqual(sdkType.name, "Vehicle");
@@ -1028,7 +1028,7 @@ it("discriminated union with custom discriminator property", async function () {
 });
 
 it("discriminated union with none envelope", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @usage(Usage.input | Usage.output)
     model Test {
@@ -1050,7 +1050,7 @@ it("discriminated union with none envelope", async function () {
     }
   `,
   );
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "union");
   strictEqual(sdkType.name, "Shape");
@@ -1071,7 +1071,7 @@ it("discriminated union with none envelope", async function () {
 });
 
 it("discriminated union with custom envelope property", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @usage(Usage.input | Usage.output)
     model Test {
@@ -1094,7 +1094,7 @@ it("discriminated union with custom envelope property", async function () {
     }
   `,
   );
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "union");
   strictEqual(sdkType.name, "Message");
@@ -1115,7 +1115,7 @@ it("discriminated union with custom envelope property", async function () {
 });
 
 it("regular union without discriminator has no discriminatedOptions", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @usage(Usage.input | Usage.output)
     model Test {
@@ -1123,7 +1123,7 @@ it("regular union without discriminator has no discriminatedOptions", async func
     }
   `,
   );
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "union");
   strictEqual(sdkType.name, "TestValue");
@@ -1140,7 +1140,7 @@ it("regular union without discriminator has no discriminatedOptions", async func
 });
 
 it("nullable discriminated union", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @usage(Usage.input | Usage.output)
     model Test {
@@ -1164,7 +1164,7 @@ it("nullable discriminated union", async function () {
     }
   `,
   );
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
   const nullableType = getSdkTypeHelper(context);
   strictEqual(nullableType.kind, "nullable");
   strictEqual(nullableType.name, "TestOptionalPet");

@@ -1,9 +1,13 @@
 import { strictEqual } from "assert";
 import { it } from "vitest";
-import { AzureCoreTester, AzureCoreServiceTester, createSdkContextForTester } from "../tester.js";
+import {
+  AzureCoreTester,
+  AzureCoreTesterWithService,
+  createSdkContextForTester,
+} from "../tester.js";
 
 it("parameter's crossLanguageDefinitionId", async () => {
-  const { program } = await AzureCoreServiceTester.compile(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     alias ServiceTraits = SupportsRepeatableRequests &
     SupportsConditionalRequests &
     SupportsClientRequestId;
@@ -17,7 +21,7 @@ it("parameter's crossLanguageDefinitionId", async () => {
       ServiceTraits
     >;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
 
   const sdkPackage = context.sdkPackage;
   strictEqual(
@@ -70,7 +74,7 @@ it("endpoint's crossLanguageDefinitionId", async () => {
 
     op test(): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-java" });
+  const context = await createSdkContextForTester(program);
 
   const sdkPackage = context.sdkPackage;
   const initialization = sdkPackage.clients[0].clientInitialization;

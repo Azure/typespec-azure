@@ -3,11 +3,7 @@ import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { getAccess } from "../../src/decorators.js";
-import {
-  createSdkContextForTester,
-  SimpleTester,
-  SimpleTesterWithBuiltInService,
-} from "../tester.js";
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
 describe("namespace access override", () => {
   it("should inherit access from parent namespace", async () => {
@@ -19,9 +15,7 @@ describe("namespace access override", () => {
       }
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const actual = getAccess(context, Test);
     strictEqual(actual, "public");
   });
@@ -37,9 +31,7 @@ describe("namespace access override", () => {
       }
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const actual = getAccess(context, Test);
     const actualAnonymous = getAccess(context, prop.type as Model);
     strictEqual(actual, "public");
@@ -57,9 +49,7 @@ describe("namespace access override", () => {
       }
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const actual = getAccess(context, Test);
     const actualAnonymous = getAccess(context, prop.type as Model);
     strictEqual(actual, "internal");
@@ -76,9 +66,7 @@ describe("namespace access override", () => {
       }
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const actual = getAccess(context, Test);
     strictEqual(actual, "internal");
   });
@@ -91,9 +79,7 @@ describe("namespace access override", () => {
       op ${t.op("test")}(): void;
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const actual = getAccess(context, test);
     strictEqual(actual, "internal");
   });
@@ -105,9 +91,7 @@ describe("namespace access override", () => {
       op ${t.op("test")}(): void;
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const actual = getAccess(context, test);
     strictEqual(actual, "public");
   });
@@ -119,9 +103,7 @@ describe("namespace access override", () => {
       op ${t.op("test")}(): void;
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const actual = getAccess(context, test);
     strictEqual(actual, "internal");
   });
@@ -134,9 +116,7 @@ it("default calculated value of operation is undefined, default value of calcula
     op ${t.op("test")}(): void;
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   strictEqual(getAccess(context, test), "public");
   strictEqual(getAccess(context, Test), "public");
 });
@@ -155,9 +135,7 @@ it("model access calculated by operation", async () => {
     }
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   let actual = getAccess(context, Test);
   strictEqual(actual, "internal");
   actual = getAccess(context, func);
@@ -179,9 +157,7 @@ it("override calculated model with public access", async () => {
     }
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   let actual = getAccess(context, Test);
   strictEqual(actual, "public");
   actual = getAccess(context, func);
@@ -202,9 +178,7 @@ it("override calculated model with internal access", async () => {
     }
     `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   strictEqual(getAccess(context, Test), "internal");
   strictEqual(getAccess(context, func), "public");
 });
@@ -244,9 +218,7 @@ it("access propagation", async () => {
     }
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   let actual = getAccess(context, Fish);
   strictEqual(actual, "internal");
   actual = getAccess(context, Shark);
@@ -310,9 +282,7 @@ it("complicated access propagation", async () => {
       }
     `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   strictEqual(getAccess(context, func1), "internal");
   strictEqual(getAccess(context, func2), "internal");
   strictEqual(getAccess(context, func3), "public");
@@ -424,9 +394,7 @@ it("access propagation for properties, base models and sub models", async () => 
     }
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   strictEqual(getAccess(context, func1), "internal");
   strictEqual(getAccess(context, func2), "public");
   strictEqual(getAccess(context, func3), "internal");
@@ -519,9 +487,7 @@ it("access propagation with override", async () => {
       }
     `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   strictEqual(getAccess(context, func1), "internal");
   strictEqual(getAccess(context, func2), "public");
   strictEqual(getAccess(context, func3), "public");
@@ -539,7 +505,7 @@ it("access propagation with override", async () => {
 });
 
 it("access propagation with nullable", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     model RunStep {
       id: string;
@@ -568,9 +534,7 @@ it("access propagation with nullable", async () => {
     @@access(listRunSteps, Access.internal);
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   strictEqual(models[0].access, "public");
@@ -578,7 +542,7 @@ it("access propagation with nullable", async () => {
 });
 
 it("access conflict from operation", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @access(Access.internal)
     model A {}
@@ -586,9 +550,7 @@ it("access conflict from operation", async () => {
     op test(@body body: A): void;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].access, "public");
@@ -598,7 +560,7 @@ it("access conflict from operation", async () => {
 });
 
 it("access conflict from propagation", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     model A {
       prop: B;
@@ -610,9 +572,7 @@ it("access conflict from propagation", async () => {
     op test(@body body: A): void;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   strictEqual(models[0].access, "public");
@@ -623,7 +583,7 @@ it("access conflict from propagation", async () => {
 });
 
 it("access conflict from other override", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     model A {
       prop: B;
@@ -640,9 +600,7 @@ it("access conflict from other override", async () => {
     op test(@body body: A): void;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   strictEqual(models[0].access, "public");
@@ -654,7 +612,7 @@ it("access conflict from other override", async () => {
 });
 
 it("access conflict from multiple override", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     model A {
       x: X;
@@ -675,9 +633,7 @@ it("access conflict from multiple override", async () => {
     op two(): B;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   strictEqual(models.find((m) => m.name === "B")?.access, "internal");
@@ -688,7 +644,7 @@ it("access conflict from multiple override", async () => {
 });
 
 it("disableUsageAccessPropagationToBase true with override", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     model BaseClassThatsPruned {
       id: int32;
@@ -706,7 +662,7 @@ it("disableUsageAccessPropagationToBase true with override", async () => {
   );
   const context = await createSdkContextForTester(
     program,
-    { emitterName: "@azure-tools/typespec-python" },
+    {},
     { disableUsageAccessPropagationToBase: true },
   );
   const models = context.sdkPackage.models;
@@ -718,7 +674,7 @@ it("disableUsageAccessPropagationToBase true with override", async () => {
 });
 
 it("disableUsageAccessPropagationToBase true", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
         model BaseClassThatsPruned {
           id: int32;
@@ -737,7 +693,7 @@ it("disableUsageAccessPropagationToBase true", async () => {
   );
   const context = await createSdkContextForTester(
     program,
-    { emitterName: "@azure-tools/typespec-python" },
+    {},
     { disableUsageAccessPropagationToBase: true },
   );
   const models = context.sdkPackage.models;
@@ -749,7 +705,7 @@ it("disableUsageAccessPropagationToBase true", async () => {
 });
 
 it("disableUsageAccessPropagationToBase true property propagation", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     model BaseClassThatsPruned {
       id: int32;
@@ -772,7 +728,7 @@ it("disableUsageAccessPropagationToBase true property propagation", async () => 
   );
   const context = await createSdkContextForTester(
     program,
-    { emitterName: "@azure-tools/typespec-python" },
+    {},
     { disableUsageAccessPropagationToBase: true },
   );
   const models = context.sdkPackage.models;
@@ -786,7 +742,7 @@ it("disableUsageAccessPropagationToBase true property propagation", async () => 
 });
 
 it("disableUsageAccessPropagationToBase true discriminator propagation", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @discriminator("kind")
     model Fish {
@@ -820,7 +776,7 @@ it("disableUsageAccessPropagationToBase true discriminator propagation", async (
   );
   const context = await createSdkContextForTester(
     program,
-    { emitterName: "@azure-tools/typespec-python" },
+    {},
     { disableUsageAccessPropagationToBase: true },
   );
   const models = context.sdkPackage.models;
@@ -839,7 +795,7 @@ it("disableUsageAccessPropagationToBase true discriminator propagation", async (
 
 describe("model property access", () => {
   it("normal model property", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       model Test {
         prop: string;
       }
@@ -847,27 +803,23 @@ describe("model property access", () => {
       op test(@body body: Test): void;
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const models = context.sdkPackage.models;
     strictEqual(models[0].properties[0].access, "public");
   });
 
   it("normal parameter", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       op test(a: string): void;
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const parameters = context.sdkPackage.clients[0].methods[0].parameters;
     strictEqual(parameters[0].access, "public");
   });
 
   it("model property with override", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       model Test {
         @access(Access.internal)
         prop: string;
@@ -876,27 +828,23 @@ describe("model property access", () => {
       op test(@body body: Test): void;
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const models = context.sdkPackage.models;
     strictEqual(models[0].properties[0].access, "internal");
   });
 
   it("parameter with override", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       op test(@access(Access.internal) a: string): void;
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const parameters = context.sdkPackage.clients[0].methods[0].parameters;
     strictEqual(parameters[0].access, "internal");
   });
 
   it("model property with override propagation", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       model Foo {
         @access(Access.internal)
         foo: Bar;
@@ -916,9 +864,7 @@ describe("model property access", () => {
       op test(@body body: Foo): Baz;
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const models = context.sdkPackage.models;
     strictEqual(models[0].properties[0].access, "internal");
     strictEqual(models[0].properties[1].access, "internal");

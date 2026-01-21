@@ -1,10 +1,10 @@
 import { strictEqual } from "assert";
 import { it } from "vitest";
-import { createSdkContextForTester, SimpleTesterWithBuiltInService } from "../tester.js";
+import { createSdkContextForTester, SimpleTesterWithService } from "../tester.js";
 import { getSdkTypeHelper } from "./utils.js";
 
 it("default", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -12,9 +12,7 @@ it("default", async function () {
       }
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "utcDateTime");
   strictEqual(sdkType.wireType.kind, "string");
@@ -22,7 +20,7 @@ it("default", async function () {
 });
 
 it("rfc3339", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
         @usage(Usage.input | Usage.output)
         model Test {
@@ -31,9 +29,7 @@ it("rfc3339", async function () {
         }
       `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "utcDateTime");
   strictEqual(sdkType.wireType.kind, "string");
@@ -41,7 +37,7 @@ it("rfc3339", async function () {
 });
 
 it("rfc7231", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -50,9 +46,7 @@ it("rfc7231", async function () {
       }
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "utcDateTime");
   strictEqual(sdkType.wireType.kind, "string");
@@ -61,7 +55,7 @@ it("rfc7231", async function () {
 
 // TODO -- uncomment or modify when https://github.com/microsoft/typespec/issues/4042 is resolved.
 it.skip("unixTimestamp32", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @usage(Usage.input | Usage.output)
     model Test {
@@ -69,9 +63,7 @@ it.skip("unixTimestamp32", async () => {
     }
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "utcDateTime");
   strictEqual(sdkType.wireType.kind, "int32");
@@ -81,7 +73,7 @@ it.skip("unixTimestamp32", async () => {
 });
 
 it("unixTimestamp", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -90,9 +82,7 @@ it("unixTimestamp", async function () {
       }
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "utcDateTime");
   strictEqual(sdkType.wireType.kind, "int64");
@@ -100,7 +90,7 @@ it("unixTimestamp", async function () {
 });
 
 it("encode propagation", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
       @doc("doc")
       @summary("title")
@@ -115,9 +105,7 @@ it("encode propagation", async function () {
       }
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "utcDateTime");
   strictEqual(sdkType.name, "extraLayerDateTime");
@@ -137,7 +125,7 @@ it("encode propagation", async function () {
 });
 
 it("nullable unixTimestamp", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -146,9 +134,7 @@ it("nullable unixTimestamp", async function () {
       }
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const nullableType = getSdkTypeHelper(context);
   strictEqual(nullableType.kind, "nullable");
 
@@ -159,7 +145,7 @@ it("nullable unixTimestamp", async function () {
 });
 
 it("unixTimestamp array", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
       @doc("doc")
       @summary("title")
@@ -172,9 +158,7 @@ it("unixTimestamp array", async function () {
       }
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "array");
   strictEqual(sdkType.valueType.kind, "utcDateTime");

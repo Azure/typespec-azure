@@ -2,7 +2,12 @@ import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
-import { createSdkContextForTester, SimpleTester, TcgcTester } from "../tester.js";
+import {
+  createClientCustomizationInput,
+  createSdkContextForTester,
+  SimpleBaseTester,
+  SimpleTester,
+} from "../tester.js";
 
 it("example config", async () => {
   const instance = await SimpleTester.createInstance();
@@ -13,10 +18,7 @@ it("example config", async () => {
       op get(): string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -34,9 +36,7 @@ it("example default config", async () => {
       op get(): string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -53,7 +53,6 @@ it("no example folder found", async () => {
     }
   `);
   const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
     "examples-dir": "./examples",
   });
 
@@ -71,10 +70,7 @@ it("load example without version", async () => {
       op get(): string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -99,10 +95,7 @@ it("load example with version", async () => {
       v3,
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -124,10 +117,7 @@ it("load multiple example for one operation", async () => {
       op get(): string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -138,20 +128,17 @@ it("load multiple example for one operation", async () => {
 });
 
 it("load example with client customization", async () => {
-  const instance = await TcgcTester.createInstance();
+  const instance = await SimpleBaseTester.createInstance();
   await instance.fs.addRealTypeSpecFile("./examples/get.json", `${__dirname}/load/get.json`);
-  const { program } = await instance.compile({
-    "main.tsp": `
-      import "@typespec/http";
-      import "@azure-tools/typespec-client-generator-core";
-      using TypeSpec.Http;
-      using Azure.ClientGenerator.Core;
-
+  const { program } = await instance.compile(
+    createClientCustomizationInput(
+      `
       @service
       namespace TestClient {
         op get(): string;
       }
-
+    `,
+      `
       @client({
         name: "FooClient",
         service: TestClient
@@ -160,11 +147,9 @@ it("load example with client customization", async () => {
         op test is TestClient.get;
       }
     `,
-  });
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+    ),
+  );
+  const context = await createSdkContextForTester(program);
 
   const client = context.sdkPackage.clients[0];
   strictEqual(client.name, "FooClient");
@@ -204,10 +189,7 @@ it("load multiple example with @clientName", async () => {
       }
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const mainClient = context.sdkPackage.clients[0];
 
@@ -252,10 +234,7 @@ it("load multiple example of original operation id with @clientName", async () =
       }
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const mainClient = context.sdkPackage.clients[0];
 
@@ -283,10 +262,7 @@ it("ensure ordering for multiple examples", async () => {
       op get(): string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -315,10 +291,7 @@ it("load example with @clientLocation existed interface", async () => {
       }
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const mainClient = context.sdkPackage.clients[0];
 
@@ -344,10 +317,7 @@ it("load example with @clientLocation new operation group", async () => {
       }
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const mainClient = context.sdkPackage.clients[0];
 
@@ -373,10 +343,7 @@ it("load example with @clientLocation root client", async () => {
       }
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const mainClient = context.sdkPackage.clients[0];
   const operation = (mainClient.methods[0] as SdkServiceMethod<SdkHttpOperation>).operation;
@@ -393,10 +360,7 @@ it("nested examples", async () => {
       op get(): string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (context.sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>)
     .operation;
@@ -425,10 +389,7 @@ it("teamplate case", async () => {
       interface TestGroup extends CommonOps<TestModel> {}
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const operation = (
     context.sdkPackage.clients[0].children?.[0].methods[0] as SdkServiceMethod<SdkHttpOperation>
@@ -439,7 +400,7 @@ it("teamplate case", async () => {
 });
 
 it("multiple services without versioning", async () => {
-  const instance = await TcgcTester.createInstance();
+  const instance = await SimpleBaseTester.createInstance();
   await instance.fs.addRealTypeSpecFile(
     "./ServiceA/examples/AI_aTest.json",
     `${__dirname}/multi-service/ServiceA_AI_aTest.json`,
@@ -449,11 +410,9 @@ it("multiple services without versioning", async () => {
     `${__dirname}/multi-service/ServiceB_BI_bTest.json`,
   );
 
-  const { program } = await instance.compile({
-    "service.tsp": `
-      import "@typespec/http";
-      using TypeSpec.Http;
-
+  const { program } = await instance.compile(
+    createClientCustomizationInput(
+      `
       @service
       namespace ServiceA {
         interface AI {
@@ -469,22 +428,16 @@ it("multiple services without versioning", async () => {
         }
       }
     `,
-    "main.tsp": `
-      import "@azure-tools/typespec-client-generator-core";
-      import "./service.tsp";
-      using Azure.ClientGenerator.Core;
-
+      `
       @client({
         name: "CombineClient",
         service: [ServiceA, ServiceB],
       })
       namespace CombineClient {}
     `,
-  });
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+    ),
+  );
+  const context = await createSdkContextForTester(program);
 
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
@@ -512,11 +465,9 @@ it("multiple services without versioning", async () => {
 });
 
 it("multiple services without examples", async () => {
-  const { program } = await TcgcTester.compile({
-    "service.tsp": `
-      import "@typespec/http";
-      using TypeSpec.Http;
-
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
       @service
       namespace ServiceA {
         interface AI {
@@ -532,22 +483,16 @@ it("multiple services without examples", async () => {
         }
       }
     `,
-    "main.tsp": `
-      import "@azure-tools/typespec-client-generator-core";
-      import "./service.tsp";
-      using Azure.ClientGenerator.Core;
-
+      `
       @client({
         name: "CombineClient",
         service: [ServiceA, ServiceB],
       })
       namespace CombineClient {}
     `,
-  });
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+    ),
+  );
+  const context = await createSdkContextForTester(program);
 
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);

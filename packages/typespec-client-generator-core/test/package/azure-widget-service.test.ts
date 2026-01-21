@@ -197,9 +197,7 @@ it("getWidget", async () => {
     getWidget is Operations.ResourceRead<Widget>;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const parentClient = sdkPackage.clients.filter(
     (c) => c.clientInitialization.initializedBy & InitializedByFlags.Individually,
@@ -283,9 +281,7 @@ it("poll widget", async () => {
     createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const parentClient = sdkPackage.clients[0];
@@ -471,9 +467,7 @@ it("lro delete", async () => {
       op delete is Operations.LongRunningResourceDelete<Widget>;
       `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const method = getServiceMethodOfClient(context.sdkPackage);
   strictEqual(method.name, "delete");
   strictEqual(method.kind, "lro");
@@ -490,9 +484,7 @@ it("paging", async () => {
       listManufacturers is Operations.ResourceList<Manufacturer>;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   strictEqual(sdkPackage.models.length, 5);
@@ -590,9 +582,7 @@ it("getWidgetAnalytics", async () => {
     getWidgetAnalytics is Operations.ResourceRead<WidgetAnalytics>;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const parentClient = sdkPackage.clients.filter(
     (c) => c.clientInitialization.initializedBy & InitializedByFlags.Individually,

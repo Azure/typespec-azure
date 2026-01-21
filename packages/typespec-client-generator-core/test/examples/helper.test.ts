@@ -21,10 +21,7 @@ it("getHttpOperationExamples", async () => {
     }
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-    "examples-dir": "./examples",
-  });
+  const context = await createSdkContextForTester(program);
 
   const examples = getHttpOperationExamples(context, getHttpOperationWithCache(context, get));
   strictEqual(examples.length, 2);

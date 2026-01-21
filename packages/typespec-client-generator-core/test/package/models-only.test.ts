@@ -11,9 +11,7 @@ it("models only package", async () => {
       }
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
   strictEqual(sdkPackage.models[0].name, "CloudEvent");
@@ -51,9 +49,7 @@ it("with azure and versioning decorators", async () => {
       }
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 2);
   const cloudEventModel = sdkPackage.models.find((x) => x.name === "CloudEvent");

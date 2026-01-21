@@ -1,10 +1,11 @@
 import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import {
-  AzureCoreServiceTester,
+  AzureCoreTesterWithService,
+  createClientCustomizationInput,
   createSdkContextForTester,
+  SimpleBaseTester,
   SimpleTester,
-  TcgcTester,
 } from "../tester.js";
 
 describe("no namespace flag", () => {
@@ -31,9 +32,7 @@ describe("no namespace flag", () => {
       }
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const fooNamespace = sdkPackage.namespaces.find((x) => x.name === "Foo");
     ok(fooNamespace);
@@ -100,9 +99,7 @@ describe("no namespace flag", () => {
       }
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
 
     const serviceNamespace = sdkPackage.namespaces.find((x) => x.name === "Service");
@@ -172,9 +169,7 @@ describe("no namespace flag", () => {
       }
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const aNamespace = sdkPackage.namespaces.find((x) => x.name === "A");
     ok(aNamespace);
@@ -214,10 +209,9 @@ describe("no namespace flag", () => {
   });
 
   it("restructure client hierarchy with renaming of client name and client namespace name", async () => {
-    const mainCode = `
-        import "@typespec/http";
-        import "./client.tsp";
-        using TypeSpec.Http;
+    const { program } = await SimpleBaseTester.compile(
+      createClientCustomizationInput(
+        `
         @service(#{
           title: "Pet Store",
         })
@@ -228,10 +222,8 @@ describe("no namespace flag", () => {
   
         @route("/op2")
         op pet(): void;
-      `;
-    const clientCode = `
-        import "@azure-tools/typespec-client-generator-core";
-        using Azure.ClientGenerator.Core;
+      `,
+        `
         namespace PetStoreRenamed; // this namespace will be the namespace of the clients and operation groups defined in this customization file
   
         @client({
@@ -250,14 +242,10 @@ describe("no namespace flag", () => {
         interface Client2 {
           pet is PetStore.pet
         }
-      `;
-    const { program } = await TcgcTester.compile({
-      "main.tsp": mainCode,
-      "client.tsp": `import "./main.tsp"; ${clientCode}`,
-    });
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+      `,
+      ),
+    );
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const foodClient = sdkPackage.clients.find((x) => x.name === "FoodClient");
     ok(foodClient);
@@ -284,7 +272,6 @@ describe("no namespace flag", () => {
     );
     const sdkPackage = (
       await createSdkContextForTester(program, {
-        emitterName: "@azure-tools/typespec-python",
         namespace: "PetStoreRenamed",
       })
     ).sdkPackage;
@@ -304,7 +291,6 @@ describe("namespace config flag", () => {
       }
     `);
     const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
       namespace: "Azure.Foo",
     });
     const sdkPackage = context.sdkPackage;
@@ -345,7 +331,6 @@ describe("namespace config flag", () => {
       }
     `);
     const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
       namespace: "FooRenamed",
     });
     const sdkPackage = context.sdkPackage;
@@ -386,7 +371,6 @@ describe("namespace config flag", () => {
       `,
     );
     const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
       namespace: "PetStoreRenamed",
     });
     const sdkPackage = context.sdkPackage;
@@ -395,12 +379,11 @@ describe("namespace config flag", () => {
     strictEqual(foodClient.namespace, "PetStoreRenamed");
   });
   it("use namespace config flag with an azure spec", async () => {
-    const { program } = await AzureCoreServiceTester.compile(`
+    const { program } = await AzureCoreTesterWithService.compile(`
       op get(): string;
     `);
 
     const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-java",
       namespace: "Azure.My.Service",
     });
     const sdkPackage = context.sdkPackage;
@@ -423,10 +406,9 @@ describe("namespace config flag", () => {
     strictEqual(myServiceAzureNamespace.clients[0].name, "ServiceClient");
   });
   it("restructure client hierarchy with namespace flag, renaming of client name, and client namespace name", async () => {
-    const mainCode = `
-      import "@typespec/http";
-      import "./client.tsp";
-      using TypeSpec.Http;
+    const { program } = await SimpleBaseTester.compile(
+      createClientCustomizationInput(
+        `
       @service(#{
         title: "Pet Store",
       })
@@ -437,10 +419,8 @@ describe("namespace config flag", () => {
 
       @route("/op2")
       op pet(): void;
-    `;
-    const clientCode = `
-      import "@azure-tools/typespec-client-generator-core";
-      using Azure.ClientGenerator.Core;
+    `,
+        `
       namespace PetStoreRenamed;
 
       @client({
@@ -459,13 +439,10 @@ describe("namespace config flag", () => {
       interface Client2 {
         pet is PetStore.pet
       }
-    `;
-    const { program } = await TcgcTester.compile({
-      "main.tsp": mainCode,
-      "client.tsp": `import "./main.tsp"; ${clientCode}`,
-    });
+    `,
+      ),
+    );
     const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
       namespace: "PetStoreFlagRenamed",
     });
     const sdkPackage = context.sdkPackage;
@@ -507,7 +484,6 @@ describe("namespace config flag", () => {
       `,
     );
     const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
       namespace: "PetStoreFlagRenamed",
     });
     const sdkPackage = context.sdkPackage;
@@ -554,7 +530,6 @@ describe("namespace config flag", () => {
     `);
 
     const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
       namespace: "Azure.A",
     });
     const sdkPackage = context.sdkPackage;
@@ -572,10 +547,9 @@ describe("namespace config flag", () => {
     strictEqual(aNamespace.namespaces.length, 0);
   });
   it("Separate namespace references", async () => {
-    const mainCode = `
-      import "@typespec/http";
-      import "./client.tsp";
-      using TypeSpec.Http;
+    const { program } = await SimpleBaseTester.compile(
+      createClientCustomizationInput(
+        `
       @service
       namespace Client.ClientNamespace;
 
@@ -591,10 +565,8 @@ describe("namespace config flag", () => {
         }
       }
 
-    `;
-    const clientCode = `
-      import "@azure-tools/typespec-client-generator-core";
-      using Azure.ClientGenerator.Core;
+    `,
+        `
       namespace ClientNameSpaceClient;
 
       @client({
@@ -607,13 +579,10 @@ describe("namespace config flag", () => {
       }
 
       @@clientNamespace(Client.ClientNamespace.FirstModel, "client.clientnamespace.first");
-    `;
-    const { program } = await TcgcTester.compile({
-      "main.tsp": mainCode,
-      "client.tsp": `import "./main.tsp"; ${clientCode}`,
-    });
+    `,
+      ),
+    );
     const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
       namespace: "Azure.Foo",
     });
     const sdkPackage = context.sdkPackage;
@@ -626,30 +595,26 @@ describe("namespace config flag", () => {
 });
 
 it("customization with models from original namespace", async () => {
-  const mainCode = `
-      import "./client.tsp";
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
       @service
       namespace Original {
         model MyModel {
           prop: string;
         }
       }
-    `;
-  const clientCode = `
-      import "@azure-tools/typespec-client-generator-core";
-      using Azure.ClientGenerator.Core;
+    `,
+      `
       @client({service: Original, name: "MyClient"})
       namespace Customization {
         op foo(): void;
       }
       @@usage(Original.MyModel, Usage.input | Usage.output);
-    `;
-  const { program } = await TcgcTester.compile({
-    "main.tsp": mainCode,
-    "client.tsp": `import "./main.tsp"; ${clientCode}`,
-  });
+    `,
+    ),
+  );
   const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
     namespace: "Renamed",
   });
   const sdkPackage = context.sdkPackage;

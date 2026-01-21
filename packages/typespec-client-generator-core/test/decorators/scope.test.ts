@@ -2,11 +2,7 @@ import { t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { getAccess } from "../../src/decorators.js";
-import {
-  createSdkContextForTester,
-  SimpleTester,
-  SimpleTesterWithBuiltInService,
-} from "../tester.js";
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
 it("emitter with same scope as decorator", async () => {
   const { program, func } = await SimpleTester.compile(t.code`
@@ -33,9 +29,7 @@ it("emitter different scope from decorator", async () => {
     ): void;
   `;
   const { program, func } = await SimpleTester.compile(code);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   strictEqual(getAccess(context, func), "public");
 
   const { program: programCsharp, func: funcCsharp } = await SimpleTester.compile(code);
@@ -89,9 +83,7 @@ it("emitter excluded from decorator scope list", async () => {
     ): void;
   `;
   const { program, func } = await SimpleTester.compile(code);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
 
   strictEqual(getAccess(context, func), "public");
   const { program: programJava, func: funcJava } = await SimpleTester.compile(code);
@@ -135,9 +127,7 @@ it("first non-scoped decorator then scoped decorator", async () => {
   `;
 
   const { program, func } = await SimpleTester.compile(code);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   strictEqual(getAccess(context, func), "internal");
 
   const { program: programCsharp, func: funcCsharp } = await SimpleTester.compile(code);
@@ -158,9 +148,7 @@ it("first scoped decorator then non-scoped decorator", async () => {
   `;
 
   const { program, func } = await SimpleTester.compile(code);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   strictEqual(getAccess(context, func), "internal");
 
   const { program: programCsharp, func: funcCsharp } = await SimpleTester.compile(code);
@@ -182,9 +170,7 @@ it("first non-scoped augmented decorator then scoped augmented decorator", async
   `;
 
   const { program, func } = await SimpleTester.compile(code);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   strictEqual(getAccess(context, func), "public");
 
   const { program: programCsharp, func: funcCsharp } = await SimpleTester.compile(code);
@@ -206,9 +192,7 @@ it("first scoped augmented decorator then non-scoped augmented decorator", async
   `;
 
   const { program, func } = await SimpleTester.compile(code);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   strictEqual(getAccess(context, func), "public");
 
   const { program: programCsharp, func: funcCsharp } = await SimpleTester.compile(code);
@@ -229,9 +213,7 @@ it("two scoped decorators", async () => {
   `;
 
   const { program, func } = await SimpleTester.compile(code);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   strictEqual(getAccess(context, func), "internal");
 
   const { program: programCsharp, func: funcCsharp } = await SimpleTester.compile(code);
@@ -252,9 +234,7 @@ it("two non-scoped decorators", async () => {
   `;
 
   const { program, func } = await SimpleTester.compile(code);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   strictEqual(getAccess(context, func), "internal");
 
   const { program: programCsharp, func: funcCsharp } = await SimpleTester.compile(code);
@@ -724,7 +704,7 @@ describe("negation", () => {
 
 describe("model property scope", () => {
   it("include property for matching scope", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       model TestModel {
         @scope("csharp")
         csharpProp: string;
@@ -748,7 +728,7 @@ describe("model property scope", () => {
   });
 
   it("exclude property from non-matching scope", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       model TestModel {
         @scope("csharp")
         csharpProp: string;
@@ -772,7 +752,7 @@ describe("model property scope", () => {
   });
 
   it("exclude property with negation scope", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       model TestModel {
         @scope("!csharp")
         internalProp: string;
@@ -796,7 +776,7 @@ describe("model property scope", () => {
   });
 
   it("include all properties without scope decorator", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       model TestModel {
         prop1: string;
         prop2: int32;
@@ -816,7 +796,7 @@ describe("model property scope", () => {
   });
 
   it("multiple properties with different scopes", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       model TestModel {
         @scope("csharp")
         csharpProp: string;

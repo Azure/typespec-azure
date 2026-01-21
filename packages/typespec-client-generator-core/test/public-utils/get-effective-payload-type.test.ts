@@ -13,7 +13,7 @@ it("get single", async () => {
     @service
     namespace MyService {};
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program);
   const serviceNamespace = listAllServiceNamespaces(context)[0];
   const defaultApiVersion = getDefaultApiVersion(context, serviceNamespace);
   ok(defaultApiVersion);

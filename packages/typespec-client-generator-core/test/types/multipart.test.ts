@@ -3,14 +3,15 @@ import { deepEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { SdkModelPropertyType, UsageFlags } from "../../src/interfaces.js";
 import {
+  createClientCustomizationInput,
   createSdkContextForTester,
+  SimpleBaseTester,
   SimpleTester,
-  SimpleTesterWithBuiltInService,
-  TcgcTester,
+  SimpleTesterWithService,
 } from "../tester.js";
 
 it("multipart form basic", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model MultiPartRequest {
       id: HttpPart<string>;
       profileImage: HttpPart<bytes>;
@@ -18,9 +19,7 @@ it("multipart form basic", async function () {
 
     op basic(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): NoContentResponse;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
 
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -56,9 +55,7 @@ it("multipart conflicting model usage", async function () {
         @post op multipartUse(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): NoContentResponse;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/conflicting-multipart-model-usage",
   });
@@ -83,9 +80,7 @@ it("multipart conflicting model usage for only multipart operations", async func
       op basic2(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): NoContentResponse;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   deepEqual(context.diagnostics.length, 0);
   const address = context.sdkPackage.models.find((x) => x.name === "Address");
   ok(address);
@@ -117,9 +112,7 @@ it("multipart conflicting model usage for mixed operations", async function () {
       op basic2(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): NoContentResponse;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   deepEqual(context.diagnostics.length, 0);
   const address = context.sdkPackage.models.find((x) => x.name === "Address");
   ok(address);
@@ -130,7 +123,7 @@ it("multipart conflicting model usage for mixed operations", async function () {
 });
 
 it("multipart with non-formdata model property", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
       model Address {
         city: string;
@@ -148,15 +141,13 @@ it("multipart with non-formdata model property", async function () {
       @put op multipartOne(@header contentType: "multipart/form-data", @multipartBody body: AddressFirstAppearance): void;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
 });
 
 it("multipart with list of bytes", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     model PictureWrapper {
       pictures: HttpPart<bytes>[];
@@ -165,9 +156,7 @@ it("multipart with list of bytes", async function () {
     @put op multipartOp(@header contentType: "multipart/form-data", @multipartBody body: PictureWrapper): void;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
@@ -182,7 +171,7 @@ it("multipart with list of bytes", async function () {
 });
 
 it("multipart with reused error model", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
       model PictureWrapper {
         pictures: HttpPart<bytes>[];
@@ -196,9 +185,7 @@ it("multipart with reused error model", async function () {
       @post op normalOp(): void | ErrorResponse;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
 
@@ -213,7 +200,7 @@ it("multipart with reused error model", async function () {
 });
 
 it("expands model into formData parameters", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @doc("A widget.")
     model Widget {
       @key("widgetName")
@@ -236,9 +223,7 @@ it("expands model into formData parameters", async function () {
       upload(...WidgetForm): Widget;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const client = context.sdkPackage.clients[0].children?.[0];
   ok(client);
   const formDataMethod = client.methods[0];
@@ -270,7 +255,7 @@ it("expands model into formData parameters", async function () {
 });
 
 it("usage doesn't apply to properties of a form data", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model MultiPartRequest {
       id: HttpPart<string>;
       profileImage: HttpPart<bytes>;
@@ -284,9 +269,7 @@ it("usage doesn't apply to properties of a form data", async function () {
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const multiPartRequest = models.find((x) => x.name === "MultiPartRequest");
@@ -299,7 +282,7 @@ it("usage doesn't apply to properties of a form data", async function () {
 });
 
 it("Json[] and bytes[] in multipart/form-data", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model MultiPartRequest {
       profileImages: HttpPart<bytes>[];
       addresses: HttpPart<Address>[];
@@ -310,9 +293,7 @@ it("Json[] and bytes[] in multipart/form-data", async function () {
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const multiPartRequest = models.find((x) => x.name === "MultiPartRequest");
@@ -328,7 +309,7 @@ it("Json[] and bytes[] in multipart/form-data", async function () {
 });
 
 it("basic multipart with @multipartBody for model", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Address {
       city: string;
     }
@@ -340,9 +321,7 @@ it("basic multipart with @multipartBody for model", async function () {
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
@@ -383,7 +362,7 @@ it("basic multipart with @multipartBody for model", async function () {
 });
 
 it("File[] of multipart with @multipartBody for model", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model MultiPartRequest{
         fileArrayOnePart: HttpPart<File[]>;
         fileArrayMultiParts: HttpPart<File>[];
@@ -391,9 +370,7 @@ it("File[] of multipart with @multipartBody for model", async function () {
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
@@ -449,7 +426,7 @@ it("File[] of multipart with @multipartBody for model", async function () {
 });
 
 it("File with specific content-type", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model RequiredMetaData extends File {
       filename: string;
       contentType: "image/png";
@@ -460,9 +437,7 @@ it("File with specific content-type", async function () {
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
   ok(MultiPartRequest);
@@ -479,7 +454,7 @@ it("File with specific content-type", async function () {
 });
 
 it("File of multipart with @multipartBody for model", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model RequiredMetaData extends File {
       filename: string;
       contentType: string;
@@ -491,9 +466,7 @@ it("File of multipart with @multipartBody for model", async function () {
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
@@ -569,7 +542,7 @@ it("File of multipart with @multipartBody for model", async function () {
 });
 
 it("check 'multi' of multipart with @multipartBody for model", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Address {
       city: string;
     }
@@ -586,9 +559,7 @@ it("check 'multi' of multipart with @multipartBody for model", async function ()
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
@@ -602,7 +573,7 @@ it("check 'multi' of multipart with @multipartBody for model", async function ()
 });
 
 it("check returned sdkType of multipart with @multipartBody for model", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model MultiPartRequest {
         stringsOnePart: HttpPart<string[]>;
         stringsMultiParts: HttpPart<string>[];
@@ -610,9 +581,7 @@ it("check returned sdkType of multipart with @multipartBody for model", async fu
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
@@ -638,7 +607,7 @@ it("check returned sdkType of multipart with @multipartBody for model", async fu
 });
 
 it("check content-type in multipart with @multipartBody for model", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model MultiPartRequest {
         stringWithoutContentType: HttpPart<string>,
         stringWithContentType: HttpPart<{@body body: string, @header contentType: "text/html"}>,
@@ -648,9 +617,7 @@ it("check content-type in multipart with @multipartBody for model", async functi
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
@@ -719,7 +686,7 @@ it("check content-type in multipart with @multipartBody for model", async functi
 });
 
 it("check isFilePart in multipart with @multipartBody for model", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model MultiPartRequest {
         bytesRaw: HttpPart<bytes>,
         bytesArrayRaw: HttpPart<bytes>[],
@@ -733,9 +700,7 @@ it("check isFilePart in multipart with @multipartBody for model", async function
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
   ok(MultiPartRequest);
@@ -750,16 +715,14 @@ it("check isFilePart in multipart with @multipartBody for model", async function
 });
 
 it("check serialized name with @multipartBody for model", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model MultiPartRequest {
         name: HttpPart<bytes, #{ name: "serializedName" }>,
     }
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
   ok(MultiPartRequest);
@@ -772,18 +735,9 @@ it("check serialized name with @multipartBody for model", async function () {
 });
 
 it("multipart in client customization", async () => {
-  const { program } = await TcgcTester.compile({
-    "main.tsp": `
-      import "@typespec/http";
-      import "@typespec/rest";
-      import "@typespec/versioning";
-      import "@azure-tools/typespec-client-generator-core";
-
-      using Http;
-      using Rest;
-      using Versioning;
-      using Azure.ClientGenerator.Core;
-
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
       @service(#{title: "Test Service"}) namespace TestService;
       model MultiPartRequest {
         profileImage: HttpPart<bytes>;
@@ -791,10 +745,7 @@ it("multipart in client customization", async () => {
 
       @post op multipartUse(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): NoContentResponse;
     `,
-    "client.tsp": `
-      import "./main.tsp";
-      using Azure.ClientGenerator.Core;
-
+      `
       namespace Customizations;
       
       @client({name: "FirstOrderClient", service: TestService})
@@ -805,10 +756,9 @@ it("multipart in client customization", async () => {
         myOp is TestService.multipartUse
       }
     `,
-  });
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+    ),
+  );
+  const context = await createSdkContextForTester(program);
 
   const models = context.sdkPackage.models;
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
@@ -823,16 +773,14 @@ it("multipart in client customization", async () => {
 });
 
 it("check header in multipart with @multipartBody for model", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model MultiPartRequest {
         prop: HttpPart<{@body body: string, @header test: string}>,
     }
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const MultiPartRequest = models.find((x) => x.name === "MultiPartRequest");
@@ -848,7 +796,7 @@ it("check header in multipart with @multipartBody for model", async function () 
 });
 
 it("multipart response", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @route("/downloadFile")
     @post
     op downloadFile(): {
@@ -859,9 +807,7 @@ it("multipart response", async function () {
       };
     };
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
 
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
@@ -885,7 +831,7 @@ it("multipart response", async function () {
 });
 
 it("multipart with visibility", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model TodoItem {
       @visibility(Lifecycle.Read) @key id: safeint;
       @maxLength(255)
@@ -906,9 +852,7 @@ it("multipart with visibility", async function () {
       item: HttpPart<TodoItem>;
     }): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
 
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);

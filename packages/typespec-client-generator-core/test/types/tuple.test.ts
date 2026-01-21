@@ -13,9 +13,7 @@ it("model with tupled properties", async function () {
     }
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const scopes = models[0].properties.find((x) => x.name === "scopes");

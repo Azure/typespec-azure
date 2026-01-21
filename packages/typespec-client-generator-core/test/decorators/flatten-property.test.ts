@@ -3,14 +3,15 @@ import { ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { getAllModels } from "../../src/types.js";
 import {
+  AzureCoreTester,
   createSdkContextForTester,
   SimpleTester,
-  SimpleTesterWithBuiltInService,
+  SimpleTesterWithService,
 } from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
 it("marks a model property to be flattened with suppression of deprecation warning", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+  const { program } = await SimpleTesterWithService.compile(t.code`
     model Model1{
       @Azure.ClientGenerator.Core.Legacy.flattenProperty
       child: Model2;
@@ -21,9 +22,7 @@ it("marks a model property to be flattened with suppression of deprecation warni
     @route("/func1")
     op func1(@body body: Model1): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const models = getAllModels(context);
   strictEqual(models.length, 2);
   const model1 = models.find((x) => x.name === "Model1")!;
@@ -48,9 +47,7 @@ it("doesn't mark a un-flattened model property", async () => {
       op func1(@body body: Model1): void;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const models = getAllModels(context);
   strictEqual(models.length, 2);
   const model1 = models.find((x) => x.name === "Model1")!;
@@ -103,8 +100,44 @@ it("throws error when used on a polymorphism type", async () => {
   });
 });
 
+it("verify diagnostic gets raised for usage", async () => {
+  const result = await AzureCoreTester.diagnose(
+    `        
+      namespace MyService {
+        model Model1{
+          @Azure.ClientGenerator.Core.Legacy.flattenProperty
+          child: Model2;
+        }
+
+        @test
+        model Model2{}
+
+        @test
+        @route("/func1")
+        op func1(@body body: Model1): void;
+      }
+      `,
+    {
+      compilerOptions: {
+        linterRuleSet: {
+          enable: {
+            "@azure-tools/typespec-azure-core/no-legacy-usage": true,
+          },
+        },
+      },
+    },
+  );
+  expectDiagnostics(result, [
+    {
+      code: "@azure-tools/typespec-azure-core/no-legacy-usage",
+      message:
+        'Referencing elements inside Legacy namespace "Azure.ClientGenerator.Core.Legacy" is not allowed.',
+    },
+  ]);
+});
+
 it("body parameter of model type should have been flattened", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(t.code`
+  const { program } = await SimpleTesterWithService.compile(t.code`
     model TestModel {
       prop: string;
     }
@@ -114,9 +147,7 @@ it("body parameter of model type should have been flattened", async () => {
     @@Legacy.flattenProperty(func1::parameters.body);
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
 

@@ -2,10 +2,10 @@ import { t } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { it } from "vitest";
 import { getNextLinkVerb } from "../../src/decorators.js";
-import { createSdkContextForTester, SimpleTesterWithBuiltInService } from "../tester.js";
+import { createSdkContextForTester, SimpleTesterWithService } from "../tester.js";
 
 it("should store next link verb HTTP verb", async () => {
-  const { listItems, program } = await SimpleTesterWithBuiltInService.compile(t.code`
+  const { listItems, program } = await SimpleTesterWithService.compile(t.code`
     model ListTestResult {
       @pageItems
       tests: Test[];
@@ -29,7 +29,7 @@ it("should store next link verb HTTP verb", async () => {
 });
 
 it("should apply nextLinkVerb with language scope", async () => {
-  const { listItems, program } = await SimpleTesterWithBuiltInService.compile(t.code`
+  const { listItems, program } = await SimpleTesterWithService.compile(t.code`
     model ListTestResult {
       @pageItems
       tests: Test[];
@@ -55,7 +55,7 @@ it("should apply nextLinkVerb with language scope", async () => {
 });
 
 it("should return GET when decorator is not applied", async () => {
-  const { listItems, program } = await SimpleTesterWithBuiltInService.compile(t.code`
+  const { listItems, program } = await SimpleTesterWithService.compile(t.code`
     model ListTestResult {
       @pageItems
       tests: Test[];
@@ -78,8 +78,7 @@ it("should return GET when decorator is not applied", async () => {
 });
 
 it("should support POST and GET HTTP verbs", async () => {
-  const { listWithGet, listWithPost, program } =
-    await SimpleTesterWithBuiltInService.compile(t.code`
+  const { listWithGet, listWithPost, program } = await SimpleTesterWithService.compile(t.code`
     model ListTestResult {
       @pageItems
       tests: Test[];
@@ -114,7 +113,7 @@ it("should support POST and GET HTTP verbs", async () => {
 });
 
 it("should reject invalid HTTP verbs", async () => {
-  const diagnostics = await SimpleTesterWithBuiltInService.diagnose(`
+  const diagnostics = await SimpleTesterWithService.diagnose(`
     model ListTestResult {
       @pageItems
       tests: Test[];

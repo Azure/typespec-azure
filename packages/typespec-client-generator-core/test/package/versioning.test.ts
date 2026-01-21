@@ -12,7 +12,7 @@ import {
   AzureCoreTester,
   createSdkContextForTester,
   SimpleTester,
-  VersionedServiceTester,
+  SimpleTesterWithVersionedService,
 } from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
@@ -64,9 +64,7 @@ it("basic default version", async () => {
   op get(...Resource.KeysOf<Widget>): Widget | Error;
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v3");
   deepStrictEqual(context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace), [
@@ -169,7 +167,6 @@ it("basic latest version", async () => {
 
   const context = await createSdkContextForTester(program, {
     "api-version": "latest",
-    emitterName: "@azure-tools/typespec-python",
   });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v3");
@@ -272,7 +269,6 @@ it("basic v3 version", async () => {
 
   const context = await createSdkContextForTester(program, {
     "api-version": "v3",
-    emitterName: "@azure-tools/typespec-python",
   });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v3");
@@ -375,7 +371,6 @@ it("basic v2 version", async () => {
 
   const context = await createSdkContextForTester(program, {
     "api-version": "v2",
-    emitterName: "@azure-tools/typespec-python",
   });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v2");
@@ -480,7 +475,6 @@ it("basic v1 version", async () => {
 
   const context = await createSdkContextForTester(program, {
     "api-version": "v1",
-    emitterName: "@azure-tools/typespec-python",
   });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v1");
@@ -569,7 +563,6 @@ it("basic all version", async () => {
 
   const context = await createSdkContextForTester(program, {
     "api-version": "all",
-    emitterName: "@azure-tools/typespec-python",
   });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "all");
@@ -641,9 +634,7 @@ it("define own api version param", async () => {
 
     op getPet(...ApiVersionParam): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.operation.parameters.length, 1);
@@ -676,9 +667,7 @@ it("default api version for interface extends", async () => {
     }      
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0].children?.[0];
   ok(client);
@@ -719,9 +708,7 @@ it("default api version for operation is", async () => {
     }      
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   const method = client.methods[0];
@@ -741,16 +728,14 @@ it("default api version for operation is", async () => {
 });
 
 it("add method", async () => {
-  const { program } = await VersionedServiceTester.compile(`
+  const { program } = await SimpleTesterWithVersionedService.compile(`
     @route("/v1")
     @post
     @added(ServiceVersions.v2)
     op v2(@header headerV2: string): void;
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);
   const method = getServiceMethodOfClient(sdkPackage);
@@ -770,15 +755,13 @@ it("add method", async () => {
 });
 
 it("add parameter", async () => {
-  const { program } = await VersionedServiceTester.compile(`
+  const { program } = await SimpleTesterWithVersionedService.compile(`
     @route("/v1")
     @post
     op v1(@added(ServiceVersions.v2) @header headerV2: string): void;
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);
   const method = getServiceMethodOfClient(sdkPackage);
@@ -831,7 +814,6 @@ it("model only used in new version", async () => {
 
   let context = await createSdkContextForTester(program, {
     "api-version": "2023-11-01-preview",
-    emitterName: "@azure-tools/typespec-python",
   });
 
   strictEqual(context.sdkPackage.clients.length, 1);
@@ -846,9 +828,7 @@ it("model only used in new version", async () => {
 
   ({ program } = await SimpleTester.compile(tsp));
 
-  context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  context = await createSdkContextForTester(program);
 
   strictEqual(context.sdkPackage.clients.length, 1);
   strictEqual(context.sdkPackage.clients[0].methods.length, 1);
@@ -887,9 +867,7 @@ it("add client", async () => {
     }
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const versioningClient = sdkPackage.clients.find((x) => x.name === "VersioningServiceClient");
@@ -954,9 +932,7 @@ it("default latest GA version with preview", async () => {
     }
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkVersionsEnum = context.sdkPackage.enums[0];
   strictEqual(sdkVersionsEnum.name, "Versions");
   strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
@@ -991,9 +967,7 @@ it("default latest preview version with GA", async () => {
     }
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkVersionsEnum = context.sdkPackage.enums[0];
   strictEqual(sdkVersionsEnum.name, "Versions");
   strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
@@ -1033,7 +1007,6 @@ it("specify api version with preview filter", async () => {
   );
   const context = await createSdkContextForTester(program, {
     "api-version": "2024-10-01",
-    emitterName: "@azure-tools/typespec-python",
   });
   const sdkVersionsEnum = context.sdkPackage.enums[0];
   strictEqual(sdkVersionsEnum.name, "Versions");
@@ -1084,7 +1057,6 @@ it("multiple clients", async () => {
   let { program } = await SimpleTester.compile(tsp);
   let context = await createSdkContextForTester(program, {
     "api-version": "v1",
-    emitterName: "@azure-tools/typespec-python",
   });
 
   let clients = listClients(context);
@@ -1099,7 +1071,6 @@ it("multiple clients", async () => {
   ({ program } = await SimpleTester.compile(tsp));
   context = await createSdkContextForTester(program, {
     "api-version": "v2",
-    emitterName: "@azure-tools/typespec-python",
   });
 
   clients = listClients(context);
@@ -1124,7 +1095,6 @@ it("multiple clients", async () => {
   ({ program } = await SimpleTester.compile(tsp));
   context = await createSdkContextForTester(program, {
     "api-version": "v3",
-    emitterName: "@azure-tools/typespec-python",
   });
 
   clients = listClients(context);
@@ -1175,7 +1145,6 @@ it("multiple operation groups", async () => {
   let { program } = await SimpleTester.compile(tsp);
   let context = await createSdkContextForTester(program, {
     "api-version": "v1",
-    emitterName: "@azure-tools/typespec-python",
   });
 
   let clients = listClients(context);
@@ -1194,7 +1163,6 @@ it("multiple operation groups", async () => {
   ({ program } = await SimpleTester.compile(tsp));
   context = await createSdkContextForTester(program, {
     "api-version": "v2",
-    emitterName: "@azure-tools/typespec-python",
   });
 
   clients = listClients(context);
@@ -1219,7 +1187,6 @@ it("multiple operation groups", async () => {
   ({ program } = await SimpleTester.compile(tsp));
   context = await createSdkContextForTester(program, {
     "api-version": "v3",
-    emitterName: "@azure-tools/typespec-python",
   });
 
   clients = listClients(context);
@@ -1266,9 +1233,7 @@ it("filter preview versions with @previewVersion decorator", async () => {
     }
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkVersionsEnum = context.sdkPackage.enums[0];
   strictEqual(sdkVersionsEnum.name, "Versions");
   strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
@@ -1309,9 +1274,7 @@ it("filter preview versions with both @previewVersion decorator and regex", asyn
     }
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkVersionsEnum = context.sdkPackage.enums[0];
   strictEqual(sdkVersionsEnum.name, "Versions");
   strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
@@ -1350,9 +1313,7 @@ it("do not filter preview versions when default API version is preview", async (
     }
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkVersionsEnum = context.sdkPackage.enums[0];
   strictEqual(sdkVersionsEnum.name, "Versions");
   strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
@@ -1413,7 +1374,6 @@ it("version not exist", async () => {
 
   const context = await createSdkContextForTester(program, {
     "api-version": "v4",
-    emitterName: "@azure-tools/typespec-python",
   });
 
   expectDiagnostics(diagnostics, {

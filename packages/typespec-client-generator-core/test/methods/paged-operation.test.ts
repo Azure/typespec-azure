@@ -4,14 +4,14 @@ import { SdkMethodParameter } from "../../src/interfaces.js";
 import { getPropertySegmentsFromModelOrParameters } from "../../src/methods.js";
 import {
   AzureCoreTester,
-  AzureCoreServiceTester,
+  AzureCoreTesterWithService,
   createSdkContextForTester,
-  SimpleTesterWithBuiltInService,
+  SimpleTesterWithService,
 } from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
 it("normal paged result", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): ListTestResult;
     model ListTestResult {
@@ -24,9 +24,7 @@ it("normal paged result", async () => {
       id: string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
@@ -43,7 +41,7 @@ it("normal paged result", async () => {
 });
 
 it("normal paged result with next link in header", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): ListTestResult;
     model ListTestResult {
@@ -57,9 +55,7 @@ it("normal paged result with next link in header", async () => {
       id: string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
@@ -75,7 +71,7 @@ it("normal paged result with next link in header", async () => {
 });
 
 it("normal paged result in anonymous model with header", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): {
       @pageItems
@@ -87,9 +83,7 @@ it("normal paged result in anonymous model with header", async () => {
       id: string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
@@ -103,7 +97,7 @@ it("normal paged result in anonymous model with header", async () => {
 });
 
 it("nullable paged result", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): ListTestResult | NotFoundResponse;
     model ListTestResult {
@@ -116,9 +110,7 @@ it("nullable paged result", async () => {
       id: string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
@@ -134,7 +126,7 @@ it("nullable paged result", async () => {
 });
 
 it("normal paged result with encoded name", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): ListTestResult;
     model ListTestResult {
@@ -149,9 +141,7 @@ it("normal paged result with encoded name", async () => {
       id: string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
@@ -167,7 +157,7 @@ it("normal paged result with encoded name", async () => {
 });
 
 it("normal paged result with nested paging value", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): ListTestResult;
     model ListTestResult {
@@ -184,9 +174,7 @@ it("normal paged result with nested paging value", async () => {
       id: string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
@@ -209,7 +197,7 @@ it("normal paged result with nested paging value", async () => {
 });
 
 it("normal paged result with deeply nested paging value", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): ListTestResult;
     model ListTestResult {
@@ -232,9 +220,7 @@ it("normal paged result with deeply nested paging value", async () => {
       id: string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
@@ -275,7 +261,7 @@ it("normal paged result with deeply nested paging value", async () => {
 });
 
 it("normal paged result with nested continuation token", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(@continuationToken @query token?: string): ListTestResult;
     model ListTestResult {
@@ -292,9 +278,7 @@ it("normal paged result with nested continuation token", async () => {
       id: string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
@@ -323,7 +307,7 @@ it("normal paged result with nested continuation token", async () => {
 });
 
 it("normal paged result with asymmetric nesting", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): ListTestResult;
     model ListTestResult {
@@ -340,9 +324,7 @@ it("normal paged result with asymmetric nesting", async () => {
       id: string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
@@ -369,7 +351,7 @@ it("normal paged result with asymmetric nesting", async () => {
 
 describe("common paging with continuation token", () => {
   it("continuation token in response body and query parameter", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       @list
       op test(@continuationToken @query token?: string): ListTestResult;
       model ListTestResult {
@@ -382,9 +364,7 @@ describe("common paging with continuation token", () => {
         prop: string;
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-java",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.name, "test");
@@ -404,7 +384,7 @@ describe("common paging with continuation token", () => {
   });
 
   it("continuation token in response body and header parameter", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       @list
       op test(@continuationToken @header token?: string): ListTestResult;
       model ListTestResult {
@@ -417,9 +397,7 @@ describe("common paging with continuation token", () => {
         prop: string;
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-java",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.name, "test");
@@ -438,7 +416,7 @@ describe("common paging with continuation token", () => {
   });
 
   it("continuation token in response body and body parameter", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       @list
       op test(@continuationToken token?: string): ListTestResult;
       model ListTestResult {
@@ -451,9 +429,7 @@ describe("common paging with continuation token", () => {
         prop: string;
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-java",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.name, "test");
@@ -472,7 +448,7 @@ describe("common paging with continuation token", () => {
   });
 
   it("continuation token in response header and query parameter", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       @list
       op test(@continuationToken @query token?: string): ListTestResult;
       model ListTestResult {
@@ -486,9 +462,7 @@ describe("common paging with continuation token", () => {
         prop: string;
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-java",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.name, "test");
@@ -507,7 +481,7 @@ describe("common paging with continuation token", () => {
   });
 
   it("continuation token in response header and header parameter", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       @list
       op test(@continuationToken @header token?: string): ListTestResult;
       model ListTestResult {
@@ -521,9 +495,7 @@ describe("common paging with continuation token", () => {
         prop: string;
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-java",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.name, "test");
@@ -542,7 +514,7 @@ describe("common paging with continuation token", () => {
   });
 
   it("continuation token in response header and body parameter", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       @list
       op test(@continuationToken token?: string): ListTestResult;
       model ListTestResult {
@@ -556,9 +528,7 @@ describe("common paging with continuation token", () => {
         prop: string;
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-java",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.name, "test");
@@ -577,7 +547,7 @@ describe("common paging with continuation token", () => {
   });
 
   it("continuation token with @override", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       @list
       op test(...Options): ListTestResult;
 
@@ -601,9 +571,7 @@ describe("common paging with continuation token", () => {
         prop: string;
       }
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-java",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.name, "test");
@@ -632,7 +600,7 @@ describe("common paging with continuation token", () => {
 });
 
 it("getPropertySegmentsFromModelOrParameters test for nested case", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     op test(): Test;
     model Test {
       a: {
@@ -645,9 +613,7 @@ it("getPropertySegmentsFromModelOrParameters test for nested case", async () => 
       };
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const testModel = context.sdkPackage.models[0];
   const aProperty = testModel.properties[0];
   const bProperty = testModel.properties[1];
@@ -669,7 +635,7 @@ it("getPropertySegmentsFromModelOrParameters test for nested case", async () => 
 });
 
 it("getPropertySegmentsFromModelOrParameters test for nested case of parameter", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     op test(param: Test): Test;
     model Test {
       a: {
@@ -682,9 +648,7 @@ it("getPropertySegmentsFromModelOrParameters test for nested case of parameter",
       };
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const testModel = context.sdkPackage.models[0];
   const aProperty = testModel.properties[0];
   const bProperty = testModel.properties[1];
@@ -695,8 +659,7 @@ it("getPropertySegmentsFromModelOrParameters test for nested case of parameter",
   strictEqual(bProperty.type.kind, "model");
   const bDProperty = bProperty.type.properties[0];
 
-  const parameters = context.sdkPackage.clients[0].methods[0]
-    .parameters as SdkMethodParameter[];
+  const parameters = context.sdkPackage.clients[0].methods[0].parameters as SdkMethodParameter[];
   deepStrictEqual(
     getPropertySegmentsFromModelOrParameters(parameters, (p) => p === aBAProperty),
     [parameters[0], aProperty, aBProperty, aBAProperty],
@@ -708,7 +671,7 @@ it("getPropertySegmentsFromModelOrParameters test for nested case of parameter",
 });
 
 it("unbranded next link with re-injected parameters", async () => {
-  const { program } = await AzureCoreServiceTester.compile(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     model TestOptions {
       @query
       includePending?: boolean;
@@ -731,9 +694,7 @@ it("unbranded next link with re-injected parameters", async () => {
       id: string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
@@ -754,7 +715,7 @@ it("unbranded next link with re-injected parameters", async () => {
 });
 
 it("unbranded next link with mix of re-injected parameters and not", async () => {
-  const { program } = await AzureCoreServiceTester.compile(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     model IncludePendingOptions {
       @query
       includePending?: boolean;
@@ -782,9 +743,7 @@ it("unbranded next link with mix of re-injected parameters and not", async () =>
       @query select: string,
     ): ParameterizedNextLinkPagingResult;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
@@ -831,9 +790,7 @@ it("unbranded next link with reinjected parameters with versioning", async () =>
       id: string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
@@ -849,7 +806,7 @@ it("unbranded next link with reinjected parameters with versioning", async () =>
 });
 
 it("paged result with intersection", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): ListTestResult & { @header h: string; };
     model ListTestResult {
@@ -862,9 +819,7 @@ it("paged result with intersection", async () => {
       id: string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
@@ -880,7 +835,7 @@ it("paged result with intersection", async () => {
 });
 
 it("paged result with body root", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): TestResponse<ListTestResult>;
     model ListTestResult {
@@ -902,9 +857,7 @@ it("paged result with body root", async () => {
       body: ResponseBody;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
@@ -920,7 +873,7 @@ it("paged result with body root", async () => {
 });
 
 it("next link with body root and inheritance", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): TestResponse<ListTestResult>;
 
@@ -946,9 +899,7 @@ it("next link with body root and inheritance", async () => {
       body: ResponseBody;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
@@ -967,7 +918,7 @@ it("next link with body root and inheritance", async () => {
 });
 
 it("@pageSize parameter check", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Page<T> {
       @pageItems items: T[];
     }
@@ -976,9 +927,7 @@ it("@pageSize parameter check", async () => {
     }
     @list op listPets(@pageIndex page: int32, @pageSize size: int8): Page<Pet>;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "listPets");
@@ -990,7 +939,7 @@ it("@pageSize parameter check", async () => {
 });
 
 it("@pageSize nested parameter check", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model PaginationSection {
       @pageSize pageSize: int8;
       @pageIndex pageIndex: int32;
@@ -1003,9 +952,7 @@ it("@pageSize nested parameter check", async () => {
     }
     @list op listPets(pagination: PaginationSection): Page<Pet>;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "listPets");
@@ -1022,7 +969,7 @@ it("@pageSize nested parameter check", async () => {
 });
 
 it("paged result with nextLinkVerb decorator POST", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST")
     @list
     op test(): ListTestResult;
@@ -1036,9 +983,7 @@ it("paged result with nextLinkVerb decorator POST", async () => {
       id: string;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");

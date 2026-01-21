@@ -1,5 +1,6 @@
 import { Program, resolvePath } from "@typespec/compiler";
-import { createTester, resolveVirtualPath } from "@typespec/compiler/testing";
+import { createTester, resolveVirtualPath, t } from "@typespec/compiler/testing";
+import { TemplateWithMarkers } from "../../../core/packages/compiler/src/testing/marked-template.js";
 import { createSdkContext, CreateSdkContextOptions } from "../src/context.js";
 import { BrandedSdkEmitterOptionsInterface } from "../src/internal-utils.js";
 
@@ -8,9 +9,9 @@ export interface SdkTesterOptions extends BrandedSdkEmitterOptionsInterface {
 }
 
 /**
- * Base tester for TCGC tests. Loads the core libraries needed for TCGC testing.
+ * Simple base tester. Loads the core libraries needed for TCGC testing.
  */
-export const TcgcTester = createTester(resolvePath(import.meta.dirname, ".."), {
+export const SimpleBaseTester = createTester(resolvePath(import.meta.dirname, ".."), {
   libraries: [
     "@typespec/http",
     "@typespec/rest",
@@ -22,7 +23,7 @@ export const TcgcTester = createTester(resolvePath(import.meta.dirname, ".."), {
 /**
  * Simple tester with common imports and usings for TCGC testing.
  */
-export const SimpleTester = TcgcTester.import(
+export const SimpleTester = SimpleBaseTester.import(
   "@typespec/http",
   "@typespec/rest",
   "@typespec/versioning",
@@ -32,9 +33,9 @@ export const SimpleTester = TcgcTester.import(
 /**
  * Tester with a built-in simple service namespace.
  */
-export const SimpleTesterWithBuiltInService = SimpleTester.wrap(
+export const SimpleTesterWithService = SimpleTester.wrap(
   (x) => `
-@service
+@service(#{title: "Test Service"})
 namespace TestService;
 
 ${x}
@@ -44,7 +45,7 @@ ${x}
 /**
  * Tester with a built-in versioned service namespace.
  */
-export const VersionedServiceTester = SimpleTester.wrap(
+export const SimpleTesterWithVersionedService = SimpleTester.wrap(
   (x) => `
 @service
 @versioned(ServiceVersions)
@@ -67,15 +68,14 @@ ${x}
 );
 
 /**
- * Tester for TCGC tests with Azure Core library support.
+ * XML tester with XML library support
  */
-export const AzureCoreTester = createTester(resolvePath(import.meta.dirname, ".."), {
+export const XmlTester = createTester(resolvePath(import.meta.dirname, ".."), {
   libraries: [
     "@typespec/http",
     "@typespec/rest",
     "@typespec/versioning",
-    "@typespec/openapi",
-    "@azure-tools/typespec-azure-core",
+    "@typespec/xml",
     "@azure-tools/typespec-client-generator-core",
   ],
 })
@@ -83,21 +83,22 @@ export const AzureCoreTester = createTester(resolvePath(import.meta.dirname, "..
     "@typespec/http",
     "@typespec/rest",
     "@typespec/versioning",
-    "@azure-tools/typespec-azure-core",
+    "@typespec/xml",
     "@azure-tools/typespec-client-generator-core",
   )
-  .using(
-    "Http",
-    "Rest",
-    "Versioning",
-    "Azure.Core",
-    "Azure.Core.Traits",
-    "Azure.ClientGenerator.Core",
-  );
+  .using("Http", "Rest", "Versioning", "Xml", "Azure.ClientGenerator.Core");
+
+export const XmlTesterWithBuiltInService = XmlTester.wrap(
+  (x) => `
+@service
+namespace TestService;
+
+${x}
+`,
+);
 
 /**
  * Base tester for TCGC tests with Azure Core libraries loaded but no auto-imports/usings.
- * Use this for multi-file tests where files have explicit imports.
  */
 export const AzureCoreBaseTester = createTester(resolvePath(import.meta.dirname, ".."), {
   libraries: [
@@ -111,58 +112,27 @@ export const AzureCoreBaseTester = createTester(resolvePath(import.meta.dirname,
 });
 
 /**
- * Helper to create multi-file test input for main.tsp + client.tsp scenarios.
- * Automatically adds common imports and usings to both files.
- *
- * @example
- * ```ts
- * const { program } = await TcgcTester.compile(
- *   createTcgcMultiFileInput({
- *     "main.tsp": `
- *       @service
- *       namespace MyService;
- *       op test(): void;
- *     `,
- *     "client.tsp": `
- *       @client({ name: "MyClient", service: MyService })
- *       namespace MyClient {}
- *     `,
- *   })
- * );
- * ```
+ * Tester for TCGC tests with Azure Core library support.
  */
-export function createTcgcMultiFileInput(files: { "main.tsp": string; "client.tsp": string }): {
-  "main.tsp": string;
-  "client.tsp": string;
-} {
-  return {
-    "main.tsp": `
-import "@typespec/http";
-import "@typespec/rest";
-import "@typespec/versioning";
-import "@azure-tools/typespec-client-generator-core";
-import "./client.tsp";
-using TypeSpec.Http;
-using TypeSpec.Rest;
-using TypeSpec.Versioning;
-using Azure.ClientGenerator.Core;
-
-${files["main.tsp"]}
-`,
-    "client.tsp": `
-import "./main.tsp";
-import "@azure-tools/typespec-client-generator-core";
-using Azure.ClientGenerator.Core;
-
-${files["client.tsp"]}
-`,
-  };
-}
+export const AzureCoreTester = AzureCoreBaseTester.import(
+  "@typespec/http",
+  "@typespec/rest",
+  "@typespec/versioning",
+  "@azure-tools/typespec-azure-core",
+  "@azure-tools/typespec-client-generator-core",
+).using(
+  "Http",
+  "Rest",
+  "Versioning",
+  "Azure.Core",
+  "Azure.Core.Traits",
+  "Azure.ClientGenerator.Core",
+);
 
 /**
  * Tester with a built-in Azure Core service namespace.
  */
-export const AzureCoreServiceTester = AzureCoreTester.wrap(
+export const AzureCoreTesterWithService = AzureCoreTester.wrap(
   (x) => `
 @server("http://localhost:3000", "endpoint")
 @service
@@ -208,7 +178,7 @@ export const ArmTester = createTester(resolvePath(import.meta.dirname, ".."), {
 /**
  * Tester with a built-in Azure Resource Manager service namespace.
  */
-export const ArmServiceTester = ArmTester.wrap(
+export const ArmTesterWithService = ArmTester.wrap(
   (x) => `
 @armProviderNamespace("My.Service")
 @server("http://localhost:3000", "endpoint")
@@ -226,6 +196,56 @@ enum Versions {
 ${x}
 `,
 );
+
+/**
+ * Helper to create client customization test input.
+ * Automatically adds common imports and usings to both files.
+ */
+export function createClientCustomizationInput(
+  main: string | TemplateWithMarkers<any>,
+  client: string | TemplateWithMarkers<any>,
+  additionalImports: string[] = [],
+  additionalUsings: string[] = [],
+): {
+  "main.tsp": TemplateWithMarkers<any>;
+  "client.tsp": TemplateWithMarkers<any>;
+} {
+  const mainCode = TemplateWithMarkers.is(main) ? main.code : main;
+  const clientCode = TemplateWithMarkers.is(client) ? client.code : client;
+
+  return {
+    "main.tsp": t.code`
+import "@typespec/http";
+import "@typespec/rest";
+import "@typespec/versioning";
+import "@azure-tools/typespec-client-generator-core";
+${additionalImports.map((x) => `import "${x}";`).join("\n")}
+import "./client.tsp";
+using TypeSpec.Http;
+using TypeSpec.Rest;
+using TypeSpec.Versioning;
+using Azure.ClientGenerator.Core;
+${additionalUsings.map((x) => `using ${x};`).join("\n")}
+
+${mainCode}
+`,
+    "client.tsp": t.code`
+import "./main.tsp";
+import "@typespec/http";
+import "@typespec/rest";
+import "@typespec/versioning";
+import "@azure-tools/typespec-client-generator-core";
+${additionalImports.map((x) => `import "${x}";`).join("\n")}
+using TypeSpec.Http;
+using TypeSpec.Rest;
+using TypeSpec.Versioning;
+using Azure.ClientGenerator.Core;
+${additionalUsings.map((x) => `using ${x};`).join("\n")}
+
+${clientCode}
+`,
+  };
+}
 
 /**
  * Helper function to create an SDK context for tester-based tests.
@@ -247,7 +267,7 @@ export function createSdkContextForTester(
       emitterOutputDir: resolveVirtualPath("tsp-output"),
       options: options,
     },
-    options.emitterName ?? "@azure-tools/typespec-csharp",
+    options.emitterName ?? "@azure-tools/typespec-python",
     createSdkContextOption,
   );
 }

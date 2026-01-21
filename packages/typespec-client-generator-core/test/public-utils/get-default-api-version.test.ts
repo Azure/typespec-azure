@@ -15,9 +15,7 @@ it("get single", async () => {
     @service
     namespace MyService {};
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const serviceNamespace = listAllServiceNamespaces(context)[0];
   const defaultApiVersion = getDefaultApiVersion(context, serviceNamespace);
   ok(defaultApiVersion);
@@ -36,9 +34,7 @@ it("get multiple date incorrect ordering", async () => {
     @service
     namespace MyService {};
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const serviceNamespace = listAllServiceNamespaces(context)[0];
   const defaultApiVersion = getDefaultApiVersion(context, serviceNamespace);
   ok(defaultApiVersion);
@@ -57,9 +53,7 @@ it("get multiple date correct ordering", async () => {
     @service
     namespace MyService {};
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const serviceNamespace = listAllServiceNamespaces(context)[0];
   const defaultApiVersion = getDefaultApiVersion(context, serviceNamespace);
   ok(defaultApiVersion);
@@ -78,9 +72,7 @@ it("get multiple semantic incorrect", async () => {
     @service
     namespace MyService {};
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const serviceNamespace = listAllServiceNamespaces(context)[0];
   const defaultApiVersion = getDefaultApiVersion(context, serviceNamespace);
   ok(defaultApiVersion);
@@ -99,9 +91,7 @@ it("get multiple semantic correct", async () => {
     @service
     namespace MyService {};
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const serviceNamespace = listAllServiceNamespaces(context)[0];
   const defaultApiVersion = getDefaultApiVersion(context, serviceNamespace);
   ok(defaultApiVersion);
@@ -113,9 +103,7 @@ it("get undefined", async () => {
     @service
     namespace MyService {};
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const serviceNamespace = listAllServiceNamespaces(context)[0];
   ok(!getDefaultApiVersion(context, serviceNamespace));
 });
@@ -129,9 +117,7 @@ it("get empty", async () => {
     @service
     namespace MyService {};
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const serviceNamespace = listAllServiceNamespaces(context)[0];
   ok(!getDefaultApiVersion(context, serviceNamespace));
 });
@@ -149,7 +135,6 @@ it("get with all", async () => {
   `);
   const context = await createSdkContextForTester(program, {
     "api-version": "all",
-    emitterName: "@azure-tools/typespec-python",
   });
   const defaultApiVersion = getDefaultApiVersion(context, MyService as Namespace);
   ok(defaultApiVersion);
@@ -170,7 +155,6 @@ it("get with latest", async () => {
   `);
   const context = await createSdkContextForTester(program, {
     "api-version": "latest",
-    emitterName: "@azure-tools/typespec-python",
   });
   const defaultApiVersion = getDefaultApiVersion(context, MyService as Namespace);
   ok(defaultApiVersion);
@@ -191,7 +175,6 @@ it("get with specific version", async () => {
   `);
   const context = await createSdkContextForTester(program, {
     "api-version": "1.0.1",
-    emitterName: "@azure-tools/typespec-python",
   });
   const defaultApiVersion = getDefaultApiVersion(context, MyService as Namespace);
   ok(defaultApiVersion);

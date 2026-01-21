@@ -1,45 +1,37 @@
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { isReadOnly } from "../../src/types.js";
-import {
-  createSdkContextForTester,
-  SimpleTester,
-  SimpleTesterWithBuiltInService,
-} from "../tester.js";
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 import { getSdkModelPropertyTypeHelper } from "./utils.js";
 
 it("required", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       name: string | int32;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const prop = getSdkModelPropertyTypeHelper(context);
   strictEqual(prop.optional, false);
   strictEqual(isReadOnly(prop), false);
 });
 
 it("optional", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       name?: string;
     }
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const prop = getSdkModelPropertyTypeHelper(context);
   strictEqual(prop.optional, true);
 });
 
 it("readonly", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       @visibility(Lifecycle.Read)
@@ -47,15 +39,13 @@ it("readonly", async function () {
     }
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const prop = getSdkModelPropertyTypeHelper(context);
   strictEqual(isReadOnly(prop), true);
 });
 
 it("not readonly", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       @visibility(Lifecycle.Read, Lifecycle.Create, Lifecycle.Update)
@@ -63,24 +53,20 @@ it("not readonly", async function () {
     }
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const prop = getSdkModelPropertyTypeHelper(context);
   strictEqual(isReadOnly(prop), false);
 });
 
 it("union type", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       name: string | int32;
     }
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const prop = getSdkModelPropertyTypeHelper(context);
   strictEqual(prop.kind, "property");
   const sdkType = prop.type;
@@ -115,7 +101,6 @@ it("versioning", async function () {
   `);
   const context = await createSdkContextForTester(program, {
     "api-version": "all",
-    emitterName: "@azure-tools/typespec-python",
   });
   const sdkModel = context.sdkPackage.models.find((x) => x.kind === "model");
   ok(sdkModel);

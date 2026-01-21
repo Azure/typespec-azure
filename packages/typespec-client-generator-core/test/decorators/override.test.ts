@@ -2,21 +2,17 @@ import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/tes
 import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { UsageFlags } from "../../src/interfaces.js";
-import { AzureCoreTester, createSdkContextForTester, TcgcTester } from "../tester.js";
+import {
+  AzureCoreBaseTester,
+  createClientCustomizationInput,
+  createSdkContextForTester,
+  SimpleBaseTester,
+} from "../tester.js";
 
 it("basic", async () => {
-  const { program } = await TcgcTester.compile({
-    "main.tsp": `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using Http;
-    using Rest;
-    using Versioning;
-    using Azure.ClientGenerator.Core;
-
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     namespace MyService;
     model Params {
@@ -26,26 +22,16 @@ it("basic", async () => {
 
     op func(...Params): void;
     `,
-    "client.tsp": `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using Http;
-    using Rest;
-    using Versioning;
-    using Azure.ClientGenerator.Core;
-
+      `
     namespace MyCustomizations;
 
     op func(params: MyService.Params): void;
 
     @@override(MyService.func, MyCustomizations.func);
     `,
-  });
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+    ),
+  );
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
 
   const paramsModel = sdkPackage.models.find((x) => x.name === "Params");
@@ -71,16 +57,6 @@ it("basic", async () => {
 
 it("basic with scope", async () => {
   const mainCode = `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using Http;
-    using Rest;
-    using Versioning;
-    using Azure.ClientGenerator.Core;
-
     @service
     namespace MyService;
     model Params {
@@ -92,25 +68,15 @@ it("basic with scope", async () => {
     `;
 
   const customizationCode = `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using Http;
-    using Rest;
-    using Versioning;
-    using Azure.ClientGenerator.Core;
-
     namespace MyCustomizations;
 
     op func(params: MyService.Params): void;
 
     @@override(MyService.func, MyCustomizations.func, "csharp");
     `;
-  const { program } = await TcgcTester.compile({
-    "main.tsp": mainCode,
-    "client.tsp": customizationCode,
-  });
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(mainCode, customizationCode),
+  );
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
   });
@@ -143,13 +109,13 @@ it("basic with scope", async () => {
   strictEqual(httpOp.bodyParam.correspondingMethodParams[0], fooParam);
   strictEqual(httpOp.bodyParam.correspondingMethodParams[1], barParam);
 
-  const { program: programCsharp } = await TcgcTester.compile({
-    "main.tsp": mainCode,
-    "client.tsp": customizationCode,
-  });
+  const { program: programCsharp } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(mainCode, customizationCode),
+  );
   const contextCsharp = await createSdkContextForTester(programCsharp, {
     emitterName: "@azure-tools/typespec-csharp",
   });
+  // csharp scope, so should be overridden
   const paramModel = contextCsharp.sdkPackage.models.find((x) => x.name === "Params");
   ok(paramModel);
 
@@ -183,16 +149,6 @@ it("basic with scope", async () => {
 
 it("regrouping", async () => {
   const mainCode = `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using Http;
-    using Rest;
-    using Versioning;
-    using Azure.ClientGenerator.Core;
-
     @service
     namespace MyService;
     model Params {
@@ -205,15 +161,6 @@ it("regrouping", async () => {
     `;
 
   const customizationCode = `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using Http;
-    using Rest;
-    using Versioning;
-    using Azure.ClientGenerator.Core;
-
     namespace MyCustomizations;
 
     model ParamsCustomized {
@@ -224,13 +171,14 @@ it("regrouping", async () => {
 
     @@override(MyService.func, MyCustomizations.func);
     `;
-  const { program } = await TcgcTester.compile({
-    "main.tsp": mainCode,
-    "client.tsp": customizationCode,
-  });
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(mainCode, customizationCode),
+  );
   const context = await createSdkContextForTester(program, {
     emitterName: "@azure-tools/typespec-python",
   });
+
+  // runner has python scope, so shouldn't be overridden
 
   const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
@@ -270,16 +218,6 @@ it("regrouping", async () => {
 
 it("remove optional parameter", async () => {
   const mainCode = `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using Http;
-    using Rest;
-    using Versioning;
-    using Azure.ClientGenerator.Core;
-
     @service
     namespace MyService;
     model Params {
@@ -291,15 +229,6 @@ it("remove optional parameter", async () => {
     `;
 
   const customizationCode = `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using Http;
-    using Rest;
-    using Versioning;
-    using Azure.ClientGenerator.Core;
-
     namespace MyCustomizations;
 
     model ParamsCustomized {
@@ -310,19 +239,15 @@ it("remove optional parameter", async () => {
 
     @@override(MyService.func, MyCustomizations.func);
     `;
-  const [, diagnostics] = await TcgcTester.compileAndDiagnose({
-    "main.tsp": mainCode,
-    "client.tsp": customizationCode,
-  });
+  const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(mainCode, customizationCode),
+  );
   expectDiagnosticEmpty(diagnostics);
 
-  const { program } = await TcgcTester.compile({
-    "main.tsp": mainCode,
-    "client.tsp": customizationCode,
-  });
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(mainCode, customizationCode),
+  );
+  const context = await createSdkContextForTester(program);
 
   ok(context.sdkPackage.models.find((x) => x.name === "Params"));
   const sdkPackage = context.sdkPackage;
@@ -351,16 +276,6 @@ it("remove optional parameter", async () => {
 
 it("remove optional parameter flip", async () => {
   const mainCode = `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using Http;
-    using Rest;
-    using Versioning;
-    using Azure.ClientGenerator.Core;
-
     @service
     namespace MyService;
     model Params {
@@ -372,15 +287,6 @@ it("remove optional parameter flip", async () => {
     `;
 
   const customizationCode = `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using Http;
-    using Rest;
-    using Versioning;
-    using Azure.ClientGenerator.Core;
-
     namespace MyCustomizations;
 
     model ParamsCustomized {
@@ -391,19 +297,11 @@ it("remove optional parameter flip", async () => {
 
     @@override(MyService.func, MyCustomizations.func);
     `;
-  const [, diagnostics] = await TcgcTester.compileAndDiagnose({
-    "main.tsp": mainCode,
-    "client.tsp": customizationCode,
-  });
+  const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(mainCode, customizationCode),
+  );
+  const context = await createSdkContextForTester(program);
   expectDiagnosticEmpty(diagnostics);
-
-  const { program } = await TcgcTester.compile({
-    "main.tsp": mainCode,
-    "client.tsp": customizationCode,
-  });
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
 
   ok(context.sdkPackage.models.find((x) => x.name === "Params"));
   const sdkPackage = context.sdkPackage;
@@ -432,16 +330,6 @@ it("remove optional parameter flip", async () => {
 
 it("params mismatch but same type", async () => {
   const mainCode = `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using Http;
-    using Rest;
-    using Versioning;
-    using Azure.ClientGenerator.Core;
-
     @service
     namespace MyService;
     model Params {
@@ -453,15 +341,6 @@ it("params mismatch but same type", async () => {
     `;
 
   const customizationCode = `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using Http;
-    using Rest;
-    using Versioning;
-    using Azure.ClientGenerator.Core;
-
     namespace MyCustomizations;
 
     model ParamsCustomized {
@@ -473,25 +352,15 @@ it("params mismatch but same type", async () => {
 
     @@override(MyService.func, MyCustomizations.func);
     `;
-  const [, diagnostics] = await TcgcTester.compileAndDiagnose({
-    "main.tsp": mainCode,
-    "client.tsp": customizationCode,
-  });
+  const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(mainCode, customizationCode),
+  );
+
   strictEqual(diagnostics.length, 0);
 });
 
 it("remove required parameter", async () => {
   const mainCode = `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using Http;
-    using Rest;
-    using Versioning;
-    using Azure.ClientGenerator.Core;
-
     @service
     namespace MyService;
     model Params {
@@ -503,15 +372,6 @@ it("remove required parameter", async () => {
     `;
 
   const customizationCode = `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using Http;
-    using Rest;
-    using Versioning;
-    using Azure.ClientGenerator.Core;
-
     namespace MyCustomizations;
 
     model ParamsCustomized {
@@ -522,10 +382,9 @@ it("remove required parameter", async () => {
 
     @@override(MyService.func, MyCustomizations.func);
     `;
-  const [, diagnostics] = await TcgcTester.compileAndDiagnose({
-    "main.tsp": mainCode,
-    "client.tsp": customizationCode,
-  });
+  const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(mainCode, customizationCode),
+  );
   expectDiagnostics(diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/override-parameters-mismatch",
     message:
@@ -534,18 +393,9 @@ it("remove required parameter", async () => {
 });
 
 it("recursive params", async () => {
-  const { program } = await TcgcTester.compile({
-    "main.tsp": `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using Http;
-    using Rest;
-    using Versioning;
-    using Azure.ClientGenerator.Core;
-
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     namespace MyService;
     model Params {
@@ -555,26 +405,16 @@ it("recursive params", async () => {
 
     op func(...Params): void;
     `,
-    "client.tsp": `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using Http;
-    using Rest;
-    using Versioning;
-    using Azure.ClientGenerator.Core;
-
+      `
     namespace MyCustomizations;
 
     op func(input: MyService.Params): void;
 
     @@override(MyService.func, MyCustomizations.func);
     `,
-  });
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+    ),
+  );
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
 
   const paramsModel = sdkPackage.models.find((x) => x.name === "Params");
@@ -599,11 +439,14 @@ it("recursive params", async () => {
 });
 
 it("core template", async () => {
-  const { program } = await AzureCoreTester.compile(`
+  const { program } = await AzureCoreBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @server("http://localhost:3000", "endpoint")
     @service
     @versioned(Versions)
-    namespace My.Service {
+    namespace My.Service;
+
       enum Versions { v1  }
 
       model Params {
@@ -616,17 +459,19 @@ it("core template", async () => {
         Params,
         Params
       >;
-    }
+    `,
+      `
+    namespace My.Customizations;
 
-    namespace My.Customizations {
-      op templateOpOverride(params: My.Service.Params, ...Azure.Core.Foundations.ApiVersionParameter): My.Service.Params;
-    }
+    op templateOp(params: My.Service.Params, ...Azure.Core.Foundations.ApiVersionParameter): My.Service.Params;
 
-    @@override(My.Service.templateOp, My.Customizations.templateOpOverride);
-    `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+    @@override(My.Service.templateOp, My.Customizations.templateOp);
+    `,
+      ["@azure-tools/typespec-azure-core"],
+      ["Azure.Core"],
+    ),
+  );
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.parameters.length, 3);
@@ -640,40 +485,21 @@ it("core template", async () => {
 });
 
 it("remove optional query param", async () => {
-  const { program } = await TcgcTester.compile({
-    "main.tsp": `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using Http;
-    using Rest;
-    using Versioning;
-    using Azure.ClientGenerator.Core;
-
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     namespace KeyVault;
 
     op getSecrets(@query("maxresults") maxresults?: int32): void;
     `,
-    "client.tsp": `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using Http;
-    using Rest;
-    using Versioning;
-    using Azure.ClientGenerator.Core;
-
+      `
     op listSecretProperties(): void;
     @@override(KeyVault.getSecrets, listSecretProperties);
     `,
-  });
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+    ),
+  );
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.parameters.length, 0);
@@ -683,18 +509,9 @@ it("remove optional query param", async () => {
 });
 
 it("remove optional query param and add secret name", async () => {
-  const { program } = await TcgcTester.compile({
-    "main.tsp": `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using Http;
-    using Rest;
-    using Versioning;
-    using Azure.ClientGenerator.Core;
-
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     namespace KeyVault;
 
@@ -707,24 +524,14 @@ it("remove optional query param and add secret name", async () => {
       maxresults?: int32
     ): void;
     `,
-    "client.tsp": `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using Http;
-    using Rest;
-    using Versioning;
-    using Azure.ClientGenerator.Core;
-
+      `
     @route("/secrets/{secret-name}/versions")
     op listSecretPropertiesVersions(@path("secret-name") secretName: string): void;
     @@override(KeyVault.getSecretVersions, listSecretPropertiesVersions);
     `,
-  });
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+    ),
+  );
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = sdkPackage.clients[0].methods[0];
   strictEqual(method.parameters.length, 1);
@@ -742,118 +549,48 @@ it("remove optional query param and add secret name", async () => {
 
 describe("@clientName", () => {
   it("original method", async () => {
-    const { program } = await TcgcTester.compile({
-      "main.tsp": `
-      import "@typespec/http";
-      import "@typespec/rest";
-      import "@typespec/versioning";
-      import "@azure-tools/typespec-client-generator-core";
-      import "./client.tsp";
-      using Http;
-      using Rest;
-      using Versioning;
-      using Azure.ClientGenerator.Core;
-
+    const { program } = await SimpleBaseTester.compile(
+      createClientCustomizationInput(
+        `
       @service
       namespace KeyVault;
 
       op getSecret(@query("secret-name") secretName: string): void;
       `,
-      "client.tsp": `
-      import "@typespec/http";
-      import "@typespec/rest";
-      import "@typespec/versioning";
-      import "@azure-tools/typespec-client-generator-core";
-      using Http;
-      using Rest;
-      using Versioning;
-      using Azure.ClientGenerator.Core;
-
+        `
       op getSecretOverride(@query("secret-name") secretName: string): void;
       @@override(KeyVault.getSecret, getSecretOverride);
       @@clientName(KeyVault.getSecret, "listSecretProperties");
       `,
-    });
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+      ),
+    );
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const method = sdkPackage.clients[0].methods[0];
     strictEqual(method.parameters.length, 1);
     strictEqual(method.name, "listSecretProperties");
   });
   it("override method", async () => {
-    const [, diagnostics] = await TcgcTester.compileAndDiagnose({
-      "main.tsp": `
-      import "@typespec/http";
-      import "@typespec/rest";
-      import "@typespec/versioning";
-      import "@azure-tools/typespec-client-generator-core";
-      import "./client.tsp";
-      using Http;
-      using Rest;
-      using Versioning;
-      using Azure.ClientGenerator.Core;
-
+    const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
+        `
       @service
       namespace KeyVault;
 
       op getSecret(@query("secret-name") secretName: string): void;
       `,
-      "client.tsp": `
-      import "@typespec/http";
-      import "@typespec/rest";
-      import "@typespec/versioning";
-      import "@azure-tools/typespec-client-generator-core";
-      using Http;
-      using Rest;
-      using Versioning;
-      using Azure.ClientGenerator.Core;
-
+        `
       op getSecretOverride(@query("secret-name") secretName: string): void;
       @@override(KeyVault.getSecret, getSecretOverride);
       @@clientName(getSecretOverride, "listSecretProperties");
       `,
-    });
+      ),
+    );
+    const context = await createSdkContextForTester(program);
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/client-name-ineffective",
       message:
         'Application of @clientName decorator to listSecretProperties is not effective because it is applied to the override method. Please apply it on the original method definition "getSecret" instead.',
-    });
-    const [{ program }] = await TcgcTester.compileAndDiagnose({
-      "main.tsp": `
-      import "@typespec/http";
-      import "@typespec/rest";
-      import "@typespec/versioning";
-      import "@azure-tools/typespec-client-generator-core";
-      import "./client.tsp";
-      using Http;
-      using Rest;
-      using Versioning;
-      using Azure.ClientGenerator.Core;
-
-      @service
-      namespace KeyVault;
-
-      op getSecret(@query("secret-name") secretName: string): void;
-      `,
-      "client.tsp": `
-      import "@typespec/http";
-      import "@typespec/rest";
-      import "@typespec/versioning";
-      import "@azure-tools/typespec-client-generator-core";
-      using Http;
-      using Rest;
-      using Versioning;
-      using Azure.ClientGenerator.Core;
-
-      op getSecretOverride(@query("secret-name") secretName: string): void;
-      @@override(KeyVault.getSecret, getSecretOverride);
-      @@clientName(getSecretOverride, "listSecretProperties");
-      `,
-    });
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
     });
     const sdkPackage = context.sdkPackage;
     const method = sdkPackage.clients[0].methods[0];
@@ -862,33 +599,15 @@ describe("@clientName", () => {
   });
 
   it("override parameter", async () => {
-    const { program } = await TcgcTester.compile({
-      "main.tsp": `
-      import "@typespec/http";
-      import "@typespec/rest";
-      import "@typespec/versioning";
-      import "@azure-tools/typespec-client-generator-core";
-      import "./client.tsp";
-      using Http;
-      using Rest;
-      using Versioning;
-      using Azure.ClientGenerator.Core;
-
+    const { program } = await SimpleBaseTester.compile(
+      createClientCustomizationInput(
+        `
       @service
       namespace KeyVault;
 
       op getSecret(@query("secret-name") secretName: string): void;
       `,
-      "client.tsp": `
-      import "@typespec/http";
-      import "@typespec/rest";
-      import "@typespec/versioning";
-      import "@azure-tools/typespec-client-generator-core";
-      using Http;
-      using Rest;
-      using Versioning;
-      using Azure.ClientGenerator.Core;
-
+        `
       alias OverrideParameters = {
         @query("secret-name") secretName: string,
       };
@@ -897,10 +616,9 @@ describe("@clientName", () => {
       @@override(KeyVault.getSecret, getSecretOverride);
       @@clientName(OverrideParameters.secretName, "secretNameOverride");
       `,
-    });
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+      ),
+    );
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const method = sdkPackage.clients[0].methods[0];
     strictEqual(method.parameters.length, 1);

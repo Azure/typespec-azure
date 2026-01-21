@@ -5,11 +5,11 @@ import { InitializedByFlags } from "../../src/interfaces.js";
 import {
   ArmTester,
   AzureCoreTester,
+  createClientCustomizationInput,
   createSdkContextForTester,
-  createTcgcMultiFileInput,
+  SimpleBaseTester,
   SimpleTester,
-  SimpleTesterWithBuiltInService,
-  TcgcTester,
+  SimpleTesterWithService,
 } from "../tester.js";
 
 it("normal client", async () => {
@@ -27,9 +27,7 @@ it("normal client", async () => {
     op pet(): void;
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -44,7 +42,7 @@ it("normal client", async () => {
   strictEqual(methods[1].name, "pet");
 });
 
-it("arm client with operation groups", { timeout: 30000 }, async () => {
+it("arm client with operation groups", async () => {
   const { program } = await ArmTester.compile(`
     @armProviderNamespace("My.Service")
     @server("http://localhost:3000", "endpoint")
@@ -73,9 +71,7 @@ it("arm client with operation groups", { timeout: 30000 }, async () => {
     }
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -137,9 +133,7 @@ it("client with sub clients", async () => {
     }
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -187,9 +181,9 @@ it("client with sub clients", async () => {
 });
 
 it("client with sub client and sub client has extra initialization paramters", async () => {
-  const { program } = await TcgcTester.compile(
-    createTcgcMultiFileInput({
-      "main.tsp": `
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
         @service(#{
           title: "Azure AI Face API",
         })
@@ -205,7 +199,7 @@ it("client with sub client and sub client has extra initialization paramters", a
           op getLargePersonGroup(@query largePersonGroupId: string): void;
         }
       `,
-      "client.tsp": `
+      `
         @client(
           {
             name: "FaceAdministrationClient",
@@ -234,11 +228,9 @@ it("client with sub client and sub client has extra initialization paramters", a
           }
         }
       `,
-    }),
+    ),
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -271,9 +263,9 @@ it("client with sub client and sub client has extra initialization paramters", a
 });
 
 it("client with sub client and sub client can also be initialized individually", async () => {
-  const { program } = await TcgcTester.compile(
-    createTcgcMultiFileInput({
-      "main.tsp": `
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
         @service(#{
           title: "Pet Store",
         })
@@ -295,7 +287,7 @@ it("client with sub client and sub client can also be initialized individually",
           op close(): void;
         }
       `,
-      "client.tsp": `
+      `
         @@clientInitialization(PetStore.Pets,
           {
             initializedBy: InitializedBy.individually | InitializedBy.parent,
@@ -308,11 +300,9 @@ it("client with sub client and sub client can also be initialized individually",
           }
         );
       `,
-    }),
+    ),
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -349,9 +339,9 @@ it("client with sub client and sub client can also be initialized individually",
 });
 
 it("client with sub client and sub client can also be initialized individually with extra paramters", async () => {
-  const { program } = await TcgcTester.compile(
-    createTcgcMultiFileInput({
-      "main.tsp": `
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
         @service
         namespace ContainerClient {
           interface Blob {
@@ -360,7 +350,7 @@ it("client with sub client and sub client can also be initialized individually w
           }
         }
       `,
-      "client.tsp": `
+      `
         model ContainerClientInitialization {
           containerName: string
         };
@@ -373,11 +363,9 @@ it("client with sub client and sub client can also be initialized individually w
         @@clientInitialization(ContainerClient, {parameters: ContainerClientInitialization});
         @@clientInitialization(ContainerClient.Blob, {parameters: BlobClientInitialization, initializedBy: InitializedBy.individually | InitializedBy.parent});
       `,
-    }),
+    ),
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -405,24 +393,22 @@ it("client with sub client and sub client can also be initialized individually w
 });
 
 it("first level client could not be initialized by parent", async () => {
-  const [{ program }, diagnostics] = await TcgcTester.compileAndDiagnose(
-    createTcgcMultiFileInput({
-      "main.tsp": `
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
         @service
         namespace MyService;
 
         op download(@path blobName: string): void;
       `,
-      "client.tsp": `
+      `
         namespace MyCustomizations;
 
         @@clientInitialization(MyService, {initializedBy: InitializedBy.parent});
       `,
-    }),
+    ),
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/invalid-initialized-by",
     message:
@@ -431,7 +417,7 @@ it("first level client could not be initialized by parent", async () => {
 });
 
 it("sub client could not only be initialized individually", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @route("/bump")
     @clientInitialization({initializedBy: InitializedBy.individually})
@@ -440,9 +426,7 @@ it("sub client could not only be initialized individually", async () => {
     }
     `,
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/invalid-initialized-by",
     message:
@@ -482,9 +466,7 @@ it("single with core", async () => {
 
     op delete is Operations.ResourceDelete<User>;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -556,9 +538,7 @@ it("multiple with core", async () => {
 
     op delete is Operations.ResourceDelete<User>;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -597,9 +577,7 @@ it("namespace", async () => {
     namespace My.Service;
     op func(): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const clientOne = sdkPackage.clients.filter((c) => c.name === "ServiceClient")[0];
@@ -614,9 +592,7 @@ it("model-only namespace should be filtered out", async () => {
       model B {}
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 0);
   strictEqual(sdkPackage.models.length, 1);
@@ -633,9 +609,7 @@ it("empty namespace with empty subclient", async () => {
       interface Baz {}
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 0);
 });
@@ -648,23 +622,19 @@ it("explicit clients with only models should not be filtered out", async () => {
       model B {}
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 });
 
 it("operationGroup", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @operationGroup
     namespace MyOperationGroup {
       op func(): void;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
@@ -693,7 +663,7 @@ it("operationGroup", async () => {
 });
 
 it("operationGroup2", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     namespace Foo {
       interface Bar {
         @route("/one")
@@ -705,9 +675,7 @@ it("operationGroup2", async () => {
       two(): void;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
@@ -753,9 +721,9 @@ it("operationGroup2", async () => {
 });
 
 it("optional params propagated", async () => {
-  const { program } = await TcgcTester.compile(
-    createTcgcMultiFileInput({
-      "main.tsp": `
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
         @service(#{
           title: "Test optional client param is propagated",
         })
@@ -773,33 +741,23 @@ it("optional params propagated", async () => {
           namespace WithoutExpand {
             @route("/without")
             op test(): void;
-          }
-      `,
-      "client.tsp": `
+      }`,
+      `
         @@clientInitialization(ClientOptionalParams,
           {
             parameters: ClientOptionalParams.ExpandParameter,
           },
         );
       `,
-    }),
+    ),
   );
-  await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  await createSdkContextForTester(program);
 });
 
 it("one client from multiple services", async () => {
-  const { program } = await TcgcTester.compile({
-    "main.tsp": `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using TypeSpec.Http;
-    using TypeSpec.Rest;
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     @versioned(VersionsA)
     namespace ServiceA {
@@ -824,13 +782,7 @@ it("one client from multiple services", async () => {
         bTest(@query("api-version") apiVersion: VersionsB): void;
       }
     }`,
-    "client.tsp": `
-    import "./main.tsp";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+      `
     @client(
       {
         name: "CombineClient",
@@ -840,10 +792,9 @@ it("one client from multiple services", async () => {
     @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CombineClient;
   `,
-  });
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+    ),
+  );
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const aVersionsEnum = sdkPackage.enums.find((e) => e.name === "VersionsA");
@@ -917,9 +868,9 @@ it("one client from multiple services", async () => {
 });
 
 it("one client from multiple services with no versioning", async () => {
-  const { program } = await TcgcTester.compile(
-    createTcgcMultiFileInput({
-      "main.tsp": `
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
         @service
         namespace ServiceA {
           interface AI {
@@ -933,9 +884,8 @@ it("one client from multiple services with no versioning", async () => {
             @route("/bTest")
             bTest(): void;
           }
-        }
-      `,
-      "client.tsp": `
+    }`,
+      `
         @client(
           {
             name: "CombineClient",
@@ -944,11 +894,9 @@ it("one client from multiple services with no versioning", async () => {
         )
         namespace CombineClient;
       `,
-    }),
+    ),
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -991,9 +939,9 @@ it("one client from multiple services with no versioning", async () => {
 });
 
 it("one client from multiple services without version dependency", async () => {
-  const { program } = await TcgcTester.compile(
-    createTcgcMultiFileInput({
-      "main.tsp": `
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
         @service
         @versioned(VersionsA)
         namespace ServiceA {
@@ -1017,9 +965,8 @@ it("one client from multiple services without version dependency", async () => {
             @route("/bTest")
             bTest(@query("api-version") apiVersion: VersionsB): void;
           }
-        }
-      `,
-      "client.tsp": `
+    }`,
+      `
         @client(
           {
             name: "CombineClient",
@@ -1028,11 +975,9 @@ it("one client from multiple services without version dependency", async () => {
         )
         namespace CombineClient;
       `,
-    }),
+    ),
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const aVersionsEnum = sdkPackage.enums.find((e) => e.name === "VersionsA");
@@ -1107,18 +1052,9 @@ it("one client from multiple services without version dependency", async () => {
 });
 
 it("one client from multiple services with `@clientLocation`", async () => {
-  const { program } = await TcgcTester.compile({
-    "main.tsp": `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using TypeSpec.Http;
-    using TypeSpec.Rest;
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     @versioned(VersionsA)
     namespace ServiceA {
@@ -1148,13 +1084,7 @@ it("one client from multiple services with `@clientLocation`", async () => {
         bTest(@query("api-version") apiVersion: VersionsB): void;
       }
     }`,
-    "client.tsp": `
-    import "./main.tsp";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+      `
     @client(
       {
         name: "CombineClient",
@@ -1167,10 +1097,9 @@ it("one client from multiple services with `@clientLocation`", async () => {
     @@clientLocation(ServiceA.AI2.aTest2, ServiceA.AI);
     @@clientLocation(ServiceB.BI.bTest, "BI2");
   `,
-  });
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+    ),
+  );
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const aVersionsEnum = sdkPackage.enums.find((e) => e.name === "VersionsA");
@@ -1256,18 +1185,9 @@ it("one client from multiple services with `@clientLocation`", async () => {
 });
 
 it("one client from multiple services with api-version set to latest", async () => {
-  const { program } = await TcgcTester.compile({
-    "main.tsp": `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using TypeSpec.Http;
-    using TypeSpec.Rest;
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     @versioned(VersionsA)
     namespace ServiceA {
@@ -1293,13 +1213,7 @@ it("one client from multiple services with api-version set to latest", async () 
         bTest(@query("api-version") apiVersion: VersionsB): void;
       }
     }`,
-    "client.tsp": `
-    import "./main.tsp";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+      `
     @client(
       {
         name: "CombineClient",
@@ -1309,10 +1223,10 @@ it("one client from multiple services with api-version set to latest", async () 
     @useDependency(ServiceA.VersionsA.av3, ServiceB.VersionsB.bv2)
     namespace CombineClient;
   `,
-  });
+    ),
+  );
   const context = await createSdkContextForTester(program, {
     "api-version": "latest",
-    emitterName: "@azure-tools/typespec-python",
   });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
@@ -1343,18 +1257,9 @@ it("one client from multiple services with api-version set to latest", async () 
 });
 
 it("one client from multiple services with api-version set to specific version bv1", async () => {
-  const { program } = await TcgcTester.compile({
-    "main.tsp": `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using TypeSpec.Http;
-    using TypeSpec.Rest;
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     @versioned(VersionsA)
     namespace ServiceA {
@@ -1385,13 +1290,7 @@ it("one client from multiple services with api-version set to specific version b
         bTest2(@query("api-version") apiVersion: VersionsB): void;
       }
     }`,
-    "client.tsp": `
-    import "./main.tsp";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+      `
     @client(
       {
         name: "CombineClient",
@@ -1401,10 +1300,10 @@ it("one client from multiple services with api-version set to specific version b
     @useDependency(ServiceA.VersionsA.av3, ServiceB.VersionsB.bv1)
     namespace CombineClient;
   `,
-  });
+    ),
+  );
   const context = await createSdkContextForTester(program, {
     "api-version": "bv1",
-    emitterName: "@azure-tools/typespec-python",
   });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
@@ -1435,18 +1334,9 @@ it("one client from multiple services with api-version set to specific version b
 });
 
 it("one client from multiple services with api-version set to all", async () => {
-  const { program } = await TcgcTester.compile({
-    "main.tsp": `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using TypeSpec.Http;
-    using TypeSpec.Rest;
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     @versioned(VersionsA)
     namespace ServiceA {
@@ -1481,13 +1371,7 @@ it("one client from multiple services with api-version set to all", async () => 
         bTest2(@query("api-version") apiVersion: VersionsB): void;
       }
     }`,
-    "client.tsp": `
-    import "./main.tsp";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+      `
     @client(
       {
         name: "CombineClient",
@@ -1497,10 +1381,10 @@ it("one client from multiple services with api-version set to all", async () => 
     @useDependency(ServiceA.VersionsA.av3, ServiceB.VersionsB.bv2)
     namespace CombineClient;
   `,
-  });
+    ),
+  );
   const context = await createSdkContextForTester(program, {
     "api-version": "all",
-    emitterName: "@azure-tools/typespec-python",
   });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
@@ -1548,18 +1432,9 @@ it("one client from multiple services with api-version set to all", async () => 
 });
 
 it("one client from multiple services with different useDependency versions", async () => {
-  const { program } = await TcgcTester.compile({
-    "main.tsp": `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using TypeSpec.Http;
-    using TypeSpec.Rest;
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     @versioned(VersionsA)
     namespace ServiceA {
@@ -1586,13 +1461,7 @@ it("one client from multiple services with different useDependency versions", as
         bTest(@query("api-version") apiVersion: VersionsB): void;
       }
     }`,
-    "client.tsp": `
-    import "./main.tsp";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+      `
     @client(
       {
         name: "CombineClient",
@@ -1602,10 +1471,9 @@ it("one client from multiple services with different useDependency versions", as
     @useDependency(ServiceA.VersionsA.av1, ServiceB.VersionsB.bv3)
     namespace CombineClient;
   `,
-  });
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+    ),
+  );
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -1636,18 +1504,9 @@ it("one client from multiple services with different useDependency versions", as
 });
 
 it("one client from multiple services with models shared across services", async () => {
-  const { program } = await TcgcTester.compile({
-    "main.tsp": `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using TypeSpec.Http;
-    using TypeSpec.Rest;
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     @versioned(VersionsA)
     namespace ServiceA {
@@ -1686,13 +1545,7 @@ it("one client from multiple services with models shared across services", async
         bTest(@body body: SharedModel, @query("api-version") apiVersion: VersionsB): void;
       }
     }`,
-    "client.tsp": `
-    import "./main.tsp";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+      `
     @client(
       {
         name: "CombineClient",
@@ -1702,10 +1555,10 @@ it("one client from multiple services with models shared across services", async
     @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CombineClient;
   `,
-  });
+    ),
+  );
   const context = await createSdkContextForTester(program, {
     "api-version": "latest",
-    emitterName: "@azure-tools/typespec-python",
   });
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
@@ -1745,21 +1598,10 @@ it("one client from multiple services with models shared across services", async
   deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
 });
 
-// TODO: This test expects a diagnostic that doesn't appear to be emitted in current code path
-// The condition in handleVersioningMutationForGlobalNamespace should catch this but isn't being triggered
-it.skip("error: multiple explicit clients with multiple services", async () => {
-  const { program } = await TcgcTester.compile({
-    "main.tsp": `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using TypeSpec.Http;
-    using TypeSpec.Rest;
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+it("error: multiple explicit clients with multiple services", async () => {
+  const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
     @service
     @versioned(VersionsA)
     namespace ServiceA {
@@ -1784,13 +1626,7 @@ it.skip("error: multiple explicit clients with multiple services", async () => {
         bTest(@query("api-version") apiVersion: VersionsB): void;
       }
     }`,
-    "client.tsp": `
-    import "./main.tsp";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+      `
     @client(
       {
         name: "ClientA",
@@ -1809,11 +1645,10 @@ it.skip("error: multiple explicit clients with multiple services", async () => {
     @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace ClientB {}
   `,
-  });
-  const context = await createSdkContextForTester(program);
-  // Access sdkPackage to trigger diagnostic population
-  const _sdkPackage = context.sdkPackage;
-  expectDiagnostics(context.diagnostics, [
+    ),
+  );
+  await createSdkContextForTester(program);
+  expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/multiple-explicit-clients-multiple-services",
       message: "Can not define multiple explicit clients with multiple services.",
@@ -1822,18 +1657,9 @@ it.skip("error: multiple explicit clients with multiple services", async () => {
 });
 
 it("client location to new operation group with multiple services", async () => {
-  const { program } = await TcgcTester.compile({
-    "main.tsp": `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using TypeSpec.Http;
-    using TypeSpec.Rest;
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     @versioned(VersionsA)
     namespace ServiceA {
@@ -1854,13 +1680,7 @@ it("client location to new operation group with multiple services", async () => 
       @route("/bTest")
       op bTest(@query("api-version") apiVersion: VersionsB): void;
     }`,
-    "client.tsp": `
-    import "./main.tsp";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+      `
     @client(
       {
         name: "CombineClient",
@@ -1874,10 +1694,9 @@ it("client location to new operation group with multiple services", async () => 
     @@clientLocation(ServiceA.aTest, "NewOperationGroup");
     @@clientLocation(ServiceB.bTest, "NewOperationGroup");
   `,
-  });
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+    ),
+  );
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -1910,18 +1729,9 @@ it("client location to new operation group with multiple services", async () => 
 });
 
 it("one client from multiple services with operation group name conflict - merged", async () => {
-  const { program } = await TcgcTester.compile({
-    "main.tsp": `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using TypeSpec.Http;
-    using TypeSpec.Rest;
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     @versioned(VersionsA)
     namespace ServiceA {
@@ -1948,13 +1758,7 @@ it("one client from multiple services with operation group name conflict - merge
         bTest(@query("api-version") apiVersion: VersionsB): void;
       }
     }`,
-    "client.tsp": `
-    import "./main.tsp";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+      `
     @client(
       {
         name: "CombineClient",
@@ -1964,10 +1768,9 @@ it("one client from multiple services with operation group name conflict - merge
     @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CombineClient;
   `,
-  });
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+    ),
+  );
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -1999,18 +1802,9 @@ it("one client from multiple services with operation group name conflict - merge
 });
 
 it("client location to existing operation group from different service", async () => {
-  const { program } = await TcgcTester.compile({
-    "main.tsp": `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using TypeSpec.Http;
-    using TypeSpec.Rest;
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     @versioned(VersionsA)
     namespace ServiceA {
@@ -2034,13 +1828,7 @@ it("client location to existing operation group from different service", async (
       @route("/bTest")
       op bTest(@query("api-version") apiVersion: VersionsB): void;
     }`,
-    "client.tsp": `
-    import "./main.tsp";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+      `
     @client(
       {
         name: "CombineClient",
@@ -2053,10 +1841,9 @@ it("client location to existing operation group from different service", async (
     // Move operation from ServiceB to existing Operations group from ServiceA
     @@clientLocation(ServiceB.bTest, "Operations");
   `,
-  });
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+    ),
+  );
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -2085,18 +1872,9 @@ it("client location to existing operation group from different service", async (
 });
 
 it("merged operation groups with nested operations", async () => {
-  const { program } = await TcgcTester.compile({
-    "main.tsp": `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using TypeSpec.Http;
-    using TypeSpec.Rest;
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     @versioned(VersionsA)
     namespace ServiceA {
@@ -2125,13 +1903,7 @@ it("merged operation groups with nested operations", async () => {
         op bTest2(@query("api-version") apiVersion: VersionsB): void;
       }
     }`,
-    "client.tsp": `
-    import "./main.tsp";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+      `
     @client(
       {
         name: "CombineClient",
@@ -2141,10 +1913,9 @@ it("merged operation groups with nested operations", async () => {
     @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CombineClient;
   `,
-  });
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+    ),
+  );
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -2173,18 +1944,9 @@ it("merged operation groups with nested operations", async () => {
 });
 
 it("multiple merged operation groups in same client", async () => {
-  const { program } = await TcgcTester.compile({
-    "main.tsp": `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using TypeSpec.Http;
-    using TypeSpec.Rest;
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     @versioned(VersionsA)
     namespace ServiceA {
@@ -2217,13 +1979,7 @@ it("multiple merged operation groups in same client", async () => {
         opB2(@query("api-version") apiVersion: VersionsB): void;
       }
     }`,
-    "client.tsp": `
-    import "./main.tsp";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
+      `
     @client(
       {
         name: "CombineClient",
@@ -2233,10 +1989,9 @@ it("multiple merged operation groups in same client", async () => {
     @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CombineClient;
   `,
-  });
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+    ),
+  );
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
@@ -2263,9 +2018,9 @@ it("multiple merged operation groups in same client", async () => {
 });
 
 it("error: inconsistent-multiple-service server", async () => {
-  const [, diagnostics] = await TcgcTester.compileAndDiagnose(
-    createTcgcMultiFileInput({
-      "main.tsp": `
+  const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
         @service
         @server("https://servicea.example.com")
         namespace ServiceA {
@@ -2273,9 +2028,8 @@ it("error: inconsistent-multiple-service server", async () => {
         @service
         @server("https://serviceb.example.com")
         namespace ServiceB {
-        }
-      `,
-      "client.tsp": `
+    }`,
+      `
         @client(
           {
             name: "CombineClient",
@@ -2284,20 +2038,26 @@ it("error: inconsistent-multiple-service server", async () => {
         )
         namespace CombineClient {}
       `,
-    }),
+    ),
   );
+  await createSdkContextForTester(program);
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service",
       message: "All services must have the same server and auth definitions.",
     },
+    {
+      code: "@azure-tools/typespec-client-generator-core/multiple-services",
+      message:
+        "Multiple services found. Only the first service will be used; others will be ignored.",
+    },
   ]);
 });
 
 it("error: inconsistent-multiple-service-servers auth", async () => {
-  const [, diagnostics] = await TcgcTester.compileAndDiagnose(
-    createTcgcMultiFileInput({
-      "main.tsp": `
+  const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
         @service
         @useAuth(BasicAuth)
         namespace ServiceA {
@@ -2305,9 +2065,8 @@ it("error: inconsistent-multiple-service-servers auth", async () => {
         @service
         @useAuth(BearerAuth)
         namespace ServiceB {
-        }
-      `,
-      "client.tsp": `
+    }`,
+      `
         @client(
           {
             name: "CombineClient",
@@ -2316,20 +2075,26 @@ it("error: inconsistent-multiple-service-servers auth", async () => {
         )
         namespace CombineClient {}
       `,
-    }),
+    ),
   );
+  await createSdkContextForTester(program);
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service",
       message: "All services must have the same server and auth definitions.",
     },
+    {
+      code: "@azure-tools/typespec-client-generator-core/multiple-services",
+      message:
+        "Multiple services found. Only the first service will be used; others will be ignored.",
+    },
   ]);
 });
 
 it("multiple clients from single service", async () => {
-  const { program } = await TcgcTester.compile(
-    createTcgcMultiFileInput({
-      "main.tsp": `
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
         @service
         @versioned(Versions)
         namespace TestService;
@@ -2345,7 +2110,7 @@ it("multiple clients from single service", async () => {
         @route("/bar")
         op bar(): void;
       `,
-      "client.tsp": `
+      `
         @client(
           {
             name: "ClientA",
@@ -2366,11 +2131,9 @@ it("multiple clients from single service", async () => {
           op bar is TestService.bar;
         }
       `,
-    }),
+    ),
   );
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 2);
   const clientA = sdkPackage.clients.find((c) => c.name === "ClientA");

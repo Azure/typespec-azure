@@ -56,9 +56,7 @@ describe("stream request", () => {
         model Thing { id: string }
       `,
     );
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
@@ -77,9 +75,7 @@ describe("stream request", () => {
         model Thing { id: string }
       `,
     );
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
@@ -104,9 +100,7 @@ describe("stream request", () => {
         model Thing { id: string }
       `,
     );
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
@@ -125,9 +119,7 @@ describe("stream request", () => {
         model Thing { id: string }
       `,
     );
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
@@ -169,9 +161,7 @@ describe("stream request", () => {
         op subscribeToChannel(stream: SSEStream<ChannelEvents>): void;
       `,
     );
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
@@ -192,9 +182,7 @@ describe("stream response", () => {
         model Thing { id: string }
       `,
     );
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
@@ -214,9 +202,7 @@ describe("stream response", () => {
         model Thing { id: string }
       `,
     );
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
@@ -242,9 +228,7 @@ describe("stream response", () => {
         model Thing { id: string }
       `,
     );
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
@@ -264,9 +248,7 @@ describe("stream response", () => {
         model Thing { id: string }
       `,
     );
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
@@ -310,9 +292,7 @@ describe("stream response", () => {
         op subscribeToChannel(): SSEStream<ChannelEvents>;
       `,
     );
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);

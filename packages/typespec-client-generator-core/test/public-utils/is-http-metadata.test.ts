@@ -1,10 +1,10 @@
 import { ok } from "assert";
 import { it } from "vitest";
 import { isHttpMetadata } from "../../src/public-utils.js";
-import { createSdkContextForTester, SimpleTesterWithBuiltInService } from "../tester.js";
+import { createSdkContextForTester, SimpleTesterWithService } from "../tester.js";
 
 it("is http query", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model BodyModel {
       @query
       query: string;
@@ -13,7 +13,7 @@ it("is http query", async () => {
     }
     op func(@bodyRoot body: BodyModel): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program);
 
   const queryProperty = context.sdkPackage.models[0].properties[0];
   ok(queryProperty);
@@ -21,7 +21,7 @@ it("is http query", async () => {
 });
 
 it("is http header", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model BodyModel {
       @header
       header: string;
@@ -30,7 +30,7 @@ it("is http header", async () => {
     }
     op func(@bodyRoot body: BodyModel): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program);
 
   const queryProperty = context.sdkPackage.models[0].properties[0];
   ok(queryProperty);
@@ -38,7 +38,7 @@ it("is http header", async () => {
 });
 
 it("is http cookie", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model BodyModel {
       @cookie
       cookie: string;
@@ -47,7 +47,7 @@ it("is http cookie", async () => {
     }
     op func(@bodyRoot body: BodyModel): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program);
 
   const queryProperty = context.sdkPackage.models[0].properties[0];
   ok(queryProperty);
@@ -55,7 +55,7 @@ it("is http cookie", async () => {
 });
 
 it("is http path", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model BodyModel {
       @path
       path: string;
@@ -64,7 +64,7 @@ it("is http path", async () => {
     }
     op func(@bodyRoot body: BodyModel): void;
   `);
-  const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+  const context = await createSdkContextForTester(program);
 
   const queryProperty = context.sdkPackage.models[0].properties[0];
   ok(queryProperty);

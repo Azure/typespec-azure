@@ -1,48 +1,20 @@
-import { resolvePath } from "@typespec/compiler";
-import { createTester } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
 import { it } from "vitest";
-import { createSdkContextForTester, SimpleTesterWithBuiltInService } from "../tester.js";
-
-// XML tester with XML library support
-const XmlTester = createTester(resolvePath(import.meta.dirname, "../.."), {
-  libraries: [
-    "@typespec/http",
-    "@typespec/rest",
-    "@typespec/versioning",
-    "@typespec/xml",
-    "@azure-tools/typespec-client-generator-core",
-  ],
-})
-  .import(
-    "@typespec/http",
-    "@typespec/rest",
-    "@typespec/versioning",
-    "@typespec/xml",
-    "@azure-tools/typespec-client-generator-core",
-  )
-  .using("Http", "Rest", "Versioning", "Xml", "Azure.ClientGenerator.Core");
-
-const XmlTesterWithBuiltInService = XmlTester.wrap(
-  (x) => `
-@service
-namespace TestService;
-
-${x}
-`,
-);
+import {
+  createSdkContextForTester,
+  SimpleTesterWithService,
+  XmlTesterWithBuiltInService,
+} from "../tester.js";
 
 it("default input json serialization option", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Blob {
       id: string;
     }
 
     op test(@body body: Blob): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].serializationOptions.json?.name, "Blob");
@@ -51,16 +23,14 @@ it("default input json serialization option", async function () {
 });
 
 it("default output json serialization option", async function () {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Blob {
       id: string;
     }
 
     op test(): Blob;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].serializationOptions.json?.name, "Blob");
@@ -69,7 +39,7 @@ it("default output json serialization option", async function () {
 });
 
 it("json serialization with @encodedName", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Blob {
       @encodedName("application/json", "newId")
       id: string;
@@ -77,9 +47,7 @@ it("json serialization with @encodedName", async () => {
 
     op test(): Blob;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].serializationOptions.json?.name, "Blob");
@@ -96,9 +64,7 @@ it("@attribute", async function () {
     op test(): {@header("content-type") contentType: "application/xml"; @body body: Blob};
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
@@ -119,9 +85,7 @@ it("@name", async function () {
     op test(): {@header("content-type") contentType: "application/xml"; @body body: Book};
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
@@ -144,9 +108,7 @@ it("@ns", async function () {
     op test(): {@header("content-type") contentType: "application/xml"; @body body: Foo};
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
@@ -186,9 +148,7 @@ it("@nsDeclarations", async function () {
     op test(): {@header("content-type") contentType: "application/xml"; @body body: Foo};
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
@@ -214,9 +174,7 @@ it("@unwrapped", async function () {
     op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
@@ -235,9 +193,7 @@ it("array of primitive types unwrapped", async function () {
     op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
@@ -260,9 +216,7 @@ it("array of primitive types unwrapped with rename", async function () {
     op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
@@ -283,9 +237,7 @@ it("array of primitive types wrapped", async function () {
     op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
@@ -307,9 +259,7 @@ it("array of primitive types wrapped with rename", async function () {
     op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
@@ -333,9 +283,7 @@ it("array of scalar types unwrapped", async function () {
     op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
@@ -360,9 +308,7 @@ it("array of scalar types unwrapped with rename", async function () {
     op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
@@ -385,9 +331,7 @@ it("array of scalar types wrapped", async function () {
     op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
@@ -412,9 +356,7 @@ it("array of scalar types wrapped with rename", async function () {
     op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
@@ -441,9 +383,7 @@ it("array of complex type unwrapped", async function () {
     op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const model = models[0];
@@ -471,9 +411,7 @@ it("array of complex type unwrapped with rename", async function () {
     op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const model = models[0];
@@ -498,9 +436,7 @@ it("array of complex type wrapped", async function () {
     op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const model = models[0];
@@ -527,9 +463,7 @@ it("array of complex type wrapped with rename", async function () {
     op test(): {@header("content-type") contentType: "application/xml"; @body body: Pet};
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const model = models[0];
@@ -550,9 +484,7 @@ it("orphan model with xml serialization", async function () {
     }
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
@@ -570,9 +502,7 @@ it("orphan model with json serialization", async function () {
     }
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
@@ -588,9 +518,7 @@ it("@unwrapped for string property", async function () {
     }
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
@@ -610,9 +538,7 @@ it("different xml content type", async function () {
     op test(): {@header("content-type") contentType: "text/xml; charset=utf-8"; @body body: Tag};
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
@@ -631,9 +557,7 @@ it("different json content type", async function () {
     op test(): {@header("content-type") contentType: "application/json; serialization=json"; @body body: Tag};
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];

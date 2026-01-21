@@ -2,7 +2,12 @@ import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
 import { getClientNameOverride } from "../../src/decorators.js";
-import { createSdkContextForTester, SimpleTester, TcgcTester } from "../tester.js";
+import {
+  createClientCustomizationInput,
+  createSdkContextForTester,
+  SimpleBaseTester,
+  SimpleTester,
+} from "../tester.js";
 
 it("carry over", async () => {
   const { program, Test1, Test2, func1, func2 } = await SimpleTester.compile(t.code`
@@ -22,9 +27,7 @@ it("carry over", async () => {
       }
     `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   strictEqual(getClientNameOverride(context, Test1), "Test1Rename");
   strictEqual(getClientNameOverride(context, Test2), undefined);
   strictEqual(getClientNameOverride(context, func1), "func1Rename");
@@ -32,18 +35,9 @@ it("carry over", async () => {
 });
 
 it("augment carry over", async () => {
-  const { program, Test1, Test2, func1, func2 } = await TcgcTester.compile({
-    "main.tsp": t.code`
-      import "@typespec/http";
-      import "@typespec/rest";
-      import "@typespec/versioning";
-      import "@azure-tools/typespec-client-generator-core";
-      import "./client.tsp";
-      using TypeSpec.Http;
-      using TypeSpec.Rest;
-      using TypeSpec.Versioning;
-      using Azure.ClientGenerator.Core;
-
+  const { program, Test1, Test2, func1, func2 } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      t.code`
       @service
       namespace ${t.namespace("MyService")} {
         model ${t.model("Test1")}{}
@@ -57,27 +51,16 @@ it("augment carry over", async () => {
         op ${t.op("func2")} is func1;
       }
     `,
-    "client.tsp": `
-      import "@typespec/http";
-      import "@typespec/rest";
-      import "@typespec/versioning";
-      import "@azure-tools/typespec-client-generator-core";
-      import "./main.tsp";
-      using TypeSpec.Http;
-      using TypeSpec.Rest;
-      using TypeSpec.Versioning;
-      using Azure.ClientGenerator.Core;
-
+      `
       namespace Customizations;
 
       @@clientName(MyService.Test1, "Test1Rename");
       @@clientName(MyService.func1, "func1Rename");
     `,
-  });
+    ),
+  );
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   strictEqual(getClientNameOverride(context, Test1), "Test1Rename");
   strictEqual(getClientNameOverride(context, Test2), undefined);
   strictEqual(getClientNameOverride(context, func1), "func1Rename");
@@ -133,16 +116,6 @@ it("@clientName with scope of versioning", async () => {
 
 it("augmented @clientName with scope of versioning", async () => {
   const mainCode = `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./client.tsp";
-    using TypeSpec.Http;
-    using TypeSpec.Rest;
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
     @service(#{
       title: "Contoso Widget Manager",
     })
@@ -160,16 +133,6 @@ it("augmented @clientName with scope of versioning", async () => {
   `;
 
   const customization = `
-    import "@typespec/http";
-    import "@typespec/rest";
-    import "@typespec/versioning";
-    import "@azure-tools/typespec-client-generator-core";
-    import "./main.tsp";
-    using TypeSpec.Http;
-    using TypeSpec.Rest;
-    using TypeSpec.Versioning;
-    using Azure.ClientGenerator.Core;
-
     namespace Customizations;
 
     @@clientName(Contoso.WidgetManager.Test, "TestCSharp", "csharp");
@@ -178,10 +141,9 @@ it("augmented @clientName with scope of versioning", async () => {
 
   // java
   {
-    const { program } = await TcgcTester.compile({
-      "main.tsp": mainCode,
-      "client.tsp": customization,
-    });
+    const { program } = await SimpleBaseTester.compile(
+      createClientCustomizationInput(mainCode, customization),
+    );
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-java",
     });
@@ -190,10 +152,9 @@ it("augmented @clientName with scope of versioning", async () => {
 
   // csharp
   {
-    const { program } = await TcgcTester.compile({
-      "main.tsp": mainCode,
-      "client.tsp": customization,
-    });
+    const { program } = await SimpleBaseTester.compile(
+      createClientCustomizationInput(mainCode, customization),
+    );
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-csharp",
     });
@@ -202,10 +163,9 @@ it("augmented @clientName with scope of versioning", async () => {
 
   // python
   {
-    const { program } = await TcgcTester.compile({
-      "main.tsp": mainCode,
-      "client.tsp": customization,
-    });
+    const { program } = await SimpleBaseTester.compile(
+      createClientCustomizationInput(mainCode, customization),
+    );
     const context = await createSdkContextForTester(program, {
       emitterName: "@azure-tools/typespec-python",
     });
@@ -237,9 +197,7 @@ it("decorator on template parameter", async function () {
     
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   strictEqual(context.sdkPackage.clients[0].methods[0].parameters[0].name, "body");
 });
 
@@ -252,9 +210,7 @@ it("apply with @client decorator to namespace client", async () => {
     op test(): void;
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   strictEqual(context.sdkPackage.clients[0].name, "MyServiceClient");
 });
 
@@ -270,9 +226,7 @@ it("apply with @client decorator to interface client", async () => {
     }
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   strictEqual(context.sdkPackage.clients[0].name, "MyInterfaceClient");
 });
 
@@ -288,9 +242,7 @@ it("apply with @operationGroup decorator to interface client", async () => {
     }
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   strictEqual(context.sdkPackage.clients.length, 1);
   const myServiceClient = context.sdkPackage.clients[0];
   strictEqual(myServiceClient.name, "MyServiceClient");
@@ -312,9 +264,7 @@ it("overrides client name from @client definition", async () => {
     }
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   strictEqual(context.sdkPackage.clients[0].name, "MyInterfaceClient");
 });
 

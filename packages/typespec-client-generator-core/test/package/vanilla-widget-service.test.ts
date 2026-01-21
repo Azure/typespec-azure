@@ -42,9 +42,7 @@ async function compileVanillaWidgetService(code: string) {
 it("vanilla widget create", async () => {
   const { program } = await compileVanillaWidgetService("@post create(...Widget): Widget | Error;");
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "create");
@@ -107,9 +105,7 @@ it("vanilla widget read", async () => {
     "@get read(@path id: string): Widget | Error;",
   );
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "read");
@@ -159,9 +155,7 @@ it("vanilla widget update", async () => {
     "@patch(#{implicitOptionality: true}) update(...Widget): Widget | Error;",
   );
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "update");
@@ -251,9 +245,7 @@ it("vanilla widget delete", async () => {
     "@delete delete(@path id: string): void | Error;",
   );
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "delete");
@@ -288,9 +280,7 @@ it("vanilla widget delete", async () => {
 it("vanilla widget list", async () => {
   const { program } = await compileVanillaWidgetService("@get list(): Widget[] | Error;");
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "list");

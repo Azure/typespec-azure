@@ -1,13 +1,9 @@
 import { expectDiagnostics, t } from "@typespec/compiler/testing";
-import { ok, strictEqual } from "assert";
+import { strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { SdkArrayType, SdkBuiltInType, UsageFlags } from "../../src/interfaces.js";
 import { getAllModels } from "../../src/types.js";
-import {
-  createSdkContextForTester,
-  SimpleTester,
-  SimpleTesterWithBuiltInService,
-} from "../tester.js";
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
 describe.each([
   ["utcDateTime", "string"],
@@ -31,9 +27,7 @@ describe.each([
       };
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const models = getAllModels(context);
     const model1 = models[0];
     strictEqual(model1.kind, "model");
@@ -56,9 +50,7 @@ describe.each([
       };
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const models = getAllModels(context);
     const model1 = models[0];
     strictEqual(model1.kind, "model");
@@ -75,9 +67,7 @@ describe.each([
       };
       `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const method = context.sdkPackage.clients[0].methods[0];
     strictEqual(method.name, "func1");
     const param = method.parameters[0];
@@ -115,9 +105,7 @@ describe.each([
       };
       `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const models = getAllModels(context);
     const model1 = models[0];
     strictEqual(model1.kind, "model");
@@ -155,9 +143,7 @@ describe.each([
       };
       `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const models = getAllModels(context);
     const model1 = models[0];
     strictEqual(model1.kind, "model");
@@ -195,9 +181,7 @@ it.each([
       };
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const models = getAllModels(context);
     const model1 = models[0];
     strictEqual(model1.kind, "model");
@@ -265,9 +249,7 @@ it("should support alternate type unknown on model property", async () => {
     };
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const models = getAllModels(context);
   const model1 = models[0];
   strictEqual(model1.kind, "model");
@@ -290,9 +272,7 @@ it.each([
     };
     `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const method = context.sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "func1");
   const param = method.parameters[0];
@@ -318,9 +298,7 @@ it.each([
     };
     `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const method = context.sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "func1");
   const param = method.parameters[0];
@@ -341,9 +319,7 @@ it("@alternateType along with @override", async () => {
     @@override(bar, baz);
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const method = context.sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "bar");
   const param = method.parameters[0];
@@ -366,9 +342,7 @@ it("@alternateType along with @override with scope", async () => {
     @@override(bar, baz, "python");
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const method = context.sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "bar");
   const param = method.parameters[0];
@@ -491,9 +465,7 @@ describe("external types", () => {
       };
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const models = getAllModels(context);
     const itemCollection = models.find((m) => m.name === "ItemCollection");
     strictEqual(itemCollection?.kind, "model");
@@ -558,9 +530,7 @@ describe("external types", () => {
       };
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const models = getAllModels(context);
     const testModel = models.find((m) => m.name === "TestModel");
     strictEqual(testModel?.kind, "model");
@@ -588,9 +558,7 @@ describe("external types", () => {
       };
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const models = getAllModels(context);
     const simpleModel = models.find((m) => m.name === "SimpleModel");
     strictEqual(simpleModel?.kind, "model");
@@ -662,9 +630,7 @@ describe("external types", () => {
       };
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const models = getAllModels(context);
     const testModel = models.find((m) => m.name === "TestModel");
     strictEqual(testModel?.kind, "model");
@@ -702,10 +668,8 @@ describe("external types", () => {
     strictEqual(diagnostics[0].code, "@azure-tools/typespec-client-generator-core/missing-scope");
   });
 
-  // TODO: Skip - external-library-version-mismatch diagnostic is not being emitted.
-  // This appears to be a behavioral issue where the version mismatch check is not triggered.
-  it.skip("mismatching external versions", async () => {
-    const { program } = await SimpleTester.compile(`
+  it("mismatching external versions", async () => {
+    const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(`
       @service
       namespace MyService {
         @alternateType({
@@ -734,19 +698,15 @@ describe("external types", () => {
         op test(@body body: TestModel): void;
       };
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
-    // Trigger the alternate type processing by getting all models
-    getAllModels(context);
-    // Check for version mismatch diagnostic (may not be at index 0 due to other diagnostics)
-    const versionMismatchDiagnostic = context.diagnostics.find(
-      (d) =>
-        d.code === "@azure-tools/typespec-client-generator-core/external-library-version-mismatch",
-    );
-    ok(versionMismatchDiagnostic, "Expected external-library-version-mismatch diagnostic");
+
+    await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
+    strictEqual(diagnostics.length, 3);
     strictEqual(
-      versionMismatchDiagnostic.message,
+      diagnostics[0].code,
+      "@azure-tools/typespec-client-generator-core/external-library-version-mismatch",
+    );
+    strictEqual(
+      diagnostics[0].message,
       "External library version mismatch. There are multiple versions of collections-lib: 1.0.0 and 1.0.1. Please unify the versions.",
     );
   });
@@ -801,9 +761,7 @@ describe("external types", () => {
       };
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const models = getAllModels(context);
     const itemCollection = models.find((m) => m.name === "ItemCollection");
     const itemCollectionType = models.find((m) => m.name === "ItemCollectionType");
@@ -870,9 +828,7 @@ describe("external types", () => {
       };
     `);
 
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const models = getAllModels(context);
     const externalModel = models.find((m) => m.name === "ExternalModel");
     const nestedModel = models.find((m) => m.name === "NestedModel");
@@ -945,9 +901,7 @@ it("should not set usage on original enum when parameter has alternateType", asy
     }
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.clients[0];
   const method = models.methods[0];
   strictEqual(method.name, "test");
@@ -974,9 +928,7 @@ it("should not set usage on original model when parameter has alternateType", as
     }
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.clients[0];
   const method = models.methods[0];
   strictEqual(method.name, "test");
@@ -1004,9 +956,7 @@ it("should not set usage on original enum when inline alternateType is used", as
     }
   `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.clients[0];
   const method = models.methods[0];
   strictEqual(method.name, "test");
@@ -1022,7 +972,7 @@ it("should not set usage on original enum when inline alternateType is used", as
 });
 
 it("applied to union", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @alternateType(unknown)
     union Dfe<T> {
       T,
@@ -1036,9 +986,7 @@ it("applied to union", async () => {
       movingStatus: Dfe<string>;
     }
     `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const models = getAllModels(context);
   const moveResponse = models.find((m) => m.name === "MoveResponse");
   strictEqual(moveResponse?.kind, "model");
@@ -1048,7 +996,7 @@ it("applied to union", async () => {
 });
 
 it("applied to enum", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @alternateType(unknown)
     enum StatusEnum {
       Active,
@@ -1063,9 +1011,7 @@ it("applied to enum", async () => {
       status: StatusEnum;
     }
     `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const models = getAllModels(context);
   const employeeStatus = models.find((m) => m.name === "EmployeeStatus");
   strictEqual(employeeStatus?.kind, "model");
@@ -1075,7 +1021,7 @@ it("applied to enum", async () => {
 });
 
 it("applied to model", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @alternateType(unknown)
     model Address {
       street: string;
@@ -1089,9 +1035,7 @@ it("applied to model", async () => {
       address: Address;
     }
     `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const models = getAllModels(context);
   const employeeInfo = models.find((m) => m.name === "EmployeeInfo");
   strictEqual(employeeInfo?.kind, "model");

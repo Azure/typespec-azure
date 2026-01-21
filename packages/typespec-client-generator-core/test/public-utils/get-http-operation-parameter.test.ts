@@ -3,21 +3,20 @@ import { it } from "vitest";
 import { SdkHttpOperation, SdkMethodParameter, SdkServiceMethod } from "../../src/interfaces.js";
 import { getHttpOperationParameter } from "../../src/public-utils.js";
 import {
+  createClientCustomizationInput,
   createSdkContextForTester,
+  SimpleBaseTester,
   SimpleTester,
-  SimpleTesterWithBuiltInService,
-  TcgcTester,
-  VersionedServiceTester,
+  SimpleTesterWithService,
+  SimpleTesterWithVersionedService,
 } from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
 it("normal method case", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     op myOp(@header h: string, @query q: string, @path p: string, @body b: string): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const parameters = method.parameters;
@@ -53,16 +52,14 @@ it("normal method case", async () => {
 });
 
 it("normal spread case", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Input {
       key: string;
     }
 
     op myOp(...Input): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const parameters = method.parameters;
@@ -85,7 +82,7 @@ it("normal spread case", async () => {
 });
 
 it("spread model with @body property", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Shelf {
       name: string;
       theme?: string;
@@ -96,9 +93,7 @@ it("spread model with @body property", async () => {
     }
     op createShelf(...CreateShelfRequest): Shelf;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const method = getServiceMethodOfClient(context.sdkPackage);
   const parameters = method.parameters;
 
@@ -125,7 +120,7 @@ it("spread model with @body property", async () => {
 });
 
 it("spread model with @bodyRoot property", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Shelf {
       @query
       name: string;
@@ -137,9 +132,7 @@ it("spread model with @bodyRoot property", async () => {
     }
     op createShelf(...CreateShelfRequest): Shelf;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const method = getServiceMethodOfClient(context.sdkPackage);
   const parameters = method.parameters;
 
@@ -178,12 +171,10 @@ it("spread model with @bodyRoot property", async () => {
 });
 
 it("implicit spread for body", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     op myOp(a: string, b: string): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const method = getServiceMethodOfClient(context.sdkPackage);
   const parameters = method.parameters;
 
@@ -210,12 +201,10 @@ it("implicit spread for body", async () => {
 });
 
 it("implicit spread for header and body", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     op myOp(@header a: string, b: string): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const method = getServiceMethodOfClient(context.sdkPackage);
   const parameters = method.parameters;
 
@@ -242,7 +231,7 @@ it("implicit spread for header and body", async () => {
 });
 
 it("@bodyRoot case", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model TestRequest {
       @header
       h: string;
@@ -253,9 +242,7 @@ it("@bodyRoot case", async () => {
     }
     op test(@bodyRoot request: TestRequest): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const method = getServiceMethodOfClient(context.sdkPackage);
   const parameters = method.parameters;
 
@@ -297,7 +284,7 @@ it("@bodyRoot case", async () => {
 });
 
 it("multipart case", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @route("upload/{name}")
     @post
     op uploadFile(
@@ -310,9 +297,7 @@ it("multipart case", async () => {
       },
     ): OkResponse;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const method = getServiceMethodOfClient(context.sdkPackage);
   const parameters = method.parameters;
 
@@ -371,9 +356,7 @@ it("template case", async () => {
       extends ExtensionResourceCreateOrUpdate<Checkup, Pet, PetStoreError>,
         ExtensionResourceList<Checkup, Pet, PetStoreError> {}
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0].children?.[0];
   ok(client);
@@ -413,12 +396,10 @@ it("template case", async () => {
 });
 
 it("api version parameter", async () => {
-  const { program } = await VersionedServiceTester.compile(`
+  const { program } = await SimpleTesterWithVersionedService.compile(`
     op test(@query apiVersion: string, @body body: string): void;
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   const method = getServiceMethodOfClient(sdkPackage);
@@ -432,33 +413,16 @@ it("api version parameter", async () => {
 });
 
 it("client parameter", async () => {
-  const { program } = await TcgcTester.compile({
-    "main.tsp": `
-      import "@typespec/http";
-      import "@typespec/rest";
-      import "@typespec/versioning";
-      import "@azure-tools/typespec-client-generator-core";
-      import "./client.tsp";
-      using Http;
-      using Rest;
-      using Versioning;
-      using Azure.ClientGenerator.Core;
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
       @service
       namespace MyService;
 
       op download(@path blob: string): void;
       op upload(@path blobName: string): void;
       `,
-    "client.tsp": `
-      import "./main.tsp";
-      import "@typespec/http";
-      import "@typespec/rest";
-      import "@typespec/versioning";
-      import "@azure-tools/typespec-client-generator-core";
-      using Http;
-      using Rest;
-      using Versioning;
-      using Azure.ClientGenerator.Core;
+      `
       namespace MyCustomizations;
 
       model MyClientInitialization {
@@ -468,10 +432,9 @@ it("client parameter", async () => {
 
       @@clientInitialization(MyService, MyCustomizations.MyClientInitialization);
       `,
-  });
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+    ),
+  );
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   let httpParam = getHttpOperationParameter(
@@ -492,17 +455,9 @@ it("client parameter", async () => {
 });
 
 it("@override impact", async () => {
-  const { program } = await TcgcTester.compile({
-    "main.tsp": `
-      import "@typespec/http";
-      import "@typespec/rest";
-      import "@typespec/versioning";
-      import "@azure-tools/typespec-client-generator-core";
-      import "./client.tsp";
-      using Http;
-      using Rest;
-      using Versioning;
-      using Azure.ClientGenerator.Core;
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
       @service
       namespace MyService;
       model Params {
@@ -512,26 +467,16 @@ it("@override impact", async () => {
 
       op func(...Params): void;
       `,
-    "client.tsp": `
-      import "./main.tsp";
-      import "@typespec/http";
-      import "@typespec/rest";
-      import "@typespec/versioning";
-      import "@azure-tools/typespec-client-generator-core";
-      using Http;
-      using Rest;
-      using Versioning;
-      using Azure.ClientGenerator.Core;
+      `
       namespace MyCustomizations;
 
       op func(params: MyService.Params): void;
 
       @@override(MyService.func, MyCustomizations.func);
       `,
-  });
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+    ),
+  );
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   const method = client.methods[0] as SdkServiceMethod<SdkHttpOperation>;
@@ -553,7 +498,7 @@ it("@override impact", async () => {
 });
 
 it("should not add Accept header when success response has no body but error response has body", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     @error
     model ErrorModel {
       message: string;
@@ -568,9 +513,7 @@ it("should not add Accept header when success response has no body but error res
       @body error: ErrorModel;
     };
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const parameters = method.parameters;
@@ -585,7 +528,7 @@ it("should not add Accept header when success response has no body but error res
 });
 
 it("should add Accept header when success response has body", async () => {
-  const { program } = await SimpleTesterWithBuiltInService.compile(`
+  const { program } = await SimpleTesterWithService.compile(`
     model ResponseModel {
       data: string;
     }
@@ -601,9 +544,7 @@ it("should add Accept header when success response has body", async () => {
       @body error: ErrorModel;
     };
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const parameters = method.parameters;

@@ -234,7 +234,7 @@ describe("models", () => {
       .toBeValid();
   });
 
-  it("anonymous model caused by lro metadata", { timeout: 30000 }, async () => {
+  it("anonymous model caused by lro metadata", async () => {
     const armRunner = await ArmTester.createInstance();
     const armTester = createLinterRuleTester(
       armRunner,

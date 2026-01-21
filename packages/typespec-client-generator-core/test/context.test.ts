@@ -25,9 +25,7 @@ it("multiple call with versioning", async () => {
   `;
 
   const { program } = await SimpleTester.compile(tsp);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   let clients = listClients(context);
   strictEqual(clients.length, 1);
   ok(clients[0].type);
@@ -58,7 +56,7 @@ it("export TCGC output from emitter", async () => {
   strictEqual(codeModel["models"][0]["name"], "Test");
 });
 
-it("export complex TCGC output from emitter", { timeout: 30000 }, async () => {
+it("export complex TCGC output from emitter", async () => {
   const { outputs } = await ArmTester.emit(SdkTestLibrary.name).compile(
     `
       @armProviderNamespace
@@ -199,11 +197,7 @@ it("export TCGC output from context", async () => {
       }
     `);
 
-  await createSdkContextForTester(
-    program,
-    { emitterName: "@azure-tools/typespec-python" },
-    { exportTCGCoutput: true },
-  );
+  await createSdkContextForTester(program, {}, { exportTCGCoutput: true });
 
   const output = fs.fs.get(resolveVirtualPath("tsp-output", "tcgc-output.yaml"));
   ok(output);
@@ -223,11 +217,7 @@ it("export TCGC output with emitter name from context", async () => {
       }
     `);
 
-  await createSdkContextForTester(
-    program,
-    { emitterName: "@azure-tools/typespec-python" },
-    { exportTCGCoutput: true },
-  );
+  await createSdkContextForTester(program, {}, { exportTCGCoutput: true });
 
   const output = fs.fs.get(resolveVirtualPath("tsp-output", "tcgc-output.yaml"));
   ok(output);

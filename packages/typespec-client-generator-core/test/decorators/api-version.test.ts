@@ -13,9 +13,7 @@ describe("@apiVersion", () => {
           version: string
         ): string;
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     // there will be no api version param on client, bc the service isn't versioned
     const apiVersionClientParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -48,9 +46,7 @@ describe("@apiVersion", () => {
         version: string
       ): string;
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
 
     const apiVersionClientParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -80,9 +76,7 @@ describe("@apiVersion", () => {
         @query "api-version": string
       ): string;
     `);
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
+    const context = await createSdkContextForTester(program);
     const sdkPackage = context.sdkPackage;
     const apiVersionClientParam = sdkPackage.clients[0].clientInitialization.parameters.find(
       (x) => x.name === "api-version",

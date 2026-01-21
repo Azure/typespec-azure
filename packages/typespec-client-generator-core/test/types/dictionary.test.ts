@@ -25,9 +25,7 @@ it("same type's dictionary come to same type", async () => {
       op get(): TestDictionary;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const testDictionaryModel = context.sdkPackage.models[0];
   strictEqual(testDictionaryModel.kind, "model");
   strictEqual(testDictionaryModel.name, "TestDictionary");
@@ -63,9 +61,7 @@ it("recursive dictionary type", async () => {
       op get(): TestDictionary;
     }
   `);
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-java",
-  });
+  const context = await createSdkContextForTester(program);
   const testModel = context.sdkPackage.models[1];
   strictEqual(testModel.kind, "model");
   strictEqual(testModel.name, "Test");

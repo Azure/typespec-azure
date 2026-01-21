@@ -1,7 +1,7 @@
 import { FinalStateValue } from "@azure-tools/typespec-azure-core";
 import { ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { ArmServiceTester, createSdkContextForTester, SimpleTester } from "../tester.js";
+import { ArmTesterWithService, createSdkContextForTester, SimpleTester } from "../tester.js";
 
 it("should mark regular operation as LRO when decorated with @markAsLro", async () => {
   const { program } = await SimpleTester.compile(`
@@ -28,9 +28,7 @@ it("should mark regular operation as LRO when decorated with @markAsLro", async 
       }
     `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-csharp",
-  });
+  const context = await createSdkContextForTester(program);
   const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
 
@@ -71,7 +69,7 @@ it("should apply @markAsLro with language scope", async () => {
     `);
 
   const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-csharp",
+    emitterName: "@azure-typespec/typespec-csharp",
   });
   strictEqual(context.sdkPackage.models.length, 2);
   const processingResponse = context.sdkPackage.models.find((m) => m.name === "ProcessingResponse");
@@ -143,9 +141,7 @@ it("should work with complex model return types", async () => {
       }
     `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-csharp",
-  });
+  const context = await createSdkContextForTester(program);
   const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
 
@@ -162,8 +158,8 @@ it("should work with complex model return types", async () => {
   strictEqual(responseType.name, "ComplexResult");
 });
 
-it("should work with ArmResourceRead", { timeout: 30000 }, async () => {
-  const { program } = await ArmServiceTester.compile(`
+it("should work with ArmResourceRead", async () => {
+  const { program } = await ArmTesterWithService.compile(`
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
       }
@@ -176,9 +172,7 @@ it("should work with ArmResourceRead", { timeout: 30000 }, async () => {
       >;
     `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
   const method = methods[0];
@@ -197,7 +191,7 @@ it("should work with ArmResourceRead", { timeout: 30000 }, async () => {
 });
 
 it("Extension.Read", async () => {
-  const { program } = await ArmServiceTester.compile(`
+  const { program } = await ArmTesterWithService.compile(`
     /** A ContosoProviderHub resource */
     model Employee is TrackedResource<{}> {
       ...ResourceNameParameter<Employee>;
@@ -211,9 +205,7 @@ it("Extension.Read", async () => {
     >;
     `);
 
-  const context = await createSdkContextForTester(program, {
-    emitterName: "@azure-tools/typespec-python",
-  });
+  const context = await createSdkContextForTester(program);
   const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
   const method = methods[0];
