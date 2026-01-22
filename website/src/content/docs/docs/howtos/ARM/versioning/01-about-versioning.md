@@ -13,9 +13,9 @@ At the same time, Azure ResourceManager teams may need to maintain OpenAPI files
 - RPaaS live validation support
 - ARM registration support
 
-This document describes how to evolve APIs according to this guidelines, and how to meet both the single active preview guideline and the need to maintain some preview version in Swagger in some situations, focusing on authoring of new APIs:
+This document describes how to evolve APIs according to these guidelines, and how to meet both the single active preview guideline and the need to maintain some preview versions in Swagger in some situations, focusing on authoring of new APIs:
 
-- [How to add a new preview version when the last version is preview](./02-preview-after-preview.md)
+- [How to add a new preview version when the last version was preview](./02-preview-after-preview.md)
 - [How to add a new stable version when the last version was preview](./03-stable-after-preview.md)
 - [How to add a new preview version when the last version was stable](./04-preview-after-stable.md)
 - [How to add a new stable version when the last version was stable](./05-stable-after-stable.md)
@@ -24,8 +24,7 @@ This document also describes how to move an existing multi-api typespec spec wit
 
 - [How to convert a spec with multiple preview versions into a spec with a single active preview](./06-converting-specs.md)
 
-Additionally, there are some services that may have features that remain in preview after a stable version is released. The recommended way to handle
-this scenario is to model your ResourceProvider as multiple services, so they can version independently. For some older services, this is not an option, so there
-is specialized guidance on how to maintain preview features over stable api releases:
+Additionally, there are some services that may always have features that remain in preview after a stable version is released. This can happen, for example, if there are multiple independent teams that own different resources in a service and operate on their own schedule. The recommended way to handle
+this scenario is to model your ResourceProvider as multiple services, so each version and the corresponding SDKs can version independently. For some older services, this is not an option, so there is specialized guidance on how to maintain preview features over stable api releases:
 
 - [How to manage a single active preview if your service always has some features in preview](./07-perpetual-preview.md)

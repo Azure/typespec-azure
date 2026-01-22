@@ -2,11 +2,11 @@
 title: Adding a Stable Version when the Last Version was a Stable Version
 ---
 
-When the previous version of your TypeSpec spec is a stable version, adding a new stable version is simply adding any new types and operations in the new stable and marking them with the appropriate versioning decoration, as described in [TypeSpec Versioning for Azure ResourceManager APIs](../versioning.md).
+When the latest api-version in your TypeSpec spec is a stable version, adding a new stable version is simply adding any new types and operations in the new stable and marking them with the appropriate versioning decoration, as described in [TypeSpec Versioning for Azure ResourceManager APIs](../versioning.md).
 
 ## Making Changes to your TypeSpec spec
 
-- Add a new version to the `Versions` enum in your spec for the new stable.
+- Add a new version to the `Versions` enum in your spec for the new stable api-version.
 - Make changes to the API description based on how the API has changed
   - If any types are removed in this stable (unlikely) mark these with an `@removed` decorator referencing the new version
   - If any types are added, renamed, or otherwise modified in the new version, mark them with the appropriate versioning decorator

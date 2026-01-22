@@ -10,8 +10,10 @@ For each type decorated with a versioning decorator that references a preview ve
 A conversion consists of the following steps, outlined in the sections below
 
 - Normalizing version decoration (optional)
-- Handling each versioning decorator application that references a preview version
+- Determining which versions should be removed: this should include all preview api-versions __except__ the last version (if the last version is a preview, that version will __not__ be removed.)
+- Handling each versioning decorator application that references a deleted preview version (except the __first__ version)
 - Removing the first version (if it is a preview)
+- Removing the deleted preview versions from the Versions enum
 - Cleaning up (optional)
 
 In this document we use the notation `@<decorator>(T, u, [arg])` this indicates an instance of the decorator `<decorator>` decorating type `T` using version `u` in a set of monotonically increasing versions `1..n`
@@ -20,8 +22,8 @@ In this document we use the notation `@<decorator>(T, u, [arg])` this indicates 
 
 Normalizing version decoration consists of removing redundant decorators and follows a few rules, described below. For these rules, consider an ordered set of versions `1...n`.
 
-- A decorator `@removed(T, c)` with type `T` and `c` in `1..n` may be safely removed if there is another decorator `@removed(T, a)` with `a` in `1..n` and `a < c` unless there is a decorator `@added(T, b)` with `b` in `1..n` and `a < b < c`.
-- A decorator `@added(T, c)` with type `T` and `c` in `1..n` may be safely removed if there is another decorator `@added(T,a)` with `a` in `1..n` and `a < c` unless there is a decorator `@removed(T,b)` with `b` in `1..n` and `a < b < c`.
+- Trim any sequence of `@removed` decorators without an `@added` between them: A decorator `@removed(T, c)` with type `T` and `c` in `1..n` may be safely removed if there is another decorator `@removed(T, a)` with `a` in `1..n` and `a < c` unless there is a decorator `@added(T, b)` with `b` in `1..n` and `a < b < c`.
+- Trim any sequence of `@added` decorators without any `@removed` between them: A decorator `@added(T, c)` with type `T` and `c` in `1..n` may be safely removed if there is another decorator `@added(T,a)` with `a` in `1..n` and `a < c` unless there is a decorator `@removed(T,b)` with `b` in `1..n` and `a < b < c`.
 - Any duplicated application of a versioning decorator to a type with the same parameters may be safely removed, that is:
   - `@added(T, a)` and `@added(T, a)` can be simplified to `@added(T, a)`
   - `@removed(T, a)` and `@removed(T, a)` can be simplified to `@removed(T, a)`
@@ -31,6 +33,15 @@ Normalizing version decoration consists of removing redundant decorators and fol
   - `@returnTypeChangedFrom(T, a, U)` and `@returnTypeChangedFrom(T, a, U)` can be simplified to `@returnTypeChangedFrom(T, a, U)`
 - If `@added(T, a)` and `@removed(T,a)` occur, `@added(T, a)` may be removed.
 - If any versioning decorator with 3 arguments `@dec(T, v, a)` where `T` is a type, `v` is a version and `a` is a valid arg value occurs with another application of the same decorator `@dec(T, v, b)` and `b != a`, then the innermost of the two decorators can be removed.
+- If any of the following decorators reference the first version, they may be removed:
+  - `@added`
+  - `@renamedFrom`
+  - `@madeOptional`
+  - `@typeChangedFrom`
+  - `@returnTypeChangedFrom`
+- if `@removed(T, 1)` occurs, where `T` is the decorated type and `1` is the first version:
+  - If `T` occurs in any subsequent version (i.e. if there is any), this decorator should remain
+  - Otherwise, the decorated type can simply be removed.
 
 ## Handling Each Versioning Decorator That References a Preview Version
 

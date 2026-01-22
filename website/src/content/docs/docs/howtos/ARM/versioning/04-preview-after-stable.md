@@ -2,7 +2,7 @@
 title: Adding a Preview Version when the Last Version was a Stable Version
 ---
 
-When the previous version of your TypeSpec spec is a stable version, adding a new preview version is simply adding any new types and operations in the new preview and marking them with the appropriate versioning decoration, as described in [TypeSpec Versioning for Azure ResourceManager APIs](../versioning.md).
+When the latest api-version in your TypeSpec spec is a stable version, adding a new preview version is simply adding any new types and operations in the new preview and marking them with the appropriate versioning decoration, as described in [TypeSpec Versioning for Azure ResourceManager APIs](../versioning.md).
 
 ## Making Changes to your TypeSpec spec
 

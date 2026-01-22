@@ -2,7 +2,7 @@
 title: Adding a Preview Version when the Last Version was a Preview
 ---
 
-When the previous version of your TypeSpec spec is a preview, adding a new preview version is simply replacing the latest preview version with a new preview version.
+When the last api-version in your TypeSpec spec is a preview, adding a new preview version is simply replacing the latest preview version with a new preview version.
 This includes:
 
 ## Making Changes to your TypeSpec spec
@@ -10,7 +10,11 @@ This includes:
 - Rename the latest preview version to match the new preview version, in all instances in the spec
   - In vscode, highlight the version name and select `rename symbol` from the context menu to rename the version throughout your spec
   - In any editor, search and replace the latest preview version in the spec with the new preview version
-- Update the version value of this version to match the new api-version string
+- Update the version value of this version to match the new api-version string, for example:
+
+  ~~v2025_12_01_preview: "2025-12-01-preview",~~
+  v2026_01_01_preview: "2026-01-01-preview",
+  
 - Update any version documentation to use the new version
 - Change the name of the `examples` version folder for the latest preview to match the new preview version
 - Make changes to the API description based on how the API has changed
@@ -41,24 +45,17 @@ This includes:
   C:\repos\azure-rest-api-specs > npm install
   ```
 
-- Rename any examples folder for the preview api-version to match the new api-version
-
-  ```bash
-  C:\repos\azure-rest-api-specs > cd specification\myRpShortname\resource-manager\Microsoft.MyRP\examples
-  C:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP\examples > mv 2025-12-01-preview 2026-01-15-preview
-  ```
-
 - Compile your spec
 
   ```bash
-  C:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP\examples > cd ..
+  C:\repos\azure-rest-api-specs > cd specification\myRpShortname\resource-manager\Microsoft.MyRP
   C:\repos\azure-rest-api-specsC:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP > npx tsp compile .
   ```
 
 - If you _don't_ need the older preview version, remove the OpenAPI directory for that version and update the `README.md` file to use the new version instead.
 
   ```bash
-  C:\repos\azure-rest-api-specsC:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP > rm -r 2025-12-01-preview
+  C:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP > rm -r 2025-12-01-preview
   ```
 
 - If you _do_ need the older preview version, update README.md to include a new entry for the new preview version.

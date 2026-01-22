@@ -2,20 +2,20 @@
 title: Adding a Stable Version when the Last Version was a Preview
 ---
 
-When the previous version of your TypeSpec spec is a preview, adding a new stable version means
+When the last api-version in your TypeSpec spec is a preview, adding a new stable version means
 
-This includes:
+This includes the followign steps:
 
 ## Making Changes to your TypeSpec spec
 
-- Add a new entry tpo the versions enum for the new stable version
+- Add a new entry to the versions enum for the new stable version
 - Update any version documentation to use the new version
 - Change the name of the `examples` version folder for the latest preview to match the new stable version
 - Determine which type changes from the latest preview are now stable
   - Update the versioning decorators for those changes to reference the new stable version
-  - For changes in the latest preview that are _not_ in the new stable version
-    - For any type with an `@added` decorator, remove the type
-    - For any property or parameter with a `@typeChangedFrom` decorator, replace the property type with the type in the second decorator argument, and then remove the decorator, for example
+  - For changes in the latest preview (p) that are _not_ in the new stable version
+    - For any type with an `@added(p)` decorator, remove the type
+    - For any property or parameter with a `@typeChangedFrom(p, Type)` decorator, replace the property type with the `Type` argument, and then remove the decorator, for example
 
       ```tsp
       @typeChangedFrom(Versions.2025-12-01-preview, string)
@@ -28,7 +28,7 @@ This includes:
       property: string;
       ```
 
-    - For any operation with an `@returnTypeChangedFrom` decorator, replace the return type with the type in the second decorator argument and then remove the decorator, for example:
+    - For any operation with an `@returnTypeChangedFrom(p, ReturnType)` decorator, replace the return type with the `ReturnType` argument and then remove the decorator, for example:
 
       ```tsp
       @returnTypeChangedFrom(Versions.2025-12-01-preview, void)
@@ -41,7 +41,7 @@ This includes:
       move is ArmResourceActionSync(Widget, MoveOptions, void);
       ```
 
-    - For any type with an `@renamedFrom` decorator, replace the name of the type with the second argument in the decorator and remove the decorator, for example:
+    - For any type with an `@renamedFrom(p, Name)` decorator, replace the name of the type with the `Name` argument in the decorator and remove the decorator, for example:
 
       ```tsp
       @renamedFrom(Versions.2025-12-01-preview, "oldProperty")
@@ -54,7 +54,7 @@ This includes:
       oldProperty: int32;
       ```
 
-    - For any property or parameter with a `@madeOptional` decorator, remove the decorator, and make the property required, for example:
+    - For any property or parameter with a `@madeOptional(p)` decorator, remove the decorator, and make the property required, for example:
 
       ```tsp
       @madeOptional(Versions.2025-12-01-preview)
@@ -67,7 +67,7 @@ This includes:
       property: int32;
       ```
 
-    - For any type with an `@removed` decorator, remove the decorator
+    - For any type with an `@removed(p)` decorator, remove the decorator
 
 - Model any additional changes in the new stable version and mark with the appropriate versioning decorator, referencing the new stable version
 - Add and modify examples to match the api changes in the new stable version
@@ -94,18 +94,11 @@ This includes:
   C:\repos\azure-rest-api-specs > npm install
   ```
 
-- Rename any examples folder for the preview api-version to match the new api-version
-
-  ```bash
-  C:\repos\azure-rest-api-specs > cd specification\myRpShortname\resource-manager\Microsoft.MyRP\examples
-  C:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP\examples > mv 2025-12-01-preview 2026-01-15-preview
-  ```
-
 - Compile your spec
 
   ```bash
-  C:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP\examples > cd ..
-  C:\repos\azure-rest-api-specsC:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP > npx tsp compile .
+  C:\repos\azure-rest-api-specs > cd specification\myRpShortname\resource-manager\Microsoft.MyRP
+  C:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP > npx tsp compile .
   ```
 
 - If you _don't_ need the older preview version, remove the OpenAPI directory for that version and update the `README.md` file to use the new version instead.

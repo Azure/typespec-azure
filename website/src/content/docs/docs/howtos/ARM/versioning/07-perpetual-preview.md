@@ -2,7 +2,7 @@
 title: Immediately Replacing a Preview Version
 ---
 
-For some Resource Providers, whenever a new stable version is released, a new preview version is created, because some preview features are not ready to be stable, but may become stable in a future version. To accommodate this need and account for the limitations of breaking change checks, which require a single version change for any PR into the rest-api-specs repo, the recommended solution is to introduce a stable and subsequent preview _together_ in your TypeSPed api description and then split this change into two PRs: one representing the new stable and the second representing the subsequent preview. This involves the following steps described in the sections below:
+For some Resource Providers, whenever a new stable version is released, a new preview version is created, because some preview features are not ready to be stable, but may become stable in a future version. To accommodate this need and account for the limitations of breaking change checks, which require a single version change for any PR into the rest-api-specs repo, the recommended solution is to introduce a stable and subsequent preview _together_ in your TypeSpec api description and then split this change into two PRs: one representing the new stable and the second representing the subsequent preview. This involves the following steps described in the sections below:
 
 - Create the new preview version based on the latest preview version
 - Create the stable version (which should immediately precede the new preview version)
@@ -11,7 +11,7 @@ For some Resource Providers, whenever a new stable version is released, a new pr
 - After this PR is merged, create a PR with the whole spec, effectively adding the new preview
 
 ## Creating New Preview and Stable Versions
-- If the existing preview version is A, add the new stable version A + 1 and the new preview version A + 2 to the Versions enumeration.
+- If the existing preview version is `A`, add the new stable version `A + 1` and the new preview version `A + 2` to the Versions enumeration.
 - For all changes from preview version `A` that are part of stable version `A + 1`
   - if a new type was added in `A` and is now stable (`@added(T, A)`), add the new decorator `@added(T, A + 1)`
   - if a type was made optional in `A` and this change is now stable (`@madeOptional(T, A)`), add the new decorator `@madeOptional(T, A + 1)`
@@ -35,7 +35,7 @@ For some Resource Providers, whenever a new stable version is released, a new pr
   - Remove version `A + 2` and all decorators that reference version `A + 2` from the spec.
   - Compile the spec to produce artifacts (especially the new stable version (`A + 1`) openapi )
   - Add the new stable version (`A + 1`) to the README.md file.
-  - Create a and merge the PR
+  - Create and merge the PR
 
 ## Create a PR with the Combined Spec
 - Do the following with Copy 2
