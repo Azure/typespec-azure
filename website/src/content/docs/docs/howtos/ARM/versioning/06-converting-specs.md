@@ -10,8 +10,8 @@ For each type decorated with a versioning decorator that references a preview ve
 A conversion consists of the following steps, outlined in the sections below
 
 - Normalizing version decoration (optional)
-- Determining which versions should be removed: this should include all preview api-versions __except__ the last version (if the last version is a preview, that version will __not__ be removed.)
-- Handling each versioning decorator application that references a deleted preview version (except the __first__ version)
+- Determining which versions should be removed: this should include all preview api-versions **except** the last version (if the last version is a preview, that version will **not** be removed.)
+- Handling each versioning decorator application that references a deleted preview version (except the **first** version)
 - Removing the first version (if it is a preview)
 - Removing the deleted preview versions from the Versions enum
 - Cleaning up (optional)
