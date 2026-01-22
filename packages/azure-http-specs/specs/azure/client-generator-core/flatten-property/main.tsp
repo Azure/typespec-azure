@@ -1,12 +1,10 @@
 import "@typespec/http";
 import "@typespec/spector";
 import "@azure-tools/typespec-client-generator-core";
-import "@azure-tools/typespec-azure-core";
 
 using Http;
 using global.Azure.ClientGenerator.Core;
 using Spector;
-using global.Azure.Core;
 
 @doc("Illustrates the model flatten cases.")
 @scenarioService("/azure/client-generator-core/flatten-property")
