@@ -14,62 +14,65 @@ A conversion consists of the following steps, outlined in the sections below
 - Removing the first version (if it is a preview)
 - Cleaning up (optional)
 
+In this document we use the notation `@<decorator>(T, u, [arg])` this indicates an instance of the decorator `<decorator>` decorating type `T` using version `u` in a set of monotonically increasing versions `1..n`
+
 ## Normalizing Version Decoration (optional)
 
 Normalizing version decoration consists of removing redundant decorators and follows a few rules, described below. For these rules, consider an ordered set of versions `1...n`.
 
-- A decorator `@@removed(T, c)` with type `T` and `c` in `1..n` may be safely removed if there is another decorator `@@removed(T, a)` with `a` in `1..n` and `a < c` unless there is a decorator `@@added(T, b)` with `b` in `1..n` and `a < b < c`.
-- A decorator `@@added(T, c)` with type `T` and `c` in `1..n` may be safely removed if there is another decorator `@@added(T,a)` with `a` in `1..n` and `a < c` unless there is a decorator `@@removed(T,b)` with `b` in `1..n` and `a < b < c`.
+- A decorator `@removed(T, c)` with type `T` and `c` in `1..n` may be safely removed if there is another decorator `@removed(T, a)` with `a` in `1..n` and `a < c` unless there is a decorator `@added(T, b)` with `b` in `1..n` and `a < b < c`.
+- A decorator `@added(T, c)` with type `T` and `c` in `1..n` may be safely removed if there is another decorator `@added(T,a)` with `a` in `1..n` and `a < c` unless there is a decorator `@removed(T,b)` with `b` in `1..n` and `a < b < c`.
 - Any duplicated application of a versioning decorator to a type with the same parameters may be safely removed, that is:
-  - `@@added(T, a)` and `@@added(T, a)` can be simplified to `@@added(T, a)`
-  - `@@removed(T, a)` and `@@removed(T, a)` can be simplified to `@@removed(T, a)`
-  - `@@madeOptional(T, a)` and `@@madeOptional(T, a)` can be simplified to `@@madeOptional(T, a)`
-  - `@@renamedFrom(T, a, name)` and `@@renamedFrom(T, a, name)` can be simplified to `@@renamedFrom(T, a, name)`
-  - `@@typeChangedFrom(T, a, U)` and `@@typeChangedFrom(T, a, U)` can be simplified to `@@typeChangedFrom(T, a, U)`
-  - `@@returnTypeChangedFrom(T, a, U)` and `@@returnTypeChangedFrom(T, a, U)` can be simplified to `@@returnTypeChangedFrom(T, a, U)`
+  - `@added(T, a)` and `@added(T, a)` can be simplified to `@added(T, a)`
+  - `@removed(T, a)` and `@removed(T, a)` can be simplified to `@removed(T, a)`
+  - `@madeOptional(T, a)` and `@madeOptional(T, a)` can be simplified to `@madeOptional(T, a)`
+  - `@renamedFrom(T, a, name)` and `@renamedFrom(T, a, name)` can be simplified to `@renamedFrom(T, a, name)`
+  - `@typeChangedFrom(T, a, U)` and `@typeChangedFrom(T, a, U)` can be simplified to `@typeChangedFrom(T, a, U)`
+  - `@returnTypeChangedFrom(T, a, U)` and `@returnTypeChangedFrom(T, a, U)` can be simplified to `@returnTypeChangedFrom(T, a, U)`
 - If `@added(T, a)` and `@removed(T,a)` occur, `@added(T, a)` may be removed.
-- If any versioning decorator with 3 arguments `@@dec(T, v, a)` where `T` is a type, `v` is a version and `a` is a valid arg value occurs with another application of the same decorator `@@dec(T, v, b)` and `b != a`, then the innermost of the two decorators can be removed.
+- If any versioning decorator with 3 arguments `@dec(T, v, a)` where `T` is a type, `v` is a version and `a` is a valid arg value occurs with another application of the same decorator `@dec(T, v, b)` and `b != a`, then the innermost of the two decorators can be removed.
 
 ## Handling Each Versioning Decorator That References a Preview Version
 
-## `@@renamedFrom(T, u, name)` decorator
+## `@renamedFrom(T, u, name)` decorator
 
 - Based on the version referenced in the decorator, determine the immediate successor version `u + 1`
 - If version `u + 1` does not exist (the version argument is the last version) then this version will not be deleted
-- If there is one or more `@@renamedFrom(T, u + 1, anotherName)` decorators, remove them.
-- Change `@@renamedFrom(T, u, name)` to `@@renamedFrom(T, u + 1, name)`
+- If there is one or more `@renamedFrom(T, u + 1, anotherName)` decorators, remove them.
+- Change `@renamedFrom(T, u, name)` to `@renamedFrom(T, u + 1, name)`
 
 ## `@typeChangedFrom(T, u, type)` decorator
 
 - Based on the version referenced in the decorator, determine the immediate successor version `u + 1`
 - If version `u + 1` does not exist (the version argument is the last version) then this version will not be deleted
 - If there is one or more `@typeChangedFrom` decorators referencing the immediate successor version, remove them.
-- Change the version argument in the decorator to match the successor version
+- Change `@typeChangedFrom(T, u, type)` to `@typeChangedFrom(T, u + 1, type)`
 
 ## `@returnTypeChangedFrom(T, u, returnType)` decorator
 
 - Based on the version referenced in the decorator, determine the immediate successor version `u + 1`
 - If version `u + 1` does not exist (the version argument is the last version) then this version will not be deleted
 - If there is one or more `@returnTypeChangedFrom` decorators referencing the immediate successor version, remove them.
-- Change the version argument in the decorator to match the successor version
+- Change `@returnTypeChangedFrom(T, u, returnType)` to `@returnTypeChangedFrom(T, u + 1, returnType)`
 
 ## `@madeOptional(T, u)` decorator
 
 - Based on the version referenced in the decorator, determine the immediate successor version `u + 1`
 - If version `u + 1` does not exist (the version argument is the last version) then this version will not be deleted
 - If there is one or more `@madeOptional` decorators referencing the immediate successor version, remove them.
-- Change the version argument in the decorator to match the successor version
+- Change `@madeOption(T, u)` to `@madeOptional(T, u + 1)`
 
 ## `@added(T, u)` decorator
 
 - Based on the version referenced in the decorator, determine the immediate successor version `u + 1`
 - If version `u + 1` does not exist (the version argument is the last version) then this version will not be deleted
-- If there is one or more `@added(T, u+ 1)` decorators referencing the immediate successor version
+- If there is one or more `@added(T, u + 1)` decorators referencing the immediate successor version
   - Remove them.
   - Change the version argument in the decorator to match the successor version [ `@added(T, u) -> @added(T, u + 1)`]
 - If there is an `@removed(T, u + 1)` decorator referencing the immediate successor version
   - If the type does not occur in any previous version `v < u`, remove the type altogether
   - If the type does occur in a previous version, remove the `@added(T, u)` decorator.
+- If there are no `@added(T, u + 1)` or `@removed(T, u + 1)` decorators referencing the immediate successor version, change the version in the decorator to the immediate successor version: [`@added(T, u)` -> `@added(T, u + 1)`]
 
 ## `@removed(T, u)` decorator
 
@@ -78,8 +81,9 @@ Normalizing version decoration consists of removing redundant decorators and fol
 - If there is one or more `@removed(T, u + 1)` decorators referencing the immediate successor version
   - Remove them.
   - Change the version argument in the decorator to match the successor version [`@removed(T, u) -> @removed(T, u + 1)`]
-- if there is one or more `@added(T, u + 1)` decorators
+- if there is one or more `@added(T, u + 1)` decorators in the immediate successor version
   - Remove the `@removed(T, u)` decorator
+- If there are no `@removed(T, u + 1)` or `@removed(T, u + 1)` decorators referencing the immediate successor version, change the version in the decorator to the immediate successor version: [`@removed(T, u)` -> `@removed(T, u + 1)`]
 
 ## Removing the _First_ version in the Specification
 
