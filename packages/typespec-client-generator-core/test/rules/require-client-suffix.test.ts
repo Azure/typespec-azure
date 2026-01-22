@@ -25,7 +25,9 @@ it("namespace doesn't end in client", async () => {
       `
       @client
       @service
-      namespace MyService;
+      namespace MyService {
+        op test(): void;
+      }
       `,
     )
     .toEmitDiagnostics([
@@ -43,7 +45,9 @@ it("explicit client name doesn't ends with Client", async () => {
       `
       @client({name: "MySDK"})
       @service
-      namespace MyService;
+      namespace MyService {
+        op test(): void;
+      }
       `,
     )
     .toEmitDiagnostics([
@@ -60,11 +64,14 @@ it("interface", async () => {
     .expect(
       `
       @service
-      namespace MyService;
+      namespace MyService {
+        op serviceOp(): void;
+      }
 
       namespace MyCustomizations {
         @client({service: MyService})
         interface MyInterface {
+          op test(): void;
         };
       }
       `,

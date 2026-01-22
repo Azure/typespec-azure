@@ -13,7 +13,7 @@ it("no duplicate operation with @clientLocation", async () => {
     `
     @service
     namespace StorageService;
-      
+
     interface StorageTasks {
       @clientLocation("StorageTasksReport")
       @route("/list")
@@ -27,6 +27,8 @@ it("no duplicate operation with @clientLocation", async () => {
     `,
   );
 
+  // StorageTasks becomes empty because all operations are moved out via @clientLocation
+  // Since it wasn't explicitly defined with @client/@operationGroup, it's simply removed (no diagnostic)
   expectDiagnosticEmpty(diagnostics);
 });
 
@@ -128,7 +130,7 @@ it("duplicate operation with @clientLocation to new clients", async () => {
     `
     @service
     namespace Contoso.WidgetManager;
-      
+
     interface A {
       @clientLocation("B")
       @route("/a")
@@ -142,6 +144,7 @@ it("duplicate operation with @clientLocation to new clients", async () => {
     `,
   );
 
+  // A becomes empty and is removed since it wasn't explicitly defined with @client/@operationGroup
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
