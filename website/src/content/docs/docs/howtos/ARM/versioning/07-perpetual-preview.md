@@ -11,6 +11,7 @@ For some Resource Providers, whenever a new stable version is released, a new pr
 - After this PR is merged, create a PR with the whole spec, effectively adding the new preview
 
 ## Creating New Preview and Stable Versions
+
 - If the existing preview version is `A`, add the new stable version `A + 1` and the new preview version `A + 2` to the Versions enumeration.
 - For all changes from preview version `A` that are part of stable version `A + 1`
   - if a new type was added in `A` and is now stable (`@added(T, A)`), add the new decorator `@added(T, A + 1)`
@@ -38,6 +39,7 @@ For some Resource Providers, whenever a new stable version is released, a new pr
   - Create and merge the PR
 
 ## Create a PR with the Combined Spec
+
 - Do the following with Copy 2
   - Follow the instructions for normalizing decoration in the [converting specifications](./06-converting-specs.md#normalizing-version-decoration-optional) document. This will remove any redundant decoration between the new stable and preview versions (`A + 1` and `A + 2`).
   - Compile the spec to produce artifacts (especially the new stable and preview version (`A + 1` and `A + 2` ) apis).

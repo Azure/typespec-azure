@@ -14,7 +14,7 @@ This includes:
 
   ~~v2025_12_01_preview: "2025-12-01-preview",~~
   v2026_01_01_preview: "2026-01-01-preview",
-  
+
 - Update any version documentation to use the new version
 - Change the name of the `examples` version folder for the latest preview to match the new preview version
 - Make changes to the API description based on how the API has changed
