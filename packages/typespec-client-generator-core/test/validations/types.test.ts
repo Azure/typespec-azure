@@ -28,10 +28,8 @@ it("no duplicate operation with @clientLocation", async () => {
   );
 
   // StorageTasks becomes empty because all operations are moved out via @clientLocation
-  expectDiagnostics(diagnostics, {
-    code: "@azure-tools/typespec-client-generator-core/empty-client",
-    message: `Client "StorageTasks" has no operations. Clients should contain at least one operation.`,
-  });
+  // Since it wasn't explicitly defined with @client/@operationGroup, it's simply removed (no diagnostic)
+  expectDiagnosticEmpty(diagnostics);
 });
 
 it("no duplicate operation with @clientLocation another", async () => {
@@ -146,6 +144,7 @@ it("duplicate operation with @clientLocation to new clients", async () => {
     `,
   );
 
+  // A becomes empty and is removed since it wasn't explicitly defined with @client/@operationGroup
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
@@ -155,10 +154,6 @@ it("duplicate operation with @clientLocation to new clients", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       message: 'Client name: "a" is duplicated in language scope: "AllScopes"',
-    },
-    {
-      code: "@azure-tools/typespec-client-generator-core/empty-client",
-      message: `Client "A" has no operations. Clients should contain at least one operation.`,
     },
   ]);
 });
