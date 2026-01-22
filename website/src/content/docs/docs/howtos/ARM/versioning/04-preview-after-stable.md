@@ -7,6 +7,7 @@ When the latest api-version in your TypeSpec spec is a stable version, adding a 
 ## Making Changes to your TypeSpec spec
 
 - Add a new version to the `Versions` enum in your spec for the new preview.
+- Decorate this version with the `@previewVersion` decorator from the `Azure.Core` library
 - Make changes to the API description based on how the API has changed
   - If any types are removed in this preview (unlikely) mark these with an `@removed` decorator referencing the new version
   - If any types are added, renamed, or otherwise modified in the new version, mark them with the appropriate versioning decorator
