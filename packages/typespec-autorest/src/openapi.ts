@@ -3045,6 +3045,8 @@ function createFeatureDocumentProxy(
   )[0][1];
   const definitions = new Map<string, [string, OpenAPI2Schema]>();
   const resolvedParameters = new Map<string, [ModelProperty, OpenAPI2Parameter]>();
+  const commonFeatureKey = [...features.keys()].find((key) => key.toLowerCase() === "common");
+  const commonFeature = features.get(commonFeatureKey!);
   let currentFeature: string = "";
   return {
     getDefinitionMap() {
@@ -3166,11 +3168,17 @@ function createFeatureDocumentProxy(
       return Promise.resolve(docs);
     },
     createLocalRef(type) {
-      const feature = getFeature(program, type);
+      let feature = getFeature(program, type);
       currentFeature = feature.featureName;
+      if (currentFeature.toLowerCase() === "common" && commonFeature !== undefined) {
+        feature = commonFeature;
+      }
       const result: LateBoundReference = new LateBoundReference();
       result.useFeatures = true;
       result.file = feature.fileName!;
+      if (commonFeature !== undefined) {
+        result.commonFile = commonFeature.fileName;
+      }
       result.getFileContext = () => this.getCurrentFeature();
       return result;
     },
@@ -3186,7 +3194,7 @@ function createFeatureDocumentProxy(
       currentFeature = feature;
     },
     getParameterRef(key: string): string {
-      return `./common.json/parameters/${encodeURIComponent(key)}`;
+      return `./${commonFeature?.fileName ?? "common"}.json#/parameters/${encodeURIComponent(key)}`;
     },
   } as OpenApi2DocumentProxy;
 
