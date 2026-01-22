@@ -27,7 +27,7 @@ For some Resource Providers, whenever a new stable version is released, a new pr
   - Remove its example folder
   - Remove all references to version A in `README.md`
 
-  ## Create A Copy of the Spec for the Stable Version only
+## Create A Copy of the Spec for the Stable Version only
 
 - Create two copies of your spec
   - One which will contain just the new stable version (use this to create the first PR into the specs repo). Call this Copy 1.
