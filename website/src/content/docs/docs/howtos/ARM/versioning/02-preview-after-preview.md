@@ -15,11 +15,11 @@ This includes:
   ~~v2025_12_01_preview: "2025-12-01-preview",~~
   v2026_01_01_preview: "2026-01-01-preview",
 
-- Move the new preview version to be the _last version_ of the versions enum, and ensure it is decorated with `@previewVersion`
+- The new preview version should already be the _last version_ of the versions enum, also ensure it is decorated with `@previewVersion`
 - Update any version documentation to use the new version
 - Change the name of the `examples` version folder for the latest preview to match the new preview version
 - Make changes to the API description based on how the API has changed
-  - If any type that was introduced in the latest preview is _not_ in the new preview, simply remove the type
+  - If any type that was introduced in the latest preview is _not_ in the new preview, simply delete the type
   - If any other types are removed in this preview (unlikely) mark these with an `@removed` decorator referencing the new version
   - If any types are added, renamed, or otherwise modified in the new version, mark them with the appropriate versioning decorator
 - Add and modify examples to match the api changes
