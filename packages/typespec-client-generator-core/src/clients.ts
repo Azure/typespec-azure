@@ -213,12 +213,23 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     // if it is client, the crossLanguageDefinitionId is the ${namespace}, if it is operation group, the crosslanguageDefinitionId is the %{namespace}.%{operationGroupName}
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, clientType),
   };
-  // NOTE: getSdkMethods recursively calls createSdkClientType
+  // Handle client methods
   sdkClientType.methods = diagnostics.pipe(
     createSdkMethods<TServiceOperation>(context, client, sdkClientType),
   );
+  // Handle sub-clients
+  for (const operationGroup of listOperationGroups(context, client)) {
+    const operationGroupClient = diagnostics.pipe(
+      createSdkClientType<TServiceOperation>(context, operationGroup, sdkClientType),
+    );
+    if (sdkClientType.children) {
+      sdkClientType.children.push(operationGroupClient);
+    } else {
+      sdkClientType.children = [operationGroupClient];
+    }
+  }
+  // Handle default client parameters (endpoint, credential, api version, subscription id)
   addDefaultClientParameters(context, sdkClientType);
-  // update initialization model properties
 
   return diagnostics.wrap(sdkClientType);
 }
@@ -238,7 +249,7 @@ function addDefaultClientParameters<
     .get(client.__raw)
     ?.find((x) => x.isApiVersionParam);
   if (!apiVersionParam) {
-    for (const sc of listOperationGroups(context, client.__raw, true)) {
+    for (const sc of listOperationGroups(context, client.__raw)) {
       // if any sub operation groups have an api version param, the top level needs
       // the api version param as well
       apiVersionParam = context.__clientParametersCache.get(sc)?.find((x) => x.isApiVersionParam);
@@ -262,7 +273,7 @@ function addDefaultClientParameters<
     .get(client.__raw)
     ?.find((x) => isSubscriptionId(context, x));
   if (!subId && context.arm) {
-    for (const sc of listOperationGroups(context, client.__raw, true)) {
+    for (const sc of listOperationGroups(context, client.__raw)) {
       // if any sub operation groups have an subId param, the top level needs it as well
       subId = context.__clientParametersCache.get(sc)?.find((x) => isSubscriptionId(context, x));
       if (subId) break;
