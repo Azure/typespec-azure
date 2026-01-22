@@ -14,6 +14,7 @@ A conversion consists of the following steps, outlined in the sections below
 - Handling each versioning decorator application that references a deleted preview version (except the **first** version)
 - Removing the first version (if it is a preview)
 - Removing the deleted preview versions from the Versions enum
+- If there is a remaining preview version, it should be the last version in the versions enum. Ensure it is decorated with the `@previewVersion` decorator.
 - Cleaning up (optional)
 
 In this document we use the notation `@<decorator>(T, u, [arg])` this indicates an instance of the decorator `<decorator>` decorating type `T` using version `u` in a set of monotonically increasing versions `1..n`

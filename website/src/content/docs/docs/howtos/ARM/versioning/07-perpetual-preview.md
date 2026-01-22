@@ -12,7 +12,7 @@ For some Resource Providers, whenever a new stable version is released, a new pr
 
 ## Creating New Preview and Stable Versions
 
-- If the existing preview version is `A`, add the new stable version `A + 1` and the new preview version `A + 2` to the Versions enumeration.
+- If the existing preview version is `A`, add the new stable version `A + 1` and the new preview version `A + 2` to the Versions enumeration, ensure that version `A + 2` is decorated with `@previewVersion` from the `Azure.Core` library (and remove that decoration from any other version).
 - For all changes from preview version `A` that are part of stable version `A + 1`
   - if a new type was added in `A` and is now stable (`@added(T, A)`), add the new decorator `@added(T, A + 1)`
   - if a type was made optional in `A` and this change is now stable (`@madeOptional(T, A)`), add the new decorator `@madeOptional(T, A + 1)`
@@ -21,27 +21,39 @@ For some Resource Providers, whenever a new stable version is released, a new pr
   - if an operation returnType was changed in `A` and this change is now stable (`@returnTypeChangedFrom(T, A, U)`), add the new decorator `@returnTypeChangedFrom(T, A + 1, U)`
   - If a type was removed in `A` and this change is now stable (`@removed(T, A)`), add the new decorator `@removed(T, A + 1)`
 - Change all versioning decorators `dec(T, A, args)` to `dec(T, A + 2, args)` where `T` is a type, `A` is the latest preview version, `A + 2` is the new preview version you added in the first step and `args` are any additional arguments to the decorator. Note that, after this change, some decorators will be duplicated in version `A + 1` and version `A + 2`. This is expected.
+- Add any new type changes to stable version (A + 1) and decorate appropriately, as shown in the [versioning guide](../versioning.md). Note that these changes should also appear in the new preview (A + 2)
 - Remove version `A` from the versions enumeration
-- Create examples directories for the two new versions and populate them with appropriate examples
+- Create examples directories for the new stable version (A + 1) and populate them with appropriate examples
 - If version A _is not needed_ in the specs repo
   - Remove its example folder
   - Remove all references to version A in `README.md`
 
 ## Create A Copy of the Spec for the Stable Version only
 
-- Create two copies of your spec
-  - One which will contain just the new stable version (use this to create the first PR into the specs repo). Call this Copy 1.
-  - The other will contain both the new stable _and_ preview versions (use this to create the final PR after the first PR is merged). Call this Copy 2.
-- Do the following with Copy 1
-  - Remove version `A + 2` and all decorators that reference version `A + 2` from the spec.
+- Create a complete copy of your spec
+  - This copy will be used to contain just the new stable version (use this to create the first PR into the specs repo). Call this Copy.
+  - The original version will contain both the new stable _and_ preview versions (use this to create the final PR after the first PR is merged). Call this Original.
+- Do the following with the Copy
+  - Remove all decorators that reference version `A + 2` and use the same parameters as in `A + 1`
+    - For example, if these decorators exist: `@added(T, A + 2) @added(T, A + 1)`, then, after this step, only `@added(T, A + 1)` should remain in this copy of the spec.
+  - Undo and remove any remaining decorators referencing `A + 2` using the following guide:
+    - For any type `T` decorated with `@added(T, A + 2)`, remove the type `T` and all its decorators
+    - For any type `T` decorated with `@removed(T, A + 2)`, remove the decorator
+    - For any type `T` decorated with `@renamedFrom(T, A + 2, oldName)` rename the type `oldName` and remove the decorator
+    - For any property of parameter `T` decorated with `@typeChangedFrom(T, A + 2, oldType)` set the type of the property to `oldType` and remove the decorator
+    - For any operation `T` decorated with `@returnTypeChangedFrom(T, A + 2, oldType)` set the return type of the operation to `oldType` and remove the decorator
+    - For any property or parameter `T` decorated with `@madeOptional(T, A + 2)` make the parameter or property `T` required and remove the decorator
+  - Remove version `A + 2` from the version enum.
   - Compile the spec to produce artifacts (especially the new stable version (`A + 1`) openapi )
   - Add the new stable version (`A + 1`) to the README.md file.
   - Create and merge the PR
 
 ## Create a PR with the Combined Spec
 
-- Do the following with Copy 2
+- Do the following with the Original
   - Follow the instructions for normalizing decoration in the [converting specifications](./06-converting-specs.md#normalizing-version-decoration-optional) document. This will remove any redundant decoration between the new stable and preview versions (`A + 1` and `A + 2`).
+  - Add any type changes that are introduced in the new preview and decorate appropriately, following the [versioning guide](../versioning.md)
+  - Add a new example folder for the new preview version and populate with appropriate examples.
   - Compile the spec to produce artifacts (especially the new stable and preview version (`A + 1` and `A + 2` ) apis).
   - Copy the README.md from copy 1 and add the new preview version to the file.
   - Create and merge the final PR - this copy will be your specification going forward.
