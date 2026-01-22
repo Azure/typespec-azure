@@ -219,7 +219,7 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
   );
   // Check if the client is empty (has no methods and no children with operations)
   // Only emit diagnostic if client.type is defined (client has a source TypeSpec type to attach the diagnostic to)
-  if (sdkClientType.methods.length === 0 && !sdkClientType.children?.length && client.type) {
+  if (sdkClientType.methods.length === 0 && client.type) {
     reportDiagnostic(context.program, {
       code: "empty-client",
       target: client.type,
