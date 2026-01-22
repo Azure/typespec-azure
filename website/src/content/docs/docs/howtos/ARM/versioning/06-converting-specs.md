@@ -82,7 +82,7 @@ Normalizing version decoration consists of removing redundant decorators and fol
   - Remove them.
   - Change the version argument in the decorator to match the successor version [ `@added(T, u) -> @added(T, u + 1)`]
 - If there is an `@removed(T, u + 1)` decorator referencing the immediate successor version
-  - If the type does not occur in any previous version `v < u`, remove the type altogether
+  - If the type does not occur in any previous version `v < u`, delete the type altogether
   - If the type does occur in a previous version, remove the `@added(T, u)` decorator.
 - If there are no `@added(T, u + 1)` or `@removed(T, u + 1)` decorators referencing the immediate successor version, change the version in the decorator to the immediate successor version: [`@added(T, u)` -> `@added(T, u + 1)`]
 

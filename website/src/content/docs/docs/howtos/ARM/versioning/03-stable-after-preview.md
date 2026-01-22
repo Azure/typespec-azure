@@ -14,7 +14,7 @@ This includes the followign steps:
 - Determine which type changes from the latest preview are now stable
   - Update the versioning decorators for those changes to reference the new stable version
   - For changes in the latest preview (p) that are _not_ in the new stable version
-    - For any type with an `@added(p)` decorator, remove the type
+    - For any type with an `@added(p)` decorator, delete the type
     - For any property or parameter with a `@typeChangedFrom(p, Type)` decorator, replace the property type with the `Type` argument, and then remove the decorator, for example
 
       ```tsp

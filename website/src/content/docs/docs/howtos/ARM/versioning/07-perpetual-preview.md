@@ -37,7 +37,7 @@ For some Resource Providers, whenever a new stable version is released, a new pr
   - Remove all decorators that reference version `A + 2` and use the same parameters as in `A + 1`
     - For example, if these decorators exist: `@added(T, A + 2) @added(T, A + 1)`, then, after this step, only `@added(T, A + 1)` should remain in this copy of the spec.
   - Undo and remove any remaining decorators referencing `A + 2` using the following guide:
-    - For any type `T` decorated with `@added(T, A + 2)`, remove the type `T` and all its decorators
+    - For any type `T` decorated with `@added(T, A + 2)`, delete the type `T` and all its decorators
     - For any type `T` decorated with `@removed(T, A + 2)`, remove the decorator
     - For any type `T` decorated with `@renamedFrom(T, A + 2, oldName)` rename the type `oldName` and remove the decorator
     - For any property of parameter `T` decorated with `@typeChangedFrom(T, A + 2, oldType)` set the type of the property to `oldType` and remove the decorator
