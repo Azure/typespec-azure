@@ -12,6 +12,7 @@ import {
   $clientLocation,
   $clientName,
   $clientNamespace,
+  $clientOption,
   $convenientAPI,
   $deserializeEmptyStringAsNull,
   $flattenProperty,
@@ -55,6 +56,7 @@ export const $decorators = {
     responseAsBool: $responseAsBool,
     clientDoc: $clientDoc,
     clientLocation: $clientLocation,
+    clientOption: $clientOption,
   } satisfies AzureClientGeneratorCoreDecorators,
 
   "Azure.ClientGenerator.Core.Legacy": {

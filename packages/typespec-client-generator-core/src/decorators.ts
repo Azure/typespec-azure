@@ -45,6 +45,7 @@ import {
   ClientInitializationDecorator,
   ClientNameDecorator,
   ClientNamespaceDecorator,
+  ClientOptionDecorator,
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
   OperationGroupDecorator,
@@ -1851,3 +1852,36 @@ export function isInScope(context: TCGCContext, entity: Operation | ModelPropert
   }
   return true;
 }
+
+export const clientOptionKey = createStateSymbol("ClientOption");
+
+/**
+ * `@clientOption` decorator implementation.
+ * Pass experimental flags or options to emitters without requiring TCGC reshipping.
+ * The decorator data is stored as {name, value} and exposed via the decorators array.
+ */
+export const $clientOption: ClientOptionDecorator = (
+  context: DecoratorContext,
+  target: Type,
+  name: string,
+  value: Type,
+  scope?: LanguageScopes,
+) => {
+  // Always emit warning that this is experimental
+  reportDiagnostic(context.program, {
+    code: "client-option",
+    target: target,
+  });
+
+  // Emit additional warning if scope is not provided
+  if (scope === undefined) {
+    reportDiagnostic(context.program, {
+      code: "client-option-requires-scope",
+      target: target,
+    });
+  }
+
+  // Store the option data - each decorator application is stored separately
+  // The decorator info will be exposed via the decorators array on SDK types
+  setScopedDecoratorData(context, $clientOption, clientOptionKey, target, { name, value }, scope);
+};

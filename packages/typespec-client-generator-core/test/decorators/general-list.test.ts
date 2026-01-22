@@ -105,9 +105,9 @@ it.skip("decorator arg type not supported", async function () {
   });
 });
 
-it("multiple same decorators", async function () {
+it("multiple same decorators with matching scope", async function () {
   runner = await createSdkTestRunner(
-    {},
+    { emitterName: "@azure-tools/typespec-python" },
     { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] },
   );
 
@@ -117,14 +117,8 @@ it("multiple same decorators", async function () {
     op test(): void;
   `);
 
+  // Only the decorator with matching scope (python) should be included
   deepStrictEqual(runner.context.sdkPackage.clients[0].methods[0].decorators, [
-    {
-      name: "Azure.ClientGenerator.Core.@clientName",
-      arguments: {
-        rename: "testForJava",
-        scope: "java",
-      },
-    },
     {
       name: "Azure.ClientGenerator.Core.@clientName",
       arguments: {
@@ -133,6 +127,33 @@ it("multiple same decorators", async function () {
       },
     },
   ]);
+  expectDiagnostics(runner.context.diagnostics, []);
+});
+
+it("multiple same decorators without scope", async function () {
+  runner = await createSdkTestRunner(
+    {},
+    { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] },
+  );
+
+  await runner.compileWithBuiltInService(`
+    @clientName("testNoScope1")
+    @clientName("testNoScope2")
+    op test(): void;
+  `);
+
+  // Decorators without scope should all be included
+  const decorators = runner.context.sdkPackage.clients[0].methods[0].decorators;
+  strictEqual(decorators.length, 2);
+
+  const decorator1 = decorators.find((d) => d.arguments.rename === "testNoScope1");
+  const decorator2 = decorators.find((d) => d.arguments.rename === "testNoScope2");
+
+  ok(decorator1, "testNoScope1 decorator should exist");
+  ok(decorator2, "testNoScope2 decorator should exist");
+  strictEqual(decorator1!.name, "Azure.ClientGenerator.Core.@clientName");
+  strictEqual(decorator2!.name, "Azure.ClientGenerator.Core.@clientName");
+
   expectDiagnostics(runner.context.diagnostics, []);
 });
 

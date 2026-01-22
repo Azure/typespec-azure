@@ -944,6 +944,36 @@ export type ClientDocDecorator = (
   scope?: string,
 ) => DecoratorValidatorCallbacks | void;
 
+/**
+ * Pass experimental flags or options to emitters without requiring TCGC reshipping.
+ * This decorator is intended for temporary workarounds or experimental features and requires
+ * suppression to acknowledge its experimental nature.
+ *
+ * **Warning**: This decorator always emits a warning that must be suppressed, and an additional
+ * warning if no scope is provided (since options are typically language-specific).
+ *
+ * @param target The type you want to apply the option to.
+ * @param name The name of the option (e.g., "enableFeatureFoo").
+ * @param value The value of the option. Can be any type; emitters will cast as needed.
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ * @example Apply an experimental option for Python
+ * ```typespec
+ * #suppress "@azure-tools/typespec-client-generator-core/client-option"
+ * @clientOption("enableFeatureFoo", true, "python")
+ * model MyModel {
+ *   prop: string;
+ * }
+ * ```
+ */
+export type ClientOptionDecorator = (
+  context: DecoratorContext,
+  target: Type,
+  name: string,
+  value: Type,
+  scope?: string,
+) => DecoratorValidatorCallbacks | void;
+
 export type AzureClientGeneratorCoreDecorators = {
   clientName: ClientNameDecorator;
   convenientAPI: ConvenientAPIDecorator;
@@ -965,4 +995,5 @@ export type AzureClientGeneratorCoreDecorators = {
   responseAsBool: ResponseAsBoolDecorator;
   clientLocation: ClientLocationDecorator;
   clientDoc: ClientDocDecorator;
+  clientOption: ClientOptionDecorator;
 };

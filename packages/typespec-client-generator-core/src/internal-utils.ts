@@ -402,6 +402,14 @@ export function getTypeDecorators(
             getDecoratorArgValue(context, decorator.args[i].jsValue, type, decoratorName),
           );
         }
+
+        // Filter by scope - only include decorators that match the current emitter or have no scope
+        const scopeArg = decoratorInfo.arguments["scope"];
+        if (scopeArg !== undefined && scopeArg !== context.emitterName) {
+          // Skip this decorator if it has a scope that doesn't match the current emitter
+          continue;
+        }
+
         retval.push(decoratorInfo);
       }
     }
