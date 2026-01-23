@@ -88,5 +88,7 @@ words:
   - vnet
   - WINDOWSVMIMAGE
   - azcore
+  - azkeys
+  - azsecrets
   - byval
   - petstoreopgrp
