@@ -604,7 +604,6 @@ it("allows resources with multiple endpoints using LegacyOperations", async () =
       otherCreateOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
       createOrUpdate is OtherOps.CreateOrUpdateAsync<Employee>;
       update is OtherOps.CustomPatchAsync<Employee, Employee>;
-      @Azure.ResourceManager.Legacy.renamePathParameter("employeeName", "eName", #{ignoreOrder: true})
       delete is OtherOps.DeleteWithoutOkAsync<Employee, Parameters = {@doc("Permanently Delete") @query permanent?: boolean;}>;
       list is OtherOps.List<Employee>;
       listBySubscription is ArmListBySubscription<Employee>;
@@ -637,22 +636,15 @@ it("allows resources with multiple endpoints using LegacyOperations", async () =
     "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/locations/{location}/employees/{employeeName}";
   const renamedLocationPath =
     "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/locations/{locationName}/employees/{employeeName}";
-  const deleteLocationPath =
-    "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/locations/{location}/employees/{eName}";
 
   const locationOperations = openApi.paths[locationPath];
   const renamedLocationOperations = openApi.paths[renamedLocationPath];
-  const deleteOperations = openApi.paths[deleteLocationPath];
   ok(resourceGroupOperations);
   ok(locationOperations);
   ok(renamedLocationOperations.get);
   ok(locationOperations.put);
   ok(locationOperations.patch);
-  ok(deleteOperations.delete);
-  const deleteParams = deleteOperations.delete.parameters;
-  expect(deleteParams.length).toBe(5);
-  const lastParam = deleteParams[4] as any;
-  expect(lastParam.name).toBe("eName");
+  ok(locationOperations.delete);
   ok(openApi.paths[`${locationPath}/move`].post);
   ok(resourceGroupOperations.put);
   ok(resourceGroupOperations.head);

@@ -3678,20 +3678,6 @@ model Foo is TrackedResource<FooProperties> {
 | --------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
 | identity? | [`ManagedServiceIdentityV4`](./data-types.md#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4) | The managed service identities assigned to this resource. |
 
-### `PathParameterRenameOptions` {#Azure.ResourceManager.Legacy.PathParameterRenameOptions}
-
-Advanced options for renaming parameters
-
-```typespec
-model Azure.ResourceManager.Legacy.PathParameterRenameOptions
-```
-
-#### Properties
-
-| Name         | Type      | Description                  |
-| ------------ | --------- | ---------------------------- |
-| ignoreOrder? | `boolean` | Preserve the parameter order |
-
 ### `PolymorphicResourceKindProperty` {#Azure.ResourceManager.Legacy.PolymorphicResourceKindProperty}
 
 Model representing the `kind` envelope property only for use with a polymorphic resource..
