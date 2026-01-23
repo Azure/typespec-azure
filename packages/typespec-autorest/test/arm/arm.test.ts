@@ -634,6 +634,7 @@ enum Features {
       @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
       @armResourceOperations
       interface Bars extends Azure.ResourceManager.TrackedResourceOperations<BarResource, BarResourceProperties> {}
+      @@Azure.ResourceManager.Legacy.feature(Bars.get, Features.FeatureA);
       `,
     ["featureA", "featureB", "shared"],
     { preset: "azure" },
@@ -655,6 +656,12 @@ enum Features {
   expect(aFile.definitions["FooResourceListResult"]).toBeDefined();
   expect(aFile.definitions["FooResourceUpdate"]).toBeDefined();
   expect(aFile.definitions["FooResourceUpdateProperties"]).toBeDefined();
+
+  expect(
+    aFile.paths[
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/barResources/{barResourceName}"
+    ].get,
+  ).toBeDefined();
 
   expect(bFile.definitions).toBeDefined();
   expect(bFile.definitions["BarResource"]).toBeDefined();
