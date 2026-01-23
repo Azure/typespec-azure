@@ -4,6 +4,7 @@ import {
   getFriendlyName,
   ignoreDiagnostics,
   Model,
+  ModelProperty,
   Operation,
   Program,
 } from "@typespec/compiler";
@@ -674,10 +675,17 @@ function createParamMutator(sourceParameterName: string, targetParameterName: st
         return MutatorFlow.DoNotRecur;
       },
       mutate: (_, clone) => {
-        const param = clone.properties.get(sourceParameterName);
-        param!.name = targetParameterName;
-        clone.properties.delete(sourceParameterName);
-        clone.properties.set(targetParameterName, param!);
+        const params: [string, ModelProperty][] = Array.from(clone.properties.entries());
+        clone.properties.clear();
+        for (let i = 0; i < params.length; i++) {
+          const [name, prop] = params[i];
+          let newName = name;
+          if (name === sourceParameterName) {
+            newName = targetParameterName;
+            prop.name = targetParameterName;
+          }
+          clone.properties.set(newName, prop);
+        }
         return MutatorFlow.DoNotRecur;
       },
     },

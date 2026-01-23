@@ -599,6 +599,7 @@ it("allows resources with multiple endpoints using LegacyOperations", async () =
 
     @armResourceOperations
     interface Employees {
+      @Azure.ResourceManager.Legacy.renamePathParameter("location", "locationName")
       get is OtherOps.Read<Employee>;
       otherCreateOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
       createOrUpdate is OtherOps.CreateOrUpdateAsync<Employee>;
@@ -632,11 +633,14 @@ it("allows resources with multiple endpoints using LegacyOperations", async () =
     ];
   const locationPath =
     "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/locations/{location}/employees/{employeeName}";
+  const renamedLocationPath =
+    "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/locations/{locationName}/employees/{employeeName}";
 
   const locationOperations = openApi.paths[locationPath];
+  const renamedLocationOperations = openApi.paths[renamedLocationPath];
   ok(resourceGroupOperations);
   ok(locationOperations);
-  ok(locationOperations.get);
+  ok(renamedLocationOperations.get);
   ok(locationOperations.put);
   ok(locationOperations.patch);
   ok(locationOperations.delete);
