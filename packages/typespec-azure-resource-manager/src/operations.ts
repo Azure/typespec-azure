@@ -675,17 +675,15 @@ function createParamMutator(sourceParameterName: string, targetParameterName: st
         return MutatorFlow.DoNotRecur;
       },
       mutate: (_, clone) => {
-        const params: [string, ModelProperty][] = Array.from(clone.properties.entries());
-        clone.properties.clear();
-        for (let i = 0; i < params.length; i++) {
-          const [name, prop] = params[i];
-          let newName = name;
-          if (name === sourceParameterName) {
-            newName = targetParameterName;
-            prop.name = targetParameterName;
-          }
-          clone.properties.set(newName, prop);
+        if (clone.properties.has(targetParameterName)) {
+          return MutatorFlow.DoNotMutate;
         }
+        if (!clone.properties.has(sourceParameterName)) {
+          return MutatorFlow.DoNotMutate;
+        }
+        clone.properties.rekey(sourceParameterName, targetParameterName);
+        const prop = clone.properties.get(targetParameterName) as ModelProperty;
+        prop.name = targetParameterName;
         return MutatorFlow.DoNotRecur;
       },
     },
