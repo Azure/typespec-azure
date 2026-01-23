@@ -1,8 +1,7 @@
-import { emitFile, NoTarget, resolvePath, type EmitContext } from "@typespec/compiler";
+import { emitFile, getDirectoryPath, resolvePath, type EmitContext } from "@typespec/compiler";
 import { stringify as stringifyYaml } from "yaml";
 import packageJson from "../package.json" with { type: "json" };
 import { buildSpecMetadata, collectLanguagePackages } from "./collector.js";
-import { reportDiagnostic } from "./lib.js";
 import type { MetadataSnapshot } from "./metadata.js";
 import {
   normalizeOptions,
@@ -10,27 +9,16 @@ import {
   type NormalizedMetadataEmitterOptions,
 } from "./options.js";
 
-const SNAPSHOT_VERSION = packageJson.version ?? "0.0.0";
+const SNAPSHOT_VERSION = packageJson.version;
 
 export async function $onEmit(context: EmitContext<MetadataEmitterOptions>): Promise<void> {
   const options = normalizeOptions(context.options);
   const typespecMetadata = buildSpecMetadata(context.program);
 
   // Get the common tsp-output directory (parent of this emitter's output dir)
-  const commonOutputDir = context.emitterOutputDir.split(/[/\\]/).slice(0, -2).join("/");
+  const commonOutputDir = getDirectoryPath(getDirectoryPath(context.emitterOutputDir));
 
-  let languageResult: Awaited<ReturnType<typeof collectLanguagePackages>>;
-  try {
-    languageResult = await collectLanguagePackages(context.program, commonOutputDir);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    reportDiagnostic(context.program, {
-      code: "failed-to-emit",
-      target: NoTarget,
-      format: { message },
-    });
-    return;
-  }
+  const languageResult = await collectLanguagePackages(context.program, commonOutputDir);
 
   const snapshot: MetadataSnapshot = {
     emitterVersion: SNAPSHOT_VERSION,
