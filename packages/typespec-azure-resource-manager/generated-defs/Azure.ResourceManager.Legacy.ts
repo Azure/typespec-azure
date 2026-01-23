@@ -19,6 +19,10 @@ export interface ArmOperationOptions {
   readonly route?: string;
 }
 
+export interface PathParameterRenameOptions {
+  readonly ignoreOrder?: boolean;
+}
+
 export interface ArmFeatureOptions {
   readonly featureName: string;
   readonly fileName: string;
@@ -85,6 +89,7 @@ export type RenamePathParameterDecorator = (
   target: Operation,
   sourceParameterName: string,
   targetParameterName: string,
+  options?: PathParameterRenameOptions,
 ) => DecoratorValidatorCallbacks | void;
 
 /**

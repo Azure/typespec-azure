@@ -40,6 +40,7 @@ import {
 import {
   ArmOperationOptions,
   ArmOperationRouteDecorator,
+  PathParameterRenameOptions,
   RenamePathParameterDecorator,
 } from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { reportDiagnostic } from "./lib.js";
@@ -612,6 +613,7 @@ export const $renamePathParameter: RenamePathParameterDecorator = (
   target: Operation,
   sourceParameterName: string,
   targetParameterName: string,
+  options?: PathParameterRenameOptions,
 ) => {
   const { program } = context;
   if (getRenamePathParameter(program, target, sourceParameterName, targetParameterName)) {
@@ -652,14 +654,18 @@ export const $renamePathParameter: RenamePathParameterDecorator = (
 
   const mutated = mutateSubgraph(
     program,
-    [createParamMutator(sourceParameterName, targetParameterName)],
+    [createParamMutator(sourceParameterName, targetParameterName, options)],
     toMutate,
   );
   target.parameters = mutated.type as Model;
   storeRenamePathParameters(program, target, sourceParameterName, targetParameterName);
 };
 
-function createParamMutator(sourceParameterName: string, targetParameterName: string): Mutator {
+function createParamMutator(
+  sourceParameterName: string,
+  targetParameterName: string,
+  options?: PathParameterRenameOptions,
+): Mutator {
   return {
     name: "RenameMutator",
     Model: {
@@ -684,6 +690,10 @@ function createParamMutator(sourceParameterName: string, targetParameterName: st
         clone.properties.rekey(sourceParameterName, targetParameterName);
         const prop = clone.properties.get(targetParameterName) as ModelProperty;
         prop.name = targetParameterName;
+        if (options !== undefined && options.ignoreOrder === true) {
+          clone.properties.delete(targetParameterName);
+          clone.properties.set(targetParameterName, prop);
+        }
         return MutatorFlow.DoNotRecur;
       },
     },

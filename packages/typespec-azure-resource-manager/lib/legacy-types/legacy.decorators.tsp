@@ -46,6 +46,12 @@ extern dec armOperationRoute(target: Operation, route?: valueof ArmOperationOpti
  */
 extern dec armExternalType(target: Model);
 
+/** Advanced options for renaming parameters */
+model PathParameterRenameOptions {
+  /** Preserve the parameter order */
+  ignoreOrder?: boolean;
+}
+
 /**
  * Renames a path parameter in an Azure Resource Manager operation.
  * @param target The operation or interface to modify
@@ -55,7 +61,8 @@ extern dec armExternalType(target: Model);
 extern dec renamePathParameter(
   target: Operation,
   sourceParameterName: valueof string,
-  targetParameterName: valueof string
+  targetParameterName: valueof string,
+  options?: valueof PathParameterRenameOptions
 );
 
 /**

@@ -621,7 +621,7 @@ The service namespace
 Renames a path parameter in an Azure Resource Manager operation.
 
 ```typespec
-@Azure.ResourceManager.Legacy.renamePathParameter(sourceParameterName: valueof string, targetParameterName: valueof string)
+@Azure.ResourceManager.Legacy.renamePathParameter(sourceParameterName: valueof string, targetParameterName: valueof string, options?: valueof Azure.ResourceManager.Legacy.PathParameterRenameOptions)
 ```
 
 #### Target
@@ -631,7 +631,8 @@ The operation or interface to modify
 
 #### Parameters
 
-| Name                | Type             | Description                         |
-| ------------------- | ---------------- | ----------------------------------- |
-| sourceParameterName | `valueof string` | The name of the parameter to rename |
-| targetParameterName | `valueof string` | The new name for the parameter      |
+| Name                | Type                                                                                                            | Description                         |
+| ------------------- | --------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| sourceParameterName | `valueof string`                                                                                                | The name of the parameter to rename |
+| targetParameterName | `valueof string`                                                                                                | The new name for the parameter      |
+| options             | [valueof `PathParameterRenameOptions`](./data-types.md#Azure.ResourceManager.Legacy.PathParameterRenameOptions) |                                     |
