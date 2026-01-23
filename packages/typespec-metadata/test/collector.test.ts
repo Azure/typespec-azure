@@ -1,14 +1,15 @@
+import { normalizePath } from "@typespec/compiler";
 import { describe, expect, it } from "vitest";
 
 describe("outputDir path handling", () => {
   it("should replace absolute base path with {output-dir} placeholder", () => {
-    const baseDir = "c:/repos/project/tsp-output";
-    const absolutePath = "c:/repos/project/tsp-output/sdk/keyvault/secrets";
+    const baseDir = "c:\\repos\\project\\tsp-output";
+    const absolutePath = "c:\\repos\\project\\tsp-output\\sdk\\keyvault\\secrets";
     const expected = "{output-dir}/sdk/keyvault/secrets";
 
     // Test the logic that converts absolute to placeholder
-    const normalizedBase = baseDir.replace(/\\/g, "/").replace(/\/$/, "");
-    const normalizedPath = absolutePath.replace(/\\/g, "/");
+    const normalizedBase = normalizePath(baseDir).replace(/\/$/, "");
+    const normalizedPath = normalizePath(absolutePath);
 
     let result: string;
     if (normalizedPath.startsWith(normalizedBase + "/")) {
@@ -22,11 +23,11 @@ describe("outputDir path handling", () => {
   });
 
   it("should handle paths that do not start with base directory", () => {
-    const baseDir = "c:/repos/project/tsp-output";
-    const absolutePath = "c:/other/path/sdk/keyvault/secrets";
+    const baseDir = "c:\\repos\\project\\tsp-output";
+    const absolutePath = "c:\\other\\path\\sdk\\keyvault\\secrets";
 
-    const normalizedBase = baseDir.replace(/\\/g, "/").replace(/\/$/, "");
-    const normalizedPath = absolutePath.replace(/\\/g, "/");
+    const normalizedBase = normalizePath(baseDir).replace(/\/$/, "");
+    const normalizedPath = normalizePath(absolutePath);
 
     let result: string;
     if (normalizedPath.startsWith(normalizedBase + "/")) {
@@ -40,12 +41,12 @@ describe("outputDir path handling", () => {
   });
 
   it("should handle exact base directory match", () => {
-    const baseDir = "c:/repos/project/tsp-output";
-    const absolutePath = "c:/repos/project/tsp-output";
+    const baseDir = "c:\\repos\\project\\tsp-output";
+    const absolutePath = "c:\\repos\\project\\tsp-output";
     const expected = "{output-dir}";
 
-    const normalizedBase = baseDir.replace(/\\/g, "/").replace(/\/$/, "");
-    const normalizedPath = absolutePath.replace(/\\/g, "/");
+    const normalizedBase = normalizePath(baseDir).replace(/\/$/, "");
+    const normalizedPath = normalizePath(absolutePath);
 
     let result: string;
     if (normalizedPath.startsWith(normalizedBase + "/")) {

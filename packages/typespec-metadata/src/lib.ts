@@ -1,15 +1,9 @@
-import { createTypeSpecLibrary, paramMessage } from "@typespec/compiler";
+import { createTypeSpecLibrary } from "@typespec/compiler";
 import { metadataEmitterOptionsSchema } from "./options.js";
 
 export const $lib = createTypeSpecLibrary({
   name: "typespec-metadata",
   diagnostics: {
-    "failed-to-emit": {
-      severity: "error",
-      messages: {
-        default: paramMessage`Failed to emit metadata file: ${"message"}.`,
-      },
-    },
     "no-types-found": {
       severity: "warning",
       messages: {

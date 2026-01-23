@@ -1,7 +1,9 @@
 import {
   getDoc,
+  getLocationContext,
   getNamespaceFullName,
   getService,
+  normalizePath,
   type Namespace,
   type Program,
 } from "@typespec/compiler";
@@ -285,7 +287,7 @@ export function buildSpecMetadata(program: Program): TypeSpecMetadata {
   const globalNamespace = program.getGlobalNamespaceType();
 
   // Recursively collect all service namespaces
-  const allServiceNamespaces = collectAllServiceNamespaces(globalNamespace);
+  const allServiceNamespaces = collectAllServiceNamespaces(program, globalNamespace);
 
   // Select the primary namespace (prefer @service decorated namespaces)
   const primaryNamespace = selectPrimaryNamespace(allServiceNamespaces, program) ?? globalNamespace;
@@ -308,14 +310,14 @@ export function buildSpecMetadata(program: Program): TypeSpecMetadata {
 /**
  * Recursively collects all service namespaces from a given namespace.
  */
-function collectAllServiceNamespaces(ns: Namespace): Namespace[] {
+function collectAllServiceNamespaces(program: Program, ns: Namespace): Namespace[] {
   const result: Namespace[] = [];
 
   for (const childNs of ns.namespaces.values()) {
-    if (isServiceNamespace(childNs)) {
+    if (isServiceNamespace(program, childNs)) {
       result.push(childNs);
       // Recursively collect from children
-      result.push(...collectAllServiceNamespaces(childNs));
+      result.push(...collectAllServiceNamespaces(program, childNs));
     }
   }
 
@@ -324,26 +326,12 @@ function collectAllServiceNamespaces(ns: Namespace): Namespace[] {
 
 /**
  * Determines if a namespace is a service namespace (not a framework/standard namespace).
- * Filters out standard TypeSpec and Azure framework namespaces.
+ * Uses getLocationContext to check if the namespace was defined in the user's project.
  */
-function isServiceNamespace(ns: Namespace): boolean {
-  const fullName = getNamespaceFullName(ns);
-  const name = ns.name;
-
-  // Filter out standard framework namespaces by exact name match
-  const excludedNamespaces = ["TypeSpec", "Azure"];
-
-  // Exclude if it's exactly one of the framework namespaces (not a child namespace)
-  if (excludedNamespaces.includes(fullName)) {
-    return false;
-  }
-
-  // Also exclude if it's a simple name match (top-level only)
-  if (excludedNamespaces.includes(name) && !fullName.includes(".")) {
-    return false;
-  }
-
-  return true;
+function isServiceNamespace(program: Program, ns: Namespace): boolean {
+  const locationContext = getLocationContext(program, ns);
+  // Only consider namespaces defined in the user's project as service namespaces
+  return locationContext.type === "project";
 }
 
 /**
@@ -438,32 +426,18 @@ function buildLanguageMetadata(
   baseOutputDir: string,
   defaultServiceDir?: string,
 ): Record<string, LanguagePackageMetadata> {
-  // Only include SDK language emitters
-  const includedEmitters = [
-    "@azure-tools/typespec-python",
-    "@azure-tools/typespec-java",
-    "@azure-tools/typespec-csharp",
-    "@azure-tools/typespec-ts",
-    "@azure-tools/typespec-go",
-    "@azure-tools/typespec-rust",
-    "@azure-tools/typespec-js",
-    "@azure-tools/typespec-swift",
-  ];
-
   const languagesDict: Record<string, LanguagePackageMetadata> = {};
 
   for (const [emitterName, emitterOptions] of Object.entries(optionMap)) {
-    if (includedEmitters.includes(emitterName)) {
-      const metadata = createLanguageMetadata(
-        emitterName,
-        emitterOptions ?? {},
-        params,
-        baseOutputDir,
-        defaultServiceDir,
-      );
-      const language = inferLanguageFromEmitterName(emitterName);
-      languagesDict[language] = metadata;
-    }
+    const metadata = createLanguageMetadata(
+      emitterName,
+      emitterOptions ?? {},
+      params,
+      baseOutputDir,
+      defaultServiceDir,
+    );
+    const language = inferLanguageFromEmitterName(emitterName);
+    languagesDict[language] = metadata;
   }
 
   return languagesDict;
@@ -508,8 +482,8 @@ function createLanguageMetadata(
   let relativeOutputDir: string | undefined;
   if (outputDirRaw) {
     const absolutePath = String(outputDirRaw);
-    const normalizedBase = baseOutputDir.replace(/\\/g, "/").replace(/\/$/, "");
-    const normalizedPath = absolutePath.replace(/\\/g, "/");
+    const normalizedBase = normalizePath(baseOutputDir).replace(/\/$/, "");
+    const normalizedPath = normalizePath(absolutePath);
 
     // Replace the base output directory with {output-dir} placeholder
     if (normalizedPath.startsWith(normalizedBase + "/")) {
