@@ -1,16 +1,9 @@
-import { Enum, Model } from "@typespec/compiler";
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { describe, it } from "vitest";
 import { SdkArrayType, SdkBuiltInType, UsageFlags } from "../../src/interfaces.js";
 import { getAllModels } from "../../src/types.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
 describe.each([
   ["utcDateTime", "string"],
@@ -18,7 +11,7 @@ describe.each([
   ["duration", "string"],
 ])("supports replacing scalar types with scalar types", (source: string, alternate: string) => {
   it("in global", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         scalar source extends ${source};
@@ -34,7 +27,8 @@ describe.each([
       };
     `);
 
-    const models = getAllModels(runner.context);
+    const context = await createSdkContextForTester(program);
+    const models = getAllModels(context);
     const model1 = models[0];
     strictEqual(model1.kind, "model");
     const childProperty = model1.properties[0];
@@ -42,7 +36,7 @@ describe.each([
   });
 
   it("of model property", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         model Model1 {
@@ -56,7 +50,8 @@ describe.each([
       };
     `);
 
-    const models = getAllModels(runner.context);
+    const context = await createSdkContextForTester(program);
+    const models = getAllModels(context);
     const model1 = models[0];
     strictEqual(model1.kind, "model");
     const childProperty = model1.properties[0];
@@ -64,7 +59,7 @@ describe.each([
   });
 
   it("of operation parameters", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         @route("/func1")
@@ -72,7 +67,8 @@ describe.each([
       };
       `);
 
-    const method = runner.context.sdkPackage.clients[0].methods[0];
+    const context = await createSdkContextForTester(program);
+    const method = context.sdkPackage.clients[0].methods[0];
     strictEqual(method.name, "func1");
     const param = method.parameters[0];
     strictEqual(param.type.kind, alternate);
@@ -86,7 +82,7 @@ describe.each([
   [undefined, undefined],
 ])("always honors @encode of alternate type", (sourceEncode?: string, alternateEncode?: string) => {
   it("if @alternateType is declared in global", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         ${sourceEncode ? `@encode("${sourceEncode}")` : ""}
@@ -109,7 +105,8 @@ describe.each([
       };
       `);
 
-    const models = getAllModels(runner.context);
+    const context = await createSdkContextForTester(program);
+    const models = getAllModels(context);
     const model1 = models[0];
     strictEqual(model1.kind, "model");
     const childProperty = model1.properties[0].type as SdkBuiltInType;
@@ -118,13 +115,13 @@ describe.each([
       alternateEncode ?? "rfc3339" /* utcDateTime default encoding */,
     );
 
-    const method = runner.context.sdkPackage.clients[0].methods[1];
+    const method = context.sdkPackage.clients[0].methods[1];
     const paramType = method.parameters[0].type as SdkBuiltInType;
     strictEqual(paramType.encode, alternateEncode ?? "rfc3339");
   });
 
   it("if @alternateType is declared inline", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         ${sourceEncode ? `@encode("${sourceEncode}")` : ""}
@@ -146,7 +143,8 @@ describe.each([
       };
       `);
 
-    const models = getAllModels(runner.context);
+    const context = await createSdkContextForTester(program);
+    const models = getAllModels(context);
     const model1 = models[0];
     strictEqual(model1.kind, "model");
     const childProperty = model1.properties[0].type as SdkBuiltInType;
@@ -155,7 +153,7 @@ describe.each([
       alternateEncode ?? "rfc3339" /* utcDateTime default encoding */,
     );
 
-    const method = runner.context.sdkPackage.clients[0].methods[1];
+    const method = context.sdkPackage.clients[0].methods[1];
     const paramType = method.parameters[0].type as SdkBuiltInType;
     strictEqual(paramType.encode, alternateEncode ?? "rfc3339");
   });
@@ -168,7 +166,7 @@ it.each([
 ])(
   "supports both source type and alternate type are scalar array",
   async (source: string, alternate: string) => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         model Model1 {
@@ -183,7 +181,8 @@ it.each([
       };
     `);
 
-    const models = getAllModels(runner.context);
+    const context = await createSdkContextForTester(program);
+    const models = getAllModels(context);
     const model1 = models[0];
     strictEqual(model1.kind, "model");
     const childProperty1 = model1.properties[0];
@@ -196,7 +195,7 @@ it.each([
 );
 
 it("should not support source type is scalar but alternate type is string[]", async () => {
-  const diagnostics = await runner.diagnose(`
+  const diagnostics = await SimpleTester.diagnose(`
     @service
     namespace MyService {
       scalar source extends string;
@@ -216,7 +215,7 @@ it("should not support source type is scalar but alternate type is string[]", as
 });
 
 it("should not support source type is scalar but alternate type is unknown", async () => {
-  const diagnostics = await runner.diagnose(`
+  const diagnostics = await SimpleTester.diagnose(`
     @service
     namespace MyService {
       scalar source extends string;
@@ -236,7 +235,7 @@ it("should not support source type is scalar but alternate type is unknown", asy
 });
 
 it("should support alternate type unknown on model property", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace MyService {
       model Model1 {
@@ -250,7 +249,8 @@ it("should support alternate type unknown on model property", async () => {
     };
   `);
 
-  const models = getAllModels(runner.context);
+  const context = await createSdkContextForTester(program);
+  const models = getAllModels(context);
   const model1 = models[0];
   strictEqual(model1.kind, "model");
   const prop = model1.properties[0];
@@ -262,7 +262,7 @@ it.each([
   ["utc8", "utcDateTime"],
   ["timemillis", "int64"],
 ])("supports custom scalar types", async (alternate: string, base: string) => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace MyService {
       scalar ${alternate} extends ${base};
@@ -272,7 +272,8 @@ it.each([
     };
     `);
 
-  const method = runner.context.sdkPackage.clients[0].methods[0];
+  const context = await createSdkContextForTester(program);
+  const method = context.sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "func1");
   const param = method.parameters[0];
   const alternateType = param.type as SdkBuiltInType;
@@ -289,7 +290,7 @@ it.each([
   ["java", false],
   ["java,go", false],
 ])("supports scope", async (scope: string, shouldReplace: boolean) => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace MyService {
       @route("/func1")
@@ -297,14 +298,15 @@ it.each([
     };
     `);
 
-  const method = runner.context.sdkPackage.clients[0].methods[0];
+  const context = await createSdkContextForTester(program);
+  const method = context.sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "func1");
   const param = method.parameters[0];
   strictEqual(param.type.kind, shouldReplace ? "string" : "utcDateTime");
 });
 
 it("@alternateType along with @override", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace Test;
 
@@ -317,7 +319,8 @@ it("@alternateType along with @override", async () => {
     @@override(bar, baz);
   `);
 
-  const method = runner.context.sdkPackage.clients[0].methods[0];
+  const context = await createSdkContextForTester(program);
+  const method = context.sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "bar");
   const param = method.parameters[0];
   strictEqual(param.type.kind, "int32");
@@ -326,7 +329,7 @@ it("@alternateType along with @override", async () => {
 });
 
 it("@alternateType along with @override with scope", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace Test;
 
@@ -339,7 +342,8 @@ it("@alternateType along with @override with scope", async () => {
     @@override(bar, baz, "python");
   `);
 
-  const method = runner.context.sdkPackage.clients[0].methods[0];
+  const context = await createSdkContextForTester(program);
+  const method = context.sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "bar");
   const param = method.parameters[0];
   strictEqual(param.type.kind, "int32");
@@ -349,8 +353,7 @@ it("@alternateType along with @override with scope", async () => {
 
 describe("external types", () => {
   it("should support external type for union (DFE case)", async () => {
-    const csharpRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
-    await csharpRunner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         @alternateType({
@@ -380,7 +383,10 @@ describe("external types", () => {
       };
     `);
 
-    const models = getAllModels(csharpRunner.context);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const models = getAllModels(context);
     const pipeline = models.find((m) => m.name === "Pipeline");
     strictEqual(pipeline?.kind, "model");
 
@@ -396,7 +402,7 @@ describe("external types", () => {
   });
 
   it("should support external type with package information (PySTAC case)", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         @alternateType({
@@ -459,7 +465,8 @@ describe("external types", () => {
       };
     `);
 
-    const models = getAllModels(runner.context);
+    const context = await createSdkContextForTester(program);
+    const models = getAllModels(context);
     const itemCollection = models.find((m) => m.name === "ItemCollection");
     strictEqual(itemCollection?.kind, "model");
     strictEqual(itemCollection.external?.identity, "pystac.Collection");
@@ -468,8 +475,7 @@ describe("external types", () => {
   });
 
   it("should support external type for scalar", async () => {
-    const runnerWithJava = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-    await runnerWithJava.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         @alternateType({
@@ -487,7 +493,10 @@ describe("external types", () => {
       };
     `);
 
-    const models = getAllModels(runnerWithJava.context);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+    const models = getAllModels(context);
     const testModel = models.find((m) => m.name === "TestModel");
     strictEqual(testModel?.kind, "model");
 
@@ -498,7 +507,7 @@ describe("external types", () => {
   });
 
   it("should support external type for enum", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         @alternateType({
@@ -521,7 +530,8 @@ describe("external types", () => {
       };
     `);
 
-    const models = getAllModels(runner.context);
+    const context = await createSdkContextForTester(program);
+    const models = getAllModels(context);
     const testModel = models.find((m) => m.name === "TestModel");
     strictEqual(testModel?.kind, "model");
 
@@ -533,7 +543,7 @@ describe("external types", () => {
   });
 
   it("should support external type with minimal information", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         @alternateType({
@@ -548,7 +558,8 @@ describe("external types", () => {
       };
     `);
 
-    const models = getAllModels(runner.context);
+    const context = await createSdkContextForTester(program);
+    const models = getAllModels(context);
     const simpleModel = models.find((m) => m.name === "SimpleModel");
     strictEqual(simpleModel?.kind, "model");
     strictEqual(simpleModel.external?.identity, "ExternalType");
@@ -557,9 +568,6 @@ describe("external types", () => {
   });
 
   it("should support scoped external types", async () => {
-    const pythonRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-    const csharpRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
-
     const spec = `
       @service
       namespace MyService {
@@ -580,22 +588,29 @@ describe("external types", () => {
       };
     `;
 
-    await pythonRunner.compile(spec);
-    await csharpRunner.compile(spec);
+    const { program: pythonProgram } = await SimpleTester.compile(spec);
+    const { program: csharpProgram } = await SimpleTester.compile(spec);
 
-    const pythonModels = getAllModels(pythonRunner.context);
+    const pythonContext = await createSdkContextForTester(pythonProgram, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+    const csharpContext = await createSdkContextForTester(csharpProgram, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+
+    const pythonModels = getAllModels(pythonContext);
     const pythonModel = pythonModels.find((m) => m.name === "CrossLanguageModel");
     strictEqual(pythonModel?.external?.identity, "python_module.PythonType");
     strictEqual(pythonModel?.external?.package, "python-package");
 
-    const csharpModels = getAllModels(csharpRunner.context);
+    const csharpModels = getAllModels(csharpContext);
     const csharpModel = csharpModels.find((m) => m.name === "CrossLanguageModel");
     strictEqual(csharpModel?.external?.identity, "CSharp.Namespace.CSharpType");
     strictEqual(csharpModel?.external?.package, "CSharp.Package");
   });
 
   it("should support array type with external elements", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         @alternateType({
@@ -615,7 +630,8 @@ describe("external types", () => {
       };
     `);
 
-    const models = getAllModels(runner.context);
+    const context = await createSdkContextForTester(program);
+    const models = getAllModels(context);
     const testModel = models.find((m) => m.name === "TestModel");
     strictEqual(testModel?.kind, "model");
 
@@ -629,8 +645,7 @@ describe("external types", () => {
   });
 
   it("using without scope should raise warning", async () => {
-    const diagnostics = (
-      await runner.compileAndDiagnose(`
+    const diagnostics = await SimpleTester.diagnose(`
       @service
       namespace MyService {
         @alternateType({
@@ -648,15 +663,13 @@ describe("external types", () => {
         @route("/test")
         op test(@body body: TestModel): void;
       };
-    `)
-    )[1];
+    `);
     strictEqual(diagnostics.length, 1);
     strictEqual(diagnostics[0].code, "@azure-tools/typespec-client-generator-core/missing-scope");
   });
 
   it("mismatching external versions", async () => {
-    const diagnostics = (
-      await runner.compileAndDiagnose(`
+    const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(`
       @service
       namespace MyService {
         @alternateType({
@@ -684,8 +697,9 @@ describe("external types", () => {
         @route("/test")
         op test(@body body: TestModel): void;
       };
-    `)
-    )[1];
+    `);
+
+    await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
     strictEqual(diagnostics.length, 3);
     strictEqual(
       diagnostics[0].code,
@@ -698,7 +712,7 @@ describe("external types", () => {
   });
 
   it("should set External usage flag for types referenced by external types", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         @alternateType({
@@ -747,7 +761,8 @@ describe("external types", () => {
       };
     `);
 
-    const models = getAllModels(runner.context);
+    const context = await createSdkContextForTester(program);
+    const models = getAllModels(context);
     const itemCollection = models.find((m) => m.name === "ItemCollection");
     const itemCollectionType = models.find((m) => m.name === "ItemCollectionType");
     const stacItem = models.find((m) => m.name === "StacItem");
@@ -788,7 +803,7 @@ describe("external types", () => {
   });
 
   it("should set External usage flag for transitively referenced types", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         @alternateType({
@@ -813,7 +828,8 @@ describe("external types", () => {
       };
     `);
 
-    const models = getAllModels(runner.context);
+    const context = await createSdkContextForTester(program);
+    const models = getAllModels(context);
     const externalModel = models.find((m) => m.name === "ExternalModel");
     const nestedModel = models.find((m) => m.name === "NestedModel");
     const deepNestedModel = models.find((m) => m.name === "DeepNestedModel");
@@ -834,8 +850,7 @@ describe("external types", () => {
   });
 
   it("should not treat regular TypeSpec models as external types", async () => {
-    const csharpRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
-    await csharpRunner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         // Regular TypeSpec model that should NOT be treated as external
@@ -858,7 +873,10 @@ describe("external types", () => {
       };
     `);
 
-    const models = getAllModels(csharpRunner.context);
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+    const models = getAllModels(context);
     const employee = models.find((m) => m.name === "Employee");
     strictEqual(employee?.kind, "model");
 
@@ -871,8 +889,7 @@ describe("external types", () => {
   });
 
   it("should warn when external type is applied to model property", async () => {
-    const diagnostics = (
-      await runner.compileAndDiagnose(`
+    const diagnostics = await SimpleTester.diagnose(`
       @service
       namespace MyService {
         model FieldName {}
@@ -891,8 +908,7 @@ describe("external types", () => {
           "rust"
         );
       };
-    `)
-    )[1];
+    `);
     strictEqual(diagnostics.length, 1);
     strictEqual(
       diagnostics[0].code,
@@ -902,19 +918,19 @@ describe("external types", () => {
 });
 
 it("should not set usage on original enum when parameter has alternateType", async () => {
-  const { Test } = (await runner.compile(`
+  const { program, Test } = await SimpleTester.compile(t.code`
     @service
-    @test namespace TestService {
-      @test
-      enum Test {
+    namespace TestService {
+      enum ${t.enum("Test")} {
         default,
       }
       
       op test(@alternateType(string) @path p: Test): void;
     }
-  `)) as { Test: Enum };
+  `);
 
-  const models = runner.context.sdkPackage.clients[0];
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.clients[0];
   const method = models.methods[0];
   strictEqual(method.name, "test");
 
@@ -923,25 +939,25 @@ it("should not set usage on original enum when parameter has alternateType", asy
   strictEqual(param.type.kind, "string");
 
   // The original Test enum should have None usage (0) since it's replaced
-  const sdkEnum = runner.context.__referencedTypeCache.get(Test);
+  const sdkEnum = context.__referencedTypeCache.get(Test);
   strictEqual(sdkEnum?.kind, "enum");
   strictEqual(sdkEnum.usage, UsageFlags.None, "Test enum should have None usage");
 });
 
 it("should not set usage on original model when parameter has alternateType", async () => {
-  const { TestModel } = (await runner.compile(`
+  const { program, TestModel } = await SimpleTester.compile(t.code`
     @service
-    @test namespace TestService {
-      @test
-      model TestModel {
+    namespace TestService {
+      model ${t.model("TestModel")} {
         value: string;
       }
       
       op test(@alternateType(string) @body body: TestModel): void;
     }
-  `)) as { TestModel: Model };
+  `);
 
-  const models = runner.context.sdkPackage.clients[0];
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.clients[0];
   const method = models.methods[0];
   strictEqual(method.name, "test");
 
@@ -950,26 +966,26 @@ it("should not set usage on original model when parameter has alternateType", as
   strictEqual(param.type.kind, "string");
 
   // The original TestModel should have None usage (0) since it's replaced
-  const sdkModel = runner.context.__referencedTypeCache.get(TestModel);
+  const sdkModel = context.__referencedTypeCache.get(TestModel);
   strictEqual(sdkModel?.kind, "model");
   strictEqual(sdkModel.usage, UsageFlags.None, "TestModel should have None usage");
 });
 
 it("should not set usage on original enum when inline alternateType is used", async () => {
-  const { Status } = (await runner.compile(`
+  const { program, Status } = await SimpleTester.compile(t.code`
     @service
-    @test namespace TestService {
-      @test
-      enum Status {
+    namespace TestService {
+      enum ${t.enum("Status")} {
         Active,
         Inactive,
       }
       
       op test(@alternateType(string) @path status: Status): void;
     }
-  `)) as { Status: Enum };
+  `);
 
-  const models = runner.context.sdkPackage.clients[0];
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.clients[0];
   const method = models.methods[0];
   strictEqual(method.name, "test");
 
@@ -978,13 +994,13 @@ it("should not set usage on original enum when inline alternateType is used", as
   strictEqual(param.type.kind, "string");
 
   // The original Status enum should have None usage (0) since it's replaced
-  const sdkEnum = runner.context.__referencedTypeCache.get(Status);
+  const sdkEnum = context.__referencedTypeCache.get(Status);
   strictEqual(sdkEnum?.kind, "enum");
   strictEqual(sdkEnum.usage, UsageFlags.None, "Status enum should have None usage");
 });
 
 it("applied to union", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @alternateType(unknown)
     union Dfe<T> {
       T,
@@ -998,7 +1014,8 @@ it("applied to union", async () => {
       movingStatus: Dfe<string>;
     }
     `);
-  const models = getAllModels(runner.context);
+  const context = await createSdkContextForTester(program);
+  const models = getAllModels(context);
   const moveResponse = models.find((m) => m.name === "MoveResponse");
   strictEqual(moveResponse?.kind, "model");
 
@@ -1007,7 +1024,7 @@ it("applied to union", async () => {
 });
 
 it("applied to enum", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @alternateType(unknown)
     enum StatusEnum {
       Active,
@@ -1022,7 +1039,8 @@ it("applied to enum", async () => {
       status: StatusEnum;
     }
     `);
-  const models = getAllModels(runner.context);
+  const context = await createSdkContextForTester(program);
+  const models = getAllModels(context);
   const employeeStatus = models.find((m) => m.name === "EmployeeStatus");
   strictEqual(employeeStatus?.kind, "model");
 
@@ -1031,7 +1049,7 @@ it("applied to enum", async () => {
 });
 
 it("applied to model", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @alternateType(unknown)
     model Address {
       street: string;
@@ -1045,7 +1063,8 @@ it("applied to model", async () => {
       address: Address;
     }
     `);
-  const models = getAllModels(runner.context);
+  const context = await createSdkContextForTester(program);
+  const models = getAllModels(context);
   const employeeInfo = models.find((m) => m.name === "EmployeeInfo");
   strictEqual(employeeInfo?.kind, "model");
 
