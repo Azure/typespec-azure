@@ -10,6 +10,7 @@ import {
   hasUniqueItems,
 } from "@azure-tools/typespec-azure-core";
 import {
+  ArmFeatureOptions,
   getArmCommonTypeOpenAPIRef,
   getArmIdentifiers,
   getArmKeyIdentifiers,
@@ -151,7 +152,6 @@ import {
   shouldInline,
 } from "@typespec/openapi";
 import { getVersionsForEnum } from "@typespec/versioning";
-import { ArmFeatureOptions } from "../../typespec-azure-resource-manager/generated-defs/Azure.ResourceManager.Legacy.js";
 import { AutorestOpenAPISchema } from "./autorest-openapi-schema.js";
 import { getExamples, getRef } from "./decorators.js";
 import { sortWithJsonSchema } from "./json-schema-sorter/sorter.js";
