@@ -265,7 +265,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     });
   } else {
     const markAsPageableInfo = getMarkAsPageable(context, operation);
-    if (markAsPageableInfo) {
+    if (markAsPageableInfo && !markAsPageableInfo.disabled && markAsPageableInfo.itemsProperty) {
       const itemsProperty = diagnostics.pipe(
         getSdkModelPropertyType(context, markAsPageableInfo.itemsProperty, operation),
       );
@@ -735,7 +735,10 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   client: SdkClientType<TServiceOperation>,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const lro = getTcgcLroMetadata(context, operation, client);
-  const paging = isList(context.program, operation) || getMarkAsPageable(context, operation);
+  const markAsPageableInfo = getMarkAsPageable(context, operation);
+  // @markAsPageable(false) disables paging even for operations with @list
+  const pagingDisabled = markAsPageableInfo?.disabled === true;
+  const paging = !pagingDisabled && (isList(context.program, operation) || markAsPageableInfo);
   if (lro && paging) {
     return getSdkLroPagingServiceMethod<TServiceOperation>(context, operation, client);
   } else if (paging) {

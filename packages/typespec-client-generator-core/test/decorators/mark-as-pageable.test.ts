@@ -538,3 +538,192 @@ it("should work with ARM ListSinglePage legacy operation", async () => {
   strictEqual(method.response.resultSegments[0].name, "value");
   strictEqual(method.response.resultSegments, method.pagingMetadata.pageItemsSegments);
 });
+
+it("should disable paging when @markAsPageable(false) is applied to a @list operation", async () => {
+  await basicRunner.compile(`
+      @service
+      namespace TestService {
+        model ItemListResult {
+          @pageItems
+          items: Item[];
+          nextLink?: string;
+        }
+
+        model Item {
+          id: string;
+          name: string;
+        }
+
+        @Azure.ClientGenerator.Core.Legacy.markAsPageable(false)
+        @list
+        @route("/items")
+        @get
+        op listItems(): ItemListResult;
+      }
+    `);
+
+  const methods = basicRunner.context.sdkPackage.clients[0].methods;
+  strictEqual(methods.length, 1);
+
+  const method = methods[0];
+  // Should be basic method since @markAsPageable(false) disables paging
+  strictEqual(method.kind, "basic");
+  strictEqual(method.name, "listItems");
+
+  // Response should be the paged model itself, not the list of items
+  const responseType = method.response.type;
+  ok(responseType);
+  strictEqual(responseType.kind, "model");
+  strictEqual(responseType.name, "ItemListResult");
+
+  // Check that resultSegments is not populated (not a paging method)
+  strictEqual(method.response.resultSegments, undefined);
+});
+
+it("should disable paging with language scope when @markAsPageable(false, scope) is applied", async () => {
+  await basicRunner.compile(`
+      @service
+      namespace TestService {
+        model ItemListResult {
+          @pageItems
+          items: Item[];
+          nextLink?: string;
+        }
+
+        model Item {
+          id: string;
+          name: string;
+        }
+
+        @Azure.ClientGenerator.Core.Legacy.markAsPageable(false, "csharp")
+        @list
+        @route("/items")
+        @get
+        op listItems(): ItemListResult;
+      }
+    `);
+
+  const methods = basicRunner.context.sdkPackage.clients[0].methods;
+  strictEqual(methods.length, 1);
+
+  const method = methods[0];
+  // Should be basic method since @markAsPageable(false) disables paging for csharp
+  strictEqual(method.kind, "basic");
+  strictEqual(method.name, "listItems");
+
+  // Response should be the paged model itself
+  const responseType = method.response.type;
+  ok(responseType);
+  strictEqual(responseType.kind, "model");
+  strictEqual(responseType.name, "ItemListResult");
+});
+
+it("should NOT disable paging when scope does not match for @markAsPageable(false)", async () => {
+  await basicRunner.compile(`
+      @service
+      namespace TestService {
+        model ItemListResult {
+          @pageItems
+          items: Item[];
+          nextLink?: string;
+        }
+
+        model Item {
+          id: string;
+          name: string;
+        }
+
+        @Azure.ClientGenerator.Core.Legacy.markAsPageable(false, "python")
+        @list
+        @route("/items")
+        @get
+        op listItems(): ItemListResult;
+      }
+    `);
+
+  const methods = basicRunner.context.sdkPackage.clients[0].methods;
+  strictEqual(methods.length, 1);
+
+  const method = methods[0];
+  // Should still be paging method since scope is python but emitter is csharp
+  strictEqual(method.kind, "paging");
+  strictEqual(method.name, "listItems");
+
+  // Response should be the list of items (paging behavior)
+  const responseType = method.response.type;
+  ok(responseType);
+  strictEqual(responseType.kind, "array");
+});
+
+it("should not mark paged model as paged result when @markAsPageable(false) is applied", async () => {
+  const { isPagedResultModel } = await import("../../src/public-utils.js");
+
+  await basicRunner.compile(`
+      @service
+      namespace TestService {
+        model ItemListResult {
+          @pageItems
+          items: Item[];
+          nextLink?: string;
+        }
+
+        model Item {
+          id: string;
+          name: string;
+        }
+
+        @Azure.ClientGenerator.Core.Legacy.markAsPageable(false)
+        @list
+        @route("/items")
+        @get
+        op listItems(): ItemListResult;
+      }
+    `);
+
+  const methods = basicRunner.context.sdkPackage.clients[0].methods;
+  strictEqual(methods.length, 1);
+
+  const method = methods[0];
+  strictEqual(method.kind, "basic");
+
+  // The response type should NOT be marked as a paged result model
+  const responseType = method.response.type;
+  ok(responseType);
+  strictEqual(responseType.kind, "model");
+  strictEqual(isPagedResultModel(basicRunner.context, responseType), false);
+});
+
+it("should allow @markAsPageable(true, 'csharp') to work the same as @markAsPageable('csharp')", async () => {
+  await basicRunner.compile(`
+      @service
+      namespace TestService {
+        model ItemListResult {
+          @pageItems
+          items: Item[];
+        }
+
+        model Item {
+          id: string;
+          name: string;
+        }
+
+        @Azure.ClientGenerator.Core.Legacy.markAsPageable(true, "csharp")
+        @route("/items")
+        @get
+        op listItems(): ItemListResult;
+      }
+    `);
+
+  const methods = basicRunner.context.sdkPackage.clients[0].methods;
+  strictEqual(methods.length, 1);
+
+  const method = methods[0];
+  strictEqual(method.kind, "paging");
+  strictEqual(method.name, "listItems");
+
+  // Check paging metadata
+  ok(method.pagingMetadata);
+  ok(method.pagingMetadata.pageItemsSegments);
+  strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
+  strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "items");
+});

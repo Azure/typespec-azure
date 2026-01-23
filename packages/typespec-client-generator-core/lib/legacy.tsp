@@ -99,23 +99,27 @@ extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
 extern dec markAsLro(target: Operation, scope?: valueof string);
 
 /**
- * Forces an operation to be treated as a pageable operation by the SDK generators,
+ * Controls whether an operation should be treated as a pageable operation by the SDK generators.
+ *
+ * When `value` is `true` or not provided, this forces an operation to be treated as pageable,
  * even when the operation does not follow standard paging patterns on the service side.
  *
- * NOTE: When used, you will need to verify the operation and add tests for the generated code
+ * When `value` is `false`, this prevents an operation from being treated as pageable,
+ * even when the operation follows standard paging patterns. The operation will be treated
+ * as a basic method, the response will be the paged model itself (not the list of items),
+ * and the paged model will not be marked with paged result usage.
+ *
+ * NOTE: When used with `true`, you will need to verify the operation and add tests for the generated code
  * to make sure the end-to-end works for library users, since there is a risk that forcing
  * this operation to be pageable will result in errors.
- *
- * When applied, TCGC will treat the operation as pageable and SDK generators should:
- * - Generate paging mechanisms (iterators/async iterators)
- * - Return appropriate pageable-specific return types
- * - Handle the operation as a collection that may require multiple requests
  *
  * This decorator is considered legacy functionality and should only be used when
  * standard TypeSpec paging patterns are not feasible.
  *
  * @param target The operation that should be treated as a pageable operation
- * @param scope Specifies the target language emitters that the decorator should apply.
+ * @param valueOrScope Either a boolean to control pageable behavior (`true` to force, `false` to disable),
+ * or a string specifying the target language emitters (for backward compatibility).
+ * @param scope Specifies the target language emitters that the decorator should apply when valueOrScope is a boolean.
  * If not set, the decorator will be applied to all language emitters by default.
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  *
@@ -127,8 +131,25 @@ extern dec markAsLro(target: Operation, scope?: valueof string);
  * op listItems(): ItemListResult;
  * ```
  *
+ * @example Force pageable for a specific language scope (backward compatible)
+ * ```typespec
+ * @Azure.ClientGenerator.Core.Legacy.markAsPageable("csharp")
+ * @route("/items")
+ * @get
+ * op listItems(): ItemListResult;
+ * ```
+ *
+ * @example Prevent a paging operation from being treated as pageable
+ * ```typespec
+ * @Azure.ClientGenerator.Core.Legacy.markAsPageable(false)
+ * @list
+ * @route("/items")
+ * @get
+ * op listItems(): ItemListResult;
+ * ```
+ *
  */
-extern dec markAsPageable(target: Operation, scope?: valueof string);
+extern dec markAsPageable(target: Operation, valueOrScope?: valueof (boolean | string), scope?: valueof string);
 
 /**
  * Specifies the HTTP verb for the next link operation in a paging scenario.

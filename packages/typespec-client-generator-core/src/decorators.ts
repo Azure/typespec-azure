@@ -1655,8 +1655,43 @@ const markAsPageableKey = createStateSymbol("markAsPageable");
 export const $markAsPageable: MarkAsPageableDecorator = (
   context: DecoratorContext,
   target: Operation,
+  valueOrScope?: boolean | LanguageScopes,
   scope?: LanguageScopes,
 ) => {
+  // Determine value and actualScope based on the type of valueOrScope
+  // - If valueOrScope is a boolean, it's the value parameter
+  // - If valueOrScope is a string, it's the scope parameter (backward compatibility)
+  // - If valueOrScope is undefined, default to true (force pageable)
+  let value: boolean;
+  let actualScope: LanguageScopes | undefined;
+
+  if (typeof valueOrScope === "boolean") {
+    value = valueOrScope;
+    actualScope = scope;
+  } else if (typeof valueOrScope === "string") {
+    // Backward compatibility: @markAsPageable("csharp") means force pageable for csharp
+    value = true;
+    actualScope = valueOrScope;
+  } else {
+    // valueOrScope is undefined
+    value = true;
+    actualScope = scope;
+  }
+
+  // When value is false, disable paging for this operation (overrides @list)
+  if (value === false) {
+    setScopedDecoratorData(
+      context,
+      $markAsPageable,
+      markAsPageableKey,
+      target,
+      { disabled: true },
+      actualScope,
+    );
+    return;
+  }
+
+  // value is true - force pageable behavior
   const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, target));
   const modelResponse = httpOperation.responses.filter(
     (r) =>
@@ -1673,7 +1708,7 @@ export const $markAsPageable: MarkAsPageableDecorator = (
     return;
   }
 
-  // Check if already marked with @list decorator
+  // Check if already marked with @list decorator (only warn when trying to force paging, not disable)
   if (isList(context.program, target)) {
     reportDiagnostic(context.program, {
       code: "mark-as-pageable-ineffective",
@@ -1732,7 +1767,7 @@ export const $markAsPageable: MarkAsPageableDecorator = (
     markAsPageableKey,
     target,
     { itemsProperty },
-    scope,
+    actualScope,
   );
 };
 
@@ -1744,7 +1779,8 @@ export function getMarkAsPageable(
 }
 
 export interface MarkAsPageableInfo {
-  itemsProperty: ModelProperty;
+  itemsProperty?: ModelProperty;
+  disabled?: boolean;
 }
 
 function getRealResponseModel(program: Program, responseModel: Model): Type {
