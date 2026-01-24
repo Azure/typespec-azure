@@ -52,8 +52,7 @@ interface ResolvedAutorestEmitterOptions extends AutorestDocumentEmitterOptions 
 }
 
 const defaultOptions = {
-  "output-file":
-    "{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json",
+  "output-file": "{emitter-output-dir}/{service-name}/{version-status}/{version}/openapi.json",
   "new-line": "lf",
   "include-x-typespec-name": "never",
   "xml-strategy": "xml-service",
@@ -101,6 +100,7 @@ export function resolveAutorestOptions(
   return {
     outputFile: resolvedOptions["output-file"],
     outputDir: emitterOutputDir,
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     azureResourceProviderFolder: resolvedOptions["azure-resource-provider-folder"],
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     examplesDirectory: resolvedOptions["examples-dir"] ?? resolvedOptions["examples-directory"],
