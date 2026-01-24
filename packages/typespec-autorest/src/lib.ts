@@ -14,6 +14,8 @@ export interface AutorestEmitterOptions {
    *  - azure-resource-provider-folder: Value of the azure-resource-provider-folder option
    *  - version-status: Only enabled if azure-resource-provider-folder is set. `preview` if version contains preview, stable otherwise.
    *
+   * @deprecated Do not use this option. Specify the path directly in emitter-output-dir.
+   *
    * @default `{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json`
    *
    *
@@ -142,6 +144,7 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
         " - azure-resource-provider-folder: Value of the azure-resource-provider-folder option",
         " - version-status: Only enabled if azure-resource-provider-folder is set. `preview` if version contains preview, stable otherwise.",
         "",
+        " Deprecated: Do not use this option. Specify the path directly in emitter-output-dir.",
         "Default: `{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json`",
         "",
         "",
