@@ -351,10 +351,8 @@ export function resolveOutputFile(
   feature?: string,
 ): string {
   const azureResourceProviderFolder = options.azureResourceProviderFolder;
-  if (azureResourceProviderFolder) {
-    const info = resolveInfo(program, service.type);
-    version = version ?? info?.version ?? "0000-00-00";
-  }
+  const info = resolveInfo(program, service.type);
+  version = version ?? info?.version;
   const interpolated = interpolatePath(options.outputFile, {
     "azure-resource-provider-folder": azureResourceProviderFolder,
     "service-name":
