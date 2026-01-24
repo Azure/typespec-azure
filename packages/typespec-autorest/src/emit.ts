@@ -361,11 +361,7 @@ export function resolveOutputFile(
       multipleServices || azureResourceProviderFolder
         ? getNamespaceFullName(service.type)
         : undefined,
-    "version-status": azureResourceProviderFolder
-      ? version?.includes("preview")
-        ? "preview"
-        : "stable"
-      : undefined,
+    "version-status": version?.includes("preview") ? "preview" : "stable",
     version,
     feature,
   });

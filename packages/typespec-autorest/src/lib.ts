@@ -160,7 +160,7 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
         " - `openapi.Org1.Service2.v1.0.yaml`",
         " - `openapi.Org1.Service2.v1.1.yaml`",
         "",
-        "Example: Versioning with version-status ",
+        "Example: Versioning with version-status",
         " - `arm-folder/AzureService/stable/2020-01-01.yaml`",
         " - `arm-folder/AzureService/preview/2020-01-01.yaml`",
       ].join("\n"),
