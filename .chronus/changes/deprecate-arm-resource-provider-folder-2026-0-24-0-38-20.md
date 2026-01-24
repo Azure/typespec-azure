@@ -3,6 +3,7 @@
 changeKind: deprecation
 packages:
   - "@azure-tools/typespec-autorest"
+  - "@azure-tools/typespec-autorest-canonical"
 ---
 
 Deprecate `azure-resource-provider-folder` option.

@@ -26,6 +26,7 @@ export interface AutorestCanonicalEmitterOptions {
    */
   "output-file"?: string;
 
+  /** @deprecated Do not use this option. Specify the path directly in emitter-output-dir. */
   "azure-resource-provider-folder"?: string;
 
   /**
