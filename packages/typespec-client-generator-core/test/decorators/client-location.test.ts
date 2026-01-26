@@ -1007,26 +1007,19 @@ describe("Parameter", () => {
     const createOrUpdateSubIdParam = createOrUpdateMethod.parameters.find(
       (p) => p.name === "subscriptionId",
     );
-    ok(
-      createOrUpdateSubIdParam,
-      "subscriptionId should be a method parameter for createOrUpdate due to @@clientLocation",
-    );
+    ok(createOrUpdateSubIdParam);
 
     // The get method should NOT have subscriptionId as a method parameter (it's on client)
     const getMethod = employees.methods.find((m) => m.name === "get");
     ok(getMethod);
     const getSubIdMethodParam = getMethod.parameters.find((p) => p.name === "subscriptionId");
-    ok(!getSubIdMethodParam, "subscriptionId should NOT be a method parameter for get");
+    ok(!getSubIdMethodParam);
 
     // But the get operation should reference the client subscriptionId parameter
     const getOperation = getMethod.operation;
     ok(getOperation);
     const getSubIdOpParam = getOperation.parameters.find((p) => p.name === "subscriptionId");
     ok(getSubIdOpParam);
-    strictEqual(
-      getSubIdOpParam.methodParameterSegments[0][0],
-      subIdOgParam,
-      "get operation's subscriptionId should reference client parameter",
-    );
+    strictEqual(getSubIdOpParam.methodParameterSegments[0][0], subIdOgParam);
   });
 });
