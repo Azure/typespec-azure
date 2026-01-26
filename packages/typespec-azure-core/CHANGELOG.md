@@ -1,5 +1,20 @@
 # Change Log - @azure-tools/typespec-azure-core
 
+## 0.64.0
+
+### Features
+
+- [#3746](https://github.com/Azure/typespec-azure/pull/3746) #3693 Allow array and unknown result for async operations
+
+### Bump dependencies
+
+- [#3677](https://github.com/Azure/typespec-azure/pull/3677) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3747](https://github.com/Azure/typespec-azure/pull/3747) Allow final-state-via: original-uri for PATCH operations
+
+
 ## 0.63.1
 
 ### Bug Fixes

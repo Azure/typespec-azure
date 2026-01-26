@@ -1,17 +1,11 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { listClients } from "../../src/decorators.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import { createSdkContextForTester, SimpleTester } from "../tester.js";
 
 it("multiple-services", async () => {
-  const diagnostics = await runner.diagnose(
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `
       @service
       namespace Test1Client {
@@ -24,23 +18,25 @@ it("multiple-services", async () => {
     `,
   );
 
+  const context = await createSdkContextForTester(program);
+
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/multiple-services",
     },
   ]);
 
-  strictEqual(listClients(runner.context).length, 1);
-  strictEqual(runner.context.sdkPackage.clients.length, 1);
+  strictEqual(listClients(context).length, 1);
+  strictEqual(context.sdkPackage.clients.length, 1);
 
-  const client = runner.context.sdkPackage.clients[0];
+  const client = context.sdkPackage.clients[0];
   strictEqual(client.name, "Test1Client");
   strictEqual(client.methods.length, 1);
   strictEqual(client.methods[0].name, "x");
 });
 
 it("require-versioned-service", async () => {
-  const diagnostics = await runner.diagnose(
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `
     @service
     @clientApiVersions(ApiVersions)
@@ -49,6 +45,9 @@ it("require-versioned-service", async () => {
     }
       `,
   );
+
+  await createSdkContextForTester(program);
+
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/require-versioned-service",
@@ -59,21 +58,21 @@ it("require-versioned-service", async () => {
 });
 
 it("missing-service-versions", async () => {
-  const diagnostics = (
-    await runner.compileAndDiagnoseWithCustomization(
-      `
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
+    `
     @service
     @versioned(Versions)
     namespace My.Service {
       enum Versions { v1, v2, v3 };
     }
-    `,
-      `
+
     enum ClientApiVersions { v4, v5, v6 };
     @@clientApiVersions(My.Service, ClientApiVersions);
     `,
-    )
-  )[1];
+  );
+
+  await createSdkContextForTester(program);
+
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/missing-service-versions",
