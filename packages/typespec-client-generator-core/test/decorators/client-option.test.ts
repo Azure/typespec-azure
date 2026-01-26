@@ -1,18 +1,11 @@
-import { Model } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import { describe, it } from "vitest";
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
 describe("@clientOption diagnostics", () => {
   it("should emit client-option warning always", async () => {
-    const diagnostics = await runner.diagnose(`
+    const diagnostics = await SimpleTester.diagnose(`
       @service
       namespace MyService;
 
@@ -28,7 +21,7 @@ describe("@clientOption diagnostics", () => {
   });
 
   it("should emit both client-option and client-option-requires-scope warnings when scope is missing", async () => {
-    const diagnostics = await runner.diagnose(`
+    const diagnostics = await SimpleTester.diagnose(`
       @service
       namespace MyService;
 
@@ -49,7 +42,7 @@ describe("@clientOption diagnostics", () => {
   });
 
   it("should only emit client-option warning when scope is provided", async () => {
-    const diagnostics = await runner.diagnose(`
+    const diagnostics = await SimpleTester.diagnose(`
       @service
       namespace MyService;
 
@@ -69,21 +62,22 @@ describe("@clientOption diagnostics", () => {
 
 describe("@clientOption in decorators array", () => {
   it("should appear in decorators array for model", async () => {
-    const { Test: _Test } = (await runner.compile(`
-      @service
-      @test namespace MyService {
-        #suppress "@azure-tools/typespec-client-generator-core/client-option"
-        @clientOption("enableFeatureFoo", true, "python")
-        @test
-        model Test {
-          id: string;
-        }
-
-        op getTest(): Test;
+    const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("enableFeatureFoo", true, "python")
+      @test
+      model Test {
+        id: string;
       }
-    `)) as { Test: Model };
 
-    const sdkModel = runner.context.sdkPackage.models.find((m) => m.name === "Test");
+      op getTest(): Test;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+
+    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
     strictEqual(sdkModel !== undefined, true);
 
     const clientOptionDecorator = sdkModel!.decorators.find(
@@ -98,23 +92,24 @@ describe("@clientOption in decorators array", () => {
   });
 
   it("should support multiple @clientOption decorators on same target", async () => {
-    const { Test: _Test } = (await runner.compile(`
-      @service
-      @test namespace MyService {
-        #suppress "@azure-tools/typespec-client-generator-core/client-option"
-        @clientOption("enableFeatureFoo", true, "python")
-        #suppress "@azure-tools/typespec-client-generator-core/client-option"
-        @clientOption("enableFeatureBar", "value", "python")
-        @test
-        model Test {
-          id: string;
-        }
-
-        op getTest(): Test;
+    const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("enableFeatureFoo", true, "python")
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("enableFeatureBar", "value", "python")
+      @test
+      model Test {
+        id: string;
       }
-    `)) as { Test: Model };
 
-    const sdkModel = runner.context.sdkPackage.models.find((m) => m.name === "Test");
+      op getTest(): Test;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+
+    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
     strictEqual(sdkModel !== undefined, true);
 
     const clientOptionDecorators = sdkModel!.decorators.filter(
@@ -123,13 +118,17 @@ describe("@clientOption in decorators array", () => {
     strictEqual(clientOptionDecorators.length, 2);
 
     // Verify each decorator has the correct name and value
-    const fooDecorator = clientOptionDecorators.find((d) => d.arguments.name === "enableFeatureFoo");
+    const fooDecorator = clientOptionDecorators.find(
+      (d) => d.arguments.name === "enableFeatureFoo",
+    );
     ok(fooDecorator, "enableFeatureFoo decorator should exist");
     strictEqual(fooDecorator!.arguments.name, "enableFeatureFoo");
     strictEqual(fooDecorator!.arguments.value, true);
     strictEqual(fooDecorator!.arguments.scope, "python");
 
-    const barDecorator = clientOptionDecorators.find((d) => d.arguments.name === "enableFeatureBar");
+    const barDecorator = clientOptionDecorators.find(
+      (d) => d.arguments.name === "enableFeatureBar",
+    );
     ok(barDecorator, "enableFeatureBar decorator should exist");
     strictEqual(barDecorator!.arguments.name, "enableFeatureBar");
     strictEqual(barDecorator!.arguments.value, "value");
@@ -137,39 +136,39 @@ describe("@clientOption in decorators array", () => {
   });
 
   it("should support different value types", async () => {
-    const { TestBool: _TestBool, TestString: _TestString, TestNumber: _TestNumber } =
-      (await runner.compile(`
-      @service
-      @test namespace MyService {
-        #suppress "@azure-tools/typespec-client-generator-core/client-option"
-        @clientOption("boolOption", true, "python")
-        @test
-        model TestBool {
-          id: string;
-        }
-
-        #suppress "@azure-tools/typespec-client-generator-core/client-option"
-        @clientOption("stringOption", "someValue", "python")
-        @test
-        model TestString {
-          id: string;
-        }
-
-        #suppress "@azure-tools/typespec-client-generator-core/client-option"
-        @clientOption("numberOption", 42, "python")
-        @test
-        model TestNumber {
-          id: string;
-        }
-
-        @route("/bool") op getBool(): TestBool;
-        @route("/string") op getString(): TestString;
-        @route("/number") op getNumber(): TestNumber;
+    const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("boolOption", true, "python")
+      @test
+      model TestBool {
+        id: string;
       }
-    `)) as { TestBool: Model; TestString: Model; TestNumber: Model };
+
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("stringOption", "someValue", "python")
+      @test
+      model TestString {
+        id: string;
+      }
+
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("numberOption", 42, "python")
+      @test
+      model TestNumber {
+        id: string;
+      }
+
+      @route("/bool") op getBool(): TestBool;
+      @route("/string") op getString(): TestString;
+      @route("/number") op getNumber(): TestNumber;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
 
     // Verify boolean value type
-    const sdkModelBool = runner.context.sdkPackage.models.find((m) => m.name === "TestBool");
+    const sdkModelBool = context.sdkPackage.models.find((m) => m.name === "TestBool");
     ok(sdkModelBool, "TestBool model should exist");
     const boolDecorator = sdkModelBool!.decorators.find(
       (d) => d.name === "Azure.ClientGenerator.Core.@clientOption",
@@ -180,7 +179,7 @@ describe("@clientOption in decorators array", () => {
     strictEqual(typeof boolDecorator!.arguments.value, "boolean");
 
     // Verify string value type
-    const sdkModelString = runner.context.sdkPackage.models.find((m) => m.name === "TestString");
+    const sdkModelString = context.sdkPackage.models.find((m) => m.name === "TestString");
     ok(sdkModelString, "TestString model should exist");
     const stringDecorator = sdkModelString!.decorators.find(
       (d) => d.name === "Azure.ClientGenerator.Core.@clientOption",
@@ -191,7 +190,7 @@ describe("@clientOption in decorators array", () => {
     strictEqual(typeof stringDecorator!.arguments.value, "string");
 
     // Verify number value type
-    const sdkModelNumber = runner.context.sdkPackage.models.find((m) => m.name === "TestNumber");
+    const sdkModelNumber = context.sdkPackage.models.find((m) => m.name === "TestNumber");
     ok(sdkModelNumber, "TestNumber model should exist");
     const numberDecorator = sdkModelNumber!.decorators.find(
       (d) => d.name === "Azure.ClientGenerator.Core.@clientOption",
@@ -203,17 +202,18 @@ describe("@clientOption in decorators array", () => {
   });
 
   it("should appear in decorators array for operation", async () => {
-    await runner.compile(`
-      @service
-      @test namespace MyService {
-        #suppress "@azure-tools/typespec-client-generator-core/client-option"
-        @clientOption("operationFlag", "customValue", "python")
-        @test
-        op testOp(): string;
-      }
+    const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("operationFlag", "customValue", "python")
+      @test
+      op testOp(): string;
     `);
 
-    const sdkMethod = runner.context.sdkPackage.clients[0].methods.find(
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+
+    const sdkMethod = context.sdkPackage.clients[0].methods.find(
       (m) => m.kind === "basic" && m.name === "testOp",
     );
     ok(sdkMethod, "SDK method should exist");
@@ -230,23 +230,24 @@ describe("@clientOption in decorators array", () => {
   });
 
   it("should appear in decorators array for enum", async () => {
-    await runner.compile(`
-      @service
-      @test namespace MyService {
-        #suppress "@azure-tools/typespec-client-generator-core/client-option"
-        @clientOption("enumFlag", true, "python")
-        @usage(Usage.input)
-        @test
-        enum TestEnum {
-          One,
-          Two,
-        }
-
-        op getTest(@query value: TestEnum): string;
+    const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("enumFlag", true, "python")
+      @usage(Usage.input)
+      @test
+      enum TestEnum {
+        One,
+        Two,
       }
+
+      op getTest(@query value: TestEnum): string;
     `);
 
-    const sdkEnum = runner.context.sdkPackage.enums.find((e) => e.name === "TestEnum");
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+
+    const sdkEnum = context.sdkPackage.enums.find((e) => e.name === "TestEnum");
     ok(sdkEnum, "SDK enum should exist");
 
     const clientOptionDecorator = sdkEnum!.decorators.find(
@@ -261,21 +262,22 @@ describe("@clientOption in decorators array", () => {
   });
 
   it("should appear in decorators array for model property", async () => {
-    await runner.compile(`
-      @service
-      @test namespace MyService {
-        @test
-        model Test {
-          #suppress "@azure-tools/typespec-client-generator-core/client-option"
-          @clientOption("propertyFlag", "propValue", "python")
-          myProp: string;
-        }
-
-        op getTest(): Test;
+    const { program } = await SimpleTesterWithService.compile(`
+      @test
+      model Test {
+        #suppress "@azure-tools/typespec-client-generator-core/client-option"
+        @clientOption("propertyFlag", "propValue", "python")
+        myProp: string;
       }
+
+      op getTest(): Test;
     `);
 
-    const sdkModel = runner.context.sdkPackage.models.find((m) => m.name === "Test");
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+
+    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
     ok(sdkModel, "SDK model should exist");
 
     const sdkProperty = sdkModel!.properties.find((p) => p.name === "myProp");
@@ -293,22 +295,23 @@ describe("@clientOption in decorators array", () => {
   });
 
   it("should respect scope filtering - decorator appears when scope matches emitter", async () => {
-    await runner.compile(`
-      @service
-      @test namespace MyService {
-        #suppress "@azure-tools/typespec-client-generator-core/client-option"
-        @clientOption("pythonOnlyFlag", true, "python")
-        @test
-        model Test {
-          id: string;
-        }
-
-        op getTest(): Test;
+    const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("pythonOnlyFlag", true, "python")
+      @test
+      model Test {
+        id: string;
       }
+
+      op getTest(): Test;
     `);
 
-    // Runner is configured with python emitter
-    const sdkModel = runner.context.sdkPackage.models.find((m) => m.name === "Test");
+    // Configure with python emitter
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+
+    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
     ok(sdkModel, "SDK model should exist");
 
     const clientOptionDecorator = sdkModel!.decorators.find(
@@ -323,23 +326,24 @@ describe("@clientOption in decorators array", () => {
   });
 
   it("should not include decorator when scope does not match emitter", async () => {
-    await runner.compile(`
-      @service
-      @test namespace MyService {
-        #suppress "@azure-tools/typespec-client-generator-core/client-option"
-        @clientOption("javaOnlyFlag", true, "java")
-        @test
-        model Test {
-          id: string;
-        }
-
-        op getTest(): Test;
+    const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("javaOnlyFlag", true, "java")
+      @test
+      model Test {
+        id: string;
       }
+
+      op getTest(): Test;
     `);
 
-    // Runner is configured with python emitter, but decorator is scoped to java
+    // Configure with python emitter, but decorator is scoped to java
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+
     // The decorator should NOT appear in the decorators array
-    const sdkModel = runner.context.sdkPackage.models.find((m) => m.name === "Test");
+    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
     ok(sdkModel, "SDK model should exist");
 
     const clientOptionDecorator = sdkModel!.decorators.find(
@@ -353,21 +357,22 @@ describe("@clientOption in decorators array", () => {
   });
 
   it("should include all argument fields in decorator info", async () => {
-    await runner.compile(`
-      @service
-      @test namespace MyService {
-        #suppress "@azure-tools/typespec-client-generator-core/client-option"
-        @clientOption("testOption", "testValue", "python")
-        @test
-        model Test {
-          id: string;
-        }
-
-        op getTest(): Test;
+    const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("testOption", "testValue", "python")
+      @test
+      model Test {
+        id: string;
       }
+
+      op getTest(): Test;
     `);
 
-    const sdkModel = runner.context.sdkPackage.models.find((m) => m.name === "Test");
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+
+    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
     ok(sdkModel, "SDK model should exist");
 
     const clientOptionDecorator = sdkModel!.decorators.find(
@@ -394,22 +399,23 @@ describe("@clientOption in decorators array", () => {
   });
 
   it("should handle decorator without scope argument", async () => {
-    await runner.compile(`
-      @service
-      @test namespace MyService {
-        #suppress "@azure-tools/typespec-client-generator-core/client-option"
-        #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope"
-        @clientOption("noScopeOption", 123)
-        @test
-        model Test {
-          id: string;
-        }
-
-        op getTest(): Test;
+    const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope"
+      @clientOption("noScopeOption", 123)
+      @test
+      model Test {
+        id: string;
       }
+
+      op getTest(): Test;
     `);
 
-    const sdkModel = runner.context.sdkPackage.models.find((m) => m.name === "Test");
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+
+    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
     ok(sdkModel, "SDK model should exist");
 
     const clientOptionDecorator = sdkModel!.decorators.find(

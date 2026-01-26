@@ -1,9 +1,6 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { describe, it } from "vitest";
 import {
   SdkHeaderParameter,
   SdkHttpOperation,
@@ -11,23 +8,24 @@ import {
   SdkQueryParameter,
   SdkServiceMethod,
 } from "../../src/interfaces.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-import { getServiceMethodOfClient, getServiceWithDefaultApiVersion } from "../utils.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import {
+  ArmTesterWithService,
+  AzureCoreTesterWithService,
+  createSdkContextForTester,
+  SimpleTester,
+  SimpleTesterWithService,
+} from "../tester.js";
+import { getServiceMethodOfClient } from "../utils.js";
 
 it("path basic", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
 
     op myOp(@path path: string): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "myOp");
   strictEqual(method.kind, "basic");
@@ -69,13 +67,14 @@ it("path basic", async () => {
 });
 
 it("path basic with null", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
 
     op myOp(@path path: string | null): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const methodParam = method.parameters[0];
   strictEqual(methodParam.type.kind, "nullable");
@@ -86,7 +85,7 @@ it("path basic with null", async () => {
 });
 
 it("path defined in model", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @route("{name}")
     @put
     op pathInModel(...NameParameter): void;
@@ -98,7 +97,8 @@ it("path defined in model", async () => {
       name: string;
     }
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "pathInModel");
   strictEqual(method.kind, "basic");
@@ -129,13 +129,14 @@ it("path defined in model", async () => {
 });
 
 it("header basic", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
 
     op myOp(@header header: string): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "myOp");
   strictEqual(method.kind, "basic");
@@ -175,13 +176,14 @@ it("header basic", async () => {
 });
 
 it("header basic with null", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
 
     op myOp(@header header: string | null): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const methodParam = method.parameters[0];
   strictEqual(methodParam.type.kind, "nullable");
@@ -192,13 +194,14 @@ it("header basic with null", async () => {
 });
 
 it("header collection format via explode:true on array", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
 
     op myOp(@header(#{explode: true}) header: string[]): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
 
@@ -209,13 +212,14 @@ it("header collection format via explode:true on array", async () => {
 });
 
 it("header collection format via explode:false on array", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
 
     op myOp(@header header: string[]): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
 
@@ -226,13 +230,14 @@ it("header collection format via explode:false on array", async () => {
 });
 
 it("header collection format via explode:true on non-array", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
 
     op myOp(@header(#{explode: true}) header: string): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
 
@@ -243,13 +248,14 @@ it("header collection format via explode:true on non-array", async () => {
 });
 
 it("header collection format via encode: ArrayEncoding.pipeDelimited on array", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace My.Service;
 
     op myOp(@header @encode(ArrayEncoding.pipeDelimited) header: string[]): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
 
@@ -260,13 +266,14 @@ it("header collection format via encode: ArrayEncoding.pipeDelimited on array", 
 });
 
 it("header collection format via encode: ArrayEncoding.spaceDelimited on array", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace My.Service;
 
     op myOp(@header @encode(ArrayEncoding.spaceDelimited) header: string[]): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
 
@@ -277,13 +284,14 @@ it("header collection format via encode: ArrayEncoding.spaceDelimited on array",
 });
 
 it("header collection format wrong encode", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace My.Service;
 
     op myOp(@header @encode("tsv") header: string[]): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
 
@@ -292,19 +300,20 @@ it("header collection format wrong encode", async () => {
   strictEqual(headerParam.kind, "header");
   strictEqual(headerParam.collectionFormat, "csv");
 
-  expectDiagnostics(runner.context.diagnostics, [
+  expectDiagnostics(context.diagnostics, [
     { code: "@azure-tools/typespec-client-generator-core/invalid-encode-for-collection-format" },
   ]);
 });
 
 it("query basic", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
 
     op myOp(@query query: string): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "myOp");
   strictEqual(method.kind, "basic");
@@ -342,13 +351,14 @@ it("query basic", async () => {
 });
 
 it("query basic with null", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
 
     op myOp(@query query: string | null): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const methodParam = method.parameters[0];
   strictEqual(methodParam.type.kind, "nullable");
@@ -359,13 +369,14 @@ it("query basic with null", async () => {
 });
 
 it("query collection format via explode:true on non-array", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
     
     op myOp(@query(#{explode: true}) query: string): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
 
@@ -376,13 +387,14 @@ it("query collection format via explode:true on non-array", async () => {
 });
 
 it("query collection format for csv via explode:false on array", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
     
     op myOp(@query query: string[]): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
 
@@ -393,13 +405,14 @@ it("query collection format for csv via explode:false on array", async () => {
 });
 
 it("query collection format for csv via explode:true on array", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
     
     op myOp(@query(#{explode: true}) query: string[]): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
 
@@ -410,13 +423,14 @@ it("query collection format for csv via explode:true on array", async () => {
 });
 
 it("query collection format for csv via encode: ArrayEncoding.pipeDelimited on array", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace My.Service;
     
     op myOp(@query @encode(ArrayEncoding.pipeDelimited) query: string[]): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
 
@@ -427,13 +441,14 @@ it("query collection format for csv via encode: ArrayEncoding.pipeDelimited on a
 });
 
 it("query collection format for csv via encode: ArrayEncoding.spaceDelimited on array", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace My.Service;
     
     op myOp(@query @encode(ArrayEncoding.spaceDelimited) query: string[]): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
 
@@ -444,13 +459,14 @@ it("query collection format for csv via encode: ArrayEncoding.spaceDelimited on 
 });
 
 it("query collection format wrong encode", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace My.Service;
 
     op myOp(@query @encode("tsv") query: string[]): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
 
@@ -459,19 +475,20 @@ it("query collection format wrong encode", async () => {
   strictEqual(queryParm.kind, "query");
   strictEqual(queryParm.collectionFormat, "csv");
 
-  expectDiagnostics(runner.context.diagnostics, [
+  expectDiagnostics(context.diagnostics, [
     { code: "@azure-tools/typespec-client-generator-core/invalid-encode-for-collection-format" },
   ]);
 });
 
 it("cookie basic", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
 
     op myOp(@cookie(#{name: "token"}) auth: string): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
 
@@ -483,7 +500,7 @@ it("cookie basic", async () => {
 });
 
 it("body basic", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
 
@@ -493,7 +510,8 @@ it("body basic", async () => {
 
     op myOp(@body body: Input): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(sdkPackage.models.length, 1);
   strictEqual(sdkPackage.models[0].name, "Input");
@@ -544,7 +562,7 @@ it("body basic", async () => {
 });
 
 it("body basic with null", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
 
@@ -554,7 +572,8 @@ it("body basic with null", async () => {
 
     op myOp(@body body: Input | null): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const methodBodyParam = method.parameters.find((x) => x.name === "body");
   ok(methodBodyParam);
@@ -566,7 +585,7 @@ it("body basic with null", async () => {
 });
 
 it("body optional", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
 
@@ -576,7 +595,8 @@ it("body optional", async () => {
 
     op myOp(@body body?: Input): void;
     `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(sdkPackage.models.length, 1);
   strictEqual(sdkPackage.models[0].name, "Input");
@@ -627,7 +647,7 @@ it("body optional", async () => {
 });
 
 it("parameter grouping", async () => {
-  await runner.compile(`@server("http://localhost:3000", "endpoint")
+  const { program } = await SimpleTester.compile(`@server("http://localhost:3000", "endpoint")
     @service
     namespace My.Service;
 
@@ -639,8 +659,8 @@ it("parameter grouping", async () => {
 
     op myOp(options: RequestOptions): void;
     `);
-
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
 
   const method = getServiceMethodOfClient(sdkPackage);
@@ -717,10 +737,11 @@ it("parameter grouping", async () => {
 
 describe("content type", () => {
   it("content type will be added if not defined and there is body", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @patch(#{implicitOptionality: true}) op patchNull(@body body: string): void;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.name, "patchNull");
@@ -759,13 +780,14 @@ describe("content type", () => {
   });
 
   it("ensure content type is a constant if only one possibility", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       model DefaultDatetimeProperty {
         value: utcDateTime;
       }
       @post op default(@body body: DefaultDatetimeProperty): void;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
 
     strictEqual(method.parameters.length, 2);
@@ -797,10 +819,11 @@ describe("content type", () => {
   });
 
   it("content type should be optional if body is optional", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @patch(#{implicitOptionality: true}) op patchNull(@body body?: string): void;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.name, "patchNull");
@@ -830,13 +853,14 @@ describe("content type", () => {
 });
 
 it("ensure accept is a constant if only one possibility (json)", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model DefaultDatetimeProperty {
       value: utcDateTime;
     }
     @get op default(): DefaultDatetimeProperty;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
 
   strictEqual(method.parameters.length, 1);
@@ -867,7 +891,7 @@ it("ensure accept is a constant if only one possibility (json)", async () => {
 });
 
 it("ensure accept is a constant if only one possibility (non-json)", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @get op default(): {
       @header
       contentType: "image/png";
@@ -876,7 +900,8 @@ it("ensure accept is a constant if only one possibility (non-json)", async () =>
       value: bytes;
     };
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
 
   strictEqual(method.parameters.length, 1);
@@ -907,13 +932,8 @@ it("ensure accept is a constant if only one possibility (non-json)", async () =>
 });
 
 it("lro rpc case", async () => {
-  const runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runnerWithCore.compile(
-    getServiceWithDefaultApiVersion(`
+  const { program } = await AzureCoreTesterWithService.compile(
+    `
       model GenerationOptions {
         prompt: string;
       }
@@ -926,9 +946,10 @@ it("lro rpc case", async () => {
       
       @route("/generations:submit")
       op longRunningRpc is Azure.Core.LongRunningRpcOperation<GenerationOptions, GenerationResponse, GenerationResult>;
-    `),
+    `,
   );
-  const sdkPackage = runnerWithCore.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
 
   strictEqual(method.parameters.length, 3);
@@ -945,7 +966,7 @@ it("lro rpc case", async () => {
 });
 
 it("never void parameter or response", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     op TestTemplate<
       headerType,
       queryType,
@@ -958,7 +979,8 @@ it("never void parameter or response", async () => {
     };
     op test is TestTemplate<void, void, void, void, void>;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.parameters.length, 0);
   strictEqual(method.response.type, undefined);
@@ -971,11 +993,12 @@ it("never void parameter or response", async () => {
 
 describe("uri template related", () => {
   it("path param: template only", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @route("template-only/{param}")
       op templateOnly(param: string): void;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/template-only/{param}");
     strictEqual(method.operation.uriTemplate, "/template-only/{param}");
@@ -986,11 +1009,12 @@ describe("uri template related", () => {
   });
 
   it("path param: explicit", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @route("explicit/{param}")
       op explicit(@path param: string): void;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/explicit/{param}");
     strictEqual(method.operation.uriTemplate, "/explicit/{param}");
@@ -1001,11 +1025,12 @@ describe("uri template related", () => {
   });
 
   it("path param: annotation only", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @route("annotation-only")
       op annotationOnly(@path param: string): void;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/annotation-only/{param}");
     strictEqual(method.operation.uriTemplate, "/annotation-only/{param}");
@@ -1016,11 +1041,12 @@ describe("uri template related", () => {
   });
 
   it("path param: template only with allowReserved", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @route("template/{+param}")
       op template(param: string): void;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/template/{param}");
     strictEqual(method.operation.uriTemplate, "/template/{+param}");
@@ -1031,11 +1057,12 @@ describe("uri template related", () => {
   });
 
   it("path param: annotation with allowReserved", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @route("annotation")
       op annotation(@path(#{ allowReserved: true }) param: string): void;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/annotation/{param}");
     strictEqual(method.operation.uriTemplate, "/annotation/{+param}");
@@ -1046,7 +1073,7 @@ describe("uri template related", () => {
   });
 
   it("path param: explode false with style in template", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @route("simple{param}")
       op simple(param: string): void;
 
@@ -1062,7 +1089,8 @@ describe("uri template related", () => {
       @route("fragment{#param}")
       op fragment(param: string): void;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
 
     let method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
     strictEqual(method.operation.path, "/simple{param}");
@@ -1106,7 +1134,7 @@ describe("uri template related", () => {
   });
 
   it("path param: explode true with style in template", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @route("simple{param*}")
       op simple(param: string): void;
 
@@ -1122,7 +1150,8 @@ describe("uri template related", () => {
       @route("fragment{#param*}")
       op fragment(param: string): void;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
 
     let method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
     strictEqual(method.operation.path, "/simple{param}");
@@ -1166,11 +1195,12 @@ describe("uri template related", () => {
   });
 
   it("query param: template only", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @route("template-only{?param}")
       op templateOnly(param: string): void;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/template-only");
     strictEqual(method.operation.uriTemplate, "/template-only{?param}");
@@ -1180,11 +1210,12 @@ describe("uri template related", () => {
   });
 
   it("query param: explicit", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @route("explicit{?param}")
       op explicit(@query param: string): void;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/explicit");
     strictEqual(method.operation.uriTemplate, "/explicit{?param}");
@@ -1194,11 +1225,12 @@ describe("uri template related", () => {
   });
 
   it("query param: annotation only", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @route("annotation-only")
       op annotationOnly(@query param: string): void;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.operation.path, "/annotation-only");
     strictEqual(method.operation.uriTemplate, "/annotation-only{?param}");
@@ -1208,14 +1240,15 @@ describe("uri template related", () => {
   });
 
   it("query param: explode in template", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @route("no_explode{?param}")
       op no_explode(param: string): void;
 
       @route("explode{?param*}")
       op explode(param: string): void;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
 
     let method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
     strictEqual(method.operation.path, "/no_explode");
@@ -1233,30 +1266,33 @@ describe("uri template related", () => {
   });
 
   it("body param: serialized name with encoded name", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       op explode(@body @encodedName("application/json", "test") param: string): void;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
 
     const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
     strictEqual(method.operation.bodyParam?.serializedName, "test");
   });
 
   it("body param: serialized name without encoded name", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       op explode(@body param: string): void;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
 
     const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
     strictEqual(method.operation.bodyParam?.serializedName, "param");
   });
 
   it("body param: serialized name of implicit body", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       op explode(param: string): void;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
 
     const method = sdkPackage.clients[0].methods[0] as SdkServiceMethod<SdkHttpOperation>;
     strictEqual(method.operation.bodyParam?.serializedName, "");
@@ -1265,11 +1301,12 @@ describe("uri template related", () => {
 
 describe("method parameter not used in operation", () => {
   it("autoroute with constant", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @autoRoute
       op test(@path param: "test"): void;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.parameters.length, 0);
     strictEqual(method.operation.parameters.length, 0);
@@ -1277,23 +1314,19 @@ describe("method parameter not used in operation", () => {
   });
 
   it("normal case with different wire name", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @autoRoute
       op test(@path("param-wire") param: string): void;
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.parameters.length, 1);
     strictEqual(method.operation.parameters.length, 1);
   });
 
   it("singleton resource", async () => {
-    const runnerWithArm = await createSdkTestRunner({
-      librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
-      autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-      emitterName: "@azure-tools/typespec-java",
-    });
-    await runnerWithArm.compileWithBuiltInAzureResourceManagerService(`
+    const { program } = await ArmTesterWithService.compile(`
       @singleton("default")
       model SingletonTrackedResource is TrackedResource<SingletonTrackedResourceProperties> {
         ...ResourceNameParameter<SingletonTrackedResource>;
@@ -1308,8 +1341,8 @@ describe("method parameter not used in operation", () => {
         createOrUpdate is ArmResourceCreateOrReplaceAsync<SingletonTrackedResource>;
       }
     `);
-
-    const sdkPackage = runnerWithArm.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     deepStrictEqual(
       method.parameters.map((p) => p.name),
@@ -1322,16 +1355,17 @@ describe("method parameter not used in operation", () => {
   });
 });
 it("isOverride false", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     op test(): void;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.isOverride, false);
 });
 
 it("isOverride true", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model TestOptions {
       @query a: string;
       @query b: string;
@@ -1343,13 +1377,14 @@ it("isOverride true", async () => {
 
     @@override(test, testOverride);
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.isOverride, true);
 });
 
 it("readonly parameters should be filtered from method parameters", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Image {
       prop: string;
       @visibility(Lifecycle.Read)
@@ -1358,7 +1393,8 @@ it("readonly parameters should be filtered from method parameters", async () => 
 
     op upload(...Image): void;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
 
