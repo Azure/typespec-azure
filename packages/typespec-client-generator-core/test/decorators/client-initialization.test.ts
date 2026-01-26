@@ -731,7 +731,7 @@ it("wrong initializedBy value type", async () => {
 });
 
 it("should warn on unused client initialization parameter", async () => {
-  const diagnostics = await runner.diagnose(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace MyService {
       model ClientInitialization {
@@ -744,14 +744,15 @@ it("should warn on unused client initialization parameter", async () => {
       op testOp(@query query: string): void;
     }
   `);
+  await createSdkContextForTester(program);
 
-  expectDiagnostics(diagnostics, {
+  expectDiagnostics(program.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/unused-client-initialization-parameter",
   });
 });
 
 it("should not warn when client initialization parameter is used", async () => {
-  const diagnostics = await runner.diagnose(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace MyService {
       model ClientInitialization {
@@ -764,12 +765,13 @@ it("should not warn when client initialization parameter is used", async () => {
       op testOp(@path blobName: string): void;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  expectDiagnostics(diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("should warn on multiple unused client initialization parameters", async () => {
-  const diagnostics = await runner.diagnose(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace MyService {
       model ClientInitialization {
@@ -784,8 +786,9 @@ it("should warn on multiple unused client initialization parameters", async () =
       op testOp(@path usedParam: string): void;
     }
   `);
+  await createSdkContextForTester(program);
 
-  expectDiagnostics(diagnostics, [
+  expectDiagnostics(program.diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/unused-client-initialization-parameter",
     },
@@ -796,7 +799,7 @@ it("should warn on multiple unused client initialization parameters", async () =
 });
 
 it("should not warn when parameter is used in subclient with @operationGroup", async () => {
-  const diagnostics = await runner.diagnose(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace MyService {
       model ClientInitialization {
@@ -815,12 +818,13 @@ it("should not warn when parameter is used in subclient with @operationGroup", a
       op mainOp(@query query: string): void;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  expectDiagnostics(diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("should not warn when parameter is used in subclient with @client", async () => {
-  const diagnostics = await runner.diagnose(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace MyService {
       model ClientInitialization {
@@ -839,12 +843,13 @@ it("should not warn when parameter is used in subclient with @client", async () 
       op mainOp(@query query: string): void;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  expectDiagnostics(diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
 
 it("should warn when parameter is not used in subclient operations", async () => {
-  const diagnostics = await runner.diagnose(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace MyService {
       model ClientInitialization {
@@ -863,14 +868,15 @@ it("should warn when parameter is not used in subclient operations", async () =>
       op mainOp(@query query: string): void;
     }
   `);
+  await createSdkContextForTester(program);
 
-  expectDiagnostics(diagnostics, {
+  expectDiagnostics(program.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/unused-client-initialization-parameter",
   });
 });
 
 it("should work with @clientLocation decorator", async () => {
-  const diagnostics = await runner.diagnose(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace MyService {
       model ClientInitialization {
@@ -889,6 +895,7 @@ it("should work with @clientLocation decorator", async () => {
       @@clientLocation(download, MyService);
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  expectDiagnostics(diagnostics, []);
+  expectDiagnostics(context.diagnostics, []);
 });
