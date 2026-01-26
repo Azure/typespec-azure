@@ -11,6 +11,7 @@ import {
   Scalar,
   Type,
   Union,
+  UnionVariant,
   createDiagnosticCollector,
   getEffectiveModelType,
   getFriendlyName,
@@ -250,17 +251,20 @@ export function getCrossLanguageDefinitionId(
     | Operation
     | Namespace
     | Interface
-    | EnumMember,
+    | EnumMember
+    | UnionVariant,
   operation?: Operation,
   appendNamespace: boolean = true,
 ): string {
-  let retval = type.name || "anonymous";
+  let retval: string = typeof type.name === "symbol" ? "anonymous" : type.name || "anonymous";
   let namespace =
     type.kind === "ModelProperty"
       ? type.model?.namespace
       : type.kind === "EnumMember"
         ? type.enum?.namespace
-        : type.namespace;
+        : type.kind === "UnionVariant"
+          ? type.union?.namespace
+          : type.namespace;
   switch (type.kind) {
     // Enum and Scalar will always have a name
     case "Union":
@@ -281,11 +285,13 @@ export function getCrossLanguageDefinitionId(
       }
       retval =
         namingPart
-          .map((x) =>
-            x.type?.kind === "Model" || x.type?.kind === "Union"
-              ? x.type.name || x.name
-              : x.name || "anonymous",
-          )
+          .map((x) => {
+            if (x.type?.kind === "Model" || x.type?.kind === "Union") {
+              const name = x.type.name;
+              return typeof name === "symbol" ? x.name : name || x.name;
+            }
+            return x.name || "anonymous";
+          })
           .join(".") +
         "." +
         retval;
@@ -308,6 +314,11 @@ export function getCrossLanguageDefinitionId(
     case "EnumMember":
       if (type.enum) {
         retval = `${getCrossLanguageDefinitionId(context, type.enum, operation, false)}.${retval}`;
+      }
+      break;
+    case "UnionVariant":
+      if (type.union) {
+        retval = `${getCrossLanguageDefinitionId(context, type.union, operation, false)}.${retval}`;
       }
       break;
   }

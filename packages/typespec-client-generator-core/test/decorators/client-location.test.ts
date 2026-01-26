@@ -334,9 +334,9 @@ describe("Operation", () => {
     strictEqual(a2Method.parameters.length, 0);
     strictEqual(a2Method.operation.parameters.length, 1);
     strictEqual(a2Method.operation.parameters[0].name, "apiVersion");
-    strictEqual(a2Method.operation.parameters[0].correspondingMethodParams.length, 1);
+    strictEqual(a2Method.operation.parameters[0].methodParameterSegments.length, 1);
     strictEqual(
-      a2Method.operation.parameters[0].correspondingMethodParams[0],
+      a2Method.operation.parameters[0].methodParameterSegments[0][0],
       bClientApiVersionParam,
     );
   });
@@ -382,9 +382,9 @@ describe("Operation", () => {
     strictEqual(a2Method.parameters.length, 0);
     strictEqual(a2Method.operation.parameters.length, 1);
     strictEqual(a2Method.operation.parameters[0].name, "apiVersion");
-    strictEqual(a2Method.operation.parameters[0].correspondingMethodParams.length, 1);
+    strictEqual(a2Method.operation.parameters[0].methodParameterSegments.length, 1);
     strictEqual(
-      a2Method.operation.parameters[0].correspondingMethodParams[0],
+      a2Method.operation.parameters[0].methodParameterSegments[0][0],
       bClientApiVersionParam,
     );
   });
@@ -428,9 +428,9 @@ describe("Operation", () => {
     strictEqual(a2Method.parameters.length, 0);
     strictEqual(a2Method.operation.parameters.length, 1);
     strictEqual(a2Method.operation.parameters[0].name, "apiVersion");
-    strictEqual(a2Method.operation.parameters[0].correspondingMethodParams.length, 1);
+    strictEqual(a2Method.operation.parameters[0].methodParameterSegments.length, 1);
     strictEqual(
-      a2Method.operation.parameters[0].correspondingMethodParams[0],
+      a2Method.operation.parameters[0].methodParameterSegments[0][0],
       rootClientApiVersionParam,
     );
   });
@@ -524,8 +524,8 @@ describe("Parameter", () => {
     // But the HTTP operation should still reference the client parameter
     const httpApiKeyParam = aMethod.operation.parameters.find((p) => p.name === "apiKey");
     ok(httpApiKeyParam);
-    strictEqual(httpApiKeyParam.correspondingMethodParams.length, 1);
-    strictEqual(httpApiKeyParam.correspondingMethodParams[0], clientApiKeyParam);
+    strictEqual(httpApiKeyParam.methodParameterSegments.length, 1);
+    strictEqual(httpApiKeyParam.methodParameterSegments[0][0], clientApiKeyParam);
   });
 
   it("detect parameter name conflict when moving to client", async () => {
@@ -628,8 +628,8 @@ describe("Parameter", () => {
     strictEqual(testOperation.parameters.length, 3);
     const subIdOperationParam = testOperation.parameters.find((p) => p.name === "subscriptionId");
     ok(subIdOperationParam);
-    strictEqual(subIdOperationParam.correspondingMethodParams.length, 1);
-    strictEqual(subIdOperationParam.correspondingMethodParams[0], subIdMethodParam);
+    strictEqual(subIdOperationParam.methodParameterSegments.length, 1);
+    strictEqual(subIdOperationParam.methodParameterSegments[0][0], subIdMethodParam);
     ok(testOperation.parameters.some((p) => p.name === "contentType"));
     ok(testOperation.parameters.some((p) => p.name === "apiVersion"));
   });
@@ -696,8 +696,8 @@ describe("Parameter", () => {
     strictEqual(getOperation.parameters.length, 4);
     const subIdOperationParam = getOperation.parameters.find((p) => p.name === "subscriptionId");
     ok(subIdOperationParam);
-    strictEqual(subIdOperationParam.correspondingMethodParams.length, 1);
-    strictEqual(subIdOperationParam.correspondingMethodParams[0], subIdMethodParam);
+    strictEqual(subIdOperationParam.methodParameterSegments.length, 1);
+    strictEqual(subIdOperationParam.methodParameterSegments[0][0], subIdMethodParam);
 
     const putMethod = client.methods.find((m) => m.name === "put");
     ok(putMethod);
@@ -713,8 +713,8 @@ describe("Parameter", () => {
     strictEqual(putOperation.parameters.length, 5);
     const putSubIdOperationParam = putOperation.parameters.find((p) => p.name === "subscriptionId");
     ok(putSubIdOperationParam);
-    strictEqual(putSubIdOperationParam.correspondingMethodParams.length, 1);
-    strictEqual(putSubIdOperationParam.correspondingMethodParams[0], subIdMethodParam);
+    strictEqual(putSubIdOperationParam.methodParameterSegments.length, 1);
+    strictEqual(putSubIdOperationParam.methodParameterSegments[0][0], subIdMethodParam);
 
     const deleteMethod = client.methods.find((m) => m.name === "delete");
     ok(deleteMethod);
@@ -728,8 +728,8 @@ describe("Parameter", () => {
       (p) => p.name === "subscriptionId",
     );
     ok(deleteSubIdOperationParam);
-    strictEqual(deleteSubIdOperationParam.correspondingMethodParams.length, 1);
-    strictEqual(deleteSubIdOperationParam.correspondingMethodParams[0], subIdClientParam);
+    strictEqual(deleteSubIdOperationParam.methodParameterSegments.length, 1);
+    strictEqual(deleteSubIdOperationParam.methodParameterSegments[0][0], subIdClientParam);
   });
 
   it("move to `@clientInitialization` for grandparent client", async () => {
@@ -917,7 +917,7 @@ describe("Parameter", () => {
     ok(subIdParam);
     const subIdMethodParam = method.parameters.find((p) => p.name === "subscriptionId");
     ok(subIdMethodParam);
-    strictEqual(subIdParam.correspondingMethodParams.length, 1);
-    strictEqual(subIdParam.correspondingMethodParams[0], subIdMethodParam);
+    strictEqual(subIdParam.methodParameterSegments.length, 1);
+    strictEqual(subIdParam.methodParameterSegments[0][0], subIdMethodParam);
   });
 });

@@ -160,9 +160,9 @@ it("union enum value's crossLanguageDefinitionId", async () => {
   // Test union enum values - union enum values only have value name as crossLanguageDefinitionId
   strictEqual(statusEnum.values.length, 3);
   strictEqual(statusEnum.values[0].name, "Active");
-  strictEqual(statusEnum.values[0].crossLanguageDefinitionId, "Active");
+  strictEqual(statusEnum.values[0].crossLanguageDefinitionId, "TestService.Status.Active");
   strictEqual(statusEnum.values[1].name, "Inactive");
-  strictEqual(statusEnum.values[1].crossLanguageDefinitionId, "Inactive");
+  strictEqual(statusEnum.values[1].crossLanguageDefinitionId, "TestService.Status.Inactive");
   strictEqual(statusEnum.values[2].name, "Pending");
-  strictEqual(statusEnum.values[2].crossLanguageDefinitionId, "Pending");
+  strictEqual(statusEnum.values[2].crossLanguageDefinitionId, "TestService.Status.Pending");
 });
