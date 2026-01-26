@@ -1,0 +1,173 @@
+---
+title: Client Options
+llmstxt: true
+---
+
+import { ClientTabs, ClientTabItem } from "@components/client-tabs";
+
+This page documents how to use the `@clientOption` decorator to pass language-specific configuration options to emitters. For an overview of the setup, please visit the setup page.
+
+:::caution
+The `@clientOption` decorator is intended for advanced scenarios where language-specific emitter behavior needs to be configured. Using this decorator always produces a warning to ensure intentional usage. Use standard TCGC decorators when possible.
+:::
+
+## Overview
+
+The `@clientOption` decorator allows spec authors to pass arbitrary key-value options to specific language emitters. This enables fine-grained control over code generation behavior that may vary between languages.
+
+```typespec
+@clientOption(name: string, value: string | boolean | number, scope?: string)
+```
+
+### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `name` | `string` | The name of the option to set |
+| `value` | `string \| boolean \| number` | The value for the option |
+| `scope` | `string` (optional) | The target language scope. **Required** - omitting scope produces an additional warning |
+
+## Usage
+
+### Basic Usage
+
+Apply the decorator to models, operations, enums, or properties with a language-specific scope:
+
+<ClientTabs>
+
+```typespec title=client.tsp
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+#suppress "@azure-tools/typespec-client-generator-core/client-option"
+@clientOption("enableFeatureFoo", true, "python")
+model MyModel {
+  id: string;
+}
+```
+
+```python
+# The Python emitter can read this option from the model's decorators array
+# and apply the appropriate code generation behavior
+```
+
+```csharp
+// C# emitter does not see this option (scoped to Python only)
+```
+
+```typescript
+// TypeScript emitter does not see this option (scoped to Python only)
+```
+
+```java
+// Java emitter does not see this option (scoped to Python only)
+```
+
+```go
+// Go emitter does not see this option (scoped to Python only)
+```
+
+</ClientTabs>
+
+### Multiple Options
+
+You can apply multiple `@clientOption` decorators to the same target:
+
+```typespec title=client.tsp
+#suppress "@azure-tools/typespec-client-generator-core/client-option"
+@clientOption("enableFeatureFoo", true, "python")
+#suppress "@azure-tools/typespec-client-generator-core/client-option"
+@clientOption("customSerializerMode", "strict", "python")
+model MyModel {
+  id: string;
+}
+```
+
+### Different Value Types
+
+The decorator supports string, boolean, and numeric values:
+
+```typespec title=client.tsp
+#suppress "@azure-tools/typespec-client-generator-core/client-option"
+@clientOption("booleanOption", true, "python")
+model BoolExample { id: string; }
+
+#suppress "@azure-tools/typespec-client-generator-core/client-option"
+@clientOption("stringOption", "customValue", "csharp")
+model StringExample { id: string; }
+
+#suppress "@azure-tools/typespec-client-generator-core/client-option"
+@clientOption("numericOption", 42, "java")
+model NumericExample { id: string; }
+```
+
+
+## How Emitters Access Client Options
+
+Language emitters can access client options through the `decorators` array on SDK types. Each decorator entry contains:
+
+- `name`: The fully qualified decorator name (`Azure.ClientGenerator.Core.@clientOption`)
+- `arguments`: An object with `name`, `value`, and optionally `scope` fields
+
+```typescript
+// Example: Reading client options in an emitter
+const sdkModel = context.sdkPackage.models.find(m => m.name === "MyModel");
+const clientOptions = sdkModel.decorators.filter(
+  d => d.name === "Azure.ClientGenerator.Core.@clientOption"
+);
+
+for (const option of clientOptions) {
+  const optionName = option.arguments.name;   // e.g., "enableFeatureFoo"
+  const optionValue = option.arguments.value; // e.g., true
+  const scope = option.arguments.scope;       // e.g., "python"
+
+  // Apply emitter-specific behavior based on the option
+}
+```
+
+## Supported Client Options by Language
+
+Language emitters should document which client options they support. The following sections list the supported options for each language.
+
+### Python
+
+| Option Name | Value Type | Target | Description |
+|------------|------------|--------|-------------|
+| *Coming soon* | | | |
+
+### C# (.NET)
+
+| Option Name | Value Type | Target | Description |
+|------------|------------|--------|-------------|
+| *Coming soon* | | | |
+
+### Java
+
+| Option Name | Value Type | Target | Description |
+|------------|------------|--------|-------------|
+| *Coming soon* | | | |
+
+### TypeScript/JavaScript
+
+| Option Name | Value Type | Target | Description |
+|------------|------------|--------|-------------|
+| *Coming soon* | | | |
+
+### Go
+
+| Option Name | Value Type | Target | Description |
+|------------|------------|--------|-------------|
+| *Coming soon* | | | |
+
+## Best Practices
+
+1. **Always specify a scope**: The decorator is designed for language-specific behavior. Omitting the scope produces an additional warning.
+
+2. **Suppress the warning intentionally**: Use `#suppress "@azure-tools/typespec-client-generator-core/client-option"` to acknowledge that you're using this advanced feature.
+
+3. **Document usage**: When using client options, document why they're needed so future maintainers understand the intent.
+
+4. **Prefer standard decorators**: Use standard TCGC decorators like `@clientName`, `@access`, `@usage`, etc. when they can achieve the desired behavior. Reserve `@clientOption` for cases where no standard decorator exists.
+
+5. **Coordinate with emitter teams**: Before using a client option, verify with the target language emitter team that the option is supported and understand its behavior.
