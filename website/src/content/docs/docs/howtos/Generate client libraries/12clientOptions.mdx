@@ -21,11 +21,11 @@ The `@clientOption` decorator allows spec authors to pass arbitrary key-value op
 
 ### Parameters
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `name` | `string` | The name of the option to set |
-| `value` | `string \| boolean \| number` | The value for the option |
-| `scope` | `string` (optional) | The target language scope. **Required** - omitting scope produces an additional warning |
+| Parameter | Type                          | Description                                                                             |
+| --------- | ----------------------------- | --------------------------------------------------------------------------------------- |
+| `name`    | `string`                      | The name of the option to set                                                           |
+| `value`   | `string \| boolean \| number` | The value for the option                                                                |
+| `scope`   | `string` (optional)           | The target language scope. **Required** - omitting scope produces an additional warning |
 
 ## Usage
 
@@ -76,8 +76,8 @@ You can apply multiple `@clientOption` decorators to the same target:
 
 ```typespec title=client.tsp
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
-@clientOption("enableFeatureFoo", true, "python")
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
+@clientOption("enableFeatureFoo", true, "python")
 @clientOption("customSerializerMode", "strict", "python")
 model MyModel {
   id: string;
@@ -91,17 +91,22 @@ The decorator supports string, boolean, and numeric values:
 ```typespec title=client.tsp
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
 @clientOption("booleanOption", true, "python")
-model BoolExample { id: string; }
+model BoolExample {
+  id: string;
+}
 
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
 @clientOption("stringOption", "customValue", "csharp")
-model StringExample { id: string; }
+model StringExample {
+  id: string;
+}
 
 #suppress "@azure-tools/typespec-client-generator-core/client-option"
 @clientOption("numericOption", 42, "java")
-model NumericExample { id: string; }
+model NumericExample {
+  id: string;
+}
 ```
-
 
 ## How Emitters Access Client Options
 
@@ -113,7 +118,7 @@ TCGC provides the `getClientOptions` helper function to easily extract client op
 import { getClientOptions } from "@azure-tools/typespec-client-generator-core";
 
 // Get client options from a model
-const sdkModel = context.sdkPackage.models.find(m => m.name === "MyModel");
+const sdkModel = context.sdkPackage.models.find((m) => m.name === "MyModel");
 const clientOptions = getClientOptions(sdkModel.decorators);
 
 for (const option of clientOptions) {
@@ -160,15 +165,15 @@ const clientOptions = getClientOptions(sdkClient.decorators);
 If you need more control, you can also filter the decorators array directly:
 
 ```typescript
-const sdkModel = context.sdkPackage.models.find(m => m.name === "MyModel");
+const sdkModel = context.sdkPackage.models.find((m) => m.name === "MyModel");
 const clientOptionDecorators = sdkModel.decorators.filter(
-  d => d.name === "Azure.ClientGenerator.Core.@clientOption"
+  (d) => d.name === "Azure.ClientGenerator.Core.@clientOption",
 );
 
 for (const decorator of clientOptionDecorators) {
-  const optionName = decorator.arguments.name;   // e.g., "enableFeatureFoo"
+  const optionName = decorator.arguments.name; // e.g., "enableFeatureFoo"
   const optionValue = decorator.arguments.value; // e.g., true
-  const scope = decorator.arguments.scope;       // e.g., "python"
+  const scope = decorator.arguments.scope; // e.g., "python"
 }
 ```
 
@@ -178,33 +183,33 @@ Language emitters should document which client options they support. The followi
 
 ### Python
 
-| Option Name | Value Type | Target | Description |
-|------------|------------|--------|-------------|
-| *Coming soon* | | | |
+| Option Name   | Value Type | Target | Description |
+| ------------- | ---------- | ------ | ----------- |
+| _Coming soon_ |            |        |             |
 
 ### C# (.NET)
 
-| Option Name | Value Type | Target | Description |
-|------------|------------|--------|-------------|
-| *Coming soon* | | | |
+| Option Name   | Value Type | Target | Description |
+| ------------- | ---------- | ------ | ----------- |
+| _Coming soon_ |            |        |             |
 
 ### Java
 
-| Option Name | Value Type | Target | Description |
-|------------|------------|--------|-------------|
-| *Coming soon* | | | |
+| Option Name   | Value Type | Target | Description |
+| ------------- | ---------- | ------ | ----------- |
+| _Coming soon_ |            |        |             |
 
 ### TypeScript/JavaScript
 
-| Option Name | Value Type | Target | Description |
-|------------|------------|--------|-------------|
-| *Coming soon* | | | |
+| Option Name   | Value Type | Target | Description |
+| ------------- | ---------- | ------ | ----------- |
+| _Coming soon_ |            |        |             |
 
 ### Go
 
-| Option Name | Value Type | Target | Description |
-|------------|------------|--------|-------------|
-| *Coming soon* | | | |
+| Option Name   | Value Type | Target | Description |
+| ------------- | ---------- | ------ | ----------- |
+| _Coming soon_ |            |        |             |
 
 ## Best Practices
 
