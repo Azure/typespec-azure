@@ -1027,6 +1027,8 @@ extern dec clientDoc(
  * Pass experimental flags or options to emitters without requiring TCGC reshipping.
  * This decorator is intended for temporary workarounds or experimental features and requires
  * suppression to acknowledge its experimental nature.
+ * 
+ * See supported client options for each language emitter here https://azure.github.io/typespec-azure/docs/howtos/generate-client-libraries/12clientOptions/
  *
  * **Warning**: This decorator always emits a warning that must be suppressed, and an additional
  * warning if no scope is provided (since options are typically language-specific).
