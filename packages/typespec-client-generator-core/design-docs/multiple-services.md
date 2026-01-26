@@ -89,10 +89,11 @@ When TCGC detects multiple services in one client, it will:
 
 1. Create the root client for the combined client. If any service is versioned, the root client's initialization method will have an `apiVersion` parameter with no default value. The `apiVersions` property and the `apiVersion` parameter for the root client will be empty (since multiple services' API versions cannot be combined). The root client's endpoint and credential parameters will be created based on the first sub-service, which means all sub-services must share the same endpoint and credential.
 2. Create sub-clients for each service's nested namespaces or interfaces. Each sub-client will have its own `apiVersion` property and initialization method if the service is versioned.
-3. Operations directly under each service's namespace are placed under the root client. Operations under nested namespaces or interfaces are placed under the corresponding sub-clients.
-4. Decorators such as `@clientLocation`, `@convenientAPI`, `@protocolAPI`, `@moveTo`, and `@scope` work as usual.
-5. All other TCGC logic remains unchanged.
-6. Since TCGC does not check if merging multiple services will cause sub-clients, models, operations, or other name conflicts, emitters must handle these conflicts appropriately.
+3. If multiple services have nested namespaces or interfaces with the same name, TCGC will automatically merge them into a single operation group. The merged operation group will have empty `apiVersions` and a `string` type for the API version parameter, and will contain operations from all the services.
+4. Operations directly under each service's namespace are placed under the root client. Operations under nested namespaces or interfaces are placed under the corresponding sub-clients.
+5. Decorators such as `@clientLocation`, `@convenientAPI`, `@protocolAPI`, `@moveTo`, and `@scope` work as usual. When using `@clientLocation` to move operations from different services to a new operation group, the resulting operation group will have empty `apiVersions` and a `string` type for the API version parameter.
+6. All other TCGC logic remains unchanged.
+7. Since TCGC only merges operation groups with the same name, emitters must still handle conflicts for models, operations, or other types appropriately.
 
 For the example above, TCGC will generate types like:
 
@@ -174,3 +175,78 @@ clients:
           - kind: basic
             name: bTest
 ```
+
+### Operation Group Merging for Name Conflicts
+
+When multiple services have nested namespaces or interfaces with the same name, TCGC automatically merges them into a single operation group that behaves like a multi-service operation group:
+
+- The `apiVersions` property will be empty
+- The API version parameter type will be `string` instead of a service-specific enum
+- The operation group will contain operations from all the services with that name
+
+For example:
+
+```typespec
+@service
+namespace ServiceA {
+  interface Operations {
+    opA(): void;
+  }
+}
+
+@service
+namespace ServiceB {
+  interface Operations {
+    opB(): void;
+  }
+}
+
+@client({
+  name: "CombineClient",
+  service: [ServiceA, ServiceB],
+})
+namespace CombineClient;
+```
+
+The generated client will have a single `Operations` operation group containing both `opA()` and `opB()` operations. The operation group will have empty `apiVersions` and a `string` type for the API version parameter.
+
+### Using `@clientLocation` with Multiple Services
+
+When using `@clientLocation` to move operations from different services to the same operation group (whether it's a new operation group name or an existing one), the resulting operation group will behave like a multi-service root client:
+
+- The `apiVersions` property will be empty
+- The API version parameter type will be `string` instead of a service-specific enum
+- The operation group can contain operations with different API versions from different services
+
+For example:
+
+```typespec
+@service
+@versioned(VersionsA)
+namespace ServiceA {
+  enum VersionsA { av1, av2 }
+  op opA(@query("api-version") apiVersion: VersionsA): void;
+}
+
+@service
+@versioned(VersionsB)
+namespace ServiceB {
+  enum VersionsB { bv1, bv2 }
+  op opB(@query("api-version") apiVersion: VersionsB): void;
+}
+
+@client({
+  name: "CombineClient",
+  service: [ServiceA, ServiceB],
+})
+namespace CombineClient;
+
+@@clientLocation(ServiceA.opA, "SharedGroup");
+@@clientLocation(ServiceB.opB, "SharedGroup");
+```
+
+The resulting `SharedGroup` operation group will have:
+
+- `apiVersions: []`
+- API version parameter with `type.kind === "string"`
+- Operations from both ServiceA and ServiceB

@@ -103,7 +103,11 @@ export interface SdkContext<
 export interface SdkClient {
   kind: "SdkClient";
   name: string;
+  /**
+   * @deprecated Use `services` instead. This property will be removed in a future release.
+   */
   service: Namespace | Namespace[];
+  services: Namespace[];
   type: Namespace | Interface;
   subOperationGroups: SdkOperationGroup[];
 }
@@ -113,7 +117,11 @@ export interface SdkOperationGroup {
   type?: Namespace | Interface;
   subOperationGroups: SdkOperationGroup[];
   groupPath: string;
+  /**
+   * @deprecated Use `services` instead. This property will be removed in a future release.
+   */
   service: Namespace;
+  services: Namespace[];
   /** Parent operation group or client. */
   parent?: SdkClient | SdkOperationGroup;
 }
@@ -1211,12 +1219,21 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   /** Metadata for the package. */
   metadata: {
     /**
+     * @deprecated Use `apiVersions` instead. This property will be removed in a future release.
+     *
      * The version of the package.
      * If undefined, the package is not versioned.
      * If `all`, the package is versioned with all versions.
      * If a string, the package is versioned with the specified version.
      */
     apiVersion?: string;
+    /**
+     * The version map of the package.
+     * Key is the service namespace full qualified name, value is the version.
+     * If value is undefined, the package is not versioned.
+     * If value is a string, the service is versioned with the specified version.
+     */
+    apiVersions?: Map<string, string>;
   };
 }
 

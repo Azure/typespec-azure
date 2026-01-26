@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Remove mutation for validation.
+Do not check array type when applying encode for model property.

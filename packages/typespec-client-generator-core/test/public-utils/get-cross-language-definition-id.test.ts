@@ -1,21 +1,13 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import { it } from "vitest";
+import {
+  AzureCoreTester,
+  AzureCoreTesterWithService,
+  createSdkContextForTester,
+} from "../tester.js";
 
 it("parameter's crossLanguageDefinitionId", async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runner.compileWithBuiltInAzureCoreService(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     alias ServiceTraits = SupportsRepeatableRequests &
     SupportsConditionalRequests &
     SupportsClientRequestId;
@@ -29,8 +21,9 @@ it("parameter's crossLanguageDefinitionId", async () => {
       ServiceTraits
     >;
   `);
+  const context = await createSdkContextForTester(program);
 
-  const sdkPackage = runner.context.sdkPackage;
+  const sdkPackage = context.sdkPackage;
   strictEqual(
     sdkPackage.clients[0].clientInitialization.parameters[1].crossLanguageDefinitionId,
     "My.Service.getServiceStatus.apiVersion",
@@ -61,12 +54,7 @@ it("parameter's crossLanguageDefinitionId", async () => {
 });
 
 it("endpoint's crossLanguageDefinitionId", async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runner.compile(`
+  const { program } = await AzureCoreTester.compile(`
     @service(#{
       title: "Contoso Widget Manager",
     })
@@ -86,8 +74,9 @@ it("endpoint's crossLanguageDefinitionId", async () => {
 
     op test(): void;
   `);
+  const context = await createSdkContextForTester(program);
 
-  const sdkPackage = runner.context.sdkPackage;
+  const sdkPackage = context.sdkPackage;
   const initialization = sdkPackage.clients[0].clientInitialization;
   const endpoint = initialization.parameters[0];
   strictEqual(endpoint.crossLanguageDefinitionId, "Contoso.WidgetManager.endpoint");

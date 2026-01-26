@@ -1,126 +1,90 @@
-import { Enum, Model } from "@typespec/compiler";
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { getUsage } from "../../src/decorators.js";
 import { UsageFlags } from "../../src/interfaces.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
 it("defaults calculated usage", async () => {
-  const { Model1, Model2, Model3, Model4 } = (await runner.compile(`
+  const { program, Model1, Model2, Model3, Model4 } = await SimpleTester.compile(t.code`
     @service
     @test namespace MyService {
-      @test
-      model Model1{ prop: string }
+      model ${t.model("Model1")}{ prop: string }
 
-      @test
-      model Model2{ prop: string }
+      model ${t.model("Model2")}{ prop: string }
 
-      @test
-      model Model3{ prop: string }
+      model ${t.model("Model3")}{ prop: string }
 
-      @test
-      model Model4 { prop: string }
+      model ${t.model("Model4")}{ prop: string }
 
-      @test
       @route("/func1")
       op func1(@body body: Model1): void;
 
-      @test
       @route("/func2")
       op func2(): Model2;
 
-      @test
       @route("/func3")
       op func3(@body body: Model3): Model3;
     }
-  `)) as { Model1: Model; Model2: Model; Model3: Model; Model4: Model };
+  `);
 
-  strictEqual(getUsage(runner.context, Model1), UsageFlags.Input | UsageFlags.Json);
-  strictEqual(getUsage(runner.context, Model2), UsageFlags.Output | UsageFlags.Json);
-  strictEqual(
-    getUsage(runner.context, Model3),
-    UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
-  );
-  strictEqual(getUsage(runner.context, Model4), UsageFlags.None);
+  const context = await createSdkContextForTester(program);
+  strictEqual(getUsage(context, Model1), UsageFlags.Input | UsageFlags.Json);
+  strictEqual(getUsage(context, Model2), UsageFlags.Output | UsageFlags.Json);
+  strictEqual(getUsage(context, Model3), UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+  strictEqual(getUsage(context, Model4), UsageFlags.None);
 });
 
 it("usage override", async () => {
-  const { Model1, Model2, Model3, Model4, Enum1, Enum2 } = (await runner.compile(`
+  const { program, Enum1, Enum2, Model1, Model2, Model3, Model4 } =
+    await SimpleTester.compile(t.code`
     @service
-    @test namespace MyService {
-      @test
+    namespace MyService {
       @usage(Usage.input | Usage.output)
-      enum Enum1{
+      enum ${t.enum("Enum1")}{
         one,
         two,
         three
       }
 
-      @test
-      enum Enum2{
+      enum ${t.enum("Enum2")}{
         one,
         two,
         three
       }
 
-      @test
       @usage(Usage.input | Usage.output)
-      model Model1{ prop: string }
+      model ${t.model("Model1")}{ prop: string }
 
-      @test
-      model Model4{ prop: string }
+      model ${t.model("Model4")}{ prop: string }
 
-      @test
       @usage(Usage.input | Usage.output)
-      model Model2{ prop: string }
+      model ${t.model("Model2")}{ prop: string }
 
-      @test
       @usage(Usage.input | Usage.output)
-      model Model3{ prop: string }
+      model ${t.model("Model3")}{ prop: string }
 
-      @test
       @route("/func1")
       op func1(@body body: Model2): void;
 
-      @test
       @route("/func2")
       op func2(): Model3;
     }
-  `)) as {
-    Model1: Model;
-    Model2: Model;
-    Model3: Model;
-    Model4: Model;
-    Enum1: Enum;
-    Enum2: Enum;
-  };
+  `);
 
-  strictEqual(getUsage(runner.context, Model1), UsageFlags.Input | UsageFlags.Output);
-  strictEqual(
-    getUsage(runner.context, Model2),
-    UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
-  );
-  strictEqual(
-    getUsage(runner.context, Model3),
-    UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
-  );
-  strictEqual(getUsage(runner.context, Model4), UsageFlags.None);
-  strictEqual(getUsage(runner.context, Enum1), UsageFlags.Input | UsageFlags.Output);
-  strictEqual(getUsage(runner.context, Enum2), UsageFlags.None);
+  const context = await createSdkContextForTester(program);
+  strictEqual(getUsage(context, Model1), UsageFlags.Input | UsageFlags.Output);
+  strictEqual(getUsage(context, Model2), UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+  strictEqual(getUsage(context, Model3), UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+  strictEqual(getUsage(context, Model4), UsageFlags.None);
+  strictEqual(getUsage(context, Enum1), UsageFlags.Input | UsageFlags.Output);
+  strictEqual(getUsage(context, Enum2), UsageFlags.None);
 });
 
 it("wrong usage value", async () => {
-  const diagnostics = await runner.diagnose(`
-    @test
+  const [, diagnostics] = await SimpleTester.compileAndDiagnose(t.code`
     @usage(1)
-    model Model1{}
+    model ${t.model("Model1")}{}
   `);
 
   expectDiagnostics(diagnostics, {
@@ -129,35 +93,30 @@ it("wrong usage value", async () => {
 });
 
 it("usage propagation", async () => {
-  const { Fish, Shark, Salmon, SawShark, Origin } = (await runner.compile(`
+  const { program, Fish, Shark, Salmon, SawShark, Origin } = await SimpleTester.compile(t.code`
     @service
-    @test namespace MyService {
+    namespace MyService {
       @discriminator("kind")
-      @test
-      model Fish {
+      model ${t.model("Fish")} {
         age: int32;
       }
 
       @discriminator("sharktype")
-      @test
       @usage(Usage.input | Usage.output)
-      model Shark extends Fish {
+      model ${t.model("Shark")} extends Fish {
         kind: "shark";
         origin: Origin;
       }
 
-      @test
-      model Salmon extends Fish {
+      model ${t.model("Salmon")} extends Fish {
         kind: "salmon";
       }
 
-      @test
-      model SawShark extends Shark {
+      model ${t.model("SawShark")} extends Shark {
         sharktype: "saw";
       }
 
-      @test
-      model Origin {
+      model ${t.model("Origin")} {
         country: string;
         city: string;
         manufacture: string;
@@ -166,33 +125,21 @@ it("usage propagation", async () => {
       @get
       op getModel(): Fish;
     }
-  `)) as { Fish: Model; Shark: Model; Salmon: Model; SawShark: Model; Origin: Model };
+  `);
 
-  strictEqual(
-    getUsage(runner.context, Fish),
-    UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
-  );
-  strictEqual(
-    getUsage(runner.context, Shark),
-    UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
-  );
-  strictEqual(getUsage(runner.context, Salmon), UsageFlags.Output | UsageFlags.Json);
-  strictEqual(
-    getUsage(runner.context, SawShark),
-    UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
-  );
-  strictEqual(
-    getUsage(runner.context, Origin),
-    UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
-  );
+  const context = await createSdkContextForTester(program);
+  strictEqual(getUsage(context, Fish), UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+  strictEqual(getUsage(context, Shark), UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+  strictEqual(getUsage(context, Salmon), UsageFlags.Output | UsageFlags.Json);
+  strictEqual(getUsage(context, SawShark), UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
+  strictEqual(getUsage(context, Origin), UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
 });
 
 it("usage and convenience", async () => {
-  const { Fish } = (await runner.compile(`
+  const { program, Fish } = await SimpleTester.compile(t.code`
     @service
-    @test namespace MyService {
-      @test
-      model Fish {
+    namespace MyService {
+      model ${t.model("Fish")} {
         age: int32;
       }
 
@@ -204,15 +151,15 @@ it("usage and convenience", async () => {
       @convenientAPI(false)
       op getModel(): Fish;
     }
-  `)) as { Fish: Model };
+  `);
 
-  strictEqual(getUsage(runner.context, Fish), UsageFlags.Input | UsageFlags.Json);
+  const context = await createSdkContextForTester(program);
+  strictEqual(getUsage(context, Fish), UsageFlags.Input | UsageFlags.Json);
 
-  const { Dog } = (await runner.compile(`
+  const { program: anotherProgram, Dog } = await SimpleTester.compile(t.code`
     @service
-    @test namespace MyService {
-      @test
-      model Dog {
+    namespace MyService {
+      model ${t.model("Dog")} {
         age: int32;
       }
 
@@ -224,22 +171,21 @@ it("usage and convenience", async () => {
       @convenientAPI(true)
       op getModel(): Dog;
     }
-  `)) as { Dog: Model };
+  `);
 
-  strictEqual(getUsage(runner.context, Dog), UsageFlags.Output | UsageFlags.Json);
+  const anotherContext = await createSdkContextForTester(anotherProgram);
+  strictEqual(getUsage(anotherContext, Dog), UsageFlags.Output | UsageFlags.Json);
 });
 
 it("patch usage", async () => {
-  const { PatchModel, JsonMergePatchModel } = (await runner.compile(`
+  const { program, PatchModel, JsonMergePatchModel } = await SimpleTester.compile(t.code`
     @service
-    @test namespace MyService {
-      @test
-      model PatchModel {
+    namespace MyService {
+      model ${t.model("PatchModel")} {
         age: int32;
       }
 
-      @test
-      model JsonMergePatchModel {
+      model ${t.model("JsonMergePatchModel")} {
         prop: string
       }
 
@@ -251,38 +197,35 @@ it("patch usage", async () => {
       @route("/jsonMergePatch")
       op jsonMergePatchModel(@body body: JsonMergePatchModel, @header contentType: "application/merge-patch+json"): void;
     }
-  `)) as { PatchModel: Model; JsonMergePatchModel: Model };
+  `);
 
-  strictEqual(getUsage(runner.context, PatchModel), UsageFlags.Input | UsageFlags.Json);
+  const context = await createSdkContextForTester(program);
+  strictEqual(getUsage(context, PatchModel), UsageFlags.Input | UsageFlags.Json);
   strictEqual(
-    getUsage(runner.context, JsonMergePatchModel),
+    getUsage(context, JsonMergePatchModel),
     UsageFlags.JsonMergePatch | UsageFlags.Input | UsageFlags.Json,
   );
 });
 
 it("@usage Input and Output on Namespace", async () => {
-  const { OrphanModel, InputModel, OutputModel, RoundtripModel } = (await runner.compile(`
+  const { program, OrphanModel, InputModel, OutputModel, RoundtripModel } =
+    await SimpleTester.compile(t.code`
     @service
-    @test
     @usage(Usage.input | Usage.output)
     namespace MyService {
-      @test
-      model OrphanModel {
+      model ${t.model("OrphanModel")} {
         prop: string;
       }
 
-      @test
-      model InputModel {
+      model ${t.model("InputModel")} {
         prop: string
       }
 
-      @test
-      model OutputModel {
+      model ${t.model("OutputModel")} {
         prop: string
       }
 
-      @test
-      model RoundtripModel {
+      model ${t.model("RoundtripModel")} {
         prop: string
       }
 
@@ -292,77 +235,73 @@ it("@usage Input and Output on Namespace", async () => {
       @route("/two")
       op two(@body body: RoundtripModel): RoundtripModel;
     }
-  `)) as { OrphanModel: Model; InputModel: Model; OutputModel: Model; RoundtripModel: Model };
-  strictEqual(getUsage(runner.context, OrphanModel), UsageFlags.Input | UsageFlags.Output);
+  `);
+
+  const context = await createSdkContextForTester(program);
+  strictEqual(getUsage(context, OrphanModel), UsageFlags.Input | UsageFlags.Output);
   // this is set to input and output because of the namespace override
   strictEqual(
-    getUsage(runner.context, InputModel),
+    getUsage(context, InputModel),
     UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
   );
   strictEqual(
-    getUsage(runner.context, OutputModel),
+    getUsage(context, OutputModel),
     UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
   );
   strictEqual(
-    getUsage(runner.context, RoundtripModel),
+    getUsage(context, RoundtripModel),
     UsageFlags.Input | UsageFlags.Output | UsageFlags.Json,
   );
 });
 
 it("@usage namespace override", async () => {
-  const { OrphanModel, OrphanModelWithOverride } = (await runner.compile(`
+  const { program, OrphanModel, OrphanModelWithOverride } = await SimpleTester.compile(t.code`
     @service
-    @test
     @usage(Usage.input)
     namespace MyService {
-      @test
-      model OrphanModel {
+      model ${t.model("OrphanModel")} {
         prop: string;
       }
 
-      @test
       @usage(Usage.input | Usage.output)
-      model OrphanModelWithOverride {
+      model ${t.model("OrphanModelWithOverride")} {
         prop: string;
       }
     }
-  `)) as { OrphanModel: Model; OrphanModelWithOverride: Model };
-  strictEqual(getUsage(runner.context, OrphanModel), UsageFlags.Input);
-  strictEqual(
-    getUsage(runner.context, OrphanModelWithOverride),
-    UsageFlags.Input | UsageFlags.Output,
-  );
+  `);
+
+  const context = await createSdkContextForTester(program);
+  strictEqual(getUsage(context, OrphanModel), UsageFlags.Input);
+  strictEqual(getUsage(context, OrphanModelWithOverride), UsageFlags.Input | UsageFlags.Output);
 });
 
 it("usage additive from operation", async () => {
-  await runner.compileWithBuiltInService(
-    `
-      @usage(Usage.output)
-      model A {}
+  const { program } = await SimpleTesterWithService.compile(t.code`
+    @usage(Usage.output)
+    model A {}
 
-      op test(@body body: A): void;
-      `,
-  );
-  const models = runner.context.sdkPackage.models;
+    op test(@body body: A): void;
+  `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   // Should have Input + Json (from operation) + Output (from @usage)
   strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
 });
 
 it("usage additive from propagation", async () => {
-  await runner.compileWithBuiltInService(
-    `
-      model A {
-        prop: B;
-      }
+  const { program } = await SimpleTesterWithService.compile(t.code`
+    model A {
+      prop: B;
+    }
 
-      @usage(Usage.output)
-      model B {}
+    @usage(Usage.output)
+    model B {}
 
-      op test(@body body: A): void;
-      `,
-  );
-  const models = runner.context.sdkPackage.models;
+    op test(@body body: A): void;
+  `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   // A should have Input + Json from operation
   strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Json);
@@ -371,23 +310,22 @@ it("usage additive from propagation", async () => {
 });
 
 it("usage additive from multiple sources", async () => {
-  await runner.compileWithBuiltInService(
-    `
-      model A {
-        prop: B;
-      }
+  const { program } = await SimpleTesterWithService.compile(t.code`
+    model A {
+      prop: B;
+    }
 
-      model B {}
+    model B {}
 
-      @usage(Usage.output)
-      model C {
-        prop: B;
-      }
+    @usage(Usage.output)
+    model C {
+      prop: B;
+    }
 
-      op test(@body body: A): void;
-      `,
-  );
-  const models = runner.context.sdkPackage.models;
+    op test(@body body: A): void;
+  `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   // A should have Input + Json from operation
   strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Json);
@@ -398,26 +336,25 @@ it("usage additive from multiple sources", async () => {
 });
 
 it("usage additive from spread", async () => {
-  await runner.compileWithBuiltInService(
-    `
-      model A {
-        x: X;
-      }
+  const { program } = await SimpleTesterWithService.compile(t.code`
+    model A {
+      x: X;
+    }
 
-      model B {
-        x: X;
-      }
+    model B {
+      x: X;
+    }
 
-      @usage(Usage.input)
-      model X {
-      }
+    @usage(Usage.input)
+    model X {
+    }
 
-      op one(...B): B;
+    op one(...B): B;
 
-      op two(): B;
-      `,
-  );
-  const models = runner.context.sdkPackage.models;
+    op two(): B;
+  `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   strictEqual(
     models.find((m) => m.name === "B")?.usage,
@@ -431,22 +368,21 @@ it("usage additive from spread", async () => {
 });
 
 it("orphan model in group", async () => {
-  await runner.compileWithBuiltInService(
-    `
-      @access(Access.public)
-      @usage(Usage.output)
-      namespace Models {
-        model Model1 {
-          ref: Model2;
-        }
-
-        model Model2 {
-          name: string;
-        }
+  const { program } = await SimpleTesterWithService.compile(t.code`
+    @access(Access.public)
+    @usage(Usage.output)
+    namespace Models {
+      model Model1 {
+        ref: Model2;
       }
-    `,
-  );
-  const models = runner.context.sdkPackage.models;
+
+      model Model2 {
+        name: string;
+      }
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   strictEqual(models[0].usage, UsageFlags.Output);
   strictEqual(models[0].access, "public");
@@ -455,26 +391,25 @@ it("orphan model in group", async () => {
 });
 
 it("disableUsageAccessPropagationToBase true with override", async () => {
-  runner = await createSdkTestRunner(
-    { emitterName: "@azure-tools/typespec-python" },
+  const { program } = await SimpleTesterWithService.compile(t.code`
+    model BaseClassThatsPruned {
+      id: int32;
+    }
+    model DerivedOne extends BaseClassThatsPruned {
+      name: string;
+      prop: UsedByProperty;
+    }
+    model UsedByProperty {
+      prop: string;
+    }
+    @@usage(DerivedOne, Usage.output);
+  `);
+  const context = await createSdkContextForTester(
+    program,
+    {},
     { disableUsageAccessPropagationToBase: true },
   );
-  await runner.compileWithBuiltInService(
-    `
-      model BaseClassThatsPruned {
-        id: int32;
-      }
-      model DerivedOne extends BaseClassThatsPruned {
-        name: string;
-        prop: UsedByProperty;
-      }
-      model UsedByProperty {
-        prop: string;
-      }
-      @@usage(DerivedOne, Usage.output);
-    `,
-  );
-  const models = runner.context.sdkPackage.models;
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   strictEqual(models[0].usage, UsageFlags.Output);
   strictEqual(models[0].name, "DerivedOne");
@@ -483,27 +418,26 @@ it("disableUsageAccessPropagationToBase true with override", async () => {
 });
 
 it("disableUsageAccessPropagationToBase true", async () => {
-  runner = await createSdkTestRunner(
-    { emitterName: "@azure-tools/typespec-python" },
+  const { program } = await SimpleTesterWithService.compile(t.code`
+    model BaseClassThatsPruned {
+      id: int32;
+    }
+    model DerivedOne extends BaseClassThatsPruned {
+      name: string;
+      prop: UsedByProperty;
+    }
+    model UsedByProperty {
+      prop: string;
+    }
+
+    op test(): DerivedOne;
+  `);
+  const context = await createSdkContextForTester(
+    program,
+    {},
     { disableUsageAccessPropagationToBase: true },
   );
-  await runner.compileWithBuiltInService(
-    `
-      model BaseClassThatsPruned {
-        id: int32;
-      }
-      model DerivedOne extends BaseClassThatsPruned {
-        name: string;
-        prop: UsedByProperty;
-      }
-      model UsedByProperty {
-        prop: string;
-      }
-
-      op test(): DerivedOne;
-    `,
-  );
-  const models = runner.context.sdkPackage.models;
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   strictEqual(models[0].usage, UsageFlags.Output | UsageFlags.Json);
   strictEqual(models[0].name, "DerivedOne");
@@ -512,31 +446,30 @@ it("disableUsageAccessPropagationToBase true", async () => {
 });
 
 it("disableUsageAccessPropagationToBase true property propagation", async () => {
-  runner = await createSdkTestRunner(
-    { emitterName: "@azure-tools/typespec-python" },
+  const { program } = await SimpleTesterWithService.compile(t.code`
+    model BaseClassThatsPruned {
+      id: int32;
+      foo: UsedByBaseProperty;
+    }
+    model DerivedOne extends BaseClassThatsPruned {
+      name: string;
+      prop: UsedByProperty;
+    }
+    model UsedByProperty {
+      prop: string;
+    }
+    model UsedByBaseProperty {
+      prop: string;
+    }
+
+    op test(): DerivedOne;
+  `);
+  const context = await createSdkContextForTester(
+    program,
+    {},
     { disableUsageAccessPropagationToBase: true },
   );
-  await runner.compileWithBuiltInService(
-    `
-      model BaseClassThatsPruned {
-        id: int32;
-        foo: UsedByBaseProperty;
-      }
-      model DerivedOne extends BaseClassThatsPruned {
-        name: string;
-        prop: UsedByProperty;
-      }
-      model UsedByProperty {
-        prop: string;
-      }
-      model UsedByBaseProperty {
-        prop: string;
-      }
-
-      op test(): DerivedOne;
-    `,
-  );
-  const models = runner.context.sdkPackage.models;
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   strictEqual(models[0].usage, UsageFlags.Output | UsageFlags.Json);
   strictEqual(models[0].name, "DerivedOne");
@@ -547,42 +480,41 @@ it("disableUsageAccessPropagationToBase true property propagation", async () => 
 });
 
 it("disableUsageAccessPropagationToBase true discriminator propagation", async () => {
-  runner = await createSdkTestRunner(
-    { emitterName: "@azure-tools/typespec-python" },
+  const { program } = await SimpleTesterWithService.compile(t.code`
+    @discriminator("kind")
+    model Fish {
+      age: int32;
+    }
+
+    @discriminator("sharktype")
+    model Shark extends Fish {
+      kind: "shark";
+      origin: Origin;
+    }
+
+    model Salmon extends Fish {
+      kind: "salmon";
+    }
+
+    model SawShark extends Shark {
+      sharktype: "saw";
+    }
+
+    model Origin {
+      country: string;
+      city: string;
+      manufacture: string;
+    }
+
+    @get
+    op getModel(): Fish;
+  `);
+  const context = await createSdkContextForTester(
+    program,
+    {},
     { disableUsageAccessPropagationToBase: true },
   );
-  await runner.compileWithBuiltInService(
-    `
-      @discriminator("kind")
-      model Fish {
-        age: int32;
-      }
-
-      @discriminator("sharktype")
-      model Shark extends Fish {
-        kind: "shark";
-        origin: Origin;
-      }
-
-      model Salmon extends Fish {
-        kind: "salmon";
-      }
-
-      model SawShark extends Shark {
-        sharktype: "saw";
-      }
-
-      model Origin {
-        country: string;
-        city: string;
-        manufacture: string;
-      }
-
-      @get
-      op getModel(): Fish;
-    `,
-  );
-  const models = runner.context.sdkPackage.models;
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 5);
   strictEqual(models[0].usage, UsageFlags.Output | UsageFlags.Json);
   strictEqual(models[0].name, "Fish");
@@ -597,36 +529,35 @@ it("disableUsageAccessPropagationToBase true discriminator propagation", async (
 });
 
 it("disableUsageAccessPropagationToBase true discriminator without ref propagation", async () => {
-  runner = await createSdkTestRunner(
-    { emitterName: "@azure-tools/typespec-python" },
+  const { program } = await SimpleTesterWithService.compile(t.code`
+    @discriminator("kind")
+    model Fish {
+      age: int32;
+    }
+
+    model Shark extends Fish {
+      kind: "shark";
+    }
+
+    model Salmon extends Fish {
+      kind: "salmon";
+    }
+
+
+    @get
+    @route("/getFish")
+    op getShark(): Shark;
+
+    @get
+    @route("/getSalmon")
+    op getSalmon(): Salmon;
+  `);
+  const context = await createSdkContextForTester(
+    program,
+    {},
     { disableUsageAccessPropagationToBase: true },
   );
-  await runner.compileWithBuiltInService(
-    `
-      @discriminator("kind")
-      model Fish {
-        age: int32;
-      }
-
-      model Shark extends Fish {
-        kind: "shark";
-      }
-
-      model Salmon extends Fish {
-        kind: "salmon";
-      }
-
-
-      @get
-      @route("/getFish")
-      op getShark(): Shark;
-
-      @get
-      @route("/getSalmon")
-      op getSalmon(): Salmon;
-    `,
-  );
-  const models = runner.context.sdkPackage.models;
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   strictEqual(models[0].usage, UsageFlags.Output | UsageFlags.Json);
   strictEqual(models[0].name, "Shark");

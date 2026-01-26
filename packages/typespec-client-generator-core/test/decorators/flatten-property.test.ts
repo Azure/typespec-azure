@@ -1,32 +1,29 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { expectDiagnostics } from "@typespec/compiler/testing";
+import { expectDiagnostics, t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { getAllModels } from "../../src/types.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
+import {
+  AzureCoreTester,
+  createSdkContextForTester,
+  SimpleTester,
+  SimpleTesterWithService,
+} from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
-
 it("marks a model property to be flattened with suppression of deprecation warning", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(t.code`
     model Model1{
       @Azure.ClientGenerator.Core.Legacy.flattenProperty
       child: Model2;
     }
 
-    @test
     model Model2{}
 
-    @test
     @route("/func1")
     op func1(@body body: Model1): void;
   `);
-  const models = getAllModels(runner.context);
+  const context = await createSdkContextForTester(program);
+  const models = getAllModels(context);
   strictEqual(models.length, 2);
   const model1 = models.find((x) => x.name === "Model1")!;
   strictEqual(model1.kind, "model");
@@ -37,23 +34,21 @@ it("marks a model property to be flattened with suppression of deprecation warni
 });
 
 it("doesn't mark a un-flattened model property", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(t.code`
     @service
-    @test namespace MyService {
-      @test
+    namespace MyService {
       model Model1{
         child: Model2;
       }
 
-      @test
       model Model2{}
 
-      @test
       @route("/func1")
       op func1(@body body: Model1): void;
     }
   `);
-  const models = getAllModels(runner.context);
+  const context = await createSdkContextForTester(program);
+  const models = getAllModels(context);
   strictEqual(models.length, 2);
   const model1 = models.find((x) => x.name === "Model1")!;
   strictEqual(model1.kind, "model");
@@ -64,19 +59,16 @@ it("doesn't mark a un-flattened model property", async () => {
 });
 
 it("throws error when used on other targets", async () => {
-  const diagnostics = await runner.diagnose(`
+  const diagnostics = await SimpleTester.diagnose(`
     @service
-    @test namespace MyService {
-      @test
+    namespace MyService {
       @Azure.ClientGenerator.Core.Legacy.flattenProperty
       model Model1{
         child: Model2;
       }
 
-      @test
       model Model2{}
 
-      @test
       @route("/func1")
       op func1(@body body: Model1): void;
     }
@@ -88,16 +80,14 @@ it("throws error when used on other targets", async () => {
 });
 
 it("throws error when used on a polymorphism type", async () => {
-  const diagnostics = await runner.diagnose(`
+  const diagnostics = await SimpleTester.diagnose(`
     @service
-    @test namespace MyService {
-      @test
+    namespace MyService {
       model Model1{
         @Azure.ClientGenerator.Core.Legacy.flattenProperty
         child: Model2;
       }
 
-      @test
       @discriminator("kind")
       model Model2{
         kind: string;
@@ -111,13 +101,7 @@ it("throws error when used on a polymorphism type", async () => {
 });
 
 it("verify diagnostic gets raised for usage", async () => {
-  const runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-
-  const result = await runnerWithCore.diagnose(
+  const result = await AzureCoreTester.diagnose(
     `        
       namespace MyService {
         model Model1{
@@ -134,9 +118,11 @@ it("verify diagnostic gets raised for usage", async () => {
       }
       `,
     {
-      linterRuleSet: {
-        enable: {
-          "@azure-tools/typespec-azure-core/no-legacy-usage": true,
+      compilerOptions: {
+        linterRuleSet: {
+          enable: {
+            "@azure-tools/typespec-azure-core/no-legacy-usage": true,
+          },
         },
       },
     },
@@ -151,7 +137,7 @@ it("verify diagnostic gets raised for usage", async () => {
 });
 
 it("body parameter of model type should have been flattened", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(t.code`
     model TestModel {
       prop: string;
     }
@@ -161,7 +147,8 @@ it("body parameter of model type should have been flattened", async () => {
     @@Legacy.flattenProperty(func1::parameters.body);
   `);
 
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
 
   const bodyMethodParam = method.parameters.find((x) => x.name === "body");
