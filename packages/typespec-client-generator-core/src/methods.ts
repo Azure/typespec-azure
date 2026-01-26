@@ -21,6 +21,7 @@ import {
 import { $ } from "@typespec/compiler/typekit";
 import {
   getAccess,
+  getDisablePageable,
   getMarkAsPageable,
   getNextLinkVerb,
   getOverriddenClientMethod,
@@ -735,7 +736,11 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   client: SdkClientType<TServiceOperation>,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const lro = getTcgcLroMetadata(context, operation, client);
-  const paging = isList(context.program, operation) || getMarkAsPageable(context, operation);
+  // `@disablePageable` disables paging even for operations with @list
+  const pagingDisabled = getDisablePageable(context, operation);
+  const paging =
+    !pagingDisabled &&
+    (isList(context.program, operation) || getMarkAsPageable(context, operation));
   if (lro && paging) {
     return getSdkLroPagingServiceMethod<TServiceOperation>(context, operation, client);
   } else if (paging) {

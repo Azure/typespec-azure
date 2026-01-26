@@ -56,6 +56,7 @@ import {
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
 import {
   ClientDefaultValueDecorator,
+  DisablePageableDecorator,
   FlattenPropertyDecorator,
   HierarchyBuildingDecorator,
   MarkAsLroDecorator,
@@ -1745,6 +1746,20 @@ export function getMarkAsPageable(
 
 export interface MarkAsPageableInfo {
   itemsProperty: ModelProperty;
+}
+
+const disablePageableKey = createStateSymbol("disablePageable");
+
+export const $disablePageable: DisablePageableDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: LanguageScopes,
+) => {
+  setScopedDecoratorData(context, $disablePageable, disablePageableKey, target, true, scope);
+};
+
+export function getDisablePageable(context: TCGCContext, entity: Operation): boolean {
+  return getScopedDecoratorData(context, disablePageableKey, entity) ?? false;
 }
 
 function getRealResponseModel(program: Program, responseModel: Model): Type {
