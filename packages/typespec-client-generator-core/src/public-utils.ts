@@ -241,7 +241,16 @@ export function getWireName(context: TCGCContext, type: Type & { name: string })
  */
 export function getCrossLanguageDefinitionId(
   context: TCGCContext,
-  type: Union | Model | Enum | Scalar | ModelProperty | Operation | Namespace | Interface | EnumMember,
+  type:
+    | Union
+    | Model
+    | Enum
+    | Scalar
+    | ModelProperty
+    | Operation
+    | Namespace
+    | Interface
+    | EnumMember,
   operation?: Operation,
   appendNamespace: boolean = true,
 ): string {
