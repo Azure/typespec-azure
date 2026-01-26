@@ -970,7 +970,7 @@ export type ClientOptionDecorator = (
   context: DecoratorContext,
   target: Type,
   name: string,
-  value: Type,
+  value: unknown,
   scope?: string,
 ) => DecoratorValidatorCallbacks | void;
 

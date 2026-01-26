@@ -1046,4 +1046,4 @@ extern dec clientDoc(
  * }
  * ```
  */
-extern dec clientOption(target: unknown, name: valueof string, value: unknown, scope?: valueof string);
+extern dec clientOption(target: unknown, name: valueof string, value: valueof unknown, scope?: valueof string);

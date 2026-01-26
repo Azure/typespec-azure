@@ -1864,7 +1864,7 @@ export const $clientOption: ClientOptionDecorator = (
   context: DecoratorContext,
   target: Type,
   name: string,
-  value: Type,
+  value: unknown,
   scope?: LanguageScopes,
 ) => {
   // Always emit warning that this is experimental
