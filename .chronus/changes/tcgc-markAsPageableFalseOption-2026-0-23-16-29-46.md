@@ -1,7 +1,7 @@
 ---
-changeKind: fix
+changeKind: feature
 packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Add the ability to mark pageable operations as basic operations with `@Legacy.markAsPageable(false)`
+Add new `@Legacy.disablePageable` decorator to mark pageable operations as basic operations

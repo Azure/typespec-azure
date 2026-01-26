@@ -539,7 +539,7 @@ it("should work with ARM ListSinglePage legacy operation", async () => {
   strictEqual(method.response.resultSegments, method.pagingMetadata.pageItemsSegments);
 });
 
-it("should disable paging when @markAsPageable(false) is applied to a @list operation", async () => {
+it("should disable paging when @disablePageable is applied to a @list operation", async () => {
   await basicRunner.compile(`
       @service
       namespace TestService {
@@ -554,7 +554,7 @@ it("should disable paging when @markAsPageable(false) is applied to a @list oper
           name: string;
         }
 
-        @Azure.ClientGenerator.Core.Legacy.markAsPageable(false)
+        @Azure.ClientGenerator.Core.Legacy.disablePageable
         @list
         @route("/items")
         @get
@@ -566,7 +566,7 @@ it("should disable paging when @markAsPageable(false) is applied to a @list oper
   strictEqual(methods.length, 1);
 
   const method = methods[0];
-  // Should be basic method since @markAsPageable(false) disables paging
+  // Should be basic method since @disablePageable disables paging
   strictEqual(method.kind, "basic");
   strictEqual(method.name, "listItems");
 
@@ -580,7 +580,7 @@ it("should disable paging when @markAsPageable(false) is applied to a @list oper
   strictEqual(method.response.resultSegments, undefined);
 });
 
-it("should disable paging with language scope when @markAsPageable(false, scope) is applied", async () => {
+it("should disable paging with language scope when @disablePageable(scope) is applied", async () => {
   await basicRunner.compile(`
       @service
       namespace TestService {
@@ -595,7 +595,7 @@ it("should disable paging with language scope when @markAsPageable(false, scope)
           name: string;
         }
 
-        @Azure.ClientGenerator.Core.Legacy.markAsPageable(false, "csharp")
+        @Azure.ClientGenerator.Core.Legacy.disablePageable("csharp")
         @list
         @route("/items")
         @get
@@ -607,7 +607,7 @@ it("should disable paging with language scope when @markAsPageable(false, scope)
   strictEqual(methods.length, 1);
 
   const method = methods[0];
-  // Should be basic method since @markAsPageable(false) disables paging for csharp
+  // Should be basic method since @disablePageable disables paging for csharp
   strictEqual(method.kind, "basic");
   strictEqual(method.name, "listItems");
 
@@ -618,7 +618,7 @@ it("should disable paging with language scope when @markAsPageable(false, scope)
   strictEqual(responseType.name, "ItemListResult");
 });
 
-it("should NOT disable paging when scope does not match for @markAsPageable(false)", async () => {
+it("should NOT disable paging when scope does not match for @disablePageable", async () => {
   await basicRunner.compile(`
       @service
       namespace TestService {
@@ -633,7 +633,7 @@ it("should NOT disable paging when scope does not match for @markAsPageable(fals
           name: string;
         }
 
-        @Azure.ClientGenerator.Core.Legacy.markAsPageable(false, "python")
+        @Azure.ClientGenerator.Core.Legacy.disablePageable("python")
         @list
         @route("/items")
         @get
@@ -655,7 +655,7 @@ it("should NOT disable paging when scope does not match for @markAsPageable(fals
   strictEqual(responseType.kind, "array");
 });
 
-it("should not mark paged model as paged result when @markAsPageable(false) is applied", async () => {
+it("should not mark paged model as paged result when @disablePageable is applied", async () => {
   const { isPagedResultModel } = await import("../../src/public-utils.js");
 
   await basicRunner.compile(`
@@ -672,7 +672,7 @@ it("should not mark paged model as paged result when @markAsPageable(false) is a
           name: string;
         }
 
-        @Azure.ClientGenerator.Core.Legacy.markAsPageable(false)
+        @Azure.ClientGenerator.Core.Legacy.disablePageable
         @list
         @route("/items")
         @get
@@ -691,39 +691,4 @@ it("should not mark paged model as paged result when @markAsPageable(false) is a
   ok(responseType);
   strictEqual(responseType.kind, "model");
   strictEqual(isPagedResultModel(basicRunner.context, responseType), false);
-});
-
-it("should allow @markAsPageable(true, 'csharp') to work the same as @markAsPageable('csharp')", async () => {
-  await basicRunner.compile(`
-      @service
-      namespace TestService {
-        model ItemListResult {
-          @pageItems
-          items: Item[];
-        }
-
-        model Item {
-          id: string;
-          name: string;
-        }
-
-        @Azure.ClientGenerator.Core.Legacy.markAsPageable(true, "csharp")
-        @route("/items")
-        @get
-        op listItems(): ItemListResult;
-      }
-    `);
-
-  const methods = basicRunner.context.sdkPackage.clients[0].methods;
-  strictEqual(methods.length, 1);
-
-  const method = methods[0];
-  strictEqual(method.kind, "paging");
-  strictEqual(method.name, "listItems");
-
-  // Check paging metadata
-  ok(method.pagingMetadata);
-  ok(method.pagingMetadata.pageItemsSegments);
-  strictEqual(method.pagingMetadata.pageItemsSegments.length, 1);
-  strictEqual(method.pagingMetadata.pageItemsSegments[0].name, "items");
 });

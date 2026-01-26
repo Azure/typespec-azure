@@ -21,6 +21,7 @@ import {
 import { $ } from "@typespec/compiler/typekit";
 import {
   getAccess,
+  getDisablePageable,
   getMarkAsPageable,
   getNextLinkVerb,
   getOverriddenClientMethod,
@@ -265,7 +266,7 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
     });
   } else {
     const markAsPageableInfo = getMarkAsPageable(context, operation);
-    if (markAsPageableInfo && !markAsPageableInfo.disabled && markAsPageableInfo.itemsProperty) {
+    if (markAsPageableInfo) {
       const itemsProperty = diagnostics.pipe(
         getSdkModelPropertyType(context, markAsPageableInfo.itemsProperty, operation),
       );
@@ -735,10 +736,11 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   client: SdkClientType<TServiceOperation>,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const lro = getTcgcLroMetadata(context, operation, client);
-  const markAsPageableInfo = getMarkAsPageable(context, operation);
-  // @markAsPageable(false) disables paging even for operations with @list
-  const pagingDisabled = markAsPageableInfo?.disabled === true;
-  const paging = !pagingDisabled && (isList(context.program, operation) || markAsPageableInfo);
+  // @disablePageable disables paging even for operations with @list
+  const pagingDisabled = getDisablePageable(context, operation);
+  const paging =
+    !pagingDisabled &&
+    (isList(context.program, operation) || getMarkAsPageable(context, operation));
   if (lro && paging) {
     return getSdkLroPagingServiceMethod<TServiceOperation>(context, operation, client);
   } else if (paging) {
