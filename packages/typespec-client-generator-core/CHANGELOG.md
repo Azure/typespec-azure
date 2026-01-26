@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.64.4
+
+### Bug Fixes
+
+- [#3843](https://github.com/Azure/typespec-azure/pull/3843) Fix subscriptionId and apiVersion client parameters not propagating to top-level client when nested operation groups contain these parameters
+- [#3833](https://github.com/Azure/typespec-azure/pull/3833) Add new `@Legacy.disablePageable` decorator to mark pageable operations as basic operations
+
+
 ## 0.64.3
 
 ### Bug Fixes
