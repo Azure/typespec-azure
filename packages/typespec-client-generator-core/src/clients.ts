@@ -253,7 +253,10 @@ function addDefaultClientParameters<
       // if any sub operation groups have an api version param, the top level needs
       // the api version param as well
       apiVersionParam = context.__clientParametersCache.get(sc)?.find((x) => x.isApiVersionParam);
-      if (apiVersionParam) break;
+      if (apiVersionParam) {
+        context.__clientParametersCache.get(client.__raw)?.push(apiVersionParam);
+        break;
+      }
     }
   }
   if (apiVersionParam) {
@@ -276,7 +279,10 @@ function addDefaultClientParameters<
     for (const sc of listOperationGroups(context, client.__raw)) {
       // if any sub operation groups have an subId param, the top level needs it as well
       subId = context.__clientParametersCache.get(sc)?.find((x) => isSubscriptionId(context, x));
-      if (subId) break;
+      if (subId) {
+        context.__clientParametersCache.get(client.__raw)?.push(subId);
+        break;
+      }
     }
   }
   if (subId) {
