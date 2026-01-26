@@ -1,37 +1,35 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { describe, it } from "vitest";
 import { SdkHttpOperation, SdkServiceMethod } from "../../src/interfaces.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import {
+  ArmTester,
+  createClientCustomizationInput,
+  createSdkContextForTester,
+  SimpleBaseTester,
+  SimpleTester,
+  SimpleTesterWithService,
+} from "../tester.js";
 
 describe("Operation", () => {
   it("@clientLocation along with @client", async () => {
-    const diagnostics = (
-      await runner.compileAndDiagnoseWithCustomization(
+    const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
         `
     @service
     namespace MyService;
 
     op test(): string;
-  `,
+    `,
         `
     @client({service: MyService})
     namespace MyServiceClient;
 
     @clientLocation("Inner")
     op test is MyService.test;
-  `,
-      )
-    )[1];
+    `,
+      ),
+    );
 
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
@@ -39,25 +37,25 @@ describe("Operation", () => {
   });
 
   it("@clientLocation along with @operationGroup", async () => {
-    const diagnostics = (
-      await runner.compileAndDiagnoseWithCustomization(
+    const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
         `
-    @service
-    namespace MyService;
+      @service
+      namespace MyService;
 
-    op test(): string;
-  `,
+      op test(): string;
+      `,
         `
-    namespace Customization;
+      namespace Customization;
 
-    @operationGroup
-    interface MyOperationGroup {
-      @clientLocation("Inner")
-      op test is MyService.test;
-    }
-  `,
-      )
-    )[1];
+      @operationGroup
+      interface MyOperationGroup {
+        @clientLocation("Inner")
+        op test is MyService.test;
+      }
+      `,
+      ),
+    );
 
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
@@ -65,7 +63,7 @@ describe("Operation", () => {
   });
 
   it("@clientLocation client-location-wrong-type", async () => {
-    const [_, diagnostics] = await runner.compileAndDiagnose(
+    const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
       `
     @service
     namespace TestService{
@@ -78,10 +76,11 @@ describe("Operation", () => {
   `,
     );
 
+    const context = await createSdkContextForTester(program);
     expectDiagnostics(diagnostics, {
       code: "@azure-tools/typespec-client-generator-core/client-location-wrong-type",
     });
-    const sdkPackage = runner.context.sdkPackage;
+    const sdkPackage = context.sdkPackage;
     const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
     ok(rootClient);
     strictEqual(rootClient.children, undefined);
@@ -90,7 +89,7 @@ describe("Operation", () => {
   });
 
   it("@clientLocation to an exist og with string target", async () => {
-    await runner.compile(
+    const { program } = await SimpleTester.compile(
       `
     @service
     namespace TestService;
@@ -111,7 +110,8 @@ describe("Operation", () => {
   `,
     );
 
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
     ok(rootClient);
     strictEqual(rootClient.children?.length, 2);
@@ -128,7 +128,7 @@ describe("Operation", () => {
   });
 
   it("move an operation to another operation group", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
     interface A {
       @route("/a1")
@@ -146,7 +146,8 @@ describe("Operation", () => {
   `,
     );
 
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
     ok(rootClient);
     strictEqual(rootClient.children?.length, 2);
@@ -162,7 +163,7 @@ describe("Operation", () => {
   });
 
   it("move an operation to another operation group and omit the original operation group", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
     interface A {
       @route("/a")
@@ -177,7 +178,8 @@ describe("Operation", () => {
   `,
     );
 
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
     ok(rootClient);
     strictEqual(rootClient.children?.length, 1);
@@ -189,7 +191,7 @@ describe("Operation", () => {
   });
 
   it("move an operation to a new opeartion group", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
     interface A {
       @route("/a1")
@@ -202,7 +204,8 @@ describe("Operation", () => {
   `,
     );
 
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
     ok(rootClient);
     strictEqual(rootClient.children?.length, 2);
@@ -217,7 +220,7 @@ describe("Operation", () => {
   });
 
   it("move an operation to a new operation group and omit the original operation group", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
     interface A {
       @route("/a")
@@ -227,7 +230,8 @@ describe("Operation", () => {
   `,
     );
 
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
     ok(rootClient);
     strictEqual(rootClient.children?.length, 1);
@@ -238,7 +242,7 @@ describe("Operation", () => {
   });
 
   it("move an operation to root client", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
     interface A {
       @route("/a1")
@@ -251,7 +255,8 @@ describe("Operation", () => {
   `,
     );
 
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
     ok(rootClient);
     strictEqual(rootClient.children?.length, 1);
@@ -264,7 +269,7 @@ describe("Operation", () => {
   });
 
   it("move an operation to root client and omit the original operation group", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
     interface A {
       @route("/a")
@@ -274,7 +279,8 @@ describe("Operation", () => {
   `,
     );
 
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
     ok(rootClient);
     strictEqual(rootClient.children, undefined);
@@ -283,7 +289,7 @@ describe("Operation", () => {
   });
 
   it("move an operation to another operation group with api version", async () => {
-    await runner.compile(
+    const { program } = await SimpleTester.compile(
       `
     @service
     @versioned(Versions)
@@ -309,7 +315,8 @@ describe("Operation", () => {
   `,
     );
 
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
     ok(rootClient);
     strictEqual(rootClient.children?.length, 2);
@@ -335,7 +342,7 @@ describe("Operation", () => {
   });
 
   it("move an operation to a new opeartion group with api version", async () => {
-    await runner.compile(
+    const { program } = await SimpleTester.compile(
       `
     @service
     @versioned(Versions)
@@ -356,7 +363,8 @@ describe("Operation", () => {
   `,
     );
 
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
     ok(rootClient);
     strictEqual(rootClient.children?.length, 2);
@@ -382,7 +390,7 @@ describe("Operation", () => {
   });
 
   it("move an operation to root client with api version", async () => {
-    await runner.compile(
+    const { program } = await SimpleTester.compile(
       `
     @service
     @versioned(Versions)
@@ -403,7 +411,8 @@ describe("Operation", () => {
   `,
     );
 
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
     ok(rootClient);
     const rootClientApiVersionParam = rootClient.clientInitialization.parameters.find(
@@ -427,7 +436,7 @@ describe("Operation", () => {
   });
 
   it("all operations have been moved", async () => {
-    await runner.compile(
+    const { program } = await SimpleTester.compile(
       `
     @service
     @versioned(Versions)
@@ -449,7 +458,8 @@ describe("Operation", () => {
   `,
     );
 
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
     ok(rootClient);
     const rootClientApiVersionParam = rootClient.clientInitialization.parameters.find(
@@ -477,7 +487,7 @@ describe("Operation", () => {
 
 describe("Parameter", () => {
   it("move parameter from operation to client", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await SimpleTesterWithService.compile(
       `
       interface A {
         @route("/a")
@@ -486,7 +496,8 @@ describe("Parameter", () => {
       `,
     );
 
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const rootClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
     ok(rootClient);
 
@@ -518,8 +529,9 @@ describe("Parameter", () => {
   });
 
   it("detect parameter name conflict when moving to client", async () => {
-    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
-      `
+    const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
+        `
       @service
       namespace MyService;
       model TestParams {
@@ -529,7 +541,7 @@ describe("Parameter", () => {
       @route("/test")
       op test(...TestParams): void;
       `,
-      `
+        `
       model MyClientOptions {
         apiKey: string;
       }
@@ -537,6 +549,7 @@ describe("Parameter", () => {
       @@clientInitialization(MyService, MyClientOptions);
       @@clientLocation(MyService.TestParams.apiKey, MyService);
       `,
+      ),
     );
     // not sure why it's showing up twice, there seems to be some compiler stuff going on here
     expectDiagnostics(diagnostics, [
@@ -550,7 +563,7 @@ describe("Parameter", () => {
   });
 
   it("can not move model properties to string", async () => {
-    const [_, diagnostics] = await runner.compileAndDiagnose(
+    const diagnostics = await SimpleTester.diagnose(
       `
       @service
       namespace MyService;
@@ -566,12 +579,7 @@ describe("Parameter", () => {
   });
 
   it("subId from client to operation", async () => {
-    const runnerWithArm = await createSdkTestRunner({
-      librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
-      autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-      emitterName: "@azure-tools/typespec-java",
-    });
-    await runnerWithArm.compile(
+    const { program } = await ArmTester.compile(
       `
     @armProviderNamespace("My.Service")
     @service(#{ title: "My.Service" })
@@ -599,7 +607,8 @@ describe("Parameter", () => {
     `,
     );
 
-    const sdkPackage = runnerWithArm.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const client = sdkPackage.clients[0];
     ok(client);
     for (const p of client.clientInitialization.parameters) {
@@ -626,12 +635,7 @@ describe("Parameter", () => {
   });
 
   it("subId from client to operation for two methods, stays on client for others", async () => {
-    const runnerWithArm = await createSdkTestRunner({
-      librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
-      autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-      emitterName: "@azure-tools/typespec-java",
-    });
-    await runnerWithArm.compile(
+    const { program } = await ArmTester.compile(
       `
     @armProviderNamespace("My.Service")
     @service(#{ title: "My.Service" })
@@ -666,7 +670,8 @@ describe("Parameter", () => {
     `,
     );
 
-    const sdkPackage = runnerWithArm.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const client = sdkPackage.clients[0];
     ok(client);
     for (const p of client.clientInitialization.parameters) {
@@ -728,7 +733,7 @@ describe("Parameter", () => {
   });
 
   it("move to `@clientInitialization` for grandparent client", async () => {
-    await runner.compile(
+    const { program } = await SimpleTester.compile(
       `
       @service
       namespace Grandparent;
@@ -755,7 +760,8 @@ describe("Parameter", () => {
       }
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const grandparentClient = sdkPackage.clients.find((c) => c.name === "GrandparentClient");
     ok(grandparentClient);
     strictEqual(grandparentClient.clientInitialization.parameters.length, 2);
@@ -783,7 +789,7 @@ describe("Parameter", () => {
   });
 
   it("move to `@clientInitialization` for parent client", async () => {
-    await runner.compile(
+    const { program } = await SimpleTester.compile(
       `
       @service
       namespace Grandparent;
@@ -810,7 +816,8 @@ describe("Parameter", () => {
       }
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const grandparentClient = sdkPackage.clients.find((c) => c.name === "GrandparentClient");
     ok(grandparentClient);
     strictEqual(grandparentClient.clientInitialization.parameters.length, 1);
@@ -837,13 +844,7 @@ describe("Parameter", () => {
   });
 
   it("with @override", async () => {
-    runner = await createSdkTestRunner({
-      librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
-      autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-      emitterName: "@azure-tools/typespec-python",
-    });
-
-    await runner.compile(
+    const { program } = await ArmTester.compile(
       `
         @armProviderNamespace
         @service(#{ title: "ContosoProviderHubClient" })
@@ -888,7 +889,8 @@ describe("Parameter", () => {
         @@override(Employees.get, employeeGet);
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const client = sdkPackage.clients[0];
     ok(client);
 

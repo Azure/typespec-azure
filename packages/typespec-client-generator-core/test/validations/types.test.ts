@@ -1,15 +1,12 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
-import { OpenAPITestLibrary } from "@typespec/openapi/testing";
-import { beforeEach, describe, it } from "vitest";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import { describe, it } from "vitest";
+import {
+  ArmTester,
+  createClientCustomizationInput,
+  createSdkContextForTester,
+  SimpleBaseTester,
+  SimpleTester,
+} from "../tester.js";
 
 describe("multi-service duplicate name validation", () => {
   // In multi-service scenarios, models/enums/unions with the same name in different services
@@ -18,29 +15,32 @@ describe("multi-service duplicate name validation", () => {
 
   it("error for same model name across services in multi-service client", async () => {
     // Same-named models in different services will collide when combined into one client
-    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
-      `
-      @service
-      @versioned(VersionsA)
-      namespace ServiceA {
-        enum VersionsA { v1 }
-        model Foo { a: string; }
-      }
-      @service
-      @versioned(VersionsB)
-      namespace ServiceB {
-        enum VersionsB { v1 }
-        model Foo { b: string; }
-      }
-      `,
-      `
-      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
-      @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
-      namespace CombineClient;
-      `,
+    const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
+        `
+        @service
+        @versioned(VersionsA)
+        namespace ServiceA {
+          enum VersionsA { v1 }
+          model Foo { a: string; }
+        }
+        @service
+        @versioned(VersionsB)
+        namespace ServiceB {
+          enum VersionsB { v1 }
+          model Foo { b: string; }
+        }
+        `,
+        `
+        @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+        @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
+        namespace CombineClient;
+        `,
+      ),
     );
 
-    expectDiagnostics(diagnostics, [
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics([...diagnostics, ...context.diagnostics], [
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
@@ -56,29 +56,32 @@ describe("multi-service duplicate name validation", () => {
 
   it("error for same enum name across services in multi-service client", async () => {
     // Same-named enums in different services will collide when combined into one client
-    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
-      `
-      @service
-      @versioned(VersionsA)
-      namespace ServiceA {
-        enum VersionsA { v1 }
-        enum Status { Active, Inactive }
-      }
-      @service
-      @versioned(VersionsB)
-      namespace ServiceB {
-        enum VersionsB { v1 }
-        enum Status { Pending, Complete }
-      }
-      `,
-      `
-      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
-      @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
-      namespace CombineClient;
-      `,
+    const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
+        `
+        @service
+        @versioned(VersionsA)
+        namespace ServiceA {
+          enum VersionsA { v1 }
+          enum Status { Active, Inactive }
+        }
+        @service
+        @versioned(VersionsB)
+        namespace ServiceB {
+          enum VersionsB { v1 }
+          enum Status { Pending, Complete }
+        }
+        `,
+        `
+        @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+        @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
+        namespace CombineClient;
+        `,
+      ),
     );
 
-    expectDiagnostics(diagnostics, [
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics([...diagnostics, ...context.diagnostics], [
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
@@ -94,29 +97,36 @@ describe("multi-service duplicate name validation", () => {
 
   it("error for same union name across services in multi-service client", async () => {
     // Same-named unions in different services will collide when combined into one client
-    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
-      `
-      @service
-      @versioned(VersionsA)
-      namespace ServiceA {
-        enum VersionsA { v1 }
-        union MyUnion { string, int32 }
-      }
-      @service
-      @versioned(VersionsB)
-      namespace ServiceB {
-        enum VersionsB { v1 }
-        union MyUnion { boolean, float32 }
-      }
-      `,
-      `
-      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
-      @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
-      namespace CombineClient;
-      `,
+    const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
+        `
+        @service
+        @versioned(VersionsA)
+        namespace ServiceA {
+          enum VersionsA { v1 }
+          union MyUnion { string, int32 }
+        }
+        @service
+        @versioned(VersionsB)
+        namespace ServiceB {
+          enum VersionsB { v1 }
+          union MyUnion { boolean, float32 }
+        }
+        `,
+        `
+        @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+        @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
+        namespace CombineClient;
+        `,
+      ),
     );
 
-    expectDiagnostics(diagnostics, [
+    const context = await createSdkContextForTester(program);
+    // Filter to only check TCGC duplicate-client-name diagnostics (ignore Azure Core union warnings)
+    const allDiagnostics = [...diagnostics, ...context.diagnostics].filter(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+    );
+    expectDiagnostics(allDiagnostics, [
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
@@ -131,26 +141,28 @@ describe("multi-service duplicate name validation", () => {
   });
 
   it("no error for different names across services", async () => {
-    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
-      `
-      @service
-      @versioned(VersionsA)
-      namespace ServiceA {
-        enum VersionsA { v1 }
-        model FooA { a: string; }
-      }
-      @service
-      @versioned(VersionsB)
-      namespace ServiceB {
-        enum VersionsB { v1 }
-        model FooB { b: string; }
-      }
-      `,
-      `
-      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
-      @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
-      namespace CombineClient;
-      `,
+    const [_, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
+        `
+        @service
+        @versioned(VersionsA)
+        namespace ServiceA {
+          enum VersionsA { v1 }
+          model FooA { a: string; }
+        }
+        @service
+        @versioned(VersionsB)
+        namespace ServiceB {
+          enum VersionsB { v1 }
+          model FooB { b: string; }
+        }
+        `,
+        `
+        @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+        @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
+        namespace CombineClient;
+        `,
+      ),
     );
 
     expectDiagnosticEmpty(diagnostics);
@@ -158,31 +170,34 @@ describe("multi-service duplicate name validation", () => {
 
   it("error for @clientName same name across services in multi-service client", async () => {
     // @clientName causing same name across services will collide when combined into one client
-    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
-      `
-      @service
-      @versioned(VersionsA)
-      namespace ServiceA {
-        enum VersionsA { v1 }
-        @clientName("SharedName")
-        model ModelA { a: string; }
-      }
-      @service
-      @versioned(VersionsB)
-      namespace ServiceB {
-        enum VersionsB { v1 }
-        @clientName("SharedName")
-        model ModelB { b: string; }
-      }
-      `,
-      `
-      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
-      @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
-      namespace CombineClient;
-      `,
+    const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
+        `
+        @service
+        @versioned(VersionsA)
+        namespace ServiceA {
+          enum VersionsA { v1 }
+          @clientName("SharedName")
+          model ModelA { a: string; }
+        }
+        @service
+        @versioned(VersionsB)
+        namespace ServiceB {
+          enum VersionsB { v1 }
+          @clientName("SharedName")
+          model ModelB { b: string; }
+        }
+        `,
+        `
+        @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+        @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
+        namespace CombineClient;
+        `,
+      ),
     );
 
-    expectDiagnostics(diagnostics, [
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics([...diagnostics, ...context.diagnostics], [
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message: 'Client name: "SharedName" is duplicated in language scope: "AllScopes"',
@@ -196,33 +211,36 @@ describe("multi-service duplicate name validation", () => {
 
   it("error for nested namespace type with same name in multi-service client", async () => {
     // Nested namespaces in different services will also collide when combined into one client
-    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
-      `
-      @service
-      @versioned(VersionsA)
-      namespace ServiceA {
-        enum VersionsA { v1 }
-        namespace Sub {
-          model Nested { a: string; }
+    const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
+        `
+        @service
+        @versioned(VersionsA)
+        namespace ServiceA {
+          enum VersionsA { v1 }
+          namespace Sub {
+            model Nested { a: string; }
+          }
         }
-      }
-      @service
-      @versioned(VersionsB)
-      namespace ServiceB {
-        enum VersionsB { v1 }
-        namespace Sub {
-          model Nested { b: string; }
+        @service
+        @versioned(VersionsB)
+        namespace ServiceB {
+          enum VersionsB { v1 }
+          namespace Sub {
+            model Nested { b: string; }
+          }
         }
-      }
-      `,
-      `
-      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
-      @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
-      namespace CombineClient;
-      `,
+        `,
+        `
+        @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+        @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
+        namespace CombineClient;
+        `,
+      ),
     );
 
-    expectDiagnostics(diagnostics, [
+    const context = await createSdkContextForTester(program);
+    expectDiagnostics([...diagnostics, ...context.diagnostics], [
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
@@ -238,7 +256,7 @@ describe("multi-service duplicate name validation", () => {
 
   it("no error for same model name in single-service (different namespaces)", async () => {
     // In single-service mode, same names in different namespaces are OK
-    const diagnostics = await runner.diagnose(
+    const diagnostics = await SimpleTester.diagnose(
       `
       @service
       namespace MyService {
@@ -258,28 +276,30 @@ describe("multi-service duplicate name validation", () => {
   it("no error for same API version enum name across services in multi-service client", async () => {
     // API version enums (e.g., "Versions") commonly have the same name across services
     // and that's expected and allowed - they're identified by UsageFlags.ApiVersionEnum
-    const [_, diagnostics] = await runner.compileAndDiagnoseWithCustomization(
-      `
-      @service
-      @versioned(Versions)
-      namespace ServiceA {
-        enum Versions { v1 }
-        model FooA { a: string; }
-        @route("/a") op getA(): FooA;
-      }
-      @service
-      @versioned(Versions)
-      namespace ServiceB {
-        enum Versions { v1 }
-        model FooB { b: string; }
-        @route("/b") op getB(): FooB;
-      }
-      `,
-      `
-      @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
-      @useDependency(ServiceA.Versions.v1, ServiceB.Versions.v1)
-      namespace CombineClient;
-      `,
+    const [_, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+      createClientCustomizationInput(
+        `
+        @service
+        @versioned(Versions)
+        namespace ServiceA {
+          enum Versions { v1 }
+          model FooA { a: string; }
+          @route("/a") op getA(): FooA;
+        }
+        @service
+        @versioned(Versions)
+        namespace ServiceB {
+          enum Versions { v1 }
+          model FooB { b: string; }
+          @route("/b") op getB(): FooB;
+        }
+        `,
+        `
+        @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+        @useDependency(ServiceA.Versions.v1, ServiceB.Versions.v1)
+        namespace CombineClient;
+        `,
+      ),
     );
 
     // Should not report errors for "Versions" enums being duplicated
@@ -289,7 +309,7 @@ describe("multi-service duplicate name validation", () => {
 
   it("error for duplicate model name within same service namespace", async () => {
     // Within the same service namespace, duplicate names ARE an error
-    const diagnostics = await runner.diagnose(
+    const diagnostics = await SimpleTester.diagnose(
       `
       @service
       namespace MyService {
@@ -314,13 +334,7 @@ describe("multi-service duplicate name validation", () => {
     // User-defined types should not conflict with ARM library types like ExtensionResource.
     // Both the user's ExtensionResource and ARM's ExtensionResource would be generated
     // into the SDK, causing naming conflicts.
-    const runnerWithArm = await createSdkTestRunner({
-      librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
-      autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-      emitterName: "@azure-tools/typespec-java",
-    });
-
-    const diagnostics = await runnerWithArm.diagnose(`
+    const [{ program }, diagnostics] = await ArmTester.compileAndDiagnose(`
       @armProviderNamespace("My.Service")
       @server("http://localhost:3000", "endpoint")
       @service(#{title: "My.Service"})
@@ -357,9 +371,13 @@ describe("multi-service duplicate name validation", () => {
       }
     `);
 
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+
     // Should report a single diagnostic because user's @clientName("ExtensionResource")
     // conflicts with ARM's ExtensionResource type
-    expectDiagnostics(diagnostics, [
+    expectDiagnostics([...diagnostics, ...context.diagnostics], [
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message: 'Client name: "ExtensionResource" is duplicated in language scope: "AllScopes"',
@@ -369,7 +387,7 @@ describe("multi-service duplicate name validation", () => {
 });
 
 it("no duplicate operation with @clientLocation", async () => {
-  const diagnostics = await runner.diagnose(
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `
     @service
     namespace StorageService;
@@ -387,11 +405,12 @@ it("no duplicate operation with @clientLocation", async () => {
     `,
   );
 
+  await createSdkContextForTester(program);
   expectDiagnosticEmpty(diagnostics);
 });
 
 it("no duplicate operation with @clientLocation another", async () => {
-  const diagnostics = await runner.diagnose(
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `
     @service
     namespace StorageService;
@@ -408,11 +427,12 @@ it("no duplicate operation with @clientLocation another", async () => {
     `,
   );
 
+  await createSdkContextForTester(program);
   expectDiagnosticEmpty(diagnostics);
 });
 
 it("duplicate operation with @clientLocation to existed clients", async () => {
-  const diagnostics = await runner.diagnose(
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `
     @service
     namespace Contoso.WidgetManager;
@@ -434,6 +454,7 @@ it("duplicate operation with @clientLocation to existed clients", async () => {
     `,
   );
 
+  await createSdkContextForTester(program);
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
@@ -450,7 +471,7 @@ it("duplicate operation with @clientLocation to existed clients", async () => {
 it("duplicate operation with @clientLocation string to existing namespace", async () => {
   // When using a string that matches an existing namespace name,
   // the operation should be moved to that namespace for validation
-  const diagnostics = await runner.diagnose(
+  const diagnostics = await SimpleTester.diagnose(
     `
     @service
     namespace Contoso.WidgetManager;
@@ -488,7 +509,7 @@ it("duplicate operation with @clientLocation string to existing namespace", asyn
 it("no duplicate operation with @clientLocation string to existing namespace", async () => {
   // When using a string that matches an existing namespace name,
   // the operation should be moved to that namespace - no conflict if names are different
-  const diagnostics = await runner.diagnose(
+  const diagnostics = await SimpleTester.diagnose(
     `
     @service
     namespace Contoso.WidgetManager;
@@ -513,7 +534,7 @@ it("no duplicate operation with @clientLocation string to existing namespace", a
 });
 
 it("duplicate operation with @clientLocation to existed clients with scope", async () => {
-  const diagnostics = await runner.diagnose(
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `
     @service
     namespace Contoso.WidgetManager;
@@ -535,6 +556,7 @@ it("duplicate operation with @clientLocation to existed clients with scope", asy
     `,
   );
 
+  await createSdkContextForTester(program);
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
@@ -549,7 +571,7 @@ it("duplicate operation with @clientLocation to existed clients with scope", asy
 });
 
 it("duplicate operation with @clientLocation to new clients", async () => {
-  const diagnostics = await runner.diagnose(
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `
     @service
     namespace Contoso.WidgetManager;
@@ -567,6 +589,7 @@ it("duplicate operation with @clientLocation to new clients", async () => {
     `,
   );
 
+  await createSdkContextForTester(program);
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
@@ -581,9 +604,7 @@ it("duplicate operation with @clientLocation to new clients", async () => {
 });
 
 it("duplicate operation warning for .NET", async () => {
-  const netRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-net" });
-
-  const diagnostics = await netRunner.diagnose(
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `
     @service
     namespace StorageService;
@@ -599,6 +620,7 @@ it("duplicate operation warning for .NET", async () => {
     `,
   );
 
+  await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-net" });
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
@@ -613,7 +635,7 @@ it("duplicate operation warning for .NET", async () => {
 });
 
 it("duplicate operation error for other languages", async () => {
-  const diagnostics = await runner.diagnose(
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `
     @service
     namespace StorageService;
@@ -629,6 +651,7 @@ it("duplicate operation error for other languages", async () => {
     `,
   );
 
+  await createSdkContextForTester(program);
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
@@ -644,11 +667,7 @@ it("duplicate operation error for other languages", async () => {
 
 describe("namespace flag duplicate name validation", () => {
   it("cross-namespace collision with namespace flag", async () => {
-    const runnerWithNamespace = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-python",
-      namespace: "Flattened",
-    });
-    await runnerWithNamespace.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         namespace SubA {
@@ -660,8 +679,13 @@ describe("namespace flag duplicate name validation", () => {
       }
     `);
 
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+      namespace: "Flattened",
+    });
+
     // When namespace flag is set, cross-namespace collisions should be reported
-    expectDiagnostics(runnerWithNamespace.context.diagnostics, [
+    expectDiagnostics(context.diagnostics, [
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
@@ -677,7 +701,7 @@ describe("namespace flag duplicate name validation", () => {
 
   it("no collision without namespace flag", async () => {
     // Without namespace flag, same names in different namespaces are OK
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         namespace SubA {
@@ -689,15 +713,12 @@ describe("namespace flag duplicate name validation", () => {
       }
     `);
 
-    expectDiagnosticEmpty(runner.context.diagnostics);
+    const context = await createSdkContextForTester(program);
+    expectDiagnosticEmpty(context.diagnostics);
   });
 
   it("cross-namespace enum collision with namespace flag", async () => {
-    const runnerWithNamespace = await createSdkTestRunner({
-      emitterName: "@azure-tools/typespec-python",
-      namespace: "Flattened",
-    });
-    await runnerWithNamespace.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace MyService {
         namespace SubA {
@@ -709,7 +730,12 @@ describe("namespace flag duplicate name validation", () => {
       }
     `);
 
-    expectDiagnostics(runnerWithNamespace.context.diagnostics, [
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+      namespace: "Flattened",
+    });
+
+    expectDiagnostics(context.diagnostics, [
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:

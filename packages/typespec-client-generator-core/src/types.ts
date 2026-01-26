@@ -1273,18 +1273,17 @@ export function getSdkModelPropertyTypeBase(
   const name = getPropertyNames(context, type)[0];
   const onClient = isOnClient(context, type, operation, apiVersions.length > 0);
   let encode: ArrayKnownEncoding | undefined = undefined;
+
+  const encodeData = getEncode(context.program, type);
   // We only support array encoding at property level for now
-  if ($(context.program).array.is(type.type)) {
-    const encodeData = getEncode(context.program, type);
-    if (encodeData?.encoding === "ArrayEncoding.pipeDelimited") {
-      encode = "pipeDelimited";
-    } else if (encodeData?.encoding === "ArrayEncoding.spaceDelimited") {
-      encode = "spaceDelimited";
-    } else if (encodeData?.encoding === "ArrayEncoding.commaDelimited") {
-      encode = "commaDelimited";
-    } else if (encodeData?.encoding === "ArrayEncoding.newlineDelimited") {
-      encode = "newlineDelimited";
-    }
+  if (encodeData?.encoding === "ArrayEncoding.pipeDelimited") {
+    encode = "pipeDelimited";
+  } else if (encodeData?.encoding === "ArrayEncoding.spaceDelimited") {
+    encode = "spaceDelimited";
+  } else if (encodeData?.encoding === "ArrayEncoding.commaDelimited") {
+    encode = "commaDelimited";
+  } else if (encodeData?.encoding === "ArrayEncoding.newlineDelimited") {
+    encode = "newlineDelimited";
   }
   const clientDefaultValue = getClientDefaultValue(context, type);
   return diagnostics.wrap({
@@ -1611,9 +1610,9 @@ function updateTypesFromOperation(
   for (const param of httpOperation.parameters.parameters) {
     if (isNeverOrVoidType(param.param.type)) continue;
     const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param.param, operation));
-    if (generateConvenient) {
-      diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
-    }
+    // Always update input usage for HTTP operation parameters (header, query, path)
+    // even when generateConvenient is false, so that types like enums are included
+    diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
     const access = getAccessOverride(context, operation) ?? "public";
     diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
   }
