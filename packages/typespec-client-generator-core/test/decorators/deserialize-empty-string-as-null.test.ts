@@ -1,22 +1,11 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import { describe, it } from "vitest";
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
 describe("deserialized empty string as null", () => {
   it("Apply the decorator to model properties of type 'string' and a Scalar type derived from 'string'", async function () {
-    runner = await createSdkTestRunner(
-      {},
-      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"] },
-    );
-
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
         scalar stringlike extends string;
 
         model A {
@@ -30,7 +19,14 @@ describe("deserialized empty string as null", () => {
         op test(): A;
       `);
 
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(
+      program,
+      {},
+      {
+        additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"],
+      },
+    );
+    const models = context.sdkPackage.models;
 
     for (const prop of [models[0].properties[0], models[0].properties[1]]) {
       deepStrictEqual(prop.decorators, [
@@ -40,16 +36,11 @@ describe("deserialized empty string as null", () => {
         },
       ]);
     }
-    expectDiagnostics(runner.context.diagnostics, []);
+    expectDiagnostics(context.diagnostics, []);
   });
 
   it("Apply decorator to model properties of indirectly derived from 'string'", async function () {
-    runner = await createSdkTestRunner(
-      {},
-      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"] },
-    );
-
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
         scalar l1 extends string;
         scalar l2 extends l1;
 
@@ -61,7 +52,14 @@ describe("deserialized empty string as null", () => {
         op test(): A;
       `);
 
-    const models = runner.context.sdkPackage.models;
+    const context = await createSdkContextForTester(
+      program,
+      {},
+      {
+        additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"],
+      },
+    );
+    const models = context.sdkPackage.models;
     const prop = models[0].properties[0];
     deepStrictEqual(prop.decorators, [
       {
@@ -69,16 +67,11 @@ describe("deserialized empty string as null", () => {
         arguments: { scope: "csharp" },
       },
     ]);
-    expectDiagnostics(runner.context.diagnostics, []);
+    expectDiagnostics(context.diagnostics, []);
   });
 
   it("should not allow the decorator on model property which is a model type", async function () {
-    runner = await createSdkTestRunner(
-      {},
-      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"] },
-    );
-
-    const diagnostics = await runner.diagnose(`
+    const diagnostics = await SimpleTester.diagnose(`
         model B {
           prop1: string;
         }
@@ -95,12 +88,7 @@ describe("deserialized empty string as null", () => {
   });
 
   it("should not allow the decorator on none model property target", async function () {
-    runner = await createSdkTestRunner(
-      {},
-      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"] },
-    );
-
-    const diagnostics = await runner.diagnose(`
+    const diagnostics = await SimpleTester.diagnose(`
         @deserializeEmptyStringAsNull
         model A {
           prop1: string[];
@@ -113,12 +101,7 @@ describe("deserialized empty string as null", () => {
   });
 
   it("should not allow the decorator on model properties of non-scalar type", async function () {
-    runner = await createSdkTestRunner(
-      {},
-      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"] },
-    );
-
-    const diagnostics = await runner.diagnose(`
+    const diagnostics = await SimpleTester.diagnose(`
         model A {
           @deserializeEmptyStringAsNull
           prop1: string[];
@@ -131,12 +114,7 @@ describe("deserialized empty string as null", () => {
   });
 
   it("should not allow the decorator on model properties of non-string primitive type", async function () {
-    runner = await createSdkTestRunner(
-      {},
-      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"] },
-    );
-
-    const diagnostics = await runner.diagnose(`
+    const diagnostics = await SimpleTester.diagnose(`
         model A {
           @deserializeEmptyStringAsNull
           prop1: int32;
@@ -149,12 +127,7 @@ describe("deserialized empty string as null", () => {
   });
 
   it("should not allow the decorator on model properties of non-string extended Scalar type", async function () {
-    runner = await createSdkTestRunner(
-      {},
-      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"] },
-    );
-
-    const diagnostics = await runner.diagnose(`
+    const diagnostics = await SimpleTester.diagnose(`
             scalar int64like extends int64;
             model A {
               @deserializeEmptyStringAsNull
@@ -168,12 +141,7 @@ describe("deserialized empty string as null", () => {
   });
 
   it("should not allow the decorator on model properties of indirectly extended from a none string Scalar type", async function () {
-    runner = await createSdkTestRunner(
-      {},
-      { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"] },
-    );
-
-    const diagnostics = await runner.diagnose(`
+    const diagnostics = await SimpleTester.diagnose(`
             scalar l1 extends int64;
             scalar l2 extends l1;
             model A {
