@@ -736,7 +736,7 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   client: SdkClientType<TServiceOperation>,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const lro = getTcgcLroMetadata(context, operation, client);
-  // @disablePageable disables paging even for operations with @list
+  // `@disablePageable` disables paging even for operations with @list
   const pagingDisabled = getDisablePageable(context, operation);
   const paging =
     !pagingDisabled &&
