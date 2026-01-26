@@ -203,7 +203,10 @@ function validateClientInitializationParametersForClient<
     if (!allOperationParameterNames.has(param.name)) {
       // Get the raw entity (Namespace or Interface) to report diagnostics on
       // Use the raw type if available, otherwise use the raw model from clientInitialization
-      const target = client.__raw.type || client.clientInitialization.__raw || context.program.getGlobalNamespaceType();
+      const target =
+        client.__raw.type ||
+        client.clientInitialization.__raw ||
+        context.program.getGlobalNamespaceType();
       reportDiagnostic(context.program, {
         code: "unused-client-initialization-parameter",
         target: target,
@@ -228,11 +231,13 @@ function collectOperationParameterNames<TServiceOperation extends SdkServiceOper
     // Check operation parameters
     if (method.operation && method.operation.kind === "http") {
       for (const param of method.operation.parameters) {
-        // Check correspondingMethodParams to find the client initialization parameter
-        if (param.correspondingMethodParams) {
-          for (const methodParam of param.correspondingMethodParams) {
-            if (methodParam.kind === "method" && methodParam.onClient) {
-              parameterNames.add(methodParam.name);
+        // Check methodParameterSegments to find the client initialization parameter
+        if (param.methodParameterSegments) {
+          for (const path of param.methodParameterSegments) {
+            for (const methodParam of path) {
+              if (methodParam.kind === "method" && methodParam.onClient) {
+                parameterNames.add(methodParam.name);
+              }
             }
           }
         }
@@ -241,10 +246,12 @@ function collectOperationParameterNames<TServiceOperation extends SdkServiceOper
       // Also check body parameter
       if (method.operation.bodyParam) {
         const bodyParam = method.operation.bodyParam;
-        if (bodyParam.correspondingMethodParams) {
-          for (const methodParam of bodyParam.correspondingMethodParams) {
-            if (methodParam.kind === "method" && methodParam.onClient) {
-              parameterNames.add(methodParam.name);
+        if (bodyParam.methodParameterSegments) {
+          for (const path of bodyParam.methodParameterSegments) {
+            for (const methodParam of path) {
+              if (methodParam.kind === "method" && methodParam.onClient) {
+                parameterNames.add(methodParam.name);
+              }
             }
           }
         }
