@@ -846,7 +846,9 @@ describe("Parameter", () => {
       emitterName: "@azure-tools/typespec-python",
     });
 
-    await runner.compile(
+    // Using compileAndDiagnose because the ARM override has known parameter mismatch
+    // but we still want to test @clientLocation functionality
+    await runner.compileAndDiagnose(
       `
         @armProviderNamespace
         @service(#{ title: "ContosoProviderHubClient" })

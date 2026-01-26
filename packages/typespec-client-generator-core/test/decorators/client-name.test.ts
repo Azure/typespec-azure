@@ -676,8 +676,7 @@ it("duplicate model client name with positive and negation scopes", async () => 
     },
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-      message:
-        'Client name: "Foo" is defined somewhere causing naming conflicts in language scope: "python"',
+      message: 'Client name: "Foo" is duplicated in language scope: "python"',
     },
   ]);
 });
