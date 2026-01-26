@@ -959,7 +959,7 @@ export type ClientDocDecorator = (
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Apply an experimental option for Python
  * ```typespec
- * #suppress "@azure-tools/typespec-client-generator-core/client-option"
+ * #suppress "@azure-tools/typespec-client-generator-core/client-option" "preview feature for python"
  * @clientOption("enableFeatureFoo", true, "python")
  * model MyModel {
  *   prop: string;

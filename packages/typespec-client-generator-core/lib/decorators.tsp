@@ -1039,7 +1039,7 @@ extern dec clientDoc(
  *
  * @example Apply an experimental option for Python
  * ```typespec
- * #suppress "@azure-tools/typespec-client-generator-core/client-option"
+ * #suppress "@azure-tools/typespec-client-generator-core/client-option" "preview feature for python"
  * @clientOption("enableFeatureFoo", true, "python")
  * model MyModel {
  *   prop: string;
