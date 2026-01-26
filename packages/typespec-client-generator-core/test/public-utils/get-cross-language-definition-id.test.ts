@@ -4,6 +4,7 @@ import {
   AzureCoreTester,
   AzureCoreTesterWithService,
   createSdkContextForTester,
+  SimpleTesterWithService,
 } from "../tester.js";
 
 it("parameter's crossLanguageDefinitionId", async () => {
@@ -95,12 +96,7 @@ it("endpoint's crossLanguageDefinitionId", async () => {
 });
 
 it("enum value's crossLanguageDefinitionId", async () => {
-  await runner.compile(`
-    @service({
-      title: "Widget Service",
-    })
-    namespace WidgetService;
-
+  const { program } = await SimpleTesterWithService.compile(`
     enum Color {
       Red: "red",
       Green: "green",
@@ -113,37 +109,29 @@ it("enum value's crossLanguageDefinitionId", async () => {
 
     op getWidget(): Widget;
   `);
+  const context = await createSdkContextForTester(program);
 
-  const sdkPackage = runner.context.sdkPackage;
+  const sdkPackage = context.sdkPackage;
   const models = Array.from(sdkPackage.models);
   const widgetModel = models.find((m) => m.name === "Widget");
   strictEqual(widgetModel !== undefined, true);
   const colorProperty = widgetModel!.properties[0];
   strictEqual(colorProperty.type.kind, "enum");
   const colorEnum = colorProperty.type;
-  strictEqual(colorEnum.crossLanguageDefinitionId, "WidgetService.Color");
-  
+  strictEqual(colorEnum.crossLanguageDefinitionId, "TestService.Color");
+
   // Test enum values
   strictEqual(colorEnum.values.length, 3);
   strictEqual(colorEnum.values[0].name, "Red");
-  strictEqual(colorEnum.values[0].crossLanguageDefinitionId, "WidgetService.Color.Red");
+  strictEqual(colorEnum.values[0].crossLanguageDefinitionId, "TestService.Color.Red");
   strictEqual(colorEnum.values[1].name, "Green");
-  strictEqual(colorEnum.values[1].crossLanguageDefinitionId, "WidgetService.Color.Green");
+  strictEqual(colorEnum.values[1].crossLanguageDefinitionId, "TestService.Color.Green");
   strictEqual(colorEnum.values[2].name, "Blue");
-  strictEqual(colorEnum.values[2].crossLanguageDefinitionId, "WidgetService.Color.Blue");
+  strictEqual(colorEnum.values[2].crossLanguageDefinitionId, "TestService.Color.Blue");
 });
 
 it("union enum value's crossLanguageDefinitionId", async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    emitterName: "@azure-tools/typespec-python",
-  });
-  await runner.compile(`
-    @service({
-      title: "Widget Service",
-    })
-    namespace WidgetService;
-
+  const { program } = await SimpleTesterWithService.compile(`
     union Status {
       string,
       Active: "active",
@@ -157,23 +145,24 @@ it("union enum value's crossLanguageDefinitionId", async () => {
 
     op getWidget(): Widget;
   `);
+  const context = await createSdkContextForTester(program);
 
-  const sdkPackage = runner.context.sdkPackage;
+  const sdkPackage = context.sdkPackage;
   const models = Array.from(sdkPackage.models);
   const widgetModel = models.find((m) => m.name === "Widget");
   strictEqual(widgetModel !== undefined, true);
   const statusProperty = widgetModel!.properties[0];
   strictEqual(statusProperty.type.kind, "enum");
   const statusEnum = statusProperty.type;
-  strictEqual(statusEnum.crossLanguageDefinitionId, "WidgetService.Status");
+  strictEqual(statusEnum.crossLanguageDefinitionId, "TestService.Status");
   strictEqual(statusEnum.isUnionAsEnum, true);
-  
-  // Test union enum values
+
+  // Test union enum values - union enum values only have value name as crossLanguageDefinitionId
   strictEqual(statusEnum.values.length, 3);
   strictEqual(statusEnum.values[0].name, "Active");
-  strictEqual(statusEnum.values[0].crossLanguageDefinitionId, "WidgetService.Status.Active");
+  strictEqual(statusEnum.values[0].crossLanguageDefinitionId, "Active");
   strictEqual(statusEnum.values[1].name, "Inactive");
-  strictEqual(statusEnum.values[1].crossLanguageDefinitionId, "WidgetService.Status.Inactive");
+  strictEqual(statusEnum.values[1].crossLanguageDefinitionId, "Inactive");
   strictEqual(statusEnum.values[2].name, "Pending");
-  strictEqual(statusEnum.values[2].crossLanguageDefinitionId, "WidgetService.Status.Pending");
+  strictEqual(statusEnum.values[2].crossLanguageDefinitionId, "Pending");
 });
