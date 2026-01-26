@@ -105,24 +105,70 @@ model NumericExample { id: string; }
 
 ## How Emitters Access Client Options
 
-Language emitters can access client options through the `decorators` array on SDK types. Each decorator entry contains:
+TCGC provides the `getClientOptions` helper function to easily extract client options from any SDK type that has a `decorators` array.
 
-- `name`: The fully qualified decorator name (`Azure.ClientGenerator.Core.@clientOption`)
-- `arguments`: An object with `name`, `value`, and optionally `scope` fields
+### Using the getClientOptions Helper (Recommended)
 
 ```typescript
-// Example: Reading client options in an emitter
+import { getClientOptions } from "@azure-tools/typespec-client-generator-core";
+
+// Get client options from a model
 const sdkModel = context.sdkPackage.models.find(m => m.name === "MyModel");
-const clientOptions = sdkModel.decorators.filter(
+const clientOptions = getClientOptions(sdkModel.decorators);
+
+for (const option of clientOptions) {
+  console.log(`Option: ${option.name} = ${option.value}`);
+  // option.name: string - The option name (e.g., "enableFeatureFoo")
+  // option.value: string | boolean | number - The option value
+  // option.scope?: string - The language scope (e.g., "python")
+}
+```
+
+The `getClientOptions` function returns an array of `SdkClientOption` objects:
+
+```typescript
+interface SdkClientOption {
+  name: string;
+  value: string | boolean | number;
+  scope?: string;
+}
+```
+
+### Works with Any Decorated SDK Type
+
+The helper works with any SDK type that has a decorators array:
+
+```typescript
+// Models
+const modelOptions = getClientOptions(sdkModel.decorators);
+
+// Enums
+const enumOptions = getClientOptions(sdkEnum.decorators);
+
+// Operations/Methods
+const methodOptions = getClientOptions(sdkMethod.decorators);
+
+// Properties
+const propertyOptions = getClientOptions(sdkProperty.decorators);
+
+// Clients
+const clientOptions = getClientOptions(sdkClient.decorators);
+```
+
+### Alternative: Manual Decorator Filtering
+
+If you need more control, you can also filter the decorators array directly:
+
+```typescript
+const sdkModel = context.sdkPackage.models.find(m => m.name === "MyModel");
+const clientOptionDecorators = sdkModel.decorators.filter(
   d => d.name === "Azure.ClientGenerator.Core.@clientOption"
 );
 
-for (const option of clientOptions) {
-  const optionName = option.arguments.name;   // e.g., "enableFeatureFoo"
-  const optionValue = option.arguments.value; // e.g., true
-  const scope = option.arguments.scope;       // e.g., "python"
-
-  // Apply emitter-specific behavior based on the option
+for (const decorator of clientOptionDecorators) {
+  const optionName = decorator.arguments.name;   // e.g., "enableFeatureFoo"
+  const optionValue = decorator.arguments.value; // e.g., true
+  const scope = decorator.arguments.scope;       // e.g., "python"
 }
 ```
 

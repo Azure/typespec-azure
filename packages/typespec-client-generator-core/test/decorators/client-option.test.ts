@@ -1,6 +1,7 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
+import { getClientOptions } from "../../src/public-utils.js";
 import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
 describe("@clientOption diagnostics", () => {
@@ -60,8 +61,8 @@ describe("@clientOption diagnostics", () => {
   });
 });
 
-describe("@clientOption in decorators array", () => {
-  it("should appear in decorators array for model", async () => {
+describe("@clientOption with getClientOptions getter", () => {
+  it("should return client options for model", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("enableFeatureFoo", true, "python")
@@ -78,20 +79,18 @@ describe("@clientOption in decorators array", () => {
     });
 
     const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
-    strictEqual(sdkModel !== undefined, true);
+    ok(sdkModel, "SDK model should exist");
 
-    const clientOptionDecorator = sdkModel!.decorators.find(
-      (d) => d.name === "Azure.ClientGenerator.Core.@clientOption",
-    );
-    strictEqual(clientOptionDecorator !== undefined, true);
-    deepStrictEqual(clientOptionDecorator!.arguments, {
+    const clientOptions = getClientOptions(sdkModel.decorators);
+    strictEqual(clientOptions.length, 1);
+    deepStrictEqual(clientOptions[0], {
       name: "enableFeatureFoo",
       value: true,
       scope: "python",
     });
   });
 
-  it("should support multiple @clientOption decorators on same target", async () => {
+  it("should return multiple client options on same target", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("enableFeatureFoo", true, "python")
@@ -110,29 +109,23 @@ describe("@clientOption in decorators array", () => {
     });
 
     const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
-    strictEqual(sdkModel !== undefined, true);
+    ok(sdkModel, "SDK model should exist");
 
-    const clientOptionDecorators = sdkModel!.decorators.filter(
-      (d) => d.name === "Azure.ClientGenerator.Core.@clientOption",
-    );
-    strictEqual(clientOptionDecorators.length, 2);
+    const clientOptions = getClientOptions(sdkModel.decorators);
+    strictEqual(clientOptions.length, 2);
 
-    // Verify each decorator has the correct name and value
-    const fooDecorator = clientOptionDecorators.find(
-      (d) => d.arguments.name === "enableFeatureFoo",
-    );
-    ok(fooDecorator, "enableFeatureFoo decorator should exist");
-    strictEqual(fooDecorator!.arguments.name, "enableFeatureFoo");
-    strictEqual(fooDecorator!.arguments.value, true);
-    strictEqual(fooDecorator!.arguments.scope, "python");
+    // Verify each option has the correct name and value
+    const fooOption = clientOptions.find((o) => o.name === "enableFeatureFoo");
+    ok(fooOption, "enableFeatureFoo option should exist");
+    strictEqual(fooOption.name, "enableFeatureFoo");
+    strictEqual(fooOption.value, true);
+    strictEqual(fooOption.scope, "python");
 
-    const barDecorator = clientOptionDecorators.find(
-      (d) => d.arguments.name === "enableFeatureBar",
-    );
-    ok(barDecorator, "enableFeatureBar decorator should exist");
-    strictEqual(barDecorator!.arguments.name, "enableFeatureBar");
-    strictEqual(barDecorator!.arguments.value, "value");
-    strictEqual(barDecorator!.arguments.scope, "python");
+    const barOption = clientOptions.find((o) => o.name === "enableFeatureBar");
+    ok(barOption, "enableFeatureBar option should exist");
+    strictEqual(barOption.name, "enableFeatureBar");
+    strictEqual(barOption.value, "value");
+    strictEqual(barOption.scope, "python");
   });
 
   it("should support different value types", async () => {
@@ -170,38 +163,32 @@ describe("@clientOption in decorators array", () => {
     // Verify boolean value type
     const sdkModelBool = context.sdkPackage.models.find((m) => m.name === "TestBool");
     ok(sdkModelBool, "TestBool model should exist");
-    const boolDecorator = sdkModelBool!.decorators.find(
-      (d) => d.name === "Azure.ClientGenerator.Core.@clientOption",
-    );
-    ok(boolDecorator, "clientOption decorator should exist on TestBool");
-    strictEqual(boolDecorator!.arguments.name, "boolOption");
-    strictEqual(boolDecorator!.arguments.value, true);
-    strictEqual(typeof boolDecorator!.arguments.value, "boolean");
+    const boolOptions = getClientOptions(sdkModelBool.decorators);
+    strictEqual(boolOptions.length, 1);
+    strictEqual(boolOptions[0].name, "boolOption");
+    strictEqual(boolOptions[0].value, true);
+    strictEqual(typeof boolOptions[0].value, "boolean");
 
     // Verify string value type
     const sdkModelString = context.sdkPackage.models.find((m) => m.name === "TestString");
     ok(sdkModelString, "TestString model should exist");
-    const stringDecorator = sdkModelString!.decorators.find(
-      (d) => d.name === "Azure.ClientGenerator.Core.@clientOption",
-    );
-    ok(stringDecorator, "clientOption decorator should exist on TestString");
-    strictEqual(stringDecorator!.arguments.name, "stringOption");
-    strictEqual(stringDecorator!.arguments.value, "someValue");
-    strictEqual(typeof stringDecorator!.arguments.value, "string");
+    const stringOptions = getClientOptions(sdkModelString.decorators);
+    strictEqual(stringOptions.length, 1);
+    strictEqual(stringOptions[0].name, "stringOption");
+    strictEqual(stringOptions[0].value, "someValue");
+    strictEqual(typeof stringOptions[0].value, "string");
 
     // Verify number value type
     const sdkModelNumber = context.sdkPackage.models.find((m) => m.name === "TestNumber");
     ok(sdkModelNumber, "TestNumber model should exist");
-    const numberDecorator = sdkModelNumber!.decorators.find(
-      (d) => d.name === "Azure.ClientGenerator.Core.@clientOption",
-    );
-    ok(numberDecorator, "clientOption decorator should exist on TestNumber");
-    strictEqual(numberDecorator!.arguments.name, "numberOption");
-    strictEqual(numberDecorator!.arguments.value, 42);
-    strictEqual(typeof numberDecorator!.arguments.value, "number");
+    const numberOptions = getClientOptions(sdkModelNumber.decorators);
+    strictEqual(numberOptions.length, 1);
+    strictEqual(numberOptions[0].name, "numberOption");
+    strictEqual(numberOptions[0].value, 42);
+    strictEqual(typeof numberOptions[0].value, "number");
   });
 
-  it("should appear in decorators array for operation", async () => {
+  it("should return client options for operation", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("operationFlag", "customValue", "python")
@@ -218,18 +205,16 @@ describe("@clientOption in decorators array", () => {
     );
     ok(sdkMethod, "SDK method should exist");
 
-    const clientOptionDecorator = sdkMethod!.decorators.find(
-      (d) => d.name === "Azure.ClientGenerator.Core.@clientOption",
-    );
-    ok(clientOptionDecorator, "clientOption decorator should be present");
-    deepStrictEqual(clientOptionDecorator!.arguments, {
+    const clientOptions = getClientOptions(sdkMethod.decorators);
+    strictEqual(clientOptions.length, 1);
+    deepStrictEqual(clientOptions[0], {
       name: "operationFlag",
       value: "customValue",
       scope: "python",
     });
   });
 
-  it("should appear in decorators array for enum", async () => {
+  it("should return client options for enum", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("enumFlag", true, "python")
@@ -250,18 +235,16 @@ describe("@clientOption in decorators array", () => {
     const sdkEnum = context.sdkPackage.enums.find((e) => e.name === "TestEnum");
     ok(sdkEnum, "SDK enum should exist");
 
-    const clientOptionDecorator = sdkEnum!.decorators.find(
-      (d) => d.name === "Azure.ClientGenerator.Core.@clientOption",
-    );
-    ok(clientOptionDecorator, "clientOption decorator should be present");
-    deepStrictEqual(clientOptionDecorator!.arguments, {
+    const clientOptions = getClientOptions(sdkEnum.decorators);
+    strictEqual(clientOptions.length, 1);
+    deepStrictEqual(clientOptions[0], {
       name: "enumFlag",
       value: true,
       scope: "python",
     });
   });
 
-  it("should appear in decorators array for model property", async () => {
+  it("should return client options for model property", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       @test
       model Test {
@@ -280,21 +263,19 @@ describe("@clientOption in decorators array", () => {
     const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
     ok(sdkModel, "SDK model should exist");
 
-    const sdkProperty = sdkModel!.properties.find((p) => p.name === "myProp");
+    const sdkProperty = sdkModel.properties.find((p) => p.name === "myProp");
     ok(sdkProperty, "SDK property should exist");
 
-    const clientOptionDecorator = sdkProperty!.decorators.find(
-      (d) => d.name === "Azure.ClientGenerator.Core.@clientOption",
-    );
-    ok(clientOptionDecorator, "clientOption decorator should be present on property");
-    deepStrictEqual(clientOptionDecorator!.arguments, {
+    const clientOptions = getClientOptions(sdkProperty.decorators);
+    strictEqual(clientOptions.length, 1);
+    deepStrictEqual(clientOptions[0], {
       name: "propertyFlag",
       value: "propValue",
       scope: "python",
     });
   });
 
-  it("should respect scope filtering - decorator appears when scope matches emitter", async () => {
+  it("should return options when scope matches emitter", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("pythonOnlyFlag", true, "python")
@@ -314,18 +295,14 @@ describe("@clientOption in decorators array", () => {
     const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
     ok(sdkModel, "SDK model should exist");
 
-    const clientOptionDecorator = sdkModel!.decorators.find(
-      (d) => d.name === "Azure.ClientGenerator.Core.@clientOption",
-    );
-    ok(clientOptionDecorator, "clientOption decorator should be present for matching scope");
-
-    // Verify the name and value are correctly captured
-    strictEqual(clientOptionDecorator!.arguments.name, "pythonOnlyFlag");
-    strictEqual(clientOptionDecorator!.arguments.value, true);
-    strictEqual(clientOptionDecorator!.arguments.scope, "python");
+    const clientOptions = getClientOptions(sdkModel.decorators);
+    strictEqual(clientOptions.length, 1);
+    strictEqual(clientOptions[0].name, "pythonOnlyFlag");
+    strictEqual(clientOptions[0].value, true);
+    strictEqual(clientOptions[0].scope, "python");
   });
 
-  it("should not include decorator when scope does not match emitter", async () => {
+  it("should return empty array when scope does not match emitter", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("javaOnlyFlag", true, "java")
@@ -342,63 +319,15 @@ describe("@clientOption in decorators array", () => {
       emitterName: "@azure-tools/typespec-python",
     });
 
-    // The decorator should NOT appear in the decorators array
     const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
     ok(sdkModel, "SDK model should exist");
 
-    const clientOptionDecorator = sdkModel!.decorators.find(
-      (d) => d.name === "Azure.ClientGenerator.Core.@clientOption",
-    );
-    strictEqual(
-      clientOptionDecorator,
-      undefined,
-      "clientOption decorator should not be present when scope doesn't match emitter",
-    );
+    // The decorator should NOT appear - getClientOptions should return empty array
+    const clientOptions = getClientOptions(sdkModel.decorators);
+    strictEqual(clientOptions.length, 0);
   });
 
-  it("should include all argument fields in decorator info", async () => {
-    const { program } = await SimpleTesterWithService.compile(`
-      #suppress "@azure-tools/typespec-client-generator-core/client-option"
-      @clientOption("testOption", "testValue", "python")
-      @test
-      model Test {
-        id: string;
-      }
-
-      op getTest(): Test;
-    `);
-
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-python",
-    });
-
-    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
-    ok(sdkModel, "SDK model should exist");
-
-    const clientOptionDecorator = sdkModel!.decorators.find(
-      (d) => d.name === "Azure.ClientGenerator.Core.@clientOption",
-    );
-    ok(clientOptionDecorator, "clientOption decorator should be present");
-
-    // Verify the decorator has the correct name format
-    strictEqual(
-      clientOptionDecorator!.name,
-      "Azure.ClientGenerator.Core.@clientOption",
-      "Decorator name should be fully qualified",
-    );
-
-    // Verify all arguments are present
-    ok("name" in clientOptionDecorator!.arguments, "arguments should have 'name' field");
-    ok("value" in clientOptionDecorator!.arguments, "arguments should have 'value' field");
-    ok("scope" in clientOptionDecorator!.arguments, "arguments should have 'scope' field");
-
-    // Verify argument values
-    strictEqual(clientOptionDecorator!.arguments.name, "testOption");
-    strictEqual(clientOptionDecorator!.arguments.value, "testValue");
-    strictEqual(clientOptionDecorator!.arguments.scope, "python");
-  });
-
-  it("should handle decorator without scope argument", async () => {
+  it("should handle option without scope argument", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope"
@@ -418,13 +347,11 @@ describe("@clientOption in decorators array", () => {
     const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
     ok(sdkModel, "SDK model should exist");
 
-    const clientOptionDecorator = sdkModel!.decorators.find(
-      (d) => d.name === "Azure.ClientGenerator.Core.@clientOption",
-    );
-    ok(clientOptionDecorator, "clientOption decorator should be present");
-    strictEqual(clientOptionDecorator!.arguments.name, "noScopeOption");
-    strictEqual(clientOptionDecorator!.arguments.value, 123);
+    const clientOptions = getClientOptions(sdkModel.decorators);
+    strictEqual(clientOptions.length, 1);
+    strictEqual(clientOptions[0].name, "noScopeOption");
+    strictEqual(clientOptions[0].value, 123);
     // scope should be undefined when not provided
-    strictEqual(clientOptionDecorator!.arguments.scope, undefined);
+    strictEqual(clientOptions[0].scope, undefined);
   });
 });

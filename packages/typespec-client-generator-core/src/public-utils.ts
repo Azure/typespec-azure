@@ -41,8 +41,10 @@ import {
   listOperationsInOperationGroup,
 } from "./decorators.js";
 import {
+  DecoratorInfo,
   SdkBodyParameter,
   SdkClient,
+  SdkClientOption,
   SdkClientType,
   SdkCookieParameter,
   SdkHeaderParameter,
@@ -896,4 +898,33 @@ export function getNamespaceFromType(
     return type.namespace;
   }
   return undefined;
+}
+
+const CLIENT_OPTION_DECORATOR_NAME = "Azure.ClientGenerator.Core.@clientOption";
+
+/**
+ * Get all client options from a decorated SDK type.
+ * This is a convenience function for extracting `@clientOption` decorator data
+ * from the decorators array on SDK types.
+ *
+ * @param decorators - The decorators array from an SDK type (model, enum, operation, property, etc.)
+ * @returns An array of client options with their name, value, and optional scope
+ *
+ * @example
+ * ```typescript
+ * const sdkModel = context.sdkPackage.models.find(m => m.name === "MyModel");
+ * const clientOptions = getClientOptions(sdkModel.decorators);
+ * for (const option of clientOptions) {
+ *   console.log(`Option: ${option.name} = ${option.value}`);
+ * }
+ * ```
+ */
+export function getClientOptions(decorators: DecoratorInfo[]): SdkClientOption[] {
+  return decorators
+    .filter((d) => d.name === CLIENT_OPTION_DECORATOR_NAME)
+    .map((d) => ({
+      name: d.arguments.name as string,
+      value: d.arguments.value as string | boolean | number,
+      scope: d.arguments.scope as string | undefined,
+    }));
 }
