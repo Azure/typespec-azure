@@ -956,15 +956,17 @@ describe("Parameter", () => {
       model EmployeeBaseParameter
           is Azure.ResourceManager.Foundations.DefaultBaseParameters<Employee>;
 
-      @armResourceOperations
-      interface Employees {
-        createOrUpdate is ArmResourceCreateOrReplaceAsync<
-          Employee,
-          BaseParameters = EmployeeBaseParameter
-        >;
-        get is ArmResourceRead<Employee>;
+      namespace AnotherLayer {
+        @armResourceOperations
+        interface Employees {
+          createOrUpdate is ArmResourceCreateOrReplaceAsync<
+            Employee,
+            BaseParameters = EmployeeBaseParameter
+          >;
+          get is ArmResourceRead<Employee>;
+        }
       }
-      @@clientLocation(EmployeeBaseParameter.subscriptionId, Employees.createOrUpdate);
+      @@clientLocation(EmployeeBaseParameter.subscriptionId, AnotherLayer.Employees.createOrUpdate);
       `,
     );
 
@@ -977,17 +979,27 @@ describe("Parameter", () => {
     const subIdClientParam = client.clientInitialization.parameters.find(
       (p) => p.name === "subscriptionId",
     );
-    ok(subIdClientParam, "subscriptionId should exist at client level");
+    ok(subIdClientParam);
+
+    // Check the AnotherLayer operation group
+    const anotherLayer = client.children?.find((c) => c.name === "AnotherLayer");
+    ok(anotherLayer);
+
+    // The operation group should also have subscriptionId in its parameters
+    const subIdNsParam = anotherLayer.clientInitialization.parameters.find(
+      (p) => p.name === "subscriptionId",
+    );
+    ok(subIdNsParam);
 
     // Check the Employees operation group
-    const employees = client.children?.find((c) => c.name === "Employees");
+    const employees = anotherLayer.children?.find((c) => c.name === "Employees");
     ok(employees);
 
     // The operation group should also have subscriptionId in its parameters
     const subIdOgParam = employees.clientInitialization.parameters.find(
       (p) => p.name === "subscriptionId",
     );
-    ok(subIdOgParam, "subscriptionId should exist at operation group level");
+    ok(subIdOgParam);
 
     // The createOrUpdate method should have subscriptionId as a method parameter (not client)
     const createOrUpdateMethod = employees.methods.find((m) => m.name === "createOrUpdate");
@@ -1012,7 +1024,7 @@ describe("Parameter", () => {
     const getSubIdOpParam = getOperation.parameters.find((p) => p.name === "subscriptionId");
     ok(getSubIdOpParam);
     strictEqual(
-      getSubIdOpParam.correspondingMethodParams[0],
+      getSubIdOpParam.methodParameterSegments[0][0],
       subIdOgParam,
       "get operation's subscriptionId should reference client parameter",
     );
