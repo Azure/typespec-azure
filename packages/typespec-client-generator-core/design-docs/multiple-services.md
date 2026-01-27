@@ -580,7 +580,7 @@ The `autoMerge` option works alongside existing customization decorators:
 
 - **`@clientInitialization`**: Still controls how each client is initialized. Can be applied to both auto-merged and explicitly defined clients.
 - **`@clientLocation`**: Can move operations between clients regardless of `autoMerge` setting.
-- **`@operationGroup`** (deprecated): Replaced by nested `@client`. Migration path: convert `@operationGroup` to `@client` with `autoMerge: false`.
+- **`@operationGroup`** (deprecated): The same functionality can be achieved using nested `@client`. Migration path: convert `@operationGroup` to nested `@client`, optionally combined with `autoMerge: false` for multi-service scenarios where you want to prevent deep merging.
 
 ### Validation Rules
 
@@ -597,8 +597,8 @@ The `autoMerge` option works alongside existing customization decorators:
    - Explicit clients take precedence
    - Remaining operations from services are auto-merged into additional sub-clients
 
-4. The `autoMerge` option is only valid when `service` is an array with multiple services:
-   - For single-service clients, `autoMerge` has no effect (there's nothing to merge)
+4. The `autoMerge` option is only meaningful when `service` is an array with multiple services:
+   - For single-service clients, `autoMerge` is ignored (there's nothing to merge from multiple services)
 
 ### Changes Needed
 
