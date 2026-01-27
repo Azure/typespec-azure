@@ -1,4 +1,3 @@
-import { Operation } from "@typespec/compiler";
 import { t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";

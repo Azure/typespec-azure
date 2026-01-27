@@ -920,12 +920,7 @@ describe("Parameter", () => {
   });
 
   it("subscriptionId on client when clientLocation moves it to method level for some operations in nested operation groups", async () => {
-    const runnerWithArm = await createSdkTestRunner({
-      librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
-      autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-      emitterName: "@azure-tools/typespec-java",
-    });
-    await runnerWithArm.compile(
+    const { program } = await ArmTester.compile(
       `
       @armProviderNamespace("Microsoft.Contoso")
       @service(#{
@@ -969,7 +964,8 @@ describe("Parameter", () => {
       `,
     );
 
-    const sdkPackage = runnerWithArm.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const client = sdkPackage.clients[0];
     ok(client);
 

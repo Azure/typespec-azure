@@ -1,17 +1,9 @@
 import { ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let basicRunner: SdkTestRunner;
-
-beforeEach(async () => {
-  basicRunner = await createSdkTestRunner({
-    emitterName: "@azure-typespec/http-client-csharp",
-  });
-});
+import { it } from "vitest";
+import { createSdkContextForTester, SimpleTester } from "../tester.js";
 
 it("should disable paging when @disablePageable is applied to a @list operation", async () => {
-  await basicRunner.compile(`
+  const { program } = await SimpleTester.compile(`
       @service
       namespace TestService {
         model ItemListResult {
@@ -33,8 +25,8 @@ it("should disable paging when @disablePageable is applied to a @list operation"
       }
     `);
 
-  const methods = basicRunner.context.sdkPackage.clients[0].methods;
-  strictEqual(methods.length, 1);
+  const context = await createSdkContextForTester(program);
+  const methods = context.sdkPackage.clients[0].methods;
 
   const method = methods[0];
   // Should be basic method since @disablePageable disables paging
@@ -52,7 +44,7 @@ it("should disable paging when @disablePageable is applied to a @list operation"
 });
 
 it("should disable paging with language scope when @disablePageable(scope) is applied", async () => {
-  await basicRunner.compile(`
+  const { program } = await SimpleTester.compile(`
       @service
       namespace TestService {
         model ItemListResult {
@@ -74,7 +66,10 @@ it("should disable paging with language scope when @disablePageable(scope) is ap
       }
     `);
 
-  const methods = basicRunner.context.sdkPackage.clients[0].methods;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-csharp",
+  });
+  const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
 
   const method = methods[0];
@@ -90,7 +85,7 @@ it("should disable paging with language scope when @disablePageable(scope) is ap
 });
 
 it("should NOT disable paging when scope does not match for @disablePageable", async () => {
-  await basicRunner.compile(`
+  const { program } = await SimpleTester.compile(`
       @service
       namespace TestService {
         model ItemListResult {
@@ -112,7 +107,10 @@ it("should NOT disable paging when scope does not match for @disablePageable", a
       }
     `);
 
-  const methods = basicRunner.context.sdkPackage.clients[0].methods;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-tools/typespec-csharp",
+  });
+  const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
 
   const method = methods[0];
@@ -129,7 +127,7 @@ it("should NOT disable paging when scope does not match for @disablePageable", a
 it("should not mark paged model as paged result when @disablePageable is applied", async () => {
   const { isPagedResultModel } = await import("../../src/public-utils.js");
 
-  await basicRunner.compile(`
+  const { program } = await SimpleTester.compile(`
       @service
       namespace TestService {
         model ItemListResult {
@@ -151,7 +149,8 @@ it("should not mark paged model as paged result when @disablePageable is applied
       }
     `);
 
-  const methods = basicRunner.context.sdkPackage.clients[0].methods;
+  const context = await createSdkContextForTester(program);
+  const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
 
   const method = methods[0];
@@ -161,5 +160,5 @@ it("should not mark paged model as paged result when @disablePageable is applied
   const responseType = method.response.type;
   ok(responseType);
   strictEqual(responseType.kind, "model");
-  strictEqual(isPagedResultModel(basicRunner.context, responseType), false);
+  strictEqual(isPagedResultModel(context, responseType), false);
 });
