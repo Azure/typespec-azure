@@ -29,7 +29,8 @@ export const AreaLabels = defineLabels({
   },
   "emitter:client:all": {
     color: "957300",
-    description: "General client emitter issues that do not involve TCGC or typespec-azure-http-specs",
+    description:
+      "General client emitter issues that do not involve TCGC or typespec-azure-http-specs",
   },
   eng: {
     color: "65bfff",
