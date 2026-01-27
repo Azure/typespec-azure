@@ -5,4 +5,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Fix namespace duplication when @clientNamespace matches namespace flag
+Fix namespace duplication when `@clientNamespace` matches namespace flag
