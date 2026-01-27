@@ -328,6 +328,7 @@ import "./main.tsp";
 import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
+using PetStoreNamespace;
 
 // Apply @clientName to the 'name' parameter of the 'get' operation
 @@clientName(get::parameters.name, "resourceId");
