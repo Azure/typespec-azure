@@ -50,6 +50,7 @@ public virtual Pageable<User> ListWithPage(CancellationToken cancellationToken =
 ```
 
 ```typescript
+export interface ListWithPageOptionalParams extends OperationOptions {}
 // Modular api layer
 export function listWithPage(
   context: Client,
