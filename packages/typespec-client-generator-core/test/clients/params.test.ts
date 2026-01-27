@@ -352,7 +352,7 @@ it("initialization multiple server parameters with apikey auth", async () => {
   strictEqual(apiVersionParam.allowReserved, false);
   strictEqual(apiVersionParam.name, "apiVersion");
   strictEqual(apiVersionParam.onClient, true);
-  strictEqual(apiVersionParam.optional, false);
+  strictEqual(apiVersionParam.optional, true);
   strictEqual(apiVersionParam.kind, "path");
   deepStrictEqual(client.apiVersions, ["v1.0"]);
 
@@ -434,7 +434,7 @@ it("non-versioning service with api version param in endpoint", async () => {
   strictEqual(apiVersionParam.clientDefaultValue, "v1");
   strictEqual(apiVersionParam.name, "apiVersion");
   strictEqual(apiVersionParam.onClient, true);
-  strictEqual(apiVersionParam.optional, false);
+  strictEqual(apiVersionParam.optional, true);
   strictEqual(apiVersionParam.kind, "path");
 });
 
@@ -616,7 +616,7 @@ it("service with default api version, method with api version param", async () =
   const apiVersionParam = withApiVersion.operation.parameters[0];
   strictEqual(apiVersionParam.kind, "query");
   strictEqual(apiVersionParam.isApiVersionParam, true);
-  strictEqual(apiVersionParam.optional, false);
+  strictEqual(apiVersionParam.optional, true);
   strictEqual(apiVersionParam.onClient, true);
   strictEqual(apiVersionParam.type.kind, "string");
   strictEqual(apiVersionParam.clientDefaultValue, "v1");
@@ -665,7 +665,7 @@ it("service with default api version, method with path api version param", async
   strictEqual(apiVersionParam.serializedName, "apiVersion");
   strictEqual(apiVersionParam.name, "apiVersion");
   strictEqual(apiVersionParam.isApiVersionParam, true);
-  strictEqual(apiVersionParam.optional, false);
+  strictEqual(apiVersionParam.optional, true);
   strictEqual(apiVersionParam.onClient, true);
   strictEqual(apiVersionParam.type.kind, "string");
   strictEqual(apiVersionParam.clientDefaultValue, "v1");

@@ -89,8 +89,12 @@ function getEndpointTypeFromSingleServer<
       }
       const apiVersionInfo = updateWithApiVersionInformation(context, param, client.__raw);
       sdkParam.isApiVersionParam = apiVersionInfo.isApiVersionParam;
-      if (sdkParam.isApiVersionParam && apiVersionInfo.clientDefaultValue) {
-        sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
+      if (sdkParam.isApiVersionParam) {
+        if (apiVersionInfo.clientDefaultValue) {
+          sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
+          // API version parameters are optional when they have a client default value
+          sdkParam.optional = true;
+        }
       }
       sdkParam.apiVersions = client.apiVersions;
       sdkParam.crossLanguageDefinitionId = `${client.crossLanguageDefinitionId}.${param.name}`;
@@ -257,12 +261,15 @@ function addDefaultClientParameters<
       multipleServiceApiVersionParam.apiVersions = [];
       multipleServiceApiVersionParam.clientDefaultValue = undefined;
       multipleServiceApiVersionParam.type = getTypeSpecBuiltInType(context, "string");
-      // API version parameters at the client level should always be optional
-      multipleServiceApiVersionParam.optional = true;
+      // API version parameters are optional only when they have a client default value
+      // For multi-service clients, clientDefaultValue is set to undefined, so optional is false
+      multipleServiceApiVersionParam.optional = false;
       defaultClientParamters.push(multipleServiceApiVersionParam);
     } else {
-      // API version parameters at the client level should always be optional
-      apiVersionParam.optional = true;
+      // API version parameters are optional only when they have a client default value
+      if (apiVersionParam.clientDefaultValue !== undefined) {
+        apiVersionParam.optional = true;
+      }
       defaultClientParamters.push(apiVersionParam);
     }
   }

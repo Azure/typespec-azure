@@ -816,7 +816,8 @@ it("one client from multiple services", async () => {
   strictEqual(apiVersionParam.clientDefaultValue, undefined);
   // For multi-service clients, the api version param type should be string
   strictEqual(apiVersionParam.type.kind, "string");
-  strictEqual(apiVersionParam.optional, true);
+  // API version parameters are optional only when they have a client default value
+  strictEqual(apiVersionParam.optional, false);
   const aiClient = client.children!.find((c) => c.name === "AI");
   ok(aiClient);
 
@@ -1000,7 +1001,7 @@ it("one client from multiple services without version dependency", async () => {
   strictEqual(apiVersionParam.clientDefaultValue, undefined);
   // For multi-service clients, the api version param type should be string
   strictEqual(apiVersionParam.type.kind, "string");
-  strictEqual(apiVersionParam.optional, true);
+  strictEqual(apiVersionParam.optional, false);
 
   const aiClient = client.children!.find((c) => c.name === "AI");
   ok(aiClient);
@@ -1123,7 +1124,8 @@ it("one client from multiple services with `@clientLocation`", async () => {
   strictEqual(apiVersionParam.clientDefaultValue, undefined);
   // For multi-service clients, the api version param type should be string
   strictEqual(apiVersionParam.type.kind, "string");
-  strictEqual(apiVersionParam.optional, true);
+  // API version parameters are optional only when they have a client default value
+  strictEqual(apiVersionParam.optional, false);
 
   const aiClient = client.children!.find((c) => c.name === "AI");
   ok(aiClient);
