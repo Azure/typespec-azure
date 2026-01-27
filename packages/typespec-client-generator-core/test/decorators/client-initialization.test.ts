@@ -899,3 +899,45 @@ it("should work with @clientLocation decorator", async () => {
 
   expectDiagnostics(context.diagnostics, []);
 });
+
+it("should not warn when client initialization parameter is used via @paramAlias", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    namespace MyService {
+      model ClientInitialization {
+        @paramAlias("blob")
+        blobName: string;
+      }
+
+      @@clientInitialization(MyService, {parameters: ClientInitialization});
+
+      @route("/download")
+      op download(@path blob: string): void;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+
+  expectDiagnostics(context.diagnostics, []);
+});
+
+it("should warn when client initialization parameter with @paramAlias is not used", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    namespace MyService {
+      model ClientInitialization {
+        @paramAlias("blob")
+        blobName: string;
+      }
+
+      @@clientInitialization(MyService, {parameters: ClientInitialization});
+
+      @route("/test")
+      op testOp(@query query: string): void;
+    }
+  `);
+  await createSdkContextForTester(program);
+
+  expectDiagnostics(program.diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/unused-client-initialization-parameter",
+  });
+});

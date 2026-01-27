@@ -188,17 +188,28 @@ function validateClientInitializationParameters<TServiceOperation extends SdkSer
 function validateClientInitializationParametersForClient<
   TServiceOperation extends SdkServiceOperation,
 >(context: TCGCContext, client: SdkClientType<TServiceOperation>): void {
+  // Only validate when there's a customized @clientInitialization decorator with parameters
+  // Skip validation for default/auto-generated client initialization
+  if (!client.clientInitialization.__raw) {
+    return;
+  }
+
+  // Get custom parameters to validate (exclude built-in parameters like endpoint and credential)
+  const customParams = client.clientInitialization.parameters.filter(
+    (param) => param.kind !== "endpoint" && param.kind !== "credential",
+  );
+
+  // Skip expensive operation parameter collection if there are no custom parameters to validate
+  if (customParams.length === 0) {
+    return;
+  }
+
   // Collect all operation parameters from this client and all sub-clients
   const allOperationParameterNames = new Set<string>();
   collectOperationParameterNames(client, allOperationParameterNames);
 
-  // Check each client initialization parameter
-  for (const param of client.clientInitialization.parameters) {
-    // Skip built-in parameters like endpoint and credential
-    if (param.kind === "endpoint" || param.kind === "credential") {
-      continue;
-    }
-
+  // Check each custom client initialization parameter
+  for (const param of customParams) {
     // Check if this parameter is used in any operation
     if (!allOperationParameterNames.has(param.name)) {
       // Get the raw entity (Namespace or Interface) to report diagnostics on
