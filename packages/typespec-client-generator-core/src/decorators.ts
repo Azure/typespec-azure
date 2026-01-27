@@ -1272,10 +1272,6 @@ function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Names
   }
   const joinedSegments = segments.join(".");
   if (isOverridden) {
-    // if the override exactly matches the namespace flag, no replacement is needed
-    if (context.namespaceFlag && joinedSegments === context.namespaceFlag) {
-      return joinedSegments;
-    }
     // if it's overridden, and there's a `@clientNamespace` flag, we want to do the shortest namespace overlap replacement
     const userDefinedNamespace = findNamespaceOverlapClosestToRoot(
       joinedSegments,
