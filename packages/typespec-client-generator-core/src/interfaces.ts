@@ -483,6 +483,8 @@ export interface SdkEnumValueType<
   value: string | number;
   enumType: SdkEnumType;
   valueType: TValueType;
+  /** Unique ID for the current type. */
+  crossLanguageDefinitionId: string;
 }
 
 export interface SdkConstantType extends SdkTypeBase {
