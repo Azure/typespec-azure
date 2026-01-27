@@ -1278,8 +1278,13 @@ function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Names
       listAllUserDefinedNamespaces(context),
     );
     if (userDefinedNamespace && context.namespaceFlag) {
-      // Check if joinedSegments already starts with the namespace flag to avoid duplication
-      if (joinedSegments.startsWith(context.namespaceFlag + ".") || joinedSegments === context.namespaceFlag) {
+      // Check if replacement would cause duplication:
+      // This happens when the namespace flag is an extension of the user-defined namespace
+      // and joinedSegments already starts with the flag (meaning override already applied it)
+      if (
+        context.namespaceFlag.startsWith(userDefinedNamespace.name) &&
+        (joinedSegments.startsWith(context.namespaceFlag + ".") || joinedSegments === context.namespaceFlag)
+      ) {
         return joinedSegments;
       }
       return joinedSegments.replace(userDefinedNamespace.name, context.namespaceFlag);
