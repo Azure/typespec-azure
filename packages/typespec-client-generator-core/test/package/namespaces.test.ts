@@ -646,3 +646,50 @@ it("@clientNamespace with same value as namespace flag should not duplicate", as
   const client = sdkPackage.clients[0];
   strictEqual(client.namespace, "Azure.Search.Documents");
 });
+
+it("@clientNamespace with partial overlap should still work correctly", async () => {
+  const { program } = await SimpleTester.compile(
+    `
+      @clientNamespace("Azure.Search.Documents")
+      @service
+      namespace Azure.Search {
+        model SearchResult {
+          prop: string;
+        }
+        op search(): SearchResult;
+      }
+    `,
+  );
+  const context = await createSdkContextForTester(program, {
+    namespace: "Azure.Search.Documents",
+  });
+  const sdkPackage = context.sdkPackage;
+  const client = sdkPackage.clients[0];
+  strictEqual(client.namespace, "Azure.Search.Documents");
+  strictEqual(sdkPackage.models[0].namespace, "Azure.Search.Documents");
+});
+
+it("@clientNamespace should work with nested namespaces and matching flag", async () => {
+  const { program } = await SimpleTester.compile(
+    `
+      @clientNamespace("Azure.Search.Documents")
+      @service
+      namespace Azure.Search {
+        namespace Models {
+          model SearchResult {
+            prop: string;
+          }
+        }
+        op search(): Models.SearchResult;
+      }
+    `,
+  );
+  const context = await createSdkContextForTester(program, {
+    namespace: "Azure.Search.Documents",
+  });
+  const sdkPackage = context.sdkPackage;
+  const client = sdkPackage.clients[0];
+  strictEqual(client.namespace, "Azure.Search.Documents");
+  // Model should be in nested namespace under the override
+  strictEqual(sdkPackage.models[0].namespace, "Azure.Search.Documents.Models");
+});
