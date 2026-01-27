@@ -617,4 +617,3 @@ The `autoMerge` option works alongside existing customization decorators:
 
 4. **Add validation**:
    - Emit diagnostic if `autoMerge: false` with explicit clients has unreferenced operations
-   - Emit diagnostic if `autoMerge` is used with single-service client (no-op warning)
