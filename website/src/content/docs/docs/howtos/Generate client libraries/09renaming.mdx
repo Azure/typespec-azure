@@ -305,10 +305,26 @@ To rename operation parameters, apply the `@clientName` decorator from a separat
 <ClientTabs>
 
 ```typespec title=client.tsp
-import "./main.tsp";
 import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
+
+namespace PetStoreNamespace;
+
+/** This is the input I need */
+@resource("input")
+model InputModel {
+  /** Id of this object */
+  @key
+  @visibility(Lifecycle.Read)
+  name: string;
+}
+
+/** Read my resource */
+op get(
+  name: string,
+  @query filter?: string
+): InputModel;
 
 // Apply @clientName to the 'name' parameter of the 'get' operation
 @@clientName(get::parameters.name, "resourceId");
