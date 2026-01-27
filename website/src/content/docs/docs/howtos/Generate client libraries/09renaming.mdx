@@ -304,11 +304,7 @@ To rename operation parameters, apply the `@clientName` decorator from a separat
 
 <ClientTabs>
 
-```typespec title=client.tsp
-import "@azure-tools/typespec-client-generator-core";
-
-using Azure.ClientGenerator.Core;
-
+```typespec title=main.tsp
 namespace PetStoreNamespace;
 
 /** This is the input I need */
@@ -321,7 +317,17 @@ model InputModel {
 }
 
 /** Read my resource */
-op get(name: string, @query filter?: string): InputModel;
+op get(
+  name: string,
+  @query filter?: string
+): InputModel;
+```
+
+```typespec title=client.tsp
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
 
 // Apply @clientName to the 'name' parameter of the 'get' operation
 @@clientName(get::parameters.name, "resourceId");
