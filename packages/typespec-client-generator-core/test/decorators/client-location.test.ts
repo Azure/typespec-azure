@@ -844,9 +844,7 @@ describe("Parameter", () => {
   });
 
   it("with @override", async () => {
-    // Using compileAndDiagnose because the ARM override has known parameter mismatch
-    // but we still want to test @clientLocation functionality
-    const [{ program }] = await ArmTester.compileAndDiagnose(
+    const { program } = await ArmTester.compile(
       `
         @armProviderNamespace
         @service(#{ title: "ContosoProviderHubClient" })
