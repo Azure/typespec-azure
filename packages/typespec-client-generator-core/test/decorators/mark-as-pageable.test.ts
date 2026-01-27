@@ -1,20 +1,14 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
-import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let basicRunner: SdkTestRunner;
-
-beforeEach(async () => {
-  basicRunner = await createSdkTestRunner({
-    emitterName: "@azure-typespec/http-client-csharp",
-  });
-});
+import { it } from "vitest";
+import {
+  ArmTester,
+  ArmTesterWithService,
+  createSdkContextForTester,
+  SimpleTester,
+} from "../tester.js";
 
 it("should mark regular operation as pageable when decorated with @markAsPageable", async () => {
-  await basicRunner.compile(`
+  const { program } = await SimpleTester.compile(`
       @service
       namespace TestService {
         model ItemListResult {
@@ -34,7 +28,8 @@ it("should mark regular operation as pageable when decorated with @markAsPageabl
       }
     `);
 
-  const methods = basicRunner.context.sdkPackage.clients[0].methods;
+  const context = await createSdkContextForTester(program);
+  const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
 
   const method = methods[0];
@@ -60,7 +55,7 @@ it("should mark regular operation as pageable when decorated with @markAsPageabl
 });
 
 it("should apply @markAsPageable with language scope", async () => {
-  await basicRunner.compile(`
+  const { program } = await SimpleTester.compile(`
       @service
       namespace TestService {
         model ItemListResult {
@@ -80,7 +75,10 @@ it("should apply @markAsPageable with language scope", async () => {
       }
     `);
 
-  const methods = basicRunner.context.sdkPackage.clients[0].methods;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-typespec/typespec-csharp",
+  });
+  const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
 
   const method = methods[0];
@@ -101,7 +99,7 @@ it("should apply @markAsPageable with language scope", async () => {
 });
 
 it("should warn when @markAsPageable is applied to operation not returning model", async () => {
-  const diagnostics = await basicRunner.diagnose(`
+  const diagnostics = await SimpleTester.diagnose(`
       @service
       namespace TestService {
         @Azure.ClientGenerator.Core.Legacy.markAsPageable
@@ -119,7 +117,7 @@ it("should warn when @markAsPageable is applied to operation not returning model
 });
 
 it("should work with complex model return types", async () => {
-  await basicRunner.compile(`
+  const { program } = await SimpleTester.compile(`
       @service
       namespace TestService {
         model PagedResult<T> {
@@ -140,7 +138,8 @@ it("should work with complex model return types", async () => {
       }
     `);
 
-  const methods = basicRunner.context.sdkPackage.clients[0].methods;
+  const context = await createSdkContextForTester(program);
+  const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
 
   const method = methods[0];
@@ -165,7 +164,7 @@ it("should work with complex model return types", async () => {
 });
 
 it("should apply @pageItems to 'value' property when not already decorated", async () => {
-  await basicRunner.compile(`
+  const { program } = await SimpleTester.compile(`
       @service
       namespace TestService {
         model ItemListResult {
@@ -184,7 +183,10 @@ it("should apply @pageItems to 'value' property when not already decorated", asy
       }
     `);
 
-  const methods = basicRunner.context.sdkPackage.clients[0].methods;
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-typespec/typespec-csharp",
+  });
+  const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
 
   const method = methods[0];
@@ -205,7 +207,7 @@ it("should apply @pageItems to 'value' property when not already decorated", asy
 });
 
 it("should warn when model has no @pageItems property and no 'value' property", async () => {
-  const diagnostics = await basicRunner.diagnose(`
+  const diagnostics = await SimpleTester.diagnose(`
       @service
       namespace TestService {
         model ItemListResult {
@@ -232,11 +234,7 @@ it("should warn when model has no @pageItems property and no 'value' property", 
 });
 
 it("should not apply when scope does not match", async () => {
-  const pythonRunner = await createSdkTestRunner({
-    emitterName: "@azure-typespec/http-client-csharp",
-  });
-
-  await pythonRunner.compile(`
+  const { program } = await SimpleTester.compile(`
       @service
       namespace TestService {
         model ItemListResult {
@@ -256,7 +254,8 @@ it("should not apply when scope does not match", async () => {
       }
     `);
 
-  const methods = pythonRunner.context.sdkPackage.clients[0].methods;
+  const context = await createSdkContextForTester(program);
+  const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
 
   const method = methods[0];
@@ -265,13 +264,7 @@ it("should not apply when scope does not match", async () => {
 });
 
 it("should warn when operation already has @list (ARM ResourceListByParent)", async () => {
-  const armRunner = await createSdkTestRunner({
-    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
-    autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-    emitterName: "@azure-typespec/http-client-csharp-mgmt",
-  });
-
-  const diagnostics = await armRunner.diagnose(`
+  const diagnostics = await ArmTester.diagnose(`
       @armProviderNamespace
       @service(#{ title: "ContosoProviderHubClient" })
       namespace Microsoft.ContosoProviderHub;
@@ -298,13 +291,7 @@ it("should warn when operation already has @list (ARM ResourceListByParent)", as
 });
 
 it("should work with ARM action with @pageItems property", async () => {
-  const armRunner = await createSdkTestRunner({
-    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
-    autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-    emitterName: "@azure-typespec/http-client-csharp-mgmt",
-  });
-
-  await armRunner.compileWithBuiltInAzureResourceManagerService(`
+  const { program } = await ArmTesterWithService.compile(`
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
       }
@@ -326,7 +313,10 @@ it("should work with ARM action with @pageItems property", async () => {
       }
     `);
 
-  const rootClient = armRunner.context.sdkPackage.clients[0];
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-typespec/http-client-csharp-mgmt",
+  });
+  const rootClient = context.sdkPackage.clients[0];
   ok(rootClient);
   const employeeClient = rootClient.children![0];
   ok(employeeClient);
@@ -351,13 +341,7 @@ it("should work with ARM action with @pageItems property", async () => {
 });
 
 it("should work with ARM action with value property without @pageItems", async () => {
-  const armRunner = await createSdkTestRunner({
-    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
-    autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-    emitterName: "@azure-typespec/http-client-csharp-mgmt",
-  });
-
-  await armRunner.compileWithBuiltInAzureResourceManagerService(`
+  const { program } = await ArmTesterWithService.compile(`
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
       }
@@ -378,7 +362,10 @@ it("should work with ARM action with value property without @pageItems", async (
       }
     `);
 
-  const rootClient = armRunner.context.sdkPackage.clients[0];
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-typespec/http-client-csharp-mgmt",
+  });
+  const rootClient = context.sdkPackage.clients[0];
   ok(rootClient);
   const employeeClient = rootClient.children![0];
   ok(employeeClient);
@@ -403,13 +390,7 @@ it("should work with ARM action with value property without @pageItems", async (
 });
 
 it("should work with ARM action with value property without @pageItems wrapped in ArmResponse", async () => {
-  const armRunner = await createSdkTestRunner({
-    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
-    autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-    emitterName: "@azure-typespec/http-client-csharp-mgmt",
-  });
-
-  await armRunner.compileWithBuiltInAzureResourceManagerService(`
+  const { program } = await ArmTesterWithService.compile(`
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
       }
@@ -430,7 +411,10 @@ it("should work with ARM action with value property without @pageItems wrapped i
       }
     `);
 
-  const rootClient = armRunner.context.sdkPackage.clients[0];
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-typespec/http-client-csharp-mgmt",
+  });
+  const rootClient = context.sdkPackage.clients[0];
   ok(rootClient);
   const employeeClient = rootClient.children![0];
   ok(employeeClient);
@@ -455,13 +439,7 @@ it("should work with ARM action with value property without @pageItems wrapped i
 });
 
 it("should fail with ARM action with array property not named value without @pageItems", async () => {
-  const armRunner = await createSdkTestRunner({
-    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
-    autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-    emitterName: "@azure-typespec/http-client-csharp-mgmt",
-  });
-
-  const diagnostics = await armRunner.diagnose(`
+  const diagnostics = await ArmTester.diagnose(`
       @armProviderNamespace
       @service(#{ title: "ContosoProviderHubClient" })
       namespace Microsoft.ContosoProviderHub;
@@ -494,13 +472,7 @@ it("should fail with ARM action with array property not named value without @pag
 });
 
 it("should work with ARM ListSinglePage legacy operation", async () => {
-  const armRunner = await createSdkTestRunner({
-    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
-    autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-    emitterName: "@azure-typespec/http-client-csharp-mgmt",
-  });
-
-  await armRunner.compileWithBuiltInAzureResourceManagerService(`
+  const { program } = await ArmTesterWithService.compile(`
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
       }
@@ -515,7 +487,10 @@ it("should work with ARM ListSinglePage legacy operation", async () => {
       }
     `);
 
-  const rootClient = armRunner.context.sdkPackage.clients[0];
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-typespec/http-client-csharp-mgmt",
+  });
+  const rootClient = context.sdkPackage.clients[0];
   ok(rootClient);
   const employeeClient = rootClient.children![0];
   ok(employeeClient);

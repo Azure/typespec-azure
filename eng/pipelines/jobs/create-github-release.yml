@@ -15,6 +15,9 @@ jobs:
       os: linux
 
     steps:
+      - checkout: self
+        submodules: true
+
       - download: current
         artifact: ${{ parameters.artifactName }}
         displayName: Download package manifest
@@ -26,7 +29,7 @@ jobs:
           cat "$(Pipeline.Workspace)/${{ parameters.artifactName }}/publish-summary.json"
         displayName: Log publish summary
 
-      - script: pnpm chronus-github create-releases --repo microsoft/typespec --publish-summary "$(Pipeline.Workspace)/${{ parameters.artifactName }}/publish-summary.json"
+      - script: pnpm chronus-github create-releases --repo azure/typespec-azure --publish-summary "$(Pipeline.Workspace)/${{ parameters.artifactName }}/publish-summary.json"
         displayName: Create github releases
         env:
           GITHUB_TOKEN: $(azuresdk-github-pat)

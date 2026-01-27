@@ -282,6 +282,7 @@ op func8(@body body: Test5): void;
 Set an alternate type for a model property, Scalar, Model, Enum, Union, or function parameter. Note that `@encode` will be overridden by the one defined in the alternate type.
 When the source type is `Scalar`, the alternate type must be `Scalar`.
 The replaced type could be a type defined in the TypeSpec or an external type declared by type identity, package that export the type and package version.
+**Important:** External types (with `identity` property) cannot be applied to model properties. They must be applied to the type definition itself (Scalar, Model, Enum, or Union).
 
 ```typespec
 @Azure.ClientGenerator.Core.alternateType(alternate: unknown | Azure.ClientGenerator.Core.ExternalType, scope?: valueof string)
@@ -362,6 +363,32 @@ union Dfe<T> {
   "python"
 )
 model ItemCollection {
+  // ... properties
+}
+```
+
+###### Invalid: External type on model property (will emit a warning)
+
+```typespec
+model MyModel {
+  field: FieldType;
+}
+// This will emit a warning - external types cannot be applied to properties
+@@alternateType(MyModel.field,
+  {
+    identity: "ExternalType",
+  },
+  "rust"
+);
+
+// Correct: Apply external type to the type definition instead
+@alternateType(
+  {
+    identity: "ExternalType",
+  },
+  "rust"
+)
+model FieldType {
   // ... properties
 }
 ```
