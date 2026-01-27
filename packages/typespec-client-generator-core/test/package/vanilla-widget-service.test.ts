@@ -1,17 +1,11 @@
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { SdkHeaderParameter } from "../../src/interfaces.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
+import { createSdkContextForTester, SimpleTester } from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
-
-async function compileVanillaWidgetService(runner: SdkTestRunner, code: string) {
-  return await runner.compile(`
+async function compileVanillaWidgetService(code: string) {
+  return await SimpleTester.compile(`
     @service(#{
       title: "Widget Service",
     })
@@ -46,9 +40,10 @@ async function compileVanillaWidgetService(runner: SdkTestRunner, code: string) 
 }
 
 it("vanilla widget create", async () => {
-  await compileVanillaWidgetService(runner, "@post create(...Widget): Widget | Error;");
+  const { program } = await compileVanillaWidgetService("@post create(...Widget): Widget | Error;");
 
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "create");
   strictEqual(method.kind, "basic");
@@ -106,9 +101,12 @@ it("vanilla widget create", async () => {
 });
 
 it("vanilla widget read", async () => {
-  await compileVanillaWidgetService(runner, "@get read(@path id: string): Widget | Error;");
+  const { program } = await compileVanillaWidgetService(
+    "@get read(@path id: string): Widget | Error;",
+  );
 
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "read");
   strictEqual(method.kind, "basic");
@@ -153,12 +151,12 @@ it("vanilla widget read", async () => {
 });
 
 it("vanilla widget update", async () => {
-  await compileVanillaWidgetService(
-    runner,
+  const { program } = await compileVanillaWidgetService(
     "@patch(#{implicitOptionality: true}) update(...Widget): Widget | Error;",
   );
 
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "update");
   strictEqual(method.kind, "basic");
@@ -243,9 +241,12 @@ it("vanilla widget update", async () => {
 });
 
 it("vanilla widget delete", async () => {
-  await compileVanillaWidgetService(runner, "@delete delete(@path id: string): void | Error;");
+  const { program } = await compileVanillaWidgetService(
+    "@delete delete(@path id: string): void | Error;",
+  );
 
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "delete");
   strictEqual(method.kind, "basic");
@@ -277,9 +278,10 @@ it("vanilla widget delete", async () => {
 });
 
 it("vanilla widget list", async () => {
-  await compileVanillaWidgetService(runner, "@get list(): Widget[] | Error;");
+  const { program } = await compileVanillaWidgetService("@get list(): Widget[] | Error;");
 
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "list");
   strictEqual(method.kind, "basic");

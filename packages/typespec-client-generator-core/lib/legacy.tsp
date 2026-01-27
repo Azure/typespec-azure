@@ -99,6 +99,38 @@ extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
 extern dec markAsLro(target: Operation, scope?: valueof string);
 
 /**
+ * Forces an operation to be treated as a pageable operation by the SDK generators,
+ * even when the operation does not follow standard paging patterns on the service side.
+ *
+ * NOTE: When used, you will need to verify the operation and add tests for the generated code
+ * to make sure the end-to-end works for library users, since there is a risk that forcing
+ * this operation to be pageable will result in errors.
+ *
+ * When applied, TCGC will treat the operation as pageable and SDK generators should:
+ * - Generate paging mechanisms (iterators/async iterators)
+ * - Return appropriate pageable-specific return types
+ * - Handle the operation as a collection that may require multiple requests
+ *
+ * This decorator is considered legacy functionality and should only be used when
+ * standard TypeSpec paging patterns are not feasible.
+ *
+ * @param target The operation that should be treated as a pageable operation
+ * @param scope Specifies the target language emitters that the decorator should apply.
+ * If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * @example Force a regular operation to be treated as pageable for backward compatibility
+ * ```typespec
+ * @Azure.ClientGenerator.Core.Legacy.markAsPageable
+ * @route("/items")
+ * @get
+ * op listItems(): ItemListResult;
+ * ```
+ *
+ */
+extern dec markAsPageable(target: Operation, scope?: valueof string);
+
+/**
  * Specifies the HTTP verb for the next link operation in a paging scenario.
  *
  * This decorator allows you to override the HTTP method used for fetching the next page

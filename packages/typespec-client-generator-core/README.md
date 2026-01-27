@@ -282,6 +282,7 @@ op func8(@body body: Test5): void;
 Set an alternate type for a model property, Scalar, Model, Enum, Union, or function parameter. Note that `@encode` will be overridden by the one defined in the alternate type.
 When the source type is `Scalar`, the alternate type must be `Scalar`.
 The replaced type could be a type defined in the TypeSpec or an external type declared by type identity, package that export the type and package version.
+**Important:** External types (with `identity` property) cannot be applied to model properties. They must be applied to the type definition itself (Scalar, Model, Enum, or Union).
 
 ```typespec
 @Azure.ClientGenerator.Core.alternateType(alternate: unknown | Azure.ClientGenerator.Core.ExternalType, scope?: valueof string)
@@ -362,6 +363,32 @@ union Dfe<T> {
   "python"
 )
 model ItemCollection {
+  // ... properties
+}
+```
+
+###### Invalid: External type on model property (will emit a warning)
+
+```typespec
+model MyModel {
+  field: FieldType;
+}
+// This will emit a warning - external types cannot be applied to properties
+@@alternateType(MyModel.field,
+  {
+    identity: "ExternalType",
+  },
+  "rust"
+);
+
+// Correct: Apply external type to the type definition instead
+@alternateType(
+  {
+    identity: "ExternalType",
+  },
+  "rust"
+)
+model FieldType {
   // ... properties
 }
 ```
@@ -1281,6 +1308,7 @@ model MyModel {
 - [`@flattenProperty`](#@flattenproperty)
 - [`@hierarchyBuilding`](#@hierarchybuilding)
 - [`@markAsLro`](#@markaslro)
+- [`@markAsPageable`](#@markaspageable)
 - [`@nextLinkVerb`](#@nextlinkverb)
 
 #### `@clientDefaultValue`
@@ -1472,6 +1500,50 @@ The operation that should be treated as a Long Running Operation
 @route("/deployments/{deploymentId}")
 @post
 op startDeployment(@path deploymentId: string): DeploymentResult | ErrorResponse;
+```
+
+#### `@markAsPageable`
+
+Forces an operation to be treated as a pageable operation by the SDK generators,
+even when the operation does not follow standard paging patterns on the service side.
+
+NOTE: When used, you will need to verify the operation and add tests for the generated code
+to make sure the end-to-end works for library users, since there is a risk that forcing
+this operation to be pageable will result in errors.
+
+When applied, TCGC will treat the operation as pageable and SDK generators should:
+
+- Generate paging mechanisms (iterators/async iterators)
+- Return appropriate pageable-specific return types
+- Handle the operation as a collection that may require multiple requests
+
+This decorator is considered legacy functionality and should only be used when
+standard TypeSpec paging patterns are not feasible.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.markAsPageable(scope?: valueof string)
+```
+
+##### Target
+
+The operation that should be treated as a pageable operation
+`Operation`
+
+##### Parameters
+
+| Name  | Type             | Description                                                                                                                                                                                                                                                     |
+| ----- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+
+##### Examples
+
+###### Force a regular operation to be treated as pageable for backward compatibility
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.markAsPageable
+@route("/items")
+@get
+op listItems(): ItemListResult;
 ```
 
 #### `@nextLinkVerb`

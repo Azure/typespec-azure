@@ -1,21 +1,10 @@
 import { FinalStateValue } from "@azure-tools/typespec-azure-core";
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
-import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let basicRunner: SdkTestRunner;
-
-beforeEach(async () => {
-  basicRunner = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-csharp",
-  });
-});
+import { it } from "vitest";
+import { ArmTesterWithService, createSdkContextForTester, SimpleTester } from "../tester.js";
 
 it("should mark regular operation as LRO when decorated with @markAsLro", async () => {
-  await basicRunner.compile(`
+  const { program } = await SimpleTester.compile(`
       @service
       namespace TestService {
         model DeploymentResult {
@@ -39,7 +28,8 @@ it("should mark regular operation as LRO when decorated with @markAsLro", async 
       }
     `);
 
-  const methods = basicRunner.context.sdkPackage.clients[0].methods;
+  const context = await createSdkContextForTester(program);
+  const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
 
   const method = methods[0];
@@ -59,7 +49,7 @@ it("should mark regular operation as LRO when decorated with @markAsLro", async 
 });
 
 it("should apply @markAsLro with language scope", async () => {
-  await basicRunner.compile(`
+  const { program } = await SimpleTester.compile(`
       @service
       namespace TestService {
         model ProcessingResponse {
@@ -78,13 +68,14 @@ it("should apply @markAsLro with language scope", async () => {
       }
     `);
 
-  strictEqual(basicRunner.context.sdkPackage.models.length, 2);
-  const processingResponse = basicRunner.context.sdkPackage.models.find(
-    (m) => m.name === "ProcessingResponse",
-  );
+  const context = await createSdkContextForTester(program, {
+    emitterName: "@azure-typespec/typespec-csharp",
+  });
+  strictEqual(context.sdkPackage.models.length, 2);
+  const processingResponse = context.sdkPackage.models.find((m) => m.name === "ProcessingResponse");
   ok(processingResponse);
 
-  const methods = basicRunner.context.sdkPackage.clients[0].methods;
+  const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
 
   const method = methods[0];
@@ -100,7 +91,7 @@ it("should apply @markAsLro with language scope", async () => {
 });
 
 it("should warn when @markAsLro is applied to operation not returning model", async () => {
-  const diagnostics = await basicRunner.diagnose(`
+  const diagnostics = await SimpleTester.diagnose(`
       @service
       namespace TestService {
         @Azure.ClientGenerator.Core.Legacy.markAsLro
@@ -118,7 +109,7 @@ it("should warn when @markAsLro is applied to operation not returning model", as
 });
 
 it("should work with complex model return types", async () => {
-  await basicRunner.compile(`
+  const { program } = await SimpleTester.compile(`
       @service
       namespace TestService {
         model BaseResult {
@@ -150,7 +141,8 @@ it("should work with complex model return types", async () => {
       }
     `);
 
-  const methods = basicRunner.context.sdkPackage.clients[0].methods;
+  const context = await createSdkContextForTester(program);
+  const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
 
   const method = methods[0];
@@ -167,12 +159,7 @@ it("should work with complex model return types", async () => {
 });
 
 it("should work with ArmResourceRead", async () => {
-  const armRunner = await createSdkTestRunner({
-    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
-    autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-    emitterName: "@azure-tools/typespec-python",
-  });
-  await armRunner.compileWithBuiltInAzureResourceManagerService(`
+  const { program } = await ArmTesterWithService.compile(`
       model Employee is TrackedResource<EmployeeProperties> {
         ...ResourceNameParameter<Employee>;
       }
@@ -185,7 +172,8 @@ it("should work with ArmResourceRead", async () => {
       >;
     `);
 
-  const methods = armRunner.context.sdkPackage.clients[0].methods;
+  const context = await createSdkContextForTester(program);
+  const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
   const method = methods[0];
   strictEqual(method.kind, "lro");
@@ -203,12 +191,7 @@ it("should work with ArmResourceRead", async () => {
 });
 
 it("Extension.Read", async () => {
-  const armRunner = await createSdkTestRunner({
-    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
-    autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-    emitterName: "@azure-tools/typespec-python",
-  });
-  await armRunner.compileWithBuiltInAzureResourceManagerService(`
+  const { program } = await ArmTesterWithService.compile(`
     /** A ContosoProviderHub resource */
     model Employee is TrackedResource<{}> {
       ...ResourceNameParameter<Employee>;
@@ -222,7 +205,8 @@ it("Extension.Read", async () => {
     >;
     `);
 
-  const methods = armRunner.context.sdkPackage.clients[0].methods;
+  const context = await createSdkContextForTester(program);
+  const methods = context.sdkPackage.clients[0].methods;
   strictEqual(methods.length, 1);
   const method = methods[0];
   strictEqual(method.kind, "lro");

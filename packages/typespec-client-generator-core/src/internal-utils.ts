@@ -80,7 +80,6 @@ import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js"
 import { getSdkBasicServiceMethod } from "./methods.js";
 import {
   getCrossLanguageDefinitionId,
-  getDefaultApiVersion,
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
@@ -125,7 +124,7 @@ export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean
   const explicitClients = listScopedDecoratorData(context, clientKey);
   let multiServices = false;
   explicitClients.forEach((value) => {
-    if (Array.isArray((value as SdkClient).service)) {
+    if ((value as SdkClient).services.length > 1) {
       multiServices = true;
     }
   });
@@ -364,12 +363,7 @@ export function getSdkTypeBaseHelper<TKind>(
   ) {
     const external = getAlternateType(context, type);
     // Only set external if it's an ExternalTypeInfo (has 'identity' but not 'kind' property), not a regular Type
-    if (
-      external &&
-      typeof external === "object" &&
-      "identity" in external &&
-      !("kind" in external)
-    ) {
+    if (external && external.kind === "externalTypeInfo") {
       base.external = external;
     }
   }
@@ -552,19 +546,14 @@ export function removeVersionsLargerThanExplicitlySpecified(
   }
 }
 
-export function filterApiVersionsInEnum(
+export function filterPreviewVersion(
   context: TCGCContext,
-  client: SdkClient,
   sdkVersionsEnum: SdkEnumType,
+  defaultApiVersion: string,
 ): void {
   // if they explicitly set an api version, remove larger versions
   removeVersionsLargerThanExplicitlySpecified(context, sdkVersionsEnum.values);
-  const clientNamespaceType = getActualClientType(client);
-  const defaultApiVersion = getDefaultApiVersion(
-    context,
-    clientNamespaceType.kind === "Interface" ? clientNamespaceType.namespace! : clientNamespaceType,
-  );
-  if (!context.previewStringRegex.test(defaultApiVersion?.value || "")) {
+  if (!context.previewStringRegex.test(defaultApiVersion)) {
     sdkVersionsEnum.values = sdkVersionsEnum.values.filter((v) => {
       if (typeof v.value !== "string") {
         return true;
@@ -791,14 +780,11 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   const explicitClientNamespaces: Namespace[] = [];
   const explicitServices = new Set<Namespace>();
   listScopedDecoratorData(context, clientKey).forEach((v, k) => {
+    // See all explicit clients that in TypeSpec program
     if (!unsafe_Realm.realmForType.has(k)) {
       const sdkClient = v as SdkClient;
-      if (Array.isArray(sdkClient.service)) {
-        explicitClientNamespaces.push(k as Namespace);
-        sdkClient.service.forEach((s) => explicitServices.add(s));
-      } else {
-        explicitServices.add(sdkClient.service);
-      }
+      explicitClientNamespaces.push(k as Namespace);
+      sdkClient.services.forEach((s) => explicitServices.add(s));
     }
   });
 
@@ -1022,8 +1008,8 @@ export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation
 export function getActualClientType(client: SdkClient | SdkOperationGroup): Namespace | Interface {
   if (client.kind === "SdkClient") return client.type;
   if (client.type) return client.type;
-  // Created operation group from `@clientLocation`. Only for single service.
-  return client.service;
+  // Created operation group from `@clientLocation`. May have single or multiple services. Choose the first service for multi-service case.
+  return client.services[0];
 }
 
 export function isSameServers(left: HttpServer[], right: HttpServer[]): boolean {

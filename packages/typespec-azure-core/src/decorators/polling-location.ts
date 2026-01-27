@@ -1,12 +1,13 @@
 import {
   createDiagnosticCollector,
-  type DecoratorContext,
   Diagnostic,
   getEffectiveModelType,
   ignoreDiagnostics,
-  type IntrinsicType,
   isNeverType,
+  isUnknownType,
   isVoidType,
+  type DecoratorContext,
+  type IntrinsicType,
   type Model,
   type ModelProperty,
   type Program,
@@ -64,7 +65,7 @@ export interface StatusMonitorPollingLocationInfo extends PollingLocationBase {
   info: StatusMonitorMetadata;
 }
 
-/** Metadata for the STatusMonitor */
+/** Metadata for the StatusMonitor */
 export interface StatusMonitorMetadata {
   /** The model type of the status monitor */
   monitorType: Model;
@@ -183,7 +184,7 @@ function extractStatusMonitorLocationInfo(
   if (statusMonitor === undefined) return undefined;
   statusMonitor.successProperty = finalPropertyValue;
   baseInfo.finalResult =
-    finalPropertyValue?.type?.kind === "Model"
+    finalPropertyValue?.type?.kind === "Model" || finalPropertyValue?.type?.kind === "Intrinsic"
       ? finalPropertyValue.type
       : $(program).intrinsic.void;
   return {
@@ -218,7 +219,8 @@ export function extractStatusMonitorInfo(
     lroStates: states,
     errorType: errorProperty?.type.kind === "Model" ? errorProperty.type : undefined,
     successType:
-      successProperty?.type?.kind === "Intrinsic" || successProperty?.type?.kind === "Model"
+      (successProperty?.type && isUnknownType(successProperty.type)) ||
+      successProperty?.type?.kind === "Model"
         ? successProperty.type
         : $(program).intrinsic.void,
     terminationInfo: {
