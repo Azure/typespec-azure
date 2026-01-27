@@ -24,6 +24,7 @@ import {
   getActualClientType,
   getTypeDecorators,
 } from "./internal-utils.js";
+import { reportDiagnostic } from "./lib.js";
 import { getLicenseInfo } from "./license.js";
 import { getCrossLanguagePackageId, getNamespaceFromType } from "./public-utils.js";
 import { getAllReferencedTypes, handleAllTypes } from "./types.js";
@@ -72,6 +73,7 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
     },
   };
   organizeNamespaces(context, sdkPackage);
+  validateClientInitializationParameters(context, sdkPackage);
   return diagnostics.wrap(sdkPackage);
 }
 
@@ -162,6 +164,116 @@ function populateApiVersionInformation(context: TCGCContext): void {
       context.setApiVersionsForType(clientType, versions);
 
       context.__clientApiVersionDefaultValueCache.set(client, versions[versions.length - 1]);
+    }
+  }
+}
+
+/**
+ * Validates that all client initialization parameters are actually used in at least one operation
+ * of the client or its sub-clients.
+ */
+function validateClientInitializationParameters<TServiceOperation extends SdkServiceOperation>(
+  context: TCGCContext,
+  sdkPackage: SdkPackage<TServiceOperation>,
+): void {
+  // Process all top-level clients - don't recurse since each client already checks its sub-clients
+  for (const client of sdkPackage.clients) {
+    validateClientInitializationParametersForClient(context, client);
+  }
+}
+
+/**
+ * Validates client initialization parameters for a single client (including its sub-clients' operations).
+ */
+function validateClientInitializationParametersForClient<
+  TServiceOperation extends SdkServiceOperation,
+>(context: TCGCContext, client: SdkClientType<TServiceOperation>): void {
+  // Only validate when there's a customized @clientInitialization decorator with parameters
+  // Skip validation for default/auto-generated client initialization
+  if (!client.clientInitialization.__raw) {
+    return;
+  }
+
+  // Get custom parameters to validate (exclude built-in parameters like endpoint and credential)
+  const customParams = client.clientInitialization.parameters.filter(
+    (param) => param.kind !== "endpoint" && param.kind !== "credential",
+  );
+
+  // Skip expensive operation parameter collection if there are no custom parameters to validate
+  if (customParams.length === 0) {
+    return;
+  }
+
+  // Collect all operation parameters from this client and all sub-clients
+  const allOperationParameterNames = new Set<string>();
+  collectOperationParameterNames(client, allOperationParameterNames);
+
+  // Check each custom client initialization parameter
+  for (const param of customParams) {
+    // Check if this parameter is used in any operation
+    if (!allOperationParameterNames.has(param.name)) {
+      // Get the raw entity (Namespace or Interface) to report diagnostics on
+      // Use the raw type if available, otherwise use the raw model from clientInitialization
+      const target =
+        client.__raw.type ||
+        client.clientInitialization.__raw ||
+        context.program.getGlobalNamespaceType();
+      reportDiagnostic(context.program, {
+        code: "unused-client-initialization-parameter",
+        target: target,
+        format: {
+          parameterName: param.name,
+          clientName: client.name,
+        },
+      });
+    }
+  }
+}
+
+/**
+ * Collects all parameter names used in operations of a client and all its sub-clients.
+ */
+function collectOperationParameterNames<TServiceOperation extends SdkServiceOperation>(
+  client: SdkClientType<TServiceOperation>,
+  parameterNames: Set<string>,
+): void {
+  // Collect parameters from all methods in this client
+  for (const method of client.methods) {
+    // Check operation parameters
+    if (method.operation && method.operation.kind === "http") {
+      for (const param of method.operation.parameters) {
+        // Check methodParameterSegments to find the client initialization parameter
+        if (param.methodParameterSegments) {
+          for (const path of param.methodParameterSegments) {
+            for (const methodParam of path) {
+              if (methodParam.kind === "method" && methodParam.onClient) {
+                parameterNames.add(methodParam.name);
+              }
+            }
+          }
+        }
+      }
+
+      // Also check body parameter
+      if (method.operation.bodyParam) {
+        const bodyParam = method.operation.bodyParam;
+        if (bodyParam.methodParameterSegments) {
+          for (const path of bodyParam.methodParameterSegments) {
+            for (const methodParam of path) {
+              if (methodParam.kind === "method" && methodParam.onClient) {
+                parameterNames.add(methodParam.name);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Recursively collect from sub-clients
+  if (client.children) {
+    for (const child of client.children) {
+      collectOperationParameterNames(child, parameterNames);
     }
   }
 }
