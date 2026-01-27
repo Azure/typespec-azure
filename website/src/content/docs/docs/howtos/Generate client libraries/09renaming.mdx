@@ -321,10 +321,7 @@ model InputModel {
 }
 
 /** Read my resource */
-op get(
-  name: string,
-  @query filter?: string
-): InputModel;
+op get(name: string, @query filter?: string): InputModel;
 
 // Apply @clientName to the 'name' parameter of the 'get' operation
 @@clientName(get::parameters.name, "resourceId");
@@ -338,7 +335,7 @@ op get(
 class PetStoreNamespaceClient:
   def get(self, resource_id: str, *, search_filter: Optional[str] = None, **kwargs) -> InputModel:
     """Get operation with renamed parameters.
-    
+
     :param resource_id: The resource identifier (wire name: 'name')
     :param search_filter: Filter query (wire name: 'filter')
     :return: InputModel
@@ -377,7 +374,7 @@ export interface GetOptionalParams extends OperationOptions {
 export async function get(
   context: Client,
   resourceId: string,
-  options: GetOptionalParams = { requestOptions: {} }
+  options: GetOptionalParams = { requestOptions: {} },
 ): Promise<InputModel>;
 
 // Usage
@@ -391,7 +388,7 @@ public final class PetStoreNamespaceClient {
     public Response<BinaryData> getWithResponse(BinaryData getRequest, RequestOptions requestOptions) {
       // implementation
     }
-    
+
     public InputModel get(String resourceId, String filter) {
       // implementation
     }
