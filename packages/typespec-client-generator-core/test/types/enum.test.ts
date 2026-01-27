@@ -183,7 +183,7 @@ it("union of union as enum float type", async function () {
     }
   `);
   const context = await createSdkContextForTester(program);
-  const sdkType = context.sdkPackage.enums[0];
+  const sdkType = context.sdkPackage.enums[1];
   ok(sdkType);
   strictEqual(sdkType.isFixed, false);
   strictEqual(sdkType.name, "ExtendedEnum");

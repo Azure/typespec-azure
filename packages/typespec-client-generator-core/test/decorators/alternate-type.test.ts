@@ -700,7 +700,7 @@ describe("external types", () => {
     `);
 
     await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-python" });
-    strictEqual(diagnostics.length, 3);
+    strictEqual(diagnostics.length, 1);
     strictEqual(
       diagnostics[0].code,
       "@azure-tools/typespec-client-generator-core/external-library-version-mismatch",
@@ -938,10 +938,8 @@ it("should not set usage on original enum when parameter has alternateType", asy
   const param = method.parameters[0];
   strictEqual(param.type.kind, "string");
 
-  // The original Test enum should have None usage (0) since it's replaced
-  const sdkEnum = context.__referencedTypeCache.get(Test);
-  strictEqual(sdkEnum?.kind, "enum");
-  strictEqual(sdkEnum.usage, UsageFlags.None, "Test enum should have None usage");
+  // The original Test enum should not exist since it's replaced
+  strictEqual(context.__referencedTypeCache.get(Test), undefined);
 });
 
 it("should not set usage on original model when parameter has alternateType", async () => {
@@ -965,10 +963,8 @@ it("should not set usage on original model when parameter has alternateType", as
   const param = method.parameters[0];
   strictEqual(param.type.kind, "string");
 
-  // The original TestModel should have None usage (0) since it's replaced
-  const sdkModel = context.__referencedTypeCache.get(TestModel);
-  strictEqual(sdkModel?.kind, "model");
-  strictEqual(sdkModel.usage, UsageFlags.None, "TestModel should have None usage");
+  // The original TestModel should not exist since it's replaced
+  strictEqual(context.__referencedTypeCache.get(TestModel), undefined);
 });
 
 it("should not set usage on original enum when inline alternateType is used", async () => {
@@ -993,10 +989,8 @@ it("should not set usage on original enum when inline alternateType is used", as
   const param = method.parameters[0];
   strictEqual(param.type.kind, "string");
 
-  // The original Status enum should have None usage (0) since it's replaced
-  const sdkEnum = context.__referencedTypeCache.get(Status);
-  strictEqual(sdkEnum?.kind, "enum");
-  strictEqual(sdkEnum.usage, UsageFlags.None, "Status enum should have None usage");
+  // The original Status enum should not exist since it's replaced
+  strictEqual(context.__referencedTypeCache.get(Status), undefined);
 });
 
 it("applied to union", async () => {

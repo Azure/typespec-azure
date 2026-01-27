@@ -87,6 +87,7 @@ import {
   hasExplicitClientOrOperationGroup,
   isSameAuth,
   isSameServers,
+  legacyHierarchyBuildingKey,
   listAllUserDefinedNamespaces,
   negationScopesKey,
   omitOperation,
@@ -94,6 +95,7 @@ import {
   overrideKey,
   parseScopes,
   scopeKey,
+  usageKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkEnum, getSdkModel, getSdkUnion } from "./types.js";
@@ -498,8 +500,6 @@ export function shouldGenerateConvenient(context: TCGCContext, entity: Operation
   const value = getConvenientOrProtocolValue(context, convenientAPIKey, entity);
   return value ?? Boolean(context.generateConvenienceMethods);
 }
-
-const usageKey = createStateSymbol("usage");
 
 export const $usage: UsageDecorator = (
   context: DecoratorContext,
@@ -1534,8 +1534,6 @@ export function getClientLocation(
   }
   return getScopedDecoratorData(context, clientLocationKey, input);
 }
-
-const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
 
 interface PropertyConflict {
   propertyName: string;

@@ -856,6 +856,7 @@ interface DocumentIntelligenceClient {
         errorMessage: string[];
       }
 
+      @usage(Usage.input)
       model UpdateFinalResult {
         id2: string;
       }
@@ -878,7 +879,7 @@ interface DocumentIntelligenceClient {
     assert.isTrue(response.isGeneratedName);
     const generatedName = response.name;
     // duplicate with existing model named "UpdateFinalResult" so the generated name will be "UpdateFinalResult1"
-    assert.strictEqual("UpdateFinalResult1", generatedName);
+    assert.strictEqual(generatedName, "UpdateFinalResult1");
     const crossLanguageId = response.crossLanguageDefinitionId;
     assert.isFalse(crossLanguageId.includes(".."));
     const lroMetadata = method.lroMetadata;

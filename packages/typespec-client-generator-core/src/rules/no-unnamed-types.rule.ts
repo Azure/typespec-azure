@@ -9,7 +9,7 @@ import {
   SdkUnionType,
   UsageFlags,
 } from "../interfaces.js";
-import { createSdkPackage } from "../package.js";
+import { handleAllTypes } from "../types.js";
 
 export const noUnnamedTypesRule = createRule({
   name: "no-unnamed-types",
@@ -28,7 +28,7 @@ export const noUnnamedTypesRule = createRule({
       },
     );
     // we create the package to see if the model is used in the final output
-    createSdkPackage(tcgcContext);
+    handleAllTypes(tcgcContext);
     return {
       model: (model: Model) => {
         const createdModel = tcgcContext.__referencedTypeCache.get(model);
