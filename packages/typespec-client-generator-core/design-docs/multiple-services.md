@@ -645,7 +645,27 @@ The nested `@client` approach works alongside existing customization decorators:
 
 ### Changes Needed
 
-1. **Update `cache.ts` logic**:
-   - Check if the client namespace has nested `@client` decorators
+1. **Update `interfaces.ts`**:
+   - Update `SdkClientType.apiVersions` type from `string[]` to `string[] | string[][]` to support 2-dimensional array for multi-service clients
+   - This change affects both the root client and child clients that contain operations from multiple services
+
+2. **Update `cache.ts` logic**:
+   - In `prepareClientAndOperationCache`: Check if the client namespace has nested `@client` decorators before auto-merging
    - When nested `@client` decorators exist, use the explicitly defined hierarchy
    - When the namespace is empty, auto-merge services' content (existing behavior)
+   - Update `getOrCreateClients`: Handle nested `@client` detection within multi-service clients
+
+3. **Update `internal-utils.ts`**:
+   - Modify `hasExplicitClientOrOperationGroup` to properly detect nested `@client` decorators within multi-service client namespaces
+   - Currently it returns `false` when a client has multiple services, but should return `true` if the namespace contains nested `@client` decorators
+
+4. **Update `clients.ts`**:
+   - Update `createSdkClientType` to populate `apiVersions` as a 2-dimensional array when the client spans multiple services
+   - Update endpoint and credential parameter creation to validate that all services share the same `@server` and `@useAuth` definitions
+
+5. **Update `decorators.ts`**:
+   - Add validation in `@client` decorator to ensure services combined into a single client have compatible endpoint and credential configurations
+
+6. **Add validation diagnostics**:
+   - Add diagnostic when services combined into a client have different `@server` definitions
+   - Add diagnostic when services combined into a client have different `@useAuth` definitions
