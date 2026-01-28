@@ -1,4 +1,4 @@
-import type { SidebarItem } from "@typespec/astro-utils/sidebar";
+import type { Badge, SidebarItem } from "@typespec/astro-utils/sidebar";
 import { getSamples } from "../utils/samples";
 
 function createLibraryReferenceStructure(
@@ -131,11 +131,14 @@ const sidebar: SidebarItem[] = [
 export default sidebar;
 
 // Helper to build nested sidebar structure for samples
+type SampleLeaf = { id: string; title: string; danger?: string };
 type SampleSidebarTree = {
-  [segment: string]: SampleSidebarTree | { id: string; title: string };
+  [segment: string]: SampleSidebarTree | SampleLeaf;
 };
 
-function buildSamplesSidebar(samples: { id: string; title: string }[]): SidebarItem[] {
+function buildSamplesSidebar(
+  samples: { id: string; title: string; danger?: string }[],
+): SidebarItem[] {
   // Build a tree from sample ids
   const root: SampleSidebarTree = {};
   for (const sample of samples) {
@@ -144,7 +147,7 @@ function buildSamplesSidebar(samples: { id: string; title: string }[]): SidebarI
     for (let i = 0; i < parts.length; i++) {
       const part = parts[i];
       if (i === parts.length - 1) {
-        node[part] = { id: sample.id, title: sample.title };
+        node[part] = { id: sample.id, title: sample.title, danger: sample.danger };
       } else {
         if (!node[part] || isSampleLeaf(node[part])) {
           node[part] = {};
@@ -154,9 +157,7 @@ function buildSamplesSidebar(samples: { id: string; title: string }[]): SidebarI
     }
   }
 
-  function isSampleLeaf(
-    node: SampleSidebarTree | { id: string; title: string },
-  ): node is { id: string; title: string } {
+  function isSampleLeaf(node: SampleSidebarTree | SampleLeaf): node is SampleLeaf {
     return (node as any).id !== undefined && (node as any).title !== undefined;
   }
 
@@ -170,9 +171,13 @@ function buildSamplesSidebar(samples: { id: string; title: string }[]): SidebarI
   function buildItems(node: SampleSidebarTree, path: string[] = []): SidebarItem[] {
     return Object.entries(node).map(([key, value]) => {
       if (isSampleLeaf(value)) {
+        const badge: Badge | undefined = value.danger
+          ? { text: "⚠", variant: "danger" }
+          : undefined;
         return {
           label: value.title,
           link: `/docs/samples/${value.id}`,
+          badge,
         } as any;
       } else {
         return {

@@ -4,6 +4,8 @@ export interface Sample {
   id: string;
   title: string;
   description: string;
+  /** Optional danger message for legacy samples that should not be used for new specs */
+  danger?: string;
   files: Record<string, string>;
 }
 
@@ -57,6 +59,7 @@ export async function getSamples(): Promise<Sample[]> {
       id: dir,
       title: sampleConfig.title,
       description: sampleConfig.description,
+      danger: sampleConfig.danger,
       files,
     };
   });
