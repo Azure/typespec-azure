@@ -149,6 +149,37 @@ export type MarkAsPageableDecorator = (
 ) => DecoratorValidatorCallbacks | void;
 
 /**
+ * Prevents an operation from being treated as a pageable operation by the SDK generators,
+ * even when the operation follows standard paging patterns (e.g., decorated with `@list`).
+ *
+ * When applied, the operation will be treated as a basic method:
+ * - The response will be the paged model itself (not the list of items)
+ * - The paged model will not be marked with paged result usage
+ * - No paging mechanisms (iterators/async iterators) will be generated
+ *
+ * This decorator is considered legacy functionality and should only be used when
+ * you need to override the default paging behavior for specific operations.
+ *
+ * @param target The operation that should NOT be treated as a pageable operation
+ * @param scope Specifies the target language emitters that the decorator should apply.
+ * If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ * @example Prevent a paging operation from being treated as pageable
+ * ```typespec
+ * @Azure.ClientGenerator.Core.Legacy.disablePageable
+ * @list
+ * @route("/items")
+ * @get
+ * op listItems(): ItemListResult;
+ * ```
+ */
+export type DisablePageableDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: string,
+) => DecoratorValidatorCallbacks | void;
+
+/**
  * Specifies the HTTP verb for the next link operation in a paging scenario.
  *
  * This decorator allows you to override the HTTP method used for fetching the next page
@@ -229,6 +260,7 @@ export type AzureClientGeneratorCoreLegacyDecorators = {
   flattenProperty: FlattenPropertyDecorator;
   markAsLro: MarkAsLroDecorator;
   markAsPageable: MarkAsPageableDecorator;
+  disablePageable: DisablePageableDecorator;
   nextLinkVerb: NextLinkVerbDecorator;
   clientDefaultValue: ClientDefaultValueDecorator;
 };

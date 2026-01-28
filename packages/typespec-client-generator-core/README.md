@@ -1305,6 +1305,7 @@ model MyModel {
 ### Azure.ClientGenerator.Core.Legacy
 
 - [`@clientDefaultValue`](#@clientdefaultvalue)
+- [`@disablePageable`](#@disablepageable)
 - [`@flattenProperty`](#@flattenproperty)
 - [`@hierarchyBuilding`](#@hierarchybuilding)
 - [`@markAsLro`](#@markaslro)
@@ -1370,6 +1371,47 @@ model Config {
   @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(false, "python")
   enableCache?: boolean;
 }
+```
+
+#### `@disablePageable`
+
+Prevents an operation from being treated as a pageable operation by the SDK generators,
+even when the operation follows standard paging patterns (e.g., decorated with `@list`).
+
+When applied, the operation will be treated as a basic method:
+
+- The response will be the paged model itself (not the list of items)
+- The paged model will not be marked with paged result usage
+- No paging mechanisms (iterators/async iterators) will be generated
+
+This decorator is considered legacy functionality and should only be used when
+you need to override the default paging behavior for specific operations.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.disablePageable(scope?: valueof string)
+```
+
+##### Target
+
+The operation that should NOT be treated as a pageable operation
+`Operation`
+
+##### Parameters
+
+| Name  | Type             | Description                                                                                                                                                                                                                                                     |
+| ----- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+
+##### Examples
+
+###### Prevent a paging operation from being treated as pageable
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.disablePageable
+@list
+@route("/items")
+@get
+op listItems(): ItemListResult;
 ```
 
 #### `@flattenProperty`
