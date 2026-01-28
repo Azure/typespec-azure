@@ -258,7 +258,7 @@ The first step design focuses on automatically merging multiple services into on
 The key design principle is:
 
 - **If the client namespace is empty**: TCGC auto-merges all services' nested namespaces/interfaces into the current client as children (first step design behavior).
-- **If the client namespace has inner defined content** (nested `@client` decorators): TCGC uses the explicitly defined client hierarchy instead of auto-merging.
+- **If the client namespace contains nested `@client` decorators**: TCGC uses the explicitly defined client hierarchy instead of auto-merging.
 
 ### Scenario 1: Multiple Clients, Each Belonging to One Service
 
@@ -466,7 +466,7 @@ Compared to the first step design (empty namespace, auto-merge):
 client = CombineClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
 
 # ServiceA and ServiceB namespaces are auto-merged at root level
-client.operations.op_a()  # Note: This would conflict with opB in same-named interface
+client.operations.op_a()  # Both opA and opB are in same merged Operations group
 client.operations.op_b()
 client.sub_namespace.sub_op_a()
 client.sub_namespace.sub_op_b()
@@ -519,7 +519,7 @@ When explicit `@client` decorators are nested within the root client:
 1. TCGC uses the explicitly defined client hierarchy instead of auto-generating from service structure.
 2. Each nested `@client` becomes a child of the root client.
 3. Operations referenced via `is` keyword are mapped to their original service operations.
-4. Since the root client namespace has inner content, no auto-discovery from service namespaces occurs.
+4. Since the root client namespace contains nested `@client` decorators, no auto-discovery from service namespaces occurs.
 
 ```yaml
 clients:
@@ -531,7 +531,7 @@ clients:
       - kind: client
         name: SharedOperations
         parent: *root
-        apiVersions: [] # Mixed from multiple services
+        apiVersions: [] # Empty because operations come from different services with different versioning
         methods:
           - kind: basic
             name: opA
@@ -571,11 +571,11 @@ client.service_b_only.sub_op_b()
 
 ### Summary of Client Hierarchy Behavior
 
-| Scenario                   | Client Namespace Content | Result                                                                 |
-| -------------------------- | ------------------------ | ---------------------------------------------------------------------- |
-| First step design          | Empty                    | All services' nested items auto-merged as root client's children       |
-| Services as children       | Nested `@client` (empty) | Each nested client auto-merges its service's content                   |
-| Fully customized           | Nested `@client` with ops| Only explicitly defined clients and operations are used                |
+| Scenario                   | Client Namespace Content              | Result                                                                 |
+| -------------------------- | ------------------------------------- | ---------------------------------------------------------------------- |
+| First step design          | Empty                                 | All services' nested items auto-merged as root client's children       |
+| Services as children       | Nested `@client` (empty namespaces)   | Each nested client auto-merges its service's content                   |
+| Fully customized           | Nested `@client` with explicit ops    | Only explicitly defined clients and operations are used                |
 
 ### Interaction with Existing Decorators
 
