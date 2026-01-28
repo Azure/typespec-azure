@@ -354,4 +354,149 @@ describe("@clientOption with getClientOptions getter", () => {
     // scope should be undefined when not provided
     strictEqual(clientOptions[0].scope, undefined);
   });
+
+  it("should support array value type", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("arrayOption", #["item1", "item2", "item3"], "python")
+      @test
+      model Test {
+        id: string;
+      }
+
+      op getTest(): Test;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+
+    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
+    ok(sdkModel, "SDK model should exist");
+
+    const clientOptions = getClientOptions(sdkModel.decorators);
+    strictEqual(clientOptions.length, 1);
+    strictEqual(clientOptions[0].name, "arrayOption");
+    ok(Array.isArray(clientOptions[0].value), "value should be an array");
+    deepStrictEqual(clientOptions[0].value, ["item1", "item2", "item3"]);
+    strictEqual(clientOptions[0].scope, "python");
+  });
+
+  it("should support object/map value type", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("objectOption", #{key1: "value1", key2: "value2"}, "python")
+      @test
+      model Test {
+        id: string;
+      }
+
+      op getTest(): Test;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+
+    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
+    ok(sdkModel, "SDK model should exist");
+
+    const clientOptions = getClientOptions(sdkModel.decorators);
+    strictEqual(clientOptions.length, 1);
+    strictEqual(clientOptions[0].name, "objectOption");
+    ok(
+      typeof clientOptions[0].value === "object" && !Array.isArray(clientOptions[0].value),
+      "value should be an object",
+    );
+    deepStrictEqual(clientOptions[0].value, { key1: "value1", key2: "value2" });
+    strictEqual(clientOptions[0].scope, "python");
+  });
+
+  it("should support nested object and array values", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("nestedOption", #{
+        stringField: "hello",
+        numberField: 42,
+        arrayField: #[1, 2, 3],
+        nestedObject: #{inner: "value"}
+      }, "python")
+      @test
+      model Test {
+        id: string;
+      }
+
+      op getTest(): Test;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+
+    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
+    ok(sdkModel, "SDK model should exist");
+
+    const clientOptions = getClientOptions(sdkModel.decorators);
+    strictEqual(clientOptions.length, 1);
+    strictEqual(clientOptions[0].name, "nestedOption");
+
+    const value = clientOptions[0].value as unknown as Record<string, unknown>;
+    strictEqual(value.stringField, "hello");
+    strictEqual(value.numberField, 42);
+    deepStrictEqual(value.arrayField, [1, 2, 3]);
+    deepStrictEqual(value.nestedObject, { inner: "value" });
+    strictEqual(clientOptions[0].scope, "python");
+  });
+
+  it("should support array of numbers", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("numberArrayOption", #[1, 2, 3, 4, 5], "python")
+      @test
+      model Test {
+        id: string;
+      }
+
+      op getTest(): Test;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+
+    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
+    ok(sdkModel, "SDK model should exist");
+
+    const clientOptions = getClientOptions(sdkModel.decorators);
+    strictEqual(clientOptions.length, 1);
+    strictEqual(clientOptions[0].name, "numberArrayOption");
+    ok(Array.isArray(clientOptions[0].value), "value should be an array");
+    deepStrictEqual(clientOptions[0].value, [1, 2, 3, 4, 5]);
+  });
+
+  it("should support array of mixed types", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("mixedArrayOption", #["string", 42, true], "python")
+      @test
+      model Test {
+        id: string;
+      }
+
+      op getTest(): Test;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+
+    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
+    ok(sdkModel, "SDK model should exist");
+
+    const clientOptions = getClientOptions(sdkModel.decorators);
+    strictEqual(clientOptions.length, 1);
+    strictEqual(clientOptions[0].name, "mixedArrayOption");
+    ok(Array.isArray(clientOptions[0].value), "value should be an array");
+    deepStrictEqual(clientOptions[0].value, ["string", 42, true]);
+  });
 });
