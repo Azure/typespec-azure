@@ -1,5 +1,6 @@
 ---
 title: Converting Existing Specs with Multiple Previews
+llmstxt: true
 ---
 
 Converting a spec with multiple preview versions into a spec with a single, latest preview version is complex because the changes that occur in any
@@ -53,12 +54,24 @@ Normalizing version decoration consists of removing redundant decorators and fol
 - If there is one or more `@renamedFrom(T, u + 1, anotherName)` decorators, remove them.
 - Change `@renamedFrom(T, u, name)` to `@renamedFrom(T, u + 1, name)`
 
+  ```diff lang=tsp
+  - @renamedFrom(Versions.`2025-10-01-preview`, "oldName")
+  + @renamedFrom(Versions.`2025-11-01`, "oldName")
+    newName: string;
+  ```
+
 ## `@typeChangedFrom(T, u, type)` decorator
 
 - Based on the version referenced in the decorator, determine the immediate successor version `u + 1`
 - If version `u + 1` does not exist (the version argument is the last version) then this version will not be deleted
 - If there is one or more `@typeChangedFrom` decorators referencing the immediate successor version, remove them.
 - Change `@typeChangedFrom(T, u, type)` to `@typeChangedFrom(T, u + 1, type)`
+
+  ```diff lang=tsp
+  - @typeChangedFrom(Versions.`2025-10-01-preview`, int32)
+  + @typeChangedFrom(Versions.`2025-11-01`, int32)
+    newType: string;
+  ```
 
 ## `@returnTypeChangedFrom(T, u, returnType)` decorator
 
@@ -67,12 +80,24 @@ Normalizing version decoration consists of removing redundant decorators and fol
 - If there is one or more `@returnTypeChangedFrom` decorators referencing the immediate successor version, remove them.
 - Change `@returnTypeChangedFrom(T, u, returnType)` to `@returnTypeChangedFrom(T, u + 1, returnType)`
 
+  ```diff lang=tsp
+  - @returnTypeChangedFrom(Versions.`2025-10-01-preview`, void)
+  + @returnTypeChangedFrom(Versions.`2025-11-01`, void)
+    move is ArmResourceActionSync<Widget, MoveRequest, MoveResponse>;
+  ```
+
 ## `@madeOptional(T, u)` decorator
 
 - Based on the version referenced in the decorator, determine the immediate successor version `u + 1`
 - If version `u + 1` does not exist (the version argument is the last version) then this version will not be deleted
 - If there is one or more `@madeOptional` decorators referencing the immediate successor version, remove them.
 - Change `@madeOption(T, u)` to `@madeOptional(T, u + 1)`
+
+  ```diff lang=tsp
+  - @madeOptional(Versions.`2025-10-01-preview`)
+  + @madeOptional(Versions.`2025-11-01`)
+    nowOptional?: string;
+  ```
 
 ## `@added(T, u)` decorator
 
@@ -81,10 +106,40 @@ Normalizing version decoration consists of removing redundant decorators and fol
 - If there is one or more `@added(T, u + 1)` decorators referencing the immediate successor version
   - Remove them.
   - Change the version argument in the decorator to match the successor version [ `@added(T, u) -> @added(T, u + 1)`]
+
+    ```diff lang=tsp
+    - @added(Versions.`2025-10-01-preview`)
+    - @added(Versions.`2025-11-01`)
+      @added(Versions.`2025-11-01`)
+      newType: string;
+    ```
+
 - If there is an `@removed(T, u + 1)` decorator referencing the immediate successor version
   - If the type does not occur in any previous version `v < u`, delete the type altogether
+
+    ```diff lang=tsp
+    - @added(Versions.`2025-10-01-preview`)
+    - @removed(Versions.`2025-11-01`)
+    - goneType: string;
+    ```
+
   - If the type does occur in a previous version, remove the `@added(T, u)` decorator.
+
+    ```diff lang=tsp
+      @added(Versions.`2025-06-01`)
+    - @added(Versions.`2025-10-01-preview`)
+      @removed(Versions.`2025-11-01`)
+      remainType: string;
+    ```
+
 - If there are no `@added(T, u + 1)` or `@removed(T, u + 1)` decorators referencing the immediate successor version, change the version in the decorator to the immediate successor version: [`@added(T, u)` -> `@added(T, u + 1)`]
+
+  ```diff lang=tsp
+    - @added(Versions.`2025-10-01-preview`)
+    + @added(Versions.`2025-11-01`)
+      @removed(Versions.`2026-02-01`)
+      remainType: string;
+  ```
 
 ## `@removed(T, u)` decorator
 
@@ -93,9 +148,30 @@ Normalizing version decoration consists of removing redundant decorators and fol
 - If there is one or more `@removed(T, u + 1)` decorators referencing the immediate successor version
   - Remove them.
   - Change the version argument in the decorator to match the successor version [`@removed(T, u) -> @removed(T, u + 1)`]
+
+    ```diff lang=tsp
+    - @removed(Versions.`2025-10-01-preview`)
+    - @removed(Versions.`2025-11-01`)
+      @removed(Versions.`2025-11-01`)
+      remainType: string;
+    ```
+
 - if there is one or more `@added(T, u + 1)` decorators in the immediate successor version
   - Remove the `@removed(T, u)` decorator
+
+    ```diff lang=tsp
+    - @removed(Versions.`2025-10-01-preview`)
+      @added(Versions.`2025-11-01`)
+      remainType: string;
+    ```
+
 - If there are no `@removed(T, u + 1)` or `@removed(T, u + 1)` decorators referencing the immediate successor version, change the version in the decorator to the immediate successor version: [`@removed(T, u)` -> `@removed(T, u + 1)`]
+
+  ```diff lang=tsp
+    - @removed(Versions.`2025-10-01-preview`)
+    + @removed(Versions.`2025-11-01`)
+      remainType: string;
+  ```
 
 ## Removing the _First_ version in the Specification
 
