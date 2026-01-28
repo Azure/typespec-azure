@@ -32,14 +32,14 @@ When the latest api-version in your TypeSpec spec is a stable version, adding a 
 - Reinstall dependencies
 
   ```bash
-  C:\repos\azure-rest-api-specs > npm install
+  C:\repos\azure-rest-api-specs > npm ci
   ```
 
 - Compile your spec
 
   ```bash
-  C:\repos\azure-rest-api-specs > cd specification\myRpShortname\resource-manager\Microsoft.MyRP
-  C:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP > npx tsp compile .
+  C:\repos\azure-rest-api-specs > cd specification\myRpShortname\resource-manager\Microsoft.MyRP\MyService
+  C:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP\MyService > npx tsp compile .
   ```
 
   - Update README.md to include a new entry for the new stable version.
