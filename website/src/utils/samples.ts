@@ -39,11 +39,15 @@ export async function getSamples(): Promise<Sample[]> {
     if (!sampleConfig.description) {
       throw new Error(`Sample config at ${path} is missing description field.`);
     }
+    const mainTsp = sampleFiles[`${dir}/main.tsp`];
+    if (!mainTsp) {
+      throw new Error(`Sample at ${dir} is missing main.tsp file.`);
+    }
     return {
       id: dir,
       title: sampleConfig.title,
       description: sampleConfig.description,
-      files: { "main.tsp": sampleFiles[`${dir}/main.tsp`] },
+      files: { "main.tsp": mainTsp },
     };
   });
 }

@@ -172,8 +172,8 @@ function buildSamplesSidebar(samples: { id: string; title: string }[]): SidebarI
       if (isSampleLeaf(value)) {
         return {
           label: value.title,
-          slug: `/samples/${value.id}`,
-        };
+          link: `/docs/samples/${value.id}`,
+        } as any;
       } else {
         return {
           label: prettifyFolderName(key),
