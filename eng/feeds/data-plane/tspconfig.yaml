@@ -7,9 +7,8 @@ emit:
   - "@azure-tools/typespec-autorest"
 options:
   "@azure-tools/typespec-autorest":
-    azure-resource-provider-folder: "data-plane"
     emitter-output-dir: "{project-root}/.."
-    output-file: "{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json"
+    output-file: "data-plane/{service-name}/{version-status}/{version}/openapi.json"
   "@azure-tools/typespec-python":    
     emitter-output-dir: "{output-dir}/{service-dir}/{{#normalizePackageName}}{{parameters.ServiceNamespace}}{{/normalizePackageName}}"
     namespace: "{{#toLowerCase}}{{parameters.ServiceNamespace}}{{/toLowerCase}}"
