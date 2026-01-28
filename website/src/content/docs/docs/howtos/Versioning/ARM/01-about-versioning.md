@@ -1,5 +1,6 @@
 ---
-title: About Versioning in the azure-rest-api-specs Repository
+title: About Versioning ARM APIs in the azure-rest-api-specs Repository
+llmstxt: true
 ---
 
 TypeSpec uses a versioning library that models the changes in each new version of the API, rather than having a separate api description for each api-version.  

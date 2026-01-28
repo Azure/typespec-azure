@@ -1,5 +1,6 @@
 ---
 title: Adding a Preview Version when the Last Version was a Preview
+llmstxt: true
 ---
 
 When the last api-version in your TypeSpec spec is a preview, adding a new preview version is simply replacing the latest preview version with a new preview version.
@@ -16,12 +17,51 @@ This includes:
   v2026_01_01_preview: "2026-01-01-preview",
 
 - The new preview version should already be the _last version_ of the versions enum, also ensure it is decorated with `@previewVersion`
-- Update any version documentation to use the new version
+- Update any mention in documentation of the old api-version to use the new api-version
 - Change the name of the `examples` version folder for the latest preview to match the new preview version
+
+  ```bash
+  > mv examples/2025-12-01-preview examples/2026-01-01-preview
+  ```
+
 - Make changes to the API description based on how the API has changed
   - If any type that was introduced in the latest preview is _not_ in the new preview, simply delete the type
-  - If any other types are removed in this preview (unlikely) mark these with an `@removed` decorator referencing the new version
-  - If any types are added, renamed, or otherwise modified in the new version, mark them with the appropriate versioning decorator
+
+    ```diff lang=tsp
+    - @added(Versions.`2026-01-01-preview`)
+    - model Foo {}
+    ```
+
+  - If any type was removed in the latest preview but **appears** in the new preview, remove the decorator
+
+    ```diff lang=tsp
+    - @removed(Versions.`2026-01-01-preview`)
+      model Bar {}
+    ```
+
+  - Similarly, if there is any change from the latest preview that does not apply to the new preview version, reverse the decorator.
+
+    ```diff lang=tsp
+    - @renamedFrom(Versions.`2026-01-01-preview`, "oldProp")
+    - newProp: string;
+    + oldProp: string;
+    ```
+
+    ```diff lang=tsp
+    - @typeChangedFrom(Versions.`2026-01-01-preview`, string)
+    - changedProp: int32;
+    + changedProp: string;
+    ```
+
+  - If any other types are removed in the new preview (unlikely) mark these with an `@removed` decorator referencing the new version
+
+    ```diff lang=tsp
+    + @removed(Versions.`2026-01-01-preview`)
+      model Bar {}
+    ```
+
+  - If any types are added, renamed, or otherwise modified in the new version, mark them with the appropriate versioning decorator.
+
 - Add and modify examples to match the api changes
 
 ## Preparing a PR into the azure-rest-api-specs repo
@@ -50,7 +90,7 @@ This includes:
 
   ```bash
   C:\repos\azure-rest-api-specs > cd specification\myRpShortname\resource-manager\Microsoft.MyRP
-  C:\repos\azure-rest-api-specsC:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP > npx tsp compile .
+  C:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP > npx tsp compile .
   ```
 
 - If you _don't_ need the older preview version, remove the OpenAPI directory for that version and update the `README.md` file to use the new version instead.

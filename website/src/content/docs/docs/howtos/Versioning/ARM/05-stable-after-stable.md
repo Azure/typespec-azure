@@ -1,8 +1,9 @@
 ---
 title: Adding a Stable Version when the Last Version was a Stable Version
+llmstxt: true
 ---
 
-When the latest api-version in your TypeSpec spec is a stable version, adding a new stable version is simply adding any new types and operations in the new stable and marking them with the appropriate versioning decoration, as described in [TypeSpec Versioning for Azure ResourceManager APIs](../versioning.md).
+When the latest api-version in your TypeSpec spec is a stable version, adding a new stable version is simply adding any new types and operations in the new stable and marking them with the appropriate versioning decoration, as described in [TypeSpec Versioning for Azure ResourceManager APIs](../../ARM/versioning.md).
 
 ## Making Changes to your TypeSpec spec
 
