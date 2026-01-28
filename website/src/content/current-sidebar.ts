@@ -76,6 +76,10 @@ const sidebar: SidebarItem[] = [
     ],
   },
   {
+    label: " Samples",
+    items: buildSamplesSidebar(await getSamples()),
+  },
+  {
     label: "📚 Libraries",
     items: [
       createLibraryReferenceStructure("libraries/azure-core", "Azure.Core", true),
@@ -109,11 +113,6 @@ const sidebar: SidebarItem[] = [
       },
     ],
   },
-  {
-    label: " Samples",
-    items: buildSamplesSidebar(await getSamples()),
-  },
-
   {
     label: "🔎 Troubleshoot",
     autogenerate: {
