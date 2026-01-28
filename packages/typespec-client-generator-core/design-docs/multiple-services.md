@@ -87,7 +87,7 @@ namespace CombineClient;
 
 When TCGC detects multiple services in one client, it will:
 
-1. Create the root client for the combined client. If any service is versioned, the root client's initialization method will have an `apiVersion` parameter with no default value. The `apiVersions` property and the `apiVersion` parameter for the root client will be empty (since multiple services' API versions cannot be combined). The root client's endpoint and credential parameters will be created based on the first sub-service, which means all sub-services must share the same endpoint and credential.
+1. Create the root client for the combined client. If any service is versioned, the root client's initialization method will have an `apiVersion` parameter with no default value. The `apiVersions` property for the root client will be a 2-dimensional array to store all possible API versions for each service (e.g., `[[av1, av2], [bv1, bv2]]`). The root client's endpoint and credential parameters will be created based on the first sub-service, which means all sub-services must share the same endpoint and credential.
 2. Create sub-clients for each service's nested namespaces or interfaces. Each sub-client will have its own `apiVersion` property and initialization method if the service is versioned.
 3. If multiple services have nested namespaces or interfaces with the same name, TCGC will automatically merge them into a single operation group. The merged operation group will have empty `apiVersions` and a `string` type for the API version parameter, and will contain operations from all the services.
 4. Operations directly under each service's namespace are placed under the root client. Operations under nested namespaces or interfaces are placed under the corresponding sub-clients.
@@ -102,7 +102,7 @@ clients:
   - &a1
     kind: client
     name: CombineClient
-    apiVersions: []
+    apiVersions: [[av1, av2], [bv1, bv2]]  # 2-dimensional array for multiple services
     clientInitialization:
       kind: clientinitialization
       parameters:
@@ -112,7 +112,7 @@ clients:
           onClient: true
         - kind: method
           name: apiVersion
-          apiVersions: []
+          apiVersions: [[av1, av2], [bv1, bv2]]
           clientDefaultValue: undefined
           isGeneratedName: false
           onClient: true
@@ -391,6 +391,10 @@ client_b.sub_namespace.sub_op_b()
 
 In the first step design, when combining multiple services with an empty client namespace, all nested namespaces/interfaces from all services are auto-merged into the root client as children. Some users prefer to keep each service's namespace as a direct child of the root client without deep merging.
 
+#### Endpoint and Credential Limitations
+
+When combining multiple services into a single client, all services must share the same endpoint and credential configuration. The root client's endpoint and credential parameters are created based on the first service in the array. If services have different `@server` or `@useAuth` definitions, emitters should report a diagnostic error.
+
 #### Syntax Proposal
 
 Use nested `@client` decorators to explicitly define each service as a child client:
@@ -434,7 +438,7 @@ clients:
   - &root
     kind: client
     name: CombineClient
-    apiVersions: []
+    apiVersions: [[av1, av2], [bv1, bv2]]  # 2-dimensional array for multiple services
     clientInitialization:
       initializedBy: individually
     children:
@@ -506,6 +510,10 @@ client.disk.sub_namespace.sub_op_b()
 
 For maximum flexibility, users can fully customize how operations from different services are organized into client hierarchies. This uses nested `@client` decorators with explicit operation mapping.
 
+#### Endpoint and Credential Limitations
+
+Same as Scenario 2: when combining multiple services into a single client, all services must share the same endpoint and credential configuration. The root client's endpoint and credential parameters are created based on the first service in the array.
+
 #### Syntax Proposal
 
 Use nested `@client` decorators with explicit operation references to create a custom client hierarchy:
@@ -556,14 +564,14 @@ clients:
   - &root
     kind: client
     name: CustomClient
-    apiVersions: []
+    apiVersions: [[av1, av2], [bv1, bv2]]  # 2-dimensional array for multiple services
     clientInitialization:
       initializedBy: individually
     children:
       - kind: client
         name: SharedOperations
         parent: *root
-        apiVersions: [] # Empty because operations come from different services with different versioning
+        apiVersions: [[av1, av2], [bv1, bv2]]  # 2-dimensional because operations come from different services
         clientInitialization:
           initializedBy: parent
         methods:
