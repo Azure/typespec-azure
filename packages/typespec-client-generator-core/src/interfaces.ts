@@ -203,6 +203,25 @@ export interface DecoratorInfo {
 }
 
 /**
+ * Represents a client option set via the `@clientOption` decorator.
+ * This is a convenience type for accessing client options without parsing the decorators array directly.
+ */
+export interface SdkClientOption {
+  /**
+   * The name of the client option.
+   */
+  name: string;
+  /**
+   * The value of the client option.
+   */
+  value: string | boolean | number;
+  /**
+   * The language scope this option applies to, if specified.
+   */
+  scope?: string;
+}
+
+/**
  * Represents a client in the package.
  */
 export interface SdkClientType<
