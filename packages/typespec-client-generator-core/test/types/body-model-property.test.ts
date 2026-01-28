@@ -1,49 +1,37 @@
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { afterEach, beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { isReadOnly } from "../../src/types.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 import { getSdkModelPropertyTypeHelper } from "./utils.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-});
-
-afterEach(async () => {
-  for (const modelsOrEnums of [runner.context.sdkPackage.models, runner.context.sdkPackage.enums]) {
-    for (const item of modelsOrEnums) {
-      ok(item.name !== "");
-    }
-  }
-});
-
 it("required", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       name: string | int32;
     }
   `);
-  const prop = getSdkModelPropertyTypeHelper(runner);
+  const context = await createSdkContextForTester(program);
+  const prop = getSdkModelPropertyTypeHelper(context);
   strictEqual(prop.optional, false);
   strictEqual(isReadOnly(prop), false);
 });
 
 it("optional", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       name?: string;
     }
   `);
 
-  const prop = getSdkModelPropertyTypeHelper(runner);
+  const context = await createSdkContextForTester(program);
+  const prop = getSdkModelPropertyTypeHelper(context);
   strictEqual(prop.optional, true);
 });
 
 it("readonly", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       @visibility(Lifecycle.Read)
@@ -51,12 +39,13 @@ it("readonly", async function () {
     }
   `);
 
-  const prop = getSdkModelPropertyTypeHelper(runner);
+  const context = await createSdkContextForTester(program);
+  const prop = getSdkModelPropertyTypeHelper(context);
   strictEqual(isReadOnly(prop), true);
 });
 
 it("not readonly", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       @visibility(Lifecycle.Read, Lifecycle.Create, Lifecycle.Update)
@@ -64,19 +53,21 @@ it("not readonly", async function () {
     }
   `);
 
-  const prop = getSdkModelPropertyTypeHelper(runner);
+  const context = await createSdkContextForTester(program);
+  const prop = getSdkModelPropertyTypeHelper(context);
   strictEqual(isReadOnly(prop), false);
 });
 
 it("union type", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       name: string | int32;
     }
   `);
 
-  const prop = getSdkModelPropertyTypeHelper(runner);
+  const context = await createSdkContextForTester(program);
+  const prop = getSdkModelPropertyTypeHelper(context);
   strictEqual(prop.kind, "property");
   const sdkType = prop.type;
   strictEqual(sdkType.kind, "union");
@@ -87,12 +78,7 @@ it("union type", async function () {
 });
 
 it("versioning", async function () {
-  runner = await createSdkTestRunner({
-    "api-version": "all",
-    emitterName: "@azure-tools/typespec-python",
-  });
-
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @versioned(Versions)
     @service(#{title: "Widget Service"})
     namespace DemoService;
@@ -113,7 +99,10 @@ it("versioning", async function () {
       removedProp: string;
     }
   `);
-  const sdkModel = runner.context.sdkPackage.models.find((x) => x.kind === "model");
+  const context = await createSdkContextForTester(program, {
+    "api-version": "all",
+  });
+  const sdkModel = context.sdkPackage.models.find((x) => x.kind === "model");
   ok(sdkModel);
   strictEqual(sdkModel.kind, "model");
 
