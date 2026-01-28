@@ -14,7 +14,7 @@ For some Resource Providers, whenever a new stable version is released, a new pr
 ## Creating New Preview and Stable Versions
 
 - If the existing preview version is `A`, add the new stable version `A + 1` and the new preview version `A + 2` to the Versions enumeration, ensure that version `A + 2` is decorated with `@previewVersion` from the `Azure.Core` library (and remove that decoration from any other version).
-- For all changes from preview version `A` that are part of stable version `A + 1`
+- For all changes from preview version `A` that are part of stable version `A + 1`, do the following:
   - if a new type was added in `A` and is now stable (`@added(T, A)`), add the new decorator `@added(T, A + 1)`
 
     ```diff lang=tsp
@@ -86,13 +86,14 @@ For some Resource Providers, whenever a new stable version is released, a new pr
   ```
 
 - Create examples directories for the new stable version (A + 1) and populate them with appropriate examples
-- If version A _is not needed_ in the specs repo
+- If version A _is not needed_ in the specs repo (see [Should I delete an old preview](./01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api) if you are not sure)
   - Remove its example folder
 
     ```bash
     > rm -r examples/2025-10-01-preview
     ```
 
+  - Remove the OpenAPI spec for version A
   - Remove all references to version A in `README.md`
 
 ## Create A Copy of the Spec for the Stable Version only

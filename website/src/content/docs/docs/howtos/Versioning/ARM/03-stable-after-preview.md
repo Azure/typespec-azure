@@ -11,7 +11,6 @@ This includes the followign steps:
 
 - Add a new entry to the versions enum for the new stable version
 - Update any mention in documentation of the old api-version to use the new api-version
-- Change the name of the `examples` version folder for the latest preview to match the new stable version
 
   ```bash
   > mv examples/2025-10-01-preview examples/2026-01-01
@@ -85,6 +84,21 @@ This includes the followign steps:
 
   ```
 
+- Change the name of the `examples` version folder for the latest preview to match the new stable version
+
+- Ensure that examples use the correct api-version (search and replace the api-version for all examples in the folder)
+
+  ```diff lang=json
+  {
+    "title": "Create a Widget",
+    "operationId": "Widgets_Create",
+    "parameters": {
+  -   "api-version": "2025-12-01-preview",
+  +   "api-version": "2026-01-01",
+    }
+  }
+  ```
+
 - Add and modify examples to match the api changes in the new stable version
 
 ## Preparing a PR into the azure-rest-api-specs repo
@@ -116,7 +130,7 @@ This includes the followign steps:
   C:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP > npx tsp compile .
   ```
 
-- If you _don't_ need the older preview version, remove the OpenAPI directory for that version and update the `README.md` file to use the new version instead.
+- If you _don't_ need the older preview version (see [Should I delete an old preview](./01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api) if you are not sure), remove the OpenAPI directory for that version and update the `README.md` file to use the new version instead.
 
   ```bash
   C:\repos\azure-rest-api-specsC:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP > rm -r 2025-12-01-preview
