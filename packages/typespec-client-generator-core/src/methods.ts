@@ -19,14 +19,13 @@ import {
   Operation,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
-import { createSdkClientType } from "./clients.js";
 import {
   getAccess,
+  getDisablePageable,
   getMarkAsPageable,
   getNextLinkVerb,
   getOverriddenClientMethod,
   getResponseAsBool,
-  listOperationGroups,
   listOperationsInOperationGroup,
   shouldGenerateConvenient,
   shouldGenerateProtocol,
@@ -737,7 +736,11 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   client: SdkClientType<TServiceOperation>,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const lro = getTcgcLroMetadata(context, operation, client);
-  const paging = isList(context.program, operation) || getMarkAsPageable(context, operation);
+  // `@disablePageable` disables paging even for operations with @list
+  const pagingDisabled = getDisablePageable(context, operation);
+  const paging =
+    !pagingDisabled &&
+    (isList(context.program, operation) || getMarkAsPageable(context, operation));
   if (lro && paging) {
     return getSdkLroPagingServiceMethod<TServiceOperation>(context, operation, client);
   } else if (paging) {
@@ -785,16 +788,6 @@ export function createSdkMethods<TServiceOperation extends SdkServiceOperation>(
     retval.push(
       diagnostics.pipe(getSdkServiceMethod<TServiceOperation>(context, operation, sdkClientType)),
     );
-  }
-  for (const operationGroup of listOperationGroups(context, client)) {
-    const operationGroupClient = diagnostics.pipe(
-      createSdkClientType<TServiceOperation>(context, operationGroup, sdkClientType),
-    );
-    if (sdkClientType.children) {
-      sdkClientType.children.push(operationGroupClient);
-    } else {
-      sdkClientType.children = [operationGroupClient];
-    }
   }
   return diagnostics.wrap(retval);
 }

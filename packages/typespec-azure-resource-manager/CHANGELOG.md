@@ -1,5 +1,14 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.64.1
+
+### Bug Fixes
+
+- [#3830](https://github.com/Azure/typespec-azure/pull/3830) Fix #3829 Allow `@feature` to apply to Operations
+- [#3787](https://github.com/Azure/typespec-azure/pull/3787) Fix arm provider namespace custom name not respected in multi service scenario
+- [#3828](https://github.com/Azure/typespec-azure/pull/3828) Fix #3821 `@renamePathParameter` reorders parameters
+
+
 ## 0.64.0
 
 ### Features
