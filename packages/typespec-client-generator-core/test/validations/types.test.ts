@@ -502,12 +502,15 @@ describe("cross-namespace duplicate name validation", () => {
 
     // Should report a single diagnostic because user's @clientName("ExtensionResource")
     // conflicts with ARM's ExtensionResource type
-    expectDiagnostics([...diagnostics, ...context.diagnostics], [
-      {
-        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-        message: 'Client name: "ExtensionResource" is duplicated in language scope: "AllScopes"',
-      },
-    ]);
+    expectDiagnostics(
+      [...diagnostics, ...context.diagnostics],
+      [
+        {
+          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+          message: 'Client name: "ExtensionResource" is duplicated in language scope: "AllScopes"',
+        },
+      ],
+    );
   });
 });
 

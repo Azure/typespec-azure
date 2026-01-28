@@ -413,7 +413,10 @@ function validateAzureLibraryTypeConflicts(
  * Validate client names across all user-defined namespaces when the --namespace flag is set.
  * When namespaces are flattened, types from different namespaces may collide.
  */
-function validateClientNamesAcrossAllNamespaces(sdkContext: SdkContext, scope: string | typeof AllScopes) {
+function validateClientNamesAcrossAllNamespaces(
+  sdkContext: SdkContext,
+  scope: string | typeof AllScopes,
+) {
   // Collect all types from all user-defined namespaces
   // Note: listAllUserDefinedNamespaces already includes nested namespaces,
   // so we collect types directly from each namespace without recursion
