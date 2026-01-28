@@ -1283,7 +1283,8 @@ function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Names
       // and joinedSegments already starts with the flag (meaning override already applied it)
       if (
         context.namespaceFlag.startsWith(userDefinedNamespace.name) &&
-        (joinedSegments.startsWith(context.namespaceFlag + ".") || joinedSegments === context.namespaceFlag)
+        (joinedSegments.startsWith(context.namespaceFlag + ".") ||
+          joinedSegments === context.namespaceFlag)
       ) {
         return joinedSegments;
       }
