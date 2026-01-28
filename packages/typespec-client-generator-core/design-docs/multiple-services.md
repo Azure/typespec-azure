@@ -321,36 +321,70 @@ namespace ServiceBClient;
 
 This creates two independent root clients, each with their own service hierarchy:
 
+According to [client.md](./client.md), the default value of `initializedBy` for a root client is `InitializedBy.individually`, while for a sub client it is `InitializedBy.parent`.
+
 ```yaml
 clients:
-  - kind: client
+  - &a1
+    kind: client
     name: ServiceAClient
     apiVersions: [av1, av2]
+    clientInitialization:
+      initializedBy: individually
     children:
       - kind: client
         name: Operations
+        parent: *a1
+        clientInitialization:
+          initializedBy: parent
         methods:
           - kind: basic
             name: opA
       - kind: client
         name: SubNamespace
+        parent: *a1
+        clientInitialization:
+          initializedBy: parent
         methods:
           - kind: basic
             name: subOpA
-  - kind: client
+  - &a2
+    kind: client
     name: ServiceBClient
     apiVersions: [bv1, bv2]
+    clientInitialization:
+      initializedBy: individually
     children:
       - kind: client
         name: Operations
+        parent: *a2
+        clientInitialization:
+          initializedBy: parent
         methods:
           - kind: basic
             name: opB
       - kind: client
         name: SubNamespace
+        parent: *a2
+        clientInitialization:
+          initializedBy: parent
         methods:
           - kind: basic
             name: subOpB
+```
+
+#### Python SDK Example
+
+```python
+# ServiceA client
+client_a = ServiceAClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
+client_a.operations.op_a()
+client_a.sub_namespace.sub_op_a()
+
+# ServiceB client
+client_b = ServiceBClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
+client_b.operations.op_b()
+client_b.sub_namespace.sub_op_b()
 ```
 
 ### Scenario 2: Services as Direct Children (No Deep Auto-Merge)
@@ -415,12 +449,16 @@ clients:
           - kind: client
             name: Operations
             parent: *compute
+            clientInitialization:
+              initializedBy: parent
             methods:
               - kind: basic
                 name: opA
           - kind: client
             name: SubNamespace
             parent: *compute
+            clientInitialization:
+              initializedBy: parent
             methods:
               - kind: basic
                 name: subOpA
@@ -435,12 +473,16 @@ clients:
           - kind: client
             name: Operations
             parent: *disk
+            clientInitialization:
+              initializedBy: parent
             methods:
               - kind: basic
                 name: opB
           - kind: client
             name: SubNamespace
             parent: *disk
+            clientInitialization:
+              initializedBy: parent
             methods:
               - kind: basic
                 name: subOpB
@@ -458,18 +500,6 @@ client.compute.sub_namespace.sub_op_a()
 # Access ServiceB operations via DiskClient
 client.disk.operations.op_b()
 client.disk.sub_namespace.sub_op_b()
-```
-
-Compared to the first step design (empty namespace, auto-merge):
-
-```python
-client = CombineClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
-
-# ServiceA and ServiceB namespaces are auto-merged at root level
-client.operations.op_a()  # Both opA and opB are in same merged Operations group
-client.operations.op_b()
-client.sub_namespace.sub_op_a()
-client.sub_namespace.sub_op_b()
 ```
 
 ### Scenario 3: Fully Customized Client Hierarchy
@@ -527,11 +557,15 @@ clients:
     kind: client
     name: CustomClient
     apiVersions: []
+    clientInitialization:
+      initializedBy: individually
     children:
       - kind: client
         name: SharedOperations
         parent: *root
         apiVersions: [] # Empty because operations come from different services with different versioning
+        clientInitialization:
+          initializedBy: parent
         methods:
           - kind: basic
             name: opA
@@ -541,6 +575,8 @@ clients:
         name: ServiceAOnly
         parent: *root
         apiVersions: [av1, av2]
+        clientInitialization:
+          initializedBy: parent
         methods:
           - kind: basic
             name: subOpA
@@ -548,6 +584,8 @@ clients:
         name: ServiceBOnly
         parent: *root
         apiVersions: [bv1, bv2]
+        clientInitialization:
+          initializedBy: parent
         methods:
           - kind: basic
             name: subOpB
@@ -596,7 +634,6 @@ The nested `@client` approach works alongside existing customization decorators:
    - Each nested `@client` with an empty namespace auto-merges its service's content
    - Each nested `@client` with explicit operations uses only those operations
    - Operations not referenced by any explicit client are omitted from the SDK
-   - A diagnostic warning is issued for unreferenced operations
 
 ### Changes Needed
 
@@ -604,6 +641,3 @@ The nested `@client` approach works alongside existing customization decorators:
    - Check if the client namespace has nested `@client` decorators
    - When nested `@client` decorators exist, use the explicitly defined hierarchy
    - When the namespace is empty, auto-merge services' content (existing behavior)
-
-2. **Add validation**:
-   - Emit diagnostic if explicit clients have unreferenced operations from the services
