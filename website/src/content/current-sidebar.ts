@@ -1,4 +1,5 @@
 import type { SidebarItem } from "@typespec/astro-utils/sidebar";
+import { getSamples } from "../utils/samples";
 
 function createLibraryReferenceStructure(
   libDir: string,
@@ -109,6 +110,11 @@ const sidebar: SidebarItem[] = [
     ],
   },
   {
+    label: " Samples",
+    items: buildSamplesSidebar(await getSamples()),
+  },
+
+  {
     label: "🔎 Troubleshoot",
     autogenerate: {
       directory: "troubleshoot",
@@ -124,3 +130,58 @@ const sidebar: SidebarItem[] = [
 ];
 
 export default sidebar;
+
+// Helper to build nested sidebar structure for samples
+type SampleSidebarTree = {
+  [segment: string]: SampleSidebarTree | { id: string; title: string };
+};
+
+function buildSamplesSidebar(samples: { id: string; title: string }[]): SidebarItem[] {
+  // Build a tree from sample ids
+  const root: SampleSidebarTree = {};
+  for (const sample of samples) {
+    const parts = sample.id.split("/");
+    let node: SampleSidebarTree = root;
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      if (i === parts.length - 1) {
+        node[part] = { id: sample.id, title: sample.title };
+      } else {
+        if (!node[part] || isSampleLeaf(node[part])) {
+          node[part] = {};
+        }
+        node = node[part] as SampleSidebarTree;
+      }
+    }
+  }
+
+  function isSampleLeaf(
+    node: SampleSidebarTree | { id: string; title: string },
+  ): node is { id: string; title: string } {
+    return (node as any).id !== undefined && (node as any).title !== undefined;
+  }
+
+  function prettifyFolderName(name: string): string {
+    return name
+      .split("-")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+  }
+
+  function buildItems(node: SampleSidebarTree, path: string[] = []): SidebarItem[] {
+    return Object.entries(node).map(([key, value]) => {
+      if (isSampleLeaf(value)) {
+        return {
+          label: value.title,
+          slug: `/samples/${value.id}`,
+        };
+      } else {
+        return {
+          label: prettifyFolderName(key),
+          items: buildItems(value, [...path, key]),
+        };
+      }
+    });
+  }
+  return buildItems(root);
+}
