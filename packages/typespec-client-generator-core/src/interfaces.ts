@@ -14,6 +14,7 @@ import {
   PagingOperation,
   Program,
   Type,
+  Value,
 } from "@typespec/compiler";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import {
@@ -214,7 +215,7 @@ export interface SdkClientOption {
   /**
    * The value of the client option.
    */
-  value: string | boolean | number;
+  value: Value;
   /**
    * The language scope this option applies to, if specified.
    */

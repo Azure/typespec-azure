@@ -10,6 +10,7 @@ import {
   Scalar,
   Type,
   Union,
+  Value,
   createDiagnosticCollector,
   getEffectiveModelType,
   getFriendlyName,
@@ -924,7 +925,7 @@ export function getClientOptions(decorators: DecoratorInfo[]): SdkClientOption[]
     .filter((d) => d.name === CLIENT_OPTION_DECORATOR_NAME)
     .map((d) => ({
       name: d.arguments.name as string,
-      value: d.arguments.value as string | boolean | number,
+      value: d.arguments.value as Value,
       scope: d.arguments.scope as string | undefined,
     }));
 }
