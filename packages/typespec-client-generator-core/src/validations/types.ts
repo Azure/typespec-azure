@@ -16,10 +16,9 @@ import { AugmentDecoratorStatementNode, DecoratorExpressionNode } from "@typespe
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import { DuplicateTracker } from "@typespec/compiler/utils";
 import { getClientNameOverride } from "../decorators.js";
-import { SdkClient, SdkContext, TCGCContext, UsageFlags } from "../interfaces.js";
+import { SdkContext, TCGCContext, UsageFlags } from "../interfaces.js";
 import {
   AllScopes,
-  clientKey,
   clientLocationKey,
   clientNameKey,
   hasExplicitClientOrOperationGroup,
@@ -33,34 +32,11 @@ export function validateTypes(context: TCGCContext) {
 }
 
 /**
- * Validate cross-namespace collisions for multi-service and Azure library conflicts.
+ * Validate cross-namespace collisions when the --namespace flag is set.
  * This runs in createSdkContext where we have access to sdkPackage and emitter options.
  */
 export function validateNamespaceCollisions(context: SdkContext) {
   validateCrossNamespaceClientNames(context);
-}
-
-/**
- * Get all service namespaces from multi-service clients.
- * Uses listScopedDecoratorData directly instead of listClients to avoid
- * the cache cleanup that removes empty multi-service clients.
- * Returns empty array if no multi-service clients exist.
- */
-function getMultiServiceNamespaces(context: TCGCContext): Namespace[] {
-  // Use a map keyed by namespace name to deduplicate, as versioning can create
-  // different namespace instances with the same name
-  const namespaceMap = new Map<string, Namespace>();
-  // Directly query @client decorator data to find multi-service clients
-  listScopedDecoratorData(context, clientKey).forEach((clientData: SdkClient) => {
-    if (clientData.services && clientData.services.length > 1) {
-      for (const ns of clientData.services) {
-        if (ns.name && !namespaceMap.has(ns.name)) {
-          namespaceMap.set(ns.name, ns);
-        }
-      }
-    }
-  });
-  return [...namespaceMap.values()];
 }
 
 /**
@@ -156,33 +132,29 @@ function validateClientNamesWithinNamespaces(tcgcContext: TCGCContext) {
 }
 
 /**
- * Validate cross-namespace collisions for multi-service clients and Azure library type conflicts.
+ * Validate cross-namespace collisions when the --namespace flag is set.
+ * When namespaces are flattened, types from different namespaces may collide.
+ * Also checks for Azure library type conflicts.
+ *
  * This requires SdkContext because:
- * 1. Multi-service validation needs to check types across namespaces
+ * 1. Needs access to namespaceFlag emitter option
  * 2. Azure library conflict detection needs sdkPackage to check only used types
- * 3. API version enum exclusion needs UsageFlags from sdkPackage
  *
  * @param sdkContext The SDK context (includes sdkPackage and emitter options).
  */
 function validateCrossNamespaceClientNames(sdkContext: SdkContext) {
-  const languageScopes = getDefinedLanguageScopes(sdkContext.program);
-  // If no `@client` or `@operationGroup` decorators are defined, we consider `@clientLocation`
-  const needToConsiderClientLocation = !hasExplicitClientOrOperationGroup(sdkContext);
-
-  // Detect multi-service scenario.
-  // Multi-service (@client with multiple services) inherently combines types from all services
-  // into a single client, so cross-namespace validation is needed.
-  const multiServiceNamespaces = getMultiServiceNamespaces(sdkContext);
-  const isMultiService = multiServiceNamespaces.length > 0;
-
   // Check if any Azure library namespace exists (Azure.Core or Azure.ResourceManager)
   const azureLibraryNamespaces = getAzureLibraryNamespaces(sdkContext.program);
   const hasAzureLibrary = azureLibraryNamespaces.length > 0;
 
-  // Only run if there's cross-namespace validation to do
-  if (!isMultiService && !hasAzureLibrary) {
+  // Only run if there's cross-namespace validation to do:
+  // - namespaceFlag is set (types will be flattened)
+  // - or Azure library is present (need to check for conflicts)
+  if (!sdkContext.namespaceFlag && !hasAzureLibrary) {
     return;
   }
+
+  const languageScopes = getDefinedLanguageScopes(sdkContext.program);
 
   // Ensure we always run validation at least once (with AllScopes)
   if (languageScopes.size === 0) {
@@ -224,77 +196,12 @@ function validateCrossNamespaceClientNames(sdkContext: SdkContext) {
     }
   }
 
-  // Pre-compute API version enum names to exclude from duplicate name validation
-  // API version enums (e.g., "Versions") commonly have the same name across services and that's OK
-  // We store names instead of Type references because versioning can create different type instances
-  const apiVersionEnumNames = new Set<string>();
-  for (const enumType of sdkContext.sdkPackage.enums) {
-    if ((enumType.usage & UsageFlags.ApiVersionEnum) !== 0) {
-      apiVersionEnumNames.add(enumType.name);
-    }
-  }
-
-  // Build a map of namespace names to their types for resolving string targets
-  const namedNamespaces = new Map<string, Namespace>();
-  for (const ns of listAllUserDefinedNamespaces(sdkContext)) {
-    if (ns.name) {
-      namedNamespaces.set(ns.name, ns);
-    }
-  }
-
   // Check all possible language scopes
   for (const scope of languageScopes) {
-    // Gather all moved operations and their targets (needed for multi-service validation)
-    const moved = new Set<Operation>();
-    const movedTo = new Map<Namespace | Interface, Operation[]>();
-    if (needToConsiderClientLocation) {
-      // Cache all `@clientName` overrides for the current scope
-      for (const [type, target] of listScopedDecoratorData(
-        sdkContext,
-        clientLocationKey,
-        scope,
-      ).entries()) {
-        if (unsafe_Realm.realmForType.has(type)) {
-          // Skip `@clientName` on versioning types
-          continue;
-        }
-        if (type.kind === "Operation") {
-          moved.add(type);
-          if (typeof target === "string") {
-            // Check if the string target matches an existing namespace
-            const existingNamespace = namedNamespaces.get(target);
-            if (existingNamespace) {
-              // Move to existing namespace referenced by name
-              if (!movedTo.has(existingNamespace)) {
-                movedTo.set(existingNamespace, [type]);
-              } else {
-                movedTo.get(existingNamespace)!.push(type);
-              }
-            }
-          } else {
-            // Move to existing clients (target is already a Namespace or Interface)
-            if (!movedTo.has(target)) {
-              movedTo.set(target, [type]);
-            } else {
-              movedTo.get(target)!.push(type);
-            }
-          }
-        }
-      }
-    }
-
-    if (isMultiService) {
-      // For multi-service: validate types across ALL service namespaces together
-      // because they will be in the same client.
-      // Same-named types across different services will collide.
-      validateClientNamesAcrossNamespaces(
-        sdkContext,
-        scope,
-        moved,
-        movedTo,
-        multiServiceNamespaces,
-        apiVersionEnumNames,
-      );
+    // When namespaceFlag is set, validate types across ALL namespaces together
+    // because they will be flattened into a single namespace
+    if (sdkContext.namespaceFlag) {
+      validateClientNamesAcrossAllNamespaces(sdkContext, scope);
     }
 
     // Check for Azure library type conflicts (only for types actually used by the client)
@@ -403,30 +310,6 @@ function validateClientNamesPerNamespace(
 }
 
 /**
- * Collect all types from a namespace and its nested namespaces recursively.
- *
- * TODO: This currently collects ALL types in the namespace, including types that may not
- * be used by the client. Ideally we should only validate types that are actually referenced
- * by the client's operations. This would require running after SDK type resolution or
- * implementing usage tracking at the TypeSpec level.
- */
-function collectTypesFromNamespace(
-  namespace: Namespace,
-  models: Model[],
-  enums: Enum[],
-  unions: Union[],
-) {
-  models.push(...namespace.models.values());
-  enums.push(...namespace.enums.values());
-  unions.push(...namespace.unions.values());
-
-  // Recursively collect from nested namespaces
-  for (const nestedNs of namespace.namespaces.values()) {
-    collectTypesFromNamespace(nestedNs, models, enums, unions);
-  }
-}
-
-/**
  * Get Azure library namespaces (Azure.Core and Azure.ResourceManager) if they exist.
  * These are used to detect naming conflicts between user-defined types
  * and built-in Azure library types.
@@ -527,93 +410,40 @@ function validateAzureLibraryTypeConflicts(
 }
 
 /**
- * Validate client names across multiple service namespaces for multi-service clients.
- * Types with the same name across different services will collide when generated
- * into the same namespace.
+ * Validate client names across all user-defined namespaces when the --namespace flag is set.
+ * When namespaces are flattened, types from different namespaces may collide.
  */
-function validateClientNamesAcrossNamespaces(
-  tcgcContext: TCGCContext,
-  scope: string | typeof AllScopes,
-  moved: Set<Operation>,
-  movedTo: Map<Namespace | Interface, Operation[]>,
-  serviceNamespaces: Namespace[],
-  apiVersionEnumNames: Set<string>,
-) {
-  // Collect all types from all service namespaces
+function validateClientNamesAcrossAllNamespaces(sdkContext: SdkContext, scope: string | typeof AllScopes) {
+  // Collect all types from all user-defined namespaces
+  // Note: listAllUserDefinedNamespaces already includes nested namespaces,
+  // so we collect types directly from each namespace without recursion
   const allModels: Model[] = [];
   const allEnums: Enum[] = [];
   const allUnions: Union[] = [];
 
-  for (const serviceNs of serviceNamespaces) {
-    collectTypesFromNamespace(serviceNs, allModels, allEnums, allUnions);
+  for (const ns of listAllUserDefinedNamespaces(sdkContext)) {
+    // Collect types directly from this namespace (not recursively)
+    allModels.push(...ns.models.values());
+    allEnums.push(...ns.enums.values());
+    allUnions.push(...ns.unions.values());
+  }
+
+  // Pre-compute API version enum names to exclude from duplicate name validation
+  // API version enums (e.g., "Versions") commonly have the same name across services and that's OK
+  // We store names instead of Type references because versioning can create different type instances
+  const apiVersionEnumNames = new Set<string>();
+  for (const enumType of sdkContext.sdkPackage.enums) {
+    if ((enumType.usage & UsageFlags.ApiVersionEnum) !== 0) {
+      apiVersionEnumNames.add(enumType.name);
+    }
   }
 
   // Filter out API version enums - they commonly have the same name (e.g., "Versions")
   // across services and that's expected/allowed
   const filteredEnums = allEnums.filter((e) => !e.name || !apiVersionEnumNames.has(e.name));
 
-  // Validate models, enums, and unions together across all services
-  validateClientNamesCore(tcgcContext, scope, [...allModels, ...filteredEnums, ...allUnions]);
-
-  // Also validate within each service namespace for operations, interfaces, properties, etc.
-  // These are scoped to their containers and don't need cross-service validation
-  for (const serviceNs of serviceNamespaces) {
-    validateClientNamesPerNamespaceOperationsOnly(tcgcContext, scope, moved, movedTo, serviceNs);
-  }
-}
-
-/**
- * Validate only operations and their containers within a namespace.
- * Used for multi-service validation where types are validated separately across all services.
- */
-function validateClientNamesPerNamespaceOperationsOnly(
-  tcgcContext: TCGCContext,
-  scope: string | typeof AllScopes,
-  moved: Set<Operation>,
-  movedTo: Map<Namespace | Interface, Operation[]>,
-  namespace: Namespace,
-) {
-  // Check for duplicate client names for operations
-  validateClientNamesCore(
-    tcgcContext,
-    scope,
-    adjustOperations(namespace.operations.values(), moved, movedTo, namespace),
-  );
-
-  // Check for duplicate client names for operations in interfaces
-  for (const item of namespace.interfaces.values()) {
-    validateClientNamesCore(
-      tcgcContext,
-      scope,
-      adjustOperations(item.operations.values(), moved, movedTo, item),
-    );
-  }
-
-  // Check for duplicate client names for interfaces
-  validateClientNamesCore(tcgcContext, scope, namespace.interfaces.values());
-
-  // Check for duplicate client names for namespaces
-  validateClientNamesCore(tcgcContext, scope, namespace.namespaces.values());
-
-  // Check for duplicate client names for model properties (within each model)
-  for (const model of namespace.models.values()) {
-    validateClientNamesCore(tcgcContext, scope, model.properties.values());
-  }
-
-  // Check for duplicate client names for enum members (within each enum)
-  for (const item of namespace.enums.values()) {
-    validateClientNamesCore(tcgcContext, scope, item.members.values());
-  }
-
-  // Check for duplicate client names for union variants (within each union)
-  for (const item of namespace.unions.values()) {
-    validateClientNamesCore(tcgcContext, scope, item.variants.values());
-  }
-
-  // Recurse into nested namespaces
-  for (const item of namespace.namespaces.values()) {
-    validateClientNamesPerNamespaceOperationsOnly(tcgcContext, scope, moved, movedTo, item);
-  }
+  // Validate models, enums, and unions together across all namespaces
+  validateClientNamesCore(sdkContext, scope, [...allModels, ...filteredEnums, ...allUnions]);
 }
 
 function validateClientNamesCore(
