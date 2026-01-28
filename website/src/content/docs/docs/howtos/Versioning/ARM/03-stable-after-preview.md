@@ -120,14 +120,14 @@ This includes the followign steps:
 - Reinstall dependencies
 
   ```bash
-  C:\repos\azure-rest-api-specs > npm install
+  C:\repos\azure-rest-api-specs > npm ci
   ```
 
 - Compile your spec
 
   ```bash
-  C:\repos\azure-rest-api-specs > cd specification\myRpShortname\resource-manager\Microsoft.MyRP
-  C:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP > npx tsp compile .
+  C:\repos\azure-rest-api-specs > cd specification\myRpShortname\resource-manager\Microsoft.MyRP\MyService
+  C:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP\MyService > npx tsp compile .
   ```
 
 - If you _don't_ need the older preview version (see [Should I delete an old preview](./01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api) if you are not sure), remove the OpenAPI directory for that version and update the `README.md` file to use the new version instead.
