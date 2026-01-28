@@ -89,13 +89,6 @@ function getEndpointTypeFromSingleServer<
       }
       const apiVersionInfo = updateWithApiVersionInformation(context, param, client.__raw);
       sdkParam.isApiVersionParam = apiVersionInfo.isApiVersionParam;
-      if (sdkParam.isApiVersionParam) {
-        if (apiVersionInfo.clientDefaultValue) {
-          sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
-          // API version parameters are optional when they have a client default value
-          sdkParam.optional = true;
-        }
-      }
       sdkParam.apiVersions = client.apiVersions;
       sdkParam.crossLanguageDefinitionId = `${client.crossLanguageDefinitionId}.${param.name}`;
     } else {
