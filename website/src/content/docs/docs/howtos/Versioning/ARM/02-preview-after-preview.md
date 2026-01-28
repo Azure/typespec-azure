@@ -24,7 +24,7 @@ This includes:
   > mv examples/2025-12-01-preview examples/2026-01-01-preview
   ```
 
-- Make changes to the API description based on how the API has changed
+- Make changes to the API description based on how the API has changed between the preview versions (if it has)
   - If any type that was introduced in the latest preview is _not_ in the new preview, simply delete the type
 
     ```diff lang=tsp
@@ -39,7 +39,7 @@ This includes:
       model Bar {}
     ```
 
-  - Similarly, if there is any change from the latest preview that does not apply to the new preview version, reverse the decorator.
+  - Similarly, if there is any change from the latest preview that does not apply to the new preview version, reverse the decorator (unlikely).
 
     ```diff lang=tsp
     - @renamedFrom(Versions.`2026-01-01-preview`, "oldProp")
