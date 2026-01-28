@@ -499,4 +499,66 @@ describe("@clientOption with getClientOptions getter", () => {
     ok(Array.isArray(clientOptions[0].value), "value should be an array");
     deepStrictEqual(clientOptions[0].value, ["string", 42, true]);
   });
+
+  it("should return client options for namespace", async () => {
+    const { program } = await SimpleTester.compile(`
+      @server("http://localhost:3000", "endpoint")
+      @service
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("namespaceFlag", "nsValue", "python")
+      namespace MyService {
+        model TestModel {
+          id: string;
+        }
+        op getTest(): TestModel;
+      }
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+
+    // The service namespace should have the decorator
+    const sdkNamespace = context.sdkPackage.namespaces.find((ns) => ns.name === "MyService");
+    ok(sdkNamespace, "SDK namespace should exist");
+
+    const clientOptions = getClientOptions(sdkNamespace.decorators);
+    strictEqual(clientOptions.length, 1);
+    deepStrictEqual(clientOptions[0], {
+      name: "namespaceFlag",
+      value: "nsValue",
+      scope: "python",
+    });
+  });
+
+  it("should return client options for interface (operation group)", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("interfaceFlag", true, "python")
+      @test
+      interface MyOperations {
+        op doSomething(): string;
+      }
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+
+    // Interfaces become sub-clients (children of the main client)
+    const client = context.sdkPackage.clients[0];
+    ok(client, "Client should exist");
+
+    // Find the sub-client for the interface
+    const subClient = client.children?.find((c) => c.name === "MyOperations");
+    ok(subClient, "Sub-client for interface should exist");
+
+    const clientOptions = getClientOptions(subClient.decorators);
+    strictEqual(clientOptions.length, 1);
+    deepStrictEqual(clientOptions[0], {
+      name: "interfaceFlag",
+      value: true,
+      scope: "python",
+    });
+  });
 });
