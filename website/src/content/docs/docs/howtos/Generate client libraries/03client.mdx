@@ -1528,7 +1528,7 @@ foodClient.Feed();
 ```
 
 ```typescript
-// Modular api layer
+// JS CodeGen api layer
 export async function feed(
   context: Client,
   options: FeedOptionalParams = { requestOptions: {} },
@@ -1539,7 +1539,7 @@ export async function pet(
   options: PetOptionalParams = { requestOptions: {} },
 ): Promise<void>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class PetActionClient {
   pet(options: PetOptionalParams = { requestOptions: {} }): Promise<void>;
 }
