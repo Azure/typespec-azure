@@ -334,9 +334,9 @@ describe("Operation", () => {
     strictEqual(a2Method.parameters.length, 0);
     strictEqual(a2Method.operation.parameters.length, 1);
     strictEqual(a2Method.operation.parameters[0].name, "apiVersion");
-    strictEqual(a2Method.operation.parameters[0].correspondingMethodParams.length, 1);
+    strictEqual(a2Method.operation.parameters[0].methodParameterSegments.length, 1);
     strictEqual(
-      a2Method.operation.parameters[0].correspondingMethodParams[0],
+      a2Method.operation.parameters[0].methodParameterSegments[0][0],
       bClientApiVersionParam,
     );
   });
@@ -382,9 +382,9 @@ describe("Operation", () => {
     strictEqual(a2Method.parameters.length, 0);
     strictEqual(a2Method.operation.parameters.length, 1);
     strictEqual(a2Method.operation.parameters[0].name, "apiVersion");
-    strictEqual(a2Method.operation.parameters[0].correspondingMethodParams.length, 1);
+    strictEqual(a2Method.operation.parameters[0].methodParameterSegments.length, 1);
     strictEqual(
-      a2Method.operation.parameters[0].correspondingMethodParams[0],
+      a2Method.operation.parameters[0].methodParameterSegments[0][0],
       bClientApiVersionParam,
     );
   });
@@ -428,9 +428,9 @@ describe("Operation", () => {
     strictEqual(a2Method.parameters.length, 0);
     strictEqual(a2Method.operation.parameters.length, 1);
     strictEqual(a2Method.operation.parameters[0].name, "apiVersion");
-    strictEqual(a2Method.operation.parameters[0].correspondingMethodParams.length, 1);
+    strictEqual(a2Method.operation.parameters[0].methodParameterSegments.length, 1);
     strictEqual(
-      a2Method.operation.parameters[0].correspondingMethodParams[0],
+      a2Method.operation.parameters[0].methodParameterSegments[0][0],
       rootClientApiVersionParam,
     );
   });
@@ -524,8 +524,8 @@ describe("Parameter", () => {
     // But the HTTP operation should still reference the client parameter
     const httpApiKeyParam = aMethod.operation.parameters.find((p) => p.name === "apiKey");
     ok(httpApiKeyParam);
-    strictEqual(httpApiKeyParam.correspondingMethodParams.length, 1);
-    strictEqual(httpApiKeyParam.correspondingMethodParams[0], clientApiKeyParam);
+    strictEqual(httpApiKeyParam.methodParameterSegments.length, 1);
+    strictEqual(httpApiKeyParam.methodParameterSegments[0][0], clientApiKeyParam);
   });
 
   it("detect parameter name conflict when moving to client", async () => {
@@ -628,8 +628,8 @@ describe("Parameter", () => {
     strictEqual(testOperation.parameters.length, 3);
     const subIdOperationParam = testOperation.parameters.find((p) => p.name === "subscriptionId");
     ok(subIdOperationParam);
-    strictEqual(subIdOperationParam.correspondingMethodParams.length, 1);
-    strictEqual(subIdOperationParam.correspondingMethodParams[0], subIdMethodParam);
+    strictEqual(subIdOperationParam.methodParameterSegments.length, 1);
+    strictEqual(subIdOperationParam.methodParameterSegments[0][0], subIdMethodParam);
     ok(testOperation.parameters.some((p) => p.name === "contentType"));
     ok(testOperation.parameters.some((p) => p.name === "apiVersion"));
   });
@@ -696,8 +696,8 @@ describe("Parameter", () => {
     strictEqual(getOperation.parameters.length, 4);
     const subIdOperationParam = getOperation.parameters.find((p) => p.name === "subscriptionId");
     ok(subIdOperationParam);
-    strictEqual(subIdOperationParam.correspondingMethodParams.length, 1);
-    strictEqual(subIdOperationParam.correspondingMethodParams[0], subIdMethodParam);
+    strictEqual(subIdOperationParam.methodParameterSegments.length, 1);
+    strictEqual(subIdOperationParam.methodParameterSegments[0][0], subIdMethodParam);
 
     const putMethod = client.methods.find((m) => m.name === "put");
     ok(putMethod);
@@ -713,8 +713,8 @@ describe("Parameter", () => {
     strictEqual(putOperation.parameters.length, 5);
     const putSubIdOperationParam = putOperation.parameters.find((p) => p.name === "subscriptionId");
     ok(putSubIdOperationParam);
-    strictEqual(putSubIdOperationParam.correspondingMethodParams.length, 1);
-    strictEqual(putSubIdOperationParam.correspondingMethodParams[0], subIdMethodParam);
+    strictEqual(putSubIdOperationParam.methodParameterSegments.length, 1);
+    strictEqual(putSubIdOperationParam.methodParameterSegments[0][0], subIdMethodParam);
 
     const deleteMethod = client.methods.find((m) => m.name === "delete");
     ok(deleteMethod);
@@ -728,8 +728,8 @@ describe("Parameter", () => {
       (p) => p.name === "subscriptionId",
     );
     ok(deleteSubIdOperationParam);
-    strictEqual(deleteSubIdOperationParam.correspondingMethodParams.length, 1);
-    strictEqual(deleteSubIdOperationParam.correspondingMethodParams[0], subIdClientParam);
+    strictEqual(deleteSubIdOperationParam.methodParameterSegments.length, 1);
+    strictEqual(deleteSubIdOperationParam.methodParameterSegments[0][0], subIdClientParam);
   });
 
   it("move to `@clientInitialization` for grandparent client", async () => {
@@ -881,7 +881,7 @@ describe("Parameter", () => {
           subscriptionId: Azure.Core.uuid,
 
           ...ResourceGroupParameter,
-          ...Azure.ResourceManager.Foundations.DefaultProviderNamespace,
+          ...Azure.ResourceManager.ProviderNamespace<Employee>,
           #suppress "@azure-tools/typespec-azure-core/documentation-required" "customization"
           employeeName: string,
         ): Employee;
@@ -915,7 +915,106 @@ describe("Parameter", () => {
     ok(subIdParam);
     const subIdMethodParam = method.parameters.find((p) => p.name === "subscriptionId");
     ok(subIdMethodParam);
-    strictEqual(subIdParam.correspondingMethodParams.length, 1);
-    strictEqual(subIdParam.correspondingMethodParams[0], subIdMethodParam);
+    strictEqual(subIdParam.methodParameterSegments.length, 1);
+    strictEqual(subIdParam.methodParameterSegments[0][0], subIdMethodParam);
+  });
+
+  it("subscriptionId on client when clientLocation moves it to method level for some operations in nested operation groups", async () => {
+    const { program } = await ArmTester.compile(
+      `
+      @armProviderNamespace("Microsoft.Contoso")
+      @service(#{
+        title: "Microsoft.Contoso management service",
+      })
+      @versioned(Microsoft.Contoso.Versions)
+      namespace Microsoft.Contoso;
+
+      /** The available API versions. */
+      enum Versions {
+        /** 2021-10-01-preview version */
+        @armCommonTypesVersion(CommonTypes.Versions.v5)
+        v2021_10_01_preview: "2021-10-01-preview",
+      }
+
+      /** Employee resource */
+      model Employee is TrackedResource<EmployeeProperties> {
+        ...ResourceNameParameter<Employee>;
+      }
+
+      /** Employee properties */
+      model EmployeeProperties {
+        /** Age of employee */
+        age?: int32;
+      }
+
+      model EmployeeBaseParameter
+          is Azure.ResourceManager.Foundations.DefaultBaseParameters<Employee>;
+
+      namespace AnotherLayer {
+        @armResourceOperations
+        interface Employees {
+          createOrUpdate is ArmResourceCreateOrReplaceAsync<
+            Employee,
+            BaseParameters = EmployeeBaseParameter
+          >;
+          get is ArmResourceRead<Employee>;
+        }
+      }
+      @@clientLocation(EmployeeBaseParameter.subscriptionId, AnotherLayer.Employees.createOrUpdate);
+      `,
+    );
+
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
+    const client = sdkPackage.clients[0];
+    ok(client);
+
+    // The subscriptionId should exist at the client level because 'get' operation doesn't have clientLocation
+    // specified for subscriptionId, so it should remain on the client
+    const subIdClientParam = client.clientInitialization.parameters.find(
+      (p) => p.name === "subscriptionId",
+    );
+    ok(subIdClientParam);
+
+    // Check the AnotherLayer operation group
+    const anotherLayer = client.children?.find((c) => c.name === "AnotherLayer");
+    ok(anotherLayer);
+
+    // The operation group should also have subscriptionId in its parameters
+    const subIdNsParam = anotherLayer.clientInitialization.parameters.find(
+      (p) => p.name === "subscriptionId",
+    );
+    ok(subIdNsParam);
+
+    // Check the Employees operation group
+    const employees = anotherLayer.children?.find((c) => c.name === "Employees");
+    ok(employees);
+
+    // The operation group should also have subscriptionId in its parameters
+    const subIdOgParam = employees.clientInitialization.parameters.find(
+      (p) => p.name === "subscriptionId",
+    );
+    ok(subIdOgParam);
+
+    // The createOrUpdate method should have subscriptionId as a method parameter (not client)
+    const createOrUpdateMethod = employees.methods.find((m) => m.name === "createOrUpdate");
+    ok(createOrUpdateMethod);
+    const createOrUpdateSubIdParam = createOrUpdateMethod.parameters.find(
+      (p) => p.name === "subscriptionId",
+    );
+    ok(createOrUpdateSubIdParam);
+
+    // The get method should NOT have subscriptionId as a method parameter (it's on client)
+    const getMethod = employees.methods.find((m) => m.name === "get");
+    ok(getMethod);
+    const getSubIdMethodParam = getMethod.parameters.find((p) => p.name === "subscriptionId");
+    ok(!getSubIdMethodParam);
+
+    // But the get operation should reference the client subscriptionId parameter
+    const getOperation = getMethod.operation;
+    ok(getOperation);
+    const getSubIdOpParam = getOperation.parameters.find((p) => p.name === "subscriptionId");
+    ok(getSubIdOpParam);
+    strictEqual(getSubIdOpParam.methodParameterSegments[0][0], subIdOgParam);
   });
 });
