@@ -2,7 +2,6 @@
 import { Code } from "@astrojs/starlight/components";
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import { type Sample, getSamples } from "src/utils/samples";
-import { parse } from "yaml";
 
 interface Props {
   sample: Sample;
@@ -13,7 +12,6 @@ export async function getStaticPaths() {
   return samples.map((x) => ({ params: { sample: x.id }, props: { sample: x } }));
 }
 
-// const { sample: sampleId } = Astro.params;
 const { sample } = Astro.props;
 ---
 
