@@ -102,7 +102,7 @@ clients:
   - &a1
     kind: client
     name: CombineClient
-    apiVersions: [[av1, av2], [bv1, bv2]]  # 2-dimensional array for multiple services
+    apiVersions: [[av1, av2], [bv1, bv2]] # 2-dimensional array for multiple services
     clientInitialization:
       kind: clientinitialization
       parameters:
@@ -438,7 +438,7 @@ clients:
   - &root
     kind: client
     name: CombineClient
-    apiVersions: [[av1, av2], [bv1, bv2]]  # 2-dimensional array for multiple services
+    apiVersions: [[av1, av2], [bv1, bv2]] # 2-dimensional array for multiple services
     clientInitialization:
       initializedBy: individually
     children:
@@ -564,14 +564,14 @@ clients:
   - &root
     kind: client
     name: CustomClient
-    apiVersions: [[av1, av2], [bv1, bv2]]  # 2-dimensional array for multiple services
+    apiVersions: [[av1, av2], [bv1, bv2]] # 2-dimensional array for multiple services
     clientInitialization:
       initializedBy: individually
     children:
       - kind: client
         name: SharedOperations
         parent: *root
-        apiVersions: [[av1, av2], [bv1, bv2]]  # 2-dimensional because operations come from different services
+        apiVersions: [[av1, av2], [bv1, bv2]] # 2-dimensional because operations come from different services
         clientInitialization:
           initializedBy: parent
         methods:
@@ -617,11 +617,11 @@ client.service_b_only.sub_op_b()
 
 ### Summary of Client Hierarchy Behavior
 
-| Scenario                   | Client Namespace Content              | Result                                                                 |
-| -------------------------- | ------------------------------------- | ---------------------------------------------------------------------- |
-| First step design          | Empty                                 | All services' nested items auto-merged as root client's children       |
-| Services as children       | Nested `@client` (empty namespaces)   | Each nested client auto-merges its service's content                   |
-| Fully customized           | Nested `@client` with explicit ops    | Only explicitly defined clients and operations are used                |
+| Scenario             | Client Namespace Content            | Result                                                           |
+| -------------------- | ----------------------------------- | ---------------------------------------------------------------- |
+| First step design    | Empty                               | All services' nested items auto-merged as root client's children |
+| Services as children | Nested `@client` (empty namespaces) | Each nested client auto-merges its service's content             |
+| Fully customized     | Nested `@client` with explicit ops  | Only explicitly defined clients and operations are used          |
 
 ### Interaction with Existing Decorators
 
