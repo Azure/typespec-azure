@@ -1,6 +1,7 @@
 ---
-import { Code } from "@astrojs/starlight/components";
+import { Code, TabItem } from "@astrojs/starlight/components";
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import EditorTabs from "@components/editor-tabs.astro";
 import { type Sample, getSamples } from "src/utils/samples";
 
 interface Props {
@@ -13,10 +14,31 @@ export async function getStaticPaths() {
 }
 
 const { sample } = Astro.props;
+
+// Sort files: main.tsp first, then alphabetically
+const sortedFiles = Object.entries(sample.files).sort(([a], [b]) => {
+  if (a === "main.tsp") return -1;
+  if (b === "main.tsp") return 1;
+  return a.localeCompare(b);
+});
+
+const hasMultipleFiles = sortedFiles.length > 1;
 ---
 
 <StarlightPage frontmatter={{ title: sample.title }}>
   <p>{sample.description}</p>
 
-  <Code lang="typespec" title="main.tsp" code={sample.files["main.tsp"]!} />
+  {
+    hasMultipleFiles ? (
+      <EditorTabs>
+        {sortedFiles.map(([fileName, content]) => (
+          <TabItem label={fileName}>
+            <Code lang="typespec" code={content} />
+          </TabItem>
+        ))}
+      </EditorTabs>
+    ) : (
+      <Code lang="typespec" title="main.tsp" code={sample.files["main.tsp"]!} />
+    )
+  }
 </StarlightPage>

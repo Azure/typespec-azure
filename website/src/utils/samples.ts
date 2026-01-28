@@ -43,11 +43,21 @@ export async function getSamples(): Promise<Sample[]> {
     if (!mainTsp) {
       throw new Error(`Sample at ${dir} is missing main.tsp file.`);
     }
+
+    // Collect all .tsp files for this sample
+    const files: Record<string, string> = {};
+    for (const [filePath, content] of Object.entries(sampleFiles)) {
+      if (filePath.startsWith(`${dir}/`)) {
+        const fileName = filePath.replace(`${dir}/`, "");
+        files[fileName] = content;
+      }
+    }
+
     return {
       id: dir,
       title: sampleConfig.title,
       description: sampleConfig.description,
-      files: { "main.tsp": mainTsp },
+      files,
     };
   });
 }
