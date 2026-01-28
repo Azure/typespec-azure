@@ -1,5 +1,5 @@
 ---
-title: Converting Existing Specs with Multiple Previews
+title: Converting Existing Specs to Single Active Preview
 llmstxt: true
 ---
 

@@ -1,5 +1,5 @@
 ---
-title: Adding a Stable Version when the Last Version was a Preview
+title: Adding a Stable Version when the Last Version was Preview
 llmstxt: true
 ---
 
