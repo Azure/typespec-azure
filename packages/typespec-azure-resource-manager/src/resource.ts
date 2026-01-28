@@ -1293,7 +1293,7 @@ export function resolveResourceBaseType(type?: string | undefined): ResourceBase
 }
 
 export const [getResourceFeature, setResourceFeature] = useStateMap<
-  Model | Interface | Namespace,
+  Model | Operation | Interface | Namespace,
   EnumMember
 >(ArmStateKeys.armFeature);
 
@@ -1363,6 +1363,8 @@ export function getFeature(program: Program, entity: Type): ArmFeatureOptions {
       return getFeatureOptions(program, feature);
     }
     case "Operation": {
+      const opFeature = getResourceFeature(program, entity);
+      if (opFeature !== undefined) return getFeatureOptions(program, opFeature);
       const opInterface = entity.interface;
       if (opInterface !== undefined) {
         return getFeature(program, opInterface);
@@ -1400,7 +1402,7 @@ export function getFeature(program: Program, entity: Type): ArmFeatureOptions {
 
 export const $feature: FeatureDecorator = (
   context: DecoratorContext,
-  entity: Model | Interface | Namespace,
+  entity: Model | Operation | Interface | Namespace,
   featureName: EnumMember,
 ) => {
   const { program } = context;

@@ -967,6 +967,7 @@ function getSdkEnumValueWithDiagnostics(
     value: type.value ?? type.name,
     enumType,
     valueType: enumType.valueType,
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
   });
 }
 
@@ -1028,6 +1029,7 @@ function getSdkUnionEnumValues(
       value: member.value,
       valueType: enumType.valueType,
       enumType,
+      crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, member.type),
     });
   }
   return diagnostics.wrap(values);

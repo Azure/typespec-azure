@@ -599,7 +599,7 @@ it("service with default api version, method with api version param", async () =
   const clientApiVersionParam = client.clientInitialization.parameters[1];
   strictEqual(clientApiVersionParam.name, "apiVersion");
   strictEqual(clientApiVersionParam.onClient, true);
-  strictEqual(clientApiVersionParam.optional, false);
+  strictEqual(clientApiVersionParam.optional, true);
   strictEqual(clientApiVersionParam.kind, "method");
   strictEqual(clientApiVersionParam.clientDefaultValue, "v1");
   strictEqual(clientApiVersionParam.isApiVersionParam, true);
@@ -646,7 +646,7 @@ it("service with default api version, method with path api version param", async
   const clientApiVersionParam = client.clientInitialization.parameters[1];
   strictEqual(clientApiVersionParam.name, "apiVersion");
   strictEqual(clientApiVersionParam.onClient, true);
-  strictEqual(clientApiVersionParam.optional, false);
+  strictEqual(clientApiVersionParam.optional, true);
   strictEqual(clientApiVersionParam.kind, "method");
   strictEqual(clientApiVersionParam.clientDefaultValue, "v1");
   strictEqual(clientApiVersionParam.isApiVersionParam, true);
