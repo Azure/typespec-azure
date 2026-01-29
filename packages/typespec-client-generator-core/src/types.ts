@@ -2188,7 +2188,7 @@ function updateXmlSerializationOptions(
   if (
     type.__raw?.kind === "ModelProperty" &&
     type.__raw.type.kind === "Model" &&
-    isArrayModelType(context.program, type.__raw.type)
+    isArrayModelType(type.__raw.type)
   ) {
     if (!type.serializationOptions.xml.unwrapped) {
       // if wrapped, set itemsName and itemsNS according to the array item type
@@ -2224,11 +2224,7 @@ function hasExplicitlyDefinedXmlSerializationInfo(context: TCGCContext, type: Ty
       return true;
     }
   }
-  if (
-    type.kind === "ModelProperty" &&
-    type.type.kind === "Model" &&
-    isArrayModelType(context.program, type.type)
-  ) {
+  if (type.kind === "ModelProperty" && type.type.kind === "Model" && isArrayModelType(type.type)) {
     const itemType = type.type.indexer.value;
     if (itemType && hasExplicitlyDefinedXmlSerializationInfo(context, itemType)) {
       return true;

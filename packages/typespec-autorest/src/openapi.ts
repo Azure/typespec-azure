@@ -485,7 +485,7 @@ export async function getOpenAPIForService(
       const model: Model | IntrinsicType = metadata.finalResult;
       const schemaOrRef = resolveExternalRef(metadata.finalResult);
       let overrideName: ((name: string, visibility: Visibility) => string) | undefined = undefined;
-      if (model.kind === "Model" && isArrayModelType(program, model)) {
+      if (model.kind === "Model" && isArrayModelType(model)) {
         const itemType = getModelOrScalarTypeIfNullable(model.indexer?.value);
         if (itemType?.kind === "Model" && itemType.name.length > 0) {
           overrideName = (n: string, v: Visibility) =>
@@ -1159,7 +1159,7 @@ export async function getOpenAPIForService(
       return { type: "file" };
     }
 
-    if (type.kind === "Model" && isArrayModelType(program, type)) {
+    if (type.kind === "Model" && isArrayModelType(type)) {
       const elementType = type.indexer.value;
       if (isBytes(elementType)) {
         return { type: "array", items: { type: "string", format: "binary" } };
@@ -1256,7 +1256,7 @@ export async function getOpenAPIForService(
     OpenAPI2QueryParameter | OpenAPI2HeaderParameter | OpenAPI2PathParameter,
     "type" | "items"
   > {
-    if (param.type.kind === "Model" && isArrayModelType(program, param.type)) {
+    if (param.type.kind === "Model" && isArrayModelType(param.type)) {
       const itemSchema = getSchemaForPrimitiveItems(
         param.type.indexer.value,
         schemaContext,
@@ -1838,7 +1838,7 @@ export async function getOpenAPIForService(
 
     const properties: OpenAPI2Schema["properties"] = {};
 
-    if (isRecordModelType(program, model)) {
+    if (isRecordModelType(model)) {
       modelSchema.additionalProperties = getSchemaOrRef(model.indexer.value, schemaContext);
     }
 
@@ -2131,7 +2131,7 @@ export async function getOpenAPIForService(
       setXmlField("attribute", true);
     }
 
-    if (prop.type.kind === "Model" && isArrayModelType(program, prop.type)) {
+    if (prop.type.kind === "Model" && isArrayModelType(prop.type)) {
       const wrapped = !xml.module.isUnwrapped(program, prop);
 
       setXmlField("wrapped", wrapped);
@@ -2460,7 +2460,7 @@ export async function getOpenAPIForService(
     context: SchemaContext,
     namespace?: Namespace,
   ): OpenAPI2Schema | undefined {
-    if (isArrayModelType(program, typespecType)) {
+    if (isArrayModelType(typespecType)) {
       const array: OpenAPI2Schema = {
         type: "array",
         items: getSchemaOrRef(typespecType.indexer.value!, {
@@ -2488,11 +2488,7 @@ export async function getOpenAPIForService(
     property: ModelProperty,
   ) {
     const armIdentifiers = getArmIdentifiers(program, property);
-    if (
-      typespecType.kind !== "Model" ||
-      !isArrayModelType(program, typespecType) ||
-      !armIdentifiers
-    ) {
+    if (typespecType.kind !== "Model" || !isArrayModelType(typespecType) || !armIdentifiers) {
       return;
     }
 

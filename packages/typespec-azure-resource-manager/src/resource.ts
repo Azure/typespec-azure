@@ -1123,11 +1123,7 @@ export const $identifiers: IdentifiersDecorator = (
 ) => {
   const { program } = context;
   const type = entity.kind === "ModelProperty" ? entity.type : entity;
-  if (
-    type.kind !== "Model" ||
-    !isArrayModelType(program, type) ||
-    type.indexer.value.kind !== "Model"
-  ) {
+  if (type.kind !== "Model" || !isArrayModelType(type) || type.indexer.value.kind !== "Model") {
     reportDiagnostic(program, {
       code: "decorator-param-wrong-type",
       messageId: "armIdentifiersIncorrectEntity",
