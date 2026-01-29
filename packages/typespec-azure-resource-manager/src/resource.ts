@@ -1,8 +1,6 @@
 import { getAllProperties } from "@azure-tools/typespec-azure-core";
 import {
   $tag,
-  ArrayModelType,
-  getProperty as compilerGetProperty,
   DecoratorContext,
   Enum,
   EnumMember,
@@ -10,7 +8,6 @@ import {
   getNamespaceFullName,
   getTags,
   Interface,
-  isArrayModelType,
   isGlobalNamespace,
   isNeverType,
   isTemplateDeclaration,
@@ -33,7 +30,6 @@ import {
   ArmResourceOperationsDecorator,
   ArmVirtualResourceDecorator,
   ExtensionResourceDecorator,
-  IdentifiersDecorator,
   LocationResourceDecorator,
   ResourceBaseTypeDecorator,
   ResourceGroupResourceDecorator,
@@ -1115,101 +1111,6 @@ export const $armProviderNameValue: ArmProviderNameValueDecorator = (
       property.type.value = armProvider;
   }
 };
-
-export const $identifiers: IdentifiersDecorator = (
-  context: DecoratorContext,
-  entity: ModelProperty | Type,
-  properties: readonly string[],
-) => {
-  const { program } = context;
-  const type = entity.kind === "ModelProperty" ? entity.type : entity;
-  if (
-    type.kind !== "Model" ||
-    !isArrayModelType(program, type) ||
-    type.indexer.value.kind !== "Model"
-  ) {
-    reportDiagnostic(program, {
-      code: "decorator-param-wrong-type",
-      messageId: "armIdentifiersIncorrectEntity",
-      target: entity,
-    });
-    return;
-  }
-
-  context.program.stateMap(ArmStateKeys.armIdentifiers).set(entity, properties);
-};
-
-/**
- * This function returns identifiers using the '@identifiers' decorator
- *
- * @param program The program to process.
- * @param entity The array model type to check.
- * @returns returns list of arm identifiers for the given array model type if any or undefined.
- */
-export function getArmIdentifiers(
-  program: Program,
-  entity: ModelProperty | Model,
-): string[] | undefined {
-  return program.stateMap(ArmStateKeys.armIdentifiers).get(entity);
-}
-
-/**
- * This function returns identifiers using the '@key' decorator.
- *
- * @param program The program to process.
- * @param entity The array model type to check.
- * @returns returns list of arm identifiers for the given array model type if any or undefined.
- */
-export function getArmKeyIdentifiers(
-  program: Program,
-  entity: ArrayModelType,
-): string[] | undefined {
-  const value = entity.indexer.value;
-  const result: string[] = [];
-  if (value.kind === "Model") {
-    for (const property of value.properties.values()) {
-      const pathToKey = getPathToKey(program, property);
-      if (pathToKey !== undefined && !pathToKey.endsWith("/id") && !pathToKey.endsWith("/name")) {
-        result.push(property.name + pathToKey);
-      } else if (getKeyName(program, property) && !["id", "name"].includes(property.name)) {
-        result.push(property.name);
-      }
-    }
-
-    if (!result.includes("id") && compilerGetProperty(value, "id") !== undefined) {
-      result.push("id");
-    }
-  }
-
-  return result.length > 0 ? result : undefined;
-}
-
-function getPathToKey(
-  program: Program,
-  entity: ModelProperty,
-  visited = new Set<ModelProperty>(),
-): string | undefined {
-  if (entity.type.kind !== "Model") {
-    return undefined;
-  }
-  if (visited.has(entity)) {
-    return undefined;
-  }
-  visited.add(entity);
-
-  for (const property of entity.type.properties.values()) {
-    if (property.type.kind !== "Model" && getKeyName(program, property)) {
-      return "/" + property.name;
-    }
-    if (property.type.kind === "Model") {
-      const path = getPathToKey(program, property, visited);
-      if (path !== undefined) {
-        return "/" + property.name + path;
-      }
-    }
-  }
-  return undefined;
-}
 
 function getServiceNamespace(program: Program, type: Type | undefined): string | undefined {
   if (type === undefined) return undefined;

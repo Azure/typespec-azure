@@ -284,7 +284,6 @@ model Schema {
   `x-ms-client-name`?: string;
   `x-ms-discriminator-value`?: string;
   `x-ms-external`?: boolean;
-  `x-ms-identifiers`?: string[];
   `x-ms-mutability`?: XmsMutability;
   `x-ms-secret`?: boolean;
 }

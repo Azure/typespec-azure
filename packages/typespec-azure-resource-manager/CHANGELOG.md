@@ -16,6 +16,10 @@
 - [#3622](https://github.com/Azure/typespec-azure/pull/3622) Add support for multiple output files in typespec-autorest
 - [#3746](https://github.com/Azure/typespec-azure/pull/3746) #3693 Allow array and unknown result for async operations
 
+### Deprecations
+
+- [#3779](https://github.com/Azure/typespec-azure/pull/3779) Deprecate `@identifiers` decorator and remove automatic `x-ms-identifiers` generation. The `@identifiers` decorator and related functionality have been removed. Use `@OpenAPI.extension("x-ms-identifiers", #[...])` if needed for legacy OpenAPI consumers. The `missing-x-ms-identifiers` linter rule has also been removed.
+
 ### Bump dependencies
 
 - [#3677](https://github.com/Azure/typespec-azure/pull/3677) Upgrade dependencies

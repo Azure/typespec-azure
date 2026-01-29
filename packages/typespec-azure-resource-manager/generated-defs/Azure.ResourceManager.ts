@@ -5,7 +5,6 @@ import type {
   EnumValue,
   Interface,
   Model,
-  ModelProperty,
   Namespace,
   Operation,
   Type,
@@ -34,25 +33,6 @@ export type ArmResourceCollectionActionDecorator = (
 export type ArmProviderNameValueDecorator = (
   context: DecoratorContext,
   target: Operation,
-) => DecoratorValidatorCallbacks | void;
-
-/**
- * This decorator is used to indicate the identifying properties of objects in the array, e.g. size
- * The properties that are used as identifiers for the object needs to be provided as a list of strings.
- *
- * @param properties The list of properties that are used as identifiers for the object. This needs to be provided as a list of strings.
- * @example
- * ```typespec
- * model Pet {
- *  @identifiers(#["size"])
- *  dog: Dog;
- * }
- * ```
- */
-export type IdentifiersDecorator = (
-  context: DecoratorContext,
-  entity: ModelProperty | Type,
-  properties: readonly string[],
 ) => DecoratorValidatorCallbacks | void;
 
 /**
@@ -350,7 +330,6 @@ export type ResourceBaseTypeDecorator = (
 export type AzureResourceManagerDecorators = {
   armResourceCollectionAction: ArmResourceCollectionActionDecorator;
   armProviderNameValue: ArmProviderNameValueDecorator;
-  identifiers: IdentifiersDecorator;
   armProviderNamespace: ArmProviderNamespaceDecorator;
   useLibraryNamespace: UseLibraryNamespaceDecorator;
   armLibraryNamespace: ArmLibraryNamespaceDecorator;

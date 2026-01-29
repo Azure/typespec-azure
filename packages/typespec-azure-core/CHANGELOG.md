@@ -6,6 +6,10 @@
 
 - [#3746](https://github.com/Azure/typespec-azure/pull/3746) #3693 Allow array and unknown result for async operations
 
+### Deprecations
+
+- [#3779](https://github.com/Azure/typespec-azure/pull/3779) Remove `x-ms-identifiers` test exception from `no-openapi` rule. The extension is deprecated and should not be used.
+
 ### Bump dependencies
 
 - [#3677](https://github.com/Azure/typespec-azure/pull/3677) Upgrade dependencies
