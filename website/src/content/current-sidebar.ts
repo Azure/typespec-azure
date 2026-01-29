@@ -1,5 +1,5 @@
 import type { Badge, SidebarItem } from "@typespec/astro-utils/sidebar";
-import { getSamples } from "../utils/samples";
+import { getDirectoryConfigs, getSamples } from "../utils/samples";
 
 function createLibraryReferenceStructure(
   libDir: string,
@@ -77,7 +77,7 @@ const sidebar: SidebarItem[] = [
   },
   {
     label: " Samples",
-    items: buildSamplesSidebar(await getSamples()),
+    items: buildSamplesSidebar(await getSamples(), await getDirectoryConfigs()),
   },
   {
     label: "📚 Libraries",
@@ -131,34 +131,80 @@ const sidebar: SidebarItem[] = [
 export default sidebar;
 
 // Helper to build nested sidebar structure for samples
-type SampleLeaf = { id: string; title: string; danger?: string };
+type SampleLeaf = { id: string; title: string; danger?: string; order?: number };
+type DirectoryNode = {
+  __isDir: true;
+  label?: string;
+  danger?: string;
+  order?: number;
+  children: SampleSidebarTree;
+};
 type SampleSidebarTree = {
-  [segment: string]: SampleSidebarTree | SampleLeaf;
+  [segment: string]: SampleSidebarTree | SampleLeaf | DirectoryNode;
 };
 
+interface DirectoryConfigInput {
+  id: string;
+  label: string;
+  danger?: string;
+  order?: number;
+}
+
 function buildSamplesSidebar(
-  samples: { id: string; title: string; danger?: string }[],
+  samples: { id: string; title: string; danger?: string; order?: number }[],
+  directoryConfigs: DirectoryConfigInput[],
 ): SidebarItem[] {
+  // Build a map of directory configs by path
+  const dirConfigMap = new Map<string, DirectoryConfigInput>();
+  for (const config of directoryConfigs) {
+    dirConfigMap.set(config.id, config);
+  }
+
   // Build a tree from sample ids
   const root: SampleSidebarTree = {};
   for (const sample of samples) {
     const parts = sample.id.split("/");
     let node: SampleSidebarTree = root;
+    let currentPath = "";
     for (let i = 0; i < parts.length; i++) {
       const part = parts[i];
+      currentPath = currentPath ? `${currentPath}/${part}` : part;
       if (i === parts.length - 1) {
-        node[part] = { id: sample.id, title: sample.title, danger: sample.danger };
+        node[part] = {
+          id: sample.id,
+          title: sample.title,
+          danger: sample.danger,
+          order: sample.order,
+        };
       } else {
         if (!node[part] || isSampleLeaf(node[part])) {
-          node[part] = {};
+          const dirConfig = dirConfigMap.get(currentPath);
+          node[part] = {
+            __isDir: true,
+            label: dirConfig?.label,
+            danger: dirConfig?.danger,
+            order: dirConfig?.order,
+            children: {},
+          };
         }
-        node = node[part] as SampleSidebarTree;
+        const dirNode = node[part] as DirectoryNode;
+        node = dirNode.children;
       }
     }
   }
 
-  function isSampleLeaf(node: SampleSidebarTree | SampleLeaf): node is SampleLeaf {
-    return (node as any).id !== undefined && (node as any).title !== undefined;
+  function isSampleLeaf(node: SampleSidebarTree | SampleLeaf | DirectoryNode): node is SampleLeaf {
+    return (
+      (node as any).id !== undefined &&
+      (node as any).title !== undefined &&
+      (node as any).__isDir === undefined
+    );
+  }
+
+  function isDirectoryNode(
+    node: SampleSidebarTree | SampleLeaf | DirectoryNode,
+  ): node is DirectoryNode {
+    return (node as any).__isDir === true;
   }
 
   function prettifyFolderName(name: string): string {
@@ -168,8 +214,25 @@ function buildSamplesSidebar(
       .join(" ");
   }
 
+  function getOrder(value: SampleSidebarTree | SampleLeaf | DirectoryNode): number {
+    if (isSampleLeaf(value) || isDirectoryNode(value)) {
+      return value.order ?? 0;
+    }
+    return 0;
+  }
+
   function buildItems(node: SampleSidebarTree, path: string[] = []): SidebarItem[] {
-    return Object.entries(node).map(([key, value]) => {
+    // Sort entries by order, then alphabetically by key
+    const sortedEntries = Object.entries(node).sort(([keyA, valueA], [keyB, valueB]) => {
+      const orderA = getOrder(valueA);
+      const orderB = getOrder(valueB);
+      if (orderA !== orderB) {
+        return orderA - orderB;
+      }
+      return keyA.localeCompare(keyB);
+    });
+
+    return sortedEntries.map(([key, value]) => {
       if (isSampleLeaf(value)) {
         const badge: Badge | undefined = value.danger
           ? { text: "⚠", variant: "danger" }
@@ -179,6 +242,15 @@ function buildSamplesSidebar(
           link: `/docs/samples/${value.id}`,
           badge,
         } as any;
+      } else if (isDirectoryNode(value)) {
+        const badge: Badge | undefined = value.danger
+          ? { text: "⚠", variant: "danger" }
+          : undefined;
+        return {
+          label: value.label ?? prettifyFolderName(key),
+          badge,
+          items: buildItems(value.children, [...path, key]),
+        };
       } else {
         return {
           label: prettifyFolderName(key),
