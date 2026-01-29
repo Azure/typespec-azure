@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.64.5
+
+### Bug Fixes
+
+- [#3861](https://github.com/Azure/typespec-azure/pull/3861) Update xml serialization name when there is no explicit decorator
+
+
 ## 0.64.4
 
 ### Bug Fixes
