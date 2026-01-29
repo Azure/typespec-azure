@@ -2,10 +2,10 @@
 import { Aside, Code, TabItem } from "@astrojs/starlight/components";
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import EditorTabs from "@typespec/astro-utils/components/editor-tabs.astro";
-import { type Sample, getSampleStructure } from "src/utils/samples";
+import { type SampleConfig, getSampleStructure } from "src/utils/samples";
 
 interface Props {
-  sample: Sample;
+  sample: SampleConfig;
 }
 
 export async function getStaticPaths() {

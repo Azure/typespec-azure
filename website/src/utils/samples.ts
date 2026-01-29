@@ -1,7 +1,8 @@
 import { parse } from "yaml";
 
-export interface Sample {
+export interface SampleConfig {
   id: string;
+  /** Sample title */
   title: string;
   description: string;
   /** Optional danger message for legacy samples that should not be used for new specs */
@@ -11,7 +12,7 @@ export interface Sample {
   files: Record<string, string>;
 }
 
-export interface SampleDirectory {
+export interface SampleDirectoryConfig {
   directory: true;
   /** Directory path relative to specs folder */
   id: string;
@@ -44,7 +45,7 @@ export interface DirectoryNode {
 /** The complete sample structure with both flat list and nested tree */
 export interface SampleStructure {
   /** Flat list of all samples */
-  samples: Sample[];
+  samples: SampleConfig[];
   /** Nested tree structure for navigation */
   tree: Record<string, SampleNode | DirectoryNode>;
 }
@@ -73,7 +74,7 @@ export async function getSampleStructure(): Promise<SampleStructure> {
   );
 
   // Build directory config map
-  const dirConfigMap = new Map<string, SampleDirectory>();
+  const dirConfigMap = new Map<string, SampleDirectoryConfig>();
   for (const [path, content] of Object.entries(sampleConfigFiles)) {
     const sampleConfig = parse(content);
     if (sampleConfig.directory === true) {
@@ -89,7 +90,7 @@ export async function getSampleStructure(): Promise<SampleStructure> {
   }
 
   // Build samples list and tree
-  const samples: Sample[] = [];
+  const samples: SampleConfig[] = [];
   const tree: Record<string, SampleNode | DirectoryNode> = {};
 
   for (const [path, content] of Object.entries(sampleConfigFiles)) {
@@ -121,7 +122,7 @@ export async function getSampleStructure(): Promise<SampleStructure> {
       }
     }
 
-    const sample: Sample = {
+    const sample: SampleConfig = {
       id: dir,
       title: sampleConfig.title,
       description: sampleConfig.description,
