@@ -7,4 +7,4 @@ import type { AzureCoreTraitsDecorators } from "./Azure.Core.Traits.js";
 /**
  * An error here would mean that the exported decorator is not using the same signature. Make sure to have export const $decName: DecNameDecorator = (...) => ...
  */
-const _: AzureCoreTraitsDecorators = $decorators["Azure.Core.Traits"];
+const _decs: AzureCoreTraitsDecorators = $decorators["Azure.Core.Traits"];

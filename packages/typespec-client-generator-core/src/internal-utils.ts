@@ -694,7 +694,7 @@ export function getValueTypeValue(
           getValueTypeValue(value.properties.get(x)!.value),
         ]),
       );
-    case "ScalarValue":
+    default:
       // TODO: handle scalar value
       return undefined;
   }
