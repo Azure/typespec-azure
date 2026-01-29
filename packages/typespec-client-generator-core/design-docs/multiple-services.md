@@ -87,7 +87,7 @@ namespace CombineClient;
 
 When TCGC detects multiple services in one client, it will:
 
-1. Create the root client for the combined client. If any service is versioned, the root client's initialization method will have an `apiVersion` parameter with no default value. The `apiVersions` property and the `apiVersion` parameter for the root client will be empty (since multiple services' API versions cannot be combined). The root client's endpoint and credential parameters will be created based on the first sub-service, which means all sub-services must share the same endpoint and credential.
+1. Create the root client for the combined client. If any service is versioned, the root client's initialization method will have an `apiVersion` parameter with no default value. The `apiVersions` property for the root client will be a 2-dimensional array to store all possible API versions for each service (e.g., `[[av1, av2], [bv1, bv2]]`). The root client's endpoint and credential parameters will be created based on the first sub-service, which means all sub-services must share the same endpoint and credential.
 2. Create sub-clients for each service's nested namespaces or interfaces. Each sub-client will have its own `apiVersion` property and initialization method if the service is versioned.
 3. If multiple services have nested namespaces or interfaces with the same name, TCGC will automatically merge them into a single operation group. The merged operation group will have empty `apiVersions` and a `string` type for the API version parameter, and will contain operations from all the services.
 4. Operations directly under each service's namespace are placed under the root client. Operations under nested namespaces or interfaces are placed under the corresponding sub-clients.
@@ -102,7 +102,7 @@ clients:
   - &a1
     kind: client
     name: CombineClient
-    apiVersions: []
+    apiVersions: [[av1, av2], [bv1, bv2]] # 2-dimensional array for multiple services
     clientInitialization:
       kind: clientinitialization
       parameters:
@@ -112,7 +112,7 @@ clients:
           onClient: true
         - kind: method
           name: apiVersion
-          apiVersions: []
+          apiVersions: [[av1, av2], [bv1, bv2]]
           clientDefaultValue: undefined
           isGeneratedName: false
           onClient: true
@@ -250,3 +250,428 @@ The resulting `SharedGroup` operation group will have:
 - `apiVersions: []`
 - API version parameter with `type.kind === "string"`
 - Operations from both ServiceA and ServiceB
+
+## Extended Design: Advanced Client Hierarchy Customization
+
+The first step design focuses on automatically merging multiple services into one client when the client namespace is empty. However, users have requested more flexibility in how they organize clients from multiple services. This section extends the previous [client hierarchy design](./client.md) to provide additional scenarios by leveraging nested `@client` decorators.
+
+The key design principle is:
+
+- **If the client namespace is empty**: TCGC auto-merges all services' nested namespaces/interfaces into the current client as children (first step design behavior).
+- **If the client namespace contains nested `@client` decorators**: TCGC uses the explicitly defined client hierarchy instead of auto-merging.
+
+### Scenario 1: Multiple Clients, Each Belonging to One Service
+
+In some cases, users may want to generate separate clients for each service rather than combining them into one client. This is useful when services have different authentication, versioning, or other client-level settings.
+
+#### Syntax Proposal
+
+Define multiple `@client` decorators, each targeting one service:
+
+```typespec title="main.tsp"
+@service
+@versioned(VersionsA)
+namespace ServiceA {
+  enum VersionsA {
+    av1,
+    av2,
+  }
+
+  interface Operations {
+    opA(): void;
+  }
+
+  namespace SubNamespace {
+    op subOpA(): void;
+  }
+}
+
+@service
+@versioned(VersionsB)
+namespace ServiceB {
+  enum VersionsB {
+    bv1,
+    bv2,
+  }
+
+  interface Operations {
+    opB(): void;
+  }
+
+  namespace SubNamespace {
+    op subOpB(): void;
+  }
+}
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@client({
+  name: "ServiceAClient",
+  service: ServiceA,
+})
+namespace ServiceAClient;
+
+@client({
+  name: "ServiceBClient",
+  service: ServiceB,
+})
+namespace ServiceBClient;
+```
+
+#### TCGC Behavior
+
+This creates two independent root clients, each with their own service hierarchy:
+
+According to [client.md](./client.md), the default value of `initializedBy` for a root client is `InitializedBy.individually`, while for a sub client it is `InitializedBy.parent`.
+
+```yaml
+clients:
+  - &a1
+    kind: client
+    name: ServiceAClient
+    apiVersions: [av1, av2]
+    clientInitialization:
+      initializedBy: individually
+    children:
+      - kind: client
+        name: Operations
+        parent: *a1
+        clientInitialization:
+          initializedBy: parent
+        methods:
+          - kind: basic
+            name: opA
+      - kind: client
+        name: SubNamespace
+        parent: *a1
+        clientInitialization:
+          initializedBy: parent
+        methods:
+          - kind: basic
+            name: subOpA
+  - &a2
+    kind: client
+    name: ServiceBClient
+    apiVersions: [bv1, bv2]
+    clientInitialization:
+      initializedBy: individually
+    children:
+      - kind: client
+        name: Operations
+        parent: *a2
+        clientInitialization:
+          initializedBy: parent
+        methods:
+          - kind: basic
+            name: opB
+      - kind: client
+        name: SubNamespace
+        parent: *a2
+        clientInitialization:
+          initializedBy: parent
+        methods:
+          - kind: basic
+            name: subOpB
+```
+
+#### Python SDK Example
+
+```python
+# ServiceA client
+client_a = ServiceAClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
+client_a.operations.op_a()
+client_a.sub_namespace.sub_op_a()
+
+# ServiceB client
+client_b = ServiceBClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
+client_b.operations.op_b()
+client_b.sub_namespace.sub_op_b()
+```
+
+### Scenario 2: Services as Direct Children (No Deep Auto-Merge)
+
+In the first step design, when combining multiple services with an empty client namespace, all nested namespaces/interfaces from all services are auto-merged into the root client as children. Some users prefer to keep each service's namespace as a direct child of the root client without deep merging.
+
+#### Endpoint and Credential Limitations
+
+When combining multiple services into a single client, all services must share the same endpoint and credential configuration. The root client's endpoint and credential parameters are created based on the first service in the array. If services have different `@server` or `@useAuth` definitions, emitters should report a diagnostic error.
+
+#### Syntax Proposal
+
+Use nested `@client` decorators to explicitly define each service as a child client:
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@client({
+  name: "CombineClient",
+  service: [ServiceA, ServiceB],
+})
+namespace CombineClient {
+  @client({
+    name: "ComputeClient",
+    service: ServiceA,
+  })
+  namespace Compute;
+
+  @client({
+    name: "DiskClient",
+    service: ServiceB,
+  })
+  namespace Disk;
+}
+```
+
+#### TCGC Behavior
+
+When the client namespace has nested `@client` decorators, TCGC will use the explicitly defined client hierarchy:
+
+1. Create the root client for the combined client.
+2. Each nested `@client` becomes a child of the root client.
+3. Since the nested client namespaces (`Compute` and `Disk`) are empty, TCGC auto-merges each service's content into its respective child client.
+4. No automatic merging across services occurs at the root level.
+
+```yaml
+clients:
+  - &root
+    kind: client
+    name: CombineClient
+    apiVersions: [[av1, av2], [bv1, bv2]] # 2-dimensional array for multiple services
+    clientInitialization:
+      initializedBy: individually
+    children:
+      - &compute
+        kind: client
+        name: ComputeClient
+        parent: *root
+        apiVersions: [av1, av2]
+        clientInitialization:
+          initializedBy: parent
+        children:
+          - kind: client
+            name: Operations
+            parent: *compute
+            clientInitialization:
+              initializedBy: parent
+            methods:
+              - kind: basic
+                name: opA
+          - kind: client
+            name: SubNamespace
+            parent: *compute
+            clientInitialization:
+              initializedBy: parent
+            methods:
+              - kind: basic
+                name: subOpA
+      - &disk
+        kind: client
+        name: DiskClient
+        parent: *root
+        apiVersions: [bv1, bv2]
+        clientInitialization:
+          initializedBy: parent
+        children:
+          - kind: client
+            name: Operations
+            parent: *disk
+            clientInitialization:
+              initializedBy: parent
+            methods:
+              - kind: basic
+                name: opB
+          - kind: client
+            name: SubNamespace
+            parent: *disk
+            clientInitialization:
+              initializedBy: parent
+            methods:
+              - kind: basic
+                name: subOpB
+```
+
+#### Python SDK Example
+
+```python
+client = CombineClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
+
+# Access ServiceA operations via ComputeClient
+client.compute.operations.op_a()
+client.compute.sub_namespace.sub_op_a()
+
+# Access ServiceB operations via DiskClient
+client.disk.operations.op_b()
+client.disk.sub_namespace.sub_op_b()
+```
+
+### Scenario 3: Fully Customized Client Hierarchy
+
+For maximum flexibility, users can fully customize how operations from different services are organized into client hierarchies. This uses nested `@client` decorators with explicit operation mapping.
+
+#### Endpoint and Credential Limitations
+
+Same as Scenario 2: when combining multiple services into a single client, all services must share the same endpoint and credential configuration. The root client's endpoint and credential parameters are created based on the first service in the array.
+
+#### Syntax Proposal
+
+Use nested `@client` decorators with explicit operation references to create a custom client hierarchy:
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@client({
+  name: "CustomClient",
+  service: [ServiceA, ServiceB],
+})
+namespace CustomClient {
+  // Custom child client combining operations from both services
+  @client
+  interface SharedOperations {
+    opA is ServiceA.Operations.opA;
+    opB is ServiceB.Operations.opB;
+  }
+
+  // Custom child client with operations from ServiceA only
+  @client
+  interface ServiceAOnly {
+    subOpA is ServiceA.SubNamespace.subOpA;
+  }
+
+  // Custom child client with operations from ServiceB only
+  @client
+  interface ServiceBOnly {
+    subOpB is ServiceB.SubNamespace.subOpB;
+  }
+}
+```
+
+#### TCGC Behavior
+
+When explicit `@client` decorators are nested within the root client:
+
+1. TCGC uses the explicitly defined client hierarchy instead of auto-generating from service structure.
+2. Each nested `@client` becomes a child of the root client.
+3. Operations referenced via `is` keyword are mapped to their original service operations.
+4. Since the root client namespace contains nested `@client` decorators, no auto-discovery from service namespaces occurs.
+
+```yaml
+clients:
+  - &root
+    kind: client
+    name: CustomClient
+    apiVersions: [[av1, av2], [bv1, bv2]] # 2-dimensional array for multiple services
+    clientInitialization:
+      initializedBy: individually
+    children:
+      - kind: client
+        name: SharedOperations
+        parent: *root
+        apiVersions: [[av1, av2], [bv1, bv2]] # 2-dimensional because operations come from different services
+        clientInitialization:
+          initializedBy: parent
+        methods:
+          - kind: basic
+            name: opA
+          - kind: basic
+            name: opB
+      - kind: client
+        name: ServiceAOnly
+        parent: *root
+        apiVersions: [av1, av2]
+        clientInitialization:
+          initializedBy: parent
+        methods:
+          - kind: basic
+            name: subOpA
+      - kind: client
+        name: ServiceBOnly
+        parent: *root
+        apiVersions: [bv1, bv2]
+        clientInitialization:
+          initializedBy: parent
+        methods:
+          - kind: basic
+            name: subOpB
+```
+
+#### Python SDK Example
+
+```python
+client = CustomClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
+
+# Access shared operations from both services
+client.shared_operations.op_a()  # Uses ServiceA's API version
+client.shared_operations.op_b()  # Uses ServiceB's API version
+
+# Access ServiceA-only operations
+client.service_a_only.sub_op_a()
+
+# Access ServiceB-only operations
+client.service_b_only.sub_op_b()
+```
+
+### Summary of Client Hierarchy Behavior
+
+| Scenario             | Client Namespace Content            | Result                                                           |
+| -------------------- | ----------------------------------- | ---------------------------------------------------------------- |
+| First step design    | Empty                               | All services' nested items auto-merged as root client's children |
+| Services as children | Nested `@client` (empty namespaces) | Each nested client auto-merges its service's content             |
+| Fully customized     | Nested `@client` with explicit ops  | Only explicitly defined clients and operations are used          |
+
+### Interaction with Existing Decorators
+
+The nested `@client` approach works alongside existing customization decorators:
+
+- **`@clientInitialization`**: Still controls how each client is initialized. Can be applied to both auto-merged and explicitly defined clients.
+- **`@clientLocation`**: Can move operations between clients regardless of namespace content.
+- **`@operationGroup`** (deprecated): The same functionality can be achieved using nested `@client`. Migration path: convert `@operationGroup` to nested `@client`.
+
+### Validation Rules
+
+1. When the root client namespace is empty:
+   - All services' content is auto-merged into the root client
+   - Same-named namespaces/interfaces across services are merged together
+
+2. When the root client namespace has nested `@client` decorators:
+   - Only explicitly defined clients are created at the root level
+   - Each nested `@client` with an empty namespace auto-merges its service's content
+   - Each nested `@client` with explicit operations uses only those operations
+   - Operations not referenced by any explicit client are omitted from the SDK
+
+### Changes Needed
+
+1. **Update `interfaces.ts`**:
+   - Update `SdkClientType.apiVersions` type from `string[]` to `string[] | string[][]` to support 2-dimensional array for multi-service clients
+   - This change affects both the root client and child clients that contain operations from multiple services
+
+2. **Update `cache.ts` logic**:
+   - In `prepareClientAndOperationCache`: Check if the client namespace has nested `@client` decorators before auto-merging
+   - When nested `@client` decorators exist, use the explicitly defined hierarchy
+   - When the namespace is empty, auto-merge services' content (existing behavior)
+   - Update `getOrCreateClients`: Handle nested `@client` detection within multi-service clients
+
+3. **Update `internal-utils.ts`**:
+   - Modify `hasExplicitClientOrOperationGroup` to properly detect nested `@client` decorators within multi-service client namespaces
+   - Currently it returns `false` when a client has multiple services, but should return `true` if the namespace contains nested `@client` decorators
+
+4. **Update `clients.ts`**:
+   - Update `createSdkClientType` to populate `apiVersions` as a 2-dimensional array when the client spans multiple services
+   - Update endpoint and credential parameter creation to validate that all services share the same `@server` and `@useAuth` definitions
+
+5. **Update `decorators.ts`**:
+   - Add validation in `@client` decorator to ensure services combined into a single client have compatible endpoint and credential configurations
+
+6. **Add validation diagnostics**:
+   - Add diagnostic when services combined into a client have different `@server` definitions
+   - Add diagnostic when services combined into a client have different `@useAuth` definitions
