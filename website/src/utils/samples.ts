@@ -23,6 +23,32 @@ export interface SampleDirectory {
   order?: number;
 }
 
+/** A sample node in the tree structure */
+export interface SampleNode {
+  kind: "sample";
+  id: string;
+  title: string;
+  danger?: string;
+  order?: number;
+}
+
+/** A directory node in the tree structure */
+export interface DirectoryNode {
+  kind: "directory";
+  label?: string;
+  danger?: string;
+  order?: number;
+  children: Record<string, SampleNode | DirectoryNode>;
+}
+
+/** The complete sample structure with both flat list and nested tree */
+export interface SampleStructure {
+  /** Flat list of all samples */
+  samples: Sample[];
+  /** Nested tree structure for navigation */
+  tree: Record<string, SampleNode | DirectoryNode>;
+}
+
 export function prepareFiles(files: Record<string, any>): Record<string, any> {
   const cleanedFiles: Record<string, any> = {};
   for (const [path, content] of Object.entries(files)) {
@@ -32,32 +58,7 @@ export function prepareFiles(files: Record<string, any>): Record<string, any> {
   return cleanedFiles;
 }
 
-export async function getDirectoryConfigs(): Promise<SampleDirectory[]> {
-  const sampleConfigFiles = prepareFiles(
-    import.meta.glob(`../../../packages/samples/specs/**/sample-config.yaml`, {
-      eager: true,
-      query: "?raw",
-    }),
-  );
-
-  const configs: SampleDirectory[] = [];
-  for (const [path, content] of Object.entries(sampleConfigFiles)) {
-    const sampleConfig = parse(content);
-    if (sampleConfig.directory === true) {
-      const dir = path.replace("/sample-config.yaml", "");
-      configs.push({
-        directory: true,
-        id: dir,
-        label: sampleConfig.label,
-        danger: sampleConfig.danger,
-        order: sampleConfig.order,
-      });
-    }
-  }
-  return configs;
-}
-
-export async function getSamples(): Promise<Sample[]> {
+export async function getSampleStructure(): Promise<SampleStructure> {
   const sampleConfigFiles = prepareFiles(
     import.meta.glob(`../../../packages/samples/specs/**/sample-config.yaml`, {
       eager: true,
@@ -70,7 +71,27 @@ export async function getSamples(): Promise<Sample[]> {
       query: "?raw",
     }),
   );
+
+  // Build directory config map
+  const dirConfigMap = new Map<string, SampleDirectory>();
+  for (const [path, content] of Object.entries(sampleConfigFiles)) {
+    const sampleConfig = parse(content);
+    if (sampleConfig.directory === true) {
+      const dir = path.replace("/sample-config.yaml", "");
+      dirConfigMap.set(dir, {
+        directory: true,
+        id: dir,
+        label: sampleConfig.label,
+        danger: sampleConfig.danger,
+        order: sampleConfig.order,
+      });
+    }
+  }
+
+  // Build samples list and tree
   const samples: Sample[] = [];
+  const tree: Record<string, SampleNode | DirectoryNode> = {};
+
   for (const [path, content] of Object.entries(sampleConfigFiles)) {
     const dir = path.replace("/sample-config.yaml", "");
     const sampleConfig = parse(content);
@@ -93,21 +114,57 @@ export async function getSamples(): Promise<Sample[]> {
 
     // Collect all .tsp files for this sample
     const files: Record<string, string> = {};
-    for (const [filePath, content] of Object.entries(sampleFiles)) {
+    for (const [filePath, fileContent] of Object.entries(sampleFiles)) {
       if (filePath.startsWith(`${dir}/`)) {
         const fileName = filePath.replace(`${dir}/`, "");
-        files[fileName] = content;
+        files[fileName] = fileContent;
       }
     }
 
-    samples.push({
+    const sample: Sample = {
       id: dir,
       title: sampleConfig.title,
       description: sampleConfig.description,
       danger: sampleConfig.danger,
       order: sampleConfig.order,
       files,
-    });
+    };
+    samples.push(sample);
+
+    // Add to tree
+    const parts = dir.split("/");
+    let node = tree;
+    let currentPath = "";
+
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      currentPath = currentPath ? `${currentPath}/${part}` : part;
+
+      if (i === parts.length - 1) {
+        // Last part - create sample node
+        node[part] = {
+          kind: "sample",
+          id: sample.id,
+          title: sample.title,
+          danger: sample.danger,
+          order: sample.order,
+        };
+      } else {
+        // Intermediate part - ensure directory exists
+        if (!node[part] || node[part].kind !== "directory") {
+          const dirConfig = dirConfigMap.get(currentPath);
+          node[part] = {
+            kind: "directory",
+            label: dirConfig?.label,
+            danger: dirConfig?.danger,
+            order: dirConfig?.order,
+            children: {},
+          };
+        }
+        node = (node[part] as DirectoryNode).children;
+      }
+    }
   }
-  return samples;
+
+  return { samples, tree };
 }

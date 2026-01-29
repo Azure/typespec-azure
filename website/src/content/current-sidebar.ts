@@ -1,5 +1,9 @@
 import type { Badge, SidebarItem } from "@typespec/astro-utils/sidebar";
-import { getDirectoryConfigs, getSamples } from "../utils/samples";
+import {
+  type DirectoryNode,
+  type SampleNode,
+  getSampleStructure,
+} from "../utils/samples";
 
 function createLibraryReferenceStructure(
   libDir: string,
@@ -77,7 +81,7 @@ const sidebar: SidebarItem[] = [
   },
   {
     label: " Samples",
-    items: buildSamplesSidebar(await getSamples(), await getDirectoryConfigs()),
+    items: buildSamplesSidebar((await getSampleStructure()).tree),
   },
   {
     label: "📚 Libraries",
@@ -130,79 +134,9 @@ const sidebar: SidebarItem[] = [
 
 export default sidebar;
 
-// Helper to build nested sidebar structure for samples
-type SampleLeaf = { id: string; title: string; danger?: string; order?: number };
-type DirectoryNode = {
-  directory: true;
-  label?: string;
-  danger?: string;
-  order?: number;
-  children: SampleSidebarTree;
-};
-type SampleSidebarTree = {
-  [segment: string]: SampleLeaf | DirectoryNode;
-};
-
-interface DirectoryConfigInput {
-  id: string;
-  label?: string;
-  danger?: string;
-  order?: number;
-}
-
 function buildSamplesSidebar(
-  samples: { id: string; title: string; danger?: string; order?: number }[],
-  directoryConfigs: DirectoryConfigInput[],
+  tree: Record<string, SampleNode | DirectoryNode>,
 ): SidebarItem[] {
-  // Build a map of directory configs by path
-  const dirConfigMap = new Map<string, DirectoryConfigInput>();
-  for (const config of directoryConfigs) {
-    dirConfigMap.set(config.id, config);
-  }
-
-  // Build a tree from sample ids
-  const root: SampleSidebarTree = {};
-  for (const sample of samples) {
-    const parts = sample.id.split("/");
-    let node: SampleSidebarTree = root;
-    let currentPath = "";
-    for (let i = 0; i < parts.length; i++) {
-      const part = parts[i];
-      currentPath = currentPath ? `${currentPath}/${part}` : part;
-      if (i === parts.length - 1) {
-        node[part] = {
-          id: sample.id,
-          title: sample.title,
-          danger: sample.danger,
-          order: sample.order,
-        };
-      } else {
-        if (!node[part] || isSampleLeaf(node[part])) {
-          const dirConfig = dirConfigMap.get(currentPath);
-          node[part] = {
-            directory: true,
-            label: dirConfig?.label,
-            danger: dirConfig?.danger,
-            order: dirConfig?.order,
-            children: {},
-          };
-        }
-        const dirNode = node[part] as DirectoryNode;
-        node = dirNode.children;
-      }
-    }
-  }
-
-  function isSampleLeaf(node: SampleSidebarTree | SampleLeaf | DirectoryNode): node is SampleLeaf {
-    return !("directory" in node);
-  }
-
-  function isDirectoryNode(
-    node: SampleSidebarTree | SampleLeaf | DirectoryNode,
-  ): node is DirectoryNode {
-    return "directory" in node;
-  }
-
   function prettifyFolderName(name: string): string {
     return name
       .split("-")
@@ -210,18 +144,11 @@ function buildSamplesSidebar(
       .join(" ");
   }
 
-  function getOrder(value: SampleSidebarTree | SampleLeaf | DirectoryNode): number {
-    if (isSampleLeaf(value) || isDirectoryNode(value)) {
-      return value.order ?? 0;
-    }
-    return 0;
-  }
-
-  function buildItems(node: SampleSidebarTree, path: string[] = []): SidebarItem[] {
+  function buildItems(node: Record<string, SampleNode | DirectoryNode>): SidebarItem[] {
     // Sort entries by order, then alphabetically by key
-    const sortedEntries = Object.entries(node).sort(([keyA, valueA], [keyB, valueB]) => {
-      const orderA = getOrder(valueA);
-      const orderB = getOrder(valueB);
+    const sortedEntries = Object.entries(node).sort(([keyA, a], [keyB, b]) => {
+      const orderA = a.order ?? 0;
+      const orderB = b.order ?? 0;
       if (orderA !== orderB) {
         return orderA - orderB;
       }
@@ -229,31 +156,25 @@ function buildSamplesSidebar(
     });
 
     return sortedEntries.map(([key, value]) => {
-      if (isSampleLeaf(value)) {
-        const badge: Badge | undefined = value.danger
-          ? { text: "⚠", variant: "danger" }
-          : undefined;
+      const badge: Badge | undefined = value.danger
+        ? { text: "⚠", variant: "danger" }
+        : undefined;
+
+      if (value.kind === "sample") {
         return {
           label: value.title,
           link: `/docs/samples/${value.id}`,
           badge,
         } as any;
-      } else if (isDirectoryNode(value)) {
-        const badge: Badge | undefined = value.danger
-          ? { text: "⚠", variant: "danger" }
-          : undefined;
+      } else {
         return {
           label: value.label ?? prettifyFolderName(key),
           badge,
-          items: buildItems(value.children, [...path, key]),
-        };
-      } else {
-        return {
-          label: prettifyFolderName(key),
-          items: buildItems(value, [...path, key]),
+          items: buildItems(value.children),
         };
       }
     });
   }
-  return buildItems(root);
+
+  return buildItems(tree);
 }
