@@ -1,9 +1,5 @@
 import type { Badge, SidebarItem } from "@typespec/astro-utils/sidebar";
-import {
-  type DirectoryNode,
-  type SampleNode,
-  getSampleStructure,
-} from "../utils/samples";
+import { type DirectoryNode, type SampleNode, getSampleStructure } from "../utils/samples";
 
 function createLibraryReferenceStructure(
   libDir: string,
@@ -134,9 +130,7 @@ const sidebar: SidebarItem[] = [
 
 export default sidebar;
 
-function buildSamplesSidebar(
-  tree: Record<string, SampleNode | DirectoryNode>,
-): SidebarItem[] {
+function buildSamplesSidebar(tree: Record<string, SampleNode | DirectoryNode>): SidebarItem[] {
   function prettifyFolderName(name: string): string {
     return name
       .split("-")
@@ -156,9 +150,7 @@ function buildSamplesSidebar(
     });
 
     return sortedEntries.map(([key, value]) => {
-      const badge: Badge | undefined = value.danger
-        ? { text: "⚠", variant: "danger" }
-        : undefined;
+      const badge: Badge | undefined = value.danger ? { text: "⚠", variant: "danger" } : undefined;
 
       if (value.kind === "sample") {
         return {
