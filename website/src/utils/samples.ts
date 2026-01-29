@@ -11,11 +11,12 @@ export interface Sample {
   files: Record<string, string>;
 }
 
-export interface DirectoryConfig {
+export interface SampleDirectory {
+  directory: true;
   /** Directory path relative to specs folder */
   id: string;
-  /** Display label for the directory */
-  label: string;
+  /** Optional display label for the directory */
+  label?: string;
   /** Optional danger message for legacy directories */
   danger?: string;
   /** Optional order for sorting in sidebar (lower numbers first, defaults to 0) */
@@ -31,7 +32,7 @@ export function prepareFiles(files: Record<string, any>): Record<string, any> {
   return cleanedFiles;
 }
 
-export async function getDirectoryConfigs(): Promise<DirectoryConfig[]> {
+export async function getDirectoryConfigs(): Promise<SampleDirectory[]> {
   const sampleConfigFiles = prepareFiles(
     import.meta.glob(`../../../packages/samples/specs/**/sample-config.yaml`, {
       eager: true,
@@ -39,14 +40,15 @@ export async function getDirectoryConfigs(): Promise<DirectoryConfig[]> {
     }),
   );
 
-  const configs: DirectoryConfig[] = [];
+  const configs: SampleDirectory[] = [];
   for (const [path, content] of Object.entries(sampleConfigFiles)) {
     const sampleConfig = parse(content);
     if (sampleConfig.directory === true) {
       const dir = path.replace("/sample-config.yaml", "");
       configs.push({
+        directory: true,
         id: dir,
-        label: sampleConfig.label ?? dir,
+        label: sampleConfig.label,
         danger: sampleConfig.danger,
         order: sampleConfig.order,
       });

@@ -133,19 +133,19 @@ export default sidebar;
 // Helper to build nested sidebar structure for samples
 type SampleLeaf = { id: string; title: string; danger?: string; order?: number };
 type DirectoryNode = {
-  __isDir: true;
+  directory: true;
   label?: string;
   danger?: string;
   order?: number;
   children: SampleSidebarTree;
 };
 type SampleSidebarTree = {
-  [segment: string]: SampleSidebarTree | SampleLeaf | DirectoryNode;
+  [segment: string]: SampleLeaf | DirectoryNode;
 };
 
 interface DirectoryConfigInput {
   id: string;
-  label: string;
+  label?: string;
   danger?: string;
   order?: number;
 }
@@ -180,7 +180,7 @@ function buildSamplesSidebar(
         if (!node[part] || isSampleLeaf(node[part])) {
           const dirConfig = dirConfigMap.get(currentPath);
           node[part] = {
-            __isDir: true,
+            directory: true,
             label: dirConfig?.label,
             danger: dirConfig?.danger,
             order: dirConfig?.order,
@@ -194,17 +194,13 @@ function buildSamplesSidebar(
   }
 
   function isSampleLeaf(node: SampleSidebarTree | SampleLeaf | DirectoryNode): node is SampleLeaf {
-    return (
-      (node as any).id !== undefined &&
-      (node as any).title !== undefined &&
-      (node as any).__isDir === undefined
-    );
+    return !("directory" in node);
   }
 
   function isDirectoryNode(
     node: SampleSidebarTree | SampleLeaf | DirectoryNode,
   ): node is DirectoryNode {
-    return (node as any).__isDir === true;
+    return "directory" in node;
   }
 
   function prettifyFolderName(name: string): string {
