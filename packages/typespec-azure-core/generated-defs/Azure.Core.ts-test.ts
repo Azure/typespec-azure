@@ -7,4 +7,4 @@ import type { AzureCoreDecorators } from "./Azure.Core.js";
 /**
  * An error here would mean that the exported decorator is not using the same signature. Make sure to have export const $decName: DecNameDecorator = (...) => ...
  */
-const _: AzureCoreDecorators = $decorators["Azure.Core"];
+const _decs: AzureCoreDecorators = $decorators["Azure.Core"];
