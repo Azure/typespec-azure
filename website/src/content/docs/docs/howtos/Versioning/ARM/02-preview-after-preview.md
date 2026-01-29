@@ -42,7 +42,7 @@ If your spec is in preview and has not ever had a stable api-version, then there
   - Remove the associated OpenAPI file and examples
 
     ```bash
-    > rm -r $(2025-12-01-preview)
+    > rm -r 2025-12-01-preview
     ```
 
   - Remove any references to the old version from README.md
@@ -73,7 +73,7 @@ This includes the following steps:
 - The new preview version should already be the _last version_ of the versions enum, also ensure it is decorated with `@previewVersion`
 - Update any mention in documentation of the old api-version to use the new api-version
 
-- Make changes to the API description based on how the API has changed between the preview versions (if it has)
+- Make changes to the API description based on how the API has changed from the last preview version to the new preview version (if it has changed)
   - If any type that was introduced in the latest preview is _not_ in the new preview, simply delete the type
 
     ```diff lang=tsp
@@ -88,7 +88,7 @@ This includes the following steps:
       model Bar {}
     ```
 
-  - Similarly, if there is any change from the latest preview that does not apply to the new preview version, reverse the decorator (unlikely).
+  - Similarly, if there is any change from the latest preview that does not apply to the new preview version, reverse the decorator.
 
     ```diff lang=tsp
     - @renamedFrom(Versions.`2026-01-01-preview`, "oldProp")
@@ -102,7 +102,13 @@ This includes the following steps:
     + changedProp: string;
     ```
 
-  - If any other types are removed in the new preview (unlikely) mark these with an `@removed` decorator referencing the new version
+    ```diff lang=tsp
+    - @madeOptional(Versions.`2026-01-01-preview`)
+    - requiredProp?: string;
+    + requiredProp: string;
+    ```
+
+  - If any other types are removed in the new preview (unlikely, because these would be breaking changes from the previous stable and require a breaking change review) mark these with an `@removed` decorator referencing the new version
 
     ```diff lang=tsp
     + @removed(Versions.`2026-01-01-preview`)

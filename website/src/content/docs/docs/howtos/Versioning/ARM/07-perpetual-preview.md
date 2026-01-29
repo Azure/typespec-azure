@@ -70,9 +70,13 @@ For some Resource Providers, whenever a new stable version is released, a new pr
     @removed(Versions.`2025-11-01`)
   + @removed(Versions.`2025-12-01-preview`)
     goneType: string;
+
+  - @renamedFrom(Versions.`2025-10-01-preview`, "oldName")
+  + @renamedFrom(Versions.`2025-12-01-preview`, "oldName")
+    newName: int32;
   ```
 
-- Add any new type changes to stable version (A + 1) and decorate appropriately, as shown in the [versioning guide](../versioning.md). Note that these changes should also appear in the new preview (A + 2)
+- Add any new type changes to stable version (A + 1) and decorate appropriately, as shown in the [versioning guide](../../ARM/versioning.md). Note that these changes should also appear in the new preview (A + 2)
 - Remove version `A` from the versions enumeration
 
   ```diff lang=tsp
