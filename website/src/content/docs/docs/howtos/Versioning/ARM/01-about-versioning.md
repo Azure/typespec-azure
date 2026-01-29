@@ -23,7 +23,7 @@ This document describes how to evolve APIs according to these guidelines, and ho
 - [How to add a new preview version when the last version was stable](./04-preview-after-stable.md)
 - [How to add a new stable version when the last version was stable](./05-stable-after-stable.md)
 
-This document also describes how to move an existing multi-api typespec spec with multiple previews:
+This document also describes how to convert an existing multi-api typespec spec with multiple previews into a spec with a single active preview. Note that this is not required, but it may significantly simplify the versioning decoration in your spec:
 
 - [How to convert a spec with multiple preview versions into a spec with a single active preview](./06-converting-specs.md)
 
