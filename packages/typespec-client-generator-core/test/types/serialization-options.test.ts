@@ -102,6 +102,75 @@ it("@name", async function () {
   strictEqual(model.properties[0].serializationOptions.xml?.name, "XmlId");
 });
 
+it("xml operation with mixed explicit and default property names", async function () {
+  runner = await createSdkTestRunner({
+    librariesToAdd: [XmlTestLibrary],
+    autoUsings: ["TypeSpec.Xml"],
+  });
+
+  await runner.compileWithBuiltInService(`
+    model Container {
+      @Xml.name("XmlId")
+      id: string;
+      value: string;
+      @encodedName("application/xml", "XmlContent")
+      content: string;
+    }
+
+    op test(): {@header("content-type") contentType: "application/xml"; @body body: Container};
+  `);
+
+  const models = runner.context.sdkPackage.models;
+  strictEqual(models.length, 1);
+  const model = models[0];
+  strictEqual(model.serializationOptions.xml?.name, "Container");
+
+  // Property with @Xml.name gets the explicit name
+  strictEqual(model.properties[0].kind, "property");
+  strictEqual(model.properties[0].serializationOptions.xml?.name, "XmlId");
+
+  // Property without any xml decorator gets the property name as xml name
+  strictEqual(model.properties[1].kind, "property");
+  strictEqual(model.properties[1].serializationOptions.xml?.name, "value");
+
+  // Property with @encodedName gets the encoded name
+  strictEqual(model.properties[2].kind, "property");
+  strictEqual(model.properties[2].serializationOptions.xml?.name, "XmlContent");
+});
+
+it("xml operation model without any xml decorators uses default names", async function () {
+  runner = await createSdkTestRunner({
+    librariesToAdd: [XmlTestLibrary],
+    autoUsings: ["TypeSpec.Xml"],
+  });
+
+  await runner.compileWithBuiltInService(`
+    model Container {
+      id: string;
+      value: string;
+      content: string;
+    }
+
+    op test(): {@header("content-type") contentType: "application/xml"; @body body: Container};
+  `);
+
+  const models = runner.context.sdkPackage.models;
+  strictEqual(models.length, 1);
+  const model = models[0];
+  // Model without any xml decorator gets the model name as xml name
+  strictEqual(model.serializationOptions.xml?.name, "Container");
+
+  // All properties without any xml decorator get property names as xml names
+  strictEqual(model.properties[0].kind, "property");
+  strictEqual(model.properties[0].serializationOptions.xml?.name, "id");
+
+  strictEqual(model.properties[1].kind, "property");
+  strictEqual(model.properties[1].serializationOptions.xml?.name, "value");
+
+  strictEqual(model.properties[2].kind, "property");
+  strictEqual(model.properties[2].serializationOptions.xml?.name, "content");
+});
+
 it("@ns", async function () {
   runner = await createSdkTestRunner({
     librariesToAdd: [XmlTestLibrary],
@@ -565,6 +634,65 @@ it("orphan model with xml serialization", async function () {
   strictEqual(model.properties[0].serializationOptions.xml?.name, "XmlName");
 });
 
+it("orphan model xml property without explicit @Xml.name uses property name", async function () {
+  runner = await createSdkTestRunner({
+    librariesToAdd: [XmlTestLibrary],
+    autoUsings: ["TypeSpec.Xml"],
+  });
+
+  await runner.compileWithBuiltInService(`
+    @usage(Usage.input | Usage.output)
+    @encodedName("application/xml", "XmlTag")
+    model Tag {
+      value: string;
+    }
+  `);
+
+  const models = runner.context.sdkPackage.models;
+  strictEqual(models.length, 1);
+  const model = models[0];
+  strictEqual(model.serializationOptions.xml?.name, "XmlTag");
+  strictEqual(model.properties[0].kind, "property");
+  // Property without @Xml.name should still get xml serialization options with property name as xml name
+  strictEqual(model.properties[0].serializationOptions.xml?.name, "value");
+});
+
+it("orphan model xml with mixed explicit and default property names", async function () {
+  runner = await createSdkTestRunner({
+    librariesToAdd: [XmlTestLibrary],
+    autoUsings: ["TypeSpec.Xml"],
+  });
+
+  await runner.compileWithBuiltInService(`
+    @usage(Usage.input | Usage.output)
+    @encodedName("application/xml", "XmlContainer")
+    model Container {
+      @Xml.name("XmlId")
+      id: string;
+      value: string;
+      @encodedName("application/xml", "XmlContent")
+      content: string;
+    }
+  `);
+
+  const models = runner.context.sdkPackage.models;
+  strictEqual(models.length, 1);
+  const model = models[0];
+  strictEqual(model.serializationOptions.xml?.name, "XmlContainer");
+
+  // Property with @Xml.name gets the explicit name
+  strictEqual(model.properties[0].kind, "property");
+  strictEqual(model.properties[0].serializationOptions.xml?.name, "XmlId");
+
+  // Property without any xml decorator gets the property name as xml name
+  strictEqual(model.properties[1].kind, "property");
+  strictEqual(model.properties[1].serializationOptions.xml?.name, "value");
+
+  // Property with @encodedName gets the encoded name
+  strictEqual(model.properties[2].kind, "property");
+  strictEqual(model.properties[2].serializationOptions.xml?.name, "XmlContent");
+});
+
 it("orphan model with json serialization", async function () {
   runner = await createSdkTestRunner({
     librariesToAdd: [XmlTestLibrary],
@@ -651,4 +779,76 @@ it("different json content type", async function () {
   const model = models[0];
   strictEqual(model.properties[0].kind, "property");
   strictEqual(model.properties[0].serializationOptions.json?.name, "rename");
+});
+
+it("model used in both json and xml operations gets both serialization options", async function () {
+  runner = await createSdkTestRunner({
+    librariesToAdd: [XmlTestLibrary],
+    autoUsings: ["TypeSpec.Xml"],
+  });
+
+  await runner.compileWithBuiltInService(`
+    model Container {
+      @encodedName("application/json", "jsonId")
+      @encodedName("application/xml", "xmlId")
+      id: string;
+      value: string;
+    }
+
+    op jsonOp(@body body: Container): void;
+    op xmlOp(): {@header("content-type") contentType: "application/xml"; @body body: Container};
+  `);
+
+  const models = runner.context.sdkPackage.models;
+  strictEqual(models.length, 1);
+  const model = models[0];
+
+  // Model gets both json and xml serialization options
+  strictEqual(model.serializationOptions.json?.name, "Container");
+  strictEqual(model.serializationOptions.xml?.name, "Container");
+
+  // Property with both @encodedName decorators gets different names for json and xml
+  strictEqual(model.properties[0].kind, "property");
+  strictEqual(model.properties[0].serializationOptions.json?.name, "jsonId");
+  strictEqual(model.properties[0].serializationOptions.xml?.name, "xmlId");
+
+  // Property without decorators gets property name as both json and xml names
+  strictEqual(model.properties[1].kind, "property");
+  strictEqual(model.properties[1].serializationOptions.json?.name, "value");
+  strictEqual(model.properties[1].serializationOptions.xml?.name, "value");
+});
+
+it("orphan model with both json and xml usage gets both serialization options", async function () {
+  runner = await createSdkTestRunner({
+    librariesToAdd: [XmlTestLibrary],
+    autoUsings: ["TypeSpec.Xml"],
+  });
+
+  await runner.compileWithBuiltInService(`
+    @usage(Usage.input | Usage.output | Usage.json | Usage.xml)
+    model Container {
+      @encodedName("application/json", "jsonId")
+      @encodedName("application/xml", "xmlId")
+      id: string;
+      value: string;
+    }
+  `);
+
+  const models = runner.context.sdkPackage.models;
+  strictEqual(models.length, 1);
+  const model = models[0];
+
+  // Orphan model with both usages gets both json and xml serialization options
+  strictEqual(model.serializationOptions.json?.name, "Container");
+  strictEqual(model.serializationOptions.xml?.name, "Container");
+
+  // Property with both @encodedName decorators gets different names for json and xml
+  strictEqual(model.properties[0].kind, "property");
+  strictEqual(model.properties[0].serializationOptions.json?.name, "jsonId");
+  strictEqual(model.properties[0].serializationOptions.xml?.name, "xmlId");
+
+  // Property without decorators gets property name as both json and xml names
+  strictEqual(model.properties[1].kind, "property");
+  strictEqual(model.properties[1].serializationOptions.json?.name, "value");
+  strictEqual(model.properties[1].serializationOptions.xml?.name, "value");
 });
