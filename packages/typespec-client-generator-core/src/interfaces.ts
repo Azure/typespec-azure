@@ -824,6 +824,21 @@ export interface SdkCookieParameter extends SdkModelPropertyTypeBase {
 }
 
 /**
+ * Metadata about a streaming operation body or response.
+ * Present when the body/response is a streaming type (e.g. JsonlStream, SSEStream).
+ */
+export interface SdkStreamMetadata {
+  /** The type of the property decorated with `@body` (e.g. string, bytes). */
+  bodyType: SdkType;
+  /** The stream model type itself (e.g. HttpStream, JsonlStream, SSEStream). */
+  originalType: SdkType;
+  /** The payload model type being streamed (e.g. Thing from JsonlStream<Thing>). */
+  streamType: SdkType;
+  /** Content types associated with this stream (e.g. ["application/jsonl"], ["text/event-stream"]). */
+  contentTypes: string[];
+}
+
+/**
  * Http body parameter.
  */
 export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
@@ -843,6 +858,8 @@ export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
    * For body parameters with spread, there can be multiple paths.
    */
   methodParameterSegments: (SdkMethodParameter | SdkModelPropertyType)[][];
+  /** Stream metadata, present when the body is a streaming type (e.g. JsonlStream, SSEStream). */
+  streamMetadata?: SdkStreamMetadata;
 }
 
 export type SdkHttpParameter =
@@ -874,6 +891,8 @@ export interface SdkMethodResponse {
    * This allows distinguishing between responses without a body and responses with a body of type `Type | null`.
    */
   optional?: boolean;
+  /** Stream metadata, present when the response is a streaming type (e.g. JsonlStream, SSEStream). */
+  streamMetadata?: SdkStreamMetadata;
 }
 
 export interface SdkServiceResponse {
@@ -889,6 +908,8 @@ interface SdkHttpResponseBase extends SdkServiceResponse {
   contentTypes?: string[];
   defaultContentType?: string;
   description?: string;
+  /** Stream metadata, present when the response is a streaming type (e.g. JsonlStream, SSEStream). */
+  streamMetadata?: SdkStreamMetadata;
 }
 
 export interface SdkHttpResponse extends SdkHttpResponseBase {

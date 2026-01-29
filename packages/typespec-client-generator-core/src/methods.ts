@@ -56,6 +56,7 @@ import {
   SdkPropertyMap,
   SdkServiceMethod,
   SdkServiceOperation,
+  SdkStreamMetadata,
   SdkTerminationStatus,
   SdkType,
   TCGCContext,
@@ -656,10 +657,20 @@ function getSdkMethodResponse(
     optional = containsResponseWithoutBody;
   }
 
+  // Propagate stream metadata from HTTP responses to method response
+  let streamMetadata: SdkStreamMetadata | undefined;
+  for (const response of responses) {
+    if (response.streamMetadata) {
+      streamMetadata = response.streamMetadata;
+      break;
+    }
+  }
+
   return {
     kind: "method",
     type,
     ...(optional !== undefined && { optional }),
+    ...(streamMetadata && { streamMetadata }),
   };
 }
 
