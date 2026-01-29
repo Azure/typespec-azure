@@ -28,7 +28,7 @@ import {
   isPathParam,
   isQueryParam,
 } from "@typespec/http";
-import { type StreamMetadata, getStreamMetadata } from "@typespec/http/experimental";
+import { StreamMetadata, getStreamMetadata } from "@typespec/http/experimental";
 import { camelCase } from "change-case";
 import { getResponseAsBool } from "./decorators.js";
 import {
