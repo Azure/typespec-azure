@@ -25,11 +25,11 @@ This document describes how to evolve APIs according to these guidelines, and ho
 
 This document also describes how to convert an existing multi-api typespec spec with multiple previews into a spec with a single active preview. Note that this is not required, but it may significantly simplify the versioning decoration in your spec:
 
-- [How to convert a spec with multiple preview versions into a spec with a single active preview](./06-converting-specs.md)
+- [How to convert a spec with multiple preview versions into a spec with a single active preview](./uncommon-scenarios/01-converting-specs.md)
 
 Additionally, there are some services that may always have features that remain in preview after a stable version is released. This can happen, for example, if there are multiple independent teams that own different resources in a service and operate on their own schedule. The recommended way to handle this scenario is to model your ResourceProvider as multiple services, so each version and the corresponding SDKs can version independently. For some older services, this is not an option, so there is specialized guidance on how to maintain preview features over stable api releases (described below). If you are thinking about splitting your service, or about creating a new preview version with every stable version, be sure to have a discussion with the [Azure API Stewardship Board](https://aka.ms/azapi/officehours) and the [Azure SDK team](https://eng.ms/docs/products/azure-developer-experience/onboard) first.
 
-- [How to manage a single active preview if your service always has some features in preview](./07-perpetual-preview.md)
+- [How to manage a single active preview if your service always has some features in preview](./uncommon-scenarios/02-perpetual-preview.md)
 
 ## Should I Retain the OpenAPI for an Old Preview API
 
