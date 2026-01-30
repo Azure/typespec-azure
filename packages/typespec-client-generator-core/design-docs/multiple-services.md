@@ -261,11 +261,13 @@ The resulting `SharedGroup` operation group will have:
 
 The first step design focuses on explicitly merging multiple services into one client using `@client` with an array of services. This section extends the previous [client hierarchy design](./client.md) to clarify the behavior when no explicit `@client` is defined and to provide additional scenarios.
 
-### Default Behavior: Multiple Services Without Explicit `@client`
+### Scenario 0: Multiple Services Without Explicit `@client` (Default Behavior)
 
 When there are multiple `@service` namespaces and no explicit `@client` decorator is defined, TCGC will automatically create a separate root client for each `@service` namespace. This matches the single-service behavior where each `@service` namespace becomes its own client.
 
-For example, given two services without explicit `@client`:
+#### Syntax Proposal
+
+No `client.tsp` file is needed. Each `@service` namespace automatically becomes a root client:
 
 ```typespec title="main.tsp"
 @service
@@ -275,6 +277,10 @@ namespace ServiceA {
 
   interface Operations {
     opA(): void;
+  }
+
+  namespace SubNamespace {
+    op subOpA(): void;
   }
 }
 
@@ -286,10 +292,82 @@ namespace ServiceB {
   interface Operations {
     opB(): void;
   }
+
+  namespace SubNamespace {
+    op subOpB(): void;
+  }
 }
 ```
 
-TCGC will automatically generate two root clients: `ServiceAClient` and `ServiceBClient`, each with their own API versions and children.
+#### TCGC Behavior
+
+TCGC will automatically generate two independent root clients, each with their own API versions and children:
+
+According to [client.md](./client.md), the default value of `initializedBy` for a root client is `InitializedBy.individually`, while for a sub client it is `InitializedBy.parent`.
+
+```yaml
+clients:
+  - &a1
+    kind: client
+    name: ServiceAClient
+    apiVersions: [av1, av2]
+    clientInitialization:
+      initializedBy: individually
+    children:
+      - kind: client
+        name: Operations
+        parent: *a1
+        clientInitialization:
+          initializedBy: parent
+        methods:
+          - kind: basic
+            name: opA
+      - kind: client
+        name: SubNamespace
+        parent: *a1
+        clientInitialization:
+          initializedBy: parent
+        methods:
+          - kind: basic
+            name: subOpA
+  - &a2
+    kind: client
+    name: ServiceBClient
+    apiVersions: [bv1, bv2]
+    clientInitialization:
+      initializedBy: individually
+    children:
+      - kind: client
+        name: Operations
+        parent: *a2
+        clientInitialization:
+          initializedBy: parent
+        methods:
+          - kind: basic
+            name: opB
+      - kind: client
+        name: SubNamespace
+        parent: *a2
+        clientInitialization:
+          initializedBy: parent
+        methods:
+          - kind: basic
+            name: subOpB
+```
+
+#### Python SDK Example
+
+```python
+# ServiceA client (auto-generated name)
+client_a = ServiceAClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
+client_a.operations.op_a()
+client_a.sub_namespace.sub_op_a()
+
+# ServiceB client (auto-generated name)
+client_b = ServiceBClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
+client_b.operations.op_b()
+client_b.sub_namespace.sub_op_b()
+```
 
 ### Explicit Client Definition Scenarios
 
