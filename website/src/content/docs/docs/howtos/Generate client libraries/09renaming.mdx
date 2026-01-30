@@ -317,10 +317,7 @@ model InputModel {
 }
 
 /** Read my resource */
-op get(
-  name: string,
-  @query filter?: string
-): InputModel;
+op get(name: string, @query filter?: string): InputModel;
 ```
 
 ```typespec title=client.tsp
