@@ -87,7 +87,7 @@ namespace CombineClient;
 
 When TCGC detects multiple services in one client, it will:
 
-1. Create the root client for the combined client. If any service is versioned, the root client's initialization method will have an `apiVersion` parameter with no default value. The `apiVersions` property for the root client will be a 2-dimensional array to store all possible API versions for each service (e.g., `[[av1, av2], [bv1, bv2]]`). The root client's endpoint and credential parameters will be created based on the first sub-service, which means all sub-services must share the same endpoint and credential.
+1. Create the root client for the combined client. If any service is versioned, the root client's initialization method will have an `apiVersion` parameter with no default value. For cross-service clients, the `apiVersions` property will be an empty array `[]`, and a new `apiVersionsMap` property will store a map of service namespace full qualified names to their API versions (e.g., `{"ServiceA": ["av1", "av2"], "ServiceB": ["bv1", "bv2"]}`). The root client's endpoint and credential parameters will be created based on the first sub-service, which means all sub-services must share the same endpoint and credential. If services have different `@server` or `@useAuth` definitions, TCGC will report a diagnostic error.
 2. Create sub-clients for each service's nested namespaces or interfaces. Each sub-client will have its own `apiVersion` property and initialization method if the service is versioned.
 3. If multiple services have nested namespaces or interfaces with the same name, TCGC will automatically merge them into a single operation group. The merged operation group will have empty `apiVersions` and a `string` type for the API version parameter, and will contain operations from all the services.
 4. Operations directly under each service's namespace are placed under the root client. Operations under nested namespaces or interfaces are placed under the corresponding sub-clients.
@@ -102,7 +102,10 @@ clients:
   - &a1
     kind: client
     name: CombineClient
-    apiVersions: [[av1, av2], [bv1, bv2]] # 2-dimensional array for multiple services
+    apiVersions: [] # Empty for cross-service clients
+    apiVersionsMap: # Map of service namespace to API versions
+      ServiceA: [av1, av2]
+      ServiceB: [bv1, bv2]
     clientInitialization:
       kind: clientinitialization
       parameters:
@@ -112,7 +115,10 @@ clients:
           onClient: true
         - kind: method
           name: apiVersion
-          apiVersions: [[av1, av2], [bv1, bv2]]
+          apiVersions: []
+          apiVersionsMap:
+            ServiceA: [av1, av2]
+            ServiceB: [bv1, bv2]
           clientDefaultValue: undefined
           isGeneratedName: false
           onClient: true
@@ -444,7 +450,10 @@ clients:
   - &root
     kind: client
     name: CombineClient
-    apiVersions: [[av1, av2], [bv1, bv2]] # 2-dimensional array for multiple services
+    apiVersions: [] # Empty for cross-service clients
+    apiVersionsMap: # Map of service namespace to API versions
+      ServiceA: [av1, av2]
+      ServiceB: [bv1, bv2]
     clientInitialization:
       initializedBy: individually
     children:
@@ -570,14 +579,20 @@ clients:
   - &root
     kind: client
     name: CustomClient
-    apiVersions: [[av1, av2], [bv1, bv2]] # 2-dimensional array for multiple services
+    apiVersions: [] # Empty for cross-service clients
+    apiVersionsMap: # Map of service namespace to API versions
+      ServiceA: [av1, av2]
+      ServiceB: [bv1, bv2]
     clientInitialization:
       initializedBy: individually
     children:
       - kind: client
         name: SharedOperations
         parent: *root
-        apiVersions: [[av1, av2], [bv1, bv2]] # 2-dimensional because operations come from different services
+        apiVersions: [] # Empty because operations come from different services
+        apiVersionsMap: # Map because operations come from different services
+          ServiceA: [av1, av2]
+          ServiceB: [bv1, bv2]
         clientInitialization:
           initializedBy: parent
         methods:
@@ -652,8 +667,9 @@ The nested `@client` approach works alongside existing customization decorators:
 ### Changes Needed
 
 1. **Update `interfaces.ts`**:
-   - Update `SdkClientType.apiVersions` type from `string[]` to `string[] | string[][]` to support 2-dimensional array for multi-service clients
-   - This change affects both the root client and child clients that contain operations from multiple services
+   - Add new `apiVersionsMap` property to `SdkClientType` with type `Record<string, string[]>` (key is service namespace full qualified name, value is API versions array)
+   - Keep existing `apiVersions` property as `string[]` for backward compatibility
+   - For cross-service clients, `apiVersions` will be empty `[]` and `apiVersionsMap` will contain the mapping
 
 2. **Update `cache.ts` logic**:
    - In `prepareClientAndOperationCache`: Check if the client namespace has nested `@client` decorators before auto-merging
@@ -666,7 +682,8 @@ The nested `@client` approach works alongside existing customization decorators:
    - Currently it returns `false` when a client has multiple services, but should return `true` if the namespace contains nested `@client` decorators
 
 4. **Update `clients.ts`**:
-   - Update `createSdkClientType` to populate `apiVersions` as a 2-dimensional array when the client spans multiple services
+   - Update `createSdkClientType` to populate `apiVersionsMap` when the client spans multiple services
+   - Keep `apiVersions` as empty array for cross-service clients
    - Update endpoint and credential parameter creation to validate that all services share the same `@server` and `@useAuth` definitions
 
 5. **Update `decorators.ts`**:
