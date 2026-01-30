@@ -47,6 +47,7 @@ import {
   TspLiteralType,
 } from "./internal-utils.js";
 import { createSdkPackage } from "./package.js";
+import { validateNamespaceCollisions } from "./validations/types.js";
 
 interface CreateTCGCContextOptions {
   mutateNamespace?: boolean; // whether to mutate global namespace for versioning
@@ -216,6 +217,10 @@ export async function createSdkContext<
     diagnostics.pipe(await handleClientExamples(sdkContext, client));
   }
   sdkContext.diagnostics = sdkContext.diagnostics.concat(diagnostics.diagnostics);
+
+  // Validate cross-namespace collisions (multi-service and Azure library conflicts)
+  // Done here to have access to sdkPackage and emitter options
+  validateNamespaceCollisions(sdkContext);
 
   if (options?.exportTCGCoutput) {
     await exportTCGCOutput(sdkContext);
