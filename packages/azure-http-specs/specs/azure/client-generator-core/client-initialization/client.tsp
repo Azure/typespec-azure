@@ -7,9 +7,9 @@ using Spector;
 using Http;
 
 @route("/azure/client-generator-core/client-initialization")
-namespace _Specs_.Azure.ClientGeneratorCore.ClientInitialization;
+namespace _Specs_.Azure.ClientGenerator.Core.ClientInitialization;
 
-@@global.Azure.ClientGenerator.Core.clientNamespace(_Specs_.Azure.ClientGeneratorCore.ClientInitialization,
+@@global.Azure.ClientGenerator.Core.clientNamespace(_Specs_.Azure.ClientGenerator.Core.ClientInitialization,
   "azure.clientgenerator.core.clientinitialization",
   "java"
 );

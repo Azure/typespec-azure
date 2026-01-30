@@ -1,30 +1,23 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { Interface } from "@typespec/compiler";
+import { Namespace } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import {
-  getClient,
   listClients,
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "../../src/decorators.js";
 import { SdkMethodResponse, UsageFlags } from "../../src/interfaces.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import {
+  AzureCoreTester,
+  createSdkContextForTester,
+  SimpleTester,
+  SimpleTesterWithVersionedService,
+} from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
-
 it("basic default version", async () => {
-  const runnerWithVersion = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-python",
-  });
-
-  await runnerWithVersion.compile(`
+  const { program } = await SimpleTester.compile(`
   @service(#{
     title: "Contoso Widget Manager",
   })
@@ -71,9 +64,14 @@ it("basic default version", async () => {
   op get(...Resource.KeysOf<Widget>): Widget | Error;
   `);
 
-  const sdkPackage = runnerWithVersion.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v3");
-  deepStrictEqual(runnerWithVersion.context.getApiVersions(), ["v1", "v2", "v3"]);
+  deepStrictEqual(context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace), [
+    "v1",
+    "v2",
+    "v3",
+  ]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -120,12 +118,7 @@ it("basic default version", async () => {
 });
 
 it("basic latest version", async () => {
-  const runnerWithVersion = await createSdkTestRunner({
-    "api-version": "latest",
-    emitterName: "@azure-tools/typespec-python",
-  });
-
-  await runnerWithVersion.compile(`
+  const { program } = await SimpleTester.compile(`
   @service(#{
     title: "Contoso Widget Manager",
   })
@@ -172,9 +165,16 @@ it("basic latest version", async () => {
   op get(...Resource.KeysOf<Widget>): Widget | Error;
   `);
 
-  const sdkPackage = runnerWithVersion.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    "api-version": "latest",
+  });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v3");
-  deepStrictEqual(runnerWithVersion.context.getApiVersions(), ["v1", "v2", "v3"]);
+  deepStrictEqual(context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace), [
+    "v1",
+    "v2",
+    "v3",
+  ]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -220,12 +220,7 @@ it("basic latest version", async () => {
 });
 
 it("basic v3 version", async () => {
-  const runnerWithVersion = await createSdkTestRunner({
-    "api-version": "v3",
-    emitterName: "@azure-tools/typespec-python",
-  });
-
-  await runnerWithVersion.compile(`
+  const { program } = await SimpleTester.compile(`
     @service(#{
       title: "Contoso Widget Manager",
     })
@@ -272,9 +267,16 @@ it("basic v3 version", async () => {
     op get(...Resource.KeysOf<Widget>): Widget | Error;
   `);
 
-  const sdkPackage = runnerWithVersion.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    "api-version": "v3",
+  });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v3");
-  deepStrictEqual(runnerWithVersion.context.getApiVersions(), ["v1", "v2", "v3"]);
+  deepStrictEqual(context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace), [
+    "v1",
+    "v2",
+    "v3",
+  ]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -320,12 +322,7 @@ it("basic v3 version", async () => {
 });
 
 it("basic v2 version", async () => {
-  const runnerWithVersion = await createSdkTestRunner({
-    "api-version": "v2",
-    emitterName: "@azure-tools/typespec-python",
-  });
-
-  await runnerWithVersion.compile(`
+  const { program } = await SimpleTester.compile(`
     @service(#{
       title: "Contoso Widget Manager",
     })
@@ -372,9 +369,15 @@ it("basic v2 version", async () => {
     op get(...Resource.KeysOf<Widget>): Widget | Error;
   `);
 
-  const sdkPackage = runnerWithVersion.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    "api-version": "v2",
+  });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v2");
-  deepStrictEqual(runnerWithVersion.context.getApiVersions(), ["v1", "v2"]);
+  deepStrictEqual(context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace), [
+    "v1",
+    "v2",
+  ]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -423,12 +426,7 @@ it("basic v2 version", async () => {
 });
 
 it("basic v1 version", async () => {
-  const runnerWithVersion = await createSdkTestRunner({
-    "api-version": "v1",
-    emitterName: "@azure-tools/typespec-python",
-  });
-
-  await runnerWithVersion.compile(`
+  const { program } = await SimpleTester.compile(`
     @service(#{
       title: "Contoso Widget Manager",
     })
@@ -475,9 +473,14 @@ it("basic v1 version", async () => {
     op get(...Resource.KeysOf<Widget>): Widget | Error;
 `);
 
-  const sdkPackage = runnerWithVersion.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    "api-version": "v1",
+  });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v1");
-  deepStrictEqual(runnerWithVersion.context.getApiVersions(), ["v1"]);
+  deepStrictEqual(context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace), [
+    "v1",
+  ]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -514,12 +517,7 @@ it("basic v1 version", async () => {
 });
 
 it("basic all version", async () => {
-  const runnerWithVersion = await createSdkTestRunner({
-    "api-version": "all",
-    emitterName: "@azure-tools/typespec-python",
-  });
-
-  await runnerWithVersion.compile(`
+  const { program } = await SimpleTester.compile(`
     @service(#{
       title: "Contoso Widget Manager",
     })
@@ -563,9 +561,16 @@ it("basic all version", async () => {
     op get(...Resource.KeysOf<Widget>): Widget | Error;
 `);
 
-  const sdkPackage = runnerWithVersion.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    "api-version": "all",
+  });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "all");
-  deepStrictEqual(runnerWithVersion.context.getApiVersions(), ["v1", "v2", "v3"]);
+  deepStrictEqual(context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace), [
+    "v1",
+    "v2",
+    "v3",
+  ]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(
@@ -614,7 +619,7 @@ it("basic all version", async () => {
 });
 
 it("define own api version param", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     @versioned(Versions)
     namespace Test;
@@ -629,7 +634,8 @@ it("define own api version param", async () => {
 
     op getPet(...ApiVersionParam): void;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.operation.parameters.length, 1);
   const apiVersionParam = method.operation.parameters[0];
@@ -641,7 +647,7 @@ it("define own api version param", async () => {
 });
 
 it("default api version for interface extends", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     namespace Azure.ResourceManager {
       interface Operations {
         @get
@@ -661,7 +667,8 @@ it("default api version for interface extends", async () => {
     }      
   `);
 
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0].children?.[0];
   ok(client);
   const apiVersionClientParam = client.clientInitialization.parameters.find(
@@ -681,7 +688,7 @@ it("default api version for interface extends", async () => {
 });
 
 it("default api version for operation is", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     namespace Azure.ResourceManager {
       interface Operations {
         @get
@@ -701,7 +708,8 @@ it("default api version for operation is", async () => {
     }      
   `);
 
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   const method = client.methods[0];
   strictEqual(method.kind, "basic");
@@ -720,14 +728,15 @@ it("default api version for operation is", async () => {
 });
 
 it("add method", async () => {
-  await runner.compileWithVersionedService(`
+  const { program } = await SimpleTesterWithVersionedService.compile(`
     @route("/v1")
     @post
-    @added(Versions.v2)
+    @added(ServiceVersions.v2)
     op v2(@header headerV2: string): void;
   `);
 
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -746,13 +755,14 @@ it("add method", async () => {
 });
 
 it("add parameter", async () => {
-  await runner.compileWithVersionedService(`
+  const { program } = await SimpleTesterWithVersionedService.compile(`
     @route("/v1")
     @post
-    op v1(@added(Versions.v2) @header headerV2: string): void;
+    op v1(@added(ServiceVersions.v2) @header headerV2: string): void;
   `);
 
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   deepStrictEqual(sdkPackage.clients[0].apiVersions, ["v1", "v2"]);
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.kind, "basic");
@@ -800,52 +810,37 @@ it("model only used in new version", async () => {
     op stableFunctionality(...StableModel): void;
   `;
 
-  let runnerWithVersion = await createSdkTestRunner({
+  let { program } = await SimpleTester.compile(tsp);
+
+  let context = await createSdkContextForTester(program, {
     "api-version": "2023-11-01-preview",
-    emitterName: "@azure-tools/typespec-python",
   });
 
-  await runnerWithVersion.compile(tsp);
+  strictEqual(context.sdkPackage.clients.length, 1);
+  strictEqual(context.sdkPackage.clients[0].methods.length, 2);
+  strictEqual(context.sdkPackage.clients[0].methods[0].name, "previewFunctionality");
+  strictEqual(context.sdkPackage.clients[0].methods[1].name, "stableFunctionality");
+  strictEqual(context.sdkPackage.models.length, 2);
+  strictEqual(context.sdkPackage.models[0].name, "PreviewModel");
+  strictEqual(context.sdkPackage.models[0].access, "internal");
+  strictEqual(context.sdkPackage.models[1].name, "StableModel");
+  strictEqual(context.sdkPackage.models[1].access, "internal");
 
-  strictEqual(runnerWithVersion.context.sdkPackage.clients.length, 1);
-  strictEqual(runnerWithVersion.context.sdkPackage.clients[0].methods.length, 2);
-  strictEqual(
-    runnerWithVersion.context.sdkPackage.clients[0].methods[0].name,
-    "previewFunctionality",
-  );
-  strictEqual(
-    runnerWithVersion.context.sdkPackage.clients[0].methods[1].name,
-    "stableFunctionality",
-  );
-  strictEqual(runnerWithVersion.context.sdkPackage.models.length, 2);
-  strictEqual(runnerWithVersion.context.sdkPackage.models[0].name, "PreviewModel");
-  strictEqual(runnerWithVersion.context.sdkPackage.models[0].access, "internal");
-  strictEqual(runnerWithVersion.context.sdkPackage.models[1].name, "StableModel");
-  strictEqual(runnerWithVersion.context.sdkPackage.models[1].access, "internal");
+  ({ program } = await SimpleTester.compile(tsp));
 
-  runnerWithVersion = await createSdkTestRunner({
-    emitterName: "@azure-tools/typespec-python",
-  });
+  context = await createSdkContextForTester(program);
 
-  await runnerWithVersion.compile(tsp);
-
-  strictEqual(runnerWithVersion.context.sdkPackage.clients.length, 1);
-  strictEqual(runnerWithVersion.context.sdkPackage.clients[0].methods.length, 1);
-  strictEqual(
-    runnerWithVersion.context.sdkPackage.clients[0].methods[0].name,
-    "stableFunctionality",
-  );
-  strictEqual(runnerWithVersion.context.sdkPackage.models.length, 1);
-  strictEqual(runnerWithVersion.context.sdkPackage.models[0].name, "StableModel");
-  strictEqual(runnerWithVersion.context.sdkPackage.models[0].access, "internal");
-  strictEqual(
-    runnerWithVersion.context.sdkPackage.models[0].usage,
-    UsageFlags.Spread | UsageFlags.Json,
-  );
+  strictEqual(context.sdkPackage.clients.length, 1);
+  strictEqual(context.sdkPackage.clients[0].methods.length, 1);
+  strictEqual(context.sdkPackage.clients[0].methods[0].name, "stableFunctionality");
+  strictEqual(context.sdkPackage.models.length, 1);
+  strictEqual(context.sdkPackage.models[0].name, "StableModel");
+  strictEqual(context.sdkPackage.models[0].access, "internal");
+  strictEqual(context.sdkPackage.models[0].usage, UsageFlags.Spread | UsageFlags.Json);
 });
 
 it("add client", async () => {
-  await runner.compile(
+  const { program } = await SimpleTester.compile(
     `
     @service
     @versioned(Versions)
@@ -856,7 +851,7 @@ it("add client", async () => {
         endpoint: url,
       }
     )
-    namespace Versioning;
+    namespace VersioningService;
     enum Versions {
       v1: "v1",
       v2: "v2",
@@ -872,9 +867,10 @@ it("add client", async () => {
     }
     `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
-  const versioningClient = sdkPackage.clients.find((x) => x.name === "VersioningClient");
+  const versioningClient = sdkPackage.clients.find((x) => x.name === "VersioningServiceClient");
   ok(versioningClient);
   strictEqual(versioningClient.methods.length, 1);
   strictEqual(versioningClient.children?.length, 1);
@@ -910,7 +906,7 @@ it("add client", async () => {
 });
 
 it("default latest GA version with preview", async () => {
-  await runner.compile(
+  const { program } = await SimpleTester.compile(
     `
     @service
     @versioned(Versions)
@@ -921,7 +917,7 @@ it("default latest GA version with preview", async () => {
         endpoint: url,
       }
     )
-    namespace Versioning;
+    namespace VersioningService;
     enum Versions {
       v2022_10_01_preview: "2022-10-01-preview",
       v2024_10_01: "2024-10-01",
@@ -936,7 +932,8 @@ it("default latest GA version with preview", async () => {
     }
     `,
   );
-  const sdkVersionsEnum = runner.context.sdkPackage.enums[0];
+  const context = await createSdkContextForTester(program);
+  const sdkVersionsEnum = context.sdkPackage.enums[0];
   strictEqual(sdkVersionsEnum.name, "Versions");
   strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
   strictEqual(sdkVersionsEnum.values.length, 1);
@@ -944,7 +941,7 @@ it("default latest GA version with preview", async () => {
 });
 
 it("default latest preview version with GA", async () => {
-  await runner.compile(
+  const { program } = await SimpleTester.compile(
     `
     @service
     @versioned(Versions)
@@ -955,7 +952,7 @@ it("default latest preview version with GA", async () => {
         endpoint: url,
       }
     )
-    namespace Versioning;
+    namespace VersioningService;
     enum Versions {
       v2024_10_01: "2024-10-01",
       v2024_11_01_preview: "2024-11-01-preview",
@@ -970,7 +967,8 @@ it("default latest preview version with GA", async () => {
     }
     `,
   );
-  const sdkVersionsEnum = runner.context.sdkPackage.enums[0];
+  const context = await createSdkContextForTester(program);
+  const sdkVersionsEnum = context.sdkPackage.enums[0];
   strictEqual(sdkVersionsEnum.name, "Versions");
   strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
   strictEqual(sdkVersionsEnum.values.length, 2);
@@ -979,12 +977,7 @@ it("default latest preview version with GA", async () => {
 });
 
 it("specify api version with preview filter", async () => {
-  const runnerWithVersion = await createSdkTestRunner({
-    "api-version": "2024-10-01",
-    emitterName: "@azure-tools/typespec-python",
-  });
-
-  await runnerWithVersion.compile(
+  const { program } = await SimpleTester.compile(
     `
     @service
     @versioned(Versions)
@@ -995,7 +988,7 @@ it("specify api version with preview filter", async () => {
         endpoint: url,
       }
     )
-    namespace Versioning;
+    namespace VersioningService;
     enum Versions {
       v2023_10_01: "2023-10-01",
       v2023_11_01_preview: "2023-11-01-preview",
@@ -1012,7 +1005,10 @@ it("specify api version with preview filter", async () => {
     }
     `,
   );
-  const sdkVersionsEnum = runnerWithVersion.context.sdkPackage.enums[0];
+  const context = await createSdkContextForTester(program, {
+    "api-version": "2024-10-01",
+  });
+  const sdkVersionsEnum = context.sdkPackage.enums[0];
   strictEqual(sdkVersionsEnum.name, "Versions");
   strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
   strictEqual(sdkVersionsEnum.values.length, 2);
@@ -1058,40 +1054,30 @@ it("multiple clients", async () => {
     }
   `;
 
-  let runnerWithVersion = await createSdkTestRunner({
+  let { program } = await SimpleTester.compile(tsp);
+  let context = await createSdkContextForTester(program, {
     "api-version": "v1",
-    emitterName: "@azure-tools/typespec-python",
   });
 
-  let { A, B } = (await runnerWithVersion.compile(tsp)) as { A: Interface; B: Interface };
-  ok(getClient(runnerWithVersion.context, A));
-  strictEqual(getClient(runnerWithVersion.context, B), undefined);
-
-  let clients = listClients(runnerWithVersion.context);
+  let clients = listClients(context);
   strictEqual(clients.length, 1);
   let aClient = clients.find((x) => x.name === "AClient");
   ok(aClient);
-  let aOps = listOperationsInOperationGroup(runnerWithVersion.context, aClient);
+  let aOps = listOperationsInOperationGroup(context, aClient);
   strictEqual(aOps.length, 1);
   let aa = aOps.find((x) => x.name === "aa");
   ok(aa);
 
-  runnerWithVersion = await createSdkTestRunner({
+  ({ program } = await SimpleTester.compile(tsp));
+  context = await createSdkContextForTester(program, {
     "api-version": "v2",
-    emitterName: "@azure-tools/typespec-python",
   });
 
-  let result = (await runnerWithVersion.compile(tsp)) as { A: Interface; B: Interface };
-  A = result.A;
-  B = result.B;
-  ok(getClient(runnerWithVersion.context, A));
-  ok(getClient(runnerWithVersion.context, B));
-
-  clients = listClients(runnerWithVersion.context);
+  clients = listClients(context);
   strictEqual(clients.length, 2);
   aClient = clients.find((x) => x.name === "AClient");
   ok(aClient);
-  aOps = listOperationsInOperationGroup(runnerWithVersion.context, aClient);
+  aOps = listOperationsInOperationGroup(context, aClient);
   strictEqual(aOps.length, 2);
   aa = aOps.find((x) => x.name === "aa");
   ok(aa);
@@ -1099,35 +1085,29 @@ it("multiple clients", async () => {
   ok(ab);
   let bClient = clients.find((x) => x.name === "BClient");
   ok(bClient);
-  let bOps = listOperationsInOperationGroup(runnerWithVersion.context, bClient);
+  let bOps = listOperationsInOperationGroup(context, bClient);
   strictEqual(bOps.length, 2);
   let ba = bOps.find((x) => x.name === "ba");
   ok(ba);
   let bb = bOps.find((x) => x.name === "bb");
   ok(bb);
 
-  runnerWithVersion = await createSdkTestRunner({
+  ({ program } = await SimpleTester.compile(tsp));
+  context = await createSdkContextForTester(program, {
     "api-version": "v3",
-    emitterName: "@azure-tools/typespec-python",
   });
 
-  result = (await runnerWithVersion.compile(tsp)) as { A: Interface; B: Interface };
-  A = result.A;
-  B = result.B;
-  ok(getClient(runnerWithVersion.context, A));
-  ok(getClient(runnerWithVersion.context, B));
-
-  clients = listClients(runnerWithVersion.context);
+  clients = listClients(context);
   strictEqual(clients.length, 2);
   aClient = clients.find((x) => x.name === "AClient");
   ok(aClient);
-  aOps = listOperationsInOperationGroup(runnerWithVersion.context, aClient);
+  aOps = listOperationsInOperationGroup(context, aClient);
   strictEqual(aOps.length, 1);
   aa = aOps.find((x) => x.name === "aa");
   ok(aa);
   bClient = clients.find((x) => x.name === "BClient");
   ok(bClient);
-  bOps = listOperationsInOperationGroup(runnerWithVersion.context, bClient);
+  bOps = listOperationsInOperationGroup(context, bClient);
   strictEqual(bOps.length, 2);
   ba = bOps.find((x) => x.name === "ba");
   ok(ba);
@@ -1162,81 +1142,69 @@ it("multiple operation groups", async () => {
     }
   `;
 
-  let runnerWithVersion = await createSdkTestRunner({
+  let { program } = await SimpleTester.compile(tsp);
+  let context = await createSdkContextForTester(program, {
     "api-version": "v1",
-    emitterName: "@azure-tools/typespec-python",
   });
 
-  await runnerWithVersion.compile(tsp);
-
-  let clients = listClients(runnerWithVersion.context);
+  let clients = listClients(context);
   strictEqual(clients.length, 1);
   let client = clients.find((x) => x.name === "WidgetManagerClient");
   ok(client);
-  let ops = listOperationGroups(runnerWithVersion.context, client);
+  let ops = listOperationGroups(context, client);
   strictEqual(ops.length, 1);
   let aOp = ops.find((x) => x.type?.name === "A");
   ok(aOp);
-  let aOps = listOperationsInOperationGroup(runnerWithVersion.context, aOp);
+  let aOps = listOperationsInOperationGroup(context, aOp);
   strictEqual(aOps.length, 1);
   let a = aOps.find((x) => x.name === "a");
   ok(a);
 
-  runnerWithVersion = await createSdkTestRunner({
+  ({ program } = await SimpleTester.compile(tsp));
+  context = await createSdkContextForTester(program, {
     "api-version": "v2",
-    emitterName: "@azure-tools/typespec-python",
   });
 
-  await runnerWithVersion.compile(tsp);
-
-  clients = listClients(runnerWithVersion.context);
+  clients = listClients(context);
   strictEqual(clients.length, 1);
   client = clients.find((x) => x.name === "WidgetManagerClient");
   ok(client);
-  ops = listOperationGroups(runnerWithVersion.context, client);
+  ops = listOperationGroups(context, client);
   strictEqual(ops.length, 2);
   aOp = ops.find((x) => x.type?.name === "A");
   ok(aOp);
-  aOps = listOperationsInOperationGroup(runnerWithVersion.context, aOp);
+  aOps = listOperationsInOperationGroup(context, aOp);
   strictEqual(aOps.length, 1);
   a = aOps.find((x) => x.name === "a");
   ok(a);
   const bOp = ops.find((x) => x.type?.name === "B");
   ok(bOp);
-  const bOps = listOperationsInOperationGroup(runnerWithVersion.context, bOp);
+  const bOps = listOperationsInOperationGroup(context, bOp);
   strictEqual(bOps.length, 1);
   const b = bOps.find((x) => x.name === "b");
   ok(b);
 
-  runnerWithVersion = await createSdkTestRunner({
+  ({ program } = await SimpleTester.compile(tsp));
+  context = await createSdkContextForTester(program, {
     "api-version": "v3",
-    emitterName: "@azure-tools/typespec-python",
   });
 
-  await runnerWithVersion.compile(tsp);
-
-  clients = listClients(runnerWithVersion.context);
+  clients = listClients(context);
   strictEqual(clients.length, 1);
   client = clients.find((x) => x.name === "WidgetManagerClient");
   ok(client);
-  ops = listOperationGroups(runnerWithVersion.context, client);
+  ops = listOperationGroups(context, client);
   strictEqual(ops.length, 1);
   aOp = ops.find((x) => x.type?.name === "A");
   ok(aOp);
-  aOps = listOperationsInOperationGroup(runnerWithVersion.context, aOp);
+  aOps = listOperationsInOperationGroup(context, aOp);
   strictEqual(aOps.length, 1);
   a = aOps.find((x) => x.name === "a");
   ok(a);
 });
 
 it("filter preview versions with @previewVersion decorator", async () => {
-  const runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-python",
-  });
-
-  await runnerWithCore.compile(
+  const { program } = await AzureCoreTester.compile(
     `
     @service
     @versioned(Versions)
@@ -1265,7 +1233,8 @@ it("filter preview versions with @previewVersion decorator", async () => {
     }
     `,
   );
-  const sdkVersionsEnum = runnerWithCore.context.sdkPackage.enums[0];
+  const context = await createSdkContextForTester(program);
+  const sdkVersionsEnum = context.sdkPackage.enums[0];
   strictEqual(sdkVersionsEnum.name, "Versions");
   strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
   // Should filter out the preview version marked with @previewVersion
@@ -1275,13 +1244,7 @@ it("filter preview versions with @previewVersion decorator", async () => {
 });
 
 it("filter preview versions with both @previewVersion decorator and regex", async () => {
-  const runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-python",
-  });
-
-  await runnerWithCore.compile(
+  const { program } = await AzureCoreTester.compile(
     `
     @service
     @versioned(Versions)
@@ -1311,7 +1274,8 @@ it("filter preview versions with both @previewVersion decorator and regex", asyn
     }
     `,
   );
-  const sdkVersionsEnum = runnerWithCore.context.sdkPackage.enums[0];
+  const context = await createSdkContextForTester(program);
+  const sdkVersionsEnum = context.sdkPackage.enums[0];
   strictEqual(sdkVersionsEnum.name, "Versions");
   strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
   // Should filter out both preview versions (one by decorator, one by regex)
@@ -1321,13 +1285,7 @@ it("filter preview versions with both @previewVersion decorator and regex", asyn
 });
 
 it("do not filter preview versions when default API version is preview", async () => {
-  const runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-python",
-  });
-
-  await runnerWithCore.compile(
+  const { program } = await AzureCoreTester.compile(
     `
     @service
     @versioned(Versions)
@@ -1355,7 +1313,8 @@ it("do not filter preview versions when default API version is preview", async (
     }
     `,
   );
-  const sdkVersionsEnum = runnerWithCore.context.sdkPackage.enums[0];
+  const context = await createSdkContextForTester(program);
+  const sdkVersionsEnum = context.sdkPackage.enums[0];
   strictEqual(sdkVersionsEnum.name, "Versions");
   strictEqual(sdkVersionsEnum.usage, UsageFlags.ApiVersionEnum);
   // Should not filter anything since default API version is preview
@@ -1366,12 +1325,7 @@ it("do not filter preview versions when default API version is preview", async (
 });
 
 it("version not exist", async () => {
-  const runnerWithVersion = await createSdkTestRunner({
-    "api-version": "v4",
-    emitterName: "@azure-tools/typespec-python",
-  });
-
-  const [_, diagnostics] = await runnerWithVersion.compileAndDiagnose(`
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(`
     @service(#{
       title: "Contoso Widget Manager",
     })
@@ -1418,6 +1372,10 @@ it("version not exist", async () => {
     op get(...Resource.KeysOf<Widget>): Widget | Error;
   `);
 
+  const context = await createSdkContextForTester(program, {
+    "api-version": "v4",
+  });
+
   expectDiagnostics(diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/api-version-undefined",
     message:
@@ -1425,9 +1383,13 @@ it("version not exist", async () => {
     severity: "warning",
   });
 
-  const sdkPackage = runnerWithVersion.context.sdkPackage;
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.metadata.apiVersion, "v3");
-  deepStrictEqual(runnerWithVersion.context.getApiVersions(), ["v1", "v2", "v3"]);
+  deepStrictEqual(context.getPackageVersions().get(sdkPackage.clients[0].__raw.type as Namespace), [
+    "v1",
+    "v2",
+    "v3",
+  ]);
   strictEqual(sdkPackage.clients.length, 1);
 
   const apiVersionParam = sdkPackage.clients[0].clientInitialization.parameters.find(

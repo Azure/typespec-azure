@@ -27,9 +27,7 @@ model TrackedResourceWithOptionalLocation<
   Properties extends {},
   PropertiesOptional extends valueof boolean = true
 > extends CommonTypes.Resource {
-  #suppress "deprecated" "https://github.com/Azure/typespec-azure/issues/2284"
   @doc("The RP-specific properties for this resource.")
-  @conditionalClientFlatten
   @armResourcePropertiesOptionality(PropertiesOptional)
   properties?: Properties;
 
@@ -198,3 +196,12 @@ model DiscriminatedExtensionResource<
 > extends Foundations.ExtensionResource {
   ...PolymorphicResourceKindProperty<KindType>;
 }
+
+/**
+ * Model representing a custom Azure Resource Manager Resource.
+ * Use this template with 'is' to create a custom resource.
+ * @template isResource Optional. A boolean flag indicating whether the resource should be marked as an Azure resource. Default true.
+ */
+@Http.Private.includeInapplicableMetadataInPayload(false)
+@customAzureResource(#{ isAzureResource: isResource })
+model CustomAzureResource<isResource extends valueof boolean = true> {}

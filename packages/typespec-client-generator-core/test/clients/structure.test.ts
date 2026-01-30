@@ -1,20 +1,19 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
 import { expectDiagnostics } from "@typespec/compiler/testing";
-import { OpenAPITestLibrary } from "@typespec/openapi/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { InitializedByFlags } from "../../src/interfaces.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import {
+  ArmTester,
+  AzureCoreTester,
+  createClientCustomizationInput,
+  createSdkContextForTester,
+  SimpleBaseTester,
+  SimpleTester,
+  SimpleTesterWithService,
+} from "../tester.js";
 
 it("normal client", async () => {
-  await runner.compile(
+  const { program } = await SimpleTester.compile(
     `
     @service(#{
       title: "Pet Store",
@@ -28,7 +27,8 @@ it("normal client", async () => {
     op pet(): void;
     `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "PetStoreClient");
@@ -43,12 +43,7 @@ it("normal client", async () => {
 });
 
 it("arm client with operation groups", async () => {
-  const runnerWithArm = await createSdkTestRunner({
-    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
-    autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runnerWithArm.compile(`
+  const { program } = await ArmTester.compile(`
     @armProviderNamespace("My.Service")
     @server("http://localhost:3000", "endpoint")
     @service(#{title: "My.Service"})
@@ -76,7 +71,8 @@ it("arm client with operation groups", async () => {
     }
   `);
 
-  const sdkPackage = runnerWithArm.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "ServiceClient");
@@ -102,7 +98,7 @@ it("arm client with operation groups", async () => {
 });
 
 it("client with sub clients", async () => {
-  await runner.compile(
+  const { program } = await SimpleTester.compile(
     `
     @service(#{
       title: "Pet Store",
@@ -137,7 +133,8 @@ it("client with sub clients", async () => {
     }
     `,
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "PetStoreClient");
@@ -184,54 +181,57 @@ it("client with sub clients", async () => {
 });
 
 it("client with sub client and sub client has extra initialization paramters", async () => {
-  await runner.compileWithCustomization(
-    `
-    @service(#{
-      title: "Azure AI Face API",
-    })
-    namespace Face;
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+        @service(#{
+          title: "Azure AI Face API",
+        })
+        namespace Face;
 
-    @route("/largefacelists")
-    interface FaceListOperations {
-      op getLargeFaceList(@query largeFaceListId: string): void;
-    }
+        @route("/largefacelists")
+        interface FaceListOperations {
+          op getLargeFaceList(@query largeFaceListId: string): void;
+        }
 
-    @route("/largepersongroups")
-    interface PersonGroupOperations {
-      op getLargePersonGroup(@query largePersonGroupId: string): void;
-    }
-    `,
-    `
-    @client(
-      {
-        name: "FaceAdministrationClient",
-        service: Face,
-      }
-    )
-    namespace FaceAdministrationClient {
-      model LargeFaceListClientOptions {
-        largeFaceListId: string;
-      }
+        @route("/largepersongroups")
+        interface PersonGroupOperations {
+          op getLargePersonGroup(@query largePersonGroupId: string): void;
+        }
+      `,
+      `
+        @client(
+          {
+            name: "FaceAdministrationClient",
+            service: Face,
+          }
+        )
+        namespace FaceAdministrationClient {
+          model LargeFaceListClientOptions {
+            largeFaceListId: string;
+          }
 
-      model LargePersonGroupClientOptions {
-        largePersonGroupId: string;
-      }
+          model LargePersonGroupClientOptions {
+            largePersonGroupId: string;
+          }
 
-      @operationGroup
-      @clientInitialization(LargeFaceListClientOptions)
-      interface LargeFaceList {
-        get is Face.FaceListOperations.getLargeFaceList;
-      }
+          @operationGroup
+          @clientInitialization(LargeFaceListClientOptions)
+          interface LargeFaceList {
+            get is Face.FaceListOperations.getLargeFaceList;
+          }
 
-      @operationGroup
-      @clientInitialization(LargePersonGroupClientOptions)
-      interface LargePersonGroup {
-        get is Face.PersonGroupOperations.getLargePersonGroup;
-      }
-    }
-    `,
+          @operationGroup
+          @clientInitialization(LargePersonGroupClientOptions)
+          interface LargePersonGroup {
+            get is Face.PersonGroupOperations.getLargePersonGroup;
+          }
+        }
+      `,
+    ),
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "FaceAdministrationClient");
@@ -263,44 +263,47 @@ it("client with sub client and sub client has extra initialization paramters", a
 });
 
 it("client with sub client and sub client can also be initialized individually", async () => {
-  await runner.compileWithCustomization(
-    `
-    @service(#{
-      title: "Pet Store",
-    })
-    namespace PetStore;
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+        @service(#{
+          title: "Pet Store",
+        })
+        namespace PetStore;
 
-    @route("/pets")
-    namespace Pets {
-      @route("/feed")
-      op feed(): void;
-      @route("/pet")
-      op pet(): void;
-    }
+        @route("/pets")
+        namespace Pets {
+          @route("/feed")
+          op feed(): void;
+          @route("/pet")
+          op pet(): void;
+        }
 
-    @route("/actions")
-    namespace Actions {
-      @route("/open")
-      op open(): void;
-      @route("/close")
-      op close(): void;
-    }
-    `,
-    `
-    @@clientInitialization(PetStore.Pets,
-      {
-        initializedBy: InitializedBy.individually | InitializedBy.parent,
-      }
-    );
+        @route("/actions")
+        namespace Actions {
+          @route("/open")
+          op open(): void;
+          @route("/close")
+          op close(): void;
+        }
+      `,
+      `
+        @@clientInitialization(PetStore.Pets,
+          {
+            initializedBy: InitializedBy.individually | InitializedBy.parent,
+          }
+        );
 
-    @@clientInitialization(PetStore.Actions,
-      {
-        initializedBy: InitializedBy.individually | InitializedBy.parent,
-      }
-    );
-    `,
+        @@clientInitialization(PetStore.Actions,
+          {
+            initializedBy: InitializedBy.individually | InitializedBy.parent,
+          }
+        );
+      `,
+    ),
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "PetStoreClient");
@@ -336,31 +339,34 @@ it("client with sub client and sub client can also be initialized individually",
 });
 
 it("client with sub client and sub client can also be initialized individually with extra paramters", async () => {
-  await runner.compileWithCustomization(
-    `
-    @service
-    namespace ContainerClient {
-      interface Blob {
-        @route("/blob")
-        op download(@path containerName: string, @path blobName: string): void;
-      }
-    }
-    `,
-    `
-    model ContainerClientInitialization {
-      containerName: string
-    };
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+        @service
+        namespace ContainerClient {
+          interface Blob {
+            @route("/blob")
+            op download(@path containerName: string, @path blobName: string): void;
+          }
+        }
+      `,
+      `
+        model ContainerClientInitialization {
+          containerName: string
+        };
 
-    model BlobClientInitialization {
-      containerName: string,
-      blobName: string
-    };
+        model BlobClientInitialization {
+          containerName: string,
+          blobName: string
+        };
 
-    @@clientInitialization(ContainerClient, {parameters: ContainerClientInitialization});
-    @@clientInitialization(ContainerClient.Blob, {parameters: BlobClientInitialization, initializedBy: InitializedBy.individually | InitializedBy.parent});
-    `,
+        @@clientInitialization(ContainerClient, {parameters: ContainerClientInitialization});
+        @@clientInitialization(ContainerClient.Blob, {parameters: BlobClientInitialization, initializedBy: InitializedBy.individually | InitializedBy.parent});
+      `,
+    ),
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "ContainerClient");
@@ -387,20 +393,23 @@ it("client with sub client and sub client can also be initialized individually w
 });
 
 it("first level client could not be initialized by parent", async () => {
-  await runner.compileWithCustomization(
-    `
-      @service
-      namespace MyService;
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+        @service
+        namespace MyService;
 
-      op download(@path blobName: string): void;
+        op download(@path blobName: string): void;
       `,
-    `
-      namespace MyCustomizations;
+      `
+        namespace MyCustomizations;
 
-      @@clientInitialization(MyService, {initializedBy: InitializedBy.parent});
+        @@clientInitialization(MyService, {initializedBy: InitializedBy.parent});
       `,
+    ),
   );
-  expectDiagnostics(runner.context.diagnostics, {
+  const context = await createSdkContextForTester(program);
+  expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/invalid-initialized-by",
     message:
       "Invalid 'initializedBy' value. First level client must have `InitializedBy.individually` specified in `initializedBy`.",
@@ -408,7 +417,7 @@ it("first level client could not be initialized by parent", async () => {
 });
 
 it("sub client could not only be initialized individually", async () => {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @route("/bump")
     @clientInitialization({initializedBy: InitializedBy.individually})
@@ -417,7 +426,8 @@ it("sub client could not only be initialized individually", async () => {
     }
     `,
   );
-  expectDiagnostics(runner.context.diagnostics, {
+  const context = await createSdkContextForTester(program);
+  expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/invalid-initialized-by",
     message:
       "Invalid 'initializedBy' value. Sub client must have `InitializedBy.parent` or `InitializedBy.individually | InitializedBy.parent` specified in `initializedBy`.",
@@ -425,12 +435,7 @@ it("sub client could not only be initialized individually", async () => {
 });
 
 it("single with core", async () => {
-  const runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runnerWithCore.compile(`
+  const { program } = await AzureCoreTester.compile(`
     @versioned(MyVersions)
     @server("http://localhost:3000", "endpoint")
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
@@ -461,7 +466,8 @@ it("single with core", async () => {
 
     op delete is Operations.ResourceDelete<User>;
   `);
-  const sdkPackage = runnerWithCore.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "ServiceClient");
@@ -492,18 +498,13 @@ it("single with core", async () => {
   )[0];
   strictEqual(apiVersionParam.name, "apiVersion");
   strictEqual(apiVersionParam.onClient, true);
-  strictEqual(apiVersionParam.optional, false);
+  strictEqual(apiVersionParam.optional, true);
   strictEqual(apiVersionParam.kind, "method");
   strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01-preview");
 });
 
 it("multiple with core", async () => {
-  const runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runnerWithCore.compile(`
+  const { program } = await AzureCoreTester.compile(`
     @versioned(MyVersions)
     @server("http://localhost:3000", "endpoint")
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
@@ -537,7 +538,8 @@ it("multiple with core", async () => {
 
     op delete is Operations.ResourceDelete<User>;
   `);
-  const sdkPackage = runnerWithCore.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "ServiceClient");
@@ -562,55 +564,42 @@ it("multiple with core", async () => {
   )[0];
   strictEqual(apiVersionParam.name, "apiVersion");
   strictEqual(apiVersionParam.onClient, true);
-  strictEqual(apiVersionParam.optional, false);
+  strictEqual(apiVersionParam.optional, true);
   strictEqual(apiVersionParam.kind, "method");
   strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01");
 });
 
 it("namespace", async () => {
-  const runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runnerWithCore.compile(`
+  const { program } = await AzureCoreTester.compile(`
     @server("http://localhost:3000", "endpoint")
     @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
     @service
     namespace My.Service;
     op func(): void;
   `);
-  const sdkPackage = runnerWithCore.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const clientOne = sdkPackage.clients.filter((c) => c.name === "ServiceClient")[0];
   strictEqual(clientOne.namespace, "My.Service");
 });
 
 it("model-only namespace should be filtered out", async () => {
-  const runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runnerWithCore.compile(`
+  const { program } = await AzureCoreTester.compile(`
     @service
     namespace Foo {
       @usage(Usage.input)
       model B {}
     }
   `);
-  const sdkPackage = runnerWithCore.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 0);
   strictEqual(sdkPackage.models.length, 1);
 });
 
 it("empty namespace with empty subclient", async () => {
-  const runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runnerWithCore.compile(`
+  const { program } = await AzureCoreTester.compile(`
     @service
     namespace Foo {
       model B {}
@@ -620,35 +609,33 @@ it("empty namespace with empty subclient", async () => {
       interface Baz {}
     }
   `);
-  const sdkPackage = runnerWithCore.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 0);
 });
 
 it("explicit clients with only models should not be filtered out", async () => {
-  const runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runnerWithCore.compile(`
+  const { program } = await AzureCoreTester.compile(`
     @client
     @service
     namespace Foo {
       model B {}
     }
   `);
-  const sdkPackage = runnerWithCore.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 });
 
 it("operationGroup", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @operationGroup
     namespace MyOperationGroup {
       op func(): void;
     }
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
   const mainClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
@@ -676,7 +663,7 @@ it("operationGroup", async () => {
 });
 
 it("operationGroup2", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     namespace Foo {
       interface Bar {
         @route("/one")
@@ -688,7 +675,8 @@ it("operationGroup2", async () => {
       two(): void;
     }
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
   const mainClient = sdkPackage.clients[0];
@@ -733,39 +721,43 @@ it("operationGroup2", async () => {
 });
 
 it("optional params propagated", async () => {
-  await runner.compileWithCustomization(
-    `
-    @service(#{
-      title: "Test optional client param is propagated",
-    })
-    namespace ClientOptionalParams;
-      model ExpandParameter {
-        @query("$expand")
-        $expand?: string;
-      }
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+        @service(#{
+          title: "Test optional client param is propagated",
+        })
+        namespace ClientOptionalParams;
+          model ExpandParameter {
+            @query("$expand")
+            $expand?: string;
+          }
 
-      namespace WithExpand {
-        @route("/with")
-        op test(@query("$expand")$expand?: string): void;
-      }
+          namespace WithExpand {
+            @route("/with")
+            op test(@query("$expand")$expand?: string): void;
+          }
 
-      namespace WithoutExpand {
-        @route("/without")
-        op test(): void;
+          namespace WithoutExpand {
+            @route("/without")
+            op test(): void;
       }`,
-    `
-  @@clientInitialization(ClientOptionalParams,
-    {
-      parameters: ClientOptionalParams.ExpandParameter,
-    },
+      `
+        @@clientInitialization(ClientOptionalParams,
+          {
+            parameters: ClientOptionalParams.ExpandParameter,
+          },
+        );
+      `,
+    ),
   );
-`,
-  );
+  await createSdkContextForTester(program);
 });
 
 it("one client from multiple services", async () => {
-  await runner.compileWithCustomization(
-    `
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     @versioned(VersionsA)
     namespace ServiceA {
@@ -773,13 +765,11 @@ it("one client from multiple services", async () => {
         av1,
         av2,
       }
-
       interface AI {
         @route("/aTest")
         aTest(@query("api-version") apiVersion: VersionsA): void;
       }
     }
-
     @service
     @versioned(VersionsB)
     namespace ServiceB {
@@ -787,27 +777,25 @@ it("one client from multiple services", async () => {
         bv1,
         bv2,
       }
-
       interface BI {
         @route("/bTest")
         bTest(@query("api-version") apiVersion: VersionsB): void;
       }
     }`,
-    `
-  @client
-  @service
-  @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
-  namespace CombineClient {
-    @clientInitialization({initializedBy: InitializedBy.parent})
-    @client({service: ServiceA, parent: CombineClient})
-    interface AI extends ServiceA.AI {}
-    @clientInitialization({initializedBy: InitializedBy.parent})
-    @client({service: ServiceB, parent: CombineClient})
-    interface BI extends ServiceB.BI {}
-  }
-`,
+      `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombineClient;
+  `,
+    ),
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const aVersionsEnum = sdkPackage.enums.find((e) => e.name === "VersionsA");
   ok(aVersionsEnum);
@@ -815,8 +803,8 @@ it("one client from multiple services", async () => {
   ok(bVersionsEnum);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "CombineClient");
-  strictEqual(client.apiVersions.length, 2);
-  deepStrictEqual(client.apiVersions, ["av2", "bv2"]);
+  // For root client of multiple services, the `apiVersions` will be empty.
+  strictEqual(client.apiVersions.length, 0);
   strictEqual(client.children!.length, 2);
   strictEqual(client.clientInitialization.parameters.length, 2);
   ok(client.clientInitialization.parameters.find((p) => p.name === "endpoint"));
@@ -824,8 +812,12 @@ it("one client from multiple services", async () => {
     (p) => p.name === "apiVersion",
   );
   ok(apiVersionParam);
-  strictEqual(apiVersionParam.apiVersions.length, 2);
-  deepStrictEqual(apiVersionParam.apiVersions, ["av2", "bv2"]);
+  strictEqual(apiVersionParam.apiVersions.length, 0);
+  strictEqual(apiVersionParam.clientDefaultValue, undefined);
+  // For multi-service clients, the api version param type should be string
+  strictEqual(apiVersionParam.type.kind, "string");
+  // For multi-service clients, the API version parameter should always be optional
+  strictEqual(apiVersionParam.optional, true);
   const aiClient = client.children!.find((c) => c.name === "AI");
   ok(aiClient);
 
@@ -877,9 +869,331 @@ it("one client from multiple services", async () => {
   strictEqual(biOperationApiVersionParam.correspondingMethodParams[0], biApiVersionParam);
 });
 
-it("one client from multiple services with versioning", async () => {
-  await runner.compileWithCustomization(
-    `
+it("one client from multiple services with no versioning", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+        @service
+        namespace ServiceA {
+          interface AI {
+            @route("/aTest")
+            aTest(): void;
+          }
+        }
+        @service
+        namespace ServiceB {
+          interface BI {
+            @route("/bTest")
+            bTest(): void;
+          }
+    }`,
+      `
+        @client(
+          {
+            name: "CombineClient",
+            service: [ServiceA, ServiceB],
+          }
+        )
+        namespace CombineClient;
+      `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  // For root client of multiple services, the `apiVersions` will be empty.
+  strictEqual(client.apiVersions.length, 0);
+  strictEqual(client.children!.length, 2);
+  strictEqual(client.clientInitialization.parameters.length, 1);
+  ok(client.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+
+  // AI client should have no api versions
+  strictEqual(aiClient.apiVersions.length, 0);
+  strictEqual(aiClient.clientInitialization.parameters.length, 1);
+  strictEqual(aiClient.clientInitialization.parameters[0].name, "endpoint");
+
+  // AI client should have aTest method with no api version
+  const aiMethod = aiClient.methods[0];
+  strictEqual(aiMethod.name, "aTest");
+  strictEqual(aiMethod.parameters.length, 0);
+  const aiOperation = aiMethod.operation;
+  strictEqual(aiOperation.parameters.length, 0);
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+
+  // BI client should have no api versions
+  strictEqual(biClient.apiVersions.length, 0);
+  strictEqual(biClient.clientInitialization.parameters.length, 1);
+  strictEqual(biClient.clientInitialization.parameters[0].name, "endpoint");
+
+  // BI client should have bTest method with no api version
+  const biMethod = biClient.methods[0];
+  strictEqual(biMethod.name, "bTest");
+  strictEqual(biMethod.parameters.length, 0);
+  const biOperation = biMethod.operation;
+  strictEqual(biOperation.parameters.length, 0);
+});
+
+it("one client from multiple services without version dependency", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+        @service
+        @versioned(VersionsA)
+        namespace ServiceA {
+          enum VersionsA {
+            av1,
+            av2,
+          }
+          interface AI {
+            @route("/aTest")
+            aTest(@query("api-version") apiVersion: VersionsA): void;
+          }
+        }
+        @service
+        @versioned(VersionsB)
+        namespace ServiceB {
+          enum VersionsB {
+            bv1,
+            bv2,
+          }
+          interface BI {
+            @route("/bTest")
+            bTest(@query("api-version") apiVersion: VersionsB): void;
+          }
+    }`,
+      `
+        @client(
+          {
+            name: "CombineClient",
+            service: [ServiceA, ServiceB],
+          }
+        )
+        namespace CombineClient;
+      `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const aVersionsEnum = sdkPackage.enums.find((e) => e.name === "VersionsA");
+  ok(aVersionsEnum);
+  const bVersionsEnum = sdkPackage.enums.find((e) => e.name === "VersionsB");
+  ok(bVersionsEnum);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  // For root client of multiple services, the `apiVersions` will be empty.
+  strictEqual(client.apiVersions.length, 0);
+  strictEqual(client.children!.length, 2);
+  strictEqual(client.clientInitialization.parameters.length, 2);
+  ok(client.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+  const apiVersionParam = client.clientInitialization.parameters.find(
+    (p) => p.name === "apiVersion",
+  );
+  ok(apiVersionParam);
+  strictEqual(apiVersionParam.apiVersions.length, 0);
+  strictEqual(apiVersionParam.clientDefaultValue, undefined);
+  // For multi-service clients, the api version param type should be string
+  strictEqual(apiVersionParam.type.kind, "string");
+  // For multi-service clients, the API version parameter should always be optional
+  strictEqual(apiVersionParam.optional, true);
+
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+
+  // AI client should have api versions from ServiceA
+  strictEqual(aiClient.apiVersions.length, 2);
+  deepStrictEqual(aiClient.apiVersions, ["av1", "av2"]);
+  strictEqual(aiClient.clientInitialization.parameters.length, 2);
+  strictEqual(aiClient.clientInitialization.parameters[0].name, "endpoint");
+  strictEqual(aiClient.clientInitialization.parameters[1].name, "apiVersion");
+  const aiApiVersionParam = aiClient.clientInitialization.parameters[1];
+  strictEqual(aiApiVersionParam.isApiVersionParam, true);
+  strictEqual(aiApiVersionParam.onClient, true);
+  strictEqual(aiApiVersionParam.clientDefaultValue, "av2");
+
+  // AI client should have aTest method with VersionsA api version
+  strictEqual(aiClient.methods.length, 1);
+  const aiMethod = aiClient.methods[0];
+  strictEqual(aiMethod.name, "aTest");
+  strictEqual(aiMethod.parameters.length, 0);
+  const aiOperation = aiMethod.operation;
+  strictEqual(aiOperation.parameters.length, 1);
+  const aiOperationApiVersionParam = aiOperation.parameters.find((p) => p.isApiVersionParam);
+  ok(aiOperationApiVersionParam);
+  strictEqual(aiOperationApiVersionParam.correspondingMethodParams.length, 1);
+  strictEqual(aiOperationApiVersionParam.correspondingMethodParams[0], aiApiVersionParam);
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+
+  strictEqual(biClient.apiVersions.length, 2);
+  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
+  strictEqual(biClient.clientInitialization.parameters.length, 2);
+  strictEqual(biClient.clientInitialization.parameters[0].name, "endpoint");
+  strictEqual(biClient.clientInitialization.parameters[1].name, "apiVersion");
+  const biApiVersionParam = biClient.clientInitialization.parameters[1];
+  strictEqual(biApiVersionParam.isApiVersionParam, true);
+  strictEqual(biApiVersionParam.onClient, true);
+  strictEqual(biApiVersionParam.clientDefaultValue, "bv2");
+
+  // BI client should have bTest method with VersionsB api version
+  const biMethod = biClient.methods[0];
+  strictEqual(biMethod.name, "bTest");
+  strictEqual(biMethod.parameters.length, 0);
+  const biOperation = biMethod.operation;
+  strictEqual(biOperation.parameters.length, 1);
+  const biOperationApiVersionParam = biOperation.parameters.find((p) => p.isApiVersionParam);
+  ok(biOperationApiVersionParam);
+  strictEqual(biOperationApiVersionParam.correspondingMethodParams.length, 1);
+  strictEqual(biOperationApiVersionParam.correspondingMethodParams[0], biApiVersionParam);
+});
+
+it("one client from multiple services with `@clientLocation`", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      interface AI {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+      }
+
+      interface AI2 {
+        @route("/aTest2")
+        aTest2(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      interface BI {
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+      `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombineClient;
+
+    @@clientLocation(ServiceA.AI2.aTest2, ServiceA.AI);
+    @@clientLocation(ServiceB.BI.bTest, "BI2");
+  `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const aVersionsEnum = sdkPackage.enums.find((e) => e.name === "VersionsA");
+  ok(aVersionsEnum);
+  const bVersionsEnum = sdkPackage.enums.find((e) => e.name === "VersionsB");
+  ok(bVersionsEnum);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  // For root client of multiple services, the `apiVersions` will be empty.
+  strictEqual(client.apiVersions.length, 0);
+  strictEqual(client.children!.length, 2);
+  strictEqual(client.clientInitialization.parameters.length, 2);
+  ok(client.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+  const apiVersionParam = client.clientInitialization.parameters.find(
+    (p) => p.name === "apiVersion",
+  );
+  ok(apiVersionParam);
+  strictEqual(apiVersionParam.apiVersions.length, 0);
+  strictEqual(apiVersionParam.clientDefaultValue, undefined);
+  // For multi-service clients, the api version param type should be string
+  strictEqual(apiVersionParam.type.kind, "string");
+  // For multi-service clients, the API version parameter should always be optional
+  strictEqual(apiVersionParam.optional, true);
+
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+
+  // AI client should have api versions from ServiceA
+  strictEqual(aiClient.apiVersions.length, 2);
+  deepStrictEqual(aiClient.apiVersions, ["av1", "av2"]);
+  strictEqual(aiClient.clientInitialization.parameters.length, 2);
+  strictEqual(aiClient.clientInitialization.parameters[0].name, "endpoint");
+  strictEqual(aiClient.clientInitialization.parameters[1].name, "apiVersion");
+  const aiApiVersionParam = aiClient.clientInitialization.parameters[1];
+  strictEqual(aiApiVersionParam.isApiVersionParam, true);
+  strictEqual(aiApiVersionParam.onClient, true);
+  strictEqual(aiApiVersionParam.clientDefaultValue, "av2");
+
+  // AI client should have aTest method with VersionsA api version
+  strictEqual(aiClient.methods.length, 2);
+  const aiMethod = aiClient.methods[0];
+  strictEqual(aiMethod.name, "aTest");
+  strictEqual(aiMethod.parameters.length, 0);
+  const aiOperation = aiMethod.operation;
+  strictEqual(aiOperation.parameters.length, 1);
+  const aiOperationApiVersionParam = aiOperation.parameters.find((p) => p.isApiVersionParam);
+  ok(aiOperationApiVersionParam);
+  strictEqual(aiOperationApiVersionParam.correspondingMethodParams.length, 1);
+  strictEqual(aiOperationApiVersionParam.correspondingMethodParams[0], aiApiVersionParam);
+
+  // AI client should have aTest2 method with VersionsA api version
+  const aiMethod2 = aiClient.methods[1];
+  strictEqual(aiMethod2.name, "aTest2");
+  strictEqual(aiMethod2.parameters.length, 0);
+  const aiOperation2 = aiMethod2.operation;
+  strictEqual(aiOperation2.parameters.length, 1);
+  const aiOperation2ApiVersionParam = aiOperation2.parameters.find((p) => p.isApiVersionParam);
+  ok(aiOperation2ApiVersionParam);
+  strictEqual(aiOperation2ApiVersionParam.correspondingMethodParams.length, 1);
+  strictEqual(aiOperation2ApiVersionParam.correspondingMethodParams[0], aiApiVersionParam);
+
+  const biClient = client.children!.find((c) => c.name === "BI2");
+  ok(biClient);
+
+  strictEqual(biClient.apiVersions.length, 2);
+  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
+  strictEqual(biClient.clientInitialization.parameters.length, 2);
+  strictEqual(biClient.clientInitialization.parameters[0].name, "endpoint");
+  strictEqual(biClient.clientInitialization.parameters[1].name, "apiVersion");
+  const biApiVersionParam = biClient.clientInitialization.parameters[1];
+  strictEqual(biApiVersionParam.isApiVersionParam, true);
+  strictEqual(biApiVersionParam.onClient, true);
+  strictEqual(biApiVersionParam.clientDefaultValue, "bv2");
+
+  // BI client should have bTest method with VersionsB api version
+  const biMethod = biClient.methods[0];
+  strictEqual(biMethod.name, "bTest");
+  strictEqual(biMethod.parameters.length, 0);
+  const biOperation = biMethod.operation;
+  strictEqual(biOperation.parameters.length, 1);
+  const biOperationApiVersionParam = biOperation.parameters.find((p) => p.isApiVersionParam);
+  ok(biOperationApiVersionParam);
+  strictEqual(biOperationApiVersionParam.correspondingMethodParams.length, 1);
+  strictEqual(biOperationApiVersionParam.correspondingMethodParams[0], biApiVersionParam);
+});
+
+it("one client from multiple services with api-version set to latest", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     @versioned(VersionsA)
     namespace ServiceA {
@@ -888,25 +1202,11 @@ it("one client from multiple services with versioning", async () => {
         av2,
         av3,
       }
-
-      @added(VersionsA.av2)
-      model ServiceAModel {
-        id: string;
-        @added(VersionsA.av3)
-        name?: string;
-      }
-
       interface AI {
-        @added(VersionsA.av2)
         @route("/aTest")
-        aTest(@query("api-version") apiVersion: VersionsA): ServiceAModel;
-        
-        @added(VersionsA.av3)
-        @route("/anew")
-        aNewOp(@query("api-version") apiVersion: VersionsA): void;
+        aTest(@query("api-version") apiVersion: VersionsA): void;
       }
     }
-
     @service
     @versioned(VersionsB)
     namespace ServiceB {
@@ -914,113 +1214,305 @@ it("one client from multiple services with versioning", async () => {
         bv1,
         bv2,
       }
-
-      model ServiceBModel {
-        data: string;
-      }
-
       interface BI {
         @route("/bTest")
-        bTest(@query("api-version") apiVersion: VersionsB): ServiceBModel;
-        
-        @added(VersionsB.bv2)
-        @route("/bNew")
-        bNewOp(@query("api-version") apiVersion: VersionsB): void;
+        bTest(@query("api-version") apiVersion: VersionsB): void;
       }
     }`,
-    `
-    @client
-    @service
-    @useDependency(
-      ServiceA.VersionsA.av3,
-      ServiceB.VersionsB.bv2
+      `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
     )
-    namespace CombineClient {
-      @client({parent: CombineClient, service: ServiceA})
-      @clientInitialization({initializedBy: InitializedBy.parent})
-      interface AI extends ServiceA.AI {}
-
-      @client({parent: CombineClient, service: ServiceB})
-      @clientInitialization({initializedBy: InitializedBy.parent})
-      interface BI extends ServiceB.BI {}
-    }
+    @useDependency(ServiceA.VersionsA.av3, ServiceB.VersionsB.bv2)
+    namespace CombineClient;
   `,
+    ),
   );
-
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program, {
+    "api-version": "latest",
+  });
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "CombineClient");
+  strictEqual(client.apiVersions.length, 0);
+  strictEqual(client.children!.length, 2);
 
-  // Client should have endpoint and apiVersion parameters
-  strictEqual(client.clientInitialization.parameters.length, 2);
-  strictEqual(client.clientInitialization.parameters[0].name, "endpoint");
-  strictEqual(client.clientInitialization.parameters[1].name, "apiVersion");
-
-  // Should have 2 children (AI and BI)
-  strictEqual(client.children?.length, 2);
-
-  const aiClient = client.children?.find((c) => c.name === "AI");
+  const aiClient = client.children!.find((c) => c.name === "AI");
   ok(aiClient);
-
-  // AI client should have ServiceA's api versions
+  strictEqual(aiClient.apiVersions.length, 3);
   deepStrictEqual(aiClient.apiVersions, ["av1", "av2", "av3"]);
+  const aiApiVersionParam = aiClient.clientInitialization.parameters.find(
+    (p) => p.isApiVersionParam,
+  );
+  ok(aiApiVersionParam);
+  strictEqual(aiApiVersionParam.clientDefaultValue, "av3");
 
-  // Check ServiceAModel exists and has correct versioning
-  const serviceAModel = sdkPackage.models.find((m) => m.name === "ServiceAModel");
-  ok(serviceAModel);
-  deepStrictEqual(serviceAModel.apiVersions, ["av2", "av3"]); // Added in av2
-
-  // Check model property versioning
-  const nameProperty = serviceAModel.properties.find((p) => p.name === "name");
-  ok(nameProperty);
-  deepStrictEqual(nameProperty.apiVersions, ["av3"]); // Added in av3
-
-  const idProperty = serviceAModel.properties.find((p) => p.name === "id");
-  ok(idProperty);
-
-  // AI client should have 2 methods initially, but aNewOp is only available from av3
-  const aiMethods = aiClient.methods;
-  const aTestMethod = aiMethods.find((m) => m.name === "aTest");
-  ok(aTestMethod);
-  deepStrictEqual(aTestMethod.apiVersions, ["av2", "av3"]);
-
-  const aNewMethod = aiMethods.find((m) => m.name === "aNewOp");
-  ok(aNewMethod);
-  deepStrictEqual(aNewMethod.apiVersions, ["av3"]); // Added in av3
-
-  const biClient = client.children?.find((c) => c.name === "BI");
+  const biClient = client.children!.find((c) => c.name === "BI");
   ok(biClient);
-
-  // BI client should have ServiceB's api versions
+  strictEqual(biClient.apiVersions.length, 2);
   deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
-
-  // Check ServiceBModel versioning
-  const serviceBModel = sdkPackage.models.find((m) => m.name === "ServiceBModel");
-  ok(serviceBModel);
-  deepStrictEqual(serviceBModel.apiVersions, ["bv1", "bv2"]); // Available from start
-
-  // BI client methods
-  const biMethods = biClient.methods;
-  const bTestMethod = biMethods.find((m) => m.name === "bTest");
-  ok(bTestMethod);
-  deepStrictEqual(bTestMethod.apiVersions, ["bv1", "bv2"]);
-
-  const bNewMethod = biMethods.find((m) => m.name === "bNewOp");
-  ok(bNewMethod);
-  deepStrictEqual(bNewMethod.apiVersions, ["bv2"]); // Added in bv2
-
-  // Parent client should have API versions from @useDependency
-  deepStrictEqual(client.apiVersions, ["av3", "bv2"]);
+  const biApiVersionParam = biClient.clientInitialization.parameters.find(
+    (p) => p.isApiVersionParam,
+  );
+  ok(biApiVersionParam);
+  strictEqual(biApiVersionParam.clientDefaultValue, "bv2");
 });
 
-it("multiple services without @useDependency should require it", async () => {
-  const runnerWithVersion = await createSdkTestRunner({
-    "api-version": "latest",
-    emitterName: "@azure-tools/typespec-python",
+it("one client from multiple services with api-version set to specific version bv1", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+        av3,
+      }
+      interface AI {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+        bv3,
+      }
+      interface BI {
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): void;
+
+        @route("/bTest2")
+        @added(VersionsB.bv2)
+        bTest2(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+      `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av3, ServiceB.VersionsB.bv1)
+    namespace CombineClient;
+  `,
+    ),
+  );
+  const context = await createSdkContextForTester(program, {
+    "api-version": "bv1",
   });
-  await runnerWithVersion.compileWithCustomization(
-    `
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  strictEqual(client.apiVersions.length, 0);
+
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+  // ServiceA doesn't have bv1, so api-version="bv1" doesn't filter it
+  // It falls back to useDependency which specifies av3
+  strictEqual(aiClient.apiVersions.length, 0);
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+  // With api-version bv1, we should see only bv1 version
+  strictEqual(biClient.apiVersions.length, 1);
+  deepStrictEqual(biClient.apiVersions, ["bv1"]);
+  const biApiVersionParam = biClient.clientInitialization.parameters.find(
+    (p) => p.isApiVersionParam,
+  );
+  ok(biApiVersionParam);
+  strictEqual(biApiVersionParam.clientDefaultValue, "bv1");
+
+  // bTest2 should not be included since it was added in bv2
+  strictEqual(biClient.methods.length, 1);
+  strictEqual(biClient.methods[0].name, "bTest");
+});
+
+it("one client from multiple services with api-version set to all", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+        av3,
+      }
+      interface AI {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+
+        @route("/aTest2")
+        @added(VersionsA.av2)
+        @removed(VersionsA.av3)
+        aTest2(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      interface BI {
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): void;
+
+        @route("/bTest2")
+        @added(VersionsB.bv2)
+        bTest2(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+      `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av3, ServiceB.VersionsB.bv2)
+    namespace CombineClient;
+  `,
+    ),
+  );
+  const context = await createSdkContextForTester(program, {
+    "api-version": "all",
+  });
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  strictEqual(client.apiVersions.length, 0);
+
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+  strictEqual(aiClient.apiVersions.length, 3);
+  deepStrictEqual(aiClient.apiVersions, ["av1", "av2", "av3"]);
+  const aiApiVersionParam = aiClient.clientInitialization.parameters.find(
+    (p) => p.isApiVersionParam,
+  );
+  ok(aiApiVersionParam);
+  strictEqual(aiApiVersionParam.clientDefaultValue, "av3");
+
+  // With api-version all, both aTest and aTest2 should be included
+  strictEqual(aiClient.methods.length, 2);
+  const aTest = aiClient.methods.find((m) => m.name === "aTest");
+  ok(aTest);
+  deepStrictEqual(aTest.apiVersions, ["av1", "av2", "av3"]);
+  const aTest2 = aiClient.methods.find((m) => m.name === "aTest2");
+  ok(aTest2);
+  deepStrictEqual(aTest2.apiVersions, ["av2"]);
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+  strictEqual(biClient.apiVersions.length, 2);
+  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
+  const biApiVersionParam = biClient.clientInitialization.parameters.find(
+    (p) => p.isApiVersionParam,
+  );
+  ok(biApiVersionParam);
+  strictEqual(biApiVersionParam.clientDefaultValue, "bv2");
+
+  // Both bTest and bTest2 should be included
+  strictEqual(biClient.methods.length, 2);
+  const bTest = biClient.methods.find((m) => m.name === "bTest");
+  ok(bTest);
+  deepStrictEqual(bTest.apiVersions, ["bv1", "bv2"]);
+  const bTest2 = biClient.methods.find((m) => m.name === "bTest2");
+  ok(bTest2);
+  deepStrictEqual(bTest2.apiVersions, ["bv2"]);
+});
+
+it("one client from multiple services with different useDependency versions", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+        av3,
+      }
+      interface AI {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+        bv3,
+      }
+      interface BI {
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+      `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av1, ServiceB.VersionsB.bv3)
+    namespace CombineClient;
+  `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  strictEqual(client.apiVersions.length, 0);
+
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+  // useDependency specifies av1, so only av1 should be included
+  strictEqual(aiClient.apiVersions.length, 1);
+  deepStrictEqual(aiClient.apiVersions, ["av1"]);
+  const aiApiVersionParam = aiClient.clientInitialization.parameters.find(
+    (p) => p.isApiVersionParam,
+  );
+  ok(aiApiVersionParam);
+  strictEqual(aiApiVersionParam.clientDefaultValue, "av1");
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+  // useDependency specifies bv3, so all versions up to bv3 should be included
+  strictEqual(biClient.apiVersions.length, 3);
+  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2", "bv3"]);
+  const biApiVersionParam = biClient.clientInitialization.parameters.find(
+    (p) => p.isApiVersionParam,
+  );
+  ok(biApiVersionParam);
+  strictEqual(biApiVersionParam.clientDefaultValue, "bv3");
+});
+
+it("one client from multiple services with models shared across services", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
     @service
     @versioned(VersionsA)
     namespace ServiceA {
@@ -1029,13 +1521,18 @@ it("multiple services without @useDependency should require it", async () => {
         av2,
       }
 
+      model SharedModel {
+        name: string;
+        @added(VersionsA.av2)
+        description?: string;
+      }
+
       interface AI {
         @route("/aTest")
-        aTest(@query("api-version") apiVersion: VersionsA): void;
+        aTest(@body body: SharedModel, @query("api-version") apiVersion: VersionsA): void;
       }
     }
-
-    @service 
+    @service
     @versioned(VersionsB)
     namespace ServiceB {
       enum VersionsB {
@@ -1043,37 +1540,613 @@ it("multiple services without @useDependency should require it", async () => {
         bv2,
       }
 
+      model SharedModel {
+        id: int32;
+        @added(VersionsB.bv2)
+        value?: string;
+      }
+
+      interface BI {
+        @route("/bTest")
+        bTest(@body body: SharedModel, @query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+      `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombineClient;
+  `,
+    ),
+  );
+  const context = await createSdkContextForTester(program, {
+    "api-version": "latest",
+  });
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+
+  // Both SharedModel types should exist - one from each service
+  const models = sdkPackage.models;
+  strictEqual(models.length, 2);
+
+  const sharedModelA = models.find((m) => m.namespace === "ServiceA");
+  ok(sharedModelA);
+  strictEqual(sharedModelA.name, "SharedModel");
+  strictEqual(sharedModelA.properties.length, 2);
+  const nameProperty = sharedModelA.properties.find((p) => p.name === "name");
+  ok(nameProperty);
+  const descriptionProperty = sharedModelA.properties.find((p) => p.name === "description");
+  ok(descriptionProperty);
+
+  const sharedModelB = models.find((m) => m.namespace === "ServiceB");
+  ok(sharedModelB);
+  strictEqual(sharedModelB.name, "SharedModel");
+  strictEqual(sharedModelB.properties.length, 2);
+  const idProperty = sharedModelB.properties.find((p) => p.name === "id");
+  ok(idProperty);
+  const valueProperty = sharedModelB.properties.find((p) => p.name === "value");
+  ok(valueProperty);
+
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+  strictEqual(aiClient.apiVersions.length, 2);
+  deepStrictEqual(aiClient.apiVersions, ["av1", "av2"]);
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+  strictEqual(biClient.apiVersions.length, 2);
+  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
+});
+
+it("error: multiple explicit clients with multiple services", async () => {
+  const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      interface AI {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
       interface BI {
         @route("/bTest")
         bTest(@query("api-version") apiVersion: VersionsB): void;
       }
     }`,
+      `
+    @client(
+      {
+        name: "ClientA",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace ClientA {}
 
-    `@client
-    @service
-    @useDependency(ServiceA.VersionsA.av1, ServiceB.VersionsB.bv1)
-    namespace CombineClient {
-      @clientInitialization({initializedBy: InitializedBy.parent})
-      @client({service: ServiceA, parent: CombineClient})
-      interface AI extends ServiceA.AI {}
-      @clientInitialization({initializedBy: InitializedBy.parent})
-      @client({service: ServiceB, parent: CombineClient})
-      interface BI extends ServiceB.BI {}
-    }
+    @client(
+      {
+        name: "ClientB",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace ClientB {}
   `,
+    ),
   );
+  await createSdkContextForTester(program);
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/multiple-explicit-clients-multiple-services",
+      message: "Can not define multiple explicit clients with multiple services.",
+    },
+  ]);
+});
 
-  const sdkPackage = runnerWithVersion.context.sdkPackage;
+it("client location to new operation group with multiple services", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      @route("/aTest")
+      op aTest(@query("api-version") apiVersion: VersionsA): void;
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      @route("/bTest")
+      op bTest(@query("api-version") apiVersion: VersionsB): void;
+    }`,
+      `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombineClient {}
+
+    // Move operations from different services to a new operation group
+    @@clientLocation(ServiceA.aTest, "NewOperationGroup");
+    @@clientLocation(ServiceB.bTest, "NewOperationGroup");
+  `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  // Root client of multiple services has empty apiVersions
+  strictEqual(client.apiVersions.length, 0);
 
+  // Find the NewOperationGroup sub-client
+  const newOpGroup = client.children!.find((c) => c.name === "NewOperationGroup");
+  ok(newOpGroup);
+
+  // Sub-client with operations from multiple services should have empty apiVersions
+  strictEqual(newOpGroup.apiVersions.length, 0);
+  strictEqual(newOpGroup.clientInitialization.parameters.length, 2);
+  strictEqual(newOpGroup.clientInitialization.parameters[0].name, "endpoint");
+  strictEqual(newOpGroup.clientInitialization.parameters[1].name, "apiVersion");
+  const apiVersionParam = newOpGroup.clientInitialization.parameters[1];
+  strictEqual(apiVersionParam.isApiVersionParam, true);
+  strictEqual(apiVersionParam.onClient, true);
+  strictEqual(apiVersionParam.clientDefaultValue, undefined);
+  // For multi-service operation groups, the api version param type should be string
+  strictEqual(apiVersionParam.type.kind, "string");
+
+  // NewOperationGroup should have both operations
+  strictEqual(newOpGroup.methods.length, 2);
+  const aTestMethod = newOpGroup.methods.find((m) => m.name === "aTest");
+  ok(aTestMethod);
+  const bTestMethod = newOpGroup.methods.find((m) => m.name === "bTest");
+  ok(bTestMethod);
+});
+
+it("one client from multiple services with operation group name conflict - merged", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      // Interface with same name in both services
+      interface Operations {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      // Interface with same name in both services
+      interface Operations {
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+      `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombineClient;
+  `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+  // Should have only 1 merged operation group instead of 2 separate ones
+  strictEqual(client.children!.length, 1);
+
+  // The merged operation group should have operations from both services
+  const operations = client.children!.find((c) => c.name === "Operations");
+  ok(operations);
+  // Multi-service operation group should have empty apiVersions
+  strictEqual(operations.apiVersions.length, 0);
+  strictEqual(operations.clientInitialization.parameters.length, 2);
+  strictEqual(operations.clientInitialization.parameters[0].name, "endpoint");
+  strictEqual(operations.clientInitialization.parameters[1].name, "apiVersion");
+  const apiVersionParam = operations.clientInitialization.parameters[1];
+  strictEqual(apiVersionParam.isApiVersionParam, true);
+  strictEqual(apiVersionParam.onClient, true);
+  strictEqual(apiVersionParam.clientDefaultValue, undefined);
+  // For multi-service operation groups, the api version param type should be string
+  strictEqual(apiVersionParam.type.kind, "string");
+
+  // Should have both methods from both services
+  strictEqual(operations.methods.length, 2);
+  const aTestMethod = operations.methods.find((m) => m.name === "aTest");
+  ok(aTestMethod);
+  const bTestMethod = operations.methods.find((m) => m.name === "bTest");
+  ok(bTestMethod);
+});
+
+it("client location to existing operation group from different service", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      // Interface that will be the target for @clientLocation
+      interface Operations {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      @route("/bTest")
+      op bTest(@query("api-version") apiVersion: VersionsB): void;
+    }`,
+      `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombineClient {}
+
+    // Move operation from ServiceB to existing Operations group from ServiceA
+    @@clientLocation(ServiceB.bTest, "Operations");
+  `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "CombineClient");
 
-  // Client should have endpoint and apiVersion parameters
-  strictEqual(client.clientInitialization.parameters.length, 2);
-  strictEqual(client.clientInitialization.parameters[0].name, "endpoint");
-  strictEqual(client.clientInitialization.parameters[1].name, "apiVersion");
+  // Should have only 1 operation group
+  strictEqual(client.children!.length, 1);
 
-  // Parent client should have API versions from @useDependency
-  deepStrictEqual(client.apiVersions, ["av1", "bv1"]);
+  // The operation group should now be multi-service (merged)
+  const operations = client.children!.find((c) => c.name === "Operations");
+  ok(operations);
+  // Multi-service operation group should have empty apiVersions
+  strictEqual(operations.apiVersions.length, 0);
+  const apiVersionParam = operations.clientInitialization.parameters.find(
+    (p) => p.isApiVersionParam,
+  );
+  ok(apiVersionParam);
+  strictEqual(apiVersionParam.type.kind, "string");
+
+  // Should have both methods from both services
+  strictEqual(operations.methods.length, 2);
+  const aTestMethod = operations.methods.find((m) => m.name === "aTest");
+  ok(aTestMethod);
+  const bTestMethod = operations.methods.find((m) => m.name === "bTest");
+  ok(bTestMethod);
+});
+
+it("merged operation groups with nested operations", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      namespace Operations {
+        @route("/aTest1")
+        op aTest1(@query("api-version") apiVersion: VersionsA): void;
+        @route("/aTest2")
+        op aTest2(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      namespace Operations {
+        @route("/bTest1")
+        op bTest1(@query("api-version") apiVersion: VersionsB): void;
+        @route("/bTest2")
+        op bTest2(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+      `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombineClient;
+  `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+
+  // Should have only 1 merged operation group
+  strictEqual(client.children!.length, 1);
+
+  // The merged operation group should have operations from both namespaces
+  const operations = client.children!.find((c) => c.name === "Operations");
+  ok(operations);
+  // Multi-service operation group should have empty apiVersions
+  strictEqual(operations.apiVersions.length, 0);
+  const apiVersionParam = operations.clientInitialization.parameters.find(
+    (p) => p.isApiVersionParam,
+  );
+  ok(apiVersionParam);
+  strictEqual(apiVersionParam.type.kind, "string");
+
+  // Should have all 4 methods from both services
+  strictEqual(operations.methods.length, 4);
+  ok(operations.methods.find((m) => m.name === "aTest1"));
+  ok(operations.methods.find((m) => m.name === "aTest2"));
+  ok(operations.methods.find((m) => m.name === "bTest1"));
+  ok(operations.methods.find((m) => m.name === "bTest2"));
+});
+
+it("multiple merged operation groups in same client", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      interface Group1 {
+        @route("/a1")
+        opA1(@query("api-version") apiVersion: VersionsA): void;
+      }
+      interface Group2 {
+        @route("/a2")
+        opA2(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      interface Group1 {
+        @route("/b1")
+        opB1(@query("api-version") apiVersion: VersionsB): void;
+      }
+      interface Group2 {
+        @route("/b2")
+        opB2(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+      `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombineClient;
+  `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+
+  // Should have 2 merged operation groups
+  strictEqual(client.children!.length, 2);
+
+  // Check first merged group
+  const group1 = client.children!.find((c) => c.name === "Group1");
+  ok(group1);
+  strictEqual(group1.apiVersions.length, 0);
+  strictEqual(group1.methods.length, 2);
+  ok(group1.methods.find((m) => m.name === "opA1"));
+  ok(group1.methods.find((m) => m.name === "opB1"));
+
+  // Check second merged group
+  const group2 = client.children!.find((c) => c.name === "Group2");
+  ok(group2);
+  strictEqual(group2.apiVersions.length, 0);
+  strictEqual(group2.methods.length, 2);
+  ok(group2.methods.find((m) => m.name === "opA2"));
+  ok(group2.methods.find((m) => m.name === "opB2"));
+});
+
+it("error: inconsistent-multiple-service server", async () => {
+  const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+        @service
+        @server("https://servicea.example.com")
+        namespace ServiceA {
+        }
+        @service
+        @server("https://serviceb.example.com")
+        namespace ServiceB {
+    }`,
+      `
+        @client(
+          {
+            name: "CombineClient",
+            service: [ServiceA, ServiceB],
+          }
+        )
+        namespace CombineClient {}
+      `,
+    ),
+  );
+  await createSdkContextForTester(program);
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service",
+      message: "All services must have the same server and auth definitions.",
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/multiple-services",
+      message:
+        "Multiple services found. Only the first service will be used; others will be ignored.",
+    },
+  ]);
+});
+
+it("error: inconsistent-multiple-service-servers auth", async () => {
+  const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+        @service
+        @useAuth(BasicAuth)
+        namespace ServiceA {
+        }
+        @service
+        @useAuth(BearerAuth)
+        namespace ServiceB {
+    }`,
+      `
+        @client(
+          {
+            name: "CombineClient",
+            service: [ServiceA, ServiceB],
+          }
+        )
+        namespace CombineClient {}
+      `,
+    ),
+  );
+  await createSdkContextForTester(program);
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service",
+      message: "All services must have the same server and auth definitions.",
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/multiple-services",
+      message:
+        "Multiple services found. Only the first service will be used; others will be ignored.",
+    },
+  ]);
+});
+
+it("multiple clients from single service", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+        @service
+        @versioned(Versions)
+        namespace TestService;
+
+        enum Versions {
+          v2022_11_01: "2022-11-01",
+          v2023_04_01_preview: "2023-04-01-preview",
+        }
+
+        @route("/foo")
+        op foo(): void;
+
+        @route("/bar")
+        op bar(): void;
+      `,
+      `
+        @client(
+          {
+            name: "ClientA",
+            service: TestService,
+          }
+        )
+        namespace ClientA{
+          op foo is TestService.foo;
+        }
+
+        @client(
+          {
+            name: "ClientB",
+            service: TestService,
+          }
+        )
+        namespace ClientB{
+          op bar is TestService.bar;
+        }
+      `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 2);
+  const clientA = sdkPackage.clients.find((c) => c.name === "ClientA");
+  ok(clientA);
+  const clientB = sdkPackage.clients.find((c) => c.name === "ClientB");
+  ok(clientB);
+  const versionsEnum = sdkPackage.enums.find((e) => e.name === "Versions");
+  ok(versionsEnum);
+  strictEqual(versionsEnum.values.length, 2);
 });

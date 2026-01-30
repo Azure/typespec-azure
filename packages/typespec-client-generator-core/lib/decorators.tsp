@@ -163,20 +163,15 @@ extern dec client(target: Namespace | Interface, options?: ClientOptions, scope?
  */
 model ClientOptions {
   /**
-   * The service that this client is generated for. If not specified, TCGC will look up the first parent namespace decorated with `@service` for the target.
+   * The services that this client is generated for. If not specified, TCGC will look up the first parent namespace decorated with `@service` for the target.
    * The namespace should be decorated with `@service`.
    */
-  service?: Namespace;
+  service?: Namespace | Namespace[];
 
   /**
    * The name of the client. If not specified, the default name will be `<Name of the target>Client`.
    */
   name?: string;
-
-  /**
-   * The parent client of this client. If specified, this client will be generated as a sub client of the parent client.
-   */
-  parent?: Namespace | Interface;
 }
 
 /**
@@ -672,6 +667,7 @@ model ExternalType {
  * Set an alternate type for a model property, Scalar, Model, Enum, Union, or function parameter. Note that `@encode` will be overridden by the one defined in the alternate type.
  * When the source type is `Scalar`, the alternate type must be `Scalar`.
  * The replaced type could be a type defined in the TypeSpec or an external type declared by type identity, package that export the type and package version.
+ * **Important:** External types (with `identity` property) cannot be applied to model properties. They must be applied to the type definition itself (Scalar, Model, Enum, or Union).
  * @param target The source type to which the alternate type will be applied.
  * @param alternate The alternate type to apply to the target. Can be a TypeSpec type or an ExternalType.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
@@ -728,6 +724,25 @@ model ExternalType {
  *   // ... properties
  * }
  * ```
+ *
+ * @example Invalid: External type on model property (will emit a warning)
+ * ```typespec
+ * model MyModel {
+ *   field: FieldType;
+ * }
+ * // This will emit a warning - external types cannot be applied to properties
+ * @@alternateType(MyModel.field, {
+ *   identity: "ExternalType",
+ * }, "rust");
+ *
+ * // Correct: Apply external type to the type definition instead
+ * @alternateType({
+ *   identity: "ExternalType",
+ * }, "rust")
+ * model FieldType {
+ *   // ... properties
+ * }
+ * ```
  */
 extern dec alternateType(
   target: ModelProperty | Scalar | Model | Enum | Union,
@@ -736,10 +751,10 @@ extern dec alternateType(
 );
 
 /**
- * Define the scope of an operation.
- * By default, the operation will be applied to all language emitters.
- * This decorator allows you to omit the operation from certain languages or apply it to specific languages.
- * @param target The target operation that you want to scope.
+ * Define the scope of an operation or model property.
+ * By default, the element will be applied to all language emitters.
+ * This decorator allows you to omit the element from certain languages or apply it to specific languages.
+ * @param target The target operation or model property that you want to scope.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  *
@@ -754,8 +769,16 @@ extern dec alternateType(
  * @scope("go")
  * op test: void;
  * ```
+ *
+ * @example Apply a model property to specific languages
+ * ```typespec
+ * model TestModel {
+ *   @scope("csharp")
+ *   csharpOnlyProp: string;
+ * }
+ * ```
  */
-extern dec scope(target: Operation, scope?: valueof string);
+extern dec scope(target: Operation | ModelProperty, scope?: valueof string);
 
 /**
  * Specify whether a parameter is an API version parameter or not.

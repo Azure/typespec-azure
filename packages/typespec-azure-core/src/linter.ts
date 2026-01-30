@@ -7,6 +7,7 @@ import { compositionOverInheritanceRule } from "./rules/composition-over-inherit
 import { friendlyNameRule } from "./rules/friendly-name.js";
 import { knownEncodingRule } from "./rules/known-encoding.js";
 import { longRunningOperationsRequirePollingOperation } from "./rules/lro-polling-operation.js";
+import { noCaseMismatchRule } from "./rules/no-case-mismatch.js";
 import { noClosedLiteralUnionRule } from "./rules/no-closed-literal-union.js";
 import { noEnumRule } from "./rules/no-enum.js";
 import { noErrorStatusCodesRule } from "./rules/no-error-status-codes.js";
@@ -23,6 +24,7 @@ import { noQueryExplodeRule } from "./rules/no-query-explode.js";
 import { noResponseBodyRule } from "./rules/no-response-body.js";
 import { noRpcPathParamsRule } from "./rules/no-rpc-path-params.js";
 import { noStringDiscriminatorRule } from "./rules/no-string-discriminator.js";
+import { noUnnamedUnionRule } from "./rules/no-unnamed-union.js";
 import { nonBreakingVersioningRule } from "./rules/non-breaking-versioning.js";
 import { apiVersionRule } from "./rules/operation-missing-api-version.js";
 import { preventFormatRule } from "./rules/prevent-format.js";
@@ -47,6 +49,7 @@ const rules = [
   compositionOverInheritanceRule,
   knownEncodingRule,
   longRunningOperationsRequirePollingOperation,
+  noCaseMismatchRule,
   noClosedLiteralUnionRule,
   noEnumRule,
   noErrorStatusCodesRule,
@@ -58,6 +61,7 @@ const rules = [
   noResponseBodyRule,
   noRpcPathParamsRule,
   noOpenAPIRule,
+  noUnnamedUnionRule,
   noHeaderExplodeRule,
   preventFormatRule,
   noMultipleDiscriminatorRule,

@@ -1,7 +1,12 @@
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual } from "assert";
-import { describe, it } from "vitest";
-import { AzureTester, diagnoseOpenApiFor, openApiFor } from "./test-host.js";
+import { describe, expect, it } from "vitest";
+import {
+  AzureTester,
+  diagnoseOpenApiFor,
+  emitOpenApiWithDiagnostics,
+  openApiFor,
+} from "./test-host.js";
 
 describe("typespec-autorest: format", () => {
   it("allows supported formats", async () => {
@@ -34,23 +39,35 @@ describe("typespec-autorest: format", () => {
   it("emits diagnostic for unsupported formats", async () => {
     const diagnostics = await diagnoseOpenApiFor(
       `
-      @service
-      namespace Test;
-
       model Widget {
         @format("fake")
         prop: string;
       }
-
-      op get(): void;
       `,
     );
-    expectDiagnostics(diagnostics, [
-      {
-        code: "@azure-tools/typespec-autorest/invalid-format",
-        message: "'string' format 'fake' is not supported in Autorest. It will not be emitted.",
-      },
-    ]);
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-autorest/unknown-format",
+      message: "'string' format 'fake' is not supported in Autorest. It will not be emitted.",
+    });
+  });
+
+  it("emits diagnostic for unsupported encoding and update type to string", async () => {
+    const [openapi, diagnostics] = await emitOpenApiWithDiagnostics(
+      `
+      model Widget {
+        @encode(ArrayEncoding.commaDelimited)
+        prop: string[];
+      }
+      `,
+    );
+    expectDiagnostics(diagnostics, {
+      code: "@azure-tools/typespec-autorest/unknown-format",
+      message:
+        "'string' encoding format 'ArrayEncoding.commaDelimited' is not supported in Autorest. It will not be emitted.",
+    });
+    expect(openapi.definitions?.Widget?.properties?.prop).toEqual({
+      type: "string",
+    });
   });
 
   it("does not emit diagnostic for Azure.Core scalars", async () => {
