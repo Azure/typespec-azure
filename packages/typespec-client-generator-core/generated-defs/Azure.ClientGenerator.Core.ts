@@ -1,5 +1,6 @@
 import type {
   DecoratorContext,
+  DecoratorValidatorCallbacks,
   Enum,
   EnumMember,
   Interface,
@@ -60,7 +61,7 @@ export type ClientNameDecorator = (
   target: Type,
   rename: string,
   scope?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Whether you want to generate an operation as a convenient method.
@@ -97,7 +98,7 @@ export type ConvenientAPIDecorator = (
   target: Operation | Namespace | Interface,
   flag?: boolean,
   scope?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Whether you want to generate an operation as a protocol method.
@@ -134,7 +135,7 @@ export type ProtocolAPIDecorator = (
   target: Operation | Namespace | Interface,
   flag?: boolean,
   scope?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Define the client generated in the client SDK.
@@ -168,7 +169,7 @@ export type ClientDecorator = (
   target: Namespace | Interface,
   options?: Type,
   scope?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Define the sub client generated in the client SDK.
@@ -188,7 +189,7 @@ export type OperationGroupDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
   scope?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Add usage for models/enums.
@@ -261,7 +262,7 @@ export type UsageDecorator = (
   target: Model | Enum | Union | Namespace,
   value: EnumMember | Union,
   scope?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Override access for operations, models, enums and model properties.
@@ -412,7 +413,7 @@ export type AccessDecorator = (
   target: ModelProperty | Model | Operation | Enum | Union | Namespace,
   value: EnumMember,
   scope?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Customize a method's signature in the generated client SDK.
@@ -466,7 +467,7 @@ export type OverrideDecorator = (
   target: Operation,
   override: Operation,
   scope?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Whether a model needs the custom JSON converter, this is only used for backward compatibility for csharp.
@@ -486,7 +487,7 @@ export type UseSystemTextJsonConverterDecorator = (
   context: DecoratorContext,
   target: Model,
   scope?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Allows customization of how clients are initialized in the generated SDK.
@@ -523,7 +524,7 @@ export type ClientInitializationDecorator = (
   target: Namespace | Interface,
   options: Type,
   scope?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Alias the name of a client parameter to a different name. This permits you to have a different name for the parameter in client initialization and the original parameter in the operation.
@@ -557,7 +558,7 @@ export type ParamAliasDecorator = (
   target: ModelProperty,
   paramAlias: string,
   scope?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Changes the namespace of a client, model, enum or union generated in the client SDK.
@@ -585,12 +586,13 @@ export type ClientNamespaceDecorator = (
   target: Namespace | Interface | Model | Enum | Union,
   rename: string,
   scope?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Set an alternate type for a model property, Scalar, Model, Enum, Union, or function parameter. Note that `@encode` will be overridden by the one defined in the alternate type.
  * When the source type is `Scalar`, the alternate type must be `Scalar`.
  * The replaced type could be a type defined in the TypeSpec or an external type declared by type identity, package that export the type and package version.
+ * **Important:** External types (with `identity` property) cannot be applied to model properties. They must be applied to the type definition itself (Scalar, Model, Enum, or Union).
  *
  * @param target The source type to which the alternate type will be applied.
  * @param alternate The alternate type to apply to the target. Can be a TypeSpec type or an ExternalType.
@@ -643,20 +645,38 @@ export type ClientNamespaceDecorator = (
  *   // ... properties
  * }
  * ```
+ * @example Invalid: External type on model property (will emit a warning)
+ * ```typespec
+ * model MyModel {
+ *   field: FieldType;
+ * }
+ * // This will emit a warning - external types cannot be applied to properties
+ * @@alternateType(MyModel.field, {
+ *   identity: "ExternalType",
+ * }, "rust");
+ *
+ * // Correct: Apply external type to the type definition instead
+ * @alternateType({
+ *   identity: "ExternalType",
+ * }, "rust")
+ * model FieldType {
+ *   // ... properties
+ * }
+ * ```
  */
 export type AlternateTypeDecorator = (
   context: DecoratorContext,
   target: ModelProperty | Scalar | Model | Enum | Union,
   alternate: Type,
   scope?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
- * Define the scope of an operation.
- * By default, the operation will be applied to all language emitters.
- * This decorator allows you to omit the operation from certain languages or apply it to specific languages.
+ * Define the scope of an operation or model property.
+ * By default, the element will be applied to all language emitters.
+ * This decorator allows you to omit the element from certain languages or apply it to specific languages.
  *
- * @param target The target operation that you want to scope.
+ * @param target The target operation or model property that you want to scope.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Omit an operation from a specific language
@@ -669,8 +689,19 @@ export type AlternateTypeDecorator = (
  * @scope("go")
  * op test: void;
  * ```
+ * @example Apply a model property to specific languages
+ * ```typespec
+ * model TestModel {
+ *   @scope("csharp")
+ *   csharpOnlyProp: string;
+ * }
+ * ```
  */
-export type ScopeDecorator = (context: DecoratorContext, target: Operation, scope?: string) => void;
+export type ScopeDecorator = (
+  context: DecoratorContext,
+  target: Operation | ModelProperty,
+  scope?: string,
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Specify whether a parameter is an API version parameter or not.
@@ -707,7 +738,7 @@ export type ApiVersionDecorator = (
   target: ModelProperty,
   value?: boolean,
   scope?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Specify additional API versions that the client can support. These versions should include those defined by the service's versioning configuration.
@@ -738,7 +769,7 @@ export type ClientApiVersionsDecorator = (
   target: Namespace,
   value: Enum,
   scope?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Indicates that a model property of type `string` or a `Scalar` type derived from `string` should be deserialized as `null` when its value is an empty string (`""`).
@@ -764,7 +795,7 @@ export type DeserializeEmptyStringAsNullDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   scope?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Indicates that a HEAD operation should be modeled as Response<bool>.
@@ -785,7 +816,7 @@ export type ResponseAsBoolDecorator = (
   context: DecoratorContext,
   target: Operation,
   scope?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name. For this usage, the decorator cannot be used along with `@client` or `@operationGroup` decorators.
@@ -872,7 +903,7 @@ export type ClientLocationDecorator = (
   source: Operation | ModelProperty,
   target: Interface | Namespace | Operation | string,
   scope?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Override documentation for a type in client libraries. This allows you to
@@ -911,7 +942,7 @@ export type ClientDocDecorator = (
   documentation: string,
   mode: EnumMember,
   scope?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 export type AzureClientGeneratorCoreDecorators = {
   clientName: ClientNameDecorator;

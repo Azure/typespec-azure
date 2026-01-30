@@ -267,7 +267,7 @@ model Azure.Core.PollingOptions
 | ------------- | ------------------------------------------------------------------- | --------------------------------------------------------------- |
 | kind          | [`PollingOptionKind`](./data-types.md#Azure.Core.PollingOptionKind) | The kind of polling options                                     |
 | pollingModel? | `Model \| void`                                                     | The model that is returned when polling should continue.        |
-| finalResult?  | `Model \| void`                                                     | The type that is returned when polling terminates successfully. |
+| finalResult?  | `Model \| unknown \| void`                                          | The type that is returned when polling terminates successfully. |
 
 ### `RepeatabilityRequestHeaders` {#Azure.Core.RepeatabilityRequestHeaders}
 

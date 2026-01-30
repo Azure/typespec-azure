@@ -1,5 +1,67 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.64.1
+
+### Bug Fixes
+
+- [#3819](https://github.com/Azure/typespec-azure/pull/3819) Fix #3802 correct file references in feature files
+- [#3812](https://github.com/Azure/typespec-azure/pull/3812) Fix duplicate schema error caused when using union templates
+
+
+## 0.64.0
+
+### Features
+
+- [#3622](https://github.com/Azure/typespec-azure/pull/3622) Add support for multiple output files in typespec-autorest
+- [#3746](https://github.com/Azure/typespec-azure/pull/3746) #3693 Allow array and unknown result for async operations
+
+### Bump dependencies
+
+- [#3677](https://github.com/Azure/typespec-azure/pull/3677) Upgrade dependencies
+
+
+## 0.63.1
+
+### Features
+
+- [#3656](https://github.com/Azure/typespec-azure/pull/3656) Emit `x-ms-client-default` when using `@Azure.ClientGenerator.Core.Legacy.clientDefaultValue`
+
+### Bug Fixes
+
+- [#3666](https://github.com/Azure/typespec-azure/pull/3666) Allow explicit `ArrayEncoding.commaDelimited` on parameters
+- [#3666](https://github.com/Azure/typespec-azure/pull/3666) Fix using `ArrayEncoding.pipeDelimited` or `ArrayEncoding.spaceDelimited` on parameter would transform the type to string incorrectly
+- [#3666](https://github.com/Azure/typespec-azure/pull/3666) Don't include `items` when encoding change type to `string`
+- [#3644](https://github.com/Azure/typespec-azure/pull/3644) Ignore encoding resulting in format not explicitly supported by autorest
+
+
+## 0.63.0
+
+### Breaking Changes
+
+- [#3522](https://github.com/Azure/typespec-azure/pull/3522) - Remove deprecated `arm-resource-flattening` option
+  
+    ```diff lang=yaml title=tspconfig.yaml
+    options:
+      @azure-tools/typespec-autorest:
+    -   arm-resource-flattening: true
+    ```
+  
+    ```diff lang=tsp title=MyResource.tsp
+    +@@Azure.ClientGenerator.Core.Legacy.flattenProperty(MyResource.properties, "autorest");
+    ```
+
+### Bump dependencies
+
+- [#3546](https://github.com/Azure/typespec-azure/pull/3546) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3613](https://github.com/Azure/typespec-azure/pull/3613) Deduplicate authentication schemes with same name
+- [#3558](https://github.com/Azure/typespec-azure/pull/3558) Respect `@externalDocs` on properties
+- [#3602](https://github.com/Azure/typespec-azure/pull/3602) Fix constraints not applied on nullable properties
+- [#3602](https://github.com/Azure/typespec-azure/pull/3602) Fix `x-ms-enum.name` not being set on nullable enum properties with default
+
+
 ## 0.62.0
 
 ### Deprecations

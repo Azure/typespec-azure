@@ -1,5 +1,51 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.36
+
+### Bug Fixes
+
+- [#3770](https://github.com/Azure/typespec-azure/pull/3770) Fix missing api-version in nextLink of lropaging test scenario.
+
+
+## 0.1.0-alpha.35
+
+### Features
+
+- [#3635](https://github.com/Azure/typespec-azure/pull/3635) Add test cases for `@clientDefaultValue` decorator.
+- [#3713](https://github.com/Azure/typespec-azure/pull/3713) Add multi-service test scenarios for older API versions and shared models.
+- [#3695](https://github.com/Azure/typespec-azure/pull/3695) Add Spector tests for pageable long-running operations (LROs)
+- [#3663](https://github.com/Azure/typespec-azure/pull/3663) Add test case for @clientDefaultValue on header parameters
+
+### Bump dependencies
+
+- [#3677](https://github.com/Azure/typespec-azure/pull/3677) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3642](https://github.com/Azure/typespec-azure/pull/3642) update client generator namespace for python
+- [#3582](https://github.com/Azure/typespec-azure/pull/3582) update tests for client-location
+
+
+## 0.1.0-alpha.34
+
+### Features
+
+- [#3609](https://github.com/Azure/typespec-azure/pull/3609) Add data plane test for combined multi service.
+- [#3618](https://github.com/Azure/typespec-azure/pull/3618) Add ARM multiple services test case.
+
+
+## 0.1.0-alpha.33
+
+### Bump dependencies
+
+- [#3546](https://github.com/Azure/typespec-azure/pull/3546) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3517](https://github.com/Azure/typespec-azure/pull/3517) Fix /azure/resource-manager/operation-templates createOrReplace LRO to return the final result as per spec (changed to spread instead of enveloped, HTTP 201 for the first response and 200 for subsequent).
+- [#3598](https://github.com/Azure/typespec-azure/pull/3598) Fix client-initialization scenario namespace from `ClientGeneratorCore` to `ClientGenerator.Core` to align with dashboard hierarchy.
+
+
 ## 0.1.0-alpha.32
 
 ### Features

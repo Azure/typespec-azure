@@ -16,6 +16,7 @@ import {
   getSummary,
   getVisibilityForClass,
   ignoreDiagnostics,
+  Interface,
   isNeverType,
   isNullType,
   isVoidType,
@@ -35,16 +36,23 @@ import {
 import {
   unsafe_mutateSubgraphWithNamespace,
   unsafe_MutatorWithNamespace,
+  unsafe_Realm,
 } from "@typespec/compiler/experimental";
 import { $ } from "@typespec/compiler/typekit";
-import { HttpOperation, HttpOperationResponseContent, HttpPayloadBody } from "@typespec/http";
+import {
+  Authentication,
+  HttpOperation,
+  HttpOperationResponseContent,
+  HttpPayloadBody,
+  HttpServer,
+} from "@typespec/http";
 import {
   getAddedOnVersions,
   getRemovedOnVersions,
-  getVersionDependencies,
   getVersioningMutators,
   getVersions,
 } from "@typespec/versioning";
+import assert from "assert";
 import {
   getAlternateType,
   getClientDocExplicit,
@@ -62,18 +70,16 @@ import {
   SdkClientType,
   SdkEnumType,
   SdkHeaderParameter,
-  SdkHttpResponse,
   SdkMethodParameter,
   SdkOperationGroup,
   SdkServiceOperation,
   SdkType,
   TCGCContext,
 } from "./interfaces.js";
-import { createDiagnostic, createStateSymbol } from "./lib.js";
+import { createDiagnostic, createStateSymbol, reportDiagnostic } from "./lib.js";
 import { getSdkBasicServiceMethod } from "./methods.js";
 import {
   getCrossLanguageDefinitionId,
-  getDefaultApiVersion,
   getHttpOperationWithCache,
   isApiVersion,
 } from "./public-utils.js";
@@ -114,8 +120,17 @@ export const omitOperation = createStateSymbol("omitOperation");
 export const overrideKey = createStateSymbol("override");
 
 export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
+  // Multiple services case is not considered explicit client. It is auto-merged.
+  const explicitClients = listScopedDecoratorData(context, clientKey);
+  let multiServices = false;
+  explicitClients.forEach((value) => {
+    if ((value as SdkClient).services.length > 1) {
+      multiServices = true;
+    }
+  });
+
   return (
-    listScopedDecoratorData(context, clientKey).size > 0 ||
+    (explicitClients.size > 0 && !multiServices) ||
     listScopedDecoratorData(context, operationGroupKey).size > 0
   );
 }
@@ -290,9 +305,8 @@ export function getAvailableApiVersions(
     context.setApiVersionsForType(type, explicitlyDecorated);
     return explicitlyDecorated;
   }
-  // If no explicit decorators, use the calculated apiVersions instead of just wrapperApiVersions
-  context.setApiVersionsForType(type, apiVersions);
-  return context.getApiVersionsForType(type);
+  context.setApiVersionsForType(type, wrapperApiVersions);
+  return wrapperApiVersions;
 }
 
 /**
@@ -349,12 +363,7 @@ export function getSdkTypeBaseHelper<TKind>(
   ) {
     const external = getAlternateType(context, type);
     // Only set external if it's an ExternalTypeInfo (has 'identity' but not 'kind' property), not a regular Type
-    if (
-      external &&
-      typeof external === "object" &&
-      "identity" in external &&
-      !("kind" in external)
-    ) {
+    if (external && external.kind === "externalTypeInfo") {
       base.external = external;
     }
   }
@@ -474,26 +483,6 @@ export function getNullOption(type: Union): Type | undefined {
   return [...type.variants.values()].map((x) => x.type).filter((t) => isNullType(t))[0];
 }
 
-export function getAllResponseBodiesAndNonBodyExists(responses: SdkHttpResponse[]): {
-  allResponseBodies: SdkType[];
-  nonBodyExists: boolean;
-} {
-  const allResponseBodies: SdkType[] = [];
-  let nonBodyExists = false;
-  for (const response of responses) {
-    if (response.type) {
-      allResponseBodies.push(response.type);
-    } else {
-      nonBodyExists = true;
-    }
-  }
-  return { allResponseBodies, nonBodyExists };
-}
-
-export function getAllResponseBodies(responses: SdkHttpResponse[]): SdkType[] {
-  return getAllResponseBodiesAndNonBodyExists(responses).allResponseBodies;
-}
-
 /**
  * Use this if you are trying to create a generated name for something without an original TypeSpec type.
  *
@@ -502,7 +491,7 @@ export function getAllResponseBodies(responses: SdkHttpResponse[]): SdkType[] {
  */
 export function createGeneratedName(
   context: TCGCContext,
-  type: Namespace | Operation,
+  type: Interface | Namespace | Operation,
   suffix: string,
 ): string {
   return `${getCrossLanguageDefinitionId(context, type).split(".").at(-1)}${suffix}`;
@@ -557,15 +546,14 @@ export function removeVersionsLargerThanExplicitlySpecified(
   }
 }
 
-export function filterApiVersionsInEnum(
+export function filterPreviewVersion(
   context: TCGCContext,
-  client: SdkClient,
   sdkVersionsEnum: SdkEnumType,
+  defaultApiVersion: string,
 ): void {
   // if they explicitly set an api version, remove larger versions
   removeVersionsLargerThanExplicitlySpecified(context, sdkVersionsEnum.values);
-  const defaultApiVersion = getDefaultApiVersion(context, client.service);
-  if (!context.previewStringRegex.test(defaultApiVersion?.value || "")) {
+  if (!context.previewStringRegex.test(defaultApiVersion)) {
     sdkVersionsEnum.values = sdkVersionsEnum.values.filter((v) => {
       if (typeof v.value !== "string") {
         return true;
@@ -764,14 +752,13 @@ export function getStreamAsBytes(
 function getVersioningMutator(
   context: TCGCContext,
   service: Namespace,
-  apiVersion: string,
-): unsafe_MutatorWithNamespace {
+  apiVersion?: string,
+): unsafe_MutatorWithNamespace | undefined {
   const versionMutator = getVersioningMutators(context.program, service);
-  compilerAssert(
-    versionMutator !== undefined && versionMutator.kind !== "transient",
-    "Versioning service should not get undefined or transient versioning mutator",
-  );
-
+  if (!versionMutator) return undefined;
+  if (versionMutator.kind === "transient") {
+    return versionMutator.mutator;
+  }
   const mutators = versionMutator.snapshots
     .filter((snapshot) => apiVersion === snapshot.version.value)
     .map((x) => x.mutator);
@@ -782,93 +769,82 @@ function getVersioningMutator(
 
 export function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Namespace {
   const globalNamespace = context.program.getGlobalNamespaceType();
-  const allApiVersions = context.getApiVersions();
-  if (allApiVersions.length === 0 || context.apiVersion === "all") return globalNamespace;
-
   const services = listServices(context.program);
-  const mutators = [];
 
-  // Check for multi-service scenarios with @useDependency
-  if (services.length > 1) {
-    const clients = context.getClients();
-    if (clients.length > 0) {
-      const versionDependencies = getVersionDependencies(
-        context.program,
-        clients[0].type as Namespace,
-      );
-      if (versionDependencies && versionDependencies.size > 0) {
-        // Multi-service scenario with @useDependency - create mutators for each service
-        for (const [serviceNs, versions] of versionDependencies.entries()) {
-          if (serviceNs.kind === "Namespace") {
-            // Extract the version string from the enum member
-            let versionString: string;
-            if (Array.isArray(versions)) {
-              // Take the last version if multiple versions
-              const lastVersion = versions[versions.length - 1];
-              if (typeof lastVersion === "string") {
-                versionString = lastVersion;
-              } else if (lastVersion && typeof lastVersion === "object" && "value" in lastVersion) {
-                versionString = String(lastVersion.value);
-              } else if (lastVersion && typeof lastVersion === "object" && "name" in lastVersion) {
-                versionString = String(lastVersion.name);
-              } else {
-                continue;
-              }
-            } else if (typeof versions === "string") {
-              versionString = versions;
-            } else if (versions && typeof versions === "object" && "value" in versions) {
-              versionString = String(versions.value);
-            } else if (versions && typeof versions === "object" && "name" in versions) {
-              versionString = String(versions.name);
-            } else {
-              continue;
-            }
+  // No service, thus no versioning mutation needed
+  if (services.length === 0) return globalNamespace;
 
-            const mutator = getVersioningMutator(context, serviceNs, versionString);
-            mutators.push(mutator);
-          }
-        }
+  // Explicit all API version setting, thus no versioning mutation needed
+  if (context.apiVersion === "all") return globalNamespace;
 
-        if (mutators.length > 0) {
-          const subgraph = unsafe_mutateSubgraphWithNamespace(
-            context.program,
-            mutators,
-            globalNamespace,
-          );
-          compilerAssert(
-            subgraph.type.kind === "Namespace",
-            "Should not have mutated to another type",
-          );
-          return subgraph.type;
-        }
-      }
+  const explicitClientNamespaces: Namespace[] = [];
+  const explicitServices = new Set<Namespace>();
+  listScopedDecoratorData(context, clientKey).forEach((v, k) => {
+    // See all explicit clients that in TypeSpec program
+    if (!unsafe_Realm.realmForType.has(k)) {
+      const sdkClient = v as SdkClient;
+      explicitClientNamespaces.push(k as Namespace);
+      sdkClient.services.forEach((s) => explicitServices.add(s));
     }
-  }
+  });
 
-  // Single service scenario or no @useDependency
-  if (services.length === 0) {
-    return globalNamespace;
-  }
+  let mutator: unsafe_MutatorWithNamespace | undefined;
 
-  // Find the service that has versioning information
-  // In single-service scenarios, this should be the service with @versioned
-  // In multi-service without @useDependency, use the first service with versions
-  let targetService = services[0].type;
-  for (const service of services) {
-    const versions = getVersions(context.program, service.type)[1];
-    if (versions) {
-      targetService = service.type;
-      break;
+  // No explicit clients (choose first service) or explicit client with one service
+  if (explicitClientNamespaces.length === 0 || explicitServices.size === 1) {
+    const serviceNamespace =
+      explicitClientNamespaces.length === 0
+        ? services[0].type
+        : explicitServices.values().next().value!;
+    const versions = getVersions(context.program, serviceNamespace)[1]?.getVersions();
+    // If the single service has no versioning, no mutation needed
+    if (!versions) return globalNamespace;
+
+    // Filter versions based on `apiVersion` config
+    removeVersionsLargerThanExplicitlySpecified(context, versions);
+    const versionsValues = versions.map((v) => v.value);
+
+    // Fix apiVersion setting problem only if there's only one service
+    if (
+      context.apiVersion !== undefined &&
+      context.apiVersion !== "latest" &&
+      context.apiVersion !== "all" &&
+      !versionsValues.includes(context.apiVersion)
+    ) {
+      reportDiagnostic(context.program, {
+        code: "api-version-undefined",
+        format: { version: context.apiVersion },
+        target: services[0].type,
+      });
+      context.apiVersion = versionsValues[versionsValues.length - 1];
     }
+
+    mutator = getVersioningMutator(
+      context,
+      serviceNamespace,
+      versionsValues[versionsValues.length - 1],
+    );
+  }
+  // Explicit clients with multiple services
+  else {
+    // Currently we do not support multiple explicit clients with multiple services
+    if (explicitClientNamespaces.length > 1 && explicitServices.size > 1) {
+      reportDiagnostic(context.program, {
+        code: "multiple-explicit-clients-multiple-services",
+        format: {},
+        target: services[0].type,
+      });
+      return globalNamespace;
+    }
+
+    mutator = getVersioningMutator(context, explicitClientNamespaces[0]);
   }
 
-  const mutator = getVersioningMutator(
-    context,
-    targetService,
-    allApiVersions[allApiVersions.length - 1],
-  );
+  if (!mutator) return globalNamespace;
   const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, [mutator], globalNamespace);
   compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
+  compilerAssert(subgraph.realm !== null, "Should have a realm after mutation");
+  context.__mutatedRealm = subgraph.realm;
   return subgraph.type;
 }
 
@@ -1027,4 +1003,122 @@ export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation
     };
   }
   return undefined;
+}
+
+export function getActualClientType(client: SdkClient | SdkOperationGroup): Namespace | Interface {
+  if (client.kind === "SdkClient") return client.type;
+  if (client.type) return client.type;
+  // Created operation group from `@clientLocation`. May have single or multiple services. Choose the first service for multi-service case.
+  return client.services[0];
+}
+
+export function isSameServers(left: HttpServer[], right: HttpServer[]): boolean {
+  if (left.length !== right.length) {
+    return false;
+  }
+  for (let i = 0; i < left.length; i++) {
+    if (left[i].url !== right[i].url) {
+      return false;
+    }
+  }
+  return true;
+}
+
+export function isSameAuth(left: Authentication, right: Authentication): boolean {
+  if (left.options.length !== right.options.length) {
+    return false;
+  }
+  for (let i = 0; i < left.options.length; i++) {
+    if (left.options[i].schemes.length !== right.options[i].schemes.length) {
+      return false;
+    }
+    for (let j = 0; j < left.options[i].schemes.length; j++) {
+      const leftScheme = left.options[i].schemes[j];
+      const rightScheme = right.options[i].schemes[j];
+      if (leftScheme.type !== rightScheme.type) {
+        return false;
+      }
+      switch (leftScheme.type) {
+        case "http":
+          assert(rightScheme.type === "http");
+          if (leftScheme.scheme !== rightScheme.scheme) {
+            return false;
+          }
+          break;
+        case "apiKey":
+          assert(rightScheme.type === "apiKey");
+          if (leftScheme.name !== rightScheme.name || leftScheme.in !== rightScheme.in) {
+            return false;
+          }
+          break;
+        case "oauth2":
+          assert(rightScheme.type === "oauth2");
+          if (leftScheme.flows.length !== rightScheme.flows.length) {
+            return false;
+          }
+          for (let k = 0; k < leftScheme.flows.length; k++) {
+            const leftFlow = leftScheme.flows[k];
+            const rightFlow = rightScheme.flows[k];
+            if (leftFlow.type !== rightFlow.type) {
+              return false;
+            }
+            if (leftFlow.scopes.length !== rightFlow.scopes.length) {
+              return false;
+            }
+            for (let l = 0; l < leftFlow.scopes.length; l++) {
+              if (leftFlow.scopes[l].value !== rightFlow.scopes[l].value) {
+                return false;
+              }
+            }
+            switch (leftFlow.type) {
+              case "authorizationCode":
+                assert(rightFlow.type === "authorizationCode");
+                if (
+                  leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
+                  leftFlow.tokenUrl !== rightFlow.tokenUrl ||
+                  leftFlow.refreshUrl !== rightFlow.refreshUrl
+                ) {
+                  return false;
+                }
+                break;
+              case "clientCredentials":
+                assert(rightFlow.type === "clientCredentials");
+                if (
+                  leftFlow.tokenUrl !== rightFlow.tokenUrl ||
+                  leftFlow.refreshUrl !== rightFlow.refreshUrl
+                ) {
+                  return false;
+                }
+                break;
+              case "implicit":
+                assert(rightFlow.type === "implicit");
+                if (
+                  leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
+                  leftFlow.refreshUrl !== rightFlow.refreshUrl
+                ) {
+                  return false;
+                }
+                break;
+              case "password":
+                assert(rightFlow.type === "password");
+                if (
+                  leftFlow.authorizationUrl !== rightFlow.authorizationUrl ||
+                  leftFlow.refreshUrl !== rightFlow.refreshUrl
+                ) {
+                  return false;
+                }
+                break;
+            }
+          }
+          break;
+        case "openIdConnect":
+          assert(rightScheme.type === "openIdConnect");
+          if (leftScheme.openIdConnectUrl !== rightScheme.openIdConnectUrl) {
+            return false;
+          }
+          break;
+      }
+    }
+  }
+  return true;
 }

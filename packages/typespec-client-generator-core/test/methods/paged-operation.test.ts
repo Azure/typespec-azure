@@ -1,23 +1,17 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { describe, it } from "vitest";
 import { SdkMethodParameter } from "../../src/interfaces.js";
 import { getPropertySegmentsFromModelOrParameters } from "../../src/methods.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import {
+  AzureCoreTester,
+  AzureCoreTesterWithService,
+  createSdkContextForTester,
+  SimpleTesterWithService,
+} from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-});
-
 it("normal paged result", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): ListTestResult;
     model ListTestResult {
@@ -30,7 +24,8 @@ it("normal paged result", async () => {
       id: string;
     }
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
@@ -46,7 +41,7 @@ it("normal paged result", async () => {
 });
 
 it("normal paged result with next link in header", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): ListTestResult;
     model ListTestResult {
@@ -60,7 +55,8 @@ it("normal paged result with next link in header", async () => {
       id: string;
     }
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
@@ -75,7 +71,7 @@ it("normal paged result with next link in header", async () => {
 });
 
 it("normal paged result in anonymous model with header", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): {
       @pageItems
@@ -87,7 +83,8 @@ it("normal paged result in anonymous model with header", async () => {
       id: string;
     }
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
@@ -100,7 +97,7 @@ it("normal paged result in anonymous model with header", async () => {
 });
 
 it("nullable paged result", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): ListTestResult | NotFoundResponse;
     model ListTestResult {
@@ -113,7 +110,8 @@ it("nullable paged result", async () => {
       id: string;
     }
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
@@ -128,7 +126,7 @@ it("nullable paged result", async () => {
 });
 
 it("normal paged result with encoded name", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): ListTestResult;
     model ListTestResult {
@@ -143,7 +141,8 @@ it("normal paged result with encoded name", async () => {
       id: string;
     }
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
@@ -158,7 +157,7 @@ it("normal paged result with encoded name", async () => {
 });
 
 it("normal paged result with nested paging value", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): ListTestResult;
     model ListTestResult {
@@ -175,7 +174,8 @@ it("normal paged result with nested paging value", async () => {
       id: string;
     }
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
@@ -197,7 +197,7 @@ it("normal paged result with nested paging value", async () => {
 });
 
 it("normal paged result with deeply nested paging value", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): ListTestResult;
     model ListTestResult {
@@ -220,7 +220,8 @@ it("normal paged result with deeply nested paging value", async () => {
       id: string;
     }
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
@@ -260,7 +261,7 @@ it("normal paged result with deeply nested paging value", async () => {
 });
 
 it("normal paged result with nested continuation token", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(@continuationToken @query token?: string): ListTestResult;
     model ListTestResult {
@@ -277,7 +278,8 @@ it("normal paged result with nested continuation token", async () => {
       id: string;
     }
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
@@ -305,7 +307,7 @@ it("normal paged result with nested continuation token", async () => {
 });
 
 it("normal paged result with asymmetric nesting", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): ListTestResult;
     model ListTestResult {
@@ -322,7 +324,8 @@ it("normal paged result with asymmetric nesting", async () => {
       id: string;
     }
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
@@ -348,7 +351,7 @@ it("normal paged result with asymmetric nesting", async () => {
 
 describe("common paging with continuation token", () => {
   it("continuation token in response body and query parameter", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @list
       op test(@continuationToken @query token?: string): ListTestResult;
       model ListTestResult {
@@ -361,7 +364,8 @@ describe("common paging with continuation token", () => {
         prop: string;
       }
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.name, "test");
     strictEqual(method.kind, "paging");
@@ -380,7 +384,7 @@ describe("common paging with continuation token", () => {
   });
 
   it("continuation token in response body and header parameter", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @list
       op test(@continuationToken @header token?: string): ListTestResult;
       model ListTestResult {
@@ -393,7 +397,8 @@ describe("common paging with continuation token", () => {
         prop: string;
       }
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.name, "test");
     strictEqual(method.kind, "paging");
@@ -411,7 +416,7 @@ describe("common paging with continuation token", () => {
   });
 
   it("continuation token in response body and body parameter", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @list
       op test(@continuationToken token?: string): ListTestResult;
       model ListTestResult {
@@ -424,7 +429,8 @@ describe("common paging with continuation token", () => {
         prop: string;
       }
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.name, "test");
     strictEqual(method.kind, "paging");
@@ -442,7 +448,7 @@ describe("common paging with continuation token", () => {
   });
 
   it("continuation token in response header and query parameter", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @list
       op test(@continuationToken @query token?: string): ListTestResult;
       model ListTestResult {
@@ -456,7 +462,8 @@ describe("common paging with continuation token", () => {
         prop: string;
       }
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.name, "test");
     strictEqual(method.kind, "paging");
@@ -474,7 +481,7 @@ describe("common paging with continuation token", () => {
   });
 
   it("continuation token in response header and header parameter", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @list
       op test(@continuationToken @header token?: string): ListTestResult;
       model ListTestResult {
@@ -488,7 +495,8 @@ describe("common paging with continuation token", () => {
         prop: string;
       }
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.name, "test");
     strictEqual(method.kind, "paging");
@@ -506,7 +514,7 @@ describe("common paging with continuation token", () => {
   });
 
   it("continuation token in response header and body parameter", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @list
       op test(@continuationToken token?: string): ListTestResult;
       model ListTestResult {
@@ -520,7 +528,8 @@ describe("common paging with continuation token", () => {
         prop: string;
       }
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.name, "test");
     strictEqual(method.kind, "paging");
@@ -538,7 +547,7 @@ describe("common paging with continuation token", () => {
   });
 
   it("continuation token with @override", async () => {
-    await runner.compileWithBuiltInService(`
+    const { program } = await SimpleTesterWithService.compile(`
       @list
       op test(...Options): ListTestResult;
 
@@ -562,7 +571,8 @@ describe("common paging with continuation token", () => {
         prop: string;
       }
     `);
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
     strictEqual(method.name, "test");
     strictEqual(method.kind, "paging");
@@ -590,7 +600,7 @@ describe("common paging with continuation token", () => {
 });
 
 it("getPropertySegmentsFromModelOrParameters test for nested case", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     op test(): Test;
     model Test {
       a: {
@@ -603,7 +613,8 @@ it("getPropertySegmentsFromModelOrParameters test for nested case", async () => 
       };
     }
   `);
-  const testModel = runner.context.sdkPackage.models[0];
+  const context = await createSdkContextForTester(program);
+  const testModel = context.sdkPackage.models[0];
   const aProperty = testModel.properties[0];
   const bProperty = testModel.properties[1];
   strictEqual(aProperty.type.kind, "model");
@@ -624,7 +635,7 @@ it("getPropertySegmentsFromModelOrParameters test for nested case", async () => 
 });
 
 it("getPropertySegmentsFromModelOrParameters test for nested case of parameter", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     op test(param: Test): Test;
     model Test {
       a: {
@@ -637,7 +648,8 @@ it("getPropertySegmentsFromModelOrParameters test for nested case of parameter",
       };
     }
   `);
-  const testModel = runner.context.sdkPackage.models[0];
+  const context = await createSdkContextForTester(program);
+  const testModel = context.sdkPackage.models[0];
   const aProperty = testModel.properties[0];
   const bProperty = testModel.properties[1];
   strictEqual(aProperty.type.kind, "model");
@@ -647,8 +659,7 @@ it("getPropertySegmentsFromModelOrParameters test for nested case of parameter",
   strictEqual(bProperty.type.kind, "model");
   const bDProperty = bProperty.type.properties[0];
 
-  const parameters = runner.context.sdkPackage.clients[0].methods[0]
-    .parameters as SdkMethodParameter[];
+  const parameters = context.sdkPackage.clients[0].methods[0].parameters as SdkMethodParameter[];
   deepStrictEqual(
     getPropertySegmentsFromModelOrParameters(parameters, (p) => p === aBAProperty),
     [parameters[0], aProperty, aBProperty, aBAProperty],
@@ -660,7 +671,7 @@ it("getPropertySegmentsFromModelOrParameters test for nested case of parameter",
 });
 
 it("unbranded next link with re-injected parameters", async () => {
-  await runner.compileWithBuiltInAzureCoreService(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     model TestOptions {
       @query
       includePending?: boolean;
@@ -683,8 +694,8 @@ it("unbranded next link with re-injected parameters", async () => {
       id: string;
     }
   `);
-
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
@@ -704,7 +715,7 @@ it("unbranded next link with re-injected parameters", async () => {
 });
 
 it("unbranded next link with mix of re-injected parameters and not", async () => {
-  await runner.compileWithBuiltInAzureCoreService(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     model IncludePendingOptions {
       @query
       includePending?: boolean;
@@ -732,8 +743,8 @@ it("unbranded next link with mix of re-injected parameters and not", async () =>
       @query select: string,
     ): ParameterizedNextLinkPagingResult;
   `);
-
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
@@ -748,7 +759,7 @@ it("unbranded next link with mix of re-injected parameters and not", async () =>
 });
 
 it("unbranded next link with reinjected parameters with versioning", async () => {
-  await runner.compile(`
+  const { program } = await AzureCoreTester.compile(`
     @server("http://localhost:3000", "endpoint")
     @service()
     @versioned(Versions)
@@ -779,8 +790,8 @@ it("unbranded next link with reinjected parameters with versioning", async () =>
       id: string;
     }
   `);
-
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
@@ -795,7 +806,7 @@ it("unbranded next link with reinjected parameters with versioning", async () =>
 });
 
 it("paged result with intersection", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): ListTestResult & { @header h: string; };
     model ListTestResult {
@@ -808,7 +819,8 @@ it("paged result with intersection", async () => {
       id: string;
     }
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
@@ -823,7 +835,7 @@ it("paged result with intersection", async () => {
 });
 
 it("paged result with body root", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): TestResponse<ListTestResult>;
     model ListTestResult {
@@ -845,7 +857,8 @@ it("paged result with body root", async () => {
       body: ResponseBody;
     }
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
@@ -860,7 +873,7 @@ it("paged result with body root", async () => {
 });
 
 it("next link with body root and inheritance", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @list
     op test(): TestResponse<ListTestResult>;
 
@@ -886,7 +899,8 @@ it("next link with body root and inheritance", async () => {
       body: ResponseBody;
     }
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");
@@ -904,7 +918,7 @@ it("next link with body root and inheritance", async () => {
 });
 
 it("@pageSize parameter check", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Page<T> {
       @pageItems items: T[];
     }
@@ -913,7 +927,8 @@ it("@pageSize parameter check", async () => {
     }
     @list op listPets(@pageIndex page: int32, @pageSize size: int8): Page<Pet>;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "listPets");
   strictEqual(method.kind, "paging");
@@ -924,7 +939,7 @@ it("@pageSize parameter check", async () => {
 });
 
 it("@pageSize nested parameter check", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model PaginationSection {
       @pageSize pageSize: int8;
       @pageIndex pageIndex: int32;
@@ -937,7 +952,8 @@ it("@pageSize nested parameter check", async () => {
     }
     @list op listPets(pagination: PaginationSection): Page<Pet>;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "listPets");
   strictEqual(method.kind, "paging");
@@ -953,7 +969,7 @@ it("@pageSize nested parameter check", async () => {
 });
 
 it("paged result with nextLinkVerb decorator POST", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @Azure.ClientGenerator.Core.Legacy.nextLinkVerb("POST")
     @list
     op test(): ListTestResult;
@@ -967,7 +983,8 @@ it("paged result with nextLinkVerb decorator POST", async () => {
       id: string;
     }
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   strictEqual(method.name, "test");
   strictEqual(method.kind, "paging");

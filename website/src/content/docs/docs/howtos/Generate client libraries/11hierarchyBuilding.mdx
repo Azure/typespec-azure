@@ -95,7 +95,104 @@ class Dog(Pet, discriminator="dog"):  # Inherits from Pet, not Animal directly
 <ClientTabItem lang="typescript">
 
 ```typescript
-//TODO
+export interface Pet extends Animal {
+  kind: "pet" | "dog";
+  /** Whether the pet is trained */
+  trained: boolean;
+}
+
+export function petSerializer(item: Pet): any {
+  return { kind: item["kind"], name: item["name"], trained: item["trained"] };
+}
+
+export function petDeserializer(item: any): Pet {
+  return {
+    kind: item["kind"],
+    name: item["name"],
+    trained: item["trained"],
+  };
+}
+
+/** Alias for PetUnion */
+export type PetUnion = Dog | Pet;
+
+export function petUnionSerializer(item: PetUnion): any {
+  switch (item.kind) {
+    default:
+      return petSerializer(item);
+  }
+}
+
+export function petUnionDeserializer(item: any): PetUnion {
+  switch (item.kind) {
+    case "dog":
+      return dogDeserializer(item as Dog);
+
+    default:
+      return petDeserializer(item);
+  }
+}
+
+/** model interface Dog */
+export interface Dog extends Pet {
+  kind: "dog";
+  /** The breed of the dog */
+  breed: string;
+}
+
+export function dogDeserializer(item: any): Dog {
+  return {
+    kind: item["kind"],
+    trained: item["trained"],
+    name: item["name"],
+    breed: item["breed"],
+  };
+}
+
+/** model interface Animal */
+export interface Animal {
+  /** The kind of animal */
+  /** The discriminator possible values: pet, dog */
+  kind: string;
+  /** Name of the animal */
+  name: string;
+}
+
+export function animalSerializer(item: Animal): any {
+  return { kind: item["kind"], name: item["name"] };
+}
+
+export function animalDeserializer(item: any): Animal {
+  return {
+    kind: item["kind"],
+    name: item["name"],
+  };
+}
+
+/** Alias for AnimalUnion */
+export type AnimalUnion = PetUnion | Animal;
+
+export function animalUnionSerializer(item: AnimalUnion): any {
+  switch (item.kind) {
+    case "pet":
+    case "dog":
+      return petUnionSerializer(item as PetUnion);
+
+    default:
+      return animalSerializer(item);
+  }
+}
+
+export function animalUnionDeserializer(item: any): AnimalUnion {
+  switch (item.kind) {
+    case "pet":
+    case "dog":
+      return petUnionDeserializer(item as PetUnion);
+
+    default:
+      return animalDeserializer(item);
+  }
+}
 ```
 
 </ClientTabItem>
