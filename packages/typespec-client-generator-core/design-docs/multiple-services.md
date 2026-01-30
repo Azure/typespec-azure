@@ -273,7 +273,10 @@ No `client.tsp` file is needed. Each `@service` namespace automatically becomes 
 @service
 @versioned(VersionsA)
 namespace ServiceA {
-  enum VersionsA { av1, av2 }
+  enum VersionsA {
+    av1,
+    av2,
+  }
 
   interface Operations {
     opA(): void;
@@ -287,7 +290,10 @@ namespace ServiceA {
 @service
 @versioned(VersionsB)
 namespace ServiceB {
-  enum VersionsB { bv1, bv2 }
+  enum VersionsB {
+    bv1,
+    bv2,
+  }
 
   interface Operations {
     opB(): void;
