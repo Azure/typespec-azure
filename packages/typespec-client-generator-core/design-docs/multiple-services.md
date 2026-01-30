@@ -259,20 +259,52 @@ The resulting `SharedGroup` operation group will have:
 
 ## Extended Design: Advanced Client Hierarchy Customization
 
-The first step design focuses on automatically merging multiple services into one client when the client namespace is empty. However, users have requested more flexibility in how they organize clients from multiple services. This section extends the previous [client hierarchy design](./client.md) to provide additional scenarios by leveraging nested `@client` decorators.
+The first step design focuses on explicitly merging multiple services into one client using `@client` with an array of services. This section extends the previous [client hierarchy design](./client.md) to clarify the behavior when no explicit `@client` is defined and to provide additional scenarios.
 
-The key design principle is:
+### Default Behavior: Multiple Services Without Explicit `@client`
 
-- **If the client namespace is empty**: TCGC auto-merges all services' nested namespaces/interfaces into the current client as children (first step design behavior).
-- **If the client namespace contains nested `@client` decorators**: TCGC uses the explicitly defined client hierarchy instead of auto-merging.
+When there are multiple `@service` namespaces and no explicit `@client` decorator is defined, TCGC will automatically create a separate root client for each `@service` namespace. This matches the single-service behavior where each `@service` namespace becomes its own client.
 
-### Scenario 1: Multiple Clients, Each Belonging to One Service
+For example, given two services without explicit `@client`:
 
-In some cases, users may want to generate separate clients for each service rather than combining them into one client. This is useful when services have different authentication, versioning, or other client-level settings.
+```typespec title="main.tsp"
+@service
+@versioned(VersionsA)
+namespace ServiceA {
+  enum VersionsA { av1, av2 }
+
+  interface Operations {
+    opA(): void;
+  }
+}
+
+@service
+@versioned(VersionsB)
+namespace ServiceB {
+  enum VersionsB { bv1, bv2 }
+
+  interface Operations {
+    opB(): void;
+  }
+}
+```
+
+TCGC will automatically generate two root clients: `ServiceAClient` and `ServiceBClient`, each with their own API versions and children.
+
+### Explicit Client Definition Scenarios
+
+When explicit `@client` decorators are used, TCGC follows the explicitly defined client hierarchy. The key design principle is:
+
+- **If the `@client` namespace is empty**: TCGC auto-merges all services' nested namespaces/interfaces into the current client as children.
+- **If the `@client` namespace contains nested `@client` decorators**: TCGC uses the explicitly defined client hierarchy instead of auto-merging.
+
+### Scenario 1: Explicit Client Names for Multiple Services
+
+Users may want to explicitly define clients for each service with custom names. Without explicit `@client`, TCGC would use the service namespace name with a `Client` suffix (e.g., `ServiceAClient`). With explicit `@client`, users can customize the client name.
 
 #### Syntax Proposal
 
-Define multiple `@client` decorators, each targeting one service:
+Define multiple `@client` decorators, each targeting one service with a custom name:
 
 ```typespec title="main.tsp"
 @service
@@ -317,21 +349,21 @@ import "@azure-tools/typespec-client-generator-core";
 using Azure.ClientGenerator.Core;
 
 @client({
-  name: "ServiceAClient",
+  name: "MyServiceAClient",  // Custom name instead of default "ServiceAClient"
   service: ServiceA,
 })
-namespace ServiceAClient;
+namespace MyServiceAClient;
 
 @client({
-  name: "ServiceBClient",
+  name: "MyServiceBClient",  // Custom name instead of default "ServiceBClient"
   service: ServiceB,
 })
-namespace ServiceBClient;
+namespace MyServiceBClient;
 ```
 
 #### TCGC Behavior
 
-This creates two independent root clients, each with their own service hierarchy:
+This creates two independent root clients with custom names, each with their own service hierarchy:
 
 According to [client.md](./client.md), the default value of `initializedBy` for a root client is `InitializedBy.individually`, while for a sub client it is `InitializedBy.parent`.
 
@@ -339,7 +371,7 @@ According to [client.md](./client.md), the default value of `initializedBy` for 
 clients:
   - &a1
     kind: client
-    name: ServiceAClient
+    name: MyServiceAClient
     apiVersions: [av1, av2]
     clientInitialization:
       initializedBy: individually
@@ -362,7 +394,7 @@ clients:
             name: subOpA
   - &a2
     kind: client
-    name: ServiceBClient
+    name: MyServiceBClient
     apiVersions: [bv1, bv2]
     clientInitialization:
       initializedBy: individually
@@ -388,13 +420,13 @@ clients:
 #### Python SDK Example
 
 ```python
-# ServiceA client
-client_a = ServiceAClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
+# ServiceA client with custom name
+client_a = MyServiceAClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
 client_a.operations.op_a()
 client_a.sub_namespace.sub_op_a()
 
-# ServiceB client
-client_b = ServiceBClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
+# ServiceB client with custom name
+client_b = MyServiceBClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
 client_b.operations.op_b()
 client_b.sub_namespace.sub_op_b()
 ```
@@ -672,10 +704,10 @@ The nested `@client` approach works alongside existing customization decorators:
    - For cross-service clients, `apiVersions` will be empty `[]` and `apiVersionsMap` will contain the mapping
 
 2. **Update `cache.ts` logic**:
+   - In `getOrCreateClients`: When no explicit `@client` is defined, create a separate root client for each `@service` namespace (not just the first one)
    - In `prepareClientAndOperationCache`: Check if the client namespace has nested `@client` decorators before auto-merging
    - When nested `@client` decorators exist, use the explicitly defined hierarchy
-   - When the namespace is empty, auto-merge services' content (existing behavior)
-   - Update `getOrCreateClients`: Handle nested `@client` detection within multi-service clients
+   - When the namespace is empty, auto-merge services' content (existing behavior for explicit multi-service clients)
 
 3. **Update `internal-utils.ts`**:
    - Modify `hasExplicitClientOrOperationGroup` to properly detect nested `@client` decorators within multi-service client namespaces
