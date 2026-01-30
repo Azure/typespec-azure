@@ -391,7 +391,7 @@ interface SdkDateTimeTypeBase extends SdkTypeBase {
   name: string;
   baseType?: SdkDateTimeType;
   /** How to encode the type on wire. */
-  encode: DateTimeKnownEncoding;
+  encode: DateTimeKnownEncoding | string;
   wireType: SdkBuiltInType;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
@@ -412,7 +412,7 @@ export interface SdkDurationType extends SdkTypeBase {
   name: string;
   baseType?: SdkDurationType;
   /** How to encode the type on wire. */
-  encode: DurationKnownEncoding;
+  encode: DurationKnownEncoding | string;
   wireType: SdkBuiltInType;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
