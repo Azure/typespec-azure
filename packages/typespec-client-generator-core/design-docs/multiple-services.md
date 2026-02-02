@@ -897,8 +897,9 @@ The nested `@client` approach works alongside existing customization decorators:
 ### Validation Rules
 
 1. When the root client namespace is empty:
-   - All services' content is auto-merged into the root client
-   - Same-named namespaces/interfaces across services are merged together
+   - Only services listed in the `service` array of the `@client` decorator are included in the client
+   - Content from these listed services is auto-merged into the root client
+   - Same-named namespaces/interfaces across the listed services are merged together
 
 2. When the root client namespace has nested `@client` decorators:
    - Only explicitly defined clients are created at the root level
