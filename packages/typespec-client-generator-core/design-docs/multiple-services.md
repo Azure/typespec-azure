@@ -515,6 +515,132 @@ client_b.operations.op_b()
 client_b.sub_namespace.sub_op_b()
 ```
 
+### Scenario 1.5: Mixing Multi-Service and Single-Service Clients
+
+Users may want to combine multiple services into one client while keeping another service as a separate client. This scenario shows how to mix multi-service clients with single-service clients.
+
+#### Syntax Proposal
+
+Define clients where one client targets multiple services and another targets a single service:
+
+```typespec title="main.tsp"
+@service
+@versioned(VersionsA)
+namespace ServiceA {
+  enum VersionsA { av1, av2 }
+
+  interface Operations {
+    opA(): void;
+  }
+}
+
+@service
+@versioned(VersionsB)
+namespace ServiceB {
+  enum VersionsB { bv1, bv2 }
+
+  interface Operations {
+    opB(): void;
+  }
+}
+
+@service
+@versioned(VersionsC)
+namespace ServiceC {
+  enum VersionsC { cv1, cv2 }
+
+  interface Operations {
+    opC(): void;
+  }
+}
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// Multi-service client combining ServiceA and ServiceB
+@client({
+  name: "CombinedABClient",
+  service: [ServiceA, ServiceB],
+})
+namespace CombinedABClient;
+
+// Single-service client for ServiceC
+@client({
+  name: "ServiceCClient",
+  service: ServiceC,
+})
+namespace ServiceCClient;
+```
+
+#### TCGC Behavior
+
+This creates two root clients:
+
+1. `CombinedABClient`: A multi-service client that auto-merges ServiceA and ServiceB content (since the namespace is empty)
+2. `ServiceCClient`: A single-service client for ServiceC
+
+According to [client.md](./client.md), the default value of `initializedBy` for a root client is `InitializedBy.individually`, while for a sub client it is `InitializedBy.parent`.
+
+```yaml
+clients:
+  - &combined
+    kind: client
+    name: CombinedABClient
+    apiVersions: [] # Empty for cross-service clients
+    apiVersionsMap:
+      ServiceA: [av1, av2]
+      ServiceB: [bv1, bv2]
+    clientInitialization:
+      initializedBy: individually
+    children:
+      - kind: client
+        name: Operations # Merged from both ServiceA and ServiceB
+        parent: *combined
+        apiVersions: [] # Empty because operations come from different services
+        apiVersionsMap:
+          ServiceA: [av1, av2]
+          ServiceB: [bv1, bv2]
+        clientInitialization:
+          initializedBy: parent
+        methods:
+          - kind: basic
+            name: opA
+          - kind: basic
+            name: opB
+  - &serviceC
+    kind: client
+    name: ServiceCClient
+    apiVersions: [cv1, cv2]
+    clientInitialization:
+      initializedBy: individually
+    children:
+      - kind: client
+        name: Operations
+        parent: *serviceC
+        clientInitialization:
+          initializedBy: parent
+        methods:
+          - kind: basic
+            name: opC
+```
+
+#### Python SDK Example
+
+```python
+# Combined client for ServiceA and ServiceB
+combined_client = CombinedABClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
+combined_client.operations.op_a()  # From ServiceA
+combined_client.operations.op_b()  # From ServiceB
+
+# Separate client for ServiceC
+service_c_client = ServiceCClient(endpoint="endpoint", credential=AzureKeyCredential("key"))
+service_c_client.operations.op_c()
+```
+
 ### Scenario 2: Services as Direct Children (No Deep Auto-Merge)
 
 In the first step design, when combining multiple services with an empty client namespace, all nested namespaces/interfaces from all services are auto-merged into the root client as children. Some users prefer to keep each service's namespace as a direct child of the root client without deep merging.
