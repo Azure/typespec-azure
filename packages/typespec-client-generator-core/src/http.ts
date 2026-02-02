@@ -12,6 +12,7 @@ import {
 import { $ } from "@typespec/compiler/typekit";
 import {
   HttpOperation,
+  HttpOperationFileBody,
   HttpOperationParameter,
   HttpOperationPathParameter,
   HttpOperationQueryParameter,
@@ -200,8 +201,13 @@ function getSdkHttpParameters(
         bodyParam.kind === "body" &&
         bodyParam.type.kind === "model"
       ) {
+        const fileBody = tspBody as HttpOperationFileBody;
         bodyParam.type.serializationOptions = bodyParam.type.serializationOptions || {};
-        bodyParam.type.serializationOptions.binary = { isFile: true };
+        bodyParam.type.serializationOptions.binary = {
+          isFile: true,
+          isText: fileBody.isText,
+          contentTypes: fileBody.contentTypes,
+        };
       }
       if (bodyParam.kind !== "body") {
         diagnostics.add(
@@ -558,7 +564,14 @@ function getSdkHttpResponseAndExceptions(
       }
       if (innerResponse.body && !isNeverOrVoidType(innerResponse.body.type)) {
         if (innerResponse.body.bodyKind === "file") {
-          serializationOptions = { binary: { isFile: true } };
+          const fileBody = innerResponse.body as HttpOperationFileBody;
+          serializationOptions = {
+            binary: {
+              isFile: true,
+              isText: fileBody.isText,
+              contentTypes: fileBody.contentTypes,
+            },
+          };
         }
         if (body && body !== innerResponse.body.type) {
           diagnostics.add(
