@@ -48,12 +48,12 @@ describe("cross-namespace duplicate name validation", () => {
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
-          'Client name: "Foo" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+          'Client name: "Foo" is defined somewhere causing naming conflicts in language scope: "python"',
       },
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
-          'Client name: "Foo" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+          'Client name: "Foo" is defined somewhere causing naming conflicts in language scope: "python"',
       },
     ]);
   });
@@ -92,12 +92,12 @@ describe("cross-namespace duplicate name validation", () => {
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
-          'Client name: "Status" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+          'Client name: "Status" is defined somewhere causing naming conflicts in language scope: "python"',
       },
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
-          'Client name: "Status" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+          'Client name: "Status" is defined somewhere causing naming conflicts in language scope: "python"',
       },
     ]);
   });
@@ -136,12 +136,12 @@ describe("cross-namespace duplicate name validation", () => {
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
-          'Client name: "MyUnion" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+          'Client name: "MyUnion" is defined somewhere causing naming conflicts in language scope: "python"',
       },
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
-          'Client name: "MyUnion" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+          'Client name: "MyUnion" is defined somewhere causing naming conflicts in language scope: "python"',
       },
     ]);
   });
@@ -213,11 +213,11 @@ describe("cross-namespace duplicate name validation", () => {
     expectDiagnostics(duplicateDiagnostics, [
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-        message: 'Client name: "SharedName" is duplicated in language scope: "AllScopes"',
+        message: 'Client name: "SharedName" is duplicated in language scope: "python"',
       },
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-        message: 'Client name: "SharedName" is duplicated in language scope: "AllScopes"',
+        message: 'Client name: "SharedName" is duplicated in language scope: "python"',
       },
     ]);
   });
@@ -260,12 +260,12 @@ describe("cross-namespace duplicate name validation", () => {
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
-          'Client name: "Nested" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+          'Client name: "Nested" is defined somewhere causing naming conflicts in language scope: "python"',
       },
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
-          'Client name: "Nested" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+          'Client name: "Nested" is defined somewhere causing naming conflicts in language scope: "python"',
       },
     ]);
   });
@@ -507,7 +507,7 @@ describe("cross-namespace duplicate name validation", () => {
       [
         {
           code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-          message: 'Client name: "ExtensionResource" is duplicated in language scope: "AllScopes"',
+          message: 'Client name: "ExtensionResource" is duplicated in language scope: "java"',
         },
       ],
     );
@@ -817,12 +817,12 @@ describe("namespace flag duplicate name validation", () => {
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
-          'Client name: "Foo" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+          'Client name: "Foo" is defined somewhere causing naming conflicts in language scope: "python"',
       },
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
-          'Client name: "Foo" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+          'Client name: "Foo" is defined somewhere causing naming conflicts in language scope: "python"',
       },
     ]);
   });
@@ -867,12 +867,12 @@ describe("namespace flag duplicate name validation", () => {
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
-          'Client name: "Status" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+          'Client name: "Status" is defined somewhere causing naming conflicts in language scope: "python"',
       },
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
-          'Client name: "Status" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+          'Client name: "Status" is defined somewhere causing naming conflicts in language scope: "python"',
       },
     ]);
   });

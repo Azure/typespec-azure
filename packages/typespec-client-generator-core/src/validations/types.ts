@@ -340,7 +340,7 @@ export function validateCrossNamespaceNames(
         if (!$(sdkContext.program).type.isUserDefined(type)) continue;
         if (type.kind === "Enum" && versionEnums.has(type)) continue;
 
-        const clientName = getClientNameOverride(sdkContext, type, AllScopes);
+        const clientName = getClientNameOverride(sdkContext, type, sdkContext.emitterName);
         if (clientName !== undefined) {
           const decorator = type.decorators.find((x) => x.definition?.name === "@clientName");
           if (decorator?.node !== undefined) {
@@ -354,13 +354,14 @@ export function validateCrossNamespaceNames(
       }
     }
 
+    const scope = sdkContext.emitterName;
     for (const [name, duplicates] of duplicateTracker.entries()) {
       for (const item of duplicates) {
         if (Array.isArray(item)) {
           diagnostics.add(
             createDiagnostic({
               code: "duplicate-client-name",
-              format: { name, scope: "AllScopes" },
+              format: { name, scope },
               target: item[1],
             }),
           );
@@ -369,7 +370,7 @@ export function validateCrossNamespaceNames(
             createDiagnostic({
               code: "duplicate-client-name",
               messageId: "nonDecorator",
-              format: { name, scope: "AllScopes" },
+              format: { name, scope },
               target: item,
             }),
           );
@@ -381,11 +382,6 @@ export function validateCrossNamespaceNames(
   // Part 2: Azure library type conflict detection
   const azureLibraryNamespaces = getAzureLibraryNamespaces(sdkContext.program);
   if (azureLibraryNamespaces.length === 0) return;
-
-  const languageScopes = getDefinedLanguageScopes(sdkContext.program);
-  if (languageScopes.size === 0) {
-    languageScopes.add(AllScopes);
-  }
 
   // Pre-compute Azure library type names
   const azureTypeNames = new Set<string>();
@@ -408,9 +404,7 @@ export function validateCrossNamespaceNames(
     if (unionType.__raw) usedTypes.add(unionType.__raw);
   }
 
-  for (const scope of languageScopes) {
-    validateAzureLibraryTypeConflicts(sdkContext, scope, azureTypeNames, usedTypes);
-  }
+  validateAzureLibraryTypeConflicts(sdkContext, sdkContext.emitterName, azureTypeNames, usedTypes);
 }
 
 function getAzureLibraryNamespaces(program: Program): Namespace[] {
@@ -465,7 +459,7 @@ function collectTypeNamesFromNamespace(namespace: Namespace): Set<string> {
  */
 function validateAzureLibraryTypeConflicts(
   sdkContext: SdkContext,
-  scope: string | typeof AllScopes,
+  scope: string,
   azureTypeNames: Set<string>,
   usedTypes: Set<Type>,
 ) {
@@ -479,10 +473,9 @@ function validateAzureLibraryTypeConflicts(
         (x) => x.definition?.name === "@clientName",
       );
       if (clientNameDecorator?.node !== undefined) {
-        const scopeStr = scope === AllScopes ? "AllScopes" : scope;
         reportDiagnostic(sdkContext.program, {
           code: "duplicate-client-name",
-          format: { name: clientName, scope: scopeStr },
+          format: { name: clientName, scope },
           target: clientNameDecorator.node,
         });
       }
