@@ -22,7 +22,6 @@ import { prepareClientAndOperationCache } from "./cache.js";
 import { defaultDecoratorsAllowList } from "./configs.js";
 import { handleClientExamples } from "./example.js";
 import {
-  getKnownScalars,
   SdkArrayType,
   SdkClient,
   SdkContext,
@@ -83,7 +82,6 @@ export function createTCGCContext(
     __clientParametersCache: new Map(),
     __tspTypeToApiVersions: new Map(),
     __clientApiVersionDefaultValueCache: new Map(),
-    __knownScalars: getKnownScalars(),
     __httpOperationExamples: new Map(),
     __pagedResultSet: new Set(),
 
@@ -218,8 +216,7 @@ export async function createSdkContext<
   }
   sdkContext.diagnostics = sdkContext.diagnostics.concat(diagnostics.diagnostics);
 
-  // Validate cross-namespace collisions (multi-service and Azure library conflicts)
-  // Done here to have access to sdkPackage and emitter options
+  // Validate Azure library type conflicts (e.g., ARM type name collisions)
   validateNamespaceCollisions(sdkContext);
 
   if (options?.exportTCGCoutput) {
@@ -257,3 +254,4 @@ export async function $onEmit(context: EmitContext<TCGCEmitterOptions>) {
     context.program.reportDiagnostics(sdkContext.diagnostics);
   }
 }
+

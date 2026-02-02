@@ -16,7 +16,7 @@ import { AugmentDecoratorStatementNode, DecoratorExpressionNode } from "@typespe
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import { DuplicateTracker } from "@typespec/compiler/utils";
 import { getClientNameOverride } from "../decorators.js";
-import { SdkContext, TCGCContext, UsageFlags } from "../interfaces.js";
+import { SdkContext, TCGCContext } from "../interfaces.js";
 import {
   AllScopes,
   clientLocationKey,
@@ -29,14 +29,6 @@ import { reportDiagnostic } from "../lib.js";
 
 export function validateTypes(context: TCGCContext) {
   validateClientNamesWithinNamespaces(context);
-}
-
-/**
- * Validate cross-namespace collisions when the --namespace flag is set.
- * This runs in createSdkContext where we have access to sdkPackage and emitter options.
- */
-export function validateNamespaceCollisions(context: SdkContext) {
-  validateCrossNamespaceClientNames(context);
 }
 
 /**
@@ -128,86 +120,6 @@ function validateClientNamesWithinNamespaces(tcgcContext: TCGCContext) {
     [...newClients.values()].map((operations) => {
       validateClientNamesCore(tcgcContext, scope, operations);
     });
-  }
-}
-
-/**
- * Validate cross-namespace collisions when the --namespace flag is set.
- * When namespaces are flattened, types from different namespaces may collide.
- * Also checks for Azure library type conflicts.
- *
- * This requires SdkContext because:
- * 1. Needs access to namespaceFlag emitter option
- * 2. Azure library conflict detection needs sdkPackage to check only used types
- *
- * @param sdkContext The SDK context (includes sdkPackage and emitter options).
- */
-function validateCrossNamespaceClientNames(sdkContext: SdkContext) {
-  // Check if any Azure library namespace exists (Azure.Core or Azure.ResourceManager)
-  const azureLibraryNamespaces = getAzureLibraryNamespaces(sdkContext.program);
-  const hasAzureLibrary = azureLibraryNamespaces.length > 0;
-
-  // Only run if there's cross-namespace validation to do:
-  // - namespaceFlag is set (types will be flattened)
-  // - or Azure library is present (need to check for conflicts)
-  if (!sdkContext.namespaceFlag && !hasAzureLibrary) {
-    return;
-  }
-
-  const languageScopes = getDefinedLanguageScopes(sdkContext.program);
-
-  // Ensure we always run validation at least once (with AllScopes)
-  if (languageScopes.size === 0) {
-    languageScopes.add(AllScopes);
-  }
-
-  // Pre-compute Azure library type names once (O(A) where A = types in Azure libraries)
-  // This avoids recomputing for each scope
-  let azureTypeNames: Set<string> | undefined;
-  if (hasAzureLibrary) {
-    azureTypeNames = new Set<string>();
-    for (const ns of azureLibraryNamespaces) {
-      const names = collectTypeNamesFromNamespace(ns);
-      for (const name of names) {
-        azureTypeNames.add(name);
-      }
-    }
-  }
-
-  // Pre-compute used types from sdkPackage once (O(U) where U = used types)
-  // These are the only types we need to check for Azure library conflicts
-  let usedTypes: Set<Type> | undefined;
-  if (hasAzureLibrary) {
-    usedTypes = new Set<Type>();
-    for (const model of sdkContext.sdkPackage.models) {
-      if (model.__raw) {
-        usedTypes.add(model.__raw);
-      }
-    }
-    for (const enumType of sdkContext.sdkPackage.enums) {
-      if (enumType.__raw) {
-        usedTypes.add(enumType.__raw);
-      }
-    }
-    for (const unionType of sdkContext.sdkPackage.unions) {
-      if (unionType.__raw) {
-        usedTypes.add(unionType.__raw);
-      }
-    }
-  }
-
-  // Check all possible language scopes
-  for (const scope of languageScopes) {
-    // When namespaceFlag is set, validate types across ALL namespaces together
-    // because they will be flattened into a single namespace
-    if (sdkContext.namespaceFlag) {
-      validateClientNamesAcrossAllNamespaces(sdkContext, scope);
-    }
-
-    // Check for Azure library type conflicts (only for types actually used by the client)
-    if (azureTypeNames !== undefined && usedTypes !== undefined) {
-      validateAzureLibraryTypeConflicts(sdkContext, scope, azureTypeNames, usedTypes);
-    }
   }
 }
 
@@ -309,146 +221,6 @@ function validateClientNamesPerNamespace(
   }
 }
 
-/**
- * Get Azure library namespaces (Azure.Core and Azure.ResourceManager) if they exist.
- * These are used to detect naming conflicts between user-defined types
- * and built-in Azure library types.
- */
-function getAzureLibraryNamespaces(program: Program): Namespace[] {
-  const namespaces: Namespace[] = [];
-  const globalNs = program.getGlobalNamespaceType();
-  const azureNs = globalNs.namespaces.get("Azure");
-  if (!azureNs) return namespaces;
-
-  const coreNs = azureNs.namespaces.get("Core");
-  if (coreNs) {
-    namespaces.push(coreNs);
-  }
-
-  const armNs = azureNs.namespaces.get("ResourceManager");
-  if (armNs) {
-    namespaces.push(armNs);
-  }
-
-  return namespaces;
-}
-
-/**
- * Collect all type names from a namespace recursively.
- * This includes models, enums, and unions from all nested namespaces.
- */
-function collectTypeNamesFromNamespace(namespace: Namespace): Set<string> {
-  const names = new Set<string>();
-
-  for (const model of namespace.models.values()) {
-    if (model.name) {
-      names.add(model.name);
-    }
-  }
-  for (const enumType of namespace.enums.values()) {
-    if (enumType.name) {
-      names.add(enumType.name);
-    }
-  }
-  for (const union of namespace.unions.values()) {
-    if (union.name) {
-      names.add(union.name);
-    }
-  }
-
-  // Recursively collect from nested namespaces
-  for (const nestedNs of namespace.namespaces.values()) {
-    const nestedNames = collectTypeNamesFromNamespace(nestedNs);
-    for (const name of nestedNames) {
-      names.add(name);
-    }
-  }
-
-  return names;
-}
-
-/**
- * Validate that user-defined types with @clientName don't conflict with Azure library types.
- * This is a targeted check that only reports conflicts when:
- * 1. A user type has an explicit @clientName decorator
- * 2. The client name matches an Azure library type name (from Azure.Core or Azure.ResourceManager)
- * 3. The type is actually used by the client (present in sdkPackage)
- *
- * This avoids false positives from Azure's own internal type duplicates and unused types.
- *
- * Time complexity: O(U) where U = number of used types in sdkPackage
- * Space complexity: O(1) - only uses pre-computed sets passed in, no new allocations
- */
-function validateAzureLibraryTypeConflicts(
-  sdkContext: SdkContext,
-  scope: string | typeof AllScopes,
-  azureTypeNames: Set<string>,
-  usedTypes: Set<Type>,
-) {
-  // Check only used types for conflicts
-  for (const userType of usedTypes) {
-    if (userType.kind !== "Model" && userType.kind !== "Enum" && userType.kind !== "Union") {
-      continue;
-    }
-    // Only check types that have an explicit @clientName decorator
-    const clientName = getClientNameOverride(sdkContext, userType, scope);
-    if (clientName !== undefined && azureTypeNames.has(clientName)) {
-      // User type with @clientName conflicts with an Azure library type
-      const clientNameDecorator = userType.decorators.find(
-        (x) => x.definition?.name === "@clientName",
-      );
-      if (clientNameDecorator?.node !== undefined) {
-        const scopeStr = scope === AllScopes ? "AllScopes" : scope;
-        reportDiagnostic(sdkContext.program, {
-          code: "duplicate-client-name",
-          format: { name: clientName, scope: scopeStr },
-          target: clientNameDecorator.node,
-        });
-      }
-    }
-  }
-}
-
-/**
- * Validate client names across all user-defined namespaces when the --namespace flag is set.
- * When namespaces are flattened, types from different namespaces may collide.
- */
-function validateClientNamesAcrossAllNamespaces(
-  sdkContext: SdkContext,
-  scope: string | typeof AllScopes,
-) {
-  // Collect all types from all user-defined namespaces
-  // Note: listAllUserDefinedNamespaces already includes nested namespaces,
-  // so we collect types directly from each namespace without recursion
-  const allModels: Model[] = [];
-  const allEnums: Enum[] = [];
-  const allUnions: Union[] = [];
-
-  for (const ns of listAllUserDefinedNamespaces(sdkContext)) {
-    // Collect types directly from this namespace (not recursively)
-    allModels.push(...ns.models.values());
-    allEnums.push(...ns.enums.values());
-    allUnions.push(...ns.unions.values());
-  }
-
-  // Pre-compute API version enum names to exclude from duplicate name validation
-  // API version enums (e.g., "Versions") commonly have the same name across services and that's OK
-  // We store names instead of Type references because versioning can create different type instances
-  const apiVersionEnumNames = new Set<string>();
-  for (const enumType of sdkContext.sdkPackage.enums) {
-    if ((enumType.usage & UsageFlags.ApiVersionEnum) !== 0) {
-      apiVersionEnumNames.add(enumType.name);
-    }
-  }
-
-  // Filter out API version enums - they commonly have the same name (e.g., "Versions")
-  // across services and that's expected/allowed
-  const filteredEnums = allEnums.filter((e) => !e.name || !apiVersionEnumNames.has(e.name));
-
-  // Validate models, enums, and unions together across all namespaces
-  validateClientNamesCore(sdkContext, scope, [...allModels, ...filteredEnums, ...allUnions]);
-}
-
 function validateClientNamesCore(
   tcgcContext: TCGCContext,
   scope: string | typeof AllScopes,
@@ -531,6 +303,125 @@ function reportDuplicateClientNames(
             target: item,
           });
         }
+      }
+    }
+  }
+}
+
+/**
+ * Validate that user-defined types with @clientName don't conflict with Azure library types.
+ * This requires SdkContext because it needs sdkPackage to check only used types.
+ *
+ * Cross-namespace duplicate name validation (for the --namespace flag) is handled
+ * separately by validateCrossNamespaceNamesWithFlag in internal-utils.ts.
+ */
+export function validateNamespaceCollisions(sdkContext: SdkContext) {
+  const azureLibraryNamespaces = getAzureLibraryNamespaces(sdkContext.program);
+  if (azureLibraryNamespaces.length === 0) return;
+
+  const languageScopes = getDefinedLanguageScopes(sdkContext.program);
+  if (languageScopes.size === 0) {
+    languageScopes.add(AllScopes);
+  }
+
+  // Pre-compute Azure library type names
+  const azureTypeNames = new Set<string>();
+  for (const ns of azureLibraryNamespaces) {
+    const names = collectTypeNamesFromNamespace(ns);
+    for (const name of names) {
+      azureTypeNames.add(name);
+    }
+  }
+
+  // Pre-compute used types from sdkPackage
+  const usedTypes = new Set<Type>();
+  for (const model of sdkContext.sdkPackage.models) {
+    if (model.__raw) usedTypes.add(model.__raw);
+  }
+  for (const enumType of sdkContext.sdkPackage.enums) {
+    if (enumType.__raw) usedTypes.add(enumType.__raw);
+  }
+  for (const unionType of sdkContext.sdkPackage.unions) {
+    if (unionType.__raw) usedTypes.add(unionType.__raw);
+  }
+
+  for (const scope of languageScopes) {
+    validateAzureLibraryTypeConflicts(sdkContext, scope, azureTypeNames, usedTypes);
+  }
+}
+
+function getAzureLibraryNamespaces(program: Program): Namespace[] {
+  const namespaces: Namespace[] = [];
+  const globalNs = program.getGlobalNamespaceType();
+  const azureNs = globalNs.namespaces.get("Azure");
+  if (!azureNs) return namespaces;
+
+  const coreNs = azureNs.namespaces.get("Core");
+  if (coreNs) {
+    namespaces.push(coreNs);
+  }
+
+  const armNs = azureNs.namespaces.get("ResourceManager");
+  if (armNs) {
+    namespaces.push(armNs);
+  }
+
+  return namespaces;
+}
+
+/**
+ * Collect all type names from a namespace recursively.
+ */
+function collectTypeNamesFromNamespace(namespace: Namespace): Set<string> {
+  const names = new Set<string>();
+
+  for (const model of namespace.models.values()) {
+    if (model.name) names.add(model.name);
+  }
+  for (const enumType of namespace.enums.values()) {
+    if (enumType.name) names.add(enumType.name);
+  }
+  for (const union of namespace.unions.values()) {
+    if (union.name) names.add(union.name);
+  }
+
+  for (const nestedNs of namespace.namespaces.values()) {
+    const nestedNames = collectTypeNamesFromNamespace(nestedNs);
+    for (const name of nestedNames) {
+      names.add(name);
+    }
+  }
+
+  return names;
+}
+
+/**
+ * Validate that user-defined types with @clientName don't conflict with Azure library types.
+ * Only reports conflicts when a user type has an explicit @clientName decorator that
+ * matches an Azure library type name and the type is actually used by the client.
+ */
+function validateAzureLibraryTypeConflicts(
+  sdkContext: SdkContext,
+  scope: string | typeof AllScopes,
+  azureTypeNames: Set<string>,
+  usedTypes: Set<Type>,
+) {
+  for (const userType of usedTypes) {
+    if (userType.kind !== "Model" && userType.kind !== "Enum" && userType.kind !== "Union") {
+      continue;
+    }
+    const clientName = getClientNameOverride(sdkContext, userType, scope);
+    if (clientName !== undefined && azureTypeNames.has(clientName)) {
+      const clientNameDecorator = userType.decorators.find(
+        (x) => x.definition?.name === "@clientName",
+      );
+      if (clientNameDecorator?.node !== undefined) {
+        const scopeStr = scope === AllScopes ? "AllScopes" : scope;
+        reportDiagnostic(sdkContext.program, {
+          code: "duplicate-client-name",
+          format: { name: clientName, scope: scopeStr },
+          target: clientNameDecorator.node,
+        });
       }
     }
   }

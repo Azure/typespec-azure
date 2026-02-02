@@ -34,11 +34,8 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
 ): [SdkPackage<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
 
-  // Validate cross-namespace names if namespace flag is set (flattens namespaces)
-  // Can't validate in $onValidate bc we don't have access to the namespace flag
-  validateCrossNamespaceNamesWithFlag(context, diagnostics);
-
   populateApiVersionInformation(context);
+  validateCrossNamespaceNamesWithFlag(context, diagnostics);
   diagnostics.pipe(handleAllTypes(context));
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   const allReferencedTypes = getAllReferencedTypes(context);

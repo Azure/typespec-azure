@@ -62,7 +62,6 @@ export interface TCGCContext {
   __generatedNames: Map<Type, string>;
   __httpOperationCache: Map<Operation, HttpOperation>;
   __tspTypeToApiVersions: Map<Type, string[]>;
-  __knownScalars?: Record<string, SdkBuiltInKinds>;
   __rawClientsOperationGroupsCache?: Map<
     Namespace | Interface | string,
     SdkClient | SdkOperationGroup

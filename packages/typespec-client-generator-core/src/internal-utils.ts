@@ -1123,15 +1123,6 @@ export function isSameAuth(left: Authentication, right: Authentication): boolean
   return true;
 }
 
-/**
- * Validates that there are no duplicate type names across namespaces when the namespace flag
- * is used (which flattens all namespaces to a single namespace).
- *
- * This should be called during package creation when the namespaceFlag is set.
- *
- * @param context The TCGC context
- * @param diagnostics The diagnostic collector to add errors to
- */
 export function validateCrossNamespaceNamesWithFlag(
   context: TCGCContext,
   diagnostics: ReturnType<typeof createDiagnosticCollector>,
@@ -1210,3 +1201,4 @@ function collectTypesFromNamespace(
     }
   }
 }
+

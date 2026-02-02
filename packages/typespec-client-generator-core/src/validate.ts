@@ -15,8 +15,5 @@ export function $onValidate(program: Program) {
   validateClients(tcgcContext);
   validateMethods(tcgcContext);
   validateHttp(tcgcContext);
-  // Basic client name validation within namespaces
   validateTypes(tcgcContext);
-  // Note: Cross-namespace collision validation (multi-service and Azure library conflicts)
-  // is done in createSdkContext where we have access to sdkPackage and emitter options
 }
