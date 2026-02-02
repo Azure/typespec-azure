@@ -10,7 +10,6 @@ import {
   Scalar,
   Type,
   Union,
-  Value,
   createDiagnosticCollector,
   getEffectiveModelType,
   getFriendlyName,
@@ -42,10 +41,9 @@ import {
   listOperationsInOperationGroup,
 } from "./decorators.js";
 import {
-  DecoratorInfo,
+  DecoratedType,
   SdkBodyParameter,
   SdkClient,
-  SdkClientOption,
   SdkClientType,
   SdkCookieParameter,
   SdkHeaderParameter,
@@ -904,28 +902,21 @@ export function getNamespaceFromType(
 const CLIENT_OPTION_DECORATOR_NAME = "Azure.ClientGenerator.Core.@clientOption";
 
 /**
- * Get all client options from a decorated SDK type.
- * This is a convenience function for extracting `@clientOption` decorator data
- * from the decorators array on SDK types.
+ * Get the value of a client option by key from a decorated SDK type.
  *
- * @param decorators - The decorators array from an SDK type (model, enum, operation, property, etc.)
- * @returns An array of client options with their name, value, and optional scope
+ * @param type - A decorated SDK type (model, enum, operation, property, client, namespace, etc.)
+ * @param key - The name of the client option to look up
+ * @returns The option value, or `undefined` if the option is not set
  *
  * @example
  * ```typescript
  * const sdkModel = context.sdkPackage.models.find(m => m.name === "MyModel");
- * const clientOptions = getClientOptions(sdkModel.decorators);
- * for (const option of clientOptions) {
- *   console.log(`Option: ${option.name} = ${option.value}`);
- * }
+ * const value = getClientOptions(sdkModel, "enableFeatureFoo");
  * ```
  */
-export function getClientOptions(decorators: DecoratorInfo[]): SdkClientOption[] {
-  return decorators
+export function getClientOptions<T extends DecoratedType>(type: T, key: string): unknown {
+  const option = type.decorators
     .filter((d) => d.name === CLIENT_OPTION_DECORATOR_NAME)
-    .map((d) => ({
-      name: d.arguments.name as string,
-      value: d.arguments.value as Value,
-      scope: d.arguments.scope as string | undefined,
-    }));
+    .find((d) => d.arguments.name === key);
+  return option?.arguments.value;
 }

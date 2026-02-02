@@ -437,7 +437,12 @@ function getDecoratorArgValue(
     if (arg.kind === "EnumMember") {
       return diagnostics.wrap(diagnostics.pipe(getClientTypeWithDiagnostics(context, arg)));
     }
-    if (arg.kind === "String" || arg.kind === "Number" || arg.kind === "Boolean" || arg.kind === "Value") {
+    if (
+      arg.kind === "String" ||
+      arg.kind === "Number" ||
+      arg.kind === "Boolean" ||
+      arg.kind === "Value"
+    ) {
       return diagnostics.wrap(arg.value);
     }
     diagnostics.add(

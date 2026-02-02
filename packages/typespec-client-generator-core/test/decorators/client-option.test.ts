@@ -62,7 +62,7 @@ describe("@clientOption diagnostics", () => {
 });
 
 describe("@clientOption with getClientOptions getter", () => {
-  it("should return client options for model", async () => {
+  it("should return client option value for model", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("enableFeatureFoo", true, "python")
@@ -81,16 +81,10 @@ describe("@clientOption with getClientOptions getter", () => {
     const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
     ok(sdkModel, "SDK model should exist");
 
-    const clientOptions = getClientOptions(sdkModel.decorators);
-    strictEqual(clientOptions.length, 1);
-    deepStrictEqual(clientOptions[0], {
-      name: "enableFeatureFoo",
-      value: true,
-      scope: "python",
-    });
+    strictEqual(getClientOptions(sdkModel, "enableFeatureFoo"), true);
   });
 
-  it("should return multiple client options on same target", async () => {
+  it("should return values for multiple client options on same target", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("enableFeatureFoo", true, "python")
@@ -111,21 +105,8 @@ describe("@clientOption with getClientOptions getter", () => {
     const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
     ok(sdkModel, "SDK model should exist");
 
-    const clientOptions = getClientOptions(sdkModel.decorators);
-    strictEqual(clientOptions.length, 2);
-
-    // Verify each option has the correct name and value
-    const fooOption = clientOptions.find((o) => o.name === "enableFeatureFoo");
-    ok(fooOption, "enableFeatureFoo option should exist");
-    strictEqual(fooOption.name, "enableFeatureFoo");
-    strictEqual(fooOption.value, true);
-    strictEqual(fooOption.scope, "python");
-
-    const barOption = clientOptions.find((o) => o.name === "enableFeatureBar");
-    ok(barOption, "enableFeatureBar option should exist");
-    strictEqual(barOption.name, "enableFeatureBar");
-    strictEqual(barOption.value, "value");
-    strictEqual(barOption.scope, "python");
+    strictEqual(getClientOptions(sdkModel, "enableFeatureFoo"), true);
+    strictEqual(getClientOptions(sdkModel, "enableFeatureBar"), "value");
   });
 
   it("should support different value types", async () => {
@@ -163,32 +144,26 @@ describe("@clientOption with getClientOptions getter", () => {
     // Verify boolean value type
     const sdkModelBool = context.sdkPackage.models.find((m) => m.name === "TestBool");
     ok(sdkModelBool, "TestBool model should exist");
-    const boolOptions = getClientOptions(sdkModelBool.decorators);
-    strictEqual(boolOptions.length, 1);
-    strictEqual(boolOptions[0].name, "boolOption");
-    strictEqual(boolOptions[0].value, true);
-    strictEqual(typeof boolOptions[0].value, "boolean");
+    const boolValue = getClientOptions(sdkModelBool, "boolOption");
+    strictEqual(boolValue, true);
+    strictEqual(typeof boolValue, "boolean");
 
     // Verify string value type
     const sdkModelString = context.sdkPackage.models.find((m) => m.name === "TestString");
     ok(sdkModelString, "TestString model should exist");
-    const stringOptions = getClientOptions(sdkModelString.decorators);
-    strictEqual(stringOptions.length, 1);
-    strictEqual(stringOptions[0].name, "stringOption");
-    strictEqual(stringOptions[0].value, "someValue");
-    strictEqual(typeof stringOptions[0].value, "string");
+    const stringValue = getClientOptions(sdkModelString, "stringOption");
+    strictEqual(stringValue, "someValue");
+    strictEqual(typeof stringValue, "string");
 
     // Verify number value type
     const sdkModelNumber = context.sdkPackage.models.find((m) => m.name === "TestNumber");
     ok(sdkModelNumber, "TestNumber model should exist");
-    const numberOptions = getClientOptions(sdkModelNumber.decorators);
-    strictEqual(numberOptions.length, 1);
-    strictEqual(numberOptions[0].name, "numberOption");
-    strictEqual(numberOptions[0].value, 42);
-    strictEqual(typeof numberOptions[0].value, "number");
+    const numberValue = getClientOptions(sdkModelNumber, "numberOption");
+    strictEqual(numberValue, 42);
+    strictEqual(typeof numberValue, "number");
   });
 
-  it("should return client options for operation", async () => {
+  it("should return client option value for operation", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("operationFlag", "customValue", "python")
@@ -205,16 +180,10 @@ describe("@clientOption with getClientOptions getter", () => {
     );
     ok(sdkMethod, "SDK method should exist");
 
-    const clientOptions = getClientOptions(sdkMethod.decorators);
-    strictEqual(clientOptions.length, 1);
-    deepStrictEqual(clientOptions[0], {
-      name: "operationFlag",
-      value: "customValue",
-      scope: "python",
-    });
+    strictEqual(getClientOptions(sdkMethod, "operationFlag"), "customValue");
   });
 
-  it("should return client options for enum", async () => {
+  it("should return client option value for enum", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("enumFlag", true, "python")
@@ -235,16 +204,10 @@ describe("@clientOption with getClientOptions getter", () => {
     const sdkEnum = context.sdkPackage.enums.find((e) => e.name === "TestEnum");
     ok(sdkEnum, "SDK enum should exist");
 
-    const clientOptions = getClientOptions(sdkEnum.decorators);
-    strictEqual(clientOptions.length, 1);
-    deepStrictEqual(clientOptions[0], {
-      name: "enumFlag",
-      value: true,
-      scope: "python",
-    });
+    strictEqual(getClientOptions(sdkEnum, "enumFlag"), true);
   });
 
-  it("should return client options for model property", async () => {
+  it("should return client option value for model property", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       @test
       model Test {
@@ -266,16 +229,10 @@ describe("@clientOption with getClientOptions getter", () => {
     const sdkProperty = sdkModel.properties.find((p) => p.name === "myProp");
     ok(sdkProperty, "SDK property should exist");
 
-    const clientOptions = getClientOptions(sdkProperty.decorators);
-    strictEqual(clientOptions.length, 1);
-    deepStrictEqual(clientOptions[0], {
-      name: "propertyFlag",
-      value: "propValue",
-      scope: "python",
-    });
+    strictEqual(getClientOptions(sdkProperty, "propertyFlag"), "propValue");
   });
 
-  it("should return options when scope matches emitter", async () => {
+  it("should return value when scope matches emitter", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("pythonOnlyFlag", true, "python")
@@ -295,14 +252,10 @@ describe("@clientOption with getClientOptions getter", () => {
     const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
     ok(sdkModel, "SDK model should exist");
 
-    const clientOptions = getClientOptions(sdkModel.decorators);
-    strictEqual(clientOptions.length, 1);
-    strictEqual(clientOptions[0].name, "pythonOnlyFlag");
-    strictEqual(clientOptions[0].value, true);
-    strictEqual(clientOptions[0].scope, "python");
+    strictEqual(getClientOptions(sdkModel, "pythonOnlyFlag"), true);
   });
 
-  it("should return empty array when scope does not match emitter", async () => {
+  it("should return undefined when scope does not match emitter", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("javaOnlyFlag", true, "java")
@@ -322,9 +275,8 @@ describe("@clientOption with getClientOptions getter", () => {
     const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
     ok(sdkModel, "SDK model should exist");
 
-    // The decorator should NOT appear - getClientOptions should return empty array
-    const clientOptions = getClientOptions(sdkModel.decorators);
-    strictEqual(clientOptions.length, 0);
+    // The decorator should NOT appear - getClientOptions should return undefined
+    strictEqual(getClientOptions(sdkModel, "javaOnlyFlag"), undefined);
   });
 
   it("should handle option without scope argument", async () => {
@@ -347,12 +299,7 @@ describe("@clientOption with getClientOptions getter", () => {
     const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
     ok(sdkModel, "SDK model should exist");
 
-    const clientOptions = getClientOptions(sdkModel.decorators);
-    strictEqual(clientOptions.length, 1);
-    strictEqual(clientOptions[0].name, "noScopeOption");
-    strictEqual(clientOptions[0].value, 123);
-    // scope should be undefined when not provided
-    strictEqual(clientOptions[0].scope, undefined);
+    strictEqual(getClientOptions(sdkModel, "noScopeOption"), 123);
   });
 
   it("should support array value type", async () => {
@@ -374,12 +321,9 @@ describe("@clientOption with getClientOptions getter", () => {
     const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
     ok(sdkModel, "SDK model should exist");
 
-    const clientOptions = getClientOptions(sdkModel.decorators);
-    strictEqual(clientOptions.length, 1);
-    strictEqual(clientOptions[0].name, "arrayOption");
-    ok(Array.isArray(clientOptions[0].value), "value should be an array");
-    deepStrictEqual(clientOptions[0].value, ["item1", "item2", "item3"]);
-    strictEqual(clientOptions[0].scope, "python");
+    const value = getClientOptions(sdkModel, "arrayOption");
+    ok(Array.isArray(value), "value should be an array");
+    deepStrictEqual(value, ["item1", "item2", "item3"]);
   });
 
   it("should support object/map value type", async () => {
@@ -401,15 +345,9 @@ describe("@clientOption with getClientOptions getter", () => {
     const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
     ok(sdkModel, "SDK model should exist");
 
-    const clientOptions = getClientOptions(sdkModel.decorators);
-    strictEqual(clientOptions.length, 1);
-    strictEqual(clientOptions[0].name, "objectOption");
-    ok(
-      typeof clientOptions[0].value === "object" && !Array.isArray(clientOptions[0].value),
-      "value should be an object",
-    );
-    deepStrictEqual(clientOptions[0].value, { key1: "value1", key2: "value2" });
-    strictEqual(clientOptions[0].scope, "python");
+    const value = getClientOptions(sdkModel, "objectOption");
+    ok(typeof value === "object" && !Array.isArray(value), "value should be an object");
+    deepStrictEqual(value, { key1: "value1", key2: "value2" });
   });
 
   it("should support nested object and array values", async () => {
@@ -436,16 +374,11 @@ describe("@clientOption with getClientOptions getter", () => {
     const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
     ok(sdkModel, "SDK model should exist");
 
-    const clientOptions = getClientOptions(sdkModel.decorators);
-    strictEqual(clientOptions.length, 1);
-    strictEqual(clientOptions[0].name, "nestedOption");
-
-    const value = clientOptions[0].value as unknown as Record<string, unknown>;
+    const value = getClientOptions(sdkModel, "nestedOption") as Record<string, unknown>;
     strictEqual(value.stringField, "hello");
     strictEqual(value.numberField, 42);
     deepStrictEqual(value.arrayField, [1, 2, 3]);
     deepStrictEqual(value.nestedObject, { inner: "value" });
-    strictEqual(clientOptions[0].scope, "python");
   });
 
   it("should support array of numbers", async () => {
@@ -467,11 +400,9 @@ describe("@clientOption with getClientOptions getter", () => {
     const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
     ok(sdkModel, "SDK model should exist");
 
-    const clientOptions = getClientOptions(sdkModel.decorators);
-    strictEqual(clientOptions.length, 1);
-    strictEqual(clientOptions[0].name, "numberArrayOption");
-    ok(Array.isArray(clientOptions[0].value), "value should be an array");
-    deepStrictEqual(clientOptions[0].value, [1, 2, 3, 4, 5]);
+    const value = getClientOptions(sdkModel, "numberArrayOption");
+    ok(Array.isArray(value), "value should be an array");
+    deepStrictEqual(value, [1, 2, 3, 4, 5]);
   });
 
   it("should support array of mixed types", async () => {
@@ -493,14 +424,12 @@ describe("@clientOption with getClientOptions getter", () => {
     const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
     ok(sdkModel, "SDK model should exist");
 
-    const clientOptions = getClientOptions(sdkModel.decorators);
-    strictEqual(clientOptions.length, 1);
-    strictEqual(clientOptions[0].name, "mixedArrayOption");
-    ok(Array.isArray(clientOptions[0].value), "value should be an array");
-    deepStrictEqual(clientOptions[0].value, ["string", 42, true]);
+    const value = getClientOptions(sdkModel, "mixedArrayOption");
+    ok(Array.isArray(value), "value should be an array");
+    deepStrictEqual(value, ["string", 42, true]);
   });
 
-  it("should return client options for namespace", async () => {
+  it("should return client option value for namespace", async () => {
     const { program } = await SimpleTester.compile(`
       @server("http://localhost:3000", "endpoint")
       @service
@@ -522,16 +451,10 @@ describe("@clientOption with getClientOptions getter", () => {
     const sdkNamespace = context.sdkPackage.namespaces.find((ns) => ns.name === "MyService");
     ok(sdkNamespace, "SDK namespace should exist");
 
-    const clientOptions = getClientOptions(sdkNamespace.decorators);
-    strictEqual(clientOptions.length, 1);
-    deepStrictEqual(clientOptions[0], {
-      name: "namespaceFlag",
-      value: "nsValue",
-      scope: "python",
-    });
+    strictEqual(getClientOptions(sdkNamespace, "namespaceFlag"), "nsValue");
   });
 
-  it("should return client options for interface (operation group)", async () => {
+  it("should return client option value for interface (operation group)", async () => {
     const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("interfaceFlag", true, "python")
@@ -553,12 +476,28 @@ describe("@clientOption with getClientOptions getter", () => {
     const subClient = client.children?.find((c) => c.name === "MyOperations");
     ok(subClient, "Sub-client for interface should exist");
 
-    const clientOptions = getClientOptions(subClient.decorators);
-    strictEqual(clientOptions.length, 1);
-    deepStrictEqual(clientOptions[0], {
-      name: "interfaceFlag",
-      value: true,
-      scope: "python",
+    strictEqual(getClientOptions(subClient, "interfaceFlag"), true);
+  });
+
+  it("should return undefined for non-existent key", async () => {
+    const { program } = await SimpleTesterWithService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("existingOption", true, "python")
+      @test
+      model Test {
+        id: string;
+      }
+
+      op getTest(): Test;
+    `);
+
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
     });
+
+    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
+    ok(sdkModel, "SDK model should exist");
+
+    strictEqual(getClientOptions(sdkModel, "nonExistentOption"), undefined);
   });
 });

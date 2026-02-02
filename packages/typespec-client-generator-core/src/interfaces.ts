@@ -14,7 +14,6 @@ import {
   PagingOperation,
   Program,
   Type,
-  Value,
 } from "@typespec/compiler";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
 import {
@@ -183,7 +182,7 @@ export interface ClientInitializationOptions {
 
 // Types for TCGC specific type  graph
 
-interface DecoratedType {
+export interface DecoratedType {
   /**
    * Client types sourced from TypeSpec decorated types will have this generic decoratores list.
    * Only decorators in allowed list will be included in this list.
@@ -201,25 +200,6 @@ export interface DecoratorInfo {
    * A dict of the decorator's arguments. For example, `{ encoding: "base64url" }`.
    */
   arguments: Record<string, any>;
-}
-
-/**
- * Represents a client option set via the `@clientOption` decorator.
- * This is a convenience type for accessing client options without parsing the decorators array directly.
- */
-export interface SdkClientOption {
-  /**
-   * The name of the client option.
-   */
-  name: string;
-  /**
-   * The value of the client option.
-   */
-  value: Value;
-  /**
-   * The language scope this option applies to, if specified.
-   */
-  scope?: string;
 }
 
 /**
