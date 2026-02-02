@@ -196,7 +196,8 @@ it("text file output", async () => {
   const httpOperation = method.operation;
   const responseBody = httpOperation.responses[0];
   ok(responseBody);
-  strictEqual(responseBody.type!.kind, "model");
+  ok(responseBody.type);
+  strictEqual(responseBody.type.kind, "model");
   strictEqual(responseBody.type.serializationOptions.binary?.isFile, true);
   strictEqual(responseBody.type.serializationOptions.binary?.isText, true);
   deepStrictEqual(responseBody.type.serializationOptions.binary?.contentTypes, ["text/plain"]);

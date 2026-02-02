@@ -681,12 +681,18 @@ export interface BinarySerializationOptions {
    * Emitters may choose to represent textual files as strings or streams of textual characters.
    * If this property is `false`, emitters must expect that the contents may contain non-textual
    * data.
+   *
+   * This property is only present when `isFile` is `true`. When undefined, it indicates the
+   * body is not a file type.
    */
   isText?: boolean;
   /**
    * The list of inner media types of the file. In other words, what kind of files can be returned.
    *
    * This is determined by the `contentType` property of the file model.
+   *
+   * This property is only present when `isFile` is `true`. When undefined, it indicates the
+   * body is not a file type.
    */
   contentTypes?: string[];
 }
