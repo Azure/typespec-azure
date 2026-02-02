@@ -40,8 +40,8 @@ describe("cross-namespace duplicate name validation", () => {
     );
 
     const context = await createSdkContextForTester(program, { namespace: "CombineClient" });
-    // Filter to get only the cross-namespace duplicate diagnostics from program
-    const duplicateDiagnostics = context.program.diagnostics.filter(
+    // Filter to get only the cross-namespace duplicate diagnostics
+    const duplicateDiagnostics = context.diagnostics.filter(
       (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
     );
     expectDiagnostics(duplicateDiagnostics, [
@@ -85,7 +85,7 @@ describe("cross-namespace duplicate name validation", () => {
     );
 
     const context = await createSdkContextForTester(program, { namespace: "CombineClient" });
-    const duplicateDiagnostics = context.program.diagnostics.filter(
+    const duplicateDiagnostics = context.diagnostics.filter(
       (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
     );
     expectDiagnostics(duplicateDiagnostics, [
@@ -129,7 +129,7 @@ describe("cross-namespace duplicate name validation", () => {
     );
 
     const context = await createSdkContextForTester(program, { namespace: "CombineClient" });
-    const duplicateDiagnostics = context.program.diagnostics.filter(
+    const duplicateDiagnostics = context.diagnostics.filter(
       (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
     );
     expectDiagnostics(duplicateDiagnostics, [
@@ -172,7 +172,7 @@ describe("cross-namespace duplicate name validation", () => {
     );
 
     const context = await createSdkContextForTester(program, { namespace: "CombineClient" });
-    const duplicateDiagnostics = context.program.diagnostics.filter(
+    const duplicateDiagnostics = context.diagnostics.filter(
       (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
     );
     expectDiagnosticEmpty(duplicateDiagnostics);
@@ -207,7 +207,7 @@ describe("cross-namespace duplicate name validation", () => {
     );
 
     const context = await createSdkContextForTester(program, { namespace: "CombineClient" });
-    const duplicateDiagnostics = context.program.diagnostics.filter(
+    const duplicateDiagnostics = context.diagnostics.filter(
       (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
     );
     expectDiagnostics(duplicateDiagnostics, [
@@ -253,7 +253,7 @@ describe("cross-namespace duplicate name validation", () => {
     );
 
     const context = await createSdkContextForTester(program, { namespace: "CombineClient" });
-    const duplicateDiagnostics = context.program.diagnostics.filter(
+    const duplicateDiagnostics = context.diagnostics.filter(
       (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
     );
     expectDiagnostics(duplicateDiagnostics, [
@@ -321,7 +321,7 @@ describe("cross-namespace duplicate name validation", () => {
     const context = await createSdkContextForTester(program, { namespace: "CombineClient" });
     // Should not report errors for "Versions" enums being duplicated
     // because they are API version enums
-    const duplicateDiagnostics = context.program.diagnostics.filter(
+    const duplicateDiagnostics = context.diagnostics.filter(
       (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
     );
     expectDiagnosticEmpty(duplicateDiagnostics);
@@ -356,7 +356,7 @@ describe("cross-namespace duplicate name validation", () => {
 
     // No namespace flag - should not report cross-namespace duplicates
     const context = await createSdkContextForTester(program);
-    const duplicateDiagnostics = context.program.diagnostics.filter(
+    const duplicateDiagnostics = context.diagnostics.filter(
       (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
     );
     expectDiagnosticEmpty(duplicateDiagnostics);
@@ -390,7 +390,7 @@ describe("cross-namespace duplicate name validation", () => {
 
     // No namespace flag - should not report cross-namespace duplicates
     const context = await createSdkContextForTester(program);
-    const duplicateDiagnostics = context.program.diagnostics.filter(
+    const duplicateDiagnostics = context.diagnostics.filter(
       (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
     );
     expectDiagnosticEmpty(duplicateDiagnostics);
@@ -426,7 +426,7 @@ describe("cross-namespace duplicate name validation", () => {
 
     // No namespace flag - should not report any duplicates
     const context = await createSdkContextForTester(program);
-    const duplicateDiagnostics = context.program.diagnostics.filter(
+    const duplicateDiagnostics = context.diagnostics.filter(
       (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
     );
     expectDiagnosticEmpty(duplicateDiagnostics);

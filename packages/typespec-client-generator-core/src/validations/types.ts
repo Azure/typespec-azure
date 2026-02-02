@@ -322,19 +322,58 @@ export function validateCrossNamespaceNames(
 ) {
   // Part 1: Namespace flag duplicate detection
   if (sdkContext.namespaceFlag) {
-    const allTypeNames = new Map<string, Type[]>();
-    for (const ns of listAllUserDefinedNamespaces(sdkContext)) {
-      collectUserTypesFromNamespace(sdkContext.program, ns, allTypeNames);
+    // Exclude version enums from duplicate checking
+    const versionEnums = new Set<Enum>();
+    for (const [, versionEnum] of sdkContext.getPackageVersionEnum()) {
+      if (versionEnum) versionEnums.add(versionEnum);
     }
-    for (const [name, types] of allTypeNames) {
-      if (types.length > 1) {
-        for (const type of types) {
+
+    const duplicateTracker = new DuplicateTracker<
+      string,
+      Type | [Type, DecoratorExpressionNode | AugmentDecoratorStatementNode]
+    >();
+
+    for (const ns of listAllUserDefinedNamespaces(sdkContext)) {
+      for (const type of [
+        ...ns.models.values(),
+        ...ns.enums.values(),
+        ...ns.unions.values(),
+        ...ns.interfaces.values(),
+      ]) {
+        if (!$(sdkContext.program).type.isUserDefined(type)) continue;
+        if (type.kind === "Enum" && versionEnums.has(type)) continue;
+
+        const clientName = getClientNameOverride(sdkContext, type, AllScopes);
+        if (clientName !== undefined) {
+          const decorator = type.decorators.find((x) => x.definition?.name === "@clientName");
+          if (decorator?.node !== undefined) {
+            duplicateTracker.track(clientName, [type, decorator.node]);
+          }
+        } else {
+          if (type.name !== undefined && typeof type.name === "string") {
+            duplicateTracker.track(type.name, type);
+          }
+        }
+      }
+    }
+
+    for (const [name, duplicates] of duplicateTracker.entries()) {
+      for (const item of duplicates) {
+        if (Array.isArray(item)) {
+          diagnostics.add(
+            createDiagnostic({
+              code: "duplicate-client-name",
+              format: { name, scope: "AllScopes" },
+              target: item[1],
+            }),
+          );
+        } else {
           diagnostics.add(
             createDiagnostic({
               code: "duplicate-client-name",
               messageId: "nonDecorator",
               format: { name, scope: "AllScopes" },
-              target: type,
+              target: item,
             }),
           );
         }
@@ -454,41 +493,4 @@ function validateAzureLibraryTypeConflicts(
   }
 }
 
-/**
- * Collect top-level user-defined types from a single namespace (non-recursive).
- * The outer loop over listAllUserDefinedNamespaces handles recursion.
- */
-function collectUserTypesFromNamespace(
-  program: Program,
-  namespace: Namespace,
-  allTypeNames: Map<string, Type[]>,
-): void {
-  for (const model of namespace.models.values()) {
-    if (model.name && $(program).type.isUserDefined(model)) {
-      const existing = allTypeNames.get(model.name) ?? [];
-      existing.push(model);
-      allTypeNames.set(model.name, existing);
-    }
-  }
-  for (const enumType of namespace.enums.values()) {
-    if (enumType.name && $(program).type.isUserDefined(enumType)) {
-      const existing = allTypeNames.get(enumType.name) ?? [];
-      existing.push(enumType);
-      allTypeNames.set(enumType.name, existing);
-    }
-  }
-  for (const unionType of namespace.unions.values()) {
-    if (unionType.name && $(program).type.isUserDefined(unionType)) {
-      const existing = allTypeNames.get(unionType.name) ?? [];
-      existing.push(unionType);
-      allTypeNames.set(unionType.name, existing);
-    }
-  }
-  for (const iface of namespace.interfaces.values()) {
-    if (iface.name && $(program).type.isUserDefined(iface)) {
-      const existing = allTypeNames.get(iface.name) ?? [];
-      existing.push(iface);
-      allTypeNames.set(iface.name, existing);
-    }
-  }
-}
+
