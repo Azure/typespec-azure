@@ -207,6 +207,7 @@ function getSdkHttpParameters(
           isFile: true,
           isText: fileBody.isText,
           contentTypes: fileBody.contentTypes,
+          filename: fileBody.filename.name,
         };
       }
       if (bodyParam.kind !== "body") {
@@ -570,6 +571,7 @@ function getSdkHttpResponseAndExceptions(
               isFile: true,
               isText: fileBody.isText,
               contentTypes: fileBody.contentTypes,
+              filename: fileBody.filename.name,
             },
           };
         }

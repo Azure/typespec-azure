@@ -25,6 +25,7 @@ it("basic file input", async () => {
   strictEqual(bodyParam.type.serializationOptions.binary?.isFile, true);
   strictEqual(bodyParam.type.serializationOptions.binary?.isText, false);
   deepStrictEqual(bodyParam.type.serializationOptions.binary?.contentTypes, ["*/*"]);
+  strictEqual(bodyParam.type.serializationOptions.binary?.filename, "filename");
   const fileModel = context.sdkPackage.models.find((m) => m.name === "File");
   ok(fileModel);
   strictEqual(fileModel.properties.length, 3);
@@ -57,6 +58,7 @@ it("file input with content type", async () => {
   strictEqual(bodyParam.type.serializationOptions.binary?.isFile, true);
   strictEqual(bodyParam.type.serializationOptions.binary?.isText, false);
   deepStrictEqual(bodyParam.type.serializationOptions.binary?.contentTypes, ["application/yaml"]);
+  strictEqual(bodyParam.type.serializationOptions.binary?.filename, "filename");
   const fileModel = bodyParam.type;
   const contentType = fileModel.properties.find((p) => p.name === "contentType")!;
   strictEqual(contentType.type.kind, "constant");
@@ -91,6 +93,7 @@ it("basic file output", async () => {
   strictEqual(responseBody.type.serializationOptions.binary?.isFile, true);
   strictEqual(responseBody.type.serializationOptions.binary?.isText, false);
   deepStrictEqual(responseBody.type.serializationOptions.binary?.contentTypes, ["*/*"]);
+  strictEqual(responseBody.type.serializationOptions.binary?.filename, "filename");
 });
 
 it("self-defined file", async () => {
@@ -137,6 +140,7 @@ it("self-defined file", async () => {
     "application/json",
     "application/yaml",
   ]);
+  strictEqual(uploadBodyParam.type.serializationOptions.binary?.filename, "filename");
   const uploadHeaderParam = uploadHttpOperation.parameters.find(
     (p) => p.serializedName === "x-filename",
   );
@@ -156,6 +160,7 @@ it("self-defined file", async () => {
     "application/json",
     "application/yaml",
   ]);
+  strictEqual(downloadResponse.type.serializationOptions.binary?.filename, "filename");
 });
 
 it("text file input", async () => {
@@ -178,6 +183,7 @@ it("text file input", async () => {
   strictEqual(bodyParam.type.serializationOptions.binary?.isFile, true);
   strictEqual(bodyParam.type.serializationOptions.binary?.isText, true);
   deepStrictEqual(bodyParam.type.serializationOptions.binary?.contentTypes, ["text/plain"]);
+  strictEqual(bodyParam.type.serializationOptions.binary?.filename, "filename");
 });
 
 it("text file output", async () => {
@@ -201,6 +207,7 @@ it("text file output", async () => {
   strictEqual(responseBody.type.serializationOptions.binary?.isFile, true);
   strictEqual(responseBody.type.serializationOptions.binary?.isText, true);
   deepStrictEqual(responseBody.type.serializationOptions.binary?.contentTypes, ["text/plain"]);
+  strictEqual(responseBody.type.serializationOptions.binary?.filename, "filename");
 });
 
 it("binary file with multiple content types", async () => {
@@ -226,4 +233,5 @@ it("binary file with multiple content types", async () => {
     "image/png",
     "image/jpeg",
   ]);
+  strictEqual(bodyParam.type.serializationOptions.binary?.filename, "filename");
 });

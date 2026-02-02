@@ -2,4 +2,4 @@
 "@azure-tools/typespec-client-generator-core": minor
 ---
 
-Add `isText` and `contentTypes` properties to `BinarySerializationOptions` for file types
+Add `isText`, `contentTypes`, and `filename` properties to `BinarySerializationOptions` for file types

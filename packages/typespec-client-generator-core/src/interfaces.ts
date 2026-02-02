@@ -695,6 +695,13 @@ export interface BinarySerializationOptions {
    * body is not a file type.
    */
   contentTypes?: string[];
+  /**
+   * The name of the property that represents the filename in the file model.
+   *
+   * This property is only present when `isFile` is `true`. When undefined, it indicates the
+   * body is not a file type.
+   */
+  filename?: string;
 }
 
 /**
