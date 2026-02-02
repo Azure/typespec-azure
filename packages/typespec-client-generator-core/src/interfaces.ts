@@ -160,10 +160,11 @@ export enum UsageFlags {
 
 /**
  * Flags used to indicate how a client is initialized.
- * `Default` means author doesn't set initialization way for the client. It is only for internal usage and not exposed in decorator.
- * `None` means the client constructor should be omitted (hand-written).
- * `Individually` means the client is initialized individually.
- * `Parent` means the client is initialized by its parent.
+ * 
+ * Note: `Default` and `None` are sentinel values (not bit flags) and should not be combined with other values.
+ * - `Default` (-1): Internal use only. Indicates no explicit initialization decorator was set.
+ * - `None` (0): Decorator value from TypeSpec. Indicates client constructor should be omitted (hand-written).
+ * - `Individually` and `Parent` are bit flags (1, 2) that can be combined using bitwise OR.
  */
 export enum InitializedByFlags {
   Default = -1,
