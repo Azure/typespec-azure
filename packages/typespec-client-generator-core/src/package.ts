@@ -23,7 +23,6 @@ import {
   filterApiVersionsWithDecorators,
   getActualClientType,
   getTypeDecorators,
-  validateCrossNamespaceNamesWithFlag,
 } from "./internal-utils.js";
 import { getLicenseInfo } from "./license.js";
 import { getCrossLanguagePackageId, getNamespaceFromType } from "./public-utils.js";
@@ -33,9 +32,7 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
 ): [SdkPackage<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-
   populateApiVersionInformation(context);
-  validateCrossNamespaceNamesWithFlag(context, diagnostics);
   diagnostics.pipe(handleAllTypes(context));
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   const allReferencedTypes = getAllReferencedTypes(context);

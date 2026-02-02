@@ -46,7 +46,7 @@ import {
   TspLiteralType,
 } from "./internal-utils.js";
 import { createSdkPackage } from "./package.js";
-import { validateNamespaceCollisions } from "./validations/types.js";
+import { validateCrossNamespaceNames } from "./validations/types.js";
 
 interface CreateTCGCContextOptions {
   mutateNamespace?: boolean; // whether to mutate global namespace for versioning
@@ -214,10 +214,10 @@ export async function createSdkContext<
   for (const client of sdkContext.sdkPackage.clients) {
     diagnostics.pipe(await handleClientExamples(sdkContext, client));
   }
-  sdkContext.diagnostics = sdkContext.diagnostics.concat(diagnostics.diagnostics);
+  // Validate cross-namespace type name collisions (namespace flag + Azure library conflicts)
+  validateCrossNamespaceNames(sdkContext, diagnostics);
 
-  // Validate Azure library type conflicts (e.g., ARM type name collisions)
-  validateNamespaceCollisions(sdkContext);
+  sdkContext.diagnostics = sdkContext.diagnostics.concat(diagnostics.diagnostics);
 
   if (options?.exportTCGCoutput) {
     await exportTCGCOutput(sdkContext);

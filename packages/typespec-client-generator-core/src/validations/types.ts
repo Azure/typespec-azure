@@ -1,4 +1,5 @@
 import {
+  createDiagnosticCollector,
   Enum,
   EnumMember,
   Interface,
@@ -14,6 +15,7 @@ import {
 } from "@typespec/compiler";
 import { AugmentDecoratorStatementNode, DecoratorExpressionNode } from "@typespec/compiler/ast";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
+import { $ } from "@typespec/compiler/typekit";
 import { DuplicateTracker } from "@typespec/compiler/utils";
 import { getClientNameOverride } from "../decorators.js";
 import { SdkContext, TCGCContext } from "../interfaces.js";
@@ -25,7 +27,7 @@ import {
   listAllUserDefinedNamespaces,
   listScopedDecoratorData,
 } from "../internal-utils.js";
-import { reportDiagnostic } from "../lib.js";
+import { createDiagnostic, reportDiagnostic } from "../lib.js";
 
 export function validateTypes(context: TCGCContext) {
   validateClientNamesWithinNamespaces(context);
@@ -309,13 +311,38 @@ function reportDuplicateClientNames(
 }
 
 /**
- * Validate that user-defined types with @clientName don't conflict with Azure library types.
- * This requires SdkContext because it needs sdkPackage to check only used types.
- *
- * Cross-namespace duplicate name validation (for the --namespace flag) is handled
- * separately by validateCrossNamespaceNamesWithFlag in internal-utils.ts.
+ * Validate cross-namespace type name collisions after sdkPackage is built.
+ * Handles both:
+ * 1. Namespace flag: duplicate type names across namespaces when --namespace flattens them
+ * 2. Azure library conflicts: user types with @clientName matching ARM/Core type names
  */
-export function validateNamespaceCollisions(sdkContext: SdkContext) {
+export function validateCrossNamespaceNames(
+  sdkContext: SdkContext,
+  diagnostics: ReturnType<typeof createDiagnosticCollector>,
+) {
+  // Part 1: Namespace flag duplicate detection
+  if (sdkContext.namespaceFlag) {
+    const allTypeNames = new Map<string, Type[]>();
+    for (const ns of listAllUserDefinedNamespaces(sdkContext)) {
+      collectUserTypesFromNamespace(sdkContext.program, ns, allTypeNames);
+    }
+    for (const [name, types] of allTypeNames) {
+      if (types.length > 1) {
+        for (const type of types) {
+          diagnostics.add(
+            createDiagnostic({
+              code: "duplicate-client-name",
+              messageId: "nonDecorator",
+              format: { name, scope: "AllScopes" },
+              target: type,
+            }),
+          );
+        }
+      }
+    }
+  }
+
+  // Part 2: Azure library type conflict detection
   const azureLibraryNamespaces = getAzureLibraryNamespaces(sdkContext.program);
   if (azureLibraryNamespaces.length === 0) return;
 
@@ -423,6 +450,45 @@ function validateAzureLibraryTypeConflicts(
           target: clientNameDecorator.node,
         });
       }
+    }
+  }
+}
+
+/**
+ * Collect top-level user-defined types from a single namespace (non-recursive).
+ * The outer loop over listAllUserDefinedNamespaces handles recursion.
+ */
+function collectUserTypesFromNamespace(
+  program: Program,
+  namespace: Namespace,
+  allTypeNames: Map<string, Type[]>,
+): void {
+  for (const model of namespace.models.values()) {
+    if (model.name && $(program).type.isUserDefined(model)) {
+      const existing = allTypeNames.get(model.name) ?? [];
+      existing.push(model);
+      allTypeNames.set(model.name, existing);
+    }
+  }
+  for (const enumType of namespace.enums.values()) {
+    if (enumType.name && $(program).type.isUserDefined(enumType)) {
+      const existing = allTypeNames.get(enumType.name) ?? [];
+      existing.push(enumType);
+      allTypeNames.set(enumType.name, existing);
+    }
+  }
+  for (const unionType of namespace.unions.values()) {
+    if (unionType.name && $(program).type.isUserDefined(unionType)) {
+      const existing = allTypeNames.get(unionType.name) ?? [];
+      existing.push(unionType);
+      allTypeNames.set(unionType.name, existing);
+    }
+  }
+  for (const iface of namespace.interfaces.values()) {
+    if (iface.name && $(program).type.isUserDefined(iface)) {
+      const existing = allTypeNames.get(iface.name) ?? [];
+      existing.push(iface);
+      allTypeNames.set(iface.name, existing);
     }
   }
 }
