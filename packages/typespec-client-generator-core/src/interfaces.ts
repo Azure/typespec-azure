@@ -1,8 +1,4 @@
-import {
-  FinalStateValue,
-  LroMetadata,
-  ParameterSource,
-} from "@azure-tools/typespec-azure-core";
+import { FinalStateValue, LroMetadata, ParameterSource } from "@azure-tools/typespec-azure-core";
 import {
   DateTimeKnownEncoding,
   Diagnostic,
@@ -58,10 +54,7 @@ export interface TCGCContext {
   flattenUnionAsEnum?: boolean;
   enableLegacyHierarchyBuilding?: boolean;
 
-  __referencedTypeCache: Map<
-    Type,
-    SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType
-  >;
+  __referencedTypeCache: Map<Type, SdkModelType | SdkEnumType | SdkUnionType | SdkNullableType>;
   __arrayDictionaryCache: Map<Type, SdkDictionaryType | SdkArrayType>;
   __methodParameterCache: Map<ModelProperty, SdkMethodParameter>;
   __modelPropertyCache: Map<ModelProperty, SdkModelPropertyType>;
@@ -76,14 +69,8 @@ export interface TCGCContext {
   >;
   __clientToOperationsCache?: Map<SdkClient | SdkOperationGroup, Operation[]>;
   __operationToClientCache?: Map<Operation, SdkClient | SdkOperationGroup>;
-  __clientParametersCache: Map<
-    SdkClient | SdkOperationGroup,
-    SdkMethodParameter[]
-  >;
-  __clientApiVersionDefaultValueCache: Map<
-    SdkClient | SdkOperationGroup,
-    string | undefined
-  >;
+  __clientParametersCache: Map<SdkClient | SdkOperationGroup, SdkMethodParameter[]>;
+  __clientApiVersionDefaultValueCache: Map<SdkClient | SdkOperationGroup, string | undefined>;
   __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
   __pagedResultSet: Set<SdkType>;
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
@@ -98,9 +85,7 @@ export interface TCGCContext {
   getPackageVersions(service?: Namespace): Map<Namespace, string[]>;
   getPackageVersionEnum(): Map<Namespace, Enum | undefined>;
   getClients(): SdkClient[];
-  getClientOrOperationGroup(
-    type: Namespace | Interface,
-  ): SdkClient | SdkOperationGroup | undefined;
+  getClientOrOperationGroup(type: Namespace | Interface): SdkClient | SdkOperationGroup | undefined;
   getOperationsForClient(client: SdkClient | SdkOperationGroup): Operation[];
   getClientForOperation(operation: Operation): SdkClient | SdkOperationGroup;
 }
@@ -311,14 +296,8 @@ type TypeEquality<T, U> = keyof T extends keyof U
 
 // these two vars are used to validate whether our SdkBuiltInKinds are exhaustive for all possible values from typespec
 // if it is not, a typescript compilation error will be thrown here.
-const _: TypeEquality<
-  Exclude<SupportedBuiltInKinds, SdkBuiltInKinds>,
-  never
-> = true;
-const __: TypeEquality<
-  Exclude<SdkBuiltInKinds, SupportedBuiltInKinds>,
-  never
-> = true;
+const _: TypeEquality<Exclude<SupportedBuiltInKinds, SdkBuiltInKinds>, never> = true;
+const __: TypeEquality<Exclude<SdkBuiltInKinds, SupportedBuiltInKinds>, never> = true;
 
 type SupportedBuiltInKinds =
   | keyof typeof SdkIntKindsEnum
@@ -365,9 +344,7 @@ enum SdkBuiltInKindsMiscellaneousEnum {
   unknown = "unknown",
 }
 
-export type SdkBuiltInKinds =
-  | Exclude<IntrinsicScalarName, SdkBuiltInKindsExcludes>
-  | "unknown";
+export type SdkBuiltInKinds = Exclude<IntrinsicScalarName, SdkBuiltInKindsExcludes> | "unknown";
 
 type SdkBuiltInKindsExcludes = "utcDateTime" | "offsetDateTime" | "duration";
 
@@ -395,33 +372,21 @@ export function isSdkBuiltInKind(kind: string): kind is SdkBuiltInKinds {
   );
 }
 
-export function isSdkIntKind(
-  kind: string,
-): kind is keyof typeof SdkIntKindsEnum {
+export function isSdkIntKind(kind: string): kind is keyof typeof SdkIntKindsEnum {
   return kind in SdkIntKindsEnum;
 }
 
-export function isSdkFloatKind(
-  kind: string,
-): kind is keyof typeof SdkFloatingPointKindsEnum {
+export function isSdkFloatKind(kind: string): kind is keyof typeof SdkFloatingPointKindsEnum {
   return kind in SdkFloatingPointKindsEnum;
 }
 
-function isSdkFixedPointKind(
-  kind: string,
-): kind is keyof typeof SdkFixedPointKindsEnum {
+function isSdkFixedPointKind(kind: string): kind is keyof typeof SdkFixedPointKindsEnum {
   return kind in SdkFixedPointKindsEnum;
 }
 
-const SdkDateTimeEncodingsConst = [
-  "rfc3339",
-  "rfc7231",
-  "unixTimestamp",
-] as const;
+const SdkDateTimeEncodingsConst = ["rfc3339", "rfc7231", "unixTimestamp"] as const;
 
-export function isSdkDateTimeEncodings(
-  encoding: string,
-): encoding is DateTimeKnownEncoding {
+export function isSdkDateTimeEncodings(encoding: string): encoding is DateTimeKnownEncoding {
   return SdkDateTimeEncodingsConst.includes(encoding as DateTimeKnownEncoding);
 }
 
@@ -534,9 +499,7 @@ export interface SdkConstantType extends SdkTypeBase {
   isGeneratedName: boolean;
 }
 
-export interface SdkUnionType<
-  TValueType extends SdkTypeBase = SdkType,
-> extends SdkTypeBase {
+export interface SdkUnionType<TValueType extends SdkTypeBase = SdkType> extends SdkTypeBase {
   name: string;
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
@@ -596,11 +559,7 @@ export interface SdkClientInitializationType extends SdkTypeBase {
   /** Whether name is created by TCGC. */
   isGeneratedName: boolean;
   /** Initialization parameters. */
-  parameters: (
-    | SdkEndpointParameter
-    | SdkCredentialParameter
-    | SdkMethodParameter
-  )[];
+  parameters: (SdkEndpointParameter | SdkCredentialParameter | SdkMethodParameter)[];
   /** How to initialize a client. */
   initializedBy: InitializedByFlags;
 }
@@ -779,14 +738,7 @@ export interface SdkModelPropertyType extends SdkModelPropertyTypeBase {
   multipartOptions?: MultipartOptions;
 }
 
-export type CollectionFormat =
-  | "multi"
-  | "csv"
-  | "ssv"
-  | "tsv"
-  | "pipes"
-  | "simple"
-  | "form";
+export type CollectionFormat = "multi" | "csv" | "ssv" | "tsv" | "pipes" | "simple" | "form";
 
 /**
  * Http header parameter.
@@ -965,12 +917,7 @@ export interface SdkHttpOperation extends SdkServiceOperationBase {
   /** Http verb. */
   verb: HttpVerb;
   /** Parameter lists. */
-  parameters: (
-    | SdkPathParameter
-    | SdkQueryParameter
-    | SdkHeaderParameter
-    | SdkCookieParameter
-  )[];
+  parameters: (SdkPathParameter | SdkQueryParameter | SdkHeaderParameter | SdkCookieParameter)[];
   /** Body parameter. */
   bodyParam?: SdkBodyParameter;
   /** Normal responses. */
@@ -1030,9 +977,7 @@ export interface SdkBasicServiceMethod<
 /**
  * Paging operation info.
  */
-interface SdkPagingServiceMethodOptions<
-  TServiceOperation extends SdkServiceOperation,
-> {
+interface SdkPagingServiceMethodOptions<TServiceOperation extends SdkServiceOperation> {
   /** Paging info. */
   pagingMetadata: SdkPagingServiceMetadata<TServiceOperation>;
 }
@@ -1040,9 +985,7 @@ interface SdkPagingServiceMethodOptions<
 /**
  * Paging operation metadata.
  */
-export interface SdkPagingServiceMetadata<
-  TServiceOperation extends SdkServiceOperation,
-> {
+export interface SdkPagingServiceMetadata<TServiceOperation extends SdkServiceOperation> {
   /** Paging metadata from TypeSpec core library. */
   __raw?: PagingOperation;
 
@@ -1053,20 +996,11 @@ export interface SdkPagingServiceMetadata<
   /** HTTP verb to use for the next link operation. Defaults to "GET" if not specified. */
   nextLinkVerb?: "GET" | "POST";
   /** Segments to indicate how to get parameters that are needed to be injected into next page link. */
-  nextLinkReInjectedParametersSegments?: (
-    | SdkMethodParameter
-    | SdkModelPropertyType
-  )[][];
+  nextLinkReInjectedParametersSegments?: (SdkMethodParameter | SdkModelPropertyType)[][];
   /** Segments to indicate how to set continuation token for next page request. */
-  continuationTokenParameterSegments?: (
-    | SdkMethodParameter
-    | SdkModelPropertyType
-  )[];
+  continuationTokenParameterSegments?: (SdkMethodParameter | SdkModelPropertyType)[];
   /** Segments to indicate how to get continuation token value from response. */
-  continuationTokenResponseSegments?: (
-    | SdkServiceResponseHeader
-    | SdkModelPropertyType
-  )[];
+  continuationTokenResponseSegments?: (SdkServiceResponseHeader | SdkModelPropertyType)[];
   /** Segments to indicate how to get page items from response. */
   pageItemsSegments?: SdkModelPropertyType[];
   /** Denotes which parameter is the page size parameter */
@@ -1076,9 +1010,7 @@ export interface SdkPagingServiceMetadata<
 /**
  * Paging method.
  */
-export interface SdkPagingServiceMethod<
-  TServiceOperation extends SdkServiceOperation,
->
+export interface SdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends
     SdkServiceMethodBase<TServiceOperation>,
     SdkPagingServiceMethodOptions<TServiceOperation> {
@@ -1115,16 +1047,8 @@ export interface SdkLroServiceMetadata {
   pollingInfo: SdkPollingOperationStep;
   envelopeResult: SdkModelType;
   logicalPath?: string;
-  finalResult?:
-    | SdkModelType
-    | SdkArrayType
-    | SdkBuiltInType<"unknown">
-    | "void";
-  finalEnvelopeResult?:
-    | SdkModelType
-    | SdkArrayType
-    | SdkBuiltInType<"unknown">
-    | "void";
+  finalResult?: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown"> | "void";
+  finalEnvelopeResult?: SdkModelType | SdkArrayType | SdkBuiltInType<"unknown"> | "void";
   finalResultPath?: string;
 }
 
@@ -1142,9 +1066,7 @@ export interface SdkPollingOperationStep {
   errorProperty?: SdkModelPropertyType;
 }
 
-export type SdkTerminationStatus =
-  | SdkHttpOperationStatus
-  | SdkModelPropertyTerminationStatus;
+export type SdkTerminationStatus = SdkHttpOperationStatus | SdkModelPropertyTerminationStatus;
 
 interface SdkHttpOperationStatus {
   kind: "status-code";
@@ -1254,9 +1176,7 @@ export interface SdkLroServiceFinalResponse {
 /**
  * Long running method.
  */
-export interface SdkLroServiceMethod<
-  TServiceOperation extends SdkServiceOperation,
->
+export interface SdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends SdkServiceMethodBase<TServiceOperation>, SdkLroServiceMethodOptions {
   kind: "lro";
 }
@@ -1264,9 +1184,7 @@ export interface SdkLroServiceMethod<
 /**
  * Long running method with paging.
  */
-export interface SdkLroPagingServiceMethod<
-  TServiceOperation extends SdkServiceOperation,
->
+export interface SdkLroPagingServiceMethod<TServiceOperation extends SdkServiceOperation>
   extends
     SdkServiceMethodBase<TServiceOperation>,
     SdkLroServiceMethodOptions,
@@ -1341,9 +1259,7 @@ export interface LicenseInfo {
 /**
  * Represents a namespace in the package, containing all clients, operations, and types.
  */
-export interface SdkNamespace<
-  TServiceOperation extends SdkServiceOperation,
-> extends DecoratedType {
+export interface SdkNamespace<TServiceOperation extends SdkServiceOperation> extends DecoratedType {
   __raw?: Namespace;
   /** Namespace name. */
   name: string;
@@ -1363,13 +1279,7 @@ export interface SdkNamespace<
 
 export type SdkHttpPackage = SdkPackage<SdkHttpOperation>;
 
-export type LanguageScopes =
-  | "dotnet"
-  | "java"
-  | "python"
-  | "javascript"
-  | "go"
-  | string;
+export type LanguageScopes = "dotnet" | "java" | "python" | "javascript" | "go" | string;
 
 interface SdkExampleBase {
   kind: string;
