@@ -171,3 +171,20 @@ it("unixTimestamp array", async function () {
   strictEqual(sdkType.valueType.baseType?.kind, "utcDateTime");
   strictEqual(sdkType.valueType.baseType.wireType.kind, "string");
 });
+
+it("custom encoding string", async function () {
+  const { program } = await SimpleTesterWithService.compile(
+    `
+      @usage(Usage.input | Usage.output)
+      model Test {
+        @encode("customFormat")
+        prop: utcDateTime;
+      }
+    `,
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
+  strictEqual(sdkType.kind, "utcDateTime");
+  strictEqual(sdkType.encode, "customFormat");
+  strictEqual(sdkType.wireType.kind, "string");
+});

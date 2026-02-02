@@ -344,8 +344,9 @@ function createSdkClientInitializationType<
         result.parameters.push(clientParameter);
       }
     }
-    if (initializationOptions?.initializedBy) {
+    if (initializationOptions?.initializedBy !== undefined) {
       if (
+        initializationOptions.initializedBy !== InitializedByFlags.None &&
         client.kind === "SdkClient" &&
         (initializationOptions.initializedBy & InitializedByFlags.Parent) ===
           InitializedByFlags.Parent
@@ -361,6 +362,7 @@ function createSdkClientInitializationType<
           }),
         );
       } else if (
+        initializationOptions.initializedBy !== InitializedByFlags.None &&
         client.kind === "SdkOperationGroup" &&
         initializationOptions.initializedBy === InitializedByFlags.Individually
       ) {
