@@ -1,4 +1,9 @@
-import { createDiagnosticCollector, Diagnostic, getDoc, getSummary } from "@typespec/compiler";
+import {
+  createDiagnosticCollector,
+  Diagnostic,
+  getDoc,
+  getSummary,
+} from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { getServers, HttpServer } from "@typespec/http";
 import {
@@ -36,7 +41,11 @@ import {
 import { createDiagnostic } from "./lib.js";
 import { createSdkMethods, getSdkMethodParameter } from "./methods.js";
 import { getCrossLanguageDefinitionId } from "./public-utils.js";
-import { getSdkBuiltInType, getSdkCredentialParameter, getTypeSpecBuiltInType } from "./types.js";
+import {
+  getSdkBuiltInType,
+  getSdkCredentialParameter,
+  getTypeSpecBuiltInType,
+} from "./types.js";
 
 function getEndpointTypeFromSingleServer<
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
@@ -87,7 +96,11 @@ function getEndpointTypeFromSingleServer<
       if (param.defaultValue) {
         sdkParam.clientDefaultValue = getValueTypeValue(param.defaultValue);
       }
-      const apiVersionInfo = updateWithApiVersionInformation(context, param, client.__raw);
+      const apiVersionInfo = updateWithApiVersionInformation(
+        context,
+        param,
+        client.__raw,
+      );
       sdkParam.isApiVersionParam = apiVersionInfo.isApiVersionParam;
       if (sdkParam.isApiVersionParam && apiVersionInfo.clientDefaultValue) {
         sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
@@ -108,7 +121,9 @@ function getEndpointTypeFromSingleServer<
     }
   }
   const isOverridable =
-    templateArguments.length === 1 && server.url.startsWith("{") && server.url.endsWith("}");
+    templateArguments.length === 1 &&
+    server.url.startsWith("{") &&
+    server.url.endsWith("}");
 
   if (templateArguments.length === 0) {
     types.push(defaultOverridableEndpointType);
@@ -127,7 +142,9 @@ function getEndpointTypeFromSingleServer<
   return diagnostics.wrap(types);
 }
 
-function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation = SdkHttpOperation>(
+function getSdkEndpointParameter<
+  TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
+>(
   context: TCGCContext,
   client: SdkClientType<TServiceOperation>,
 ): [SdkEndpointParameter, readonly Diagnostic[]] {
@@ -140,10 +157,18 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
 
   if (servers === undefined) {
     // if there is no defined server url, we will return an overridable endpoint
-    types.push(...diagnostics.pipe(getEndpointTypeFromSingleServer(context, client, undefined)));
+    types.push(
+      ...diagnostics.pipe(
+        getEndpointTypeFromSingleServer(context, client, undefined),
+      ),
+    );
   } else {
     for (const server of servers) {
-      types.push(...diagnostics.pipe(getEndpointTypeFromSingleServer(context, client, server)));
+      types.push(
+        ...diagnostics.pipe(
+          getEndpointTypeFromSingleServer(context, client, server),
+        ),
+      );
     }
   }
   let type: SdkEndpointType | SdkUnionType<SdkEndpointType>;
@@ -182,13 +207,18 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
   });
 }
 
-export function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
+export function createSdkClientType<
+  TServiceOperation extends SdkServiceOperation,
+>(
   context: TCGCContext,
   client: SdkClient | SdkOperationGroup,
   parent?: SdkClientType<TServiceOperation>,
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  let name = client.kind === "SdkClient" ? client.name : client.groupPath.split(".").at(-1)!;
+  let name =
+    client.kind === "SdkClient"
+      ? client.name
+      : client.groupPath.split(".").at(-1)!;
   if (client.type) {
     const override = getClientNameOverride(context, client.type);
     if (override) {
@@ -199,7 +229,9 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
   // For multi-service operation groups, use the first service for namespace
   // and cross language definition id. This follows the same pattern as multi-service root clients where
   // metadata is derived from the first service in the array.
-  const typeForMetadata = Array.isArray(clientType) ? clientType[0] : clientType;
+  const typeForMetadata = Array.isArray(clientType)
+    ? clientType[0]
+    : clientType;
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
@@ -207,15 +239,22 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     doc: client.type ? getClientDoc(context, client.type) : undefined,
     summary: client.type ? getSummary(context.program, client.type) : undefined,
     methods: [],
-    apiVersions: Array.isArray(clientType) ? [] : context.getApiVersionsForType(clientType),
+    apiVersions: Array.isArray(clientType)
+      ? []
+      : context.getApiVersionsForType(clientType),
     namespace: getClientNamespace(context, typeForMetadata),
     clientInitialization: diagnostics.pipe(
       createSdkClientInitializationType(context, client, parent),
     ),
-    decorators: client.type ? diagnostics.pipe(getTypeDecorators(context, client.type)) : [],
+    decorators: client.type
+      ? diagnostics.pipe(getTypeDecorators(context, client.type))
+      : [],
     parent,
     // if it is client, the crossLanguageDefinitionId is the ${namespace}, if it is operation group, the crosslanguageDefinitionId is the %{namespace}.%{operationGroupName}
-    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, typeForMetadata),
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(
+      context,
+      typeForMetadata,
+    ),
   };
   // Handle client methods
   sdkClientType.methods = diagnostics.pipe(
@@ -224,7 +263,11 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
   // Handle sub-clients
   for (const operationGroup of listOperationGroups(context, client)) {
     const operationGroupClient = diagnostics.pipe(
-      createSdkClientType<TServiceOperation>(context, operationGroup, sdkClientType),
+      createSdkClientType<TServiceOperation>(
+        context,
+        operationGroup,
+        sdkClientType,
+      ),
     );
     if (sdkClientType.children) {
       sdkClientType.children.push(operationGroupClient);
@@ -244,7 +287,9 @@ function addDefaultClientParameters<
   const diagnostics = createDiagnosticCollector();
   const defaultClientParamters = [];
   // there will always be an endpoint property
-  defaultClientParamters.push(diagnostics.pipe(getSdkEndpointParameter(context, client)));
+  defaultClientParamters.push(
+    diagnostics.pipe(getSdkEndpointParameter(context, client)),
+  );
   const credentialParam = getSdkCredentialParameter(context, client);
   if (credentialParam) {
     defaultClientParamters.push(credentialParam);
@@ -256,9 +301,13 @@ function addDefaultClientParameters<
     for (const sc of listOperationGroups(context, client.__raw)) {
       // if any sub operation groups have an api version param, the top level needs
       // the api version param as well
-      apiVersionParam = context.__clientParametersCache.get(sc)?.find((x) => x.isApiVersionParam);
+      apiVersionParam = context.__clientParametersCache
+        .get(sc)
+        ?.find((x) => x.isApiVersionParam);
       if (apiVersionParam) {
-        context.__clientParametersCache.get(client.__raw)?.push(apiVersionParam);
+        context.__clientParametersCache
+          .get(client.__raw)
+          ?.push(apiVersionParam);
         break;
       }
     }
@@ -270,7 +319,10 @@ function addDefaultClientParameters<
       const multipleServiceApiVersionParam = { ...apiVersionParam };
       multipleServiceApiVersionParam.apiVersions = [];
       multipleServiceApiVersionParam.clientDefaultValue = undefined;
-      multipleServiceApiVersionParam.type = getTypeSpecBuiltInType(context, "string");
+      multipleServiceApiVersionParam.type = getTypeSpecBuiltInType(
+        context,
+        "string",
+      );
       // For multi-service clients, the API version parameter should always be optional
       multipleServiceApiVersionParam.optional = true;
       defaultClientParamters.push(multipleServiceApiVersionParam);
@@ -288,7 +340,9 @@ function addDefaultClientParameters<
   if (!subId && context.arm) {
     for (const sc of listOperationGroups(context, client.__raw)) {
       // if any sub operation groups have an subId param, the top level needs it as well
-      subId = context.__clientParametersCache.get(sc)?.find((x) => isSubscriptionId(context, x));
+      subId = context.__clientParametersCache
+        .get(sc)
+        ?.find((x) => isSubscriptionId(context, x));
       if (subId) {
         context.__clientParametersCache.get(client.__raw)?.push(subId);
         break;
@@ -318,28 +372,42 @@ function createSdkClientInitializationType<
     doc: "Initialization for the client",
     parameters: [],
     initializedBy:
-      client.kind === "SdkClient" ? InitializedByFlags.Individually : InitializedByFlags.Default,
+      client.kind === "SdkClient"
+        ? InitializedByFlags.Individually
+        : InitializedByFlags.Default,
     name,
     isGeneratedName: true,
     decorators: [],
   };
-  let initializationOptions: ClientInitializationOptions | undefined = undefined;
+  let initializationOptions: ClientInitializationOptions | undefined =
+    undefined;
 
   // customization
   if (client.type) {
-    initializationOptions = getClientInitializationOptions(context, client.type);
+    initializationOptions = getClientInitializationOptions(
+      context,
+      client.type,
+    );
     if (initializationOptions?.parameters) {
       result.doc = getDoc(context.program, initializationOptions.parameters);
-      result.summary = getSummary(context.program, initializationOptions.parameters);
+      result.summary = getSummary(
+        context.program,
+        initializationOptions.parameters,
+      );
       result.name =
-        initializationOptions.parameters.name === "" ? name : initializationOptions.parameters.name;
-      result.isGeneratedName = initializationOptions.parameters.name === "" ? true : false;
+        initializationOptions.parameters.name === ""
+          ? name
+          : initializationOptions.parameters.name;
+      result.isGeneratedName =
+        initializationOptions.parameters.name === "" ? true : false;
       result.decorators = diagnostics.pipe(
         getTypeDecorators(context, initializationOptions.parameters),
       );
       result.__raw = initializationOptions.parameters;
       for (const parameter of initializationOptions.parameters.properties.values()) {
-        const clientParameter = diagnostics.pipe(getSdkMethodParameter(context, parameter));
+        const clientParameter = diagnostics.pipe(
+          getSdkMethodParameter(context, parameter),
+        );
         clientParameter.onClient = true;
         result.parameters.push(clientParameter);
       }
@@ -406,7 +474,9 @@ function createSdkClientInitializationType<
     const childParamNames = new Set(result.parameters.map((p) => p.name));
 
     // Only add parent params that aren't already defined in child
-    const inheritedParams = parentParams.filter((p) => !childParamNames.has(p.name));
+    const inheritedParams = parentParams.filter(
+      (p) => !childParamNames.has(p.name),
+    );
 
     result.parameters = [...inheritedParams, ...result.parameters];
 
@@ -418,7 +488,10 @@ function createSdkClientInitializationType<
     }
 
     for (const param of inheritedParams) {
-      if (param.kind === "method" && !clientParams.some((cp) => cp.name === param.name)) {
+      if (
+        param.kind === "method" &&
+        !clientParams.some((cp) => cp.name === param.name)
+      ) {
         clientParams.push(param);
       }
     }

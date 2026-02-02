@@ -115,7 +115,10 @@ function setScopedDecoratorData(
       const newObject = Object.fromEntries([[AllScopes, value]]);
       context.program
         .stateMap(key)
-        .set(target, !targetEntry ? newObject : { ...targetEntry, ...newObject });
+        .set(
+          target,
+          !targetEntry ? newObject : { ...targetEntry, ...newObject },
+        );
     }
     return;
   }
@@ -125,7 +128,9 @@ function setScopedDecoratorData(
     // override the previous value for negation scopes
     const newObject: Record<string | symbol, any> =
       scopes !== undefined && scopes.length > 0
-        ? Object.fromEntries([AllScopes, ...scopes].map((scope) => [scope, value]))
+        ? Object.fromEntries(
+            [AllScopes, ...scopes].map((scope) => [scope, value]),
+          )
         : Object.fromEntries([[AllScopes, value]]);
     newObject[negationScopesKey] = negationScopes;
     context.program.stateMap(key).set(target, newObject);
@@ -133,7 +138,9 @@ function setScopedDecoratorData(
     // if a scope exists in the target entry and it overlaps with the negation scope, it means negation scope doesn't override it
     if (targetEntry !== undefined) {
       const existingScopes = Object.getOwnPropertyNames(targetEntry);
-      const intersections = existingScopes.filter((x) => negationScopes.includes(x));
+      const intersections = existingScopes.filter((x) =>
+        negationScopes.includes(x),
+      );
       if (intersections !== undefined && intersections.length > 0) {
         for (const scopeToKeep of intersections) {
           newObject[scopeToKeep] = targetEntry[scopeToKeep];
@@ -149,7 +156,10 @@ function setScopedDecoratorData(
   }
 }
 
-function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string[]?, string[]?] {
+function parseScopes(
+  context: DecoratorContext,
+  scope?: LanguageScopes,
+): [string[]?, string[]?] {
   if (scope === undefined) {
     return [undefined, undefined];
   }
@@ -181,7 +191,10 @@ export const $client: ClientDecorator = (
   options?: Type,
   scope?: LanguageScopes,
 ) => {
-  if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
+  if (
+    (context.decoratorTarget as Node).kind ===
+    SyntaxKind.AugmentDecoratorStatement
+  ) {
     reportDiagnostic(context.program, {
       code: "wrong-client-decorator",
       target: context.decoratorTarget,
@@ -189,11 +202,16 @@ export const $client: ClientDecorator = (
     return;
   }
   const explicitName =
-    options?.kind === "Model" ? options?.properties.get("name")?.type : undefined;
-  const name: string = explicitName?.kind === "String" ? explicitName.value : target.name;
+    options?.kind === "Model"
+      ? options?.properties.get("name")?.type
+      : undefined;
+  const name: string =
+    explicitName?.kind === "String" ? explicitName.value : target.name;
   let services: Namespace[];
   const serviceConfig =
-    options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
+    options?.kind === "Model"
+      ? options?.properties.get("service")?.type
+      : undefined;
 
   if (serviceConfig?.kind === "Namespace") {
     services = [serviceConfig];
@@ -249,7 +267,8 @@ export const $client: ClientDecorator = (
       !target.decorators.some(
         (d) =>
           d.definition?.name === "@useDependency" &&
-          getNamespaceFullName(d.definition?.namespace) === "TypeSpec.Versioning",
+          getNamespaceFullName(d.definition?.namespace) ===
+            "TypeSpec.Versioning",
       )
     ) {
       const versionRecords = [];
@@ -293,12 +312,17 @@ function judgeService(program: Program, type: Namespace): boolean {
   return (
     isService(program, type) ||
     type.decorators.some(
-      (d) => d.definition?.name === "@service" && d.definition?.namespace.name === "TypeSpec",
+      (d) =>
+        d.definition?.name === "@service" &&
+        d.definition?.namespace.name === "TypeSpec",
     )
   );
 }
 
-function findClientService(program: Program, client: Namespace | Interface): Namespace | undefined {
+function findClientService(
+  program: Program,
+  client: Namespace | Interface,
+): Namespace | undefined {
   let current: Namespace | undefined = client as any;
   while (current) {
     if (judgeService(program, current)) {
@@ -343,7 +367,10 @@ export const $operationGroup: OperationGroupDecorator = (
   target: Namespace | Interface,
   scope?: LanguageScopes,
 ) => {
-  if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
+  if (
+    (context.decoratorTarget as Node).kind ===
+    SyntaxKind.AugmentDecoratorStatement
+  ) {
     reportDiagnostic(context.program, {
       code: "wrong-client-decorator",
       target: context.decoratorTarget,
@@ -370,9 +397,14 @@ export const $operationGroup: OperationGroupDecorator = (
  * @param type Type to check
  * @returns boolean
  */
-export function isOperationGroup(context: TCGCContext, type: Namespace | Interface): boolean {
+export function isOperationGroup(
+  context: TCGCContext,
+  type: Namespace | Interface,
+): boolean {
   if (hasExplicitClientOrOperationGroup(context)) {
-    return getScopedDecoratorData(context, operationGroupKey, type) !== undefined;
+    return (
+      getScopedDecoratorData(context, operationGroupKey, type) !== undefined
+    );
   }
   // if there is no explicit client, we will treat non-client namespaces and all interfaces as operation group
   if (type.kind === "Interface" && !isTemplateDeclaration(type)) {
@@ -381,7 +413,9 @@ export function isOperationGroup(context: TCGCContext, type: Namespace | Interfa
   if (
     type.kind === "Namespace" &&
     !type.decorators.some(
-      (d) => d.definition?.name === "@service" && d.definition?.namespace.name === "TypeSpec",
+      (d) =>
+        d.definition?.name === "@service" &&
+        d.definition?.namespace.name === "TypeSpec",
     )
   ) {
     return true;
@@ -401,7 +435,9 @@ export function getOperationGroup(
 ): SdkOperationGroup | undefined {
   const operationGroup = context.getClientOrOperationGroup(type);
 
-  return operationGroup?.kind === "SdkOperationGroup" ? operationGroup : undefined;
+  return operationGroup?.kind === "SdkOperationGroup"
+    ? operationGroup
+    : undefined;
 }
 
 /**
@@ -467,7 +503,14 @@ export const $protocolAPI: ProtocolAPIDecorator = (
   value?: boolean,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(context, $protocolAPI, protocolAPIKey, entity, value, scope);
+  setScopedDecoratorData(
+    context,
+    $protocolAPI,
+    protocolAPIKey,
+    entity,
+    value,
+    scope,
+  );
 };
 
 const convenientAPIKey = createStateSymbol("convenientAPI");
@@ -478,7 +521,14 @@ export const $convenientAPI: ConvenientAPIDecorator = (
   value?: boolean,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(context, $convenientAPI, convenientAPIKey, entity, value, scope);
+  setScopedDecoratorData(
+    context,
+    $convenientAPI,
+    convenientAPIKey,
+    entity,
+    value,
+    scope,
+  );
 };
 
 function getConvenientOrProtocolValue(
@@ -494,7 +544,11 @@ function getConvenientOrProtocolValue(
 
   // Check the parent interface if the operation is in an interface
   if (entity.interface) {
-    const interfaceValue = getScopedDecoratorData(context, key, entity.interface);
+    const interfaceValue = getScopedDecoratorData(
+      context,
+      key,
+      entity.interface,
+    );
     if (interfaceValue !== undefined) {
       return interfaceValue;
     }
@@ -503,7 +557,11 @@ function getConvenientOrProtocolValue(
   // Check the parent namespace hierarchy
   let currentNamespace: Namespace | undefined = entity.namespace;
   while (currentNamespace) {
-    const namespaceValue = getScopedDecoratorData(context, key, currentNamespace);
+    const namespaceValue = getScopedDecoratorData(
+      context,
+      key,
+      currentNamespace,
+    );
     if (namespaceValue !== undefined) {
       return namespaceValue;
     }
@@ -513,12 +571,18 @@ function getConvenientOrProtocolValue(
   return undefined;
 }
 
-export function shouldGenerateProtocol(context: TCGCContext, entity: Operation): boolean {
+export function shouldGenerateProtocol(
+  context: TCGCContext,
+  entity: Operation,
+): boolean {
   const value = getConvenientOrProtocolValue(context, protocolAPIKey, entity);
   return value ?? Boolean(context.generateProtocolMethods);
 }
 
-export function shouldGenerateConvenient(context: TCGCContext, entity: Operation): boolean {
+export function shouldGenerateConvenient(
+  context: TCGCContext,
+  entity: Operation,
+): boolean {
   const value = getConvenientOrProtocolValue(context, convenientAPIKey, entity);
   return value ?? Boolean(context.generateConvenienceMethods);
 }
@@ -556,7 +620,10 @@ export const $usage: UsageDecorator = (
     }
   } else {
     for (const variant of value.variants.values()) {
-      if (variant.type.kind === "EnumMember" && typeof variant.type.value === "number") {
+      if (
+        variant.type.kind === "EnumMember" &&
+        typeof variant.type.value === "number"
+      ) {
         if (isValidValue(variant.type.value)) {
           newUsage |= variant.type.value;
         }
@@ -581,10 +648,18 @@ export const $usage: UsageDecorator = (
   }
 
   // Get existing usage and combine with new usage (additive behavior)
-  const existingUsage = getScopedDecoratorData(context as any, usageKey, entity) || 0;
+  const existingUsage =
+    getScopedDecoratorData(context as any, usageKey, entity) || 0;
   const combinedUsage = existingUsage | newUsage;
 
-  setScopedDecoratorData(context, $usage, usageKey, entity, combinedUsage, scope);
+  setScopedDecoratorData(
+    context,
+    $usage,
+    usageKey,
+    entity,
+    combinedUsage,
+    scope,
+  );
 };
 
 export function getUsageOverride(
@@ -596,11 +671,18 @@ export function getUsageOverride(
   return getScopedDecoratorData(context, usageKey, entity.namespace);
 }
 
-export function getUsage(context: TCGCContext, entity: Model | Enum | Union): UsageFlags {
+export function getUsage(
+  context: TCGCContext,
+  entity: Model | Enum | Union,
+): UsageFlags {
   switch (entity.kind) {
     case "Union":
       const type = getSdkUnion(context, entity);
-      if (type.kind === "enum" || type.kind === "union" || type.kind === "nullable") {
+      if (
+        type.kind === "enum" ||
+        type.kind === "union" ||
+        type.kind === "nullable"
+      ) {
         return type.usage;
       }
       return UsageFlags.None;
@@ -619,7 +701,10 @@ export const $access: AccessDecorator = (
   value: EnumMember,
   scope?: LanguageScopes,
 ) => {
-  if (typeof value.value !== "string" || (value.value !== "public" && value.value !== "internal")) {
+  if (
+    typeof value.value !== "string" ||
+    (value.value !== "public" && value.value !== "internal")
+  ) {
     reportDiagnostic(context.program, {
       code: "invalid-access",
       format: {},
@@ -627,7 +712,14 @@ export const $access: AccessDecorator = (
     });
     return;
   }
-  setScopedDecoratorData(context, $access, accessKey, entity, value.value, scope);
+  setScopedDecoratorData(
+    context,
+    $access,
+    accessKey,
+    entity,
+    value.value,
+    scope,
+  );
 };
 
 export function getAccessOverride(
@@ -648,7 +740,11 @@ export function getAccess(
   entity: Model | Enum | Operation | Union | ModelProperty,
 ) {
   const override = getAccessOverride(context, entity);
-  if (override || entity.kind === "Operation" || entity.kind === "ModelProperty") {
+  if (
+    override ||
+    entity.kind === "Operation" ||
+    entity.kind === "ModelProperty"
+  ) {
     return override || "public";
   }
 
@@ -659,7 +755,11 @@ export function getAccess(
       return getSdkEnum(context, entity).access;
     case "Union": {
       const type = getSdkUnion(context, entity);
-      if (type.kind === "enum" || type.kind === "union" || type.kind === "nullable") {
+      if (
+        type.kind === "enum" ||
+        type.kind === "union" ||
+        type.kind === "nullable"
+      ) {
         return type.access;
       }
       return "public";
@@ -688,7 +788,14 @@ export const $flattenProperty: FlattenPropertyDecorator = (
     });
     return;
   }
-  setScopedDecoratorData(context, $flattenProperty, flattenPropertyKey, target, true, scope);
+  setScopedDecoratorData(
+    context,
+    $flattenProperty,
+    flattenPropertyKey,
+    target,
+    true,
+    scope,
+  );
 };
 
 /**
@@ -698,7 +805,10 @@ export const $flattenProperty: FlattenPropertyDecorator = (
  * @param target ModelProperty that we want to check whether it should be flattened or not
  * @returns whether the model property should be flattened or not
  */
-export function shouldFlattenProperty(context: TCGCContext, target: ModelProperty): boolean {
+export function shouldFlattenProperty(
+  context: TCGCContext,
+  target: ModelProperty,
+): boolean {
   return getScopedDecoratorData(context, flattenPropertyKey, target) ?? false;
 }
 
@@ -716,7 +826,9 @@ export const $clientName: ClientNameDecorator = (
       if (
         (
           ignoreDiagnostics(
-            (context.program.checker as any).resolveTypeReference(target.targetType),
+            (context.program.checker as any).resolveTypeReference(
+              target.targetType,
+            ),
           ) as any
         )?.node !== entity.node
       ) {
@@ -737,7 +849,14 @@ export const $clientName: ClientNameDecorator = (
     });
     return;
   }
-  setScopedDecoratorData(context, $clientName, clientNameKey, entity, value, scope);
+  setScopedDecoratorData(
+    context,
+    $clientName,
+    clientNameKey,
+    entity,
+    value,
+    scope,
+  );
 };
 
 export function getClientNameOverride(
@@ -755,7 +874,10 @@ function collectParams(
 ): ModelProperty[] {
   properties.forEach((value, key) => {
     // If the property is of type 'model', recurse into its properties
-    if (params.filter((x) => compareModelProperties(undefined, x, value)).length === 0) {
+    if (
+      params.filter((x) => compareModelProperties(undefined, x, value))
+        .length === 0
+    ) {
       if (value.type.kind === "Model") {
         collectParams(value.type.properties, params);
       } else {
@@ -777,11 +899,11 @@ export const $override = (
   context.program.stateMap(omitOperation).set(override, true);
 
   // Extract and sort parameter names
-  const originalParams = collectParams(original.parameters.properties).sort((a, b) =>
-    a.name.localeCompare(b.name),
+  const originalParams = collectParams(original.parameters.properties).sort(
+    (a, b) => a.name.localeCompare(b.name),
   );
-  const overrideParams = collectParams(override.parameters.properties).sort((a, b) =>
-    a.name.localeCompare(b.name),
+  const overrideParams = collectParams(override.parameters.properties).sort(
+    (a, b) => a.name.localeCompare(b.name),
   );
 
   // Check if the sorted parameter names arrays are equal, omit optional parameters
@@ -798,7 +920,9 @@ export const $override = (
         continue;
       }
     }
-    if (!compareModelProperties(undefined, originalParam, overrideParams[index])) {
+    if (
+      !compareModelProperties(undefined, originalParam, overrideParams[index])
+    ) {
       if (!originalParam.optional) {
         parametersMatch = false;
         checkParameter = originalParam;
@@ -838,7 +962,14 @@ export const $override = (
       },
     });
   }
-  setScopedDecoratorData(context, $override, overrideKey, original, override, scope);
+  setScopedDecoratorData(
+    context,
+    $override,
+    overrideKey,
+    original,
+    override,
+    scope,
+  );
 };
 
 /**
@@ -880,7 +1011,8 @@ function isExternalType(model: Model): boolean {
   const otherProps = properties.filter((prop) => prop.name !== "identity");
   const validProps = otherProps.every(
     (prop) =>
-      (prop.name === "package" || prop.name === "minVersion") && prop.type.kind === "String",
+      (prop.name === "package" || prop.name === "minVersion") &&
+      prop.type.kind === "String",
   );
 
   return validProps;
@@ -961,7 +1093,14 @@ export const $alternateType: AlternateTypeDecorator = (
       return;
     }
   }
-  setScopedDecoratorData(context, $alternateType, alternateTypeKey, source, alternateInput, scope);
+  setScopedDecoratorData(
+    context,
+    $alternateType,
+    alternateTypeKey,
+    source,
+    alternateInput,
+    scope,
+  );
 };
 
 /**
@@ -987,7 +1126,8 @@ export function getAlternateType(
     const externalPackage = retval.package;
     const externalMinVersion = retval.minVersion;
     if (externalPackage && externalMinVersion) {
-      const existingVersion = context.__externalPackageToVersions.get(externalPackage);
+      const existingVersion =
+        context.__externalPackageToVersions.get(externalPackage);
       if (existingVersion && existingVersion !== externalMinVersion) {
         reportDiagnostic(context.program, {
           code: "external-library-version-mismatch",
@@ -999,7 +1139,10 @@ export function getAlternateType(
           target: source,
         });
       }
-      context.__externalPackageToVersions.set(externalPackage, externalMinVersion);
+      context.__externalPackageToVersions.set(
+        externalPackage,
+        externalMinVersion,
+      );
     }
   }
   return retval;
@@ -1023,13 +1166,16 @@ export const $clientInitialization: ClientInitializationDecorator = (
     if (options.properties.get("initializedBy")) {
       const value = options.properties.get("initializedBy")!.type;
 
-      const isValidValue = (value: number): boolean => value === 0 || value === 1 || value === 2;
+      const isValidValue = (value: number): boolean =>
+        value === 0 || value === 1 || value === 2;
 
       if (value.kind === "EnumMember") {
         if (typeof value.value !== "number" || !isValidValue(value.value)) {
           reportDiagnostic(context.program, {
             code: "invalid-initialized-by",
-            format: { message: "Please use `InitializedBy` enum to set the value." },
+            format: {
+              message: "Please use `InitializedBy` enum to set the value.",
+            },
             target: target,
           });
           return;
@@ -1043,7 +1189,9 @@ export const $clientInitialization: ClientInitializationDecorator = (
           ) {
             reportDiagnostic(context.program, {
               code: "invalid-initialized-by",
-              format: { message: "Please use `InitializedBy` enum to set the value." },
+              format: {
+                message: "Please use `InitializedBy` enum to set the value.",
+              },
               target: target,
             });
             return;
@@ -1074,7 +1222,11 @@ export function getClientInitializationOptions(
   context: TCGCContext,
   entity: Namespace | Interface,
 ): ClientInitializationOptions | undefined {
-  const options = getScopedDecoratorData(context, clientInitializationKey, entity);
+  const options = getScopedDecoratorData(
+    context,
+    clientInitializationKey,
+    entity,
+  );
 
   // backward compatibility
   if (
@@ -1094,7 +1246,9 @@ export function getClientInitializationOptions(
       initializedBy = options.properties.get("initializedBy").type.value;
     } else if (options.properties.get("initializedBy").type.kind === "Union") {
       initializedBy = 0;
-      for (const variant of options.properties.get("initializedBy").type.variants.values()) {
+      for (const variant of options.properties
+        .get("initializedBy")
+        .type.variants.values()) {
         initializedBy |= variant.type.value;
       }
     }
@@ -1103,12 +1257,10 @@ export function getClientInitializationOptions(
   let parametersModel = options?.properties.get("parameters")?.type;
   let currEntity: Namespace | Interface | undefined = entity;
   while (currEntity) {
-    const movedParameters = findEntriesWithTarget<ModelProperty, Namespace | Interface>(
-      context,
-      clientLocationKey,
-      currEntity,
-      "ModelProperty",
-    );
+    const movedParameters = findEntriesWithTarget<
+      ModelProperty,
+      Namespace | Interface
+    >(context, clientLocationKey, currEntity, "ModelProperty");
     const tk = $(context.program);
     if (movedParameters.length > 0) {
       if (parametersModel) {
@@ -1121,7 +1273,10 @@ export function getClientInitializationOptions(
           name: "ClientInitializationParameters",
           properties: {
             ...Object.fromEntries(
-              movedParameters.map((movedParameter) => [movedParameter.name, movedParameter]),
+              movedParameters.map((movedParameter) => [
+                movedParameter.name,
+                movedParameter,
+              ]),
             ),
           },
         });
@@ -1145,7 +1300,8 @@ export const $paramAlias: ParamAliasDecorator = (
   scope?: LanguageScopes,
 ) => {
   const paramAliasDec = context.program.stateMap(paramAliasKey).get(original);
-  const paramAliasVal = paramAliasDec?.[scope || AllScopes] ?? paramAliasDec?.[AllScopes];
+  const paramAliasVal =
+    paramAliasDec?.[scope || AllScopes] ?? paramAliasDec?.[AllScopes];
   if (paramAliasVal) {
     reportDiagnostic(context.program, {
       code: "multiple-param-alias",
@@ -1157,10 +1313,20 @@ export const $paramAlias: ParamAliasDecorator = (
     });
     return;
   }
-  setScopedDecoratorData(context, $paramAlias, paramAliasKey, original, paramAlias, scope);
+  setScopedDecoratorData(
+    context,
+    $paramAlias,
+    paramAliasKey,
+    original,
+    paramAlias,
+    scope,
+  );
 };
 
-export function getParamAlias(context: TCGCContext, original: ModelProperty): string | undefined {
+export function getParamAlias(
+  context: TCGCContext,
+  original: ModelProperty,
+): string | undefined {
   return getScopedDecoratorData(context, paramAliasKey, original);
 }
 
@@ -1172,10 +1338,20 @@ export const $apiVersion: ApiVersionDecorator = (
   value?: boolean,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(context, $apiVersion, apiVersionKey, target, value ?? true, scope);
+  setScopedDecoratorData(
+    context,
+    $apiVersion,
+    apiVersionKey,
+    target,
+    value ?? true,
+    scope,
+  );
 };
 
-export function getIsApiVersion(context: TCGCContext, param: ModelProperty): boolean | undefined {
+export function getIsApiVersion(
+  context: TCGCContext,
+  param: ModelProperty,
+): boolean | undefined {
   return getScopedDecoratorData(context, apiVersionKey, param);
 }
 
@@ -1193,7 +1369,14 @@ export const $clientNamespace: ClientNamespaceDecorator = (
     });
     return;
   }
-  setScopedDecoratorData(context, $clientNamespace, clientNamespaceKey, entity, value, scope);
+  setScopedDecoratorData(
+    context,
+    $clientNamespace,
+    clientNamespaceKey,
+    entity,
+    value,
+    scope,
+  );
 };
 
 /**
@@ -1256,12 +1439,19 @@ export function getClientNamespace(
   return getNamespaceFullNameWithOverride(context, entity.namespace);
 }
 
-function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Namespace): string {
+function getNamespaceFullNameWithOverride(
+  context: TCGCContext,
+  namespace: Namespace,
+): string {
   const segments = [];
   let current: Namespace | undefined = namespace;
   let isOverridden: boolean = false;
   while (current && current.name !== "") {
-    const override = getScopedDecoratorData(context, clientNamespaceKey, current);
+    const override = getScopedDecoratorData(
+      context,
+      clientNamespaceKey,
+      current,
+    );
     if (override) {
       segments.unshift(override);
       isOverridden = true;
@@ -1288,7 +1478,10 @@ function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Names
       ) {
         return joinedSegments;
       }
-      return joinedSegments.replace(userDefinedNamespace.name, context.namespaceFlag);
+      return joinedSegments.replace(
+        userDefinedNamespace.name,
+        context.namespaceFlag,
+      );
     }
     return joinedSegments;
   }
@@ -1304,7 +1497,13 @@ export const $scope: ScopeDecorator = (
   const [negationScopes, scopes] = parseScopes(context, scope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
     // for negation scope, override the previous value
-    setScopedDecoratorData(context, $scope, negationScopesKey, entity, negationScopes);
+    setScopedDecoratorData(
+      context,
+      $scope,
+      negationScopesKey,
+      entity,
+      negationScopes,
+    );
   }
   if (scopes !== undefined && scopes.length > 0) {
     // for normal scope, add them incrementally
@@ -1335,7 +1534,14 @@ export const $clientApiVersions: ClientApiVersionsDecorator = (
   value: Enum,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(context, $clientApiVersions, clientApiVersionsKey, target, value, scope);
+  setScopedDecoratorData(
+    context,
+    $clientApiVersions,
+    clientApiVersionsKey,
+    target,
+    value,
+    scope,
+  );
 };
 
 /**
@@ -1351,27 +1557,13 @@ export function getExplicitClientApiVersions(
 ): Enum | undefined {
   return getScopedDecoratorData(context, clientApiVersionsKey, target);
 }
-export const $deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorator = (
-  context: DecoratorContext,
-  target: ModelProperty,
-  scope?: LanguageScopes,
-) => {
-  if (target.type.kind !== "Scalar") {
-    reportDiagnostic(context.program, {
-      code: "invalid-deserializeEmptyStringAsNull-target-type",
-      format: {},
-      target: target,
-    });
-    return;
-  }
-
-  if (target.type.name !== "string") {
-    let scalarType = target.type as Scalar;
-    while (scalarType.baseScalar !== undefined) {
-      scalarType = scalarType.baseScalar;
-    }
-
-    if (scalarType.name !== "string") {
+export const $deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorator =
+  (
+    context: DecoratorContext,
+    target: ModelProperty,
+    scope?: LanguageScopes,
+  ) => {
+    if (target.type.kind !== "Scalar") {
       reportDiagnostic(context.program, {
         code: "invalid-deserializeEmptyStringAsNull-target-type",
         format: {},
@@ -1379,8 +1571,23 @@ export const $deserializeEmptyStringAsNull: DeserializeEmptyStringAsNullDecorato
       });
       return;
     }
-  }
-};
+
+    if (target.type.name !== "string") {
+      let scalarType = target.type as Scalar;
+      while (scalarType.baseScalar !== undefined) {
+        scalarType = scalarType.baseScalar;
+      }
+
+      if (scalarType.name !== "string") {
+        reportDiagnostic(context.program, {
+          code: "invalid-deserializeEmptyStringAsNull-target-type",
+          format: {},
+          target: target,
+        });
+        return;
+      }
+    }
+  };
 
 const responseAsBoolKey = createStateSymbol("responseAsBool");
 
@@ -1399,10 +1606,20 @@ export const $responseAsBool: ResponseAsBoolDecorator = (
     });
     return;
   }
-  setScopedDecoratorData(context, $responseAsBool, responseAsBoolKey, target, true, scope);
+  setScopedDecoratorData(
+    context,
+    $responseAsBool,
+    responseAsBoolKey,
+    target,
+    true,
+    scope,
+  );
 };
 
-export function getResponseAsBool(context: TCGCContext, target: Operation): boolean {
+export function getResponseAsBool(
+  context: TCGCContext,
+  target: Operation,
+): boolean {
   return getScopedDecoratorData(context, responseAsBoolKey, target);
 }
 
@@ -1439,7 +1656,14 @@ export const $clientDoc: ClientDocDecorator = (
     mode: docMode,
   };
 
-  setScopedDecoratorData(context, $clientDoc, clientDocKey, target, docData, scope);
+  setScopedDecoratorData(
+    context,
+    $clientDoc,
+    clientDocKey,
+    target,
+    docData,
+    scope,
+  );
 };
 
 /**
@@ -1482,7 +1706,9 @@ export const $clientLocation = (
       const clientInitializationParams = target.decorators
         .filter((d) => d.decorator.name === "$clientInitialization")
         .map((d) => d.args[0].value)
-        .filter((a): a is Model => a.entityKind === "Type" && a.kind === "Model")
+        .filter(
+          (a): a is Model => a.entityKind === "Type" && a.kind === "Model",
+        )
         .filter((model) => model.properties.has(source.name))
         .map((model) => model.properties.get(source.name)!);
       if (clientInitializationParams.length > 0) {
@@ -1505,7 +1731,14 @@ export const $clientLocation = (
       return;
     }
   }
-  setScopedDecoratorData(context, $clientLocation, clientLocationKey, source, target, scope);
+  setScopedDecoratorData(
+    context,
+    $clientLocation,
+    clientLocationKey,
+    source,
+    target,
+    scope,
+  );
 };
 
 /**
@@ -1536,7 +1769,10 @@ export function getClientLocation(
   input: Operation | ModelProperty,
 ): Namespace | Interface | Operation | string | undefined {
   // if there is `@client` or `@operationGroup` decorator, `@clientLocation` on operation will be ignored
-  if (input.kind === "Operation" && hasExplicitClientOrOperationGroup(context)) {
+  if (
+    input.kind === "Operation" &&
+    hasExplicitClientOrOperationGroup(context)
+  ) {
     return undefined;
   }
   return getScopedDecoratorData(context, clientLocationKey, input);
@@ -1549,7 +1785,11 @@ interface PropertyConflict {
   reason: "missing" | "type-mismatch";
 }
 
-function isPropertySuperset(program: Program, target: Model, value: Model): PropertyConflict[] {
+function isPropertySuperset(
+  program: Program,
+  target: Model,
+  value: Model,
+): PropertyConflict[] {
   const conflicts: PropertyConflict[] = [];
 
   // Check if all properties in value exist in target
@@ -1627,7 +1867,10 @@ export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
   );
 };
 
-export function getLegacyHierarchyBuilding(context: TCGCContext, target: Model): Model | undefined {
+export function getLegacyHierarchyBuilding(
+  context: TCGCContext,
+  target: Model,
+): Model | undefined {
   // If legacy hierarchy building is not respected, ignore the decorator completely
   if (!context.enableLegacyHierarchyBuilding) return undefined;
 
@@ -1641,10 +1884,13 @@ export const $markAsLro: MarkAsLroDecorator = (
   target: Operation,
   scope?: LanguageScopes,
 ) => {
-  const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, target));
+  const httpOperation = ignoreDiagnostics(
+    getHttpOperation(context.program, target),
+  );
   const hasModelResponse = httpOperation.responses.filter(
     (r) =>
-      r.type?.kind === "Model" && !(r.statusCodes === "*" || isErrorModel(context.program, r.type)),
+      r.type?.kind === "Model" &&
+      !(r.statusCodes === "*" || isErrorModel(context.program, r.type)),
   )[0];
   if (!hasModelResponse) {
     reportDiagnostic(context.program, {
@@ -1666,7 +1912,14 @@ export const $markAsLro: MarkAsLroDecorator = (
     });
     return;
   }
-  setScopedDecoratorData(context, $markAsLro, markAsLroKey, target, true, scope);
+  setScopedDecoratorData(
+    context,
+    $markAsLro,
+    markAsLroKey,
+    target,
+    true,
+    scope,
+  );
 };
 
 export function getMarkAsLro(context: TCGCContext, entity: Operation): boolean {
@@ -1680,10 +1933,13 @@ export const $markAsPageable: MarkAsPageableDecorator = (
   target: Operation,
   scope?: LanguageScopes,
 ) => {
-  const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, target));
+  const httpOperation = ignoreDiagnostics(
+    getHttpOperation(context.program, target),
+  );
   const modelResponse = httpOperation.responses.filter(
     (r) =>
-      r.type?.kind === "Model" && !(r.statusCodes === "*" || isErrorModel(context.program, r.type)),
+      r.type?.kind === "Model" &&
+      !(r.statusCodes === "*" || isErrorModel(context.program, r.type)),
   )[0];
   if (!modelResponse) {
     reportDiagnostic(context.program, {
@@ -1709,7 +1965,10 @@ export const $markAsPageable: MarkAsPageableDecorator = (
   }
 
   // Check the response model for @pageItems decorator
-  const responseType = getRealResponseModel(context.program, modelResponse.type as Model);
+  const responseType = getRealResponseModel(
+    context.program,
+    modelResponse.type as Model,
+  );
   if (responseType.kind !== "Model") {
     reportDiagnostic(context.program, {
       code: "invalid-mark-as-pageable-target",
@@ -1777,10 +2036,20 @@ export const $disablePageable: DisablePageableDecorator = (
   target: Operation,
   scope?: LanguageScopes,
 ) => {
-  setScopedDecoratorData(context, $disablePageable, disablePageableKey, target, true, scope);
+  setScopedDecoratorData(
+    context,
+    $disablePageable,
+    disablePageableKey,
+    target,
+    true,
+    scope,
+  );
 };
 
-export function getDisablePageable(context: TCGCContext, entity: Operation): boolean {
+export function getDisablePageable(
+  context: TCGCContext,
+  entity: Operation,
+): boolean {
   return getScopedDecoratorData(context, disablePageableKey, entity) ?? false;
 }
 
@@ -1810,7 +2079,14 @@ export const $nextLinkVerb: NextLinkVerbDecorator = (
     verb.kind === "String" && (verb.value === "POST" || verb.value === "GET"),
     "@nextLinkVerb decorator only supports 'POST' or 'GET' string literal values.",
   );
-  setScopedDecoratorData(context, $nextLinkVerb, nextLinkVerbKey, target, verb.value, scope);
+  setScopedDecoratorData(
+    context,
+    $nextLinkVerb,
+    nextLinkVerbKey,
+    target,
+    verb.value,
+    scope,
+  );
 };
 
 /**
@@ -1819,7 +2095,10 @@ export const $nextLinkVerb: NextLinkVerbDecorator = (
  * @param entity Operation to check for nextLinkVerb decorator
  * @returns The HTTP verb string ("POST" or "GET"). Defaults to "GET" if decorator is not applied.
  */
-export function getNextLinkVerb(context: TCGCContext, entity: Operation): "GET" | "POST" {
+export function getNextLinkVerb(
+  context: TCGCContext,
+  entity: Operation,
+): "GET" | "POST" {
   return getScopedDecoratorData(context, nextLinkVerbKey, entity) ?? "GET";
 }
 
@@ -1861,9 +2140,16 @@ export function getClientDefaultValue(
  * @param entity Operation or ModelProperty to check if it is in scope
  * @returns
  */
-export function isInScope(context: TCGCContext, entity: Operation | ModelProperty): boolean {
+export function isInScope(
+  context: TCGCContext,
+  entity: Operation | ModelProperty,
+): boolean {
   const scopes = getScopedDecoratorData(context, scopeKey, entity);
-  const negationScopes = getScopedDecoratorData(context, negationScopesKey, entity);
+  const negationScopes = getScopedDecoratorData(
+    context,
+    negationScopesKey,
+    entity,
+  );
 
   if (scopes !== undefined) {
     if (scopes.includes(context.emitterName)) {
@@ -1875,7 +2161,10 @@ export function isInScope(context: TCGCContext, entity: Operation | ModelPropert
     }
   }
 
-  if (negationScopes !== undefined && negationScopes.includes(context.emitterName)) {
+  if (
+    negationScopes !== undefined &&
+    negationScopes.includes(context.emitterName)
+  ) {
     return false;
   }
   return true;
