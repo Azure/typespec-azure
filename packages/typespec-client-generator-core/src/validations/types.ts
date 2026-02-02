@@ -177,9 +177,6 @@ function validateClientNamesPerNamespace(
   // Check for duplicate client names for models, enums, and unions
   validateClientNamesCore(tcgcContext, scope, typesToValidate);
 
-  // Check for duplicate client names for scalars
-  validateClientNamesCore(tcgcContext, scope, namespace.scalars.values());
-
   // Check for duplicate client names for operations
   validateClientNamesCore(
     tcgcContext,
