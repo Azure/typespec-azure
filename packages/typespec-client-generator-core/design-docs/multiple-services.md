@@ -787,20 +787,29 @@ using Azure.ClientGenerator.Core;
 })
 namespace CustomClient {
   // Custom child client combining operations from both services
-  @client
+  @client({
+    name: "SharedOperations",
+    service: [ServiceA, ServiceB],
+  })
   interface SharedOperations {
     opA is ServiceA.Operations.opA;
     opB is ServiceB.Operations.opB;
   }
 
   // Custom child client with operations from ServiceA only
-  @client
+  @client({
+    name: "ServiceAOnly",
+    service: ServiceA,
+  })
   interface ServiceAOnly {
     subOpA is ServiceA.SubNamespace.subOpA;
   }
 
   // Custom child client with operations from ServiceB only
-  @client
+  @client({
+    name: "ServiceBOnly",
+    service: ServiceB,
+  })
   interface ServiceBOnly {
     subOpB is ServiceB.SubNamespace.subOpB;
   }
