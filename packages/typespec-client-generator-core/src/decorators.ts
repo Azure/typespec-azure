@@ -1233,6 +1233,10 @@ export function getClientNamespace(
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
   if (override) {
     // if `@clientNamespace` is applied to the entity, this wins out
+    // if the override exactly matches the namespace flag, no replacement is needed
+    if (context.namespaceFlag && override === context.namespaceFlag) {
+      return override;
+    }
     const userDefinedNamespace = findNamespaceOverlapClosestToRoot(
       override,
       listAllUserDefinedNamespaces(context),
@@ -1274,6 +1278,16 @@ function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Names
       listAllUserDefinedNamespaces(context),
     );
     if (userDefinedNamespace && context.namespaceFlag) {
+      // Check if replacement would cause duplication:
+      // This happens when the namespace flag is an extension of the user-defined namespace
+      // and joinedSegments already starts with the flag (meaning override already applied it)
+      if (
+        context.namespaceFlag.startsWith(userDefinedNamespace.name) &&
+        (joinedSegments.startsWith(context.namespaceFlag + ".") ||
+          joinedSegments === context.namespaceFlag)
+      ) {
+        return joinedSegments;
+      }
       return joinedSegments.replace(userDefinedNamespace.name, context.namespaceFlag);
     }
     return joinedSegments;
