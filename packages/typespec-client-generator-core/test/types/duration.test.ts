@@ -120,3 +120,20 @@ it("float seconds decorated scalar", async function () {
   strictEqual(sdkType.valueType.baseType.encode, "ISO8601");
   strictEqual(sdkType.valueType.baseType.crossLanguageDefinitionId, "TypeSpec.duration");
 });
+
+it("custom encoding string", async function () {
+  const { program } = await SimpleTesterWithService.compile(
+    `
+      @usage(Usage.input | Usage.output)
+      model Test {
+        @encode("customDurationFormat")
+        prop: duration;
+      }
+    `,
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
+  strictEqual(sdkType.kind, "duration");
+  strictEqual(sdkType.encode, "customDurationFormat");
+  strictEqual(sdkType.wireType.kind, "string");
+});
