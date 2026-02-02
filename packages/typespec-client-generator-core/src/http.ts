@@ -12,6 +12,7 @@ import {
 import { $ } from "@typespec/compiler/typekit";
 import {
   HttpOperation,
+  HttpOperationHeaderParameter,
   HttpOperationParameter,
   HttpOperationPathParameter,
   HttpOperationQueryParameter,
@@ -505,7 +506,10 @@ export function getSdkHttpParameter(
   return diagnostics.wrap({
     ...headerQueryBase,
     kind: "header",
-    serializedName: getHeaderFieldName(program, param) ?? base.name,
+    serializedName:
+      getHeaderFieldName(program, param) ??
+      (httpParam as HttpOperationHeaderParameter)?.name ??
+      base.name,
   });
 }
 

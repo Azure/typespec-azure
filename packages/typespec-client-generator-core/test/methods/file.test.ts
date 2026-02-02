@@ -243,3 +243,26 @@ it("binary file with multiple content types", async () => {
   ok(bodyParam.type.serializationOptions.binary?.filename);
   strictEqual(bodyParam.type.serializationOptions.binary?.filename.name, "filename");
 });
+
+it("file type headers should have correct serializedName", async () => {
+  const { program } = await SimpleTester.compile(
+    `
+      @service
+      namespace TestService {
+        op uploadXml(@body file: File<"application/xml">): void;
+      }
+    `,
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const method = sdkPackage.clients[0].methods[0];
+  strictEqual(method.name, "uploadXml");
+  const httpOperation = method.operation;
+  // Find Content-Type header parameter
+  const contentTypeParam = httpOperation.parameters.find(
+    (p) => p.kind === "header" && p.name === "contentType",
+  );
+  ok(contentTypeParam);
+  // The serializedName should be "Content-Type", not "contentType"
+  strictEqual(contentTypeParam.serializedName, "Content-Type");
+});
