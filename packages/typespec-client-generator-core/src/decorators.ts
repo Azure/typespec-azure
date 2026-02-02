@@ -1023,7 +1023,7 @@ export const $clientInitialization: ClientInitializationDecorator = (
     if (options.properties.get("initializedBy")) {
       const value = options.properties.get("initializedBy")!.type;
 
-      const isValidValue = (value: number): boolean => value === 1 || value === 2;
+      const isValidValue = (value: number): boolean => value === 0 || value === 1 || value === 2;
 
       if (value.kind === "EnumMember") {
         if (typeof value.value !== "number" || !isValidValue(value.value)) {
