@@ -489,5 +489,3 @@ function validateAzureLibraryTypeConflicts(
     }
   }
 }
-
-

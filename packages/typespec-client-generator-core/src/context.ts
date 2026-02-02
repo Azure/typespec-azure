@@ -254,4 +254,3 @@ export async function $onEmit(context: EmitContext<TCGCEmitterOptions>) {
     context.program.reportDiagnostics(sdkContext.diagnostics);
   }
 }
-
