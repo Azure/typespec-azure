@@ -729,3 +729,35 @@ it("wrong initializedBy value type", async () => {
     code: "invalid-argument",
   });
 });
+
+it("client initialized with None", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+      @service
+      namespace MyService;
+
+      op download(@path blobName: string): void;
+      `,
+      `
+      namespace MyCustomizations;
+
+      model MyClientInitialization {
+        blobName: string;
+      }
+
+      @@clientInitialization(MyService, {parameters: MyCustomizations.MyClientInitialization, initializedBy: InitializedBy.none});
+      `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const client = sdkPackage.clients[0];
+  strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.None);
+  strictEqual(client.clientInitialization.parameters.length, 2);
+  const endpoint = client.clientInitialization.parameters.find((x) => x.kind === "endpoint");
+  ok(endpoint);
+  const blobName = client.clientInitialization.parameters.find((x) => x.name === "blobName");
+  ok(blobName);
+  strictEqual(blobName.onClient, true);
+});
