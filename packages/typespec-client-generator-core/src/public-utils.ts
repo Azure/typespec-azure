@@ -43,6 +43,7 @@ import {
   listOperationsInOperationGroup,
 } from "./decorators.js";
 import {
+  DecoratedType,
   SdkBodyParameter,
   SdkClient,
   SdkClientType,
@@ -927,4 +928,26 @@ export function getNamespaceFromType(
     return type.namespace;
   }
   return undefined;
+}
+
+const CLIENT_OPTION_DECORATOR_NAME = "Azure.ClientGenerator.Core.@clientOption";
+
+/**
+ * Get the value of a client option by key from a decorated SDK type.
+ *
+ * @param type - A decorated SDK type (model, enum, operation, property, client, namespace, etc.)
+ * @param key - The name of the client option to look up
+ * @returns The option value, or `undefined` if the option is not set
+ *
+ * @example
+ * ```typescript
+ * const sdkModel = context.sdkPackage.models.find(m => m.name === "MyModel");
+ * const value = getClientOptions(sdkModel, "enableFeatureFoo");
+ * ```
+ */
+export function getClientOptions<T extends DecoratedType>(type: T, key: string): unknown {
+  const option = type.decorators
+    .filter((d) => d.name === CLIENT_OPTION_DECORATOR_NAME)
+    .find((d) => d.arguments.name === key);
+  return option?.arguments.value;
 }

@@ -184,7 +184,7 @@ export interface ClientInitializationOptions {
 
 // Types for TCGC specific type  graph
 
-interface DecoratedType {
+export interface DecoratedType {
   /**
    * Client types sourced from TypeSpec decorated types will have this generic decoratores list.
    * Only decorators in allowed list will be included in this list.
@@ -675,6 +675,35 @@ export interface XmlSerializationOptions {
 export interface BinarySerializationOptions {
   /** Whether this is a file/stream input */
   isFile: boolean;
+  /**
+   * Whether the file contents should be represented as a string or raw byte stream.
+   *
+   * True if the `contents` property is a `string`, `false` if it is `bytes`.
+   *
+   * Emitters may choose to represent textual files as strings or streams of textual characters.
+   * If this property is `false`, emitters must expect that the contents may contain non-textual
+   * data.
+   *
+   * This property is only present when `isFile` is `true`. When undefined, it indicates the
+   * body is not a file type.
+   */
+  isText?: boolean;
+  /**
+   * The list of inner media types of the file. In other words, what kind of files can be returned.
+   *
+   * This is determined by the `contentType` property of the file model.
+   *
+   * This property is only present when `isFile` is `true`. When undefined, it indicates the
+   * body is not a file type.
+   */
+  contentTypes?: string[];
+  /**
+   * The ModelProperty that represents the filename in the file model.
+   *
+   * This property is only present when `isFile` is `true`. When undefined, it indicates the
+   * body is not a file type.
+   */
+  filename?: ModelProperty;
 }
 
 /**
