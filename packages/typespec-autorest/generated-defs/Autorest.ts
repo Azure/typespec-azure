@@ -1,4 +1,10 @@
-import type { DecoratorContext, Model, ModelProperty, Operation } from "@typespec/compiler";
+import type {
+  DecoratorContext,
+  DecoratorValidatorCallbacks,
+  Model,
+  ModelProperty,
+  Operation,
+} from "@typespec/compiler";
 
 /**
  * `@example` - attaches example files to an operation. Multiple examples can be specified.
@@ -13,7 +19,7 @@ export type ExampleDecorator = (
   target: Operation,
   pathOrUri: string,
   title: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * `@useRef` - is used to replace the TypeSpec model type in emitter output with a pre-existing named OpenAPI schema such as Azure Resource Manager common types.
@@ -26,7 +32,7 @@ export type UseRefDecorator = (
   context: DecoratorContext,
   entity: Model | ModelProperty,
   jsonRef: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 export type AutorestDecorators = {
   example: ExampleDecorator;

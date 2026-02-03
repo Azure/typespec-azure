@@ -1,15 +1,9 @@
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
-import { beforeEach, it } from "vitest";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import { it } from "vitest";
+import { createSdkContextForTester, SimpleTester } from "../tester.js";
 
 it("no duplicate operation with @clientLocation", async () => {
-  const diagnostics = await runner.diagnose(
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `
     @service
     namespace StorageService;
@@ -27,11 +21,12 @@ it("no duplicate operation with @clientLocation", async () => {
     `,
   );
 
+  await createSdkContextForTester(program);
   expectDiagnosticEmpty(diagnostics);
 });
 
 it("no duplicate operation with @clientLocation another", async () => {
-  const diagnostics = await runner.diagnose(
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `
     @service
     namespace StorageService;
@@ -48,11 +43,12 @@ it("no duplicate operation with @clientLocation another", async () => {
     `,
   );
 
+  await createSdkContextForTester(program);
   expectDiagnosticEmpty(diagnostics);
 });
 
 it("duplicate operation with @clientLocation to existed clients", async () => {
-  const diagnostics = await runner.diagnose(
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `
     @service
     namespace Contoso.WidgetManager;
@@ -74,6 +70,7 @@ it("duplicate operation with @clientLocation to existed clients", async () => {
     `,
   );
 
+  await createSdkContextForTester(program);
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
@@ -88,7 +85,7 @@ it("duplicate operation with @clientLocation to existed clients", async () => {
 });
 
 it("duplicate operation with @clientLocation to existed clients with scope", async () => {
-  const diagnostics = await runner.diagnose(
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `
     @service
     namespace Contoso.WidgetManager;
@@ -110,6 +107,7 @@ it("duplicate operation with @clientLocation to existed clients with scope", asy
     `,
   );
 
+  await createSdkContextForTester(program);
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
@@ -124,7 +122,7 @@ it("duplicate operation with @clientLocation to existed clients with scope", asy
 });
 
 it("duplicate operation with @clientLocation to new clients", async () => {
-  const diagnostics = await runner.diagnose(
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `
     @service
     namespace Contoso.WidgetManager;
@@ -142,6 +140,7 @@ it("duplicate operation with @clientLocation to new clients", async () => {
     `,
   );
 
+  await createSdkContextForTester(program);
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
@@ -156,9 +155,7 @@ it("duplicate operation with @clientLocation to new clients", async () => {
 });
 
 it("duplicate operation warning for .NET", async () => {
-  const netRunner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-net" });
-
-  const diagnostics = await netRunner.diagnose(
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `
     @service
     namespace StorageService;
@@ -174,6 +171,7 @@ it("duplicate operation warning for .NET", async () => {
     `,
   );
 
+  await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-net" });
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name-warning",
@@ -188,7 +186,7 @@ it("duplicate operation warning for .NET", async () => {
 });
 
 it("duplicate operation error for other languages", async () => {
-  const diagnostics = await runner.diagnose(
+  const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
     `
     @service
     namespace StorageService;
@@ -204,6 +202,7 @@ it("duplicate operation error for other languages", async () => {
     `,
   );
 
+  await createSdkContextForTester(program);
   expectDiagnostics(diagnostics, [
     {
       code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",

@@ -1,5 +1,68 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.64.1
+
+### Bug Fixes
+
+- [#3830](https://github.com/Azure/typespec-azure/pull/3830) Fix #3829 Allow `@feature` to apply to Operations
+- [#3787](https://github.com/Azure/typespec-azure/pull/3787) Fix arm provider namespace custom name not respected in multi service scenario
+- [#3828](https://github.com/Azure/typespec-azure/pull/3828) Fix #3821 `@renamePathParameter` reorders parameters
+
+
+## 0.64.0
+
+### Features
+
+- [#3622](https://github.com/Azure/typespec-azure/pull/3622) Add support for multiple output files in typespec-autorest
+- [#3746](https://github.com/Azure/typespec-azure/pull/3746) #3693 Allow array and unknown result for async operations
+
+### Bump dependencies
+
+- [#3677](https://github.com/Azure/typespec-azure/pull/3677) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3748](https://github.com/Azure/typespec-azure/pull/3748) Fix #3430 Allow using customAzureResource in operation templates
+- [#3591](https://github.com/Azure/typespec-azure/pull/3591) Corrected spelling of 'for an operation' from 'for and operation'.
+- [#3747](https://github.com/Azure/typespec-azure/pull/3747) Allow final-state-via: original-uri for PATCH operations
+- [#3736](https://github.com/Azure/typespec-azure/pull/3736) Fix #3692 override parameter name and add actions for Nsp
+
+
+## 0.63.0
+
+### Breaking Changes
+
+- [#3522](https://github.com/Azure/typespec-azure/pull/3522) - Remove Private decorator `@Azure.ResourceManager.Private.conditionalClientFlatten`
+  
+    ```diff lang=tsp
+    @Azure.ResourceManager.Private.conditionalClientFlatten
+    ```
+  
+    ```diff lang=tsp title=MyResource.tsp
+    +@Azure.ClientGenerator.Core.Legacy.flattenProperty
+    ```
+
+### Features
+
+- [#3572](https://github.com/Azure/typespec-azure/pull/3572) Remove single service restriction for ARM specs
+
+### Bump dependencies
+
+- [#3546](https://github.com/Azure/typespec-azure/pull/3546) Upgrade dependencies
+
+
+## 0.62.1
+
+### Features
+
+- [#3544](https://github.com/Azure/typespec-azure/pull/3544) Add standard operations for NetworkSecurityPerimeter
+
+### Bug Fixes
+
+- [#3525](https://github.com/Azure/typespec-azure/pull/3525) Fix `missing-x-ms-identifiers` rule message pointing to legacy `@extension` decorator instead of `@identifiers`.
+- [#3559](https://github.com/Azure/typespec-azure/pull/3559) Fix #3437 Provide consistent return values for parent and scope in resolveArmResources
+
+
 ## 0.62.0
 
 ### Deprecations

@@ -4,6 +4,8 @@ import {
   ArrayModelType,
   getProperty as compilerGetProperty,
   DecoratorContext,
+  Enum,
+  EnumMember,
   getKeyName,
   getNamespaceFullName,
   getTags,
@@ -25,7 +27,7 @@ import { useStateMap } from "@typespec/compiler/utils";
 import { getHttpOperation, isPathParam } from "@typespec/http";
 import { $autoRoute, getParentResource, getSegment } from "@typespec/rest";
 
-import { pascalCase } from "change-case";
+import { camelCase, pascalCase } from "change-case";
 import {
   ArmProviderNameValueDecorator,
   ArmResourceOperationsDecorator,
@@ -42,8 +44,12 @@ import {
 } from "../generated-defs/Azure.ResourceManager.js";
 import {
   ArmExternalTypeDecorator,
+  ArmFeatureOptions,
   CustomAzureResourceDecorator,
   CustomResourceOptions,
+  FeatureDecorator,
+  FeatureOptionsDecorator,
+  FeaturesDecorator,
 } from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { reportDiagnostic } from "./lib.js";
 import {
@@ -189,7 +195,7 @@ export interface ResolvedResource {
   /** The parent of this resource */
   parent?: ResolvedResource;
   /** The scope of this resource */
-  scope?: string;
+  scope?: string | ResolvedResource;
 }
 
 /** Description of the resource type */
@@ -469,11 +475,11 @@ export function resolveArmResources(program: Program): Provider {
       resources.push(fullResource);
     }
   }
-  for (const resource of resources) {
-    resource.parent = getResourceParent(resources, resource);
-  }
-  for (const resource of resources) {
-    resource.scope = getScope(resource);
+  const toProcess = resources.slice();
+  while (toProcess.length > 0) {
+    const resource = toProcess.shift()!;
+    resource.parent = getResourceParent(resources, resource, toProcess);
+    resource.scope = getResourceScope(resources, resource, toProcess);
   }
 
   // Add the unmarked operations
@@ -489,10 +495,12 @@ export function resolveArmResources(program: Program): Provider {
 }
 
 function getResourceParent(
-  resources: ResolvedResource[],
+  knownResources: ResolvedResource[],
   child: ResolvedResource,
+  resourcesToProcess: ResolvedResource[],
 ): ResolvedResource | undefined {
-  for (const resource of resources) {
+  if (child.resourceType.types.length < 2) return undefined;
+  for (const resource of knownResources) {
     if (
       resource.resourceType.types.length + 1 === child.resourceType.types.length &&
       resource.resourceType.provider === child.resourceType.provider &&
@@ -501,29 +509,25 @@ function getResourceParent(
       return resource;
     }
   }
-
-  if (child.resourceType.types.length > 1) {
-    const parent: ResolvedResource = {
-      type: child.type,
-      kind: "Other",
-      providerNamespace: child.providerNamespace,
-      resourceType: {
-        provider: child.resourceType.provider,
-        types: child.resourceType.types.slice(0, -1),
-      },
-      resourceName: getParentName(child.resourceType.types[child.resourceType.types.length - 2]),
-      resourceInstancePath: `/${child.resourceInstancePath
-        .split("/")
-        .filter((s) => s.length > 0)
-        .slice(0, -2)
-        .join("/")}`,
-      operations: { lifecycle: {}, actions: [], lists: [] },
-    };
-    resources.push(parent);
-    return parent;
-  }
-
-  return undefined;
+  const parent: ResolvedResource = {
+    type: child.type,
+    kind: "Other",
+    providerNamespace: child.providerNamespace,
+    resourceType: {
+      provider: child.resourceType.provider,
+      types: child.resourceType.types.slice(0, -1),
+    },
+    resourceName: getParentName(child.resourceType.types[child.resourceType.types.length - 2]),
+    resourceInstancePath: `/${child.resourceInstancePath
+      .split("/")
+      .filter((s) => s.length > 0)
+      .slice(0, -2)
+      .join("/")}`,
+    operations: { lifecycle: {}, actions: [], lists: [] },
+  };
+  knownResources.push(parent);
+  resourcesToProcess.push(parent);
+  return parent;
 }
 
 function getParentName(typeName: string): string {
@@ -533,20 +537,21 @@ function getParentName(typeName: string): string {
   return pascalCase(typeName);
 }
 
-function getScope(resource: ResolvedResource): string | undefined {
+function getResourceScope(
+  knownResources: ResolvedResource[],
+  resource: ResolvedResource,
+  resourcesToProcess: ResolvedResource[],
+): ResolvedResource | string | undefined {
   if (resource.scope !== undefined) return resource.scope;
-  if (resource.parent !== undefined) return getScope(resource.parent);
+  if (resource.parent !== undefined)
+    return getResourceScope(knownResources, resource.parent, resourcesToProcess);
   const partsIndex = resource.resourceInstancePath.lastIndexOf("/providers");
   if (partsIndex === 0) return "Tenant";
+
   const segments = resource.resourceInstancePath
     .slice(0, partsIndex)
     .split("/")
     .filter((s) => s.length > 0);
-  if (
-    resource.resourceType.types.length === 2 &&
-    resource.resourceType.types[0].toLowerCase() === "locations"
-  )
-    return "Location";
   if (segments.length === 1 && isVariableSegment(segments[0])) return "Scope";
   if (
     segments.length === 2 &&
@@ -569,7 +574,56 @@ function getScope(resource: ResolvedResource): string | undefined {
     segments[2].toLowerCase() === "managementgroups"
   )
     return "ManagementGroup";
-  if (segments.some((s) => s.toLowerCase() === "providers")) return "ExternalResource";
+  if (segments.some((s) => s.toLowerCase() === "providers")) {
+    const parentProviderIndex = segments.findLastIndex((s) => s.toLowerCase() === "providers");
+    if (segments.length < parentProviderIndex + 2) {
+      return "ExternalResource";
+    }
+    const provider = segments[parentProviderIndex + 1];
+    if (isVariableSegment(provider)) {
+      return "ExternalResource";
+    }
+    const typeSegments: string[] = segments.slice(parentProviderIndex + 2);
+    if (typeSegments.length % 2 !== 0) {
+      return "ExternalResource";
+    }
+    const types: string[] = [];
+    for (let i = 0; i < typeSegments.length; i++) {
+      if (i % 2 === 0) {
+        if (isVariableSegment(typeSegments[i])) {
+          return "ExternalResource";
+        }
+        types.push(typeSegments[i]);
+      } else if (!isVariableSegment(typeSegments[i])) {
+        return "ExternalResource";
+      }
+    }
+    const parent: ResolvedResource = {
+      type: resource.type,
+      kind: "Other",
+      providerNamespace: provider,
+      resourceType: {
+        provider: provider,
+        types: types,
+      },
+      resourceName: getParentName(types[types.length - 1]),
+      resourceInstancePath: `/${segments.join("/")}`,
+      operations: { lifecycle: {}, actions: [], lists: [] },
+    };
+    for (const knownResource of knownResources) {
+      if (
+        parent.resourceType.provider.toLowerCase() ===
+          knownResource.resourceType.provider.toLowerCase() &&
+        parent.resourceType.types.flatMap((r) => r.toLowerCase()).join("/") ===
+          knownResource.resourceType.types.flatMap((k) => k.toLowerCase()).join("/")
+      ) {
+        return knownResource;
+      }
+    }
+    knownResources.push(parent);
+    resourcesToProcess.push(parent);
+    return parent;
+  }
   return undefined;
 }
 
@@ -1069,11 +1123,7 @@ export const $identifiers: IdentifiersDecorator = (
 ) => {
   const { program } = context;
   const type = entity.kind === "ModelProperty" ? entity.type : entity;
-  if (
-    type.kind !== "Model" ||
-    !isArrayModelType(program, type) ||
-    type.indexer.value.kind !== "Model"
-  ) {
+  if (type.kind !== "Model" || !isArrayModelType(type) || type.indexer.value.kind !== "Model") {
     reportDiagnostic(program, {
       code: "decorator-param-wrong-type",
       messageId: "armIdentifiersIncorrectEntity",
@@ -1237,3 +1287,154 @@ export function resolveResourceBaseType(type?: string | undefined): ResourceBase
   }
   return resolvedType;
 }
+
+export const [getResourceFeature, setResourceFeature] = useStateMap<
+  Model | Operation | Interface | Namespace,
+  EnumMember
+>(ArmStateKeys.armFeature);
+
+export const [getResourceFeatureSet, setResourceFeatureSet] = useStateMap<
+  Namespace,
+  Map<string, ArmFeatureOptions>
+>(ArmStateKeys.armFeatureSet);
+
+export const [getResourceFeatureOptions, setResourceFeatureOptions] = useStateMap<
+  EnumMember,
+  ArmFeatureOptions
+>(ArmStateKeys.armFeatureOptions);
+
+const commonFeatureOptions: ArmFeatureOptions = {
+  featureName: "Common",
+  fileName: "common",
+  description: "",
+};
+export function getFeatureOptions(program: Program, feature: EnumMember): ArmFeatureOptions {
+  const defaultFeatureName: string = (feature.value ?? feature.name) as string;
+  const defaultOptions: ArmFeatureOptions = {
+    featureName: defaultFeatureName,
+    fileName: camelCase(defaultFeatureName),
+    description: "",
+  };
+  return program.stateMap(ArmStateKeys.armFeatureOptions).get(feature) ?? defaultOptions;
+}
+
+/**
+ * Get the FeatureOptions for a given type, these could be inherited from the namespace or parent type
+ * @param program - The program to process.
+ * @param entity - The type entity to get feature options for.
+ * @returns The ArmFeatureOptions if found, otherwise undefined.
+ */
+export function getFeature(program: Program, entity: Type): ArmFeatureOptions {
+  switch (entity.kind) {
+    case "Namespace": {
+      const feature = getResourceFeature(program, entity);
+      if (feature === undefined) return commonFeatureOptions;
+      const options = getFeatureOptions(program, feature);
+      return options;
+    }
+    case "Interface": {
+      let feature = getResourceFeature(program, entity);
+      if (feature !== undefined) return getFeatureOptions(program, feature);
+      const namespace = entity.namespace;
+      if (namespace === undefined) return commonFeatureOptions;
+      feature = getResourceFeature(program, namespace);
+      if (feature === undefined) return commonFeatureOptions;
+      return getFeatureOptions(program, feature);
+    }
+    case "Model": {
+      let feature = getResourceFeature(program, entity);
+      if (feature !== undefined) return getFeatureOptions(program, feature);
+      if (isTemplateInstance(entity)) {
+        for (const arg of entity.templateMapper.args) {
+          if (arg.entityKind === "Type" && arg.kind === "Model") {
+            const options = getFeature(program, arg);
+            if (options !== commonFeatureOptions) return options;
+          }
+        }
+      }
+      const namespace = entity.namespace;
+      if (namespace === undefined) return commonFeatureOptions;
+      feature = getResourceFeature(program, namespace);
+      if (feature === undefined) return commonFeatureOptions;
+      return getFeatureOptions(program, feature);
+    }
+    case "Operation": {
+      const opFeature = getResourceFeature(program, entity);
+      if (opFeature !== undefined) return getFeatureOptions(program, opFeature);
+      const opInterface = entity.interface;
+      if (opInterface !== undefined) {
+        return getFeature(program, opInterface);
+      }
+      const namespace = entity.namespace;
+      if (namespace === undefined) return commonFeatureOptions;
+      const feature = getResourceFeature(program, namespace);
+      if (feature === undefined) return commonFeatureOptions;
+      return getFeatureOptions(program, feature);
+    }
+    case "EnumMember": {
+      return getFeature(program, entity.enum);
+    }
+    case "UnionVariant": {
+      return getFeature(program, entity.union);
+    }
+    case "ModelProperty": {
+      if (entity.model === undefined) return commonFeatureOptions;
+      return getFeature(program, entity.model);
+    }
+    case "Enum":
+    case "Union":
+    case "Scalar": {
+      const namespace = entity.namespace;
+      if (namespace === undefined) return commonFeatureOptions;
+      const feature = getResourceFeature(program, namespace);
+      if (feature === undefined) return commonFeatureOptions;
+      return getFeatureOptions(program, feature);
+    }
+
+    default:
+      return commonFeatureOptions;
+  }
+}
+
+export const $feature: FeatureDecorator = (
+  context: DecoratorContext,
+  entity: Model | Operation | Interface | Namespace,
+  featureName: EnumMember,
+) => {
+  const { program } = context;
+  setResourceFeature(program, entity, featureName);
+};
+
+export const $features: FeaturesDecorator = (
+  context: DecoratorContext,
+  entity: Namespace,
+  features: Enum,
+) => {
+  const { program } = context;
+  let featureMap: Map<string, ArmFeatureOptions> | undefined = getResourceFeatureSet(
+    program,
+    entity,
+  );
+  if (featureMap !== undefined) {
+    return;
+  }
+  featureMap = new Map<string, ArmFeatureOptions>();
+
+  for (const member of features.members.values()) {
+    const options = getFeatureOptions(program, member); // Ensure defaults are created
+    featureMap.set(options.featureName, options);
+  }
+  const common = [...featureMap.keys()].some((k) => k.toLowerCase() === "common");
+  if (!common) {
+    featureMap.set("Common", commonFeatureOptions);
+  }
+  setResourceFeatureSet(program, entity, featureMap);
+};
+
+export const $featureOptions: FeatureOptionsDecorator = (
+  context: DecoratorContext,
+  entity: EnumMember,
+  options: ArmFeatureOptions,
+) => {
+  setResourceFeatureOptions(context.program, entity, options);
+};

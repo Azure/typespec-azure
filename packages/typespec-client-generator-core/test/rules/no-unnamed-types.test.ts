@@ -1,17 +1,17 @@
 import {
-  BasicTestRunner,
   createLinterRuleTester,
   LinterRuleTester,
+  TesterInstance,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { noUnnamedTypesRule } from "../../src/rules/no-unnamed-types.rule.js";
-import { createSdkTestRunner } from "../test-host.js";
+import { ArmTester, AzureCoreTester } from "../tester.js";
 
-let runner: BasicTestRunner;
+let runner: TesterInstance;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await createSdkTestRunner();
+  runner = await AzureCoreTester.createInstance();
   tester = createLinterRuleTester(
     runner,
     noUnnamedTypesRule,
@@ -232,6 +232,45 @@ describe("models", () => {
         `,
       )
       .toBeValid();
+  });
+
+  it("anonymous model caused by lro metadata", async () => {
+    const armRunner = await ArmTester.createInstance();
+    const armTester = createLinterRuleTester(
+      armRunner,
+      noUnnamedTypesRule,
+      "@azure-tools/typespec-client-generator-core",
+    );
+    await armTester
+      .expect(
+        `
+        @armProviderNamespace
+        @service
+        @versioned(Versions)
+        namespace TestClient;
+        enum Versions {
+          @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+          v1: "v1",
+        }
+        model Employee is TrackedResource<EmployeeProperties> {
+          ...ResourceNameParameter<Employee>;
+        }
+        model MoveRequest {
+          targetResourceGroup?: string;
+        }
+        model EmployeeProperties {
+          age?: int32;
+        }
+        op move is ArmResourceActionAsync<Employee, MoveRequest, {@body body: {id?: string}}>;
+        `,
+      )
+      .toEmitDiagnostics([
+        {
+          code: "@azure-tools/typespec-client-generator-core/no-unnamed-types",
+          severity: "warning",
+          message: `Anonymous model with generated name "MoveFinalResult" detected. Define this model separately with a proper name to improve code readability and reusability.`,
+        },
+      ]);
   });
 });
 

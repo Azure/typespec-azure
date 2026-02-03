@@ -3,14 +3,18 @@ import {
   addVisibilityModifiers,
   clearVisibilityModifiersForClass,
   DecoratorContext,
+  Enum,
   getKeyName,
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
   getTypeName,
   Interface,
   isKey,
+  isTemplateDeclarationOrInstance,
+  isTemplateInstance,
   Model,
   ModelProperty,
+  Namespace,
   Operation,
   Program,
   Scalar,
@@ -53,7 +57,6 @@ import {
   AzureResourceBaseDecorator,
   AzureResourceManagerPrivateDecorators,
   BuiltInResourceOperationDecorator,
-  ConditionalClientFlattenDecorator,
   DefaultResourceKeySegmentNameDecorator,
   EnforceConstraintDecorator,
   ExtensionResourceOperationDecorator,
@@ -64,7 +67,9 @@ import {
   ResourceBaseParametersOfDecorator,
   ResourceParameterBaseForDecorator,
   ResourceParentTypeDecorator,
+  ValidateCommonTypesVersionForResourceDecorator,
 } from "../generated-defs/Azure.ResourceManager.Private.js";
+import { getArmCommonTypesVersion } from "./common-types.js";
 import { reportDiagnostic } from "./lib.js";
 import { getArmProviderNamespace, isArmLibraryNamespace } from "./namespace.js";
 import {
@@ -305,13 +310,21 @@ const $assignProviderNameValue: AssignProviderNameValueDecorator = (
   resourceType: Model,
 ) => {
   const { program } = context;
-  const armProviderNamespace = getArmProviderNamespace(program, resourceType as Model);
+  let armProviderNamespace = getArmProviderNamespace(program, resourceType);
+  // Workaround for deprecated Legacy.Provider which by default point to TenantActionScope which is not able to resolve the provider namespace
+  if (
+    resourceType.name === "TenantActionScope" &&
+    armProviderNamespace === undefined &&
+    target.model?.namespace
+  ) {
+    armProviderNamespace = getArmProviderNamespace(program, target.model.namespace);
+  }
   if (
     armProviderNamespace &&
     target.type.kind === "String" &&
     target.type.value === "Microsoft.ThisWillBeReplaced"
   ) {
-    target.type.value = armProviderNamespace;
+    target.type = $(context.program).literal.createString(armProviderNamespace);
   }
 };
 
@@ -446,7 +459,8 @@ export function registerArmResource(
   if (
     namespaceName === undefined ||
     namespaceName === "Azure.ResourceManager" ||
-    namespaceName === "Azure.ResourceManager.Legacy"
+    namespaceName === "Azure.ResourceManager.Legacy" ||
+    namespaceName === "Azure.ResourceManager.CommonTypes"
   ) {
     // The @armResource decorator will be evaluated on instantiations of
     // base templated resource types like TrackedResource<SomeResource>,
@@ -589,24 +603,6 @@ const $azureResourceBase: AzureResourceBaseDecorator = (
 export function isAzureResource(program: Program, resourceType: Model): boolean {
   const isResourceBase = program.stateMap(ArmStateKeys.azureResourceBase).get(resourceType);
   return isResourceBase ?? false;
-}
-
-/**
- * Please DO NOT USE in RestAPI specs.
- * Internal decorator that deprecated direct usage of `x-ms-client-flatten` OpenAPI extension.
- * It will programatically enabled/disable client flattening with @flattenProperty with autorest
- * emitter flags to maintain compatibility in swagger.
- */
-const $conditionalClientFlatten: ConditionalClientFlattenDecorator = (
-  context: DecoratorContext,
-  entity: ModelProperty,
-) => {
-  context.program.stateMap(ArmStateKeys.armConditionalClientFlatten).set(entity, true);
-};
-
-export function isConditionallyFlattened(program: Program, entity: ModelProperty): boolean {
-  const flatten = program.stateMap(ArmStateKeys.armConditionalClientFlatten).get(entity);
-  return flatten ?? false;
 }
 
 const $armRenameListByOperation: ArmRenameListByOperationDecorator = (
@@ -945,6 +941,49 @@ const $legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorat
   }
 };
 
+const $validateCommonTypesVersionForResource: ValidateCommonTypesVersionForResourceDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  version: string,
+  resourceName: string,
+) => {
+  if (isTemplateDeclarationOrInstance(target) && !isTemplateInstance(target)) {
+    return;
+  }
+  const lowestVersion = getLowestCommonTypeVersion(context.program, target.namespace!);
+  if (lowestVersion === undefined || lowestVersion < version) {
+    reportDiagnostic(context.program, {
+      code: "invalid-version-for-common-type",
+      target,
+      format: {
+        resourceName: resourceName,
+        requiredVersion: version,
+        version: lowestVersion ?? "v3",
+      },
+    });
+  }
+};
+
+function getLowestCommonTypeVersion(program: Program, ns: Namespace): string | undefined {
+  let lowestVersion = getArmCommonTypesVersion(program, ns);
+  // If it is versioned namespace, we will check each Version enum member. If no
+  // @armCommonTypeVersion decorator, add the one
+  const versioned = ns.decorators.find((x) => x.definition?.name === "@versioned");
+  if (versioned) {
+    const versionEnum = versioned.args[0].value as Enum;
+    versionEnum.members.forEach((v) => {
+      const candidateVersion = getArmCommonTypesVersion(program, v);
+      if (
+        candidateVersion !== undefined &&
+        (lowestVersion === undefined || lowestVersion > candidateVersion)
+      ) {
+        lowestVersion = candidateVersion;
+      }
+    });
+  }
+  return lowestVersion;
+}
+
 /** @internal */
 export const $decorators = {
   "Azure.ResourceManager.Private": {
@@ -952,7 +991,6 @@ export const $decorators = {
     resourceParameterBaseFor: $resourceParameterBaseFor,
     azureResourceBase: $azureResourceBase,
     omitIfEmpty: $omitIfEmpty,
-    conditionalClientFlatten: $conditionalClientFlatten,
     assignUniqueProviderNameValue: $assignUniqueProviderNameValue,
     assignProviderNameValue: $assignProviderNameValue,
     armUpdateProviderNamespace: $armUpdateProviderNamespace,
@@ -969,6 +1007,7 @@ export const $decorators = {
     legacyExtensionResourceOperation: $legacyExtensionResourceOperation,
     legacyResourceOperation: $legacyResourceOperation,
     builtInResourceOperation: $builtInResourceOperation,
+    validateCommonTypesVersionForResource: $validateCommonTypesVersionForResource,
   } satisfies AzureResourceManagerPrivateDecorators,
   "Azure.ResourceManager.Extension.Private": {
     builtInResource: $builtInResource,

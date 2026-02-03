@@ -1,5 +1,6 @@
 import type {
   DecoratorContext,
+  DecoratorValidatorCallbacks,
   Interface,
   Model,
   ModelProperty,
@@ -18,7 +19,7 @@ export type ResourceParameterBaseForDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   values: Type,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  *
@@ -30,20 +31,7 @@ export type ResourceBaseParametersOfDecorator = (
   context: DecoratorContext,
   target: Model,
   propertyName: Model,
-) => void;
-
-/**
- * Please DO NOT USE in RestAPI specs.
- * Internal decorator that deprecated direct usage of `x-ms-client-flatten` OpenAPI extension.
- * It will programatically enabled/disable client flattening with
- *
- * @flattenProperty with autorest
- * emitter flags to maintain compatibility in swagger.
- */
-export type ConditionalClientFlattenDecorator = (
-  context: DecoratorContext,
-  target: ModelProperty,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Omit a property in the target model.
@@ -57,7 +45,7 @@ export type OmitIfEmptyDecorator = (
   context: DecoratorContext,
   target: Model,
   propertyName: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  *
@@ -69,7 +57,7 @@ export type AssignProviderNameValueDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   resource: Model,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * This decorator is used to identify Azure Resource Manager resource. In generated
@@ -77,7 +65,10 @@ export type AssignProviderNameValueDecorator = (
  *
  * It is *not* meant to be used directly by a spec author,
  */
-export type AzureResourceBaseDecorator = (context: DecoratorContext, target: Model) => void;
+export type AzureResourceBaseDecorator = (
+  context: DecoratorContext,
+  target: Model,
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Update the Azure Resource Manager provider namespace for a given entity.
@@ -85,7 +76,7 @@ export type AzureResourceBaseDecorator = (context: DecoratorContext, target: Mod
 export type ArmUpdateProviderNamespaceDecorator = (
   context: DecoratorContext,
   target: Operation,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  *
@@ -97,7 +88,7 @@ export type AssignUniqueProviderNameValueDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   resource: Model,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * This decorator is used to identify Azure Resource Manager resource types and extract their
@@ -116,7 +107,7 @@ export type ArmResourceInternalDecorator = (
   context: DecoratorContext,
   target: Model,
   properties: Model,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * This decorator identifies Azure Resource Manager resource types that do not define
@@ -133,7 +124,7 @@ export type ArmResourceWithParameterDecorator = (
   properties: Model,
   type: string,
   nameParameter: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Provides default name decoration on resource name property with
@@ -145,7 +136,7 @@ export type DefaultResourceKeySegmentNameDecorator = (
   armResource: Model,
   keyName: string,
   segment: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Provides strict contraint type check.
@@ -161,7 +152,7 @@ export type EnforceConstraintDecorator = (
   target: Operation | Model,
   sourceType: Model,
   constraintType: Model,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Marks the operation as being a collection action
@@ -178,7 +169,7 @@ export type ArmRenameListByOperationDecorator = (
   parentTypeName?: string,
   parentFriendlyTypeName?: string,
   applyOperationRename?: boolean,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Please DO NOT USE in RestAPI specs.
@@ -188,7 +179,7 @@ export type ArmResourcePropertiesOptionalityDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   isOptional: boolean,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * designates a parameter as an explicit bodyRoot and sets the optionality of the parameter
@@ -197,7 +188,7 @@ export type ArmBodyRootDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   isOptional: boolean,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * designates a type as a legacy type and emits a warning diagnostic when used
@@ -205,7 +196,7 @@ export type ArmBodyRootDecorator = (
 export type LegacyTypeDecorator = (
   context: DecoratorContext,
   target: Model | Operation | Interface | Scalar,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Determines the built-in parent of a base resource
@@ -216,7 +207,7 @@ export type ResourceParentTypeDecorator = (
   context: DecoratorContext,
   target: Model,
   parentType: "Subscription" | "ResourceGroup" | "Tenant" | "Extension",
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Marks a resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
@@ -239,7 +230,7 @@ export type LegacyResourceOperationDecorator = (
     | "action"
     | "checkExistence",
   resourceName?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Marks an extension resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
@@ -264,7 +255,7 @@ export type ExtensionResourceOperationDecorator = (
     | "action"
     | "checkExistence",
   resourceName?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Marks an extension resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
@@ -289,7 +280,7 @@ export type BuiltInResourceOperationDecorator = (
     | "action"
     | "checkExistence",
   resourceName?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Marks a resource operation with the associated resource, operation type, and name. If no name is provided, the name is calculated by resource type.
@@ -312,12 +303,25 @@ export type LegacyExtensionResourceOperationDecorator = (
     | "action"
     | "checkExistence",
   resourceName?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
+
+/**
+ * Validates that the specified common-types version is valid for the given resource type.
+ *
+ * @param target The resource model
+ * @param version The common-types version
+ * @param resourceName The name of the resource
+ */
+export type ValidateCommonTypesVersionForResourceDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  version: string,
+  resourceName: string,
+) => DecoratorValidatorCallbacks | void;
 
 export type AzureResourceManagerPrivateDecorators = {
   resourceParameterBaseFor: ResourceParameterBaseForDecorator;
   resourceBaseParametersOf: ResourceBaseParametersOfDecorator;
-  conditionalClientFlatten: ConditionalClientFlattenDecorator;
   omitIfEmpty: OmitIfEmptyDecorator;
   assignProviderNameValue: AssignProviderNameValueDecorator;
   azureResourceBase: AzureResourceBaseDecorator;
@@ -336,4 +340,5 @@ export type AzureResourceManagerPrivateDecorators = {
   extensionResourceOperation: ExtensionResourceOperationDecorator;
   builtInResourceOperation: BuiltInResourceOperationDecorator;
   legacyExtensionResourceOperation: LegacyExtensionResourceOperationDecorator;
+  validateCommonTypesVersionForResource: ValidateCommonTypesVersionForResourceDecorator;
 };

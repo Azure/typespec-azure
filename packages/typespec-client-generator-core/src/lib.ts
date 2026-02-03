@@ -403,17 +403,11 @@ export const $lib = createTypeSpecLibrary({
           "`@clientLocation` could only move operation to the interface or namespace belong to the root namespace with `@service`.",
       },
     },
-    "client-location-duplicate": {
-      severity: "warning",
-      messages: {
-        default:
-          "`@clientLocation`'s target should not duplicate with defined namespace or interface under `@service` namespace.",
-      },
-    },
     "legacy-hierarchy-building-conflict": {
       severity: "warning",
       messages: {
-        default: paramMessage`@hierarchyBuilding decorator causes conflicts in inherited properties. Please check that the model ${"childModel"} has the same properties as ${"parentModel"} in the spec.`,
+        "property-missing": paramMessage`@hierarchyBuilding decorator conflict: Model ${"childModel"} is missing property '${"propertyName"}' that is required by parent model ${"parentModel"}.`,
+        "type-mismatch": paramMessage`@hierarchyBuilding decorator conflict: Property '${"propertyName"}' in model ${"childModel"} has a different type than parent model ${"parentModel"} expects.`,
       },
     },
     "legacy-hierarchy-building-circular-reference": {
@@ -434,6 +428,12 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`External library version mismatch. There are multiple versions of ${"libraryName"}: ${"versionA"} and ${"versionB"}. Please unify the versions.`,
       },
     },
+    "external-type-on-model-property": {
+      severity: "warning",
+      messages: {
+        default: `@alternateType with external type information cannot be applied to model properties. Please apply it to the type definition itself (Scalar, Model, Enum, or Union) instead.`,
+      },
+    },
     "invalid-mark-as-lro-target": {
       severity: "warning",
       messages: {
@@ -446,16 +446,40 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`@markAsLro decorator is ineffective since this operation already returns real LRO metadata. Please remove the @markAsLro decorator.`,
       },
     },
+    "invalid-mark-as-pageable-target": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@markAsPageable decorator can only be applied to operations that return a model with a property decorated with @pageItems or a property named 'value'. We will ignore this decorator.`,
+      },
+    },
+    "mark-as-pageable-ineffective": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`@markAsPageable decorator is ineffective since this operation is already marked as pageable with @list decorator. Please remove the @markAsPageable decorator.`,
+      },
+    },
     "api-version-undefined": {
       severity: "warning",
       messages: {
         default: paramMessage`The API version specified in the config: "${"version"}" is not defined in service versioning list. Fall back to the latest version.`,
       },
     },
-    "multiple-services-require-use-dependency": {
+    "multiple-explicit-clients-multiple-services": {
       severity: "error",
       messages: {
-        default: paramMessage`When using multiple services, you must use @useDependency to specify the versions of sub-services that the main service depends on. Found services: ${"services"}`,
+        default: "Can not define multiple explicit clients with multiple services.",
+      },
+    },
+    "invalid-client-service-multiple": {
+      severity: "error",
+      messages: {
+        default: "`@client` with multiple services is only allowed on `Namespace`.",
+      },
+    },
+    "inconsistent-multiple-service": {
+      severity: "error",
+      messages: {
+        default: "All services must have the same server and auth definitions.",
       },
     },
   },

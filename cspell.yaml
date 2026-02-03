@@ -63,6 +63,7 @@ words:
   - msazure
   - msdata
   - mylocation
+  - nsps
   - nupkg
   - odata
   - Onco
@@ -87,5 +88,7 @@ words:
   - vnet
   - WINDOWSVMIMAGE
   - azcore
+  - azkeys
+  - azsecrets
   - byval
   - petstoreopgrp

@@ -99,12 +99,6 @@ export interface AutorestEmitterOptions {
   "emit-lro-options"?: "none" | "final-state-only" | "all";
 
   /**
-   * Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of the
-   * ARM resource properties.
-   * @deprecated
-   */
-  "arm-resource-flattening"?: boolean;
-  /**
    * Determines whether and how to emit schemas for common-types
    * @default "for-visibility-changes"
    */
@@ -119,6 +113,12 @@ export interface AutorestEmitterOptions {
    * @default "xml-service"
    */
   "xml-strategy"?: "xml-service" | "none";
+
+  /**
+   * Determines whether output should be split into multiple files.  The only supported option for splitting is "legacy-feature-files",
+   * which uses the typespec-azure-resource-manager `@feature` decorators to split into output files based on feature.
+   */
+  "output-splitting"?: "legacy-feature-files";
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
@@ -229,13 +229,6 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       description:
         "Determine whether and how to emit x-ms-long-running-operation-options for lro resolution",
     },
-    "arm-resource-flattening": {
-      type: "boolean",
-      nullable: true,
-      default: false,
-      description:
-        "Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of the ARM resource properties.",
-    },
     "emit-common-types-schema": {
       type: "string",
       enum: ["never", "for-visibility-changes"],
@@ -250,6 +243,13 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       nullable: true,
       default: "xml-service",
       description: "Strategy for applying XML serialization metadata to schemas.",
+    },
+    "output-splitting": {
+      type: "string",
+      enum: ["legacy-feature-files"],
+      nullable: true,
+      description:
+        'Determines whether output should be split into multiple files.  The only supported option for splitting is "legacy-feature-files", which uses the typespec-azure-resource-manager `@feature` decorators to split into output files based on feature.',
     },
   },
   required: [],
@@ -369,10 +369,11 @@ export const $lib = createTypeSpecLibrary({
         default: `Cookies are not supported in Swagger 2.0. Parameter was ignored.`,
       },
     },
-    "invalid-format": {
+    "unknown-format": {
       severity: "warning",
       messages: {
         default: paramMessage`'${"schema"}' format '${"format"}' is not supported in Autorest. It will not be emitted.`,
+        encoding: paramMessage`'${"schema"}' encoding format '${"format"}' is not supported in Autorest. It will not be emitted.`,
       },
     },
     "unsupported-auth": {

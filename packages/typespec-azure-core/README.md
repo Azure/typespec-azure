@@ -37,6 +37,7 @@ Available ruleSets:
 | `@azure-tools/typespec-azure-core/composition-over-inheritance`                                                                                                          | Check that if a model is used in an operation and has derived models that it has a discriminator or recommend to use composition via spread or `is`. |
 | `@azure-tools/typespec-azure-core/known-encoding`                                                                                                                        | Check for supported encodings.                                                                                                                       |
 | `@azure-tools/typespec-azure-core/long-running-polling-operation-required`                                                                                               | Long-running operations should have a linked polling operation.                                                                                      |
+| [`@azure-tools/typespec-azure-core/no-case-mismatch`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-case-mismatch)                           | Validate that no two types have the same name with different casing.                                                                                 |
 | [`@azure-tools/typespec-azure-core/no-closed-literal-union`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-closed-literal-union)             | Unions of literals should include the base scalar type to mark them as open enum.                                                                    |
 | [`@azure-tools/typespec-azure-core/no-enum`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-enum)                                             | Azure services should not use enums.                                                                                                                 |
 | `@azure-tools/typespec-azure-core/no-error-status-codes`                                                                                                                 | Recommend using the error response defined by Azure REST API guidelines.                                                                             |
@@ -48,6 +49,7 @@ Available ruleSets:
 | `@azure-tools/typespec-azure-core/no-response-body`                                                                                                                      | Ensure that the body is set correctly for the response type.                                                                                         |
 | `@azure-tools/typespec-azure-core/no-rpc-path-params`                                                                                                                    | Operations defined using RpcOperation should not have path parameters.                                                                               |
 | `@azure-tools/typespec-azure-core/no-openapi`                                                                                                                            | Azure specs should not be using decorators from @typespec/openapi or @azure-tools/typespec-autorest                                                  |
+| [`@azure-tools/typespec-azure-core/no-unnamed-union`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-unnamed-union)                           | Azure services should not define a union expression but create a declaration.                                                                        |
 | [`@azure-tools/typespec-azure-core/no-header-explode`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-header-explode)                         | It is recommended to serialize header parameter without explode: true                                                                                |
 | [`@azure-tools/typespec-azure-core/no-format`](https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/prevent-format)                                    | Azure services should not use the `@format` decorator.                                                                                               |
 | `@azure-tools/typespec-azure-core/no-multiple-discriminator`                                                                                                             | Classes should have at most one discriminator.                                                                                                       |
@@ -93,7 +95,7 @@ Available ruleSets:
 Identifies a ModelProperty as containing the final location for the operation result.
 
 ```typespec
-@Azure.Core.finalLocation(finalResult?: Model | void)
+@Azure.Core.finalLocation(finalResult?: Model | unknown | void)
 ```
 
 ##### Target
@@ -102,9 +104,9 @@ Identifies a ModelProperty as containing the final location for the operation re
 
 ##### Parameters
 
-| Name        | Type            | Description                                                                                                                                                        |
-| ----------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| finalResult | `Model \| void` | Sets the expected return value for the final result. Overrides<br />any value provided in the decorated property, if the property uses ResourceLocation<Resource>. |
+| Name        | Type                       | Description                                                                                                                                                        |
+| ----------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| finalResult | `Model \| unknown \| void` | Sets the expected return value for the final result. Overrides<br />any value provided in the decorated property, if the property uses ResourceLocation<Resource>. |
 
 #### `@finalOperation`
 

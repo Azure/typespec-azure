@@ -242,7 +242,6 @@ model NetworkSecurityPerimeterConfigurationListResult {
 
 /**
  * The name for a network security perimeter configuration
- * @template Segment The resource type name for network security perimeter configuration (default is networkSecurityPerimeterConfigurations)
  */
 @added(Versions.v5)
 model NetworkSecurityPerimeterConfigurationNameParameter {

@@ -50,13 +50,14 @@ public virtual Pageable<User> ListWithPage(CancellationToken cancellationToken =
 ```
 
 ```typescript
-// Modular api layer
+export interface ListWithPageOptionalParams extends OperationOptions {}
+// JS CodeGen api layer
 export function listWithPage(
   context: Client,
   options: ListWithPageOptionalParams = { requestOptions: {} },
 ): PagedAsyncIterableIterator<User>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class TestServiceClient {
   listWithPage(
     options: ListWithPageOptionalParams = { requestOptions: {} },
@@ -121,13 +122,13 @@ public virtual Pageable<User> ListWithPage(CancellationToken cancellationToken =
 ```
 
 ```typescript
-// Modular api layer
+// JS CodeGen api layer
 export function listWithPage(
   context: Client,
   options: ListWithPageOptionalParams = { requestOptions: {} },
 ): PagedAsyncIterableIterator<User>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class TestServiceClient {
   listWithPage(
     options: ListWithPageOptionalParams = { requestOptions: {} },
@@ -198,13 +199,13 @@ def list_with_page(self, **kwargs: Any) -> ItemPaged["_models.User"]:
 ```
 
 ```typescript
-// Modular api layer
+// JS CodeGen api layer
 export function listWithPage(
   context: Client,
   options: ListWithPageOptionalParams = { requestOptions: {} },
 ): PagedAsyncIterableIterator<User>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class TestServiceClient {
   listWithPage(
     options: ListWithPageOptionalParams = { requestOptions: {} },
@@ -258,7 +259,18 @@ def list_with_page(self, **kwargs: Any) -> ItemPaged["_models.User"]:
 ```
 
 ```typescript
-// TODO
+// JS CodeGen api layer
+export function listWithPage(
+  context: Client,
+  options: ListWithPageOptionalParams = { requestOptions: {} },
+): PagedAsyncIterableIterator<User>;
+
+// JS CodeGen classical client layer
+export class TestServiceClient {
+  listWithPage(
+    options: ListWithPageOptionalParams = { requestOptions: {} },
+  ): PagedAsyncIterableIterator<User>;
+}
 ```
 
 ```java
@@ -306,13 +318,13 @@ def list_with_page(self, **kwargs: Any) -> ItemPaged["_models.User"]:
 ```
 
 ```typescript
-// Modular api layer
+// JS CodeGen api layer
 export function listWithPage(
   context: Client,
   options: ListWithPageOptionalParams = { requestOptions: {} },
 ): PagedAsyncIterableIterator<User>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class TestServiceClient {
   listWithPage(
     options: ListWithPageOptionalParams = { requestOptions: {} },
@@ -365,13 +377,13 @@ def list_with_page(self, **kwargs: Any) -> ItemPaged["_models.User"]:
 ```
 
 ```typescript
-// Modular api layer
+// JS CodeGen api layer
 export function listWithPage(
   context: Client,
   options: ListWithPageOptionalParams = { requestOptions: {} },
 ): PagedAsyncIterableIterator<User>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class TestServiceClient {
   listWithPage(
     options: ListWithPageOptionalParams = { requestOptions: {} },

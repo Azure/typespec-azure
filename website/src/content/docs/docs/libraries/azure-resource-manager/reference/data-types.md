@@ -1929,6 +1929,61 @@ model Azure.ResourceManager.CommonTypes.NetworkSecurityProfile
 | diagnosticSettingsVersion? | `int32`                                    | Current diagnostic settings version     |
 | enabledLogCategories?      | `string[]`                                 | List of log categories that are enabled |
 
+### `NspConfigurationNameParameter` {#Azure.ResourceManager.CommonTypes.NspConfigurationNameParameter}
+
+The name parameter for a network security perimeter configuration.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.NspConfigurationNameParameter<KeyName>
+```
+
+#### Template Parameters
+
+| Name    | Description                                                                       |
+| ------- | --------------------------------------------------------------------------------- |
+| KeyName | The name of the network security perimeter configuration resource name parameter. |
+
+#### Properties
+
+| Name                                      | Type     | Description                                             |
+| ----------------------------------------- | -------- | ------------------------------------------------------- |
+| networkSecurityPerimeterConfigurationName | `string` | The name for a network security perimeter configuration |
+
+### `NspConfigurationResource` {#Azure.ResourceManager.CommonTypes.NspConfigurationResource}
+
+Network security perimeter (NSP) configuration resource. Providers must instantiate an instance of this resource in their
+provider namespace to enable NSP capabilities for their resources.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.NspConfigurationResource<KeyName, Description>
+```
+
+#### Template Parameters
+
+| Name        | Description                                                                                                                           |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| KeyName     | Optional. The name of the NSP configuration resource name parameter. By default, this is `networkSecurityPerimeterConfigurationName`. |
+| Description | Optional. The documentary description of the NSP configuration resource name parameter.                                               |
+
+#### Examples
+
+```ts
+namespace Microsoft.Contoso;
+model NspConfiguration is NspConfigurationResource {}
+alias EmployeeConfigOps is NspConfigurations<NspConfiguration>;
+@armResourceOperations
+interface Employees {
+ @doc("get a network security perimeter configuration for resource employee")
+ getNspConfiguration is EmployeeConfigOps.Read<Employee>;
+}
+```
+
+#### Properties
+
+| Name        | Type                                                                                                                                                   | Description |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| properties? | [`NetworkSecurityPerimeterConfigurationProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationProperties) |             |
+
 ### `Operation` {#Azure.ResourceManager.CommonTypes.Operation}
 
 Details of a REST API operation, returned from the Resource Provider Operations API
@@ -1949,7 +2004,7 @@ model Azure.ResourceManager.CommonTypes.Operation
 
 ### `OperationDisplay` {#Azure.ResourceManager.CommonTypes.OperationDisplay}
 
-Localized display information for and operation.
+Localized display information for an operation.
 
 ```typespec
 model Azure.ResourceManager.CommonTypes.OperationDisplay
@@ -3371,6 +3426,24 @@ model Azure.ResourceManager.Foundations.TenantScope<Resource>
 
 ## Azure.ResourceManager.Legacy
 
+### `ArmFeatureOptions` {#Azure.ResourceManager.Legacy.ArmFeatureOptions}
+
+Options for defining a feature and the associated file
+
+```typespec
+model Azure.ResourceManager.Legacy.ArmFeatureOptions
+```
+
+#### Properties
+
+| Name            | Type     | Description                               |
+| --------------- | -------- | ----------------------------------------- |
+| featureName     | `string` | The feature name                          |
+| fileName        | `string` | The associated file name for the features |
+| description     | `string` | The feature description in Swagger        |
+| title?          | `string` | The feature title in Swagger              |
+| termsOfService? | `string` | The feature terms of service in Swagger   |
+
 ### `ArmOperationOptions` {#Azure.ResourceManager.Legacy.ArmOperationOptions}
 
 Route options for an operation
@@ -3385,6 +3458,25 @@ model Azure.ResourceManager.Legacy.ArmOperationOptions
 | --------------- | --------- | -------------------------------------- |
 | useStaticRoute? | `boolean` | Should a static route be used          |
 | route?          | `string`  | The status route for operations to use |
+
+### `CustomAzureResource` {#Azure.ResourceManager.Legacy.CustomAzureResource}
+
+Model representing a custom Azure Resource Manager Resource.
+Use this template with 'is' to create a custom resource.
+
+```typespec
+model Azure.ResourceManager.Legacy.CustomAzureResource<isResource>
+```
+
+#### Template Parameters
+
+| Name       | Description                                                                                                   |
+| ---------- | ------------------------------------------------------------------------------------------------------------- |
+| isResource | Optional. A boolean flag indicating whether the resource should be marked as an Azure resource. Default true. |
+
+#### Properties
+
+None
 
 ### `CustomResourceOptions` {#Azure.ResourceManager.Legacy.CustomResourceOptions}
 

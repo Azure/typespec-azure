@@ -1,5 +1,23 @@
 # Changelog - @azure-tools/typespec-autorest-canonical
 
+## 0.25.0
+
+### Bump dependencies
+
+- [#3677](https://github.com/Azure/typespec-azure/pull/3677) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3622](https://github.com/Azure/typespec-azure/pull/3622) Adapt to shared type changes in typespec-autorest
+
+
+## 0.24.0
+
+### Bump dependencies
+
+- [#3546](https://github.com/Azure/typespec-azure/pull/3546) Upgrade dependencies
+
+
 ## 0.23.0
 
 ### Bump dependencies

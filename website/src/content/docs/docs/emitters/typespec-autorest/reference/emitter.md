@@ -145,12 +145,6 @@ Create read-only property schema for lro status
 
 Determine whether and how to emit x-ms-long-running-operation-options for lro resolution
 
-### `arm-resource-flattening`
-
-**Type:** `boolean`
-
-Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of the ARM resource properties.
-
 ### `emit-common-types-schema`
 
 **Type:** `"never" | "for-visibility-changes"`
@@ -162,3 +156,9 @@ Determine whether and how to emit schemas for common-types rather than referenci
 **Type:** `"xml-service" | "none"`
 
 Strategy for applying XML serialization metadata to schemas.
+
+### `output-splitting`
+
+**Type:** `"legacy-feature-files"`
+
+Determines whether output should be split into multiple files. The only supported option for splitting is "legacy-feature-files", which uses the typespec-azure-resource-manager `@feature` decorators to split into output files based on feature.

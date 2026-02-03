@@ -54,85 +54,116 @@ async function checkExamplesDirExists(host: CompilerHost, dir: string) {
  * Load all examples for a client
  *
  * @param context
- * @param apiVersion
  * @returns a map of all operations' examples, key is operation's operation id,
  * value is a map of examples, key is example's title, value is example's details
  */
 async function loadExamples(
   context: TCGCContext,
-  apiVersion: string | undefined,
 ): Promise<[Map<string, Record<string, LoadedExample>>, readonly Diagnostic[]]> {
   const diagnostics = createDiagnosticCollector();
-  const examplesBaseDir =
-    context.examplesDir ?? resolvePath(context.program.projectRoot, "examples");
 
-  const exampleDir = apiVersion
-    ? resolvePath(examplesBaseDir, apiVersion)
-    : resolvePath(examplesBaseDir);
-  if (!(await checkExamplesDirExists(context.program.host, exampleDir))) {
-    if (context.examplesDir) {
-      diagnostics.add(
-        createDiagnostic({
-          code: "example-loading",
-          messageId: "noDirectory",
-          format: { directory: exampleDir },
-          target: NoTarget,
-        }),
-      );
-    }
-    return diagnostics.wrap(new Map());
-  }
-
-  const map = new Map<string, Record<string, LoadedExample>>();
-  const exampleFiles = await searchExampleJsonFiles(context.program, exampleDir);
-  for (const fileName of exampleFiles) {
-    try {
-      const exampleFile = await context.program.host.readFile(resolvePath(exampleDir, fileName));
-      const example = JSON.parse(exampleFile.text);
-      if (!example.operationId || !example.title) {
+  const apiVersions = context.getPackageVersions();
+  const exampleDirs: string[][] = [];
+  if (apiVersions.size <= 1) {
+    // single service case
+    const apiVersion =
+      apiVersions.size === 1 ? apiVersions.values().next().value?.at(-1) : undefined;
+    const examplesBaseDir = resolvePath(
+      context.program.projectRoot,
+      context.examplesDir ?? "./examples",
+    );
+    const exampleDir = apiVersion
+      ? resolvePath(examplesBaseDir, apiVersion)
+      : resolvePath(examplesBaseDir);
+    if (!(await checkExamplesDirExists(context.program.host, exampleDir))) {
+      if (context.examplesDir) {
         diagnostics.add(
           createDiagnostic({
             code: "example-loading",
-            messageId: "noOperationId",
-            format: { filename: fileName },
+            messageId: "noDirectory",
+            format: { directory: exampleDir },
             target: NoTarget,
           }),
         );
-        continue;
       }
+      return diagnostics.wrap(new Map());
+    }
+    exampleDirs.push([exampleDir, examplesBaseDir]);
+  } else {
+    // multiple services case, we need to load examples from sub service folders
+    for (const [service, versions] of apiVersions) {
+      const apiVersion = versions.length > 0 ? versions[versions.length - 1] : undefined;
+      const examplesBaseDir = resolvePath(
+        context.program.projectRoot,
+        service.name,
+        context.examplesDir ?? "./examples",
+      );
+      const exampleDir = apiVersion
+        ? resolvePath(examplesBaseDir, apiVersion)
+        : resolvePath(examplesBaseDir);
 
-      if (!map.has(example.operationId.toLowerCase())) {
-        map.set(example.operationId.toLowerCase(), {});
+      if (await checkExamplesDirExists(context.program.host, exampleDir)) {
+        exampleDirs.push([exampleDir, examplesBaseDir]);
       }
-      const examples = map.get(example.operationId.toLowerCase())!;
+    }
+  }
 
-      if (example.title in examples) {
+  const map = new Map<string, Record<string, LoadedExample>>();
+  for (const [exampleDir, examplesBaseDir] of exampleDirs) {
+    const exampleFiles = await searchExampleJsonFiles(context.program, exampleDir);
+    for (const fileName of exampleFiles) {
+      try {
+        const exampleFile = await context.program.host.readFile(resolvePath(exampleDir, fileName));
+        const example = JSON.parse(exampleFile.text);
+        if (!example.operationId || !example.title) {
+          diagnostics.add(
+            createDiagnostic({
+              code: "example-loading",
+              messageId: "noOperationId",
+              format: { filename: fileName },
+              target: NoTarget,
+            }),
+          );
+          continue;
+        }
+
+        if (!map.has(example.operationId.toLowerCase())) {
+          map.set(example.operationId.toLowerCase(), {});
+        }
+        const examples = map.get(example.operationId.toLowerCase())!;
+
+        if (example.title in examples) {
+          diagnostics.add(
+            createDiagnostic({
+              code: "duplicate-example-file",
+              target: NoTarget,
+              format: {
+                filename: fileName,
+                operationId: example.operationId,
+                title: example.title,
+              },
+            }),
+          );
+        }
+
+        examples[example.title] = {
+          relativePath: getRelativePathFromDirectory(
+            examplesBaseDir,
+            resolvePath(exampleDir, fileName),
+            false,
+          ),
+          data: example,
+        };
+      } catch (err) {
         diagnostics.add(
           createDiagnostic({
-            code: "duplicate-example-file",
+            code: "example-loading",
+            messageId: "default",
+            format: { filename: fileName, error: err?.toString() ?? "" },
             target: NoTarget,
-            format: {
-              filename: fileName,
-              operationId: example.operationId,
-              title: example.title,
-            },
           }),
         );
       }
-
-      examples[example.title] = {
-        relativePath: apiVersion ? resolvePath(apiVersion, fileName) : fileName,
-        data: example,
-      };
-    } catch (err) {
-      diagnostics.add(
-        createDiagnostic({
-          code: "example-loading",
-          messageId: "default",
-          format: { filename: fileName, error: err?.toString() ?? "" },
-          target: NoTarget,
-        }),
-      );
     }
   }
   return diagnostics.wrap(map);
@@ -171,10 +202,7 @@ export async function handleClientExamples(
 ): Promise<[void, readonly Diagnostic[]]> {
   const diagnostics = createDiagnosticCollector();
 
-  const packageVersions = context.getApiVersions();
-  const examples = diagnostics.pipe(
-    await loadExamples(context, packageVersions[packageVersions.length - 1]),
-  );
+  const examples = diagnostics.pipe(await loadExamples(context));
   const clientQueue = [client];
   while (clientQueue.length > 0) {
     const client = clientQueue.pop()!;

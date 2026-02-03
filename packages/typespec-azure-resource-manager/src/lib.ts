@@ -3,12 +3,6 @@ import { createTypeSpecLibrary, paramMessage } from "@typespec/compiler";
 export const $lib = createTypeSpecLibrary({
   name: "@azure-tools/typespec-azure-resource-manager",
   diagnostics: {
-    "single-arm-provider": {
-      severity: "error",
-      messages: {
-        default: "Only one @armProviderNamespace can be declared in a typespec spec at once.",
-      },
-    },
     "decorator-param-wrong-type": {
       severity: "error",
       messages: {
@@ -129,6 +123,12 @@ export const $lib = createTypeSpecLibrary({
       messages: {
         default:
           "This type is meant for conversion of legacy service APIs.  This type should not be used in new service APIs.",
+      },
+    },
+    "invalid-version-for-common-type": {
+      severity: "warning",
+      messages: {
+        default: paramMessage`The specified common-types version '${"version"}'  is not valid for ${"resourceName"} resources. Please use version ${"requiredVersion"} or later of common-types.`,
       },
     },
   },

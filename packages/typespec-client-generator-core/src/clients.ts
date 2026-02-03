@@ -1,13 +1,6 @@
-import {
-  createDiagnosticCollector,
-  Diagnostic,
-  getDoc,
-  getSummary,
-  listServices,
-} from "@typespec/compiler";
+import { createDiagnosticCollector, Diagnostic, getDoc, getSummary } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { getServers, HttpServer } from "@typespec/http";
-import { getVersionDependencies } from "@typespec/versioning";
 import {
   getClientInitializationOptions,
   getClientNameOverride,
@@ -24,7 +17,6 @@ import {
   SdkEndpointParameter,
   SdkEndpointType,
   SdkHttpOperation,
-  SdkMethodParameter,
   SdkOperationGroup,
   SdkPathParameter,
   SdkServiceOperation,
@@ -34,7 +26,7 @@ import {
 } from "./interfaces.js";
 import {
   createGeneratedName,
-  getAvailableApiVersions,
+  getActualClientType,
   getClientDoc,
   getTypeDecorators,
   getValueTypeValue,
@@ -44,7 +36,7 @@ import {
 import { createDiagnostic } from "./lib.js";
 import { createSdkMethods, getSdkMethodParameter } from "./methods.js";
 import { getCrossLanguageDefinitionId } from "./public-utils.js";
-import { getSdkBuiltInType, getSdkCredentialParameter } from "./types.js";
+import { getSdkBuiltInType, getSdkCredentialParameter, getTypeSpecBuiltInType } from "./types.js";
 
 function getEndpointTypeFromSingleServer<
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
@@ -71,10 +63,11 @@ function getEndpointTypeFromSingleServer<
         optional: false,
         serializedName: "endpoint",
         correspondingMethodParams: [],
+        methodParameterSegments: [],
         type: getSdkBuiltInType(context, $(context.program).builtin.url),
         isApiVersionParam: false,
-        apiVersions: context.getApiVersionsForType(client.__raw.type ?? client.__raw.service),
-        crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, client.__raw.service)}.endpoint`,
+        apiVersions: client.apiVersions,
+        crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.endpoint`,
         decorators: [],
         access: "public",
         flatten: false,
@@ -99,8 +92,8 @@ function getEndpointTypeFromSingleServer<
       if (sdkParam.isApiVersionParam && apiVersionInfo.clientDefaultValue) {
         sdkParam.clientDefaultValue = apiVersionInfo.clientDefaultValue;
       }
-      sdkParam.apiVersions = getAvailableApiVersions(context, param, client.__raw.type);
-      sdkParam.crossLanguageDefinitionId = `${getCrossLanguageDefinitionId(context, client.__raw.service)}.${param.name}`;
+      sdkParam.apiVersions = client.apiVersions;
+      sdkParam.crossLanguageDefinitionId = `${client.crossLanguageDefinitionId}.${param.name}`;
     } else {
       diagnostics.add(
         createDiagnostic({
@@ -140,7 +133,9 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
 ): [SdkEndpointParameter, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   const rawClient = client.__raw;
-  const servers = getServers(context.program, client.__raw.service);
+  // For multiple services, just take the first one to get servers
+  const service = rawClient.services[0];
+  const servers = getServers(context.program, service);
   const types: SdkEndpointType[] = [];
 
   if (servers === undefined) {
@@ -158,10 +153,11 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
       access: "public",
       usage: UsageFlags.None,
       variantTypes: types,
-      name: createGeneratedName(context, rawClient.service, "Endpoint"),
+      name: createGeneratedName(context, service, "Endpoint"),
       isGeneratedName: true,
-      crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, rawClient.service)}.Endpoint`,
-      namespace: getClientNamespace(context, rawClient.service),
+      apiVersions: client.apiVersions,
+      crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.Endpoint`,
+      namespace: getClientNamespace(context, service),
       decorators: [],
     } as SdkUnionType<SdkEndpointType>;
   } else {
@@ -175,10 +171,11 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
     doc: "Service host",
     onClient: true,
     urlEncode: false,
-    apiVersions: context.getApiVersionsForType(rawClient.type ?? rawClient.service),
+    // Endpoint parameter's api versions are derived from the client
+    apiVersions: client.apiVersions,
     optional: false,
     isApiVersionParam: false,
-    crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, rawClient.service)}.endpoint`,
+    crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.endpoint`,
     decorators: [],
     access: "public",
     flatten: false,
@@ -198,14 +195,11 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
       name = override;
     }
   }
-  if (!parent && client.kind === "SdkClient" && client.parent) {
-    const parentRaw = context.__rawClientsOperationGroupsCache?.get(client.parent) as
-      | SdkClient
-      | undefined;
-    parent = context.__clientTypesCache?.find((c) => c.__raw === parentRaw) as
-      | SdkClientType<TServiceOperation>
-      | undefined;
-  }
+  const clientType = getActualClientType(client);
+  // For multi-service operation groups, use the first service for namespace
+  // and cross language definition id. This follows the same pattern as multi-service root clients where
+  // metadata is derived from the first service in the array.
+  const typeForMetadata = Array.isArray(clientType) ? clientType[0] : clientType;
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
@@ -213,24 +207,34 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     doc: client.type ? getClientDoc(context, client.type) : undefined,
     summary: client.type ? getSummary(context.program, client.type) : undefined,
     methods: [],
-    apiVersions: context.getApiVersionsForType(client.type ?? client.service),
-    namespace: getClientNamespace(context, client.type ?? client.service),
+    apiVersions: Array.isArray(clientType) ? [] : context.getApiVersionsForType(clientType),
+    namespace: getClientNamespace(context, typeForMetadata),
     clientInitialization: diagnostics.pipe(
       createSdkClientInitializationType(context, client, parent),
     ),
     decorators: client.type ? diagnostics.pipe(getTypeDecorators(context, client.type)) : [],
     parent,
     // if it is client, the crossLanguageDefinitionId is the ${namespace}, if it is operation group, the crosslanguageDefinitionId is the %{namespace}.%{operationGroupName}
-    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, client.type ?? client.service),
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, typeForMetadata),
   };
-  // NOTE: getSdkMethods recursively calls createSdkClientType
+  // Handle client methods
   sdkClientType.methods = diagnostics.pipe(
     createSdkMethods<TServiceOperation>(context, client, sdkClientType),
   );
+  // Handle sub-clients
+  for (const operationGroup of listOperationGroups(context, client)) {
+    const operationGroupClient = diagnostics.pipe(
+      createSdkClientType<TServiceOperation>(context, operationGroup, sdkClientType),
+    );
+    if (sdkClientType.children) {
+      sdkClientType.children.push(operationGroupClient);
+    } else {
+      sdkClientType.children = [operationGroupClient];
+    }
+  }
+  // Handle default client parameters (endpoint, credential, api version, subscription id)
   addDefaultClientParameters(context, sdkClientType);
-  // update initialization model properties
-  context.__clientTypesCache = context.__clientTypesCache || [];
-  context.__clientTypesCache.push(sdkClientType);
+
   return diagnostics.wrap(sdkClientType);
 }
 
@@ -241,7 +245,7 @@ function addDefaultClientParameters<
   const defaultClientParamters = [];
   // there will always be an endpoint property
   defaultClientParamters.push(diagnostics.pipe(getSdkEndpointParameter(context, client)));
-  const credentialParam = getSdkCredentialParameter(context, client.__raw);
+  const credentialParam = getSdkCredentialParameter(context, client);
   if (credentialParam) {
     defaultClientParamters.push(credentialParam);
   }
@@ -249,66 +253,46 @@ function addDefaultClientParameters<
     .get(client.__raw)
     ?.find((x) => x.isApiVersionParam);
   if (!apiVersionParam) {
-    for (const sc of listOperationGroups(context, client.__raw, true)) {
+    for (const sc of listOperationGroups(context, client.__raw)) {
       // if any sub operation groups have an api version param, the top level needs
       // the api version param as well
       apiVersionParam = context.__clientParametersCache.get(sc)?.find((x) => x.isApiVersionParam);
-      if (apiVersionParam) break;
-    }
-  }
-
-  // Check for multi-service scenario with @useDependency
-  if (!apiVersionParam && client.__raw.kind === "SdkClient") {
-    const services = listServices(context.program);
-    if (services.length > 1 && client.__raw.type?.kind === "Namespace") {
-      // Check if this is a multi-service client with @useDependency
-      const versionDependencies = getVersionDependencies(context.program, client.__raw.type);
-      if (versionDependencies && versionDependencies.size > 0) {
-        // Create an API version parameter for multi-service clients with @useDependency
-        const stringType = context.program.checker.getStdType("string");
-
-        // Create a SdkMethodParameter for the API version
-        const apiVersionMethodParam: SdkMethodParameter = {
-          __raw: undefined,
-          kind: "method",
-          name: "apiVersion",
-          isGeneratedName: false,
-          doc: "The API version to use for the operation",
-          type: getSdkBuiltInType(context, stringType),
-          optional: false,
-          isApiVersionParam: true,
-          onClient: true,
-          apiVersions: context.getApiVersionsForType(client.__raw.type ?? client.__raw.service),
-          clientDefaultValue: undefined,
-          decorators: [],
-          crossLanguageDefinitionId: `${client.crossLanguageDefinitionId}.apiVersion`,
-          access: "public",
-          flatten: false,
-        };
-
-        // Add to cache
-        let clientParams = context.__clientParametersCache.get(client.__raw);
-        if (!clientParams) {
-          clientParams = [];
-          context.__clientParametersCache.set(client.__raw, clientParams);
-        }
-        clientParams.push(apiVersionMethodParam);
-        apiVersionParam = apiVersionMethodParam;
+      if (apiVersionParam) {
+        context.__clientParametersCache.get(client.__raw)?.push(apiVersionParam);
+        break;
       }
     }
   }
-
   if (apiVersionParam) {
-    defaultClientParamters.push(apiVersionParam);
+    if (client.__raw.services.length > 1) {
+      // for multi-service clients, keep apiVersions empty and no default value
+      // and set the type to string instead of a specific enum
+      const multipleServiceApiVersionParam = { ...apiVersionParam };
+      multipleServiceApiVersionParam.apiVersions = [];
+      multipleServiceApiVersionParam.clientDefaultValue = undefined;
+      multipleServiceApiVersionParam.type = getTypeSpecBuiltInType(context, "string");
+      // For multi-service clients, the API version parameter should always be optional
+      multipleServiceApiVersionParam.optional = true;
+      defaultClientParamters.push(multipleServiceApiVersionParam);
+    } else {
+      // For single-service clients, API version parameters are optional only when they have a client default value
+      if (apiVersionParam.clientDefaultValue !== undefined) {
+        apiVersionParam.optional = true;
+      }
+      defaultClientParamters.push(apiVersionParam);
+    }
   }
   let subId = context.__clientParametersCache
     .get(client.__raw)
     ?.find((x) => isSubscriptionId(context, x));
   if (!subId && context.arm) {
-    for (const sc of listOperationGroups(context, client.__raw, true)) {
+    for (const sc of listOperationGroups(context, client.__raw)) {
       // if any sub operation groups have an subId param, the top level needs it as well
       subId = context.__clientParametersCache.get(sc)?.find((x) => isSubscriptionId(context, x));
-      if (subId) break;
+      if (subId) {
+        context.__clientParametersCache.get(client.__raw)?.push(subId);
+        break;
+      }
     }
   }
   if (subId) {
@@ -360,8 +344,9 @@ function createSdkClientInitializationType<
         result.parameters.push(clientParameter);
       }
     }
-    if (initializationOptions?.initializedBy) {
+    if (initializationOptions?.initializedBy !== undefined) {
       if (
+        initializationOptions.initializedBy !== InitializedByFlags.None &&
         client.kind === "SdkClient" &&
         (initializationOptions.initializedBy & InitializedByFlags.Parent) ===
           InitializedByFlags.Parent
@@ -377,6 +362,7 @@ function createSdkClientInitializationType<
           }),
         );
       } else if (
+        initializationOptions.initializedBy !== InitializedByFlags.None &&
         client.kind === "SdkOperationGroup" &&
         initializationOptions.initializedBy === InitializedByFlags.Individually
       ) {
