@@ -409,6 +409,32 @@ it("duplicate operation in interface with all language scopes", async () => {
   ]);
 });
 
+it("duplicate scalar with all language scopes", async () => {
+  const diagnostics = await SimpleTester.diagnose(
+    `
+    @service
+    namespace Contoso.WidgetManager;
+      
+    @clientName("b")
+    scalar a extends string;
+
+    scalar b extends string;
+    `,
+  );
+
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message: 'Client name: "b" is duplicated in language scope: "AllScopes"',
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message:
+        'Client name: "b" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
+    },
+  ]);
+});
+
 it("duplicate interface with all language scopes", async () => {
   const diagnostics = await SimpleTester.diagnose(
     `

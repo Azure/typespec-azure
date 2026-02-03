@@ -1560,9 +1560,6 @@ it("one client from multiple services with models shared across services", async
     )
     @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CombineClient;
-
-    // Rename ServiceB's SharedModel to avoid naming conflict
-    @@clientName(ServiceB.SharedModel, "SharedModelB");
   `,
     ),
   );
@@ -1574,17 +1571,37 @@ it("one client from multiple services with models shared across services", async
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "CombineClient");
 
-  // Both models should exist with different names
+  // Both SharedModel types should exist - one from each service
   const models = sdkPackage.models;
   strictEqual(models.length, 2);
 
-  const sharedModelA = models.find((m) => m.name === "SharedModel");
+  const sharedModelA = models.find((m) => m.namespace === "ServiceA");
   ok(sharedModelA);
-  strictEqual(sharedModelA.namespace, "ServiceA");
+  strictEqual(sharedModelA.name, "SharedModel");
+  strictEqual(sharedModelA.properties.length, 2);
+  const nameProperty = sharedModelA.properties.find((p) => p.name === "name");
+  ok(nameProperty);
+  const descriptionProperty = sharedModelA.properties.find((p) => p.name === "description");
+  ok(descriptionProperty);
 
-  const sharedModelB = models.find((m) => m.name === "SharedModelB");
+  const sharedModelB = models.find((m) => m.namespace === "ServiceB");
   ok(sharedModelB);
-  strictEqual(sharedModelB.namespace, "ServiceB");
+  strictEqual(sharedModelB.name, "SharedModel");
+  strictEqual(sharedModelB.properties.length, 2);
+  const idProperty = sharedModelB.properties.find((p) => p.name === "id");
+  ok(idProperty);
+  const valueProperty = sharedModelB.properties.find((p) => p.name === "value");
+  ok(valueProperty);
+
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+  strictEqual(aiClient.apiVersions.length, 2);
+  deepStrictEqual(aiClient.apiVersions, ["av1", "av2"]);
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+  strictEqual(biClient.apiVersions.length, 2);
+  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
 });
 
 it("error: multiple explicit clients with multiple services", async () => {
