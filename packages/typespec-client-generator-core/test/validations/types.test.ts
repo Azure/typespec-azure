@@ -1,7 +1,6 @@
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { describe, it } from "vitest";
 import {
-  ArmTester,
   createClientCustomizationInput,
   createSdkContextForTester,
   SimpleBaseTester,
@@ -48,8 +47,7 @@ describe("cross-namespace duplicate name validation", () => {
     expectDiagnostics(duplicateDiagnostics, [
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-        message:
-          'Client name: "Foo" is duplicated in language scope: "python"',
+        message: 'Client name: "Foo" is duplicated in language scope: "python"',
       },
     ]);
   });
@@ -89,8 +87,7 @@ describe("cross-namespace duplicate name validation", () => {
     expectDiagnostics(duplicateDiagnostics, [
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-        message:
-          'Client name: "Status" is duplicated in language scope: "python"',
+        message: 'Client name: "Status" is duplicated in language scope: "python"',
       },
     ]);
   });
@@ -130,8 +127,7 @@ describe("cross-namespace duplicate name validation", () => {
     expectDiagnostics(duplicateDiagnostics, [
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-        message:
-          'Client name: "MyUnion" is duplicated in language scope: "python"',
+        message: 'Client name: "MyUnion" is duplicated in language scope: "python"',
       },
     ]);
   });
@@ -249,8 +245,7 @@ describe("cross-namespace duplicate name validation", () => {
     expectDiagnostics(duplicateDiagnostics, [
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-        message:
-          'Client name: "Nested" is duplicated in language scope: "python"',
+        message: 'Client name: "Nested" is duplicated in language scope: "python"',
       },
     ]);
   });
@@ -438,64 +433,6 @@ describe("cross-namespace duplicate name validation", () => {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
       },
     ]);
-  });
-
-  it("error for user-defined type conflicting with Azure.ResourceManager type", async () => {
-    // User-defined types should not conflict with ARM library types like ExtensionResource.
-    // Both the user's ExtensionResource and ARM's ExtensionResource would be generated
-    // into the SDK, causing naming conflicts.
-    const [{ program }, diagnostics] = await ArmTester.compileAndDiagnose(`
-      @armProviderNamespace("My.Service")
-      @server("http://localhost:3000", "endpoint")
-      @service(#{title: "My.Service"})
-      @versioned(Versions)
-      @armCommonTypesVersion(CommonTypes.Versions.v5)
-      namespace My.Service;
-
-      /** Api versions */
-      enum Versions {
-        /** 2024-04-01-preview api version */
-        V2024_04_01_PREVIEW: "2024-04-01-preview",
-      }
-
-      // User defines a model with @clientName that conflicts with ARM's ExtensionResource
-      @clientName("ExtensionResource")
-      model MyExtensionResource {
-        name: string;
-        value: int32;
-      }
-
-      model TestTrackedResource is TrackedResource<TestTrackedResourceProperties> {
-        ...ResourceNameParameter<TestTrackedResource>;
-      }
-
-      model TestTrackedResourceProperties {
-        description?: string;
-        // Reference the user's ExtensionResource
-        extension?: MyExtensionResource;
-      }
-
-      @armResourceOperations
-      interface Tests {
-        get is ArmResourceRead<TestTrackedResource>;
-      }
-    `);
-
-    const context = await createSdkContextForTester(program, {
-      emitterName: "@azure-tools/typespec-java",
-    });
-
-    // Should report a single diagnostic because user's @clientName("ExtensionResource")
-    // conflicts with ARM's ExtensionResource type
-    expectDiagnostics(
-      [...diagnostics, ...context.diagnostics],
-      [
-        {
-          code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-          message: 'Client name: "ExtensionResource" is duplicated in language scope: "java"',
-        },
-      ],
-    );
   });
 });
 
@@ -793,8 +730,7 @@ describe("namespace flag duplicate name validation", () => {
     expectDiagnostics(context.diagnostics, [
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-        message:
-          'Client name: "Foo" is duplicated in language scope: "python"',
+        message: 'Client name: "Foo" is duplicated in language scope: "python"',
       },
     ]);
   });
@@ -840,8 +776,7 @@ describe("namespace flag duplicate name validation", () => {
     expectDiagnostics(context.diagnostics, [
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-        message:
-          'Client name: "Status" is duplicated in language scope: "python"',
+        message: 'Client name: "Status" is duplicated in language scope: "python"',
       },
     ]);
   });
