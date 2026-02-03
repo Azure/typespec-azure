@@ -482,6 +482,20 @@ export const $lib = createTypeSpecLibrary({
         default: "All services must have the same server and auth definitions.",
       },
     },
+    "client-option": {
+      severity: "warning",
+      messages: {
+        default:
+          "@clientOption is experimental and should only be used for temporary workarounds. This usage must be suppressed.",
+      },
+    },
+    "client-option-requires-scope": {
+      severity: "warning",
+      messages: {
+        default:
+          "@clientOption should be applied with a specific language scope since it is highly likely this is language-specific.",
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,

@@ -185,7 +185,7 @@ export interface ClientInitializationOptions {
 
 // Types for TCGC specific type  graph
 
-interface DecoratedType {
+export interface DecoratedType {
   /**
    * Client types sourced from TypeSpec decorated types will have this generic decoratores list.
    * Only decorators in allowed list will be included in this list.
