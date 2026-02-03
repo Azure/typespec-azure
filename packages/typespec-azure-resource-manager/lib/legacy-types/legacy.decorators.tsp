@@ -97,4 +97,4 @@ extern dec featureOptions(target: EnumMember, options: valueof ArmFeatureOptions
  * @param target The target to associate the feature with
  * @param featureName The feature to associate with the target
  */
-extern dec feature(target: Model | Interface | Namespace, featureName: EnumMember);
+extern dec feature(target: Model | Operation | Interface | Namespace, featureName: EnumMember);

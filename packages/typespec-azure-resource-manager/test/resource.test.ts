@@ -1480,4 +1480,31 @@ describe("multiple services", () => {
     expect(ResB.name).toEqual("ResB");
     expect(ResB.armProviderNamespace).toEqual("Microsoft.ServiceB");
   });
+
+  it("respect the specified provider name", async () => {
+    const { program } = await Tester.compile(`
+    @armProviderNamespace("Provider.A")
+    namespace Microsoft.ServiceA {
+      model ResA is TrackedResource<{}> {
+        @key @segment("foos") @path name: string;
+      }
+    }
+
+    @armProviderNamespace("Provider.B")
+    namespace Microsoft.ServiceB {
+      model ResB is TrackedResource<{}> {
+        @key @segment("foos") @path name: string;
+      }
+    }
+  `);
+
+    const resources = getArmResources(program);
+    expect(resources).toHaveLength(2);
+
+    const [ResA, ResB] = resources;
+    expect(ResA.name).toEqual("ResA");
+    expect(ResA.armProviderNamespace).toEqual("Provider.A");
+    expect(ResB.name).toEqual("ResB");
+    expect(ResB.armProviderNamespace).toEqual("Provider.B");
+  });
 });

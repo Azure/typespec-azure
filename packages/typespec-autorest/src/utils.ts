@@ -34,6 +34,7 @@ export function getClientName(context: AutorestEmitterContext, type: Type & { na
   const clientName = getClientNameOverride(context.tcgcSdkContext, type);
   return clientName ?? type.name;
 }
+
 /**
  * Determines whether a type will be inlined in OpenAPI rather than defined
  * as a schema and referenced.
@@ -51,11 +52,11 @@ export function shouldInline(program: Program, type: Type): boolean {
   }
   switch (type.kind) {
     case "Model":
+    case "Union":
       return !type.name || isTemplateInstance(type);
     case "Scalar":
       return program.checker.isStdType(type) || isTemplateInstance(type);
     case "Enum":
-    case "Union":
       return !type.name;
     default:
       return true;

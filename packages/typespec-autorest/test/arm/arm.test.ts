@@ -586,13 +586,16 @@ it("can split resources and operations by feature", async () => {
   );
 });
 it("can represent type references within and between features", async () => {
-  const { featureA, featureB, common } = await CompileOpenApiWithFeatures(
+  const { featureA, featureB, shared } = await CompileOpenApiWithFeatures(
     `
 
 @Azure.ResourceManager.Legacy.features(Features)
 @armProviderNamespace("Microsoft.Test")
 namespace Microsoft.Test;
 enum Features {
+  /** Common */
+  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "Common", fileName: "shared", description: "The data for common features"})
+  Common: "Common",
   /** Feature A */
   @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureA", fileName: "featureA", description: "The data for feature A"})
   FeatureA: "Feature A",
@@ -631,14 +634,15 @@ enum Features {
       @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
       @armResourceOperations
       interface Bars extends Azure.ResourceManager.TrackedResourceOperations<BarResource, BarResourceProperties> {}
+      @@Azure.ResourceManager.Legacy.feature(Bars.get, Features.FeatureA);
       `,
-    ["featureA", "featureB", "common"],
+    ["featureA", "featureB", "shared"],
     { preset: "azure" },
   );
 
   const aFile = featureA as any;
   const bFile = featureB as any;
-  const commonFile = common as any;
+  const commonFile = shared as any;
 
   expect(aFile.definitions).toBeDefined();
   expect(aFile.definitions["FooResource"]).toBeDefined();
@@ -647,11 +651,17 @@ enum Features {
   );
   expect(aFile.definitions["FooResourceProperties"]).toBeDefined();
   expect(aFile.definitions["FooResourceProperties"].properties["password"].$ref).toBe(
-    "./common.json/definitions/secretString",
+    "./shared.json#/definitions/secretString",
   );
   expect(aFile.definitions["FooResourceListResult"]).toBeDefined();
   expect(aFile.definitions["FooResourceUpdate"]).toBeDefined();
   expect(aFile.definitions["FooResourceUpdateProperties"]).toBeDefined();
+
+  expect(
+    aFile.paths[
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/barResources/{barResourceName}"
+    ].get,
+  ).toBeDefined();
 
   expect(bFile.definitions).toBeDefined();
   expect(bFile.definitions["BarResource"]).toBeDefined();
@@ -660,10 +670,10 @@ enum Features {
   );
   expect(bFile.definitions["BarResourceProperties"]).toBeDefined();
   expect(bFile.definitions["BarResourceProperties"].properties["password"].$ref).toBe(
-    "./common.json/definitions/secretString",
+    "./shared.json#/definitions/secretString",
   );
   expect(bFile.definitions["BarResourceProperties"].properties["provisioningState"].$ref).toBe(
-    "./common.json/definitions/Azure.ResourceManager.ResourceProvisioningState",
+    "./shared.json#/definitions/Azure.ResourceManager.ResourceProvisioningState",
   );
   expect(bFile.definitions["BarResourceListResult"]).toBeDefined();
   expect(bFile.definitions["BarResourceUpdate"]).toBeDefined();

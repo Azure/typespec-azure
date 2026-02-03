@@ -524,6 +524,11 @@ extern dec useSystemTextJsonConverter(target: Model, scope?: valueof string);
  */
 enum InitializedBy {
   /**
+   * The client initialization should be omitted and hand-written.
+   */
+  none: 0,
+
+  /**
    * The client could be initialized individually.
    */
   individually: 1,
