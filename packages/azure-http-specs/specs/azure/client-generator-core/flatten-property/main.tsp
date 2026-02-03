@@ -144,7 +144,9 @@ model FlattenUnknownModel {
   ```
   """)
 @put
-op putFlattenUnknownModel(@body input: FlattenUnknownModel): FlattenUnknownModel;
+op putFlattenUnknownModel(
+  @body input: FlattenUnknownModel,
+): FlattenUnknownModel;
 
 @doc("This is the model with all read-only properties to be flattened.")
 model SolutionProperties {
@@ -178,21 +180,17 @@ model Solution {
   Expected input body:
   ```json
   {
-    "name": "foo",
-    "properties": {},
-    "propertiesOptional": {}
+    "name": "foo"
   }
   ```
   
   Expected response body:
   ```json
   {
-    "name": "test",
-    "properties": {
-      "solutionId": "solution1",
-      "title": "Solution Title",
-      "content": "Solution Content"
-    }
+    "name": "foo",
+    "solutionId": "solution1",
+    "title": "Solution Title",
+    "content": "Solution Content"
   }
   ```
   """)

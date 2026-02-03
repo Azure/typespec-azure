@@ -82,17 +82,13 @@ Scenarios.Azure_ClientGenerator_Core_FlattenProperty_putFlattenReadOnlyModel = p
   createMockApiDefinitions(
     "flattenReadOnlyModel",
     {
-      name: "foo",
-      properties: {},
-      propertiesOptional: {},
+      name: "foo"
     },
     {
-      name: "test",
-      properties: {
-        solutionId: "solution1",
-        title: "Solution Title",
-        content: "Solution Content",
-      },
+      name: "foo",
+      solutionId: "solution1",
+      title: "Solution Title",
+      content: "Solution Content",
     },
   ),
 );
