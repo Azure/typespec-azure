@@ -23,12 +23,14 @@ describe("cross-namespace duplicate name validation", () => {
         namespace ServiceA {
           enum VersionsA { v1 }
           model Foo { a: string; }
+          @route("/a") op getA(): Foo;
         }
         @service
         @versioned(VersionsB)
         namespace ServiceB {
           enum VersionsB { v1 }
           model Foo { b: string; }
+          @route("/b") op getB(): Foo;
         }
         `,
         `
@@ -40,7 +42,6 @@ describe("cross-namespace duplicate name validation", () => {
     );
 
     const context = await createSdkContextForTester(program, { namespace: "CombineClient" });
-    // Filter to get only the cross-namespace duplicate diagnostics
     const duplicateDiagnostics = context.diagnostics.filter(
       (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
     );
@@ -48,12 +49,7 @@ describe("cross-namespace duplicate name validation", () => {
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
-          'Client name: "Foo" is defined somewhere causing naming conflicts in language scope: "python"',
-      },
-      {
-        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-        message:
-          'Client name: "Foo" is defined somewhere causing naming conflicts in language scope: "python"',
+          'Client name: "Foo" is duplicated in language scope: "python"',
       },
     ]);
   });
@@ -68,12 +64,14 @@ describe("cross-namespace duplicate name validation", () => {
         namespace ServiceA {
           enum VersionsA { v1 }
           enum Status { Active, Inactive }
+          @route("/a") op getA(@query status: Status): void;
         }
         @service
         @versioned(VersionsB)
         namespace ServiceB {
           enum VersionsB { v1 }
           enum Status { Pending, Complete }
+          @route("/b") op getB(@query status: Status): void;
         }
         `,
         `
@@ -92,12 +90,7 @@ describe("cross-namespace duplicate name validation", () => {
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
-          'Client name: "Status" is defined somewhere causing naming conflicts in language scope: "python"',
-      },
-      {
-        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-        message:
-          'Client name: "Status" is defined somewhere causing naming conflicts in language scope: "python"',
+          'Client name: "Status" is duplicated in language scope: "python"',
       },
     ]);
   });
@@ -112,12 +105,14 @@ describe("cross-namespace duplicate name validation", () => {
         namespace ServiceA {
           enum VersionsA { v1 }
           union MyUnion { string, int32 }
+          @route("/a") op getA(@query value: MyUnion): void;
         }
         @service
         @versioned(VersionsB)
         namespace ServiceB {
           enum VersionsB { v1 }
           union MyUnion { boolean, float32 }
+          @route("/b") op getB(@query value: MyUnion): void;
         }
         `,
         `
@@ -136,12 +131,7 @@ describe("cross-namespace duplicate name validation", () => {
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
-          'Client name: "MyUnion" is defined somewhere causing naming conflicts in language scope: "python"',
-      },
-      {
-        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-        message:
-          'Client name: "MyUnion" is defined somewhere causing naming conflicts in language scope: "python"',
+          'Client name: "MyUnion" is duplicated in language scope: "python"',
       },
     ]);
   });
@@ -189,6 +179,7 @@ describe("cross-namespace duplicate name validation", () => {
           enum VersionsA { v1 }
           @clientName("SharedName")
           model ModelA { a: string; }
+          @route("/a") op getA(): ModelA;
         }
         @service
         @versioned(VersionsB)
@@ -196,6 +187,7 @@ describe("cross-namespace duplicate name validation", () => {
           enum VersionsB { v1 }
           @clientName("SharedName")
           model ModelB { b: string; }
+          @route("/b") op getB(): ModelB;
         }
         `,
         `
@@ -211,10 +203,6 @@ describe("cross-namespace duplicate name validation", () => {
       (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
     );
     expectDiagnostics(duplicateDiagnostics, [
-      {
-        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-        message: 'Client name: "SharedName" is duplicated in language scope: "python"',
-      },
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message: 'Client name: "SharedName" is duplicated in language scope: "python"',
@@ -234,6 +222,7 @@ describe("cross-namespace duplicate name validation", () => {
           namespace Sub {
             model Nested { a: string; }
           }
+          @route("/a") op getA(): Sub.Nested;
         }
         @service
         @versioned(VersionsB)
@@ -242,6 +231,7 @@ describe("cross-namespace duplicate name validation", () => {
           namespace Sub {
             model Nested { b: string; }
           }
+          @route("/b") op getB(): Sub.Nested;
         }
         `,
         `
@@ -260,12 +250,7 @@ describe("cross-namespace duplicate name validation", () => {
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
-          'Client name: "Nested" is defined somewhere causing naming conflicts in language scope: "python"',
-      },
-      {
-        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-        message:
-          'Client name: "Nested" is defined somewhere causing naming conflicts in language scope: "python"',
+          'Client name: "Nested" is duplicated in language scope: "python"',
       },
     ]);
   });
@@ -596,9 +581,9 @@ it("duplicate operation with @clientLocation to existed clients", async () => {
   ]);
 });
 
-it("duplicate operation with @clientLocation string to existing namespace", async () => {
-  // When using a string that matches an existing namespace name,
-  // the operation should be moved to that namespace for validation
+it("no duplicate operation with @clientLocation string to existing namespace name", async () => {
+  // String targets always create new clients, they don't resolve to existing namespaces.
+  // So there is no conflict between the moved operation and existing operations.
   const diagnostics = await SimpleTester.diagnose(
     `
     @service
@@ -621,17 +606,7 @@ it("duplicate operation with @clientLocation string to existing namespace", asyn
     `,
   );
 
-  expectDiagnostics(diagnostics, [
-    {
-      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-      message: 'Client name: "a" is duplicated in language scope: "AllScopes"',
-    },
-    {
-      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-      message:
-        'Client name: "a" is defined somewhere causing naming conflicts in language scope: "AllScopes"',
-    },
-  ]);
+  expectDiagnosticEmpty(diagnostics);
 });
 
 it("no duplicate operation with @clientLocation string to existing namespace", async () => {
@@ -800,9 +775,11 @@ describe("namespace flag duplicate name validation", () => {
       namespace MyService {
         namespace SubA {
           model Foo { a: string; }
+          @route("/a") op getA(): Foo;
         }
         namespace SubB {
           model Foo { b: string; }
+          @route("/b") op getB(): Foo;
         }
       }
     `);
@@ -817,12 +794,7 @@ describe("namespace flag duplicate name validation", () => {
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
-          'Client name: "Foo" is defined somewhere causing naming conflicts in language scope: "python"',
-      },
-      {
-        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-        message:
-          'Client name: "Foo" is defined somewhere causing naming conflicts in language scope: "python"',
+          'Client name: "Foo" is duplicated in language scope: "python"',
       },
     ]);
   });
@@ -851,9 +823,11 @@ describe("namespace flag duplicate name validation", () => {
       namespace MyService {
         namespace SubA {
           enum Status { Active }
+          @route("/a") op getA(@query status: Status): void;
         }
         namespace SubB {
           enum Status { Pending }
+          @route("/b") op getB(@query status: Status): void;
         }
       }
     `);
@@ -867,12 +841,7 @@ describe("namespace flag duplicate name validation", () => {
       {
         code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
         message:
-          'Client name: "Status" is defined somewhere causing naming conflicts in language scope: "python"',
-      },
-      {
-        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
-        message:
-          'Client name: "Status" is defined somewhere causing naming conflicts in language scope: "python"',
+          'Client name: "Status" is duplicated in language scope: "python"',
       },
     ]);
   });

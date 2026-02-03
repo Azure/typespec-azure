@@ -37,6 +37,7 @@ import {
   SdkServiceResponseHeader,
   SdkUnionType,
   TCGCContext,
+  UsageFlags,
 } from "./interfaces.js";
 import {
   BrandedSdkEmitterOptionsInterface,
@@ -45,8 +46,8 @@ import {
   TCGCEmitterOptions,
   TspLiteralType,
 } from "./internal-utils.js";
+import { createDiagnostic } from "./lib.js";
 import { createSdkPackage } from "./package.js";
-import { validateCrossNamespaceNames } from "./validations/types.js";
 
 interface CreateTCGCContextOptions {
   mutateNamespace?: boolean; // whether to mutate global namespace for versioning
@@ -214,15 +215,93 @@ export async function createSdkContext<
   for (const client of sdkContext.sdkPackage.clients) {
     diagnostics.pipe(await handleClientExamples(sdkContext, client));
   }
-  // Validate cross-namespace type name collisions (namespace flag + Azure library conflicts)
-  validateCrossNamespaceNames(sdkContext, diagnostics);
+  // Validate cross-namespace type name collisions (including Azure library conflicts)
 
-  sdkContext.diagnostics = sdkContext.diagnostics.concat(diagnostics.diagnostics);
+  const azureLibraryNames = collectAzureLibraryTypeNames(context.program);
+  diagnostics.pipe(validateNamesAcrossNamespaces(sdkContext, "models", azureLibraryNames?.models));
+  diagnostics.pipe(validateNamesAcrossNamespaces(sdkContext, "enums", azureLibraryNames?.enums));
+  diagnostics.pipe(validateNamesAcrossNamespaces(sdkContext, "unions", azureLibraryNames?.unions));
+  sdkContext.diagnostics = [...sdkContext.diagnostics, ...diagnostics.diagnostics];
 
   if (options?.exportTCGCoutput) {
     await exportTCGCOutput(sdkContext);
   }
   return sdkContext;
+}
+
+function validateNamesAcrossNamespaces(
+  context: SdkContext,
+  group: "models" | "enums" | "unions",
+  azureLibraryNames?: Set<string>,
+) {
+  const diagnostics = createDiagnosticCollector();
+  // Pre-seed with Azure library type names so user types that conflict are flagged
+  const seenNames = new Set<string>(azureLibraryNames ? Array.from(azureLibraryNames) : []);
+
+  let items: (SdkModelType | SdkEnumType | SdkUnionType)[] = [];
+  switch (group) {
+    case "models":
+      items = context.sdkPackage.models;
+      break;
+    case "enums":
+      items = context.sdkPackage.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0);
+      break;
+    case "unions":
+      items = context.sdkPackage.unions.filter((u): u is SdkUnionType => u.kind === "union");
+      break;
+  }
+
+  for (const item of items) {
+    if (seenNames.has(item.name)) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "duplicate-client-name",
+          format: { name: item.name, scope: context.emitterName },
+          target: item.__raw!,
+        }),
+      );
+    } else {
+      seenNames.add(item.name);
+    }
+  }
+  return diagnostics.wrap(undefined);
+}
+
+function collectAzureLibraryTypeNames(program: Program):
+  | {
+      models: Set<string>;
+      enums: Set<string>;
+      unions: Set<string>;
+    }
+  | undefined {
+  const names = {
+    models: new Set<string>(),
+    enums: new Set<string>(),
+    unions: new Set<string>(),
+  };
+  const globalNs = program.getGlobalNamespaceType();
+  const azureNs = globalNs.namespaces.get("Azure");
+  if (!azureNs) return undefined;
+
+  for (const nsName of ["Core", "ResourceManager"]) {
+    const ns = azureNs.namespaces.get(nsName);
+    if (ns) collectNamesRecursive(ns, names);
+  }
+  return names;
+}
+
+function collectNamesRecursive(
+  ns: Namespace,
+  names: {
+    models: Set<string>;
+    enums: Set<string>;
+    unions: Set<string>;
+  },
+) {
+  for (const m of ns.models.values()) if (m.name) names.models.add(m.name);
+  for (const e of ns.enums.values()) if (e.name) names.enums.add(e.name);
+  for (const u of ns.unions.values()) if (u.name) names.unions.add(u.name);
+  for (const child of ns.namespaces.values()) collectNamesRecursive(child, names);
 }
 
 async function exportTCGCOutput(context: SdkContext) {
