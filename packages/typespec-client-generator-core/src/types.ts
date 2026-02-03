@@ -31,7 +31,9 @@ import {
 } from "@typespec/compiler";
 import {
   Authentication,
+  HttpOperationFileBody,
   HttpOperationMultipartBody,
+  HttpPayloadBody,
   Visibility,
   getAuthentication,
   getServers,
@@ -1652,7 +1654,7 @@ function updateTypesFromOperation(
       }
 
       // add serialization options to model type
-      updateSerializationOptions(context, sdkType, httpBody.contentTypes);
+      updateSerializationOptions(context, sdkType, httpBody.contentTypes, undefined, httpBody);
 
       // after completion of usage calculation for httpBody, check whether it has
       // conflicting usage between multipart and regular body
@@ -1714,7 +1716,13 @@ function updateTypesFromOperation(
           }
 
           // add serialization options to model type
-          updateSerializationOptions(context, sdkType, innerResponse.body.contentTypes);
+          updateSerializationOptions(
+            context,
+            sdkType,
+            innerResponse.body.contentTypes,
+            undefined,
+            innerResponse.body,
+          );
         }
         const access = getAccessOverride(context, operation) ?? "public";
         diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
@@ -2050,6 +2058,7 @@ function updateSerializationOptions(
   type: SdkType,
   contentTypes: string[],
   options?: PropagationOptions,
+  httpBody?: HttpPayloadBody,
 ) {
   options = options ?? {};
   options.seenTypes = options.seenTypes ?? new Set<SdkType>();
@@ -2080,6 +2089,18 @@ function updateSerializationOptions(
   if (type.kind === "nullable") {
     updateSerializationOptions(context, type.type, contentTypes, options);
     return;
+  }
+
+  // Handle file body serialization - if it's a file, set binary options and skip json/xml
+  if (httpBody?.bodyKind === "file") {
+    const fileBody = httpBody as HttpOperationFileBody;
+    type.serializationOptions.binary = {
+      isFile: true,
+      isText: fileBody.isText,
+      contentTypes: fileBody.contentTypes,
+      filename: fileBody.filename,
+    };
+    return; // No need to add json/xml serialization for file types
   }
 
   setSerializationOptions(context, type, contentTypes);
