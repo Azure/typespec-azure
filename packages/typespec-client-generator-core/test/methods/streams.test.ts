@@ -2,6 +2,7 @@ import { resolvePath } from "@typespec/compiler";
 import { createTester } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
+import { UsageFlags } from "../../src/interfaces.js";
 import { createSdkContextForTester } from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
@@ -73,6 +74,11 @@ describe("stream request", () => {
     strictEqual(bodyMeta.streamType.kind, "model");
     strictEqual(bodyMeta.streamType.name, "Thing");
     deepStrictEqual(bodyMeta.contentTypes, ["application/jsonl"]);
+
+    // streamType has Input + Json usage and appears in sdkPackage.models
+    strictEqual(bodyMeta.streamType.usage, UsageFlags.Input | UsageFlags.Json);
+    const thingModel = sdkPackage.models.find((m) => m.name === "Thing");
+    ok(thingModel);
   });
 
   it("json stream request", async () => {
@@ -101,6 +107,10 @@ describe("stream request", () => {
     strictEqual(bodyMeta.streamType.kind, "model");
     strictEqual(bodyMeta.streamType.name, "Thing");
     deepStrictEqual(bodyMeta.contentTypes, ["application/jsonl"]);
+
+    // streamType has Input + Json usage and appears in sdkPackage.models
+    strictEqual(bodyMeta.streamType.usage, UsageFlags.Input | UsageFlags.Json);
+    ok(sdkPackage.models.find((m) => m.name === "Thing"));
   });
 
   it("custom stream request", async () => {
@@ -135,6 +145,10 @@ describe("stream request", () => {
     strictEqual(bodyMeta.streamType.kind, "model");
     strictEqual(bodyMeta.streamType.name, "Thing");
     deepStrictEqual(bodyMeta.contentTypes, ["custom/built-here"]);
+
+    // streamType has Input usage (no Json since custom content type) and appears in sdkPackage.models
+    strictEqual(bodyMeta.streamType.usage, UsageFlags.Input);
+    ok(sdkPackage.models.find((m) => m.name === "Thing"));
   });
 
   it("spread stream request", async () => {
@@ -162,6 +176,10 @@ describe("stream request", () => {
     strictEqual(bodyMeta.streamType.kind, "model");
     strictEqual(bodyMeta.streamType.name, "Thing");
     deepStrictEqual(bodyMeta.contentTypes, ["application/jsonl"]);
+
+    // streamType has Input + Json usage and appears in sdkPackage.models
+    strictEqual(bodyMeta.streamType.usage, UsageFlags.Input | UsageFlags.Json);
+    ok(sdkPackage.models.find((m) => m.name === "Thing"));
   });
 
   it("sse request", async () => {
@@ -214,6 +232,9 @@ describe("stream request", () => {
     strictEqual(bodyMeta.streamType.kind, "union");
     strictEqual(bodyMeta.streamType.name, "ChannelEvents");
     deepStrictEqual(bodyMeta.contentTypes, ["text/event-stream"]);
+
+    // streamType union has Input usage (no Json since SSE uses text/event-stream)
+    strictEqual(bodyMeta.streamType.usage, UsageFlags.Input);
   });
 });
 
@@ -252,6 +273,10 @@ describe("stream response", () => {
     strictEqual(methodMeta.streamType.kind, "model");
     strictEqual(methodMeta.streamType.name, "Thing");
     deepStrictEqual(methodMeta.contentTypes, ["application/jsonl"]);
+
+    // streamType has Output + Json usage and appears in sdkPackage.models
+    strictEqual(responseMeta.streamType.usage, UsageFlags.Output | UsageFlags.Json);
+    ok(sdkPackage.models.find((m) => m.name === "Thing"));
   });
 
   it("json stream response", async () => {
@@ -287,6 +312,10 @@ describe("stream response", () => {
     ok(methodMeta);
     strictEqual(methodMeta.streamType.kind, "model");
     deepStrictEqual(methodMeta.contentTypes, ["application/jsonl"]);
+
+    // streamType has Output + Json usage and appears in sdkPackage.models
+    strictEqual(responseMeta.streamType.usage, UsageFlags.Output | UsageFlags.Json);
+    ok(sdkPackage.models.find((m) => m.name === "Thing"));
   });
 
   it("custom stream response", async () => {
@@ -328,6 +357,10 @@ describe("stream response", () => {
     ok(methodMeta);
     strictEqual(methodMeta.streamType.kind, "model");
     deepStrictEqual(methodMeta.contentTypes, ["custom/built-here"]);
+
+    // streamType has Output usage (no Json since custom content type) and appears in sdkPackage.models
+    strictEqual(responseMeta.streamType.usage, UsageFlags.Output);
+    ok(sdkPackage.models.find((m) => m.name === "Thing"));
   });
 
   it("intersection stream response", async () => {
@@ -363,6 +396,10 @@ describe("stream response", () => {
     ok(methodMeta);
     strictEqual(methodMeta.streamType.kind, "model");
     deepStrictEqual(methodMeta.contentTypes, ["application/jsonl"]);
+
+    // streamType has Output + Json usage and appears in sdkPackage.models
+    strictEqual(responseMeta.streamType.usage, UsageFlags.Output | UsageFlags.Json);
+    ok(sdkPackage.models.find((m) => m.name === "Thing"));
   });
 
   it("sse response", async () => {
@@ -423,5 +460,8 @@ describe("stream response", () => {
     strictEqual(methodMeta.streamType.kind, "union");
     strictEqual(methodMeta.streamType.name, "ChannelEvents");
     deepStrictEqual(methodMeta.contentTypes, ["text/event-stream"]);
+
+    // streamType union has Output usage (no Json since SSE uses text/event-stream)
+    strictEqual(responseMeta.streamType.usage, UsageFlags.Output);
   });
 });
