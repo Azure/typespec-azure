@@ -199,7 +199,7 @@ export function getScopedDecoratorData(
  */
 function parseScopeString(scope: string): [string[], string[]] {
   // handle !(scope1, scope2,...) syntax
-  const negationScopeRegex = new RegExp(/!\((.*?)\)/);
+  const negationScopeRegex = /!\((.*?)\)/;
   const negationScopeMatch = scope.match(negationScopeRegex);
   if (negationScopeMatch) {
     return [negationScopeMatch[1].split(",").map((s) => s.trim()), []];
@@ -236,6 +236,11 @@ function isScopeApplicable(scopeArg: string, emitterName: string): boolean {
     if (positiveScopes.includes(emitterName)) {
       return true;
     }
+    // If positive scopes specified but emitter doesn't match any, and no negation scopes
+    // then the decorator doesn't apply to this emitter
+    if (negationScopes.length === 0) {
+      return false;
+    }
   }
 
   // If there are negation scopes
@@ -248,9 +253,8 @@ function isScopeApplicable(scopeArg: string, emitterName: string): boolean {
     return true;
   }
 
-  // No negation scopes and emitter doesn't match any positive scope
-  // This means it's a positive-only scope list and emitter is not in it
-  return positiveScopes.length === 0 || positiveScopes.includes(emitterName);
+  // No scopes specified at all (empty string edge case)
+  return true;
 }
 
 /**
