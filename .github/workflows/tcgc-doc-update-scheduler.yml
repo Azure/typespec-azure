@@ -1,0 +1,65 @@
+name: TCGC Documentation Update Scheduler
+
+# This workflow triggers GitHub Copilot coding agent via CLI to maintain TCGC documentation
+
+on:
+  schedule:
+    # Run weekly on Monday at 9:00 AM UTC
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+    inputs:
+      focus_area:
+        description: "Documentation area to focus on"
+        required: false
+        default: "all"
+        type: choice
+        options:
+          - all
+          - user-docs
+          - emitter-docs
+          - design-docs
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  trigger-copilot-agent:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build task prompt
+        id: build-prompt
+        run: |
+          FOCUS_AREA="${{ github.event.inputs.focus_area || 'all' }}"
+          DATE=$(date +%Y-%m-%d)
+
+          PROMPT="Update TCGC documentation. Focus area: $FOCUS_AREA"
+
+          echo "prompt=$PROMPT" >> $GITHUB_OUTPUT
+
+      - name: Trigger Copilot coding agent
+        run: |
+          gh agent-task create "${{ steps.build-prompt.outputs.prompt }}" \
+            --repo ${{ github.repository }} \
+            --base main \
+            --agent .github/agents/tcgc-doc-updater.agent.md \
+            --model claude-opus-4-5
+
+      - name: Summary
+        run: |
+          echo "## TCGC Documentation Update Task Started" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "GitHub Copilot coding agent has been triggered to maintain TCGC documentation." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Focus Area:** ${{ github.event.inputs.focus_area || 'all' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Model:** Claude Opus 4.5" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Custom Agent:** .github/agents/tcgc-doc-updater.agent.md" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Check the [agents panel](https://github.com/copilot/agents) for progress." >> $GITHUB_STEP_SUMMARY
