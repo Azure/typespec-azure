@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.64.6
+
+### Bug Fixes
+
+- [#3890](https://github.com/Azure/typespec-azure/pull/3890) Fix regression with @clientOption negation scope handling. Decorators using negation scope patterns like '!python' or '!(java, python)' are now correctly filtered.
+- [#3890](https://github.com/Azure/typespec-azure/pull/3890) Add `@clientOption` flag for experimental, language-specific flags
+
+
 ## 0.64.5
 
 ### Bug Fixes
