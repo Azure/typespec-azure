@@ -500,4 +500,140 @@ describe("@clientOption with getClientOptions getter", () => {
 
     strictEqual(getClientOptions(sdkModel, "nonExistentOption"), undefined);
   });
+
+  it("should include decorator for emitter not in negation scope using !language syntax", async () => {
+    const { program } = await SimpleTesterWithBuiltInService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("flag", true, "!python")
+      @test
+      model Test {
+        id: string;
+      }
+
+      op getTest(): Test;
+    `);
+
+    // Configure with java emitter - should include the decorator since java is not negated
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+
+    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
+    ok(sdkModel, "SDK model should exist");
+
+    strictEqual(getClientOptions(sdkModel, "flag"), true);
+  });
+
+  it("should exclude decorator for emitter in negation scope using !language syntax", async () => {
+    const { program } = await SimpleTesterWithBuiltInService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("flag", true, "!python")
+      @test
+      model Test {
+        id: string;
+      }
+
+      op getTest(): Test;
+    `);
+
+    // Configure with python emitter - should NOT include the decorator since python is negated
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+
+    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
+    ok(sdkModel, "SDK model should exist");
+
+    strictEqual(getClientOptions(sdkModel, "flag"), undefined);
+  });
+
+  it("should include decorator for emitter not in grouped negation scope using !(lang1, lang2) syntax", async () => {
+    const { program } = await SimpleTesterWithBuiltInService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("flag", "value", "!(python, java)")
+      @test
+      model Test {
+        id: string;
+      }
+
+      op getTest(): Test;
+    `);
+
+    // Configure with csharp emitter - should include since csharp is not negated
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+
+    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
+    ok(sdkModel, "SDK model should exist");
+
+    strictEqual(getClientOptions(sdkModel, "flag"), "value");
+  });
+
+  it("should exclude decorator for emitter in grouped negation scope using !(lang1, lang2) syntax", async () => {
+    const { program } = await SimpleTesterWithBuiltInService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("flag", "value", "!(python, java)")
+      @test
+      model Test {
+        id: string;
+      }
+
+      op getTest(): Test;
+    `);
+
+    // Configure with python emitter - should NOT include since python is negated
+    const context = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-python",
+    });
+
+    const sdkModel = context.sdkPackage.models.find((m) => m.name === "Test");
+    ok(sdkModel, "SDK model should exist");
+
+    strictEqual(getClientOptions(sdkModel, "flag"), undefined);
+  });
+
+  it("should handle multiple negation scopes using !lang1, !lang2 syntax", async () => {
+    const { program } = await SimpleTesterWithBuiltInService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("flag", 42, "!python, !java")
+      @test
+      model Test {
+        id: string;
+      }
+
+      op getTest(): Test;
+    `);
+
+    // Configure with csharp emitter - should include since csharp is not negated
+    const contextCsharp = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-csharp",
+    });
+
+    const sdkModelCsharp = contextCsharp.sdkPackage.models.find((m) => m.name === "Test");
+    ok(sdkModelCsharp, "SDK model should exist");
+    strictEqual(getClientOptions(sdkModelCsharp, "flag"), 42);
+  });
+
+  it("should exclude decorator when emitter matches one of multiple negation scopes", async () => {
+    const { program } = await SimpleTesterWithBuiltInService.compile(`
+      #suppress "@azure-tools/typespec-client-generator-core/client-option"
+      @clientOption("flag", 42, "!python, !java")
+      @test
+      model Test {
+        id: string;
+      }
+
+      op getTest(): Test;
+    `);
+
+    // Configure with java emitter - should NOT include since java is negated
+    const contextJava = await createSdkContextForTester(program, {
+      emitterName: "@azure-tools/typespec-java",
+    });
+
+    const sdkModelJava = contextJava.sdkPackage.models.find((m) => m.name === "Test");
+    ok(sdkModelJava, "SDK model should exist");
+    strictEqual(getClientOptions(sdkModelJava, "flag"), undefined);
+  });
 });
