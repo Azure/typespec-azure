@@ -230,7 +230,10 @@ function findServiceForOperation(services: Namespace[], operation: Operation): N
     }
     namespace = namespace.namespace;
   }
-  // fallback to the first service
+  // Fallback to the first service. This can happen when an operation is defined outside
+  // of any service namespace (e.g., in Azure.ResourceManager or other shared namespaces)
+  // and is imported into a client that combines multiple services. In such cases,
+  // we use the first service's api version as the default.
   return services[0];
 }
 
