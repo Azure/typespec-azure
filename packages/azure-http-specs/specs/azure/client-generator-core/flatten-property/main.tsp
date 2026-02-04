@@ -144,9 +144,7 @@ model FlattenUnknownModel {
   ```
   """)
 @put
-op putFlattenUnknownModel(
-  @body input: FlattenUnknownModel,
-): FlattenUnknownModel;
+op putFlattenUnknownModel(@body input: FlattenUnknownModel): FlattenUnknownModel;
 
 @doc("This is the model with all read-only properties to be flattened.")
 model SolutionProperties {
