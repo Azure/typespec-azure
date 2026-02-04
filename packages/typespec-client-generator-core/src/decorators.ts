@@ -45,6 +45,7 @@ import {
   ClientInitializationDecorator,
   ClientNameDecorator,
   ClientNamespaceDecorator,
+  ClientOptionDecorator,
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
   OperationGroupDecorator,
@@ -91,6 +92,7 @@ import {
   omitOperation,
   operationGroupKey,
   overrideKey,
+  parseScopes,
   scopeKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
@@ -120,7 +122,7 @@ function setScopedDecoratorData(
     return;
   }
 
-  const [negationScopes, scopes] = parseScopes(context, scope);
+  const [negationScopes, scopes] = parseScopes(scope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
     // override the previous value for negation scopes
     const newObject: Record<string | symbol, any> =
@@ -147,32 +149,6 @@ function setScopedDecoratorData(
       .stateMap(key)
       .set(target, !targetEntry ? newObject : { ...targetEntry, ...newObject });
   }
-}
-
-function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string[]?, string[]?] {
-  if (scope === undefined) {
-    return [undefined, undefined];
-  }
-
-  // handle !(scope1, scope2,...) syntax
-  const negationScopeRegex = new RegExp(/!\((.*?)\)/);
-  const negationScopeMatch = scope.match(negationScopeRegex);
-  if (negationScopeMatch) {
-    return [negationScopeMatch[1].split(",").map((s) => s.trim()), undefined];
-  }
-
-  // handle !scope1, !scope2, scope3, ... syntax
-  const splitScopes = scope.split(",").map((s) => s.trim());
-  const negationScopes: string[] = [];
-  const scopes: string[] = [];
-  for (const s of splitScopes) {
-    if (s.startsWith("!")) {
-      negationScopes.push(s.slice(1));
-    } else {
-      scopes.push(s);
-    }
-  }
-  return [negationScopes, scopes];
 }
 
 export const $client: ClientDecorator = (
@@ -1279,7 +1255,7 @@ export const $scope: ScopeDecorator = (
   entity: Operation | ModelProperty,
   scope?: LanguageScopes,
 ) => {
-  const [negationScopes, scopes] = parseScopes(context, scope);
+  const [negationScopes, scopes] = parseScopes(scope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
     // for negation scope, override the previous value
     setScopedDecoratorData(context, $scope, negationScopesKey, entity, negationScopes);
@@ -1858,3 +1834,36 @@ export function isInScope(context: TCGCContext, entity: Operation | ModelPropert
   }
   return true;
 }
+
+export const clientOptionKey = createStateSymbol("ClientOption");
+
+/**
+ * `@clientOption` decorator implementation.
+ * Pass experimental flags or options to emitters without requiring TCGC reshipping.
+ * The decorator data is stored as {name, value} and exposed via the decorators array.
+ */
+export const $clientOption: ClientOptionDecorator = (
+  context: DecoratorContext,
+  target: Type,
+  name: string,
+  value: unknown,
+  scope?: LanguageScopes,
+) => {
+  // Always emit warning that this is experimental
+  reportDiagnostic(context.program, {
+    code: "client-option",
+    target: target,
+  });
+
+  // Emit additional warning if scope is not provided
+  if (scope === undefined) {
+    reportDiagnostic(context.program, {
+      code: "client-option-requires-scope",
+      target: target,
+    });
+  }
+
+  // Store the option data - each decorator application is stored separately
+  // The decorator info will be exposed via the decorators array on SDK types
+  setScopedDecoratorData(context, $clientOption, clientOptionKey, target, { name, value }, scope);
+};
