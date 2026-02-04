@@ -1,0 +1,62 @@
+{
+  "name": "@azure-tools/typespec-metadata",
+  "version": "0.1.0",
+  "description": "TypeSpec emitter that produces structured metadata snapshots for APIView and other tooling.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Microsoft Corporation",
+  "keywords": [
+    "typespec",
+    "emitter",
+    "metadata",
+    "apiview"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Azure/typespec-azure.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Azure/typespec-azure/issues"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "files": [
+    "dist/**",
+    "!dist/test/**"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/src/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "watch": "tsc -p . --watch",
+    "clean": "rimraf ./dist ./temp",
+    "lint": "eslint .  --max-warnings=0",
+    "lint:fix": "eslint . --fix ",
+    "test": "vitest run",
+    "test:watch": "vitest -w",
+    "test:ui": "vitest --ui",
+    "test:ci": "vitest run --coverage  --reporter=junit --reporter=default"
+  },
+  "dependencies": {
+    "yaml": "~2.8.2"
+  },
+  "peerDependencies": {
+    "@typespec/compiler": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/node": "~25.0.2",
+    "@typespec/compiler": "workspace:^",
+    "@vitest/coverage-v8": "^4.0.15",
+    "@vitest/ui": "^4.0.15",
+    "c8": "^10.1.3",
+    "rimraf": "~6.1.2",
+    "typescript": "~5.9.2",
+    "vitest": "^4.0.15"
+  }
+}

@@ -402,6 +402,14 @@ export function getTypeDecorators(
             getDecoratorArgValue(context, decorator.args[i].jsValue, type, decoratorName),
           );
         }
+
+        // Filter by scope - only include decorators that match the current emitter or have no scope
+        const scopeArg = decoratorInfo.arguments["scope"];
+        if (scopeArg !== undefined && scopeArg !== context.emitterName) {
+          // Skip this decorator if it has a scope that doesn't match the current emitter
+          continue;
+        }
+
         retval.push(decoratorInfo);
       }
     }
@@ -429,7 +437,12 @@ function getDecoratorArgValue(
     if (arg.kind === "EnumMember") {
       return diagnostics.wrap(diagnostics.pipe(getClientTypeWithDiagnostics(context, arg)));
     }
-    if (arg.kind === "String" || arg.kind === "Number" || arg.kind === "Boolean") {
+    if (
+      arg.kind === "String" ||
+      arg.kind === "Number" ||
+      arg.kind === "Boolean" ||
+      arg.kind === "Value"
+    ) {
       return diagnostics.wrap(arg.value);
     }
     diagnostics.add(
