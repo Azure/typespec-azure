@@ -209,7 +209,9 @@ func (client *PetStoreNamespaceClient) Get(ctx context.Context, name string, opt
 
 ### Renaming operations and parameters
 
-Similarly, you can rename operations like in the example below:
+#### Renaming operations
+
+You can rename operations using the `@clientName` decorator:
 
 <ClientTabs>
 
@@ -290,7 +292,141 @@ func (client *PetStoreNamespaceClient) Read(ctx context.Context, name string, op
 
 </ClientTabs>
 
-You cannot at this moment rename parameters in the client.tsp file. You will need to add the `@clientName` decorator over the parameter directly, example:
+#### Renaming operation parameters
+
+Operation parameters can be renamed using the `@clientName` decorator applied from the `client.tsp` file using the `@@` augment syntax. This is useful when you want different parameter names in the generated client SDK while keeping the wire name unchanged.
+
+:::note
+The name of an operation parameter is **not** part of the API definition for most parameter types. For query parameters, the wire name is controlled by the `@query` decorator (or the parameter name if `@query` has no arguments). Changing a parameter name is an **SDK breaking change** but not an API breaking change.
+:::
+
+To rename operation parameters, apply the `@clientName` decorator from a separate `client.tsp` file:
+
+<ClientTabs>
+
+```typespec title=main.tsp
+namespace PetStoreNamespace;
+
+/** This is the input I need */
+@resource("input")
+model InputModel {
+  /** Id of this object */
+  @key
+  @visibility(Lifecycle.Read)
+  name: string;
+}
+
+/** Read my resource */
+op get(name: string, @query filter?: string): InputModel;
+```
+
+```typespec title=client.tsp
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+using PetStoreNamespace;
+
+// Apply @clientName to the 'name' parameter of the 'get' operation
+@@clientName(get::parameters.name, "resourceId");
+
+// Apply language-specific names
+@@clientName(get::parameters.filter, "search_filter", "python");
+```
+
+```python
+# Generated client code
+class PetStoreNamespaceClient:
+  def get(self, resource_id: str, *, search_filter: Optional[str] = None, **kwargs) -> InputModel:
+    """Get operation with renamed parameters.
+
+    :param resource_id: The resource identifier (wire name: 'name')
+    :param search_filter: Filter query (wire name: 'filter')
+    :return: InputModel
+    """
+    ...
+
+# Usage
+response: InputModel = client.get(resource_id="name", search_filter="active")
+```
+
+```csharp
+// Generated client code
+namespace PetStoreNamespace
+{
+  public partial class PetStoreNamespaceClient
+  {
+    // protocol method
+    public virtual async Task<Response> GetAsync(string resourceId, string filter, RequestContext context) {}
+    public virtual Response Get(string resourceId, string filter, RequestContext context) {}
+    // convenience method
+    public virtual async Task<Response<InputModel>> GetAsync(string resourceId, string filter, CancellationToken cancellationToken = default) {}
+    public virtual Response<InputModel> Get(string resourceId, string filter, CancellationToken cancellationToken = default) {}
+  }
+}
+
+// Usage
+InputModel model = await client.GetAsync(resourceId: "name", filter: "active");
+```
+
+```typescript
+// Generated client code
+export interface GetOptionalParams extends OperationOptions {
+  filter?: string;
+}
+
+export async function get(
+  context: Client,
+  resourceId: string,
+  options: GetOptionalParams = { requestOptions: {} },
+): Promise<InputModel>;
+
+// Usage
+const result = await get(context, "name", { filter: "active" });
+```
+
+```java
+// Generated client code
+package petstorenamespace;
+public final class PetStoreNamespaceClient {
+    public Response<BinaryData> getWithResponse(BinaryData getRequest, RequestOptions requestOptions) {
+      // implementation
+    }
+
+    public InputModel get(String resourceId, String filter) {
+      // implementation
+    }
+}
+
+// Usage
+InputModel model = client.get("name", "active");
+```
+
+```go
+// Generated client code
+type PetStoreNamespaceClient struct {}
+
+func NewPetStoreNamespaceClient() *PetStoreNamespaceClient {
+  return &PetStoreNamespaceClient{}
+}
+
+type PetStoreNamespaceClientGetOptions struct {
+  Filter *string
+}
+
+func (client *PetStoreNamespaceClient) Get(ctx context.Context, resourceID string, options *PetStoreNamespaceClientGetOptions) (PetStoreNamespaceClientGetResponse, error) {
+  // implementation
+}
+
+// Usage
+client := NewPetStoreNamespaceClient()
+filter := "active"
+resp, err := client.Get(context.TODO(), "name", &PetStoreNamespaceClientGetOptions{
+  Filter: &filter,
+})
+```
+
+</ClientTabs>
 
 ## Implementation
 

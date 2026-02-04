@@ -124,7 +124,7 @@ export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean
   const explicitClients = listScopedDecoratorData(context, clientKey);
   let multiServices = false;
   explicitClients.forEach((value) => {
-    if (Array.isArray((value as SdkClient).service)) {
+    if ((value as SdkClient).services.length > 1) {
       multiServices = true;
     }
   });
@@ -402,6 +402,14 @@ export function getTypeDecorators(
             getDecoratorArgValue(context, decorator.args[i].jsValue, type, decoratorName),
           );
         }
+
+        // Filter by scope - only include decorators that match the current emitter or have no scope
+        const scopeArg = decoratorInfo.arguments["scope"];
+        if (scopeArg !== undefined && scopeArg !== context.emitterName) {
+          // Skip this decorator if it has a scope that doesn't match the current emitter
+          continue;
+        }
+
         retval.push(decoratorInfo);
       }
     }
@@ -429,7 +437,12 @@ function getDecoratorArgValue(
     if (arg.kind === "EnumMember") {
       return diagnostics.wrap(diagnostics.pipe(getClientTypeWithDiagnostics(context, arg)));
     }
-    if (arg.kind === "String" || arg.kind === "Number" || arg.kind === "Boolean") {
+    if (
+      arg.kind === "String" ||
+      arg.kind === "Number" ||
+      arg.kind === "Boolean" ||
+      arg.kind === "Value"
+    ) {
       return diagnostics.wrap(arg.value);
     }
     diagnostics.add(
@@ -783,13 +796,8 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
     // See all explicit clients that in TypeSpec program
     if (!unsafe_Realm.realmForType.has(k)) {
       const sdkClient = v as SdkClient;
-      if (Array.isArray(sdkClient.service)) {
-        explicitClientNamespaces.push(k as Namespace);
-        sdkClient.service.forEach((s) => explicitServices.add(s));
-      } else {
-        explicitClientNamespaces.push(k as Namespace);
-        explicitServices.add(sdkClient.service);
-      }
+      explicitClientNamespaces.push(k as Namespace);
+      sdkClient.services.forEach((s) => explicitServices.add(s));
     }
   });
 
@@ -1013,8 +1021,8 @@ export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation
 export function getActualClientType(client: SdkClient | SdkOperationGroup): Namespace | Interface {
   if (client.kind === "SdkClient") return client.type;
   if (client.type) return client.type;
-  // Created operation group from `@clientLocation`. Only for single service.
-  return client.service;
+  // Created operation group from `@clientLocation`. May have single or multiple services. Choose the first service for multi-service case.
+  return client.services[0];
 }
 
 export function isSameServers(left: HttpServer[], right: HttpServer[]): boolean {

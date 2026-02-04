@@ -90,14 +90,14 @@ export function addressArraySerializer(result: Array<Address>): any[] {
   });
 }
 
-// Modular api layer
+// JS CodeGen api layer
 export async function upload(
   context: Client,
   body: MultipartRequest,
   options: UploadOptionalParams = { requestOptions: {} },
 ): Promise<void>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class TestServiceClient {
   upload(
     body: MultipartRequest,
