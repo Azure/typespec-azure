@@ -195,28 +195,32 @@ export function getScopedDecoratorData(
  * 2. !scope1, !scope2, scope3, ... - Individual negation with positive scopes
  *
  * @param scope The scope string to parse
- * @returns A tuple of [negationScopes, positiveScopes]
+ * @returns A tuple of [negationScopes, positiveScopes] where each can be undefined if not present
  */
-function parseScopeString(scope: string): [string[], string[]] {
+export function parseScopes(scope?: string): [string[]?, string[]?] {
+  if (scope === undefined) {
+    return [undefined, undefined];
+  }
+
   // handle !(scope1, scope2,...) syntax
   const negationScopeRegex = /!\((.*?)\)/;
   const negationScopeMatch = scope.match(negationScopeRegex);
   if (negationScopeMatch) {
-    return [negationScopeMatch[1].split(",").map((s) => s.trim()), []];
+    return [negationScopeMatch[1].split(",").map((s) => s.trim()), undefined];
   }
 
   // handle !scope1, !scope2, scope3, ... syntax
   const splitScopes = scope.split(",").map((s) => s.trim());
   const negationScopes: string[] = [];
-  const positiveScopes: string[] = [];
+  const scopes: string[] = [];
   for (const s of splitScopes) {
     if (s.startsWith("!")) {
       negationScopes.push(s.slice(1));
     } else {
-      positiveScopes.push(s);
+      scopes.push(s);
     }
   }
-  return [negationScopes, positiveScopes];
+  return [negationScopes, scopes];
 }
 
 /**
@@ -228,23 +232,23 @@ function parseScopeString(scope: string): [string[], string[]] {
  * @returns true if the decorator should be included, false otherwise
  */
 function isScopeApplicable(scopeArg: string, emitterName: string): boolean {
-  const [negationScopes, positiveScopes] = parseScopeString(scopeArg);
+  const [negationScopes, positiveScopes] = parseScopes(scopeArg);
 
   // If there are positive scopes specified
-  if (positiveScopes.length > 0) {
+  if (positiveScopes !== undefined && positiveScopes.length > 0) {
     // If the emitter matches any positive scope, include it
     if (positiveScopes.includes(emitterName)) {
       return true;
     }
     // If positive scopes specified but emitter doesn't match any, and no negation scopes
     // then the decorator doesn't apply to this emitter
-    if (negationScopes.length === 0) {
+    if (negationScopes === undefined || negationScopes.length === 0) {
       return false;
     }
   }
 
   // If there are negation scopes
-  if (negationScopes.length > 0) {
+  if (negationScopes !== undefined && negationScopes.length > 0) {
     // If the emitter is in the negation list, exclude it
     if (negationScopes.includes(emitterName)) {
       return false;
