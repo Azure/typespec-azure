@@ -95,12 +95,7 @@ it("@name", async function () {
 });
 
 it("xml operation with mixed explicit and default property names", async function () {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [XmlTestLibrary],
-    autoUsings: ["TypeSpec.Xml"],
-  });
-
-  await runner.compileWithBuiltInService(`
+  const { program } = await XmlTesterWithBuiltInService.compile(`
     model Container {
       @Xml.name("XmlId")
       id: string;
@@ -112,7 +107,8 @@ it("xml operation with mixed explicit and default property names", async functio
     op test(): {@header("content-type") contentType: "application/xml"; @body body: Container};
   `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
   strictEqual(model.serializationOptions.xml?.name, "Container");
@@ -131,12 +127,7 @@ it("xml operation with mixed explicit and default property names", async functio
 });
 
 it("xml operation model without any xml decorators uses default names", async function () {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [XmlTestLibrary],
-    autoUsings: ["TypeSpec.Xml"],
-  });
-
-  await runner.compileWithBuiltInService(`
+  const { program } = await XmlTesterWithBuiltInService.compile(`
     model Container {
       id: string;
       value: string;
@@ -146,7 +137,8 @@ it("xml operation model without any xml decorators uses default names", async fu
     op test(): {@header("content-type") contentType: "application/xml"; @body body: Container};
   `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
   // Model without any xml decorator gets the model name as xml name
@@ -563,12 +555,7 @@ it("orphan model with xml serialization", async function () {
 });
 
 it("orphan model xml property without explicit @Xml.name uses property name", async function () {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [XmlTestLibrary],
-    autoUsings: ["TypeSpec.Xml"],
-  });
-
-  await runner.compileWithBuiltInService(`
+  const { program } = await XmlTesterWithBuiltInService.compile(`
     @usage(Usage.input | Usage.output)
     @encodedName("application/xml", "XmlTag")
     model Tag {
@@ -576,7 +563,8 @@ it("orphan model xml property without explicit @Xml.name uses property name", as
     }
   `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
   strictEqual(model.serializationOptions.xml?.name, "XmlTag");
@@ -586,12 +574,7 @@ it("orphan model xml property without explicit @Xml.name uses property name", as
 });
 
 it("orphan model xml with mixed explicit and default property names", async function () {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [XmlTestLibrary],
-    autoUsings: ["TypeSpec.Xml"],
-  });
-
-  await runner.compileWithBuiltInService(`
+  const { program } = await XmlTesterWithBuiltInService.compile(`
     @usage(Usage.input | Usage.output)
     @encodedName("application/xml", "XmlContainer")
     model Container {
@@ -603,7 +586,8 @@ it("orphan model xml with mixed explicit and default property names", async func
     }
   `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
   strictEqual(model.serializationOptions.xml?.name, "XmlContainer");
@@ -694,12 +678,7 @@ it("different json content type", async function () {
 });
 
 it("model used in both json and xml operations gets both serialization options", async function () {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [XmlTestLibrary],
-    autoUsings: ["TypeSpec.Xml"],
-  });
-
-  await runner.compileWithBuiltInService(`
+  const { program } = await XmlTesterWithBuiltInService.compile(`
     model Container {
       @encodedName("application/json", "jsonId")
       @encodedName("application/xml", "xmlId")
@@ -711,7 +690,8 @@ it("model used in both json and xml operations gets both serialization options",
     op xmlOp(): {@header("content-type") contentType: "application/xml"; @body body: Container};
   `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
 
@@ -731,12 +711,7 @@ it("model used in both json and xml operations gets both serialization options",
 });
 
 it("orphan model with both json and xml usage gets both serialization options", async function () {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [XmlTestLibrary],
-    autoUsings: ["TypeSpec.Xml"],
-  });
-
-  await runner.compileWithBuiltInService(`
+  const { program } = await XmlTesterWithBuiltInService.compile(`
     @usage(Usage.input | Usage.output | Usage.json | Usage.xml)
     model Container {
       @encodedName("application/json", "jsonId")
@@ -746,7 +721,8 @@ it("orphan model with both json and xml usage gets both serialization options", 
     }
   `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const model = models[0];
 
