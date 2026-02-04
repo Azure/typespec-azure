@@ -189,6 +189,71 @@ export function getScopedDecoratorData(
 }
 
 /**
+ * Parse a scope string to extract negation scopes and positive scopes.
+ * Supports two syntax patterns:
+ * 1. !(scope1, scope2,...) - Grouped negation
+ * 2. !scope1, !scope2, scope3, ... - Individual negation with positive scopes
+ *
+ * @param scope The scope string to parse
+ * @returns A tuple of [negationScopes, positiveScopes]
+ */
+function parseScopeString(scope: string): [string[], string[]] {
+  // handle !(scope1, scope2,...) syntax
+  const negationScopeRegex = new RegExp(/!\((.*?)\)/);
+  const negationScopeMatch = scope.match(negationScopeRegex);
+  if (negationScopeMatch) {
+    return [negationScopeMatch[1].split(",").map((s) => s.trim()), []];
+  }
+
+  // handle !scope1, !scope2, scope3, ... syntax
+  const splitScopes = scope.split(",").map((s) => s.trim());
+  const negationScopes: string[] = [];
+  const positiveScopes: string[] = [];
+  for (const s of splitScopes) {
+    if (s.startsWith("!")) {
+      negationScopes.push(s.slice(1));
+    } else {
+      positiveScopes.push(s);
+    }
+  }
+  return [negationScopes, positiveScopes];
+}
+
+/**
+ * Check if a scope string is applicable to the given emitter name.
+ * Handles negation scopes like "!python" or "!(java, python)".
+ *
+ * @param scopeArg The scope string from the decorator argument
+ * @param emitterName The current emitter name
+ * @returns true if the decorator should be included, false otherwise
+ */
+function isScopeApplicable(scopeArg: string, emitterName: string): boolean {
+  const [negationScopes, positiveScopes] = parseScopeString(scopeArg);
+
+  // If there are positive scopes specified
+  if (positiveScopes.length > 0) {
+    // If the emitter matches any positive scope, include it
+    if (positiveScopes.includes(emitterName)) {
+      return true;
+    }
+  }
+
+  // If there are negation scopes
+  if (negationScopes.length > 0) {
+    // If the emitter is in the negation list, exclude it
+    if (negationScopes.includes(emitterName)) {
+      return false;
+    }
+    // If not in negation list, include it (applies to all except negated scopes)
+    return true;
+  }
+
+  // No negation scopes and emitter doesn't match any positive scope
+  // This means it's a positive-only scope list and emitter is not in it
+  return positiveScopes.length === 0 || positiveScopes.includes(emitterName);
+}
+
+/**
  *
  * @param emitterName Full emitter name
  * @returns The language of the emitter. I.e. "@azure-tools/typespec-csharp" will return "csharp"
@@ -405,8 +470,8 @@ export function getTypeDecorators(
 
         // Filter by scope - only include decorators that match the current emitter or have no scope
         const scopeArg = decoratorInfo.arguments["scope"];
-        if (scopeArg !== undefined && scopeArg !== context.emitterName) {
-          // Skip this decorator if it has a scope that doesn't match the current emitter
+        if (scopeArg !== undefined && !isScopeApplicable(scopeArg, context.emitterName)) {
+          // Skip this decorator if its scope is not applicable to the current emitter
           continue;
         }
 
