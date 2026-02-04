@@ -61,23 +61,26 @@ Purpose: Functional samples demonstrating TCGC features.
 
 When this workflow runs, perform the following tasks:
 
-### Step 1: Analyze Recent Changes
+### Step 1: Analyze Full Codebase
 
-1. Check recent commits and PRs to `packages/typespec-client-generator-core/` for new features or changes
-2. Review any new decorators, types, tests, or APIs added or modified to TCGC
+1. Comprehensively review the entire `packages/typespec-client-generator-core/` codebase
+2. Catalog all decorators, types, APIs, and public interfaces exported by TCGC
+3. Review the `src/` directory for all implemented features and their behaviors
+4. Check `lib/` and `generated-defs/` for decorator definitions and signatures
 
 ### Step 2: Cross-Reference Documentation
 
-1. Compare code changes with existing documentation
-2. Identify documentation gaps where new features are not documented
+1. Compare the full codebase with existing documentation
+2. Identify documentation gaps where features are not documented or under-documented
 3. Find outdated documentation that doesn't match current behavior
 4. Check if examples in docs still work with current code
 
 ### Step 3: Review Test Coverage
 
-1. Check if new TCGC features have corresponding Spector samples
-2. Verify that documented behaviors have test coverage
-3. Identify missing scenarios that should be documented
+1. Check if TCGC features have corresponding Spector samples in `packages/azure-http-specs/specs/`
+2. Review test files in `packages/typespec-client-generator-core/test/` to understand feature behaviors
+3. Verify that documented behaviors have test coverage
+4. Identify missing scenarios that should be documented
 
 ### Step 4: Take Action Based on Findings
 
@@ -85,7 +88,7 @@ When this workflow runs, perform the following tasks:
 
 - Create a pull request with documentation improvements
 - Include clear descriptions of what was updated and why
-- Reference the related code changes or features
+- Reference the specific code files and features being documented
 
 **If gaps are too large for automatic update:**
 
