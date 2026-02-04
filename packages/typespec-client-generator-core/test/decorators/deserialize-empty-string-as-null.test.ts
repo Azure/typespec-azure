@@ -21,7 +21,7 @@ describe("deserialized empty string as null", () => {
 
     const context = await createSdkContextForTester(
       program,
-      {},
+      { emitterName: "@azure-tools/typespec-csharp" },
       {
         additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"],
       },
@@ -54,7 +54,7 @@ describe("deserialized empty string as null", () => {
 
     const context = await createSdkContextForTester(
       program,
-      {},
+      { emitterName: "@azure-tools/typespec-csharp" },
       {
         additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@deserializeEmptyStringAsNull"],
       },

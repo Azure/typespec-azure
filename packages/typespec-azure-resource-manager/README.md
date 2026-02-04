@@ -662,7 +662,7 @@ Decorator to associate a feature with a model, interface, or namespace
 ##### Target
 
 The target to associate the feature with
-`Model | Interface | Namespace`
+`Model | Operation | Interface | Namespace`
 
 ##### Parameters
 

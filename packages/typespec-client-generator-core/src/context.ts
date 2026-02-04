@@ -22,7 +22,6 @@ import { prepareClientAndOperationCache } from "./cache.js";
 import { defaultDecoratorsAllowList } from "./configs.js";
 import { handleClientExamples } from "./example.js";
 import {
-  getKnownScalars,
   SdkArrayType,
   SdkClient,
   SdkContext,
@@ -38,6 +37,7 @@ import {
   SdkServiceResponseHeader,
   SdkUnionType,
   TCGCContext,
+  UsageFlags,
 } from "./interfaces.js";
 import {
   BrandedSdkEmitterOptionsInterface,
@@ -46,6 +46,7 @@ import {
   TCGCEmitterOptions,
   TspLiteralType,
 } from "./internal-utils.js";
+import { createDiagnostic } from "./lib.js";
 import { createSdkPackage } from "./package.js";
 
 interface CreateTCGCContextOptions {
@@ -82,7 +83,6 @@ export function createTCGCContext(
     __clientParametersCache: new Map(),
     __tspTypeToApiVersions: new Map(),
     __clientApiVersionDefaultValueCache: new Map(),
-    __knownScalars: getKnownScalars(),
     __httpOperationExamples: new Map(),
     __pagedResultSet: new Set(),
 
@@ -215,12 +215,49 @@ export async function createSdkContext<
   for (const client of sdkContext.sdkPackage.clients) {
     diagnostics.pipe(await handleClientExamples(sdkContext, client));
   }
-  sdkContext.diagnostics = sdkContext.diagnostics.concat(diagnostics.diagnostics);
+  // Validate cross-namespace type name collisions (including Azure library conflicts since they're included in our models)
+  diagnostics.pipe(validateNamesAcrossNamespaces(sdkContext, "models"));
+  diagnostics.pipe(validateNamesAcrossNamespaces(sdkContext, "enums"));
+  diagnostics.pipe(validateNamesAcrossNamespaces(sdkContext, "unions"));
+  sdkContext.diagnostics = [...sdkContext.diagnostics, ...diagnostics.diagnostics];
 
   if (options?.exportTCGCoutput) {
     await exportTCGCOutput(sdkContext);
   }
   return sdkContext;
+}
+
+function validateNamesAcrossNamespaces(context: SdkContext, group: "models" | "enums" | "unions") {
+  const diagnostics = createDiagnosticCollector();
+  const seenNames = new Set<string>();
+
+  let items: (SdkModelType | SdkEnumType | SdkUnionType)[] = [];
+  switch (group) {
+    case "models":
+      items = context.sdkPackage.models;
+      break;
+    case "enums":
+      items = context.sdkPackage.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0);
+      break;
+    case "unions":
+      items = context.sdkPackage.unions.filter((u): u is SdkUnionType => u.kind === "union");
+      break;
+  }
+
+  for (const item of items) {
+    if (seenNames.has(item.name)) {
+      diagnostics.add(
+        createDiagnostic({
+          code: "duplicate-client-name",
+          format: { name: item.name, scope: context.emitterName },
+          target: item.__raw!,
+        }),
+      );
+    } else {
+      seenNames.add(item.name);
+    }
+  }
+  return diagnostics.wrap(undefined);
 }
 
 async function exportTCGCOutput(context: SdkContext) {

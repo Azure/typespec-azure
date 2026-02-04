@@ -3293,6 +3293,37 @@ importers:
         specifier: ^4.0.15
         version: 4.0.17(@types/node@25.0.9)(@vitest/ui@4.0.17)(happy-dom@20.3.4)(jsdom@25.0.1)(tsx@4.21.0)(yaml@2.8.2)
 
+  packages/typespec-metadata:
+    dependencies:
+      yaml:
+        specifier: ~2.8.2
+        version: 2.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ~25.0.2
+        version: 25.0.9
+      '@typespec/compiler':
+        specifier: workspace:^
+        version: link:../../core/packages/compiler
+      '@vitest/coverage-v8':
+        specifier: ^4.0.15
+        version: 4.0.17(vitest@4.0.17)
+      '@vitest/ui':
+        specifier: ^4.0.15
+        version: 4.0.17(vitest@4.0.17)
+      c8:
+        specifier: ^10.1.3
+        version: 10.1.3
+      rimraf:
+        specifier: ~6.1.2
+        version: 6.1.2
+      typescript:
+        specifier: ~5.9.2
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.15
+        version: 4.0.17(@types/node@25.0.9)(@vitest/ui@4.0.17)(happy-dom@20.3.4)(jsdom@25.0.1)(tsx@4.21.0)(yaml@2.8.2)
+
   website:
     dependencies:
       '@astrojs/check':

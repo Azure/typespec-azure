@@ -95,16 +95,26 @@ export class LateBoundReference {
   file?: string;
   value?: string;
   useFeatures: boolean = false;
+  commonFile: string = "common";
   getFileContext: () => string | undefined = () => undefined;
   setLocalValue(program: Program, inValue: string, type?: Type): void {
     if (type) {
       switch (type.kind) {
         case "Model":
         case "ModelProperty":
-          this.file = this.useFeatures ? getFeature(program, type)?.fileName : undefined;
+          if (this.useFeatures) {
+            const feature = getFeature(program, type);
+            let featureFile = feature.fileName;
+            if (feature.featureName.toLowerCase() === "common") {
+              featureFile = this.commonFile;
+            }
+            this.file = featureFile;
+          } else {
+            this.file = undefined;
+          }
           break;
         default:
-          this.file = this.useFeatures ? "common" : undefined;
+          this.file = this.useFeatures ? this.commonFile : undefined;
       }
     }
     this.isLocal = true;
@@ -120,7 +130,7 @@ export class LateBoundReference {
     if (!this.isLocal) return this.value;
     if (referencingFile === undefined || this.file === undefined || referencingFile === this.file)
       return `#/definitions/${this.value}`;
-    return `./${this.file}.json/definitions/${this.value}`;
+    return `./${this.file}.json#/definitions/${this.value}`;
   }
 }
 
