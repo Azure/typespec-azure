@@ -2104,9 +2104,21 @@ function updateSerializationOptions(
   }
 
   setSerializationOptions(context, type, contentTypes);
+
+  // If the model has serialization options from explicit decorators (not from contentTypes),
+  // ensure properties also get those serialization options.
+  // This handles orphan models where contentTypes is empty but the model has XML/JSON decorators.
+  let effectiveContentTypes = contentTypes;
+  if (type.serializationOptions.xml && !contentTypes.some(isMediaTypeXml)) {
+    effectiveContentTypes = [...effectiveContentTypes, "application/xml"];
+  }
+  if (type.serializationOptions.json && !contentTypes.some(isMediaTypeJson)) {
+    effectiveContentTypes = [...effectiveContentTypes, "application/json"];
+  }
+
   for (const property of type.properties) {
     if (property.kind === "property") {
-      setSerializationOptions(context, property, contentTypes);
+      setSerializationOptions(context, property, effectiveContentTypes);
     }
   }
 
