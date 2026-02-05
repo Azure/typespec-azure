@@ -1,10 +1,10 @@
 // @ts-check
+import { defineConfig } from "eslint/config";
 import { dirname } from "path";
-import tsEslint from "typescript-eslint";
 import { fileURLToPath } from "url";
 import { TypeSpecCommonEslintConfigs, getTypeScriptProjectRules } from "./core/eslint.config.js";
 
-export default tsEslint.config(
+export default defineConfig(
   {
     ignores: [
       "**/dist/**/*",
@@ -12,8 +12,9 @@ export default tsEslint.config(
       "**/temp/**/*",
       "**/generated-defs/*",
       "**/website/build/**/*",
-      "**/.docusaurus/**/*",
+      "**/.astro/**/*",
       "core/packages/compiler/templates/**/*", // Ignore the templates which might have invalid code and not follow exactly our rules.
+      "core/packages/typespec-vscode/templates/**/*", // Ignore the templates which might have invalid code and not follow exactly our rules.
       "**/venv/**/*", // Ignore python virtual env
       "**/.vscode-test-web/**/*", // Ignore VSCode test web project
       // TODO: enable
