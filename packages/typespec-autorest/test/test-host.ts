@@ -125,7 +125,12 @@ export async function compileVersionedOpenAPI<K extends string>(
 ): Promise<Record<K, OpenAPI2Document>> {
   return compileMultipleOpenAPI(
     code,
-    Object.fromEntries(versions.map((x) => [x, resolvePath("stable", x, "openapi.json")])),
+    Object.fromEntries(
+      versions.map((x) => [
+        x,
+        resolvePath(x.includes("preview") ? "preview" : "stable", x, "openapi.json"),
+      ]),
+    ),
     options,
   );
 }
