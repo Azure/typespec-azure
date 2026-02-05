@@ -173,4 +173,4 @@ This includes the following steps:
   C:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP\  > rm -r 2025-12-01-preview
   ```
 
-- If you _do_ need the older preview version, update README.md to include a new entry for the new preview version.
+- If you _do_ need the older preview version (see [Should I delete an old preview](./01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api) if you are not sure), update README.md to include a new entry for the new preview version.

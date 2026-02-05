@@ -17,13 +17,5 @@
     "lib": ["DOM", "ES2022"],
     "skipLibCheck": true,
     "jsx": "react-jsx"
-  },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "test/**/*.ts",
-    "e2e/**/*.ts",
-    "vite.config.ts",
-    "samples/dist/samples.ts"
-  ]
+  }
 }
