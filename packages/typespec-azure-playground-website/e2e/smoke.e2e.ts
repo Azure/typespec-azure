@@ -7,8 +7,11 @@ test.describe("typespec-azure-playground-website UI tests", () => {
 
   test("compiled arm sample", async ({ page }) => {
     await page.goto(host);
-    const samplesDropDown = page.locator("_react=SamplesDropdown").locator("select");
-    await samplesDropDown.selectOption({ label: "Azure Resource Manager framework" });
+
+    // Open samples drawer and pick the ARM sample.
+    const samplesButton = page.locator('button[aria-label="Browse samples"]');
+    await samplesButton.click();
+    await page.locator("text=Azure Resource Manager framework").first().click();
     const outputContainer = page.locator("_react=FileOutput");
     await expect(outputContainer).toContainText(`"title": "ContosoProviderHubClient"`);
   });
