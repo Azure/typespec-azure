@@ -310,13 +310,21 @@ const $assignProviderNameValue: AssignProviderNameValueDecorator = (
   resourceType: Model,
 ) => {
   const { program } = context;
-  const armProviderNamespace = getArmProviderNamespace(program, resourceType as Model);
+  let armProviderNamespace = getArmProviderNamespace(program, resourceType);
+  // Workaround for deprecated Legacy.Provider which by default point to TenantActionScope which is not able to resolve the provider namespace
+  if (
+    resourceType.name === "TenantActionScope" &&
+    armProviderNamespace === undefined &&
+    target.model?.namespace
+  ) {
+    armProviderNamespace = getArmProviderNamespace(program, target.model.namespace);
+  }
   if (
     armProviderNamespace &&
     target.type.kind === "String" &&
     target.type.value === "Microsoft.ThisWillBeReplaced"
   ) {
-    target.type.value = armProviderNamespace;
+    target.type = $(context.program).literal.createString(armProviderNamespace);
   }
 };
 

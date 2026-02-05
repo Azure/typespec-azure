@@ -12,8 +12,10 @@ import {
   $clientLocation,
   $clientName,
   $clientNamespace,
+  $clientOption,
   $convenientAPI,
   $deserializeEmptyStringAsNull,
+  $disablePageable,
   $flattenProperty,
   $legacyHierarchyBuilding,
   $markAsLro,
@@ -55,6 +57,7 @@ export const $decorators = {
     responseAsBool: $responseAsBool,
     clientDoc: $clientDoc,
     clientLocation: $clientLocation,
+    clientOption: $clientOption,
   } satisfies AzureClientGeneratorCoreDecorators,
 
   "Azure.ClientGenerator.Core.Legacy": {
@@ -62,6 +65,7 @@ export const $decorators = {
     flattenProperty: $flattenProperty,
     markAsLro: $markAsLro,
     markAsPageable: $markAsPageable,
+    disablePageable: $disablePageable,
     nextLinkVerb: $nextLinkVerb,
     clientDefaultValue: $clientDefaultValue,
   } satisfies AzureClientGeneratorCoreLegacyDecorators,

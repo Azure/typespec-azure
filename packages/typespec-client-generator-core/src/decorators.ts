@@ -45,6 +45,7 @@ import {
   ClientInitializationDecorator,
   ClientNameDecorator,
   ClientNamespaceDecorator,
+  ClientOptionDecorator,
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
   OperationGroupDecorator,
@@ -56,6 +57,7 @@ import {
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
 import {
   ClientDefaultValueDecorator,
+  DisablePageableDecorator,
   FlattenPropertyDecorator,
   HierarchyBuildingDecorator,
   MarkAsLroDecorator,
@@ -90,6 +92,7 @@ import {
   omitOperation,
   operationGroupKey,
   overrideKey,
+  parseScopes,
   scopeKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
@@ -119,7 +122,7 @@ function setScopedDecoratorData(
     return;
   }
 
-  const [negationScopes, scopes] = parseScopes(context, scope);
+  const [negationScopes, scopes] = parseScopes(scope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
     // override the previous value for negation scopes
     const newObject: Record<string | symbol, any> =
@@ -146,32 +149,6 @@ function setScopedDecoratorData(
       .stateMap(key)
       .set(target, !targetEntry ? newObject : { ...targetEntry, ...newObject });
   }
-}
-
-function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string[]?, string[]?] {
-  if (scope === undefined) {
-    return [undefined, undefined];
-  }
-
-  // handle !(scope1, scope2,...) syntax
-  const negationScopeRegex = new RegExp(/!\((.*?)\)/);
-  const negationScopeMatch = scope.match(negationScopeRegex);
-  if (negationScopeMatch) {
-    return [negationScopeMatch[1].split(",").map((s) => s.trim()), undefined];
-  }
-
-  // handle !scope1, !scope2, scope3, ... syntax
-  const splitScopes = scope.split(",").map((s) => s.trim());
-  const negationScopes: string[] = [];
-  const scopes: string[] = [];
-  for (const s of splitScopes) {
-    if (s.startsWith("!")) {
-      negationScopes.push(s.slice(1));
-    } else {
-      scopes.push(s);
-    }
-  }
-  return [negationScopes, scopes];
 }
 
 export const $client: ClientDecorator = (
@@ -1022,13 +999,15 @@ export const $clientInitialization: ClientInitializationDecorator = (
     if (options.properties.get("initializedBy")) {
       const value = options.properties.get("initializedBy")!.type;
 
-      const isValidValue = (value: number): boolean => value === 1 || value === 2;
+      const isValidValue = (value: number): boolean => value === 0 || value === 1 || value === 2;
 
       if (value.kind === "EnumMember") {
         if (typeof value.value !== "number" || !isValidValue(value.value)) {
           reportDiagnostic(context.program, {
             code: "invalid-initialized-by",
-            format: { message: "Please use `InitializedBy` enum to set the value." },
+            format: {
+              message: "Please use `InitializedBy` enum to set the value.",
+            },
             target: target,
           });
           return;
@@ -1042,7 +1021,9 @@ export const $clientInitialization: ClientInitializationDecorator = (
           ) {
             reportDiagnostic(context.program, {
               code: "invalid-initialized-by",
-              format: { message: "Please use `InitializedBy` enum to set the value." },
+              format: {
+                message: "Please use `InitializedBy` enum to set the value.",
+              },
               target: target,
             });
             return;
@@ -1232,6 +1213,10 @@ export function getClientNamespace(
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
   if (override) {
     // if `@clientNamespace` is applied to the entity, this wins out
+    // if the override exactly matches the namespace flag, no replacement is needed
+    if (context.namespaceFlag && override === context.namespaceFlag) {
+      return override;
+    }
     const userDefinedNamespace = findNamespaceOverlapClosestToRoot(
       override,
       listAllUserDefinedNamespaces(context),
@@ -1273,6 +1258,16 @@ function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Names
       listAllUserDefinedNamespaces(context),
     );
     if (userDefinedNamespace && context.namespaceFlag) {
+      // Check if replacement would cause duplication:
+      // This happens when the namespace flag is an extension of the user-defined namespace
+      // and joinedSegments already starts with the flag (meaning override already applied it)
+      if (
+        context.namespaceFlag.startsWith(userDefinedNamespace.name) &&
+        (joinedSegments.startsWith(context.namespaceFlag + ".") ||
+          joinedSegments === context.namespaceFlag)
+      ) {
+        return joinedSegments;
+      }
       return joinedSegments.replace(userDefinedNamespace.name, context.namespaceFlag);
     }
     return joinedSegments;
@@ -1286,7 +1281,7 @@ export const $scope: ScopeDecorator = (
   entity: Operation | ModelProperty,
   scope?: LanguageScopes,
 ) => {
-  const [negationScopes, scopes] = parseScopes(context, scope);
+  const [negationScopes, scopes] = parseScopes(scope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
     // for negation scope, override the previous value
     setScopedDecoratorData(context, $scope, negationScopesKey, entity, negationScopes);
@@ -1755,6 +1750,20 @@ export interface MarkAsPageableInfo {
   itemsProperty: ModelProperty;
 }
 
+const disablePageableKey = createStateSymbol("disablePageable");
+
+export const $disablePageable: DisablePageableDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: LanguageScopes,
+) => {
+  setScopedDecoratorData(context, $disablePageable, disablePageableKey, target, true, scope);
+};
+
+export function getDisablePageable(context: TCGCContext, entity: Operation): boolean {
+  return getScopedDecoratorData(context, disablePageableKey, entity) ?? false;
+}
+
 function getRealResponseModel(program: Program, responseModel: Model): Type {
   let bodyProperty: ModelProperty | undefined = undefined;
   for (const prop of responseModel.properties.values()) {
@@ -1851,3 +1860,36 @@ export function isInScope(context: TCGCContext, entity: Operation | ModelPropert
   }
   return true;
 }
+
+export const clientOptionKey = createStateSymbol("ClientOption");
+
+/**
+ * `@clientOption` decorator implementation.
+ * Pass experimental flags or options to emitters without requiring TCGC reshipping.
+ * The decorator data is stored as {name, value} and exposed via the decorators array.
+ */
+export const $clientOption: ClientOptionDecorator = (
+  context: DecoratorContext,
+  target: Type,
+  name: string,
+  value: unknown,
+  scope?: LanguageScopes,
+) => {
+  // Always emit warning that this is experimental
+  reportDiagnostic(context.program, {
+    code: "client-option",
+    target: target,
+  });
+
+  // Emit additional warning if scope is not provided
+  if (scope === undefined) {
+    reportDiagnostic(context.program, {
+      code: "client-option-requires-scope",
+      target: target,
+    });
+  }
+
+  // Store the option data - each decorator application is stored separately
+  // The decorator info will be exposed via the decorators array on SDK types
+  setScopedDecoratorData(context, $clientOption, clientOptionKey, target, { name, value }, scope);
+};

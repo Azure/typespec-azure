@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.64.1
+
+### Bug Fixes
+
+- [#3819](https://github.com/Azure/typespec-azure/pull/3819) Fix #3802 correct file references in feature files
+- [#3812](https://github.com/Azure/typespec-azure/pull/3812) Fix duplicate schema error caused when using union templates
+
+
 ## 0.64.0
 
 ### Features

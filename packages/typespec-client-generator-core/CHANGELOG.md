@@ -1,5 +1,27 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.64.5
+
+### Bug Fixes
+
+- [#3861](https://github.com/Azure/typespec-azure/pull/3861) Update xml serialization name when there is no explicit decorator
+
+
+## 0.64.4
+
+### Bug Fixes
+
+- [#3843](https://github.com/Azure/typespec-azure/pull/3843) Fix subscriptionId and apiVersion client parameters not propagating to top-level client when nested operation groups contain these parameters
+- [#3833](https://github.com/Azure/typespec-azure/pull/3833) Add new `@Legacy.disablePageable` decorator to mark pageable operations as basic operations
+
+
+## 0.64.3
+
+### Bug Fixes
+
+- [#3820](https://github.com/Azure/typespec-azure/pull/3820) Reduce param mapping time consumption.
+
+
 ## 0.64.2
 
 ### Bug Fixes

@@ -5,6 +5,7 @@ packages:
   - "@azure-tools/typespec-autorest-canonical"
   - "@azure-tools/typespec-autorest"
   - "@azure-tools/typespec-azure-core"
+  - "@azure-tools/typespec-azure-http-specs"
   - "@azure-tools/typespec-azure-portal-core"
   - "@azure-tools/typespec-azure-resource-manager"
   - "@azure-tools/typespec-azure-rulesets"
