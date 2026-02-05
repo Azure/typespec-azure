@@ -2,7 +2,7 @@ import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
 import { Visibility } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
-import { SdkModelType, UsageFlags } from "../../src/interfaces.js";
+import { UsageFlags } from "../../src/interfaces.js";
 import { isAzureCoreTspModel } from "../../src/internal-utils.js";
 import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
@@ -1044,7 +1044,7 @@ it("propagation", async () => {
   `);
   const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
-  strictEqual(models.length, 4);
+  strictEqual(models.length, 5);
   for (const model of models) {
     strictEqual(model.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
   }
@@ -1061,12 +1061,10 @@ it("propagation", async () => {
   strictEqual(fish?.properties[0].kind, "property");
   strictEqual(fish?.properties[0].serializationOptions.json?.name, "kind");
 
-  const salmon = Array.from(context.__referencedTypeCache.values()).find(
-    (x) => x.kind === "model" && x.name === "Salmon",
-  ) as SdkModelType;
-  strictEqual(salmon?.serializationOptions.json, undefined);
+  const salmon = models.find((x) => x.name === "Salmon");
+  strictEqual(salmon?.serializationOptions.json?.name, "Salmon");
   strictEqual(salmon?.properties[0].kind, "property");
-  strictEqual(salmon?.properties[0].serializationOptions.json, undefined);
+  strictEqual(salmon?.properties[0].serializationOptions.json?.name, "kind");
 
   const sawShark = models.find((x) => x.name === "SawShark");
   strictEqual(sawShark?.serializationOptions.json?.name, "SawShark");
@@ -1106,7 +1104,7 @@ it("propagation from subtype", async () => {
   `);
   const context = await createSdkContextForTester(program);
   const models = context.sdkPackage.models;
-  strictEqual(models.length, 2);
+  strictEqual(models.length, 5);
   for (const model of models) {
     strictEqual(model.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
   }
@@ -1118,29 +1116,88 @@ it("propagation from subtype", async () => {
 
   const salmon = models.find((x) => x.name === "Salmon");
   strictEqual(salmon?.serializationOptions.json?.name, "Salmon");
-  strictEqual(fish?.properties[0].kind, "property");
-  strictEqual(fish?.properties[0].serializationOptions.json?.name, "kind");
+  strictEqual(salmon?.properties[0].kind, "property");
+  strictEqual(salmon?.properties[0].serializationOptions.json?.name, "kind");
 
-  const types = Array.from(context.__referencedTypeCache.values());
-
-  const shark = types.find((x) => x.kind === "model" && x.name === "Shark") as SdkModelType;
-  strictEqual(shark?.serializationOptions.json, undefined);
+  const shark = models.find((x) => x.name === "Shark");
+  strictEqual(shark?.serializationOptions.json?.name, "Shark");
   strictEqual(shark?.properties[0].kind, "property");
-  strictEqual(shark?.properties[0].serializationOptions.json, undefined);
-  strictEqual(shark?.properties[1].kind, "property");
-  strictEqual(shark?.properties[1].serializationOptions.json, undefined);
+  strictEqual(shark?.properties[0].serializationOptions.json?.name, "sharktype");
 
-  const sawShark = types.find((x) => x.kind === "model" && x.name === "SawShark") as SdkModelType;
-  strictEqual(sawShark?.serializationOptions.json, undefined);
+  const sawShark = models.find((x) => x.name === "SawShark");
+  strictEqual(sawShark?.serializationOptions.json?.name, "SawShark");
   strictEqual(sawShark?.properties[0].kind, "property");
-  strictEqual(sawShark?.properties[0].serializationOptions.json, undefined);
+  strictEqual(sawShark?.properties[0].serializationOptions.json?.name, "sharktype");
 
-  const goblinShark = types.find(
-    (x) => x.kind === "model" && x.name === "GoblinShark",
-  ) as SdkModelType;
-  strictEqual(goblinShark?.serializationOptions.json, undefined);
+  const goblinShark = models.find((x) => x.name === "GoblinShark");
+  strictEqual(goblinShark?.serializationOptions.json?.name, "GoblinShark");
   strictEqual(goblinShark?.properties[0].kind, "property");
-  strictEqual(goblinShark?.properties[0].serializationOptions.json, undefined);
+  strictEqual(goblinShark?.properties[0].serializationOptions.json?.name, "sharktype");
+});
+
+it("propagation from sibling subtype includes all discriminated subtypes", async () => {
+  // Reproduces https://github.com/Azure/typespec-rust/issues/799
+  // When only one discriminated subtype is directly used in operations,
+  // all sibling subtypes should still appear in sdkPackage.models.
+  const { program } = await SimpleTesterWithService.compile(`
+    model Resource {
+      id: string;
+    }
+
+    @discriminator("resourceType")
+    model DomainResource extends Resource {
+      resourceType: string;
+      text?: string;
+    }
+
+    model Condition extends DomainResource {
+      resourceType: "Condition";
+      status?: string;
+    }
+
+    model Observation extends DomainResource {
+      resourceType: "Observation";
+      code: string;
+    }
+
+    model ResearchStudy extends DomainResource {
+      resourceType: "ResearchStudy";
+      title?: string;
+    }
+
+    model ResponseModel {
+      finding: Observation;
+      resources: Resource[];
+    }
+
+    @route("/analyze")
+    op analyze(): ResponseModel;
+  `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+
+  const domainResource = models.find((x) => x.name === "DomainResource");
+  ok(domainResource);
+  ok(domainResource!.discriminatedSubtypes);
+
+  ok(
+    models.find((x) => x.name === "Observation"),
+    "Observation should be in models (directly used)",
+  );
+  ok(
+    models.find((x) => x.name === "Condition"),
+    "Condition should be in models (discriminated sibling)",
+  );
+  ok(
+    models.find((x) => x.name === "ResearchStudy"),
+    "ResearchStudy should be in models (discriminated sibling)",
+  );
+
+  for (const name of ["Observation", "Condition", "ResearchStudy"]) {
+    const model = models.find((x) => x.name === name);
+    ok(model!.usage & UsageFlags.Output, `${name} should have Output usage`);
+    ok(model!.serializationOptions.json, `${name} should have json serialization options`);
+  }
 });
 
 it("propagation from subtype of type with another discriminated property", async () => {

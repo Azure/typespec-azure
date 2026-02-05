@@ -1914,6 +1914,48 @@ function handleServiceOrphanType(
   return diagnostics.wrap(undefined);
 }
 
+/**
+ * After all operations and orphan types have been processed, some discriminated subtypes
+ * may still be missing usage flags. This happens when a sibling subtype propagates usage
+ * up to the discriminated parent — the ignoreSubTypeStack mechanism correctly prevents
+ * the parent from propagating back down to other siblings during that traversal. But once
+ * all types are created, we need a final pass to ensure every discriminated subtype of a
+ * used parent also inherits that usage, so that sdkPackage.models is consistent (all types
+ * referenced from discriminatedSubtypes are also present in the models list).
+ */
+function propagateUsageToDiscriminatedSubtypes(context: TCGCContext): void {
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const sdkType of context.__referencedTypeCache.values()) {
+      if (
+        sdkType.kind === "model" &&
+        sdkType.usage !== UsageFlags.None &&
+        sdkType.discriminatedSubtypes
+      ) {
+        // Derive content types from the parent model's serialization options
+        const contentTypes: string[] = [];
+        if (sdkType.serializationOptions.json) {
+          contentTypes.push("application/json");
+        }
+        if (sdkType.serializationOptions.xml) {
+          contentTypes.push("application/xml");
+        }
+
+        for (const subtype of Object.values(sdkType.discriminatedSubtypes)) {
+          if ((subtype.usage & sdkType.usage) !== sdkType.usage) {
+            updateUsageOrAccess(context, sdkType.usage, subtype);
+            if (contentTypes.length > 0) {
+              updateSerializationOptions(context, subtype, contentTypes);
+            }
+            changed = true;
+          }
+        }
+      }
+    }
+  }
+}
+
 function filterOutTypes(
   context: TCGCContext,
   filter: number,
@@ -2037,6 +2079,8 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
       namespaces.push(...namespace.namespaces.values());
     }
   }
+  // propagate usage from discriminated parent models to all subtypes
+  propagateUsageToDiscriminatedSubtypes(context);
   // update access
   diagnostics.pipe(updateAccessOverride(context));
   // update usage
