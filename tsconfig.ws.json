@@ -1,6 +1,7 @@
 {
   "references": [
     { "path": "core/tsconfig.ws.json" },
+    { "path": "packages/typespec-apiview/tsconfig.json" },
     { "path": "packages/typespec-autorest/tsconfig.json" },
     { "path": "packages/typespec-autorest-canonical/tsconfig.json" },
     { "path": "packages/typespec-azure-core/tsconfig.json" },
