@@ -7,8 +7,6 @@ test.describe("typespec-azure-playground-website UI tests", () => {
 
   test("compiled arm sample", async ({ page }) => {
     await page.goto(host);
-
-    // Open samples drawer and pick the ARM sample.
     const samplesButton = page.locator('button[aria-label="Browse samples"]');
     await samplesButton.click();
     await page.locator("text=Azure Resource Manager framework").first().click();
