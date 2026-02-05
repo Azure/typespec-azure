@@ -1,2 +1,4 @@
 title: Encryption
 description: Sample configuration for encryption in resource-common-properties.
+
+llmstxt: true

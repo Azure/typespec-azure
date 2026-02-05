@@ -1,2 +1,4 @@
 title: Trait Versioning
 description: Sample configuration for trait-versioning in data-plane.
+
+llmstxt: true

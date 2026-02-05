@@ -5,6 +5,8 @@ export interface SampleConfig {
   /** Sample title */
   title: string;
   description: string;
+  /** Include sample in llms.txt generation */
+  llmstxt?: boolean;
   /** Optional danger message for legacy samples that should not be used for new specs */
   danger?: string;
   /** Optional order for sorting in sidebar (lower numbers first, defaults to 0) */
@@ -126,6 +128,7 @@ export async function getSampleStructure(): Promise<SampleStructure> {
       id: dir,
       title: sampleConfig.title,
       description: sampleConfig.description,
+      llmstxt: sampleConfig.llmstxt === true,
       danger: sampleConfig.danger,
       order: sampleConfig.order,
       files,
@@ -168,4 +171,29 @@ export async function getSampleStructure(): Promise<SampleStructure> {
   }
 
   return { samples, tree };
+}
+
+export function renderSampleAsMarkdown(sample: SampleConfig): string {
+  const lines: string[] = [];
+
+  if (sample.danger) {
+    lines.push(`> **Danger**: ${sample.danger}`);
+    lines.push("");
+  }
+
+  const sortedFiles = Object.entries(sample.files).sort(([a], [b]) => {
+    if (a === "main.tsp") return -1;
+    if (b === "main.tsp") return 1;
+    return a.localeCompare(b);
+  });
+
+  for (const [fileName, content] of sortedFiles) {
+    lines.push(`## ${fileName}`);
+    lines.push("```typespec");
+    lines.push(content);
+    lines.push("```");
+    lines.push("");
+  }
+
+  return lines.join("\n").trim();
 }

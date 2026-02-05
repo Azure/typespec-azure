@@ -1,2 +1,4 @@
 title: Nobody Action
 description: Sample configuration for nobody-action in operations.
+
+llmstxt: true

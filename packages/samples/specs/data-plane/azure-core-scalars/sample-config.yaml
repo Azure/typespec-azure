@@ -1,2 +1,4 @@
 title: Azure Core Scalars
 description: Sample configuration for azure-core-scalars in data-plane.
+
+llmstxt: true
