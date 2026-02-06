@@ -1300,6 +1300,7 @@ export function getSdkModelPropertyTypeBase(
       context,
       type,
       operation ? context.getClientForOperation(operation) : undefined,
+      operation,
     ),
     onClient,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
