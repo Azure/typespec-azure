@@ -290,27 +290,74 @@ export function parseEmitterName(
 }
 
 /**
+ * Find the service namespace that contains the given operation.
+ * @param services Array of service namespaces
+ * @param operation The operation to find the service for
+ * @returns The service namespace that contains the operation
+ */
+function findServiceForOperation(services: Namespace[], operation: Operation): Namespace {
+  let namespace = operation.namespace;
+  while (namespace) {
+    if (services.includes(namespace)) {
+      return namespace;
+    }
+    namespace = namespace.namespace;
+  }
+  // Fallback to the first service. This can happen when an operation is defined outside
+  // of any service namespace (e.g., in Azure.ResourceManager or other shared namespaces)
+  // and is imported into a client that combines multiple services. In such cases,
+  // we use the first service's api version as the default.
+  return services[0];
+}
+
+/**
  *
  * @param context
  * @param type The type that we are adding api version information onto
+ * @param client The client or operation group that contains the operation
+ * @param operation The operation that contains the api version parameter (needed for multi-service operation groups)
  * @returns Whether the type is the api version parameter and the default value for the client
  */
 export function updateWithApiVersionInformation(
   context: TCGCContext,
   type: ModelProperty,
   client?: SdkClient | SdkOperationGroup,
+  operation?: Operation,
 ): {
   isApiVersionParam: boolean;
   clientDefaultValue?: string;
 } {
   const isApiVersionParam = isApiVersion(context, type);
-  return {
-    isApiVersionParam,
-    clientDefaultValue:
-      isApiVersionParam && client
-        ? context.__clientApiVersionDefaultValueCache.get(client)
-        : undefined,
-  };
+  if (!isApiVersionParam || !client) {
+    return { isApiVersionParam, clientDefaultValue: undefined };
+  }
+
+  // For single-service clients, use the cached value
+  if (client.services.length <= 1) {
+    return {
+      isApiVersionParam,
+      clientDefaultValue: context.__clientApiVersionDefaultValueCache.get(client),
+    };
+  }
+
+  // For multi-service clients/operation groups, we need to find the api version
+  // from the operation's specific service
+  if (operation) {
+    const service = findServiceForOperation(client.services, operation);
+    const packageVersions = context.getPackageVersions();
+    const versions = filterApiVersionsWithDecorators(
+      context,
+      type,
+      packageVersions.get(service) || [],
+    );
+    return {
+      isApiVersionParam,
+      clientDefaultValue: versions.length > 0 ? versions[versions.length - 1] : undefined,
+    };
+  }
+
+  // No operation provided for multi-service client, return undefined
+  return { isApiVersionParam, clientDefaultValue: undefined };
 }
 
 export function filterApiVersionsWithDecorators(

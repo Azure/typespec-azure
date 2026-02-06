@@ -1732,6 +1732,22 @@ it("client location to new operation group with multiple services", async () => 
   ok(aTestMethod);
   const bTestMethod = newOpGroup.methods.find((m) => m.name === "bTest");
   ok(bTestMethod);
+
+  // Check operation-level api version parameters have correct clientDefaultValue
+  // This is the fix for the bug - previously these were undefined
+  strictEqual(aTestMethod.kind, "basic");
+  const aOperation = aTestMethod.operation;
+  const aOperationApiVersionParam = aOperation.parameters.find((p) => p.isApiVersionParam);
+  ok(aOperationApiVersionParam);
+  // Operation from ServiceA should have ServiceA's latest api version as default
+  strictEqual(aOperationApiVersionParam.clientDefaultValue, "av2");
+
+  strictEqual(bTestMethod.kind, "basic");
+  const bOperation = bTestMethod.operation;
+  const bOperationApiVersionParam = bOperation.parameters.find((p) => p.isApiVersionParam);
+  ok(bOperationApiVersionParam);
+  // Operation from ServiceB should have ServiceB's latest api version as default
+  strictEqual(bOperationApiVersionParam.clientDefaultValue, "bv2");
 });
 
 it("one client from multiple services with operation group name conflict - merged", async () => {
@@ -1805,6 +1821,21 @@ it("one client from multiple services with operation group name conflict - merge
   ok(aTestMethod);
   const bTestMethod = operations.methods.find((m) => m.name === "bTest");
   ok(bTestMethod);
+
+  // Check operation-level api version parameters have correct clientDefaultValue
+  strictEqual(aTestMethod.kind, "basic");
+  const aOperation = aTestMethod.operation;
+  const aOperationApiVersionParam = aOperation.parameters.find((p) => p.isApiVersionParam);
+  ok(aOperationApiVersionParam);
+  // Operation from ServiceA should have ServiceA's latest api version as default
+  strictEqual(aOperationApiVersionParam.clientDefaultValue, "av2");
+
+  strictEqual(bTestMethod.kind, "basic");
+  const bOperation = bTestMethod.operation;
+  const bOperationApiVersionParam = bOperation.parameters.find((p) => p.isApiVersionParam);
+  ok(bOperationApiVersionParam);
+  // Operation from ServiceB should have ServiceB's latest api version as default
+  strictEqual(bOperationApiVersionParam.clientDefaultValue, "bv2");
 });
 
 it("client location to existing operation group from different service", async () => {
