@@ -43,16 +43,25 @@ model NspConfigurationResource<
 /**
  * The name parameter for a network security perimeter configuration.
  * @template KeyName The name of the network security perimeter configuration resource name parameter.
+ * @template ResourceNamePattern The regex pattern for the network security perimeter configuration resource name (default is "^[a-z][a-zA-Z0-9]*$")
+ * @template MinLength The minimum length for the network security perimeter configuration resource name (default is 1)
+ * @template MaxLength The maximum length for the network security perimeter configuration resource name (default is 512)
  */
 @Versioning.added(Versions.v5)
 @Http.Private.includeInapplicableMetadataInPayload(false)
-model NspConfigurationNameParameter<KeyName extends valueof string = "networkSecurityPerimeterConfigurationName"> {
+model NspConfigurationNameParameter<
+  KeyName extends valueof string = "networkSecurityPerimeterConfigurationName",
+  ResourceNamePattern extends valueof string = string("^[a-z][a-zA-Z0-9]*$"),
+  MinLength extends valueof int32 = 1,
+  MaxLength extends valueof int32 = 512
+> {
   /** The name for a network security perimeter configuration */
   @path
   @segment("networkSecurityPerimeterConfigurations")
   @key(KeyName)
-  @minLength(1)
-  @maxLength(512)
+  @minLength(MinLength)
+  @maxLength(MaxLength)
+  @pattern(ResourceNamePattern)
   networkSecurityPerimeterConfigurationName: string;
 }
 
@@ -61,6 +70,7 @@ model NspConfigurationNameParameter<KeyName extends valueof string = "networkSec
  * @template NspConfigurationResourceModel The type of the network security perimeter configuration resource. You must declare a network security perimeter configuration resource type in your provider namespace.
  * @template NspConfigurationKeyName Optional. The NSP configuration resource name parameter. By default, this is `networkSecurityPerimeterConfigurationName`.
  * @template ResourceName Optional. The name of the network security perimeter configuration resource in this context, by default, this is `{targetResourceName}NetworkSecurityPerimeterConfiguration`.
+ * @template ResourceParameter Optional. The name parameter model for the network security perimeter configuration resource. By default, this is `NspConfigurationNameParameter`, which has a required path parameter for the network security perimeter configuration resource name. You can use this template parameter to specify a different parameter type if needed, but it must include at least a path parameter for the network security perimeter configuration resource name.
  *
  * @example
  * ```ts
@@ -78,7 +88,8 @@ model NspConfigurationNameParameter<KeyName extends valueof string = "networkSec
 interface NspConfigurationOperations<
   NspConfigurationResourceModel extends NetworkSecurityPerimeterConfiguration,
   NspConfigurationKeyName extends valueof string = "networkSecurityPerimeterConfigurationName",
-  ResourceName extends valueof string = string("")
+  ResourceName extends valueof string = string(""),
+  ResourceParameter extends {} = NspConfigurationNameParameter<NspConfigurationKeyName>
 > {
   /**
    * @dev List the network security perimeter configurations to a resource
@@ -98,7 +109,7 @@ interface NspConfigurationOperations<
   @autoRoute
   @list
   @listsResource(Resource)
-  @segmentOf(NetworkSecurityPerimeterConfigurationNameParameter)
+  @segmentOf(ResourceParameter)
   @builtInResourceOperation(ParentResource, Resource, "list", OverrideResourceName)
   @Azure.ResourceManager.Private.enforceConstraint(ParentResource, Foundations.Resource)
   ListByParent<
@@ -133,7 +144,7 @@ interface NspConfigurationOperations<
   @get
   @autoRoute
   @listsResource(Resource)
-  @segmentOf(NetworkSecurityPerimeterConfigurationNameParameter)
+  @segmentOf(ResourceParameter)
   @builtInResourceOperation(ParentResource, Resource, "list", OverrideResourceName)
   @Azure.ResourceManager.Private.enforceConstraint(ParentResource, Foundations.Resource)
   ListSinglePageByParent<
@@ -178,7 +189,7 @@ interface NspConfigurationOperations<
     OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmReadOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
-      KeysOf<NspConfigurationNameParameter<KeyName>> &
+      KeysOf<ResourceParameter> &
       Parameters,
     Response,
     Error
@@ -191,10 +202,8 @@ interface NspConfigurationOperations<
    * @template Response The success response for the read operation
    * @template Resource the NspConfiguration resource being read
    * @template BaseParameters Optional. Allows overriding the operation parameters
-  
    * @template KeyName Optional. The NSP configuration resource name parameter. By default, this is `networkSecurityPerimeterConfigurationName`
    * @template Parameters Optional. Additional parameters after the path parameters
-   
    * @template Error Optional. The error response, if non-standard.
    * @template OverrideResourceName Optional. The name of the network security perimeter configuration resource being operated on.
    * @template OptionalRequestBody Optional. Indicates if the request body is optional.
@@ -220,7 +229,7 @@ interface NspConfigurationOperations<
     OptionalRequestBody extends valueof boolean = false
   >(
     ...ResourceInstanceParameters<ParentResource, BaseParameters>,
-    ...KeysOf<NspConfigurationNameParameter<KeyName>>,
+    ...KeysOf<ResourceParameter>,
     ...Parameters,
 
     @doc("The content of the action request")
@@ -269,7 +278,7 @@ interface NspConfigurationOperations<
     OptionalRequestBody extends valueof boolean = false
   >(
     ...ResourceInstanceParameters<ParentResource, BaseParameters>,
-    ...KeysOf<NspConfigurationNameParameter<KeyName>>,
+    ...KeysOf<ResourceParameter>,
     ...Parameters,
 
     @doc("The content of the action request")
