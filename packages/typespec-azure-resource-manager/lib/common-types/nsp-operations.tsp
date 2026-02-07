@@ -189,7 +189,7 @@ interface NspConfigurationOperations<
     OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmReadOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
-      KeysOf<ResourceParameter> &
+      KeysOf<NspConfigurationNameParameter<KeyName>> &
       Parameters,
     Response,
     Error
@@ -229,7 +229,7 @@ interface NspConfigurationOperations<
     OptionalRequestBody extends valueof boolean = false
   >(
     ...ResourceInstanceParameters<ParentResource, BaseParameters>,
-    ...KeysOf<ResourceParameter>,
+    ...KeysOf<NspConfigurationNameParameter<KeyName>>,
     ...Parameters,
 
     @doc("The content of the action request")
@@ -278,7 +278,7 @@ interface NspConfigurationOperations<
     OptionalRequestBody extends valueof boolean = false
   >(
     ...ResourceInstanceParameters<ParentResource, BaseParameters>,
-    ...KeysOf<ResourceParameter>,
+    ...KeysOf<NspConfigurationNameParameter<KeyName>>,
     ...Parameters,
 
     @doc("The content of the action request")
