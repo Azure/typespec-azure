@@ -16,9 +16,7 @@ export const $uniqueItems: UniqueItemsDecorator = (
 ) => {
   const { program } = context;
   if (entity.kind === "ModelProperty") {
-    if (
-      !isTypeOrNullableType(entity.type, (t) => t.kind === "Model" && isArrayModelType(program, t))
-    ) {
+    if (!isTypeOrNullableType(entity.type, (t) => t.kind === "Model" && isArrayModelType(t))) {
       reportDiagnostic(program, {
         code: "unique-items-invalid-type",
         target: entity,
@@ -28,7 +26,7 @@ export const $uniqueItems: UniqueItemsDecorator = (
     setUniqueItems(program, entity, true);
     return;
   }
-  if (!isArrayModelType(program, entity)) {
+  if (!isArrayModelType(entity)) {
     reportDiagnostic(program, {
       code: "unique-items-invalid-type",
       target: entity,

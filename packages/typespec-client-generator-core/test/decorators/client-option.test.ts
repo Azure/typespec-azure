@@ -2,11 +2,7 @@ import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import { getClientOptions } from "../../src/public-utils.js";
-import {
-  createSdkContextForTester,
-  SimpleTester,
-  SimpleTesterWithBuiltInService,
-} from "../tester.js";
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
 describe("@clientOption diagnostics", () => {
   it("should emit client-option warning always", async () => {
@@ -67,7 +63,7 @@ describe("@clientOption diagnostics", () => {
 
 describe("@clientOption with getClientOptions getter", () => {
   it("should return client option value for model", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("enableFeatureFoo", true, "python")
       @test
@@ -89,7 +85,7 @@ describe("@clientOption with getClientOptions getter", () => {
   });
 
   it("should return values for multiple client options on same target", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("enableFeatureFoo", true, "python")
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
@@ -114,7 +110,7 @@ describe("@clientOption with getClientOptions getter", () => {
   });
 
   it("should support different value types", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("boolOption", true, "python")
       @test
@@ -168,7 +164,7 @@ describe("@clientOption with getClientOptions getter", () => {
   });
 
   it("should return client option value for operation", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("operationFlag", "customValue", "python")
       @test
@@ -188,7 +184,7 @@ describe("@clientOption with getClientOptions getter", () => {
   });
 
   it("should return client option value for enum", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("enumFlag", true, "python")
       @usage(Usage.input)
@@ -212,7 +208,7 @@ describe("@clientOption with getClientOptions getter", () => {
   });
 
   it("should return client option value for model property", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       @test
       model Test {
         #suppress "@azure-tools/typespec-client-generator-core/client-option"
@@ -237,7 +233,7 @@ describe("@clientOption with getClientOptions getter", () => {
   });
 
   it("should return value when scope matches emitter", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("pythonOnlyFlag", true, "python")
       @test
@@ -260,7 +256,7 @@ describe("@clientOption with getClientOptions getter", () => {
   });
 
   it("should return undefined when scope does not match emitter", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("javaOnlyFlag", true, "java")
       @test
@@ -284,7 +280,7 @@ describe("@clientOption with getClientOptions getter", () => {
   });
 
   it("should handle option without scope argument", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       #suppress "@azure-tools/typespec-client-generator-core/client-option-requires-scope"
       @clientOption("noScopeOption", 123)
@@ -307,7 +303,7 @@ describe("@clientOption with getClientOptions getter", () => {
   });
 
   it("should support array value type", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("arrayOption", #["item1", "item2", "item3"], "python")
       @test
@@ -331,7 +327,7 @@ describe("@clientOption with getClientOptions getter", () => {
   });
 
   it("should support object/map value type", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("objectOption", #{key1: "value1", key2: "value2"}, "python")
       @test
@@ -355,7 +351,7 @@ describe("@clientOption with getClientOptions getter", () => {
   });
 
   it("should support nested object and array values", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("nestedOption", #{
         stringField: "hello",
@@ -386,7 +382,7 @@ describe("@clientOption with getClientOptions getter", () => {
   });
 
   it("should support array of numbers", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("numberArrayOption", #[1, 2, 3, 4, 5], "python")
       @test
@@ -410,7 +406,7 @@ describe("@clientOption with getClientOptions getter", () => {
   });
 
   it("should support array of mixed types", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("mixedArrayOption", #["string", 42, true], "python")
       @test
@@ -459,7 +455,7 @@ describe("@clientOption with getClientOptions getter", () => {
   });
 
   it("should return client option value for interface (operation group)", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("interfaceFlag", true, "python")
       @test
@@ -484,7 +480,7 @@ describe("@clientOption with getClientOptions getter", () => {
   });
 
   it("should return undefined for non-existent key", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("existingOption", true, "python")
       @test
@@ -506,7 +502,7 @@ describe("@clientOption with getClientOptions getter", () => {
   });
 
   it("should include decorator for emitter not in negation scope using !language syntax", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("flag", true, "!python")
       @test
@@ -529,7 +525,7 @@ describe("@clientOption with getClientOptions getter", () => {
   });
 
   it("should exclude decorator for emitter in negation scope using !language syntax", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("flag", true, "!python")
       @test
@@ -552,7 +548,7 @@ describe("@clientOption with getClientOptions getter", () => {
   });
 
   it("should include decorator for emitter not in grouped negation scope using !(lang1, lang2) syntax", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("flag", "value", "!(python, java)")
       @test
@@ -575,7 +571,7 @@ describe("@clientOption with getClientOptions getter", () => {
   });
 
   it("should exclude decorator for emitter in grouped negation scope using !(lang1, lang2) syntax", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("flag", "value", "!(python, java)")
       @test
@@ -598,7 +594,7 @@ describe("@clientOption with getClientOptions getter", () => {
   });
 
   it("should handle multiple negation scopes using !lang1, !lang2 syntax", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("flag", 42, "!python, !java")
       @test
@@ -620,7 +616,7 @@ describe("@clientOption with getClientOptions getter", () => {
   });
 
   it("should exclude decorator when emitter matches one of multiple negation scopes", async () => {
-    const { program } = await SimpleTesterWithBuiltInService.compile(`
+    const { program } = await SimpleTesterWithService.compile(`
       #suppress "@azure-tools/typespec-client-generator-core/client-option"
       @clientOption("flag", 42, "!python, !java")
       @test

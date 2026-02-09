@@ -62,7 +62,6 @@ export interface TCGCContext {
   __generatedNames: Map<Type, string>;
   __httpOperationCache: Map<Operation, HttpOperation>;
   __tspTypeToApiVersions: Map<Type, string[]>;
-  __knownScalars?: Record<string, SdkBuiltInKinds>;
   __rawClientsOperationGroupsCache?: Map<
     Namespace | Interface | string,
     SdkClient | SdkOperationGroup
@@ -103,7 +102,11 @@ export interface SdkContext<
 export interface SdkClient {
   kind: "SdkClient";
   name: string;
+  /**
+   * @deprecated Use `services` instead. This property will be removed in a future release.
+   */
   service: Namespace | Namespace[];
+  services: Namespace[];
   type: Namespace | Interface;
   subOperationGroups: SdkOperationGroup[];
 }
@@ -113,7 +116,11 @@ export interface SdkOperationGroup {
   type?: Namespace | Interface;
   subOperationGroups: SdkOperationGroup[];
   groupPath: string;
+  /**
+   * @deprecated Use `services` instead. This property will be removed in a future release.
+   */
   service: Namespace;
+  services: Namespace[];
   /** Parent operation group or client. */
   parent?: SdkClient | SdkOperationGroup;
 }
@@ -152,12 +159,15 @@ export enum UsageFlags {
 
 /**
  * Flags used to indicate how a client is initialized.
- * `Default` means author doesn't set initialization way for the client. It is only for internal usage and not exposed in decorator.
- * `Individually` means the client is initialized individually.
- * `Parent` means the client is initialized by its parent.
+ *
+ * Note: `Default` and `None` are sentinel values (not bit flags) and should not be combined with other values.
+ * - `Default` (-1): Internal use only. Indicates no explicit initialization decorator was set.
+ * - `None` (0): Decorator value from TypeSpec. Indicates client constructor should be omitted (hand-written).
+ * - `Individually` and `Parent` are bit flags (1, 2) that can be combined using bitwise OR.
  */
 export enum InitializedByFlags {
-  Default = 0,
+  Default = -1,
+  None = 0,
   Individually = 1 << 0,
   Parent = 1 << 1,
 }
@@ -383,7 +393,7 @@ interface SdkDateTimeTypeBase extends SdkTypeBase {
   name: string;
   baseType?: SdkDateTimeType;
   /** How to encode the type on wire. */
-  encode: DateTimeKnownEncoding;
+  encode: DateTimeKnownEncoding | string;
   wireType: SdkBuiltInType;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
@@ -404,7 +414,7 @@ export interface SdkDurationType extends SdkTypeBase {
   name: string;
   baseType?: SdkDurationType;
   /** How to encode the type on wire. */
-  encode: DurationKnownEncoding;
+  encode: DurationKnownEncoding | string;
   wireType: SdkBuiltInType;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
@@ -475,6 +485,8 @@ export interface SdkEnumValueType<
   value: string | number;
   enumType: SdkEnumType;
   valueType: TValueType;
+  /** Unique ID for the current type. */
+  crossLanguageDefinitionId: string;
 }
 
 export interface SdkConstantType extends SdkTypeBase {
@@ -663,6 +675,35 @@ export interface XmlSerializationOptions {
 export interface BinarySerializationOptions {
   /** Whether this is a file/stream input */
   isFile: boolean;
+  /**
+   * Whether the file contents should be represented as a string or raw byte stream.
+   *
+   * True if the `contents` property is a `string`, `false` if it is `bytes`.
+   *
+   * Emitters may choose to represent textual files as strings or streams of textual characters.
+   * If this property is `false`, emitters must expect that the contents may contain non-textual
+   * data.
+   *
+   * This property is only present when `isFile` is `true`. When undefined, it indicates the
+   * body is not a file type.
+   */
+  isText?: boolean;
+  /**
+   * The list of inner media types of the file. In other words, what kind of files can be returned.
+   *
+   * This is determined by the `contentType` property of the file model.
+   *
+   * This property is only present when `isFile` is `true`. When undefined, it indicates the
+   * body is not a file type.
+   */
+  contentTypes?: string[];
+  /**
+   * The ModelProperty that represents the filename in the file model.
+   *
+   * This property is only present when `isFile` is `true`. When undefined, it indicates the
+   * body is not a file type.
+   */
+  filename?: ModelProperty;
 }
 
 /**
@@ -1209,12 +1250,21 @@ export interface SdkPackage<TServiceOperation extends SdkServiceOperation> {
   /** Metadata for the package. */
   metadata: {
     /**
+     * @deprecated Use `apiVersions` instead. This property will be removed in a future release.
+     *
      * The version of the package.
      * If undefined, the package is not versioned.
      * If `all`, the package is versioned with all versions.
      * If a string, the package is versioned with the specified version.
      */
     apiVersion?: string;
+    /**
+     * The version map of the package.
+     * Key is the service namespace full qualified name, value is the version.
+     * If value is undefined, the package is not versioned.
+     * If value is a string, the service is versioned with the specified version.
+     */
+    apiVersions?: Map<string, string>;
   };
 }
 

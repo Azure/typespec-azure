@@ -403,13 +403,6 @@ export const $lib = createTypeSpecLibrary({
           "`@clientLocation` could only move operation to the interface or namespace belong to the root namespace with `@service`.",
       },
     },
-    "client-location-duplicate": {
-      severity: "warning",
-      messages: {
-        default:
-          "`@clientLocation`'s target should not duplicate with defined namespace or interface under `@service` namespace.",
-      },
-    },
     "legacy-hierarchy-building-conflict": {
       severity: "warning",
       messages: {
@@ -433,6 +426,12 @@ export const $lib = createTypeSpecLibrary({
       severity: "warning",
       messages: {
         default: paramMessage`External library version mismatch. There are multiple versions of ${"libraryName"}: ${"versionA"} and ${"versionB"}. Please unify the versions.`,
+      },
+    },
+    "external-type-on-model-property": {
+      severity: "warning",
+      messages: {
+        default: `@alternateType with external type information cannot be applied to model properties. Please apply it to the type definition itself (Scalar, Model, Enum, or Union) instead.`,
       },
     },
     "invalid-mark-as-lro-target": {
@@ -469,13 +468,6 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: "Can not define multiple explicit clients with multiple services.",
-      },
-    },
-    "client-location-new-operation-group-multi-service": {
-      severity: "error",
-      messages: {
-        default:
-          "Cannot move operations from different services to a new operation group that doesn't exist.",
       },
     },
     "invalid-client-service-multiple": {

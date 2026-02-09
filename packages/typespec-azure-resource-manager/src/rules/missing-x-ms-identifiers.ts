@@ -25,7 +25,7 @@ export const missingXmsIdentifiersRule = createRule({
     return {
       modelProperty: (property: ModelProperty) => {
         const type = property.type;
-        if (type.kind === "Model" && isArrayModelType(context.program, type)) {
+        if (type.kind === "Model" && isArrayModelType(type)) {
           if (isArrayMissingIdentifier(context.program, type, property)) {
             context.reportDiagnostic({
               target: property,

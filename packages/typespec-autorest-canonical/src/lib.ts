@@ -6,9 +6,8 @@ export interface AutorestCanonicalEmitterOptions {
    * Output file will interpolate the following values:
    *  - service-name: Name of the service if multiple
    *  - version: Version of the service if multiple
-   *  - azure-resource-provider-folder: Value of the azure-resource-provider-folder option
    *
-   * @default `{azure-resource-provider-folder}/{service-name}/canonical/openapi.json`
+   * @default `{emitter-output-dir}/{service-name}/canonical/openapi.json`
    *
    *
    * @example Single service no versioning
@@ -27,6 +26,7 @@ export interface AutorestCanonicalEmitterOptions {
    */
   "output-file"?: string;
 
+  /** @deprecated Do not use this option. Specify the path directly in emitter-output-dir. */
   "azure-resource-provider-folder"?: string;
 
   /**

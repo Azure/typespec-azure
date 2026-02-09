@@ -11,10 +11,8 @@ export interface AutorestEmitterOptions {
    * Output file will interpolate the following values:
    *  - service-name: Name of the service if multiple
    *  - version: Version of the service if multiple
-   *  - azure-resource-provider-folder: Value of the azure-resource-provider-folder option
-   *  - version-status: Only enabled if azure-resource-provider-folder is set. `preview` if version contains preview, stable otherwise.
    *
-   * @default `{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json`
+   * @default `{emitter-output-dir}/{service-name}/{version-status}/{version}/openapi.json`
    *
    *
    * @example Single service no versioning
@@ -53,6 +51,7 @@ export interface AutorestEmitterOptions {
 
   version?: string;
 
+  /** @deprecated Do not use this option. Specify the path directly in emitter-output-dir. */
   "azure-resource-provider-folder"?: string;
 
   /**
@@ -139,10 +138,9 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
         "Output file will interpolate the following values:",
         " - service-name: Name of the service if multiple",
         " - version: Version of the service if multiple",
-        " - azure-resource-provider-folder: Value of the azure-resource-provider-folder option",
-        " - version-status: Only enabled if azure-resource-provider-folder is set. `preview` if version contains preview, stable otherwise.",
+        " - version-status: `preview` if version contains preview, stable otherwise.",
         "",
-        "Default: `{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json`",
+        "Default: `{emitter-output-dir}/{service-name}/{version-status}/{version}/openapi.json`",
         "",
         "",
         "Example: Single service no versioning",
@@ -162,8 +160,8 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
         " - `openapi.Org1.Service2.v1.0.yaml`",
         " - `openapi.Org1.Service2.v1.1.yaml`",
         "",
-        "Example: azureResourceProviderFolder is provided",
-        " - `arm-folder/AzureService/preview/2020-01-01.yaml`",
+        "Example: Versioning with version-status",
+        " - `arm-folder/AzureService/stable/2020-01-01.yaml`",
         " - `arm-folder/AzureService/preview/2020-01-01.yaml`",
       ].join("\n"),
     },
@@ -180,7 +178,12 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       description: "DEPRECATED. Use examples-dir instead",
     },
     version: { type: "string", nullable: true },
-    "azure-resource-provider-folder": { type: "string", nullable: true },
+    "azure-resource-provider-folder": {
+      type: "string",
+      nullable: true,
+      description:
+        "Deprecated. Do not use this option. Specify the path directly in emitter-output-dir.",
+    },
     "arm-types-dir": {
       type: "string",
       nullable: true,

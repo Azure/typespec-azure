@@ -167,12 +167,12 @@ export const $client: ClientDecorator = (
   const explicitName =
     options?.kind === "Model" ? options?.properties.get("name")?.type : undefined;
   const name: string = explicitName?.kind === "String" ? explicitName.value : target.name;
-  let service: Namespace | Namespace[] | undefined = undefined;
+  let services: Namespace[];
   const serviceConfig =
     options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
 
   if (serviceConfig?.kind === "Namespace") {
-    service = serviceConfig;
+    services = [serviceConfig];
   } else if (
     serviceConfig?.kind === "Tuple" &&
     serviceConfig.values.every((v) => v.kind === "Namespace")
@@ -184,12 +184,12 @@ export const $client: ClientDecorator = (
       });
       return;
     }
-    service = serviceConfig.values;
+    services = serviceConfig.values;
     // validate all services has same server definition
     let servers = undefined;
     let auth = undefined;
     let isSame = true;
-    for (const svc of service) {
+    for (const svc of services) {
       const currentServers = getServers(context.program, svc);
       if (currentServers === undefined) continue;
       if (servers === undefined) {
@@ -201,7 +201,7 @@ export const $client: ClientDecorator = (
         }
       }
     }
-    for (const svc of service) {
+    for (const svc of services) {
       const currentAuth = getAuthentication(context.program, svc);
       if (currentAuth === undefined) continue;
       if (auth === undefined) {
@@ -230,7 +230,7 @@ export const $client: ClientDecorator = (
     ) {
       const versionRecords = [];
       // collect the latest version enum member from each service
-      for (const svc of service) {
+      for (const svc of services) {
         const versions = getVersions(context.program, svc)[1]?.getVersions();
         if (versions && versions.length > 0) {
           versionRecords.push(versions[versions.length - 1].enumMember);
@@ -242,22 +242,23 @@ export const $client: ClientDecorator = (
       }
     }
   } else {
-    service = findClientService(context.program, target);
-  }
-
-  if (service === undefined) {
-    reportDiagnostic(context.program, {
-      code: "client-service",
-      format: { name },
-      target: context.decoratorTarget,
-    });
-    return;
+    const service = findClientService(context.program, target);
+    if (service === undefined) {
+      reportDiagnostic(context.program, {
+        code: "client-service",
+        format: { name },
+        target: context.decoratorTarget,
+      });
+      return;
+    }
+    services = [service];
   }
 
   const client: SdkClient = {
     kind: "SdkClient",
     name,
-    service,
+    service: services.length === 1 ? services[0] : services,
+    services,
     type: target,
     subOperationGroups: [],
   };
@@ -880,6 +881,13 @@ export const $alternateType: AlternateTypeDecorator = (
   let alternateInput: Type | ExternalTypeInfo = alternate;
   if (alternate.kind === "Model" && isExternalType(alternate)) {
     // This means we're dealing with external type
+    if (source.kind === "ModelProperty") {
+      reportDiagnostic(context.program, {
+        code: "external-type-on-model-property",
+        target: source,
+      });
+      return;
+    }
     if (!scope) {
       reportDiagnostic(context.program, {
         code: "missing-scope",
@@ -991,13 +999,15 @@ export const $clientInitialization: ClientInitializationDecorator = (
     if (options.properties.get("initializedBy")) {
       const value = options.properties.get("initializedBy")!.type;
 
-      const isValidValue = (value: number): boolean => value === 1 || value === 2;
+      const isValidValue = (value: number): boolean => value === 0 || value === 1 || value === 2;
 
       if (value.kind === "EnumMember") {
         if (typeof value.value !== "number" || !isValidValue(value.value)) {
           reportDiagnostic(context.program, {
             code: "invalid-initialized-by",
-            format: { message: "Please use `InitializedBy` enum to set the value." },
+            format: {
+              message: "Please use `InitializedBy` enum to set the value.",
+            },
             target: target,
           });
           return;
@@ -1011,7 +1021,9 @@ export const $clientInitialization: ClientInitializationDecorator = (
           ) {
             reportDiagnostic(context.program, {
               code: "invalid-initialized-by",
-              format: { message: "Please use `InitializedBy` enum to set the value." },
+              format: {
+                message: "Please use `InitializedBy` enum to set the value.",
+              },
               target: target,
             });
             return;
@@ -1201,6 +1213,10 @@ export function getClientNamespace(
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
   if (override) {
     // if `@clientNamespace` is applied to the entity, this wins out
+    // if the override exactly matches the namespace flag, no replacement is needed
+    if (context.namespaceFlag && override === context.namespaceFlag) {
+      return override;
+    }
     const userDefinedNamespace = findNamespaceOverlapClosestToRoot(
       override,
       listAllUserDefinedNamespaces(context),
@@ -1242,6 +1258,16 @@ function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Names
       listAllUserDefinedNamespaces(context),
     );
     if (userDefinedNamespace && context.namespaceFlag) {
+      // Check if replacement would cause duplication:
+      // This happens when the namespace flag is an extension of the user-defined namespace
+      // and joinedSegments already starts with the flag (meaning override already applied it)
+      if (
+        context.namespaceFlag.startsWith(userDefinedNamespace.name) &&
+        (joinedSegments.startsWith(context.namespaceFlag + ".") ||
+          joinedSegments === context.namespaceFlag)
+      ) {
+        return joinedSegments;
+      }
       return joinedSegments.replace(userDefinedNamespace.name, context.namespaceFlag);
     }
     return joinedSegments;

@@ -1,38 +1,30 @@
-import { Operation } from "@typespec/compiler";
+import { t } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
+import { describe, it } from "vitest";
 import { shouldGenerateConvenient, shouldGenerateProtocol } from "../../src/decorators.js";
 import { UsageFlags } from "../../src/interfaces.js";
-import { SdkTestRunner, createSdkContextTestHelper, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 
 async function convenientAPITestHelper(
-  runner: SdkTestRunner,
   convenientValue: boolean,
   globalValue: boolean,
 ): Promise<void> {
-  const testCode = `
-    @convenientAPI(${convenientValue})
-    @test
-    op test(): void;
-  `;
-  const { test } = await runner.compileWithBuiltInService(testCode);
+  const { program, test } = await SimpleTesterWithService.compile(t.code`
+    @convenientAPI(${String(convenientValue)})
+    op ${t.op("test")}(): void;
+  `);
+  const context = await createSdkContextForTester(program);
 
   const actual = shouldGenerateConvenient(
-    await createSdkContextTestHelper(runner.program, {
-      generateProtocolMethods: false,
-      generateConvenienceMethods: globalValue,
+    await createSdkContextForTester(program, {
+      "generate-protocol-methods": false,
+      "generate-convenience-methods": globalValue,
     }),
-    test as Operation,
+    test,
   );
   strictEqual(actual, convenientValue);
 
-  const method = runner.context.sdkPackage.clients[0].methods[0];
+  const method = context.sdkPackage.clients[0].methods[0];
   strictEqual(method.name, "test");
   strictEqual(method.kind, "basic");
   strictEqual(method.generateConvenient, convenientValue);
@@ -40,34 +32,40 @@ async function convenientAPITestHelper(
 
 describe("@convenientAPI", () => {
   it("generateConvenienceMethodsTrue, operation marked convenientAPI true", async () => {
-    await convenientAPITestHelper(runner, true, true);
+    await convenientAPITestHelper(true, true);
   });
   it("generateConvenienceMethodsTrue, operation marked convenientAPI false", async () => {
-    await convenientAPITestHelper(runner, false, true);
+    await convenientAPITestHelper(false, true);
   });
   it("generateConvenienceMethodsFalse, operation marked convenientAPI true", async () => {
-    await convenientAPITestHelper(runner, true, false);
+    await convenientAPITestHelper(true, false);
   });
   it("generateConvenienceMethodsFalse, operation marked convenientAPI false", async () => {
-    await convenientAPITestHelper(runner, false, false);
+    await convenientAPITestHelper(false, false);
   });
 
   it("mark an operation as convenientAPI default, pass in sdkContext with generateConvenienceMethods false", async () => {
-    const { test } = await runner.compileWithBuiltInService(`
+    const { program, test } = await SimpleTesterWithService.compile(
+      t.code`
       @convenientAPI
-      @test
-      op test(): void;
-    `);
-
-    const actual = shouldGenerateConvenient(
-      await createSdkContextTestHelper(runner.program, {
-        generateProtocolMethods: false,
-        generateConvenienceMethods: false,
-      }),
-      test as Operation,
+      op ${t.op("test")}(): void;
+    `,
+      {
+        compilerOptions: {
+          options: {
+            "@azure-tools/typespec-python": {
+              "generate-protocol-methods": false,
+              "generate-convenience-methods": false,
+            },
+          },
+        },
+      },
     );
+    const context = await createSdkContextForTester(program);
+
+    const actual = shouldGenerateConvenient(context, test);
     strictEqual(actual, true);
-    const method = runner.context.sdkPackage.clients[0].methods[0];
+    const method = context.sdkPackage.clients[0].methods[0];
     strictEqual(method.name, "test");
     strictEqual(method.kind, "basic");
     strictEqual(method.generateConvenient, true);
@@ -76,131 +74,110 @@ describe("@convenientAPI", () => {
 
 describe("@convenientAPI on interface", () => {
   it("applies convenientAPI false to all operations in interface", async () => {
-    const testCode = `
+    const { program, test1, test2 } = await SimpleTester.compile(t.code`
       @service
       namespace MyService {
         @convenientAPI(false)
         @operationGroup
         interface MyOperations {
-          @test("test1")
           @route("/test1")
-          op test1(): void;
-          @test("test2")
+          op ${t.op("test1")}(): void;
           @route("/test2")
-          op test2(): void;
+          op ${t.op("test2")}(): void;
         }
       }
-    `;
-    const { test1, test2 } = (await runner.compile(testCode)) as {
-      test1: Operation;
-      test2: Operation;
-    };
+    `);
+    const context = await createSdkContextForTester(program);
 
     // Test the core functionality - shouldGenerateConvenient should return false
-    strictEqual(shouldGenerateConvenient(runner.context, test1), false);
-    strictEqual(shouldGenerateConvenient(runner.context, test2), false);
+    strictEqual(shouldGenerateConvenient(context, test1), false);
+    strictEqual(shouldGenerateConvenient(context, test2), false);
   });
 
   it("operation level convenientAPI overrides interface level", async () => {
-    const testCode = `
+    const { program, test1, test2 } = await SimpleTester.compile(t.code`
       @service
       namespace MyService {
         @convenientAPI(false)
         @operationGroup
         interface MyOperations {
           @convenientAPI(true)
-          @test("test1")
           @route("/test1")
-          op test1(): void;
-          @test("test2")
+          op ${t.op("test1")}(): void;
           @route("/test2")
-          op test2(): void;
+          op ${t.op("test2")}(): void;
         }
       }
-    `;
-    const { test1, test2 } = (await runner.compile(testCode)) as {
-      test1: Operation;
-      test2: Operation;
-    };
+    `);
+    const context = await createSdkContextForTester(program);
 
     // Test the override behavior
-    strictEqual(shouldGenerateConvenient(runner.context, test1), true);
-    strictEqual(shouldGenerateConvenient(runner.context, test2), false);
+    strictEqual(shouldGenerateConvenient(context, test1), true);
+    strictEqual(shouldGenerateConvenient(context, test2), false);
   });
 });
 
 describe("@convenientAPI on namespace", () => {
   it("applies convenientAPI false to all operations in namespace", async () => {
     // Test by applying decorator in an augmentation style within TestService
-    const testCode = `
+    const { program, test1, test2 } = await SimpleTester.compile(t.code`
       @service
       @convenientAPI(false)
       namespace TestService2 {
-        @test("test1")
         @route("/test1")
-        op test1(): void;
-        @test("test2")
+        op ${t.op("test1")}(): void;
         @route("/test2")
-        op test2(): void;
+        op ${t.op("test2")}(): void;
       }
-    `;
-    const { test1, test2 } = (await runner.compile(testCode)) as {
-      test1: Operation;
-      test2: Operation;
-    };
+    `);
+    const context = await createSdkContextForTester(program);
 
-    strictEqual(shouldGenerateConvenient(runner.context, test1), false);
-    strictEqual(shouldGenerateConvenient(runner.context, test2), false);
+    strictEqual(shouldGenerateConvenient(context, test1), false);
+    strictEqual(shouldGenerateConvenient(context, test2), false);
 
-    const methods = runner.context.sdkPackage.clients[0].methods;
+    const methods = context.sdkPackage.clients[0].methods;
     strictEqual(methods.length, 2);
     strictEqual(methods[0].generateConvenient, false);
     strictEqual(methods[1].generateConvenient, false);
   });
 
   it("operation level convenientAPI overrides namespace level", async () => {
-    const testCode = `
+    const { program, test1, test2 } = await SimpleTester.compile(t.code`
       @service
       @convenientAPI(false)
       namespace TestService2 {
         @convenientAPI(true)
-        @test("test1")
         @route("/test1")
-        op test1(): void;
-        @test("test2")
+        op ${t.op("test1")}(): void;
         @route("/test2")
-        op test2(): void;
+        op ${t.op("test2")}(): void;
       }
-    `;
-    const { test1, test2 } = (await runner.compile(testCode)) as {
-      test1: Operation;
-      test2: Operation;
-    };
+    `);
+    const context = await createSdkContextForTester(program);
 
-    strictEqual(shouldGenerateConvenient(runner.context, test1), true);
-    strictEqual(shouldGenerateConvenient(runner.context, test2), false);
+    strictEqual(shouldGenerateConvenient(context, test1), true);
+    strictEqual(shouldGenerateConvenient(context, test2), false);
 
-    const methods = runner.context.sdkPackage.clients[0].methods;
+    const methods = context.sdkPackage.clients[0].methods;
     strictEqual(methods.length, 2);
     strictEqual(methods[0].generateConvenient, true);
     strictEqual(methods[1].generateConvenient, false);
   });
 
   it("propagates convenientAPI from parent namespace to child namespace", async () => {
-    const testCode = `
+    const { program, test1 } = await SimpleTester.compile(t.code`
       @service
       @convenientAPI(false)
       namespace TestService2 {
-        @test("test1")
         @route("/test1")
-        op test1(): void;
+        op ${t.op("test1")}(): void;
       }
-    `;
-    const { test1 } = (await runner.compile(testCode)) as { test1: Operation };
+    `);
+    const context = await createSdkContextForTester(program);
 
-    strictEqual(shouldGenerateConvenient(runner.context, test1), false);
+    strictEqual(shouldGenerateConvenient(context, test1), false);
 
-    const methods = runner.context.sdkPackage.clients[0].methods;
+    const methods = context.sdkPackage.clients[0].methods;
     strictEqual(methods.length, 1);
     strictEqual(methods[0].generateConvenient, false);
   });
@@ -208,78 +185,75 @@ describe("@convenientAPI on namespace", () => {
 
 describe("@convenientAPI with interface in namespace", () => {
   it("operation inherits from interface when namespace has no decorator", async () => {
-    const testCode = `
+    const { program, test1 } = await SimpleTesterWithService.compile(t.code`
       namespace MyService {
         @convenientAPI(false)
         interface MyOperations {
-          @test("test1")
-          op test1(): void;
+          op ${t.op("test1")}(): void;
         }
       }
-    `;
-    const { test1 } = await runner.compileWithBuiltInService(testCode);
+    `);
+    const context = await createSdkContextForTester(program);
 
-    strictEqual(shouldGenerateConvenient(runner.context, test1 as Operation), false);
+    strictEqual(shouldGenerateConvenient(context, test1), false);
   });
 
   it("interface decorator takes precedence over namespace decorator", async () => {
-    const testCode = `
+    const { program, test1 } = await SimpleTesterWithService.compile(t.code`
       @convenientAPI(true)
       namespace MyService {
         @convenientAPI(false)
         interface MyOperations {
-          @test("test1")
-          op test1(): void;
+          op ${t.op("test1")}(): void;
         }
       }
-    `;
-    const { test1 } = await runner.compileWithBuiltInService(testCode);
+    `);
+    const context = await createSdkContextForTester(program);
 
-    strictEqual(shouldGenerateConvenient(runner.context, test1 as Operation), false);
+    strictEqual(shouldGenerateConvenient(context, test1), false);
   });
 
   it("operation decorator takes precedence over interface and namespace", async () => {
-    const testCode = `
+    const { program, test1 } = await SimpleTesterWithService.compile(t.code`
       @convenientAPI(false)
       namespace MyService {
         @convenientAPI(false)
         interface MyOperations {
           @convenientAPI(true)
-          @test("test1")
-          op test1(): void;
+          op ${t.op("test1")}(): void;
         }
       }
-    `;
-    const { test1 } = await runner.compileWithBuiltInService(testCode);
+    `);
+    const context = await createSdkContextForTester(program);
 
-    strictEqual(shouldGenerateConvenient(runner.context, test1 as Operation), true);
+    strictEqual(shouldGenerateConvenient(context, test1), true);
   });
 });
 
 describe("@protocolAPI and @convenientAPI with scope", () => {
   it("mark an operation as protocolAPI false for csharp and convenientAPI false for java, pass in default sdkContext", async () => {
-    const testCode = `
+    const testCode = t.code`
       @protocolAPI(false, "csharp")
       @convenientAPI(false, "java")
-      @test
-      op test(): void;
+      op ${t.op("test")}(): void;
     `;
 
     // java should get protocolAPI=true and convenientAPI=false
     {
-      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
+      const { program, test } = await SimpleTesterWithService.compile(testCode);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-java",
+      });
 
-      const { test } = (await runner.compileWithBuiltInService(testCode)) as { test: Operation };
-
-      const method = runner.context.sdkPackage.clients[0].methods[0];
+      const method = context.sdkPackage.clients[0].methods[0];
       strictEqual(method.name, "test");
       strictEqual(method.kind, "basic");
 
-      strictEqual(shouldGenerateProtocol(runner.context, test), true);
+      strictEqual(shouldGenerateProtocol(context, test), true);
       strictEqual(method.generateProtocol, true);
 
       strictEqual(
-        shouldGenerateConvenient(runner.context, test),
+        shouldGenerateConvenient(context, test),
         false,
         "convenientAPI should be false for java",
       );
@@ -288,68 +262,66 @@ describe("@protocolAPI and @convenientAPI with scope", () => {
 
     // csharp should get protocolAPI=false and convenientAPI=true
     {
-      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-csharp" });
-      const { test } = (await runner.compileWithBuiltInService(testCode)) as { test: Operation };
-      const method = runner.context.sdkPackage.clients[0].methods[0];
+      const { program, test } = await SimpleTesterWithService.compile(testCode);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      const method = context.sdkPackage.clients[0].methods[0];
       strictEqual(method.name, "test");
       strictEqual(method.kind, "basic");
 
       strictEqual(
-        shouldGenerateProtocol(runner.context, test),
+        shouldGenerateProtocol(context, test),
         false,
         "protocolAPI should be false for csharp",
       );
       strictEqual(method.generateProtocol, false, "protocolAPI should be false for csharp");
 
-      strictEqual(shouldGenerateConvenient(runner.context, test), true);
+      strictEqual(shouldGenerateConvenient(context, test), true);
       strictEqual(method.generateConvenient, true);
     }
   });
 
   it("namespace level decorator with scope applies to all operations", async () => {
-    const testCode = `
+    const testCode = t.code`
       @service
       @convenientAPI(false, "python")
       namespace TestService3 {
-        @test("test1")
         @route("/test1")
-        op test1(): void;
-        @test("test2")
+        op ${t.op("test1")}(): void;
         @route("/test2")
-        op test2(): void;
+        op ${t.op("test2")}(): void;
       }
     `;
 
     // python should get convenientAPI=false
     {
-      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-      const { test1, test2 } = (await runner.compile(testCode)) as {
-        test1: Operation;
-        test2: Operation;
-      };
+      const { program, test1, test2 } = await SimpleTester.compile(testCode);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-python",
+      });
 
-      strictEqual(shouldGenerateConvenient(runner.context, test1), false);
-      strictEqual(shouldGenerateConvenient(runner.context, test2), false);
+      strictEqual(shouldGenerateConvenient(context, test1), false);
+      strictEqual(shouldGenerateConvenient(context, test2), false);
     }
 
     // java should use default behavior
     {
-      const runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-      const { test1, test2 } = (await runner.compile(testCode)) as {
-        test1: Operation;
-        test2: Operation;
-      };
+      const { program, test1, test2 } = await SimpleTester.compile(testCode);
+      const context = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-java",
+      });
 
       // Should fall back to context default which is true
-      strictEqual(shouldGenerateConvenient(runner.context, test1), true);
-      strictEqual(shouldGenerateConvenient(runner.context, test2), true);
+      strictEqual(shouldGenerateConvenient(context, test1), true);
+      strictEqual(shouldGenerateConvenient(context, test2), true);
     }
   });
 });
 
 describe("@convenientAPI(false) with enum parameters", () => {
   it("enum in query parameter should have Input usage even with convenientAPI(false)", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace TestService {
         enum IncludeEnum {
@@ -371,8 +343,9 @@ describe("@convenientAPI(false) with enum parameters", () => {
         ): ItemResult;
       }
     `);
+    const context = await createSdkContextForTester(program);
 
-    const sdkPackage = runner.context.sdkPackage;
+    const sdkPackage = context.sdkPackage;
     ok(sdkPackage.enums);
     const includeEnum = sdkPackage.enums.find((e) => e.name === "IncludeEnum");
     ok(includeEnum, "IncludeEnum should be in the enums list");
@@ -383,7 +356,7 @@ describe("@convenientAPI(false) with enum parameters", () => {
   });
 
   it("enum in header parameter should have Input usage even with convenientAPI(false)", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace TestService {
         enum StatusEnum {
@@ -402,8 +375,9 @@ describe("@convenientAPI(false) with enum parameters", () => {
         ): Response;
       }
     `);
+    const context = await createSdkContextForTester(program);
 
-    const sdkPackage = runner.context.sdkPackage;
+    const sdkPackage = context.sdkPackage;
     ok(sdkPackage.enums);
     const statusEnum = sdkPackage.enums.find((e) => e.name === "StatusEnum");
     ok(statusEnum, "StatusEnum should be in the enums list");
@@ -414,7 +388,7 @@ describe("@convenientAPI(false) with enum parameters", () => {
   });
 
   it("enum in path parameter should have Input usage even with convenientAPI(false)", async () => {
-    await runner.compile(`
+    const { program } = await SimpleTester.compile(`
       @service
       namespace TestService {
         enum ResourceType {
@@ -434,8 +408,9 @@ describe("@convenientAPI(false) with enum parameters", () => {
         ): Resource;
       }
     `);
+    const context = await createSdkContextForTester(program);
 
-    const sdkPackage = runner.context.sdkPackage;
+    const sdkPackage = context.sdkPackage;
     ok(sdkPackage.enums);
     const resourceType = sdkPackage.enums.find((e) => e.name === "ResourceType");
     ok(resourceType, "ResourceType should be in the enums list");

@@ -1,21 +1,14 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import { it } from "vitest";
+import {
+  AzureCoreTester,
+  AzureCoreTesterWithService,
+  createSdkContextForTester,
+  SimpleTesterWithService,
+} from "../tester.js";
 
 it("parameter's crossLanguageDefinitionId", async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runner.compileWithBuiltInAzureCoreService(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     alias ServiceTraits = SupportsRepeatableRequests &
     SupportsConditionalRequests &
     SupportsClientRequestId;
@@ -29,8 +22,9 @@ it("parameter's crossLanguageDefinitionId", async () => {
       ServiceTraits
     >;
   `);
+  const context = await createSdkContextForTester(program);
 
-  const sdkPackage = runner.context.sdkPackage;
+  const sdkPackage = context.sdkPackage;
   strictEqual(
     sdkPackage.clients[0].clientInitialization.parameters[1].crossLanguageDefinitionId,
     "My.Service.getServiceStatus.apiVersion",
@@ -61,12 +55,7 @@ it("parameter's crossLanguageDefinitionId", async () => {
 });
 
 it("endpoint's crossLanguageDefinitionId", async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runner.compile(`
+  const { program } = await AzureCoreTester.compile(`
     @service(#{
       title: "Contoso Widget Manager",
     })
@@ -86,8 +75,9 @@ it("endpoint's crossLanguageDefinitionId", async () => {
 
     op test(): void;
   `);
+  const context = await createSdkContextForTester(program);
 
-  const sdkPackage = runner.context.sdkPackage;
+  const sdkPackage = context.sdkPackage;
   const initialization = sdkPackage.clients[0].clientInitialization;
   const endpoint = initialization.parameters[0];
   strictEqual(endpoint.crossLanguageDefinitionId, "Contoso.WidgetManager.endpoint");
@@ -103,4 +93,76 @@ it("endpoint's crossLanguageDefinitionId", async () => {
     endpoint.type.variantTypes[1].templateArguments[0].crossLanguageDefinitionId,
     "Contoso.WidgetManager.endpoint",
   );
+});
+
+it("enum value's crossLanguageDefinitionId", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    enum Color {
+      Red: "red",
+      Green: "green",
+      Blue: "blue",
+    }
+
+    model Widget {
+      color: Color;
+    }
+
+    op getWidget(): Widget;
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const sdkPackage = context.sdkPackage;
+  const models = Array.from(sdkPackage.models);
+  const widgetModel = models.find((m) => m.name === "Widget");
+  strictEqual(widgetModel !== undefined, true);
+  const colorProperty = widgetModel!.properties[0];
+  strictEqual(colorProperty.type.kind, "enum");
+  const colorEnum = colorProperty.type;
+  strictEqual(colorEnum.crossLanguageDefinitionId, "TestService.Color");
+
+  // Test enum values
+  strictEqual(colorEnum.values.length, 3);
+  strictEqual(colorEnum.values[0].name, "Red");
+  strictEqual(colorEnum.values[0].crossLanguageDefinitionId, "TestService.Color.Red");
+  strictEqual(colorEnum.values[1].name, "Green");
+  strictEqual(colorEnum.values[1].crossLanguageDefinitionId, "TestService.Color.Green");
+  strictEqual(colorEnum.values[2].name, "Blue");
+  strictEqual(colorEnum.values[2].crossLanguageDefinitionId, "TestService.Color.Blue");
+});
+
+it("union enum value's crossLanguageDefinitionId", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+    union Status {
+      string,
+      Active: "active",
+      Inactive: "inactive",
+      Pending: "pending",
+    }
+
+    model Widget {
+      status: Status;
+    }
+
+    op getWidget(): Widget;
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const sdkPackage = context.sdkPackage;
+  const models = Array.from(sdkPackage.models);
+  const widgetModel = models.find((m) => m.name === "Widget");
+  strictEqual(widgetModel !== undefined, true);
+  const statusProperty = widgetModel!.properties[0];
+  strictEqual(statusProperty.type.kind, "enum");
+  const statusEnum = statusProperty.type;
+  strictEqual(statusEnum.crossLanguageDefinitionId, "TestService.Status");
+  strictEqual(statusEnum.isUnionAsEnum, true);
+
+  // Test union enum values - union enum values only have value name as crossLanguageDefinitionId
+  strictEqual(statusEnum.values.length, 3);
+  strictEqual(statusEnum.values[0].name, "Active");
+  strictEqual(statusEnum.values[0].crossLanguageDefinitionId, "TestService.Status.Active");
+  strictEqual(statusEnum.values[1].name, "Inactive");
+  strictEqual(statusEnum.values[1].crossLanguageDefinitionId, "TestService.Status.Inactive");
+  strictEqual(statusEnum.values[2].name, "Pending");
+  strictEqual(statusEnum.values[2].crossLanguageDefinitionId, "TestService.Status.Pending");
 });
