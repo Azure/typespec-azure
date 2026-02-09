@@ -162,33 +162,6 @@ it("multiple same decorators without scope", async function () {
   expectDiagnostics(context.diagnostics, []);
 });
 
-it("multiple same decorators without scope", async function () {
-  runner = await createSdkTestRunner(
-    {},
-    { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] },
-  );
-
-  await runner.compileWithBuiltInService(`
-    @clientName("testNoScope1")
-    @clientName("testNoScope2")
-    op test(): void;
-  `);
-
-  // Decorators without scope should all be included
-  const decorators = runner.context.sdkPackage.clients[0].methods[0].decorators;
-  strictEqual(decorators.length, 2);
-
-  const decorator1 = decorators.find((d: any) => d.arguments.rename === "testNoScope1");
-  const decorator2 = decorators.find((d: any) => d.arguments.rename === "testNoScope2");
-
-  ok(decorator1, "testNoScope1 decorator should exist");
-  ok(decorator2, "testNoScope2 decorator should exist");
-  strictEqual(decorator1!.name, "Azure.ClientGenerator.Core.@clientName");
-  strictEqual(decorator2!.name, "Azure.ClientGenerator.Core.@clientName");
-
-  expectDiagnostics(runner.context.diagnostics, []);
-});
-
 it("decorators on a namespace", async function () {
   const { program } = await SimpleTesterWithService.compile(`
     op test(): void;
