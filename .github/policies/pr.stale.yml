@@ -8,7 +8,7 @@ where:
 configuration:
   resourceManagementConfiguration:
     scheduledSearches:
-      - description: Notify user when the PR has not been updated in 30 days
+      - description: Notify user when the PR has not been updated in 30 days - check
         frequencies:
           - daily:
               time: 13:0
