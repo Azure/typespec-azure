@@ -11,7 +11,7 @@ configuration:
       - description: Notify user when the PR has not been updated in 30 days
         frequencies:
           - daily:
-              time: 13:0
+              time: 13:00
         filters:
           - isPullRequest
           - isOpen
