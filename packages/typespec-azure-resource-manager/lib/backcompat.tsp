@@ -34,7 +34,12 @@ alias PrivateLinkResourceParameter<
   ResourceNamePattern extends valueof string = string("^[a-z][a-zA-Z0-9]*$"),
   MinLength extends valueof int32 = 3,
   MaxLength extends valueof int32 = 63
-> = CommonTypes.PrivateLinkResourceParameter<Segment, ResourceNamePattern, MinLength, MaxLength>;
+> = CommonTypes.PrivateLinkResourceNameParameter<
+  Segment,
+  ResourceNamePattern,
+  MinLength,
+  MaxLength
+>;
 alias PrivateEndpointConnectionResourceListResult = CommonTypes.PrivateEndpointConnectionListResult;
 #suppress "deprecated" "Need for back compatibility in common-types"
 alias PrivateEndpointConnectionResourceListResultV5 = CommonTypes.PrivateEndpointConnectionListResultV5;

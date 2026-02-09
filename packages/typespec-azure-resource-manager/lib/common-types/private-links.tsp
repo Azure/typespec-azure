@@ -165,11 +165,23 @@ model PrivateEndpointConnectionNameParameter<
 /**
  * The name of the private link associated with the Azure resource.
  * @template Segment The resource type name for private links (default is privateLinkResources)
+ */
+model PrivateLinkResourceParameter<Segment extends valueof string = "privateLinkResources"> {
+  /** The name of the private link associated with the Azure resource. */
+  @path
+  @key("privateLinkResourceName")
+  @TypeSpec.Rest.segment(Segment)
+  name: string;
+}
+
+/**
+ * The name of the private link associated with the Azure resource.
+ * @template Segment The resource type name for private links (default is privateLinkResources)
  * @template ResourceNamePattern The regex pattern for the private link resource name (default is "^[a-z][a-zA-Z0-9]*$")
  * @template MinLength The minimum length for the private link resource name (default is 3)
  * @template MaxLength The maximum length for the private link resource name (default is 63
  */
-model PrivateLinkResourceParameter<
+model PrivateLinkResourceNameParameter<
   Segment extends valueof string = "privateLinkResources",
   ResourceNamePattern extends valueof string = string("^[a-z][a-zA-Z0-9]*$"),
   MinLength extends valueof int32 = 3,
