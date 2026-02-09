@@ -123,7 +123,7 @@ describe("typespec-autorest: options", () => {
       ok(runner.fs.fs.has(resolveVirtualPath("./my-output/openapi.json")));
     });
 
-    it("emit to {emitter-output-dir}/{version}/{output-file} if spec contains versioning", async () => {
+    it("emit to {emitter-output-dir}/{version-status}/{version}/{output-file} if spec contains versioning", async () => {
       const versionedRunner = await Tester.createInstance();
       await versionedRunner.compile(
         `
@@ -132,7 +132,6 @@ describe("typespec-autorest: options", () => {
 namespace DemoService;
 enum Versions {v1, v2}
 
-#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
 op test(): void;
       `,
         {
@@ -150,45 +149,8 @@ op test(): void;
         !versionedRunner.fs.fs.has(resolveVirtualPath("./my-output/openapi.json")),
         "Shouldn't have created the non versioned file name",
       );
-      ok(versionedRunner.fs.fs.has(resolveVirtualPath("./my-output/v1/openapi.json")));
-      ok(versionedRunner.fs.fs.has(resolveVirtualPath("./my-output/v2/openapi.json")));
-    });
-
-    it("emit to {emitter-output-dir}/{arm-folder}/{serviceName}/{versionType}/{version}/{output-file} if spec contains azure-resource-provider-folder is passed", async () => {
-      const versionedRunner = await Tester.createInstance();
-      await versionedRunner.compile(
-        `
-@TypeSpec.Versioning.versioned(Versions)
-@service(#{title: "Widget Service"})
-namespace TestService;
-enum Versions {v1, "v2-preview"}
-
-#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "This is a test."
-op test(): void;
-      `,
-        {
-          compilerOptions: {
-            outputDir: "./my-output",
-            options: {
-              "@azure-tools/typespec-autorest": {
-                "emitter-output-dir": emitterOutputDir,
-                "azure-resource-provider-folder": "./arm-folder",
-              },
-            },
-          },
-        },
-      );
-
-      ok(
-        versionedRunner.fs.fs.has(
-          resolveVirtualPath("./my-output/arm-folder/TestService/stable/v1/openapi.json"),
-        ),
-      );
-      ok(
-        versionedRunner.fs.fs.has(
-          resolveVirtualPath("./my-output/arm-folder/TestService/preview/v2-preview/openapi.json"),
-        ),
-      );
+      ok(versionedRunner.fs.fs.has(resolveVirtualPath("./my-output/stable/v1/openapi.json")));
+      ok(versionedRunner.fs.fs.has(resolveVirtualPath("./my-output/stable/v2/openapi.json")));
     });
   });
 

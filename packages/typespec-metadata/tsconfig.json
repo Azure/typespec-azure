@@ -6,6 +6,5 @@
     "outDir": "dist",
     "rootDir": ".",
     "tsBuildInfoFile": "temp/tsconfig.tsbuildinfo"
-  },
-  "include": ["src/**/*.ts", "test/**/*.ts", "package.json"]
+  }
 }

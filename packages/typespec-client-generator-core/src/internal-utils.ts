@@ -189,6 +189,79 @@ export function getScopedDecoratorData(
 }
 
 /**
+ * Parse a scope string to extract negation scopes and positive scopes.
+ * Supports two syntax patterns:
+ * 1. !(scope1, scope2,...) - Grouped negation
+ * 2. !scope1, !scope2, scope3, ... - Individual negation with positive scopes
+ *
+ * @param scope The scope string to parse
+ * @returns A tuple of [negationScopes, positiveScopes] where each can be undefined if not present
+ */
+export function parseScopes(scope?: string): [string[]?, string[]?] {
+  if (scope === undefined) {
+    return [undefined, undefined];
+  }
+
+  // handle !(scope1, scope2,...) syntax
+  const negationScopeRegex = /!\((.*?)\)/;
+  const negationScopeMatch = scope.match(negationScopeRegex);
+  if (negationScopeMatch) {
+    return [negationScopeMatch[1].split(",").map((s) => s.trim()), undefined];
+  }
+
+  // handle !scope1, !scope2, scope3, ... syntax
+  const splitScopes = scope.split(",").map((s) => s.trim());
+  const negationScopes: string[] = [];
+  const scopes: string[] = [];
+  for (const s of splitScopes) {
+    if (s.startsWith("!")) {
+      negationScopes.push(s.slice(1));
+    } else {
+      scopes.push(s);
+    }
+  }
+  return [negationScopes, scopes];
+}
+
+/**
+ * Check if a scope string is applicable to the given emitter name.
+ * Handles negation scopes like "!python" or "!(java, python)".
+ *
+ * @param scopeArg The scope string from the decorator argument
+ * @param emitterName The current emitter name
+ * @returns true if the decorator should be included, false otherwise
+ */
+function isScopeApplicable(scopeArg: string, emitterName: string): boolean {
+  const [negationScopes, positiveScopes] = parseScopes(scopeArg);
+
+  // If there are positive scopes specified
+  if (positiveScopes !== undefined && positiveScopes.length > 0) {
+    // If the emitter matches any positive scope, include it
+    if (positiveScopes.includes(emitterName)) {
+      return true;
+    }
+    // If positive scopes specified but emitter doesn't match any, and no negation scopes
+    // then the decorator doesn't apply to this emitter
+    if (negationScopes === undefined || negationScopes.length === 0) {
+      return false;
+    }
+  }
+
+  // If there are negation scopes
+  if (negationScopes !== undefined && negationScopes.length > 0) {
+    // If the emitter is in the negation list, exclude it
+    if (negationScopes.includes(emitterName)) {
+      return false;
+    }
+    // If not in negation list, include it (applies to all except negated scopes)
+    return true;
+  }
+
+  // No scopes specified at all (empty string edge case)
+  return true;
+}
+
+/**
  *
  * @param emitterName Full emitter name
  * @returns The language of the emitter. I.e. "@azure-tools/typespec-csharp" will return "csharp"
@@ -217,27 +290,74 @@ export function parseEmitterName(
 }
 
 /**
+ * Find the service namespace that contains the given operation.
+ * @param services Array of service namespaces
+ * @param operation The operation to find the service for
+ * @returns The service namespace that contains the operation
+ */
+function findServiceForOperation(services: Namespace[], operation: Operation): Namespace {
+  let namespace = operation.namespace;
+  while (namespace) {
+    if (services.includes(namespace)) {
+      return namespace;
+    }
+    namespace = namespace.namespace;
+  }
+  // Fallback to the first service. This can happen when an operation is defined outside
+  // of any service namespace (e.g., in Azure.ResourceManager or other shared namespaces)
+  // and is imported into a client that combines multiple services. In such cases,
+  // we use the first service's api version as the default.
+  return services[0];
+}
+
+/**
  *
  * @param context
  * @param type The type that we are adding api version information onto
+ * @param client The client or operation group that contains the operation
+ * @param operation The operation that contains the api version parameter (needed for multi-service operation groups)
  * @returns Whether the type is the api version parameter and the default value for the client
  */
 export function updateWithApiVersionInformation(
   context: TCGCContext,
   type: ModelProperty,
   client?: SdkClient | SdkOperationGroup,
+  operation?: Operation,
 ): {
   isApiVersionParam: boolean;
   clientDefaultValue?: string;
 } {
   const isApiVersionParam = isApiVersion(context, type);
-  return {
-    isApiVersionParam,
-    clientDefaultValue:
-      isApiVersionParam && client
-        ? context.__clientApiVersionDefaultValueCache.get(client)
-        : undefined,
-  };
+  if (!isApiVersionParam || !client) {
+    return { isApiVersionParam, clientDefaultValue: undefined };
+  }
+
+  // For single-service clients, use the cached value
+  if (client.services.length <= 1) {
+    return {
+      isApiVersionParam,
+      clientDefaultValue: context.__clientApiVersionDefaultValueCache.get(client),
+    };
+  }
+
+  // For multi-service clients/operation groups, we need to find the api version
+  // from the operation's specific service
+  if (operation) {
+    const service = findServiceForOperation(client.services, operation);
+    const packageVersions = context.getPackageVersions();
+    const versions = filterApiVersionsWithDecorators(
+      context,
+      type,
+      packageVersions.get(service) || [],
+    );
+    return {
+      isApiVersionParam,
+      clientDefaultValue: versions.length > 0 ? versions[versions.length - 1] : undefined,
+    };
+  }
+
+  // No operation provided for multi-service client, return undefined
+  return { isApiVersionParam, clientDefaultValue: undefined };
 }
 
 export function filterApiVersionsWithDecorators(
@@ -405,8 +525,8 @@ export function getTypeDecorators(
 
         // Filter by scope - only include decorators that match the current emitter or have no scope
         const scopeArg = decoratorInfo.arguments["scope"];
-        if (scopeArg !== undefined && scopeArg !== context.emitterName) {
-          // Skip this decorator if it has a scope that doesn't match the current emitter
+        if (scopeArg !== undefined && !isScopeApplicable(scopeArg, context.emitterName)) {
+          // Skip this decorator if its scope is not applicable to the current emitter
           continue;
         }
 

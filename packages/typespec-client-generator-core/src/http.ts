@@ -12,6 +12,7 @@ import {
 import { $ } from "@typespec/compiler/typekit";
 import {
   HttpOperation,
+  HttpOperationHeaderParameter,
   HttpOperationParameter,
   HttpOperationPathParameter,
   HttpOperationQueryParameter,
@@ -48,7 +49,6 @@ import {
   SdkQueryParameter,
   SdkServiceResponseHeader,
   SdkType,
-  SerializationOptions,
   TCGCContext,
 } from "./interfaces.js";
 import {
@@ -195,14 +195,6 @@ function getSdkHttpParameters(
       const bodyParam = diagnostics.pipe(
         getSdkHttpParameter(context, tspBody.property, httpOperation.operation, undefined, "body"),
       );
-      if (
-        tspBody.bodyKind === "file" &&
-        bodyParam.kind === "body" &&
-        bodyParam.type.kind === "model"
-      ) {
-        bodyParam.type.serializationOptions = bodyParam.type.serializationOptions || {};
-        bodyParam.type.serializationOptions.binary = { isFile: true };
-      }
       if (bodyParam.kind !== "body") {
         diagnostics.add(
           createDiagnostic({
@@ -514,7 +506,10 @@ export function getSdkHttpParameter(
   return diagnostics.wrap({
     ...headerQueryBase,
     kind: "header",
-    serializedName: getHeaderFieldName(program, param) ?? base.name,
+    serializedName:
+      getHeaderFieldName(program, param) ??
+      (httpParam as HttpOperationHeaderParameter)?.name ??
+      base.name,
   });
 }
 
@@ -533,7 +528,6 @@ function getSdkHttpResponseAndExceptions(
   const diagnostics = createDiagnosticCollector();
   const responses: SdkHttpResponse[] = [];
   const exceptions: SdkHttpErrorResponse[] = [];
-  let serializationOptions: SerializationOptions = {};
   for (const response of httpOperation.responses) {
     const headers: SdkServiceResponseHeader[] = [];
     let body: Type | undefined;
@@ -557,9 +551,6 @@ function getSdkHttpResponseAndExceptions(
         context.__responseHeaderCache.set(header, headers[headers.length - 1]);
       }
       if (innerResponse.body && !isNeverOrVoidType(innerResponse.body.type)) {
-        if (innerResponse.body.bodyKind === "file") {
-          serializationOptions = { binary: { isFile: true } };
-        }
         if (body && body !== innerResponse.body.type) {
           diagnostics.add(
             createDiagnostic({
@@ -587,9 +578,6 @@ function getSdkHttpResponseAndExceptions(
           if (innerResponse.body.property) {
             addEncodeInfo(context, innerResponse.body.property, type, defaultContentType);
           }
-        }
-        if (type.kind === "model") {
-          type.serializationOptions = { ...type.serializationOptions, ...serializationOptions };
         }
       }
     }

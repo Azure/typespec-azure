@@ -136,4 +136,31 @@ This includes the followign steps:
   C:\repos\azure-rest-api-specsC:\repos\azure-rest-api-specs\specification\myRpShortname\resource-manager\Microsoft.MyRP > rm -r 2025-12-01-preview
   ```
 
-- If you _do_ need the older preview version, update README.md to include a new entry for the new stable version.
+- If you _do_ need the older preview version (see [Should I delete an old preview](./01-about-versioning.md#should-i-retain-the-openapi-for-an-old-preview-api) if you are not sure):
+  - remove the `x-typespec-generated` extension from the `info` section of the OpenAPI file for the preview version:
+
+    ```diff lang=json
+        "info": {
+         "title": "Microsoft.Contoso management service",
+         "version": "2021-10-01-preview",
+    -    "description": "Microsoft.Contoso Resource Provider management API.",
+    -    "x-typespec-generated": [
+    -      {
+    -        "emitter": "@azure-tools/typespec-autorest"
+    -      }
+    -    ]
+    +    "description": "Microsoft.Contoso Resource Provider management API."
+       },
+    ```
+
+    Note that if you do not remove the x-typespec-generated comment, TypeSpec Validation will fail with an error like:
+
+    ```bash
+    Rule Compile failed
+
+    Output folder '..\resource-manager\Microsoft.Contoso' appears to contain TypeSpec-generated swagger files, not generated from the current TypeSpec sources. Perhaps you deleted a version from your TypeSpec, but didn't delete the associated swaggers?
+
+    ..\resource-manager\Microsoft.Contoso\preview\2021-10-01-preview\contoso.json
+    ```
+
+  - update README.md to include a new entry for the new preview version.

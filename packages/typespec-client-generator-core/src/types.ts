@@ -31,7 +31,9 @@ import {
 } from "@typespec/compiler";
 import {
   Authentication,
+  HttpOperationFileBody,
   HttpOperationMultipartBody,
+  HttpPayloadBody,
   Visibility,
   getAuthentication,
   getServers,
@@ -1298,6 +1300,7 @@ export function getSdkModelPropertyTypeBase(
       context,
       type,
       operation ? context.getClientForOperation(operation) : undefined,
+      operation,
     ),
     onClient,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
@@ -1652,7 +1655,7 @@ function updateTypesFromOperation(
       }
 
       // add serialization options to model type
-      updateSerializationOptions(context, sdkType, httpBody.contentTypes);
+      updateSerializationOptions(context, sdkType, httpBody.contentTypes, undefined, httpBody);
 
       // after completion of usage calculation for httpBody, check whether it has
       // conflicting usage between multipart and regular body
@@ -1714,7 +1717,13 @@ function updateTypesFromOperation(
           }
 
           // add serialization options to model type
-          updateSerializationOptions(context, sdkType, innerResponse.body.contentTypes);
+          updateSerializationOptions(
+            context,
+            sdkType,
+            innerResponse.body.contentTypes,
+            undefined,
+            innerResponse.body,
+          );
         }
         const access = getAccessOverride(context, operation) ?? "public";
         diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
@@ -2050,6 +2059,7 @@ function updateSerializationOptions(
   type: SdkType,
   contentTypes: string[],
   options?: PropagationOptions,
+  httpBody?: HttpPayloadBody,
 ) {
   options = options ?? {};
   options.seenTypes = options.seenTypes ?? new Set<SdkType>();
@@ -2082,10 +2092,34 @@ function updateSerializationOptions(
     return;
   }
 
+  // Handle file body serialization - if it's a file, set binary options and skip json/xml
+  if (httpBody?.bodyKind === "file") {
+    const fileBody = httpBody as HttpOperationFileBody;
+    type.serializationOptions.binary = {
+      isFile: true,
+      isText: fileBody.isText,
+      contentTypes: fileBody.contentTypes,
+      filename: fileBody.filename,
+    };
+    return; // No need to add json/xml serialization for file types
+  }
+
   setSerializationOptions(context, type, contentTypes);
+
+  // If the model has serialization options from explicit decorators (not from contentTypes),
+  // ensure properties also get those serialization options.
+  // This handles orphan models where contentTypes is empty but the model has XML/JSON decorators.
+  let effectiveContentTypes = contentTypes;
+  if (type.serializationOptions.xml && !contentTypes.some(isMediaTypeXml)) {
+    effectiveContentTypes = [...effectiveContentTypes, "application/xml"];
+  }
+  if (type.serializationOptions.json && !contentTypes.some(isMediaTypeJson)) {
+    effectiveContentTypes = [...effectiveContentTypes, "application/json"];
+  }
+
   for (const property of type.properties) {
     if (property.kind === "property") {
-      setSerializationOptions(context, property, contentTypes);
+      setSerializationOptions(context, property, effectiveContentTypes);
     }
   }
 

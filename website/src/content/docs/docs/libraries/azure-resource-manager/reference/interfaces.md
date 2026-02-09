@@ -909,6 +909,25 @@ op Azure.ResourceManager.TrackedResourceOperations<Resource, Properties, BasePar
 op Azure.ResourceManager.TrackedResourceOperations<Resource, Properties, BaseParameters>.listBySubscription(apiVersion: string, subscriptionId: Azure.Core.uuid, provider: "Microsoft.ThisWillBeReplaced"): Azure.ResourceManager.ArmResponse<Azure.ResourceManager.ResourceListResult<Resource>> | Azure.ResourceManager.CommonTypes.ErrorResponse
 ```
 
+### `ActionAsync` {#Azure.ResourceManager.ActionAsync}
+
+```typespec
+op Azure.ResourceManager.ActionAsync(provider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Error
+```
+
+#### Template Parameters
+
+| Name                | Description                                                                          |
+| ------------------- | ------------------------------------------------------------------------------------ |
+| Resource            | The resource being acted upon                                                        |
+| Request             | The request model for the action                                                     |
+| Response            | The response model for the action, returned after polling the long-running operation |
+| BaseParameters      | Optional. Allows overriding the parameters for the operation                         |
+| LroHeaders          | Optional. Allows overriding the headers returned in the Accepted response            |
+| Parameters          | Optional. Additional parameters after the path parameters                            |
+| Error               | Optional. The error response, if non-standard.                                       |
+| OptionalRequestBody | Optional. Indicates whether the body parameter is optional.                          |
+
 ### `ArmCustomPatchAsync` {#Azure.ResourceManager.ArmCustomPatchAsync}
 
 A long-running resource update using a custom PATCH payload (Asynchronous)
