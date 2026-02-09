@@ -2369,12 +2369,12 @@ interface Employees {
 | ------ | --------------------------------------------------- | ------------------------------- |
 | value? | `ResourceManager.CommonTypes.PrivateLinkResource[]` | Array of private link resources |
 
-### `PrivateLinkResourceParameter` {#Azure.ResourceManager.CommonTypes.PrivateLinkResourceParameter}
+### `PrivateLinkResourceNameParameter` {#Azure.ResourceManager.CommonTypes.PrivateLinkResourceNameParameter}
 
 The name of the private link associated with the Azure resource.
 
 ```typespec
-model Azure.ResourceManager.CommonTypes.PrivateLinkResourceParameter<Segment, ResourceNamePattern, MinLength, MaxLength>
+model Azure.ResourceManager.CommonTypes.PrivateLinkResourceNameParameter<Segment, ResourceNamePattern, MinLength, MaxLength>
 ```
 
 #### Template Parameters
@@ -2385,6 +2385,26 @@ model Azure.ResourceManager.CommonTypes.PrivateLinkResourceParameter<Segment, Re
 | ResourceNamePattern | The regex pattern for the private link resource name (default is "^[a-z][a-zA-Z0-9]\*$") |
 | MinLength           | The minimum length for the private link resource name (default is 3)                     |
 | MaxLength           | The maximum length for the private link resource name (default is 63                     |
+
+#### Properties
+
+| Name | Type     | Description                                                      |
+| ---- | -------- | ---------------------------------------------------------------- |
+| name | `string` | The name of the private link associated with the Azure resource. |
+
+### `PrivateLinkResourceParameter` {#Azure.ResourceManager.CommonTypes.PrivateLinkResourceParameter}
+
+The name of the private link associated with the Azure resource.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.PrivateLinkResourceParameter<Segment>
+```
+
+#### Template Parameters
+
+| Name    | Description                                                                |
+| ------- | -------------------------------------------------------------------------- |
+| Segment | The resource type name for private links (default is privateLinkResources) |
 
 #### Properties
 
