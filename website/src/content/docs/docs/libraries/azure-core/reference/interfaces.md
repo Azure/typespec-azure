@@ -278,7 +278,7 @@ op Azure.Core.ResourceOperations<InterfaceTraits, ErrorResponse>.GetResourceOper
 Operation signature to retrieve a resource operation status.
 
 ```typespec
-op Azure.Core.GetResourceOperationStatus(apiVersion: string): Azure.Core.ResourceOperationStatus<Resource, StatusResult, StatusError> | Azure.Core.Foundations.ErrorResponse
+op Azure.Core.GetResourceOperationStatus(): Azure.Core.ResourceOperationStatus<Resource, StatusResult, StatusError> | Azure.Core.Foundations.ErrorResponse
 ```
 
 #### Template Parameters
@@ -427,7 +427,7 @@ op Azure.Core.LongRunningResourceDelete(apiVersion: string): Azure.Core.Foundati
 A long-running remote procedure call (RPC) operation.
 
 ```typespec
-op Azure.Core.LongRunningRpcOperation(apiVersion: string): Azure.Core.{ statusCode: 202, id: string, status: Azure.Core.Foundations.OperationState, error: StatusError, result: StatusResult, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
+op Azure.Core.LongRunningRpcOperation(): Azure.Core.{ statusCode: 202, id: string, status: Azure.Core.Foundations.OperationState, error: StatusError, result: StatusResult, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
 ```
 
 #### Template Parameters
@@ -637,7 +637,7 @@ op Azure.Core.ResourceUpdate(apiVersion: string, contentType: "application/merge
 A remote procedure call (RPC) operation.
 
 ```typespec
-op Azure.Core.RpcOperation(apiVersion: string): {} | ErrorResponse
+op Azure.Core.RpcOperation(): {} | ErrorResponse
 ```
 
 #### Template Parameters
@@ -657,7 +657,7 @@ op Azure.Core.RpcOperation(apiVersion: string): {} | ErrorResponse
 Operation that returns the status of another operation.
 
 ```typespec
-op Azure.Core.Foundations.GetOperationStatus(apiVersion: string, operationId: string): Azure.Core.Foundations.OperationStatus<StatusResult, StatusError> | ErrorResponse
+op Azure.Core.Foundations.GetOperationStatus(operationId: string): Azure.Core.Foundations.OperationStatus<StatusResult, StatusError> | ErrorResponse
 ```
 
 #### Template Parameters
@@ -675,7 +675,7 @@ op Azure.Core.Foundations.GetOperationStatus(apiVersion: string, operationId: st
 Long-running operation.
 
 ```typespec
-op Azure.Core.Foundations.LongRunningOperation(apiVersion: string): Azure.Core.Foundations.{ operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
+op Azure.Core.Foundations.LongRunningOperation(): Azure.Core.Foundations.{ operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
 ```
 
 #### Template Parameters
@@ -692,7 +692,7 @@ op Azure.Core.Foundations.LongRunningOperation(apiVersion: string): Azure.Core.F
 Long-running operation that updates a resource.
 
 ```typespec
-op Azure.Core.Foundations.LongRunningResourceUpdate(apiVersion: string, contentType: "application/merge-patch+json", resource: Resource): Azure.Core.Foundations.{ statusCode: 200, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
+op Azure.Core.Foundations.LongRunningResourceUpdate(contentType: "application/merge-patch+json", resource: Resource): Azure.Core.Foundations.{ statusCode: 200, operationLocation: TypeSpec.Rest.ResourceLocation } | ErrorResponse
 ```
 
 #### Template Parameters
@@ -708,7 +708,7 @@ op Azure.Core.Foundations.LongRunningResourceUpdate(apiVersion: string, contentT
 Operation that lists resources in a non-paginated way.
 
 ```typespec
-op Azure.Core.Foundations.NonPagedResourceList(apiVersion: string): Azure.Core.Foundations.{ body: Array<Element> } | ErrorResponse
+op Azure.Core.Foundations.NonPagedResourceList(): Azure.Core.Foundations.{ body: Array<Element> } | ErrorResponse
 ```
 
 #### Template Parameters
@@ -724,7 +724,7 @@ op Azure.Core.Foundations.NonPagedResourceList(apiVersion: string): Azure.Core.F
 The most basic operation.
 
 ```typespec
-op Azure.Core.Foundations.Operation(apiVersion: string): Response | ErrorResponse
+op Azure.Core.Foundations.Operation(): Response | ErrorResponse
 ```
 
 #### Template Parameters
@@ -741,7 +741,7 @@ op Azure.Core.Foundations.Operation(apiVersion: string): Response | ErrorRespons
 Operation that applies to a collection of resources.
 
 ```typespec
-op Azure.Core.Foundations.ResourceCollectionOperation(apiVersion: string): Response | ErrorResponse
+op Azure.Core.Foundations.ResourceCollectionOperation(): Response | ErrorResponse
 ```
 
 #### Template Parameters
@@ -759,7 +759,7 @@ op Azure.Core.Foundations.ResourceCollectionOperation(apiVersion: string): Respo
 Operation that lists resources in a paginated way.
 
 ```typespec
-op Azure.Core.Foundations.ResourceList(apiVersion: string): Response | ErrorResponse
+op Azure.Core.Foundations.ResourceList(): Response | ErrorResponse
 ```
 
 #### Template Parameters
@@ -777,7 +777,7 @@ op Azure.Core.Foundations.ResourceList(apiVersion: string): Response | ErrorResp
 The most basic operation that applies to a resource.
 
 ```typespec
-op Azure.Core.Foundations.ResourceOperation(apiVersion: string): Response | ErrorResponse
+op Azure.Core.Foundations.ResourceOperation(): Response | ErrorResponse
 ```
 
 #### Template Parameters
