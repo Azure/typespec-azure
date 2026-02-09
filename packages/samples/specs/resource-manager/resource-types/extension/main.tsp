@@ -69,7 +69,10 @@ interface RoleAssignments {
     Azure.ResourceManager.Foundations.ResourceUpdateModel<RoleAssignment, RoleAssignmentProperties>
   >;
   delete is ArmResourceDeleteSync<RoleAssignment>;
-  list is ArmResourceListByParent<RoleAssignment>;
+  list is ArmResourceListByParent<
+    RoleAssignment,
+    Parameters = ArmTopParameter & ArmFilterParameter & ArmSkipParameter
+  >;
 
   /** A sample HEAD operation to check resource existence */
   checkExistence is ArmResourceCheckExistence<RoleAssignment>;
