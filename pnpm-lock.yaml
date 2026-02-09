@@ -2337,6 +2337,46 @@ importers:
         specifier: ~5.9.2
         version: 5.9.3
 
+  core/packages/tsp-integration:
+    dependencies:
+      '@pnpm/workspace.find-packages':
+        specifier: ^1000.0.24
+        version: 1000.0.55(@pnpm/logger@1001.0.1)(@pnpm/worker@1000.6.2(@pnpm/logger@1001.0.1)(@types/node@25.0.9))(typanion@3.14.0)
+      execa:
+        specifier: ^9.6.1
+        version: 9.6.1
+      globby:
+        specifier: ~16.1.0
+        version: 16.1.0
+      log-symbols:
+        specifier: ^7.0.1
+        version: 7.0.1
+      ora:
+        specifier: ^9.0.0
+        version: 9.0.0
+      pathe:
+        specifier: ^2.0.3
+        version: 2.0.3
+      picocolors:
+        specifier: ~1.1.1
+        version: 1.1.1
+      simple-git:
+        specifier: ^3.28.0
+        version: 3.30.0
+      tar:
+        specifier: ^7.5.2
+        version: 7.5.4
+      yaml:
+        specifier: ~2.8.2
+        version: 2.8.2
+    devDependencies:
+      typescript:
+        specifier: ~5.9.2
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.15
+        version: 4.0.17(@types/node@25.0.9)(@vitest/ui@4.0.17)(happy-dom@20.3.4)(jsdom@25.0.1)(tsx@4.21.0)(yaml@2.8.2)
+
   core/packages/tspd:
     dependencies:
       '@alloy-js/core':
@@ -2659,46 +2699,6 @@ importers:
       typescript:
         specifier: ~5.9.2
         version: 5.9.3
-
-  packages/integration-tester:
-    dependencies:
-      '@pnpm/workspace.find-packages':
-        specifier: ^1000.0.24
-        version: 1000.0.55(@pnpm/logger@1001.0.1)(@pnpm/worker@1000.6.2(@pnpm/logger@1001.0.1)(@types/node@25.0.9))(typanion@3.14.0)
-      execa:
-        specifier: ^9.6.1
-        version: 9.6.1
-      globby:
-        specifier: ~16.1.0
-        version: 16.1.0
-      log-symbols:
-        specifier: ^7.0.1
-        version: 7.0.1
-      ora:
-        specifier: ^9.0.0
-        version: 9.0.0
-      pathe:
-        specifier: ^2.0.3
-        version: 2.0.3
-      picocolors:
-        specifier: ~1.1.1
-        version: 1.1.1
-      simple-git:
-        specifier: ^3.28.0
-        version: 3.30.0
-      tar:
-        specifier: ^7.5.2
-        version: 7.5.4
-      yaml:
-        specifier: ~2.8.2
-        version: 2.8.2
-    devDependencies:
-      typescript:
-        specifier: ~5.9.2
-        version: 5.9.3
-      vitest:
-        specifier: ^4.0.15
-        version: 4.0.17(@types/node@25.0.9)(@vitest/ui@4.0.17)(happy-dom@20.3.4)(jsdom@25.0.1)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/samples:
     dependencies:
