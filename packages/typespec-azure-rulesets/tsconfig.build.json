@@ -1,5 +1,11 @@
 {
   "extends": "./tsconfig.json",
   "include": ["src/**/*.ts", "generated-defs/**/*.ts"],
-  "exclude": ["**/*.test.*"]
+  "exclude": ["**/*.test.*"],
+  "references": [
+    { "path": "../../core/packages/compiler/tsconfig.build.json" },
+    { "path": "../typespec-azure-core/tsconfig.build.json" },
+    { "path": "../typespec-client-generator-core/tsconfig.build.json" },
+    { "path": "../typespec-azure-resource-manager/tsconfig.build.json" }
+  ]
 }
