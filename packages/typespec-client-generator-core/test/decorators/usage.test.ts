@@ -608,7 +608,7 @@ it("discriminator removed when only subtype is used", async () => {
   strictEqual(petModel!.discriminatedSubtypes !== undefined, true);
   strictEqual(petModel!.discriminatedSubtypes!["cat"], catModel);
   strictEqual(petModel!.discriminatedSubtypes!["dog"], undefined);
-  
+
   // Discriminator property should still be set since Cat is a valid subtype
   strictEqual(petModel!.discriminatorProperty !== undefined, true);
   strictEqual(catModel!.discriminatorValue, "cat");
