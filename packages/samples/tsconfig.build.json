@@ -1,5 +1,6 @@
 {
   "extends": "./tsconfig.json",
   "include": ["**/*.ts"],
-  "exclude": ["dist", "**/*.test.*"]
+  "exclude": ["dist", "**/*.test.*"],
+  "references": [{ "path": "../../core/packages/compiler/tsconfig.build.json" }]
 }
