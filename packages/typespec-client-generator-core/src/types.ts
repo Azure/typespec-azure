@@ -1841,6 +1841,13 @@ function updateExternalUsage(context: TCGCContext): void {
 }
 
 /**
+ * Helper function to check if a type has input or output usage
+ */
+function hasInputOrOutputUsage(usage: number): boolean {
+  return (usage & (UsageFlags.Input | UsageFlags.Output)) !== 0;
+}
+
+/**
  * Clean up discriminator info when discriminated subtypes are missing usage.
  * If a base model has discriminatedSubtypes where some subtypes have no usage
  * (and won't be included in the SDK package), we should remove the discriminator
@@ -1854,7 +1861,7 @@ function cleanupDiscriminatorForUnusedBase(context: TCGCContext): void {
     // Check if any discriminated subtypes have no usage
     let hasUnusedSubtype = false;
     for (const subtype of Object.values(sdkType.discriminatedSubtypes)) {
-      if ((subtype.usage & (UsageFlags.Input | UsageFlags.Output)) === 0) {
+      if (!hasInputOrOutputUsage(subtype.usage)) {
         hasUnusedSubtype = true;
         break;
       }
@@ -1886,9 +1893,11 @@ function cleanupDiscriminatorForUnusedBase(context: TCGCContext): void {
  * Helper function to check if a model has a specific base model in its hierarchy
  */
 function hasBaseModel(model: SdkModelType, targetBase: SdkModelType): boolean {
+  const visited = new Set<SdkModelType>();
   let current = model.baseModel;
-  while (current) {
+  while (current && !visited.has(current)) {
     if (current === targetBase) return true;
+    visited.add(current);
     current = current.baseModel;
   }
   return false;
