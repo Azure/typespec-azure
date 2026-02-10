@@ -39,7 +39,7 @@ jobs:
           FOCUS_AREA="${{ github.event.inputs.focus_area || 'all' }}"
           DATE=$(date +%Y-%m-%d)
 
-          PROMPT="Update TCGC documentation. Focus area: $FOCUS_AREA"
+          PROMPT="Update TCGC documentation (Run date: $DATE). Focus area: $FOCUS_AREA"
 
           echo "prompt=$PROMPT" >> $GITHUB_OUTPUT
 
