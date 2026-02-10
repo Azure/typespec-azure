@@ -49,6 +49,7 @@
     "hast-util-to-html": "^9.0.5",
     "rehype": "^13.0.2",
     "remark-heading-id": "^1.0.1",
-    "unist-util-visit": "^5.0.0"
+    "unist-util-visit": "^5.0.0",
+    "yaml": "~2.8.2"
   }
 }

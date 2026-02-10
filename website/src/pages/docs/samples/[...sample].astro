@@ -1,0 +1,51 @@
+---
+import { Aside, Code, TabItem } from "@astrojs/starlight/components";
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import EditorTabs from "@typespec/astro-utils/components/editor-tabs.astro";
+import { type SampleConfig, getSampleStructure } from "src/utils/samples";
+
+interface Props {
+  sample: SampleConfig;
+}
+
+export async function getStaticPaths() {
+  const { samples } = await getSampleStructure();
+  return samples.map((x) => ({ params: { sample: x.id }, props: { sample: x } }));
+}
+
+const { sample } = Astro.props;
+
+// Sort files: main.tsp first, then alphabetically
+const sortedFiles = Object.entries(sample.files).sort(([a], [b]) => {
+  if (a === "main.tsp") return -1;
+  if (b === "main.tsp") return 1;
+  return a.localeCompare(b);
+});
+
+const hasMultipleFiles = sortedFiles.length > 1;
+---
+
+<StarlightPage frontmatter={{ title: sample.title }}>
+  {sample.danger && <Aside type="danger">{sample.danger}</Aside>}
+
+  <p>{sample.description}</p>
+
+  {
+    hasMultipleFiles ? (
+      <EditorTabs>
+        {sortedFiles.map(([fileName, content]) => (
+          <TabItem label={fileName}>
+            <Code lang="typespec" code={content} />
+          </TabItem>
+        ))}
+      </EditorTabs>
+    ) : (
+      <Code
+        lang="typespec"
+        title="main.tsp"
+        meta={`tryit="${JSON.stringify({ emit: ["@azure-tools/typespec-autorest"] })}"`}
+        code={sample.files["main.tsp"]!}
+      />
+    )
+  }
+</StarlightPage>
