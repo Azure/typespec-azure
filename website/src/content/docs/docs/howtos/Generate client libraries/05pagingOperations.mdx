@@ -427,3 +427,202 @@ model Page {
   ]>;
 }
 ```
+
+## Legacy Paging Decorators
+
+:::caution
+The following decorators are legacy functionality from `Azure.ClientGenerator.Core.Legacy` and should **only** be used for brownfield services. New services should use standard TypeSpec paging patterns instead.
+:::
+
+### Forcing an operation to be paging (`@markAsPageable`)
+
+The `@markAsPageable` decorator forces an operation to be treated as a pageable operation by SDK generators, even when the operation does not follow standard paging patterns.
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+using Azure.ClientGenerator.Core.Legacy;
+
+@markAsPageable
+@route("/items")
+@get
+op listItems(): ItemListResult;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+# When @markAsPageable is applied, the operation returns a paging type
+def list_items(self, **kwargs: Any) -> ItemPaged["_models.Item"]:
+    ...
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+```csharp
+// When @markAsPageable is applied, the operation returns a pageable type
+public virtual Pageable<Item> ListItems(CancellationToken cancellationToken = default);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
+
+```typescript
+// When @markAsPageable is applied, the operation returns a paged async iterable
+export function listItems(
+  options?: ListItemsOptionalParams,
+): PagedAsyncIterableIterator<Item>;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+```java
+// When @markAsPageable is applied, the operation returns a paged iterable
+public PagedIterable<Item> listItems();
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+// When @markAsPageable is applied, the operation returns a pager
+func (c *Client) NewListItemsPager(options *ListItemsOptions) *runtime.Pager[ListItemsResponse]
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+When applied, TCGC will treat the operation as pageable and SDK generators should generate paging mechanisms (iterators/async iterators) and return appropriate pageable-specific return types.
+
+### Preventing paging treatment (`@disablePageable`)
+
+The `@disablePageable` decorator prevents an operation from being treated as pageable, even when it follows standard paging patterns (e.g., decorated with `@list`).
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+using Azure.ClientGenerator.Core.Legacy;
+
+@disablePageable
+@list
+@route("/items")
+@get
+op listItems(): ItemListResult;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+# When @disablePageable is applied, the operation returns the raw response model
+def list_items(self, **kwargs: Any) -> _models.ItemListResult:
+    ...
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+```csharp
+// When @disablePageable is applied, the operation returns the raw response model
+public virtual Response<ItemListResult> ListItems(CancellationToken cancellationToken = default);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
+
+```typescript
+// When @disablePageable is applied, the operation returns the raw response model
+export function listItems(
+  options?: ListItemsOptionalParams,
+): Promise<ItemListResult>;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+```java
+// When @disablePageable is applied, the operation returns the raw response model
+public ItemListResult listItems();
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+// When @disablePageable is applied, the operation returns the raw response model
+func (c *Client) ListItems(ctx context.Context, options *ListItemsOptions) (ItemListResult, error)
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+When applied, the response will be the paged model itself (not the list of items), and no paging mechanisms will be generated.
+
+### Specifying next link HTTP verb (`@nextLinkVerb`)
+
+The `@nextLinkVerb` decorator overrides the HTTP method used for fetching the next page. Only `"POST"` and `"GET"` are supported.
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+using Azure.ClientGenerator.Core.Legacy;
+
+@nextLinkVerb("POST")
+@post
+op listItems(): PageResult;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+# The next page will be fetched using POST instead of GET
+def list_items(self, **kwargs: Any) -> ItemPaged["_models.Item"]:
+    ...
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+```csharp
+// The next page will be fetched using POST instead of GET
+public virtual Pageable<Item> ListItems(CancellationToken cancellationToken = default);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
+
+```typescript
+// The next page will be fetched using POST instead of GET
+export function listItems(
+  options?: ListItemsOptionalParams,
+): PagedAsyncIterableIterator<Item>;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+```java
+// The next page will be fetched using POST instead of GET
+public PagedIterable<Item> listItems();
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+// The next page will be fetched using POST instead of GET
+func (c *Client) NewListItemsPager(options *ListItemsOptions) *runtime.Pager[ListItemsResponse]
+```
+
+</ClientTabItem>
+</ClientTabs>

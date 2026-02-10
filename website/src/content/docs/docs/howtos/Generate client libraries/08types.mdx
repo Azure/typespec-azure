@@ -475,8 +475,9 @@ Suppose you want your generated client library to use a type from an external pa
 ```typespec
 @alternateType(
   {
-    fullyQualifiedName: "externallib.ExternalModel",
+    identity: "externallib.ExternalModel",
     package: "externallib",
+    minVersion: "1.0.0",
   },
   "python"
 )
@@ -487,6 +488,16 @@ model MyModel {
 
 In this example, instead of generating `MyModel` in the Python sdk, the emitter will reference `ExternalModel` from `externallib` instead.
 
+The `ExternalType` model has the following properties:
+
+- `identity` (required): The fully-qualified name of the external type (e.g., `pystac.Collection`).
+- `package` (optional): The package that exports the external type (e.g., `pystac`).
+- `minVersion` (optional): The minimum version of the package to use (e.g., `1.13.0`).
+
+:::caution
+External types (with `identity` property) cannot be applied to model properties. They must be applied to the type definition itself (Scalar, Model, Enum, or Union).
+:::
+
 ### Use Cases
 
 - Integrating with shared types from other services or libraries.
@@ -496,6 +507,8 @@ In this example, instead of generating `MyModel` in the Python sdk, the emitter 
 ### Notes
 
 - The referenced type should be compatible with the intended usage in the generated client library.
+- When `@alternateType` is applied to a `Scalar`, the alternate type must also be a `Scalar`.
+- `@encode` on the original type will be overridden by the one defined in the alternate type.
 
 ## Client Default Values (Legacy)
 
@@ -648,6 +661,81 @@ model Config {
   // Apply default for all languages except Java and Python
   @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(100, "!(java, python)")
   maxRetries?: int32;
+}
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+## Deserializing Empty Strings as Null
+
+The `@deserializeEmptyStringAsNull` decorator indicates that a model property of type `string` (or a scalar derived from `string`) should be deserialized as `null` when its value is an empty string (`""`). This is useful when a service returns empty strings to represent absent values.
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+model MyModel {
+  @deserializeEmptyStringAsNull
+  displayName?: string;
+
+  @deserializeEmptyStringAsNull
+  description?: string;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+class MyModel(_model_base.Model):
+    # When the service returns "", the value will be deserialized as None
+    display_name: Optional[str] = rest_field(name="displayName")
+    description: Optional[str] = rest_field()
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+```csharp
+// When the service returns "", the value will be deserialized as null
+public partial class MyModel
+{
+    public string DisplayName { get; set; }
+    public string Description { get; set; }
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
+
+```typescript
+// When the service returns "", the value will be deserialized as undefined
+export interface MyModel {
+  displayName?: string;
+  description?: string;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+```java
+// When the service returns "", the value will be deserialized as null
+public final class MyModel {
+    public String getDisplayName() { ... }
+    public String getDescription() { ... }
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+// When the service returns "", the value will be deserialized as nil
+type MyModel struct {
+	DisplayName *string
+	Description *string
 }
 ```
 

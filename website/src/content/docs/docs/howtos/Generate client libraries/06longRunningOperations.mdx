@@ -268,3 +268,82 @@ func (c *Client) BeginExportUser(ctx context.Context, name string, format string
 ```
 
 </ClientTabs>
+
+## Legacy LRO Decorator
+
+:::caution
+The `@markAsLro` decorator is legacy functionality from `Azure.ClientGenerator.Core.Legacy` and should **only** be used when standard TypeSpec LRO patterns are not feasible. When used, you will need to verify the operation and add tests for the generated code, since forcing an operation to be LRO may result in errors.
+:::
+
+The `@markAsLro` decorator forces an operation to be treated as a Long Running Operation (LRO) by SDK generators, even when the operation is not long-running on the service side.
+
+When applied, TCGC will treat the operation as an LRO and SDK generators should generate polling mechanisms (pollers), return appropriate LRO-specific return types, and handle the operation as an asynchronous long-running process.
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+using Azure.ClientGenerator.Core.Legacy;
+
+@markAsLro
+@route("/deployments/{deploymentId}")
+@post
+op startDeployment(@path deploymentId: string): DeploymentResult | ErrorResponse;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+# When @markAsLro is applied, the operation returns a poller
+def begin_start_deployment(
+    self, deployment_id: str, **kwargs: Any
+) -> LROPoller[DeploymentResult]:
+    ...
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+```csharp
+// When @markAsLro is applied, the operation returns a long-running operation
+public virtual Operation<DeploymentResult> StartDeployment(
+    string deploymentId,
+    CancellationToken cancellationToken = default);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
+
+```typescript
+// When @markAsLro is applied, the operation returns a poller
+export function startDeployment(
+  deploymentId: string,
+  options?: StartDeploymentOptionalParams,
+): PollerLike<OperationState<DeploymentResult>, DeploymentResult>;
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+```java
+// When @markAsLro is applied, the operation returns a poller
+public SyncPoller<PollOperationDetails, DeploymentResult> beginStartDeployment(
+    String deploymentId);
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+// When @markAsLro is applied, the operation returns a poller
+func (c *Client) BeginStartDeployment(
+	ctx context.Context,
+	deploymentID string,
+	options *StartDeploymentOptions,
+) (*runtime.Poller[DeploymentResult], error)
+```
+
+</ClientTabItem>
+</ClientTabs>

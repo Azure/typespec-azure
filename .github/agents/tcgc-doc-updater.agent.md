@@ -44,10 +44,6 @@ Purpose: Functional samples demonstrating TCGC features.
 
 ## Instructions
 
-### Step 0: Bootstrap
-
-Run `pnpm install && pnpm build` from the repo root. Both commands must complete successfully before proceeding.
-
 ### Step 1: Analyze Full Codebase
 
 1. Comprehensively review the `packages/typespec-client-generator-core/` codebase
