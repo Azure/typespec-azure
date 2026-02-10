@@ -295,7 +295,7 @@ export function parseEmitterName(
  * @param operation The operation to find the service for
  * @returns The service namespace that contains the operation
  */
-function findServiceForOperation(services: Namespace[], operation: Operation): Namespace {
+export function findServiceForOperation(services: Namespace[], operation: Operation): Namespace {
   let namespace = operation.namespace;
   while (namespace) {
     if (services.includes(namespace)) {
@@ -344,15 +344,11 @@ export function updateWithApiVersionInformation(
   // from the operation's specific service
   if (operation) {
     const service = findServiceForOperation(client.services, operation);
-    const packageVersions = context.getPackageVersions();
-    const versions = filterApiVersionsWithDecorators(
-      context,
-      type,
-      packageVersions.get(service) || [],
-    );
+    const packageVersions = context.getPackageVersions().get(service) || [];
     return {
       isApiVersionParam,
-      clientDefaultValue: versions.length > 0 ? versions[versions.length - 1] : undefined,
+      clientDefaultValue:
+        packageVersions.length > 0 ? packageVersions[packageVersions.length - 1] : undefined,
     };
   }
 
