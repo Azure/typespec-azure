@@ -1841,30 +1841,29 @@ function updateExternalUsage(context: TCGCContext): void {
 }
 
 /**
- * Clean up discriminator info when only subtypes have usage.
- * If only subtypes are used in operations (not the base model itself),
- * we should remove the discriminator information from the base model.
- * This prevents language emitters from needing to handle unreferenced sibling types.
+ * Clean up discriminator info when discriminated subtypes are missing usage.
+ * If a base model has discriminatedSubtypes where some subtypes have no usage
+ * (and won't be included in the SDK package), we should remove the discriminator
+ * information from the base model. This prevents language emitters from needing
+ * to handle unreferenced sibling types.
  */
 function cleanupDiscriminatorForUnusedBase(context: TCGCContext): void {
   for (const sdkType of context.__referencedTypeCache.values()) {
     if (sdkType.kind !== "model" || !sdkType.discriminatedSubtypes) continue;
 
-    // Check if this base model has any direct usage
-    // We check if base model appears in the filtered results (has usage flags)
-    const baseHasUsage = (sdkType.usage & (UsageFlags.Input | UsageFlags.Output)) !== 0;
-
-    // Check if any subtypes have usage
-    let anySubtypeHasUsage = false;
+    // Check if any discriminated subtypes have no usage
+    let hasUnusedSubtype = false;
     for (const subtype of Object.values(sdkType.discriminatedSubtypes)) {
-      if ((subtype.usage & (UsageFlags.Input | UsageFlags.Output)) !== 0) {
-        anySubtypeHasUsage = true;
+      if ((subtype.usage & (UsageFlags.Input | UsageFlags.Output)) === 0) {
+        hasUnusedSubtype = true;
         break;
       }
     }
 
-    // If only subtypes have usage (not the base), clear discriminator info
-    if (!baseHasUsage && anySubtypeHasUsage) {
+    // If there are unused subtypes, remove discriminator info from base
+    // This prevents language emitters from needing to generate serialization
+    // for types that won't be included in the SDK
+    if (hasUnusedSubtype) {
       // Clear discriminator info from base model
       sdkType.discriminatedSubtypes = undefined;
       sdkType.discriminatorProperty = undefined;
