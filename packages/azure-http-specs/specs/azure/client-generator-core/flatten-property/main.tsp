@@ -183,6 +183,14 @@ model Solution {
 @route("/flattenReadOnlyModel")
 @scenarioDoc("""
   Test model with flatten property containing all read-only properties.
+  
+  Expected behavior: When flattening a property that contains only read-only properties:
+  - For input (write): Read-only properties should not appear in the input model, regardless of flattening
+  - For response (read): Read-only properties should be flattened to the parent model level
+  
+  The `properties` and `propertiesOptional` fields contain only read-only properties (`solutionId`, 
+  `title`, `content`). These should be flattened into the parent `Solution` model in the response.
+  
   Expected input body:
   ```json
   {
@@ -190,7 +198,7 @@ model Solution {
   }
   ```
   
-  Expected response body:
+  Expected response body (properties flattened to parent level):
   ```json
   {
     "name": "foo",
