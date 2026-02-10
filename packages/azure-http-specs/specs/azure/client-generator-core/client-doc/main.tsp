@@ -50,8 +50,8 @@ op getReplace(@query name: string): ReplaceModel;
 @scenario
 @scenarioDoc("""
   This scenario tests that @clientDoc with DocumentationMode.append appends to the service documentation.
-  The generated model "AppendModel" should have documentation "Service documentation for the model. Additional client-specific notes."
-  The property "name" should have documentation "Service documentation for the property. Extra details for the property."
+  The generated model "AppendModel" should have documentation that includes both "Service documentation for the model." and "Additional client-specific notes."
+  The property "name" should have documentation that includes both "Service documentation for the property." and "Extra details for the property."
   Expected query parameter: name="test"
   Expected response body:
   ```json
