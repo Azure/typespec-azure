@@ -26,17 +26,12 @@ enum Versions {
 interface Operations extends Azure.ResourceManager.Operations {}
 
 @doc("Widget Resource")
-model WidgetResource is TrackedResource<WidgetResourceProperties> {
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @doc("The name of the widget.")
-  @key("widgetName")
-  @segment("widgets")
-  @path
-  name: string;
+model Widget is TrackedResource<WidgetProperties> {
+  ...ResourceNameParameter<Widget, NamePattern = "^[a-zA-Z0-9-]{3,24}$">;
 }
 
 @doc("Widget Resource Properties.")
-model WidgetResourceProperties {
+model WidgetProperties {
   @doc("The widget color.")
   @visibility(Lifecycle.Create, Lifecycle.Read)
   color: string;
@@ -50,10 +45,10 @@ model WidgetResourceProperties {
 
 @armResourceOperations
 interface Widgets {
-  get is ArmResourceRead<WidgetResource>;
-  create is ArmResourceCreateOrUpdateAsync<WidgetResource>;
-  update is ArmTagsPatchSync<WidgetResource>;
-  delete is ArmResourceDeleteWithoutOkAsync<WidgetResource>;
-  listByResourceGroup is ArmResourceListByParent<WidgetResource>;
-  listBySubscription is ArmListBySubscription<WidgetResource>;
+  get is ArmResourceRead<Widget>;
+  create is ArmResourceCreateOrUpdateAsync<Widget>;
+  update is ArmTagsPatchSync<Widget>;
+  delete is ArmResourceDeleteWithoutOkAsync<Widget>;
+  listByResourceGroup is ArmResourceListByParent<Widget>;
+  listBySubscription is ArmListBySubscription<Widget>;
 }
