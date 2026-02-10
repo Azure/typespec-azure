@@ -14,7 +14,9 @@ You may ONLY modify files in the following locations:
 - `website/src/content/docs/docs/howtos/Generate client libraries/` — user documentation
 - `website/src/content/docs/docs/libraries/typespec-client-generator-core/guideline.md` — emitter developer documentation
 - `packages/typespec-client-generator-core/design-docs/` — design documents
-- `packages/azure-http-specs/specs/` — Spector test specs (and `cspell.yaml` for spelling)
+- `packages/azure-http-specs/specs/` — Spector test specs
+- `packages/azure-http-specs/spec-summary.md` — generated spec summary (may be updated by `pnpm regen-docs`)
+- `cspell.yaml` — spelling dictionary
 
 Do **NOT** modify TCGC source code (`packages/typespec-client-generator-core/src/`), other emitter packages, or any files outside the locations listed above.
 
