@@ -1840,6 +1840,61 @@ function updateExternalUsage(context: TCGCContext): void {
   }
 }
 
+/**
+ * Clean up discriminator info when only subtypes have usage.
+ * If only subtypes are used in operations (not the base model itself),
+ * we should remove the discriminator information from the base model.
+ * This prevents language emitters from needing to handle unreferenced sibling types.
+ */
+function cleanupDiscriminatorForUnusedBase(context: TCGCContext): void {
+  for (const sdkType of context.__referencedTypeCache.values()) {
+    if (sdkType.kind !== "model" || !sdkType.discriminatedSubtypes) continue;
+
+    // Check if this base model has any direct usage
+    // We check if base model appears in the filtered results (has usage flags)
+    const baseHasUsage = (sdkType.usage & (UsageFlags.Input | UsageFlags.Output)) !== 0;
+
+    // Check if any subtypes have usage
+    let anySubtypeHasUsage = false;
+    for (const subtype of Object.values(sdkType.discriminatedSubtypes)) {
+      if ((subtype.usage & (UsageFlags.Input | UsageFlags.Output)) !== 0) {
+        anySubtypeHasUsage = true;
+        break;
+      }
+    }
+
+    // If only subtypes have usage (not the base), clear discriminator info
+    if (!baseHasUsage && anySubtypeHasUsage) {
+      // Clear discriminator info from base model
+      sdkType.discriminatedSubtypes = undefined;
+      sdkType.discriminatorProperty = undefined;
+
+      // Clear discriminator value from all subtypes in the hierarchy
+      for (const subtype of context.__referencedTypeCache.values()) {
+        if (
+          subtype.kind === "model" &&
+          subtype.discriminatorValue &&
+          hasBaseModel(subtype, sdkType)
+        ) {
+          subtype.discriminatorValue = undefined;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Helper function to check if a model has a specific base model in its hierarchy
+ */
+function hasBaseModel(model: SdkModelType, targetBase: SdkModelType): boolean {
+  let current = model.baseModel;
+  while (current) {
+    if (current === targetBase) return true;
+    current = current.baseModel;
+  }
+  return false;
+}
+
 function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   for (const sdkType of context.__referencedTypeCache.values()) {
@@ -2048,6 +2103,8 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   updateExternalUsage(context);
   // update discriminated subtypes and filter out duplicate properties from `@hierarchyBuilding`
   diagnostics.pipe(handleLegacyHierarchyBuilding(context));
+  // clean up discriminator info when only subtypes have usage
+  cleanupDiscriminatorForUnusedBase(context);
   // update generated name
   resolveConflictGeneratedName(context);
 

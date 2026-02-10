@@ -566,3 +566,46 @@ it("disableUsageAccessPropagationToBase true discriminator without ref propagati
   strictEqual(models[2].usage, UsageFlags.Output | UsageFlags.Json);
   strictEqual(models[2].name, "Salmon");
 });
+
+it("discriminator removed when only subtype is used", async () => {
+  const { program } = await SimpleTesterWithService.compile(`
+      @discriminator("kind")
+      model Pet {
+        kind: string;
+        name: string;
+        weight?: float32;
+      }
+      model Cat extends Pet {
+        kind: "cat";
+        meow: int32;
+      }
+      model Dog extends Pet {
+        kind: "dog";
+        bark: string;
+      }
+      @route("/read")
+      op read(): { @body body: Cat };
+    `);
+
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+
+  // Only Cat and Pet should be in models (Dog should be filtered out by usage)
+  strictEqual(models.length, 2);
+  const petModel = models.find((m) => m.name === "Pet");
+  const catModel = models.find((m) => m.name === "Cat");
+
+  // Pet and Cat should exist
+  strictEqual(petModel !== undefined, true);
+  strictEqual(catModel !== undefined, true);
+
+  // Dog should not be in models
+  const dogModel = models.find((m) => m.name === "Dog");
+  strictEqual(dogModel, undefined);
+
+  // Since only Cat (a subtype) is used directly, Pet's discriminatedSubtypes should be cleared
+  // This prevents language emitters from needing to handle Dog which has no usage
+  strictEqual(petModel!.discriminatedSubtypes, undefined);
+  strictEqual(petModel!.discriminatorProperty, undefined);
+  strictEqual(catModel!.discriminatorValue, undefined);
+});
