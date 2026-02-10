@@ -1840,6 +1840,37 @@ function updateExternalUsage(context: TCGCContext): void {
   }
 }
 
+/**
+ * Helper function to check if a type has input or output usage
+ */
+function hasInputOrOutputUsage(usage: number): boolean {
+  return (usage & (UsageFlags.Input | UsageFlags.Output)) !== 0;
+}
+
+/**
+ * Clean up discriminator info when discriminated subtypes are missing usage.
+ * Remove subtypes without usage from the discriminatedSubtypes map to prevent
+ * language emitters from referencing unavailable types.
+ */
+function cleanupDiscriminatorForUnusedBase(context: TCGCContext): void {
+  for (const sdkType of context.__referencedTypeCache.values()) {
+    if (sdkType.kind !== "model" || !sdkType.discriminatedSubtypes) continue;
+
+    // Remove discriminated subtypes that have no usage
+    for (const [key, subtype] of Object.entries(sdkType.discriminatedSubtypes)) {
+      if (!hasInputOrOutputUsage(subtype.usage)) {
+        delete sdkType.discriminatedSubtypes[key];
+      }
+    }
+
+    // If all subtypes were removed, clear the discriminatedSubtypes entirely
+    if (Object.keys(sdkType.discriminatedSubtypes).length === 0) {
+      sdkType.discriminatedSubtypes = undefined;
+      sdkType.discriminatorProperty = undefined;
+    }
+  }
+}
+
 function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   for (const sdkType of context.__referencedTypeCache.values()) {
@@ -2048,6 +2079,8 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   updateExternalUsage(context);
   // update discriminated subtypes and filter out duplicate properties from `@hierarchyBuilding`
   diagnostics.pipe(handleLegacyHierarchyBuilding(context));
+  // clean up discriminator info when only subtypes have usage
+  cleanupDiscriminatorForUnusedBase(context);
   // update generated name
   resolveConflictGeneratedName(context);
 
