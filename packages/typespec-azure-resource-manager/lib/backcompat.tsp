@@ -16,17 +16,7 @@ alias PrivateEndpointConnectionProperties = CommonTypes.PrivateEndpointConnectio
 alias PrivateLinkServiceConnectionState = CommonTypes.PrivateLinkServiceConnectionState;
 alias PrivateEndpointConnectionProvisioningState = CommonTypes.PrivateEndpointConnectionProvisioningState;
 alias PrivateEndpointServiceConnectionStatus = CommonTypes.PrivateEndpointServiceConnectionStatus;
-alias PrivateEndpointConnectionParameter<
-  KeyName extends valueof string = string("privateEndpointConnectionName"),
-  ResourceNamePattern extends valueof string = string("^[a-z][a-zA-Z0-9]*$"),
-  MinLength extends valueof int32 = 3,
-  MaxLength extends valueof int32 = 63
-> = CommonTypes.PrivateEndpointConnectionNameParameter<
-  KeyName,
-  ResourceNamePattern,
-  MinLength,
-  MaxLength
->;
+alias PrivateEndpointConnectionParameter = CommonTypes.PrivateEndpointConnectionParameter;
 alias PrivateLinkResource = CommonTypes.PrivateLinkResource;
 alias PrivateLinkResourceProperties = CommonTypes.PrivateLinkResourceProperties;
 alias PrivateLinkResourceParameter<
