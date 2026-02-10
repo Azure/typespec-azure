@@ -48,7 +48,7 @@ jobs:
             --repo ${{ github.repository }} \
             --base main \
             --agent .github/agents/tcgc-doc-updater.agent.md \
-            --model claude-opus-4-5
+            --model claude-opus-4-6
 
       - name: Summary
         run: |
@@ -58,7 +58,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Focus Area:** ${{ github.event.inputs.focus_area || 'all' }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Model:** Claude Opus 4.5" >> $GITHUB_STEP_SUMMARY
+          echo "**Model:** Claude Opus 4.6" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Custom Agent:** .github/agents/tcgc-doc-updater.agent.md" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
