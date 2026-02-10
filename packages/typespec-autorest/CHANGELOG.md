@@ -1,5 +1,18 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.65.0
+
+### Deprecations
+
+- [#3836](https://github.com/Azure/typespec-azure/pull/3836) Deprecate `azure-resource-provider-folder` option.
+  
+  ```diff lang=yaml
+  -azure-resource-provider-folder: "resource-manager"
+  -output-file: "{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json"
+  +output-file: "resource-manager/{service-name}/{version-status}/{version}/openapi.json"
+  ```
+
+
 ## 0.64.1
 
 ### Bug Fixes
