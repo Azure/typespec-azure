@@ -23,10 +23,10 @@ model ReplaceModel {
 }
 
 @doc("Service documentation for the model.")
-@clientDoc(" Additional client-specific notes.", DocumentationMode.append)
+@clientDoc("Additional client-specific notes.", DocumentationMode.append)
 model AppendModel {
   @doc("Service documentation for the property.")
-  @clientDoc(" Extra details for the property.", DocumentationMode.append)
+  @clientDoc("Extra details for the property.", DocumentationMode.append)
   name: string;
 }
 
