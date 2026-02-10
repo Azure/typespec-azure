@@ -473,9 +473,7 @@ public virtual Pageable<Item> ListItems(CancellationToken cancellationToken = de
 
 ```typescript
 // When @markAsPageable is applied, the operation returns a paged async iterable
-export function listItems(
-  options?: ListItemsOptionalParams,
-): PagedAsyncIterableIterator<Item>;
+export function listItems(options?: ListItemsOptionalParams): PagedAsyncIterableIterator<Item>;
 ```
 
 </ClientTabItem>
@@ -539,9 +537,7 @@ public virtual Response<ItemListResult> ListItems(CancellationToken cancellation
 
 ```typescript
 // When @disablePageable is applied, the operation returns the raw response model
-export function listItems(
-  options?: ListItemsOptionalParams,
-): Promise<ItemListResult>;
+export function listItems(options?: ListItemsOptionalParams): Promise<ItemListResult>;
 ```
 
 </ClientTabItem>
@@ -603,9 +599,7 @@ public virtual Pageable<Item> ListItems(CancellationToken cancellationToken = de
 
 ```typescript
 // The next page will be fetched using POST instead of GET
-export function listItems(
-  options?: ListItemsOptionalParams,
-): PagedAsyncIterableIterator<Item>;
+export function listItems(options?: ListItemsOptionalParams): PagedAsyncIterableIterator<Item>;
 ```
 
 </ClientTabItem>
