@@ -125,6 +125,14 @@ model FlattenUnknownModel {
 @route("/flattenUnknownModel")
 @scenarioDoc("""
   Update and receive model with flatten property of unknown type.
+  
+  Note: `unknown` is a non-model type. The flatten decorator should be ignored for non-model types, 
+  so whether flattened or not, the behavior should be the same. This test verifies that SDKs correctly 
+  ignore flatten for non-model types.
+  
+  Expected behavior: The `properties` field should NOT be flattened and should remain as-is in the model,
+  since flatten only applies to model types.
+  
   Expected input body:
   ```json
   {
