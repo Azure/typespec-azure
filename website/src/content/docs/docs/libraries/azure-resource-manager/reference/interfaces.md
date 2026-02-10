@@ -141,7 +141,7 @@ interface Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, Resour
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | PrivateEndpointResource | The type of the private endpoint connection resource. You must declare a private endpoint connection resource type in your provider namespace.       |
 | ResourceName            | Optional. The name of the private endpoint connection resource in this context, by default, this is `{targetResourceName}PrivateEndpointConnection`. |
-| ResourceParameter       | Optional. The name parameter model for the private endpoint connection resource. By default, this is `PrivateEndpointConnectionParameter`            |
+| ResourceParameter       | Optional. The name parameter model for the private endpoint connection resource. By default, this parameter has no constraints                       |
 
 #### `PrivateEndpoints.ListByParent` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.ListByParent}
 

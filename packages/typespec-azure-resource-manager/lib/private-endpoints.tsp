@@ -37,7 +37,7 @@ model PrivateEndpointConnectionResource<Description extends valueof string = "A 
  * Operations over private endpoint connection resources.
  * @template PrivateEndpointResource The type of the private endpoint connection resource. You must declare a private endpoint connection resource type in your provider namespace.
  * @template ResourceName Optional. The name of the private endpoint connection resource in this context, by default, this is `{targetResourceName}PrivateEndpointConnection`.
- * @template ResourceParameter Optional. The name parameter model for the private endpoint connection resource. By default, this is `PrivateEndpointConnectionParameter`
+ * @template ResourceParameter Optional. The name parameter model for the private endpoint connection resource. By default, this parameter has no constraints
  * @example
  * ```ts
  * namespace Microsoft.Contoso;
@@ -53,7 +53,7 @@ model PrivateEndpointConnectionResource<Description extends valueof string = "A 
 interface PrivateEndpoints<
   PrivateEndpointResource extends PrivateEndpointConnectionResource,
   ResourceName extends valueof string = string(""),
-  ResourceParameter extends {} = PrivateEndpointConnectionParameter
+  ResourceParameter extends {} = CommonTypes.PrivateEndpointConnectionParameter
 > {
   /**
    * @dev List the private endpoint connections over a resource

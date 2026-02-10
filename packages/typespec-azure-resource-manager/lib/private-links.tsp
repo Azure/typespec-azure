@@ -54,7 +54,7 @@ model PrivateLink<Description extends valueof string = "A private link resource.
 interface PrivateLinks<
   PrivateLinkResourceModel extends PrivateLink,
   ResourceName extends valueof string = string(""),
-  ResourceParameter extends {} = PrivateLinkResourceParameter
+  ResourceParameter extends {} = CommonTypes.PrivateLinkResourceParameter
 > {
   /**
    * @dev List the private links to a resource

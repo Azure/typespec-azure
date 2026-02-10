@@ -51,7 +51,7 @@ model NspConfigurationResource<
 @Http.Private.includeInapplicableMetadataInPayload(false)
 model NspConfigurationNameParameter<
   KeyName extends valueof string = "networkSecurityPerimeterConfigurationName",
-  ResourceNamePattern extends valueof string = string("^[a-z][a-zA-Z0-9]*$"),
+  ResourceNamePattern extends valueof string = string(""),
   MinLength extends valueof int32 = 1,
   MaxLength extends valueof int32 = 512
 > {

@@ -761,8 +761,7 @@
             "required": true,
             "type": "string",
             "minLength": 1,
-            "maxLength": 512,
-            "pattern": "^[a-z][a-zA-Z0-9]*$"
+            "maxLength": 512
           }
         ],
         "responses": {
@@ -909,8 +908,7 @@
             "required": true,
             "type": "string",
             "minLength": 1,
-            "maxLength": 512,
-            "pattern": "^[a-z][a-zA-Z0-9]*$"
+            "maxLength": 512
           }
         ],
         "responses": {
