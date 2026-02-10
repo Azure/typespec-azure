@@ -1849,58 +1849,26 @@ function hasInputOrOutputUsage(usage: number): boolean {
 
 /**
  * Clean up discriminator info when discriminated subtypes are missing usage.
- * If a base model has discriminatedSubtypes where some subtypes have no usage
- * (and won't be included in the SDK package), we should remove the discriminator
- * information from the base model. This prevents language emitters from needing
- * to handle unreferenced sibling types.
+ * Remove subtypes without usage from the discriminatedSubtypes map to prevent
+ * language emitters from referencing unavailable types.
  */
 function cleanupDiscriminatorForUnusedBase(context: TCGCContext): void {
   for (const sdkType of context.__referencedTypeCache.values()) {
     if (sdkType.kind !== "model" || !sdkType.discriminatedSubtypes) continue;
 
-    // Check if any discriminated subtypes have no usage
-    let hasUnusedSubtype = false;
-    for (const subtype of Object.values(sdkType.discriminatedSubtypes)) {
+    // Remove discriminated subtypes that have no usage
+    for (const [key, subtype] of Object.entries(sdkType.discriminatedSubtypes)) {
       if (!hasInputOrOutputUsage(subtype.usage)) {
-        hasUnusedSubtype = true;
-        break;
+        delete sdkType.discriminatedSubtypes[key];
       }
     }
 
-    // If there are unused subtypes, remove discriminator info from base
-    // This prevents language emitters from needing to generate serialization
-    // for types that won't be included in the SDK
-    if (hasUnusedSubtype) {
-      // Clear discriminator info from base model
+    // If all subtypes were removed, clear the discriminatedSubtypes entirely
+    if (Object.keys(sdkType.discriminatedSubtypes).length === 0) {
       sdkType.discriminatedSubtypes = undefined;
       sdkType.discriminatorProperty = undefined;
-
-      // Clear discriminator value from all subtypes in the hierarchy
-      for (const subtype of context.__referencedTypeCache.values()) {
-        if (
-          subtype.kind === "model" &&
-          subtype.discriminatorValue &&
-          hasBaseModel(subtype, sdkType)
-        ) {
-          subtype.discriminatorValue = undefined;
-        }
-      }
     }
   }
-}
-
-/**
- * Helper function to check if a model has a specific base model in its hierarchy
- */
-function hasBaseModel(model: SdkModelType, targetBase: SdkModelType): boolean {
-  const visited = new Set<SdkModelType>();
-  let current = model.baseModel;
-  while (current && !visited.has(current)) {
-    if (current === targetBase) return true;
-    visited.add(current);
-    current = current.baseModel;
-  }
-  return false;
 }
 
 function handleLegacyHierarchyBuilding(context: TCGCContext): [void, readonly Diagnostic[]] {

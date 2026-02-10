@@ -603,9 +603,13 @@ it("discriminator removed when only subtype is used", async () => {
   const dogModel = models.find((m) => m.name === "Dog");
   strictEqual(dogModel, undefined);
 
-  // Since only Cat (a subtype) is used directly, Pet's discriminatedSubtypes should be cleared
-  // This prevents language emitters from needing to handle Dog which has no usage
-  strictEqual(petModel!.discriminatedSubtypes, undefined);
-  strictEqual(petModel!.discriminatorProperty, undefined);
-  strictEqual(catModel!.discriminatorValue, undefined);
+  // Dog should be removed from Pet's discriminatedSubtypes
+  // Only Cat should remain in the discriminatedSubtypes map
+  strictEqual(petModel!.discriminatedSubtypes !== undefined, true);
+  strictEqual(petModel!.discriminatedSubtypes!["cat"], catModel);
+  strictEqual(petModel!.discriminatedSubtypes!["dog"], undefined);
+  
+  // Discriminator property should still be set since Cat is a valid subtype
+  strictEqual(petModel!.discriminatorProperty !== undefined, true);
+  strictEqual(catModel!.discriminatorValue, "cat");
 });
