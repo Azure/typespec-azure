@@ -1,6 +1,7 @@
 name: TCGC Documentation Update Scheduler
 
-# This workflow triggers GitHub Copilot coding agent via CLI to maintain TCGC documentation
+# This workflow triggers GitHub Copilot coding agent via the REST API to maintain TCGC documentation.
+# It creates a GitHub issue assigned to copilot-swe-agent[bot], which starts a coding agent session.
 
 on:
   schedule:
@@ -21,14 +22,16 @@ on:
           - spector
 
 permissions:
+  actions: write
   contents: write
+  issues: write
   pull-requests: write
 
 jobs:
   trigger-copilot-agent:
     runs-on: ubuntu-latest
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.COPILOT_PAT }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -39,17 +42,34 @@ jobs:
           FOCUS_AREA="${{ github.event.inputs.focus_area || 'all' }}"
           DATE=$(date +%Y-%m-%d)
 
-          PROMPT="Update TCGC documentation (Run date: $DATE). Focus area: $FOCUS_AREA"
+          TITLE="[Automated] Update TCGC documentation ($DATE) - Focus: $FOCUS_AREA"
+          BODY="Update TCGC documentation (Run date: $DATE). Focus area: $FOCUS_AREA"
 
-          echo "prompt=$PROMPT" >> $GITHUB_OUTPUT
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
+          echo "body=$BODY" >> $GITHUB_OUTPUT
 
-      - name: Trigger Copilot coding agent
+      - name: Create issue and assign to Copilot coding agent
+        id: create-issue
         run: |
-          gh agent-task create "${{ steps.build-prompt.outputs.prompt }}" \
-            --repo ${{ github.repository }} \
-            --base main \
-            --agent .github/agents/tcgc-doc-updater.agent.md \
-            --model claude-opus-4-6
+          ISSUE_URL=$(gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/${{ github.repository }}/issues \
+            --input - <<< '{
+              "title": "${{ steps.build-prompt.outputs.title }}",
+              "body": "${{ steps.build-prompt.outputs.body }}",
+              "assignees": ["copilot-swe-agent[bot]"],
+              "agent_assignment": {
+                "target_repo": "${{ github.repository }}",
+                "base_branch": "main",
+                "custom_instructions": "",
+                "custom_agent": "tcgc-doc-updater",
+                "model": ""
+              }
+            }' --jq '.html_url')
+
+          echo "issue_url=$ISSUE_URL" >> $GITHUB_OUTPUT
 
       - name: Summary
         run: |
@@ -59,8 +79,8 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Focus Area:** ${{ github.event.inputs.focus_area || 'all' }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Model:** Claude Opus 4.6" >> $GITHUB_STEP_SUMMARY
+          echo "**Custom Agent:** tcgc-doc-updater" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Custom Agent:** .github/agents/tcgc-doc-updater.agent.md" >> $GITHUB_STEP_SUMMARY
+          echo "**Issue:** ${{ steps.create-issue.outputs.issue_url }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Check the [agents panel](https://github.com/copilot/agents) for progress." >> $GITHUB_STEP_SUMMARY

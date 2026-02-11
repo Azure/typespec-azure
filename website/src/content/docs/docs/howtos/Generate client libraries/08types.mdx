@@ -472,6 +472,8 @@ The `@alternateType` decorator allows you to override the emitted type for a mod
 
 Suppose you want your generated client library to use a type from an external package instead of the default emitted type.
 
+<ClientTabs>
+
 ```typespec
 @alternateType(
   {
@@ -485,6 +487,48 @@ model MyModel {
   prop: string;
 }
 ```
+
+```python
+# In Python SDK, instead of generating MyModel,
+# the emitter will reference ExternalModel from externallib
+from externallib import ExternalModel
+```
+
+```csharp
+// In C# SDK, MyModel would be generated normally
+// unless an external type is specified for C#
+public partial class MyModel
+{
+    public string Prop { get; set; }
+}
+```
+
+```typescript
+// In TypeScript SDK, MyModel would be generated normally
+// unless an external type is specified for TypeScript
+export interface MyModel {
+    prop: string;
+}
+```
+
+```java
+// In Java SDK, MyModel would be generated normally
+// unless an external type is specified for Java
+public final class MyModel {
+    private String prop;
+    public String getProp() { return prop; }
+}
+```
+
+```go
+// In Go SDK, MyModel would be generated normally
+// unless an external type is specified for Go
+type MyModel struct {
+    Prop *string
+}
+```
+
+</ClientTabs>
 
 In this example, instead of generating `MyModel` in the Python sdk, the emitter will reference `ExternalModel` from `externallib` instead.
 
@@ -1873,8 +1917,8 @@ Python generates this as a union of literals, not as enum. We also don't generat
 ```python
 from typing import Literal, Union
 
-model Widget:
-  horizontal: Union[Literal["left"] | Literal["right"] | str]
+class Widget:
+    horizontal: Union[Literal["left"], Literal["right"], str]
 ```
 
 </ClientTabItem>

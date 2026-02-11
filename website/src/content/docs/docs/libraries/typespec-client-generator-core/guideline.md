@@ -30,8 +30,12 @@ If your client emitter has options or global variables, extend [`SdkContext`](..
 import { EmitContext } from "@typespec/compiler";
 import { createSdkContext } from "@azure-tools/typespec-client-generator-core";
 
-interface PythonEmitterOptions extends SdkEmitterOptions {
+// Define your emitter-specific options
+interface PythonEmitterOptions {
   // Options specific to the client emitter
+  packageDir?: string;
+  flavor?: "azure" | "unbranded";
+  // ... other options
 }
 
 interface PythonSdkContext extends SdkContext<PythonEmitterOptions> {
@@ -134,6 +138,11 @@ The initialization parameter can be either [`SdkEndpointParameter`](../reference
 
 **SdkMethodParameter** is a normal client-level parameter that can be used in some of the methods belonging to the client. For type details, refer to the next section.
 
+:::caution[Deprecated Properties]
+- `SdkClient.service` and `SdkOperationGroup.service` are deprecated. Use `services` (plural) instead. These properties will be removed in a future release.
+- `SdkPackage.metadata.apiVersion` is deprecated. Use `apiVersions` instead.
+:::
+
 ### Method
 
 Emitters get all methods belonging to a client with `SdkClientType.methods`. An [`SdkServiceMethod`](../reference/js-api/type-aliases/sdkservicemethod/) represents a client's method.
@@ -203,14 +212,20 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 
 - [`SdkModelPropertyType`](../reference/js-api/interfaces/sdkmodelpropertytype/) represents a TCGC model property type. It is typically converted from a TypeSpec [`ModelProperty`](https://typespec.io/docs/standard-library/reference/js-api/interfaces/modelproperty/) type. It represents a property of a model and has the following key properties:
   - `flatten`: Indicates if the property can be flattened
-  - `additionalProperties`: Indicates if the model can accept additional properties with a specific type
+  - `discriminator`: Indicates if the property is a discriminator property
+  - `serializationOptions`: Contains serialization metadata (JSON, XML, multipart, etc.)
+  - `encode`: Indicates the encoding style for properties (e.g., for arrays: "pipeDelimited", "commaDelimited", etc.)
+  
+**Model Types:**
+
+- [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) represents a TCGC model type. It has the following key properties related to inheritance and polymorphism:
+  - `additionalProperties`: Indicates if the model can accept additional properties with a specific type (corresponds to TypeSpec `Record<>` types)
   - For discriminated models:
     - `discriminatorProperty`: The property used as a discriminator
     - `discriminatedSubtypes`: List of all subtypes of this discriminated model
   - For subtypes of discriminated models:
     - `discriminatorValue`: The instance value for the discriminator for this subtype
-  - For array properties:
-    - `arrayEncode`: Indicates the encoding style for array properties (if specified).
+  - `baseModel`: The parent model if this model extends another model
 
 ### Example types
 
