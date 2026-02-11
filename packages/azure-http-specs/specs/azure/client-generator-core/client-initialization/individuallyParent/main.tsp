@@ -6,14 +6,14 @@ using Http;
 using Spector;
 using Azure.ClientGenerator.Core;
 
-@doc("Test for client initialization decorator - moving parameters from method to client level")
-@scenarioService("/azure/client-generator-core/client-initialization/individually-parent")
-namespace _Specs_.Azure.ClientGenerator.Core.ClientInitialization.IndividuallyParentClient;
-
 @global.Azure.ClientGenerator.Core.clientNamespace(
   "azure.clientgenerator.core.clientinitialization.individuallyparentclient",
   "java"
 )
+@doc("Test for client initialization decorator - moving parameters from method to client level")
+@scenarioService("/azure/client-generator-core/client-initialization/individually-parent")
+namespace _Specs_.Azure.ClientGenerator.Core.ClientInitialization.IndividuallyParentClient;
+
 model PathParamClientOptions {
   @doc("The blob name to use for operations")
   blobName: string;
