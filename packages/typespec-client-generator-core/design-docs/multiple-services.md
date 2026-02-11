@@ -527,7 +527,10 @@ Define clients where one client targets multiple services and another targets a 
 @service
 @versioned(VersionsA)
 namespace ServiceA {
-  enum VersionsA { av1, av2 }
+  enum VersionsA {
+    av1,
+    av2,
+  }
 
   interface Operations {
     opA(): void;
@@ -537,7 +540,10 @@ namespace ServiceA {
 @service
 @versioned(VersionsB)
 namespace ServiceB {
-  enum VersionsB { bv1, bv2 }
+  enum VersionsB {
+    bv1,
+    bv2,
+  }
 
   interface Operations {
     opB(): void;
@@ -547,7 +553,10 @@ namespace ServiceB {
 @service
 @versioned(VersionsC)
 namespace ServiceC {
-  enum VersionsC { cv1, cv2 }
+  enum VersionsC {
+    cv1,
+    cv2,
+  }
 
   interface Operations {
     opC(): void;
