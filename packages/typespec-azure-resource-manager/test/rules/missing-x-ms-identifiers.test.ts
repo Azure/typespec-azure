@@ -1,29 +1,29 @@
+import { Tester } from "#test/tester.js";
 import {
-  BasicTestRunner,
   LinterRuleTester,
+  TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
+
 import { missingXmsIdentifiersRule } from "../../src/rules/missing-x-ms-identifiers.js";
-import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
-describe("typespec-azure-core: no-enum rule", () => {
-  let runner: BasicTestRunner;
-  let tester: LinterRuleTester;
+let runner: TesterInstance;
+let tester: LinterRuleTester;
 
-  beforeEach(async () => {
-    runner = await createAzureResourceManagerTestRunner();
-    tester = createLinterRuleTester(
-      runner,
-      missingXmsIdentifiersRule,
-      "@azure-tools/typespec-azure-resource-manager",
-    );
-  });
+beforeEach(async () => {
+  runner = await Tester.createInstance();
+  tester = createLinterRuleTester(
+    runner,
+    missingXmsIdentifiersRule,
+    "@azure-tools/typespec-azure-resource-manager",
+  );
+});
 
-  it("emit warning for array of model without x-ms-identifiers", async () => {
-    await tester
-      .expect(
-        `
+it("emit warning for array of model without x-ms-identifiers", async () => {
+  await tester
+    .expect(
+      `
         model Foo {
           bar: Bar[];
         }
@@ -32,19 +32,19 @@ describe("typespec-azure-core: no-enum rule", () => {
           customName: string;
         }
         `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
-        message: `Missing identifying properties of objects in the array item, please add @OpenAPI.extension("x-ms-identifiers", #[<prop>]) to specify it. If there are no appropriate identifying properties, please add @OpenAPI.extension("x-ms-identifiers", #[]).`,
-      });
-  });
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
+      message: `Missing identifying properties of objects in the array item, please add @identifiers(#["<prop>"]) to specify it. If there are no appropriate identifying properties, please add @identifiers(#[]).`,
+    });
+});
 
-  it("emit warning if value is not a tuple", async () => {
-    await tester
-      .expect(
-        `
+it("emit diagnostic when x-ms-identifiers property names are not found in the target type", async () => {
+  await tester
+    .expect(
+      `
         model Foo {
-          @OpenAPI.extension("x-ms-identifiers", "customName")
+          @identifiers(#["not-a-prop"])
           bar: Bar[];
         }
 
@@ -52,19 +52,19 @@ describe("typespec-azure-core: no-enum rule", () => {
           customName: string;
         }
         `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
-        message: `Value passed to @OpenAPI.extension("x-ms-identifiers",...) was a "string". Pass an array of property name.`,
-      });
-  });
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
+      message: `Property "not-a-prop" is not found in "Bar". Make sure value of x-ms-identifiers extension are valid property name of the array element.`,
+    });
+});
 
-  it("emit diagnostic when x-ms-identifiers property names are not found in the target type", async () => {
-    await tester
-      .expect(
-        `
+it(`doesn't emit diagnostic if @identifiers(...) is specified`, async () => {
+  await tester
+    .expect(
+      `
         model Foo {
-          @OpenAPI.extension("x-ms-identifiers", #["not-a-prop"])
+          @identifiers(#["customName"])
           bar: Bar[];
         }
 
@@ -72,36 +72,16 @@ describe("typespec-azure-core: no-enum rule", () => {
           customName: string;
         }
         `,
-      )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
-        message: `Property "not-a-prop" is not found in "Bar". Make sure value of x-ms-identifiers extension are valid property name of the array element.`,
-      });
-  });
+    )
+    .toBeValid();
+});
 
-  it(`doesn't emit diagnostic if @extension("x-ms-identifiers",...) is specified`, async () => {
-    await tester
-      .expect(
-        `
+it(`doesn't emit diagnostic if x-ms-identifiers property is defined in a base class`, async () => {
+  await tester
+    .expect(
+      `
         model Foo {
-          @OpenAPI.extension("x-ms-identifiers", #["customName"])
-          bar: Bar[];
-        }
-
-        model Bar {
-          customName: string;
-        }
-        `,
-      )
-      .toBeValid();
-  });
-
-  it(`doesn't emit diagnostic if x-ms-identifiers property is defined in a base class`, async () => {
-    await tester
-      .expect(
-        `
-        model Foo {
-          @OpenAPI.extension("x-ms-identifiers", #["name"])
+          @identifiers(#["name"])
           bar: Child[];
         }
 
@@ -111,14 +91,14 @@ describe("typespec-azure-core: no-enum rule", () => {
 
         model Base { name: string;}
         `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it(`doesn't emit diagnostic if element is a primitive type`, async () => {
-    await tester
-      .expect(
-        `
+it(`doesn't emit diagnostic if element is a primitive type`, async () => {
+  await tester
+    .expect(
+      `
         model Foo {
           bar: Bar[];
         }
@@ -127,60 +107,14 @@ describe("typespec-azure-core: no-enum rule", () => {
           id: string;
         }
         `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it("allow array of x-ms-identifiers", async () => {
-    await tester
-      .expect(
-        `
-        model Pet {
-          @OpenAPI.extension("x-ms-identifiers", #["food/brand/name"])
-          pet: Dog[];
-        }
- 
-        model Dog {
-          food: Food;
-        }
-        
-        model Food {
-          brand: Brand;
-        }
-        
-        model Brand {
-          name: string;
-        }
-        `,
-      )
-      .toBeValid();
-  });
-
-  it("allow array of x-ms-identifiers starting with /", async () => {
-    await tester
-      .expect(
-        `
-        model Pet {
-          @OpenAPI.extension("x-ms-identifiers", #["/food/brand"])
-          pet: Dog[];
-        }
- 
-        model Dog {
-          food: Food;
-        }
-        
-        model Food {
-          brand: string;
-        }
-        `,
-      )
-      .toBeValid();
-  });
-
-  it("allow x-ms-identifiers from keys", async () => {
-    await tester
-      .expect(
-        `
+it("allow x-ms-identifiers from keys", async () => {
+  await tester
+    .expect(
+      `
         model Pet {
           pet: Dog[];
         }
@@ -194,14 +128,14 @@ describe("typespec-azure-core: no-enum rule", () => {
           brand: string;
         }
         `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it("allow x-ms-identifiers from keys on default identifiers", async () => {
-    await tester
-      .expect(
-        `
+it("allow x-ms-identifiers from keys on default identifiers", async () => {
+  await tester
+    .expect(
+      `
         model Pet {
           pet: Dog[];
         }
@@ -210,14 +144,14 @@ describe("typespec-azure-core: no-enum rule", () => {
           name: string;
         }
         `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it("allow x-ms-identifiers from identifiers decorator", async () => {
-    await tester
-      .expect(
-        `
+it("allow x-ms-identifiers from identifiers decorator", async () => {
+  await tester
+    .expect(
+      `
         model Pet {
           @identifiers(#["name"])
           pet: Dog[];
@@ -227,16 +161,16 @@ describe("typespec-azure-core: no-enum rule", () => {
           name: string;
         }
         `,
-      )
-      .toBeValid();
-  });
+    )
+    .toBeValid();
+});
 
-  it("emit diagnostic if a section is not found", async () => {
-    await tester
-      .expect(
-        `
+it("emit diagnostic if a section is not found", async () => {
+  await tester
+    .expect(
+      `
         model Pet {
-          @OpenAPI.extension("x-ms-identifiers", #["food/brand"])
+          @identifiers(#["food/brand"])
           pet: Dog[];
         }
  
@@ -245,10 +179,36 @@ describe("typespec-azure-core: no-enum rule", () => {
           brand: string;
         }
         `,
+    )
+    .toEmitDiagnostics({
+      code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
+      message: `Property "brand" is not found in "string". Make sure value of x-ms-identifiers extension are valid property name of the array element.`,
+    });
+});
+
+describe("codefix", () => {
+  it("adds @identifiers decorator", async () => {
+    await tester
+      .expect(
+        `
+        model Foo {
+          bar: Bar[];
+        }
+
+        model Bar {
+          customName: string;
+        }
+        `,
       )
-      .toEmitDiagnostics({
-        code: "@azure-tools/typespec-azure-resource-manager/missing-x-ms-identifiers",
-        message: `Property "brand" is not found in "string". Make sure value of x-ms-identifiers extension are valid property name of the array element.`,
-      });
+      .applyCodeFix("add-decorator-identifiers").toEqual(`
+        model Foo {
+          @identifiers(#["<prop>"])
+          bar: Bar[];
+        }
+
+        model Bar {
+          customName: string;
+        }
+      `);
   });
 });

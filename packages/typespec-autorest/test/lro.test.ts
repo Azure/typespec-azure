@@ -32,8 +32,7 @@ describe("typespec-autorest: Long-running Operations", () => {
           endpoint: string,
         }
       )
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      namespace Test;
+          namespace Test;
 
       alias ServiceTraits = SupportsRepeatableRequests & SupportsConditionalRequests & SupportsClientRequestId;
 
@@ -79,11 +78,50 @@ describe("typespec-autorest: Long-running Operations", () => {
     );
   });
 
+  it("includes x-ms-long-running-operation for lro get", async () => {
+    const openapi = await compileOpenAPI(
+      `
+      using Azure.Core.Traits;
+
+      @service(#{
+        title: "Contoso Widget Manager",
+      })
+      namespace Test;
+
+      alias ServiceTraits = SupportsRepeatableRequests & SupportsConditionalRequests & SupportsClientRequestId;
+
+      alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
+
+      @resource("widgets")
+      model Widget {
+        @key("widgetName")
+        @visibility(Lifecycle.Read)
+        name: string;
+        manufacturerId: string;
+      
+      ...EtagProperty;
+      }
+
+      @Azure.ClientGenerator.Core.Legacy.markAsLro
+      op getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget>;
+    
+      @pollingOperation(getWidgetOperationStatus)
+      op createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
+      `,
+      { preset: "azure", options: { "emit-lro-options": "all" } },
+    );
+
+    deepStrictEqual(
+      openapi.paths["/widgets/{widgetName}/operations/{operationId}"].get?.[
+        "x-ms-long-running-operation"
+      ],
+      true,
+    );
+  });
+
   const armCode = paramMessage`
       @armProviderNamespace
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test;
+              namespace Microsoft.Test;
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -203,6 +241,44 @@ describe("typespec-autorest: Long-running Operations", () => {
     deepStrictEqual(openapi.paths[itemPath].put["x-ms-long-running-operation-options"], {
       "final-state-via": "original-uri",
       "final-state-schema": "#/definitions/Widget",
+    });
+  });
+
+  it("Creates a final state schema for array types", async () => {
+    const openapi = await compileOpenAPI(
+      armCode.apply(armCode, [
+        {
+          putOp: "getProcessedWidgets is ArmResourceActionAsync<Widget, void, Widget[]>;",
+        },
+      ]),
+      { preset: "azure", options: { "emit-lro-options": "all" } },
+    );
+
+    const itemPath =
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}/getProcessedWidgets";
+    deepStrictEqual(openapi.paths[itemPath].post?.["x-ms-long-running-operation"], true);
+    deepStrictEqual(openapi.paths[itemPath].post["x-ms-long-running-operation-options"], {
+      "final-state-via": "location",
+      "final-state-schema": "#/definitions/WidgetArray",
+    });
+  });
+
+  it("Creates a final state schema for unknown types", async () => {
+    const openapi = await compileOpenAPI(
+      armCode.apply(armCode, [
+        {
+          putOp: "getProcessedWidgets is ArmResourceActionAsync<Widget, void, unknown>;",
+        },
+      ]),
+      { preset: "azure", options: { "emit-lro-options": "all" } },
+    );
+
+    const itemPath =
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}/getProcessedWidgets";
+    deepStrictEqual(openapi.paths[itemPath].post?.["x-ms-long-running-operation"], true);
+    deepStrictEqual(openapi.paths[itemPath].post["x-ms-long-running-operation-options"], {
+      "final-state-via": "location",
+      "final-state-schema": "#/definitions/unknown",
     });
   });
 

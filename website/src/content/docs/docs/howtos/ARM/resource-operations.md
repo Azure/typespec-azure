@@ -1,22 +1,25 @@
 ---
 title: ARM Resource Operations
+description: Recommended and required operations
+llmstxt: true
 ---
 
 ## Recommended and Required Operations
 
 ### TrackedResource
 
-| Operation             | Recommended | Required | TypeSpec Representation                                          |
-| --------------------- | ----------- | -------- | ---------------------------------------------------------------- |
-| GET                   | Yes         | Yes      | `get is ArmResourceRead<Resource>;`                              |
-| CreateOrUpdate (PUT)  | Yes         | Yes      | `createOrUpdate is ArmResourceCreateOrUpdateAsync<Resource>;`    |
-| Tags Update (PATCH)   | No          | Yes\*    | `update is ArmResourceTagsPatchSync<Resource>;`                  |
-| Full Update (PATCH)   | Yes         | No\*     | `update is ArmCustomPatchSync<Resource, PatchRequest>;`          |
-| Delete                | Yes         | Yes      | `delete is ArmResourceDeleteSync<Resource>;`                     |
-| List by ResourceGroup | Yes         | Yes      | `listByResourceGroup is ArmResourceListByParent<Resource>;`      |
-| List by Subscription  | Yes         | Yes      | `listBySubscription is ArmResourceListBySubscription<Resource>;` |
+| Operation             | Recommended | Required | TypeSpec Representation                                       |
+| --------------------- | ----------- | -------- | ------------------------------------------------------------- |
+| GET                   | Yes         | Yes      | `get is ArmResourceRead<Resource>;`                           |
+| CreateOrUpdate (PUT)  | Yes         | Yes      | `createOrUpdate is ArmResourceCreateOrUpdateAsync<Resource>;` |
+| Tags Update (PATCH)   | No          | Yes\*    | `update is ArmResourceTagsPatchSync<Resource>;`               |
+| Full Update (PATCH)   | Yes         | No\*     | `update is ArmCustomPatchSync<Resource, PatchRequest>;`       |
+| Delete                | Yes         | Yes      | `delete is ArmResourceDeleteSync<Resource>;`                  |
+| List by ResourceGroup | Yes         | Yes      | `listByResourceGroup is ArmResourceListByParent<Resource>;`   |
+| List by Subscription  | Yes         | Yes      | `listBySubscription is ArmListBySubscription<Resource>;`      |
 
-\* Arm requires that, at minimum, a TrackedResource can update Tags. A Full PATCH of all updateable resource properties is preferred.
+\* Arm requires that, at minimum, a TrackedResource can update Tags. A Full PATCH of all updateable
+resource properties is preferred.
 
 ### Proxy Resource
 
@@ -28,11 +31,14 @@ title: ARM Resource Operations
 | Delete               | Yes         | No\*     | `delete is ArmResourceDeleteSync<Resource>;`                  |
 | List by Parent       | Yes         | Yes      | `listByParent is ArmResourceListByParent<Resource>;`          |
 
-\* Note that, if a resource implements Create, it is highly recommended that it implement delete as well, and vice-versa.
+\* Note that, if a resource implements Create, it is highly recommended that it implement delete as
+well, and vice-versa.
 
 ## TypeSpec Operation Templates and Interface Templates
 
-TypeSpec provide operation templates that describe the request and response of standard resource operations. A description of the options available for each resource template, and how to choose which one is described in the sections below.
+TypeSpec provide operation templates that describe the request and response of standard resource
+operations. A description of the options available for each resource template, and how to choose
+which one is described in the sections below.
 
 ### Synchronous and Asynchronous APIs
 
@@ -40,11 +46,27 @@ CreateOrUpdate (PUT), Update (Patch), Delete, and Action (POST) operations over 
 
 ### Determining Which Resource Properties Appear in Lifecycle Operations
 
-By default, any property that occurs in your resource model will also appear in the response to GET, PUT, PATCH, and LIST operations, and in the request for PUT and PATCH operations. This does not work for all properties. Some properties are calculated by the service and cannot be directly set by PUT or PATCH (provisioningState, modification date, etc.). Some properties can only be set when creating a resource, but always appear in responses (e.g. 'location'). Some properties can only be set when updating the resource, and appear in responses. Some properties (rarely) may be settable when updating the resource via PUT or PATCH. To allow using a common resource model, but applying these `views` of resources to determine how the resource appear in request and responses, TypeSpec provides the visibility framework. You can see a complete representation of available visibilities in the table [on Property Visibility and Other Constraints](./resource-type.md#property-visibility-and-other-constraints). The sections below outline some common scenarios for designing properties with your operations in mind.
+By default, any property that occurs in your resource model will also appear in the response to GET,
+PUT, PATCH, and LIST operations, and in the request for PUT and PATCH operations. This does not work
+for all properties. Some properties are calculated by the service and cannot be directly set by PUT
+or PATCH (provisioningState, modification date, etc.). Some properties can only be set when creating
+a resource, but always appear in responses (e.g. 'location'). Some properties can only be set when
+updating the resource, and appear in responses. Some properties (rarely) may be settable when
+updating the resource via PUT or PATCH. To allow using a common resource model, but applying these
+`views` of resources to determine how the resource appear in request and responses, TypeSpec
+provides the visibility framework. You can see a complete representation of available visibilities
+in the table
+[on Property Visibility and Other Constraints](./resource-type.md#property-visibility-and-other-constraints).
+The sections below outline some common scenarios for designing properties with your operations in
+mind.
 
 #### Properties That Are Never Directly Set by the User
 
-It is common to have properties that are calculated by the service or otherwise not directly set by the user, examples include timestamps, dates, values that are only set by specific actions (on/off, enabled/disabled, provisioningState). You want to make sure that these properties are marked so that they will appear in responses and not requests. this is done using the `@visibility(Lifecycle.Read)` decorator instance:
+It is common to have properties that are calculated by the service or otherwise not directly set by
+the user, examples include timestamps, dates, values that are only set by specific actions (on/off,
+enabled/disabled, provisioningState). You want to make sure that these properties are marked so that
+they will appear in responses and not requests. this is done using the `@visibility(Lifecycle.Read)`
+decorator instance:
 
 ```typespec
 @visibility(Lifecycle.Read)
@@ -53,7 +75,8 @@ provisioningState: ProvisioningState;
 
 ### Resource Get Operations
 
-Get is the operation to retrieve a single resource TypeSpec provides a single operation template for GET:
+Get is the operation to retrieve a single resource TypeSpec provides a single operation template for
+GET:
 
 ```typespec
 op get is ArmResourceRead<MyResource>;
@@ -64,23 +87,35 @@ op get is ArmResourceRead<MyResource>;
 
 ### Resource CreateOrUpdate Operations (PUT)
 
-The CreateOrUpdate operation may be synchronous (The operation may always complete before a response is returned) or asynchronous (an initial response may be returned before the operation fully completes).
+The CreateOrUpdate operation may be synchronous (The operation may always complete before a response
+is returned) or asynchronous (an initial response may be returned before the operation fully
+completes).
 
-- Simple resources may have synchronous PUT operations. If a resource may need to perform additional checks, creation of other dependent resources, or the like, it is best to use an Asynchronous API.
-- Asynchronous operations for PUT occur when the RP needs to perform additional validaton actions, create other resources, or perform other tasks as part of resource creation or update that can cause the operation to take longer than the length of a single request/response.
+- Simple resources may have synchronous PUT operations. If a resource may need to perform additional
+  checks, creation of other dependent resources, or the like, it is best to use an Asynchronous API.
+- Asynchronous operations for PUT occur when the RP needs to perform additional validaton actions,
+  create other resources, or perform other tasks as part of resource creation or update that can
+  cause the operation to take longer than the length of a single request/response.
 
 | Operation        | TypeSpec                                                          |
 | ---------------- | ----------------------------------------------------------------- |
 | Synchronous PUT  | `createOrUpdate is ArmResourceCreateOrReplaceSync<ResourceType>`  |
 | Asynchronous PUT | `createOrUpdate is ArmResourceCreateOrReplaceAsync<ResourceType>` |
 
-In the TypeSpec in the table `createOrUpdate` is the name of the operation, which will be passed on to clients, and `ResourceType` is the type of the resource being created (or updated)
+In the TypeSpec in the table `createOrUpdate` is the name of the operation, which will be passed on
+to clients, and `ResourceType` is the type of the resource being created (or updated)
 
 ### Resource Update Operations (PATCH)
 
-ARM Requires that all `Tracked` resources implement PATCH for ARM tags, which are contained in the envelope of every `TrackedResource`. ARM recommends that you also allow PATCH of other envelope properties and resource-specific properties. Unless marked with a specific visibility, any property in your rp-specific properties will be automatically included in the PATCH schema.
+ARM Requires that all `Tracked` resources implement PATCH for ARM tags, which are contained in the
+envelope of every `TrackedResource`. ARM recommends that you also allow PATCH of other envelope
+properties and resource-specific properties. Unless marked with a specific visibility, any property
+in your rp-specific properties will be automatically included in the PATCH schema.
 
-TypeSpec Provides both Synchronous and Asynchronous PATCH Operations, and allows you to specify a PATCH for Resource tags only, a PATCH for all updateable properties, or a custom patch. Generally, you should choose the patch for all updateable properties, unless you have a very good reason for choosing another PATCH operation.
+TypeSpec Provides both Synchronous and Asynchronous PATCH Operations, and allows you to specify a
+PATCH for Resource tags only, a PATCH for all updateable properties, or a custom patch. Generally,
+you should choose the patch for all updateable properties, unless you have a very good reason for
+choosing another PATCH operation.
 
 | Operation Description      | TypeSpec                                                                                                                                   |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -89,22 +124,27 @@ TypeSpec Provides both Synchronous and Asynchronous PATCH Operations, and allows
 | Sync All Properties PATCH  | `update is ArmCustomPatchSync<ResourceType, Azure.ResourceManager.Foundations.ResourceUpdateModel<ResourceType, ResourcePropertiesType>>`  |
 | Async All Properties PATCH | `update is ArmCustomPatchAsync<ResourceType, Azure.ResourceManager.Foundations.ResourceUpdateModel<ResourceType, ResourcePropertiesType>>` |
 
-The ArmResourcePatch\* templates take the resource type and the resource properties type as parameters.
-The ArmTagsPatch\* templates take the resource type as a parameter.
-The ArmCustomPatch\* templates take the resource type and your custom PATCH request type as parameters.
+The ArmResourcePatch\* templates take the resource type and the resource properties type as
+parameters. The ArmTagsPatch\* templates take the resource type as a parameter. The ArmCustomPatch\*
+templates take the resource type and your custom PATCH request type as parameters.
 
 ### Resource Delete Operations (DELETE)
 
-The Delete operation may be synchronous (The operation may always complete before a response is returned) or asynchronous (an initial response may be returned before the operation fully completes).
+The Delete operation may be synchronous (The operation may always complete before a response is
+returned) or asynchronous (an initial response may be returned before the operation fully
+completes).
 
-Simple resources may have synchronous DELETE operations. If a resource needs to clean up other resources or do other validations as part of delete, the delete operation may need to be asynchronous.
+Simple resources may have synchronous DELETE operations. If a resource needs to clean up other
+resources or do other validations as part of delete, the delete operation may need to be
+asynchronous.
 
 | Operation           | TypeSpec                                                  |
 | ------------------- | --------------------------------------------------------- |
 | Synchronous Delete  | `delete is ArmResourceDeleteSync<ResourceType>`           |
 | Asynchronous Delete | `delete is ArmResourceDeleteWithoutOkAsync<ResourceType>` |
 
-In the TypeSpec in the table `delete` is the name of the operation, which will be passed on to clients, and `ResourceType` is the type of the resource being deleted.
+In the TypeSpec in the table `delete` is the name of the operation, which will be passed on to
+clients, and `ResourceType` is the type of the resource being deleted.
 
 ### Resource List Operations (GET)
 
@@ -117,14 +157,18 @@ Arm Resource list operations return a list of Tracked or Proxy Resources at a pa
   - For **Child Resources**, this is at the scope of the resource parent.
 - Tracked resources _must_ include a list operation at the Subscription level.
 
-| Operation          | TypeSpec                                                            |
-| ------------------ | ------------------------------------------------------------------- |
-| ListByParent       | `listByWidget is ArmResourceListByParent<ResourceType>`             |
-| ListBySubscription | `listBySubscription is ArmResourceListBySubscription<ResourceType>` |
+| Operation          | TypeSpec                                                    |
+| ------------------ | ----------------------------------------------------------- |
+| ListByParent       | `listByWidget is ArmResourceListByParent<ResourceType>`     |
+| ListBySubscription | `listBySubscription is ArmListBySubscription<ResourceType>` |
 
 ### Resource Actions (POST)
 
-Custom actions define any operations over resources outside the simple CRUDL (Create< Read, Update, Delete, List) or lifecycle operations described above. Any operation that returns data that is not made up of resources, performs a prescriptive state change on the resource (cycling power, upgrading, etc.), or any operation that does not fit into the operations described above should be modelled as a _resource action_. Examples of resource actions include:
+Custom actions define any operations over resources outside the simple CRUDL (Create< Read, Update,
+Delete, List) or lifecycle operations described above. Any operation that returns data that is not
+made up of resources, performs a prescriptive state change on the resource (cycling power,
+upgrading, etc.), or any operation that does not fit into the operations described above should be
+modelled as a _resource action_. Examples of resource actions include:
 
 - Operations that manage credentials associated with a resource
 - Operations that calculate statistics about resources
@@ -132,18 +176,22 @@ Custom actions define any operations over resources outside the simple CRUDL (Cr
 
 #### Actions that take input and output
 
-Operations that manage credentials are a good example fo this category. TypeSpec defines synchronous and asynchronous templates for actions that consume and produce information.
+Operations that manage credentials are a good example fo this category. TypeSpec defines synchronous
+and asynchronous templates for actions that consume and produce information.
 
 | Operation                    | TypeSpec                                                                       |
 | ---------------------------- | ------------------------------------------------------------------------------ |
 | Synchronous Resource Action  | `updateCredentials is ArmResourceActionSync<ResourceType, Request, Response>`  |
 | Asynchronous Resource Action | `updateCredentials is ArmResourceActionAsync<ResourceType, Request, Response>` |
 
-Parameters to the template are the ResourceType, the model for the operation Request body, and the model for the operation Response body.
+Parameters to the template are the ResourceType, the model for the operation Request body, and the
+model for the operation Response body.
 
 #### Actions that take input but produce no output (state changing actions)
 
-Operations that make state changes will often take some user configuration, and will return a seccess code or an error code depending on success or failure. TypeSpec defines synchronous and asynchronous operation templates for state changing actions.
+Operations that make state changes will often take some user configuration, and will return a
+seccess code or an error code depending on success or failure. TypeSpec defines synchronous and
+asynchronous operation templates for state changing actions.
 
 | Operation                     | TypeSpec                                                                              |
 | ----------------------------- | ------------------------------------------------------------------------------------- |
@@ -154,14 +202,18 @@ Parameters to the template are the ResourceType and the model for the operation 
 
 ### Actions that take no input but produce output (data retrieval actions)
 
-Some operations return data or paged lists of data. TypeSpec does not yet provide templates for these kinds of actions, but here are two templates that you could reuse in your own specification, described in the next section of the document:
+Some operations return data or paged lists of data. TypeSpec does not yet provide templates for
+these kinds of actions, but here are two templates that you could reuse in your own specification,
+described in the next section of the document:
 
 - [Synchronous Resource List Actions](#synchronous-list-action)
 - [Asynchronous List Action](#asynchronous-list-action)
 
 ### Check Name Operations
 
-Some services provide operations to check name availability, either location-specific (locally) or globally, especially if a resource name must be globally unique (such as when an exposed endpoint uses the resource name in the url).
+Some services provide operations to check name availability, either location-specific (locally) or
+globally, especially if a resource name must be globally unique (such as when an exposed endpoint
+uses the resource name in the url).
 
 | Operation                      | TypeSpec                                                                                             |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------- |
@@ -169,7 +221,11 @@ Some services provide operations to check name availability, either location-spe
 | Local Name Availability Check  | `checkLocalName is checkLocalNameAvailability<TRequest, TResponse, TAdditionalParams>`               |
 | Custom Name Availability Check | `customNameCheck is checkNameAvailability<TScopeParameters, TRequest, TResponse, TAdditionalParams>` |
 
-`checkGlobalNameAvailability` and `checkLocalNameAvailability` have default values that allow them to be used without specifying any template parameters. `checkNameAvailability` requires the `TScopeParameters` template parameter, which describes the parameters which define the scope of the name check request. For reference, the following table shows the `TScopeParameters` for the standard templates:
+`checkGlobalNameAvailability` and `checkLocalNameAvailability` have default values that allow them
+to be used without specifying any template parameters. `checkNameAvailability` requires the
+`TScopeParameters` template parameter, which describes the parameters which define the scope of the
+name check request. For reference, the following table shows the `TScopeParameters` for the standard
+templates:
 
 | Operation                      | Scope Parameters                                                       |
 | ------------------------------ | ---------------------------------------------------------------------- |
@@ -178,13 +234,18 @@ Some services provide operations to check name availability, either location-spe
 
 ## Writing Custom Operations
 
-TypeSpec operation templates provide a simple mechanism for producing the most common operation patterns in ARM, using best practices and conforming to ARM RPC guidelines. However, sometimes a service has special requirements for operations that fall outside these boundaries. The `Azure.ResourceManager.Foundations` namespace provides lower level building blocks that can be used to produce operations and operation templates.
+TypeSpec operation templates provide a simple mechanism for producing the most common operation
+patterns in ARM, using best practices and conforming to ARM RPC guidelines. However, sometimes a
+service has special requirements for operations that fall outside these boundaries. The
+`Azure.ResourceManager.Foundations` namespace provides lower level building blocks that can be used
+to produce operations and operation templates.
 
 The building blocks are described in the sections below:
 
 ### ARM Response Types
 
-Custom operations in ARM still need to respect the correct response schema. This library provides standard ARM response types to help with reusability and compliance.
+Custom operations in ARM still need to respect the correct response schema. This library provides
+standard ARM response types to help with reusability and compliance.
 
 | Model                               | Code | Description                                   |
 | ----------------------------------- | ---- | --------------------------------------------- |
@@ -201,7 +262,8 @@ Custom operations in ARM still need to respect the correct response schema. This
 
 ### Common Operation Parameters
 
-There are a number of model types which specify common parameters which are used in resource type operations:
+There are a number of model types which specify common parameters which are used in resource type
+operations:
 
 | Model                           | In           | Description                                                 |
 | ------------------------------- | ------------ | ----------------------------------------------------------- |
@@ -215,7 +277,8 @@ There are a number of model types which specify common parameters which are used
 
 ### Synchronous List Action
 
-Here is a sample template for resource list actions that return synchronously, using the common building blocks.
+Here is a sample template for resource list actions that return synchronously, using the common
+building blocks.
 
 ```typespec
 // Template definition
@@ -242,7 +305,8 @@ interface MyResourceOperations {
 
 ### Asynchronous List Action
 
-Here is a sample template for resource list actions that return asynchronously, using the common building blocks.
+Here is a sample template for resource list actions that return asynchronously, using the common
+building blocks.
 
 ```typespec
 // Template definition

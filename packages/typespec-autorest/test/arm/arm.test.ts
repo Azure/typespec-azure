@@ -1,12 +1,11 @@
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { it } from "vitest";
-import { compileOpenAPI } from "../test-host.js";
+import { expect, it } from "vitest";
+import { compileOpenAPI, CompileOpenApiWithFeatures } from "../test-host.js";
 
 it("can share types with a library namespace", async () => {
   const openapi: any = await compileOpenAPI(
     `
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @armLibraryNamespace
+          @armLibraryNamespace
       namespace Microsoft.Library {
         model TestTrackedResource is TrackedResource<TestTrackedProperties> {
           @key("trackedResourceName")
@@ -31,8 +30,7 @@ it("can share types with a library namespace", async () => {
 
       @useLibraryNamespace(Microsoft.Library)
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      namespace Microsoft.Test {
+          namespace Microsoft.Test {
 
       interface Operations extends Azure.ResourceManager.Operations {}
 
@@ -69,7 +67,7 @@ it("can share types with a library namespace", async () => {
 
 it("can use private links with common-types references", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
       @armProviderNamespace
       namespace Microsoft.PrivateLinkTest;
@@ -123,7 +121,7 @@ it("can use private links with common-types references", async () => {
 
 it("can use private endpoints with common-types references", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PrivateLinkTest;
@@ -165,7 +163,7 @@ it("can use private endpoints with common-types references", async () => {
 
 it("verify resolution of private endpoints and private links with v5 version", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PrivateLinkTest;
@@ -218,7 +216,7 @@ it("verify resolution of private endpoints and private links with v5 version", a
 
 it("can use ResourceNameParameter for custom name parameter definition", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PrivateLinkTest;
@@ -259,7 +257,7 @@ it("can use ResourceNameParameter for custom name parameter definition", async (
 
 it("can use ResourceNameParameter for default name parameter definition", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PrivateLinkTest;
@@ -300,40 +298,9 @@ it("can use ResourceNameParameter for default name parameter definition", async 
   ok(openapi.paths?.[privateEndpointGet]?.get?.parameters?.[1]);
 });
 
-it("can emit x-ms-client-flatten with optional configuration", async () => {
-  const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-      @armProviderNamespace
-      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-      namespace Microsoft.Contoso;
-      
-      model Employee is TrackedResource<EmployeeProperties> {
-        ...ResourceNameParameter<Employee>;
-      }
-      model EmployeeProperties {
-        age?: int32;
-        city?: string;
-        @visibility(Lifecycle.Read)
-        provisioningState?: ResourceProvisioningState;
-      }
-      @parentResource(Employee)
-      model Dependent is ProxyResource<DependentProperties> {
-        ...ResourceNameParameter<Dependent>;
-      }
-      model DependentProperties {
-        age?: int32;
-      }
-      `,
-    { preset: "azure", options: { "arm-resource-flattening": true } },
-  );
-
-  ok(openapi.definitions?.Employee?.properties?.properties?.["x-ms-client-flatten"]);
-  ok(openapi.definitions?.Dependent?.properties?.properties?.["x-ms-client-flatten"]);
-});
-
 it("no x-ms-client-flatten emitted with default configuration", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.Contoso;
@@ -369,7 +336,7 @@ it("no x-ms-client-flatten emitted with default configuration", async () => {
 });
 it("generates PATCH bodies for custom patch of common resource envelope mixins", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PatchTest;
@@ -415,6 +382,7 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
       interface AllProperties {
         get is ArmResourceRead<AllPropertiesResource>;
         put is ArmResourceCreateOrReplaceAsync<AllPropertiesResource>;
+         @patch(#{ implicitOptionality: true })
         update is ArmCustomPatchAsync<AllPropertiesResource, AllPropertiesResource>;
         delete is ArmResourceDeleteWithoutOkAsync<AllPropertiesResource>;
       }
@@ -422,6 +390,7 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
       interface AssignedOperations {
         get is ArmResourceRead<SystemAssignedResource>;
         put is ArmResourceCreateOrReplaceAsync<SystemAssignedResource>;
+        @patch(#{ implicitOptionality: true })
         update is ArmCustomPatchAsync<SystemAssignedResource, SystemAssignedResource>;
         delete is ArmResourceDeleteWithoutOkAsync<SystemAssignedResource>;
       }
@@ -463,7 +432,7 @@ it("generates PATCH bodies for custom patch of common resource envelope mixins",
 });
 it("generates PATCH bodies for resource patch of common resource envelope mixins", async () => {
   const openapi: any = await compileOpenAPI(
-    `@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+    `
       @armProviderNamespace
       @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
       namespace Microsoft.PatchTest;
@@ -549,4 +518,167 @@ it("generates PATCH bodies for resource patch of common resource envelope mixins
   ok(
     openapi.definitions?.["Azure.ResourceManager.CommonTypes.SystemAssignedServiceIdentityUpdate"],
   );
+});
+it("can split resources and operations by feature", async () => {
+  const { privateLink, privateEndpoint } = await CompileOpenApiWithFeatures(
+    `
+      @Azure.ResourceManager.Legacy.features(Features)
+      @armProviderNamespace
+      @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+      namespace Microsoft.PrivateLinkTest;
+
+      enum Features {
+        privateLink;
+        privateEndpoint;
+        common;
+      }
+      
+      interface Operations extends Azure.ResourceManager.Operations {}
+      
+      @Azure.ResourceManager.Legacy.feature(Features.privateEndpoint)
+      @tenantResource
+      model PrivateEndpointConnectionResource is ProxyResource<PrivateEndpointConnectionProperties> {
+        @path
+        @segment("privateEndpointConnections")
+        @key("privateEndpointConnectionName")
+        name: string;
+      }
+      
+      @Azure.ResourceManager.Legacy.feature(Features.privateEndpoint)
+      @armResourceOperations(PrivateEndpointConnectionResource)
+      interface PrivateEndpointConnections {
+        #suppress "deprecated" "PrivateLinkResourceListResultV5 validation"
+        listConnections is ArmResourceListByParent<PrivateEndpointConnectionResource,
+         Response = ArmResponse<Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionListResultV5>>;
+      }
+
+      @Azure.ResourceManager.Legacy.feature(Features.privateLink)
+      model PrivateLinkResource is ProxyResource<PrivateLinkResourceProperties> {
+        ...PrivateLinkResourceParameter;
+      }
+
+      @Azure.ResourceManager.Legacy.feature(Features.privateLink)
+      @armResourceOperations(PrivateLinkResource)
+      interface PrivateLinkResources {
+        #suppress "deprecated" "PrivateLinkResourceListResultV5 validation"
+        listByLinkResult is ArmResourceListByParent< PrivateLinkResource,
+          Response = ArmResponse<Azure.ResourceManager.CommonTypes.PrivateLinkResourceListResultV5>
+        >;
+      }
+      `,
+    ["privateLink", "privateEndpoint", "common"],
+    { preset: "azure" },
+  );
+
+  const privateEndpointList = "/providers/Microsoft.PrivateLinkTest/privateEndpointConnections";
+  const privateLinkList =
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PrivateLinkTest/privateLinkResources";
+  const pe = privateEndpoint as any;
+  const pl = privateLink as any;
+
+  deepStrictEqual(
+    pe.paths[privateEndpointList].get.responses["200"].schema["$ref"],
+    "../../common-types/resource-management/v5/privatelinks.json#/definitions/PrivateEndpointConnectionListResult",
+  );
+  deepStrictEqual(
+    pl.paths[privateLinkList].get.responses["200"].schema["$ref"],
+    "../../common-types/resource-management/v5/privatelinks.json#/definitions/PrivateLinkResourceListResult",
+  );
+});
+it("can represent type references within and between features", async () => {
+  const { featureA, featureB, shared } = await CompileOpenApiWithFeatures(
+    `
+
+@Azure.ResourceManager.Legacy.features(Features)
+@armProviderNamespace("Microsoft.Test")
+namespace Microsoft.Test;
+enum Features {
+  /** Common */
+  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "Common", fileName: "shared", description: "The data for common features"})
+  Common: "Common",
+  /** Feature A */
+  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureA", fileName: "featureA", description: "The data for feature A"})
+  FeatureA: "Feature A",
+  /** Feature B */
+  @Azure.ResourceManager.Legacy.featureOptions(#{featureName: "FeatureB", fileName: "featureB", description: "The data for feature B"})
+  FeatureB: "Feature B",
+}
+      @secret
+      scalar secretString extends string;
+
+      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      model FooResource is TrackedResource<FooResourceProperties> {
+         ...ResourceNameParameter<FooResource>;
+      }
+      
+      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      model FooResourceProperties { 
+        ...DefaultProvisioningStateProperty;
+        password: secretString;
+      }
+
+      @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+      model BarResource is ProxyResource<BarResourceProperties> {
+          ...ResourceNameParameter<BarResource>;
+      }
+      @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+      model BarResourceProperties { 
+        ...DefaultProvisioningStateProperty;
+        password: secretString;
+      }
+
+      @Azure.ResourceManager.Legacy.feature(Features.FeatureA)
+      @armResourceOperations
+      interface Foos extends Azure.ResourceManager.TrackedResourceOperations<FooResource, FooResourceProperties> {}
+
+      @Azure.ResourceManager.Legacy.feature(Features.FeatureB)
+      @armResourceOperations
+      interface Bars extends Azure.ResourceManager.TrackedResourceOperations<BarResource, BarResourceProperties> {}
+      @@Azure.ResourceManager.Legacy.feature(Bars.get, Features.FeatureA);
+      `,
+    ["featureA", "featureB", "shared"],
+    { preset: "azure" },
+  );
+
+  const aFile = featureA as any;
+  const bFile = featureB as any;
+  const commonFile = shared as any;
+
+  expect(aFile.definitions).toBeDefined();
+  expect(aFile.definitions["FooResource"]).toBeDefined();
+  expect(aFile.definitions["FooResource"].properties["properties"].$ref).toBe(
+    "#/definitions/FooResourceProperties",
+  );
+  expect(aFile.definitions["FooResourceProperties"]).toBeDefined();
+  expect(aFile.definitions["FooResourceProperties"].properties["password"].$ref).toBe(
+    "./shared.json#/definitions/secretString",
+  );
+  expect(aFile.definitions["FooResourceListResult"]).toBeDefined();
+  expect(aFile.definitions["FooResourceUpdate"]).toBeDefined();
+  expect(aFile.definitions["FooResourceUpdateProperties"]).toBeDefined();
+
+  expect(
+    aFile.paths[
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/barResources/{barResourceName}"
+    ].get,
+  ).toBeDefined();
+
+  expect(bFile.definitions).toBeDefined();
+  expect(bFile.definitions["BarResource"]).toBeDefined();
+  expect(bFile.definitions["BarResource"].properties["properties"].$ref).toBe(
+    "#/definitions/BarResourceProperties",
+  );
+  expect(bFile.definitions["BarResourceProperties"]).toBeDefined();
+  expect(bFile.definitions["BarResourceProperties"].properties["password"].$ref).toBe(
+    "./shared.json#/definitions/secretString",
+  );
+  expect(bFile.definitions["BarResourceProperties"].properties["provisioningState"].$ref).toBe(
+    "./shared.json#/definitions/Azure.ResourceManager.ResourceProvisioningState",
+  );
+  expect(bFile.definitions["BarResourceListResult"]).toBeDefined();
+  expect(bFile.definitions["BarResourceUpdate"]).toBeDefined();
+  expect(bFile.definitions["BarResourceUpdateProperties"]).toBeDefined();
+
+  expect(commonFile.definitions).toBeDefined();
+  expect(commonFile.definitions["secretString"]).toBeDefined();
 });

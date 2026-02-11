@@ -18,7 +18,6 @@ namespace Microsoft.ContosoProviderHub;
 /** Contoso API versions */
 enum Versions {
   /** 2021-10-01-preview version */
-  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   `2021-10-01-preview`,
 }
@@ -80,7 +79,7 @@ interface Employees {
   listBySubscription is ArmListBySubscription<Employee>;
 
   /** A sample resource action that move employee to different location */
-  move is ArmResourceActionSync<Employee, MoveRequest, MoveResponse>;
+  move is ActionAsync<Employee, MoveRequest, MoveResponse>;
 
   /** A sample HEAD operation to check resource existence */
   checkExistence is ArmResourceCheckExistence<Employee>;

@@ -1,5 +1,6 @@
 ---
 title: Generated Types
+llmstxt: true
 ---
 
 import { ClientTabs, ClientTabItem } from "@components/client-tabs";
@@ -44,7 +45,13 @@ foo = Foo(prop="hello")
 <ClientTabItem lang="typescript" >
 
 ```typescript
-// TODO
+export interface Foo {
+  prop: string;
+}
+
+export function fooSerializer(item: Foo): any {
+  return { prop: item["prop"] };
+}
 ```
 
 </ClientTabItem>
@@ -56,6 +63,16 @@ As `flavor=azure`, Java emitter generates the model classes under `models` packa
 import service.models.Foo;
 
 Foo foo = new Foo("hello");
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+type Foo struct {
+  Prop string `json:"prop"`
+}
+
 ```
 
 </ClientTabItem>
@@ -97,7 +114,13 @@ foo = Foo(prop="hello")
 <ClientTabItem lang="typescript" >
 
 ```typescript
-// TODO
+export interface Foo {
+  prop: string;
+}
+
+export function fooSerializer(item: Foo): any {
+  return { prop: item["prop"] };
+}
 ```
 
 </ClientTabItem>
@@ -109,6 +132,18 @@ As `flavor=azure`, Java emitter generates the model classes under `models` packa
 import service.container.models.Foo;
 
 Foo foo = new Foo("hello");
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+package container
+
+type Foo struct {
+  Prop string `json:"prop"`
+}
+
 ```
 
 </ClientTabItem>
@@ -149,7 +184,13 @@ foo = Foo(prop="hello")
 <ClientTabItem lang="typescript" >
 
 ```typescript
-// TODO
+export interface Foo {
+  prop: string;
+}
+
+export function fooSerializer(item: Foo): any {
+  return { prop: item["prop"] };
+}
 ```
 
 </ClientTabItem>
@@ -161,6 +202,17 @@ As `flavor=azure`, Java emitter generates the model classes under `models` packa
 import service.container.models.Foo;
 
 Foo foo = new Foo("hello");
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+package container
+
+type Foo struct {
+  Prop *string
+}
 ```
 
 </ClientTabItem>
@@ -412,6 +464,196 @@ The `@clientDoc` decorator can be used on everything that the `@doc` decorator c
 When both `@doc` and `@clientDoc` are present, the generated code outputs the final documentation depending on the mode that you called `@clientDoc` with.
 If called with `replace`, `@clientDoc` replaces `@doc` completely. If called with `append`, `@clientDoc` is appended onto `@doc`.
 
+## Using `@alternateType` to Reference External Types
+
+The `@alternateType` decorator allows you to override the emitted type for a model, union, or enum in generated client libraries. With recent updates, you can now reference types defined in external namespaces or imported libraries.
+
+### Example: Referencing an External Type
+
+Suppose you want your generated client library to use a type from an external package instead of the default emitted type.
+
+```typespec
+@alternateType(
+  {
+    fullyQualifiedName: "externallib.ExternalModel",
+    package: "externallib",
+  },
+  "python"
+)
+model MyModel {
+  prop: string;
+}
+```
+
+In this example, instead of generating `MyModel` in the Python sdk, the emitter will reference `ExternalModel` from `externallib` instead.
+
+### Use Cases
+
+- Integrating with shared types from other services or libraries.
+- Ensuring consistency across multiple SDKs by reusing common models.
+- Reducing duplication when types are already defined elsewhere.
+
+### Notes
+
+- The referenced type should be compatible with the intended usage in the generated client library.
+
+## Client Default Values (Legacy)
+
+:::caution
+The `@clientDefaultValue` decorator is legacy functionality that should **only** be used to mitigate SDK breaking changes for brownfield services. **New services should NOT use this decorator.** Instead, use standard TypeSpec patterns for default values.
+:::
+
+The `@Azure.ClientGenerator.Core.Legacy.clientDefaultValue` decorator allows you to set a client-level default value for a model property or operation parameter. This is primarily intended for maintaining backward compatibility with existing SDK users who may rely on default values that were previously generated from Swagger definitions.
+
+### Model Property Default Values
+
+Use `@clientDefaultValue` on model properties when you need to specify a default value that will be used in the generated SDK code.
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+model RequestOptions {
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(30)
+  timeout?: int32;
+
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("standard")
+  tier?: string;
+
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(false)
+  enableRetry?: boolean;
+}
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="python">
+
+```python
+# Not supported yet in python and track status in https://github.com/microsoft/typespec/issues/9198
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="csharp" >
+
+```csharp
+TODO
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="typescript" >
+
+```typescript
+TODO;
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="java" >
+
+```java
+TODO
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="go" >
+
+```go
+TODO
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+### Operation Parameter Default Values
+
+Use `@clientDefaultValue` on operation parameters when you need to specify a default value for query parameters, headers, or other operation inputs.
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+op getItems(
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(10)
+  @query
+  pageSize?: int32,
+
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue("desc")
+  @query
+  sortOrder?: string,
+): Item[];
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="python">
+
+```python
+    def get_items(
+        self, *, page_size: int = 10, sort_order: str = "desc", **kwargs: Any
+    ) -> list[_models.Item]:
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="csharp" >
+
+```csharp
+TODO
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="typescript" >
+
+```typescript
+TODO;
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="java" >
+
+```java
+TODO
+```
+
+</ClientTabItem>
+
+<ClientTabItem lang="go" >
+
+```go
+TODO
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+### Language-Specific Scoping
+
+You can also scope the default value to specific languages using the `scope` parameter:
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+model Config {
+  // Apply default only for Python
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(false, "python")
+  enableCache?: boolean;
+
+  // Apply default for all languages except Java and Python
+  @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(100, "!(java, python)")
+  maxRetries?: int32;
+}
+```
+
+</ClientTabItem>
+</ClientTabs>
+
 ## Models
 
 ### Models with additional properties of any type
@@ -484,19 +726,7 @@ public partial class Animal : IJsonModel<Animal> {
 <ClientTabItem lang="typescript" >
 
 ```ts
-// RLC input
-export interface Animal extends Record<string, unknown> {
-  name: string;
-  kind: string;
-}
-
-// RLC output
-export interface AnimalOutput extends Record<string, any> {
-  name: string;
-  kind: string;
-}
-
-// Modular for both legacy and non legacy
+// JS CodeGen for both legacy and non legacy
 export interface Animal extends Record<string, any> {
   name: string;
   kind: string;
@@ -518,6 +748,20 @@ public final class Animal implements JsonSerializable<Animal> {
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+// Input: Animal (with known fields + optional unknowns)
+type Animal struct {
+  Name *string
+  Kind *string
+  AdditionalProperties map[string]interface{}
+}
+
+```
+
+</ClientTabItem>
+
 </ClientTabs>
 
 #### Additional properties of specific type
@@ -620,17 +864,7 @@ public partial class Animal : IJsonModel<Animal>
 <ClientTabItem lang="typescript" >
 
 ```ts
-// RLC input
-export interface AnimalProperty {
-  category: string;
-  value: unknown;
-}
-export interface Animal extends Record<string, unknown> {
-  name: string;
-  kind: string;
-}
-
-// RLC output
+// JS CodeGen for legacy clients
 export interface AnimalProperty {
   category: string;
   value: any;
@@ -640,17 +874,7 @@ export interface Animal extends Record<string, any> {
   kind: string;
 }
 
-// Modular for legacy clients
-export interface AnimalProperty {
-  category: string;
-  value: any;
-}
-export interface Animal extends Record<string, any> {
-  name: string;
-  kind: string;
-}
-
-// Modular for non-legacy clients
+// JS CodeGen for non-legacy clients
 export interface AnimalProperty {
   category: string;
   value: any;
@@ -673,6 +897,23 @@ public final class Animal implements JsonSerializable<Animal> {
     public String getKind();
     public Map<String, AnimalProperty> getAdditionalProperties();
     public Animal setAdditionalProperties(Map<String, AnimalProperty> additionalProperties);
+}
+
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+type AnimalProperty struct {
+  Category *string
+  Value    interface{}
+}
+
+type Animal struct {
+  Name *string
+  Kind *string
+  AdditionalProperties map[string]AnimalProperty
 }
 
 ```
@@ -732,13 +973,7 @@ public partial class Animal : IJsonModel<Animal>
 <ClientTabItem lang="typescript" >
 
 ```ts
-// RLC input and output
-export interface Animal extends Record<string, string | number> {
-  name: string;
-  kind: string;
-}
-
-// Modular for legacy and non-legacy clients
+// JS CodeGen for legacy and non-legacy clients
 export interface Animal extends Record<string, string | number> {
   name: string;
   kind: string;
@@ -759,6 +994,15 @@ public final class Animal implements JsonSerializable<Animal> {
 }
 ```
 
+</ClientTabItem>
+<ClientTabItem lang="go" >
+```go
+type Animal struct {
+	Name string
+	Kind string
+	AdditionalProperties map[string]interface{}
+}
+```
 </ClientTabItem>
 </ClientTabs>
 
@@ -813,13 +1057,7 @@ public partial class Animal : IJsonModel<Animal>
 <ClientTabItem lang="typescript" >
 
 ```ts
-// RLC input and output
-export interface Animal extends Record<string, string | null> {
-  name: string;
-  kind: string;
-}
-
-// Modular for legacy and non-legacy clients
+// JS CodeGen for legacy and non-legacy clients
 export interface Animal extends Record<string, string | null> {
   name: string;
   kind: string;
@@ -840,6 +1078,13 @@ public final class Animal implements JsonSerializable<Animal> {
     public Animal setAdditionalProperties(Map<String, String> additionalProperties);
 }
 
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+// NOT_SUPPORTED
 ```
 
 </ClientTabItem>
@@ -947,33 +1192,7 @@ public partial class Ragdoll : Cat
 <ClientTabItem lang="typescript" >
 
 ```ts
-// RLC input models
-export interface Siamese extends CatParent {
-  kind: "siamese";
-}
-
-export interface Ragdoll extends CatParent {
-  kind: "ragdoll";
-}
-
-export type Cat = CatParent | Siamese | Ragdoll;
-
-// RLC output models
-export interface CatOutputParent {
-  kind: string;
-}
-
-export interface SiameseOutput extends CatOutputParent {
-  kind: "siamese";
-}
-
-export interface RagdollOutput extends CatOutputParent {
-  kind: "ragdoll";
-}
-
-export type CatOutput = CatOutputParent | SiameseOutput | RagdollOutput;
-
-// Modular models
+// JS CodeGen models
 /** model interface Cat */
 export interface Cat {
   kind: string;
@@ -1117,13 +1336,46 @@ TODO
 
 </ClientTabItem>
 <ClientTabItem lang="typescript" >
+```ts
+export interface Foo {
+  basicNullableProperty: string | null;
+  modelNullableProperty: Bar | null;
+  enumNullableProperty: LR | null;
+}
 
-TODO
+export interface Bar {
+  prop: string;
+}
 
+export type LR = "left" | "right";
+```
 </ClientTabItem>
 <ClientTabItem lang="java" >
 
 TODO
+
+</ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+type Foo struct {
+  BasicNullableProperty *string
+  ModelNullableProperty *Bar
+  EnumNullableProperty  *LR
+}
+
+type Bar struct {
+  Prop *string
+}
+
+type LR string
+
+const (
+  LRLeft LR = "left"
+  LRRight LR = "right"
+)
+
+```
 
 </ClientTabItem>
 </ClientTabs>
@@ -1242,8 +1494,19 @@ public partial class Foo : IUtf8JsonSerializable, IJsonModel<Foo>
 <ClientTabItem lang="typescript" >
 
 ```typescript
-// Please note that this feature is not supported right now, and the model will be generated un-flattened.
-// Please comment and follow work status on: https://github.com/Azure/autorest.typescript/issues/2164
+// This is for legacy pattern, for new services/APIs, it's not recommended.
+export interface Foo {
+  name: string;
+}
+export function _fooPropSerializer(item: Foo): any {
+  return { name: item["name"] };
+}
+
+export function _fooPropDeserializer(item: any) {
+  return {
+    name: item["name"],
+  };
+}
 ```
 
 </ClientTabItem>
@@ -1410,6 +1673,32 @@ public final class Dog extends Pet {  // Inherits from Pet, not Animal
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="go">
+
+```go
+package models
+
+type Animal struct {
+  Kind string
+  Name string
+}
+
+type Pet struct {
+  Animal
+  Owner string
+  Vaccinated bool
+}
+
+type Dog struct {
+  Animal
+  Owner string
+  Vaccinated bool
+  Breed string
+}
+
+```
+
+</ClientTabItem>
 </ClientTabs>
 
 ## Unions
@@ -1532,6 +1821,25 @@ public enum WidgetHorizontal {
    LEFT("left"),
    RIGHT("right");
 }
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+package models
+
+type Widget struct {
+  Horizontal WidgetHorizontal
+}
+
+type WidgetHorizontal string
+
+const (
+  WidgetHorizontalLeft WidgetHorizontal = "left"
+  WidgetHorizontalRight WidgetHorizontal = "right"
+)
+
 ```
 
 </ClientTabItem>
@@ -1661,6 +1969,19 @@ public final class WidgetColor extends ExpandableStringEnum<Colors> {
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+type Colors string
+
+const (
+  ColorsRed Colors = "red"
+  ColorsBlue Colors = "blue"
+)
+
+```
+
+</ClientTabItem>
 </ClientTabs>
 
 ### Union of other union/enum, basic type and literals of that type
@@ -1734,6 +2055,22 @@ public final class ProvisioningState extends ExpandableStringEnum<ProvisioningSt
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+type ProvisioningState string
+const (
+  ProvisioningStateInProgress ProvisioningState = "InProgress"
+  // Constants from Azure.ResourceManager.ResourceProvisioningState
+  ResourceProvisioningStateSucceeded ProvisioningState = "Succeeded"
+  ResourceProvisioningStateFailed    ProvisioningState = "Failed"
+  ResourceProvisioningStateCanceled  ProvisioningState = "Canceled"
+  // ... other imported states
+)
+
+```
+
+</ClientTabItem>
 </ClientTabs>
 
 ### Union of other unions of literals with same type
@@ -1804,6 +2141,21 @@ public enum Orientation {
    UP("up"),
    DOWN("down");
 }
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+type Orientation string
+
+const (
+  OrientationLeft Orientation = "left"
+  OrientationRight Orientation = "right"
+  OrientationUp Orientation = "up"
+  OrientationDown Orientation = "down"
+)
+
 ```
 
 </ClientTabItem>
@@ -1886,6 +2238,25 @@ public enum WidgetOrientation {
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+type Orientation string
+
+const (
+  OrientationLeft Orientation = "left"
+  OrientationRight Orientation = "right"
+  OrientationUp Orientation = "up"
+  OrientationDown Orientation = "down"
+)
+
+type Widget struct {
+  Orientation Orientation `json:"orientation"`
+}
+
+```
+
+</ClientTabItem>
 </ClientTabs>
 
 ## Enums
@@ -1947,6 +2318,19 @@ public enum LR {
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+type LR string
+
+const (
+  LRLeft LR = "left"
+  LRRight LR = "right"
+)
+
+```
+
+</ClientTabItem>
 </ClientTabs>
 
 ### Versioning Enums
@@ -1983,7 +2367,12 @@ enum Versions {
 <ClientTabItem lang="typescript" >
 
 ```typescript
-// JS does not generate the enum used for versioning
+export enum KnownVersions {
+  V1 = "v1",
+  V2 = "v2",
+}
+
+export type Versions = string;
 ```
 
 </ClientTabItem>
@@ -1994,6 +2383,19 @@ public enum ServiceServiceVersion implements ServiceVersion {
     V1("v1"),
     V2("v2");
 }
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+type Versions string
+
+const (
+  VersionsV1 Versions = "v1"
+  VersionsV2 Versions = "v2"
+)
+
 ```
 
 </ClientTabItem>
@@ -2072,6 +2474,35 @@ public enum Orientation {
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+type LR string
+
+const (
+  LRLeft LR = "left"
+  LRRight LR = "right"
+)
+
+type UD string
+
+const (
+  UDUp UD = "up"
+  UDDown UD = "down"
+)
+
+type Orientation string
+
+const (
+  OrientationLeft Orientation = "left"
+  OrientationRight Orientation = "right"
+  OrientationUp Orientation = "up"
+  OrientationDown Orientation = "down"
+)
+
+```
+
+</ClientTabItem>
 </ClientTabs>
 
 ## Scalars
@@ -2109,7 +2540,19 @@ utf8JsonWriter.WriteStringValue(Prop.ToString());
 <ClientTabItem lang="typescript" >
 
 ```typescript
-TODO;
+export interface Test {
+  prop: Date;
+}
+
+export function testSerializer(item: Test): any {
+  return { prop: item["prop"].toISOString() };
+}
+
+export function testDeserializer(item: any): Test {
+  return {
+    prop: new Date(item["prop"]),
+  };
+}
 ```
 
 </ClientTabItem>
@@ -2154,7 +2597,19 @@ TODO
 <ClientTabItem lang="typescript" >
 
 ```typescript
-TODO;
+export interface Test {
+  prop: string;
+}
+
+export function testSerializer(item: Test): any {
+  return { prop: item["prop"] };
+}
+
+export function testDeserializer(item: any): Test {
+  return {
+    prop: item["prop"],
+  };
+}
 ```
 
 </ClientTabItem>
@@ -2166,4 +2621,10 @@ jsonWriter.writeStringField("prop", Objects.toString(this.value, null));
 ```
 
 </ClientTabItem>
+<ClientTabItem lang="go" >
+```go
+// NOT_SUPPORTED
+```
+</ClientTabItem>
 </ClientTabs>
+```

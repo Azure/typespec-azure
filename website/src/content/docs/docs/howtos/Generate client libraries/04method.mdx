@@ -1,5 +1,6 @@
 ---
 title: Basic methods
+llmstxt: true
 ---
 
 import { ClientTabs, ClientTabItem } from "@components/client-tabs";
@@ -85,6 +86,23 @@ public final class PetStoreNamespaceClient {
 }
 ```
 
+```go
+type OutputModel struct {
+  Name string `json:"name"`
+}
+
+type PetStoreNamespaceClient struct {}
+
+type PetStoreNamespaceClientGetModelOptions struct {}
+
+type PetStoreNamespaceClientGetModelResponse struct {
+	OutputModel
+}
+
+func (client *PetStoreNamespaceClient) GetModel(ctx context.Context, name string, options *PetStoreNamespaceClientGetModelOptions) (PetStoreNamespaceClientGetModelResponse, error)
+
+```
+
 </ClientTabs>
 
 ### Customizations
@@ -146,6 +164,10 @@ public final class PetStoreNamespaceClient {
     // protocol method
     public Response<BinaryData> getModelWithResponse(String name, RequestOptions requestOptions)
 }
+```
+
+```go
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>
@@ -216,6 +238,10 @@ public final class PetStoreNamespaceClient {
     // convenient method
     OutputModel getModel(String name)
 }
+```
+
+```go
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>
@@ -313,6 +339,10 @@ public final class ImageGenerations {
 }
 ```
 
+```go
+// NOT_SUPPORTED
+```
+
 </ClientTabs>
 
 ## Basic method signature
@@ -382,39 +412,11 @@ public virtual Response Post(User user, CancellationToken cancellationToken = de
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// from user experience perspective
-
-// RLC
-export interface GetUser200Response extends HttpResponse {
-  status: "200";
-  body: User;
-}
-
-export type DemoServiceContext = Client & {
-  path: {
-    /** Resource for '/users' has methods for the following verbs: get */
-    (path: "/users"): {
-      get(
-        options: RequestParameters,
-      ): StreamableMethod<GetUser200Response | GetUserDefaultResponse>;
-    };
-
-    /** Resource for '/users' has methods for the following verbs: post */
-    (path: "/users"): {
-      post(
-        options: {
-          body: User;
-        } & RequestParameters,
-      ): StreamableMethod<PostUserDefaultResponse>;
-    };
-  };
-};
-
-// Modular Api Layer
+// JS CodeGen Api Layer
 export async function get(): Promise<User>;
 export async function post(body: User, options: PostOptionalParams): Promise<void>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class DemoServiceClient {
   get(options: GetUserOptionalParams): Promise<User>;
   post(body: User, options: PostOptionalParams): Promise<void>;
@@ -433,22 +435,19 @@ public void post(User user);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientGetOptions struct {
-}
+type ClientGetOptions struct {}
+
+type ClientPostOptions struct {}
 
 type ClientGetResponse struct {
+	User
 }
+
+type ClientPostResponse struct {}
 
 func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error)
 
-type ClientPostOptions struct {
-}
-
-type ClientPostResponse struct {
-}
-
-func (client *Client) Post(ctx context.Context, user User, options *ClientPostOptions) (ClientPostResponse, error)
-
+func (client *Client) Post(ctx context.Context, body User, options *ClientPostOptions) (ClientPostResponse, error)
 ```
 
 </ClientTabItem>
@@ -504,32 +503,14 @@ public virtual Response Upload(string firstName, string lastName, CancellationTo
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// from user experience perspective
-
-export type DemoServiceContext = Client & {
-  path: {
-    /** Resource for '/completions' has methods for the following verbs: post */
-    (path: "/users"): {
-      post(
-        options: {
-          body: {
-            firstName: string;
-            lastName: string;
-          };
-        } & RequestParameters,
-      ): StreamableMethod<PostUserDefaultResponse>;
-    };
-  };
-};
-
-// Modular Api Layer
+// JS CodeGen Api Layer
 export async function upload(
   firstName: string,
   lastName: string,
   options: UploadOptionalParams,
 ): Promise<void>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class DemoServiceClient {
   upload(firstName: string, lastName: string, options: UploadOptionalParams): Promise<void>;
 }
@@ -546,11 +527,9 @@ public void upload(String firstName, String lastName);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientUploadOptions struct {
-}
+type ClientUploadOptions struct {}
 
-type ClientUploadResponse struct {
-}
+type ClientUploadResponse struct {}
 
 func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
 
@@ -601,28 +580,7 @@ public virtual Response Upload(string id, string firstName, string lastName, Can
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// from user experience perspective
-
-export type DemoServiceContext = Client & {
-  path: {
-    /** Resource for '/completions' has methods for the following verbs: post */
-    (
-      path: "/users/{id}",
-      id,
-    ): {
-      post(
-        options: {
-          body: {
-            firstName: string;
-            lastName: string;
-          };
-        } & RequestParameters,
-      ): StreamableMethod<PostUserDefaultResponse>;
-    };
-  };
-};
-
-// Modular Api Layer
+// JS CodeGen Api Layer
 export async function upload(
   id: string,
   firstName: string,
@@ -630,7 +588,7 @@ export async function upload(
   options: UploadOptionalParams,
 ): Promise<void>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class DemoServiceClient {
   upload(
     id: string,
@@ -652,13 +610,12 @@ public void upload(String id, String firstName, String lastName);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientUploadOptions struct {
-}
+type ClientUploadOptions struct {}
 
-type ClientUploadResponse struct {
-}
+type ClientUploadResponse struct {}
 
 func (client *Client) Upload(ctx context.Context, id string, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
+
 ```
 
 </ClientTabItem>
@@ -710,32 +667,14 @@ public virtual Response Upload(string firstName, string lastName, CancellationTo
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// from user experience perspective
-
-export type DemoServiceContext = Client & {
-  path: {
-    /** Resource for '/completions' has methods for the following verbs: post */
-    (path: "/users"): {
-      post(
-        options: {
-          body: {
-            firstName: string;
-            lastName: string;
-          };
-        } & RequestParameters,
-      ): StreamableMethod<PostUserDefaultResponse>;
-    };
-  };
-};
-
-// Modular Api Layer
+// JS CodeGen Api Layer
 export async function upload(
   firstName: string,
   lastName: string,
   options: UploadOptionalParams,
 ): Promise<void>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class DemoServiceClient {
   upload(firstName: string, lastName: string, options: UploadOptionalParams): Promise<void>;
 }
@@ -752,13 +691,12 @@ public void upload(String firstName, String lastName);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientUploadOptions struct {
-}
+type ClientUploadResponse struct {}
 
-type ClientUploadResponse struct {
-}
+type ClientUploadOptions struct {}
 
 func (client *Client) Upload(ctx context.Context, firstName string, lastName string, options *ClientUploadOptions) (ClientUploadResponse, error)
+
 ```
 
 </ClientTabItem>
@@ -816,25 +754,10 @@ public virtual Response Upload(User user, CancellationToken cancellationToken = 
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// from user experience perspective
-
-export type DemoServiceContext = Client & {
-  path: {
-    /** Resource for '/completions' has methods for the following verbs: post */
-    (path: "/users"): {
-      post(
-        options: {
-          body: User;
-        } & RequestParameters,
-      ): StreamableMethod<PostUserDefaultResponse>;
-    };
-  };
-};
-
-// Modular Api Layer
+// JS CodeGen Api Layer
 export async function upload(user: User, options: UploadOptionalParams): Promise<void>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class DemoServiceClient {
   upload(user: User, options: UploadOptionalParams): Promise<void>;
 }
@@ -861,17 +784,16 @@ public void upload(User user);
 
 ```go
 type User struct {
-	firstName *string
-  lastName *string
+  FirstName *string
+  LastName *string
 }
 
-type ClientUploadOptions struct {
-}
+type ClientUploadOptions struct {}
 
-type ClientUploadResponse struct {
-}
+type ClientUploadResponse struct {}
 
 func (client *Client) Upload(ctx context.Context, user User, options *ClientUploadOptions) (ClientUploadResponse, error)
+
 ```
 
 </ClientTabItem>
@@ -919,24 +841,7 @@ public virtual Response GetBlobProperties(string name, string testHeader, Reques
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// from user experience perspective
-
-export type DemoServiceContext = Client & {
-  path: {
-    /** Resource for '/completions' has methods for the following verbs: post */
-    (path: "/blob_properties/{name}", name): {
-      post(
-        options: {
-          headers: {
-            "test-header": string;
-          } & RawHttpHeaders
-        } & RequestParameters
-      ): StreamableMethod<PostUserDefaultResponse>;
-    };
-  };
-};
-
-// Modular Options
+// JS CodeGen Options
 export interface GetBlobPropertiesOptionalParams extends OperationOptions {
   requestOptions: {
     headers: {
@@ -945,10 +850,10 @@ export interface GetBlobPropertiesOptionalParams extends OperationOptions {
   }
 }
 
-// Modular api layer
+// JS CodeGen api layer
 export async function getBlobProperties(name: string, options: GetBlobPropertiesOptionalParams): Promise<void>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class DemoServiceClient {
   getBlobProperties(name: string, options: GetBlobPropertiesOptionalParams): Promise<void>
 }
@@ -972,6 +877,7 @@ type ClientGetBlobPropertiesResponse struct {
 }
 
 func (client *Client) GetBlobProperties(ctx context.Context, name string, testHeader string, options *ClientGetBlobPropertiesOptions) (ClientGetBlobPropertiesResponse, error)
+
 ```
 
 </ClientTabItem>
@@ -1026,38 +932,18 @@ public virtual Response Register(Schema schema, CancellationToken cancellationTo
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// from user experience perspective
-
-export type DemoServiceContext = Client & {
-  path: {
-    /** Resource for '/completions' has methods for the following verbs: post */
-    (path: "/schemaRegister"): {
-      post(
-        options: {
-          headers: {
-            "content-type": "application/json";
-          } & RawHttpHeaders;
-          body: {
-            schema: string;
-          };
-        } & RequestParameters,
-      ): StreamableMethod<PostUserDefaultResponse>;
-    };
-  };
-};
-
-// Modular model
+// JS CodeGen model
 export interface Schema {
   schema: string;
 }
 
-// Modular api layer
+// JS CodeGen api layer
 export async function register(
   body: Schema,
   options: GetBlobPropertiesOptionalParams,
 ): Promise<void>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class DemoServiceClient {
   getBlobProperties(body: Schema, options: GetBlobPropertiesOptionalParams): Promise<void>;
 }
@@ -1082,13 +968,12 @@ public void register(Schema schema);
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientRegisterOptions struct {
-}
+type ClientRegisterResponse struct {}
 
-type ClientRegisterResponse struct {
-}
+type ClientRegisterOptions struct {}
 
 func (client *Client) Register(ctx context.Context, schema []byte, options *ClientRegisterOptions) (ClientRegisterResponse, error)
+
 ```
 
 </ClientTabItem>
@@ -1155,29 +1040,7 @@ def scheduleRepairs(self, widget_name: str, problem: str, contact: str, *, conte
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// from user experience perspective
-
-export interface RepairInfo {
-  problem: string;
-  contact: string;
-}
-
-export type WidgetServiceContext = Client & {
-  path: {
-    (
-      path: "/widgets/{widgetName}:scheduleRepairs",
-      widgetName: string,
-    ): {
-      post(
-        options: {
-          body: RepairInfo;
-        } & RequestParameters,
-      ): StreamableMethod<PostUserDefaultResponse>;
-    };
-  };
-};
-
-// Modular api layer
+// JS CodeGen api layer
 export async function scheduleRepairs(
   context: Client,
   widgetName: string,
@@ -1186,7 +1049,7 @@ export async function scheduleRepairs(
   options: ScheduleRepairsOptionalParams = { requestOptions: {} },
 ): Promise<RepairResult>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class WidgetServiceClient {
   scheduleRepairs(
     widgetName: string,
@@ -1208,19 +1071,24 @@ public RepairResult scheduleRepairs(String widgetName, String problem, String co
 <ClientTabItem lang="go"  >
 
 ```go
-type ClientScheduleRepairsOptions struct {
+type RepairInfo struct {
+	Contact *string
+	Problem *string
 }
 
 type RepairResult struct {
-	reason *string
-  info *string
+	Info    *string
+	Reason  *string
 }
 
 type ClientScheduleRepairsResponse struct {
-  RepairResult
+	RepairResult
 }
 
-func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, problem string, contact string, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
+type ClientScheduleRepairsOptions struct {}
+
+func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, repairInfo RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
+
 ```
 
 </ClientTabItem>
@@ -1322,29 +1190,7 @@ def scheduleRepairs(self, body: [Schema, JSON, IO[bytes]], *, content_type: str 
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// from user experience perspective
-
-export interface RepairInfo {
-  problem: string;
-  contact: string;
-}
-
-export type WidgetServiceContext = Client & {
-  path: {
-    (
-      path: "/widgets/{widgetName}:scheduleRepairs",
-      widgetName: string,
-    ): {
-      post(
-        options: {
-          body: RepairInfo;
-        } & RequestParameters,
-      ): StreamableMethod<PostUserDefaultResponse>;
-    };
-  };
-};
-
-// Modular api layer
+// JS CodeGen api layer
 export async function scheduleRepairs(
   context: Client,
   widgetName: string,
@@ -1352,7 +1198,7 @@ export async function scheduleRepairs(
   options: ScheduleRepairsOptionalParams = { requestOptions: {} },
 ): Promise<RepairResult>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class WidgetServiceClient {
   scheduleRepairs(
     widgetName: string,
@@ -1389,23 +1235,22 @@ public RepairResult scheduleRepairs(String widgetName, RepairInfo body);
 
 ```go
 type RepairInfo struct {
-	problem *string
-  contact *string
-}
-
-type ClientScheduleRepairsOptions struct {
+	Contact *string
+	Problem *string
 }
 
 type RepairResult struct {
-	reason *string
-  info *string
+	Info    *string
+	Reason  *string
 }
 
-type ClientScheduleRepairsResponse struct {
-  RepairResult
+type ServiceClientScheduleRepairsOptions struct {}
+
+type ServiceClientScheduleRepairsResponse struct {
+	RepairResult
 }
 
-func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, body RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
+func (client *Client) ScheduleRepairs(ctx context.Context, widgetName string, repairInfo RepairInfo, options *ClientScheduleRepairsOptions) (ClientScheduleRepairsResponse, error)
 ```
 
 </ClientTabItem>
@@ -1493,35 +1338,33 @@ namespace Analyze
 ```
 
 ```typescript
-// from user experience perspective
+// JS CodeGen api layer
+export async function completions(
+  context: Client,
+  input: CompletionInput,
+  options: CompletionsOptionalParams = { requestOptions: {} },
+): Promise<CompletionResult>;
 
-export interface CompletionInput {
-  input: string | string[];
+export async function analyze(
+  context: Client,
+  mode: "strict" | "lenient",
+  image: Uint8Array,
+  options: AnalyzeOptionalParams = { requestOptions: {} },
+): Promise<AnalyzeResult>;
+
+// JS CodeGen classical client layer
+export class AnalyzeClient {
+  completions(
+    input: CompletionInput,
+    options: CompletionsOptionalParams = { requestOptions: {} },
+  ): Promise<CompletionResult>;
+
+  analyze(
+    mode: "strict" | "lenient",
+    image: Uint8Array,
+    options: AnalyzeOptionalParams = { requestOptions: {} },
+  ): Promise<AnalyzeResult>;
 }
-
-export type DemoServiceContext = Client & {
-  path: {
-    /** Resource for '/analyze' has methods for the following verbs: post */
-    (path: "/analyze"): {
-      post(
-        options: {
-          body: string;
-          queryParameters: {
-            mode: "strict" | "lenient";
-          };
-        } & RequestParameters,
-      ): StreamableMethod<Analyze200Response | AnalyzeDefaultResponse>;
-    };
-    /** Resource for '/completions' has methods for the following verbs: post */
-    (path: "/completions"): {
-      post(
-        options: {
-          body: CompletionInput;
-        } & RequestParameters,
-      ): StreamableMethod<Completions200Response | CompletionsDefaultResponse>;
-    };
-  };
-};
 ```
 
 ```java
@@ -1541,6 +1384,46 @@ public final class AnalyzeClient {
     public AnalyzeResult analyze(Mode mode, byte[] image)
     public CompletionResult completions(CompletionInput input)
 }
+```
+
+```go
+type AnalyzeResult struct {
+	Confidence *float32
+	Result     *string
+}
+
+type CompletionInput struct {
+	Input []*string
+}
+
+type CompletionResult struct {
+	Text   *string
+	Tokens *int32
+}
+
+type AnalyzeClientAnalyzeOptions struct {}
+
+type AnalyzeClientCompletionsOptions struct {}
+
+type AnalyzeClientAnalyzeResponse struct {
+	AnalyzeResult
+}
+
+type AnalyzeClientCompletionsResponse struct {
+	CompletionResult
+}
+
+type AnalyzeRequestMode string
+
+const (
+	AnalyzeRequestModeLenient AnalyzeRequestMode = "lenient"
+	AnalyzeRequestModeStrict AnalyzeRequestMode = "strict"
+)
+
+func (client *AnalyzeClient) Analyze(ctx context.Context, mode AnalyzeRequestMode, imageParam io.ReadSeekCloser, options *AnalyzeClientAnalyzeOptions) (AnalyzeClientAnalyzeResponse, error)
+
+func (client *AnalyzeClient) Completions(ctx context.Context, input CompletionInput, options *AnalyzeClientCompletionsOptions) (AnalyzeClientCompletionsResponse, error)
+
 ```
 
 </ClientTabs>
@@ -1579,29 +1462,25 @@ public Response<long> B(string x, Cancellation token);
 ```
 
 ```typescript
-// from user experience perspective
+// JS CodeGen api layer
+export async function a(
+  context: Client,
+  x: number,
+  options: AOptionalParams = { requestOptions: {} },
+): Promise<number>;
 
-export type DemoServiceContext = Client & {
-  path: {
-    /** Resource for '/foo' has methods for the following verbs: post */
-    (path: "/foo"): {
-      post(
-        options?: {
-          body?: {
-            x: number;
-          };
-        } & RequestParameters,
-      ): StreamableMethod<A200Response>;
-      post(
-        options?: {
-          body?: {
-            x: string;
-          };
-        } & RequestParameters,
-      ): StreamableMethod<B200Response>;
-    };
-  };
-};
+export async function b(
+  context: Client,
+  x: string,
+  options: BOptionalParams = { requestOptions: {} },
+): Promise<number>;
+
+// JS CodeGen classical client layer
+export class TestServiceClient {
+  b(x: string, options: BOptionalParams = { requestOptions: {} }): Promise<number>;
+
+  a(x: number, options: AOptionalParams = { requestOptions: {} }): Promise<number>;
+}
 ```
 
 ```java
@@ -1611,6 +1490,24 @@ public final class Client {
     public double a(int x)
     public long b(String x)
 }
+```
+
+```go
+type ClientAOptions struct {}
+
+type ClientBOptions struct {}
+
+type ClientAResponse struct {
+	Value *float32
+}
+
+type ClientBResponse struct {
+	Value *int64
+}
+
+func (client *Client) A(ctx context.Context, x int32, options *ClientAOptions) (ClientAResponse, error)
+
+func (client *Client) B(ctx context.Context, x string, options *ClientBOptions) (ClientBResponse, error)
 ```
 
 </ClientTabs>
@@ -1666,11 +1563,15 @@ public Response<long> Foo(string x, Cancellation token);
 ```
 
 ```typescript
-JS RLC is not in the business of customization with client.tsp
+// NOT_SUPPORTED
 ```
 
 ```java
 NOT_SUPPORTED
+```
+
+```go
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>
@@ -1709,7 +1610,16 @@ def get(self, *, etag: Optional[str] = None, match_condition: Optional[MatchCond
 ```
 
 ```typescript
-# TODO
+// JS CodeGen api layer
+export async function get(
+  context: Client,
+  options: GetOptionalParams = { requestOptions: {} },
+): Promise<Response>;
+
+// JS CodeGen classical client layer
+export class TestServiceClient {
+  get(options: GetOptionalParams = { requestOptions: {} }): Promise<Response>;
+}
 ```
 
 ```java
@@ -1719,15 +1629,125 @@ public Response get(MatchConditions matchConditions);
 ```
 
 ```go
+type Response struct {
+  Name string
+}
+
 type ClientGetOptions struct {
-	// The request should only proceed if an entity matches this string.
+// The request should only proceed if an entity matches this string.
 	IfMatch *string
 
-	// The request should only proceed if no entity matches this string.
+// The request should only proceed if no entity matches this string.
 	IfNoneMatch *string
 }
 
-func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (ClientGetResponse, error)
+func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (*Response, error)
+
+```
+
+</ClientTabs>
+
+## Using `@clientLocation` to control parameter placement
+
+The `@clientLocation` decorator allows you to explicitly move parameters between client and operation levels.
+
+### Moving subscriptionId from client to operation level
+
+In ARM services, `subscriptionId` is automatically elevated to the client level. By applying `@clientLocation` to `subscriptionId` and explicitly moving it to an operation, you can move it back down to the method-level.
+
+In the following case, since all instances of the subscription ID parameter have been explicitly moved onto the method-level, there is no longer a subscription ID parameter to the client.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+@service
+@armProviderNamespace
+@versioned(Versions)
+@armCommonTypesVersion(CommonTypes.Versions.v5)
+namespace Microsoft.ContosoProviderHub;
+
+/** Api versions */
+enum Versions {
+  /** 2024-04-01-preview api version */
+  V2024_04_01_PREVIEW: "2024-04-01-preview",
+}
+
+@subscriptionResource
+model MyModel is ProxyResource<{}> {
+  @key("extendedZoneName")
+  @segment("extendedZones")
+  @path
+  name: string;
+}
+
+op get is ArmResourceRead<MyModel>;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+// Move subscription ID from client to operation `get`
+@@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, get);
+```
+
+```python
+# Since all instances of subscription ID in the service have been moved to the operation level,
+# there is no `subscription_id` parameter on the client
+class ContosoProviderHubClient:
+    def __init__(self, credential, **kwargs):
+        ...
+
+    def get(self, subscription_id: str, extended_zone_name: str, **kwargs) -> MyModel:
+        ...
+```
+
+```csharp
+// Main client with subscriptionId as client parameter
+public partial class ContosoProviderHubClient
+{
+    public ContosoProviderHubClient(TokenCredential credential)
+    {
+        ...
+    }
+
+    public virtual Response<MyModel> Get(string subscriptionId, string extendedZoneName, CancellationToken cancellationToken = default)
+    {
+        ...
+    }
+}
+```
+
+```typescript
+export class ContosoProviderHubClient {
+
+  constructor(credential: TokenCredential) {
+    ...
+  }
+
+  async get(subscriptionId: string, extendedZoneName: string): Promise<MyModel> {
+    ...
+  }
+}
+```
+
+```java
+public final class ContosoProviderHubClient {
+
+    public ContosoProviderHubClient(TokenCredential credential) {
+        ...
+    }
+
+    public MyModel get(String subscriptionId, String extendedZoneName) {
+        ...
+    }
+}
+```
+
+```go
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>

@@ -1,25 +1,40 @@
+import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
+  compilerAssert,
   DecoratorContext,
   DecoratorFunction,
   Enum,
   EnumMember,
+  getDiscriminator,
+  getNamespaceFullName,
+  ignoreDiagnostics,
   Interface,
+  isErrorModel,
+  isList,
+  isNumeric,
+  isService,
+  isTemplateDeclaration,
   Model,
   ModelProperty,
   Namespace,
+  Numeric,
   Operation,
   Program,
   RekeyableMap,
   Scalar,
   Type,
   Union,
-  getDiscriminator,
-  getNamespaceFullName,
-  ignoreDiagnostics,
-  isService,
-  isTemplateDeclaration,
 } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
+import { $ } from "@typespec/compiler/typekit";
+import {
+  getAuthentication,
+  getHttpOperation,
+  getServers,
+  isBody,
+  isBodyRoot,
+} from "@typespec/http";
+import { $useDependency, getVersions } from "@typespec/versioning";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
@@ -30,9 +45,9 @@ import {
   ClientInitializationDecorator,
   ClientNameDecorator,
   ClientNamespaceDecorator,
+  ClientOptionDecorator,
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
-  FlattenPropertyDecorator,
   OperationGroupDecorator,
   ParamAliasDecorator,
   ProtocolAPIDecorator,
@@ -40,10 +55,19 @@ import {
   ScopeDecorator,
   UsageDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
-import { HierarchyBuildingDecorator } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
+import {
+  ClientDefaultValueDecorator,
+  DisablePageableDecorator,
+  FlattenPropertyDecorator,
+  HierarchyBuildingDecorator,
+  MarkAsLroDecorator,
+  MarkAsPageableDecorator,
+  NextLinkVerbDecorator,
+} from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
   AccessFlags,
   ClientInitializationOptions,
+  ExternalTypeInfo,
   LanguageScopes,
   SdkClient,
   SdkOperationGroup,
@@ -57,13 +81,18 @@ import {
   clientNameKey,
   clientNamespaceKey,
   compareModelProperties,
+  findEntriesWithTarget,
   findRootSourceProperty,
   getScopedDecoratorData,
   hasExplicitClientOrOperationGroup,
+  isSameAuth,
+  isSameServers,
   listAllUserDefinedNamespaces,
   negationScopesKey,
   omitOperation,
   operationGroupKey,
+  overrideKey,
+  parseScopes,
   scopeKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
@@ -93,7 +122,7 @@ function setScopedDecoratorData(
     return;
   }
 
-  const [negationScopes, scopes] = parseScopes(context, scope);
+  const [negationScopes, scopes] = parseScopes(scope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
     // override the previous value for negation scopes
     const newObject: Record<string | symbol, any> =
@@ -122,32 +151,6 @@ function setScopedDecoratorData(
   }
 }
 
-function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string[]?, string[]?] {
-  if (scope === undefined) {
-    return [undefined, undefined];
-  }
-
-  // handle !(scope1, scope2,...) syntax
-  const negationScopeRegex = new RegExp(/!\((.*?)\)/);
-  const negationScopeMatch = scope.match(negationScopeRegex);
-  if (negationScopeMatch) {
-    return [negationScopeMatch[1].split(",").map((s) => s.trim()), undefined];
-  }
-
-  // handle !scope1, !scope2, scope3, ... syntax
-  const splitScopes = scope.split(",").map((s) => s.trim());
-  const negationScopes: string[] = [];
-  const scopes: string[] = [];
-  for (const s of splitScopes) {
-    if (s.startsWith("!")) {
-      negationScopes.push(s.slice(1));
-    } else {
-      scopes.push(s);
-    }
-  }
-  return [negationScopes, scopes];
-}
-
 export const $client: ClientDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
@@ -164,31 +167,99 @@ export const $client: ClientDecorator = (
   const explicitName =
     options?.kind === "Model" ? options?.properties.get("name")?.type : undefined;
   const name: string = explicitName?.kind === "String" ? explicitName.value : target.name;
-  let service = options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
+  let services: Namespace[];
+  const serviceConfig =
+    options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
 
-  if (service?.kind !== "Namespace") {
-    service = findClientService(context.program, target);
-  }
-
-  if (
-    service === undefined ||
-    service.kind !== "Namespace" ||
-    !judgeService(context.program, service)
+  if (serviceConfig?.kind === "Namespace") {
+    services = [serviceConfig];
+  } else if (
+    serviceConfig?.kind === "Tuple" &&
+    serviceConfig.values.every((v) => v.kind === "Namespace")
   ) {
-    reportDiagnostic(context.program, {
-      code: "client-service",
-      format: { name },
-      target: context.decoratorTarget,
-    });
-    return;
+    if (target.kind === "Interface") {
+      reportDiagnostic(context.program, {
+        code: "invalid-client-service-multiple",
+        target: context.decoratorTarget,
+      });
+      return;
+    }
+    services = serviceConfig.values;
+    // validate all services has same server definition
+    let servers = undefined;
+    let auth = undefined;
+    let isSame = true;
+    for (const svc of services) {
+      const currentServers = getServers(context.program, svc);
+      if (currentServers === undefined) continue;
+      if (servers === undefined) {
+        servers = currentServers;
+      } else {
+        isSame = isSameServers(servers, currentServers);
+        if (!isSame) {
+          break;
+        }
+      }
+    }
+    for (const svc of services) {
+      const currentAuth = getAuthentication(context.program, svc);
+      if (currentAuth === undefined) continue;
+      if (auth === undefined) {
+        auth = currentAuth;
+      } else {
+        isSame = isSameAuth(auth, currentAuth);
+        if (!isSame) {
+          break;
+        }
+      }
+    }
+    if (!isSame) {
+      reportDiagnostic(context.program, {
+        code: "inconsistent-multiple-service",
+        target: context.decoratorTarget,
+      });
+      return;
+    }
+    // no explicit versioning dependency
+    if (
+      !target.decorators.some(
+        (d) =>
+          d.definition?.name === "@useDependency" &&
+          getNamespaceFullName(d.definition?.namespace) === "TypeSpec.Versioning",
+      )
+    ) {
+      const versionRecords = [];
+      // collect the latest version enum member from each service
+      for (const svc of services) {
+        const versions = getVersions(context.program, svc)[1]?.getVersions();
+        if (versions && versions.length > 0) {
+          versionRecords.push(versions[versions.length - 1].enumMember);
+        }
+      }
+      // set the versioning dependency
+      if (versionRecords.length > 0) {
+        context.call($useDependency, target, ...versionRecords);
+      }
+    }
+  } else {
+    const service = findClientService(context.program, target);
+    if (service === undefined) {
+      reportDiagnostic(context.program, {
+        code: "client-service",
+        format: { name },
+        target: context.decoratorTarget,
+      });
+      return;
+    }
+    services = [service];
   }
 
   const client: SdkClient = {
     kind: "SdkClient",
     name,
-    service,
+    service: services.length === 1 ? services[0] : services,
+    services,
     type: target,
-    crossLanguageDefinitionId: `${getNamespaceFullName(service)}.${name}`,
     subOperationGroups: [],
   };
   setScopedDecoratorData(context, $client, clientKey, target, client, scope);
@@ -203,10 +274,7 @@ function judgeService(program: Program, type: Namespace): boolean {
   );
 }
 
-function findClientService(
-  program: Program,
-  client: Namespace | Interface,
-): Namespace | Interface | undefined {
+function findClientService(program: Program, client: Namespace | Interface): Namespace | undefined {
   let current: Namespace | undefined = client as any;
   while (current) {
     if (judgeService(program, current)) {
@@ -286,7 +354,12 @@ export function isOperationGroup(context: TCGCContext, type: Namespace | Interfa
   if (type.kind === "Interface" && !isTemplateDeclaration(type)) {
     return true;
   }
-  if (type.kind === "Namespace" && !type.decorators.some((t) => t.decorator.name === "$service")) {
+  if (
+    type.kind === "Namespace" &&
+    !type.decorators.some(
+      (d) => d.definition?.name === "@service" && d.definition?.namespace.name === "TypeSpec",
+    )
+  ) {
     return true;
   }
   return false;
@@ -366,7 +439,7 @@ const protocolAPIKey = createStateSymbol("protocolAPI");
 
 export const $protocolAPI: ProtocolAPIDecorator = (
   context: DecoratorContext,
-  entity: Operation,
+  entity: Operation | Namespace | Interface,
   value?: boolean,
   scope?: LanguageScopes,
 ) => {
@@ -377,20 +450,52 @@ const convenientAPIKey = createStateSymbol("convenientAPI");
 
 export const $convenientAPI: ConvenientAPIDecorator = (
   context: DecoratorContext,
-  entity: Operation,
+  entity: Operation | Namespace | Interface,
   value?: boolean,
   scope?: LanguageScopes,
 ) => {
   setScopedDecoratorData(context, $convenientAPI, convenientAPIKey, entity, value, scope);
 };
 
+function getConvenientOrProtocolValue(
+  context: TCGCContext,
+  key: symbol,
+  entity: Operation,
+): boolean | undefined {
+  // First check if the operation itself has the decorator
+  const value = getScopedDecoratorData(context, key, entity);
+  if (value !== undefined) {
+    return value;
+  }
+
+  // Check the parent interface if the operation is in an interface
+  if (entity.interface) {
+    const interfaceValue = getScopedDecoratorData(context, key, entity.interface);
+    if (interfaceValue !== undefined) {
+      return interfaceValue;
+    }
+  }
+
+  // Check the parent namespace hierarchy
+  let currentNamespace: Namespace | undefined = entity.namespace;
+  while (currentNamespace) {
+    const namespaceValue = getScopedDecoratorData(context, key, currentNamespace);
+    if (namespaceValue !== undefined) {
+      return namespaceValue;
+    }
+    currentNamespace = currentNamespace.namespace;
+  }
+
+  return undefined;
+}
+
 export function shouldGenerateProtocol(context: TCGCContext, entity: Operation): boolean {
-  const value = getScopedDecoratorData(context, protocolAPIKey, entity);
+  const value = getConvenientOrProtocolValue(context, protocolAPIKey, entity);
   return value ?? Boolean(context.generateProtocolMethods);
 }
 
 export function shouldGenerateConvenient(context: TCGCContext, entity: Operation): boolean {
-  const value = getScopedDecoratorData(context, convenientAPIKey, entity);
+  const value = getConvenientOrProtocolValue(context, convenientAPIKey, entity);
   return value ?? Boolean(context.generateConvenienceMethods);
 }
 
@@ -538,14 +643,13 @@ export function getAccess(
   }
 }
 
-const flattenPropertyKey = createStateSymbol("flattenPropertyKey");
+const flattenPropertyKey = createStateSymbol("flattenProperty");
 /**
  * Whether a model property should be flattened.
  *
  * @param context DecoratorContext
  * @param target ModelProperty to mark as flattened
  * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
- * @deprecated This decorator is not recommended to use.
  */
 export const $flattenProperty: FlattenPropertyDecorator = (
   context: DecoratorContext,
@@ -560,7 +664,7 @@ export const $flattenProperty: FlattenPropertyDecorator = (
     });
     return;
   }
-  setScopedDecoratorData(context, $flattenProperty, flattenPropertyKey, target, true, scope); // eslint-disable-line @typescript-eslint/no-deprecated
+  setScopedDecoratorData(context, $flattenProperty, flattenPropertyKey, target, true, scope);
 };
 
 /**
@@ -620,8 +724,6 @@ export function getClientNameOverride(
   return getScopedDecoratorData(context, clientNameKey, entity, languageScope);
 }
 
-const overrideKey = createStateSymbol("override");
-
 // Recursive function to collect parameter names
 function collectParams(
   properties: RekeyableMap<string, ModelProperty>,
@@ -660,11 +762,13 @@ export const $override = (
 
   // Check if the sorted parameter names arrays are equal, omit optional parameters
   let parametersMatch = true;
+  let checkParameter: ModelProperty | undefined = undefined;
   let index = 0;
   for (const originalParam of originalParams) {
     if (index > overrideParams.length - 1) {
       if (!originalParam.optional) {
         parametersMatch = false;
+        checkParameter = originalParam;
         break;
       } else {
         continue;
@@ -673,6 +777,7 @@ export const $override = (
     if (!compareModelProperties(undefined, originalParam, overrideParams[index])) {
       if (!originalParam.optional) {
         parametersMatch = false;
+        checkParameter = originalParam;
         break;
       } else {
         continue;
@@ -682,7 +787,11 @@ export const $override = (
     // Apply the alternate type to the original parameter
     const overrideParam = overrideParams[index];
     overrideParam.decorators
-      .filter((d) => d.decorator.name === "$alternateType")
+      .filter(
+        (d) =>
+          d.definition?.name === "@alternateType" &&
+          getNamespaceFullName(d.definition?.namespace) === namespace,
+      )
       .map((d) =>
         context.call(
           $alternateType,
@@ -701,8 +810,7 @@ export const $override = (
       target: context.decoratorTarget,
       format: {
         methodName: original.name,
-        originalParameters: originalParams.map((x) => x.name).join(`", "`),
-        overrideParameters: overrideParams.map((x) => x.name).join(`", "`),
+        checkParameter: checkParameter?.name ?? "",
       },
     });
   }
@@ -724,6 +832,36 @@ export function getOverriddenClientMethod(
   return getScopedDecoratorData(context, overrideKey, entity);
 }
 
+/**
+ * Check if a model is an external type.
+ * The external type model has properties: identity (required), package (optional), minVersion (optional).
+ */
+function isExternalType(model: Model): boolean {
+  if (model.indexer !== undefined) {
+    return false;
+  }
+
+  const properties = [...model.properties.values()];
+
+  // Check if it has an 'identity' property with String literal type
+  const hasIdentity = properties.some(
+    (prop) => prop.name === "identity" && prop.type.kind === "String",
+  );
+
+  if (!hasIdentity) {
+    return false;
+  }
+
+  // Check that all other properties are only 'package' or 'minVersion' with String literal types
+  const otherProps = properties.filter((prop) => prop.name !== "identity");
+  const validProps = otherProps.every(
+    (prop) =>
+      (prop.name === "package" || prop.name === "minVersion") && prop.type.kind === "String",
+  );
+
+  return validProps;
+}
+
 const alternateTypeKey = createStateSymbol("alternateType");
 
 /**
@@ -731,26 +869,75 @@ const alternateTypeKey = createStateSymbol("alternateType");
  *
  * @param context the decorator context
  * @param source source type to be replaced
- * @param alternate target type to replace the source type
+ * @param alternate target type to replace the source type or ExternalType object
  * @param scope Names of the projection (e.g. "python", "csharp", "java", "javascript")
  */
 export const $alternateType: AlternateTypeDecorator = (
   context: DecoratorContext,
-  source: ModelProperty | Scalar,
+  source: ModelProperty | Scalar | Model | Enum | Union,
   alternate: Type,
   scope?: LanguageScopes,
 ) => {
-  if (source.kind === "Scalar" && alternate.kind !== "Scalar") {
-    reportDiagnostic(context.program, {
-      code: "invalid-alternate-type",
-      format: {
-        kindName: alternate.kind,
-      },
-      target: alternate,
-    });
-    return;
+  let alternateInput: Type | ExternalTypeInfo = alternate;
+  if (alternate.kind === "Model" && isExternalType(alternate)) {
+    // This means we're dealing with external type
+    if (source.kind === "ModelProperty") {
+      reportDiagnostic(context.program, {
+        code: "external-type-on-model-property",
+        target: source,
+      });
+      return;
+    }
+    if (!scope) {
+      reportDiagnostic(context.program, {
+        code: "missing-scope",
+        format: {
+          decoratorName: "@alternateType",
+        },
+        target: source,
+      });
+    }
+
+    const alternatePropertyValues = [...alternate.properties.values()];
+    // Get identity if needed
+    const identity = alternatePropertyValues
+      .filter((x) => x.name === "identity")
+      .map((x) => x.type)
+      .filter((x) => x.kind === "String")
+      .map((x) => x.value)[0];
+
+    const packageName = alternatePropertyValues
+      .filter((x) => x.name === "package")
+      .map((x) => x.type)
+      .filter((x) => x.kind === "String")
+      .map((x) => x.value)[0];
+
+    const minVersion = alternatePropertyValues
+      .filter((x) => x.name === "minVersion")
+      .map((x) => x.type)
+      .filter((x) => x.kind === "String")
+      .map((x) => x.value)[0];
+
+    alternateInput = {
+      kind: "externalTypeInfo",
+      identity,
+      package: packageName,
+      minVersion,
+    };
+  } else {
+    // Not external type
+    if (source.kind === "Scalar" && alternate.kind !== "Scalar") {
+      reportDiagnostic(context.program, {
+        code: "invalid-alternate-type",
+        format: {
+          kindName: alternate.kind,
+        },
+        target: alternate,
+      });
+      return;
+    }
   }
-  setScopedDecoratorData(context, $alternateType, alternateTypeKey, source, alternate, scope);
+  setScopedDecoratorData(context, $alternateType, alternateTypeKey, source, alternateInput, scope);
 };
 
 /**
@@ -762,9 +949,36 @@ export const $alternateType: AlternateTypeDecorator = (
  */
 export function getAlternateType(
   context: TCGCContext,
-  source: ModelProperty | Scalar,
-): Scalar | undefined {
-  return getScopedDecoratorData(context, alternateTypeKey, source);
+  source: ModelProperty | Scalar | Model | Enum | Union,
+): Type | ExternalTypeInfo | undefined {
+  const retval: Type | ExternalTypeInfo | undefined = getScopedDecoratorData(
+    context,
+    alternateTypeKey,
+    source,
+  );
+  if (retval !== undefined && retval.kind === "externalTypeInfo") {
+    if (!context.__externalPackageToVersions) {
+      context.__externalPackageToVersions = new Map();
+    }
+    const externalPackage = retval.package;
+    const externalMinVersion = retval.minVersion;
+    if (externalPackage && externalMinVersion) {
+      const existingVersion = context.__externalPackageToVersions.get(externalPackage);
+      if (existingVersion && existingVersion !== externalMinVersion) {
+        reportDiagnostic(context.program, {
+          code: "external-library-version-mismatch",
+          format: {
+            libraryName: externalPackage,
+            versionA: existingVersion,
+            versionB: externalMinVersion,
+          },
+          target: source,
+        });
+      }
+      context.__externalPackageToVersions.set(externalPackage, externalMinVersion);
+    }
+  }
+  return retval;
 }
 
 export const $useSystemTextJsonConverter: DecoratorFunction = (
@@ -785,13 +999,15 @@ export const $clientInitialization: ClientInitializationDecorator = (
     if (options.properties.get("initializedBy")) {
       const value = options.properties.get("initializedBy")!.type;
 
-      const isValidValue = (value: number): boolean => value === 1 || value === 2;
+      const isValidValue = (value: number): boolean => value === 0 || value === 1 || value === 2;
 
       if (value.kind === "EnumMember") {
         if (typeof value.value !== "number" || !isValidValue(value.value)) {
           reportDiagnostic(context.program, {
             code: "invalid-initialized-by",
-            format: { message: "Please use `InitializedBy` enum to set the value." },
+            format: {
+              message: "Please use `InitializedBy` enum to set the value.",
+            },
             target: target,
           });
           return;
@@ -805,7 +1021,9 @@ export const $clientInitialization: ClientInitializationDecorator = (
           ) {
             reportDiagnostic(context.program, {
               code: "invalid-initialized-by",
-              format: { message: "Please use `InitializedBy` enum to set the value." },
+              format: {
+                message: "Please use `InitializedBy` enum to set the value.",
+              },
               target: target,
             });
             return;
@@ -837,10 +1055,10 @@ export function getClientInitializationOptions(
   entity: Namespace | Interface,
 ): ClientInitializationOptions | undefined {
   const options = getScopedDecoratorData(context, clientInitializationKey, entity);
-  if (options === undefined) return undefined;
 
   // backward compatibility
   if (
+    options &&
     options.properties.get("initializedBy") === undefined &&
     options.properties.get("parameters") === undefined
   ) {
@@ -851,7 +1069,7 @@ export function getClientInitializationOptions(
 
   let initializedBy = undefined;
 
-  if (options.properties.get("initializedBy")) {
+  if (options?.properties.get("initializedBy")) {
     if (options.properties.get("initializedBy").type.kind === "EnumMember") {
       initializedBy = options.properties.get("initializedBy").type.value;
     } else if (options.properties.get("initializedBy").type.kind === "Union") {
@@ -862,8 +1080,38 @@ export function getClientInitializationOptions(
     }
   }
 
+  let parametersModel = options?.properties.get("parameters")?.type;
+  let currEntity: Namespace | Interface | undefined = entity;
+  while (currEntity) {
+    const movedParameters = findEntriesWithTarget<ModelProperty, Namespace | Interface>(
+      context,
+      clientLocationKey,
+      currEntity,
+      "ModelProperty",
+    );
+    const tk = $(context.program);
+    if (movedParameters.length > 0) {
+      if (parametersModel) {
+        // If the parameters model already exists, we will merge the moved parameters into it.
+        for (const movedParameter of movedParameters) {
+          parametersModel.properties.set(movedParameter.name, movedParameter);
+        }
+      } else {
+        parametersModel = tk.model.create({
+          name: "ClientInitializationParameters",
+          properties: {
+            ...Object.fromEntries(
+              movedParameters.map((movedParameter) => [movedParameter.name, movedParameter]),
+            ),
+          },
+        });
+      }
+    }
+    currEntity = currEntity.namespace;
+  }
+
   return {
-    parameters: options.properties.get("parameters")?.type,
+    parameters: parametersModel,
     initializedBy: initializedBy,
   };
 }
@@ -965,6 +1213,10 @@ export function getClientNamespace(
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
   if (override) {
     // if `@clientNamespace` is applied to the entity, this wins out
+    // if the override exactly matches the namespace flag, no replacement is needed
+    if (context.namespaceFlag && override === context.namespaceFlag) {
+      return override;
+    }
     const userDefinedNamespace = findNamespaceOverlapClosestToRoot(
       override,
       listAllUserDefinedNamespaces(context),
@@ -1006,6 +1258,16 @@ function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Names
       listAllUserDefinedNamespaces(context),
     );
     if (userDefinedNamespace && context.namespaceFlag) {
+      // Check if replacement would cause duplication:
+      // This happens when the namespace flag is an extension of the user-defined namespace
+      // and joinedSegments already starts with the flag (meaning override already applied it)
+      if (
+        context.namespaceFlag.startsWith(userDefinedNamespace.name) &&
+        (joinedSegments.startsWith(context.namespaceFlag + ".") ||
+          joinedSegments === context.namespaceFlag)
+      ) {
+        return joinedSegments;
+      }
       return joinedSegments.replace(userDefinedNamespace.name, context.namespaceFlag);
     }
     return joinedSegments;
@@ -1016,10 +1278,10 @@ function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Names
 
 export const $scope: ScopeDecorator = (
   context: DecoratorContext,
-  entity: Operation,
+  entity: Operation | ModelProperty,
   scope?: LanguageScopes,
 ) => {
-  const [negationScopes, scopes] = parseScopes(context, scope);
+  const [negationScopes, scopes] = parseScopes(scope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
     // for negation scope, override the previous value
     setScopedDecoratorData(context, $scope, negationScopesKey, entity, negationScopes);
@@ -1176,50 +1438,126 @@ export function getClientDocExplicit(
 
 export const $clientLocation = (
   context: DecoratorContext,
-  source: Operation,
-  target: Interface | Namespace | string,
+  source: Operation | ModelProperty,
+  target: Interface | Namespace | Operation | string,
   scope?: LanguageScopes,
 ) => {
+  if (source.kind === "Operation") {
+    // can only move parameters to an operation, not another operation
+    if (typeof target !== "string" && target.kind === "Operation") {
+      reportDiagnostic(context.program, {
+        code: "client-location-conflict",
+        format: { operationName: source.name },
+        target: context.decoratorTarget,
+        messageId: "operationToOperation",
+      });
+      return;
+    }
+  } else if (source.kind === "ModelProperty") {
+    // verify that there isn't a conflict with existing client initialization parameter
+    if (
+      typeof target !== "string" &&
+      (target.kind === "Interface" || target.kind === "Namespace")
+    ) {
+      const clientInitializationParams = target.decorators
+        .filter((d) => d.decorator.name === "$clientInitialization")
+        .map((d) => d.args[0].value)
+        .filter((a): a is Model => a.entityKind === "Type" && a.kind === "Model")
+        .filter((model) => model.properties.has(source.name))
+        .map((model) => model.properties.get(source.name)!);
+      if (clientInitializationParams.length > 0) {
+        reportDiagnostic(context.program, {
+          code: "client-location-conflict",
+          format: { parameterName: source.name },
+          target: context.decoratorTarget,
+          messageId: "modelPropertyToClientInitialization",
+        });
+        return;
+      }
+    }
+    if (typeof target === "string") {
+      reportDiagnostic(context.program, {
+        code: "client-location-conflict",
+        format: { parameterName: source.name },
+        target: context.decoratorTarget,
+        messageId: "modelPropertyToString",
+      });
+      return;
+    }
+  }
   setScopedDecoratorData(context, $clientLocation, clientLocationKey, source, target, scope);
 };
 
 /**
- * Gets the `Namespace`, `Interface` or name of client where an operation change the location to.
- *
- * @param context TCGCContext
- * @param operation Operation to be moved
- * @returns `Namespace`, `Interface`, `string` target or undefined if no location change.
+ * Gets the `Namespace`, `Interface` or name of client where an operation changes location to.
  */
 export function getClientLocation(
   context: TCGCContext,
-  operation: Operation,
-): Namespace | Interface | string | undefined {
-  // if there is `@client` or `@operationGroup` decorator, `@clientLocation` will be ignored
-  if (hasExplicitClientOrOperationGroup(context)) {
+  input: Operation,
+): Namespace | Interface | string | undefined;
+
+/**
+ * Gets the `Namespace`, `Interface`, `Operation` where a parameter changes location to.
+ */
+export function getClientLocation(
+  context: TCGCContext,
+  input: ModelProperty,
+): Namespace | Interface | Operation | undefined;
+
+/**
+ * Gets the `Namespace`, `Interface`, `Operation` or name of client where an operation / parameter change the location to.
+ *
+ * @param context TCGCContext
+ * @param input Operation or parameter to be moved
+ * @returns `Namespace`, `Interface`, `Operation`, `string` target or undefined if no location change.
+ */
+export function getClientLocation(
+  context: TCGCContext,
+  input: Operation | ModelProperty,
+): Namespace | Interface | Operation | string | undefined {
+  // if there is `@client` or `@operationGroup` decorator, `@clientLocation` on operation will be ignored
+  if (input.kind === "Operation" && hasExplicitClientOrOperationGroup(context)) {
     return undefined;
   }
-  return getScopedDecoratorData(context, clientLocationKey, operation) as
-    | Namespace
-    | Interface
-    | string
-    | undefined;
+  return getScopedDecoratorData(context, clientLocationKey, input);
 }
 
 const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
 
-function isPropertySuperset(target: Model, value: Model): boolean {
+interface PropertyConflict {
+  propertyName: string;
+  reason: "missing" | "type-mismatch";
+}
+
+function isPropertySuperset(program: Program, target: Model, value: Model): PropertyConflict[] {
+  const conflicts: PropertyConflict[] = [];
+
   // Check if all properties in value exist in target
   for (const name of value.properties.keys()) {
     if (!target.properties.has(name)) {
-      return false;
+      conflicts.push({
+        propertyName: name,
+        reason: "missing",
+      });
+      continue;
     }
     const targetProperty = target.properties.get(name)!;
     const valueProperty = value.properties.get(name)!;
+    // Compare properties to handle envelope/spread semantics correctly
+    // Properties match if they come from the same source OR if they have the same type
+    // This ensures properties from envelopes (e.g., ...ArmTagsProperty) are recognized
+    // as equivalent to directly defined properties with the same name and type
     if (targetProperty.sourceProperty !== valueProperty.sourceProperty) {
-      return false;
+      // Different sources - check if they have the same type
+      if (targetProperty.type !== valueProperty.type) {
+        conflicts.push({
+          propertyName: name,
+          reason: "type-mismatch",
+        });
+      }
     }
   }
-  return true;
+  return conflicts;
 }
 
 export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
@@ -1229,15 +1567,33 @@ export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
   scope?: LanguageScopes,
 ) => {
   // Validate that target has all properties from value
-  if (!isPropertySuperset(target, value)) {
-    reportDiagnostic(context.program, {
-      code: "legacy-hierarchy-building-conflict",
-      format: {
-        childModel: target.name,
-        parentModel: value.name,
-      },
-      target: context.decoratorTarget,
-    });
+  const conflicts = isPropertySuperset(context.program, target, value);
+  if (conflicts.length > 0) {
+    for (const conflict of conflicts) {
+      if (conflict.reason === "missing") {
+        reportDiagnostic(context.program, {
+          code: "legacy-hierarchy-building-conflict",
+          messageId: "property-missing",
+          format: {
+            childModel: target.name,
+            parentModel: value.name,
+            propertyName: conflict.propertyName,
+          },
+          target: context.decoratorTarget,
+        });
+      } else if (conflict.reason === "type-mismatch") {
+        reportDiagnostic(context.program, {
+          code: "legacy-hierarchy-building-conflict",
+          messageId: "type-mismatch",
+          format: {
+            childModel: target.name,
+            parentModel: value.name,
+            propertyName: conflict.propertyName,
+          },
+          target: context.decoratorTarget,
+        });
+      }
+    }
     return;
   }
 
@@ -1258,13 +1614,234 @@ export function getLegacyHierarchyBuilding(context: TCGCContext, target: Model):
   return getScopedDecoratorData(context, legacyHierarchyBuildingKey, target);
 }
 
+const markAsLroKey = createStateSymbol("markAsLro");
+
+export const $markAsLro: MarkAsLroDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: LanguageScopes,
+) => {
+  const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, target));
+  const hasModelResponse = httpOperation.responses.filter(
+    (r) =>
+      r.type?.kind === "Model" && !(r.statusCodes === "*" || isErrorModel(context.program, r.type)),
+  )[0];
+  if (!hasModelResponse) {
+    reportDiagnostic(context.program, {
+      code: "invalid-mark-as-lro-target",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+  if (getLroMetadata(context.program, target)) {
+    reportDiagnostic(context.program, {
+      code: "mark-as-lro-ineffective",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+  setScopedDecoratorData(context, $markAsLro, markAsLroKey, target, true, scope);
+};
+
+export function getMarkAsLro(context: TCGCContext, entity: Operation): boolean {
+  return getScopedDecoratorData(context, markAsLroKey, entity) ?? false;
+}
+
+const markAsPageableKey = createStateSymbol("markAsPageable");
+
+export const $markAsPageable: MarkAsPageableDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: LanguageScopes,
+) => {
+  const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, target));
+  const modelResponse = httpOperation.responses.filter(
+    (r) =>
+      r.type?.kind === "Model" && !(r.statusCodes === "*" || isErrorModel(context.program, r.type)),
+  )[0];
+  if (!modelResponse) {
+    reportDiagnostic(context.program, {
+      code: "invalid-mark-as-pageable-target",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+
+  // Check if already marked with @list decorator
+  if (isList(context.program, target)) {
+    reportDiagnostic(context.program, {
+      code: "mark-as-pageable-ineffective",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+
+  // Check the response model for @pageItems decorator
+  const responseType = getRealResponseModel(context.program, modelResponse.type as Model);
+  if (responseType.kind !== "Model") {
+    reportDiagnostic(context.program, {
+      code: "invalid-mark-as-pageable-target",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+
+  // Check if any property has @pageItems decorator by checking the program state
+  // The @pageItems decorator uses a state symbol "TypeSpec.pageItems"
+  const pageItemsStateKey = Symbol.for("TypeSpec.pageItems");
+  let itemsProperty: ModelProperty | undefined = undefined;
+  for (const [, prop] of responseType.properties) {
+    if (context.program.stateSet(pageItemsStateKey).has(prop)) {
+      itemsProperty = prop;
+      break;
+    }
+  }
+
+  if (!itemsProperty) {
+    // Try to find a property named "value"
+    itemsProperty = responseType.properties.get("value");
+    if (!itemsProperty) {
+      // No @pageItems property and no "value" property found
+      reportDiagnostic(context.program, {
+        code: "invalid-mark-as-pageable-target",
+        format: {
+          operation: target.name,
+        },
+        target: context.decoratorTarget,
+      });
+      return;
+    }
+  }
+
+  // Store metadata that will be checked by TCGC to treat this operation as pageable
+  setScopedDecoratorData(
+    context,
+    $markAsPageable,
+    markAsPageableKey,
+    target,
+    { itemsProperty },
+    scope,
+  );
+};
+
+export function getMarkAsPageable(
+  context: TCGCContext,
+  entity: Operation,
+): MarkAsPageableInfo | undefined {
+  return getScopedDecoratorData(context, markAsPageableKey, entity);
+}
+
+export interface MarkAsPageableInfo {
+  itemsProperty: ModelProperty;
+}
+
+const disablePageableKey = createStateSymbol("disablePageable");
+
+export const $disablePageable: DisablePageableDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: LanguageScopes,
+) => {
+  setScopedDecoratorData(context, $disablePageable, disablePageableKey, target, true, scope);
+};
+
+export function getDisablePageable(context: TCGCContext, entity: Operation): boolean {
+  return getScopedDecoratorData(context, disablePageableKey, entity) ?? false;
+}
+
+function getRealResponseModel(program: Program, responseModel: Model): Type {
+  let bodyProperty: ModelProperty | undefined = undefined;
+  for (const prop of responseModel.properties.values()) {
+    if (isBody(program, prop) || isBodyRoot(program, prop)) {
+      bodyProperty = prop;
+      break;
+    }
+  }
+  if (bodyProperty) {
+    return bodyProperty.type;
+  }
+  return responseModel;
+}
+
+const nextLinkVerbKey = createStateSymbol("nextLinkVerb");
+
+export const $nextLinkVerb: NextLinkVerbDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  verb: Type,
+  scope?: LanguageScopes,
+) => {
+  compilerAssert(
+    verb.kind === "String" && (verb.value === "POST" || verb.value === "GET"),
+    "@nextLinkVerb decorator only supports 'POST' or 'GET' string literal values.",
+  );
+  setScopedDecoratorData(context, $nextLinkVerb, nextLinkVerbKey, target, verb.value, scope);
+};
+
 /**
- * Check if an operation is in scope for the current emitter.
+ * Get the HTTP verb specified for next link operations in paging scenarios.
  * @param context TCGCContext
- * @param entity Operation to check if it is in scope
+ * @param entity Operation to check for nextLinkVerb decorator
+ * @returns The HTTP verb string ("POST" or "GET"). Defaults to "GET" if decorator is not applied.
+ */
+export function getNextLinkVerb(context: TCGCContext, entity: Operation): "GET" | "POST" {
+  return getScopedDecoratorData(context, nextLinkVerbKey, entity) ?? "GET";
+}
+
+const clientDefaultValueKey = createStateSymbol("clientDefaultValue");
+
+export const $clientDefaultValue: ClientDefaultValueDecorator = (
+  context: DecoratorContext,
+  target: ModelProperty,
+  value: string | boolean | Numeric,
+  scope?: LanguageScopes,
+) => {
+  const actualValue = isNumeric(value) ? value.asNumber() : value;
+  setScopedDecoratorData(
+    context,
+    $clientDefaultValue,
+    clientDefaultValueKey,
+    target,
+    actualValue,
+    scope,
+  );
+};
+
+/**
+ * Get the client-level default value for a model property.
+ * @param context TCGCContext
+ * @param entity ModelProperty to check for clientDefaultValue decorator
+ * @returns The client-level default value if decorator is applied, undefined otherwise.
+ */
+export function getClientDefaultValue(
+  context: TCGCContext,
+  entity: ModelProperty,
+): string | boolean | Numeric | undefined {
+  return getScopedDecoratorData(context, clientDefaultValueKey, entity);
+}
+
+/**
+ * Check if an operation or model property is in scope for the current emitter.
+ * @param context TCGCContext
+ * @param entity Operation or ModelProperty to check if it is in scope
  * @returns
  */
-export function isInScope(context: TCGCContext, entity: Operation): boolean {
+export function isInScope(context: TCGCContext, entity: Operation | ModelProperty): boolean {
   const scopes = getScopedDecoratorData(context, scopeKey, entity);
   const negationScopes = getScopedDecoratorData(context, negationScopesKey, entity);
 
@@ -1283,3 +1860,36 @@ export function isInScope(context: TCGCContext, entity: Operation): boolean {
   }
   return true;
 }
+
+export const clientOptionKey = createStateSymbol("ClientOption");
+
+/**
+ * `@clientOption` decorator implementation.
+ * Pass experimental flags or options to emitters without requiring TCGC reshipping.
+ * The decorator data is stored as {name, value} and exposed via the decorators array.
+ */
+export const $clientOption: ClientOptionDecorator = (
+  context: DecoratorContext,
+  target: Type,
+  name: string,
+  value: unknown,
+  scope?: LanguageScopes,
+) => {
+  // Always emit warning that this is experimental
+  reportDiagnostic(context.program, {
+    code: "client-option",
+    target: target,
+  });
+
+  // Emit additional warning if scope is not provided
+  if (scope === undefined) {
+    reportDiagnostic(context.program, {
+      code: "client-option-requires-scope",
+      target: target,
+    });
+  }
+
+  // Store the option data - each decorator application is stored separately
+  // The decorator info will be exposed via the decorators array on SDK types
+  setScopedDecoratorData(context, $clientOption, clientOptionKey, target, { name, value }, scope);
+};

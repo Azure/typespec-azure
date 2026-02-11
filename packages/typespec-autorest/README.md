@@ -57,10 +57,9 @@ Output file will interpolate the following values:
 
 - service-name: Name of the service if multiple
 - version: Version of the service if multiple
-- azure-resource-provider-folder: Value of the azure-resource-provider-folder option
-- version-status: Only enabled if azure-resource-provider-folder is set. `preview` if version contains preview, stable otherwise.
+- version-status: `preview` if version contains preview, stable otherwise.
 
-Default: `{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json`
+Default: `{emitter-output-dir}/{service-name}/{version-status}/{version}/openapi.json`
 
 Example: Single service no versioning
 
@@ -83,9 +82,9 @@ Example: Multiple service with versioning
 - `openapi.Org1.Service2.v1.0.yaml`
 - `openapi.Org1.Service2.v1.1.yaml`
 
-Example: azureResourceProviderFolder is provided
+Example: Versioning with version-status
 
-- `arm-folder/AzureService/preview/2020-01-01.yaml`
+- `arm-folder/AzureService/stable/2020-01-01.yaml`
 - `arm-folder/AzureService/preview/2020-01-01.yaml`
 
 ### `examples-dir`
@@ -107,6 +106,8 @@ DEPRECATED. Use examples-dir instead
 ### `azure-resource-provider-folder`
 
 **Type:** `string`
+
+Deprecated. Do not use this option. Specify the path directly in emitter-output-dir.
 
 ### `arm-types-dir`
 
@@ -151,17 +152,23 @@ Create read-only property schema for lro status
 
 Determine whether and how to emit x-ms-long-running-operation-options for lro resolution
 
-### `arm-resource-flattening`
-
-**Type:** `boolean`
-
-Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of the ARM resource properties.
-
 ### `emit-common-types-schema`
 
 **Type:** `"never" | "for-visibility-changes"`
 
 Determine whether and how to emit schemas for common-types rather than referencing them
+
+### `xml-strategy`
+
+**Type:** `"xml-service" | "none"`
+
+Strategy for applying XML serialization metadata to schemas.
+
+### `output-splitting`
+
+**Type:** `"legacy-feature-files"`
+
+Determines whether output should be split into multiple files. The only supported option for splitting is "legacy-feature-files", which uses the typespec-azure-resource-manager `@feature` decorators to split into output files based on feature.
 
 ## Decorators
 

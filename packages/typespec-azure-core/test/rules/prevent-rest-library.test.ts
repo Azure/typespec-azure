@@ -1,18 +1,13 @@
-import {
-  BasicTestRunner,
-  LinterRuleTester,
-  createLinterRuleTester,
-} from "@typespec/compiler/testing";
+import { Tester } from "#test/test-host.js";
+import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { preventRestLibraryInterfaces } from "../../src/rules/prevent-rest-library.js";
-import { createAzureCoreTestRunner } from "../test-host.js";
 
 describe("typespec-azure-core: no-rest-library-interfaces rule", () => {
-  let runner: BasicTestRunner;
   let tester: LinterRuleTester;
 
   beforeEach(async () => {
-    runner = await createAzureCoreTestRunner();
+    const runner = await Tester.createInstance();
     tester = createLinterRuleTester(
       runner,
       preventRestLibraryInterfaces,

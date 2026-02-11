@@ -19,21 +19,9 @@ namespace Azure.Core {
    *   v3Preview
    * }
    * ```
-   * 
+   *
    */
   extern dec previewVersion(target: TypeSpec.Reflection.EnumMember);
-
-  /**
-   * Marks a Model as a paged collection.
-   */
-  #deprecated "Do not use this decorator. Use @list decorator on the operation instead."
-  extern dec pagedResult(entity: Model);
-
-  /**
-   * Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
-   */
-  #deprecated "Do not use this decorator. Use @pageItems instead."
-  extern dec items(entity: ModelProperty);
 
   /**
    * Used for custom StatusMonitor implementation.
@@ -87,7 +75,7 @@ namespace Azure.Core {
    * @param finalResult Sets the expected return value for the final result.  Overrides
    * any value provided in the decorated property, if the property uses ResourceLocation<Resource>.
    */
-  extern dec finalLocation(entity: ModelProperty, finalResult?: Model | void);
+  extern dec finalLocation(entity: ModelProperty, finalResult?: Model | unknown | void);
 
   /**
    * Identifies an operation that is linked to the target operation.
@@ -139,14 +127,6 @@ namespace Azure.Core {
     entity: Operation,
     finalState: valueof "original-uri" | "operation-location" | "location" | "azure-async-operation"
   );
-
-  /**
-   * Identifies that an operation is used to retrieve the next page for paged operations.
-   * @param linkedOperation The linked Operation
-   * @param parameters Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will
-   * be passed to the linked operation request.
-   */
-  extern dec nextPageOperation(entity: Operation, linkedOperation: Operation, parameters?: {});
 
   /**
    * Specifies that an array model or array-typed property should contain only unique items.

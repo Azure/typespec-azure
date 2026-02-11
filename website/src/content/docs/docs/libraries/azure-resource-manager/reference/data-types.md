@@ -1,5 +1,7 @@
 ---
 title: "Data types"
+description: "Data types exported by @azure-tools/typespec-azure-resource-manager"
+llmstxt: true
 ---
 
 ## Azure.ResourceManager
@@ -246,6 +248,20 @@ op delete(
 | Name       | Type  | Description      |
 | ---------- | ----- | ---------------- |
 | statusCode | `200` | The status code. |
+
+### `ArmFilterParameter` {#Azure.ResourceManager.ArmFilterParameter}
+
+Standard list parameter $filter, allows the user to filter the results of a list operation.
+
+```typespec
+model Azure.ResourceManager.ArmFilterParameter
+```
+
+#### Properties
+
+| Name   | Type     | Description                                                 |
+| ------ | -------- | ----------------------------------------------------------- |
+| filter | `string` | The OData filter expression to apply to the list operation. |
 
 ### `ArmLocationResource` {#Azure.ResourceManager.ArmLocationResource}
 
@@ -512,6 +528,34 @@ op get is ArmResourceRead<Employee, Response = ArmResponse<Employee>>;
 | ---------- | -------------- | ---------------- |
 | statusCode | `200`          | The status code. |
 | body       | `ResponseBody` |                  |
+
+### `ArmSkipParameter` {#Azure.ResourceManager.ArmSkipParameter}
+
+List parameter $skip, allows the user to control the offset of returned items.
+
+```typespec
+model Azure.ResourceManager.ArmSkipParameter
+```
+
+#### Properties
+
+| Name | Type    | Description                                                            |
+| ---- | ------- | ---------------------------------------------------------------------- |
+| skip | `int64` | The number of items to skip before starting to collect the result set. |
+
+### `ArmTopParameter` {#Azure.ResourceManager.ArmTopParameter}
+
+Standard list parameter $top, allows the user to control the total number of returned items.
+
+```typespec
+model Azure.ResourceManager.ArmTopParameter
+```
+
+#### Properties
+
+| Name | Type    | Description                          |
+| ---- | ------- | ------------------------------------ |
+| top  | `int64` | The total number of items to return. |
 
 ### `AvailabilityZonesProperty` {#Azure.ResourceManager.AvailabilityZonesProperty}
 
@@ -840,6 +884,90 @@ model Azure.ResourceManager.ParentKeysOf<Resource>
 
 None
 
+### `PrivateEndpointConnectionResource` {#Azure.ResourceManager.PrivateEndpointConnectionResource}
+
+A private endpoint connection resource.
+Resource providers must declare a private endpoint connection resource type in their provider namespace if
+they support private endpoint connections
+
+```typespec
+model Azure.ResourceManager.PrivateEndpointConnectionResource<Description>
+```
+
+#### Template Parameters
+
+| Name        | Description                                                                                       |
+| ----------- | ------------------------------------------------------------------------------------------------- |
+| Description | Optional. The documentary description of the private endpoint connection resource name parameter. |
+
+#### Examples
+
+```ts
+namespace Microsoft.Contoso;
+model PrivateEndpointConnection is PrivateEndpointConnectionResource {}
+alias EmployeeConnectionOps is PrivateEndpoints<PrivateEndpointConnection>;
+@armResourceOperations
+interface Employees {
+ @doc("get a private endpoint connection for resource employee")
+ getPrivateEndpointConnection is EmployeeConnectionOps.Read<Employee>;
+}
+```
+
+#### Properties
+
+| Name        | Type                                                                                                                           | Description                                |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
+| properties? | [`PrivateEndpointConnectionProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionProperties) | The private endpoint connection properties |
+
+### `PrivateEndpointConnectionUpdate` {#Azure.ResourceManager.PrivateEndpointConnectionUpdate}
+
+PATCH model for private endpoint connections
+
+```typespec
+model Azure.ResourceManager.PrivateEndpointConnectionUpdate
+```
+
+#### Properties
+
+| Name        | Type                                                                                                        | Description                                |
+| ----------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| properties? | `OptionalProperties<UpdateableProperties<ResourceManager.CommonTypes.PrivateEndpointConnectionProperties>>` | The private endpoint connection properties |
+
+### `PrivateLink` {#Azure.ResourceManager.PrivateLink}
+
+A private link resource.
+Resource providers must declare a private link resource type in their provider namespace if
+they support private link resources
+
+```typespec
+model Azure.ResourceManager.PrivateLink<Description>
+```
+
+#### Template Parameters
+
+| Name        | Description                                                                        |
+| ----------- | ---------------------------------------------------------------------------------- |
+| Description | Optional. The documentary description of the private link resource name parameter. |
+
+#### Examples
+
+```ts
+namespace Microsoft.Contoso;
+model PrivateLink is PrivateLinkResource {}
+alias EmployeeConnectionOps is PrivateLinks<PrivateLink>;
+@armResourceOperations
+interface Employees {
+ @doc("get a private endpoint connection for resource employee")
+ getPrivateEndpointConnection is EmployeeConnectionOps.Read<Employee>;
+}
+```
+
+#### Properties
+
+| Name        | Type                                                                                                               | Description          |
+| ----------- | ------------------------------------------------------------------------------------------------------------------ | -------------------- |
+| properties? | [`PrivateLinkResourceProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.PrivateLinkResourceProperties) | Resource properties. |
+
 ### `ProviderNamespace` {#Azure.ResourceManager.ProviderNamespace}
 
 Model describing the provider namespace.
@@ -940,8 +1068,14 @@ Model representing the standard `kind` envelope property for a resource.
 Spread this model into a resource model if the resource support ARM `kind`.
 
 ```typespec
-model Azure.ResourceManager.ResourceKindProperty
+model Azure.ResourceManager.ResourceKindProperty<Type>
 ```
+
+#### Template Parameters
+
+| Name | Description                                                                                        |
+| ---- | -------------------------------------------------------------------------------------------------- |
+| Type | The type of the kind property. Default is string. However you can pass a union with string values. |
 
 #### Examples
 
@@ -954,9 +1088,9 @@ model Foo is TrackedResource<FooProperties> {
 
 #### Properties
 
-| Name  | Type     | Description                                                                                                                                                                                                                           |
-| ----- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| kind? | `string` | Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type. If supported, the resource provider must validate and persist this value. |
+| Name  | Type   | Description |
+| ----- | ------ | ----------- |
+| kind? | `Type` |             |
 
 ### `ResourceListCustomResult` {#Azure.ResourceManager.ResourceListCustomResult}
 
@@ -1159,6 +1293,20 @@ model Employee {
 | ----------- | -------- | ---------------------------------------------------------------------- |
 | resourceUri | `string` | The fully qualified Azure Resource manager identifier of the resource. |
 
+### `SkipTokenParameter` {#Azure.ResourceManager.SkipTokenParameter}
+
+Standard list parameter $skiptoken, normally returned in the `nextLink` url of a page of items
+
+```typespec
+model Azure.ResourceManager.SkipTokenParameter
+```
+
+#### Properties
+
+| Name      | Type     | Description                            |
+| --------- | -------- | -------------------------------------- |
+| skipToken | `string` | An opaque value to use for pagination. |
+
 ### `SubscriptionActionScope` {#Azure.ResourceManager.SubscriptionActionScope}
 
 Template used by ArmProviderAction templates.
@@ -1277,34 +1425,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 | Name        | Type         | Description |
 | ----------- | ------------ | ----------- |
 | properties? | `Properties` |             |
-
-### `Versions` {#Azure.ResourceManager.Versions}
-
-Supported versions of Azure.ResourceManager building blocks.
-
-```typespec
-enum Azure.ResourceManager.Versions
-```
-
-| Name           | Value             | Description           |
-| -------------- | ----------------- | --------------------- |
-| v1_0_Preview_1 | `"1.0-preview.1"` | Version 1.0-preview.1 |
-
-#### Examples
-
-```typespec
-enum Versions {
-  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  v2021_10_01_preview: "2021-10-01-preview",
-
-  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  v2021_11_01: "2021-11-01",
-}
-```
 
 ### `ResourceProvisioningState` {#Azure.ResourceManager.ResourceProvisioningState}
 
@@ -1865,6 +1985,64 @@ model Azure.ResourceManager.CommonTypes.NetworkSecurityProfile
 | diagnosticSettingsVersion? | `int32`                                    | Current diagnostic settings version     |
 | enabledLogCategories?      | `string[]`                                 | List of log categories that are enabled |
 
+### `NspConfigurationNameParameter` {#Azure.ResourceManager.CommonTypes.NspConfigurationNameParameter}
+
+The name parameter for a network security perimeter configuration.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.NspConfigurationNameParameter<KeyName, ResourceNamePattern, MinLength, MaxLength>
+```
+
+#### Template Parameters
+
+| Name                | Description                                                                                                          |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| KeyName             | The name of the network security perimeter configuration resource name parameter.                                    |
+| ResourceNamePattern | The regex pattern for the network security perimeter configuration resource name (default is "^[a-z][a-zA-Z0-9]\*$") |
+| MinLength           | The minimum length for the network security perimeter configuration resource name (default is 1)                     |
+| MaxLength           | The maximum length for the network security perimeter configuration resource name (default is 512)                   |
+
+#### Properties
+
+| Name                                      | Type     | Description                                             |
+| ----------------------------------------- | -------- | ------------------------------------------------------- |
+| networkSecurityPerimeterConfigurationName | `string` | The name for a network security perimeter configuration |
+
+### `NspConfigurationResource` {#Azure.ResourceManager.CommonTypes.NspConfigurationResource}
+
+Network security perimeter (NSP) configuration resource. Providers must instantiate an instance of this resource in their
+provider namespace to enable NSP capabilities for their resources.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.NspConfigurationResource<KeyName, Description>
+```
+
+#### Template Parameters
+
+| Name        | Description                                                                                                                           |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| KeyName     | Optional. The name of the NSP configuration resource name parameter. By default, this is `networkSecurityPerimeterConfigurationName`. |
+| Description | Optional. The documentary description of the NSP configuration resource name parameter.                                               |
+
+#### Examples
+
+```ts
+namespace Microsoft.Contoso;
+model NspConfiguration is NspConfigurationResource {}
+alias EmployeeConfigOps is NspConfigurations<NspConfiguration>;
+@armResourceOperations
+interface Employees {
+ @doc("get a network security perimeter configuration for resource employee")
+ getNspConfiguration is EmployeeConfigOps.Read<Employee>;
+}
+```
+
+#### Properties
+
+| Name        | Type                                                                                                                                                   | Description |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| properties? | [`NetworkSecurityPerimeterConfigurationProperties`](./data-types.md#Azure.ResourceManager.CommonTypes.NetworkSecurityPerimeterConfigurationProperties) |             |
+
 ### `Operation` {#Azure.ResourceManager.CommonTypes.Operation}
 
 Details of a REST API operation, returned from the Resource Provider Operations API
@@ -1885,7 +2063,7 @@ model Azure.ResourceManager.CommonTypes.Operation
 
 ### `OperationDisplay` {#Azure.ResourceManager.CommonTypes.OperationDisplay}
 
-Localized display information for and operation.
+Localized display information for an operation.
 
 ```typespec
 model Azure.ResourceManager.CommonTypes.OperationDisplay
@@ -2064,6 +2242,29 @@ interface Employees {
 | ------ | --------------------------------------------------------- | -------------------------------------- |
 | value? | `ResourceManager.CommonTypes.PrivateEndpointConnection[]` | Array of private endpoint connections. |
 
+### `PrivateEndpointConnectionNameParameter` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionNameParameter}
+
+The name of the private endpoint connection associated with the Azure resource.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionNameParameter<KeyName, ResourceNamePattern, MinLength, MaxLength>
+```
+
+#### Template Parameters
+
+| Name                | Description                                                                                             |
+| ------------------- | ------------------------------------------------------------------------------------------------------- |
+| KeyName             | The name of the private endpoint connection name parameter (default is "privateEndpointConnectionName") |
+| ResourceNamePattern | The regex pattern for the private endpoint connection name (default is "^[a-z][a-zA-Z0-9]\*$")          |
+| MinLength           | The minimum length for the private endpoint connection name (default is 3)                              |
+| MaxLength           | The maximum length for the private endpoint connection name (default is 63                              |
+
+#### Properties
+
+| Name | Type     | Description                                                                     |
+| ---- | -------- | ------------------------------------------------------------------------------- |
+| name | `string` | The name of the private endpoint connection associated with the Azure resource. |
+
 ### `PrivateEndpointConnectionParameter` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionParameter}
 
 The name of the private endpoint connection associated with the Azure resource.
@@ -2167,6 +2368,29 @@ interface Employees {
 | Name   | Type                                                | Description                     |
 | ------ | --------------------------------------------------- | ------------------------------- |
 | value? | `ResourceManager.CommonTypes.PrivateLinkResource[]` | Array of private link resources |
+
+### `PrivateLinkResourceNameParameter` {#Azure.ResourceManager.CommonTypes.PrivateLinkResourceNameParameter}
+
+The name of the private link associated with the Azure resource.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.PrivateLinkResourceNameParameter<Segment, ResourceNamePattern, MinLength, MaxLength>
+```
+
+#### Template Parameters
+
+| Name                | Description                                                                              |
+| ------------------- | ---------------------------------------------------------------------------------------- |
+| Segment             | The resource type name for private links (default is privateLinkResources)               |
+| ResourceNamePattern | The regex pattern for the private link resource name (default is "^[a-z][a-zA-Z0-9]\*$") |
+| MinLength           | The minimum length for the private link resource name (default is 3)                     |
+| MaxLength           | The maximum length for the private link resource name (default is 63                     |
+
+#### Properties
+
+| Name | Type     | Description                                                      |
+| ---- | -------- | ---------------------------------------------------------------- |
+| name | `string` | The name of the private link associated with the Azure resource. |
 
 ### `PrivateLinkResourceParameter` {#Azure.ResourceManager.CommonTypes.PrivateLinkResourceParameter}
 
@@ -2435,10 +2659,10 @@ model Azure.ResourceManager.CommonTypes.TrackedResource
 
 #### Properties
 
-| Name     | Type             | Description                               |
-| -------- | ---------------- | ----------------------------------------- |
-| tags?    | `Record<string>` | Resource tags.                            |
-| location | `string`         | The geo-location where the resource lives |
+| Name     | Type                 | Description                               |
+| -------- | -------------------- | ----------------------------------------- |
+| tags?    | `Record<string>`     | Resource tags.                            |
+| location | `Core.azureLocation` | The geo-location where the resource lives |
 
 ### `UserAssignedIdentities` {#Azure.ResourceManager.CommonTypes.UserAssignedIdentities}
 
@@ -2787,19 +3011,20 @@ alias VirtualMachineScaleSetVm = Extension.ExternalChildResource<
 An external resource target, used when an extension targets a resource from another provider namespace
 
 ```typespec
-model Azure.ResourceManager.Extension.ExternalResource<TargetNamespace, ResourceType, ResourceParameterName, NamePattern, NameType, Description>
+model Azure.ResourceManager.Extension.ExternalResource<TargetNamespace, ResourceType, ResourceParameterName, NamePattern, NameType, Description, ParentType>
 ```
 
 #### Template Parameters
 
-| Name                  | Description                                                                                             |
-| --------------------- | ------------------------------------------------------------------------------------------------------- |
-| TargetNamespace       | The provider namespace for the external resource.                                                       |
-| ResourceType          | The type of the external resource.                                                                      |
-| ResourceParameterName | The name of the 'name' parameter of the external resource.                                              |
-| NamePattern           | The pattern restriction for the name of the external resource (default is none).                        |
-| NameType              | The type of the name parameter of the external resource (default is string).                            |
-| Description           | The description of the name parameter of the external resource (default is "The name of the resource"). |
+| Name                  | Description                                                                                                           |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| TargetNamespace       | The provider namespace for the external resource.                                                                     |
+| ResourceType          | The type of the external resource.                                                                                    |
+| ResourceParameterName | The name of the 'name' parameter of the external resource.                                                            |
+| NamePattern           | The pattern restriction for the name of the external resource (default is none).                                      |
+| NameType              | The type of the name parameter of the external resource (default is string).                                          |
+| Description           | The description of the name parameter of the external resource (default is "The name of the resource").               |
+| ParentType            | The parent type of the external resource (default is "ResourceGroup", other options are "Tenant" and "Subscription"). |
 
 #### Examples
 
@@ -3306,6 +3531,24 @@ model Azure.ResourceManager.Foundations.TenantScope<Resource>
 
 ## Azure.ResourceManager.Legacy
 
+### `ArmFeatureOptions` {#Azure.ResourceManager.Legacy.ArmFeatureOptions}
+
+Options for defining a feature and the associated file
+
+```typespec
+model Azure.ResourceManager.Legacy.ArmFeatureOptions
+```
+
+#### Properties
+
+| Name            | Type     | Description                               |
+| --------------- | -------- | ----------------------------------------- |
+| featureName     | `string` | The feature name                          |
+| fileName        | `string` | The associated file name for the features |
+| description     | `string` | The feature description in Swagger        |
+| title?          | `string` | The feature title in Swagger              |
+| termsOfService? | `string` | The feature terms of service in Swagger   |
+
 ### `ArmOperationOptions` {#Azure.ResourceManager.Legacy.ArmOperationOptions}
 
 Route options for an operation
@@ -3320,6 +3563,180 @@ model Azure.ResourceManager.Legacy.ArmOperationOptions
 | --------------- | --------- | -------------------------------------- |
 | useStaticRoute? | `boolean` | Should a static route be used          |
 | route?          | `string`  | The status route for operations to use |
+
+### `CustomAzureResource` {#Azure.ResourceManager.Legacy.CustomAzureResource}
+
+Model representing a custom Azure Resource Manager Resource.
+Use this template with 'is' to create a custom resource.
+
+```typespec
+model Azure.ResourceManager.Legacy.CustomAzureResource<isResource>
+```
+
+#### Template Parameters
+
+| Name       | Description                                                                                                   |
+| ---------- | ------------------------------------------------------------------------------------------------------------- |
+| isResource | Optional. A boolean flag indicating whether the resource should be marked as an Azure resource. Default true. |
+
+#### Properties
+
+None
+
+### `CustomResourceOptions` {#Azure.ResourceManager.Legacy.CustomResourceOptions}
+
+Options for customizing the behavior of a custom azure resource
+
+```typespec
+model Azure.ResourceManager.Legacy.CustomResourceOptions
+```
+
+#### Properties
+
+| Name             | Type      | Description                                        |
+| ---------------- | --------- | -------------------------------------------------- |
+| isAzureResource? | `boolean` | Should the resource be marked as an Azure resource |
+
+### `DiscriminatedExtensionResource` {#Azure.ResourceManager.Legacy.DiscriminatedExtensionResource}
+
+Polymorphic extension resources can be instantiated using this type, using 'kind' as the discriminator property.
+
+See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+
+```typespec
+model Azure.ResourceManager.Legacy.DiscriminatedExtensionResource<KindType, Description>
+```
+
+#### Template Parameters
+
+| Name        | Description                                                       |
+| ----------- | ----------------------------------------------------------------- |
+| KindType    | The type of the discriminator property `kind`. Default is string. |
+| Description | A description of the resource                                     |
+
+#### Examples
+
+```typespec
+model Pet is DiscriminatedExtensionResource;
+
+model Dog extends Pet {
+  kind: "dog";
+  properties: DogProperties;
+}
+```
+
+#### Properties
+
+| Name | Type       | Description |
+| ---- | ---------- | ----------- |
+| kind | `KindType` |             |
+
+### `DiscriminatedProxyResource` {#Azure.ResourceManager.Legacy.DiscriminatedProxyResource}
+
+Discriminated proxy resource types can be created by instantiating using this type, with 'kind' as the discriminator property.
+
+See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+
+```typespec
+model Azure.ResourceManager.Legacy.DiscriminatedProxyResource<KindType, Description>
+```
+
+#### Template Parameters
+
+| Name        | Description                                                       |
+| ----------- | ----------------------------------------------------------------- |
+| KindType    | The type of the discriminator property `kind`. Default is string. |
+| Description | A description of the resource                                     |
+
+#### Examples
+
+```typespec
+model Pet is DiscriminatedProxyResource;
+
+model Dog extends Pet {
+  kind: "dog";
+  properties: DogProperties;
+}
+```
+
+#### Properties
+
+| Name | Type       | Description |
+| ---- | ---------- | ----------- |
+| kind | `KindType` |             |
+
+### `DiscriminatedTrackedResource` {#Azure.ResourceManager.Legacy.DiscriminatedTrackedResource}
+
+Discriminated tracked resource types can be created by instantiating this type, with 'kind' as the discriminator property.
+
+See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+
+```typespec
+model Azure.ResourceManager.Legacy.DiscriminatedTrackedResource<KindType, Description>
+```
+
+#### Template Parameters
+
+| Name        | Description                                                       |
+| ----------- | ----------------------------------------------------------------- |
+| KindType    | The type of the discriminator property `kind`. Default is string. |
+| Description | A description of the resource                                     |
+
+#### Examples
+
+```typespec
+model Pet is DiscriminatedTrackedResource;
+
+model Dog extends Pet {
+  kind: "dog";
+  properties: DogProperties;
+}
+```
+
+#### Properties
+
+| Name | Type       | Description |
+| ---- | ---------- | ----------- |
+| kind | `KindType` |             |
+
+### `ExtendedLocationOptional` {#Azure.ResourceManager.Legacy.ExtendedLocationOptional}
+
+The complex type of the extended location.
+
+```typespec
+model Azure.ResourceManager.Legacy.ExtendedLocationOptional
+```
+
+#### Properties
+
+| Name  | Type                                                                                             | Description                        |
+| ----- | ------------------------------------------------------------------------------------------------ | ---------------------------------- |
+| name? | `string`                                                                                         | The name of the extended location. |
+| type? | [`ExtendedLocationType`](./data-types.md#Azure.ResourceManager.CommonTypes.ExtendedLocationType) | The type of the extended location. |
+
+### `ExtendedLocationOptionalProperty` {#Azure.ResourceManager.Legacy.ExtendedLocationOptionalProperty}
+
+Legacy. Model representing a non-standard `extendedLocation` envelope property with all properties optional.
+Spread this model into a Resource Model, if you are converting a BrownField API with extended location that has optional properties
+
+```typespec
+model Azure.ResourceManager.Legacy.ExtendedLocationOptionalProperty
+```
+
+#### Examples
+
+```typespec
+model Employee is TrackedResource<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+  ...ExtendedLocationOptionalProperty;
+}
+```
+
+#### Properties
+
+| Name              | Type                                                                                                | Description |
+| ----------------- | --------------------------------------------------------------------------------------------------- | ----------- |
+| extendedLocation? | [`ExtendedLocationOptional`](./data-types.md#Azure.ResourceManager.Legacy.ExtendedLocationOptional) |             |
 
 ### `ManagedServiceIdentityV4` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4}
 
@@ -3366,6 +3783,36 @@ model Foo is TrackedResource<FooProperties> {
 | --------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
 | identity? | [`ManagedServiceIdentityV4`](./data-types.md#Azure.ResourceManager.Legacy.ManagedServiceIdentityV4) | The managed service identities assigned to this resource. |
 
+### `PolymorphicResourceKindProperty` {#Azure.ResourceManager.Legacy.PolymorphicResourceKindProperty}
+
+Model representing the `kind` envelope property only for use with a polymorphic resource..
+Spread this model into a resource model if the resource support ARM `kind`.
+
+```typespec
+model Azure.ResourceManager.Legacy.PolymorphicResourceKindProperty<Type>
+```
+
+#### Template Parameters
+
+| Name | Description                                                                                        |
+| ---- | -------------------------------------------------------------------------------------------------- |
+| Type | The type of the kind property. Default is string. However you can pass a union with string values. |
+
+#### Examples
+
+```typespec
+model Foo is TrackedResource<FooProperties> {
+  // Only have standard Succeeded, Failed, Cancelled states
+  ...PolymorphicResourceKindProperty;
+}
+```
+
+#### Properties
+
+| Name | Type   | Description |
+| ---- | ------ | ----------- |
+| kind | `Type` |             |
+
 ### `Provider` {#Azure.ResourceManager.Legacy.Provider}
 
 ```typespec
@@ -3401,6 +3848,52 @@ model Azure.ResourceManager.Legacy.ProviderParameter<Resource>
 | Name     | Type                             | Description |
 | -------- | -------------------------------- | ----------- |
 | provider | `"Microsoft.ThisWillBeReplaced"` |             |
+
+### `ResourceWithPathParameter` {#Azure.ResourceManager.Legacy.ResourceWithPathParameter}
+
+Template that allows a model to include a path parameter property without adding the property to a request body
+
+```typespec
+model Azure.ResourceManager.Legacy.ResourceWithPathParameter
+```
+
+#### Properties
+
+None
+
+### `TrackedResourceWithOptionalLocation` {#Azure.ResourceManager.Legacy.TrackedResourceWithOptionalLocation}
+
+This type uses an optional location property, only used by legacy APIs.
+Concrete tracked resource types can be created by aliasing this type using a specific property type.
+
+See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
+
+```typespec
+model Azure.ResourceManager.Legacy.TrackedResourceWithOptionalLocation<Properties, PropertiesOptional>
+```
+
+#### Template Parameters
+
+| Name               | Description                                                                                                                                    |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Properties         | A model containing the provider-specific properties for this resource                                                                          |
+| PropertiesOptional | A boolean flag indicating whether the resource `Properties` field is marked as optional or required. Default true is optional and recommended. |
+
+#### Examples
+
+```typespec
+model Employee is TrackedResourceWithOptionalLocation<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+}
+```
+
+#### Properties
+
+| Name        | Type             | Description                               |
+| ----------- | ---------------- | ----------------------------------------- |
+| properties? | `Properties`     |                                           |
+| tags?       | `Record<string>` | Resource tags.                            |
+| location?   | `string`         | The geo-location where the resource lives |
 
 ### `ManagedServiceIdentityType` {#Azure.ResourceManager.Legacy.ManagedServiceIdentityType}
 

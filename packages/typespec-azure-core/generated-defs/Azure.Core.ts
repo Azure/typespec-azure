@@ -1,5 +1,6 @@
 import type {
   DecoratorContext,
+  DecoratorValidatorCallbacks,
   Enum,
   EnumMember,
   Model,
@@ -18,7 +19,7 @@ import type {
 export type LroStatusDecorator = (
   context: DecoratorContext,
   entity: Enum | Union | ModelProperty,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Identifies a ModelProperty as containing the final location for the operation result.
@@ -30,7 +31,7 @@ export type FinalLocationDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
   finalResult?: Type,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Identifies a model property as containing the location to poll for operation state.
@@ -43,7 +44,7 @@ export type PollingLocationDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
   options?: Type,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Decorator that marks a Version EnumMember as a preview version.
@@ -64,17 +65,10 @@ export type PollingLocationDecorator = (
  * }
  * ```
  */
-export type PreviewVersionDecorator = (context: DecoratorContext, target: EnumMember) => void;
-
-/**
- * Marks a Model as a paged collection.
- */
-export type PagedResultDecorator = (context: DecoratorContext, entity: Model) => void;
-
-/**
- * Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
- */
-export type ItemsDecorator = (context: DecoratorContext, entity: ModelProperty) => void;
+export type PreviewVersionDecorator = (
+  context: DecoratorContext,
+  target: EnumMember,
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Used for custom StatusMonitor implementation.
@@ -83,7 +77,7 @@ export type ItemsDecorator = (context: DecoratorContext, entity: ModelProperty) 
 export type LroSucceededDecorator = (
   context: DecoratorContext,
   entity: EnumMember | UnionVariant,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Used for custom StatusMonitor implementation.
@@ -92,7 +86,7 @@ export type LroSucceededDecorator = (
 export type LroCanceledDecorator = (
   context: DecoratorContext,
   entity: EnumMember | UnionVariant,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Used for custom StatusMonitor implementation.
@@ -101,21 +95,27 @@ export type LroCanceledDecorator = (
 export type LroFailedDecorator = (
   context: DecoratorContext,
   entity: EnumMember | UnionVariant,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Used for custom StatusMonitor implementation.
  * Identifies a model property of a StatusMonitor as containing the result
  * of a long-running operation that terminates successfully (Succeeded).
  */
-export type LroResultDecorator = (context: DecoratorContext, entity: ModelProperty) => void;
+export type LroResultDecorator = (
+  context: DecoratorContext,
+  entity: ModelProperty,
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Used for custom StatusMonitor implementation.
  * Identifies a model property of a StatusMonitor as containing the result
  * of a long-running operation that terminates unsuccessfully (Failed).
  */
-export type LroErrorResultDecorator = (context: DecoratorContext, entity: ModelProperty) => void;
+export type LroErrorResultDecorator = (
+  context: DecoratorContext,
+  entity: ModelProperty,
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Identifies an operation that is linked to the target operation.
@@ -131,7 +131,7 @@ export type OperationLinkDecorator = (
   linkedOperation: Operation,
   linkType: string,
   parameters?: Type,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Used to define how to call custom polling operations for long-running operations.
@@ -144,7 +144,7 @@ export type PollingOperationParameterDecorator = (
   context: DecoratorContext,
   entity: ModelProperty,
   targetParameter?: Type,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Identifies that an operation is a polling operation for an LRO.
@@ -158,7 +158,7 @@ export type PollingOperationDecorator = (
   entity: Operation,
   linkedOperation: Operation,
   parameters?: Type,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Identifies that an operation is the final operation for an LRO.
@@ -172,7 +172,7 @@ export type FinalOperationDecorator = (
   entity: Operation,
   linkedOperation: Operation,
   parameters?: Type,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Overrides the final state value for an operation
@@ -183,21 +183,7 @@ export type UseFinalStateViaDecorator = (
   context: DecoratorContext,
   entity: Operation,
   finalState: "original-uri" | "operation-location" | "location" | "azure-async-operation",
-) => void;
-
-/**
- * Identifies that an operation is used to retrieve the next page for paged operations.
- *
- * @param linkedOperation The linked Operation
- * @param parameters Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will
- * be passed to the linked operation request.
- */
-export type NextPageOperationDecorator = (
-  context: DecoratorContext,
-  entity: Operation,
-  linkedOperation: Operation,
-  parameters?: Type,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Specifies that an array model or array-typed property should contain only unique items.
@@ -205,15 +191,13 @@ export type NextPageOperationDecorator = (
 export type UniqueItemsDecorator = (
   context: DecoratorContext,
   entity: ModelProperty | Model,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 export type AzureCoreDecorators = {
   lroStatus: LroStatusDecorator;
   finalLocation: FinalLocationDecorator;
   pollingLocation: PollingLocationDecorator;
   previewVersion: PreviewVersionDecorator;
-  pagedResult: PagedResultDecorator;
-  items: ItemsDecorator;
   lroSucceeded: LroSucceededDecorator;
   lroCanceled: LroCanceledDecorator;
   lroFailed: LroFailedDecorator;
@@ -224,6 +208,5 @@ export type AzureCoreDecorators = {
   pollingOperation: PollingOperationDecorator;
   finalOperation: FinalOperationDecorator;
   useFinalStateVia: UseFinalStateViaDecorator;
-  nextPageOperation: NextPageOperationDecorator;
   uniqueItems: UniqueItemsDecorator;
 };

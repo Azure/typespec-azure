@@ -1,7 +1,9 @@
 ---
 title: "Decorators"
+description: "Decorators exported by @azure-tools/typespec-azure-core"
 toc_min_heading_level: 2
 toc_max_heading_level: 3
+llmstxt: true
 ---
 
 ## Azure.Core
@@ -11,7 +13,7 @@ toc_max_heading_level: 3
 Identifies a ModelProperty as containing the final location for the operation result.
 
 ```typespec
-@Azure.Core.finalLocation(finalResult?: Model | void)
+@Azure.Core.finalLocation(finalResult?: Model | unknown | void)
 ```
 
 #### Target
@@ -20,9 +22,9 @@ Identifies a ModelProperty as containing the final location for the operation re
 
 #### Parameters
 
-| Name        | Type            | Description                                                                                                                                                        |
-| ----------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| finalResult | `Model \| void` | Sets the expected return value for the final result. Overrides<br />any value provided in the decorated property, if the property uses ResourceLocation<Resource>. |
+| Name        | Type                       | Description                                                                                                                                                        |
+| ----------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| finalResult | `Model \| unknown \| void` | Sets the expected return value for the final result. Overrides<br />any value provided in the decorated property, if the property uses ResourceLocation<Resource>. |
 
 ### `@finalOperation` {#@Azure.Core.finalOperation}
 
@@ -42,26 +44,6 @@ Identifies that an operation is the final operation for an LRO.
 | --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
 | linkedOperation | `Operation` | The linked Operation                                                                                                      |
 | parameters      | `{}`        | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
-
-### `@items` {#@Azure.Core.items}
-
-:::caution
-**Deprecated**: Do not use this decorator. Use @pageItems instead.
-:::
-
-Identifies the ModelProperty that contains the paged items. Can only be used on a Model marked with `@pagedResult`.
-
-```typespec
-@Azure.Core.items
-```
-
-#### Target
-
-`ModelProperty`
-
-#### Parameters
-
-None
 
 ### `@lroCanceled` {#@Azure.Core.lroCanceled}
 
@@ -168,25 +150,6 @@ Identifies an EnumMember as a long-running "Succeeded" terminal state.
 
 None
 
-### `@nextPageOperation` {#@Azure.Core.nextPageOperation}
-
-Identifies that an operation is used to retrieve the next page for paged operations.
-
-```typespec
-@Azure.Core.nextPageOperation(linkedOperation: Operation, parameters?: {})
-```
-
-#### Target
-
-`Operation`
-
-#### Parameters
-
-| Name            | Type        | Description                                                                                                               |
-| --------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
-| linkedOperation | `Operation` | The linked Operation                                                                                                      |
-| parameters      | `{}`        | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
-
 ### `@operationLink` {#@Azure.Core.operationLink}
 
 Identifies an operation that is linked to the target operation.
@@ -206,26 +169,6 @@ Identifies an operation that is linked to the target operation.
 | linkedOperation | `Operation`      | The linked Operation                                                                                                      |
 | linkType        | `valueof string` | A string indicating the role of the linked operation                                                                      |
 | parameters      | `{}`             | Map of `RequestParameter<Name>` and/or `ResponseProperty<Name>` that will<br />be passed to the linked operation request. |
-
-### `@pagedResult` {#@Azure.Core.pagedResult}
-
-:::caution
-**Deprecated**: Do not use this decorator. Use @list decorator on the operation instead.
-:::
-
-Marks a Model as a paged collection.
-
-```typespec
-@Azure.Core.pagedResult
-```
-
-#### Target
-
-`Model`
-
-#### Parameters
-
-None
 
 ### `@pollingLocation` {#@Azure.Core.pollingLocation}
 

@@ -1,22 +1,12 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { InitializedByFlags, SdkHeaderParameter } from "../../src/interfaces.js";
 import { isAzureCoreModel } from "../../src/public-utils.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
+import { AzureCoreTester, createSdkContextForTester } from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
-let runnerWithCore: SdkTestRunner;
-
-beforeEach(async () => {
-  runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-});
-async function compileAzureWidgetService(runner: SdkTestRunner, code: string) {
-  return await runner.compile(`
+async function compileAzureWidgetService(code: string) {
+  return await AzureCoreTester.compile(`
   @useAuth(
     ApiKeyAuth<ApiKeyLocation.header, "api-key"> | OAuth2Auth<[
       {
@@ -46,8 +36,7 @@ async function compileAzureWidgetService(runner: SdkTestRunner, code: string) {
   @doc("The Contoso Widget Manager service version.")
   enum Versions {
     @doc("Version 2022-08-31")
-    @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-    "2022-08-30",
+      "2022-08-30",
   }
 
   // Models ////////////////////
@@ -202,14 +191,14 @@ async function compileAzureWidgetService(runner: SdkTestRunner, code: string) {
 }
 
 it("getWidget", async () => {
-  await compileAzureWidgetService(
-    runnerWithCore,
+  const { program } = await compileAzureWidgetService(
     `
     @doc("Get a Widget")
     getWidget is Operations.ResourceRead<Widget>;
     `,
   );
-  const sdkPackage = runnerWithCore.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const parentClient = sdkPackage.clients.filter(
     (c) => c.clientInitialization.initializedBy & InitializedByFlags.Individually,
   )[0];
@@ -282,8 +271,7 @@ it("getWidget", async () => {
   );
 });
 it("poll widget", async () => {
-  await compileAzureWidgetService(
-    runnerWithCore,
+  const { program } = await compileAzureWidgetService(
     `
     @doc("Gets status of a Widget operation.")
     getWidgetOperationStatus is Operations.GetResourceOperationStatus<Widget>;
@@ -293,7 +281,8 @@ it("poll widget", async () => {
     createOrUpdateWidget is Operations.LongRunningResourceCreateOrUpdate<Widget>;
     `,
   );
-  const sdkPackage = runnerWithCore.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const parentClient = sdkPackage.clients[0];
   const client = parentClient.children?.[0];
@@ -466,42 +455,37 @@ it("poll widget", async () => {
   strictEqual(methodResponse.kind, "method");
   strictEqual(methodResponse.type, widgetModel);
   strictEqual(createOrUpdate.response.resultSegments?.length, 1);
+  strictEqual(createOrUpdate.lroMetadata.finalResponse?.envelopeResult.kind, "model");
   strictEqual(
     createOrUpdate.response.resultSegments[0],
     createOrUpdate.lroMetadata.finalResponse?.envelopeResult.properties[3],
   );
 });
 it("lro delete", async () => {
-  await compileAzureWidgetService(
-    runnerWithCore,
+  const { program } = await compileAzureWidgetService(
     `
-      op delete is ResourceOperations.LongRunningResourceDelete<Widget>;
+      op delete is Operations.LongRunningResourceDelete<Widget>;
       `,
   );
-  const method = getServiceMethodOfClient(runnerWithCore.context.sdkPackage);
+  const context = await createSdkContextForTester(program);
+  const method = getServiceMethodOfClient(context.sdkPackage);
   strictEqual(method.name, "delete");
   strictEqual(method.kind, "lro");
   strictEqual(method.response.type, undefined);
-  strictEqual(runnerWithCore.context.sdkPackage.models.length, 3);
-  strictEqual(
-    runnerWithCore.context.sdkPackage.models.filter((x) => !isAzureCoreModel(x)).length,
-    0,
-  );
-  strictEqual(runnerWithCore.context.sdkPackage.enums.length, 2);
-  strictEqual(
-    runnerWithCore.context.sdkPackage.enums.filter((x) => !isAzureCoreModel(x)).length,
-    1,
-  );
+  strictEqual(context.sdkPackage.models.length, 4);
+  strictEqual(context.sdkPackage.models.filter((x) => !isAzureCoreModel(x)).length, 0);
+  strictEqual(context.sdkPackage.enums.length, 3);
+  strictEqual(context.sdkPackage.enums.filter((x) => !isAzureCoreModel(x)).length, 1);
 });
 it("paging", async () => {
-  await compileAzureWidgetService(
-    runnerWithCore,
+  const { program } = await compileAzureWidgetService(
     `
       @doc("List Manufacturer resources")
       listManufacturers is Operations.ResourceList<Manufacturer>;
     `,
   );
-  const sdkPackage = runnerWithCore.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   strictEqual(sdkPackage.models.length, 5);
   strictEqual(sdkPackage.models.filter((x) => !isAzureCoreModel(x)).length, 1);
@@ -592,14 +576,14 @@ it("paging", async () => {
 });
 
 it("getWidgetAnalytics", async () => {
-  await compileAzureWidgetService(
-    runnerWithCore,
+  const { program } = await compileAzureWidgetService(
     `
     @doc("Get a WidgetAnalytics")
     getWidgetAnalytics is Operations.ResourceRead<WidgetAnalytics>;
     `,
   );
-  const sdkPackage = runnerWithCore.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const parentClient = sdkPackage.clients.filter(
     (c) => c.clientInitialization.initializedBy & InitializedByFlags.Individually,
   )[0];

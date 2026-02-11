@@ -1,17 +1,18 @@
+import { Tester } from "#test/tester.js";
 import {
-  BasicTestRunner,
   LinterRuleTester,
+  TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { armPutResponseCodesRule } from "../../src/rules/arm-put-response-codes.js";
-import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
-let runner: BasicTestRunner;
+import { armPutResponseCodesRule } from "../../src/rules/arm-put-response-codes.js";
+
+let runner: TesterInstance;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await createAzureResourceManagerTestRunner();
+  runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
     armPutResponseCodesRule,
@@ -24,7 +25,6 @@ it("Emits a warning for put operation that does not contain the appropriate resp
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
@@ -56,7 +56,6 @@ it("Emits a warning for put action that does not contain the appropriate respons
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
@@ -88,7 +87,6 @@ it("Does not emit a warning for put operation that contains the appropriate resp
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
@@ -121,7 +119,6 @@ it("Does not emit a warning for operation that uses the 'ArmResourceCreateOrUpda
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
@@ -146,7 +143,6 @@ it("Does not emit a warning for operation that uses the 'ArmResourceCreateOrRepl
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
@@ -171,7 +167,6 @@ it("Does not emit a warning for operation that uses the 'ArmResourceCreateOrRepl
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {
@@ -196,7 +191,6 @@ it("Does not emit a warning for put action that contains the appropriate respons
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       
       model Employee is ProxyResource<{}> {

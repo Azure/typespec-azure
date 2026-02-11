@@ -1,26 +1,12 @@
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { afterEach, beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { SdkArrayType, SdkMethodResponse, UsageFlags } from "../../src/interfaces.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import { createSdkContextForTester, SimpleTester, SimpleTesterWithService } from "../tester.js";
 import { getSdkTypeHelper } from "./utils.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-});
-
-afterEach(async () => {
-  for (const modelsOrEnums of [runner.context.sdkPackage.models, runner.context.sdkPackage.enums]) {
-    for (const item of modelsOrEnums) {
-      ok(item.name !== "");
-    }
-  }
-});
-
 it("primitive union", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithService.compile(
     `
       @usage(Usage.input | Usage.output)
       model Test {
@@ -28,7 +14,8 @@ it("primitive union", async function () {
       }
     `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "union");
   strictEqual(sdkType.name, "TestName");
   strictEqual(sdkType.isGeneratedName, true);
@@ -40,18 +27,19 @@ it("primitive union", async function () {
   strictEqual(values[0].kind, "string");
   strictEqual(values[1].kind, "int32");
 
-  deepStrictEqual(runner.context.sdkPackage.unions[0], sdkType);
+  deepStrictEqual(context.sdkPackage.unions[0], sdkType);
 });
 
 it("nullable", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       name: float32 | null;
     }
   `);
 
-  const nullableType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program);
+  const nullableType = getSdkTypeHelper(context);
   strictEqual(nullableType.kind, "nullable");
   strictEqual(nullableType.name, "TestName");
   strictEqual(nullableType.isGeneratedName, true);
@@ -62,18 +50,19 @@ it("nullable", async function () {
   const sdkType = nullableType.type;
   strictEqual(sdkType.kind, "float32");
 
-  deepStrictEqual(runner.context.sdkPackage.unions[0], nullableType);
+  deepStrictEqual(context.sdkPackage.unions[0], nullableType);
 });
 
 it("nullable with more types", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       name: string | float32 | null;
     }
   `);
 
-  const nullableType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program);
+  const nullableType = getSdkTypeHelper(context);
   strictEqual(nullableType.kind, "nullable");
   strictEqual(nullableType.name, "TestName");
   strictEqual(nullableType.isGeneratedName, true);
@@ -87,18 +76,47 @@ it("nullable with more types", async function () {
   strictEqual(sdkType.variantTypes[0].kind, "string");
   strictEqual(sdkType.variantTypes[1].kind, "float32");
 
-  deepStrictEqual(runner.context.sdkPackage.unions[0], nullableType);
+  deepStrictEqual(context.sdkPackage.unions[0], nullableType);
+});
+
+it("nullable doc", async function () {
+  const { program } = await SimpleTesterWithService.compile(`
+    @usage(Usage.input | Usage.output)
+    model TestModel {
+      prop: TestNullable;
+    }
+    
+    @doc("nullable doc")
+    union TestNullable {
+      null,
+      {
+        prop: string;
+      }
+    }
+  `);
+
+  const context = await createSdkContextForTester(program);
+  const nullableUnion = getSdkTypeHelper(context);
+  strictEqual(nullableUnion.kind, "nullable");
+  strictEqual(nullableUnion.name, "TestNullable");
+  strictEqual(nullableUnion.isGeneratedName, false);
+  strictEqual(nullableUnion.doc, "nullable doc");
+
+  strictEqual(nullableUnion.type.kind, "model");
+  strictEqual(nullableUnion.type.name, "TestModelProp");
+  strictEqual(nullableUnion.type.isGeneratedName, true);
 });
 
 it("record with nullable", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       name: Record<float32 | null>;
     }
   `);
 
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "dict");
   const elementType = sdkType.valueType;
   strictEqual(elementType.kind, "nullable");
@@ -109,18 +127,19 @@ it("record with nullable", async function () {
   strictEqual(elementType.access, "public");
   strictEqual(elementType.type.kind, "float32");
 
-  deepStrictEqual(runner.context.sdkPackage.unions[0], elementType);
+  deepStrictEqual(context.sdkPackage.unions[0], elementType);
 });
 
 it("record with nullable with more types", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       name: Record<string | float32 | null>;
     }
   `);
 
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "dict");
   const elementType = sdkType.valueType;
   strictEqual(elementType.kind, "nullable");
@@ -136,18 +155,19 @@ it("record with nullable with more types", async function () {
   strictEqual(elementTypeValueType.variantTypes[0].kind, "string");
   strictEqual(elementTypeValueType.variantTypes[1].kind, "float32");
 
-  deepStrictEqual(runner.context.sdkPackage.unions[0], elementType);
+  deepStrictEqual(context.sdkPackage.unions[0], elementType);
 });
 
 it("array with nullable", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       name: (float32 | null)[];
     }
   `);
 
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "array");
   const elementType = sdkType.valueType;
   strictEqual(elementType.kind, "nullable");
@@ -158,18 +178,19 @@ it("array with nullable", async function () {
   strictEqual(elementType.access, "public");
   strictEqual(elementType.type.kind, "float32");
 
-  deepStrictEqual(runner.context.sdkPackage.unions[0], elementType);
+  deepStrictEqual(context.sdkPackage.unions[0], elementType);
 });
 
 it("array with nullable with more types", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Test {
       name: (string | float32 | null)[];
     }
   `);
 
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "array");
   const elementType = sdkType.valueType;
   strictEqual(elementType.kind, "nullable");
@@ -184,11 +205,11 @@ it("array with nullable with more types", async function () {
   strictEqual(elementTypeValueType.variantTypes[0].kind, "string");
   strictEqual(elementTypeValueType.variantTypes[1].kind, "float32");
 
-  deepStrictEqual(runner.context.sdkPackage.unions[0], elementType);
+  deepStrictEqual(context.sdkPackage.unions[0], elementType);
 });
 
 it("additional property is nullable", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model TestExtends extends Record<string|null> {
       name: string;
@@ -206,7 +227,8 @@ it("additional property is nullable", async function () {
     }
   `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
 
   const extendsType = models.find((x) => x.name === "TestExtends");
@@ -225,7 +247,7 @@ it("additional property is nullable", async function () {
   strictEqual(additionalProperties.access, "public");
   strictEqual(additionalProperties.type.kind, "string");
 
-  deepStrictEqual(runner.context.sdkPackage.unions[0], additionalProperties);
+  deepStrictEqual(context.sdkPackage.unions[0], additionalProperties);
 
   const isType = models.find((x) => x.name === "TestIs");
   ok(isType);
@@ -243,7 +265,7 @@ it("additional property is nullable", async function () {
   strictEqual(isTypeAdditionalProperties.access, "public");
   strictEqual(isTypeAdditionalProperties.type.kind, "string");
 
-  deepStrictEqual(runner.context.sdkPackage.unions[1], isTypeAdditionalProperties);
+  deepStrictEqual(context.sdkPackage.unions[1], isTypeAdditionalProperties);
 
   const spreadType = models.find((x) => x.name === "TestSpread");
   ok(spreadType);
@@ -261,11 +283,11 @@ it("additional property is nullable", async function () {
   strictEqual(spreadTypeAdditionalProperties.access, "public");
   strictEqual(spreadTypeAdditionalProperties.type.kind, "string");
 
-  deepStrictEqual(runner.context.sdkPackage.unions[2], spreadTypeAdditionalProperties);
+  deepStrictEqual(context.sdkPackage.unions[2], spreadTypeAdditionalProperties);
 });
 
 it("additional property nullable with more types", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model TestExtends extends Record<string|float32|null> {
       name: string;
@@ -283,7 +305,8 @@ it("additional property nullable with more types", async function () {
     }
   `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
 
   const extendsType = models.find((x) => x.name === "TestExtends");
@@ -309,7 +332,7 @@ it("additional property nullable with more types", async function () {
   strictEqual(extendsAdPropUnderlyingType.variantTypes[0].kind, "string");
   strictEqual(extendsAdPropUnderlyingType.variantTypes[1].kind, "float32");
 
-  deepStrictEqual(runner.context.sdkPackage.unions[0], extendsTypeAdditionalProperties);
+  deepStrictEqual(context.sdkPackage.unions[0], extendsTypeAdditionalProperties);
 
   const isType = models.find((x) => x.name === "TestIs");
   ok(isType);
@@ -333,7 +356,7 @@ it("additional property nullable with more types", async function () {
   strictEqual(isTypeAdditionalPropertiesUnderlyingType.variantTypes[0].kind, "string");
   strictEqual(isTypeAdditionalPropertiesUnderlyingType.variantTypes[1].kind, "float32");
 
-  deepStrictEqual(runner.context.sdkPackage.unions[1], isTypeAdditionalProperties);
+  deepStrictEqual(context.sdkPackage.unions[1], isTypeAdditionalProperties);
 
   const spreadType = models.find((x) => x.name === "TestSpread");
   ok(spreadType);
@@ -357,18 +380,19 @@ it("additional property nullable with more types", async function () {
   strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.variantTypes[0].kind, "string");
   strictEqual(spreadTypeAdditionalPropertiesUnderlyingType.variantTypes[1].kind, "float32");
 
-  deepStrictEqual(runner.context.sdkPackage.unions[2], spreadTypeAdditionalProperties);
+  deepStrictEqual(context.sdkPackage.unions[2], spreadTypeAdditionalProperties);
 });
 
 it("model with simple union property", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model ModelWithSimpleUnionProperty {
       prop: int32 | int32[];
     }
   `);
 
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "union");
   strictEqual(sdkType.usage, UsageFlags.Input | UsageFlags.Output);
   strictEqual(sdkType.access, "public");
@@ -380,11 +404,11 @@ it("model with simple union property", async function () {
   const elementType = (<SdkArrayType>values[1]).valueType;
   strictEqual(elementType.kind, "int32");
 
-  deepStrictEqual(runner.context.sdkPackage.unions[0], sdkType);
+  deepStrictEqual(context.sdkPackage.unions[0], sdkType);
 });
 
 it("model with named union", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model BaseModel {
       name: string;
@@ -409,7 +433,8 @@ it("model with named union", async function () {
     }
   `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 4);
   const modelWithNamedUnionProperty = models.find(
     (x) => x.kind === "model" && x.name === "ModelWithNamedUnionProperty",
@@ -438,11 +463,11 @@ it("model with named union", async function () {
     models.find((x) => x.kind === "model" && x.name === "Model2"),
   );
 
-  deepStrictEqual(runner.context.sdkPackage.unions[0], sdkType);
+  deepStrictEqual(context.sdkPackage.unions[0], sdkType);
 });
 
 it("model with nullable named union", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model BaseModel {
       name: string;
@@ -468,7 +493,8 @@ it("model with nullable named union", async function () {
     }
   `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 4);
   const modelWithNamedUnionProperty = models.find(
     (x) => x.kind === "model" && x.name === "ModelWithNamedUnionProperty",
@@ -501,11 +527,11 @@ it("model with nullable named union", async function () {
     models.find((x) => x.kind === "model" && x.name === "Model2"),
   );
 
-  deepStrictEqual(runner.context.sdkPackage.unions[0], sdkType);
+  deepStrictEqual(context.sdkPackage.unions[0], sdkType);
 });
 
 it("model with nullable enum property", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     enum PetKind {
       dog, cat, bird
     }
@@ -515,7 +541,8 @@ it("model with nullable enum property", async function () {
     }
   `);
 
-  const nullableType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program);
+  const nullableType = getSdkTypeHelper(context);
   strictEqual(nullableType.kind, "nullable");
   strictEqual(nullableType.usage, UsageFlags.Input | UsageFlags.Output);
   strictEqual(nullableType.access, "public");
@@ -529,18 +556,19 @@ it("model with nullable enum property", async function () {
   const values = sdkType.values;
   strictEqual(values.length, 3);
 
-  deepStrictEqual(runner.context.sdkPackage.unions[0], nullableType);
+  deepStrictEqual(context.sdkPackage.unions[0], nullableType);
 });
 
 it("model with nullable union as enum", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Home {
       pet: "dog" | "cat" | "bird" | string | null;
     }
   `);
 
-  const nullableType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program);
+  const nullableType = getSdkTypeHelper(context);
   strictEqual(nullableType.kind, "nullable");
   strictEqual(nullableType.name, "HomePet");
   strictEqual(nullableType.isGeneratedName, true);
@@ -556,11 +584,11 @@ it("model with nullable union as enum", async function () {
   const values = sdkType.values;
   strictEqual(values.length, 3);
 
-  deepStrictEqual(runner.context.sdkPackage.unions[0], nullableType);
+  deepStrictEqual(context.sdkPackage.unions[0], nullableType);
 });
 
 it("model with nullable model property", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model PropertyModel {
       internalProp: string;
@@ -572,7 +600,8 @@ it("model with nullable model property", async function () {
     }
   `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const model = models.find((x) => x.kind === "model" && x.name === "Test");
   ok(model);
@@ -588,11 +617,11 @@ it("model with nullable model property", async function () {
   strictEqual(sdkType.kind, "model");
   strictEqual(sdkType.name, "PropertyModel");
 
-  deepStrictEqual(runner.context.sdkPackage.unions[0], nullableType);
+  deepStrictEqual(context.sdkPackage.unions[0], nullableType);
 });
 
 it("nullable union with anonymous model ref self", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     union A {
       null,
       {
@@ -604,8 +633,9 @@ it("nullable union with anonymous model ref self", async function () {
     op post(@body body: A): { @body body: A }; 
   `);
 
-  const models = runner.context.sdkPackage.models;
-  const unions = runner.context.sdkPackage.unions;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
+  const unions = context.sdkPackage.unions;
 
   strictEqual(models.length, 1);
   strictEqual(models[0].kind, "model");
@@ -618,7 +648,7 @@ it("nullable union with anonymous model ref self", async function () {
   strictEqual(unions[0].crossLanguageDefinitionId, "TestService.A");
   strictEqual(unions[0].type, models[0]);
 
-  const method = runner.context.sdkPackage.clients[0].methods[0];
+  const method = context.sdkPackage.clients[0].methods[0];
   ok(method);
   const bodyParamType = method.parameters[0].type;
   strictEqual(bodyParamType.kind, "nullable");
@@ -632,7 +662,7 @@ it("nullable union with anonymous model ref self", async function () {
 });
 
 it("nullable union circular", async function () {
-  await runner.compileAndDiagnose(`
+  const [{ program }] = await SimpleTester.compileAndDiagnose(`
     @service
     namespace Test {
       union Test {
@@ -644,13 +674,14 @@ it("nullable union circular", async function () {
     }
   `);
 
-  expectDiagnostics(runner.context.diagnostics, {
+  const context = await createSdkContextForTester(program);
+  expectDiagnostics(context.diagnostics, {
     code: "@azure-tools/typespec-client-generator-core/union-circular",
   });
 });
 
 it("complicated union circular", async function () {
-  await runner.compileAndDiagnose(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace Test {
       union A {
@@ -672,15 +703,16 @@ it("complicated union circular", async function () {
     }
   `);
 
+  const context = await createSdkContextForTester(program);
   const diagnostic = {
     code: "@azure-tools/typespec-client-generator-core/union-circular",
   };
   // A, B, C all have one diagnostic
-  expectDiagnostics(runner.context.diagnostics, [diagnostic, diagnostic, diagnostic]);
+  expectDiagnostics(context.diagnostics, [diagnostic, diagnostic, diagnostic]);
 });
 
 it("mix types", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model ModelType {
       name: string;
@@ -697,7 +729,8 @@ it("mix types", async function () {
     }
   `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   const model = models.find((x) => x.kind === "model" && x.name === "Test");
   ok(model);
@@ -716,7 +749,7 @@ it("mix types", async function () {
       strictEqual(v.kind, "constant");
     }
   }
-  deepStrictEqual(runner.context.sdkPackage.unions[0], unionType);
+  deepStrictEqual(context.sdkPackage.unions[0], unionType);
 
   const nullableProp = nullableModel.properties[0];
   strictEqual(nullableProp.type.kind, "nullable");
@@ -740,11 +773,11 @@ it("mix types", async function () {
     }
   }
 
-  deepStrictEqual(runner.context.sdkPackage.unions[1], nullableProp.type);
+  deepStrictEqual(context.sdkPackage.unions[1], nullableProp.type);
 });
 
 it("usage", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     union UnionAsEnum {
       "A",
       "B",
@@ -771,21 +804,22 @@ it("usage", async function () {
     ): void;
   `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const foo = models.find((x) => x.name === "Foo");
   ok(foo);
   strictEqual(foo.usage, UsageFlags.Input | UsageFlags.Json);
   strictEqual(foo.access, "internal");
 
-  const enums = runner.context.sdkPackage.enums;
+  const enums = context.sdkPackage.enums;
   strictEqual(enums.length, 1);
   const unionAsEnum = enums.find((x) => x.name === "UnionAsEnum");
   ok(unionAsEnum);
   strictEqual(unionAsEnum.usage, UsageFlags.Input | UsageFlags.Json);
   strictEqual(unionAsEnum.access, "internal");
 
-  const unions = runner.context.sdkPackage.unions;
+  const unions = context.sdkPackage.unions;
   strictEqual(unions.length, 1);
   strictEqual(unions[0].kind, "nullable");
   strictEqual(unions[0].usage, UsageFlags.Input | UsageFlags.Json);
@@ -793,7 +827,7 @@ it("usage", async function () {
 });
 
 it("usage override", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     @access(Access.public)
     union UnionAsEnum {
@@ -826,20 +860,21 @@ it("usage override", async function () {
     ): void;
   `);
 
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const foo = models.find((x) => x.name === "Foo");
   ok(foo);
   strictEqual(foo.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
   strictEqual(foo.access, "public");
-  const enums = runner.context.sdkPackage.enums;
+  const enums = context.sdkPackage.enums;
   strictEqual(enums.length, 1);
   const unionAsEnum = enums.find((x) => x.name === "UnionAsEnum");
   ok(unionAsEnum);
   strictEqual(unionAsEnum.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
   strictEqual(unionAsEnum.access, "public");
 
-  const unions = runner.context.sdkPackage.unions;
+  const unions = context.sdkPackage.unions;
   strictEqual(unions.length, 1);
   strictEqual(unions[0].kind, "nullable");
   strictEqual(unions[0].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
@@ -847,7 +882,7 @@ it("usage override", async function () {
 });
 
 it("usage override for orphan union as enum", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     union UnionAsEnum {
       "A",
@@ -864,7 +899,8 @@ it("usage override for orphan union as enum", async function () {
     }
   `);
 
-  const enums = runner.context.sdkPackage.enums;
+  const context = await createSdkContextForTester(program);
+  const enums = context.sdkPackage.enums;
   strictEqual(enums.length, 2);
   const unionAsEnum = enums.find((x) => x.name === "UnionAsEnum");
   ok(unionAsEnum);
@@ -877,7 +913,7 @@ it("usage override for orphan union as enum", async function () {
 });
 
 it("union with only one literal", async function () {
-  await runner.compileWithBuiltInService(
+  const { program } = await SimpleTesterWithService.compile(
     `
     @usage(Usage.input | Usage.output)
     model Test {
@@ -889,11 +925,266 @@ it("union with only one literal", async function () {
     }
   `,
   );
-  const sdkType = getSdkTypeHelper(runner);
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
   strictEqual(sdkType.kind, "enum");
   strictEqual(sdkType.name, "TestUnion");
   const values = sdkType.values;
   strictEqual(values.length, 1);
   strictEqual(values[0].value, "A");
-  deepStrictEqual(runner.context.sdkPackage.enums[0], sdkType);
+  deepStrictEqual(context.sdkPackage.enums[0], sdkType);
+});
+
+it("default discriminated union", async function () {
+  const { program } = await SimpleTesterWithService.compile(
+    `
+    @usage(Usage.input | Usage.output)
+    model Test {
+      pet: Pet;
+    }
+
+    @discriminated
+    union Pet { 
+      cat: Cat, 
+      dog: Dog 
+    }
+
+    model Cat { 
+      name: string; 
+      meow: boolean; 
+    }
+    
+    model Dog { 
+      name: string; 
+      bark: boolean; 
+    }
+  `,
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
+  strictEqual(sdkType.kind, "union");
+  strictEqual(sdkType.name, "Pet");
+  strictEqual(sdkType.isGeneratedName, false);
+  strictEqual(sdkType.usage, UsageFlags.Input | UsageFlags.Output);
+  strictEqual(sdkType.access, "public");
+
+  // Test discriminatedOptions
+  ok(sdkType.discriminatedOptions);
+  strictEqual(sdkType.discriminatedOptions.envelope, "object");
+  strictEqual(sdkType.discriminatedOptions.discriminatorPropertyName, "kind");
+  strictEqual(sdkType.discriminatedOptions.envelopePropertyName, "value");
+
+  const variantTypes = sdkType.variantTypes;
+  strictEqual(variantTypes.length, 2);
+  strictEqual(variantTypes[0].kind, "model");
+  strictEqual(variantTypes[0].name, "Cat");
+  strictEqual(variantTypes[1].kind, "model");
+  strictEqual(variantTypes[1].name, "Dog");
+});
+
+it("discriminated union with custom discriminator property", async function () {
+  const { program } = await SimpleTesterWithService.compile(
+    `
+    @usage(Usage.input | Usage.output)
+    model Test {
+      vehicle: Vehicle;
+    }
+
+    @discriminated(#{discriminatorPropertyName: "type"})
+    union Vehicle { 
+      car: Car, 
+      bike: Bike 
+    }
+
+    model Car { 
+      brand: string; 
+      doors: int32; 
+    }
+    
+    model Bike { 
+      brand: string; 
+      gears: int32; 
+    }
+  `,
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
+  strictEqual(sdkType.kind, "union");
+  strictEqual(sdkType.name, "Vehicle");
+  strictEqual(sdkType.isGeneratedName, false);
+
+  // Test discriminatedOptions with custom discriminator
+  ok(sdkType.discriminatedOptions);
+  strictEqual(sdkType.discriminatedOptions.envelope, "object");
+  strictEqual(sdkType.discriminatedOptions.discriminatorPropertyName, "type");
+  strictEqual(sdkType.discriminatedOptions.envelopePropertyName, "value");
+
+  const variantTypes = sdkType.variantTypes;
+  strictEqual(variantTypes.length, 2);
+  strictEqual(variantTypes[0].kind, "model");
+  strictEqual(variantTypes[0].name, "Car");
+  strictEqual(variantTypes[1].kind, "model");
+  strictEqual(variantTypes[1].name, "Bike");
+});
+
+it("discriminated union with none envelope", async function () {
+  const { program } = await SimpleTesterWithService.compile(
+    `
+    @usage(Usage.input | Usage.output)
+    model Test {
+      shape: Shape;
+    }
+
+    @discriminated(#{envelope: "none"})
+    union Shape { 
+      circle: Circle, 
+      square: Square 
+    }
+
+    model Circle { 
+      radius: float32; 
+    }
+    
+    model Square { 
+      side: float32; 
+    }
+  `,
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
+  strictEqual(sdkType.kind, "union");
+  strictEqual(sdkType.name, "Shape");
+  strictEqual(sdkType.isGeneratedName, false);
+
+  // Test discriminatedOptions with none envelope
+  ok(sdkType.discriminatedOptions);
+  strictEqual(sdkType.discriminatedOptions.envelope, "none");
+  strictEqual(sdkType.discriminatedOptions.discriminatorPropertyName, "kind");
+  strictEqual(sdkType.discriminatedOptions.envelopePropertyName, undefined);
+
+  const variantTypes = sdkType.variantTypes;
+  strictEqual(variantTypes.length, 2);
+  strictEqual(variantTypes[0].kind, "model");
+  strictEqual(variantTypes[0].name, "Circle");
+  strictEqual(variantTypes[1].kind, "model");
+  strictEqual(variantTypes[1].name, "Square");
+});
+
+it("discriminated union with custom envelope property", async function () {
+  const { program } = await SimpleTesterWithService.compile(
+    `
+    @usage(Usage.input | Usage.output)
+    model Test {
+      message: Message;
+    }
+
+    @discriminated(#{envelopePropertyName: "data"})
+    union Message { 
+      text: TextMessage, 
+      image: ImageMessage 
+    }
+
+    model TextMessage { 
+      content: string; 
+    }
+    
+    model ImageMessage { 
+      url: string; 
+      alt: string; 
+    }
+  `,
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
+  strictEqual(sdkType.kind, "union");
+  strictEqual(sdkType.name, "Message");
+  strictEqual(sdkType.isGeneratedName, false);
+
+  // Test discriminatedOptions with custom envelope property
+  ok(sdkType.discriminatedOptions);
+  strictEqual(sdkType.discriminatedOptions.envelope, "object");
+  strictEqual(sdkType.discriminatedOptions.discriminatorPropertyName, "kind");
+  strictEqual(sdkType.discriminatedOptions.envelopePropertyName, "data");
+
+  const variantTypes = sdkType.variantTypes;
+  strictEqual(variantTypes.length, 2);
+  strictEqual(variantTypes[0].kind, "model");
+  strictEqual(variantTypes[0].name, "TextMessage");
+  strictEqual(variantTypes[1].kind, "model");
+  strictEqual(variantTypes[1].name, "ImageMessage");
+});
+
+it("regular union without discriminator has no discriminatedOptions", async function () {
+  const { program } = await SimpleTesterWithService.compile(
+    `
+    @usage(Usage.input | Usage.output)
+    model Test {
+      value: string | int32 | boolean;
+    }
+  `,
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkType = getSdkTypeHelper(context);
+  strictEqual(sdkType.kind, "union");
+  strictEqual(sdkType.name, "TestValue");
+  strictEqual(sdkType.isGeneratedName, true);
+
+  // Test that regular unions don't have discriminatedOptions
+  strictEqual(sdkType.discriminatedOptions, undefined);
+
+  const variantTypes = sdkType.variantTypes;
+  strictEqual(variantTypes.length, 3);
+  strictEqual(variantTypes[0].kind, "string");
+  strictEqual(variantTypes[1].kind, "int32");
+  strictEqual(variantTypes[2].kind, "boolean");
+});
+
+it("nullable discriminated union", async function () {
+  const { program } = await SimpleTesterWithService.compile(
+    `
+    @usage(Usage.input | Usage.output)
+    model Test {
+      optionalPet: Pet | null;
+    }
+
+    @discriminated
+    union Pet { 
+      cat: Cat, 
+      dog: Dog 
+    }
+
+    model Cat { 
+      name: string; 
+      meow: boolean; 
+    }
+    
+    model Dog { 
+      name: string; 
+      bark: boolean; 
+    }
+  `,
+  );
+  const context = await createSdkContextForTester(program);
+  const nullableType = getSdkTypeHelper(context);
+  strictEqual(nullableType.kind, "nullable");
+  strictEqual(nullableType.name, "TestOptionalPet");
+  strictEqual(nullableType.isGeneratedName, true);
+
+  const unionType = nullableType.type;
+  strictEqual(unionType.kind, "union");
+  strictEqual(unionType.name, "Pet");
+  strictEqual(unionType.isGeneratedName, false);
+
+  // Test discriminatedOptions are preserved in nullable wrapper
+  ok(unionType.discriminatedOptions);
+  strictEqual(unionType.discriminatedOptions.envelope, "object");
+  strictEqual(unionType.discriminatedOptions.discriminatorPropertyName, "kind");
+  strictEqual(unionType.discriminatedOptions.envelopePropertyName, "value");
+
+  const variantTypes = unionType.variantTypes;
+  strictEqual(variantTypes.length, 2);
+  strictEqual(variantTypes[0].kind, "model");
+  strictEqual(variantTypes[0].name, "Cat");
+  strictEqual(variantTypes[1].kind, "model");
+  strictEqual(variantTypes[1].name, "Dog");
 });

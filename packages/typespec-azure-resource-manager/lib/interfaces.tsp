@@ -1,6 +1,5 @@
 using Http;
 using Rest;
-using OpenAPI;
 using Azure.ResourceManager.Foundations;
 using Azure.ResourceManager.Private;
 
@@ -13,6 +12,9 @@ namespace Azure.ResourceManager;
  *   GET "/providers/Microsoft.ContosoProviderHub/operations"
  */
 interface Operations {
+  /**
+   * @dev List the operations for the provider.
+   */
   @tag("Operations")
   @autoRoute
   @armUpdateProviderNamespace
@@ -324,6 +326,7 @@ interface ResourceUpdateSync<
    * @template Properties RP-specific property bag for the resource
    * @template BaseParameters The http parameters that are part of the request
    */
+  @patch(#{ implicitOptionality: true })
   update is ArmCustomPatchSync<Resource, ResourceUpdateModel<Resource, Properties>, BaseParameters>;
 }
 

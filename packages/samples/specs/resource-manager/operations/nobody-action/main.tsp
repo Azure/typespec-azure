@@ -18,7 +18,6 @@ namespace Microsoft.ContosoProviderHub;
 /** Contoso API versions */
 enum Versions {
   /** 2021-10-01-preview version */
-  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   `2021-10-01-preview`,
 }
@@ -91,6 +90,9 @@ interface Employees {
 
   /** Sample async action with no request body and response */
   actionNoReqResAsync is ArmResourceActionNoResponseContentAsync<Employee, void>;
+
+  /** Sample async action using only 202 response */
+  actionAcceptedOnlyAsync is ActionAsync<Employee, void, void>;
 
   /** A sample HEAD operation to check resource existence */
   checkExistence is ArmResourceCheckExistence<Employee>;

@@ -60,6 +60,15 @@
           },
           {
             "$ref": "#/parameters/Azure.ResourceManager.ResourceUriParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ArmTopParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ArmFilterParameter"
+          },
+          {
+            "$ref": "#/parameters/Azure.ResourceManager.ArmSkipParameter"
           }
         ],
         "responses": {
@@ -401,8 +410,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/RoleAssignmentProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       },
       "allOf": [
@@ -454,8 +462,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/RoleAssignmentUpdateProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       }
     },
@@ -472,6 +479,35 @@
     }
   },
   "parameters": {
+    "Azure.ResourceManager.ArmFilterParameter": {
+      "name": "$filter",
+      "in": "query",
+      "description": "The OData filter expression to apply to the list operation.",
+      "required": true,
+      "type": "string",
+      "x-ms-parameter-location": "method",
+      "x-ms-client-name": "filter"
+    },
+    "Azure.ResourceManager.ArmSkipParameter": {
+      "name": "$skip",
+      "in": "query",
+      "description": "The number of items to skip before starting to collect the result set.",
+      "required": true,
+      "type": "integer",
+      "format": "int64",
+      "x-ms-parameter-location": "method",
+      "x-ms-client-name": "skip"
+    },
+    "Azure.ResourceManager.ArmTopParameter": {
+      "name": "$top",
+      "in": "query",
+      "description": "The total number of items to return.",
+      "required": true,
+      "type": "integer",
+      "format": "int64",
+      "x-ms-parameter-location": "method",
+      "x-ms-client-name": "top"
+    },
     "Azure.ResourceManager.ResourceUriParameter": {
       "name": "resourceUri",
       "in": "path",

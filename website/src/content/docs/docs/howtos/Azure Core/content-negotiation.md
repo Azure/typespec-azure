@@ -1,5 +1,6 @@
 ---
 title: Content Type Negotiation
+llmstxt: true
 ---
 
 See [Http documentation on content type negotiation](https://typespec.io/docs/libraries/http/content-types/#content-type-negotiation) for the general concept

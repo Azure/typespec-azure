@@ -1,21 +1,32 @@
 import {
+  createDiagnosticCollector,
+  Diagnostic,
+  getEffectiveModelType,
+  ignoreDiagnostics,
+  isNeverType,
+  isUnknownType,
+  isVoidType,
   type DecoratorContext,
   type IntrinsicType,
   type Model,
   type ModelProperty,
   type Program,
   type Type,
-  ignoreDiagnostics,
-  isNeverType,
-  isVoidType,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { useStateMap, useStateSet } from "@typespec/compiler/utils";
+import { isMetadata } from "@typespec/http";
 import type { PollingLocationDecorator } from "../../generated-defs/Azure.Core.js";
 import { AzureCoreStateKeys } from "../lib.js";
-import { type StatusMonitorMetadata, extractStatusMonitorInfo } from "../lro-info.js";
+import { ModelPropertyTerminationStatus } from "../lro-helpers.js";
+import { getLroErrorResult } from "./lro-error-result.js";
 import { getLroResult } from "./lro-result.js";
-import { findLroStatusProperty } from "./lro-status.js";
+import {
+  extractLroStates,
+  findLroStatusProperty,
+  getLongRunningStates,
+  LongRunningStates,
+} from "./lro-status.js";
 
 export const [
   /**
@@ -52,6 +63,28 @@ export interface StatusMonitorPollingLocationInfo extends PollingLocationBase {
   kind: pollingOptionsKind.StatusMonitor;
   /** The status monitor detailed data for control of polling. */
   info: StatusMonitorMetadata;
+}
+
+/** Metadata for the StatusMonitor */
+export interface StatusMonitorMetadata {
+  /** The model type of the status monitor */
+  monitorType: Model;
+  /** Information on polling status property and termina states */
+  terminationInfo: ModelPropertyTerminationStatus;
+
+  lroStates: LongRunningStates;
+
+  /** The property containing the response when polling terminates with success */
+  successProperty?: ModelProperty;
+
+  /** The property containing error information when polling terminates with failure */
+  errorProperty?: ModelProperty;
+
+  statusProperty: ModelProperty;
+
+  successType: Model | IntrinsicType;
+
+  errorType?: Model;
 }
 
 // keys of the pollingOptions type
@@ -151,7 +184,7 @@ function extractStatusMonitorLocationInfo(
   if (statusMonitor === undefined) return undefined;
   statusMonitor.successProperty = finalPropertyValue;
   baseInfo.finalResult =
-    finalPropertyValue?.type?.kind === "Model"
+    finalPropertyValue?.type?.kind === "Model" || finalPropertyValue?.type?.kind === "Intrinsic"
       ? finalPropertyValue.type
       : $(program).intrinsic.void;
   return {
@@ -159,4 +192,43 @@ function extractStatusMonitorLocationInfo(
     info: statusMonitor,
     ...baseInfo,
   };
+}
+
+export function extractStatusMonitorInfo(
+  program: Program,
+  model: Model,
+  statusProperty: ModelProperty,
+): [StatusMonitorMetadata | undefined, readonly Diagnostic[]] {
+  const diagnosticsToToss = createDiagnosticCollector();
+  const diagnosticsToKeep = createDiagnosticCollector();
+  const lroResult = diagnosticsToKeep.pipe(getLroResult(program, model, true));
+  const successProperty: ModelProperty | undefined =
+    lroResult?.kind === "ModelProperty" ? lroResult : undefined;
+  const errorProperty: ModelProperty | undefined = diagnosticsToKeep.pipe(
+    getLroErrorResult(program, model, true),
+  );
+  const states: LongRunningStates | undefined =
+    getLongRunningStates(program, statusProperty) ??
+    diagnosticsToToss.pipe(extractLroStates(program, statusProperty));
+  if (!states || !statusProperty) return diagnosticsToKeep.wrap(undefined);
+  return diagnosticsToKeep.wrap({
+    monitorType: getEffectiveModelType(program, model, (p) => !isMetadata(program, p)) ?? model,
+    successProperty: successProperty,
+    errorProperty: errorProperty,
+    statusProperty: statusProperty,
+    lroStates: states,
+    errorType: errorProperty?.type.kind === "Model" ? errorProperty.type : undefined,
+    successType:
+      (successProperty?.type && isUnknownType(successProperty.type)) ||
+      successProperty?.type?.kind === "Model"
+        ? successProperty.type
+        : $(program).intrinsic.void,
+    terminationInfo: {
+      kind: "model-property",
+      property: statusProperty,
+      canceledState: states.canceledState,
+      failedState: states.failedState,
+      succeededState: states.succeededState,
+    },
+  });
 }

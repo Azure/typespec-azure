@@ -7,26 +7,25 @@ emit:
   - "@azure-tools/typespec-autorest"
 options:
   "@azure-tools/typespec-autorest":
-    azure-resource-provider-folder: "data-plane"
     emitter-output-dir: "{project-root}/.."
-    output-file: "{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json"
+    output-file: "data-plane/{service-name}/{version-status}/{version}/openapi.json"
   "@azure-tools/typespec-python":    
-    package-dir: "azure-contoso"
+    emitter-output-dir: "{output-dir}/{service-dir}/azure-contoso"
     namespace: "azure.contoso"
     package-mode: dataplane
   "@azure-tools/typespec-csharp":
-    package-dir: "Azure.Contoso"
-    namespace: "{package-dir}"
+    emitter-output-dir: "{output-dir}/{service-dir}/Azure.Contoso"
+    namespace: "Azure.Contoso"
     clear-output-folder: true
     model-namespace: false
   "@azure-tools/typespec-ts":
-    package-dir: "azure-contoso-rest"
+    emitter-output-dir: "{output-dir}/{service-dir}/azure-contoso-rest"
     package-details:
       name: "@azure-rest/azure-contoso"
       description: "Azure.Contoso Service"
     flavor: azure
   "@azure-tools/typespec-java":
-    package-dir: "azure-contoso"
+    emitter-output-dir: "{output-dir}/{service-dir}/azure-contoso"
     namespace: com.azure.contoso
 linter:
   extends:

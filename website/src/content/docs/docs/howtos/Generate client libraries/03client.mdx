@@ -1,12 +1,11 @@
 ---
 title: Clients
+llmstxt: true
 ---
 
 import { ClientTabs, ClientTabItem } from "@components/client-tabs";
 
 This page documents the client behavior as well as how to customize clients.
-
-> **NOTE:** The JS RLC doesn't support client hierarchy customization and will ignore client.tsp. Therefore, the following scenarios won't affect the JS RLC user experience. In this context, the TypeScript part refers to the JS Modular Emitter.
 
 ## Default Behavior
 
@@ -116,6 +115,32 @@ public final class PetStoreClient {
 PetStoreClient client = new PetStoreClientBuilder().buildClient();
 client.feed();
 client.pet();
+```
+
+```go
+// generated petstore_client.go
+type PetStoreClient struct {}
+
+func NewPetStoreClient() *PetStoreClient {
+	return &PetStoreClient{}
+}
+
+func (client *PetStoreClient) Feed(ctx context.Context, options *PetStoreClientFeedOptions) (PetStoreClientFeedResponse, error) {}
+
+func (client *PetStoreClient) Pet(ctx context.Context, options *PetStoreClientPetOptions) (PetStoreClientPetResponse, error) {}
+
+// generated options.go
+type PetStoreClientFeedOptions struct {}
+type PetStoreClientPetOptions struct {}
+
+// generated response.go
+type PetStoreClientFeedResponse struct {}
+type PetStoreClientPetResponse struct {}
+
+// Usage Sample
+petStoreClient := NewPetStoreClient()
+petStoreClient.Feed(context.Background(), &PetStoreClientFeedOptions{})
+petStoreClient.Pet(context.Background(), &PetStoreClientPetOptions{})
 ```
 
 </ClientTabs>
@@ -239,6 +264,54 @@ dogsClient.pet();
 CatsClient catsClient = builder.buildCatsClient();
 catsClient.feed();
 catsClient.pet();
+```
+
+```go
+// generated petstore_client.go
+type PetStoreClient struct {}
+
+func (client *PetStoreClient) NewPetStoreCatsClient() *PetStoreCatsClient {
+	return &PetStoreCatsClient{}
+}
+
+func (client *PetStoreClient) NewPetStoreDogsClient() *PetStoreDogsClient {
+	return &PetStoreDogsClient{}
+}
+
+// generated petstoredogs_client.go
+type PetStoreDogsClient struct {}
+
+func (client *PetStoreDogsClient) Feed(ctx context.Context, options *PetStoreDogsClientFeedOptions) (PetStoreDogsClientFeedResponse, error) {}
+
+func (client *PetStoreDogsClient) Pet(ctx context.Context, options *PetStoreDogsClientPetOptions) (PetStoreDogsClientPetResponse, error) {}
+
+// generated petstorecats_client.go
+type PetStoreCatsClient struct {}
+
+func (client *PetStoreCatsClient) Feed(ctx context.Context, options *PetStoreCatsClientFeedOptions) (PetStoreCatsClientFeedResponse, error) {}
+
+func (client *PetStoreCatsClient) Pet(ctx context.Context, options *PetStoreCatsClientPetOptions) (PetStoreCatsClientPetResponse, error) {}
+
+// generated options.go
+type PetStoreDogsClientFeedOptions struct {}
+type PetStoreDogsClientPetOptions struct {}
+type PetStoreCatsClientFeedOptions struct {}
+type PetStoreCatsClientPetOptions struct {}
+
+// generated response.go
+type PetStoreDogsClientFeedResponse {}
+type PetStoreDogsClientPetResponse {}
+type PetStoreCatsClientFeedResponse {}
+type PetStoreCatsClientPetResponse {}
+
+// Usage Sample
+petStoreClient := NewPetStoreClient()
+petStoreCatsClient := petStoreClient.NewPetStoreCatsClient()
+petStoreCatsClient.Feed(context.Background(), &PetStoreCatsClientFeedOptions{})
+petStoreCatsClient.Pet(context.Background(), &PetStoreCatsClientPetOptions{})
+petStoreDogsClient := petStoreClient.NewPetStoreDogsClient()
+petStoreDogsClient.Feed(context.Background(), &PetStoreDogsClientFeedOptions{})
+petStoreDogsClient.Pet(context.Background(), &PetStoreDogsClientPetOptions{})
 ```
 
 </ClientTabs>
@@ -432,6 +505,89 @@ actionsClient.open();
 actionsClient.close();
 ```
 
+```go
+// generated petstore_client.go
+type PetStoreClient struct {}
+
+func NewPetStoreClient() *PetStoreClient {
+  return &PetStoreClient{}
+}
+
+func (client *PetStoreClient) Info(ctx context.Context, options *PetStoreClientInfoOptions) (PetStoreClientInfoResponse, error) {}
+
+// generated petstoreactions_client.go
+type PetStoreActionsClient struct {}
+
+func NewPetStoreActionsClient() *PetStoreActionsClient {
+  return &PetStoreActionsClient{}
+}
+
+func (client *PetStoreActionsClient) Close(ctx context.Context, options *PetStoreActionsClientCloseOptions) (PetStoreActionsClientCloseResponse, error) {}
+
+func (client *PetStoreActionsClient) Open(ctx context.Context, options *PetStoreActionsClientOpenOptions) (PetStoreActionsClientOpenResponse, error) {}
+
+// generated petstorebillings_client.go
+type PetStoreBillingsClient struct {}
+
+func NewPetStoreBillingsClient() *PetStoreBillingsClient {
+  return &PetStoreBillingsClient{}
+}
+
+func (client *PetStoreBillingsClient) History(ctx context.Context, options *PetStoreBillingsClientHistoryOptions) (PetStoreBillingsClientHistoryResponse, error) {}
+
+// generated petstorepets_client.go
+type PetStorePetsClient struct {}
+
+func NewPetStorePetsClient() *PetStorePetsClient {
+  return &PetStorePetsClient{}
+}
+
+func (client *PetStorePetsClient) Info(ctx context.Context, options *PetStorePetsClientInfoOptions) (PetStorePetsClientInfoResponse, error) {}
+
+// generated petstorepetsactions_client.go
+type PetStorePetsActionsClient struct {}
+
+func NewPetStorePetsActionsClient() *PetStorePetsActionsClient {
+  return &PetStorePetsActionsClient{}
+}
+
+func (client *PetStorePetsActionsClient) Feed(ctx context.Context, options *PetStorePetsActionsClientFeedOptions) (PetStorePetsActionsClientFeedResponse, error) {}
+
+func (client *PetStorePetsActionsClient) Pet(ctx context.Context, options *PetStorePetsActionsClientPetOptions) (PetStorePetsActionsClientPetResponse, error) {}
+
+// generated options.go
+type PetStoreActionsClientCloseOptions struct {}
+type PetStoreActionsClientOpenOptions struct {}
+type PetStoreBillingsClientHistoryOptions struct {}
+type PetStoreClientInfoOptions struct {}
+type PetStorePetsActionsClientFeedOptions struct {}
+type PetStorePetsActionsClientPetOptions struct {}
+type PetStorePetsClientInfoOptions struct {}
+
+// generated response.go
+type PetStoreActionsClientCloseResponse struct {}
+type PetStoreActionsClientOpenResponse struct {}
+type PetStoreBillingsClientHistoryResponse struct {}
+type PetStoreClientInfoResponse struct {}
+type PetStorePetsActionsClientFeedResponse struct {}
+type PetStorePetsActionsClientPetResponse struct {}
+type PetStorePetsClientInfoResponse struct {}
+
+// Usage Sample
+petStoreClient := NewPetStoreClient()
+petStoreClient.Info(context.Background(), &PetStoreClientInfoOptions{})
+petStoreActionsClient := NewPetStoreActionsClient()
+petStoreActionsClient.Close(context.Background(), &PetStoreActionsClientCloseOptions{})
+petStoreActionsClient.Open(context.Background(), &PetStoreActionsClientOpenOptions{})
+petStoreBillingsClient := NewPetStoreBillingsClient()
+petStoreBillingsClient.History(context.Background(), &PetStoreBillingsClientHistoryOptions{})
+petStorePetsClient := NewPetStorePetsClient()
+petStorePetsClient.Info(context.Background(), &PetStorePetsClientInfoOptions{})
+petStorePetsActionsClient := NewPetStorePetsActionsClient()
+petStorePetsActionsClient.Feed(context.Background(), &PetStorePetsActionsClientFeedOptions{})
+petStorePetsActionsClient.Pet(context.Background(), &PetStorePetsActionsClientPetOptions{})
+```
+
 </ClientTabs>
 
 ## Customizations
@@ -547,6 +703,32 @@ client.feed();
 client.pet();
 ```
 
+```go
+// generated petstore_client.go
+type PetStoreClient struct {}
+
+func NewPetStorePetsActionsClient() *PetStorePetsActionsClient{
+  return &PetStorePetsActionsClient{}
+}
+
+func (client *PetStoreClient) Feed(ctx context.Context, options *PetStoreClientFeedOptions) (PetStoreClientFeedResponse, error) {}
+
+func (client *PetStoreClient) Pet(ctx context.Context, options *PetStoreClientPetOptions) (PetStoreClientPetResponse, error) {}
+
+// generated options.go
+type PetStoreClientFeedOptions struct {}
+type PetStoreClientPetOptions struct {}
+
+// generated response.go
+type PetStoreClientFeedResponse struct {}
+type PetStoreClientPetResponse struct {}
+
+// Usage Sample
+petStoreClient := NewPetStoreClient()
+petStoreClient.Feed(context.Background(), &PetStoreClientFeedOptions{})
+petStoreClient.Pet(context.Background(), &PetStoreClientPetOptions{})
+```
+
 </ClientTabs>
 
 ### Renaming the Client Name
@@ -635,6 +817,32 @@ public final class PetStoreGreatClient {
 PetStoreGreatClient client = new PetStoreGreatClientBuilder().buildClient();
 client.feed();
 client.pet();
+```
+
+```go
+// petstoregreat_client.go
+type PetStoreGreatClient struct {}
+
+func NewPetStoreGreatClient() *PetStoreGreatClient{
+  return &PetStoreGreatClient{}
+}
+
+func (client *PetStoreGreatClient) Feed(ctx context.Context, options *PetStoreGreatClientFeedOptions) (PetStoreGreatClientFeedResponse, error) {}
+
+func (client *PetStoreGreatClient) Pet(ctx context.Context, options *PetStoreGreatClientPetOptions) (PetStoreGreatClientPetResponse, error) {}
+
+// options.go
+type PetStoreGreatClientFeedOptions struct {}
+type PetStoreGreatClientPetOptions struct {}
+
+// response.go
+type PetStoreGreatClientFeedResponse struct {}
+type PetStoreGreatClientPetResponse struct {}
+
+// Usage Sample
+client := NewPetStoreGreatClient()
+client.Feed(context.Background(), &PetStoreGreatClientFeedOptions{})
+client.Pet(context.Background(), &PetStoreGreatClientPetOptions{})
 ```
 
 </ClientTabs>
@@ -727,6 +935,10 @@ package petstorerenamed;
 PetStoreClient client = new PetStoreClientBuilder().buildClient();
 client.feed();
 client.pet();
+```
+
+```go
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>
@@ -862,6 +1074,40 @@ foodClient.feed()
 petActionClient.pet()
 ```
 
+```go
+// generated food_client.go
+type FoodClient struct {}
+
+func NewFoodClient() *FoodClient{
+  return &FoodClient{}
+}
+
+func (client *FoodClient) Feed(ctx context.Context, options *FoodClientFeedOptions) (FoodClientFeedResponse, error) {}
+
+// generated petaction_client.go
+type PetActionClient struct {}
+
+func NewPetActionClient() *PetActionClient{
+  return &PetActionClient{}
+}
+
+func (client *PetActionClient) Pet(ctx context.Context, options *PetActionClientPetOptions) (PetActionClientPetResponse, error) {}
+
+// generated options.go
+type FoodClientFeedOptions struct {}
+type PetActionClientPetOptions struct {}
+
+// generated response.go
+type FoodClientFeedResponse struct {}
+type PetActionClientPetResponse struct {}
+
+// Usage Sample
+foodClient := NewFoodClient()
+foodClient.Feed(context.Background(), &FoodClientFeedOptions{})
+petActionClient := NewPetActionClient()
+petActionClient.Pet(context.Background(), &PetActionClientPetOptions{})
+```
+
 </ClientTabs>
 
 ### One Client and Two Operation Groups
@@ -981,6 +1227,48 @@ OpGrp2Client opGrp2Client = builder.buildOpGrp2Client();
 opGrp2Client.pet();
 ```
 
+```go
+// generated petstore_client.go
+type PetStoreClient struct {}
+
+func NewPetStoreClient() *PetStoreClient{
+  return &PetStoreClient{}
+}
+
+func (client *PetStoreClient)NewOpGrp1Client() *OpGrp1Client{
+  return &OpGrp1Client{}
+}
+
+func (client *PetStoreClient)NewOpGrp2Client() *OpGrp2Client{
+  return &OpGrp2Client{}
+}
+
+// generated petstoreopgrp1_client.go
+type OpGrp1Client struct {}
+
+func (client *PetStoreOpGrp1Client) Feed(ctx context.Context, options *PetStoreOpGrp1ClientFeedOptions) (PetStoreOpGrp1ClientFeedResponse, error) {}
+
+// generated petstoreopgrp2_client.go
+type OpGrp2Client struct {}
+
+func (client *PetStoreOpGrp2Client) Pet(ctx context.Context, options *PetStoreOpGrp2ClientPetOptions) (PetStoreOpGrp2ClientPetResponse, error) {}
+
+// generated options.go
+type PetStoreOpGrp1ClientFeedOptions struct {}
+type PetStoreOpGrp2ClientPetOptions struct {}
+
+// generated response.go
+type PetStoreOpGrp1ClientFeedResponse struct {}
+type PetStoreOpGrp2ClientPetResponse struct {}
+
+// Usage Sample
+petStoreClient := NewPetStoreClient()
+opGrp1Client := petStoreClient.NewOpGrp1Client()
+opGrp1Client.Feed(context.Background(), &PetStoreOpGrp1ClientFeedOptions{})
+opGrp2Client := petStoreClient.NewOpGrp2Client()
+opGrp2Client.Pet(context.Background(),&PetStoreOpGrp2ClientPetOptions{})
+```
+
 </ClientTabs>
 
 ### Splitting the Operations into Sub-Namespaces
@@ -1058,7 +1346,13 @@ client2.pet()
 ```
 
 ```typescript
-NOT_SUPPORTED;
+import { FoodClient, PetActionClient } from "@azure/package-name";
+
+const foodClient = new FoodClient();
+const petActionClient = new PetActionClient();
+
+foodClient.feed();
+petActionClient.pet();
 ```
 
 ```java
@@ -1109,6 +1403,42 @@ foodClient.feed();
 
 PetActionClient petActionClient = new PetActionClientBuilder().buildClient();
 petActionClient.pet();
+```
+
+```go
+// generated food_client.go
+type FoodClient struct {}
+
+func NewFoodClient() *FoodClient{
+  return &FoodClient{}
+}
+
+func (client *FoodClient) Feed(ctx context.Context, options *FoodClientFeedOptions) (FoodClientFeedResponse, error) {}
+
+// generated pet_action_client.go
+package newpetstore
+
+type PetActionClient struct {}
+
+func NewPetActionClient() *PetActionClient{
+  return &PetActionClient{}
+}
+
+func (client *PetActionClient) Pet(ctx context.Context, options *PetActionClientPetOptions) (PetActionClientPetResponse, error) {}
+
+// generated options.go
+type FoodClientFeedOptions struct {}
+type PetActionClientPetOptions struct {}
+
+// generated response.go
+type FoodClientFeedResponse struct {}
+type PetActionClientPetResponse struct {}
+
+// Usage Sample
+foodClient := NewFoodClient()
+foodClient.Feed(context.Background(), &FoodClientFeedOptions{})
+petClient := NewPetActionClient()
+petClient.Pet(context.Background(), &PetActionClientPetOptions{})
 ```
 
 </ClientTabs>
@@ -1198,7 +1528,34 @@ foodClient.Feed();
 ```
 
 ```typescript
-NOT_SUPPORTED;
+// JS CodeGen api layer
+export async function feed(
+  context: Client,
+  options: FeedOptionalParams = { requestOptions: {} },
+): Promise<void>;
+
+export async function pet(
+  context: Client,
+  options: PetOptionalParams = { requestOptions: {} },
+): Promise<void>;
+
+// JS CodeGen classical client layer
+export class PetActionClient {
+  pet(options: PetOptionalParams = { requestOptions: {} }): Promise<void>;
+}
+
+export class FoodClient {
+  feed(options: FeedOptionalParams = { requestOptions: {} }): Promise<void>;
+}
+
+// sample
+import { FoodClient, PetActionClient } from "@azure/package-name";
+
+const foodClient = new FoodClient();
+const petActionClient = new PetActionClient();
+
+foodClient.feed();
+petActionClient.pet();
 ```
 
 ```java
@@ -1249,6 +1606,42 @@ PetActionClient petActionClient = new PetActionClientBuilder().buildClient();
 
 foodClient.feed();
 petActionClient.pet();
+```
+
+```go
+// generated food_client.go
+type FoodClient struct {}
+
+func NewFoodClient() *FoodClient{
+  return &FoodClient{}
+}
+
+func (client *FoodClient) Feed(ctx context.Context, options *FoodClientFeedOptions) (FoodClientFeedResponse, error) {}
+
+// generated pet_action_client.go
+package petstorerenamed
+
+type PetActionClient struct {}
+
+func NewPetActionClient() *PetActionClient{
+  return &PetActionClient{}
+}
+
+func (client *PetActionClient) Pet(ctx context.Context, options *PetActionClientPetOptions) (PetActionClientPetResponse, error) {}
+
+// generated options.go
+type FoodClientFeedOptions struct {}
+type PetActionClientPetOptions struct {}
+
+// generated response.go
+type FoodClientFeedResponse struct {}
+type PetActionClientPetResponse struct {}
+
+// Usage Sample
+foodClient := NewFoodClient()
+foodClient.Feed(context.Background(), &FoodClientFeedOptions{})
+petClient := NewPetActionClient()
+petClient.Pet(context.Background(), &PetActionClientPetOptions{})
 ```
 
 </ClientTabs>
@@ -1369,6 +1762,34 @@ client.upload()
 client.download()
 ```
 
+```go
+// generated storage_client.go
+type StorageClient struct {}
+
+func NewStorageClient() *NewStorageClient{
+  return &NewStorageClient{}
+}
+
+func (client *StorageClient) Download(ctx context.Context, options *StorageClientDownloadOptions) (StorageClientDownloadResponse, error) {}
+
+func (client *StorageClient) Upload(ctx context.Context, options *StorageClientUploadOptions) (StorageClientUploadResponse, error) {}
+
+// generated options.go
+type StorageClientDownloadOptions struct {}
+type StorageClientUploadOptions struct {}
+
+// generated response.go
+type StorageClientDownloadResponse struct {}
+type StorageClientUploadResponse struct {}
+
+
+// Usage Sample
+client := NewStorageClient()
+client.Download(context.Background(), &StorageClientDownloadOptions{})
+client.Upload(context.Background(), &StorageClientUploadOptions{})
+
+```
+
 </ClientTabs>
 
 If you want to rename the parameter name that you elevate to the client level, you can use the `@paramAlias` decorator.
@@ -1480,6 +1901,36 @@ client.upload()
 client.download()
 ```
 
+```go
+// generated storage_client.go
+type StorageClient struct {}
+
+func NewStorageClient(internal *azcore.Client, endpoint string, blobName string) *NewStorageClient{
+  return &NewStorageClient{
+    internal: internal,
+    endpoint: endpoint,
+    blobName: blobName
+  }
+}
+
+func (client *StorageClient) Upload(ctx context.Context, options *StorageClientUploadOptions) (StorageClientUploadResponse, error) {}
+
+func (client *StorageClient) Download(ctx context.Context, options *StorageClientDownloadOptions) (StorageClientDownloadResponse, error) {}
+
+// generated options.go
+type StorageClientDownloadOptions struct {}
+type StorageClientUploadOptions struct {}
+
+// generated response.go
+type StorageClientDownloadResponse struct {}
+type StorageClientUploadResponse struct {}
+
+// Usage Sample
+client := NewStorageClient(nil,"<my-endpoint>","myBlobName")
+client.Upload(context.Background(), &StorageClientUploadOptions{})
+client.Download(context.Background(), &StorageClientDownloadOptions{})
+```
+
 </ClientTabs>
 
 ### Change Operation Group Initialization Way
@@ -1526,11 +1977,228 @@ NOT_SUPPORTED
 ```
 
 ```typescript
-// TODO
+export class StorageClient {
+  download(
+    blobName: string,
+    options: DownloadOptionalParams = { requestOptions: {} },
+  ): Promise<void>;
+}
+
+const client = new StorageClient();
+client.download("blobName");
 ```
 
 ```java
 // TODO
+```
+
+```go
+// NOT_SUPPORTED
+```
+
+</ClientTabs>
+
+### One Client from Multiple Services
+
+You could define a single client that combines operations from multiple services. This is useful when you want to provide a unified client experience for related services that share a common endpoint, but require different versioning.
+
+1. **Service Array**: Set all the services that you want to merge in to the `@client` decorator's `service` property (e.g., `service: [ServiceA, ServiceB]`).
+
+2. **Version Dependencies**: If you want to specify each service's API version used in the single client, you could use `@useDependency` to declare which version of each service the client supports. Otherwise, the latest version of each service will be used by default.
+
+3. **Operation Group Structure**: Operations and operation groups will be auto merged into the single client (based on operation, interfaces or namespaces from the original services).
+
+4. **Operation Group Merging**: If multiple services have nested namespaces or interfaces with the same name, TCGC will automatically merge them into a single operation group. The merged operation group will have empty `apiVersions` and a `string` type for the API version parameter, and will contain operations from all the services.
+
+5. **@clientLocation with Multiple Services**: You can use `@clientLocation` to move operations from different services to the same operation group. The resulting operation group will have empty `apiVersions` and a `string` type for the API version parameter, allowing it to handle operations with different API versions.
+
+:::caution
+All services being merged must share the same endpoint and authentication method. If not, you will get diagnostics error.
+TCGC automatically merges operation groups with the same name, but you still need to ensure that there are no naming conflicts between models, enums, and other types in the services being merged. If there are conflicts, you may need to rename the types in the original services to avoid collisions.
+:::
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+@service
+@versioned(VersionsA)
+namespace ServiceA {
+  enum VersionsA {
+    av1,
+    av2,
+  }
+  interface AI {
+    @route("/aTest")
+    aTest(@query("api-version") apiVersion: VersionsA): void;
+  }
+}
+
+@service
+@versioned(VersionsB)
+namespace ServiceB {
+  enum VersionsB {
+    bv1,
+    bv2,
+  }
+  interface BI {
+    @route("/bTest")
+    bTest(@query("api-version") apiVersion: VersionsB): void;
+  }
+}
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+
+using Azure.ClientGenerator.Core;
+
+@client({
+  name: "CombineClient",
+  service: [ServiceA, ServiceB],
+})
+@useDependency(ServiceA.VersionsA.av1, ServiceB.VersionsB.bv2)
+namespace CombineClient;
+```
+
+```python
+# generated _client.py
+class CombineClient:
+    def __init__(self, endpoint: str, **kwargs: Any) -> None:
+      self.ai = AIOperations(endpoint=endpoint, **kwargs)
+      self.bi = BIOperations(endpoint=endpoint, **kwargs)
+
+# generated operations/_operations.py
+class AIOperations:
+    def __init__(self, client, api_version: str = "av1") -> None: ...
+
+    @distributed_trace
+    def a_test(self, **kwargs: Any) -> None: ...
+
+class BIOperations:
+    def __init__(self, client, api_version: str = "bv2") -> None: ...
+
+    @distributed_trace
+    def b_test(self, **kwargs: Any) -> None: ...
+
+# usage sample
+from combine_client import CombineClient
+
+client = CombineClient(endpoint="<my-endpoint>")
+client.ai.a_test()  # uses api-version av1
+client.bi.b_test()  # uses api-version bv2
+```
+
+```csharp
+using CombineClient;
+
+// The combined client with operation groups for each service
+CombineClient client = new CombineClient(new Uri("<my-endpoint>"));
+
+// AI operations use ServiceA's api-version (av1)
+client.GetAIClient().ATest();
+
+// BI operations use ServiceB's api-version (bv2)
+client.GetBIClient().BTest();
+```
+
+```typescript
+import { CombineClient } from "@azure/package-name";
+
+const client = new CombineClient("<my-endpoint>");
+
+// AI operations use ServiceA's api-version (av1)
+client.ai.aTest();
+
+// BI operations use ServiceB's api-version (bv2)
+client.bi.bTest();
+```
+
+```java
+// Client builder class
+package combineclient;
+
+@ServiceClientBuilder(
+    serviceClients = {
+        AIClient.class,
+        BIClient.class,
+        AIAsyncClient.class,
+        BIAsyncClient.class })
+public final class CombineClientBuilder implements HttpTrait<CombineClientBuilder>,
+    ConfigurationTrait<CombineClientBuilder>, EndpointTrait<CombineClientBuilder> {
+
+    public CombineClientBuilder();
+
+    public AIClient buildAIClient();
+    public BIClient buildBIClient();
+}
+
+// Client classes
+@ServiceClient(builder = CombineClientBuilder.class)
+public final class AIClient {
+    // Uses ServiceA's api-version (av1)
+    public void aTest();
+}
+
+@ServiceClient(builder = CombineClientBuilder.class)
+public final class BIClient {
+    // Uses ServiceB's api-version (bv2)
+    public void bTest();
+}
+
+// Usage
+CombineClientBuilder builder = new CombineClientBuilder()
+    .endpoint("<my-endpoint>");
+
+AIClient aiClient = builder.buildAIClient();
+aiClient.aTest();  // uses api-version av1
+
+BIClient biClient = builder.buildBIClient();
+biClient.bTest();  // uses api-version bv2
+```
+
+```go
+// generated combine_client.go
+type CombineClient struct {}
+
+func NewCombineClient(endpoint string) *CombineClient {
+    return &CombineClient{}
+}
+
+func (client *CombineClient) NewAIClient() *AIClient {
+    return &AIClient{}
+}
+
+func (client *CombineClient) NewBIClient() *BIClient {
+    return &BIClient{}
+}
+
+// generated ai_client.go
+type AIClient struct {}
+
+// Uses ServiceA's api-version (av1)
+func (client *AIClient) ATest(ctx context.Context, options *AIClientATestOptions) (AIClientATestResponse, error) {}
+
+// generated bi_client.go
+type BIClient struct {}
+
+// Uses ServiceB's api-version (bv2)
+func (client *BIClient) BTest(ctx context.Context, options *BIClientBTestOptions) (BIClientBTestResponse, error) {}
+
+// generated options.go
+type AIClientATestOptions struct {}
+type BIClientBTestOptions struct {}
+
+// generated response.go
+type AIClientATestResponse struct {}
+type BIClientBTestResponse struct {}
+
+// Usage Sample
+combineClient := NewCombineClient("<my-endpoint>")
+aiClient := combineClient.NewAIClient()
+aiClient.ATest(context.Background(), &AIClientATestOptions{})  // uses api-version av1
+biClient := combineClient.NewBIClient()
+biClient.BTest(context.Background(), &BIClientBTestOptions{})  // uses api-version bv2
 ```
 
 </ClientTabs>

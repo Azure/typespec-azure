@@ -1,5 +1,141 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.37
+
+### Features
+
+- [#3791](https://github.com/Azure/typespec-azure/pull/3791) Add exportArray LRO operation test with array response using ArmProviderActionAsync
+
+### Bug Fixes
+
+- [#3697](https://github.com/Azure/typespec-azure/pull/3697) add nested test cases for client-initialization
+
+
+## 0.1.0-alpha.36
+
+### Bug Fixes
+
+- [#3770](https://github.com/Azure/typespec-azure/pull/3770) Fix missing api-version in nextLink of lropaging test scenario.
+
+
+## 0.1.0-alpha.35
+
+### Features
+
+- [#3635](https://github.com/Azure/typespec-azure/pull/3635) Add test cases for `@clientDefaultValue` decorator.
+- [#3713](https://github.com/Azure/typespec-azure/pull/3713) Add multi-service test scenarios for older API versions and shared models.
+- [#3695](https://github.com/Azure/typespec-azure/pull/3695) Add Spector tests for pageable long-running operations (LROs)
+- [#3663](https://github.com/Azure/typespec-azure/pull/3663) Add test case for @clientDefaultValue on header parameters
+
+### Bump dependencies
+
+- [#3677](https://github.com/Azure/typespec-azure/pull/3677) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3642](https://github.com/Azure/typespec-azure/pull/3642) update client generator namespace for python
+- [#3582](https://github.com/Azure/typespec-azure/pull/3582) update tests for client-location
+
+
+## 0.1.0-alpha.34
+
+### Features
+
+- [#3609](https://github.com/Azure/typespec-azure/pull/3609) Add data plane test for combined multi service.
+- [#3618](https://github.com/Azure/typespec-azure/pull/3618) Add ARM multiple services test case.
+
+
+## 0.1.0-alpha.33
+
+### Bump dependencies
+
+- [#3546](https://github.com/Azure/typespec-azure/pull/3546) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3517](https://github.com/Azure/typespec-azure/pull/3517) Fix /azure/resource-manager/operation-templates createOrReplace LRO to return the final result as per spec (changed to spread instead of enveloped, HTTP 201 for the first response and 200 for subsequent).
+- [#3598](https://github.com/Azure/typespec-azure/pull/3598) Fix client-initialization scenario namespace from `ClientGeneratorCore` to `ClientGenerator.Core` to align with dashboard hierarchy.
+
+
+## 0.1.0-alpha.32
+
+### Features
+
+- [#3458](https://github.com/Azure/typespec-azure/pull/3458) Add spector test for `@nextLinkVerb` decorator
+
+### Bump dependencies
+
+- [#3447](https://github.com/Azure/typespec-azure/pull/3447) Upgrade dependencies october 2025
+
+### Bug Fixes
+
+- [#3428](https://github.com/Azure/typespec-azure/pull/3428) Fix URI inconsistency in alternate-type mockapi.ts to match main.tsp definition
+- [#3424](https://github.com/Azure/typespec-azure/pull/3424) Bug fix for Arm ExtensionResource test case
+- [#3350](https://github.com/Azure/typespec-azure/pull/3350) Remove unused openapi using
+
+
+## 0.1.0-alpha.31
+
+### Bug Fixes
+
+- [#3380](https://github.com/Azure/typespec-azure/pull/3380) Fix missing ApiVersionParameter in PreviewVersion test.
+
+
+## 0.1.0-alpha.30
+
+### Features
+
+- [#3255](https://github.com/Azure/typespec-azure/pull/3255) Add spector test cases for @previewVersion decorator
+- [#3273](https://github.com/Azure/typespec-azure/pull/3273) Add "optional parameter be required in client" and "optional parameter not included in client" test case for `@override` decorator
+- [#3306](https://github.com/Azure/typespec-azure/pull/3306) Add test for external types used in `@alternateType`
+
+### Bug Fixes
+
+- [#3345](https://github.com/Azure/typespec-azure/pull/3345) Fix client.tsp of client-operation-group for python
+- [#3301](https://github.com/Azure/typespec-azure/pull/3301) Consistency for java namespace
+- [#3258](https://github.com/Azure/typespec-azure/pull/3258) Fix missing decorator for the test case of moving method parameter to client.
+
+
+## 0.1.0-alpha.29
+
+### Features
+
+- [#3291](https://github.com/Azure/typespec-azure/pull/3291) Add spector test cases for @previewVersion decorator
+
+### Bug Fixes
+
+- [#3291](https://github.com/Azure/typespec-azure/pull/3291) Fix missing decorator for the test case of moving method parameter to client.
+
+
+## 0.1.0-alpha.28
+
+### Features
+
+- [#3187](https://github.com/Azure/typespec-azure/pull/3187) Add tests for `@clientLocation`'s new usage to move parameter location.
+
+### Bump dependencies
+
+- [#3207](https://github.com/Azure/typespec-azure/pull/3207) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3202](https://github.com/Azure/typespec-azure/pull/3202) Switch to the `@flattenProperty` decorator from the `Azure.ClientGenerator.Core.Legacy` namespace
+
+
+## 0.1.0-alpha.27
+
+### Bug Fixes
+
+- [#3163](https://github.com/Azure/typespec-azure/pull/3163) Avoid conflict in namespace/model names
+
+
+## 0.1.0-alpha.26
+
+### Bug Fixes
+
+- [#3131](https://github.com/Azure/typespec-azure/pull/3131) Update test case for multi layter discriminator
+
+
 ## 0.1.0-alpha.25
 
 ### Deprecations

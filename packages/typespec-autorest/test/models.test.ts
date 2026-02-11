@@ -22,6 +22,25 @@ describe("typespec-autorest: model definitions", () => {
     });
   });
 
+  it("allows secrets on models", async () => {
+    const res = await oapiForModel(
+      "Foo",
+      `@secret
+       model Foo {
+        x: int32;
+      };`,
+    );
+
+    deepStrictEqual(res.defs.Foo, {
+      type: "object",
+      properties: {
+        x: { type: "integer", format: "int32" },
+      },
+      required: ["x"],
+      "x-ms-secret": true,
+    });
+  });
+
   it("change definition name with @clientName", async () => {
     const res = await compileOpenAPI(`@clientName("ClientFoo") model Foo {};`, { preset: "azure" });
     expect(res.definitions).toHaveProperty("ClientFoo");
@@ -163,29 +182,6 @@ describe("typespec-autorest: model definitions", () => {
       type: "object",
       properties: { y: { type: "integer", format: "int32" } },
       required: ["y"],
-    });
-  });
-
-  it("specify default value on nullable property", async () => {
-    const res = await oapiForModel(
-      "Foo",
-      `
-      model Foo {
-        optional?: string | null = null;
-      };
-      `,
-    );
-
-    ok(res.defs.Foo, "expected definition named Foo");
-    deepStrictEqual(res.defs.Foo, {
-      type: "object",
-      properties: {
-        optional: {
-          type: "string",
-          "x-nullable": true,
-          default: null,
-        },
-      },
     });
   });
 
@@ -554,178 +550,6 @@ describe("typespec-autorest: model definitions", () => {
     ok(res.isRef);
     ok(res.defs.Pet, "expected definition named Pet");
     deepStrictEqual(res.defs.Pet.properties.someString.default, "withDefault");
-  });
-
-  describe("nullable", () => {
-    it("defines nullable properties", async () => {
-      const res = await oapiForModel(
-        "Pet",
-        `
-      model Pet {
-        name: string | null;
-      };
-      `,
-      );
-      ok(res.isRef);
-      deepStrictEqual(res.defs.Pet, {
-        type: "object",
-        properties: {
-          name: {
-            type: "string",
-            "x-nullable": true,
-          },
-        },
-        required: ["name"],
-      });
-    });
-
-    it("defines nullable array", async () => {
-      const res = await oapiForModel(
-        "Pet",
-        `
-      model Pet {
-        name: int32[] | null;
-      };
-      `,
-      );
-      ok(res.isRef);
-      deepStrictEqual(res.defs.Pet, {
-        type: "object",
-        properties: {
-          name: {
-            type: "array",
-            items: {
-              type: "integer",
-              format: "int32",
-            },
-            "x-nullable": true,
-          },
-        },
-        required: ["name"],
-      });
-    });
-
-    it("defines nullable enum", async () => {
-      const res = await oapiForModel(
-        "Pet",
-        `
-      enum PetKind { dog, cat }
-      model Pet {
-        kind: PetKind | null;
-      };
-      `,
-      );
-      ok(res.isRef);
-      deepStrictEqual(res.defs.Pet, {
-        type: "object",
-        properties: {
-          kind: {
-            $ref: "#/definitions/PetKind",
-            "x-nullable": true,
-          },
-        },
-        required: ["kind"],
-      });
-      deepStrictEqual(res.defs.PetKind, {
-        type: "string",
-        enum: ["dog", "cat"],
-        "x-ms-enum": {
-          modelAsString: false,
-          name: "PetKind",
-        },
-      });
-    });
-
-    it("defines nullable union", async () => {
-      const res = await oapiForModel(
-        "Pet",
-        `
-      union PetKind { "dog", "cat" }
-      model Pet {
-        kind: PetKind | null;
-      };
-      `,
-      );
-      ok(res.isRef);
-      deepStrictEqual(res.defs.Pet, {
-        type: "object",
-        properties: {
-          kind: {
-            $ref: "#/definitions/PetKind",
-            "x-nullable": true,
-          },
-        },
-        required: ["kind"],
-      });
-      deepStrictEqual(res.defs.PetKind, {
-        type: "string",
-        enum: ["dog", "cat"],
-        "x-ms-enum": {
-          modelAsString: false,
-          name: "PetKind",
-        },
-      });
-    });
-
-    it("defines nullable model", async () => {
-      const res = await compileOpenAPI(
-        `
-        model Pet {
-          name: string;
-        }
-  
-        model Dog {
-          type: Pet | null;
-        }
-        `,
-      );
-      deepStrictEqual(res.definitions?.Dog.properties?.type, {
-        $ref: "#/definitions/Pet",
-        "x-nullable": true,
-      });
-    });
-
-    it("defines nullable record", async () => {
-      const res = await compileOpenAPI(
-        `
-        model Pet {
-          name: string;
-        }
-  
-        model Dog {
-          record: Record<Pet | null>;
-        }
-        `,
-      );
-      deepStrictEqual(res.definitions?.Dog.properties?.record, {
-        additionalProperties: {
-          $ref: "#/definitions/Pet",
-          "x-nullable": true,
-        },
-        type: "object",
-      });
-    });
-
-    it("defines nullable Array", async () => {
-      const res = await compileOpenAPI(
-        `
-        model Pet {
-          name: string;
-        }
-  
-        model Dog {
-         arrayProp: Array<Pet | null>;
-        }
-        `,
-      );
-      deepStrictEqual(res.definitions?.Dog.properties?.arrayProp, {
-        items: {
-          $ref: "#/definitions/Pet",
-          "x-nullable": true,
-        },
-        type: "array",
-      });
-    });
   });
 
   it("recovers logical type name", async () => {

@@ -18,7 +18,6 @@ namespace Microsoft.ContosoProviderHub;
 /** Contoso API versions */
 enum Versions {
   /** 2021-10-01-preview version */
-  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   `2021-10-01-preview`,
 }
@@ -67,6 +66,10 @@ union ProvisioningState {
 
 interface Operations extends Azure.ResourceManager.Operations {}
 
+/** Defines all the operations for an employee resource
+ * Scope parameter allows the same set of operations to be defined for
+ * different scopes (tenant, subscription, resource group, resource, managementGroup, etc.)
+ */
 interface EmplOps<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
   get is Extension.Read<Scope, Employee>;
 
@@ -106,20 +109,68 @@ alias VirtualMachineScaleSetVm = Extension.ExternalChildResource<
   Description = "The name of the virtual machine scale set VM"
 >;
 
+alias ServiceGroup = Extension.ExternalResource<
+  "Microsoft.Management",
+  "serviceGroups",
+  "serviceGroupName",
+  NamePattern = "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,80}$",
+  Description = "The name of the service fabric cluster",
+  ParentType = "Tenant"
+>;
+
+/**
+ * Operations over any scope
+ * routed at: {scope}/providers/Microsoft.ContosoProviderHub/employees
+ */
 @armResourceOperations
 interface Employees extends EmplOps<Extension.ScopeParameter> {}
+
+/**
+ * Tenant-level operations
+ * routed at: /providers/Microsoft.ContosoProviderHub/employees
+ */
 @armResourceOperations
 interface Tenants extends EmplOps<Extension.Tenant> {}
+
+/**
+ * Subscription-level operations
+ * routed at: /subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderHub/employees
+ */
 @armResourceOperations
 interface Subscriptions extends EmplOps<Extension.Subscription> {}
+
+/**
+ * Resource group-level operations
+ * routed at: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees
+ */
 @armResourceOperations
 interface ResourceGroups extends EmplOps<Extension.ResourceGroup> {}
+
+/**
+ * Management group-level operations
+ * routed at: /providers/Microsoft.Management/managementGroups/{managementGroupId}/providers/Microsoft.ContosoProviderHub/employees
+ */
 @armResourceOperations
 interface ManagementGroups extends EmplOps<Extension.ManagementGroup> {}
 
+/**
+ * Service group level operations
+ * routed at: /providers/Microsoft.Management/serviceGroups/{serviceGroupName}/providers/Microsoft.ContosoProviderHub/employees
+ */
+@armResourceOperations
+interface ServiceGroups extends EmplOps<ServiceGroup> {}
+
+/**
+ * Operations over virtual machines
+ * routed at: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.ContosoProviderHub/employees
+ */
 @armResourceOperations
 interface VirtualMachines extends EmplOps<VirtualMachine> {}
 
+/**
+ * Operations over scale set VMs
+ * routed at: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{scaleSetName}/virtualMachineScaleSetVms/{scaleSetVmName}/providers/Microsoft.ContosoProviderHub/employees
+ */
 @armResourceOperations
 interface ScaleSetVms extends EmplOps<VirtualMachineScaleSetVm> {}
 
@@ -178,6 +229,10 @@ interface GenericOps
       }
     > {}
 
+/**
+ * Generic Resource Operations
+ * routed at /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{providerNamespace}/{parentType}/{parentName}/{resourceType}/{resourceName}/providers/Microsoft.ContosoProviderHub/employees
+ */
 @armResourceOperations
 interface GenericResources {
   get is GenericOps.Read<Employee>;

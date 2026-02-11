@@ -1,9 +1,9 @@
 import { deepStrictEqual } from "assert";
 import { it } from "vitest";
-import { openApiFor } from "./test-host.js";
+import { compileMultipleOpenAPI } from "./test-host.js";
 
 it("supports emitting multiple services", async () => {
-  const { Service, Client } = await openApiFor(
+  const { Service, Client } = await compileMultipleOpenAPI(
     `
       @service(#{ title: "My service" })
       namespace Service {
@@ -15,7 +15,7 @@ it("supports emitting multiple services", async () => {
         @route("other") op other(): string;
       }
       `,
-    ["Service", "Client"],
+    { Service: "Service/openapi.json", Client: "Client/openapi.json" },
   );
 
   deepStrictEqual(Service.paths, {

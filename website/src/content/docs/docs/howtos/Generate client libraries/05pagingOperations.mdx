@@ -1,5 +1,6 @@
 ---
 title: Paging Operations
+llmstxt: true
 ---
 
 import { ClientTabs, ClientTabItem } from "@components/client-tabs";
@@ -14,21 +15,20 @@ Next link should be annotated in the response model with `@nextLink`.
 
 There are two ways to indicate a paging operation with `@nextLink`:
 
-1. Use `@pagedResult` and `@items` in `Azure.Core` lib.
+1. Use `@list`, `@nextLink` and `@items`
 
 <ClientTabs>
 
 ```typespec
-op listWithPage(): UserList;
+@list op listWithPage(): UserList;
 
 model User {
   id: string;
   name: string;
 }
 
-@pagedResult
 model UserList {
-  @items
+  @pageItems
   value: User[];
 
   @nextLink
@@ -50,11 +50,38 @@ public virtual Pageable<User> ListWithPage(CancellationToken cancellationToken =
 ```
 
 ```typescript
-// TODO
+export interface ListWithPageOptionalParams extends OperationOptions {}
+// JS CodeGen api layer
+export function listWithPage(
+  context: Client,
+  options: ListWithPageOptionalParams = { requestOptions: {} },
+): PagedAsyncIterableIterator<User>;
+
+// JS CodeGen classical client layer
+export class TestServiceClient {
+  listWithPage(
+    options: ListWithPageOptionalParams = { requestOptions: {} },
+  ): PagedAsyncIterableIterator<User>;
+}
 ```
 
 ```java
 public PagedIterable<User> listWithPage();
+```
+
+```go
+type User struct {
+  ID   string `json:"id"`
+  Name string `json:"name"`
+}
+
+type UserList struct {
+  Value    []User
+  NextLink *string
+}
+
+func (c *Client) ListWithPage(ctx context.Context) (UserList, error)
+
 ```
 
 </ClientTabs>
@@ -95,11 +122,37 @@ public virtual Pageable<User> ListWithPage(CancellationToken cancellationToken =
 ```
 
 ```typescript
-// TODO
+// JS CodeGen api layer
+export function listWithPage(
+  context: Client,
+  options: ListWithPageOptionalParams = { requestOptions: {} },
+): PagedAsyncIterableIterator<User>;
+
+// JS CodeGen classical client layer
+export class TestServiceClient {
+  listWithPage(
+    options: ListWithPageOptionalParams = { requestOptions: {} },
+  ): PagedAsyncIterableIterator<User>;
+}
 ```
 
 ```java
 public PagedIterable<User> listWithPage();
+```
+
+```go
+type User struct {
+  ID   string
+  Name string
+}
+
+type UserList struct {
+  Value    []User
+  NextLink *string
+}
+
+func (c *Client) ListWithPage(ctx context.Context) (UserList, error)
+
 ```
 
 </ClientTabs>
@@ -146,11 +199,26 @@ def list_with_page(self, **kwargs: Any) -> ItemPaged["_models.User"]:
 ```
 
 ```typescript
-// TODO
+// JS CodeGen api layer
+export function listWithPage(
+  context: Client,
+  options: ListWithPageOptionalParams = { requestOptions: {} },
+): PagedAsyncIterableIterator<User>;
+
+// JS CodeGen classical client layer
+export class TestServiceClient {
+  listWithPage(
+    options: ListWithPageOptionalParams = { requestOptions: {} },
+  ): PagedAsyncIterableIterator<User>;
+}
 ```
 
 ```java
 NOT_SUPPORTED
+```
+
+```go
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>
@@ -191,11 +259,26 @@ def list_with_page(self, **kwargs: Any) -> ItemPaged["_models.User"]:
 ```
 
 ```typescript
-// TODO
+// JS CodeGen api layer
+export function listWithPage(
+  context: Client,
+  options: ListWithPageOptionalParams = { requestOptions: {} },
+): PagedAsyncIterableIterator<User>;
+
+// JS CodeGen classical client layer
+export class TestServiceClient {
+  listWithPage(
+    options: ListWithPageOptionalParams = { requestOptions: {} },
+  ): PagedAsyncIterableIterator<User>;
+}
 ```
 
 ```java
 NOT_SUPPORTED
+```
+
+```go
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>
@@ -235,11 +318,26 @@ def list_with_page(self, **kwargs: Any) -> ItemPaged["_models.User"]:
 ```
 
 ```typescript
-// TODO
+// JS CodeGen api layer
+export function listWithPage(
+  context: Client,
+  options: ListWithPageOptionalParams = { requestOptions: {} },
+): PagedAsyncIterableIterator<User>;
+
+// JS CodeGen classical client layer
+export class TestServiceClient {
+  listWithPage(
+    options: ListWithPageOptionalParams = { requestOptions: {} },
+  ): PagedAsyncIterableIterator<User>;
+}
 ```
 
 ```java
 NOT_SUPPORTED
+```
+
+```go
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>
@@ -279,11 +377,26 @@ def list_with_page(self, **kwargs: Any) -> ItemPaged["_models.User"]:
 ```
 
 ```typescript
-// TODO
+// JS CodeGen api layer
+export function listWithPage(
+  context: Client,
+  options: ListWithPageOptionalParams = { requestOptions: {} },
+): PagedAsyncIterableIterator<User>;
+
+// JS CodeGen classical client layer
+export class TestServiceClient {
+  listWithPage(
+    options: ListWithPageOptionalParams = { requestOptions: {} },
+  ): PagedAsyncIterableIterator<User>;
+}
 ```
 
 ```java
 NOT_SUPPORTED
+```
+
+```go
+// NOT_SUPPORTED
 ```
 
 </ClientTabs>
@@ -308,7 +421,7 @@ model Certificate {
   name: string;
 }
 model Page {
-  @items items: Certificate[];
+  @pageItems items: Certificate[];
   @nextLink nextLink: Azure.Core.Legacy.parameterizedNextLink<[
     ListCertificateOptions.includePending
   ]>;

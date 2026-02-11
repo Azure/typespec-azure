@@ -1,5 +1,57 @@
 # Changelog - @azure-tools/typespec-azure-rulesets
 
+## 0.65.0
+
+No changes, version bump only.
+
+## 0.64.0
+
+### Bump dependencies
+
+- [#3677](https://github.com/Azure/typespec-azure/pull/3677) Upgrade dependencies
+
+
+## 0.63.0
+
+### Features
+
+- [#3475](https://github.com/Azure/typespec-azure/pull/3475) Add new `no-case-mismatch` rule checking for types with names only differing by case
+
+### Bump dependencies
+
+- [#3546](https://github.com/Azure/typespec-azure/pull/3546) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3483](https://github.com/Azure/typespec-azure/pull/3483) Add new `no-unnamed-union` rule to prevent usage of unnamed unions in Azure
+
+
+## 0.62.0
+
+### Features
+
+- [#3411](https://github.com/Azure/typespec-azure/pull/3411) Add `@azure-tools/typespec-azure-resource-manager/secret-prop` rule to `resource-manager` ruleset
+
+### Bump dependencies
+
+- [#3447](https://github.com/Azure/typespec-azure/pull/3447) Upgrade dependencies october 2025
+
+### Bug Fixes
+
+- [#3350](https://github.com/Azure/typespec-azure/pull/3350) Disable `retry-after` rule in arm ruleset which was a noop
+
+
+## 0.61.0
+
+No changes, version bump only.
+
+## 0.60.0
+
+### Bump dependencies
+
+- [#3207](https://github.com/Azure/typespec-azure/pull/3207) Upgrade dependencies
+
+
 ## 0.59.0
 
 ### Bump dependencies

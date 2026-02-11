@@ -1,17 +1,18 @@
+import { Tester } from "#test/tester.js";
 import {
-  BasicTestRunner,
   LinterRuleTester,
+  TesterInstance,
   createLinterRuleTester,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
-import { lroLocationHeaderRule } from "../../src/rules/lro-location-header.js";
-import { createAzureResourceManagerTestRunner } from "../test-host.js";
 
-let runner: BasicTestRunner;
+import { lroLocationHeaderRule } from "../../src/rules/lro-location-header.js";
+
+let runner: TesterInstance;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await createAzureResourceManagerTestRunner();
+  runner = await Tester.createInstance();
   tester = createLinterRuleTester(
     runner,
     lroLocationHeaderRule,
@@ -24,10 +25,8 @@ it("Emits a warning for LRO 202 response that does not contain a Location header
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       model Employee is ProxyResource<EmployeeProperties> {
-        @doc("Name of employee")
         @pattern("^[a-zA-Z0-9-]{3,24}$")
         @key("employeeName")
         @path
@@ -53,10 +52,8 @@ it("Emits a warning for custom 202 response that does not contain a Location hea
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       model Employee is ProxyResource<EmployeeProperties> {
-        @doc("Name of employee")
         @pattern("^[a-zA-Z0-9-]{3,24}$")
         @key("employeeName")
         @path
@@ -81,10 +78,8 @@ it("Does not emit a warning for LRO 202 response that contains the Location resp
     .expect(
       `
       @armProviderNamespace
-      @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
       namespace Microsoft.Contoso;
       model Employee is ProxyResource<EmployeeProperties> {
-        @doc("Name of employee")
         @pattern("^[a-zA-Z0-9-]{3,24}$")
         @key("employeeName")
         @path

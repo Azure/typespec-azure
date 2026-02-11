@@ -1,18 +1,13 @@
-import {
-  BasicTestRunner,
-  LinterRuleTester,
-  createLinterRuleTester,
-} from "@typespec/compiler/testing";
+import { Tester } from "#test/test-host.js";
+import { LinterRuleTester, createLinterRuleTester } from "@typespec/compiler/testing";
 import { beforeEach, describe, it } from "vitest";
 import { noClosedLiteralUnionRule } from "../../src/rules/no-closed-literal-union.js";
-import { createAzureCoreTestRunner } from "../test-host.js";
 
 describe("typespec-azure-core: no-closed-literal-union rule", () => {
-  let runner: BasicTestRunner;
   let tester: LinterRuleTester;
 
   beforeEach(async () => {
-    runner = await createAzureCoreTestRunner();
+    const runner = await Tester.createInstance();
     tester = createLinterRuleTester(
       runner,
       noClosedLiteralUnionRule,

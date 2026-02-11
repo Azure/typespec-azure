@@ -23,6 +23,7 @@ import { getVersioningMutators } from "@typespec/versioning";
 import { AutorestEmitterOptions, getTracer, reportDiagnostic } from "./lib.js";
 import {
   AutorestDocumentEmitterOptions,
+  createDocumentProxy,
   getOpenAPIForService,
   sortOpenAPIDocument,
 } from "./openapi.js";
@@ -51,10 +52,10 @@ interface ResolvedAutorestEmitterOptions extends AutorestDocumentEmitterOptions 
 }
 
 const defaultOptions = {
-  "output-file":
-    "{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json",
+  "output-file": "{emitter-output-dir}/{service-name}/{version-status}/{version}/openapi.json",
   "new-line": "lf",
   "include-x-typespec-name": "never",
+  "xml-strategy": "xml-service",
 } as const;
 
 export async function $onEmit(context: EmitContext<AutorestEmitterOptions>) {
@@ -99,6 +100,7 @@ export function resolveAutorestOptions(
   return {
     outputFile: resolvedOptions["output-file"],
     outputDir: emitterOutputDir,
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     azureResourceProviderFolder: resolvedOptions["azure-resource-provider-folder"],
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     examplesDirectory: resolvedOptions["examples-dir"] ?? resolvedOptions["examples-directory"],
@@ -110,8 +112,29 @@ export function resolveAutorestOptions(
     armTypesDir,
     useReadOnlyStatusSchema: resolvedOptions["use-read-only-status-schema"],
     emitLroOptions: resolvedOptions["emit-lro-options"],
-    armResourceFlattening: resolvedOptions["arm-resource-flattening"],
     emitCommonTypesSchema: resolvedOptions["emit-common-types-schema"],
+    xmlStrategy: resolvedOptions["xml-strategy"],
+    outputSplitting: resolvedOptions["output-splitting"],
+  };
+}
+
+function getEmitterContext(
+  program: Program,
+  service: Service,
+  options: ResolvedAutorestEmitterOptions,
+  multiService: boolean = false,
+  version?: string,
+): AutorestEmitterContext {
+  const tcgcSdkContext = createTCGCContext(program, "@azure-tools/typespec-autorest");
+  tcgcSdkContext.enableLegacyHierarchyBuilding = true;
+  return {
+    program,
+    outputFile: resolveOutputFile(program, service, multiService, options, version),
+    service: service,
+    tcgcSdkContext,
+    proxy: createDocumentProxy(program, service, options, version),
+    version: version,
+    multiService: multiService,
   };
 }
 
@@ -119,9 +142,6 @@ export async function getAllServicesAtAllVersions(
   program: Program,
   options: ResolvedAutorestEmitterOptions,
 ): Promise<AutorestServiceRecord[]> {
-  const tcgcSdkContext = createTCGCContext(program, "@azure-tools/typespec-autorest");
-  tcgcSdkContext.enableLegacyHierarchyBuilding = true;
-
   const services = listServices(program);
   if (services.length === 0) {
     services.push({ type: program.getGlobalNamespaceType() });
@@ -132,33 +152,60 @@ export async function getAllServicesAtAllVersions(
     const versions = getVersioningMutators(program, service.type);
 
     if (versions === undefined) {
-      const context: AutorestEmitterContext = {
+      const context: AutorestEmitterContext = getEmitterContext(
         program,
-        outputFile: resolveOutputFile(program, service, services.length > 1, options),
-        service: service,
-        tcgcSdkContext,
-      };
-
-      const result = await getOpenAPIForService(context, options);
-      serviceRecords.push({
         service,
-        versioned: false,
-        ...result,
-      });
+        options,
+        services.length > 1,
+      );
+
+      const results = await getOpenAPIForService(context, options);
+      for (const result of results) {
+        const newResult = { ...result };
+        newResult.outputFile = resolveOutputFile(
+          program,
+          service,
+          services.length > 1,
+          options,
+          undefined,
+          result.feature,
+        );
+        serviceRecords.push({
+          service,
+          versioned: false,
+          ...newResult,
+        });
+      }
     } else if (versions.kind === "transient") {
-      const context: AutorestEmitterContext = {
+      const context: AutorestEmitterContext = getEmitterContext(
         program,
-        outputFile: resolveOutputFile(program, service, services.length > 1, options),
-        service: service,
-        tcgcSdkContext,
-      };
-
-      const result = await getVersionSnapshotDocument(context, versions.mutator, options);
-      serviceRecords.push({
         service,
-        versioned: false,
-        ...result,
-      });
+        options,
+        services.length > 1,
+      );
+
+      const results = await getVersionSnapshotDocument(
+        context,
+        versions.mutator,
+        options,
+        services.length > 1,
+      );
+      for (const result of results) {
+        const newResult = { ...result };
+        newResult.outputFile = resolveOutputFile(
+          program,
+          service,
+          services.length > 1,
+          options,
+          undefined,
+          result.feature,
+        );
+        serviceRecords.push({
+          service,
+          versioned: false,
+          ...newResult,
+        });
+      }
     } else {
       const filteredVersions = versions.snapshots.filter(
         (v) => !options.version || options.version === v.version?.value,
@@ -175,26 +222,36 @@ export async function getAllServicesAtAllVersions(
       serviceRecords.push(serviceRecord);
 
       for (const record of filteredVersions) {
-        const context: AutorestEmitterContext = {
+        const context: AutorestEmitterContext = getEmitterContext(
           program,
-          outputFile: resolveOutputFile(
+          service,
+          options,
+          services.length > 1,
+          record.version?.value,
+        );
+
+        const results = await getVersionSnapshotDocument(
+          context,
+          record.mutator,
+          options,
+          services.length > 1,
+        );
+        for (const result of results) {
+          const newResult = { ...result };
+          newResult.outputFile = resolveOutputFile(
             program,
             service,
             services.length > 1,
             options,
-            record.version?.value,
-          ),
-          service,
-          version: record.version?.value,
-          tcgcSdkContext,
-        };
-
-        const result = await getVersionSnapshotDocument(context, record.mutator, options);
-        serviceRecord.versions.push({
-          ...result,
-          service,
-          version: record.version!.value,
-        });
+            record.version!.value,
+            result.feature,
+          );
+          serviceRecord.versions.push({
+            ...newResult,
+            service,
+            version: record.version!.value,
+          });
+        }
       }
     }
   }
@@ -206,6 +263,7 @@ async function getVersionSnapshotDocument(
   context: AutorestEmitterContext,
   mutator: unsafe_MutatorWithNamespace,
   options: ResolvedAutorestEmitterOptions,
+  multiService: boolean = false,
 ) {
   const subgraph = unsafe_mutateSubgraphWithNamespace(
     context.program,
@@ -214,10 +272,15 @@ async function getVersionSnapshotDocument(
   );
 
   compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
-  const document = await getOpenAPIForService(
-    { ...context, service: getService(context.program, subgraph.type)! },
+  const service = getService(context.program, subgraph.type)!;
+  const newContext: AutorestEmitterContext = getEmitterContext(
+    context.program,
+    service,
     options,
+    multiService,
+    context.version,
   );
+  const document = await getOpenAPIForService(newContext, options);
 
   return document;
 }
@@ -246,6 +309,9 @@ async function emitOutput(
   result: AutorestEmitterResult,
   options: ResolvedAutorestEmitterOptions,
 ) {
+  const currentFeature = result.feature;
+  if (currentFeature !== undefined && result.context.proxy !== undefined)
+    result.context.proxy.setCurrentFeature(currentFeature);
   const sortedDocument = sortOpenAPIDocument(result.document);
 
   // Write out the OpenAPI document to the output path
@@ -276,30 +342,26 @@ function prettierOutput(output: string) {
   return output + "\n";
 }
 
-function resolveOutputFile(
+export function resolveOutputFile(
   program: Program,
   service: Service,
   multipleServices: boolean,
   options: ResolvedAutorestEmitterOptions,
   version?: string,
+  feature?: string,
 ): string {
   const azureResourceProviderFolder = options.azureResourceProviderFolder;
-  if (azureResourceProviderFolder) {
-    const info = resolveInfo(program, service.type);
-    version = version ?? info?.version ?? "0000-00-00";
-  }
+  const info = resolveInfo(program, service.type);
+  version = version ?? info?.version;
   const interpolated = interpolatePath(options.outputFile, {
     "azure-resource-provider-folder": azureResourceProviderFolder,
     "service-name":
       multipleServices || azureResourceProviderFolder
         ? getNamespaceFullName(service.type)
         : undefined,
-    "version-status": azureResourceProviderFolder
-      ? version?.includes("preview")
-        ? "preview"
-        : "stable"
-      : undefined,
+    "version-status": version && (version.includes("preview") ? "preview" : "stable"),
     version,
+    feature,
   });
 
   return resolvePath(options.outputDir, interpolated);

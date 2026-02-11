@@ -1,24 +1,22 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
 import { Visibility } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { SdkModelType, UsageFlags } from "../../src/interfaces.js";
 import { isAzureCoreTspModel } from "../../src/internal-utils.js";
 import { isAzureCoreModel } from "../../src/public-utils.js";
 import { getAllModels } from "../../src/types.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-});
+import {
+  AzureCoreTesterWithService,
+  createSdkContextForTester,
+  SimpleTester,
+  SimpleTesterWithService,
+} from "../tester.js";
 
 it("basic", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
-    @test namespace MyService {
+    namespace MyService {
       model InputModel {
         prop: string
       }
@@ -30,16 +28,17 @@ it("basic", async () => {
       op test(@body input: InputModel): OutputModel;
     }
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const modelNames = models.map((model) => model.name).sort();
   deepStrictEqual(modelNames, ["InputModel", "OutputModel"].sort());
 });
 
 it("models in Record", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
-    @test namespace MyService {
+    namespace MyService {
       model InnerModel {
         prop: string
       }
@@ -47,7 +46,8 @@ it("models in Record", async () => {
       op test(@body input: Record<InnerModel>): void;
     }
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const modelNames = models.map((model) => model.name).sort();
   deepStrictEqual(modelNames, ["InnerModel"].sort());
@@ -58,9 +58,9 @@ it("models in Record", async () => {
 });
 
 it("models in Array", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
-    @test namespace MyService {
+    namespace MyService {
       model InnerModel {
         prop: string
       }
@@ -68,7 +68,8 @@ it("models in Array", async () => {
       op test(@body input: InnerModel[]): void;
     }
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const modelNames = models.map((model) => model.name).sort();
   deepStrictEqual(modelNames, ["InnerModel"].sort());
@@ -79,9 +80,9 @@ it("models in Array", async () => {
 });
 
 it("embedded models", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
-    @test namespace MyService {
+    namespace MyService {
       model InnerModel {
         prop: string
       }
@@ -93,7 +94,8 @@ it("embedded models", async () => {
       op test(@body input: InputModel): void;
     }
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const modelNames = models.map((model) => model.name).sort();
   deepStrictEqual(modelNames, ["InputModel", "InnerModel"].sort());
@@ -104,9 +106,9 @@ it("embedded models", async () => {
 });
 
 it("base model", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
-    @test namespace MyService {
+    namespace MyService {
       model BaseModel {
         prop: string
       }
@@ -118,7 +120,8 @@ it("base model", async () => {
       op test(@body input: InputModel): void;
     }
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const modelNames = models.map((model) => model.name).sort();
   deepStrictEqual(modelNames, ["InputModel", "BaseModel"].sort());
@@ -129,7 +132,7 @@ it("base model", async () => {
 });
 
 it("derived model", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model InputModel {
       prop: string
     }
@@ -140,7 +143,8 @@ it("derived model", async () => {
 
     op test(@body input: DerivedModel): void;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const modelNames = models.map((model) => model.name).sort();
   deepStrictEqual(modelNames, ["InputModel", "DerivedModel"].sort());
@@ -151,14 +155,15 @@ it("derived model", async () => {
 });
 
 it("recursive model", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model RecursiveModel {
       prop: RecursiveModel
     }
       
     op test(@body input: RecursiveModel): RecursiveModel;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const recursiveModel = models[0];
   strictEqual(recursiveModel.name, "RecursiveModel");
@@ -175,7 +180,7 @@ it("recursive model", async () => {
 });
 
 it("discriminator model", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @discriminator("kind")
     model Fish {
       age: int32;
@@ -204,7 +209,8 @@ it("discriminator model", async () => {
     @get
     op getModel(): Fish;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 5);
   const fish = models.find((x) => x.name === "Fish");
   ok(fish);
@@ -236,7 +242,7 @@ it("discriminator model", async () => {
 });
 
 it("handle derived model with discriminator first", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Salmon extends Fish {
       kind: "salmon";
       friends?: Fish[];
@@ -252,7 +258,8 @@ it("handle derived model with discriminator first", async () => {
     @get
     op getSalmon(): Salmon;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const fish = models.find((x) => x.name === "Fish");
   ok(fish);
@@ -284,7 +291,7 @@ it("handle derived model with discriminator first", async () => {
 });
 
 it("single discriminated model", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @discriminator("kind")
     model Fish {
       age: int32;
@@ -293,7 +300,8 @@ it("single discriminated model", async () => {
     @get
     op getModel(): Fish;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const fish = models.find((x) => x.name === "Fish");
   ok(fish);
@@ -311,7 +319,7 @@ it("single discriminated model", async () => {
 });
 
 it("enum discriminator model", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     enum DogKind {
       Golden: "golden",
     }
@@ -330,7 +338,8 @@ it("enum discriminator model", async () => {
     @get
     op getExtensibleModel(): Dog;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
 
   const golden = models.find((x) => x.name === "Golden");
@@ -347,8 +356,8 @@ it("enum discriminator model", async () => {
   const dog = models.find((x) => x.name === "Dog");
   ok(dog);
   strictEqual(dog.serializationOptions.json?.name, "Dog");
-  strictEqual(runner.context.sdkPackage.enums.length, 1);
-  const dogKind = runner.context.sdkPackage.enums[0];
+  strictEqual(context.sdkPackage.enums.length, 1);
+  const dogKind = context.sdkPackage.enums[0];
 
   const dogKindProperty = dog.properties.find(
     (x) => x.kind === "property" && x.serializedName === "kind",
@@ -361,7 +370,7 @@ it("enum discriminator model", async () => {
 });
 
 it("anonymous model contains template", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
 
     model Name {
       name: string;
@@ -372,14 +381,15 @@ it("anonymous model contains template", async () => {
 
     op test(): {prop: ModelTemplate<Name>};
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   const modelNames = models.map((model) => model.name).sort();
   deepStrictEqual(modelNames, ["TestResponse", "Name", "ModelTemplateName"].sort());
 });
 
 it("union to extensible enum values", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     union PetKind {
       @doc("Cat")
       Cat: "cat",
@@ -392,8 +402,9 @@ it("union to extensible enum values", async () => {
     @put
     op putPet(@body petKind: PetKind): void;
   `);
-  strictEqual(runner.context.sdkPackage.enums.length, 1);
-  const petKind = runner.context.sdkPackage.enums[0];
+  const context = await createSdkContextForTester(program);
+  strictEqual(context.sdkPackage.enums.length, 1);
+  const petKind = context.sdkPackage.enums[0];
   strictEqual(petKind.name, "PetKind");
   strictEqual(petKind.isFixed, false);
   strictEqual(petKind.valueType.kind, "string");
@@ -421,7 +432,7 @@ it("union to extensible enum values", async () => {
 });
 
 it("template variable of anonymous union", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     interface GetAndSend<Type> {
       get(): {
         prop: Type;
@@ -433,7 +444,8 @@ it("template variable of anonymous union", async () => {
     @route("/string-extensible")
     interface StringExtensible extends GetAndSend<string | "b" | "c"> {}
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 2);
   strictEqual(sdkPackage.enums.length, 1);
   const prop = sdkPackage.enums.find((x) => x.name === "GetResponseProp" && x.isGeneratedName);
@@ -449,7 +461,7 @@ it("template variable of anonymous union", async () => {
 });
 
 it("property of anonymous union as enum", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Pet {
       kind: string | "cat" | "dog";
     }
@@ -458,11 +470,12 @@ it("property of anonymous union as enum", async () => {
     @put
     op putPet(@body pet: Pet): void;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const pet = models.find((x) => x.name === "Pet");
 
-  const enums = runner.context.sdkPackage.enums;
+  const enums = context.sdkPackage.enums;
   const kind = enums.find((x) => x.name === "PetKind");
   ok(pet && kind);
   ok(kind.isGeneratedName);
@@ -472,7 +485,7 @@ it("property of anonymous union as enum", async () => {
 });
 
 it("request/response header with enum value", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model RepeatableResponse {
       @visibility(Lifecycle.Read)
       @header("Repeatability-Result")
@@ -480,7 +493,8 @@ it("request/response header with enum value", async () => {
     }
     op foo(@header("Repeatability-Result") repeatabilityResult?: "accepted" | "rejected"): RepeatableResponse;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 0);
   strictEqual(sdkPackage.enums.length, 2);
   strictEqual(sdkPackage.enums[0].name, "FooRequestRepeatabilityResult");
@@ -496,7 +510,7 @@ it("request/response header with enum value", async () => {
 });
 
 it("enum discriminator model without base discriminator property", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     enum DogKind {
       Golden: "golden",
     }
@@ -514,7 +528,8 @@ it("enum discriminator model without base discriminator property", async () => {
     @get
     op getExtensibleModel(): Dog;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
 
   const golden = models.find((x) => x.name === "Golden");
@@ -531,8 +546,8 @@ it("enum discriminator model without base discriminator property", async () => {
   const dog = models.find((x) => x.name === "Dog");
   ok(dog);
   strictEqual(dog.serializationOptions.json?.name, "Dog");
-  strictEqual(runner.context.sdkPackage.enums.length, 1);
-  const dogKind = runner.context.sdkPackage.enums[0];
+  strictEqual(context.sdkPackage.enums.length, 1);
+  const dogKind = context.sdkPackage.enums[0];
 
   const dogKindProperty = dog.properties[0];
   ok(dogKindProperty);
@@ -543,7 +558,7 @@ it("enum discriminator model without base discriminator property", async () => {
 });
 
 it("discriminator", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @discriminator("kind")
     model Fish {
       age: int32;
@@ -573,7 +588,8 @@ it("discriminator", async () => {
     @get
     op getModel(): Fish;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 5);
   const shark = models.find((x) => x.name === "Shark");
   ok(shark);
@@ -586,7 +602,7 @@ it("discriminator", async () => {
 });
 
 it("union discriminator", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     union KindType {
       string,
       shark: "shark",
@@ -611,7 +627,8 @@ it("union discriminator", async () => {
     @get
     op getModel(): Fish;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   const fish = models.find((x) => x.name === "Fish");
   ok(fish);
@@ -633,14 +650,14 @@ it("union discriminator", async () => {
   strictEqual(kindTypeProperty.type.kind, "enumvalue");
   strictEqual(salmon.discriminatorValue, "salmon");
 
-  strictEqual(runner.context.sdkPackage.enums.length, 1);
-  const kindType = runner.context.sdkPackage.enums.find((x) => x.name === "KindType");
+  strictEqual(context.sdkPackage.enums.length, 1);
+  const kindType = context.sdkPackage.enums.find((x) => x.name === "KindType");
   ok(kindType);
   strictEqual(kindType.isFixed, false);
 });
 
 it("string discriminator map to enum value", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     union KindType {
       string,
       shark: "shark",
@@ -666,7 +683,8 @@ it("string discriminator map to enum value", async () => {
     @get
     op getModel(): Fish;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   const fish = models.find((x) => x.name === "Fish");
   ok(fish);
@@ -688,14 +706,14 @@ it("string discriminator map to enum value", async () => {
   strictEqual(kindTypeProperty.type.kind, "enumvalue");
   strictEqual(salmon.discriminatorValue, "salmon");
 
-  strictEqual(runner.context.sdkPackage.enums.length, 1);
-  const kindType = runner.context.sdkPackage.enums.find((x) => x.name === "KindType");
+  strictEqual(context.sdkPackage.enums.length, 1);
+  const kindType = context.sdkPackage.enums.find((x) => x.name === "KindType");
   ok(kindType);
   strictEqual(kindType.isFixed, false);
 });
 
 it("discriminator rename", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @discriminator("kind")
     model Fish {
       @clientName("type")
@@ -714,7 +732,8 @@ it("discriminator rename", async () => {
     @get
     op getModel(): Fish;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const fish = models.find((x) => x.name === "Fish");
   ok(fish);
@@ -730,7 +749,7 @@ it("discriminator rename", async () => {
 });
 
 it("discriminator with encodedName", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @discriminator("odataType")
     model CharFilter {
       @encodedName("application/json", "@odata.type")
@@ -741,7 +760,8 @@ it("discriminator with encodedName", async () => {
     @get
     op getModel(): CharFilter;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   const discriminatorProperty = models[0].discriminatorProperty;
   ok(discriminatorProperty);
@@ -751,12 +771,7 @@ it("discriminator with encodedName", async () => {
 });
 
 it("filterOutCoreModels true", async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runner.compileWithBuiltInAzureCoreService(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     @resource("users")
     @doc("Details about a user.")
     model User {
@@ -772,12 +787,13 @@ it("filterOutCoreModels true", async () => {
     @doc("Creates or updates a User")
     op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
   `);
-  const models = runner.context.sdkPackage.models.filter((x) => !isAzureCoreModel(x));
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models.filter((x) => !isAzureCoreModel(x));
   strictEqual(models.length, 1);
   strictEqual(models[0].name, "User");
   strictEqual(models[0].crossLanguageDefinitionId, "My.Service.User");
 
-  for (const [type, sdkType] of runner.context.__referencedTypeCache.entries()) {
+  for (const [type, sdkType] of context.__referencedTypeCache.entries()) {
     if (isAzureCoreTspModel(type)) {
       ok(sdkType.usage !== UsageFlags.None);
     }
@@ -785,12 +801,7 @@ it("filterOutCoreModels true", async () => {
 });
 
 it("filterOutCoreModels false", async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runner.compileWithBuiltInAzureCoreService(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     @resource("users")
     @doc("Details about a user.")
     model User {
@@ -806,7 +817,8 @@ it("filterOutCoreModels false", async () => {
     @doc("Creates or updates a User")
     op createOrUpdate is StandardResourceOperations.ResourceCreateOrUpdate<User>;
   `);
-  const models = runner.context.sdkPackage.models.sort((a, b) => a.name.localeCompare(b.name));
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models.sort((a, b) => a.name.localeCompare(b.name));
   strictEqual(models.length, 4);
   strictEqual(models[0].name, "Error");
   strictEqual(models[0].crossLanguageDefinitionId, "Azure.Core.Foundations.Error");
@@ -819,12 +831,7 @@ it("filterOutCoreModels false", async () => {
 });
 
 it("lro core filterOutCoreModels true", async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runner.compileWithBuiltInAzureCoreService(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     @resource("users")
     @doc("Details about a user.")
     model User {
@@ -841,19 +848,15 @@ it("lro core filterOutCoreModels true", async () => {
     @pollingOperation(My.Service.getStatus)
     op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
   `);
-  const models = runner.context.sdkPackage.models.filter((x) => !isAzureCoreModel(x));
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models.filter((x) => !isAzureCoreModel(x));
   strictEqual(models.length, 1);
   strictEqual(models[0].name, "User");
   strictEqual(models[0].crossLanguageDefinitionId, "My.Service.User");
 });
 
 it("lro core filterOutCoreModels false", async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runner.compileWithBuiltInAzureCoreService(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     @resource("users")
     @doc("Details about a user.")
     model User {
@@ -870,7 +873,8 @@ it("lro core filterOutCoreModels false", async () => {
     @pollingOperation(My.Service.getStatus)
     op createOrUpdateUser is StandardResourceOperations.LongRunningResourceCreateOrUpdate<User>;
   `);
-  const models = runner.context.sdkPackage.models.sort((a, b) => a.name.localeCompare(b.name));
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models.sort((a, b) => a.name.localeCompare(b.name));
   strictEqual(models.length, 5);
   strictEqual(models[0].name, "Error");
   strictEqual(models[0].crossLanguageDefinitionId, "Azure.Core.Foundations.Error");
@@ -882,23 +886,20 @@ it("lro core filterOutCoreModels false", async () => {
   strictEqual(models[3].crossLanguageDefinitionId, "Azure.Core.ResourceOperationStatus");
   strictEqual(models[4].name, "User");
   strictEqual(models[4].crossLanguageDefinitionId, "My.Service.User");
-  strictEqual(runner.context.sdkPackage.enums.length, 1);
-  strictEqual(runner.context.sdkPackage.enums[0].name, "OperationState");
+  strictEqual(context.sdkPackage.enums.length, 2);
+  strictEqual(context.sdkPackage.enums[0].name, "OperationState");
+  strictEqual(context.sdkPackage.enums[1].name, "Versions");
 });
 
 it("model with core property", async () => {
-  const runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runnerWithCore.compileWithBuiltInAzureCoreService(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     @usage(Usage.input)
     model MyError {
       innerError: Azure.Core.Foundations.Error;
     }
   `);
-  const models = runnerWithCore.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   const myError = models.find((x) => x.name === "MyError");
   ok(myError);
@@ -916,31 +917,34 @@ it("model with core property", async () => {
 });
 
 it("no models filter core", async () => {
-  await runner.compile(`
-        @service
-        @test namespace MyService { }
-      `);
-  const models = runner.context.sdkPackage.models;
+  const { program } = await SimpleTester.compile(`
+    @service
+    namespace MyService { }
+  `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 0);
 });
 
 it("no models don't filter core", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
-    @test namespace MyService { }
+    namespace MyService { }
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 0);
 });
 
 it("input usage", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model InputModel {
       prop: string
     }
     op operation(@body input: InputModel): void;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Json);
   strictEqual(models.filter((x) => (x.usage & UsageFlags.Input) > 0).length, 1);
@@ -948,13 +952,14 @@ it("input usage", async () => {
 });
 
 it("output usage", async () => {
-  await runner.compileWithBuiltInService(`
-        model OutputModel {
-          prop: string
-        }
-        op operation(): OutputModel;
-      `);
-  const models = runner.context.sdkPackage.models;
+  const { program } = await SimpleTesterWithService.compile(`
+    model OutputModel {
+      prop: string
+    }
+    op operation(): OutputModel;
+  `);
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].usage, UsageFlags.Output | UsageFlags.Json);
 
@@ -963,13 +968,14 @@ it("output usage", async () => {
 });
 
 it("roundtrip usage", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model RoundtripModel {
       prop: string
     }
     op operation(@body input: RoundtripModel): RoundtripModel;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
 
@@ -979,7 +985,7 @@ it("roundtrip usage", async () => {
 });
 
 it("readonly usage", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model ResultModel {
       name: string;
     }
@@ -995,7 +1001,8 @@ it("readonly usage", async () => {
       @body body: RoundTripModel;
     };
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   strictEqual(
     models.find((x) => x.name === "RoundTripModel")?.usage,
@@ -1008,7 +1015,7 @@ it("readonly usage", async () => {
 });
 
 it("propagation", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @discriminator("kind")
     model Fish {
       age: int32;
@@ -1035,7 +1042,8 @@ it("propagation", async () => {
     }
     op operation(@body input: Shark): Shark;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 4);
   for (const model of models) {
     strictEqual(model.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
@@ -1053,7 +1061,7 @@ it("propagation", async () => {
   strictEqual(fish?.properties[0].kind, "property");
   strictEqual(fish?.properties[0].serializationOptions.json?.name, "kind");
 
-  const salmon = Array.from(runner.context.__referencedTypeCache.values()).find(
+  const salmon = Array.from(context.__referencedTypeCache.values()).find(
     (x) => x.kind === "model" && x.name === "Salmon",
   ) as SdkModelType;
   strictEqual(salmon?.serializationOptions.json, undefined);
@@ -1072,7 +1080,7 @@ it("propagation", async () => {
 });
 
 it("propagation from subtype", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @discriminator("kind")
     model Fish {
       age: int32;
@@ -1096,7 +1104,8 @@ it("propagation from subtype", async () => {
     }
     op operation(@body input: Salmon): Salmon;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   for (const model of models) {
     strictEqual(model.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
@@ -1112,7 +1121,7 @@ it("propagation from subtype", async () => {
   strictEqual(fish?.properties[0].kind, "property");
   strictEqual(fish?.properties[0].serializationOptions.json?.name, "kind");
 
-  const types = Array.from(runner.context.__referencedTypeCache.values());
+  const types = Array.from(context.__referencedTypeCache.values());
 
   const shark = types.find((x) => x.kind === "model" && x.name === "Shark") as SdkModelType;
   strictEqual(shark?.serializationOptions.json, undefined);
@@ -1135,7 +1144,7 @@ it("propagation from subtype", async () => {
 });
 
 it("propagation from subtype of type with another discriminated property", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @discriminator("kind")
     model Fish {
       age: int32;
@@ -1166,7 +1175,8 @@ it("propagation from subtype of type with another discriminated property", async
     }
     op operation(@body input: Salmon): Salmon;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 6);
   for (const model of models) {
     strictEqual(model.usage, UsageFlags.Input | UsageFlags.Output | UsageFlags.Json);
@@ -1212,7 +1222,7 @@ it("propagation from subtype of type with another discriminated property", async
 });
 
 it("unnamed model", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Test {
       prop1: {innerProp1: string};
       prop2: {innerProp2: string};
@@ -1221,7 +1231,8 @@ it("unnamed model", async () => {
       @body body: Test
     ): void;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   const propreties: string[] = [];
   models.forEach((model) => {
@@ -1234,7 +1245,7 @@ it("unnamed model", async () => {
 });
 
 it("model access transitive closure", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Test {
       prop: string;
     }
@@ -1243,14 +1254,15 @@ it("model access transitive closure", async () => {
       @body body: Test
     ): void;
   `);
+  const context = await createSdkContextForTester(program);
 
-  const models = runner.context.sdkPackage.models;
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].access, "internal");
 });
 
 it("complicated access transitive closure", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Test1 {
       prop: Test2;
     }
@@ -1301,7 +1313,8 @@ it("complicated access transitive closure", async () => {
       @body body: Test6
     ): void;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 6);
 
   const Test1 = models.find((x) => x.name === "Test1");
@@ -1330,7 +1343,7 @@ it("complicated access transitive closure", async () => {
 });
 
 it("additionalProperties of same type", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model AdditionalPropertiesModel extends Record<string> {
       prop: string;
@@ -1349,7 +1362,8 @@ it("additionalProperties of same type", async () => {
       prop: string;
     }
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 4);
   const AdditionalPropertiesModel = models.find((x) => x.name === "AdditionalPropertiesModel");
   const AdditionalPropertiesModel2 = models.find((x) => x.name === "AdditionalPropertiesModel2");
@@ -1371,7 +1385,7 @@ it("additionalProperties of same type", async () => {
 });
 
 it("additionalProperties usage", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model AdditionalPropertiesModel extends Record<Test> {
     }
 
@@ -1393,7 +1407,8 @@ it("additionalProperties usage", async () => {
     @route("test2")
     op test2(@body input: AdditionalPropertiesModel3): AdditionalPropertiesModel3;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 5);
   const AdditionalPropertiesModel = models.find((x) => x.name === "AdditionalPropertiesModel");
   const AdditionalPropertiesModel2 = models.find((x) => x.name === "AdditionalPropertiesModel2");
@@ -1425,7 +1440,7 @@ it("additionalProperties usage", async () => {
 });
 
 it("additionalProperties of different types", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model AdditionalPropertiesModel {
       prop: string;
@@ -1438,7 +1453,8 @@ it("additionalProperties of different types", async () => {
       ...Record<boolean | float32>;
     }
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const AdditionalPropertiesModel = models.find((x) => x.name === "AdditionalPropertiesModel");
   const AdditionalPropertiesModel2 = models.find((x) => x.name === "AdditionalPropertiesModel2");
@@ -1452,7 +1468,7 @@ it("additionalProperties of different types", async () => {
 });
 
 it("crossLanguageDefinitionId", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace MyService {
       @usage(Usage.input)
@@ -1462,7 +1478,8 @@ it("crossLanguageDefinitionId", async () => {
       model OutputModel {}
     }
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const inputModel = models.find((x) => x.name === "InputModel");
   ok(inputModel);
@@ -1473,7 +1490,7 @@ it("crossLanguageDefinitionId", async () => {
 });
 
 it("template model", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     model Catalog is TrackedResource<CatalogProperties> {
       @pattern("^[A-Za-z0-9_-]{1,50}$")
@@ -1504,7 +1521,8 @@ it("template model", async () => {
       deploymentDateUtc?: utcDateTime;
     }
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 4);
   const catalog = models.find((x) => x.name === "Catalog");
   const deployment = models.find((x) => x.name === "Deployment");
@@ -1514,7 +1532,7 @@ it("template model", async () => {
 });
 
 it("model with deprecated annotation", async () => {
-  await runner.compileAndDiagnose(`
+  const [{ program }] = await SimpleTester.compileAndDiagnose(`
     @service
     namespace MyService;
     #deprecated "no longer support"
@@ -1524,25 +1542,26 @@ it("model with deprecated annotation", async () => {
       @body body: Test
     ): void;
   `);
+  const context = await createSdkContextForTester(program);
 
-  const models = runner.context.sdkPackage.models;
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].deprecation, "no longer support");
 });
 
 it("orphan model", async () => {
-  await runner.compileAndDiagnose(`
+  const { program } = await SimpleTester.compile(`
     @service
-    @test namespace MyService {
-      @test
+    namespace MyService {
       @usage(Usage.input | Usage.output)
       model Model1{}
 
       model Model2{}
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const models = runner.context.sdkPackage.models;
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].name, "Model1");
   strictEqual(models[0].crossLanguageDefinitionId, "MyService.Model1");
@@ -1550,7 +1569,7 @@ it("orphan model", async () => {
 });
 
 it("model with client hierarchy", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace Test1Client {
       model T1 {
@@ -1575,12 +1594,13 @@ it("model with client hierarchy", async () => {
       }
     }
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
 });
 
 it("error model", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @error
     model ApiError {
       code: string;
@@ -1588,7 +1608,8 @@ it("error model", async () => {
 
     op test(): ApiError;
   `);
-  const models = getAllModels(runner.context);
+  const context = await createSdkContextForTester(program);
+  const models = getAllModels(context);
   strictEqual(models.length, 1);
   const model = models[0];
   strictEqual(model.kind, "model");
@@ -1596,7 +1617,7 @@ it("error model", async () => {
 });
 
 it("error model inheritance", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model ValidResponse {
       prop: string;
     };
@@ -1625,7 +1646,8 @@ it("error model inheritance", async () => {
 
     op test(): ValidResponse | FourZeroFourError | FiveHundredError;
   `);
-  const models = getAllModels(runner.context);
+  const context = await createSdkContextForTester(program);
+  const models = getAllModels(context);
   strictEqual(models.length, 5);
   const errorModels = models.filter(
     (x) => x.kind === "model" && (x.usage & UsageFlags.Exception) > 0,
@@ -1646,10 +1668,9 @@ it("error model inheritance", async () => {
 });
 
 it("never or void property", async () => {
-  await runner.compileAndDiagnose(`
+  const { program } = await SimpleTester.compile(`
     @service
-    @test namespace MyService {
-      @test
+    namespace MyService {
       @usage(Usage.input | Usage.output)
       model Test{
         prop1: never;
@@ -1657,15 +1678,16 @@ it("never or void property", async () => {
       }
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const models = runner.context.sdkPackage.models;
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].name, "Test");
   strictEqual(models[0].properties.length, 0);
 });
 
 it("xml usage", async () => {
-  await runner.compileAndDiagnose(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace MyService {
       model RoundTrip {
@@ -1683,8 +1705,9 @@ it("xml usage", async () => {
       op test2(@header("content-type") contentType: "application/xml", @body body: Input): void;
     }
   `);
+  const context = await createSdkContextForTester(program);
 
-  const models = runner.context.sdkPackage.models;
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const roundTripModel = models.find((x) => x.name === "RoundTrip");
   const inputModel = models.find((x) => x.name === "Input");
@@ -1699,7 +1722,7 @@ it("xml usage", async () => {
 });
 
 it("check bodyParam for @multipartBody", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Address {
       city: string;
     }
@@ -1712,7 +1735,8 @@ it("check bodyParam for @multipartBody", async function () {
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const formDataMethod = runner.context.sdkPackage.clients[0].methods[0];
+  const context = await createSdkContextForTester(program);
+  const formDataMethod = context.sdkPackage.clients[0].methods[0];
   strictEqual(formDataMethod.kind, "basic");
   strictEqual(formDataMethod.name, "upload");
   strictEqual(formDataMethod.parameters.length, 2);
@@ -1748,14 +1772,15 @@ it("check bodyParam for @multipartBody", async function () {
 });
 
 it("check multipartOptions for property of base model", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model MultiPartRequest{
         fileProperty: HttpPart<File>;
     }
     @post
     op upload(@header contentType: "multipart/form-data", @multipartBody body: MultiPartRequest): void;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   const fileModel = models.find((x) => x.name === "File");
   ok(fileModel);
   for (const p of fileModel.properties) {
@@ -1766,7 +1791,7 @@ it("check multipartOptions for property of base model", async function () {
 });
 
 it("remove property with none visibility", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Test{
         prop: string;
         @invisible(Lifecycle)
@@ -1775,13 +1800,14 @@ it("remove property with none visibility", async function () {
     @post
     op do(@body body: Test): void;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 1);
   strictEqual(models[0].properties.length, 1);
 });
 
 it("header property on body root model visibility", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model InputModel {
       @visibility(Lifecycle.Read)
       @header("x-name")
@@ -1789,7 +1815,8 @@ it("header property on body root model visibility", async function () {
     }
     op foo(@bodyRoot body: InputModel): void;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.models.length, 1);
   const inputModel = sdkPackage.models[0];
   strictEqual(inputModel.name, "InputModel");
@@ -1803,7 +1830,7 @@ it("header property on body root model visibility", async function () {
 });
 
 it("discriminator from template", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @discriminator("kind")
     model Base {
       kind: string;
@@ -1819,7 +1846,8 @@ it("discriminator from template", async function () {
 
     op test(): One;
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 2);
   const base = models.find((x) => x.name === "Base");
   ok(base);
@@ -1841,11 +1869,11 @@ it("discriminator from template", async function () {
   strictEqual(one.properties[1].kind, "property");
   strictEqual(one.properties[1].name, "prop");
 
-  expectDiagnosticEmpty(runner.context.diagnostics);
+  expectDiagnosticEmpty(context.diagnostics);
 });
 
 it("model sequence", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model A {
       prop: string;
     }
@@ -1873,7 +1901,8 @@ it("model sequence", async function () {
       baz(): C;
     }
   `);
-  const models = runner.context.sdkPackage.models;
+  const context = await createSdkContextForTester(program);
+  const models = context.sdkPackage.models;
   strictEqual(models.length, 3);
   strictEqual(models.map((x) => x.name).join(","), "A,C,B");
 });

@@ -21,7 +21,7 @@ import { armResourceProvisioningStateRule } from "./rules/arm-resource-provision
 import { beyondNestingRule } from "./rules/beyond-nesting-levels.js";
 import { coreOperationsRule } from "./rules/core-operations.js";
 import { envelopePropertiesRules } from "./rules/envelope-properties.js";
-import { listBySubscriptionRule } from "./rules/list-operation.js";
+import { improperSubscriptionListOperationRule } from "./rules/improper-subscription-list-operation.js";
 import { lroLocationHeaderRule } from "./rules/lro-location-header.js";
 import { missingXmsIdentifiersRule } from "./rules/missing-x-ms-identifiers.js";
 import { noEmptyModel } from "./rules/no-empty-model.js";
@@ -31,6 +31,7 @@ import { operationsInterfaceMissingRule } from "./rules/operations-interface-mis
 import { patchEnvelopePropertiesRules } from "./rules/patch-envelope-properties.js";
 import { resourceNameRule } from "./rules/resource-name.js";
 import { retryAfterRule } from "./rules/retry-after.js";
+import { secretProprule } from "./rules/secret-prop.js";
 import { unsupportedTypeRule } from "./rules/unsupported-type.js";
 
 const rules = [
@@ -56,7 +57,7 @@ const rules = [
   envelopePropertiesRules,
   interfacesRule,
   armResourceInvalidActionVerbRule,
-  listBySubscriptionRule,
+  improperSubscriptionListOperationRule,
   lroLocationHeaderRule,
   missingXmsIdentifiersRule,
   noResponseBodyRule,
@@ -66,6 +67,7 @@ const rules = [
   resourceNameRule,
   retryAfterRule,
   unsupportedTypeRule,
+  secretProprule,
   noEmptyModel,
 ];
 

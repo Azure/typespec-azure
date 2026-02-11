@@ -1,5 +1,6 @@
 ---
 title: Multipart Operations
+llmstxt: true
 ---
 
 import { ClientTabs, ClientTabItem } from "@components/client-tabs";
@@ -50,9 +51,59 @@ def upload(
 ```
 
 ```typescript
-// Not yet implemented. See issues:
-// - RLC: https://github.com/Azure/autorest.typescript/issues/2568
-// - Modular: https://github.com/Azure/autorest.typescript/issues/2422
+/** model interface MultipartRequest */
+export interface MultipartRequest {
+  id: string;
+  address: Address;
+  profileImage: FileContents | { contents: FileContents; contentType?: string; filename?: string };
+  previousAddresses: Address[];
+  pictures: Array<
+    FileContents | { contents: FileContents; contentType?: string; filename?: string }
+  >;
+}
+
+export function multipartRequestSerializer(item: MultipartRequest): any {
+  return [
+    { name: "id", body: item["id"] },
+    { name: "address", body: addressSerializer(item["address"]) },
+    createFilePartDescriptor("profileImage", item["profileImage"]),
+    {
+      name: "previousAddresses",
+      body: addressArraySerializer(item["previousAddresses"]),
+    },
+    ...item["pictures"].map((x: unknown) => createFilePartDescriptor("pictures", x)),
+  ];
+}
+
+/** model interface Address */
+export interface Address {
+  city: string;
+}
+
+export function addressSerializer(item: Address): any {
+  return { city: item["city"] };
+}
+
+export function addressArraySerializer(result: Array<Address>): any[] {
+  return result.map((item) => {
+    return addressSerializer(item);
+  });
+}
+
+// JS CodeGen api layer
+export async function upload(
+  context: Client,
+  body: MultipartRequest,
+  options: UploadOptionalParams = { requestOptions: {} },
+): Promise<void>;
+
+// JS CodeGen classical client layer
+export class TestServiceClient {
+  upload(
+    body: MultipartRequest,
+    options: UploadOptionalParams = { requestOptions: {} },
+  ): Promise<void>;
+}
 ```
 
 ```java
@@ -64,6 +115,32 @@ public final class MultipartRequest {
 
 // Client API
 public void upload(MultipartRequest body);
+```
+
+```go
+type Address struct {
+	City *string
+}
+
+type File struct {
+	Contents []byte
+	ContentType *string
+	Filename *string
+}
+
+type MultipartRequest struct {
+	Address Address
+	ID string
+	Pictures []streaming.MultipartContent
+	PreviousAddresses []Address
+	ProfileImage streaming.MultipartContent
+}
+
+type FileUploadServiceClientUploadOptions struct {}
+
+type FileUploadServiceClientUploadResponse struct {}
+
+func (client *FileUploadServiceClient) Upload(ctx context.Context, body MultipartRequest, options *FileUploadServiceClientUploadOptions) (FileUploadServiceClientUploadResponse, error)
 ```
 
 </ClientTabs>

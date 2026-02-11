@@ -1,25 +1,28 @@
 import {
-  getNamespaceFullName,
+  compilerAssert,
+  Enum,
   Interface,
   isService,
   isTemplateDeclaration,
   isTemplateDeclarationOrInstance,
   Namespace,
   Operation,
-  Program,
 } from "@typespec/compiler";
+import { unsafe_Realm } from "@typespec/compiler/experimental";
+import { getVersionDependencies, getVersions } from "@typespec/versioning";
 import { getClientLocation, getClientNameOverride, isInScope } from "./decorators.js";
-import { LanguageScopes, SdkClient, SdkOperationGroup, TCGCContext } from "./interfaces.js";
+import { SdkClient, SdkOperationGroup, TCGCContext } from "./interfaces.js";
 import {
-  AllScopes,
   clientKey,
   clientLocationKey,
+  findServiceForOperation,
   getScopedDecoratorData,
   hasExplicitClientOrOperationGroup,
   listAllUserDefinedNamespaces,
   listScopedDecoratorData,
   omitOperation,
   operationGroupKey,
+  removeVersionsLargerThanExplicitlySpecified,
 } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
 import { getLibraryName } from "./public-utils.js";
@@ -41,28 +44,135 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   // create clients
   const clients = getOrCreateClients(context);
 
+  // handle versioning with mutated types
+  context.__packageVersions = new Map<Namespace, string[]>();
+  context.__packageVersionEnum = new Map<Namespace, Enum | undefined>();
+
+  if (clients.length === 1 && clients[0].services.length > 1) {
+    // multi-service client
+    const versionDependencies = getVersionDependencies(
+      context.program,
+      clients[0]!.type as Namespace,
+    );
+
+    for (const specificService of clients[0].services) {
+      if (context.__packageVersions.has(specificService)) {
+        continue;
+      }
+
+      const versions = getVersions(context.program, specificService)[1]?.getVersions();
+      if (!versions) {
+        context.__packageVersions.set(specificService, []);
+        continue;
+      }
+
+      context.__packageVersionEnum.set(specificService, versions[0].enumMember.enum);
+
+      const versionDependency = versionDependencies?.get(specificService);
+
+      compilerAssert(
+        versionDependency !== undefined && "name" in versionDependency,
+        "Client with multiple services is missing version dependency declaration.",
+      );
+
+      let end = false;
+      context.__packageVersions.set(
+        specificService,
+        versions
+          .map((version) => version.value)
+          .filter((v) => {
+            if (end) return false;
+            if (v === versionDependency.value) end = true;
+            return true;
+          }),
+      );
+    }
+  } else if (clients.length > 0) {
+    // single-service client
+    const versions = getVersions(context.program, clients[0].services[0])[1]?.getVersions();
+
+    if (!versions || versions.length === 0) {
+      context.__packageVersions.set(clients[0].services[0], []);
+    } else {
+      context.__packageVersionEnum.set(clients[0].services[0], versions[0].enumMember.enum);
+
+      removeVersionsLargerThanExplicitlySpecified(context, versions);
+
+      const filteredVersions = versions.map((version) => version.value);
+      context.__packageVersions.set(clients[0].services[0], filteredVersions);
+    }
+  }
+
+  // Track operation group names to detect conflicts in multi-service scenarios
+  const operationGroupNameMap = new Map<string, SdkOperationGroup>();
+  // Track merged operation groups and their original types for later operations processing
+  const mergedOperationGroupTypes = new Map<SdkOperationGroup, (Namespace | Interface)[]>();
+
   // create operation groups for each client
   for (const client of clients) {
     const groups: SdkOperationGroup[] = [];
 
-    // iterate client's interfaces and namespaces to find operation groups
-    if (client.type.kind === "Namespace") {
-      for (const subItem of client.type.namespaces.values()) {
-        const og = createOperationGroup(context, subItem, `${client.name}`);
-        if (og) {
-          groups.push(og);
+    if (client.services.length > 1) {
+      // Multiple services case will auto-merge all the services and add their nested operation groups
+      for (const specificService of client.services) {
+        createFirstLevelOperationGroup(context, specificService, specificService);
+      }
+    } else {
+      // Single service case needs to use the client type since it could contain customizations
+      createFirstLevelOperationGroup(context, client.type, client.services[0]);
+    }
+
+    function createFirstLevelOperationGroup(
+      context: TCGCContext,
+      type: Namespace | Interface,
+      service: Namespace,
+    ) {
+      // iterate client's interfaces and namespaces to find operation groups
+      if (type.kind === "Namespace") {
+        for (const subItem of type.namespaces.values()) {
+          const og = createOperationGroup(context, subItem, `${client.name}`, service, client);
+          if (og && !handleMultipleServicesOperationGroupNameConflict(og)) {
+            groups.push(og);
+          }
+        }
+        for (const subItem of type.interfaces.values()) {
+          if (isTemplateDeclaration(subItem)) {
+            // Skip template interfaces
+            continue;
+          }
+          const og = createOperationGroup(context, subItem, `${client.name}`, service, client);
+          if (og && !handleMultipleServicesOperationGroupNameConflict(og)) {
+            groups.push(og);
+          }
         }
       }
-      for (const subItem of client.type.interfaces.values()) {
-        if (isTemplateDeclaration(subItem)) {
-          // Skip template interfaces
-          continue;
-        }
-        const og = createOperationGroup(context, subItem, `${client.name}`);
-        if (og) {
-          groups.push(og);
+    }
+
+    function handleMultipleServicesOperationGroupNameConflict(og: SdkOperationGroup): boolean {
+      if (client.services.length > 1 && og.type) {
+        // Track for conflict detection
+        const ogName = getLibraryName(context, og.type);
+        const existingOg = operationGroupNameMap.get(ogName);
+        if (!existingOg) {
+          operationGroupNameMap.set(ogName, og);
+        } else {
+          // Conflict detected, update the existing operation group to have multiple services
+          existingOg.services.push(og.services[0]);
+          existingOg.service = existingOg.services[0]; // eslint-disable-line @typescript-eslint/no-deprecated
+          existingOg.subOperationGroups.push(...og.subOperationGroups);
+          if (existingOg.type !== undefined) {
+            mergedOperationGroupTypes.set(existingOg, [existingOg.type!]);
+            existingOg.type = undefined;
+          }
+          // Store the merged types for later operations processing
+          const types = mergedOperationGroupTypes.get(existingOg)!;
+          if (og.type) {
+            types.push(og.type);
+          }
+          return true;
         }
       }
+      return false;
     }
 
     // build client's cache
@@ -74,31 +184,65 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   // create operation group for `@clientLocation` of  string value
   // if no explicit `@client` or `@operationGroup`
   if (!hasExplicitClientOrOperationGroup(context)) {
-    const newOperationGroupNames = new Set<string>();
-    [...listScopedDecoratorData(context, clientLocationKey).values()].map((target) => {
-      if (typeof target === "string") {
-        if (
-          clients[0].subOperationGroups.some(
-            (og) => og.type && getLibraryName(context, og.type) === target,
-          )
-        ) {
-          // do not create a new operation group if it already exists
-          return;
+    const newOperationGroupWithServices = new Map<string, Namespace[]>();
+    listScopedDecoratorData(context, clientLocationKey).forEach((v, k) => {
+      // only deal with mutated types or without mutation
+      if (
+        (!context.__mutatedRealm && !unsafe_Realm.realmForType.has(k)) ||
+        (context.__mutatedRealm && context.__mutatedRealm.hasType(k))
+      ) {
+        // If the target operation group already exists, handle the multiple services case
+        if (typeof v === "string") {
+          // Check if an operation group with this name already exists, only check first level og for string target
+          const existingOg = clients[0].subOperationGroups.find(
+            (og) => og.type && getLibraryName(context, og.type) === v,
+          );
+
+          const operationService =
+            clients[0].services.length > 1
+              ? findServiceForOperation(clients[0].services, k as Operation)
+              : clients[0].services[0];
+
+          if (existingOg) {
+            // Operation group already exists - check if moving this operation would create a multi-service situation
+            // Check if the existing operation group's service matches the operation's service
+            if (!existingOg.services.includes(operationService)) {
+              // This would create a multi-service operation group - merge the services
+              existingOg.services.push(operationService);
+              existingOg.service = existingOg.services[0]; // eslint-disable-line @typescript-eslint/no-deprecated
+            }
+            // Operation will be moved to this existing operation group during operations processing
+            context.__rawClientsOperationGroupsCache!.set(v, existingOg);
+            return;
+          }
+
+          if (newOperationGroupWithServices.has(v)) {
+            // Add the service to the list if it's not already there
+            const services = newOperationGroupWithServices.get(v)!;
+            if (!services.includes(operationService)) {
+              services.push(operationService);
+            }
+          } else {
+            newOperationGroupWithServices.set(v, [operationService]);
+          }
         }
-        newOperationGroupNames.add(target);
       }
     });
 
-    for (const ogName of newOperationGroupNames) {
-      const og: SdkOperationGroup = {
-        kind: "SdkOperationGroup",
-        groupPath: `${clients[0].name}.${ogName}`,
-        service: clients[0].service,
-        subOperationGroups: [],
-      };
-      context.__rawClientsOperationGroupsCache.set(ogName, og);
-      clients[0].subOperationGroups!.push(og);
-      context.__clientToOperationsCache.set(og, []);
+    if (newOperationGroupWithServices.size > 0) {
+      newOperationGroupWithServices.forEach((services, ogName) => {
+        const og: SdkOperationGroup = {
+          kind: "SdkOperationGroup",
+          groupPath: `${clients[0].name}.${ogName}`,
+          service: services[0],
+          services,
+          subOperationGroups: [],
+          parent: clients[0],
+        };
+        context.__rawClientsOperationGroupsCache!.set(ogName, og);
+        clients[0].subOperationGroups!.push(og);
+        context.__clientToOperationsCache!.set(og, []);
+      });
     }
   }
 
@@ -106,69 +250,79 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   const queue: (SdkClient | SdkOperationGroup)[] = [...clients];
   while (queue.length > 0) {
     const group = queue.shift()!;
-    if (group.type) {
-      // operations directly under the group
-      const operations = [...group.type.operations.values()];
 
-      // when there is explicitly `@operationGroup` or `@client`
-      // operations under namespace or interface that are not decorated with `@operationGroup` or `@client`
-      // should be placed in the first accessor client or operation group
-      if (group.type.kind === "Namespace" && hasExplicitClientOrOperationGroup(context)) {
-        const innerQueue: Namespace[] = [group.type];
-        while (innerQueue.length > 0) {
-          const ns = innerQueue.shift()!;
-          for (const subNs of ns.namespaces.values()) {
-            if (!context.__rawClientsOperationGroupsCache.has(subNs)) {
-              operations.push(...subNs.operations.values());
-              innerQueue.push(subNs);
-            }
-          }
-          for (const iface of ns.interfaces.values()) {
-            if (!context.__rawClientsOperationGroupsCache.has(iface)) {
-              operations.push(...iface.operations.values());
-            }
-          }
-        }
+    // operations directly under the group
+    const operations = [];
+
+    // Check if this is a merged operation group (has multiple services but still has a type)
+    const mergedTypes =
+      group.kind === "SdkOperationGroup" ? mergedOperationGroupTypes.get(group) : undefined;
+
+    if (group.kind === "SdkClient" && group.services.length > 1) {
+      // multi-service client
+      operations.push(...group.services.flatMap((service) => [...service.operations.values()]));
+    } else if (mergedTypes) {
+      // multi-service operation group
+      for (const type of mergedTypes) {
+        operations.push(...type.operations.values());
       }
+    } else if (group.type) {
+      // single-service client or operation group
+      operations.push(...group.type.operations.values());
+    }
 
-      // add operations
-      for (const op of operations) {
-        // skip operations that are not in scope
-        if (!isInScope(context, op)) {
-          continue;
-        }
-
-        // skip templated operations, omit operations (has override decorator)
-        if (
-          !isTemplateDeclarationOrInstance(op) &&
-          !context.program.stateMap(omitOperation).get(op)
-        ) {
-          let pushGroup: SdkClient | SdkOperationGroup = group;
-          const clientLocation = getClientLocation(context, op);
-          if (clientLocation) {
-            // operation with `@clientLocation` decorator is placed in another operation group
-            if (context.__rawClientsOperationGroupsCache.has(clientLocation)) {
-              pushGroup = context.__rawClientsOperationGroupsCache.get(clientLocation)!;
-            } else {
-              if (typeof clientLocation !== "string") {
-                reportDiagnostic(context.program, {
-                  code: "client-location-wrong-type",
-                  target: op,
-                });
-              } else {
-                reportDiagnostic(context.program, {
-                  code: "client-location-duplicate",
-                  target: clients[0].type,
-                });
-              }
-            }
+    // when there is explicitly `@operationGroup` or `@client`
+    // operations under namespace or interface that are not decorated with `@operationGroup` or `@client`
+    // should be placed in the first accessor client or operation group
+    if (group.type?.kind === "Namespace" && hasExplicitClientOrOperationGroup(context)) {
+      const innerQueue: Namespace[] = [group.type];
+      while (innerQueue.length > 0) {
+        const ns = innerQueue.shift()!;
+        for (const subNs of ns.namespaces.values()) {
+          if (!context.__rawClientsOperationGroupsCache.has(subNs)) {
+            operations.push(...subNs.operations.values());
+            innerQueue.push(subNs);
           }
-          context.__clientToOperationsCache.get(pushGroup)!.push(op);
-          context.__operationToClientCache.set(op, pushGroup);
+        }
+        for (const iface of ns.interfaces.values()) {
+          if (!context.__rawClientsOperationGroupsCache.has(iface)) {
+            operations.push(...iface.operations.values());
+          }
         }
       }
     }
-    queue.push(...group.subOperationGroups);
+
+    // add operations
+    for (const op of operations) {
+      // skip operations that are not in scope
+      if (!isInScope(context, op)) {
+        continue;
+      }
+
+      // skip templated operations, omit operations (has override decorator)
+      if (
+        !isTemplateDeclarationOrInstance(op) &&
+        !context.program.stateMap(omitOperation).get(op)
+      ) {
+        let pushGroup: SdkClient | SdkOperationGroup = group;
+        const clientLocation = getClientLocation(context, op);
+        if (clientLocation) {
+          // operation with `@clientLocation` decorator is placed in another operation group
+          if (context.__rawClientsOperationGroupsCache.has(clientLocation)) {
+            pushGroup = context.__rawClientsOperationGroupsCache.get(clientLocation)!;
+          } else {
+            reportDiagnostic(context.program, {
+              code: "client-location-wrong-type",
+              target: op,
+            });
+          }
+        }
+        context.__clientToOperationsCache.get(pushGroup)!.push(op);
+        context.__operationToClientCache.set(op, pushGroup);
+      }
+    }
+
+    if (group.type) queue.push(...group.subOperationGroups);
   }
 
   // omit empty client or operation groups
@@ -224,7 +378,7 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
     }
   }
   if (explicitClients.length > 0) {
-    if (explicitClients.some((client) => isArm(client.service))) {
+    if (explicitClients.some((client) => isArm(client.services))) {
       context.arm = true;
     }
     return explicitClients;
@@ -254,8 +408,8 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
         kind: "SdkClient",
         name: clientName,
         service: service,
+        services: [service],
         type: service,
-        crossLanguageDefinitionId: getNamespaceFullName(service),
         subOperationGroups: [],
       },
     ];
@@ -276,27 +430,29 @@ function createOperationGroup(
   context: TCGCContext,
   type: Namespace | Interface,
   groupPathPrefix: string,
+  service: Namespace,
+  parent?: SdkClient | SdkOperationGroup,
 ): SdkOperationGroup | undefined {
   let operationGroup: SdkOperationGroup | undefined;
-  const service =
-    findOperationGroupService(context.program, type, context.emitterName) ?? (type as any);
-  if (!isService(context.program, service)) {
-    reportDiagnostic(context.program, {
-      code: "client-service",
-      format: { name: type.name },
-      target: type,
-    });
-  }
   if (hasExplicitClientOrOperationGroup(context)) {
     operationGroup = getScopedDecoratorData(context, operationGroupKey, type);
     if (operationGroup) {
       operationGroup.groupPath = `${groupPathPrefix}.${getLibraryName(context, type)}`;
-      operationGroup.service = service;
+
+      operationGroup.service = service; // eslint-disable-line @typescript-eslint/no-deprecated
+      operationGroup.services = [service];
       operationGroup.subOperationGroups = [];
+      operationGroup.parent = parent;
 
       if (type.kind === "Namespace") {
         operationGroup.subOperationGroups =
-          buildHierarchyOfOperationGroups(context, type, operationGroup.groupPath) ?? [];
+          buildHierarchyOfOperationGroups(
+            context,
+            type,
+            operationGroup.groupPath,
+            service,
+            operationGroup,
+          ) ?? [];
       }
     }
   } else {
@@ -306,14 +462,22 @@ function createOperationGroup(
         kind: "SdkOperationGroup",
         type,
         groupPath: `${groupPathPrefix}.${getLibraryName(context, type)}`,
-        service,
+        service: service,
+        services: [service],
         subOperationGroups: [],
+        parent,
       };
     }
 
     if (operationGroup && type.kind === "Namespace") {
       operationGroup.subOperationGroups =
-        buildHierarchyOfOperationGroups(context, type, operationGroup.groupPath) ?? [];
+        buildHierarchyOfOperationGroups(
+          context,
+          type,
+          operationGroup.groupPath,
+          service,
+          operationGroup,
+        ) ?? [];
     }
   }
 
@@ -326,41 +490,23 @@ function createOperationGroup(
   return operationGroup;
 }
 
-function findOperationGroupService(
-  program: Program,
-  client: Namespace | Interface,
-  scope: LanguageScopes,
-): Namespace | Interface | undefined {
-  let current: Namespace | undefined = client as any;
-  while (current) {
-    if (isService(program, current)) {
-      // we don't check scoped clients here, because we want to find the service for the client
-      return current;
-    }
-    const client = program.stateMap(clientKey).get(current);
-    if (client && (client[scope] || client[AllScopes])) {
-      return (client[scope] ?? client[AllScopes]).service;
-    }
-    current = current.namespace;
-  }
-  return undefined;
-}
-
 function buildHierarchyOfOperationGroups(
   context: TCGCContext,
   type: Namespace,
   groupPathPrefix: string,
+  service: Namespace,
+  parent?: SdkClient | SdkOperationGroup,
 ): SdkOperationGroup[] | undefined {
   // build hierarchy of operation group
   const subOperationGroups: SdkOperationGroup[] = [];
   type.namespaces.forEach((ns) => {
-    const subOperationGroup = createOperationGroup(context, ns, groupPathPrefix);
+    const subOperationGroup = createOperationGroup(context, ns, groupPathPrefix, service, parent);
     if (subOperationGroup) {
       subOperationGroups.push(subOperationGroup);
     }
   });
   type.interfaces.forEach((i) => {
-    const subOperationGroup = createOperationGroup(context, i, groupPathPrefix);
+    const subOperationGroup = createOperationGroup(context, i, groupPathPrefix, service, parent);
     if (subOperationGroup) {
       subOperationGroups.push(subOperationGroup);
     }
@@ -371,7 +517,10 @@ function buildHierarchyOfOperationGroups(
   return undefined;
 }
 
-function isArm(service: Namespace): boolean {
+function isArm(service: Namespace[] | Namespace): boolean {
+  if (Array.isArray(service)) {
+    return service.some((s) => isArm(s));
+  }
   return service.decorators.some(
     (decorator) => decorator.decorator.name === "$armProviderNamespace",
   );

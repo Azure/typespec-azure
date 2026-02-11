@@ -1,12 +1,14 @@
 ---
 title: 2. Defining the Service
+description: Defining the ARM service
+llmstxt: true
 ---
 
 To define an Azure Resource Manager service, the first thing you will need to do is define the service namespace and decorate it with the `service` and `armProviderNamespace` decorators:
 
 ```typespec
 @armProviderNamespace
-@service(#{title: "<service name>", version: "<service version>"})
+@service(#{ title: "<service name>" })
 namespace <mynamespace>;
 ```
 
@@ -14,8 +16,7 @@ For example:
 
 ```typespec
 @armProviderNamespace
-@service(#{ title: "Contoso User Service", version: "2020-10-01-preview" })
-@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
+@service(#{ title: "Contoso User Service" })
 @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
 namespace Contoso.Users;
 ```

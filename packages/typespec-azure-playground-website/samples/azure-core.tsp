@@ -27,7 +27,7 @@ using Azure.Core.Traits;
 Supported Widget Services endpoints (protocol and hostname, for example:
 https://westus.api.widget.contoso.com).
  */
-    endpoint: string,
+    endpoint: url,
   }
 )
 @versioned(Contoso.WidgetManager.Versions)
@@ -36,7 +36,6 @@ namespace Contoso.WidgetManager;
 /** The Contoso Widget Manager service version. */
 enum Versions {
   /** Version 2022-08-31 */
-  @useDependency(Azure.Core.Versions.v1_0_Preview_2)
   `2022-08-30`,
 }
 

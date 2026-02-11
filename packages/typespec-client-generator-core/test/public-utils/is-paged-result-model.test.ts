@@ -1,53 +1,10 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
 import { ok } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { isPagedResultModel } from "../../src/public-utils.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
-
-it("normal paged model", async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runner.compileWithBuiltInAzureCoreService(`
-    #suppress "deprecated" "Keep for validation purposes."
-    @pagedResult
-    model TestResult {
-      #suppress "deprecated" "Keep for validation purposes."
-      @items
-      value: Test[];
-
-      @nextLink
-      nextLink?: url;
-    }
-
-    model Test {
-      prop: string;
-    }
-
-    op test(): TestResult;
-  `);
-
-  const sdkPackage = runner.context.sdkPackage;
-  ok(
-    isPagedResultModel(runner.context, sdkPackage.models.filter((m) => m.name === "TestResult")[0]),
-  );
-});
+import { AzureCoreTesterWithService, createSdkContextForTester } from "../tester.js";
 
 it("template paged model", async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runner.compileWithBuiltInAzureCoreService(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     model TestResult is Page<Test>;
 
     model Test {
@@ -57,20 +14,14 @@ it("template paged model", async () => {
     @list
     op test(): TestResult;
   `);
+  const context = await createSdkContextForTester(program);
 
-  const sdkPackage = runner.context.sdkPackage;
-  ok(
-    isPagedResultModel(runner.context, sdkPackage.models.filter((m) => m.name === "TestResult")[0]),
-  );
+  const sdkPackage = context.sdkPackage;
+  ok(isPagedResultModel(context, sdkPackage.models.filter((m) => m.name === "TestResult")[0]));
 });
 
 it("another usage of template paged model", async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runner.compileWithBuiltInAzureCoreService(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     model Test {
       prop: string;
     }
@@ -78,20 +29,14 @@ it("another usage of template paged model", async () => {
     @list
     op test(): Page<Test>;
   `);
+  const context = await createSdkContextForTester(program);
 
-  const sdkPackage = runner.context.sdkPackage;
-  ok(
-    isPagedResultModel(runner.context, sdkPackage.models.filter((m) => m.name === "PagedTest")[0]),
-  );
+  const sdkPackage = context.sdkPackage;
+  ok(isPagedResultModel(context, sdkPackage.models.filter((m) => m.name === "PagedTest")[0]));
 });
 
 it("paged model use template list", async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runner.compileWithBuiltInAzureCoreService(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     model Test {
       prop: string;
     }
@@ -101,9 +46,31 @@ it("paged model use template list", async () => {
 
     op test is testTemplate<Test>;
   `);
+  const context = await createSdkContextForTester(program);
 
-  const sdkPackage = runner.context.sdkPackage;
-  ok(
-    isPagedResultModel(runner.context, sdkPackage.models.filter((m) => m.name === "PagedTest")[0]),
-  );
+  const sdkPackage = context.sdkPackage;
+  ok(isPagedResultModel(context, sdkPackage.models.filter((m) => m.name === "PagedTest")[0]));
+});
+
+it("paged model with @markAsPageable decorator", async () => {
+  const { program } = await AzureCoreTesterWithService.compile(`
+    model ItemListResult {
+      @pageItems
+      items: Item[];
+    }
+
+    model Item {
+      id: string;
+      name: string;
+    }
+
+    @Azure.ClientGenerator.Core.Legacy.markAsPageable
+    @route("/items")
+    @get
+    op listItems(): ItemListResult;
+  `);
+  const context = await createSdkContextForTester(program);
+
+  const sdkPackage = context.sdkPackage;
+  ok(isPagedResultModel(context, sdkPackage.models.filter((m) => m.name === "ItemListResult")[0]));
 });

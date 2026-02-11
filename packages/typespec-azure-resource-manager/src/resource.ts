@@ -4,7 +4,10 @@ import {
   ArrayModelType,
   getProperty as compilerGetProperty,
   DecoratorContext,
+  Enum,
+  EnumMember,
   getKeyName,
+  getNamespaceFullName,
   getTags,
   Interface,
   isArrayModelType,
@@ -23,6 +26,8 @@ import {
 import { useStateMap } from "@typespec/compiler/utils";
 import { getHttpOperation, isPathParam } from "@typespec/http";
 import { $autoRoute, getParentResource, getSegment } from "@typespec/rest";
+
+import { camelCase, pascalCase } from "change-case";
 import {
   ArmProviderNameValueDecorator,
   ArmResourceOperationsDecorator,
@@ -37,7 +42,15 @@ import {
   SubscriptionResourceDecorator,
   TenantResourceDecorator,
 } from "../generated-defs/Azure.ResourceManager.js";
-import { CustomAzureResourceDecorator } from "../generated-defs/Azure.ResourceManager.Legacy.js";
+import {
+  ArmExternalTypeDecorator,
+  ArmFeatureOptions,
+  CustomAzureResourceDecorator,
+  CustomResourceOptions,
+  FeatureDecorator,
+  FeatureOptionsDecorator,
+  FeaturesDecorator,
+} from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { reportDiagnostic } from "./lib.js";
 import {
   getArmProviderNamespace,
@@ -51,6 +64,7 @@ import {
   ArmResourceOperations,
   getArmResourceOperationData,
   getArmResourceOperationList,
+  getResourceNameForOperation,
   resolveResourceOperations,
 } from "./operations.js";
 import { getArmResource, listArmResources, registerArmResource } from "./private.decorators.js";
@@ -80,6 +94,19 @@ export interface ArmResourceDetailsBase {
   typespecType: Model;
 }
 
+export const [isArmExternalType, setArmExternalType] = useStateMap<Model, boolean>(
+  ArmStateKeys.armExternalType,
+);
+
+export const $armExternalType: ArmExternalTypeDecorator = (
+  context: DecoratorContext,
+  entity: Model,
+) => {
+  const { program } = context;
+  if (isTemplateDeclaration(entity)) return;
+  setArmExternalType(program, entity, true);
+};
+
 /** Details for RP resources */
 export interface ArmResourceDetails extends ArmResourceDetailsBase {
   /** The set of lifecycle operations and actions for the resource */
@@ -96,41 +123,79 @@ export interface ArmVirtualResourceDetails {
   provider?: string;
 }
 
-/** New base details for resolved resources */
-export interface ResourceMetadata {
+/** New details for a resolved resource */
+export interface ResourceModel {
   /** The model type for the resource */
   type: Model;
   /** The kind of resource (extension | tracked | proxy | custom | virtual | built-in) */
   kind: ArmResourceKind;
   /** The provider namespace */
   providerNamespace: string;
-}
-
-/** New details for a resolved resource */
-export interface ResolvedResource extends ResourceMetadata {
   /** The set of resolved operations for a resource.  For most 
         resources there will be 1 returned record */
-  operations?: ResolvedOperations[];
-}
-
-export interface ResolvedResources {
   resources?: ResolvedResource[];
-  unassociatedOperations?: ArmResourceOperation[];
 }
 
-export interface ResolvedOperationResourceInfo {
+export interface Provider {
+  /** The set of resources in this provider */
+  resources?: ResolvedResource[];
+  /** non-resource operations in this provider */
+  providerOperations?: ArmResourceOperation[];
+}
+
+export interface ResourcePathInfo {
   /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
   resourceType: ResourceType;
   /** The path to the instance of a resource */
   resourceInstancePath: string;
 }
 
+export interface ResolvedResourceInfo {
+  /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
+  resourceType: ResourceType;
+  /** The path to the instance of a resource */
+  resourceInstancePath: string;
+  /** The name of the resource at this instance path  */
+  resourceName: string;
+}
+
+interface ResolvedResourceOperations {
+  operations: ArmResolvedOperationsForResource;
+  /** Other operations associated with this resource */
+  associatedOperations?: ArmResourceOperation[];
+  /** The name of the resource at this instance path  */
+  resourceName: string;
+  /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
+  resourceType: ResourceType;
+  /** The path to the instance of a resource */
+  resourceInstancePath: string;
+  /** The parent of this resource */
+  parent?: ResolvedResource;
+  /** The scope of this resource */
+  scope?: string;
+}
 /** Resolved operations, including operations for non-arm resources */
-export interface ResolvedOperations extends ResolvedOperationResourceInfo {
+export interface ResolvedResource {
+  /** The model type for the resource */
+  type: Model;
+  /** The kind of resource (extension | tracked | proxy | custom | virtual | built-in) */
+  kind: "Tracked" | "Proxy" | "Extension" | "Other";
+  /** The provider namespace */
+  providerNamespace: string;
   /** The lifecycle and action operations using this resourceInstancePath (or the parent path) */
   operations: ArmResolvedOperationsForResource;
   /** Other operations associated with this resource */
   associatedOperations?: ArmResourceOperation[];
+  /** The name of the resource at this instance path  */
+  resourceName: string;
+  /** The resource type (The actual resource type string will be "${provider}/${types.join("/")}) */
+  resourceType: ResourceType;
+  /** The path to the instance of a resource */
+  resourceInstancePath: string;
+  /** The parent of this resource */
+  parent?: ResolvedResource;
+  /** The scope of this resource */
+  scope?: string | ResolvedResource;
 }
 
 /** Description of the resource type */
@@ -188,11 +253,12 @@ export const $armVirtualResource: ArmVirtualResourceDecorator = (
 export const $customAzureResource: CustomAzureResourceDecorator = (
   context: DecoratorContext,
   entity: Model,
+  options?: CustomResourceOptions,
 ) => {
   const { program } = context;
+  const optionsValue = options ?? { isAzureResource: false };
   if (isTemplateDeclaration(entity)) return;
-
-  program.stateMap(ArmStateKeys.customAzureResource).set(entity, "Custom");
+  setCustomResource(program, entity, optionsValue);
 };
 
 function getProperty(
@@ -245,6 +311,12 @@ export function getArmVirtualResourceDetails(
   return undefined;
 }
 
+const [getCustomResourceOptions, setCustomResource] = useStateMap<Model, CustomResourceOptions>(
+  ArmStateKeys.customAzureResource,
+);
+
+export { getCustomResourceOptions };
+
 /**
  * Determine if the given model is a custom resource.
  * @param program The program to process.
@@ -252,7 +324,8 @@ export function getArmVirtualResourceDetails(
  * @returns true if the model or any model it extends is marked as a resource, otherwise false.
  */
 export function isCustomAzureResource(program: Program, target: Model): boolean {
-  if (program.stateMap(ArmStateKeys.customAzureResource).has(target)) return true;
+  const resourceOptions = getCustomResourceOptions(program, target);
+  if (resourceOptions) return true;
   if (target.baseModel) return isCustomAzureResource(program, target.baseModel);
   return false;
 }
@@ -356,12 +429,28 @@ export function getArmResources(program: Program): ArmResourceDetails[] {
   return resources;
 }
 
-export const [getResolvedResources, setResolvedResources] = useStateMap<
-  Namespace,
-  ResolvedResources
->(ArmStateKeys.armResolvedResources);
+export const [getResolvedResources, setResolvedResources] = useStateMap<Namespace, Provider>(
+  ArmStateKeys.armResolvedResources,
+);
 
-export function resolveArmResources(program: Program): ResolvedResources {
+export function getPublicResourceKind(
+  typespecType: Model,
+): "Tracked" | "Proxy" | "Extension" | "Other" | undefined {
+  const kind = getArmResourceKind(typespecType);
+  if (kind === undefined) return "Other";
+  switch (kind) {
+    case "Tracked":
+      return "Tracked";
+    case "Proxy":
+      return "Proxy";
+    case "Extension":
+      return "Extension";
+    default:
+      return "Other";
+  }
+}
+
+export function resolveArmResources(program: Program): Provider {
   const provider = resolveProviderNamespace(program);
   if (provider === undefined) return {};
   const resolvedResources = getResolvedResources(program, provider);
@@ -374,27 +463,168 @@ export function resolveArmResources(program: Program): ResolvedResources {
   const resources: ResolvedResource[] = [];
   for (const resource of listArmResources(program)) {
     const operations = resolveArmResourceOperations(program, resource.typespecType);
-    const fullResource: ResolvedResource = {
-      type: resource.typespecType,
-      kind:
-        getArmResourceKind(resource.typespecType) ??
-        (operations.length > 0 ? "Tracked" : "Virtual"),
-      providerNamespace: resource.armProviderNamespace,
-      operations: operations,
-    };
-    resources.push(fullResource);
+    for (const op of operations) {
+      const fullResource: ResolvedResource = {
+        ...op,
+        type: resource.typespecType,
+        kind:
+          getPublicResourceKind(resource.typespecType) ??
+          (operations.length > 0 ? "Tracked" : "Other"),
+        providerNamespace: resource.armProviderNamespace,
+      };
+      resources.push(fullResource);
+    }
+  }
+  const toProcess = resources.slice();
+  while (toProcess.length > 0) {
+    const resource = toProcess.shift()!;
+    resource.parent = getResourceParent(resources, resource, toProcess);
+    resource.scope = getResourceScope(resources, resource, toProcess);
   }
 
   // Add the unmarked operations
-  const resolved = {
+  const resolved: Provider = {
     resources: resources,
-    unassociatedOperations: getUnassociatedOperations(program).filter(
+    providerOperations: getUnassociatedOperations(program).filter(
       (op) => !isArmResourceOperation(program, op.operation),
     ),
   };
 
   setResolvedResources(program, provider, resolved);
   return resolved;
+}
+
+function getResourceParent(
+  knownResources: ResolvedResource[],
+  child: ResolvedResource,
+  resourcesToProcess: ResolvedResource[],
+): ResolvedResource | undefined {
+  if (child.resourceType.types.length < 2) return undefined;
+  for (const resource of knownResources) {
+    if (
+      resource.resourceType.types.length + 1 === child.resourceType.types.length &&
+      resource.resourceType.provider === child.resourceType.provider &&
+      resource.resourceType.types.join("/") === child.resourceType.types.slice(0, -1).join("/")
+    ) {
+      return resource;
+    }
+  }
+  const parent: ResolvedResource = {
+    type: child.type,
+    kind: "Other",
+    providerNamespace: child.providerNamespace,
+    resourceType: {
+      provider: child.resourceType.provider,
+      types: child.resourceType.types.slice(0, -1),
+    },
+    resourceName: getParentName(child.resourceType.types[child.resourceType.types.length - 2]),
+    resourceInstancePath: `/${child.resourceInstancePath
+      .split("/")
+      .filter((s) => s.length > 0)
+      .slice(0, -2)
+      .join("/")}`,
+    operations: { lifecycle: {}, actions: [], lists: [] },
+  };
+  knownResources.push(parent);
+  resourcesToProcess.push(parent);
+  return parent;
+}
+
+function getParentName(typeName: string): string {
+  if (typeName.endsWith("s")) {
+    typeName = typeName.slice(0, -1);
+  }
+  return pascalCase(typeName);
+}
+
+function getResourceScope(
+  knownResources: ResolvedResource[],
+  resource: ResolvedResource,
+  resourcesToProcess: ResolvedResource[],
+): ResolvedResource | string | undefined {
+  if (resource.scope !== undefined) return resource.scope;
+  if (resource.parent !== undefined)
+    return getResourceScope(knownResources, resource.parent, resourcesToProcess);
+  const partsIndex = resource.resourceInstancePath.lastIndexOf("/providers");
+  if (partsIndex === 0) return "Tenant";
+
+  const segments = resource.resourceInstancePath
+    .slice(0, partsIndex)
+    .split("/")
+    .filter((s) => s.length > 0);
+  if (segments.length === 1 && isVariableSegment(segments[0])) return "Scope";
+  if (
+    segments.length === 2 &&
+    isVariableSegment(segments[1]) &&
+    segments[0].toLowerCase() === "subscriptions"
+  )
+    return "Subscription";
+  if (
+    segments.length === 4 &&
+    isVariableSegment(segments[3]) &&
+    segments[0].toLowerCase() === "subscriptions" &&
+    segments[2].toLowerCase() === "resourcegroups"
+  )
+    return "ResourceGroup";
+  if (
+    segments.length === 4 &&
+    isVariableSegment(segments[3]) &&
+    segments[0].toLowerCase() === "providers" &&
+    segments[1].toLowerCase() === "microsoft.management" &&
+    segments[2].toLowerCase() === "managementgroups"
+  )
+    return "ManagementGroup";
+  if (segments.some((s) => s.toLowerCase() === "providers")) {
+    const parentProviderIndex = segments.findLastIndex((s) => s.toLowerCase() === "providers");
+    if (segments.length < parentProviderIndex + 2) {
+      return "ExternalResource";
+    }
+    const provider = segments[parentProviderIndex + 1];
+    if (isVariableSegment(provider)) {
+      return "ExternalResource";
+    }
+    const typeSegments: string[] = segments.slice(parentProviderIndex + 2);
+    if (typeSegments.length % 2 !== 0) {
+      return "ExternalResource";
+    }
+    const types: string[] = [];
+    for (let i = 0; i < typeSegments.length; i++) {
+      if (i % 2 === 0) {
+        if (isVariableSegment(typeSegments[i])) {
+          return "ExternalResource";
+        }
+        types.push(typeSegments[i]);
+      } else if (!isVariableSegment(typeSegments[i])) {
+        return "ExternalResource";
+      }
+    }
+    const parent: ResolvedResource = {
+      type: resource.type,
+      kind: "Other",
+      providerNamespace: provider,
+      resourceType: {
+        provider: provider,
+        types: types,
+      },
+      resourceName: getParentName(types[types.length - 1]),
+      resourceInstancePath: `/${segments.join("/")}`,
+      operations: { lifecycle: {}, actions: [], lists: [] },
+    };
+    for (const knownResource of knownResources) {
+      if (
+        parent.resourceType.provider.toLowerCase() ===
+          knownResource.resourceType.provider.toLowerCase() &&
+        parent.resourceType.types.flatMap((r) => r.toLowerCase()).join("/") ===
+          knownResource.resourceType.types.flatMap((k) => k.toLowerCase()).join("/")
+      ) {
+        return knownResource;
+      }
+    }
+    knownResources.push(parent);
+    resourcesToProcess.push(parent);
+    return parent;
+  }
+  return undefined;
 }
 
 function isVariableSegment(segment: string): boolean {
@@ -404,14 +634,19 @@ function isVariableSegment(segment: string): boolean {
 function getResourceInfo(
   program: Program,
   operation: ArmResourceOperation,
-): ResolvedOperationResourceInfo | undefined {
-  return getResourcePathElements(operation.httpOperation.path, operation.kind);
+): ResolvedResourceInfo | undefined {
+  const pathInfo = getResourcePathElements(operation.httpOperation.path, operation.kind);
+  if (pathInfo === undefined) return undefined;
+  return {
+    ...pathInfo,
+    resourceName: operation.resourceName ?? operation.operationGroup,
+  };
 }
 
 export function getResourcePathElements(
   path: string,
   kind: ArmOperationKind,
-): ResolvedOperationResourceInfo | undefined {
+): ResourcePathInfo | undefined {
   const segments = path.split("/").filter((s) => s.length > 0);
   const providerIndex = segments.findLastIndex((s) => s === "providers");
   if (providerIndex === -1 || providerIndex === segments.length - 1) return undefined;
@@ -420,7 +655,7 @@ export function getResourcePathElements(
   const instanceSegments: string[] = segments.slice(0, providerIndex + 2);
   for (let i = providerIndex + 2; i < segments.length; i += 2) {
     if (isVariableSegment(segments[i])) {
-      return undefined;
+      break;
     }
 
     if (i + 1 < segments.length && isVariableSegment(segments[i + 1])) {
@@ -455,89 +690,73 @@ export function getResourcePathElements(
 function tryAddLifecycleOperation(
   resourceType: ResourceType,
   sourceOperation: ArmResourceOperation,
-  targetOperation: ResolvedOperations,
+  targetResource: ResolvedResourceOperations,
 ): boolean {
-  const pathSegments: string[] = sourceOperation.httpOperation.path
-    .split("/")
-    .filter((s) => s.length > 0);
-  const isInstanceOperation: boolean = isVariableSegment(pathSegments[pathSegments.length - 1]);
-  const isResourceCollectionOperation: boolean =
-    !isInstanceOperation &&
-    pathSegments[pathSegments.length - 1] === resourceType.types[resourceType.types.length - 1];
-  switch (sourceOperation.httpOperation.verb) {
-    case "get":
-      if (isInstanceOperation) {
-        if (targetOperation.operations.lifecycle.read === undefined) {
-          targetOperation.operations.lifecycle.read = [];
-        }
-        addUniqueOperation(sourceOperation, targetOperation.operations.lifecycle.read);
-        return true;
-      }
-      if (!isResourceCollectionOperation) {
-        addUniqueOperation(sourceOperation, targetOperation.operations.actions || []);
-        return true;
-      }
-      if (targetOperation.operations.lists === undefined) {
-        targetOperation.operations.lists = [];
-      }
-      addUniqueOperation(sourceOperation, targetOperation.operations.lists);
+  const opType = sourceOperation.kind;
+  const operations = targetResource.operations;
+  switch (opType) {
+    case "read":
+      operations.lifecycle.read ??= [];
+      addUniqueOperation(sourceOperation, operations.lifecycle.read);
       return true;
-    case "put":
-      if (!isInstanceOperation) {
-        return false;
-      }
-      if (targetOperation.operations.lifecycle.createOrUpdate === undefined) {
-        targetOperation.operations.lifecycle.createOrUpdate = [];
-      }
-      addUniqueOperation(sourceOperation, targetOperation.operations.lifecycle.createOrUpdate);
+    case "createOrUpdate":
+      operations.lifecycle.createOrUpdate ??= [];
+      addUniqueOperation(sourceOperation, operations.lifecycle.createOrUpdate);
       return true;
-    case "patch":
-      if (!isInstanceOperation) {
-        return false;
-      }
-      if (targetOperation.operations.lifecycle.update === undefined) {
-        targetOperation.operations.lifecycle.update = [];
-      }
-      addUniqueOperation(sourceOperation, targetOperation.operations.lifecycle.update);
+    case "update":
+      operations.lifecycle.update ??= [];
+      addUniqueOperation(sourceOperation, operations.lifecycle.update);
       return true;
     case "delete":
-      if (!isInstanceOperation) {
-        return false;
-      }
-      if (targetOperation.operations.lifecycle.delete === undefined) {
-        targetOperation.operations.lifecycle.delete = [];
-      }
-      addUniqueOperation(sourceOperation, targetOperation.operations.lifecycle.delete);
+      operations.lifecycle.delete ??= [];
+      addUniqueOperation(sourceOperation, operations.lifecycle.delete);
       return true;
-    case "post":
-    case "head":
-      if (isInstanceOperation) {
-        return false;
-      }
-      if (targetOperation.operations.actions === undefined) {
-        targetOperation.operations.actions = [];
-      }
-      addUniqueOperation(sourceOperation, targetOperation.operations.actions);
+    case "list":
+      operations.lists ??= [];
+      addUniqueOperation(sourceOperation, operations.lists);
       return true;
-    default:
-      return false;
+    case "action":
+      operations.actions ??= [];
+      addUniqueOperation(sourceOperation, operations.actions);
+      return true;
+    case "checkExistence":
+      operations.lifecycle.checkExistence ??= [];
+      addUniqueOperation(sourceOperation, operations.lifecycle.checkExistence);
+      return true;
+    case "other":
+      targetResource.associatedOperations ??= [];
+      addUniqueOperation(sourceOperation, targetResource.associatedOperations);
+      return true;
   }
+  return false;
 }
 
 function addAssociatedOperation(
   sourceOperation: ArmResourceOperation,
-  targetOperation: ResolvedOperations,
+  targetOperation: ResolvedResourceOperations,
 ): void {
-  if (!targetOperation.associatedOperations) {
-    targetOperation.associatedOperations = [];
-  }
+  targetOperation.associatedOperations ??= [];
   addUniqueOperation(sourceOperation, targetOperation.associatedOperations);
 }
 
 export function isResourceOperationMatch(
-  source: { resourceType: ResourceType; resourceInstancePath: string },
-  target: { resourceType: ResourceType; resourceInstancePath: string },
+  source: {
+    resourceType: ResourceType;
+    resourceInstancePath: string;
+    resourceName?: string;
+  },
+  target: {
+    resourceType: ResourceType;
+    resourceInstancePath: string;
+    resourceName?: string;
+  },
 ): boolean {
+  if (
+    source.resourceName &&
+    target.resourceName &&
+    source.resourceName.toLowerCase() !== target.resourceName.toLowerCase()
+  )
+    return false;
   if (source.resourceType.provider.toLowerCase() !== target.resourceType.provider.toLowerCase())
     return false;
   if (source.resourceType.types.length !== target.resourceType.types.length) return false;
@@ -545,7 +764,7 @@ export function isResourceOperationMatch(
     if (source.resourceType.types[i].toLowerCase() !== target.resourceType.types[i].toLowerCase())
       return false;
   }
-  const sourceSegments = source.resourceInstancePath.split("/");
+  /*const sourceSegments = source.resourceInstancePath.split("/");
   const targetSegments = target.resourceInstancePath.split("/");
   if (sourceSegments.length !== targetSegments.length) return false;
   for (let i = 0; i < sourceSegments.length; i++) {
@@ -555,7 +774,7 @@ export function isResourceOperationMatch(
       }
       if (sourceSegments[i].toLowerCase() !== targetSegments[i].toLowerCase()) return false;
     } else if (!isVariableSegment(targetSegments[i])) return false;
-  }
+  }*/
   return true;
 }
 
@@ -565,20 +784,15 @@ export function getUnassociatedOperations(program: Program): ArmResourceOperatio
     .filter((op) => op !== undefined) as ArmResourceOperation[];
 }
 
-function getResourceOperation(
+export function getResourceOperation(
   program: Program,
   operation: Operation,
 ): ArmResourceOperation | undefined {
   if (operation.kind !== "Operation") return undefined;
-  if (!operation.isFinished) return undefined;
+  if (operation.isFinished === false) return undefined;
   if (isTemplateDeclarationOrInstance(operation) && !isTemplateInstance(operation))
     return undefined;
   if (operation.interface === undefined || operation.interface.name === undefined) return undefined;
-  if (
-    isTemplateDeclarationOrInstance(operation.interface) &&
-    !isTemplateInstance(operation.interface)
-  )
-    return undefined;
   const [httpOp, _] = getHttpOperation(program, operation);
   return {
     path: httpOp.path,
@@ -587,6 +801,7 @@ function getResourceOperation(
     kind: "other",
     operation: operation,
     operationGroup: operation.interface.name,
+    resourceModelName: "",
   };
 }
 
@@ -642,8 +857,8 @@ function addUniqueOperation(operation: ArmResourceOperation, operations: ArmReso
 export function resolveArmResourceOperations(
   program: Program,
   resourceType: Model,
-): ResolvedOperations[] {
-  const resolvedOperations: Set<ResolvedOperations> = new Set<ResolvedOperations>();
+): ResolvedResourceOperations[] {
+  const resolvedOperations: Set<ResolvedResourceOperations> = new Set<ResolvedResourceOperations>();
   const operations = getArmResourceOperationList(program, resourceType);
   for (const operation of operations) {
     const armOperation: ArmResourceOperation | undefined = getResourceOperation(
@@ -653,8 +868,17 @@ export function resolveArmResourceOperations(
 
     if (armOperation === undefined) continue;
     armOperation.kind = operation.kind;
+
+    armOperation.resourceModelName = operation.resource?.name ?? resourceType.name;
     const resourceInfo = getResourceInfo(program, armOperation);
     if (resourceInfo === undefined) continue;
+    armOperation.name = operation.name;
+    armOperation.resourceKind = operation.resourceKind;
+    resourceInfo.resourceName =
+      operation.resourceName ??
+      getResourceNameForOperation(program, armOperation, resourceInfo.resourceInstancePath) ??
+      armOperation.resourceModelName;
+    armOperation.resourceName = resourceInfo.resourceName;
 
     let matched = false;
     // Check if we already have an operation for this resource
@@ -671,25 +895,27 @@ export function resolveArmResourceOperations(
 
     if (matched) continue;
     // If we don't have an operation for this resource, create a new one
-    const newOperation: ResolvedOperations = {
+    const newResource: ResolvedResourceOperations = {
       resourceType: resourceInfo.resourceType,
       resourceInstancePath: resourceInfo.resourceInstancePath,
+      resourceName: resourceInfo.resourceName,
       operations: {
         lifecycle: {
           read: undefined,
           createOrUpdate: undefined,
           update: undefined,
           delete: undefined,
+          checkExistence: undefined,
         },
         actions: [],
         lists: [],
       },
       associatedOperations: [],
     };
-    if (!tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, newOperation)) {
-      addAssociatedOperation(armOperation, newOperation);
+    if (!tryAddLifecycleOperation(resourceInfo.resourceType, armOperation, newResource)) {
+      addAssociatedOperation(armOperation, newResource);
     }
-    resolvedOperations.add(newOperation);
+    resolvedOperations.add(newResource);
   }
   return [...resolvedOperations.values()].toSorted((a, b) => {
     // Sort by provider, type, then instance path
@@ -731,12 +957,21 @@ export function getArmResourceInfo(
 export function getArmResourceKind(resourceType: Model): ArmResourceKind | undefined {
   if (resourceType.baseModel) {
     const coreType = resourceType.baseModel;
-    if (coreType.name.startsWith("TrackedResource")) {
+    const coreTypeNamespace = coreType.namespace ? getNamespaceFullName(coreType.namespace) : "";
+    if (
+      coreType.name.startsWith("TrackedResource") ||
+      coreType.name.startsWith("LegacyTrackedResource") ||
+      (coreTypeNamespace.startsWith("Azure.ResourceManager") &&
+        resourceType.properties.has("location") &&
+        resourceType.properties.has("tags"))
+    ) {
       return "Tracked";
     } else if (coreType.name.startsWith("ProxyResource")) {
       return "Proxy";
     } else if (coreType.name.startsWith("ExtensionResource")) {
       return "Extension";
+    } else if (coreTypeNamespace === "Azure.ResourceManager.CommonTypes") {
+      return "BuiltIn";
     }
   }
 
@@ -883,17 +1118,12 @@ export const $armProviderNameValue: ArmProviderNameValueDecorator = (
 
 export const $identifiers: IdentifiersDecorator = (
   context: DecoratorContext,
-  entity: ModelProperty,
+  entity: ModelProperty | Type,
   properties: readonly string[],
 ) => {
   const { program } = context;
-  const { type } = entity;
-
-  if (
-    type.kind !== "Model" ||
-    !isArrayModelType(program, type) ||
-    type.indexer.value.kind !== "Model"
-  ) {
+  const type = entity.kind === "ModelProperty" ? entity.type : entity;
+  if (type.kind !== "Model" || !isArrayModelType(type) || type.indexer.value.kind !== "Model") {
     reportDiagnostic(program, {
       code: "decorator-param-wrong-type",
       messageId: "armIdentifiersIncorrectEntity",
@@ -906,18 +1136,21 @@ export const $identifiers: IdentifiersDecorator = (
 };
 
 /**
- * This function returns identifiers using the @identifiers decorator
+ * This function returns identifiers using the '@identifiers' decorator
  *
  * @param program The program to process.
  * @param entity The array model type to check.
  * @returns returns list of arm identifiers for the given array model type if any or undefined.
  */
-export function getArmIdentifiers(program: Program, entity: ModelProperty): string[] | undefined {
+export function getArmIdentifiers(
+  program: Program,
+  entity: ModelProperty | Model,
+): string[] | undefined {
   return program.stateMap(ArmStateKeys.armIdentifiers).get(entity);
 }
 
 /**
- * This function returns identifiers using the @key decorator.
+ * This function returns identifiers using the '@key' decorator.
  *
  * @param program The program to process.
  * @param entity The array model type to check.
@@ -1054,3 +1287,154 @@ export function resolveResourceBaseType(type?: string | undefined): ResourceBase
   }
   return resolvedType;
 }
+
+export const [getResourceFeature, setResourceFeature] = useStateMap<
+  Model | Operation | Interface | Namespace,
+  EnumMember
+>(ArmStateKeys.armFeature);
+
+export const [getResourceFeatureSet, setResourceFeatureSet] = useStateMap<
+  Namespace,
+  Map<string, ArmFeatureOptions>
+>(ArmStateKeys.armFeatureSet);
+
+export const [getResourceFeatureOptions, setResourceFeatureOptions] = useStateMap<
+  EnumMember,
+  ArmFeatureOptions
+>(ArmStateKeys.armFeatureOptions);
+
+const commonFeatureOptions: ArmFeatureOptions = {
+  featureName: "Common",
+  fileName: "common",
+  description: "",
+};
+export function getFeatureOptions(program: Program, feature: EnumMember): ArmFeatureOptions {
+  const defaultFeatureName: string = (feature.value ?? feature.name) as string;
+  const defaultOptions: ArmFeatureOptions = {
+    featureName: defaultFeatureName,
+    fileName: camelCase(defaultFeatureName),
+    description: "",
+  };
+  return program.stateMap(ArmStateKeys.armFeatureOptions).get(feature) ?? defaultOptions;
+}
+
+/**
+ * Get the FeatureOptions for a given type, these could be inherited from the namespace or parent type
+ * @param program - The program to process.
+ * @param entity - The type entity to get feature options for.
+ * @returns The ArmFeatureOptions if found, otherwise undefined.
+ */
+export function getFeature(program: Program, entity: Type): ArmFeatureOptions {
+  switch (entity.kind) {
+    case "Namespace": {
+      const feature = getResourceFeature(program, entity);
+      if (feature === undefined) return commonFeatureOptions;
+      const options = getFeatureOptions(program, feature);
+      return options;
+    }
+    case "Interface": {
+      let feature = getResourceFeature(program, entity);
+      if (feature !== undefined) return getFeatureOptions(program, feature);
+      const namespace = entity.namespace;
+      if (namespace === undefined) return commonFeatureOptions;
+      feature = getResourceFeature(program, namespace);
+      if (feature === undefined) return commonFeatureOptions;
+      return getFeatureOptions(program, feature);
+    }
+    case "Model": {
+      let feature = getResourceFeature(program, entity);
+      if (feature !== undefined) return getFeatureOptions(program, feature);
+      if (isTemplateInstance(entity)) {
+        for (const arg of entity.templateMapper.args) {
+          if (arg.entityKind === "Type" && arg.kind === "Model") {
+            const options = getFeature(program, arg);
+            if (options !== commonFeatureOptions) return options;
+          }
+        }
+      }
+      const namespace = entity.namespace;
+      if (namespace === undefined) return commonFeatureOptions;
+      feature = getResourceFeature(program, namespace);
+      if (feature === undefined) return commonFeatureOptions;
+      return getFeatureOptions(program, feature);
+    }
+    case "Operation": {
+      const opFeature = getResourceFeature(program, entity);
+      if (opFeature !== undefined) return getFeatureOptions(program, opFeature);
+      const opInterface = entity.interface;
+      if (opInterface !== undefined) {
+        return getFeature(program, opInterface);
+      }
+      const namespace = entity.namespace;
+      if (namespace === undefined) return commonFeatureOptions;
+      const feature = getResourceFeature(program, namespace);
+      if (feature === undefined) return commonFeatureOptions;
+      return getFeatureOptions(program, feature);
+    }
+    case "EnumMember": {
+      return getFeature(program, entity.enum);
+    }
+    case "UnionVariant": {
+      return getFeature(program, entity.union);
+    }
+    case "ModelProperty": {
+      if (entity.model === undefined) return commonFeatureOptions;
+      return getFeature(program, entity.model);
+    }
+    case "Enum":
+    case "Union":
+    case "Scalar": {
+      const namespace = entity.namespace;
+      if (namespace === undefined) return commonFeatureOptions;
+      const feature = getResourceFeature(program, namespace);
+      if (feature === undefined) return commonFeatureOptions;
+      return getFeatureOptions(program, feature);
+    }
+
+    default:
+      return commonFeatureOptions;
+  }
+}
+
+export const $feature: FeatureDecorator = (
+  context: DecoratorContext,
+  entity: Model | Operation | Interface | Namespace,
+  featureName: EnumMember,
+) => {
+  const { program } = context;
+  setResourceFeature(program, entity, featureName);
+};
+
+export const $features: FeaturesDecorator = (
+  context: DecoratorContext,
+  entity: Namespace,
+  features: Enum,
+) => {
+  const { program } = context;
+  let featureMap: Map<string, ArmFeatureOptions> | undefined = getResourceFeatureSet(
+    program,
+    entity,
+  );
+  if (featureMap !== undefined) {
+    return;
+  }
+  featureMap = new Map<string, ArmFeatureOptions>();
+
+  for (const member of features.members.values()) {
+    const options = getFeatureOptions(program, member); // Ensure defaults are created
+    featureMap.set(options.featureName, options);
+  }
+  const common = [...featureMap.keys()].some((k) => k.toLowerCase() === "common");
+  if (!common) {
+    featureMap.set("Common", commonFeatureOptions);
+  }
+  setResourceFeatureSet(program, entity, featureMap);
+};
+
+export const $featureOptions: FeatureOptionsDecorator = (
+  context: DecoratorContext,
+  entity: EnumMember,
+  options: ArmFeatureOptions,
+) => {
+  setResourceFeatureOptions(context.program, entity, options);
+};

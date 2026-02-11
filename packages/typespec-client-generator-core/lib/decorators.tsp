@@ -3,7 +3,12 @@ using Reflection;
 namespace Azure.ClientGenerator.Core;
 
 /**
- * Changes the name of a client, method, parameter, union, model, enum, model property, etc. generated in the client SDK.
+ * Overrides the generated name for client SDK elements including clients, methods, parameters,
+ * unions, models, enums, and model properties.
+ *
+ * This decorator takes precedence over all other naming mechanisms, including the `name`
+ * property in `@client` decorator and default naming conventions.
+ *
  * @param target The type you want to rename.
  * @param rename The rename you want applied to the object.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
@@ -50,33 +55,79 @@ extern dec clientName(target: unknown, rename: valueof string, scope?: valueof s
 
 /**
  * Whether you want to generate an operation as a convenient method.
- * @param target The target operation.
+ * When applied to a namespace or interface, it affects all operations within that scope unless explicitly overridden.
+ * @param target The target operation, namespace, or interface.
  * @param flag Whether to generate the operation as a convenience method or not.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  *
- * @example
+ * @example Apply to a single operation
  * ```typespec
  * @convenientAPI(false)
  * op test: void;
  * ```
+ *
+ * @example Apply to all operations in an interface
+ * ```typespec
+ * @convenientAPI(false)
+ * interface MyOperations {
+ *   op test1(): void;
+ *   op test2(): void;
+ * }
+ * ```
+ *
+ * @example Apply to all operations in a namespace
+ * ```typespec
+ * @convenientAPI(false)
+ * namespace MyService {
+ *   op test1(): void;
+ *   op test2(): void;
+ * }
+ * ```
  */
-extern dec convenientAPI(target: Operation, flag?: valueof boolean, scope?: valueof string);
+extern dec convenientAPI(
+  target: Operation | Namespace | Interface,
+  flag?: valueof boolean,
+  scope?: valueof string
+);
 
 /**
  * Whether you want to generate an operation as a protocol method.
- * @param target The target operation.
+ * When applied to a namespace or interface, it affects all operations within that scope unless explicitly overridden.
+ * @param target The target operation, namespace, or interface.
  * @param flag Whether to generate the operation as a protocol method or not.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  *
- * @example
+ * @example Apply to a single operation
  * ```typespec
  * @protocolAPI(false)
  * op test: void;
  * ```
+ *
+ * @example Apply to all operations in an interface
+ * ```typespec
+ * @protocolAPI(false)
+ * interface MyOperations {
+ *   op test1(): void;
+ *   op test2(): void;
+ * }
+ * ```
+ *
+ * @example Apply to all operations in a namespace
+ * ```typespec
+ * @protocolAPI(false)
+ * namespace MyService {
+ *   op test1(): void;
+ *   op test2(): void;
+ * }
+ * ```
  */
-extern dec protocolAPI(target: Operation, flag?: valueof boolean, scope?: valueof string);
+extern dec protocolAPI(
+  target: Operation | Namespace | Interface,
+  flag?: valueof boolean,
+  scope?: valueof string
+);
 
 /**
  * Define the client generated in the client SDK.
@@ -112,10 +163,10 @@ extern dec client(target: Namespace | Interface, options?: ClientOptions, scope?
  */
 model ClientOptions {
   /**
-   * The service that this client is generated for. If not specified, TCGC will look up the first parent namespace decorated with `@service` for the target.
+   * The services that this client is generated for. If not specified, TCGC will look up the first parent namespace decorated with `@service` for the target.
    * The namespace should be decorated with `@service`.
    */
-  service?: Namespace;
+  service?: Namespace | Namespace[];
 
   /**
    * The name of the client. If not specified, the default name will be `<Name of the target>Client`.
@@ -403,26 +454,6 @@ extern dec access(
 );
 
 /**
- * Set whether a model property should be flattened or not.
- * This decorator is not recommended to use for green field services.
- * @param target The target model property that you want to flatten.
- * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
- *
- * @example
- * ```typespec
- * model Foo {
- *    @flattenProperty
- *    prop: Bar;
- * }
- * model Bar {
- * }
- * ```
- */
-#deprecated "@flattenProperty decorator is not recommended to use."
-extern dec flattenProperty(target: ModelProperty, scope?: valueof string);
-
-/**
  * Customize a method's signature in the generated client SDK.
  * Currently, only parameter signature customization is supported.
  * This decorator allows you to specify a different method signature for the client SDK than the original definition.
@@ -492,6 +523,11 @@ extern dec useSystemTextJsonConverter(target: Model, scope?: valueof string);
  * InitializedBy value.
  */
 enum InitializedBy {
+  /**
+   * The client initialization should be omitted and hand-written.
+   */
+  none: 0,
+
   /**
    * The client could be initialized individually.
    */
@@ -613,10 +649,32 @@ extern dec clientNamespace(
 );
 
 /**
- * Set an alternate type for a model property, Scalar, or function parameter. Note that `@encode` will be overridden by the one defined in the alternate type.
+ * Represents an external type that can be used in alternate type definitions.
+ */
+model ExternalType {
+  /**
+   * The identity of the external type. For example, `pystac.Collection`
+   */
+  identity: string;
+
+  /**
+   * The package that exports the external type. For example, `pystac`
+   */
+  package?: string;
+
+  /**
+   * The minimum version of the package to use for your external type. For example, `1.13.0`
+   */
+  minVersion?: string;
+}
+
+/**
+ * Set an alternate type for a model property, Scalar, Model, Enum, Union, or function parameter. Note that `@encode` will be overridden by the one defined in the alternate type.
  * When the source type is `Scalar`, the alternate type must be `Scalar`.
+ * The replaced type could be a type defined in the TypeSpec or an external type declared by type identity, package that export the type and package version.
+ * **Important:** External types (with `identity` property) cannot be applied to model properties. They must be applied to the type definition itself (Scalar, Model, Enum, or Union).
  * @param target The source type to which the alternate type will be applied.
- * @param alternate The alternate type to apply to the target.
+ * @param alternate The alternate type to apply to the target. Can be a TypeSpec type or an ExternalType.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  * @example Change a model property to a different type
@@ -648,18 +706,60 @@ extern dec clientNamespace(
  *   locations: string[];
  * }
  * ```
+ *
+ * @example Use external type for DFE case
+ * ```typespec
+ * @alternateType({
+ *   identity: "Azure.Core.Expressions.DataFactoryExpression",
+ * }, "csharp")
+ * union Dfe<T> {
+ *   T,
+ *   DfeExpression
+ * }
+ * ```
+ *
+ * @example Use external type with package information
+ * ```typespec
+ * @alternateType({
+ *   identity: "pystac.Collection",
+ *   package: "pystac",
+ *   minVersion: "1.13.0",
+ * }, "python")
+ * model ItemCollection {
+ *   // ... properties
+ * }
+ * ```
+ *
+ * @example Invalid: External type on model property (will emit a warning)
+ * ```typespec
+ * model MyModel {
+ *   field: FieldType;
+ * }
+ * // This will emit a warning - external types cannot be applied to properties
+ * @@alternateType(MyModel.field, {
+ *   identity: "ExternalType",
+ * }, "rust");
+ *
+ * // Correct: Apply external type to the type definition instead
+ * @alternateType({
+ *   identity: "ExternalType",
+ * }, "rust")
+ * model FieldType {
+ *   // ... properties
+ * }
+ * ```
  */
 extern dec alternateType(
-  target: ModelProperty | Scalar,
-  alternate: unknown,
+  target: ModelProperty | Scalar | Model | Enum | Union,
+  alternate: unknown | ExternalType,
   scope?: valueof string
 );
 
 /**
- * Define the scope of an operation.
- * By default, the operation will be applied to all language emitters.
- * This decorator allows you to omit the operation from certain languages or apply it to specific languages.
- * @param target The target operation that you want to scope.
+ * Define the scope of an operation or model property.
+ * By default, the element will be applied to all language emitters.
+ * This decorator allows you to omit the element from certain languages or apply it to specific languages.
+ * @param target The target operation or model property that you want to scope.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
  * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  *
@@ -674,8 +774,16 @@ extern dec alternateType(
  * @scope("go")
  * op test: void;
  * ```
+ *
+ * @example Apply a model property to specific languages
+ * ```typespec
+ * model TestModel {
+ *   @scope("csharp")
+ *   csharpOnlyProp: string;
+ * }
+ * ```
  */
-extern dec scope(target: Operation, scope?: valueof string);
+extern dec scope(target: Operation | ModelProperty, scope?: valueof string);
 
 /**
  * Specify whether a parameter is an API version parameter or not.
@@ -776,9 +884,8 @@ extern dec deserializeEmptyStringAsNull(target: ModelProperty, scope?: valueof s
 extern dec responseAsBool(target: Operation, scope?: valueof string);
 
 /**
- * Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name.
- * This decorator allows you to change the client an operation belongs to in the client SDK.
- * This decorator cannot be used along with `@client` or `@operationGroup` decorators.
+ * Change the operation location in the client. If the target client is not defined, use `string` to indicate a new client name. For this usage, the decorator cannot be used along with `@client` or `@operationGroup` decorators.
+ * Change the parameter location to operation or client. For this usage, the decorator cannot be used in the parameter defined in  `@clientInitialization` decorator.
  * @param source The operation to change location for.
  * @param target The target `Namespace`, `Interface` or a string which can indicate the client.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
@@ -839,12 +946,30 @@ extern dec responseAsBool(target: Operation, scope?: valueof string);
  *   @clientLocation(MoveToRootClient)
  *   getHealthStatus(): void; // This operation will be moved to the root client of MoveToRootClient namespace.
  * }
-
+ *
+ * ```
+ *
+ * @example Move parameter from operation to client
+ * ```typespec
+ * @service
+ * namespace MyClient;
+ * 
+ * getHealthStatus(
+ *   @clientLocation(MyClient) // This parameter will be moved to the `.clientInitialization` parameters of `MyClient`. It will not appear on the operation-level.
+ *   clientId: string
+ * ): void;
+ * ```
+ * 
+ * @example Move parameter from client to operation
+ * ```typespec
+ * // client.tsp
+ * 
+ * @@clientLocation(CommonTypes.SubscriptionIdParameter.subscriptionId, get); // This will keep the `subscriptionId` parameter on the operation level instead of applying TCGC's default logic of elevating `subscriptionId` to client.
  * ```
  */
 extern dec clientLocation(
-  source: Operation,
-  target: Interface | Namespace | (valueof string),
+  source: Operation | ModelProperty,
+  target: Interface | Namespace | Operation | (valueof string),
   scope?: valueof string
 );
 
@@ -900,5 +1025,37 @@ extern dec clientDoc(
   target: unknown,
   documentation: valueof string,
   mode: EnumMember,
+  scope?: valueof string
+);
+
+/**
+ * Pass experimental flags or options to emitters without requiring TCGC reshipping.
+ * This decorator is intended for temporary workarounds or experimental features and requires
+ * suppression to acknowledge its experimental nature.
+ *
+ * See supported client options for each language emitter here https://azure.github.io/typespec-azure/docs/howtos/generate-client-libraries/12clientOptions/
+ *
+ * **Warning**: This decorator always emits a warning that must be suppressed, and an additional
+ * warning if no scope is provided (since options are typically language-specific).
+ *
+ * @param target The type you want to apply the option to.
+ * @param name The name of the option (e.g., "enableFeatureFoo").
+ * @param value The value of the option. Can be any type; emitters will cast as needed.
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * @example Apply an experimental option for Python
+ * ```typespec
+ * #suppress "@azure-tools/typespec-client-generator-core/client-option" "preview feature for python"
+ * @clientOption("enableFeatureFoo", true, "python")
+ * model MyModel {
+ *   prop: string;
+ * }
+ * ```
+ */
+extern dec clientOption(
+  target: unknown,
+  name: valueof string,
+  value: valueof unknown,
   scope?: valueof string
 );

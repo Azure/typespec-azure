@@ -6,8 +6,6 @@ import "@azure-tools/typespec-azure-resource-manager";
 import "./ref-library/int-templates.tsp";
 import "./ref-library/op-templates.tsp";
 
-using Http;
-using Rest;
 using Versioning;
 using Azure.ResourceManager;
 
@@ -20,7 +18,6 @@ namespace Microsoft.LibraryTest;
 /** ARM Library API versions */
 enum Versions {
   /** 2021-09-21-preview version */
-  @useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   `2021-09-21-preview`,
 }
@@ -28,13 +25,12 @@ enum Versions {
 interface Operations extends Azure.ResourceManager.Operations {}
 
 model AllPropertiesResource is TrackedResource<AllPropertiesProperties> {
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
-  @doc("The name of the all properties resource.")
-  @key("allPropertiesName")
-  @segment("allProperties")
-  @path
-  name: string;
-
+  ...ResourceNameParameter<
+    AllPropertiesResource,
+    "allPropertiesName",
+    "allProperties",
+    "^[a-zA-Z0-9-]{3,24}$"
+  >;
   ...EntityTagProperty;
   ...ManagedByProperty;
   ...ResourceKindProperty;
@@ -43,9 +39,24 @@ model AllPropertiesResource is TrackedResource<AllPropertiesProperties> {
   ...ManagedServiceIdentityProperty;
 }
 
+alias MergePatch<T extends Reflection.Model> = OptionalProperties<OmitDefaults<UpdateableProperties<T>>>;
+
+model AllPropertiesPropertiesUpdate is MergePatch<AllPropertiesProperties>;
+model AllPropertiesUpdate
+  is MergePatch<OmitProperties<AllPropertiesResource, "properties" | "name">> {
+  /** Rp-specific resource properties */
+  properties?: AllPropertiesPropertiesUpdate;
+}
+
 @armResourceOperations
-interface AllProperties
-  extends TrackedResourceOperations<AllPropertiesResource, AllPropertiesProperties> {}
+interface AllProperties {
+  get is ArmResourceRead<AllPropertiesResource>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<AllPropertiesResource>;
+  update is ArmCustomPatchSync<AllPropertiesResource, AllPropertiesUpdate>;
+  delete is ArmResourceDeleteWithoutOkAsync<AllPropertiesResource>;
+  listBySubscription is ArmListBySubscription<AllPropertiesResource>;
+  listByResourceGroup is ArmResourceListByParent<AllPropertiesResource>;
+}
 
 @doc("rp-specific properties for the resource with all envelope properties")
 model AllPropertiesProperties {

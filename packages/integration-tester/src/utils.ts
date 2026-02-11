@@ -5,6 +5,8 @@ import ora, { type Ora } from "ora";
 import { resolve } from "pathe";
 import pc from "picocolors";
 
+export class ValidationFailedError extends Error {}
+
 export const projectRoot = resolve(import.meta.dirname, "..");
 export const repoRoot = resolve(projectRoot, "../..");
 
@@ -96,4 +98,71 @@ export async function staticAction<T>(
 
 export function log(...args: any[]) {
   console.log(...args);
+}
+
+/** Run tasks with limited concurrency */
+export async function runWithConcurrency<T, R>(
+  items: T[],
+  concurrency: number,
+  processor: (item: T) => Promise<R>,
+): Promise<R[]> {
+  if (items.length === 0) {
+    return [];
+  }
+
+  const toRun = [...items];
+  const results: R[] = [];
+  let completed = 0;
+  let running = 0;
+
+  return new Promise((resolve, reject) => {
+    function runNext() {
+      if (toRun.length === 0 || running >= concurrency) {
+        return;
+      }
+
+      const item = toRun.shift();
+      if (!item) {
+        return;
+      }
+
+      running++;
+      processor(item)
+        .then((result) => {
+          results.push(result);
+          completed++;
+          running--;
+
+          if (completed === items.length) {
+            resolve(results);
+            return;
+          }
+
+          runNext();
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    }
+
+    // Start initial batch of tasks up to concurrency limit
+    for (let i = 0; i < Math.min(concurrency, toRun.length); i++) {
+      runNext();
+    }
+  });
+}
+
+export async function waitForUserInput(): Promise<string> {
+  const readline = await import("readline");
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  return new Promise((resolve) => {
+    rl.question("", (answer) => {
+      rl.close();
+      resolve(answer.trim());
+    });
+  });
 }

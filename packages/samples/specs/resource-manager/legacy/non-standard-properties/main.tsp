@@ -1,0 +1,69 @@
+import "@typespec/http";
+import "@typespec/rest";
+import "@typespec/versioning";
+import "@azure-tools/typespec-azure-core";
+import "@azure-tools/typespec-azure-resource-manager";
+
+using Versioning;
+using Azure.ResourceManager;
+
+@armProviderNamespace
+@service(#{ title: "ContosoProviderHubClient" })
+@versioned(Versions)
+@doc("Contoso Resource Provider management API.")
+namespace Microsoft.ContosoProviderHub;
+
+/** Contoso API versions */
+enum Versions {
+  /** 2021-10-01-preview version */
+  @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
+  `2021-10-01-preview`,
+}
+
+interface Operations extends Azure.ResourceManager.Operations {}
+
+#suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "This is a legacy sample"
+@doc("A ContosoProviderHub resource")
+model Employee is Legacy.TrackedResourceWithOptionalLocation<EmployeeProperties> {
+  ...ResourceNameParameter<Employee>;
+  ...Legacy.EntityTagProperty;
+}
+
+@doc("The rp-specific properties of the employee")
+model EmployeeProperties {
+  @doc("The employee age in years")
+  age?: int32;
+
+  @doc("The city of current residence")
+  city?: string;
+
+  @doc("security profile for the employee")
+  @encode("base64url")
+  profile?: bytes;
+
+  @visibility(Lifecycle.Read)
+  @doc("The status of the last operation.")
+  provisioningState?: ProvisioningState;
+}
+
+@armResourceOperations
+interface Employees extends TrackedResourceOperations<Employee, EmployeeProperties> {}
+
+@doc("The provisioning state of a resource.")
+@Azure.Core.lroStatus
+union ProvisioningState {
+  string,
+  ResourceProvisioningState,
+
+  @doc("The resource is being provisioned")
+  Provisioning: "Provisioning",
+
+  @doc("The resource is updating")
+  Updating: "Updating",
+
+  @doc("The resource is being deleted")
+  Deleting: "Deleting",
+
+  @doc("The resource create request has been accepted")
+  Accepted: "Accepted",
+}

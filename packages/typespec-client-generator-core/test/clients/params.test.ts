@@ -1,62 +1,31 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { AzureResourceManagerTestLibrary } from "@azure-tools/typespec-azure-resource-manager/testing";
-import { ApiKeyAuth, OAuth2Flow, Oauth2Auth } from "@typespec/http";
-import { OpenAPITestLibrary } from "@typespec/openapi/testing";
+import { ApiKeyAuth, Oauth2Auth, OAuth2Flow } from "@typespec/http";
 import { deepStrictEqual, ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import {
   SdkCredentialParameter,
   SdkCredentialType,
   SdkEndpointParameter,
   SdkEndpointType,
 } from "../../src/interfaces.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
-
-function getServiceWithDefaultApiVersion(op: string) {
-  return `
-    @server(
-      "{endpoint}",
-      "Testserver endpoint",
-      {
-        /**
-         * Need to be set as 'http://localhost:3000' in client.
-         */
-        endpoint: url,
-      }
-    )
-    @service
-    @versioned(Versions)
-    namespace Server.Versions.Versioned;
-
-    /**
-     * The version of the API.
-     */
-    enum Versions {
-      /**
-       * The version 2022-12-01-preview.
-       */
-      @useDependency(Azure.Core.Versions.v1_0_Preview_2)
-      v2022_12_01_preview: "2022-12-01-preview",
-    }
-
-    ${op}
-    `;
-}
+import {
+  ArmTesterWithService,
+  AzureCoreTester,
+  AzureCoreTesterWithService,
+  createClientCustomizationInput,
+  createSdkContextForTester,
+  SimpleBaseTester,
+  SimpleTester,
+} from "../tester.js";
 
 it("name", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
         @client({name: "MyClient"})
         @service
         namespace NotMyClient;
         op myOp(): void;
       `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   strictEqual(sdkPackage.clients[0].name, "MyClient");
   strictEqual(sdkPackage.clients[0].kind, "client");
@@ -64,13 +33,14 @@ it("name", async () => {
 });
 
 it("initialization default endpoint no credential", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
         @server("http://localhost:3000", "endpoint")
         @service
         namespace My.Service;
         op myOp(): void;
       `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "ServiceClient");
@@ -97,14 +67,15 @@ it("initialization default endpoint no credential", async () => {
 });
 
 it("initialization default endpoint with apikey auth", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
         @server("http://localhost:3000", "endpoint")
         @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
         @service
         namespace My.Service;
         op myOp(): void;
       `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "ServiceClient");
@@ -136,7 +107,7 @@ it("initialization default endpoint with apikey auth", async () => {
 });
 
 it("initialization default endpoint with bearer auth", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
         @server("http://localhost:3000", "endpoint")
         @useAuth(OAuth2Auth<[MyFlow]>)
         @service
@@ -149,7 +120,8 @@ it("initialization default endpoint with bearer auth", async () => {
           scopes: ["https://security.microsoft.com/.default"];
         }
       `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "ServiceClient");
@@ -189,7 +161,7 @@ it("initialization default endpoint with bearer auth", async () => {
 });
 
 it("initialization default endpoint with union auth", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
         @server("http://localhost:3000", "endpoint")
         @useAuth(ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key"> | OAuth2Auth<[MyFlow]>)
         @service
@@ -202,7 +174,8 @@ it("initialization default endpoint with union auth", async () => {
           scopes: ["https://security.microsoft.com/.default"];
         }
       `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "ServiceClient");
@@ -252,7 +225,7 @@ it("initialization default endpoint with union auth", async () => {
 });
 
 it("initialization one server parameter with apikey auth", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
         @server(
           "{endpointInput}",
           "Testserver endpoint",
@@ -265,7 +238,8 @@ it("initialization one server parameter with apikey auth", async () => {
         namespace My.Service;
         op myOp(): void;
       `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "ServiceClient");
@@ -305,7 +279,7 @@ it("initialization one server parameter with apikey auth", async () => {
 });
 
 it("initialization multiple server parameters with apikey auth", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
         @versioned(Versions)
         @server(
           "{endpoint}/server/path/multiple/{apiVersion}",
@@ -328,7 +302,8 @@ it("initialization multiple server parameters with apikey auth", async () => {
           v1_0: "v1.0",
         }
       `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "ServiceClient");
@@ -396,7 +371,7 @@ it("initialization multiple server parameters with apikey auth", async () => {
 });
 
 it("non-versioning service with api version param in endpoint", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
         @server(
           "{endpoint}/server/path/multiple/{apiVersion}",
           "Test server with path parameters.",
@@ -412,7 +387,8 @@ it("non-versioning service with api version param in endpoint", async () => {
         namespace My.Service;
         op myOp(): void;
       `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "ServiceClient");
@@ -463,7 +439,7 @@ it("non-versioning service with api version param in endpoint", async () => {
 });
 
 it("endpoint with path param default value", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
         @server(
           "{endpoint}",
           "Test server endpoint",
@@ -475,7 +451,8 @@ it("endpoint with path param default value", async () => {
         namespace MyService;
         op myOp(): void;
       `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.clientInitialization.parameters.length, 1);
@@ -515,19 +492,15 @@ function getServiceNoDefaultApiVersion(op: string) {
 }
 
 it("service with no default api version, method with no api version param", async () => {
-  const runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runnerWithCore.compile(
+  const { program } = await AzureCoreTester.compile(
     getServiceNoDefaultApiVersion(`
         @route("/without-api-version")
         @head
         op withoutApiVersion(): OkResponse;
         `),
   );
-  const sdkPackage = runnerWithCore.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
   const client = sdkPackage.clients[0];
@@ -544,19 +517,15 @@ it("service with no default api version, method with no api version param", asyn
 });
 
 it("service with no default api version, method with api version param", async () => {
-  const runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runnerWithCore.compile(
+  const { program } = await AzureCoreTester.compile(
     getServiceNoDefaultApiVersion(`
       @route("/with-query-api-version")
       @head
       op withQueryApiVersion(@query("api-version") apiVersion: string): OkResponse;
         `),
   );
-  const sdkPackage = runnerWithCore.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
 
@@ -570,7 +539,7 @@ it("service with no default api version, method with api version param", async (
   const apiVersionMethodParam = withApiVersion.parameters[0];
   strictEqual(apiVersionMethodParam.name, "apiVersion");
   strictEqual(apiVersionMethodParam.kind, "method");
-  strictEqual(apiVersionMethodParam.isApiVersionParam, true);
+  strictEqual(apiVersionMethodParam.isApiVersionParam, false);
   strictEqual(apiVersionMethodParam.optional, false);
   strictEqual(apiVersionMethodParam.onClient, false);
   strictEqual(apiVersionMethodParam.type.kind, "string");
@@ -579,7 +548,7 @@ it("service with no default api version, method with api version param", async (
   strictEqual(withApiVersion.operation.parameters.length, 1);
   const apiVersionParam = withApiVersion.operation.parameters[0];
   strictEqual(apiVersionParam.kind, "query");
-  strictEqual(apiVersionParam.isApiVersionParam, true);
+  strictEqual(apiVersionParam.isApiVersionParam, false);
   strictEqual(apiVersionParam.optional, false);
   strictEqual(apiVersionParam.onClient, false);
   strictEqual(apiVersionParam.type.kind, "string");
@@ -589,19 +558,15 @@ it("service with no default api version, method with api version param", async (
 });
 
 it("service with default api version, method without api version param", async () => {
-  const runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runnerWithCore.compile(
-    getServiceWithDefaultApiVersion(`
+  const { program } = await AzureCoreTesterWithService.compile(
+    `
       @route("/without-api-version")
       @head
       op withoutApiVersion(): OkResponse;
-      `),
+      `,
   );
-  const sdkPackage = runnerWithCore.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
   const client = sdkPackage.clients[0];
@@ -612,26 +577,19 @@ it("service with default api version, method without api version param", async (
   strictEqual(withoutApiVersion.kind, "basic");
   strictEqual(withoutApiVersion.parameters.length, 0);
   strictEqual(withoutApiVersion.operation.parameters.length, 0);
-  strictEqual(
-    withoutApiVersion.crossLanguageDefinitionId,
-    "Server.Versions.Versioned.withoutApiVersion",
-  );
+  strictEqual(withoutApiVersion.crossLanguageDefinitionId, "My.Service.withoutApiVersion");
 });
 
 it("service with default api version, method with api version param", async () => {
-  const runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runnerWithCore.compile(
-    getServiceWithDefaultApiVersion(`
+  const { program } = await AzureCoreTesterWithService.compile(
+    `
       @route("/with-query-api-version")
       @head
       op withQueryApiVersion(@query("api-version") apiVersion: string): OkResponse;
-    `),
+    `,
   );
-  const sdkPackage = runnerWithCore.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
   const client = sdkPackage.clients[0];
@@ -641,9 +599,9 @@ it("service with default api version, method with api version param", async () =
   const clientApiVersionParam = client.clientInitialization.parameters[1];
   strictEqual(clientApiVersionParam.name, "apiVersion");
   strictEqual(clientApiVersionParam.onClient, true);
-  strictEqual(clientApiVersionParam.optional, false);
+  strictEqual(clientApiVersionParam.optional, true);
   strictEqual(clientApiVersionParam.kind, "method");
-  strictEqual(clientApiVersionParam.clientDefaultValue, "2022-12-01-preview");
+  strictEqual(clientApiVersionParam.clientDefaultValue, "v1");
   strictEqual(clientApiVersionParam.isApiVersionParam, true);
   strictEqual(clientApiVersionParam.type.kind, "string");
   strictEqual(client.methods.length, 1);
@@ -651,10 +609,7 @@ it("service with default api version, method with api version param", async () =
   const withApiVersion = client.methods[0];
   strictEqual(withApiVersion.name, "withQueryApiVersion");
   strictEqual(withApiVersion.kind, "basic");
-  strictEqual(
-    withApiVersion.crossLanguageDefinitionId,
-    "Server.Versions.Versioned.withQueryApiVersion",
-  );
+  strictEqual(withApiVersion.crossLanguageDefinitionId, "My.Service.withQueryApiVersion");
   strictEqual(withApiVersion.parameters.length, 0);
   strictEqual(withApiVersion.operation.parameters.length, 1);
 
@@ -664,7 +619,7 @@ it("service with default api version, method with api version param", async () =
   strictEqual(apiVersionParam.optional, false);
   strictEqual(apiVersionParam.onClient, true);
   strictEqual(apiVersionParam.type.kind, "string");
-  strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01-preview");
+  strictEqual(apiVersionParam.clientDefaultValue, "v1");
   strictEqual(apiVersionParam.correspondingMethodParams.length, 1);
   strictEqual(
     apiVersionParam.correspondingMethodParams[0],
@@ -673,19 +628,15 @@ it("service with default api version, method with api version param", async () =
 });
 
 it("service with default api version, method with path api version param", async () => {
-  const runnerWithCore = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core", "Azure.Core.Traits"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runnerWithCore.compile(
-    getServiceWithDefaultApiVersion(`
+  const { program } = await AzureCoreTesterWithService.compile(
+    `
       @route("/with-path-api-version")
       @head
       op withPathApiVersion(@path apiVersion: string): OkResponse;
-    `),
+    `,
   );
-  const sdkPackage = runnerWithCore.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
   const client = sdkPackage.clients[0];
@@ -695,9 +646,9 @@ it("service with default api version, method with path api version param", async
   const clientApiVersionParam = client.clientInitialization.parameters[1];
   strictEqual(clientApiVersionParam.name, "apiVersion");
   strictEqual(clientApiVersionParam.onClient, true);
-  strictEqual(clientApiVersionParam.optional, false);
+  strictEqual(clientApiVersionParam.optional, true);
   strictEqual(clientApiVersionParam.kind, "method");
-  strictEqual(clientApiVersionParam.clientDefaultValue, "2022-12-01-preview");
+  strictEqual(clientApiVersionParam.clientDefaultValue, "v1");
   strictEqual(clientApiVersionParam.isApiVersionParam, true);
   strictEqual(clientApiVersionParam.type.kind, "string");
   strictEqual(client.methods.length, 1);
@@ -705,10 +656,7 @@ it("service with default api version, method with path api version param", async
   const withApiVersion = client.methods[0];
   strictEqual(withApiVersion.name, "withPathApiVersion");
   strictEqual(withApiVersion.kind, "basic");
-  strictEqual(
-    withApiVersion.crossLanguageDefinitionId,
-    "Server.Versions.Versioned.withPathApiVersion",
-  );
+  strictEqual(withApiVersion.crossLanguageDefinitionId, "My.Service.withPathApiVersion");
   strictEqual(withApiVersion.parameters.length, 0);
   strictEqual(withApiVersion.operation.parameters.length, 1);
 
@@ -720,7 +668,7 @@ it("service with default api version, method with path api version param", async
   strictEqual(apiVersionParam.optional, false);
   strictEqual(apiVersionParam.onClient, true);
   strictEqual(apiVersionParam.type.kind, "string");
-  strictEqual(apiVersionParam.clientDefaultValue, "2022-12-01-preview");
+  strictEqual(apiVersionParam.clientDefaultValue, "v1");
   strictEqual(apiVersionParam.correspondingMethodParams.length, 1);
   strictEqual(
     apiVersionParam.correspondingMethodParams[0],
@@ -729,7 +677,7 @@ it("service with default api version, method with path api version param", async
 });
 
 it("endpoint template argument with default value of enum member", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @server(
       "{endpoint}/client/structure/{client}",
       "",
@@ -753,7 +701,8 @@ it("endpoint template argument with default value of enum member", async () => {
       ClientOperationGroup: "client-operation-group",
     }
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
 
@@ -774,12 +723,7 @@ it("endpoint template argument with default value of enum member", async () => {
 });
 
 it("client level signatures by default", async () => {
-  const runnerWithArm = await createSdkTestRunner({
-    librariesToAdd: [AzureResourceManagerTestLibrary, AzureCoreTestLibrary, OpenAPITestLibrary],
-    autoUsings: ["Azure.ResourceManager", "Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runnerWithArm.compileWithBuiltInAzureResourceManagerService(`
+  const { program } = await ArmTesterWithService.compile(`
     model MyProperties {
       @visibility(Lifecycle.Read)
       @doc("Display name of the Azure Extended Zone.")
@@ -803,8 +747,8 @@ it("client level signatures by default", async () => {
       }
     }
   `);
-
-  const sdkPackage = runnerWithArm.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0].children?.[0];
   ok(client);
   for (const p of client.clientInitialization.parameters) {
@@ -816,4 +760,171 @@ it("client level signatures by default", async () => {
     "endpoint",
     "subscriptionId",
   ]);
+});
+
+it("optional client param with some methods using, some not", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace ClientOptionalParams;
+
+    model ExpandParameter {
+      @query("$expand")
+      expand?: string;
+    }
+
+    namespace WithExpand {
+      @route("/with-expand")
+      op test(@query("$expand") expand?: string): void;
+    }
+
+    namespace WithoutExpand {
+      @route("/without-expand")
+      op test(): void;
+    }
+  `,
+      `
+  @@clientInitialization(ClientOptionalParams,
+  {
+    parameters: ClientOptionalParams.ExpandParameter
+  });
+  `,
+    ),
+  );
+
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const clientOptionalParamsClient = sdkPackage.clients[0];
+  strictEqual(clientOptionalParamsClient.children?.length, 2);
+  strictEqual(clientOptionalParamsClient.clientInitialization.parameters.length, 2);
+  ok(clientOptionalParamsClient.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+  const expandParam = clientOptionalParamsClient.clientInitialization.parameters.find(
+    (p) => p.name === "expand",
+  );
+  ok(expandParam);
+  strictEqual(expandParam.optional, true);
+  strictEqual(expandParam.onClient, true);
+
+  const withExpandClient = clientOptionalParamsClient.children?.find(
+    (c) => c.name === "WithExpand",
+  );
+  ok(withExpandClient);
+  strictEqual(withExpandClient.methods.length, 1);
+  strictEqual(withExpandClient.clientInitialization.parameters.length, 2);
+  ok(withExpandClient.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+  const expandClientParam = withExpandClient.clientInitialization.parameters.find(
+    (p) => p.name === "expand",
+  );
+  ok(expandClientParam);
+  strictEqual(expandClientParam.optional, true);
+  strictEqual(expandClientParam.onClient, true);
+
+  const withExpandMethod = withExpandClient.methods[0];
+  strictEqual(withExpandMethod.parameters.length, 0);
+  strictEqual(withExpandMethod.operation.parameters.length, 1);
+  strictEqual(withExpandMethod.operation.parameters[0].correspondingMethodParams[0], expandParam);
+
+  const withoutExpandClient = clientOptionalParamsClient.children?.find(
+    (c) => c.name === "WithoutExpand",
+  );
+  ok(withoutExpandClient);
+  strictEqual(withoutExpandClient.methods.length, 1);
+  strictEqual(withoutExpandClient.clientInitialization.parameters.length, 2);
+  ok(withoutExpandClient.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+  const withoutExpandClientParam = withoutExpandClient.clientInitialization.parameters.find(
+    (p) => p.name === "expand",
+  );
+  ok(withoutExpandClientParam);
+  strictEqual(withoutExpandClientParam.optional, true);
+  strictEqual(withoutExpandClientParam.onClient, true);
+
+  const withoutExpandMethod = withoutExpandClient.methods[0];
+  strictEqual(withoutExpandMethod.parameters.length, 0);
+  strictEqual(withoutExpandMethod.operation.parameters.length, 0);
+});
+
+it("child client with own initialization params should not inherit parent params", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace ClientOptionalParams;
+      model ExpandParameter {
+        @query("$expand")
+        expand?: string;
+      }
+
+    namespace WithCustomInit {
+      @route("/with-custom")
+      op testCustom(@query("filter") filter?: string): void;
+    }
+
+    namespace WithDefaultInit {
+      @route("/with-default")
+      op testDefault(@query("filter") filter?: string): void;
+    }
+  `,
+      `
+    @@clientInitialization(ClientOptionalParams, {
+      parameters: ClientOptionalParams.ExpandParameter
+    });
+
+    model CustomInitParams {
+      @query("customParam")
+      customParam: string;
+    }
+
+    @@clientInitialization(ClientOptionalParams.WithCustomInit, {
+      parameters: CustomInitParams,
+      initializedBy: InitializedBy.individually
+    });
+
+    @@clientInitialization(ClientOptionalParams.WithDefaultInit, {
+      initializedBy: InitializedBy.parent
+    });
+  `,
+    ),
+  );
+
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const parentClient = sdkPackage.clients[0];
+
+  // Parent client should have endpoint and expand parameter
+  strictEqual(parentClient.children?.length, 2);
+  strictEqual(parentClient.clientInitialization.parameters.length, 2);
+  ok(parentClient.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+  const parentExpandParam = parentClient.clientInitialization.parameters.find(
+    (p) => p.name === "expand",
+  );
+  ok(parentExpandParam);
+  strictEqual(parentExpandParam.optional, true);
+
+  // Child with custom init params should NOT inherit parent's expand param
+  const withCustomInitClient = parentClient.children?.find((c) => c.name === "WithCustomInit");
+  ok(withCustomInitClient);
+  strictEqual(withCustomInitClient.methods.length, 1);
+  // Should only have endpoint and customParam, NOT expand
+  strictEqual(withCustomInitClient.clientInitialization.parameters.length, 2);
+  ok(withCustomInitClient.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+  ok(withCustomInitClient.clientInitialization.parameters.find((p) => p.name === "customParam"));
+  // Should NOT have expand parameter from parent
+  strictEqual(
+    withCustomInitClient.clientInitialization.parameters.find((p) => p.name === "expand"),
+    undefined,
+  );
+
+  // Child with InitializedBy.parent should inherit parent's params
+  const withDefaultInitClient = parentClient.children?.find((c) => c.name === "WithDefaultInit");
+  ok(withDefaultInitClient);
+  strictEqual(withDefaultInitClient.methods.length, 1);
+  // Should have endpoint and expand from parent
+  strictEqual(withDefaultInitClient.clientInitialization.parameters.length, 2);
+  ok(withDefaultInitClient.clientInitialization.parameters.find((p) => p.name === "endpoint"));
+  const childExpandParam = withDefaultInitClient.clientInitialization.parameters.find(
+    (p) => p.name === "expand",
+  );
+  ok(childExpandParam);
+  strictEqual(childExpandParam.optional, true);
 });

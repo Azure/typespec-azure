@@ -1,5 +1,150 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.65.0
+
+### Deprecations
+
+- [#3836](https://github.com/Azure/typespec-azure/pull/3836) Deprecate `azure-resource-provider-folder` option.
+  
+  ```diff lang=yaml
+  -azure-resource-provider-folder: "resource-manager"
+  -output-file: "{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json"
+  +output-file: "resource-manager/{service-name}/{version-status}/{version}/openapi.json"
+  ```
+
+
+## 0.64.1
+
+### Bug Fixes
+
+- [#3819](https://github.com/Azure/typespec-azure/pull/3819) Fix #3802 correct file references in feature files
+- [#3812](https://github.com/Azure/typespec-azure/pull/3812) Fix duplicate schema error caused when using union templates
+
+
+## 0.64.0
+
+### Features
+
+- [#3622](https://github.com/Azure/typespec-azure/pull/3622) Add support for multiple output files in typespec-autorest
+- [#3746](https://github.com/Azure/typespec-azure/pull/3746) #3693 Allow array and unknown result for async operations
+
+### Bump dependencies
+
+- [#3677](https://github.com/Azure/typespec-azure/pull/3677) Upgrade dependencies
+
+
+## 0.63.1
+
+### Features
+
+- [#3656](https://github.com/Azure/typespec-azure/pull/3656) Emit `x-ms-client-default` when using `@Azure.ClientGenerator.Core.Legacy.clientDefaultValue`
+
+### Bug Fixes
+
+- [#3666](https://github.com/Azure/typespec-azure/pull/3666) Allow explicit `ArrayEncoding.commaDelimited` on parameters
+- [#3666](https://github.com/Azure/typespec-azure/pull/3666) Fix using `ArrayEncoding.pipeDelimited` or `ArrayEncoding.spaceDelimited` on parameter would transform the type to string incorrectly
+- [#3666](https://github.com/Azure/typespec-azure/pull/3666) Don't include `items` when encoding change type to `string`
+- [#3644](https://github.com/Azure/typespec-azure/pull/3644) Ignore encoding resulting in format not explicitly supported by autorest
+
+
+## 0.63.0
+
+### Breaking Changes
+
+- [#3522](https://github.com/Azure/typespec-azure/pull/3522) - Remove deprecated `arm-resource-flattening` option
+  
+    ```diff lang=yaml title=tspconfig.yaml
+    options:
+      @azure-tools/typespec-autorest:
+    -   arm-resource-flattening: true
+    ```
+  
+    ```diff lang=tsp title=MyResource.tsp
+    +@@Azure.ClientGenerator.Core.Legacy.flattenProperty(MyResource.properties, "autorest");
+    ```
+
+### Bump dependencies
+
+- [#3546](https://github.com/Azure/typespec-azure/pull/3546) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3613](https://github.com/Azure/typespec-azure/pull/3613) Deduplicate authentication schemes with same name
+- [#3558](https://github.com/Azure/typespec-azure/pull/3558) Respect `@externalDocs` on properties
+- [#3602](https://github.com/Azure/typespec-azure/pull/3602) Fix constraints not applied on nullable properties
+- [#3602](https://github.com/Azure/typespec-azure/pull/3602) Fix `x-ms-enum.name` not being set on nullable enum properties with default
+
+
+## 0.62.0
+
+### Deprecations
+
+- [#3465](https://github.com/Azure/typespec-azure/pull/3465) Deprecate `arm-resource-flattening` option to reduce confusion with new flattening mechanisms.
+  
+    ```diff lang=yaml title=tspconfig.yaml
+    options:
+      @azure-tools/typespec-autoprest:
+    -   arm-resource-flattening: true
+    ```
+  
+    ```diff lang=tsp title=MyResource.tsp
+    +@@Azure.ClientGenerator.Core.Legacy.flattenProperty(MyResource.properties, "autorest");
+    ```
+
+### Bump dependencies
+
+- [#3447](https://github.com/Azure/typespec-azure/pull/3447) Upgrade dependencies october 2025
+
+### Bug Fixes
+
+- [#3386](https://github.com/Azure/typespec-azure/pull/3386) Fix base64 encoding use correct `byte` format
+- [#3481](https://github.com/Azure/typespec-azure/pull/3481) Fix #3477 Allow uniqueItems for nullable array properties
+
+
+## 0.61.1
+
+### Bug Fixes
+
+- [#3452](https://github.com/Azure/typespec-azure/pull/3452) Fix #3416 Allow flattening for body parameters
+
+
+## 0.61.0
+
+### Features
+
+- [#3358](https://github.com/Azure/typespec-azure/pull/3358) Support x-ms-secret in model types
+- [#3358](https://github.com/Azure/typespec-azure/pull/3358) Allow x-ms-long-running-operation for resource get
+- [#3360](https://github.com/Azure/typespec-azure/pull/3360) Added an `xml-strategy` option to control whether the emitter outputs XML serialization metadata. The options are:
+  
+  - `xml-strategy: xml-service`: Emit XML serialization metadata for the whole service and all its schemas if the service uses the "application/xml" content-type.
+  - `xml-strategy: none`: Never emit XML serialization metadata.
+- [#3290](https://github.com/Azure/typespec-azure/pull/3290) Added support for emitting XML annotations.
+
+### Bug Fixes
+
+- [#3266](https://github.com/Azure/typespec-azure/pull/3266) Cleanup usage of legacy Azure.Core paging apis
+
+
+## 0.60.0
+
+### Bump dependencies
+
+- [#3207](https://github.com/Azure/typespec-azure/pull/3207) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3196](https://github.com/Azure/typespec-azure/pull/3196) Fix optionality for ArmCustomPatch templates
+
+
+## 0.59.1
+
+### Bug Fixes
+
+- [#3173](https://github.com/Azure/typespec-azure/pull/3173) Inline azureLocation
+- [#3147](https://github.com/Azure/typespec-azure/pull/3147) Add support for x-ms-external through armExternalResource decorator
+- [#3147](https://github.com/Azure/typespec-azure/pull/3147) Add support for x-ms-azure-resource extension for custom resources
+
+
 ## 0.59.0
 
 ### Features

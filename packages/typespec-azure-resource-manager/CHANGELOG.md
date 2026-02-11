@@ -1,5 +1,172 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.65.0
+
+### Features
+
+- [#3907](https://github.com/Azure/typespec-azure/pull/3907) Add new template for Async Action and standard list query parameters
+- [#3906](https://github.com/Azure/typespec-azure/pull/3906) #3818 Add overrides for built-in resource operations path name constraints
+
+
+## 0.64.1
+
+### Bug Fixes
+
+- [#3830](https://github.com/Azure/typespec-azure/pull/3830) Fix #3829 Allow `@feature` to apply to Operations
+- [#3787](https://github.com/Azure/typespec-azure/pull/3787) Fix arm provider namespace custom name not respected in multi service scenario
+- [#3828](https://github.com/Azure/typespec-azure/pull/3828) Fix #3821 `@renamePathParameter` reorders parameters
+
+
+## 0.64.0
+
+### Features
+
+- [#3622](https://github.com/Azure/typespec-azure/pull/3622) Add support for multiple output files in typespec-autorest
+- [#3746](https://github.com/Azure/typespec-azure/pull/3746) #3693 Allow array and unknown result for async operations
+
+### Bump dependencies
+
+- [#3677](https://github.com/Azure/typespec-azure/pull/3677) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3748](https://github.com/Azure/typespec-azure/pull/3748) Fix #3430 Allow using customAzureResource in operation templates
+- [#3591](https://github.com/Azure/typespec-azure/pull/3591) Corrected spelling of 'for an operation' from 'for and operation'.
+- [#3747](https://github.com/Azure/typespec-azure/pull/3747) Allow final-state-via: original-uri for PATCH operations
+- [#3736](https://github.com/Azure/typespec-azure/pull/3736) Fix #3692 override parameter name and add actions for Nsp
+
+
+## 0.63.0
+
+### Breaking Changes
+
+- [#3522](https://github.com/Azure/typespec-azure/pull/3522) - Remove Private decorator `@Azure.ResourceManager.Private.conditionalClientFlatten`
+  
+    ```diff lang=tsp
+    @Azure.ResourceManager.Private.conditionalClientFlatten
+    ```
+  
+    ```diff lang=tsp title=MyResource.tsp
+    +@Azure.ClientGenerator.Core.Legacy.flattenProperty
+    ```
+
+### Features
+
+- [#3572](https://github.com/Azure/typespec-azure/pull/3572) Remove single service restriction for ARM specs
+
+### Bump dependencies
+
+- [#3546](https://github.com/Azure/typespec-azure/pull/3546) Upgrade dependencies
+
+
+## 0.62.1
+
+### Features
+
+- [#3544](https://github.com/Azure/typespec-azure/pull/3544) Add standard operations for NetworkSecurityPerimeter
+
+### Bug Fixes
+
+- [#3525](https://github.com/Azure/typespec-azure/pull/3525) Fix `missing-x-ms-identifiers` rule message pointing to legacy `@extension` decorator instead of `@identifiers`.
+- [#3559](https://github.com/Azure/typespec-azure/pull/3559) Fix #3437 Provide consistent return values for parent and scope in resolveArmResources
+
+
+## 0.62.0
+
+### Deprecations
+
+- [#3465](https://github.com/Azure/typespec-azure/pull/3465) Deprecate `arm-resource-flattening` option to reduce confusion with new flattening mechanisms.
+  
+    ```diff lang=yaml title=tspconfig.yaml
+    options:
+      @azure-tools/typespec-autoprest:
+    -   arm-resource-flattening: true
+    ```
+  
+    ```diff lang=tsp title=MyResource.tsp
+    +@@Azure.ClientGenerator.Core.Legacy.flattenProperty(MyResource.properties, "autorest");
+    ```
+
+### Features
+
+- [#3411](https://github.com/Azure/typespec-azure/pull/3411) Add new `secret-prop` rule scanning for property looking like they might contain sensitive information but not marked with `@secret`
+- [#3350](https://github.com/Azure/typespec-azure/pull/3350) Remove dependency on OpenAPI
+
+### Bump dependencies
+
+- [#3447](https://github.com/Azure/typespec-azure/pull/3447) Upgrade dependencies october 2025
+
+### Bug Fixes
+
+- [#3399](https://github.com/Azure/typespec-azure/pull/3399) `arm-resource-operation` do not flag template instances
+- [#3492](https://github.com/Azure/typespec-azure/pull/3492) Fix #3404 changes to resolveArmResources
+- [#3410](https://github.com/Azure/typespec-azure/pull/3410) Fix invalid syntax causing error with PrivateLinks
+
+
+## 0.61.1
+
+### Bug Fixes
+
+- [#3442](https://github.com/Azure/typespec-azure/pull/3442) Fix #3420 make kind property required in polymorphic resources
+- [#3396](https://github.com/Azure/typespec-azure/pull/3396) Update resolveArmResources to allow grouping #3252
+
+
+## 0.61.0
+
+### Features
+
+- [#3356](https://github.com/Azure/typespec-azure/pull/3356) Support `@identifiers` on array model
+
+### Bug Fixes
+
+- [#3268](https://github.com/Azure/typespec-azure/pull/3268) Remove versioning
+  
+  ```diff lang=tsp
+  -@useDependency(Azure.ResourceManager.Versions.v1_preview2)
+  ```
+
+
+## 0.60.1
+
+### Bug Fixes
+
+- [#3330](https://github.com/Azure/typespec-azure/pull/3330) Fix #3294 Add model and operation templates for private link
+- [#3337](https://github.com/Azure/typespec-azure/pull/3337) Fix #3243 Allow polymorphic legacy resources
+- [#3332](https://github.com/Azure/typespec-azure/pull/3332) Fix #3295 Allow tenant-level external resources
+
+
+## 0.60.0
+
+### Bump dependencies
+
+- [#3207](https://github.com/Azure/typespec-azure/pull/3207) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3240](https://github.com/Azure/typespec-azure/pull/3240) Add request parameters to legacy operations list
+- [#3242](https://github.com/Azure/typespec-azure/pull/3242) Fix #3201 Remove duplicate TrackedResource type
+- [#3196](https://github.com/Azure/typespec-azure/pull/3196) Fix optionality for ArmCustomPatch templates
+- [#3178](https://github.com/Azure/typespec-azure/pull/3178) Allow renaming parameters in an operation
+
+
+## 0.59.2
+
+### Bug Fixes
+
+- [#3147](https://github.com/Azure/typespec-azure/pull/3147) Add support for x-ms-external through armExternalResource decorator
+- [#3154](https://github.com/Azure/typespec-azure/pull/3154) Add single page list and correct put template names
+- [#3172](https://github.com/Azure/typespec-azure/pull/3172) Add single page list and legacy put and patch operations
+
+
+## 0.59.1
+
+### Bug Fixes
+
+- [#3142](https://github.com/Azure/typespec-azure/pull/3142) Relax constraints for Action request and synchronous response parameters
+- [#3143](https://github.com/Azure/typespec-azure/pull/3143) Add templates for optional location and etags
+- [#3141](https://github.com/Azure/typespec-azure/pull/3141) Add operations for Private Endpoints
+
+
 ## 0.59.0
 
 ### Deprecations

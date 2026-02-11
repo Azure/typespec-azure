@@ -718,7 +718,7 @@
           {
             "name": "allPropertiesName",
             "in": "path",
-            "description": "The name of the all properties resource.",
+            "description": "The name of the AllPropertiesResource",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -758,7 +758,7 @@
           {
             "name": "allPropertiesName",
             "in": "path",
-            "description": "The name of the all properties resource.",
+            "description": "The name of the AllPropertiesResource",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -828,7 +828,7 @@
           {
             "name": "allPropertiesName",
             "in": "path",
-            "description": "The name of the all properties resource.",
+            "description": "The name of the AllPropertiesResource",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -839,7 +839,7 @@
             "description": "The resource properties to be updated.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/AllPropertiesResourceUpdate"
+              "$ref": "#/definitions/AllPropertiesUpdate"
             }
           }
         ],
@@ -877,16 +877,13 @@
           {
             "name": "allPropertiesName",
             "in": "path",
-            "description": "The name of the all properties resource.",
+            "description": "The name of the AllPropertiesResource",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
           }
         ],
         "responses": {
-          "200": {
-            "description": "Resource deleted successfully."
-          },
           "202": {
             "description": "Resource deletion accepted.",
             "headers": {
@@ -1653,14 +1650,23 @@
         }
       }
     },
+    "AllPropertiesPropertiesUpdate": {
+      "type": "object",
+      "description": "The template for adding optional properties.",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "Name of the resource"
+        }
+      }
+    },
     "AllPropertiesResource": {
       "type": "object",
       "description": "Concrete tracked resource types can be created by aliasing this type using a specific property type.",
       "properties": {
         "properties": {
           "$ref": "#/definitions/AllPropertiesProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         },
         "eTag": {
           "type": "string",
@@ -1720,24 +1726,24 @@
         "value"
       ]
     },
-    "AllPropertiesResourceUpdate": {
+    "AllPropertiesUpdate": {
       "type": "object",
-      "description": "The type used for update operations of the AllPropertiesResource.",
+      "description": "The template for adding optional properties.",
       "properties": {
         "managedBy": {
           "type": "string",
           "description": "The fully qualified resource ID of the resource that manages this resource. Indicates if this resource is managed by another Azure resource. If this is present, complete mode deployment will not delete the resource if it is removed from the template since it is managed by another resource."
         },
         "plan": {
-          "$ref": "#/definitions/Azure.ResourceManager.CommonTypes.PlanUpdate",
+          "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/Plan",
           "description": "Details of the resource plan."
         },
         "sku": {
-          "$ref": "#/definitions/Azure.ResourceManager.CommonTypes.SkuUpdate",
+          "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/Sku",
           "description": "The SKU (Stock Keeping Unit) assigned to this resource."
         },
         "identity": {
-          "$ref": "#/definitions/Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate",
+          "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/managedidentity.json#/definitions/ManagedServiceIdentity",
           "description": "The managed service identities assigned to this resource."
         },
         "tags": {
@@ -1748,91 +1754,8 @@
           }
         },
         "properties": {
-          "$ref": "#/definitions/AllPropertiesResourceUpdateProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
-        }
-      }
-    },
-    "AllPropertiesResourceUpdateProperties": {
-      "type": "object",
-      "description": "The updatable properties of the AllPropertiesResource.",
-      "properties": {
-        "displayName": {
-          "type": "string",
-          "description": "Name of the resource",
-          "default": "default"
-        }
-      }
-    },
-    "Azure.ResourceManager.CommonTypes.ManagedServiceIdentityUpdate": {
-      "type": "object",
-      "description": "Managed service identity (system assigned and/or user assigned identities)",
-      "properties": {
-        "type": {
-          "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/managedidentity.json#/definitions/ManagedServiceIdentityType",
-          "description": "The type of managed identity assigned to this resource."
-        },
-        "userAssignedIdentities": {
-          "type": "object",
-          "description": "The identities assigned to this resource by the user.",
-          "additionalProperties": {
-            "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/managedidentity.json#/definitions/UserAssignedIdentity",
-            "x-nullable": true
-          }
-        }
-      }
-    },
-    "Azure.ResourceManager.CommonTypes.PlanUpdate": {
-      "type": "object",
-      "description": "Plan for the resource.",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "A user defined name of the 3rd Party Artifact that is being procured."
-        },
-        "publisher": {
-          "type": "string",
-          "description": "The publisher of the 3rd Party Artifact that is being bought. E.g. NewRelic"
-        },
-        "product": {
-          "type": "string",
-          "description": "The 3rd Party artifact that is being procured. E.g. NewRelic. Product maps to the OfferID specified for the artifact at the time of Data Market onboarding."
-        },
-        "promotionCode": {
-          "type": "string",
-          "description": "A publisher provided promotion code as provisioned in Data Market for the said product/artifact."
-        },
-        "version": {
-          "type": "string",
-          "description": "The version of the desired product/artifact."
-        }
-      }
-    },
-    "Azure.ResourceManager.CommonTypes.SkuUpdate": {
-      "type": "object",
-      "description": "The resource model definition representing SKU",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the SKU. Ex - P3. It is typically a letter+number code"
-        },
-        "tier": {
-          "$ref": "../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/SkuTier",
-          "description": "This field is required to be implemented by the Resource Provider if the service has more than one tier, but is not required on a PUT."
-        },
-        "size": {
-          "type": "string",
-          "description": "The SKU size. When the name field is the combination of tier and some other value, this would be the standalone code."
-        },
-        "family": {
-          "type": "string",
-          "description": "If the service has different generations of hardware, for the same SKU, then that can be captured here."
-        },
-        "capacity": {
-          "type": "integer",
-          "format": "int32",
-          "description": "If the SKU supports scale out/in then the capacity integer should be included. If scale out/in is not possible for the resource this may be omitted."
+          "$ref": "#/definitions/AllPropertiesPropertiesUpdate",
+          "description": "Rp-specific resource properties"
         }
       }
     },
@@ -1889,8 +1812,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/Microsoft.InterfacesTest.TestExtensionProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       },
       "allOf": [
@@ -1921,8 +1843,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/Microsoft.InterfacesTest.TestTenantProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       },
       "allOf": [
@@ -1937,8 +1858,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/Microsoft.InterfacesTest.TrackedChildProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       },
       "allOf": [
@@ -1973,8 +1893,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/Microsoft.InterfacesTest.TestTrackedProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       },
       "allOf": [
@@ -2023,8 +1942,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/Microsoft.OperationsTest.TestTrackedProperties2",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       },
       "allOf": [
@@ -2097,8 +2015,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/TestExtensionResourceUpdateProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       }
     },
@@ -2140,8 +2057,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/TestTenantResourceUpdateProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       }
     },
@@ -2211,8 +2127,7 @@
         },
         "properties": {
           "$ref": "#/definitions/TestTrackedResource2UpdateProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       }
     },

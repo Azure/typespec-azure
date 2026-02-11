@@ -11,10 +11,8 @@ export interface AutorestEmitterOptions {
    * Output file will interpolate the following values:
    *  - service-name: Name of the service if multiple
    *  - version: Version of the service if multiple
-   *  - azure-resource-provider-folder: Value of the azure-resource-provider-folder option
-   *  - version-status: Only enabled if azure-resource-provider-folder is set. `preview` if version contains preview, stable otherwise.
    *
-   * @default `{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json`
+   * @default `{emitter-output-dir}/{service-name}/{version-status}/{version}/openapi.json`
    *
    *
    * @example Single service no versioning
@@ -53,6 +51,7 @@ export interface AutorestEmitterOptions {
 
   version?: string;
 
+  /** @deprecated Do not use this option. Specify the path directly in emitter-output-dir. */
   "azure-resource-provider-folder"?: string;
 
   /**
@@ -99,15 +98,26 @@ export interface AutorestEmitterOptions {
   "emit-lro-options"?: "none" | "final-state-only" | "all";
 
   /**
-   * Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of the
-   * ARM resource properties.
-   */
-  "arm-resource-flattening"?: boolean;
-  /**
    * Determines whether and how to emit schemas for common-types
    * @default "for-visibility-changes"
    */
   "emit-common-types-schema"?: "never" | "for-visibility-changes";
+
+  /**
+   * Strategy for applying XML serialization metadata to schemas.
+   *
+   * - "xml-service": Apply XML serialization metadata for any service that uses the `"application/xml"` content type.
+   * - "none": Do not apply any XML serialization metadata.
+   *
+   * @default "xml-service"
+   */
+  "xml-strategy"?: "xml-service" | "none";
+
+  /**
+   * Determines whether output should be split into multiple files.  The only supported option for splitting is "legacy-feature-files",
+   * which uses the typespec-azure-resource-manager `@feature` decorators to split into output files based on feature.
+   */
+  "output-splitting"?: "legacy-feature-files";
 }
 
 const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
@@ -128,10 +138,9 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
         "Output file will interpolate the following values:",
         " - service-name: Name of the service if multiple",
         " - version: Version of the service if multiple",
-        " - azure-resource-provider-folder: Value of the azure-resource-provider-folder option",
-        " - version-status: Only enabled if azure-resource-provider-folder is set. `preview` if version contains preview, stable otherwise.",
+        " - version-status: `preview` if version contains preview, stable otherwise.",
         "",
-        "Default: `{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json`",
+        "Default: `{emitter-output-dir}/{service-name}/{version-status}/{version}/openapi.json`",
         "",
         "",
         "Example: Single service no versioning",
@@ -151,8 +160,8 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
         " - `openapi.Org1.Service2.v1.0.yaml`",
         " - `openapi.Org1.Service2.v1.1.yaml`",
         "",
-        "Example: azureResourceProviderFolder is provided",
-        " - `arm-folder/AzureService/preview/2020-01-01.yaml`",
+        "Example: Versioning with version-status",
+        " - `arm-folder/AzureService/stable/2020-01-01.yaml`",
         " - `arm-folder/AzureService/preview/2020-01-01.yaml`",
       ].join("\n"),
     },
@@ -169,7 +178,12 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       description: "DEPRECATED. Use examples-dir instead",
     },
     version: { type: "string", nullable: true },
-    "azure-resource-provider-folder": { type: "string", nullable: true },
+    "azure-resource-provider-folder": {
+      type: "string",
+      nullable: true,
+      description:
+        "Deprecated. Do not use this option. Specify the path directly in emitter-output-dir.",
+    },
     "arm-types-dir": {
       type: "string",
       nullable: true,
@@ -218,13 +232,6 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       description:
         "Determine whether and how to emit x-ms-long-running-operation-options for lro resolution",
     },
-    "arm-resource-flattening": {
-      type: "boolean",
-      nullable: true,
-      default: false,
-      description:
-        "Back-compat flag. If true, continue to emit `x-ms-client-flatten` in for some of the ARM resource properties.",
-    },
     "emit-common-types-schema": {
       type: "string",
       enum: ["never", "for-visibility-changes"],
@@ -232,6 +239,20 @@ const EmitterOptionsSchema: JSONSchemaType<AutorestEmitterOptions> = {
       default: "for-visibility-changes",
       description:
         "Determine whether and how to emit schemas for common-types rather than referencing them",
+    },
+    "xml-strategy": {
+      type: "string",
+      enum: ["xml-service", "none"],
+      nullable: true,
+      default: "xml-service",
+      description: "Strategy for applying XML serialization metadata to schemas.",
+    },
+    "output-splitting": {
+      type: "string",
+      enum: ["legacy-feature-files"],
+      nullable: true,
+      description:
+        'Determines whether output should be split into multiple files.  The only supported option for splitting is "legacy-feature-files", which uses the typespec-azure-resource-manager `@feature` decorators to split into output files based on feature.',
     },
   },
   required: [],
@@ -351,10 +372,11 @@ export const $lib = createTypeSpecLibrary({
         default: `Cookies are not supported in Swagger 2.0. Parameter was ignored.`,
       },
     },
-    "invalid-format": {
+    "unknown-format": {
       severity: "warning",
       messages: {
         default: paramMessage`'${"schema"}' format '${"format"}' is not supported in Autorest. It will not be emitted.`,
+        encoding: paramMessage`'${"schema"}' encoding format '${"format"}' is not supported in Autorest. It will not be emitted.`,
       },
     },
     "unsupported-auth": {

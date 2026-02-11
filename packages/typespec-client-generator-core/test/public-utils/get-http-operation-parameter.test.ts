@@ -1,21 +1,23 @@
 import { ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { SdkHttpOperation, SdkMethodParameter, SdkServiceMethod } from "../../src/interfaces.js";
 import { getHttpOperationParameter } from "../../src/public-utils.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
+import {
+  createClientCustomizationInput,
+  createSdkContextForTester,
+  SimpleBaseTester,
+  SimpleTester,
+  SimpleTesterWithService,
+  SimpleTesterWithVersionedService,
+} from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
-
 it("normal method case", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     op myOp(@header h: string, @query q: string, @path p: string, @body b: string): void;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const parameters = method.parameters;
 
@@ -50,14 +52,15 @@ it("normal method case", async () => {
 });
 
 it("normal spread case", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Input {
       key: string;
     }
 
     op myOp(...Input): void;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const parameters = method.parameters;
 
@@ -79,7 +82,7 @@ it("normal spread case", async () => {
 });
 
 it("spread model with @body property", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Shelf {
       name: string;
       theme?: string;
@@ -90,7 +93,8 @@ it("spread model with @body property", async () => {
     }
     op createShelf(...CreateShelfRequest): Shelf;
   `);
-  const method = getServiceMethodOfClient(runner.context.sdkPackage);
+  const context = await createSdkContextForTester(program);
+  const method = getServiceMethodOfClient(context.sdkPackage);
   const parameters = method.parameters;
 
   strictEqual(parameters.length, 3);
@@ -116,7 +120,7 @@ it("spread model with @body property", async () => {
 });
 
 it("spread model with @bodyRoot property", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model Shelf {
       @query
       name: string;
@@ -128,7 +132,8 @@ it("spread model with @bodyRoot property", async () => {
     }
     op createShelf(...CreateShelfRequest): Shelf;
   `);
-  const method = getServiceMethodOfClient(runner.context.sdkPackage);
+  const context = await createSdkContextForTester(program);
+  const method = getServiceMethodOfClient(context.sdkPackage);
   const parameters = method.parameters;
 
   strictEqual(parameters.length, 3);
@@ -166,10 +171,11 @@ it("spread model with @bodyRoot property", async () => {
 });
 
 it("implicit spread for body", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     op myOp(a: string, b: string): void;
   `);
-  const method = getServiceMethodOfClient(runner.context.sdkPackage);
+  const context = await createSdkContextForTester(program);
+  const method = getServiceMethodOfClient(context.sdkPackage);
   const parameters = method.parameters;
 
   strictEqual(parameters.length, 3);
@@ -195,10 +201,11 @@ it("implicit spread for body", async () => {
 });
 
 it("implicit spread for header and body", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     op myOp(@header a: string, b: string): void;
   `);
-  const method = getServiceMethodOfClient(runner.context.sdkPackage);
+  const context = await createSdkContextForTester(program);
+  const method = getServiceMethodOfClient(context.sdkPackage);
   const parameters = method.parameters;
 
   strictEqual(parameters.length, 3);
@@ -224,7 +231,7 @@ it("implicit spread for header and body", async () => {
 });
 
 it("@bodyRoot case", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model TestRequest {
       @header
       h: string;
@@ -235,7 +242,8 @@ it("@bodyRoot case", async () => {
     }
     op test(@bodyRoot request: TestRequest): void;
   `);
-  const method = getServiceMethodOfClient(runner.context.sdkPackage);
+  const context = await createSdkContextForTester(program);
+  const method = getServiceMethodOfClient(context.sdkPackage);
   const parameters = method.parameters;
 
   strictEqual(parameters.length, 2);
@@ -276,7 +284,7 @@ it("@bodyRoot case", async () => {
 });
 
 it("multipart case", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @route("upload/{name}")
     @post
     op uploadFile(
@@ -289,7 +297,8 @@ it("multipart case", async () => {
       },
     ): OkResponse;
   `);
-  const method = getServiceMethodOfClient(runner.context.sdkPackage);
+  const context = await createSdkContextForTester(program);
+  const method = getServiceMethodOfClient(context.sdkPackage);
   const parameters = method.parameters;
 
   strictEqual(parameters.length, 3);
@@ -315,7 +324,7 @@ it("multipart case", async () => {
 });
 
 it("template case", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service(#{
       title: "Pet Store Service",
     })
@@ -347,7 +356,8 @@ it("template case", async () => {
       extends ExtensionResourceCreateOrUpdate<Checkup, Pet, PetStoreError>,
         ExtensionResourceList<Checkup, Pet, PetStoreError> {}
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0].children?.[0];
   ok(client);
   const method = client.methods[0] as SdkServiceMethod<SdkHttpOperation>;
@@ -386,10 +396,11 @@ it("template case", async () => {
 });
 
 it("api version parameter", async () => {
-  await runner.compileWithVersionedService(`
+  const { program } = await SimpleTesterWithVersionedService.compile(`
     op test(@query apiVersion: string, @body body: string): void;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   const method = getServiceMethodOfClient(sdkPackage);
   const httpParam = getHttpOperationParameter(
@@ -402,15 +413,16 @@ it("api version parameter", async () => {
 });
 
 it("client parameter", async () => {
-  await runner.compileWithCustomization(
-    `
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
       @service
       namespace MyService;
 
       op download(@path blob: string): void;
       op upload(@path blobName: string): void;
       `,
-    `
+      `
       namespace MyCustomizations;
 
       model MyClientInitialization {
@@ -420,8 +432,10 @@ it("client parameter", async () => {
 
       @@clientInitialization(MyService, MyCustomizations.MyClientInitialization);
       `,
+    ),
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   let httpParam = getHttpOperationParameter(
     client.methods[0] as SdkServiceMethod<SdkHttpOperation>,
@@ -441,8 +455,9 @@ it("client parameter", async () => {
 });
 
 it("@override impact", async () => {
-  await runner.compileWithCustomization(
-    `
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
       @service
       namespace MyService;
       model Params {
@@ -452,15 +467,17 @@ it("@override impact", async () => {
 
       op func(...Params): void;
       `,
-    `
+      `
       namespace MyCustomizations;
 
       op func(params: MyService.Params): void;
 
       @@override(MyService.func, MyCustomizations.func);
       `,
+    ),
   );
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   const method = client.methods[0] as SdkServiceMethod<SdkHttpOperation>;
   const parameters = method.parameters;
@@ -470,7 +487,7 @@ it("@override impact", async () => {
   for (const param of parameters) {
     if (param.name === "params") {
       const httpParam = getHttpOperationParameter(method, param);
-      ok(!httpParam);
+      ok(httpParam);
     } else if (param.name === "contentType") {
       const httpParam = getHttpOperationParameter(method, param);
       ok(httpParam);
@@ -478,25 +495,10 @@ it("@override impact", async () => {
       strictEqual(httpParam.serializedName, "Content-Type");
     }
   }
-
-  strictEqual(parameters[0].type.kind, "model");
-  for (const property of parameters[0].type.properties) {
-    if (property.name === "foo") {
-      const httpParam = getHttpOperationParameter(method, property);
-      ok(httpParam);
-      strictEqual(httpParam.kind, "property");
-      strictEqual(httpParam.name, "foo");
-    } else if (property.name === "bar") {
-      const httpParam = getHttpOperationParameter(method, property);
-      ok(httpParam);
-      strictEqual(httpParam.kind, "property");
-      strictEqual(httpParam.name, "bar");
-    }
-  }
 });
 
 it("should not add Accept header when success response has no body but error response has body", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @error
     model ErrorModel {
       message: string;
@@ -511,7 +513,8 @@ it("should not add Accept header when success response has no body but error res
       @body error: ErrorModel;
     };
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const parameters = method.parameters;
 
@@ -525,7 +528,7 @@ it("should not add Accept header when success response has no body but error res
 });
 
 it("should add Accept header when success response has body", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model ResponseModel {
       data: string;
     }
@@ -541,7 +544,8 @@ it("should add Accept header when success response has body", async () => {
       @body error: ErrorModel;
     };
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const method = getServiceMethodOfClient(sdkPackage);
   const parameters = method.parameters;
 
