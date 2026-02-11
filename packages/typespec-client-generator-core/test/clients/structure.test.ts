@@ -2083,11 +2083,6 @@ it("error: inconsistent-multiple-service server", async () => {
       code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service",
       message: "All services must have the same server and auth definitions.",
     },
-    {
-      code: "@azure-tools/typespec-client-generator-core/multiple-services",
-      message:
-        "Multiple services found. Only the first service will be used; others will be ignored.",
-    },
   ]);
 });
 
@@ -2119,11 +2114,6 @@ it("error: inconsistent-multiple-service-servers auth", async () => {
     {
       code: "@azure-tools/typespec-client-generator-core/inconsistent-multiple-service",
       message: "All services must have the same server and auth definitions.",
-    },
-    {
-      code: "@azure-tools/typespec-client-generator-core/multiple-services",
-      message:
-        "Multiple services found. Only the first service will be used; others will be ignored.",
     },
   ]);
 });

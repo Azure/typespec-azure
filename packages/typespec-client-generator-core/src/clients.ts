@@ -1,4 +1,10 @@
-import { createDiagnosticCollector, Diagnostic, getDoc, getSummary } from "@typespec/compiler";
+import {
+  createDiagnosticCollector,
+  Diagnostic,
+  getDoc,
+  getNamespaceFullName,
+  getSummary,
+} from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { getServers, HttpServer } from "@typespec/http";
 import {
@@ -182,6 +188,21 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
   });
 }
 
+function buildApiVersionsMap(
+  context: TCGCContext,
+  client: SdkClient | SdkOperationGroup,
+): Record<string, string[]> {
+  if (client.services.length <= 1) {
+    return {};
+  }
+  const map: Record<string, string[]> = {};
+  for (const service of client.services) {
+    const versions = context.getPackageVersions().get(service) ?? [];
+    map[getNamespaceFullName(service)] = versions;
+  }
+  return map;
+}
+
 export function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
   client: SdkClient | SdkOperationGroup,
@@ -208,6 +229,7 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     summary: client.type ? getSummary(context.program, client.type) : undefined,
     methods: [],
     apiVersions: Array.isArray(clientType) ? [] : context.getApiVersionsForType(clientType),
+    apiVersionsMap: buildApiVersionsMap(context, client),
     namespace: getClientNamespace(context, typeForMetadata),
     clientInitialization: diagnostics.pipe(
       createSdkClientInitializationType(context, client, parent),

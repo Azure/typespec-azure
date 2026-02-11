@@ -28,6 +28,27 @@ import { reportDiagnostic } from "./lib.js";
 import { getLibraryName } from "./public-utils.js";
 
 /**
+ * Check if a multi-service client has nested @client decorators within its namespace.
+ * When nested @client decorators exist, the explicit hierarchy should be used instead of auto-merging.
+ */
+function hasNestedClientDecorators(context: TCGCContext, client: SdkClient): boolean {
+  if (client.type.kind !== "Namespace") return false;
+  // Check if any @client decorated namespaces or interfaces exist within this client's namespace
+  const clientNs = client.type;
+  for (const subNs of clientNs.namespaces.values()) {
+    if (getScopedDecoratorData(context, clientKey, subNs)) {
+      return true;
+    }
+  }
+  for (const iface of clientNs.interfaces.values()) {
+    if (getScopedDecoratorData(context, clientKey, iface)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Create TCGC client types and operation group types and prepare the cache for clients, operation groups and operations.
  *
  * @param context TCGCContext
@@ -48,58 +69,64 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   context.__packageVersions = new Map<Namespace, string[]>();
   context.__packageVersionEnum = new Map<Namespace, Enum | undefined>();
 
-  if (clients.length === 1 && clients[0].services.length > 1) {
-    // multi-service client
-    const versionDependencies = getVersionDependencies(
-      context.program,
-      clients[0]!.type as Namespace,
-    );
-
-    for (const specificService of clients[0].services) {
-      if (context.__packageVersions.has(specificService)) {
-        continue;
-      }
-
-      const versions = getVersions(context.program, specificService)[1]?.getVersions();
-      if (!versions) {
-        context.__packageVersions.set(specificService, []);
-        continue;
-      }
-
-      context.__packageVersionEnum.set(specificService, versions[0].enumMember.enum);
-
-      const versionDependency = versionDependencies?.get(specificService);
-
-      compilerAssert(
-        versionDependency !== undefined && "name" in versionDependency,
-        "Client with multiple services is missing version dependency declaration.",
+  for (const client of clients) {
+    if (client.services.length > 1) {
+      // multi-service client
+      const versionDependencies = getVersionDependencies(
+        context.program,
+        client.type as Namespace,
       );
 
-      let end = false;
-      context.__packageVersions.set(
-        specificService,
-        versions
-          .map((version) => version.value)
-          .filter((v) => {
-            if (end) return false;
-            if (v === versionDependency.value) end = true;
-            return true;
-          }),
-      );
-    }
-  } else if (clients.length > 0) {
-    // single-service client
-    const versions = getVersions(context.program, clients[0].services[0])[1]?.getVersions();
+      for (const specificService of client.services) {
+        if (context.__packageVersions.has(specificService)) {
+          continue;
+        }
 
-    if (!versions || versions.length === 0) {
-      context.__packageVersions.set(clients[0].services[0], []);
-    } else {
-      context.__packageVersionEnum.set(clients[0].services[0], versions[0].enumMember.enum);
+        const versions = getVersions(context.program, specificService)[1]?.getVersions();
+        if (!versions) {
+          context.__packageVersions.set(specificService, []);
+          continue;
+        }
 
-      removeVersionsLargerThanExplicitlySpecified(context, versions);
+        context.__packageVersionEnum.set(specificService, versions[0].enumMember.enum);
 
-      const filteredVersions = versions.map((version) => version.value);
-      context.__packageVersions.set(clients[0].services[0], filteredVersions);
+        const versionDependency = versionDependencies?.get(specificService);
+
+        compilerAssert(
+          versionDependency !== undefined && "name" in versionDependency,
+          "Client with multiple services is missing version dependency declaration.",
+        );
+
+        let end = false;
+        context.__packageVersions.set(
+          specificService,
+          versions
+            .map((version) => version.value)
+            .filter((v) => {
+              if (end) return false;
+              if (v === versionDependency.value) end = true;
+              return true;
+            }),
+        );
+      }
+    } else if (client.services.length === 1) {
+      const service = client.services[0];
+      if (context.__packageVersions.has(service)) {
+        continue;
+      }
+      // single-service client
+      const versions = getVersions(context.program, service)[1]?.getVersions();
+
+      if (!versions || versions.length === 0) {
+        context.__packageVersions.set(service, []);
+      } else {
+        context.__packageVersionEnum.set(service, versions[0].enumMember.enum);
+
+        removeVersionsLargerThanExplicitlySpecified(context, versions);
+
+        const filteredVersions = versions.map((version) => version.value);
+        context.__packageVersions.set(service, filteredVersions);
+      }
     }
   }
 
@@ -112,15 +139,17 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   for (const client of clients) {
     const groups: SdkOperationGroup[] = [];
 
-    if (client.services.length > 1) {
+    if (client.services.length > 1 && !hasNestedClientDecorators(context, client)) {
       // Multiple services case will auto-merge all the services and add their nested operation groups
+      // Only auto-merge when the client namespace is "empty" (no nested @client decorators)
       for (const specificService of client.services) {
         createFirstLevelOperationGroup(context, specificService, specificService);
       }
-    } else {
+    } else if (client.services.length <= 1) {
       // Single service case needs to use the client type since it could contain customizations
       createFirstLevelOperationGroup(context, client.type, client.services[0]);
     }
+    // If client has nested @client decorators, skip auto-merge - nested clients handle their own OGs
 
     function createFirstLevelOperationGroup(
       context: TCGCContext,
@@ -384,35 +413,30 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
     return explicitClients;
   }
 
-  // if there is no explicit client, we will treat the first namespace with service decorator as client
+  // if there is no explicit client, we will create a separate root client for each service namespace
   const serviceNamespaces: Namespace[] = namespaces.filter((ns) => isService(context.program, ns));
   if (serviceNamespaces.length >= 1) {
-    const service = serviceNamespaces.shift()!;
-    serviceNamespaces.map((ns) => {
-      reportDiagnostic(context.program, {
-        code: "multiple-services",
-        target: ns,
-      });
-    });
-    let originalName = service.name;
-    const clientNameOverride = getClientNameOverride(context, service);
-    if (clientNameOverride) {
-      originalName = clientNameOverride;
-    } else {
-      originalName = service.name;
-    }
-    const clientName = originalName.endsWith("Client") ? originalName : `${originalName}Client`;
-    context.arm = isArm(service);
-    return [
-      {
+    const clients: SdkClient[] = [];
+    for (const service of serviceNamespaces) {
+      let originalName = service.name;
+      const clientNameOverride = getClientNameOverride(context, service);
+      if (clientNameOverride) {
+        originalName = clientNameOverride;
+      } else {
+        originalName = service.name;
+      }
+      const clientName = originalName.endsWith("Client") ? originalName : `${originalName}Client`;
+      clients.push({
         kind: "SdkClient",
         name: clientName,
         service: service,
         services: [service],
         type: service,
         subOperationGroups: [],
-      },
-    ];
+      });
+    }
+    context.arm = clients.some((client) => isArm(client.services));
+    return clients;
   }
 
   return [];
