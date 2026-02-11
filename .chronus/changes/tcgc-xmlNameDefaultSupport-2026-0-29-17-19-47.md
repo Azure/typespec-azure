@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Add `.crossLanguageDefinitionId`. to `SdkEnumValueType`
+Add `.streamMetadata` for sse events streamed in or out

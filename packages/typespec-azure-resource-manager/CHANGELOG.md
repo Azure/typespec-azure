@@ -1,5 +1,13 @@
 # Change Log - @azure-tools/typespec-azure-resource-manager
 
+## 0.65.0
+
+### Features
+
+- [#3907](https://github.com/Azure/typespec-azure/pull/3907) Add new template for Async Action and standard list query parameters
+- [#3906](https://github.com/Azure/typespec-azure/pull/3906) #3818 Add overrides for built-in resource operations path name constraints
+
+
 ## 0.64.1
 
 ### Bug Fixes

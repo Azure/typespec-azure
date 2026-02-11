@@ -6,14 +6,14 @@ using Http;
 using Spector;
 using Azure.ClientGenerator.Core;
 
-@doc("Test for client initialization decorator - moving parameters from method to client level")
-@scenarioService("/azure/client-generator-core/client-initialization/default")
-namespace _Specs_.Azure.ClientGenerator.Core.ClientInitialization.DefaultClient;
-
 @global.Azure.ClientGenerator.Core.clientNamespace(
   "azure.clientgenerator.core.clientinitialization.defaultclient",
   "java"
 )
+@doc("Test for client initialization decorator - moving parameters from method to client level")
+@scenarioService("/azure/client-generator-core/client-initialization/default")
+namespace _Specs_.Azure.ClientGenerator.Core.ClientInitialization.DefaultClient;
+
 model HeaderParamClientOptions {
   @doc("The name of the client. This parameter is used as a header in all operations.")
   name: string;

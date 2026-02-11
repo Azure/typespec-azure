@@ -261,3 +261,49 @@ op withParameterizedNextLink(
   ...IncludePendingOptions,
   @query select: string,
 ): ParameterizedNextLinkPagingResult;
+
+#suppress "@azure-tools/typespec-azure-core/use-standard-operations" "For testing global.Azure.Core.Page"
+@scenario
+@doc("List with relative nextLink URL that requires endpoint resolution.")
+@route("/with-relative-next-link")
+@scenarioDoc("""
+    This scenario tests pagination where the nextLink is a relative URL instead of an absolute URL.
+    When a relative URL is used, the client must resolve it against the endpoint base URL for subsequent requests.
+    
+    Expected query parameter on initial request:
+    - api-version=2022-12-01-preview
+    
+    Expected response body (first page):
+    ```json
+    {
+      "value":[
+         {
+            "id": 1,
+            "name": "User1",
+            "etag": "11bdc430-65e8-45ad-81d9-8ffa60d55b59"
+         }
+      ],
+      "nextLink": "/azure/core/page/with-relative-next-link/page/2"
+    }
+    ```
+    
+    Expected query parameter on next link request:
+    - api-version=2022-12-01-preview
+    
+    Expected response body (second page):
+    ```json
+    {
+      "value":[
+         {
+            "id": 2,
+            "name": "User2",
+            "etag": "11bdc430-65e8-45ad-81d9-8ffa60d55b59"
+         }
+      ]
+    }
+    ```
+    
+    Note: The nextLink is a relative URL, not an absolute URL. The client must resolve it against the service endpoint.
+  """)
+@list
+op withRelativeNextLink(): global.Azure.Core.Page<User>;
