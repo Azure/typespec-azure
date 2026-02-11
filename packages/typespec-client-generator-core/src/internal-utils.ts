@@ -139,7 +139,7 @@ export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean
     explicitClients.forEach((_value, key) => {
       if (key.kind === "Namespace" || key.kind === "Interface") {
         // Check if this key's namespace is inside a multi-service client namespace
-        let ns = key.kind === "Namespace" ? key.namespace : key.namespace;
+        let ns = key.namespace;
         while (ns) {
           if (multiServiceClientNamespaces.includes(ns)) {
             hasNestedClients = true;

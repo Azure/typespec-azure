@@ -64,8 +64,7 @@ function serviceHasOperationGroupDecorators(context: TCGCContext, service: Names
   for (const [type] of context.program.stateMap(operationGroupKey).entries()) {
     if (type.kind === "Interface" || type.kind === "Namespace") {
       // Check if this type is within the service namespace
-      let ns: Namespace | undefined =
-        type.kind === "Namespace" ? type.namespace : type.namespace;
+      let ns: Namespace | undefined = type.namespace;
       while (ns) {
         if (ns === service) return true;
         ns = ns.namespace;
@@ -99,10 +98,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   for (const client of clients) {
     if (client.services.length > 1) {
       // multi-service client
-      const versionDependencies = getVersionDependencies(
-        context.program,
-        client.type as Namespace,
-      );
+      const versionDependencies = getVersionDependencies(context.program, client.type as Namespace);
 
       for (const specificService of client.services) {
         if (context.__packageVersions.has(specificService)) {
@@ -555,7 +551,7 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
     // These nested clients are handled as children of the multi-service parent
     const rootClients = explicitClients.filter((client: SdkClient) => {
       const clientType = client.type;
-      const clientNs = clientType.kind === "Namespace" ? clientType.namespace : clientType.namespace;
+      const clientNs = clientType.namespace;
       // Check if this client's parent namespace is a MULTI-SERVICE client
       return !explicitClients.some(
         (other: SdkClient) =>
