@@ -2547,3 +2547,93 @@ it("apiVersionsMap empty for single-service client", async () => {
   deepStrictEqual(client.apiVersionsMap, {});
   deepStrictEqual(client.apiVersions, ["v1", "v2"]);
 });
+
+// ========================================================================
+// Scenario 2: Services as direct children (nested @client)
+// ========================================================================
+
+it("scenario 2: services as direct children with nested @client", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      interface Operations {
+        @route("/opA")
+        opA(@query("api-version") apiVersion: VersionsA): void;
+      }
+      namespace SubNamespace {
+        @route("/subOpA")
+        op subOpA(): void;
+      }
+    }
+
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      interface Operations {
+        @route("/opB")
+        opB(@query("api-version") apiVersion: VersionsB): void;
+      }
+      namespace SubNamespace {
+        @route("/subOpB")
+        op subOpB(): void;
+      }
+    }`,
+      `
+    @client({
+      name: "CombineClient",
+      service: [ServiceA, ServiceB],
+    })
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombineClient {
+      @client({
+        name: "ComputeClient",
+        service: ServiceA,
+      })
+      namespace Compute {}
+
+      @client({
+        name: "DiskClient",
+        service: ServiceB,
+      })
+      namespace Disk {}
+    }
+  `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+
+  // Root client
+  const rootClients = sdkPackage.clients.filter((c) => !c.parent);
+  strictEqual(rootClients.length, 1);
+  const rootClient = rootClients[0];
+  strictEqual(rootClient.name, "CombineClient");
+  strictEqual(rootClient.apiVersions.length, 0);
+  deepStrictEqual(rootClient.apiVersionsMap, {
+    ServiceA: ["av1", "av2"],
+    ServiceB: ["bv1", "bv2"],
+  });
+
+  // Nested clients
+  ok(rootClient.children);
+  strictEqual(rootClient.children.length, 2);
+
+  const computeClient = rootClient.children.find((c) => c.name === "ComputeClient");
+  ok(computeClient);
+  deepStrictEqual(computeClient.apiVersions, ["av1", "av2"]);
+
+  const diskClient = rootClient.children.find((c) => c.name === "DiskClient");
+  ok(diskClient);
+  deepStrictEqual(diskClient.apiVersions, ["bv1", "bv2"]);
+});

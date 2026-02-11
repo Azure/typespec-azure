@@ -194,8 +194,81 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       } else {
         createFirstLevelOperationGroup(context, clientType, service);
       }
+    } else if (client.services.length > 1 && hasNestedClientDecorators(context, client)) {
+      // Multi-service client with nested @client decorators (Scenario 2/3)
+      // Create operation groups for each nested @client
+      if (client.type.kind === "Namespace") {
+        for (const subNs of client.type.namespaces.values()) {
+          const nestedClientData = getScopedDecoratorData(context, clientKey, subNs) as
+            | SdkClient
+            | undefined;
+          if (nestedClientData) {
+            // Create an operation group for the nested client
+            const og: SdkOperationGroup = {
+              kind: "SdkOperationGroup",
+              type: subNs,
+              groupPath: `${client.name}.${nestedClientData.name}`,
+              service: nestedClientData.services[0],
+              services: nestedClientData.services,
+              subOperationGroups: [],
+              parent: client,
+            };
+            context.__rawClientsOperationGroupsCache!.set(subNs, og);
+            context.__clientToOperationsCache!.set(og, []);
+
+            // If the nested client namespace is empty, auto-merge from its service
+            if (isNamespaceEmpty(subNs)) {
+              const nestedService = nestedClientData.services[0];
+              if (nestedService.kind === "Namespace") {
+                for (const serviceSubNs of nestedService.namespaces.values()) {
+                  const subOg = createOperationGroup(
+                    context,
+                    serviceSubNs,
+                    og.groupPath,
+                    nestedService,
+                    og,
+                    true,
+                  );
+                  if (subOg) og.subOperationGroups.push(subOg);
+                }
+                for (const serviceIface of nestedService.interfaces.values()) {
+                  if (isTemplateDeclaration(serviceIface)) continue;
+                  const subOg = createOperationGroup(
+                    context,
+                    serviceIface,
+                    og.groupPath,
+                    nestedService,
+                    og,
+                    true,
+                  );
+                  if (subOg) og.subOperationGroups.push(subOg);
+                }
+              }
+            }
+            groups.push(og);
+          }
+        }
+        for (const iface of client.type.interfaces.values()) {
+          const nestedClientData = getScopedDecoratorData(context, clientKey, iface) as
+            | SdkClient
+            | undefined;
+          if (nestedClientData) {
+            const og: SdkOperationGroup = {
+              kind: "SdkOperationGroup",
+              type: iface,
+              groupPath: `${client.name}.${nestedClientData.name}`,
+              service: nestedClientData.services[0],
+              services: nestedClientData.services,
+              subOperationGroups: [],
+              parent: client,
+            };
+            context.__rawClientsOperationGroupsCache!.set(iface, og);
+            context.__clientToOperationsCache!.set(og, []);
+            groups.push(og);
+          }
+        }
+      }
     }
-    // If client has nested @client decorators, skip auto-merge - nested clients handle their own OGs
 
     function createFirstLevelOperationGroup(
       context: TCGCContext,
@@ -466,7 +539,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
 function getOrCreateClients(context: TCGCContext): SdkClient[] {
   const namespaces: Namespace[] = listAllUserDefinedNamespaces(context);
 
-  const explicitClients = [];
+  const explicitClients: SdkClient[] = [];
   for (const ns of namespaces) {
     if (getScopedDecoratorData(context, clientKey, ns)) {
       explicitClients.push(getScopedDecoratorData(context, clientKey, ns));
@@ -478,10 +551,24 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
     }
   }
   if (explicitClients.length > 0) {
-    if (explicitClients.some((client) => isArm(client.services))) {
+    // Filter out nested clients within multi-service parent clients
+    // These nested clients are handled as children of the multi-service parent
+    const rootClients = explicitClients.filter((client: SdkClient) => {
+      const clientType = client.type;
+      const clientNs = clientType.kind === "Namespace" ? clientType.namespace : clientType.namespace;
+      // Check if this client's parent namespace is a MULTI-SERVICE client
+      return !explicitClients.some(
+        (other: SdkClient) =>
+          other !== client &&
+          other.type.kind === "Namespace" &&
+          other.type === clientNs &&
+          other.services.length > 1,
+      );
+    });
+    if (rootClients.some((client: SdkClient) => isArm(client.services))) {
       context.arm = true;
     }
-    return explicitClients;
+    return rootClients;
   }
 
   // if there is no explicit client, we will create a separate root client for each service namespace
