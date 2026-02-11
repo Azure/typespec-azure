@@ -2171,3 +2171,379 @@ it("multiple clients from single service", async () => {
   ok(versionsEnum);
   strictEqual(versionsEnum.values.length, 2);
 });
+
+// ========================================================================
+// Scenario 0: Multiple services without explicit @client
+// ========================================================================
+
+it("scenario 0: multiple versioned services without explicit @client", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+
+      interface Operations {
+        @route("/opA")
+        opA(@query("api-version") apiVersion: VersionsA): void;
+      }
+
+      namespace SubNamespace {
+        @route("/subOpA")
+        op subOpA(): void;
+      }
+    }
+
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+
+      interface Operations {
+        @route("/opB")
+        opB(@query("api-version") apiVersion: VersionsB): void;
+      }
+
+      namespace SubNamespace {
+        @route("/subOpB")
+        op subOpB(): void;
+      }
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+
+  // Two independent root clients
+  strictEqual(sdkPackage.clients.length, 2);
+
+  const clientA = sdkPackage.clients.find((c) => c.name === "ServiceAClient");
+  ok(clientA);
+  deepStrictEqual(clientA.apiVersions, ["av1", "av2"]);
+  deepStrictEqual(clientA.apiVersionsMap, {});
+  ok(clientA.children);
+  strictEqual(clientA.children.length, 2);
+
+  const opsA = clientA.children.find((c) => c.name === "Operations");
+  ok(opsA);
+  strictEqual(opsA.methods.length, 1);
+  strictEqual(opsA.methods[0].name, "opA");
+
+  const subNsA = clientA.children.find((c) => c.name === "SubNamespace");
+  ok(subNsA);
+  strictEqual(subNsA.methods.length, 1);
+  strictEqual(subNsA.methods[0].name, "subOpA");
+
+  const clientB = sdkPackage.clients.find((c) => c.name === "ServiceBClient");
+  ok(clientB);
+  deepStrictEqual(clientB.apiVersions, ["bv1", "bv2"]);
+  deepStrictEqual(clientB.apiVersionsMap, {});
+  ok(clientB.children);
+  strictEqual(clientB.children.length, 2);
+
+  const opsB = clientB.children.find((c) => c.name === "Operations");
+  ok(opsB);
+  strictEqual(opsB.methods.length, 1);
+  strictEqual(opsB.methods[0].name, "opB");
+
+  const subNsB = clientB.children.find((c) => c.name === "SubNamespace");
+  ok(subNsB);
+  strictEqual(subNsB.methods.length, 1);
+  strictEqual(subNsB.methods[0].name, "subOpB");
+});
+
+it("scenario 0: multiple unversioned services without explicit @client", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    namespace ServiceA {
+      @route("/opA")
+      op opA(): void;
+    }
+
+    @service
+    namespace ServiceB {
+      @route("/opB")
+      op opB(): void;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+
+  // Two independent root clients
+  strictEqual(sdkPackage.clients.length, 2);
+
+  const clientA = sdkPackage.clients.find((c) => c.name === "ServiceAClient");
+  ok(clientA);
+  strictEqual(clientA.apiVersions.length, 0);
+  deepStrictEqual(clientA.apiVersionsMap, {});
+  strictEqual(clientA.methods.length, 1);
+  strictEqual(clientA.methods[0].name, "opA");
+
+  const clientB = sdkPackage.clients.find((c) => c.name === "ServiceBClient");
+  ok(clientB);
+  strictEqual(clientB.apiVersions.length, 0);
+  deepStrictEqual(clientB.apiVersionsMap, {});
+  strictEqual(clientB.methods.length, 1);
+  strictEqual(clientB.methods[0].name, "opB");
+});
+
+// ========================================================================
+// Scenario 1: Explicit client names for multiple services
+// ========================================================================
+
+it("scenario 1: explicit client names for multiple services", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      interface Operations {
+        @route("/opA")
+        opA(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      interface Operations {
+        @route("/opB")
+        opB(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+      `
+    @client({
+      name: "MyServiceAClient",
+      service: ServiceA,
+    })
+    namespace MyServiceAClient {}
+
+    @client({
+      name: "MyServiceBClient",
+      service: ServiceB,
+    })
+    namespace MyServiceBClient {}
+  `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+
+  strictEqual(sdkPackage.clients.length, 2);
+
+  const clientA = sdkPackage.clients.find((c) => c.name === "MyServiceAClient");
+  ok(clientA);
+  deepStrictEqual(clientA.apiVersions, ["av1", "av2"]);
+  deepStrictEqual(clientA.apiVersionsMap, {});
+  ok(clientA.children);
+  const opsA = clientA.children.find((c) => c.name === "Operations");
+  ok(opsA);
+  strictEqual(opsA.methods.length, 1);
+  strictEqual(opsA.methods[0].name, "opA");
+
+  const clientB = sdkPackage.clients.find((c) => c.name === "MyServiceBClient");
+  ok(clientB);
+  deepStrictEqual(clientB.apiVersions, ["bv1", "bv2"]);
+  deepStrictEqual(clientB.apiVersionsMap, {});
+  ok(clientB.children);
+  const opsB = clientB.children.find((c) => c.name === "Operations");
+  ok(opsB);
+  strictEqual(opsB.methods.length, 1);
+  strictEqual(opsB.methods[0].name, "opB");
+});
+
+// ========================================================================
+// Scenario 1.5: Mixing multi-service and single-service clients
+// ========================================================================
+
+it("scenario 1.5: mixing multi-service and single-service clients", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      interface Operations {
+        @route("/opA")
+        opA(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      interface Operations {
+        @route("/opB")
+        opB(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }
+
+    @service
+    @versioned(VersionsC)
+    namespace ServiceC {
+      enum VersionsC {
+        cv1,
+        cv2,
+      }
+      interface Operations {
+        @route("/opC")
+        opC(@query("api-version") apiVersion: VersionsC): void;
+      }
+    }`,
+      `
+    @client({
+      name: "CombinedABClient",
+      service: [ServiceA, ServiceB],
+    })
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombinedABClient {}
+
+    @client({
+      name: "ServiceCClient",
+      service: ServiceC,
+    })
+    namespace ServiceCClient {}
+  `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+
+  strictEqual(sdkPackage.clients.length, 2);
+
+  // Multi-service client
+  const combinedClient = sdkPackage.clients.find((c) => c.name === "CombinedABClient");
+  ok(combinedClient);
+  strictEqual(combinedClient.apiVersions.length, 0); // Empty for cross-service
+  deepStrictEqual(combinedClient.apiVersionsMap, {
+    ServiceA: ["av1", "av2"],
+    ServiceB: ["bv1", "bv2"],
+  });
+  ok(combinedClient.children);
+  // Merged Operations from ServiceA and ServiceB
+  const mergedOps = combinedClient.children.find((c) => c.name === "Operations");
+  ok(mergedOps);
+  strictEqual(mergedOps.apiVersions.length, 0);
+  strictEqual(mergedOps.methods.length, 2);
+  ok(mergedOps.methods.find((m) => m.name === "opA"));
+  ok(mergedOps.methods.find((m) => m.name === "opB"));
+
+  // Single-service client
+  const serviceCClient = sdkPackage.clients.find((c) => c.name === "ServiceCClient");
+  ok(serviceCClient);
+  deepStrictEqual(serviceCClient.apiVersions, ["cv1", "cv2"]);
+  deepStrictEqual(serviceCClient.apiVersionsMap, {});
+  ok(serviceCClient.children);
+  const opsC = serviceCClient.children.find((c) => c.name === "Operations");
+  ok(opsC);
+  strictEqual(opsC.methods.length, 1);
+  strictEqual(opsC.methods[0].name, "opC");
+});
+
+// ========================================================================
+// apiVersionsMap tests
+// ========================================================================
+
+it("apiVersionsMap populated for multi-service client", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      interface AI {
+        @route("/aTest")
+        aTest(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      interface BI {
+        @route("/bTest")
+        bTest(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+      `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+      }
+    )
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombineClient;
+  `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+
+  const client = sdkPackage.clients[0];
+  strictEqual(client.name, "CombineClient");
+
+  // Root client has empty apiVersions but populated apiVersionsMap
+  strictEqual(client.apiVersions.length, 0);
+  deepStrictEqual(client.apiVersionsMap, {
+    ServiceA: ["av1", "av2"],
+    ServiceB: ["bv1", "bv2"],
+  });
+
+  // Sub-clients have their own apiVersions and empty apiVersionsMap
+  const aiClient = client.children!.find((c) => c.name === "AI");
+  ok(aiClient);
+  deepStrictEqual(aiClient.apiVersions, ["av1", "av2"]);
+  deepStrictEqual(aiClient.apiVersionsMap, {});
+
+  const biClient = client.children!.find((c) => c.name === "BI");
+  ok(biClient);
+  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
+  deepStrictEqual(biClient.apiVersionsMap, {});
+});
+
+it("apiVersionsMap empty for single-service client", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    @versioned(Versions)
+    namespace TestService {
+      enum Versions { v1, v2 }
+      @route("/test")
+      op test(@query("api-version") apiVersion: Versions): void;
+    }
+  `);
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const client = sdkPackage.clients[0];
+  deepStrictEqual(client.apiVersionsMap, {});
+  deepStrictEqual(client.apiVersions, ["v1", "v2"]);
+});

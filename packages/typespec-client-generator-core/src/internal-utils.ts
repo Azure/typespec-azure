@@ -1038,9 +1038,34 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
     }
     if (rootMultiServiceClients.length > 0) {
       // Multi-service client(s) - use the root multi-service client namespace for versioning
-      // This handles both the "First Step Design" and nested @client scenarios
       const mutator = getVersioningMutator(context, rootMultiServiceClients[0]);
       if (mutator) mutators.push(mutator);
+
+      // Also handle any additional single-service clients not covered by multi-service client
+      // (Scenario 1.5: mixing multi-service and single-service clients)
+      const coveredServices = new Set<Namespace>();
+      listScopedDecoratorData(context, clientKey).forEach((v) => {
+        const sdkClient = v as SdkClient;
+        if (sdkClient.services.length > 1) {
+          sdkClient.services.forEach((s) => coveredServices.add(s));
+        }
+      });
+
+      for (const serviceNs of explicitServices) {
+        if (coveredServices.has(serviceNs)) continue;
+        const versions = getVersions(context.program, serviceNs)[1]?.getVersions();
+        if (!versions) continue;
+
+        removeVersionsLargerThanExplicitlySpecified(context, versions);
+        const versionsValues = versions.map((v) => v.value);
+
+        const mutator = getVersioningMutator(
+          context,
+          serviceNs,
+          versionsValues[versionsValues.length - 1],
+        );
+        if (mutator) mutators.push(mutator);
+      }
     } else {
       // Multiple explicit clients each with a single service (e.g., Scenario 1)
       // Apply versioning for each service

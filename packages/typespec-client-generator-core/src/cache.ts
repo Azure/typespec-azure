@@ -49,6 +49,33 @@ function hasNestedClientDecorators(context: TCGCContext, client: SdkClient): boo
 }
 
 /**
+ * Check if a namespace is empty (no user-defined operations, namespaces, or interfaces).
+ * Used to determine if a client namespace should auto-merge from its service.
+ */
+function isNamespaceEmpty(ns: Namespace): boolean {
+  return ns.operations.size === 0 && ns.namespaces.size === 0 && ns.interfaces.size === 0;
+}
+
+/**
+ * Check if a service namespace has @operationGroup decorators on any of its interfaces or namespaces.
+ * Checks all scopes by examining the raw state map.
+ */
+function serviceHasOperationGroupDecorators(context: TCGCContext, service: Namespace): boolean {
+  for (const [type] of context.program.stateMap(operationGroupKey).entries()) {
+    if (type.kind === "Interface" || type.kind === "Namespace") {
+      // Check if this type is within the service namespace
+      let ns: Namespace | undefined =
+        type.kind === "Namespace" ? type.namespace : type.namespace;
+      while (ns) {
+        if (ns === service) return true;
+        ns = ns.namespace;
+      }
+    }
+  }
+  return false;
+}
+
+/**
  * Create TCGC client types and operation group types and prepare the cache for clients, operation groups and operations.
  *
  * @param context TCGCContext
@@ -139,15 +166,34 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   for (const client of clients) {
     const groups: SdkOperationGroup[] = [];
 
+    // Track if this client is auto-merging (operation groups should be auto-created from service)
+    let isAutoMerging = false;
+
     if (client.services.length > 1 && !hasNestedClientDecorators(context, client)) {
       // Multiple services case will auto-merge all the services and add their nested operation groups
       // Only auto-merge when the client namespace is "empty" (no nested @client decorators)
+      isAutoMerging = true;
       for (const specificService of client.services) {
         createFirstLevelOperationGroup(context, specificService, specificService);
       }
     } else if (client.services.length <= 1) {
-      // Single service case needs to use the client type since it could contain customizations
-      createFirstLevelOperationGroup(context, client.type, client.services[0]);
+      // Single service case
+      // If the client type is NOT the service itself and the client namespace is empty,
+      // auto-merge from the service namespace (Scenario 1: explicit client with empty namespace)
+      // But only if the service content doesn't have @operationGroup decorators in any scope
+      const clientType = client.type;
+      const service = client.services[0];
+      if (
+        clientType !== service &&
+        clientType.kind === "Namespace" &&
+        isNamespaceEmpty(clientType) &&
+        !serviceHasOperationGroupDecorators(context, service)
+      ) {
+        isAutoMerging = true;
+        createFirstLevelOperationGroup(context, service, service);
+      } else {
+        createFirstLevelOperationGroup(context, clientType, service);
+      }
     }
     // If client has nested @client decorators, skip auto-merge - nested clients handle their own OGs
 
@@ -159,7 +205,14 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       // iterate client's interfaces and namespaces to find operation groups
       if (type.kind === "Namespace") {
         for (const subItem of type.namespaces.values()) {
-          const og = createOperationGroup(context, subItem, `${client.name}`, service, client);
+          const og = createOperationGroup(
+            context,
+            subItem,
+            `${client.name}`,
+            service,
+            client,
+            isAutoMerging,
+          );
           if (og && !handleMultipleServicesOperationGroupNameConflict(og)) {
             groups.push(og);
           }
@@ -169,7 +222,14 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
             // Skip template interfaces
             continue;
           }
-          const og = createOperationGroup(context, subItem, `${client.name}`, service, client);
+          const og = createOperationGroup(
+            context,
+            subItem,
+            `${client.name}`,
+            service,
+            client,
+            isAutoMerging,
+          );
           if (og && !handleMultipleServicesOperationGroupNameConflict(og)) {
             groups.push(og);
           }
@@ -288,7 +348,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       group.kind === "SdkOperationGroup" ? mergedOperationGroupTypes.get(group) : undefined;
 
     if (group.kind === "SdkClient" && group.services.length > 1) {
-      // multi-service client
+      // multi-service client - collect operations from all services
       operations.push(...group.services.flatMap((service) => [...service.operations.values()]));
     } else if (mergedTypes) {
       // multi-service operation group
@@ -298,6 +358,17 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     } else if (group.type) {
       // single-service client or operation group
       operations.push(...group.type.operations.values());
+      // If this is a single-service client with an empty namespace (different from service),
+      // also collect operations from the service namespace
+      if (
+        group.kind === "SdkClient" &&
+        group.services.length === 1 &&
+        group.type !== group.services[0] &&
+        group.type.kind === "Namespace" &&
+        isNamespaceEmpty(group.type)
+      ) {
+        operations.push(...group.services[0].operations.values());
+      }
     }
 
     // when there is explicitly `@operationGroup` or `@client`
@@ -456,9 +527,10 @@ function createOperationGroup(
   groupPathPrefix: string,
   service: Namespace,
   parent?: SdkClient | SdkOperationGroup,
+  forceImplicit?: boolean,
 ): SdkOperationGroup | undefined {
   let operationGroup: SdkOperationGroup | undefined;
-  if (hasExplicitClientOrOperationGroup(context)) {
+  if (!forceImplicit && hasExplicitClientOrOperationGroup(context)) {
     operationGroup = getScopedDecoratorData(context, operationGroupKey, type);
     if (operationGroup) {
       operationGroup.groupPath = `${groupPathPrefix}.${getLibraryName(context, type)}`;
