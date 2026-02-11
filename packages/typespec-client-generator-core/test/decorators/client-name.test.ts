@@ -667,3 +667,55 @@ it("duplicate model client name with multiple language scopes", async () => {
     },
   ]);
 });
+
+it("duplicate model client name with positive and negation scopes", async () => {
+  const diagnostics = await runner.diagnose(
+    `
+    @service
+    namespace Contoso.WidgetManager;
+    
+    @clientName("Foo", "python")
+    model ModelOne {
+      id: int32;
+    }
+
+    @clientName("Foo", "!csharp")
+    model ModelTwo {
+      prop1: string;
+    }
+    `,
+  );
+
+  expectDiagnostics(diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message: 'Client name: "Foo" is duplicated in language scope: "python"',
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+      message: 'Client name: "Foo" is duplicated in language scope: "python"',
+    },
+  ]);
+});
+
+it("no conflict with non-overlapping positive and negation scopes", async () => {
+  const diagnostics = await runner.diagnose(
+    `
+    @service
+    namespace Contoso.WidgetManager;
+    
+    @clientName("Foo", "csharp")
+    model ModelOne {
+      id: int32;
+    }
+
+    @clientName("Foo", "!csharp")
+    model ModelTwo {
+      prop1: string;
+    }
+    `,
+  );
+
+  // Should have no diagnostics since csharp is excluded from ModelTwo
+  expectDiagnostics(diagnostics, []);
+});
