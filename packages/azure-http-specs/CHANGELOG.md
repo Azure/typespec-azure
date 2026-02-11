@@ -1,5 +1,42 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.37
+
+### Features
+
+- [#3791](https://github.com/Azure/typespec-azure/pull/3791) Add exportArray LRO operation test with array response using ArmProviderActionAsync
+
+### Bug Fixes
+
+- [#3697](https://github.com/Azure/typespec-azure/pull/3697) add nested test cases for client-initialization
+
+
+## 0.1.0-alpha.36
+
+### Bug Fixes
+
+- [#3770](https://github.com/Azure/typespec-azure/pull/3770) Fix missing api-version in nextLink of lropaging test scenario.
+
+
+## 0.1.0-alpha.35
+
+### Features
+
+- [#3635](https://github.com/Azure/typespec-azure/pull/3635) Add test cases for `@clientDefaultValue` decorator.
+- [#3713](https://github.com/Azure/typespec-azure/pull/3713) Add multi-service test scenarios for older API versions and shared models.
+- [#3695](https://github.com/Azure/typespec-azure/pull/3695) Add Spector tests for pageable long-running operations (LROs)
+- [#3663](https://github.com/Azure/typespec-azure/pull/3663) Add test case for @clientDefaultValue on header parameters
+
+### Bump dependencies
+
+- [#3677](https://github.com/Azure/typespec-azure/pull/3677) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3642](https://github.com/Azure/typespec-azure/pull/3642) update client generator namespace for python
+- [#3582](https://github.com/Azure/typespec-azure/pull/3582) update tests for client-location
+
+
 ## 0.1.0-alpha.34
 
 ### Features

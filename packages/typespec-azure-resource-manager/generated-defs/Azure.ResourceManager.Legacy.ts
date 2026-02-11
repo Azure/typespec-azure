@@ -119,7 +119,7 @@ export type FeatureOptionsDecorator = (
  */
 export type FeatureDecorator = (
   context: DecoratorContext,
-  target: Model | Interface | Namespace,
+  target: Model | Operation | Interface | Namespace,
   featureName: EnumMember,
 ) => DecoratorValidatorCallbacks | void;
 

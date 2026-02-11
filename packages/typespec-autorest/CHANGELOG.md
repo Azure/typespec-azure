@@ -1,5 +1,38 @@
 # Change Log - @azure-tools/typespec-autorest
 
+## 0.65.0
+
+### Deprecations
+
+- [#3836](https://github.com/Azure/typespec-azure/pull/3836) Deprecate `azure-resource-provider-folder` option.
+  
+  ```diff lang=yaml
+  -azure-resource-provider-folder: "resource-manager"
+  -output-file: "{azure-resource-provider-folder}/{service-name}/{version-status}/{version}/openapi.json"
+  +output-file: "resource-manager/{service-name}/{version-status}/{version}/openapi.json"
+  ```
+
+
+## 0.64.1
+
+### Bug Fixes
+
+- [#3819](https://github.com/Azure/typespec-azure/pull/3819) Fix #3802 correct file references in feature files
+- [#3812](https://github.com/Azure/typespec-azure/pull/3812) Fix duplicate schema error caused when using union templates
+
+
+## 0.64.0
+
+### Features
+
+- [#3622](https://github.com/Azure/typespec-azure/pull/3622) Add support for multiple output files in typespec-autorest
+- [#3746](https://github.com/Azure/typespec-azure/pull/3746) #3693 Allow array and unknown result for async operations
+
+### Bump dependencies
+
+- [#3677](https://github.com/Azure/typespec-azure/pull/3677) Upgrade dependencies
+
+
 ## 0.63.1
 
 ### Features

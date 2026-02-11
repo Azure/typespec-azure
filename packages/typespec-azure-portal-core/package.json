@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-portal-core",
-  "version": "0.63.0",
+  "version": "0.65.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Azure Portal Core library",
   "license": "MIT",
@@ -8,8 +8,8 @@
   "readme": "https://github.com/Azure/typespec-azure/blob/main/packages/typespec-azure-portal-core/README.md",
   "scripts": {
     "clean": "rimraf ./dist ./temp",
-    "build": "tsc -p . && npm run lint-typespec-library",
-    "watch": "tsc -p . --watch",
+    "build": "tsc -p tsconfig.build.json && npm run lint-typespec-library",
+    "watch": "tsc -p tsconfig.build.json --watch",
     "lint-typespec-library": "tsp compile . --warn-as-error --import @typespec/library-linter --no-emit",
     "test": "vitest run",
     "test:watch": "vitest -w",

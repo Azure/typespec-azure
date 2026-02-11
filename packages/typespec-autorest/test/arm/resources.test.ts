@@ -368,6 +368,41 @@ it("emits x-ms-azure-resource for resource with @customAzureResource and options
   );
   ok(openApi.definitions?.Widget["x-ms-azure-resource"]);
 });
+it("omits path metadata for @customAzureResource with options.usePathNameParameter", async () => {
+  const openApi = await compileOpenAPI(
+    `
+    @armProviderNamespace
+      namespace Microsoft.Contoso;
+
+    #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "legacy test"
+    @doc("Widget resource")
+    model Widget is Azure.ResourceManager.Legacy.CustomAzureResource {
+       ...ResourceNameParameter<Widget>;
+       options: string;
+    }
+    
+    @@visibility(Widget.name, Lifecycle.Read);
+
+    interface Widgets {
+      get is ArmResourceRead<Widget>;
+      list is ArmResourceListByParent<Widget>;
+      put is ArmResourceCreateOrReplaceSync<Widget>;
+      update is ArmTagsPatchSync<Widget>;
+      delete is ArmResourceDeleteSync<Widget>;
+    }
+`,
+    { preset: "azure" },
+  );
+  const widgetPath =
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Contoso/widgets/{widgetName}";
+  const opApi = openApi as any;
+  ok(opApi.definitions?.Widget["x-ms-azure-resource"]);
+  expect(opApi.definitions?.Widget.properties?.name).toBeUndefined();
+  expect(opApi.definitions?.Widget.properties?.widgetName).toBeUndefined();
+  expect(opApi.paths[widgetPath].put.responses["200"].schema).toStrictEqual({
+    $ref: "#/definitions/Widget",
+  });
+});
 it("does not emit x-ms-azure-resource for resource with @customAzureResource", async () => {
   const openApi = await compileOpenAPI(
     `
@@ -564,11 +599,12 @@ it("allows resources with multiple endpoints using LegacyOperations", async () =
 
     @armResourceOperations
     interface Employees {
+      @Azure.ResourceManager.Legacy.renamePathParameter("location", "locationName")
       get is OtherOps.Read<Employee>;
       otherCreateOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
       createOrUpdate is OtherOps.CreateOrUpdateAsync<Employee>;
       update is OtherOps.CustomPatchAsync<Employee, Employee>;
-      delete is OtherOps.DeleteWithoutOkAsync<Employee>;
+      delete is OtherOps.DeleteWithoutOkAsync<Employee, Parameters = {@doc("Permanently Delete") @query permanent?: boolean;}>;
       list is OtherOps.List<Employee>;
       listBySubscription is ArmListBySubscription<Employee>;
 
@@ -586,6 +622,7 @@ it("allows resources with multiple endpoints using LegacyOperations", async () =
       "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/employees"
     ].get,
   );
+
   ok(
     openApi.paths[
       "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/locations/{location}/employees"
@@ -597,11 +634,14 @@ it("allows resources with multiple endpoints using LegacyOperations", async () =
     ];
   const locationPath =
     "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/locations/{location}/employees/{employeeName}";
+  const renamedLocationPath =
+    "/subscriptions/{subscriptionId}/providers/Microsoft.ContosoProviderhub/locations/{locationName}/employees/{employeeName}";
 
   const locationOperations = openApi.paths[locationPath];
+  const renamedLocationOperations = openApi.paths[renamedLocationPath];
   ok(resourceGroupOperations);
   ok(locationOperations);
-  ok(locationOperations.get);
+  ok(renamedLocationOperations.get);
   ok(locationOperations.put);
   ok(locationOperations.patch);
   ok(locationOperations.delete);

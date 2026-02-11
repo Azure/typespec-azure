@@ -15,24 +15,25 @@ import {
   getSummary,
   ignoreDiagnostics,
   isList,
-  Model,
   ModelProperty,
   Operation,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
-import { createSdkClientType } from "./clients.js";
 import {
   getAccess,
+  getDisablePageable,
+  getMarkAsPageable,
   getNextLinkVerb,
   getOverriddenClientMethod,
   getResponseAsBool,
-  listOperationGroups,
   listOperationsInOperationGroup,
   shouldGenerateConvenient,
   shouldGenerateProtocol,
 } from "./decorators.js";
 import { getSdkHttpOperation } from "./http.js";
 import {
+  SdkArrayType,
+  SdkBuiltInType,
   SdkClient,
   SdkClientType,
   SdkLroPagingServiceMethod,
@@ -55,6 +56,7 @@ import {
   SdkPropertyMap,
   SdkServiceMethod,
   SdkServiceOperation,
+  SdkStreamMetadata,
   SdkTerminationStatus,
   SdkType,
   TCGCContext,
@@ -85,6 +87,7 @@ import {
   getSdkModel,
   getSdkModelPropertyType,
   getSdkModelPropertyTypeBase,
+  getSdkModelWithDiagnostics,
 } from "./types.js";
 
 function getSdkServiceOperation<TServiceOperation extends SdkServiceOperation>(
@@ -263,7 +266,34 @@ function getSdkPagingServiceMethod<TServiceOperation extends SdkServiceOperation
       },
     });
   } else {
-    compilerAssert(false, "Unexpected operation should be paged if calling this function");
+    const markAsPageableInfo = getMarkAsPageable(context, operation);
+    if (markAsPageableInfo) {
+      const itemsProperty = diagnostics.pipe(
+        getSdkModelPropertyType(context, markAsPageableInfo.itemsProperty, operation),
+      );
+
+      // Set resultSegments to match the behavior of normal paging operations
+      baseServiceMethod.response.resultSegments = [itemsProperty];
+
+      if (responseType) {
+        context.__pagedResultSet.add(responseType);
+      }
+      // tcgc will let all paging method return a list of items
+      baseServiceMethod.response.type = diagnostics.pipe(
+        getClientTypeWithDiagnostics(context, markAsPageableInfo.itemsProperty.type, operation),
+      );
+
+      return diagnostics.wrap({
+        ...baseServiceMethod,
+        kind: "paging",
+        pagingMetadata: {
+          __raw: undefined, // because in this case it is not a real paging operation
+          pageItemsSegments: baseServiceMethod.response.resultSegments,
+        },
+      });
+    } else {
+      compilerAssert(false, "Unexpected operation should be paged if calling this function");
+    }
   }
 }
 
@@ -347,7 +377,7 @@ function getSdkLroServiceMethod<TServiceOperation extends SdkServiceOperation>(
   client: SdkClientType<TServiceOperation>,
 ): [SdkLroServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const metadata = getServiceMethodLroMetadata(context, operation, client)!;
+  const metadata = diagnostics.pipe(getServiceMethodLroMetadata(context, operation, client))!;
   const baseServiceMethod = diagnostics.pipe(
     getSdkBasicServiceMethod<TServiceOperation>(context, operation, client),
   );
@@ -375,23 +405,19 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
   context: TCGCContext,
   operation: Operation,
   client: SdkClientType<TServiceOperation>,
-): SdkLroServiceMetadata | undefined {
+): [SdkLroServiceMetadata | undefined, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
   const rawMetadata = getTcgcLroMetadata(context, operation, client);
   if (rawMetadata === undefined) {
-    return undefined;
+    return diagnostics.wrap(undefined);
   }
 
-  let finalEnvelopeResult: SdkModelType | "void" | undefined = undefined;
-  const diagnostics = createDiagnosticCollector();
-  if (rawMetadata.finalEnvelopeResult === "void") {
-    finalEnvelopeResult = "void";
-  } else if (rawMetadata.finalEnvelopeResult) {
-    finalEnvelopeResult = getSdkModel(context, rawMetadata.finalEnvelopeResult);
-  }
-  return {
+  const finalResponse = getFinalResponse();
+
+  return diagnostics.wrap({
     __raw: rawMetadata,
     finalStateVia: rawMetadata.finalStateVia,
-    finalResponse: getFinalResponse(),
+    finalResponse,
     finalStep: getSdkLroServiceFinalStep(context, rawMetadata.finalStep),
     pollingStep: {
       responseBody: rawMetadata.pollingInfo.responseModel
@@ -400,16 +426,18 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
           ) as SdkModelType)
         : undefined,
     },
-    operation: ignoreDiagnostics(getSdkBasicServiceMethod(context, rawMetadata.operation, client))
+    operation: diagnostics.pipe(getSdkBasicServiceMethod(context, rawMetadata.operation, client))
       .operation,
-    logicalResult: getSdkModel(context, rawMetadata.logicalResult),
+    logicalResult: diagnostics.pipe(getSdkModelWithDiagnostics(context, rawMetadata.logicalResult)),
     statusMonitorStep: getStatusMonitorStep(context, rawMetadata.statusMonitorStep),
     pollingInfo: getPollingInfo(context, rawMetadata.pollingInfo),
-    envelopeResult: getSdkModel(context, rawMetadata.envelopeResult),
+    envelopeResult: diagnostics.pipe(
+      getSdkModelWithDiagnostics(context, rawMetadata.envelopeResult),
+    ),
     logicalPath: rawMetadata.logicalPath,
-    finalEnvelopeResult,
+    finalEnvelopeResult: finalResponse ? finalResponse.envelopeResult : "void",
     finalResultPath: rawMetadata.finalResultPath,
-  };
+  });
 
   function getSdkLroServiceFinalStep(
     context: TCGCContext,
@@ -433,9 +461,9 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
         return {
           kind: "pollingSuccessProperty",
           responseModel: getSdkModel(context, step.responseModel),
-          target: ignoreDiagnostics(getSdkModelPropertyType(context, step.target)),
+          target: diagnostics.pipe(getSdkModelPropertyType(context, step.target)),
           sourceProperty: step.sourceProperty
-            ? ignoreDiagnostics(getSdkModelPropertyType(context, step.sourceProperty))
+            ? diagnostics.pipe(getSdkModelPropertyType(context, step.sourceProperty))
             : undefined,
         };
       }
@@ -456,13 +484,17 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     if (statusMonitorStep.kind === "nextOperationLink") {
       return {
         kind: "nextOperationLink",
-        responseModel: getSdkModel(context, statusMonitorStep.responseModel),
+        responseModel: diagnostics.pipe(
+          getSdkModelWithDiagnostics(context, statusMonitorStep.responseModel),
+        ),
         target: getSdkOperationLink(context, statusMonitorStep.target),
       };
     }
     return {
       kind: "nextOperationReference",
-      responseModel: getSdkModel(context, statusMonitorStep.responseModel),
+      responseModel: diagnostics.pipe(
+        getSdkModelWithDiagnostics(context, statusMonitorStep.responseModel),
+      ),
       target: getSdkOperationReference(context, statusMonitorStep.target, client),
     };
   }
@@ -471,7 +503,7 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     return {
       kind: "link",
       location: link.location,
-      property: ignoreDiagnostics(getSdkModelPropertyType(context, link.property)),
+      property: diagnostics.pipe(getSdkModelPropertyType(context, link.property)),
     };
   }
 
@@ -484,12 +516,13 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     for (const [key, p] of reference.parameters?.entries() ?? []) {
       parameters.set(key, {
         sourceKind: p.sourceKind,
-        source: ignoreDiagnostics(getSdkModelPropertyType(context, p.source)),
-        target: ignoreDiagnostics(getSdkModelPropertyType(context, p.target)),
+        source: diagnostics.pipe(getSdkModelPropertyType(context, p.source)),
+        target: diagnostics.pipe(getSdkModelPropertyType(context, p.target)),
       });
     }
     return {
       kind: "reference",
+      // since these operations may not be included in the client customization, we ignore diagnostics here
       operation: ignoreDiagnostics(getSdkBasicServiceMethod(context, reference.operation, client))
         .operation,
       parameterMap: reference.parameterMap,
@@ -503,14 +536,16 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
     pollingInfo: PollingOperationStep,
   ): SdkPollingOperationStep {
     const resultProperty = pollingInfo.resultProperty
-      ? ignoreDiagnostics(getSdkModelPropertyType(context, pollingInfo.resultProperty))
+      ? diagnostics.pipe(getSdkModelPropertyType(context, pollingInfo.resultProperty))
       : undefined;
     const errorProperty = pollingInfo.errorProperty
-      ? ignoreDiagnostics(getSdkModelPropertyType(context, pollingInfo.errorProperty))
+      ? diagnostics.pipe(getSdkModelPropertyType(context, pollingInfo.errorProperty))
       : undefined;
     return {
       kind: "pollingOperationStep",
-      responseModel: getSdkModel(context, pollingInfo.responseModel),
+      responseModel: diagnostics.pipe(
+        getSdkModelWithDiagnostics(context, pollingInfo.responseModel),
+      ),
       terminationStatus: getTerminationStatus(context, pollingInfo.terminationStatus),
       resultProperty,
       errorProperty,
@@ -527,7 +562,7 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
       case "model-property":
         return {
           ...terminationStatus,
-          property: ignoreDiagnostics(getSdkModelPropertyType(context, terminationStatus.property)),
+          property: diagnostics.pipe(getSdkModelPropertyType(context, terminationStatus.property)),
         };
     }
   }
@@ -535,27 +570,32 @@ function getServiceMethodLroMetadata<TServiceOperation extends SdkServiceOperati
   function getFinalResponse(): SdkLroServiceFinalResponse | undefined {
     if (
       rawMetadata?.finalEnvelopeResult === undefined ||
-      rawMetadata.finalEnvelopeResult === "void"
+      rawMetadata.finalEnvelopeResult === "void" ||
+      rawMetadata.finalResult === undefined ||
+      rawMetadata.finalResult === "void"
     ) {
       return undefined;
     }
-
     const envelopeResult = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, rawMetadata.finalEnvelopeResult),
-    ) as SdkModelType;
+    ) as SdkModelType | SdkArrayType | SdkBuiltInType<"unknown">;
+
     const result = diagnostics.pipe(
-      getClientTypeWithDiagnostics(context, rawMetadata.finalResult as Model),
-    ) as SdkModelType;
-    const resultPath = rawMetadata.finalResultPath;
+      getClientTypeWithDiagnostics(context, rawMetadata.finalResult),
+    ) as SdkModelType | SdkArrayType | SdkBuiltInType<"unknown">;
+
     // find the property inside the envelope result using the final result path
     let sdkProperty: SdkModelPropertyType | undefined = undefined;
-    for (const property of envelopeResult.properties) {
-      if (property.__raw === undefined || property.kind !== "property") {
-        continue;
-      }
-      if (property.__raw?.name === resultPath) {
-        sdkProperty = property;
-        break;
+    if (envelopeResult.kind === "model") {
+      const resultPath = rawMetadata.finalResultPath;
+      for (const property of envelopeResult.properties) {
+        if (property.__raw === undefined || property.kind !== "property") {
+          continue;
+        }
+        if (property.__raw?.name === resultPath) {
+          sdkProperty = property;
+          break;
+        }
       }
     }
 
@@ -617,10 +657,20 @@ function getSdkMethodResponse(
     optional = containsResponseWithoutBody;
   }
 
+  // Propagate stream metadata from HTTP responses to method response
+  let streamMetadata: SdkStreamMetadata | undefined;
+  for (const response of responses) {
+    if (response.streamMetadata) {
+      streamMetadata = response.streamMetadata;
+      break;
+    }
+  }
+
   return {
     kind: "method",
     type,
     ...(optional !== undefined && { optional }),
+    ...(streamMetadata && { streamMetadata }),
   };
 }
 
@@ -697,7 +747,11 @@ function getSdkServiceMethod<TServiceOperation extends SdkServiceOperation>(
   client: SdkClientType<TServiceOperation>,
 ): [SdkServiceMethod<TServiceOperation>, readonly Diagnostic[]] {
   const lro = getTcgcLroMetadata(context, operation, client);
-  const paging = isList(context.program, operation);
+  // `@disablePageable` disables paging even for operations with @list
+  const pagingDisabled = getDisablePageable(context, operation);
+  const paging =
+    !pagingDisabled &&
+    (isList(context.program, operation) || getMarkAsPageable(context, operation));
   if (lro && paging) {
     return getSdkLroPagingServiceMethod<TServiceOperation>(context, operation, client);
   } else if (paging) {
@@ -745,16 +799,6 @@ export function createSdkMethods<TServiceOperation extends SdkServiceOperation>(
     retval.push(
       diagnostics.pipe(getSdkServiceMethod<TServiceOperation>(context, operation, sdkClientType)),
     );
-  }
-  for (const operationGroup of listOperationGroups(context, client)) {
-    const operationGroupClient = diagnostics.pipe(
-      createSdkClientType<TServiceOperation>(context, operationGroup, sdkClientType),
-    );
-    if (sdkClientType.children) {
-      sdkClientType.children.push(operationGroupClient);
-    } else {
-      sdkClientType.children = [operationGroupClient];
-    }
   }
   return diagnostics.wrap(retval);
 }

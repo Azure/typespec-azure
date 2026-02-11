@@ -23,6 +23,11 @@ describe("TypeSpec Samples (With autorest emitter)", () => {
     outputDir: resolvePath(rootOutputDir, "core"),
     exclude: [...excludedSamples, "authentication", "multipart", "todoApp"],
     emit: [resolvePath(pkgRoot, "node_modules/@azure-tools/typespec-autorest").replace(/\\/g, "/")],
+    options: {
+      "@azure-tools/typespec-autorest": {
+        "output-file": "{emitter-output-dir}/{service-name}/{version}/openapi.json",
+      },
+    },
   });
 });
 

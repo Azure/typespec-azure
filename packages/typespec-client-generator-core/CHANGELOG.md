@@ -1,5 +1,104 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.65.0
+
+### Deprecations
+
+- [#3732](https://github.com/Azure/typespec-azure/pull/3732) The `service` property in `SdkOperationGroup` and `SdkClient` is now deprecated. Use the new `services` property instead, which supports multiple services. The deprecated `service` property will return `services[0]` for single service scenarios or the full `services` array for multi-service scenarios. This property will be removed in a future release.
+
+### Features
+
+- [#3764](https://github.com/Azure/typespec-azure/pull/3764) Add `.crossLanguageDefinitionId`. to `SdkEnumValueType`
+- [#3877](https://github.com/Azure/typespec-azure/pull/3877) Added `InitializedBy.none` (value 0) to allow TypeSpec authors to indicate that client constructors should be omitted and hand-written. Note: The internal `InitializedByFlags.Default` value changed from `0` to `-1` to accommodate this addition.
+- [#3876](https://github.com/Azure/typespec-azure/pull/3876) Add full support for `Http.File` type with `BinarySerializationOptions` containing `isText`, `contentTypes`, and `filename` properties.
+- [#3827](https://github.com/Azure/typespec-azure/pull/3827) Add `@clientOption` flag for experimental, language-specific flags
+- [#3769](https://github.com/Azure/typespec-azure/pull/3769) Added `apiVersions` Map to `SdkPackage.metadata` to export API versions for multiple services. The Map key is the service namespace full qualified name, and the value is the version string. The existing `apiVersion` property is now deprecated and will be removed in a future release. For single service scenarios, both properties will be populated. For multiple service scenarios, only `apiVersions` will be populated while `apiVersion` will be undefined.
+- [#3732](https://github.com/Azure/typespec-azure/pull/3732) Allow operation groups to contain operations from multiple services. Operation groups created via `@clientLocation` or automatically merged when multiple services have operation groups with the same name now support multi-service scenarios with empty `apiVersions` and string API version parameter type.
+
+### Bug Fixes
+
+- [#3797](https://github.com/Azure/typespec-azure/pull/3797) Do not check array type when applying encode for model property.
+- [#3849](https://github.com/Azure/typespec-azure/pull/3849) Fix namespace duplication when `@clientNamespace` matches namespace flag
+- [#3887](https://github.com/Azure/typespec-azure/pull/3887) Fixed apiVersion parameter clientDefaultValue missing when an operation group contains operations from different services.
+- [#3885](https://github.com/Azure/typespec-azure/pull/3885) Fix regression with @clientOption negation scope handling. Decorators using negation scope patterns like '!python' or '!(java, python)' are now correctly filtered.
+- [#3501](https://github.com/Azure/typespec-azure/pull/3501) Allow custom encoding strings in `SdkDateTimeTypeBase` and `SdkDurationType` by using union type `DateTimeKnownEncoding | string` and `DurationKnownEncoding | string`.
+- [#3915](https://github.com/Azure/typespec-azure/pull/3915) Remove unused discriminated subtypes from discriminatedSubtypes map. When a base model has discriminated subtypes where some subtypes have no usage, only the unused subtypes are removed from the map while preserving discriminator info for used subtypes.
+- [#3806](https://github.com/Azure/typespec-azure/pull/3806) The `apiVersion` parameter in client initialization is now correctly marked as `optional: true` for all client-level API version parameters, including both single-service and multi-service scenarios.
+- [#3775](https://github.com/Azure/typespec-azure/pull/3775) Correctly detect name collisions with `--namespace` flag and or multi service usage
+- [#3784](https://github.com/Azure/typespec-azure/pull/3784) Add warning when `@alternateType` decorator with external type information is applied to model properties. External types should be applied to the type definition itself (Scalar, Model, Enum, or Union) instead of model properties.
+
+
+## 0.64.6
+
+### Bug Fixes
+
+- [#3890](https://github.com/Azure/typespec-azure/pull/3890) Fix regression with @clientOption negation scope handling. Decorators using negation scope patterns like '!python' or '!(java, python)' are now correctly filtered.
+- [#3890](https://github.com/Azure/typespec-azure/pull/3890) Add `@clientOption` flag for experimental, language-specific flags
+
+
+## 0.64.5
+
+### Bug Fixes
+
+- [#3861](https://github.com/Azure/typespec-azure/pull/3861) Update xml serialization name when there is no explicit decorator
+
+
+## 0.64.4
+
+### Bug Fixes
+
+- [#3843](https://github.com/Azure/typespec-azure/pull/3843) Fix subscriptionId and apiVersion client parameters not propagating to top-level client when nested operation groups contain these parameters
+- [#3833](https://github.com/Azure/typespec-azure/pull/3833) Add new `@Legacy.disablePageable` decorator to mark pageable operations as basic operations
+
+
+## 0.64.3
+
+### Bug Fixes
+
+- [#3820](https://github.com/Azure/typespec-azure/pull/3820) Reduce param mapping time consumption.
+
+
+## 0.64.2
+
+### Bug Fixes
+
+- [#3807](https://github.com/Azure/typespec-azure/pull/3807) Fix `@markAsPageable` decorator to populate `method.response.resultSegments` to match the behavior of native pageable operations, ensuring the array of properties to walk to get results from the response model is available.
+
+
+## 0.64.1
+
+### Bug Fixes
+
+- [#3767](https://github.com/Azure/typespec-azure/pull/3767) Fix enum type exclusion in protocol methods when `@convenientAPI(false)`.
+- [#3768](https://github.com/Azure/typespec-azure/pull/3768) Refine diagnostic for LRO and paging metadata generation.
+
+
+## 0.64.0
+
+### Features
+
+- [#3660](https://github.com/Azure/typespec-azure/pull/3660) Add `@markAsPageable` decorator.
+- [#3746](https://github.com/Azure/typespec-azure/pull/3746) #3693 Allow array and unknown result for async operations
+
+### Bump dependencies
+
+- [#3677](https://github.com/Azure/typespec-azure/pull/3677) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3716](https://github.com/Azure/typespec-azure/pull/3716) Fix api-version parameter type to string for multi-service clients instead of using a specific enum type.
+- [#3723](https://github.com/Azure/typespec-azure/pull/3723) Improve `@hierarchyBuilding` decorator diagnostic messages to include specific property names and conflict details when there are inherited property conflicts
+- [#3717](https://github.com/Azure/typespec-azure/pull/3717) Remove mutation for validation.
+- [#3611](https://github.com/Azure/typespec-azure/pull/3611) Generate names for anonymous models in LroMetadata.
+
+
+## 0.63.4
+
+### Bug Fixes
+
+- [#3728](https://github.com/Azure/typespec-azure/pull/3728) Allow alternate types for models, enums, and unions
+
+
 ## 0.63.3
 
 ### Bug Fixes

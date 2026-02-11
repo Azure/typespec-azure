@@ -1,25 +1,55 @@
-import { EventsTestLibrary } from "@typespec/events/testing";
-import { SSETestLibrary } from "@typespec/sse/testing";
-import { StreamsTestLibrary } from "@typespec/streams/testing";
-import { deepStrictEqual, strictEqual } from "assert";
-import { beforeEach, describe, it } from "vitest";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
+import { resolvePath } from "@typespec/compiler";
+import { createTester } from "@typespec/compiler/testing";
+import { deepStrictEqual, ok, strictEqual } from "assert";
+import { describe, it } from "vitest";
+import { UsageFlags } from "../../src/interfaces.js";
+import { createSdkContextForTester } from "../tester.js";
 import { getServiceMethodOfClient } from "../utils.js";
 
-let runner: SdkTestRunner;
+const StreamsTester = createTester(resolvePath(import.meta.dirname, "../.."), {
+  libraries: [
+    "@typespec/http",
+    "@typespec/rest",
+    "@typespec/versioning",
+    "@typespec/streams",
+    "@typespec/sse",
+    "@typespec/events",
+    "@azure-tools/typespec-client-generator-core",
+  ],
+})
+  .import(
+    "@typespec/http",
+    "@typespec/rest",
+    "@typespec/versioning",
+    "@typespec/http/streams",
+    "@typespec/streams",
+    "@typespec/sse",
+    "@typespec/events",
+    "@azure-tools/typespec-client-generator-core",
+  )
+  .using(
+    "Http",
+    "Rest",
+    "Versioning",
+    "TypeSpec.Http.Streams",
+    "TypeSpec.Streams",
+    "TypeSpec.SSE",
+    "TypeSpec.Events",
+    "Azure.ClientGenerator.Core",
+  );
 
-beforeEach(async () => {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [StreamsTestLibrary, SSETestLibrary, EventsTestLibrary],
-    autoImports: [`@typespec/http/streams`, "@typespec/streams", "@typespec/sse"],
-    autoUsings: ["TypeSpec.Http.Streams", "TypeSpec.Streams", "TypeSpec.SSE", "TypeSpec.Events"],
-    emitterName: "@azure-tools/typespec-python",
-  });
-});
+const StreamsTesterWithBuiltInService = StreamsTester.wrap(
+  (x) => `
+@service
+namespace TestService;
+
+${x}
+`,
+);
 
 describe("stream request", () => {
   it("http stream request", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         @route("/")
         op get(stream: HttpStream<Thing, "application/jsonl", string>): void;
@@ -27,17 +57,32 @@ describe("stream request", () => {
         model Thing { id: string }
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
-    strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.parameters[0].type.kind, "model");
     strictEqual(method.parameters[0].type.properties[1].type.kind, "bytes");
     strictEqual(method.parameters[0].type.properties[1].type.encode, "bytes");
     deepStrictEqual(method.operation.bodyParam?.type, method.parameters[0].type.properties[1].type);
+
+    // stream metadata on body param
+    const bodyMeta = method.operation.bodyParam?.streamMetadata;
+    ok(bodyMeta);
+    strictEqual(bodyMeta.bodyType.kind, "string");
+    strictEqual(bodyMeta.originalType.kind, "model");
+    strictEqual(bodyMeta.originalType.name, "HttpStreamThing");
+    strictEqual(bodyMeta.streamType.kind, "model");
+    strictEqual(bodyMeta.streamType.name, "Thing");
+    deepStrictEqual(bodyMeta.contentTypes, ["application/jsonl"]);
+
+    // streamType has Input + Json usage and appears in sdkPackage.models
+    strictEqual(bodyMeta.streamType.usage, UsageFlags.Input | UsageFlags.Json);
+    const thingModel = sdkPackage.models.find((m) => m.name === "Thing");
+    ok(thingModel);
   });
 
   it("json stream request", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         @route("/")
         op get(stream: JsonlStream<Thing>): void;
@@ -45,17 +90,31 @@ describe("stream request", () => {
         model Thing { id: string }
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
-    strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.parameters[0].type.kind, "model");
     strictEqual(method.parameters[0].type.properties[1].type.kind, "bytes");
     strictEqual(method.parameters[0].type.properties[1].type.encode, "bytes");
     deepStrictEqual(method.operation.bodyParam?.type, method.parameters[0].type.properties[1].type);
+
+    // stream metadata on body param
+    const bodyMeta = method.operation.bodyParam?.streamMetadata;
+    ok(bodyMeta);
+    strictEqual(bodyMeta.bodyType.kind, "string");
+    strictEqual(bodyMeta.originalType.kind, "model");
+    strictEqual(bodyMeta.originalType.name, "JsonlStreamThing");
+    strictEqual(bodyMeta.streamType.kind, "model");
+    strictEqual(bodyMeta.streamType.name, "Thing");
+    deepStrictEqual(bodyMeta.contentTypes, ["application/jsonl"]);
+
+    // streamType has Input + Json usage and appears in sdkPackage.models
+    strictEqual(bodyMeta.streamType.usage, UsageFlags.Input | UsageFlags.Json);
+    ok(sdkPackage.models.find((m) => m.name === "Thing"));
   });
 
   it("custom stream request", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         @streamOf(Thing)
         model CustomStream {
@@ -69,17 +128,31 @@ describe("stream request", () => {
         model Thing { id: string }
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
-    strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.parameters[0].type.kind, "model");
     strictEqual(method.parameters[0].type.properties[1].type.kind, "bytes");
     strictEqual(method.parameters[0].type.properties[1].type.encode, "bytes");
     deepStrictEqual(method.operation.bodyParam?.type, method.parameters[0].type.properties[1].type);
+
+    // stream metadata on body param
+    const bodyMeta = method.operation.bodyParam?.streamMetadata;
+    ok(bodyMeta);
+    strictEqual(bodyMeta.bodyType.kind, "bytes");
+    strictEqual(bodyMeta.originalType.kind, "model");
+    strictEqual(bodyMeta.originalType.name, "CustomStream");
+    strictEqual(bodyMeta.streamType.kind, "model");
+    strictEqual(bodyMeta.streamType.name, "Thing");
+    deepStrictEqual(bodyMeta.contentTypes, ["custom/built-here"]);
+
+    // streamType has Input usage (no Json since custom content type) and appears in sdkPackage.models
+    strictEqual(bodyMeta.streamType.usage, UsageFlags.Input);
+    ok(sdkPackage.models.find((m) => m.name === "Thing"));
   });
 
   it("spread stream request", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         @route("/")
         op get(...JsonlStream<Thing>): void;
@@ -87,16 +160,30 @@ describe("stream request", () => {
         model Thing { id: string }
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
-    strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.parameters[1].type.kind, "bytes");
     strictEqual(method.parameters[1].type.encode, "bytes");
     deepStrictEqual(method.operation.bodyParam?.type, method.parameters[1].type);
+
+    // stream metadata on body param
+    const bodyMeta = method.operation.bodyParam?.streamMetadata;
+    ok(bodyMeta);
+    strictEqual(bodyMeta.bodyType.kind, "string");
+    strictEqual(bodyMeta.originalType.kind, "model");
+    strictEqual(bodyMeta.originalType.name, "JsonlStreamThing");
+    strictEqual(bodyMeta.streamType.kind, "model");
+    strictEqual(bodyMeta.streamType.name, "Thing");
+    deepStrictEqual(bodyMeta.contentTypes, ["application/jsonl"]);
+
+    // streamType has Input + Json usage and appears in sdkPackage.models
+    strictEqual(bodyMeta.streamType.usage, UsageFlags.Input | UsageFlags.Json);
+    ok(sdkPackage.models.find((m) => m.name === "Thing"));
   });
 
   it("sse request", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         model UserConnect {
           username: string;
@@ -128,19 +215,32 @@ describe("stream request", () => {
         op subscribeToChannel(stream: SSEStream<ChannelEvents>): void;
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
-    strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.parameters[0].type.kind, "model");
     strictEqual(method.parameters[0].type.properties[1].type.kind, "bytes");
     strictEqual(method.parameters[0].type.properties[1].type.encode, "bytes");
     deepStrictEqual(method.operation.bodyParam?.type, method.parameters[0].type.properties[1].type);
+
+    // stream metadata on body param - SSE streams have union streamType
+    const bodyMeta = method.operation.bodyParam?.streamMetadata;
+    ok(bodyMeta);
+    strictEqual(bodyMeta.bodyType.kind, "string");
+    strictEqual(bodyMeta.originalType.kind, "model");
+    strictEqual(bodyMeta.originalType.name, "SSEStreamChannelEvents");
+    strictEqual(bodyMeta.streamType.kind, "union");
+    strictEqual(bodyMeta.streamType.name, "ChannelEvents");
+    deepStrictEqual(bodyMeta.contentTypes, ["text/event-stream"]);
+
+    // streamType union has Input usage (no Json since SSE uses text/event-stream)
+    strictEqual(bodyMeta.streamType.usage, UsageFlags.Input);
   });
 });
 
 describe("stream response", () => {
   it("http stream response", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         @route("/")
         op get(): HttpStream<Thing, "application/jsonl", string>;
@@ -148,18 +248,39 @@ describe("stream response", () => {
         model Thing { id: string }
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
-    strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.response.type?.kind, "bytes");
     strictEqual(method.response.type?.encode, "bytes");
     strictEqual(method.operation.responses.length, 1);
     strictEqual(method.operation.responses[0].type?.kind, "bytes");
     strictEqual(method.operation.responses[0].type?.encode, "bytes");
+
+    // stream metadata on HTTP response
+    const responseMeta = method.operation.responses[0].streamMetadata;
+    ok(responseMeta);
+    strictEqual(responseMeta.bodyType.kind, "string");
+    strictEqual(responseMeta.originalType.kind, "model");
+    strictEqual(responseMeta.originalType.name, "HttpStreamThing");
+    strictEqual(responseMeta.streamType.kind, "model");
+    strictEqual(responseMeta.streamType.name, "Thing");
+    deepStrictEqual(responseMeta.contentTypes, ["application/jsonl"]);
+
+    // stream metadata propagated to method response
+    const methodMeta = method.response.streamMetadata;
+    ok(methodMeta);
+    strictEqual(methodMeta.streamType.kind, "model");
+    strictEqual(methodMeta.streamType.name, "Thing");
+    deepStrictEqual(methodMeta.contentTypes, ["application/jsonl"]);
+
+    // streamType has Output + Json usage and appears in sdkPackage.models
+    strictEqual(responseMeta.streamType.usage, UsageFlags.Output | UsageFlags.Json);
+    ok(sdkPackage.models.find((m) => m.name === "Thing"));
   });
 
   it("json stream response", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         @route("/")
         op get(): JsonlStream<Thing>;
@@ -167,18 +288,38 @@ describe("stream response", () => {
         model Thing { id: string }
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
-    strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.response.type?.kind, "bytes");
     strictEqual(method.response.type?.encode, "bytes");
     strictEqual(method.operation.responses.length, 1);
     strictEqual(method.operation.responses[0].type?.kind, "bytes");
     strictEqual(method.operation.responses[0].type?.encode, "bytes");
+
+    // stream metadata on HTTP response
+    const responseMeta = method.operation.responses[0].streamMetadata;
+    ok(responseMeta);
+    strictEqual(responseMeta.bodyType.kind, "string");
+    strictEqual(responseMeta.originalType.kind, "model");
+    strictEqual(responseMeta.originalType.name, "JsonlStreamThing");
+    strictEqual(responseMeta.streamType.kind, "model");
+    strictEqual(responseMeta.streamType.name, "Thing");
+    deepStrictEqual(responseMeta.contentTypes, ["application/jsonl"]);
+
+    // stream metadata propagated to method response
+    const methodMeta = method.response.streamMetadata;
+    ok(methodMeta);
+    strictEqual(methodMeta.streamType.kind, "model");
+    deepStrictEqual(methodMeta.contentTypes, ["application/jsonl"]);
+
+    // streamType has Output + Json usage and appears in sdkPackage.models
+    strictEqual(responseMeta.streamType.usage, UsageFlags.Output | UsageFlags.Json);
+    ok(sdkPackage.models.find((m) => m.name === "Thing"));
   });
 
   it("custom stream response", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         @streamOf(Thing)
         model CustomStream {
@@ -192,18 +333,38 @@ describe("stream response", () => {
         model Thing { id: string }
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
-    strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.response.type?.kind, "bytes");
     strictEqual(method.response.type?.encode, "bytes");
     strictEqual(method.operation.responses.length, 1);
     strictEqual(method.operation.responses[0].type?.kind, "bytes");
     strictEqual(method.operation.responses[0].type?.encode, "bytes");
+
+    // stream metadata on HTTP response
+    const responseMeta = method.operation.responses[0].streamMetadata;
+    ok(responseMeta);
+    strictEqual(responseMeta.bodyType.kind, "bytes");
+    strictEqual(responseMeta.originalType.kind, "model");
+    strictEqual(responseMeta.originalType.name, "CustomStream");
+    strictEqual(responseMeta.streamType.kind, "model");
+    strictEqual(responseMeta.streamType.name, "Thing");
+    deepStrictEqual(responseMeta.contentTypes, ["custom/built-here"]);
+
+    // stream metadata propagated to method response
+    const methodMeta = method.response.streamMetadata;
+    ok(methodMeta);
+    strictEqual(methodMeta.streamType.kind, "model");
+    deepStrictEqual(methodMeta.contentTypes, ["custom/built-here"]);
+
+    // streamType has Output usage (no Json since custom content type) and appears in sdkPackage.models
+    strictEqual(responseMeta.streamType.usage, UsageFlags.Output);
+    ok(sdkPackage.models.find((m) => m.name === "Thing"));
   });
 
   it("intersection stream response", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         @route("/")
         op get(): JsonlStream<Thing> & { @statusCode statusCode: 204; };
@@ -211,18 +372,38 @@ describe("stream response", () => {
         model Thing { id: string }
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
-    strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.response.type?.kind, "bytes");
     strictEqual(method.response.type?.encode, "bytes");
     strictEqual(method.operation.responses.length, 1);
     strictEqual(method.operation.responses[0].type?.kind, "bytes");
     strictEqual(method.operation.responses[0].type?.encode, "bytes");
+
+    // stream metadata on HTTP response
+    const responseMeta = method.operation.responses[0].streamMetadata;
+    ok(responseMeta);
+    strictEqual(responseMeta.bodyType.kind, "string");
+    strictEqual(responseMeta.originalType.kind, "model");
+    strictEqual(responseMeta.originalType.name, "JsonlStreamThing");
+    strictEqual(responseMeta.streamType.kind, "model");
+    strictEqual(responseMeta.streamType.name, "Thing");
+    deepStrictEqual(responseMeta.contentTypes, ["application/jsonl"]);
+
+    // stream metadata propagated to method response
+    const methodMeta = method.response.streamMetadata;
+    ok(methodMeta);
+    strictEqual(methodMeta.streamType.kind, "model");
+    deepStrictEqual(methodMeta.contentTypes, ["application/jsonl"]);
+
+    // streamType has Output + Json usage and appears in sdkPackage.models
+    strictEqual(responseMeta.streamType.usage, UsageFlags.Output | UsageFlags.Json);
+    ok(sdkPackage.models.find((m) => m.name === "Thing"));
   });
 
   it("sse response", async () => {
-    await runner.compileWithBuiltInService(
+    const { program } = await StreamsTesterWithBuiltInService.compile(
       `
         model UserConnect {
           username: string;
@@ -254,13 +435,33 @@ describe("stream response", () => {
         op subscribeToChannel(): SSEStream<ChannelEvents>;
       `,
     );
-    const sdkPackage = runner.context.sdkPackage;
+    const context = await createSdkContextForTester(program);
+    const sdkPackage = context.sdkPackage;
     const method = getServiceMethodOfClient(sdkPackage);
-    strictEqual(sdkPackage.models.length, 0);
     strictEqual(method.response.type?.kind, "bytes");
     strictEqual(method.response.type?.encode, "bytes");
     strictEqual(method.operation.responses.length, 1);
     strictEqual(method.operation.responses[0].type?.kind, "bytes");
     strictEqual(method.operation.responses[0].type?.encode, "bytes");
+
+    // stream metadata on HTTP response - SSE streams have union streamType
+    const responseMeta = method.operation.responses[0].streamMetadata;
+    ok(responseMeta);
+    strictEqual(responseMeta.bodyType.kind, "string");
+    strictEqual(responseMeta.originalType.kind, "model");
+    strictEqual(responseMeta.originalType.name, "SSEStreamChannelEvents");
+    strictEqual(responseMeta.streamType.kind, "union");
+    strictEqual(responseMeta.streamType.name, "ChannelEvents");
+    deepStrictEqual(responseMeta.contentTypes, ["text/event-stream"]);
+
+    // stream metadata propagated to method response
+    const methodMeta = method.response.streamMetadata;
+    ok(methodMeta);
+    strictEqual(methodMeta.streamType.kind, "union");
+    strictEqual(methodMeta.streamType.name, "ChannelEvents");
+    deepStrictEqual(methodMeta.contentTypes, ["text/event-stream"]);
+
+    // streamType union has Output usage (no Json since SSE uses text/event-stream)
+    strictEqual(responseMeta.streamType.usage, UsageFlags.Output);
   });
 });

@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-azure-core",
-  "version": "0.63.0",
+  "version": "0.65.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Azure Core library",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -43,8 +43,8 @@
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp",
-    "build": "pnpm run gen-extern-signature && tsc -p . && pnpm run lint-typespec-library",
-    "watch": "tsc -p . --watch",
+    "build": "pnpm run gen-extern-signature && tsc -p tsconfig.build.json && pnpm run lint-typespec-library",
+    "watch": "tsc -p tsconfig.build.json --watch",
     "gen-extern-signature": "tspd --enable-experimental gen-extern-signature .",
     "lint-typespec-library": "tsp compile . --warn-as-error --import @typespec/library-linter --no-emit",
     "test": "vitest run",

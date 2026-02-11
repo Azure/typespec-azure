@@ -91,6 +91,9 @@ interface Employees {
   /** Sample async action with no request body and response */
   actionNoReqResAsync is ArmResourceActionNoResponseContentAsync<Employee, void>;
 
+  /** Sample async action using only 202 response */
+  actionAcceptedOnlyAsync is ActionAsync<Employee, void, void>;
+
   /** A sample HEAD operation to check resource existence */
   checkExistence is ArmResourceCheckExistence<Employee>;
 }

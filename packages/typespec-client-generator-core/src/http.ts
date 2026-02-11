@@ -12,6 +12,7 @@ import {
 import { $ } from "@typespec/compiler/typekit";
 import {
   HttpOperation,
+  HttpOperationHeaderParameter,
   HttpOperationParameter,
   HttpOperationPathParameter,
   HttpOperationQueryParameter,
@@ -28,7 +29,7 @@ import {
   isPathParam,
   isQueryParam,
 } from "@typespec/http";
-import { getStreamMetadata } from "@typespec/http/experimental";
+import { StreamMetadata, getStreamMetadata } from "@typespec/http/experimental";
 import { camelCase } from "change-case";
 import { getResponseAsBool } from "./decorators.js";
 import {
@@ -47,8 +48,8 @@ import {
   SdkPathParameter,
   SdkQueryParameter,
   SdkServiceResponseHeader,
+  SdkStreamMetadata,
   SdkType,
-  SerializationOptions,
   TCGCContext,
 } from "./interfaces.js";
 import {
@@ -83,6 +84,29 @@ import {
   getTypeSpecBuiltInType,
   isReadOnly,
 } from "./types.js";
+
+function buildSdkStreamMetadata(
+  context: TCGCContext,
+  tspStreamMetadata: StreamMetadata,
+  operation: Operation,
+): [SdkStreamMetadata, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const bodyType = diagnostics.pipe(
+    getClientTypeWithDiagnostics(context, tspStreamMetadata.bodyType, operation),
+  );
+  const originalType = diagnostics.pipe(
+    getClientTypeWithDiagnostics(context, tspStreamMetadata.originalType, operation),
+  );
+  const streamType = diagnostics.pipe(
+    getClientTypeWithDiagnostics(context, tspStreamMetadata.streamType, operation),
+  );
+  return diagnostics.wrap({
+    bodyType,
+    originalType,
+    streamType,
+    contentTypes: [...tspStreamMetadata.contentTypes],
+  });
+}
 
 export function getSdkHttpOperation(
   context: TCGCContext,
@@ -173,6 +197,13 @@ function getSdkHttpParameters(
     bodyParam: undefined,
   };
 
+  const methodParametersMap = new Map<ModelProperty, SdkMethodParameter>();
+  methodParameters.map((mp) => {
+    if (mp.__raw) {
+      methodParametersMap.set(mp.__raw, mp);
+    }
+  });
+
   retval.parameters = httpOperation.parameters.parameters
     .filter((x) => !isNeverOrVoidType(x.param.type))
     .map((x) =>
@@ -183,21 +214,11 @@ function getSdkHttpParameters(
   );
   // add operation info onto body param
   const tspBody = httpOperation.parameters.body;
-  // we add correspondingMethodParams after we create the type, since we need the info on the type
-  const correspondingMethodParams: (SdkMethodParameter | SdkModelPropertyType)[] = [];
   if (tspBody) {
     if (tspBody.property && !isNeverOrVoidType(tspBody.property.type)) {
       const bodyParam = diagnostics.pipe(
         getSdkHttpParameter(context, tspBody.property, httpOperation.operation, undefined, "body"),
       );
-      if (
-        tspBody.bodyKind === "file" &&
-        bodyParam.kind === "body" &&
-        bodyParam.type.kind === "model"
-      ) {
-        bodyParam.type.serializationOptions = bodyParam.type.serializationOptions || {};
-        bodyParam.type.serializationOptions.binary = { isFile: true };
-      }
       if (bodyParam.kind !== "body") {
         diagnostics.add(
           createDiagnostic({
@@ -232,7 +253,7 @@ function getSdkHttpParameters(
         apiVersions: getAvailableApiVersions(context, tspBody.type, httpOperation.operation),
         type,
         optional: isHttpBodySpread(tspBody) ? false : (tspBody.property?.optional ?? false), // optional is always false for spread body
-        correspondingMethodParams,
+        correspondingMethodParams: [],
         methodParameterSegments: [],
         crossLanguageDefinitionId: `${getCrossLanguageDefinitionId(context, httpOperation.operation)}.body`,
         decorators: diagnostics.pipe(getTypeDecorators(context, tspBody.type)),
@@ -246,6 +267,7 @@ function getSdkHttpParameters(
           context,
           httpOperation.operation,
           methodParameters,
+          methodParametersMap,
           retval.bodyParam,
         ),
       );
@@ -257,10 +279,14 @@ function getSdkHttpParameters(
 
       addContentTypeInfoToBodyParam(context, httpOperation, retval.bodyParam);
 
-      // map stream request body type to bytes
-      if (getStreamMetadata(context.program, httpOperation.parameters)) {
+      // map stream request body type to bytes, but preserve stream metadata
+      const requestStreamMeta = getStreamMetadata(context.program, httpOperation.parameters);
+      if (requestStreamMeta) {
         retval.bodyParam.type = diagnostics.pipe(
           getStreamAsBytes(context, retval.bodyParam.type.__raw!),
+        );
+        retval.bodyParam.streamMetadata = diagnostics.pipe(
+          buildSdkStreamMetadata(context, requestStreamMeta, httpOperation.operation),
         );
         // eslint-disable-next-line @typescript-eslint/no-deprecated
         retval.bodyParam.correspondingMethodParams.map((p) => (p.type = retval.bodyParam!.type));
@@ -273,18 +299,22 @@ function getSdkHttpParameters(
       ...createContentTypeOrAcceptHeader(context, httpOperation, retval.bodyParam),
       doc: `Body parameter's content type. Known values are ${retval.bodyParam.contentTypes}`,
     };
-    if (!methodParameters.some((m) => m.name === "contentType")) {
-      methodParameters.push({
+    let methodParameter: SdkMethodParameter | undefined = methodParameters.find(
+      (m) => m.name === "contentType",
+    );
+    if (!methodParameter) {
+      methodParameter = {
         ...contentTypeBase,
         kind: "method",
-      });
+      };
+      methodParameters.push(methodParameter);
     }
     retval.parameters.push({
       ...contentTypeBase,
       kind: "header",
       serializedName: "Content-Type",
-      correspondingMethodParams,
-      methodParameterSegments: [],
+      correspondingMethodParams: [methodParameter],
+      methodParameterSegments: [[methodParameter]],
     });
   }
   if (responseBody && !headerParams.some((h) => isAcceptHeader(h))) {
@@ -292,23 +322,34 @@ function getSdkHttpParameters(
     const acceptBase = {
       ...createContentTypeOrAcceptHeader(context, httpOperation, responseBody),
     };
-    if (!methodParameters.some((m) => m.name === "accept")) {
-      methodParameters.push({
+    let methodParameter: SdkMethodParameter | undefined = methodParameters.find(
+      (m) => m.name === "accept",
+    );
+    if (!methodParameter) {
+      methodParameter = {
         ...acceptBase,
         kind: "method",
-      });
+      };
+      methodParameters.push(methodParameter);
     }
     retval.parameters.push({
       ...acceptBase,
       kind: "header",
       serializedName: "Accept",
-      correspondingMethodParams,
-      methodParameterSegments: [],
+      correspondingMethodParams: [methodParameter],
+      methodParameterSegments: [[methodParameter]],
     });
   }
   for (const param of retval.parameters) {
+    if (param.methodParameterSegments.length > 0) continue;
     param.methodParameterSegments = diagnostics.pipe(
-      getMethodParameterSegments(context, httpOperation.operation, methodParameters, param),
+      getMethodParameterSegments(
+        context,
+        httpOperation.operation,
+        methodParameters,
+        methodParametersMap,
+        param,
+      ),
     );
     // Derive correspondingMethodParams from methodParameterSegments (last element of each path)
     // eslint-disable-next-line @typescript-eslint/no-deprecated
@@ -493,7 +534,10 @@ export function getSdkHttpParameter(
   return diagnostics.wrap({
     ...headerQueryBase,
     kind: "header",
-    serializedName: getHeaderFieldName(program, param) ?? base.name,
+    serializedName:
+      getHeaderFieldName(program, param) ??
+      (httpParam as HttpOperationHeaderParameter)?.name ??
+      base.name,
   });
 }
 
@@ -512,12 +556,12 @@ function getSdkHttpResponseAndExceptions(
   const diagnostics = createDiagnosticCollector();
   const responses: SdkHttpResponse[] = [];
   const exceptions: SdkHttpErrorResponse[] = [];
-  let serializationOptions: SerializationOptions = {};
   for (const response of httpOperation.responses) {
     const headers: SdkServiceResponseHeader[] = [];
     let body: Type | undefined;
     let type: SdkType | undefined;
     let contentTypes: string[] = [];
+    let streamMetadata: SdkStreamMetadata | undefined;
 
     for (const innerResponse of response.responses) {
       const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
@@ -536,9 +580,6 @@ function getSdkHttpResponseAndExceptions(
         context.__responseHeaderCache.set(header, headers[headers.length - 1]);
       }
       if (innerResponse.body && !isNeverOrVoidType(innerResponse.body.type)) {
-        if (innerResponse.body.bodyKind === "file") {
-          serializationOptions = { binary: { isFile: true } };
-        }
         if (body && body !== innerResponse.body.type) {
           diagnostics.add(
             createDiagnostic({
@@ -556,9 +597,13 @@ function getSdkHttpResponseAndExceptions(
         contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
         body =
           body.kind === "Model" ? getEffectivePayloadType(context, body, Visibility.Read) : body;
-        if (getStreamMetadata(context.program, innerResponse)) {
-          // map stream response body type to bytes
+        const responseStreamMeta = getStreamMetadata(context.program, innerResponse);
+        if (responseStreamMeta) {
+          // map stream response body type to bytes, but preserve stream metadata
           type = diagnostics.pipe(getStreamAsBytes(context, innerResponse.body.type));
+          streamMetadata = diagnostics.pipe(
+            buildSdkStreamMetadata(context, responseStreamMeta, httpOperation.operation),
+          );
         } else {
           type = diagnostics.pipe(
             getClientTypeWithDiagnostics(context, body, httpOperation.operation),
@@ -566,9 +611,6 @@ function getSdkHttpResponseAndExceptions(
           if (innerResponse.body.property) {
             addEncodeInfo(context, innerResponse.body.property, type, defaultContentType);
           }
-        }
-        if (type.kind === "model") {
-          type.serializationOptions = { ...type.serializationOptions, ...serializationOptions };
         }
       }
     }
@@ -586,6 +628,7 @@ function getSdkHttpResponseAndExceptions(
         getActualClientType(client.__raw),
       ),
       description: response.description,
+      streamMetadata,
     };
 
     if (
@@ -623,6 +666,7 @@ export function getMethodParameterSegments(
   context: TCGCContext,
   operation: Operation,
   methodParameters: SdkMethodParameter[],
+  methodParametersMap: Map<ModelProperty, SdkMethodParameter>,
   serviceParam: SdkHttpParameter,
 ): [(SdkMethodParameter | SdkModelPropertyType)[][], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
@@ -660,7 +704,12 @@ export function getMethodParameterSegments(
   serviceParam.onClient = false;
 
   // 4. To see if the service parameter is a method parameter or a property of a method parameter.
-  const directMappingPath = findMappingWithPath(context, methodParameters, serviceParam);
+  const directMappingPath = findMappingWithPath(
+    context,
+    methodParameters,
+    methodParametersMap,
+    serviceParam,
+  );
   if (directMappingPath) {
     return diagnostics.wrap([directMappingPath]);
   }
@@ -671,7 +720,12 @@ export function getMethodParameterSegments(
     const paths: (SdkMethodParameter | SdkModelPropertyType)[][] = [];
     let optionalSkip = 0;
     for (const serviceParamProp of serviceParam.type.properties) {
-      const propertyMappingPath = findMappingWithPath(context, methodParameters, serviceParamProp);
+      const propertyMappingPath = findMappingWithPath(
+        context,
+        methodParameters,
+        methodParametersMap,
+        serviceParamProp,
+      );
       if (propertyMappingPath) {
         paths.push(propertyMappingPath);
       } else if (serviceParamProp.optional) {
@@ -712,8 +766,13 @@ export function getMethodParameterSegments(
 function findMappingWithPath(
   context: TCGCContext,
   methodParameters: SdkMethodParameter[],
+  methodParametersMap: Map<ModelProperty, SdkMethodParameter>,
   serviceParam: SdkHttpParameter | SdkModelPropertyType,
 ): (SdkMethodParameter | SdkModelPropertyType)[] | undefined {
+  // Quick check for direct mapping
+  if (serviceParam.__raw && methodParametersMap.has(serviceParam.__raw)) {
+    return [methodParametersMap.get(serviceParam.__raw)!];
+  }
   // Use a queue of tuples: [current parameter, path to reach it]
   const queue: [
     SdkMethodParameter | SdkModelPropertyType,
@@ -729,22 +788,6 @@ function findMappingWithPath(
       methodParam.__raw &&
       serviceParam.__raw &&
       compareModelProperties(context, methodParam.__raw, serviceParam.__raw)
-    ) {
-      return path;
-    }
-
-    // Two following two hard coded mapping is for the case that TCGC help to add content type and accept header when not exists.
-    if (
-      serviceParam.kind === "header" &&
-      serviceParam.serializedName === "Content-Type" &&
-      methodParam.name === "contentType"
-    ) {
-      return path;
-    }
-    if (
-      serviceParam.kind === "header" &&
-      serviceParam.serializedName === "Accept" &&
-      methodParam.name === "accept"
     ) {
       return path;
     }

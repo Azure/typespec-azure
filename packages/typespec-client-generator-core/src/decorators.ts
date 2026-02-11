@@ -10,6 +10,7 @@ import {
   ignoreDiagnostics,
   Interface,
   isErrorModel,
+  isList,
   isNumeric,
   isService,
   isTemplateDeclaration,
@@ -26,7 +27,13 @@ import {
 } from "@typespec/compiler";
 import { SyntaxKind, type Node } from "@typespec/compiler/ast";
 import { $ } from "@typespec/compiler/typekit";
-import { getAuthentication, getHttpOperation, getServers } from "@typespec/http";
+import {
+  getAuthentication,
+  getHttpOperation,
+  getServers,
+  isBody,
+  isBodyRoot,
+} from "@typespec/http";
 import { $useDependency, getVersions } from "@typespec/versioning";
 import {
   AccessDecorator,
@@ -38,6 +45,7 @@ import {
   ClientInitializationDecorator,
   ClientNameDecorator,
   ClientNamespaceDecorator,
+  ClientOptionDecorator,
   ConvenientAPIDecorator,
   DeserializeEmptyStringAsNullDecorator,
   OperationGroupDecorator,
@@ -49,9 +57,11 @@ import {
 } from "../generated-defs/Azure.ClientGenerator.Core.js";
 import {
   ClientDefaultValueDecorator,
+  DisablePageableDecorator,
   FlattenPropertyDecorator,
   HierarchyBuildingDecorator,
   MarkAsLroDecorator,
+  MarkAsPageableDecorator,
   NextLinkVerbDecorator,
 } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
@@ -82,6 +92,7 @@ import {
   omitOperation,
   operationGroupKey,
   overrideKey,
+  parseScopes,
   scopeKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
@@ -111,7 +122,7 @@ function setScopedDecoratorData(
     return;
   }
 
-  const [negationScopes, scopes] = parseScopes(context, scope);
+  const [negationScopes, scopes] = parseScopes(scope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
     // override the previous value for negation scopes
     const newObject: Record<string | symbol, any> =
@@ -140,32 +151,6 @@ function setScopedDecoratorData(
   }
 }
 
-function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string[]?, string[]?] {
-  if (scope === undefined) {
-    return [undefined, undefined];
-  }
-
-  // handle !(scope1, scope2,...) syntax
-  const negationScopeRegex = new RegExp(/!\((.*?)\)/);
-  const negationScopeMatch = scope.match(negationScopeRegex);
-  if (negationScopeMatch) {
-    return [negationScopeMatch[1].split(",").map((s) => s.trim()), undefined];
-  }
-
-  // handle !scope1, !scope2, scope3, ... syntax
-  const splitScopes = scope.split(",").map((s) => s.trim());
-  const negationScopes: string[] = [];
-  const scopes: string[] = [];
-  for (const s of splitScopes) {
-    if (s.startsWith("!")) {
-      negationScopes.push(s.slice(1));
-    } else {
-      scopes.push(s);
-    }
-  }
-  return [negationScopes, scopes];
-}
-
 export const $client: ClientDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
@@ -182,12 +167,12 @@ export const $client: ClientDecorator = (
   const explicitName =
     options?.kind === "Model" ? options?.properties.get("name")?.type : undefined;
   const name: string = explicitName?.kind === "String" ? explicitName.value : target.name;
-  let service: Namespace | Namespace[] | undefined = undefined;
+  let services: Namespace[];
   const serviceConfig =
     options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
 
   if (serviceConfig?.kind === "Namespace") {
-    service = serviceConfig;
+    services = [serviceConfig];
   } else if (
     serviceConfig?.kind === "Tuple" &&
     serviceConfig.values.every((v) => v.kind === "Namespace")
@@ -199,12 +184,12 @@ export const $client: ClientDecorator = (
       });
       return;
     }
-    service = serviceConfig.values;
+    services = serviceConfig.values;
     // validate all services has same server definition
     let servers = undefined;
     let auth = undefined;
     let isSame = true;
-    for (const svc of service) {
+    for (const svc of services) {
       const currentServers = getServers(context.program, svc);
       if (currentServers === undefined) continue;
       if (servers === undefined) {
@@ -216,7 +201,7 @@ export const $client: ClientDecorator = (
         }
       }
     }
-    for (const svc of service) {
+    for (const svc of services) {
       const currentAuth = getAuthentication(context.program, svc);
       if (currentAuth === undefined) continue;
       if (auth === undefined) {
@@ -245,7 +230,7 @@ export const $client: ClientDecorator = (
     ) {
       const versionRecords = [];
       // collect the latest version enum member from each service
-      for (const svc of service) {
+      for (const svc of services) {
         const versions = getVersions(context.program, svc)[1]?.getVersions();
         if (versions && versions.length > 0) {
           versionRecords.push(versions[versions.length - 1].enumMember);
@@ -257,22 +242,23 @@ export const $client: ClientDecorator = (
       }
     }
   } else {
-    service = findClientService(context.program, target);
-  }
-
-  if (service === undefined) {
-    reportDiagnostic(context.program, {
-      code: "client-service",
-      format: { name },
-      target: context.decoratorTarget,
-    });
-    return;
+    const service = findClientService(context.program, target);
+    if (service === undefined) {
+      reportDiagnostic(context.program, {
+        code: "client-service",
+        format: { name },
+        target: context.decoratorTarget,
+      });
+      return;
+    }
+    services = [service];
   }
 
   const client: SdkClient = {
     kind: "SdkClient",
     name,
-    service,
+    service: services.length === 1 ? services[0] : services,
+    services,
     type: target,
     subOperationGroups: [],
   };
@@ -895,6 +881,13 @@ export const $alternateType: AlternateTypeDecorator = (
   let alternateInput: Type | ExternalTypeInfo = alternate;
   if (alternate.kind === "Model" && isExternalType(alternate)) {
     // This means we're dealing with external type
+    if (source.kind === "ModelProperty") {
+      reportDiagnostic(context.program, {
+        code: "external-type-on-model-property",
+        target: source,
+      });
+      return;
+    }
     if (!scope) {
       reportDiagnostic(context.program, {
         code: "missing-scope",
@@ -926,6 +919,7 @@ export const $alternateType: AlternateTypeDecorator = (
       .map((x) => x.value)[0];
 
     alternateInput = {
+      kind: "externalTypeInfo",
       identity,
       package: packageName,
       minVersion,
@@ -946,15 +940,6 @@ export const $alternateType: AlternateTypeDecorator = (
   setScopedDecoratorData(context, $alternateType, alternateTypeKey, source, alternateInput, scope);
 };
 
-export function getAlternateType(
-  context: TCGCContext,
-  source: ModelProperty | Scalar,
-): Scalar | undefined;
-export function getAlternateType(
-  context: TCGCContext,
-  source: ModelProperty | Scalar | Model | Enum | Union,
-): ExternalTypeInfo | undefined;
-
 /**
  * Get the alternate type for a source type in a specific scope.
  *
@@ -971,7 +956,7 @@ export function getAlternateType(
     alternateTypeKey,
     source,
   );
-  if (retval !== undefined && "identity" in retval && !("kind" in retval)) {
+  if (retval !== undefined && retval.kind === "externalTypeInfo") {
     if (!context.__externalPackageToVersions) {
       context.__externalPackageToVersions = new Map();
     }
@@ -1014,13 +999,15 @@ export const $clientInitialization: ClientInitializationDecorator = (
     if (options.properties.get("initializedBy")) {
       const value = options.properties.get("initializedBy")!.type;
 
-      const isValidValue = (value: number): boolean => value === 1 || value === 2;
+      const isValidValue = (value: number): boolean => value === 0 || value === 1 || value === 2;
 
       if (value.kind === "EnumMember") {
         if (typeof value.value !== "number" || !isValidValue(value.value)) {
           reportDiagnostic(context.program, {
             code: "invalid-initialized-by",
-            format: { message: "Please use `InitializedBy` enum to set the value." },
+            format: {
+              message: "Please use `InitializedBy` enum to set the value.",
+            },
             target: target,
           });
           return;
@@ -1034,7 +1021,9 @@ export const $clientInitialization: ClientInitializationDecorator = (
           ) {
             reportDiagnostic(context.program, {
               code: "invalid-initialized-by",
-              format: { message: "Please use `InitializedBy` enum to set the value." },
+              format: {
+                message: "Please use `InitializedBy` enum to set the value.",
+              },
               target: target,
             });
             return;
@@ -1224,6 +1213,10 @@ export function getClientNamespace(
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
   if (override) {
     // if `@clientNamespace` is applied to the entity, this wins out
+    // if the override exactly matches the namespace flag, no replacement is needed
+    if (context.namespaceFlag && override === context.namespaceFlag) {
+      return override;
+    }
     const userDefinedNamespace = findNamespaceOverlapClosestToRoot(
       override,
       listAllUserDefinedNamespaces(context),
@@ -1265,6 +1258,16 @@ function getNamespaceFullNameWithOverride(context: TCGCContext, namespace: Names
       listAllUserDefinedNamespaces(context),
     );
     if (userDefinedNamespace && context.namespaceFlag) {
+      // Check if replacement would cause duplication:
+      // This happens when the namespace flag is an extension of the user-defined namespace
+      // and joinedSegments already starts with the flag (meaning override already applied it)
+      if (
+        context.namespaceFlag.startsWith(userDefinedNamespace.name) &&
+        (joinedSegments.startsWith(context.namespaceFlag + ".") ||
+          joinedSegments === context.namespaceFlag)
+      ) {
+        return joinedSegments;
+      }
       return joinedSegments.replace(userDefinedNamespace.name, context.namespaceFlag);
     }
     return joinedSegments;
@@ -1278,7 +1281,7 @@ export const $scope: ScopeDecorator = (
   entity: Operation | ModelProperty,
   scope?: LanguageScopes,
 ) => {
-  const [negationScopes, scopes] = parseScopes(context, scope);
+  const [negationScopes, scopes] = parseScopes(scope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
     // for negation scope, override the previous value
     setScopedDecoratorData(context, $scope, negationScopesKey, entity, negationScopes);
@@ -1521,11 +1524,22 @@ export function getClientLocation(
 
 const legacyHierarchyBuildingKey = createStateSymbol("legacyHierarchyBuilding");
 
-function isPropertySuperset(target: Model, value: Model): boolean {
+interface PropertyConflict {
+  propertyName: string;
+  reason: "missing" | "type-mismatch";
+}
+
+function isPropertySuperset(program: Program, target: Model, value: Model): PropertyConflict[] {
+  const conflicts: PropertyConflict[] = [];
+
   // Check if all properties in value exist in target
   for (const name of value.properties.keys()) {
     if (!target.properties.has(name)) {
-      return false;
+      conflicts.push({
+        propertyName: name,
+        reason: "missing",
+      });
+      continue;
     }
     const targetProperty = target.properties.get(name)!;
     const valueProperty = value.properties.get(name)!;
@@ -1536,11 +1550,14 @@ function isPropertySuperset(target: Model, value: Model): boolean {
     if (targetProperty.sourceProperty !== valueProperty.sourceProperty) {
       // Different sources - check if they have the same type
       if (targetProperty.type !== valueProperty.type) {
-        return false;
+        conflicts.push({
+          propertyName: name,
+          reason: "type-mismatch",
+        });
       }
     }
   }
-  return true;
+  return conflicts;
 }
 
 export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
@@ -1550,15 +1567,33 @@ export const $legacyHierarchyBuilding: HierarchyBuildingDecorator = (
   scope?: LanguageScopes,
 ) => {
   // Validate that target has all properties from value
-  if (!isPropertySuperset(target, value)) {
-    reportDiagnostic(context.program, {
-      code: "legacy-hierarchy-building-conflict",
-      format: {
-        childModel: target.name,
-        parentModel: value.name,
-      },
-      target: context.decoratorTarget,
-    });
+  const conflicts = isPropertySuperset(context.program, target, value);
+  if (conflicts.length > 0) {
+    for (const conflict of conflicts) {
+      if (conflict.reason === "missing") {
+        reportDiagnostic(context.program, {
+          code: "legacy-hierarchy-building-conflict",
+          messageId: "property-missing",
+          format: {
+            childModel: target.name,
+            parentModel: value.name,
+            propertyName: conflict.propertyName,
+          },
+          target: context.decoratorTarget,
+        });
+      } else if (conflict.reason === "type-mismatch") {
+        reportDiagnostic(context.program, {
+          code: "legacy-hierarchy-building-conflict",
+          messageId: "type-mismatch",
+          format: {
+            childModel: target.name,
+            parentModel: value.name,
+            propertyName: conflict.propertyName,
+          },
+          target: context.decoratorTarget,
+        });
+      }
+    }
     return;
   }
 
@@ -1616,6 +1651,131 @@ export const $markAsLro: MarkAsLroDecorator = (
 
 export function getMarkAsLro(context: TCGCContext, entity: Operation): boolean {
   return getScopedDecoratorData(context, markAsLroKey, entity) ?? false;
+}
+
+const markAsPageableKey = createStateSymbol("markAsPageable");
+
+export const $markAsPageable: MarkAsPageableDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: LanguageScopes,
+) => {
+  const httpOperation = ignoreDiagnostics(getHttpOperation(context.program, target));
+  const modelResponse = httpOperation.responses.filter(
+    (r) =>
+      r.type?.kind === "Model" && !(r.statusCodes === "*" || isErrorModel(context.program, r.type)),
+  )[0];
+  if (!modelResponse) {
+    reportDiagnostic(context.program, {
+      code: "invalid-mark-as-pageable-target",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+
+  // Check if already marked with @list decorator
+  if (isList(context.program, target)) {
+    reportDiagnostic(context.program, {
+      code: "mark-as-pageable-ineffective",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+
+  // Check the response model for @pageItems decorator
+  const responseType = getRealResponseModel(context.program, modelResponse.type as Model);
+  if (responseType.kind !== "Model") {
+    reportDiagnostic(context.program, {
+      code: "invalid-mark-as-pageable-target",
+      format: {
+        operation: target.name,
+      },
+      target: context.decoratorTarget,
+    });
+    return;
+  }
+
+  // Check if any property has @pageItems decorator by checking the program state
+  // The @pageItems decorator uses a state symbol "TypeSpec.pageItems"
+  const pageItemsStateKey = Symbol.for("TypeSpec.pageItems");
+  let itemsProperty: ModelProperty | undefined = undefined;
+  for (const [, prop] of responseType.properties) {
+    if (context.program.stateSet(pageItemsStateKey).has(prop)) {
+      itemsProperty = prop;
+      break;
+    }
+  }
+
+  if (!itemsProperty) {
+    // Try to find a property named "value"
+    itemsProperty = responseType.properties.get("value");
+    if (!itemsProperty) {
+      // No @pageItems property and no "value" property found
+      reportDiagnostic(context.program, {
+        code: "invalid-mark-as-pageable-target",
+        format: {
+          operation: target.name,
+        },
+        target: context.decoratorTarget,
+      });
+      return;
+    }
+  }
+
+  // Store metadata that will be checked by TCGC to treat this operation as pageable
+  setScopedDecoratorData(
+    context,
+    $markAsPageable,
+    markAsPageableKey,
+    target,
+    { itemsProperty },
+    scope,
+  );
+};
+
+export function getMarkAsPageable(
+  context: TCGCContext,
+  entity: Operation,
+): MarkAsPageableInfo | undefined {
+  return getScopedDecoratorData(context, markAsPageableKey, entity);
+}
+
+export interface MarkAsPageableInfo {
+  itemsProperty: ModelProperty;
+}
+
+const disablePageableKey = createStateSymbol("disablePageable");
+
+export const $disablePageable: DisablePageableDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+  scope?: LanguageScopes,
+) => {
+  setScopedDecoratorData(context, $disablePageable, disablePageableKey, target, true, scope);
+};
+
+export function getDisablePageable(context: TCGCContext, entity: Operation): boolean {
+  return getScopedDecoratorData(context, disablePageableKey, entity) ?? false;
+}
+
+function getRealResponseModel(program: Program, responseModel: Model): Type {
+  let bodyProperty: ModelProperty | undefined = undefined;
+  for (const prop of responseModel.properties.values()) {
+    if (isBody(program, prop) || isBodyRoot(program, prop)) {
+      bodyProperty = prop;
+      break;
+    }
+  }
+  if (bodyProperty) {
+    return bodyProperty.type;
+  }
+  return responseModel;
 }
 
 const nextLinkVerbKey = createStateSymbol("nextLinkVerb");
@@ -1700,3 +1860,36 @@ export function isInScope(context: TCGCContext, entity: Operation | ModelPropert
   }
   return true;
 }
+
+export const clientOptionKey = createStateSymbol("ClientOption");
+
+/**
+ * `@clientOption` decorator implementation.
+ * Pass experimental flags or options to emitters without requiring TCGC reshipping.
+ * The decorator data is stored as {name, value} and exposed via the decorators array.
+ */
+export const $clientOption: ClientOptionDecorator = (
+  context: DecoratorContext,
+  target: Type,
+  name: string,
+  value: unknown,
+  scope?: LanguageScopes,
+) => {
+  // Always emit warning that this is experimental
+  reportDiagnostic(context.program, {
+    code: "client-option",
+    target: target,
+  });
+
+  // Emit additional warning if scope is not provided
+  if (scope === undefined) {
+    reportDiagnostic(context.program, {
+      code: "client-option-requires-scope",
+      target: target,
+    });
+  }
+
+  // Store the option data - each decorator application is stored separately
+  // The decorator info will be exposed via the decorators array on SDK types
+  setScopedDecoratorData(context, $clientOption, clientOptionKey, target, { name, value }, scope);
+};

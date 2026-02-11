@@ -249,6 +249,20 @@ op delete(
 | ---------- | ----- | ---------------- |
 | statusCode | `200` | The status code. |
 
+### `ArmFilterParameter` {#Azure.ResourceManager.ArmFilterParameter}
+
+Standard list parameter $filter, allows the user to filter the results of a list operation.
+
+```typespec
+model Azure.ResourceManager.ArmFilterParameter
+```
+
+#### Properties
+
+| Name   | Type     | Description                                                 |
+| ------ | -------- | ----------------------------------------------------------- |
+| filter | `string` | The OData filter expression to apply to the list operation. |
+
 ### `ArmLocationResource` {#Azure.ResourceManager.ArmLocationResource}
 
 Template for ARM location resources. Use the parameter to specify
@@ -514,6 +528,34 @@ op get is ArmResourceRead<Employee, Response = ArmResponse<Employee>>;
 | ---------- | -------------- | ---------------- |
 | statusCode | `200`          | The status code. |
 | body       | `ResponseBody` |                  |
+
+### `ArmSkipParameter` {#Azure.ResourceManager.ArmSkipParameter}
+
+List parameter $skip, allows the user to control the offset of returned items.
+
+```typespec
+model Azure.ResourceManager.ArmSkipParameter
+```
+
+#### Properties
+
+| Name | Type    | Description                                                            |
+| ---- | ------- | ---------------------------------------------------------------------- |
+| skip | `int64` | The number of items to skip before starting to collect the result set. |
+
+### `ArmTopParameter` {#Azure.ResourceManager.ArmTopParameter}
+
+Standard list parameter $top, allows the user to control the total number of returned items.
+
+```typespec
+model Azure.ResourceManager.ArmTopParameter
+```
+
+#### Properties
+
+| Name | Type    | Description                          |
+| ---- | ------- | ------------------------------------ |
+| top  | `int64` | The total number of items to return. |
 
 ### `AvailabilityZonesProperty` {#Azure.ResourceManager.AvailabilityZonesProperty}
 
@@ -1251,6 +1293,20 @@ model Employee {
 | ----------- | -------- | ---------------------------------------------------------------------- |
 | resourceUri | `string` | The fully qualified Azure Resource manager identifier of the resource. |
 
+### `SkipTokenParameter` {#Azure.ResourceManager.SkipTokenParameter}
+
+Standard list parameter $skiptoken, normally returned in the `nextLink` url of a page of items
+
+```typespec
+model Azure.ResourceManager.SkipTokenParameter
+```
+
+#### Properties
+
+| Name      | Type     | Description                            |
+| --------- | -------- | -------------------------------------- |
+| skipToken | `string` | An opaque value to use for pagination. |
+
 ### `SubscriptionActionScope` {#Azure.ResourceManager.SubscriptionActionScope}
 
 Template used by ArmProviderAction templates.
@@ -1929,6 +1985,29 @@ model Azure.ResourceManager.CommonTypes.NetworkSecurityProfile
 | diagnosticSettingsVersion? | `int32`                                    | Current diagnostic settings version     |
 | enabledLogCategories?      | `string[]`                                 | List of log categories that are enabled |
 
+### `NspConfigurationNameParameter` {#Azure.ResourceManager.CommonTypes.NspConfigurationNameParameter}
+
+The name parameter for a network security perimeter configuration.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.NspConfigurationNameParameter<KeyName, ResourceNamePattern, MinLength, MaxLength>
+```
+
+#### Template Parameters
+
+| Name                | Description                                                                                                          |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| KeyName             | The name of the network security perimeter configuration resource name parameter.                                    |
+| ResourceNamePattern | The regex pattern for the network security perimeter configuration resource name (default is "^[a-z][a-zA-Z0-9]\*$") |
+| MinLength           | The minimum length for the network security perimeter configuration resource name (default is 1)                     |
+| MaxLength           | The maximum length for the network security perimeter configuration resource name (default is 512)                   |
+
+#### Properties
+
+| Name                                      | Type     | Description                                             |
+| ----------------------------------------- | -------- | ------------------------------------------------------- |
+| networkSecurityPerimeterConfigurationName | `string` | The name for a network security perimeter configuration |
+
 ### `NspConfigurationResource` {#Azure.ResourceManager.CommonTypes.NspConfigurationResource}
 
 Network security perimeter (NSP) configuration resource. Providers must instantiate an instance of this resource in their
@@ -1984,7 +2063,7 @@ model Azure.ResourceManager.CommonTypes.Operation
 
 ### `OperationDisplay` {#Azure.ResourceManager.CommonTypes.OperationDisplay}
 
-Localized display information for and operation.
+Localized display information for an operation.
 
 ```typespec
 model Azure.ResourceManager.CommonTypes.OperationDisplay
@@ -2163,6 +2242,29 @@ interface Employees {
 | ------ | --------------------------------------------------------- | -------------------------------------- |
 | value? | `ResourceManager.CommonTypes.PrivateEndpointConnection[]` | Array of private endpoint connections. |
 
+### `PrivateEndpointConnectionNameParameter` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionNameParameter}
+
+The name of the private endpoint connection associated with the Azure resource.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionNameParameter<KeyName, ResourceNamePattern, MinLength, MaxLength>
+```
+
+#### Template Parameters
+
+| Name                | Description                                                                                             |
+| ------------------- | ------------------------------------------------------------------------------------------------------- |
+| KeyName             | The name of the private endpoint connection name parameter (default is "privateEndpointConnectionName") |
+| ResourceNamePattern | The regex pattern for the private endpoint connection name (default is "^[a-z][a-zA-Z0-9]\*$")          |
+| MinLength           | The minimum length for the private endpoint connection name (default is 3)                              |
+| MaxLength           | The maximum length for the private endpoint connection name (default is 63                              |
+
+#### Properties
+
+| Name | Type     | Description                                                                     |
+| ---- | -------- | ------------------------------------------------------------------------------- |
+| name | `string` | The name of the private endpoint connection associated with the Azure resource. |
+
 ### `PrivateEndpointConnectionParameter` {#Azure.ResourceManager.CommonTypes.PrivateEndpointConnectionParameter}
 
 The name of the private endpoint connection associated with the Azure resource.
@@ -2266,6 +2368,29 @@ interface Employees {
 | Name   | Type                                                | Description                     |
 | ------ | --------------------------------------------------- | ------------------------------- |
 | value? | `ResourceManager.CommonTypes.PrivateLinkResource[]` | Array of private link resources |
+
+### `PrivateLinkResourceNameParameter` {#Azure.ResourceManager.CommonTypes.PrivateLinkResourceNameParameter}
+
+The name of the private link associated with the Azure resource.
+
+```typespec
+model Azure.ResourceManager.CommonTypes.PrivateLinkResourceNameParameter<Segment, ResourceNamePattern, MinLength, MaxLength>
+```
+
+#### Template Parameters
+
+| Name                | Description                                                                              |
+| ------------------- | ---------------------------------------------------------------------------------------- |
+| Segment             | The resource type name for private links (default is privateLinkResources)               |
+| ResourceNamePattern | The regex pattern for the private link resource name (default is "^[a-z][a-zA-Z0-9]\*$") |
+| MinLength           | The minimum length for the private link resource name (default is 3)                     |
+| MaxLength           | The maximum length for the private link resource name (default is 63                     |
+
+#### Properties
+
+| Name | Type     | Description                                                      |
+| ---- | -------- | ---------------------------------------------------------------- |
+| name | `string` | The name of the private link associated with the Azure resource. |
 
 ### `PrivateLinkResourceParameter` {#Azure.ResourceManager.CommonTypes.PrivateLinkResourceParameter}
 
@@ -3438,6 +3563,25 @@ model Azure.ResourceManager.Legacy.ArmOperationOptions
 | --------------- | --------- | -------------------------------------- |
 | useStaticRoute? | `boolean` | Should a static route be used          |
 | route?          | `string`  | The status route for operations to use |
+
+### `CustomAzureResource` {#Azure.ResourceManager.Legacy.CustomAzureResource}
+
+Model representing a custom Azure Resource Manager Resource.
+Use this template with 'is' to create a custom resource.
+
+```typespec
+model Azure.ResourceManager.Legacy.CustomAzureResource<isResource>
+```
+
+#### Template Parameters
+
+| Name       | Description                                                                                                   |
+| ---------- | ------------------------------------------------------------------------------------------------------------- |
+| isResource | Optional. A boolean flag indicating whether the resource should be marked as an Azure resource. Default true. |
+
+#### Properties
+
+None
 
 ### `CustomResourceOptions` {#Azure.ResourceManager.Legacy.CustomResourceOptions}
 

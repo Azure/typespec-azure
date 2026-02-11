@@ -8,7 +8,7 @@ using Azure.ResourceManager.Private;
  * @template NspConfigurationResourceModel The type of the network security perimeter configuration resource. You must declare a network security perimeter configuration resource type in your provider namespace.
  * @template NspConfigurationKeyName Optional. The NSP configuration resource name parameter. By default, this is `networkSecurityPerimeterConfigurationName`.
  * @template ResourceName Optional. The name of the network security perimeter configuration resource in this context, by default, this is `{targetResourceName}NetworkSecurityPerimeterConfiguration`.
- *
+ * @template ResourceParameter Optional. The name parameter for this NSP. By default, this is `NetworkSecurityPerimeterConfigurationNameParameter`.
  * @example
  * ```ts
  * namespace Microsoft.Contoso;
@@ -24,11 +24,13 @@ using Azure.ResourceManager.Private;
 alias NspConfigurations<
   NspConfigurationResourceModel extends CommonTypes.NetworkSecurityPerimeterConfiguration,
   NspConfigurationKeyName extends valueof string = "networkSecurityPerimeterConfigurationName",
-  ResourceName extends valueof string = string("")
+  ResourceName extends valueof string = string(""),
+  ResourceParameter extends {} = CommonTypes.NetworkSecurityPerimeterConfigurationNameParameter
 > = CommonTypes.NspConfigurationOperations<
   NspConfigurationResourceModel,
   NspConfigurationKeyName,
-  ResourceName
+  ResourceName,
+  ResourceParameter
 >;
 
 /** Network security perimeter (NSP) configuration resource. Providers must instantiate an instance of this resource in their

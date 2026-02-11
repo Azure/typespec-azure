@@ -156,6 +156,7 @@ op func8(@body body: Test5): void;
 Set an alternate type for a model property, Scalar, Model, Enum, Union, or function parameter. Note that `@encode` will be overridden by the one defined in the alternate type.
 When the source type is `Scalar`, the alternate type must be `Scalar`.
 The replaced type could be a type defined in the TypeSpec or an external type declared by type identity, package that export the type and package version.
+**Important:** External types (with `identity` property) cannot be applied to model properties. They must be applied to the type definition itself (Scalar, Model, Enum, or Union).
 
 ```typespec
 @Azure.ClientGenerator.Core.alternateType(alternate: unknown | Azure.ClientGenerator.Core.ExternalType, scope?: valueof string)
@@ -236,6 +237,32 @@ union Dfe<T> {
   "python"
 )
 model ItemCollection {
+  // ... properties
+}
+```
+
+##### Invalid: External type on model property (will emit a warning)
+
+```typespec
+model MyModel {
+  field: FieldType;
+}
+// This will emit a warning - external types cannot be applied to properties
+@@alternateType(MyModel.field,
+  {
+    identity: "ExternalType",
+  },
+  "rust"
+);
+
+// Correct: Apply external type to the type definition instead
+@alternateType(
+  {
+    identity: "ExternalType",
+  },
+  "rust"
+)
+model FieldType {
   // ... properties
 }
 ```
@@ -689,6 +716,46 @@ namespace Contoso;
 ```typespec
 @clientNamespace("ContosoClient.Models")
 model Test {
+  prop: string;
+}
+```
+
+### `@clientOption` {#@Azure.ClientGenerator.Core.clientOption}
+
+Pass experimental flags or options to emitters without requiring TCGC reshipping.
+This decorator is intended for temporary workarounds or experimental features and requires
+suppression to acknowledge its experimental nature.
+
+See supported client options for each language emitter here https://azure.github.io/typespec-azure/docs/howtos/generate-client-libraries/12clientOptions/
+
+**Warning**: This decorator always emits a warning that must be suppressed, and an additional
+warning if no scope is provided (since options are typically language-specific).
+
+```typespec
+@Azure.ClientGenerator.Core.clientOption(name: valueof string, value: valueof unknown, scope?: valueof string)
+```
+
+#### Target
+
+The type you want to apply the option to.
+`unknown`
+
+#### Parameters
+
+| Name  | Type              | Description                                                                                                                                                                                                                                                |
+| ----- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| name  | `valueof string`  | The name of the option (e.g., "enableFeatureFoo").                                                                                                                                                                                                         |
+| value | `valueof unknown` | The value of the option. Can be any type; emitters will cast as needed.                                                                                                                                                                                    |
+| scope | `valueof string`  | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+
+#### Examples
+
+##### Apply an experimental option for Python
+
+```typespec
+#suppress "@azure-tools/typespec-client-generator-core/client-option" "preview feature for python"
+@clientOption("enableFeatureFoo", true, "python")
+model MyModel {
   prop: string;
 }
 ```
@@ -1212,6 +1279,47 @@ model Config {
 }
 ```
 
+### `@disablePageable` {#@Azure.ClientGenerator.Core.Legacy.disablePageable}
+
+Prevents an operation from being treated as a pageable operation by the SDK generators,
+even when the operation follows standard paging patterns (e.g., decorated with `@list`).
+
+When applied, the operation will be treated as a basic method:
+
+- The response will be the paged model itself (not the list of items)
+- The paged model will not be marked with paged result usage
+- No paging mechanisms (iterators/async iterators) will be generated
+
+This decorator is considered legacy functionality and should only be used when
+you need to override the default paging behavior for specific operations.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.disablePageable(scope?: valueof string)
+```
+
+#### Target
+
+The operation that should NOT be treated as a pageable operation
+`Operation`
+
+#### Parameters
+
+| Name  | Type             | Description                                                                                                                                                                                                                                                     |
+| ----- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+
+#### Examples
+
+##### Prevent a paging operation from being treated as pageable
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.disablePageable
+@list
+@route("/items")
+@get
+op listItems(): ItemListResult;
+```
+
 ### `@flattenProperty` {#@Azure.ClientGenerator.Core.Legacy.flattenProperty}
 
 Set whether a model property should be flattened or not.
@@ -1340,6 +1448,50 @@ The operation that should be treated as a Long Running Operation
 @route("/deployments/{deploymentId}")
 @post
 op startDeployment(@path deploymentId: string): DeploymentResult | ErrorResponse;
+```
+
+### `@markAsPageable` {#@Azure.ClientGenerator.Core.Legacy.markAsPageable}
+
+Forces an operation to be treated as a pageable operation by the SDK generators,
+even when the operation does not follow standard paging patterns on the service side.
+
+NOTE: When used, you will need to verify the operation and add tests for the generated code
+to make sure the end-to-end works for library users, since there is a risk that forcing
+this operation to be pageable will result in errors.
+
+When applied, TCGC will treat the operation as pageable and SDK generators should:
+
+- Generate paging mechanisms (iterators/async iterators)
+- Return appropriate pageable-specific return types
+- Handle the operation as a collection that may require multiple requests
+
+This decorator is considered legacy functionality and should only be used when
+standard TypeSpec paging patterns are not feasible.
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.markAsPageable(scope?: valueof string)
+```
+
+#### Target
+
+The operation that should be treated as a pageable operation
+`Operation`
+
+#### Parameters
+
+| Name  | Type             | Description                                                                                                                                                                                                                                                     |
+| ----- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+
+#### Examples
+
+##### Force a regular operation to be treated as pageable for backward compatibility
+
+```typespec
+@Azure.ClientGenerator.Core.Legacy.markAsPageable
+@route("/items")
+@get
+op listItems(): ItemListResult;
 ```
 
 ### `@nextLinkVerb` {#@Azure.ClientGenerator.Core.Legacy.nextLinkVerb}

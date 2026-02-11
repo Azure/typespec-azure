@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-autorest",
-  "version": "0.63.1",
+  "version": "0.65.0",
   "author": "Microsoft Corporation",
   "description": "TypeSpec library for emitting openapi from the TypeSpec REST protocol binding",
   "homepage": "https://azure.github.io/typespec-azure",
@@ -36,8 +36,8 @@
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp",
-    "build": "npm run gen-extern-signature && npm run regen-autorest-openapi-schema && tsc -p . && npm run lint-typespec-library",
-    "watch": "tsc -p . --watch",
+    "build": "npm run gen-extern-signature && npm run regen-autorest-openapi-schema && tsc -p tsconfig.build.json && npm run lint-typespec-library",
+    "watch": "tsc -p tsconfig.build.json --watch",
     "gen-extern-signature": "tspd --enable-experimental gen-extern-signature .",
     "lint-typespec-library": "tsp compile . --warn-as-error --import @typespec/library-linter --no-emit",
     "regen-autorest-openapi-schema": "tsp compile ./schema/autorest-openapi-schema.tsp --warn-as-error && node ./.scripts/schema-json-to-js.js",
