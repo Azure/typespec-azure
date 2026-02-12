@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.65.1
+
+### Bug Fixes
+
+- [#3929](https://github.com/Azure/typespec-azure/pull/3929) Changed `InitializedByFlags.Default` back to `0` to indicate no user-specific initialization setting for sub clients. Renamed `InitializedByFlags.None` to `InitializedByFlags.CustomizeCode` (value 4) and `InitializedBy.none` to `InitializedBy.customizeCode` to indicate that client initialization should be omitted from generated code and handled manually in custom code.
+
+
 ## 0.65.0
 
 ### Deprecations
