@@ -526,7 +526,7 @@ enum InitializedBy {
   /**
    * The client initialization should be omitted from generated code and handled manually in custom code.
    */
-  customizeCode: -1,
+  customizeCode: 4,
 
   /**
    * The client could be initialized individually.

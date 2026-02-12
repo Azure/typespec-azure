@@ -160,13 +160,13 @@ export enum UsageFlags {
 /**
  * Flags used to indicate how a client is initialized.
  *
- * - `Default` (0): No user-specific initialization setting has been specified. This is the default value when no explicit initialization decorator is set.
- * - `CustomizeCode` (-1): Indicates that the client initialization should be omitted from generated code and handled manually in custom code.
+ * - `Default` (0): No user-specific initialization setting has been specified. This is the default value for sub clients when no explicit initialization decorator is set.
+ * - `CustomizeCode` (4): Indicates that the client initialization should be omitted from generated code and handled manually in custom code.
  * - `Individually` and `Parent` are bit flags (1, 2) that can be combined using bitwise OR.
  */
 export enum InitializedByFlags {
   Default = 0,
-  CustomizeCode = -1,
+  CustomizeCode = 1 << 2,
   Individually = 1 << 0,
   Parent = 1 << 1,
 }
