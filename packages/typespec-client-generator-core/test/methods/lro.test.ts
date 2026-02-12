@@ -1204,54 +1204,54 @@ it("versioned LRO with customization", async () => {
   const { program } = await AzureCoreBaseTester.compile(
     createClientCustomizationInput(
       `
-@service
-@versioned(Versions)
-namespace TestService;
+      @service
+      @versioned(Versions)
+      namespace TestService;
 
-enum Versions {
-  v1,
-  v2,
-}
+      enum Versions {
+        v1,
+        v2,
+      }
 
-alias TestOperations = ResourceOperations<NoConditionalRequests & NoClientRequestId & NoRepeatableRequests>;
+      alias TestOperations = ResourceOperations<NoConditionalRequests & NoClientRequestId & NoRepeatableRequests>;
 
-@resource("id")
-model TestResult {
-  @key
-  id: string;
+      @resource("id")
+      model TestResult {
+        @key
+        id: string;
 
-  @lroStatus
-  status: JobStatus;
-}
+        @lroStatus
+        status: JobStatus;
+      }
 
-@lroStatus
-union JobStatus {
-  string,
-  NotStarted: "notStarted",
-  Running: "running",
+      @lroStatus
+      union JobStatus {
+        string,
+        NotStarted: "notStarted",
+        Running: "running",
 
-  @lroSucceeded
-  Succeeded: "succeeded",
+        @lroSucceeded
+        Succeeded: "succeeded",
 
-  @lroFailed
-  Failed: "failed",
+        @lroFailed
+        Failed: "failed",
 
-  Canceled: "canceled",
-}
+        Canceled: "canceled",
+      }
 
-@get
-op get is TestOperations.ResourceRead<TestResult>;
+      @get
+      op get is TestOperations.ResourceRead<TestResult>;
 
-@pollingOperation(get)
-op create is TestOperations.LongRunningResourceCreateOrReplace<TestResult>;
-    `,
+      @pollingOperation(get)
+      op create is TestOperations.LongRunningResourceCreateOrReplace<TestResult>;
+          `,
       `
-@client({
-  service: TestService,
-})
-namespace TestClient;
+      @client({
+        service: TestService,
+      })
+      namespace TestClient;
 
-op test is TestService.create;
+      op test is TestService.create;
     `,
       ["@azure-tools/typespec-azure-core"],
       ["Azure.Core", "Azure.Core.Traits"],

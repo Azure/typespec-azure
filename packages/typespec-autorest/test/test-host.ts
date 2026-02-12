@@ -95,9 +95,9 @@ export async function compileOpenAPI(
   return JSON.parse(outputs["openapi.json"]);
 }
 
-export async function compileVersionedOpenAPI<K extends string>(
+export async function compileMultipleOpenAPI<K extends string>(
   code: string,
-  versions: K[],
+  files: Record<K, string>,
   options: CompileOpenAPIOptions = {},
 ): Promise<Record<K, OpenAPI2Document>> {
   const [{ outputs }, diagnostics] = await Tester.compileAndDiagnose(code, {
@@ -112,10 +112,27 @@ export async function compileVersionedOpenAPI<K extends string>(
   expectDiagnosticEmpty(ignoreDiagnostics(diagnostics, ["@typespec/http/no-service-found"]));
 
   const output: any = {};
-  for (const version of versions) {
-    output[version] = JSON.parse(outputs[resolvePath(version, "openapi.json")]);
+  for (const [key, filename] of Object.entries(files)) {
+    output[key] = JSON.parse(outputs[filename as any]);
   }
   return output;
+}
+
+export async function compileVersionedOpenAPI<K extends string>(
+  code: string,
+  versions: K[],
+  options: CompileOpenAPIOptions = {},
+): Promise<Record<K, OpenAPI2Document>> {
+  return compileMultipleOpenAPI(
+    code,
+    Object.fromEntries(
+      versions.map((x) => [
+        x,
+        resolvePath(x.includes("preview") ? "preview" : "stable", x, "openapi.json"),
+      ]),
+    ),
+    options,
+  );
 }
 
 export async function CompileOpenApiWithFeatures<F extends string>(

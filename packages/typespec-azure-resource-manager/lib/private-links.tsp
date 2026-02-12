@@ -37,6 +37,7 @@ model PrivateLink<Description extends valueof string = "A private link resource.
  * Operations over private link resources.
  * @template PrivateLinkResourceModel The type of the private link resource. You must declare a private link resource type in your provider namespace.
  * @template ResourceName Optional. The name of the private link resource in this context, by default, this is `{targetResourceName}PrivateLink`.
+ * @template ResourceParameter Optional. The name parameter model for the private link resource. By default, this is `PrivateLinkResourceParameter`, which has a required path parameter for the private link resource name. You can use this template parameter to specify a different parameter type if needed, but it must include at least a path parameter for the private link resource name.
  *
  * @example
  * ```ts
@@ -52,7 +53,8 @@ model PrivateLink<Description extends valueof string = "A private link resource.
  */
 interface PrivateLinks<
   PrivateLinkResourceModel extends PrivateLink,
-  ResourceName extends valueof string = string("")
+  ResourceName extends valueof string = string(""),
+  ResourceParameter extends {} = CommonTypes.PrivateLinkResourceParameter
 > {
   /**
    * @dev List the private links to a resource
@@ -71,7 +73,7 @@ interface PrivateLinks<
   @autoRoute
   @list
   @listsResource(Resource)
-  @segmentOf(PrivateLinkResourceParameter)
+  @segmentOf(ResourceParameter)
   @builtInResourceOperation(ParentResource, Resource, "list", OverrideResourceName)
   @Private.enforceConstraint(ParentResource, Foundations.Resource)
   ListByParent<
@@ -105,7 +107,7 @@ interface PrivateLinks<
   @get
   @autoRoute
   @listsResource(Resource)
-  @segmentOf(PrivateLinkResourceParameter)
+  @segmentOf(ResourceParameter)
   @builtInResourceOperation(ParentResource, Resource, "list", OverrideResourceName)
   @Private.enforceConstraint(ParentResource, Foundations.Resource)
   ListSinglePageByParent<
@@ -146,7 +148,7 @@ interface PrivateLinks<
     OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmReadOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
-      KeysOf<PrivateLinkResourceParameter> &
+      KeysOf<ResourceParameter> &
       Parameters,
     Response,
     Error

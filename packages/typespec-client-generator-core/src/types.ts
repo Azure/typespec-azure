@@ -1,10 +1,7 @@
 import { UnionEnum, getLroMetadata, getUnionAsEnum } from "@azure-tools/typespec-azure-core";
 import {
   BooleanLiteral,
-  BytesKnownEncoding,
-  DateTimeKnownEncoding,
   Diagnostic,
-  DurationKnownEncoding,
   EncodeData,
   Enum,
   EnumMember,
@@ -34,7 +31,9 @@ import {
 } from "@typespec/compiler";
 import {
   Authentication,
+  HttpOperationFileBody,
   HttpOperationMultipartBody,
+  HttpPayloadBody,
   Visibility,
   getAuthentication,
   getServers,
@@ -42,7 +41,8 @@ import {
   isOrExtendsHttpFile,
   isStatusCode,
 } from "@typespec/http";
-import { isStream } from "@typespec/streams";
+import { getStreamMetadata } from "@typespec/http/experimental";
+import { getStreamOf, isStream } from "@typespec/streams";
 import {
   getAccess,
   getAccessOverride,
@@ -170,15 +170,15 @@ export function addEncodeInfo(
   const innerType = propertyType.kind === "nullable" ? propertyType.type : propertyType;
   const encodeData = getEncode(context.program, type);
   if (innerType.kind === "duration") {
-    if (!encodeData) return diagnostics.wrap(undefined);
-    innerType.encode = encodeData.encoding as DurationKnownEncoding;
+    if (!encodeData || !encodeData.encoding) return diagnostics.wrap(undefined);
+    innerType.encode = encodeData.encoding;
     innerType.wireType = diagnostics.pipe(
       getClientTypeWithDiagnostics(context, encodeData.type),
     ) as SdkBuiltInType;
   }
   if (innerType.kind === "utcDateTime" || innerType.kind === "offsetDateTime") {
-    if (encodeData) {
-      innerType.encode = encodeData.encoding as DateTimeKnownEncoding;
+    if (encodeData && encodeData.encoding) {
+      innerType.encode = encodeData.encoding;
       innerType.wireType = diagnostics.pipe(
         getClientTypeWithDiagnostics(context, encodeData.type),
       ) as SdkBuiltInType;
@@ -187,8 +187,8 @@ export function addEncodeInfo(
     }
   }
   if (innerType.kind === "bytes") {
-    if (encodeData) {
-      innerType.encode = encodeData.encoding as BytesKnownEncoding;
+    if (encodeData && encodeData.encoding) {
+      innerType.encode = encodeData.encoding;
     } else if (type.kind === "Scalar" || !defaultContentType) {
       // for scalar bytes without specific encode, or no specific content type, fallback to base64
       innerType.encode = "base64";
@@ -316,7 +316,7 @@ function getSdkDateTimeType(
   return diagnostics.wrap({
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, kind)),
     name: getLibraryName(context, type),
-    encode: (encode ?? "rfc3339") as DateTimeKnownEncoding,
+    encode: encode ?? "rfc3339",
     wireType: wireType ?? getTypeSpecBuiltInType(context, "string"),
     baseType: baseType,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
@@ -412,7 +412,7 @@ function getSdkDurationTypeWithDiagnostics(
   return diagnostics.wrap({
     ...diagnostics.pipe(getSdkTypeBaseHelper(context, type, kind)),
     name: getLibraryName(context, type),
-    encode: (encode ?? "ISO8601") as DurationKnownEncoding,
+    encode: encode ?? "ISO8601",
     wireType: wireType ?? getTypeSpecBuiltInType(context, "string"),
     baseType: baseType,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type),
@@ -1301,6 +1301,7 @@ export function getSdkModelPropertyTypeBase(
       context,
       type,
       operation ? context.getClientForOperation(operation) : undefined,
+      operation,
     ),
     onClient,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, type, operation),
@@ -1600,8 +1601,23 @@ function updateTypesFromOperation(
     if (isNeverOrVoidType(param.type)) continue;
     // if it is a body model, skip
     if (httpOperation.parameters.body?.property === param) continue;
-    // if it is a stream model, skip
-    if (param.type.kind === "Model" && isStream(program, param.type)) continue;
+    // if it is a stream model, skip the wrapper but register the streamed payload type
+    if (param.type.kind === "Model" && isStream(program, param.type)) {
+      const streamOf = getStreamOf(program, param.type);
+      if (streamOf && generateConvenient) {
+        const sdkStreamType = diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, streamOf, operation),
+        );
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkStreamType));
+        const paramStreamMeta = getStreamMetadata(program, httpOperation.parameters);
+        if (paramStreamMeta?.contentTypes.some((x) => isMediaTypeJson(x))) {
+          diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkStreamType));
+        }
+        const access = getAccessOverride(context, operation) ?? "public";
+        diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));
+      }
+      continue;
+    }
     const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param, operation));
     if (generateConvenient) {
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
@@ -1655,7 +1671,7 @@ function updateTypesFromOperation(
       }
 
       // add serialization options to model type
-      updateSerializationOptions(context, sdkType, httpBody.contentTypes);
+      updateSerializationOptions(context, sdkType, httpBody.contentTypes, undefined, httpBody);
 
       // after completion of usage calculation for httpBody, check whether it has
       // conflicting usage between multipart and regular body
@@ -1679,6 +1695,19 @@ function updateTypesFromOperation(
     }
     const access = getAccessOverride(context, operation) ?? "public";
     diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
+  }
+  // register the streamed payload type for stream request bodies (handles spread streams)
+  const requestStreamMeta = getStreamMetadata(program, httpOperation.parameters);
+  if (requestStreamMeta && generateConvenient) {
+    const sdkStreamType = diagnostics.pipe(
+      getClientTypeWithDiagnostics(context, requestStreamMeta.streamType, operation),
+    );
+    diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkStreamType));
+    if (requestStreamMeta.contentTypes.some((x) => isMediaTypeJson(x))) {
+      diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkStreamType));
+    }
+    const access = getAccessOverride(context, operation) ?? "public";
+    diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));
   }
 
   const lroMetaData = getLroMetadata(program, operation);
@@ -1717,10 +1746,29 @@ function updateTypesFromOperation(
           }
 
           // add serialization options to model type
-          updateSerializationOptions(context, sdkType, innerResponse.body.contentTypes);
+          updateSerializationOptions(
+            context,
+            sdkType,
+            innerResponse.body.contentTypes,
+            undefined,
+            innerResponse.body,
+          );
         }
         const access = getAccessOverride(context, operation) ?? "public";
         diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
+      }
+      // register the streamed payload type for stream responses
+      const responseStreamMeta = getStreamMetadata(program, innerResponse);
+      if (responseStreamMeta && generateConvenient) {
+        const sdkStreamType = diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, responseStreamMeta.streamType, operation),
+        );
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkStreamType));
+        if (responseStreamMeta.contentTypes.some((x) => isMediaTypeJson(x))) {
+          diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkStreamType));
+        }
+        const access = getAccessOverride(context, operation) ?? "public";
+        diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));
       }
       const headers = getHttpOperationResponseHeaders(innerResponse);
       if (headers) {
@@ -1830,6 +1878,37 @@ function updateExternalUsage(context: TCGCContext): void {
     ) {
       // Propagate External usage to the external type itself and all referenced types
       updateUsageOrAccess(context, UsageFlags.External, sdkType);
+    }
+  }
+}
+
+/**
+ * Helper function to check if a type has input or output usage
+ */
+function hasInputOrOutputUsage(usage: number): boolean {
+  return (usage & (UsageFlags.Input | UsageFlags.Output)) !== 0;
+}
+
+/**
+ * Clean up discriminator info when discriminated subtypes are missing usage.
+ * Remove subtypes without usage from the discriminatedSubtypes map to prevent
+ * language emitters from referencing unavailable types.
+ */
+function cleanupDiscriminatorForUnusedBase(context: TCGCContext): void {
+  for (const sdkType of context.__referencedTypeCache.values()) {
+    if (sdkType.kind !== "model" || !sdkType.discriminatedSubtypes) continue;
+
+    // Remove discriminated subtypes that have no usage
+    for (const [key, subtype] of Object.entries(sdkType.discriminatedSubtypes)) {
+      if (!hasInputOrOutputUsage(subtype.usage)) {
+        delete sdkType.discriminatedSubtypes[key];
+      }
+    }
+
+    // If all subtypes were removed, clear the discriminatedSubtypes entirely
+    if (Object.keys(sdkType.discriminatedSubtypes).length === 0) {
+      sdkType.discriminatedSubtypes = undefined;
+      sdkType.discriminatorProperty = undefined;
     }
   }
 }
@@ -2042,6 +2121,8 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   updateExternalUsage(context);
   // update discriminated subtypes and filter out duplicate properties from `@hierarchyBuilding`
   diagnostics.pipe(handleLegacyHierarchyBuilding(context));
+  // clean up discriminator info when only subtypes have usage
+  cleanupDiscriminatorForUnusedBase(context);
   // update generated name
   resolveConflictGeneratedName(context);
 
@@ -2053,6 +2134,7 @@ function updateSerializationOptions(
   type: SdkType,
   contentTypes: string[],
   options?: PropagationOptions,
+  httpBody?: HttpPayloadBody,
 ) {
   options = options ?? {};
   options.seenTypes = options.seenTypes ?? new Set<SdkType>();
@@ -2085,10 +2167,34 @@ function updateSerializationOptions(
     return;
   }
 
+  // Handle file body serialization - if it's a file, set binary options and skip json/xml
+  if (httpBody?.bodyKind === "file") {
+    const fileBody = httpBody as HttpOperationFileBody;
+    type.serializationOptions.binary = {
+      isFile: true,
+      isText: fileBody.isText,
+      contentTypes: fileBody.contentTypes,
+      filename: fileBody.filename,
+    };
+    return; // No need to add json/xml serialization for file types
+  }
+
   setSerializationOptions(context, type, contentTypes);
+
+  // If the model has serialization options from explicit decorators (not from contentTypes),
+  // ensure properties also get those serialization options.
+  // This handles orphan models where contentTypes is empty but the model has XML/JSON decorators.
+  let effectiveContentTypes = contentTypes;
+  if (type.serializationOptions.xml && !contentTypes.some(isMediaTypeXml)) {
+    effectiveContentTypes = [...effectiveContentTypes, "application/xml"];
+  }
+  if (type.serializationOptions.json && !contentTypes.some(isMediaTypeJson)) {
+    effectiveContentTypes = [...effectiveContentTypes, "application/json"];
+  }
+
   for (const property of type.properties) {
     if (property.kind === "property") {
-      setSerializationOptions(context, property, contentTypes);
+      setSerializationOptions(context, property, effectiveContentTypes);
     }
   }
 

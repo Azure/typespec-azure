@@ -29,6 +29,8 @@ extends:
     settings:
       skipBuildTagsForGitHubPullRequests: true
     sdl:
+      git:
+        longpaths: true
       codeql:
         compiled:
           enabled: false

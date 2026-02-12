@@ -36,7 +36,8 @@ export function isMediaTypeOctetStream(mediaType: string): boolean {
 export function isMediaTypeJson(mediaType: string): boolean {
   const mt = parseMediaType(mediaType);
   return mt
-    ? (mt.subtype === json || mt.suffix === json) && (mt.type === application || mt.type === text)
+    ? (mt.subtype === json || mt.subtype === "jsonl" || mt.suffix === json) &&
+        (mt.type === application || mt.type === text)
     : false;
 }
 

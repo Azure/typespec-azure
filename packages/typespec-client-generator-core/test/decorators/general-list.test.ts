@@ -126,18 +126,39 @@ it("multiple same decorators", async function () {
     {
       name: "Azure.ClientGenerator.Core.@clientName",
       arguments: {
-        rename: "testForJava",
-        scope: "java",
-      },
-    },
-    {
-      name: "Azure.ClientGenerator.Core.@clientName",
-      arguments: {
         rename: "testForPython",
         scope: "python",
       },
     },
   ]);
+  expectDiagnostics(context.diagnostics, []);
+});
+
+it("multiple same decorators without scope", async function () {
+  const { program } = await SimpleTesterWithService.compile(`
+    @clientName("testNoScope1")
+    @clientName("testNoScope2")
+    op test(): void;
+  `);
+
+  const context = await createSdkContextForTester(
+    program,
+    {},
+    { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@clientName"] },
+  );
+
+  // Decorators without scope should all be included
+  const decorators = context.sdkPackage.clients[0].methods[0].decorators;
+  strictEqual(decorators.length, 2);
+
+  const decorator1 = decorators.find((d) => d.arguments.rename === "testNoScope1");
+  const decorator2 = decorators.find((d) => d.arguments.rename === "testNoScope2");
+
+  ok(decorator1, "testNoScope1 decorator should exist");
+  ok(decorator2, "testNoScope2 decorator should exist");
+  strictEqual(decorator1!.name, "Azure.ClientGenerator.Core.@clientName");
+  strictEqual(decorator2!.name, "Azure.ClientGenerator.Core.@clientName");
+
   expectDiagnostics(context.diagnostics, []);
 });
 
@@ -228,7 +249,7 @@ describe("xml scenario", () => {
       model Foo {
         @ns("https://example.com/ns1", "ns1")
         bar1: string;
-      
+
         @ns("https://example.com/ns2", "ns2")
         bar2: string;
       }
@@ -276,12 +297,12 @@ describe("xml scenario", () => {
         ns1: "https://example.com/ns1",
         ns2: "https://example.com/ns2",
       }
-      
+
       @Xml.ns(Namespaces.ns1)
       model Foo {
         @Xml.ns(Namespaces.ns1)
         bar1: string;
-      
+
         @Xml.ns(Namespaces.ns2)
         bar2: string;
       }
@@ -364,7 +385,7 @@ describe("csharp only decorator", () => {
 
     const context = await createSdkContextForTester(
       program,
-      {},
+      { emitterName: "@azure-tools/typespec-csharp" },
       { additionalDecorators: ["Azure\\.ClientGenerator\\.Core\\.@useSystemTextJsonConverter"] },
     );
 

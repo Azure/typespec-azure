@@ -1,5 +1,16 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.37
+
+### Features
+
+- [#3791](https://github.com/Azure/typespec-azure/pull/3791) Add exportArray LRO operation test with array response using ArmProviderActionAsync
+
+### Bug Fixes
+
+- [#3697](https://github.com/Azure/typespec-azure/pull/3697) add nested test cases for client-initialization
+
+
 ## 0.1.0-alpha.36
 
 ### Bug Fixes
