@@ -33,7 +33,7 @@ Before starting, confirm the following with the user:
 2. Verify the fix commit is present on the release branch:
 
    ```bash
-   git log origin/release/<sprint-name> --oneline -10
+   git log origin/release/ -10 < sprint-name > --oneline
    ```
 
 ### 2. CREATE HOTFIX PUBLISH BRANCH
@@ -57,9 +57,9 @@ Before starting, confirm the following with the user:
 
 ### 3. Run the version bump command with `--ignore-policies` (required for hotfix releases since the release branch is not `main`):
 
-   ```bash
-   pnpm chronus version --ignore-policies
-   ```
+```bash
+pnpm chronus version --ignore-policies
+```
 
 3. **IMPORTANT:** If the `core` submodule pointer was changed by the version bump, reset it — the submodule should NOT change in a hotfix:
 
