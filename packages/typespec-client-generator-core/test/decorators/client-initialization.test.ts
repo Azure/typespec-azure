@@ -746,14 +746,14 @@ it("client initialized with None", async () => {
         blobName: string;
       }
 
-      @@clientInitialization(MyService, {parameters: MyCustomizations.MyClientInitialization, initializedBy: InitializedBy.none});
+      @@clientInitialization(MyService, {parameters: MyCustomizations.MyClientInitialization, initializedBy: InitializedBy.customizeCode});
       `,
     ),
   );
   const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
-  strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.None);
+  strictEqual(client.clientInitialization.initializedBy, InitializedByFlags.CustomizeCode);
   strictEqual(client.clientInitialization.parameters.length, 2);
   const endpoint = client.clientInitialization.parameters.find((x) => x.kind === "endpoint");
   ok(endpoint);
