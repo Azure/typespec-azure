@@ -1013,7 +1013,6 @@ export const $clientInitialization: ClientInitializationDecorator = (
           return;
         }
       } else if (value.kind === "Union") {
-        let hasCustomizeCode = false;
         for (const variant of value.variants.values()) {
           if (
             variant.type.kind !== "EnumMember" ||
@@ -1030,18 +1029,15 @@ export const $clientInitialization: ClientInitializationDecorator = (
             return;
           }
           if (variant.type.value === 4) {
-            hasCustomizeCode = true;
+            reportDiagnostic(context.program, {
+              code: "invalid-initialized-by",
+              format: {
+                message: "`InitializedBy.customizeCode` cannot be combined with other values.",
+              },
+              target: target,
+            });
+            return;
           }
-        }
-        if (hasCustomizeCode) {
-          reportDiagnostic(context.program, {
-            code: "invalid-initialized-by",
-            format: {
-              message: "`InitializedBy.customizeCode` cannot be combined with other values.",
-            },
-            target: target,
-          });
-          return;
         }
       }
     }
