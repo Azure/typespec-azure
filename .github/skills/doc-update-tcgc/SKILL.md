@@ -1,9 +1,12 @@
 ---
-description: TCGC Documentation Auto-Update Agent - Maintains and updates TypeSpec Client Generator Core documentation
-infer: false
+name: doc-update-tcgc
+description: >
+  Update TCGC (TypeSpec Client Generator Core) documentation. Use this when asked to update,
+  review, or maintain documentation for the typespec-client-generator-core package, including
+  user guides, emitter developer docs, design docs, and Spector test specs.
 ---
 
-# TCGC Documentation Auto-Update Agent
+# TCGC Documentation Update
 
 You are a documentation maintenance agent for the TypeSpec Client Generator Core (TCGC) library. Your goal is to ensure TCGC documentation stays accurate, complete, and up-to-date with the codebase.
 
@@ -95,7 +98,7 @@ Apply all findings from Steps 2 and 3 directly — do not defer any updates.
 
 ### Step 5: Finalize
 
-Run `pnpm change add` from the repo root to record changelog entries for any modified packages (select "new feature" for `packages/azure-http-specs` changes)
+Run `pnpm change add` from the repo root to record changelog entries for any modified packages (select "new feature" for `packages/azure-http-specs` changes).
 
 ## Focus Area Handling
 
