@@ -39,7 +39,7 @@ The target type you want to override access info.
 | Name  | Type             | Description                                                                                                                                                                                                                                                |
 | ----- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | value | `EnumMember`     | The access info you want to set for this model or operation. It should be one of the `Access` enum values, either `Access.public` or `Access.internal`.                                                                                                    |
-| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -172,7 +172,7 @@ The source type to which the alternate type will be applied.
 | Name      | Type                                           | Description                                                                                                                                                                                                                                                |
 | --------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | alternate | `unknown \| ClientGenerator.Core.ExternalType` | The alternate type to apply to the target. Can be a TypeSpec type or an ExternalType.                                                                                                                                                                      |
-| scope     | `valueof string`                               | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -288,7 +288,7 @@ The target parameter that you want to mark as an API version parameter.
 | Name  | Type              | Description                                                                                                                                                                                                                                                |
 | ----- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | value | `valueof boolean` | If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.                                                                                                                                                 |
-| scope | `valueof string`  | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -335,7 +335,7 @@ The target namespace or interface that you want to define as a client.
 | Name    | Type                                                                        | Description                                                                                                                                                                                                                                                |
 | ------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | options | [`ClientOptions`](./data-types.md#Azure.ClientGenerator.Core.ClientOptions) | Optional configuration for the service.                                                                                                                                                                                                                    |
-| scope   | `valueof string`                                                            | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope   | `valueof string`                                                            | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -366,6 +366,32 @@ namespace MyService {
 interface MyInterface {}
 ```
 
+##### Using scope to target specific languages
+
+```typespec
+namespace MyService {
+
+}
+
+// Apply only to Python SDK
+@client({
+  service: MyService,
+}, "python")
+interface PythonSpecificClient {}
+
+// Apply to multiple languages
+@client({
+  service: MyService,
+}, "python, java")
+interface MultiLanguageClient {}
+
+// Apply to all except C# and JavaScript
+@client({
+  service: MyService,
+}, "!(csharp, javascript)")
+interface ExcludedLanguagesClient {}
+```
+
 ### `@clientApiVersions` {#@Azure.ClientGenerator.Core.clientApiVersions}
 
 Specify additional API versions that the client can support. These versions should include those defined by the service's versioning configuration.
@@ -386,7 +412,7 @@ The target client for which you want to define additional API versions.
 | Name  | Type             | Description                                                                                                                                                                                                                                                |
 | ----- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | value | `Enum`           | If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.                                                                                                                                                 |
-| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -434,7 +460,7 @@ The target type (operation, model, enum, etc.) for which you want to apply clien
 | ------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | documentation | `valueof string` | The client-specific documentation to apply                                                                                                                                                                                                                 |
 | mode          | `EnumMember`     | Specifies how to apply the documentation (append or replace)                                                                                                                                                                                               |
-| scope         | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -487,7 +513,7 @@ The target client that you want to customize client initialization for.
 | Name    | Type                                                                                                    | Description                                                                                                                                                                                                                                                |
 | ------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | options | [`ClientInitializationOptions`](./data-types.md#Azure.ClientGenerator.Core.ClientInitializationOptions) | The options for client initialization. You can use `ClientInitializationOptions` model to set the options.                                                                                                                                                 |
-| scope   | `valueof string`                                                                                        | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -530,7 +556,7 @@ The operation to change location for.
 | Name   | Type                                                      | Description                                                                                                                                                                                                                                                |
 | ------ | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | target | `Interface \| Namespace \| Operation` \| `valueof string` | The target `Namespace`, `Interface` or a string which can indicate the client.                                                                                                                                                                             |
-| scope  | `valueof string`                                          | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -636,7 +662,7 @@ The type you want to rename.
 | Name   | Type             | Description                                                                                                                                                                                                                                                |
 | ------ | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | rename | `valueof string` | The rename you want applied to the object.                                                                                                                                                                                                                 |
-| scope  | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -700,7 +726,7 @@ The type you want to change the namespace for.
 | Name   | Type             | Description                                                                                                                                                                                                                                                |
 | ------ | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | rename | `valueof string` | The rename you want applied to the object                                                                                                                                                                                                                  |
-| scope  | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -746,7 +772,7 @@ The type you want to apply the option to.
 | ----- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | name  | `valueof string`  | The name of the option (e.g., "enableFeatureFoo").                                                                                                                                                                                                         |
 | value | `valueof unknown` | The value of the option. Can be any type; emitters will cast as needed.                                                                                                                                                                                    |
-| scope | `valueof string`  | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -779,7 +805,7 @@ The target operation, namespace, or interface.
 | Name  | Type              | Description                                                                                                                                                                                                                                                |
 | ----- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | flag  | `valueof boolean` | Whether to generate the operation as a convenience method or not.                                                                                                                                                                                          |
-| scope | `valueof string`  | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -827,7 +853,7 @@ The target type that you want to apply this deserialization behavior to.
 
 | Name  | Type             | Description                                                                                                                                                                                                                                                |
 | ----- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -863,7 +889,7 @@ The target namespace or interface that you want to define as a sub client.
 
 | Name  | Type             | Description                                                                                                                                                                                                                                                |
 | ----- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -892,7 +918,7 @@ This decorator allows you to specify a different method signature for the client
 | Name     | Type             | Description                                                                                                                                                                                                                                                |
 | -------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | override | `Operation`      | : The override method definition that specifies the exact client method you want                                                                                                                                                                           |
-| scope    | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -955,7 +981,7 @@ The target model property that you want to alias.
 | Name       | Type             | Description                                                                                                                                                                                                                                                |
 | ---------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | paramAlias | `valueof string` | The alias name you want to apply to the target model property.                                                                                                                                                                                             |
-| scope      | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -999,7 +1025,7 @@ The target operation, namespace, or interface.
 | Name  | Type              | Description                                                                                                                                                                                                                                                |
 | ----- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | flag  | `valueof boolean` | Whether to generate the operation as a protocol method or not.                                                                                                                                                                                             |
-| scope | `valueof string`  | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -1049,7 +1075,7 @@ The target operation that you want to apply this behavior to.
 
 | Name  | Type             | Description                                                                                                                                                                                                                                                |
 | ----- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -1078,7 +1104,7 @@ The target operation or model property that you want to scope.
 
 | Name  | Type             | Description                                                                                                                                                                                                                                                |
 | ----- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -1134,7 +1160,7 @@ The target type you want to extend usage.
 | Name  | Type                  | Description                                                                                                                                                                                                                                                |
 | ----- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | value | `EnumMember \| Union` | The usage info you want to add for this model. It can be a single value of `Usage` enum value or a combination of `Usage` enum values using bitwise OR.<br />For example, `Usage.input \| Usage.output \| Usage.json`.                                     |
-| scope | `valueof string`      | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -1205,7 +1231,7 @@ The target model that you want to set the custom JSON converter.
 
 | Name  | Type             | Description                                                                                                                                                                                                                                                |
 | ----- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -1244,7 +1270,7 @@ The model property or operation parameter that should have a client-level defaul
 | Name  | Type                                   | Description                                                                                                                                                                                                                                                     |
 | ----- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | value | `valueof string \| boolean \| numeric` | The default value to be used by SDK generators (must be a string, number, or boolean literal)                                                                                                                                                                   |
-| scope | `valueof string`                       | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -1306,7 +1332,7 @@ The operation that should NOT be treated as a pageable operation
 
 | Name  | Type             | Description                                                                                                                                                                                                                                                     |
 | ----- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -1338,7 +1364,7 @@ The target model property that you want to flatten.
 
 | Name  | Type             | Description                                                                                                                                                                                                                                                |
 | ----- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -1437,7 +1463,7 @@ The operation that should be treated as a Long Running Operation
 
 | Name  | Type             | Description                                                                                                                                                                                                                                                     |
 | ----- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -1481,7 +1507,7 @@ The operation that should be treated as a pageable operation
 
 | Name  | Type             | Description                                                                                                                                                                                                                                                     |
 | ----- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| scope | `valueof string` | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
@@ -1518,7 +1544,7 @@ The paging operation to specify next link operation behavior for
 | Name  | Type              | Description                                                                                                                                                                                                                                                     |
 | ----- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | verb  | `"GET" \| "POST"` | The HTTP verb to use for next link operations. Must be "POST" or "GET".                                                                                                                                                                                         |
-| scope | `valueof string`  | Specifies the target language emitters that the decorator should apply.<br />If not set, the decorator will be applied to all language emitters by default.<br />You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python. |
+| scope | `valueof string` | Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.<br /><br />**Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).<br /><br />**Valid patterns:**<br />• Single language: `"python"`<br />• Multiple languages (comma-separated): `"python, java"`<br />• Negation to exclude languages: `"!csharp"` or `"!(java, python)"` |
 
 #### Examples
 
