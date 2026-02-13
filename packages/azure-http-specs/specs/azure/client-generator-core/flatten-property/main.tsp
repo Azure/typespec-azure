@@ -110,3 +110,103 @@ op putFlattenModel(@body input: FlattenModel): FlattenModel;
   """)
 @put
 op putNestedFlattenModel(@body input: NestedFlattenModel): NestedFlattenModel;
+
+@doc("This is the model with unknown type properties to be flattened.")
+model FlattenUnknownModel {
+  name: string;
+
+  #suppress "@azure-tools/typespec-azure-core/no-unknown" "For testing purposes"
+  #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Testing backcompat"
+  @global.Azure.ClientGenerator.Core.Legacy.flattenProperty
+  properties?: unknown;
+}
+
+@scenario
+@route("/flattenUnknownModel")
+@scenarioDoc("""
+  Update and receive model with flatten property of unknown type.
+  
+  Note: `unknown` is a non-model type. The flatten decorator should be ignored for non-model types, 
+  so whether flattened or not, the behavior should be the same. This test verifies that SDKs correctly 
+  ignore flatten for non-model types.
+  
+  Expected behavior: The `properties` field should NOT be flattened and should remain as-is in the model,
+  since flatten only applies to model types.
+  
+  Expected input body:
+  ```json
+  {
+    "name": "foo"
+  }
+  ```
+  
+  Expected response body:
+  ```json
+  {
+    "name": "test",
+    "properties": {
+      "key1": "value1",
+      "key2": "value2"
+    }
+  }
+  ```
+  """)
+@put
+op putFlattenUnknownModel(@body input: FlattenUnknownModel): FlattenUnknownModel;
+
+@doc("This is the model with all read-only properties to be flattened.")
+model SolutionProperties {
+  @visibility(Lifecycle.Read)
+  solutionId?: string;
+
+  @visibility(Lifecycle.Read)
+  title?: string;
+
+  @visibility(Lifecycle.Read)
+  content?: string;
+}
+
+@doc("This is the model with flattened properties that are all read-only.")
+model Solution {
+  name: string;
+
+  #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Testing backcompat"
+  @global.Azure.ClientGenerator.Core.Legacy.flattenProperty
+  properties: SolutionProperties;
+
+  #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Testing backcompat"
+  @global.Azure.ClientGenerator.Core.Legacy.flattenProperty
+  propertiesOptional?: SolutionProperties;
+}
+
+@scenario
+@route("/flattenReadOnlyModel")
+@scenarioDoc("""
+  Test model with flatten property containing all read-only properties.
+  
+  Expected behavior: When flattening a property that contains only read-only properties:
+  - For input (write): Read-only properties should not appear in the input model, regardless of flattening
+  - For response (read): Read-only properties should be flattened to the parent model level
+  
+  The `properties` and `propertiesOptional` fields contain only read-only properties (`solutionId`, 
+  `title`, `content`). These should be flattened into the parent `Solution` model in the response.
+  
+  Expected input body:
+  ```json
+  {
+    "name": "foo"
+  }
+  ```
+  
+  Expected response body (properties flattened to parent level):
+  ```json
+  {
+    "name": "foo",
+    "solutionId": "solution1",
+    "title": "Solution Title",
+    "content": "Solution Content"
+  }
+  ```
+  """)
+@put
+op putFlattenReadOnlyModel(@body body: Solution): Solution;

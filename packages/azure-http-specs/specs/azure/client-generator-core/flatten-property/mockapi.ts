@@ -61,3 +61,34 @@ Scenarios.Azure_ClientGenerator_Core_FlattenProperty_putNestedFlattenModel = pas
     },
   ),
 );
+
+Scenarios.Azure_ClientGenerator_Core_FlattenProperty_putFlattenUnknownModel = passOnSuccess(
+  createMockApiDefinitions(
+    "flattenUnknownModel",
+    {
+      name: "foo",
+    },
+    {
+      name: "test",
+      properties: {
+        key1: "value1",
+        key2: "value2",
+      },
+    },
+  ),
+);
+
+Scenarios.Azure_ClientGenerator_Core_FlattenProperty_putFlattenReadOnlyModel = passOnSuccess(
+  createMockApiDefinitions(
+    "flattenReadOnlyModel",
+    {
+      name: "foo",
+    },
+    {
+      name: "foo",
+      solutionId: "solution1",
+      title: "Solution Title",
+      content: "Solution Content",
+    },
+  ),
+);
