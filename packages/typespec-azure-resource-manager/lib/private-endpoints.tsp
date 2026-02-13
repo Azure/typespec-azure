@@ -37,7 +37,7 @@ model PrivateEndpointConnectionResource<Description extends valueof string = "A 
  * Operations over private endpoint connection resources.
  * @template PrivateEndpointResource The type of the private endpoint connection resource. You must declare a private endpoint connection resource type in your provider namespace.
  * @template ResourceName Optional. The name of the private endpoint connection resource in this context, by default, this is `{targetResourceName}PrivateEndpointConnection`.
- *
+ * @template ResourceParameter Optional. The name parameter model for the private endpoint connection resource. By default, this parameter has no constraints
  * @example
  * ```ts
  * namespace Microsoft.Contoso;
@@ -52,7 +52,8 @@ model PrivateEndpointConnectionResource<Description extends valueof string = "A 
  */
 interface PrivateEndpoints<
   PrivateEndpointResource extends PrivateEndpointConnectionResource,
-  ResourceName extends valueof string = string("")
+  ResourceName extends valueof string = string(""),
+  ResourceParameter extends {} = CommonTypes.PrivateEndpointConnectionParameter
 > {
   /**
    * @dev List the private endpoint connections over a resource
@@ -71,7 +72,7 @@ interface PrivateEndpoints<
   @autoRoute
   @list
   @listsResource(Resource)
-  @segmentOf(PrivateEndpointConnectionParameter)
+  @segmentOf(ResourceParameter)
   @builtInResourceOperation(ParentResource, Resource, "list", OverrideResourceName)
   @Private.enforceConstraint(ParentResource, Foundations.Resource)
   ListByParent<
@@ -112,7 +113,7 @@ interface PrivateEndpoints<
     OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmReadOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
-      KeysOf<PrivateEndpointConnectionParameter> &
+      KeysOf<ResourceParameter> &
       Parameters,
     Response,
     Error
@@ -150,7 +151,7 @@ interface PrivateEndpoints<
     OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmCreateOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
-      KeysOf<PrivateEndpointConnectionParameter> &
+      KeysOf<ResourceParameter> &
       Parameters,
     Resource,
     Response,
@@ -182,7 +183,7 @@ interface PrivateEndpoints<
     OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmCreateOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
-      KeysOf<PrivateEndpointConnectionParameter> &
+      KeysOf<ResourceParameter> &
       Parameters,
     Resource,
     Response,
@@ -220,7 +221,7 @@ interface PrivateEndpoints<
     OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmCreateOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
-      KeysOf<PrivateEndpointConnectionParameter> &
+      KeysOf<ResourceParameter> &
       Parameters,
     Resource,
     Response,
@@ -264,7 +265,7 @@ interface PrivateEndpoints<
     OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmUpdateOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
-      KeysOf<PrivateEndpointConnectionParameter> &
+      KeysOf<ResourceParameter> &
       Parameters,
     PatchModel,
     Response,
@@ -298,7 +299,7 @@ interface PrivateEndpoints<
     OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmUpdateOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
-      KeysOf<PrivateEndpointConnectionParameter> &
+      KeysOf<ResourceParameter> &
       Parameters,
     PatchModel,
     Response,
@@ -333,7 +334,7 @@ interface PrivateEndpoints<
     OverrideResourceName extends valueof string = "${ResourceName}"
   >(
     ...ResourceInstanceParameters<ParentResource, BaseParameters>,
-    ...KeysOf<PrivateEndpointConnectionParameter>,
+    ...KeysOf<ResourceParameter>,
     ...Parameters,
   ): Response | Error;
 
@@ -362,7 +363,7 @@ interface PrivateEndpoints<
     OverrideResourceName extends valueof string = "${ResourceName}"
   >(
     ...ResourceInstanceParameters<ParentResource, BaseParameters>,
-    ...KeysOf<PrivateEndpointConnectionParameter>,
+    ...KeysOf<ResourceParameter>,
     ...Parameters,
   ): Response | Error;
 
@@ -391,7 +392,7 @@ interface PrivateEndpoints<
     OverrideResourceName extends valueof string = "${ResourceName}"
   >(
     ...ResourceInstanceParameters<ParentResource, BaseParameters>,
-    ...KeysOf<PrivateEndpointConnectionParameter>,
+    ...KeysOf<ResourceParameter>,
     ...Parameters,
   ): Response | Error;
 }

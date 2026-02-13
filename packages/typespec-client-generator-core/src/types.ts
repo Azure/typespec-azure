@@ -41,7 +41,8 @@ import {
   isOrExtendsHttpFile,
   isStatusCode,
 } from "@typespec/http";
-import { isStream } from "@typespec/streams";
+import { getStreamMetadata } from "@typespec/http/experimental";
+import { getStreamOf, isStream } from "@typespec/streams";
 import {
   getAccess,
   getAccessOverride,
@@ -1600,8 +1601,23 @@ function updateTypesFromOperation(
     if (isNeverOrVoidType(param.type)) continue;
     // if it is a body model, skip
     if (httpOperation.parameters.body?.property === param) continue;
-    // if it is a stream model, skip
-    if (param.type.kind === "Model" && isStream(program, param.type)) continue;
+    // if it is a stream model, skip the wrapper but register the streamed payload type
+    if (param.type.kind === "Model" && isStream(program, param.type)) {
+      const streamOf = getStreamOf(program, param.type);
+      if (streamOf && generateConvenient) {
+        const sdkStreamType = diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, streamOf, operation),
+        );
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkStreamType));
+        const paramStreamMeta = getStreamMetadata(program, httpOperation.parameters);
+        if (paramStreamMeta?.contentTypes.some((x) => isMediaTypeJson(x))) {
+          diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkStreamType));
+        }
+        const access = getAccessOverride(context, operation) ?? "public";
+        diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));
+      }
+      continue;
+    }
     const sdkType = diagnostics.pipe(getClientTypeWithDiagnostics(context, param, operation));
     if (generateConvenient) {
       diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
@@ -1680,6 +1696,19 @@ function updateTypesFromOperation(
     const access = getAccessOverride(context, operation) ?? "public";
     diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
   }
+  // register the streamed payload type for stream request bodies (handles spread streams)
+  const requestStreamMeta = getStreamMetadata(program, httpOperation.parameters);
+  if (requestStreamMeta && generateConvenient) {
+    const sdkStreamType = diagnostics.pipe(
+      getClientTypeWithDiagnostics(context, requestStreamMeta.streamType, operation),
+    );
+    diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkStreamType));
+    if (requestStreamMeta.contentTypes.some((x) => isMediaTypeJson(x))) {
+      diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkStreamType));
+    }
+    const access = getAccessOverride(context, operation) ?? "public";
+    diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));
+  }
 
   const lroMetaData = getLroMetadata(program, operation);
   for (const response of httpOperation.responses) {
@@ -1727,6 +1756,19 @@ function updateTypesFromOperation(
         }
         const access = getAccessOverride(context, operation) ?? "public";
         diagnostics.pipe(updateUsageOrAccess(context, access, sdkType));
+      }
+      // register the streamed payload type for stream responses
+      const responseStreamMeta = getStreamMetadata(program, innerResponse);
+      if (responseStreamMeta && generateConvenient) {
+        const sdkStreamType = diagnostics.pipe(
+          getClientTypeWithDiagnostics(context, responseStreamMeta.streamType, operation),
+        );
+        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Output, sdkStreamType));
+        if (responseStreamMeta.contentTypes.some((x) => isMediaTypeJson(x))) {
+          diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Json, sdkStreamType));
+        }
+        const access = getAccessOverride(context, operation) ?? "public";
+        diagnostics.pipe(updateUsageOrAccess(context, access, sdkStreamType));
       }
       const headers = getHttpOperationResponseHeaders(innerResponse);
       if (headers) {
@@ -1836,6 +1878,37 @@ function updateExternalUsage(context: TCGCContext): void {
     ) {
       // Propagate External usage to the external type itself and all referenced types
       updateUsageOrAccess(context, UsageFlags.External, sdkType);
+    }
+  }
+}
+
+/**
+ * Helper function to check if a type has input or output usage
+ */
+function hasInputOrOutputUsage(usage: number): boolean {
+  return (usage & (UsageFlags.Input | UsageFlags.Output)) !== 0;
+}
+
+/**
+ * Clean up discriminator info when discriminated subtypes are missing usage.
+ * Remove subtypes without usage from the discriminatedSubtypes map to prevent
+ * language emitters from referencing unavailable types.
+ */
+function cleanupDiscriminatorForUnusedBase(context: TCGCContext): void {
+  for (const sdkType of context.__referencedTypeCache.values()) {
+    if (sdkType.kind !== "model" || !sdkType.discriminatedSubtypes) continue;
+
+    // Remove discriminated subtypes that have no usage
+    for (const [key, subtype] of Object.entries(sdkType.discriminatedSubtypes)) {
+      if (!hasInputOrOutputUsage(subtype.usage)) {
+        delete sdkType.discriminatedSubtypes[key];
+      }
+    }
+
+    // If all subtypes were removed, clear the discriminatedSubtypes entirely
+    if (Object.keys(sdkType.discriminatedSubtypes).length === 0) {
+      sdkType.discriminatedSubtypes = undefined;
+      sdkType.discriminatorProperty = undefined;
     }
   }
 }
@@ -2048,6 +2121,8 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
   updateExternalUsage(context);
   // update discriminated subtypes and filter out duplicate properties from `@hierarchyBuilding`
   diagnostics.pipe(handleLegacyHierarchyBuilding(context));
+  // clean up discriminator info when only subtypes have usage
+  cleanupDiscriminatorForUnusedBase(context);
   // update generated name
   resolveConflictGeneratedName(context);
 

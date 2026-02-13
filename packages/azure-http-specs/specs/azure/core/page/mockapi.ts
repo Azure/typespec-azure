@@ -88,3 +88,34 @@ Scenarios.Azure_Core_Page_withParameterizedNextLink = passOnSuccess([
     kind: "MockApiDefinition",
   },
 ]);
+
+Scenarios.Azure_Core_Page_withRelativeNextLink = passOnSuccess([
+  {
+    // First page request
+    uri: "/azure/core/page/with-relative-next-link",
+    method: "get",
+    request: {},
+    response: {
+      status: 200,
+      body: json({
+        value: [{ id: 1, name: "User1", etag: "11bdc430-65e8-45ad-81d9-8ffa60d55b59" }],
+        // Relative nextLink - client must resolve against endpoint
+        nextLink: dyn`/azure/core/page/with-relative-next-link/page/2`,
+      }),
+    },
+    kind: "MockApiDefinition",
+  },
+  {
+    // Second page request
+    uri: "/azure/core/page/with-relative-next-link/page/2",
+    method: "get",
+    request: {},
+    response: {
+      status: 200,
+      body: json({
+        value: [{ id: 2, name: "User2", etag: "11bdc430-65e8-45ad-81d9-8ffa60d55b59" }],
+      }),
+    },
+    kind: "MockApiDefinition",
+  },
+]);

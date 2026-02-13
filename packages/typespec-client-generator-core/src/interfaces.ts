@@ -81,7 +81,7 @@ export interface TCGCContext {
   getMutatedGlobalNamespace(): Namespace;
   getApiVersionsForType(type: Type): string[];
   setApiVersionsForType(type: Type, apiVersions: string[]): void;
-  getPackageVersions(service?: Namespace): Map<Namespace, string[]>;
+  getPackageVersions(): Map<Namespace, string[]>;
   getPackageVersionEnum(): Map<Namespace, Enum | undefined>;
   getClients(): SdkClient[];
   getClientOrOperationGroup(type: Namespace | Interface): SdkClient | SdkOperationGroup | undefined;
@@ -160,14 +160,15 @@ export enum UsageFlags {
 /**
  * Flags used to indicate how a client is initialized.
  *
- * Note: `Default` and `None` are sentinel values (not bit flags) and should not be combined with other values.
- * - `Default` (-1): Internal use only. Indicates no explicit initialization decorator was set.
- * - `None` (0): Decorator value from TypeSpec. Indicates client constructor should be omitted (hand-written).
- * - `Individually` and `Parent` are bit flags (1, 2) that can be combined using bitwise OR.
+ * - `Default` (0): No user-specific initialization setting has been specified. This is the default value for sub clients when no explicit initialization decorator is set.
+ * - `Individually` (1): The client could be initialized individually.
+ * - `Parent` (2): The client could be initialized by its parent client.
+ * - `CustomizeCode` (4): Indicates that the client initialization should be omitted from generated code and handled manually in custom code.
+ * - `Individually` and `Parent` are bit flags that can be combined using bitwise OR.
  */
 export enum InitializedByFlags {
-  Default = -1,
-  None = 0,
+  Default = 0,
+  CustomizeCode = 1 << 2,
   Individually = 1 << 0,
   Parent = 1 << 1,
 }
@@ -855,6 +856,21 @@ export interface SdkCookieParameter extends SdkModelPropertyTypeBase {
 }
 
 /**
+ * Metadata about a streaming operation body or response.
+ * Present when the body/response is a streaming type (e.g. JsonlStream, SSEStream).
+ */
+export interface SdkStreamMetadata {
+  /** The type of the property decorated with `@body` (e.g. string, bytes). */
+  bodyType: SdkType;
+  /** The stream model type itself (e.g. HttpStream, JsonlStream, SSEStream). */
+  originalType: SdkType;
+  /** The payload model type being streamed (e.g. Thing from JsonlStream<Thing>). */
+  streamType: SdkType;
+  /** Content types associated with this stream (e.g. ["application/jsonl"], ["text/event-stream"]). */
+  contentTypes: string[];
+}
+
+/**
  * Http body parameter.
  */
 export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
@@ -874,6 +890,8 @@ export interface SdkBodyParameter extends SdkModelPropertyTypeBase {
    * For body parameters with spread, there can be multiple paths.
    */
   methodParameterSegments: (SdkMethodParameter | SdkModelPropertyType)[][];
+  /** Stream metadata, present when the body is a streaming type (e.g. JsonlStream, SSEStream). */
+  streamMetadata?: SdkStreamMetadata;
 }
 
 export type SdkHttpParameter =
@@ -905,6 +923,8 @@ export interface SdkMethodResponse {
    * This allows distinguishing between responses without a body and responses with a body of type `Type | null`.
    */
   optional?: boolean;
+  /** Stream metadata, present when the response is a streaming type (e.g. JsonlStream, SSEStream). */
+  streamMetadata?: SdkStreamMetadata;
 }
 
 export interface SdkServiceResponse {
@@ -920,6 +940,8 @@ interface SdkHttpResponseBase extends SdkServiceResponse {
   contentTypes?: string[];
   defaultContentType?: string;
   description?: string;
+  /** Stream metadata, present when the response is a streaming type (e.g. JsonlStream, SSEStream). */
+  streamMetadata?: SdkStreamMetadata;
 }
 
 export interface SdkHttpResponse extends SdkHttpResponseBase {
