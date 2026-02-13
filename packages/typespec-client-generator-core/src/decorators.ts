@@ -999,7 +999,7 @@ export const $clientInitialization: ClientInitializationDecorator = (
     if (options.properties.get("initializedBy")) {
       const value = options.properties.get("initializedBy")!.type;
 
-      const isValidValue = (value: number): boolean => value === 0 || value === 1 || value === 2;
+      const isValidValue = (value: number): boolean => value === 4 || value === 1 || value === 2;
 
       if (value.kind === "EnumMember") {
         if (typeof value.value !== "number" || !isValidValue(value.value)) {
@@ -1023,6 +1023,16 @@ export const $clientInitialization: ClientInitializationDecorator = (
               code: "invalid-initialized-by",
               format: {
                 message: "Please use `InitializedBy` enum to set the value.",
+              },
+              target: target,
+            });
+            return;
+          }
+          if (variant.type.value === 4) {
+            reportDiagnostic(context.program, {
+              code: "invalid-initialized-by",
+              format: {
+                message: "`InitializedBy.customizeCode` cannot be combined with other values.",
               },
               target: target,
             });

@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.65.1
+
+### Bug Fixes
+
+- [#3929](https://github.com/Azure/typespec-azure/pull/3929) Changed `InitializedByFlags.Default` back to `0` to indicate no user-specific initialization setting for sub clients. Renamed `InitializedByFlags.None` to `InitializedByFlags.CustomizeCode` (value 4) and `InitializedBy.none` to `InitializedBy.customizeCode` to indicate that client initialization should be omitted from generated code and handled manually in custom code.
+
+
 ## 0.65.0
 
 ### Deprecations
@@ -9,7 +16,7 @@
 ### Features
 
 - [#3764](https://github.com/Azure/typespec-azure/pull/3764) Add `.crossLanguageDefinitionId`. to `SdkEnumValueType`
-- [#3877](https://github.com/Azure/typespec-azure/pull/3877) Added `InitializedBy.none` (value 0) to allow TypeSpec authors to indicate that client constructors should be omitted and hand-written. Note: The internal `InitializedByFlags.Default` value changed from `0` to `-1` to accommodate this addition.
+- [#3877](https://github.com/Azure/typespec-azure/pull/3877) Added `InitializedBy.customizeCode` (value 4) to allow TypeSpec authors to indicate that client initialization should be omitted from generated code and handled manually in custom code. `InitializedByFlags.Default` remains `0` indicating no user-specific initialization setting for sub clients. Renamed `InitializedBy.none` to `InitializedBy.customizeCode` and `InitializedByFlags.None` to `InitializedByFlags.CustomizeCode`.
 - [#3876](https://github.com/Azure/typespec-azure/pull/3876) Add full support for `Http.File` type with `BinarySerializationOptions` containing `isText`, `contentTypes`, and `filename` properties.
 - [#3827](https://github.com/Azure/typespec-azure/pull/3827) Add `@clientOption` flag for experimental, language-specific flags
 - [#3769](https://github.com/Azure/typespec-azure/pull/3769) Added `apiVersions` Map to `SdkPackage.metadata` to export API versions for multiple services. The Map key is the service namespace full qualified name, and the value is the version string. The existing `apiVersion` property is now deprecated and will be removed in a future release. For single service scenarios, both properties will be populated. For multiple service scenarios, only `apiVersions` will be populated while `apiVersion` will be undefined.
