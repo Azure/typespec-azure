@@ -1,0 +1,108 @@
+name: Documentation Update Scheduler
+
+# This workflow uses the GitHub Copilot SDK to automatically update documentation
+# for any configured package. Configs are defined in eng/scripts/doc-updater/src/configs/.
+#
+# To add a new package: create a config in eng/scripts/doc-updater/src/configs/ and
+# register it in the configs/index.ts registry. Then add it to the 'config' choices below.
+
+on:
+  schedule:
+    # Run weekly on Monday at 9:00 AM UTC
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+    inputs:
+      config:
+        description: "Package config to run"
+        required: true
+        default: "tcgc"
+        type: choice
+        options:
+          - tcgc
+      focus_area:
+        description: "Documentation area to focus on"
+        required: false
+        default: "all"
+        type: string
+      model:
+        description: "Model to use for the agent"
+        required: false
+        default: "claude-opus-4.6"
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-docs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      # The Copilot SDK requires a fine-grained PAT with "Copilot Requests: Read"
+      # permission. The built-in GITHUB_TOKEN does NOT have the required scope.
+      # The SDK checks COPILOT_GITHUB_TOKEN first, then GH_TOKEN, then GITHUB_TOKEN.
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install repo dependencies
+        run: pnpm install
+
+      - name: Install Copilot CLI
+        run: npm install -g @github/copilot
+
+      - name: Install doc-updater dependencies
+        working-directory: eng/scripts/doc-updater
+        run: npm install
+
+      - name: Run doc-updater
+        working-directory: eng/scripts/doc-updater
+        run: |
+          CONFIG="${{ github.event.inputs.config || 'tcgc' }}"
+          FOCUS="${{ github.event.inputs.focus_area || 'all' }}"
+          MODEL="${{ github.event.inputs.model || 'claude-opus-4.6' }}"
+
+          npx tsx src/index.ts \
+            --config "$CONFIG" \
+            --focus "$FOCUS" \
+            --model "$MODEL"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+          branch: automated/doc-update-${{ github.event.inputs.config || 'tcgc' }}
+          title: "[Automated] Update ${{ github.event.inputs.config || 'tcgc' }} documentation"
+          body: |
+            Automated documentation update via Copilot SDK.
+
+            **Config:** ${{ github.event.inputs.config || 'tcgc' }}
+            **Focus area:** ${{ github.event.inputs.focus_area || 'all' }}
+            **Model:** ${{ github.event.inputs.model || 'claude-opus-4.6' }}
+
+            This PR was created by the [doc-update-scheduler workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+          commit-message: "docs: automated update for ${{ github.event.inputs.config || 'tcgc' }}"
+          delete-branch: true
+
+      - name: Summary
+        run: |
+          CONFIG="${{ github.event.inputs.config || 'tcgc' }}"
+          FOCUS="${{ github.event.inputs.focus_area || 'all' }}"
+
+          echo "## Documentation Update Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Config:** $CONFIG" >> $GITHUB_STEP_SUMMARY
+          echo "**Focus Area:** $FOCUS" >> $GITHUB_STEP_SUMMARY
+          echo "**Model:** ${{ github.event.inputs.model || 'claude-opus-4.6' }}" >> $GITHUB_STEP_SUMMARY

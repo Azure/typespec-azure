@@ -30,8 +30,12 @@ If your client emitter has options or global variables, extend [`SdkContext`](..
 import { EmitContext } from "@typespec/compiler";
 import { createSdkContext } from "@azure-tools/typespec-client-generator-core";
 
-interface PythonEmitterOptions extends SdkEmitterOptions {
+// Define your emitter-specific options
+interface PythonEmitterOptions {
   // Options specific to the client emitter
+  packageDir?: string;
+  flavor?: "azure" | "unbranded";
+  // ... other options
 }
 
 interface PythonSdkContext extends SdkContext<PythonEmitterOptions> {
@@ -134,6 +138,11 @@ The initialization parameter can be either [`SdkEndpointParameter`](../reference
 
 **SdkMethodParameter** is a normal client-level parameter that can be used in some of the methods belonging to the client. For type details, refer to the next section.
 
+:::caution[Deprecated Properties]
+- `SdkClient.service` and `SdkOperationGroup.service` are deprecated. Use `services` (plural) instead. These properties will be removed in a future release.
+- `SdkPackage.metadata.apiVersion` is deprecated. Use `apiVersions` instead.
+:::
+
 ### Method
 
 Emitters get all methods belonging to a client with `SdkClientType.methods`. An [`SdkServiceMethod`](../reference/js-api/type-aliases/sdkservicemethod/) represents a client's method.
@@ -203,14 +212,20 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
 
 - [`SdkModelPropertyType`](../reference/js-api/interfaces/sdkmodelpropertytype/) represents a TCGC model property type. It is typically converted from a TypeSpec [`ModelProperty`](https://typespec.io/docs/standard-library/reference/js-api/interfaces/modelproperty/) type. It represents a property of a model and has the following key properties:
   - `flatten`: Indicates if the property can be flattened
-  - `additionalProperties`: Indicates if the model can accept additional properties with a specific type
+  - `discriminator`: Indicates if the property is a discriminator property
+  - `serializationOptions`: Contains serialization metadata (JSON, XML, multipart, etc.)
+  - `encode`: Indicates the encoding style for properties (e.g., for arrays: "pipeDelimited", "commaDelimited", etc.)
+  
+**Model Types:**
+
+- [`SdkModelType`](../reference/js-api/interfaces/sdkmodeltype/) represents a TCGC model type. It has the following key properties related to inheritance and polymorphism:
+  - `additionalProperties`: Indicates if the model can accept additional properties with a specific type (corresponds to TypeSpec `Record<>` types)
   - For discriminated models:
     - `discriminatorProperty`: The property used as a discriminator
     - `discriminatedSubtypes`: List of all subtypes of this discriminated model
   - For subtypes of discriminated models:
     - `discriminatorValue`: The instance value for the discriminator for this subtype
-  - For array properties:
-    - `arrayEncode`: Indicates the encoding style for array properties (if specified).
+  - `baseModel`: The parent model if this model extends another model
 
 ### Example types
 
@@ -228,9 +243,9 @@ For [`SdkModelExampleValue`](../reference/js-api/interfaces/sdkmodelexamplevalue
 
 ### Client Detection
 
-The clients depend on the combination usage of `Namespace`, `Interface`, `@service`, `@client`, `@operationGroup` and `@moveTo`.
+The clients depend on the combination usage of `Namespace`, `Interface`, `@service`, `@client`, `@operationGroup` and `@clientLocation`.
 
-If there is no explicitly defined `@client` or `@operationGroup`, then the first namespace with `@service` is a root client. The nested namespaces and interfaces under that namespace are sub clients with hierarchy. Meanwhile, any operations with `@moveTo` a `string` type target, is a sub client under the root client.
+If there is no explicitly defined `@client` or `@operationGroup`, then the first namespace with `@service` is a root client. The nested namespaces and interfaces under that namespace are sub clients with hierarchy. Meanwhile, any operations with `@clientLocation` targeting a `string` type, create a sub client under the root client.
 
 If there is any `@client` definition or `@operationGroup` definition, then each `@client` is a root client and each `@operationGroup` is a sub client with hierarchy.
 
@@ -249,6 +264,8 @@ Normally, a client's initialization parameters include:
 
 3. **API version parameter**: If the service is versioned, then the API version parameter on method is elevated to client.
    - The API version parameter is detected by parameter name (`api-version` or `apiversion`) or parameter type (API version enum type used in `@versioned` decorator).
+   - The `@apiVersion` decorator can be used to explicitly mark or unmark a parameter as an API version parameter.
+   - The `@clientApiVersions` decorator can be used to define additional API versions beyond those in the `@versioned` enum.
 
 4. **Subscription ID parameter**: If the service is an ARM service, then the subscription ID parameter on method is elevated to client.
 
@@ -256,11 +273,13 @@ The client's initialization way is `undefined`. Emitters can choose how to initi
 
 With `@clientInitialization` decorator, the default behavior may change. New client-level parameters are added. Client initialization way can be specified with initializing by parent client, initializing individually or both.
 
+With `@clientLocation` decorator on a `ModelProperty`, the parameter can be explicitly moved between client and operation levels. For example, a parameter can be elevated from the operation to a client, or a parameter that would normally be elevated to the client (like `subscriptionId` in ARM services) can be kept at the operation level.
+
 ### Method Detection
 
-The methods depend on the combination usage of `Operation`, `@scope`, and `@moveTo`.
+The methods depend on the combination usage of `Operation`, `@scope`, and `@clientLocation`.
 
-A client's operations include the `Operation` under the client's `Namespace` or `Interface`, adding any operations with `@moveTo` current client, deducting any operations with `@scope` out of current emitter or `@moveTo` another client.
+A client's operations include the `Operation` under the client's `Namespace` or `Interface`, adding any operations with `@clientLocation` targeting the current client, deducting any operations with `@scope` out of current emitter or `@clientLocation` targeting another client.
 
 ### Method Parameters Handling
 
