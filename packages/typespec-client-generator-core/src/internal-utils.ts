@@ -120,17 +120,39 @@ export const omitOperation = createStateSymbol("omitOperation");
 export const overrideKey = createStateSymbol("override");
 
 export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean {
-  // Multiple services case is not considered explicit client. It is auto-merged.
   const explicitClients = listScopedDecoratorData(context, clientKey);
-  let multiServices = false;
-  explicitClients.forEach((value) => {
+  let multiServicesOnly = false;
+  let hasNestedClients = false;
+  const multiServiceClientNamespaces: Namespace[] = [];
+
+  explicitClients.forEach((value, key) => {
     if ((value as SdkClient).services.length > 1) {
-      multiServices = true;
+      multiServicesOnly = true;
+      if (key.kind === "Namespace") {
+        multiServiceClientNamespaces.push(key);
+      }
     }
   });
 
+  // Check if any multi-service client has nested @client decorators
+  if (multiServicesOnly) {
+    explicitClients.forEach((_value, key) => {
+      if (key.kind === "Namespace" || key.kind === "Interface") {
+        // Check if this key's namespace is inside a multi-service client namespace
+        let ns = key.namespace;
+        while (ns) {
+          if (multiServiceClientNamespaces.includes(ns)) {
+            hasNestedClients = true;
+            return;
+          }
+          ns = ns.namespace;
+        }
+      }
+    });
+  }
+
   return (
-    (explicitClients.size > 0 && !multiServices) ||
+    (explicitClients.size > 0 && (!multiServicesOnly || hasNestedClients)) ||
     listScopedDecoratorData(context, operationGroupKey).size > 0
   );
 }
@@ -908,32 +930,80 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
 
   const explicitClientNamespaces: Namespace[] = [];
   const explicitServices = new Set<Namespace>();
+  const rootMultiServiceClients: Namespace[] = [];
   listScopedDecoratorData(context, clientKey).forEach((v, k) => {
     // See all explicit clients that in TypeSpec program
     if (!unsafe_Realm.realmForType.has(k)) {
       const sdkClient = v as SdkClient;
       explicitClientNamespaces.push(k as Namespace);
       sdkClient.services.forEach((s) => explicitServices.add(s));
+      if (sdkClient.services.length > 1) {
+        rootMultiServiceClients.push(k as Namespace);
+      }
     }
   });
 
-  let mutator: unsafe_MutatorWithNamespace | undefined;
+  const mutators: unsafe_MutatorWithNamespace[] = [];
 
-  // No explicit clients (choose first service) or explicit client with one service
-  if (explicitClientNamespaces.length === 0 || explicitServices.size === 1) {
-    const serviceNamespace =
-      explicitClientNamespaces.length === 0
-        ? services[0].type
-        : explicitServices.values().next().value!;
+  // No explicit clients
+  if (explicitClientNamespaces.length === 0) {
+    if (services.length === 1) {
+      // Single service, no explicit client
+      const serviceNamespace = services[0].type;
+      const versions = getVersions(context.program, serviceNamespace)[1]?.getVersions();
+      if (!versions) return globalNamespace;
+
+      removeVersionsLargerThanExplicitlySpecified(context, versions);
+      const versionsValues = versions.map((v) => v.value);
+
+      if (
+        context.apiVersion !== undefined &&
+        context.apiVersion !== "latest" &&
+        context.apiVersion !== "all" &&
+        !versionsValues.includes(context.apiVersion)
+      ) {
+        reportDiagnostic(context.program, {
+          code: "api-version-undefined",
+          format: { version: context.apiVersion },
+          target: services[0].type,
+        });
+        context.apiVersion = versionsValues[versionsValues.length - 1];
+      }
+
+      const mutator = getVersioningMutator(
+        context,
+        serviceNamespace,
+        versionsValues[versionsValues.length - 1],
+      );
+      if (mutator) mutators.push(mutator);
+    } else {
+      // Multiple services without explicit @client (Scenario 0)
+      // Apply versioning mutator for each service using its latest version
+      for (const service of services) {
+        const versions = getVersions(context.program, service.type)[1]?.getVersions();
+        if (!versions) continue;
+
+        removeVersionsLargerThanExplicitlySpecified(context, versions);
+        const versionsValues = versions.map((v) => v.value);
+
+        const mutator = getVersioningMutator(
+          context,
+          service.type,
+          versionsValues[versionsValues.length - 1],
+        );
+        if (mutator) mutators.push(mutator);
+      }
+    }
+  }
+  // Explicit client(s) with only one service
+  else if (explicitServices.size === 1) {
+    const serviceNamespace = explicitServices.values().next().value!;
     const versions = getVersions(context.program, serviceNamespace)[1]?.getVersions();
-    // If the single service has no versioning, no mutation needed
     if (!versions) return globalNamespace;
 
-    // Filter versions based on `apiVersion` config
     removeVersionsLargerThanExplicitlySpecified(context, versions);
     const versionsValues = versions.map((v) => v.value);
 
-    // Fix apiVersion setting problem only if there's only one service
     if (
       context.apiVersion !== undefined &&
       context.apiVersion !== "latest" &&
@@ -948,16 +1018,17 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
       context.apiVersion = versionsValues[versionsValues.length - 1];
     }
 
-    mutator = getVersioningMutator(
+    const mutator = getVersioningMutator(
       context,
       serviceNamespace,
       versionsValues[versionsValues.length - 1],
     );
+    if (mutator) mutators.push(mutator);
   }
   // Explicit clients with multiple services
   else {
-    // Currently we do not support multiple explicit clients with multiple services
-    if (explicitClientNamespaces.length > 1 && explicitServices.size > 1) {
+    if (rootMultiServiceClients.length > 1) {
+      // Only one root multi-service client is allowed per package
       reportDiagnostic(context.program, {
         code: "multiple-explicit-clients-multiple-services",
         format: {},
@@ -965,12 +1036,58 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
       });
       return globalNamespace;
     }
+    if (rootMultiServiceClients.length > 0) {
+      // Multi-service client(s) - use the root multi-service client namespace for versioning
+      const mutator = getVersioningMutator(context, rootMultiServiceClients[0]);
+      if (mutator) mutators.push(mutator);
 
-    mutator = getVersioningMutator(context, explicitClientNamespaces[0]);
+      // Also handle any additional single-service clients not covered by multi-service client
+      // (Scenario 1.5: mixing multi-service and single-service clients)
+      const coveredServices = new Set<Namespace>();
+      listScopedDecoratorData(context, clientKey).forEach((v) => {
+        const sdkClient = v as SdkClient;
+        if (sdkClient.services.length > 1) {
+          sdkClient.services.forEach((s) => coveredServices.add(s));
+        }
+      });
+
+      for (const serviceNs of explicitServices) {
+        if (coveredServices.has(serviceNs)) continue;
+        const versions = getVersions(context.program, serviceNs)[1]?.getVersions();
+        if (!versions) continue;
+
+        removeVersionsLargerThanExplicitlySpecified(context, versions);
+        const versionsValues = versions.map((v) => v.value);
+
+        const mutator = getVersioningMutator(
+          context,
+          serviceNs,
+          versionsValues[versionsValues.length - 1],
+        );
+        if (mutator) mutators.push(mutator);
+      }
+    } else {
+      // Multiple explicit clients each with a single service (e.g., Scenario 1)
+      // Apply versioning for each service
+      for (const serviceNs of explicitServices) {
+        const versions = getVersions(context.program, serviceNs)[1]?.getVersions();
+        if (!versions) continue;
+
+        removeVersionsLargerThanExplicitlySpecified(context, versions);
+        const versionsValues = versions.map((v) => v.value);
+
+        const mutator = getVersioningMutator(
+          context,
+          serviceNs,
+          versionsValues[versionsValues.length - 1],
+        );
+        if (mutator) mutators.push(mutator);
+      }
+    }
   }
 
-  if (!mutator) return globalNamespace;
-  const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, [mutator], globalNamespace);
+  if (mutators.length === 0) return globalNamespace;
+  const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, mutators, globalNamespace);
   compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");
   compilerAssert(subgraph.realm !== null, "Should have a realm after mutation");
   context.__mutatedRealm = subgraph.realm;

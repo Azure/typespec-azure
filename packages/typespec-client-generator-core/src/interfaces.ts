@@ -227,6 +227,8 @@ export interface SdkClientType<
   methods: SdkMethod<TServiceOperation>[];
   /** API versions supported for current type. */
   apiVersions: string[];
+  /** Map of service namespace full qualified names to their API versions. Used for cross-service clients. */
+  apiVersionsMap: Record<string, string[]>;
   /** Unique ID for the current type. */
   crossLanguageDefinitionId: string;
   /** The parent client of this client. The structure follows the definition hierarchy. */
