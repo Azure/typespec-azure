@@ -2,6 +2,7 @@ import {
   Enum,
   EnumMember,
   Interface,
+  isTemplateDeclaration,
   Model,
   ModelProperty,
   Namespace,
@@ -213,10 +214,13 @@ function validateClientNamesCore(
   >();
 
   for (const item of items) {
-    // Skip template instantiations (they are not separate type declarations)
-    // Template instantiations have a templateMapper property
-    if ((item.kind === "Model" || item.kind === "Union") && item.templateMapper !== undefined) {
-      continue;
+    // Skip template declarations and template instantiations
+    // Template declarations are the generic definitions like `union Dfe<T> { ... }`
+    // Template instantiations are the concrete uses like `Dfe<int32>` which have a templateMapper property
+    if (item.kind === "Model" || item.kind === "Union") {
+      if (isTemplateDeclaration(item) || item.templateMapper !== undefined) {
+        continue;
+      }
     }
 
     const clientName = getClientNameOverride(tcgcContext, item, scope);

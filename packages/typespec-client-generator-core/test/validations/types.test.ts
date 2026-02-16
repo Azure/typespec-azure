@@ -839,4 +839,39 @@ describe("namespace flag duplicate name validation", () => {
     );
     expectDiagnosticEmpty(duplicateDiagnostics);
   });
+
+  it("no duplicate error for generic union with @alternateType decorator", async () => {
+    // Generic unions with @alternateType decorator and multiple instantiations should not cause duplicate errors
+    const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
+      `
+      @service
+      namespace TestService {
+        model DataFactoryElementModel {}
+
+        @alternateType({identity: "Azure.Core.Expressions.DataFactoryElement"}, "csharp")
+        union Dfe<T> {
+          T,
+          DataFactoryElementModel
+        }
+
+        model TestModel {
+          stringProperty: Dfe<string>;
+          intProperty: Dfe<int32>;
+          boolProperty: Dfe<boolean>;
+        }
+
+        @route("/test")
+        op testOp(): TestModel;
+      }
+      `,
+    );
+
+    // Create SDK context to trigger validation
+    await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-csharp" });
+
+    const duplicateDiagnostics = diagnostics.filter(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+    );
+    expectDiagnosticEmpty(duplicateDiagnostics);
+  });
 });
