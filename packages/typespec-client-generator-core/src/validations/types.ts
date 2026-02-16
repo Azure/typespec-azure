@@ -213,6 +213,12 @@ function validateClientNamesCore(
   >();
 
   for (const item of items) {
+    // Skip template instantiations (they are not separate type declarations)
+    // Template instantiations have a templateMapper property
+    if ((item.kind === "Model" || item.kind === "Union") && item.templateMapper !== undefined) {
+      continue;
+    }
+
     const clientName = getClientNameOverride(tcgcContext, item, scope);
     if (clientName !== undefined) {
       const clientNameDecorator = item.decorators.find((x) => x.definition?.name === "@clientName");

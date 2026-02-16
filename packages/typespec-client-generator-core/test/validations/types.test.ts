@@ -780,4 +780,63 @@ describe("namespace flag duplicate name validation", () => {
       },
     ]);
   });
+
+  it("no duplicate error for generic union template instantiations", async () => {
+    // Generic unions instantiated with different type parameters should not cause duplicate errors
+    const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
+      `
+      @service
+      namespace TestService {
+        union Dfe<T> {
+          default: T,
+          unspecified: "unspecified",
+        }
+
+        model TestModel {
+          intProperty: Dfe<int32>;
+          boolProperty: Dfe<boolean>;
+        }
+
+        @route("/test")
+        op testOp(): TestModel;
+      }
+      `,
+    );
+
+    // Create SDK context to trigger validation
+    await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-csharp" });
+
+    const duplicateDiagnostics = diagnostics.filter(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+    );
+    expectDiagnosticEmpty(duplicateDiagnostics);
+  });
+
+  it("no duplicate error for generic model template instantiations", async () => {
+    // Generic models instantiated with different type parameters should not cause duplicate errors
+    const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
+      `
+      @service
+      namespace TestService {
+        model Response<T> {
+          value: T;
+        }
+
+        @route("/int")
+        op getInt(): Response<int32>;
+
+        @route("/string")
+        op getString(): Response<string>;
+      }
+      `,
+    );
+
+    // Create SDK context to trigger validation
+    await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-csharp" });
+
+    const duplicateDiagnostics = diagnostics.filter(
+      (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+    );
+    expectDiagnosticEmpty(duplicateDiagnostics);
+  });
 });
