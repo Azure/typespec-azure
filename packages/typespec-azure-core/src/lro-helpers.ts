@@ -59,7 +59,6 @@ import {
   type PollingLocationInfo,
   pollingOptionsKind,
   type StatusMonitorMetadata,
-  type StatusMonitorPollingLocationInfo,
 } from "./decorators/polling-location.js";
 import { PollingOperationKey } from "./decorators/polling-operation.js";
 import type { PropertyMap } from "./lro-info.js";
@@ -841,7 +840,6 @@ function getStatusMonitorLinksFromModel(
   program: Program,
   model: Model,
 ): StatusMonitorLinkData | undefined {
-  let pollingData: StatusMonitorPollingLocationInfo | undefined = undefined;
   let pollingLinks: ModelProperty[] | undefined = filterModelProperties(model, (prop) =>
     isPollingLocation(program, prop),
   );
@@ -851,7 +849,7 @@ function getStatusMonitorLinksFromModel(
     pollingLinks = pollingLinks.filter((p) => !isBody(program, p) && !isBodyRoot(program, p));
   }
   const pollingProperty = pollingLinks[0];
-  pollingData = getPollingLocationInfo(program, pollingProperty);
+  const pollingData = getPollingLocationInfo(program, pollingProperty);
   const pollingLink = createOperationLink(program, pollingProperty);
   const monitorInfo = getStatusMonitorInfo(program, pollingLink, pollingData);
   if (monitorInfo === undefined) return undefined;
