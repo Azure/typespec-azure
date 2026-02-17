@@ -1,4 +1,5 @@
 import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
+import { strictEqual } from "assert";
 import { describe, it } from "vitest";
 import {
   createClientCustomizationInput,
@@ -804,12 +805,32 @@ describe("namespace flag duplicate name validation", () => {
     );
 
     // Create SDK context to trigger validation
-    await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-csharp" });
+    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-csharp" });
 
     const duplicateDiagnostics = diagnostics.filter(
       (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
     );
     expectDiagnosticEmpty(duplicateDiagnostics);
+
+    // Validate the TestModel shape - it should have two properties with union types
+    const testModel = context.sdkPackage.models.find((m) => m.name === "TestModel");
+    strictEqual(testModel !== undefined, true, "TestModel should exist");
+    strictEqual(testModel!.properties.length, 2, "TestModel should have 2 properties");
+    
+    const intProp = testModel!.properties.find((p) => p.kind === "property" && p.name === "intProperty");
+    const boolProp = testModel!.properties.find((p) => p.kind === "property" && p.name === "boolProperty");
+    
+    strictEqual(intProp !== undefined, true, "intProperty should exist");
+    strictEqual(boolProp !== undefined, true, "boolProperty should exist");
+    
+    // Both properties should have union types
+    strictEqual(intProp!.type.kind, "union", "intProperty should be a union type");
+    strictEqual(boolProp!.type.kind, "union", "boolProperty should be a union type");
+    
+    // The union names should include the template parameter (e.g., "DfeInt32", "DfeBoolean")
+    strictEqual(intProp!.type.name.startsWith("Dfe"), true, "intProperty union name should start with 'Dfe'");
+    strictEqual(boolProp!.type.name.startsWith("Dfe"), true, "boolProperty union name should start with 'Dfe'");
+    strictEqual(intProp!.type.name !== boolProp!.type.name, true, "The two union types should have different names");
   });
 
   it("no duplicate error for generic model template instantiations", async () => {
@@ -832,12 +853,27 @@ describe("namespace flag duplicate name validation", () => {
     );
 
     // Create SDK context to trigger validation
-    await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-csharp" });
+    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-csharp" });
 
     const duplicateDiagnostics = diagnostics.filter(
       (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
     );
     expectDiagnosticEmpty(duplicateDiagnostics);
+
+    // Validate that both response types are generated with unique names
+    const responseModels = context.sdkPackage.models.filter((m) => m.name.startsWith("Response"));
+    strictEqual(responseModels.length, 2, "Should have 2 Response model instantiations");
+    
+    // The models should have different names (e.g., "ResponseInt32", "ResponseString")
+    const names = responseModels.map((m) => m.name).sort();
+    strictEqual(names[0] !== names[1], true, "The two Response models should have different names");
+    
+    // Each model should have a 'value' property with the correct type
+    const intResponse = responseModels.find((m) => m.properties.find((p) => p.kind === "property" && p.type.kind === "int32"));
+    const stringResponse = responseModels.find((m) => m.properties.find((p) => p.kind === "property" && p.type.kind === "string"));
+    
+    strictEqual(intResponse !== undefined, true, "Should have a Response model with int32 value");
+    strictEqual(stringResponse !== undefined, true, "Should have a Response model with string value");
   });
 
   it("no duplicate error for generic union with @alternateType decorator", async () => {
@@ -867,11 +903,33 @@ describe("namespace flag duplicate name validation", () => {
     );
 
     // Create SDK context to trigger validation
-    await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-csharp" });
+    const context = await createSdkContextForTester(program, { emitterName: "@azure-tools/typespec-csharp" });
 
     const duplicateDiagnostics = diagnostics.filter(
       (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
     );
     expectDiagnosticEmpty(duplicateDiagnostics);
+
+    // Validate the TestModel shape
+    const testModel = context.sdkPackage.models.find((m) => m.name === "TestModel");
+    strictEqual(testModel !== undefined, true, "TestModel should exist");
+    strictEqual(testModel!.properties.length, 3, "TestModel should have 3 properties");
+    
+    const stringProp = testModel!.properties.find((p) => p.kind === "property" && p.name === "stringProperty");
+    const intProp = testModel!.properties.find((p) => p.kind === "property" && p.name === "intProperty");
+    const boolProp = testModel!.properties.find((p) => p.kind === "property" && p.name === "boolProperty");
+    
+    strictEqual(stringProp !== undefined, true, "stringProperty should exist");
+    strictEqual(intProp !== undefined, true, "intProperty should exist");
+    strictEqual(boolProp !== undefined, true, "boolProperty should exist");
+    
+    // All properties should have union types
+    strictEqual(stringProp!.type.kind, "union", "stringProperty should be a union type");
+    strictEqual(intProp!.type.kind, "union", "intProperty should be a union type");
+    strictEqual(boolProp!.type.kind, "union", "boolProperty should be a union type");
+    
+    // The union names should be unique for each template instantiation
+    const unionNames = new Set([stringProp!.type.name, intProp!.type.name, boolProp!.type.name]);
+    strictEqual(unionNames.size, 3, "All three union types should have unique names");
   });
 });
