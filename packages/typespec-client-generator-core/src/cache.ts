@@ -394,7 +394,7 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
         target: ns,
       });
     });
-    let originalName = service.name;
+    let originalName;
     const clientNameOverride = getClientNameOverride(context, service);
     if (clientNameOverride) {
       originalName = clientNameOverride;
