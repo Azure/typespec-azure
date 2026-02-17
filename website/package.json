@@ -19,7 +19,7 @@
     "@astrojs/starlight": "^0.37.0",
     "@docsearch/css": "^4.1.0",
     "@docsearch/js": "^4.1.0",
-    "@fluentui/react-components": "~9.72.3",
+    "@fluentui/react-components": "~9.73.0",
     "@typespec/playground": "workspace:^",
     "astro": "^5.16.5",
     "es-module-shims": "~2.8.0",

@@ -9,7 +9,7 @@
     "url": "git+https://github.com/Azure/typespec-azure.git"
   },
   "engines": {
-    "vscode": "^1.108.0"
+    "vscode": "^1.109.0"
   },
   "extensionDependencies": [
     "typespec.typespec-vscode"
@@ -35,8 +35,8 @@
     "lint:fix": "eslint . --fix "
   },
   "devDependencies": {
-    "@types/node": "~25.0.2",
-    "@types/vscode": "~1.108.1",
+    "@types/node": "~25.2.3",
+    "@types/vscode": "~1.109.0",
     "@vscode/vsce": "~3.7.1",
     "esbuild": "^0.27.0",
     "typescript": "~5.9.2"
