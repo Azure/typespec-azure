@@ -10,7 +10,6 @@ test.describe("typespec-azure-playground-website UI tests", () => {
     const samplesButton = page.locator('button[aria-label="Browse samples"]');
     await samplesButton.click();
     await page.locator("text=Azure Resource Manager framework").first().click();
-    const outputContainer = page.locator("_react=FileOutput");
-    await expect(outputContainer).toContainText(`"title": "ContosoProviderHubClient"`);
+    await expect(page.getByText(`"title": "ContosoProviderHubClient"`)).toBeVisible();
   });
 });
