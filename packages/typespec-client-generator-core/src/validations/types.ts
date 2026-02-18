@@ -2,7 +2,6 @@ import {
   Enum,
   EnumMember,
   Interface,
-  isTemplateDeclaration,
   Model,
   ModelProperty,
   Namespace,
@@ -26,7 +25,6 @@ import {
   listScopedDecoratorData,
 } from "../internal-utils.js";
 import { reportDiagnostic } from "../lib.js";
-import { getLibraryName } from "../public-utils.js";
 
 export function validateTypes(context: TCGCContext) {
   validateClientNames(context);
@@ -215,12 +213,6 @@ function validateClientNamesCore(
   >();
 
   for (const item of items) {
-    // Skip template declarations (the generic definitions like `union Dfe<T> { ... }`)
-    // These are not concrete types and should not be validated
-    if ((item.kind === "Model" || item.kind === "Union") && isTemplateDeclaration(item)) {
-      continue;
-    }
-
     const clientName = getClientNameOverride(tcgcContext, item, scope);
     if (clientName !== undefined) {
       const clientNameDecorator = item.decorators.find((x) => x.definition?.name === "@clientName");
@@ -228,14 +220,8 @@ function validateClientNamesCore(
         duplicateTracker.track(clientName, [item, clientNameDecorator.node]);
       }
     } else {
-      // For template instantiations, use getLibraryName which includes template parameter suffixes
-      // For non-template types, getLibraryName returns the same as item.name
-      const name = (item.kind === "Model" || item.kind === "Union") 
-        ? getLibraryName(tcgcContext, item, scope)
-        : typeof item.name === "string" ? item.name : undefined;
-      
-      if (name !== undefined && name !== "") {
-        duplicateTracker.track(name, item);
+      if (item.name !== undefined && typeof item.name === "string") {
+        duplicateTracker.track(item.name, item);
       }
     }
   }
