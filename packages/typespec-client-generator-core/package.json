@@ -1,6 +1,6 @@
 {
   "name": "@azure-tools/typespec-client-generator-core",
-  "version": "0.65.1",
+  "version": "0.65.2",
   "author": "Microsoft Corporation",
   "description": "TypeSpec Data Plane Generation library",
   "homepage": "https://azure.github.io/typespec-azure",
