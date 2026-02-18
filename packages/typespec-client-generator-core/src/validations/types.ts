@@ -214,15 +214,6 @@ function validateClientNamesCore(
   >();
 
   for (const item of items) {
-    // Skip template declarations and template instantiations
-    // Template declarations are the generic definitions like `union Dfe<T> { ... }`
-    // Template instantiations are the concrete uses like `Dfe<int32>` which have a templateMapper property
-    if (item.kind === "Model" || item.kind === "Union") {
-      if (isTemplateDeclaration(item) || item.templateMapper !== undefined) {
-        continue;
-      }
-    }
-
     const clientName = getClientNameOverride(tcgcContext, item, scope);
     if (clientName !== undefined) {
       const clientNameDecorator = item.decorators.find((x) => x.definition?.name === "@clientName");
