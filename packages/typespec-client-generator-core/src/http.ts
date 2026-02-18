@@ -29,7 +29,7 @@ import {
   isPathParam,
   isQueryParam,
 } from "@typespec/http";
-import { getStreamMetadata } from "@typespec/http/experimental";
+import { StreamMetadata, getStreamMetadata } from "@typespec/http/experimental";
 import { camelCase } from "change-case";
 import { getResponseAsBool } from "./decorators.js";
 import {
@@ -48,6 +48,7 @@ import {
   SdkPathParameter,
   SdkQueryParameter,
   SdkServiceResponseHeader,
+  SdkStreamMetadata,
   SdkType,
   TCGCContext,
 } from "./interfaces.js";
@@ -83,6 +84,29 @@ import {
   getTypeSpecBuiltInType,
   isReadOnly,
 } from "./types.js";
+
+function buildSdkStreamMetadata(
+  context: TCGCContext,
+  tspStreamMetadata: StreamMetadata,
+  operation: Operation,
+): [SdkStreamMetadata, readonly Diagnostic[]] {
+  const diagnostics = createDiagnosticCollector();
+  const bodyType = diagnostics.pipe(
+    getClientTypeWithDiagnostics(context, tspStreamMetadata.bodyType, operation),
+  );
+  const originalType = diagnostics.pipe(
+    getClientTypeWithDiagnostics(context, tspStreamMetadata.originalType, operation),
+  );
+  const streamType = diagnostics.pipe(
+    getClientTypeWithDiagnostics(context, tspStreamMetadata.streamType, operation),
+  );
+  return diagnostics.wrap({
+    bodyType,
+    originalType,
+    streamType,
+    contentTypes: [...tspStreamMetadata.contentTypes],
+  });
+}
 
 export function getSdkHttpOperation(
   context: TCGCContext,
@@ -255,10 +279,14 @@ function getSdkHttpParameters(
 
       addContentTypeInfoToBodyParam(context, httpOperation, retval.bodyParam);
 
-      // map stream request body type to bytes
-      if (getStreamMetadata(context.program, httpOperation.parameters)) {
+      // map stream request body type to bytes, but preserve stream metadata
+      const requestStreamMeta = getStreamMetadata(context.program, httpOperation.parameters);
+      if (requestStreamMeta) {
         retval.bodyParam.type = diagnostics.pipe(
           getStreamAsBytes(context, retval.bodyParam.type.__raw!),
+        );
+        retval.bodyParam.streamMetadata = diagnostics.pipe(
+          buildSdkStreamMetadata(context, requestStreamMeta, httpOperation.operation),
         );
         // eslint-disable-next-line @typescript-eslint/no-deprecated
         retval.bodyParam.correspondingMethodParams.map((p) => (p.type = retval.bodyParam!.type));
@@ -533,6 +561,7 @@ function getSdkHttpResponseAndExceptions(
     let body: Type | undefined;
     let type: SdkType | undefined;
     let contentTypes: string[] = [];
+    let streamMetadata: SdkStreamMetadata | undefined;
 
     for (const innerResponse of response.responses) {
       const defaultContentType = innerResponse.body?.contentTypes.includes("application/json")
@@ -568,9 +597,13 @@ function getSdkHttpResponseAndExceptions(
         contentTypes = contentTypes.concat(innerResponse.body.contentTypes);
         body =
           body.kind === "Model" ? getEffectivePayloadType(context, body, Visibility.Read) : body;
-        if (getStreamMetadata(context.program, innerResponse)) {
-          // map stream response body type to bytes
+        const responseStreamMeta = getStreamMetadata(context.program, innerResponse);
+        if (responseStreamMeta) {
+          // map stream response body type to bytes, but preserve stream metadata
           type = diagnostics.pipe(getStreamAsBytes(context, innerResponse.body.type));
+          streamMetadata = diagnostics.pipe(
+            buildSdkStreamMetadata(context, responseStreamMeta, httpOperation.operation),
+          );
         } else {
           type = diagnostics.pipe(
             getClientTypeWithDiagnostics(context, body, httpOperation.operation),
@@ -595,6 +628,7 @@ function getSdkHttpResponseAndExceptions(
         getActualClientType(client.__raw),
       ),
       description: response.description,
+      streamMetadata,
     };
 
     if (
