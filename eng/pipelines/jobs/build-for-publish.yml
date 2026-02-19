@@ -31,7 +31,6 @@ jobs:
 
       - task: AzureCLI@2
         displayName: Upload scenario manifest
-        condition: eq(variables['PUBLISH_PKG_AZURE_TOOLS_AZURE_HTTP_SPECS'], 'true')
         inputs:
           workingDirectory: packages/azure-http-specs
           azureSubscription: "TypeSpec Storage"
