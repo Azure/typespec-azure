@@ -1226,8 +1226,7 @@ export function getClientNamespace(
     // if the override matches or extends the namespace flag, no replacement is needed
     if (
       context.namespaceFlag &&
-      (override === context.namespaceFlag ||
-        override.startsWith(context.namespaceFlag + "."))
+      (override === context.namespaceFlag || override.startsWith(context.namespaceFlag + "."))
     ) {
       return override;
     }
