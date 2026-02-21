@@ -75,7 +75,7 @@ union ProvisioningState {
 /** Employee update request body */
 model EmployeeUpdate {
   /** Resource tags. */
-  ...ArmTagsProperty;
+  ...Azure.ResourceManager.Foundations.ArmTagsProperty;
 
   /** The resource-specific properties for this resource. */
   properties?: EmployeeUpdateProperties;
