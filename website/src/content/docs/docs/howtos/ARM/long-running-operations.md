@@ -47,11 +47,7 @@ Make sure `FinalResult` is set to the resource type so that the final polling re
 ```typespec
 op createOrUpdate is ArmResourceCreateOrReplaceAsync<
   MyResource,
-  LroHeaders = ArmLroLocationHeader<
-    Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
-    MyResource,
-    string
-  > &
+  LroHeaders = ArmLroLocationHeader<FinalResult = MyResource> &
     Azure.Core.Foundations.RetryAfterHeader
 >;
 ```
@@ -83,8 +79,7 @@ op update is ArmResourcePatchAsync<MyResource, MyResourceProperties>;
 The default `LroHeaders` for PATCH is:
 
 ```
-ArmLroLocationHeader<Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>, MyResource, string>
-  & Azure.Core.Foundations.RetryAfterHeader
+ArmLroLocationHeader<FinalResult = MyResource> & Azure.Core.Foundations.RetryAfterHeader
 ```
 
 ### Customizing to use an Azure-AsyncOperation header
@@ -170,11 +165,7 @@ op startMigration is ArmResourceActionAsync<MyResource, MigrationRequest, Migrat
 The default `LroHeaders` for a POST action is:
 
 ```
-ArmLroLocationHeader<
-  Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
-  MigrationResponse,
-  string
-> & Azure.Core.Foundations.RetryAfterHeader
+ArmLroLocationHeader<FinalResult = MigrationResponse> & Azure.Core.Foundations.RetryAfterHeader
 ```
 
 ### Default action with no response content
@@ -186,11 +177,7 @@ op restart is ArmResourceActionNoResponseContentAsync<MyResource, RestartRequest
 The default `LroHeaders` for a no-content POST action is:
 
 ```
-ArmLroLocationHeader<
-  Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
-  void,
-  string
-> & Azure.Core.Foundations.RetryAfterHeader
+ArmLroLocationHeader<FinalResult = void> & Azure.Core.Foundations.RetryAfterHeader
 ```
 
 ### Customizing to use an Azure-AsyncOperation header
