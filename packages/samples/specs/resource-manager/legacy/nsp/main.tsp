@@ -16,7 +16,7 @@ namespace Microsoft.ContosoProviderHub;
 
 /** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
+  /** 2025-11-19-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
   `2025-11-19-preview`,
 }
