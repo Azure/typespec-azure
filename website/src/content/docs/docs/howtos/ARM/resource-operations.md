@@ -85,6 +85,22 @@ op get is ArmResourceRead<MyResource>;
 - **get**: The name of the operation passed on to clients.
 - **Resource**: A reference to your resource type.
 
+### Resource Check Existence Operations (HEAD)
+
+The check existence operation uses a HEAD request to efficiently determine whether a resource exists
+without returning the resource body. This is useful when you only need to verify a resource's
+existence and do not need to retrieve its full representation.
+
+```typespec
+op checkExistence is ArmResourceCheckExistence<MyResource>;
+```
+
+| Operation       | TypeSpec                                                    |
+| --------------- | ----------------------------------------------------------- |
+| Check Existence | `checkExistence is ArmResourceCheckExistence<ResourceType>` |
+
+This operation returns a 204 response if the resource exists, or a 404 response if it does not.
+
 ### Resource CreateOrUpdate Operations (PUT)
 
 The CreateOrUpdate operation may be synchronous (The operation may always complete before a response
@@ -117,16 +133,20 @@ PATCH for Resource tags only, a PATCH for all updateable properties, or a custom
 you should choose the patch for all updateable properties, unless you have a very good reason for
 choosing another PATCH operation.
 
-| Operation Description      | TypeSpec                                                                                                                                   |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Sync TagsOnly PATCH        | `update is ArmTagsPatchSync<ResourceType>`                                                                                                 |
-| Async TagsOnly PATCH       | `update is ArmTagsPatchAsync<ResourceType>`                                                                                                |
-| Sync All Properties PATCH  | `update is ArmCustomPatchSync<ResourceType, Azure.ResourceManager.Foundations.ResourceUpdateModel<ResourceType, ResourcePropertiesType>>`  |
-| Async All Properties PATCH | `update is ArmCustomPatchAsync<ResourceType, Azure.ResourceManager.Foundations.ResourceUpdateModel<ResourceType, ResourcePropertiesType>>` |
+| Operation Description         | TypeSpec                                                                                                                                   |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Sync TagsOnly PATCH           | `update is ArmTagsPatchSync<ResourceType>`                                                                                                 |
+| Async TagsOnly PATCH          | `update is ArmTagsPatchAsync<ResourceType>`                                                                                                |
+| Sync Lifecycle PATCH          | `update is ArmResourcePatchSync<ResourceType, ResourcePropertiesType>`                                                                     |
+| Async Lifecycle PATCH         | `update is ArmResourcePatchAsync<ResourceType, ResourcePropertiesType>`                                                                    |
+| Sync Custom Properties PATCH  | `update is ArmCustomPatchSync<ResourceType, Azure.ResourceManager.Foundations.ResourceUpdateModel<ResourceType, ResourcePropertiesType>>`  |
+| Async Custom Properties PATCH | `update is ArmCustomPatchAsync<ResourceType, Azure.ResourceManager.Foundations.ResourceUpdateModel<ResourceType, ResourcePropertiesType>>` |
 
-The ArmResourcePatch\* templates take the resource type and the resource properties type as
-parameters. The ArmTagsPatch\* templates take the resource type as a parameter. The ArmCustomPatch\*
-templates take the resource type and your custom PATCH request type as parameters.
+The `ArmResourcePatch*` templates use the resource's Lifecycle.Update visibility to automatically
+determine which properties are included in the PATCH schema. They take the resource type and the
+resource properties type as parameters. The `ArmTagsPatch*` templates take the resource type as a
+parameter. The `ArmCustomPatch*` templates take the resource type and your custom PATCH request type
+as parameters.
 
 ### Resource Delete Operations (DELETE)
 
@@ -161,6 +181,11 @@ Arm Resource list operations return a list of Tracked or Proxy Resources at a pa
 | ------------------ | ----------------------------------------------------------- |
 | ListByParent       | `listByWidget is ArmResourceListByParent<ResourceType>`     |
 | ListBySubscription | `listBySubscription is ArmListBySubscription<ResourceType>` |
+| ListAtScope        | `listAtScope is ArmResourceListAtScope<ResourceType>`       |
+
+The `ArmResourceListAtScope` template is used when the scope of the list operation is determined by
+the `BaseParameters` type parameter. This is useful for resources with custom scope requirements
+that do not fit the standard parent or subscription scopes.
 
 ### Resource Actions (POST)
 
@@ -187,6 +212,16 @@ and asynchronous templates for actions that consume and produce information.
 Parameters to the template are the ResourceType, the model for the operation Request body, and the
 model for the operation Response body.
 
+For long-running actions where the response is only available after polling the LRO (rather than
+being returned inline with the initial accepted response), use the `ActionAsync` template:
+
+| Operation                              | TypeSpec                                                       |
+| -------------------------------------- | -------------------------------------------------------------- |
+| Long-running Action (poll for results) | `startProcess is ActionAsync<ResourceType, Request, Response>` |
+
+Unlike `ArmResourceActionAsync`, which may return the response inline, `ActionAsync` always returns
+an accepted LRO response. The final result is obtained by polling the operation.
+
 #### Actions that take input but produce no output (state changing actions)
 
 Operations that make state changes will often take some user configuration, and will return a
@@ -208,6 +243,22 @@ described in the next section of the document:
 
 - [Synchronous Resource List Actions](#synchronous-list-action)
 - [Asynchronous List Action](#asynchronous-list-action)
+
+### Provider Actions (POST)
+
+Provider actions are operations that are not scoped to a specific resource instance but instead
+operate at the provider level. These are useful for operations like performing tenant-wide
+configuration or subscription-level actions that are not tied to a particular resource.
+
+| Operation                         | TypeSpec                                                                        |
+| --------------------------------- | ------------------------------------------------------------------------------- |
+| Synchronous Provider Action       | `myAction is ArmProviderActionSync<Request, Response>`                          |
+| Asynchronous Provider Action      | `myAction is ArmProviderActionAsync<Request, Response>`                         |
+| Provider Action with custom scope | `myAction is ArmProviderActionSync<Request, Response, SubscriptionActionScope>` |
+| Provider Action with no request   | `myAction is ArmProviderActionSync<void, Response>`                             |
+
+By default, provider actions use `TenantActionScope`. You can specify a different scope such as
+`SubscriptionActionScope` or `ExtensionResourceActionScope` using the `Scope` template parameter.
 
 ### Check Name Operations
 
