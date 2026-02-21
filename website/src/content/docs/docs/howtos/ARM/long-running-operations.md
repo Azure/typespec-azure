@@ -146,8 +146,7 @@ To return both headers, use `ArmCombinedLroHeaders`. Keep `FinalResult` as `void
 ```typespec
 op delete is ArmResourceDeleteWithoutOkAsync<
   MyResource,
-  LroHeaders = ArmCombinedLroHeaders<FinalResult = void> &
-    Azure.Core.Foundations.RetryAfterHeader
+  LroHeaders = ArmCombinedLroHeaders<FinalResult = void> & Azure.Core.Foundations.RetryAfterHeader
 >;
 ```
 
@@ -225,7 +224,6 @@ For an action with no response content:
 op restart is ArmResourceActionNoResponseContentAsync<
   MyResource,
   RestartRequest,
-  LroHeaders = ArmCombinedLroHeaders<FinalResult = void> &
-    Azure.Core.Foundations.RetryAfterHeader
+  LroHeaders = ArmCombinedLroHeaders<FinalResult = void> & Azure.Core.Foundations.RetryAfterHeader
 >;
 ```
