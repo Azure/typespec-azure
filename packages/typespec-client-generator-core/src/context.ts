@@ -215,10 +215,13 @@ export async function createSdkContext<
   for (const client of sdkContext.sdkPackage.clients) {
     diagnostics.pipe(await handleClientExamples(sdkContext, client));
   }
-  // Validate cross-namespace type name collisions (including Azure library conflicts since they're included in our models)
-  diagnostics.pipe(validateNamesAcrossNamespaces(sdkContext, "models"));
-  diagnostics.pipe(validateNamesAcrossNamespaces(sdkContext, "enums"));
-  diagnostics.pipe(validateNamesAcrossNamespaces(sdkContext, "unions"));
+  // Validate cross-namespace type name collisions only when the namespace flag is set,
+  // because that's when namespaces are flattened and types with the same name will collide.
+  if (sdkContext.namespaceFlag) {
+    diagnostics.pipe(validateNamesAcrossNamespaces(sdkContext, "models"));
+    diagnostics.pipe(validateNamesAcrossNamespaces(sdkContext, "enums"));
+    diagnostics.pipe(validateNamesAcrossNamespaces(sdkContext, "unions"));
+  }
   sdkContext.diagnostics = [...sdkContext.diagnostics, ...diagnostics.diagnostics];
 
   if (options?.exportTCGCoutput) {

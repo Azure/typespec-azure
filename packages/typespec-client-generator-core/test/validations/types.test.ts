@@ -319,12 +319,14 @@ describe("cross-namespace duplicate name validation", () => {
         namespace ServiceA {
           enum VersionsA { v1 }
           model Foo { a: string; }
+          @route("/a") op getA(): Foo;
         }
         @service
         @versioned(VersionsB)
         namespace ServiceB {
           enum VersionsB { v1 }
           model Foo { b: string; }
+          @route("/b") op getB(): Foo;
         }
         `,
         `
@@ -353,12 +355,14 @@ describe("cross-namespace duplicate name validation", () => {
         namespace ServiceA {
           enum VersionsA { v1 }
           enum Status { Active, Inactive }
+          @route("/a") op getA(@query status: Status): void;
         }
         @service
         @versioned(VersionsB)
         namespace ServiceB {
           enum VersionsB { v1 }
           enum Status { Pending, Complete }
+          @route("/b") op getB(@query status: Status): void;
         }
         `,
         `
