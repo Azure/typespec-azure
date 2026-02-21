@@ -61,7 +61,7 @@ To return both `Azure-AsyncOperation` and `Location` headers, use `ArmCombinedLr
 ```typespec
 op createOrUpdate is ArmResourceCreateOrReplaceAsync<
   MyResource,
-  LroHeaders = ArmCombinedLroHeaders<ArmOperationStatus, MyResource> &
+  LroHeaders = ArmCombinedLroHeaders<FinalResult = MyResource> &
     Azure.Core.Foundations.RetryAfterHeader
 >;
 ```
@@ -105,7 +105,7 @@ To return both headers, use `ArmCombinedLroHeaders`. Set `FinalResult` to the re
 op update is ArmResourcePatchAsync<
   MyResource,
   MyResourceProperties,
-  LroHeaders = ArmCombinedLroHeaders<ArmOperationStatus, MyResource> &
+  LroHeaders = ArmCombinedLroHeaders<FinalResult = MyResource> &
     Azure.Core.Foundations.RetryAfterHeader
 >;
 ```
@@ -146,7 +146,7 @@ To return both headers, use `ArmCombinedLroHeaders`. Keep `FinalResult` as `void
 ```typespec
 op delete is ArmResourceDeleteWithoutOkAsync<
   MyResource,
-  LroHeaders = ArmCombinedLroHeaders<ArmOperationStatus, void> &
+  LroHeaders = ArmCombinedLroHeaders<FinalResult = void> &
     Azure.Core.Foundations.RetryAfterHeader
 >;
 ```
@@ -214,7 +214,7 @@ op startMigration is ArmResourceActionAsync<
   MyResource,
   MigrationRequest,
   MigrationResponse,
-  LroHeaders = ArmCombinedLroHeaders<ArmOperationStatus, MigrationResponse> &
+  LroHeaders = ArmCombinedLroHeaders<FinalResult = MigrationResponse> &
     Azure.Core.Foundations.RetryAfterHeader
 >;
 ```
@@ -225,7 +225,7 @@ For an action with no response content:
 op restart is ArmResourceActionNoResponseContentAsync<
   MyResource,
   RestartRequest,
-  LroHeaders = ArmCombinedLroHeaders<ArmOperationStatus, void> &
+  LroHeaders = ArmCombinedLroHeaders<FinalResult = void> &
     Azure.Core.Foundations.RetryAfterHeader
 >;
 ```
