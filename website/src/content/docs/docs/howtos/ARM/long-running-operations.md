@@ -5,9 +5,10 @@ llmstxt: true
 ---
 
 ARM long-running (asynchronous) operation templates allow you to customize the LRO headers returned
-in the `202 Accepted` response, while retaining the correct `finalResult` value that matches the
-result of the operation. This is done using the `LroHeaders` template parameter available on all
-async operation templates.
+in the initial response, while retaining the correct `finalResult` value that matches the result of
+the operation. This is done using the `LroHeaders` template parameter available on all async
+operation templates. The headers appear in the `201 Created` response for PUT operations and in the
+`202 Accepted` response for PATCH, DELETE, and POST operations.
 
 ## LRO Header Types
 
