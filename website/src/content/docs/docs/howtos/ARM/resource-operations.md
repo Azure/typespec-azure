@@ -8,28 +8,28 @@ llmstxt: true
 
 ### TrackedResource
 
-| Operation             | Recommended | Required | TypeSpec Representation                                         |
-| --------------------- | ----------- | -------- | --------------------------------------------------------------- |
-| GET                   | Yes         | Yes      | `get is ArmResourceRead<Resource>;`                             |
-| CreateOrUpdate (PUT)  | Yes         | Yes      | `createOrUpdate is ArmResourceCreateOrReplaceAsync<Resource>;`  |
-| Tags Update (PATCH)   | No          | Yes\*    | `update is ArmTagsPatchSync<Resource>;`                         |
-| Full Update (PATCH)   | Yes         | No\*     | `update is ArmResourcePatchSync<Resource, ResourceProperties>;` |
-| Delete                | Yes         | Yes      | `delete is ArmResourceDeleteSync<Resource>;`                    |
-| List by ResourceGroup | Yes         | Yes      | `listByResourceGroup is ArmResourceListByParent<Resource>;`     |
-| List by Subscription  | Yes         | Yes      | `listBySubscription is ArmListBySubscription<Resource>;`        |
+| Operation             | Recommended | Required | TypeSpec Representation                                        |
+| --------------------- | ----------- | -------- | -------------------------------------------------------------- |
+| GET                   | Yes         | Yes      | `get is ArmResourceRead<Resource>;`                            |
+| CreateOrUpdate (PUT)  | Yes         | Yes      | `createOrUpdate is ArmResourceCreateOrReplaceAsync<Resource>;` |
+| Tags Update (PATCH)   | No          | Yes\*    | `update is ArmTagsPatchSync<Resource>;`                        |
+| Full Update (PATCH)   | Yes         | No\*     | `update is ArmCustomPatchSync<Resource, PatchRequest>;`        |
+| Delete                | Yes         | Yes      | `delete is ArmResourceDeleteSync<Resource>;`                   |
+| List by ResourceGroup | Yes         | Yes      | `listByResourceGroup is ArmResourceListByParent<Resource>;`    |
+| List by Subscription  | Yes         | Yes      | `listBySubscription is ArmListBySubscription<Resource>;`       |
 
 \* Arm requires that, at minimum, a TrackedResource can update Tags. A Full PATCH of all updateable
 resource properties is preferred.
 
 ### Proxy Resource
 
-| Operation            | Recommended | Required | TypeSpec Representation                                         |
-| -------------------- | ----------- | -------- | --------------------------------------------------------------- |
-| GET                  | Yes         | Yes      | `get is ArmResourceRead<Resource>;`                             |
-| CreateOrUpdate (PUT) | Yes         | No\*     | `createOrUpdate is ArmResourceCreateOrReplaceAsync<Resource>;`  |
-| Update (PATCH)       | Yes         | No       | `update is ArmResourcePatchSync<Resource, ResourceProperties>;` |
-| Delete               | Yes         | No\*     | `delete is ArmResourceDeleteSync<Resource>;`                    |
-| List by Parent       | Yes         | Yes      | `listByParent is ArmResourceListByParent<Resource>;`            |
+| Operation            | Recommended | Required | TypeSpec Representation                                        |
+| -------------------- | ----------- | -------- | -------------------------------------------------------------- |
+| GET                  | Yes         | Yes      | `get is ArmResourceRead<Resource>;`                            |
+| CreateOrUpdate (PUT) | Yes         | No\*     | `createOrUpdate is ArmResourceCreateOrReplaceAsync<Resource>;` |
+| Update (PATCH)       | Yes         | No       | `update is ArmCustomPatchSync<Resource, PatchRequest>;`        |
+| Delete               | Yes         | No\*     | `delete is ArmResourceDeleteSync<Resource>;`                   |
+| List by Parent       | Yes         | Yes      | `listByParent is ArmResourceListByParent<Resource>;`           |
 
 \* Note that, if a resource implements Create, it is highly recommended that it implement delete as
 well, and vice-versa.
@@ -117,17 +117,14 @@ PATCH for Resource tags only, a PATCH for all updateable properties, or a custom
 you should choose the patch for all updateable properties, unless you have a very good reason for
 choosing another PATCH operation.
 
-| Operation Description      | TypeSpec                                                                |
-| -------------------------- | ----------------------------------------------------------------------- |
-| Sync TagsOnly PATCH        | `update is ArmTagsPatchSync<ResourceType>`                              |
-| Async TagsOnly PATCH       | `update is ArmTagsPatchAsync<ResourceType>`                             |
-| Sync All Properties PATCH  | `update is ArmResourcePatchSync<ResourceType, ResourcePropertiesType>`  |
-| Async All Properties PATCH | `update is ArmResourcePatchAsync<ResourceType, ResourcePropertiesType>` |
-| Sync Custom PATCH          | `update is ArmCustomPatchSync<ResourceType, PatchRequestModel>`         |
-| Async Custom PATCH         | `update is ArmCustomPatchAsync<ResourceType, PatchRequestModel>`        |
+| Operation Description      | TypeSpec                                                         |
+| -------------------------- | ---------------------------------------------------------------- |
+| Sync TagsOnly PATCH        | `update is ArmTagsPatchSync<ResourceType>`                       |
+| Async TagsOnly PATCH       | `update is ArmTagsPatchAsync<ResourceType>`                      |
+| Sync All Properties PATCH  | `update is ArmCustomPatchSync<ResourceType, PatchRequestModel>`  |
+| Async All Properties PATCH | `update is ArmCustomPatchAsync<ResourceType, PatchRequestModel>` |
 
-The ArmResourcePatch\* templates take the resource type and the resource properties type as
-parameters. The ArmTagsPatch\* templates take the resource type as a parameter. The ArmCustomPatch\*
+The ArmTagsPatch\* templates take the resource type as a parameter. The ArmCustomPatch\*
 templates take the resource type and your custom PATCH request type as parameters.
 
 ### Resource Delete Operations (DELETE)
@@ -299,7 +296,7 @@ model Widget {
   name: string;
   color: string;
 }
-@armResourceOperations
+@armResourceOperations(MyResource)
 interface MyResourceOperations {
   // ResourceListResult<T> produces a Pageable list of T
   listWidgets is ArmResourceListActionSync<MyResource, ResourceListResult<Widget>>;
@@ -330,7 +327,7 @@ model Widget {
   name: string;
   color: string;
 }
-@armResourceOperations
+@armResourceOperations(MyResource)
 interface MyResourceOperations {
   // ResourceListResult<T> produces a Pageable list of T
   listWidgets is ArmResourceListActionAsync<MyResource, ResourceListResult<Widget>>;
