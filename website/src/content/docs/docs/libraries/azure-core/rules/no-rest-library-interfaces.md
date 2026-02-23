@@ -13,7 +13,6 @@ Resource interfaces from the `TypeSpec.Rest.Resource` library are incompatible w
 Extending from `TypeSpec.Rest.Resource.ResourceOperations`:
 
 ```tsp
-@route("bad")
 interface Widgets
   extends TypeSpec.Rest.Resource.ResourceOperations<Widget, Foundations.ErrorResponse> {}
 ```
@@ -27,6 +26,5 @@ interface MyResourceOperations<TResource extends TypeSpec.Reflection.Model> {
   read is ResourceRead<TResource>;
 }
 
-@route("good")
 interface Widgets extends MyResourceOperations<Widget> {}
 ```

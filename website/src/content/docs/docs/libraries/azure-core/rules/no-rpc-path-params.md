@@ -13,7 +13,6 @@ Operations defined using `RpcOperation` or `LongRunningRpcOperation` should not 
 `@path` parameter in an `RpcOperation`:
 
 ```tsp
-@route("/one")
 op testOne is RpcOperation<
   {
     @path bar: string;
@@ -32,7 +31,6 @@ op customOp<TFoo extends TypeSpec.Reflection.Model> is RpcOperation<
   TFoo
 >;
 
-@route("/two")
 op testTwo is customOp<{}>;
 ```
 
@@ -40,7 +38,6 @@ op testTwo is customOp<{}>;
 
 ```tsp
 @pollingOperation(getStatus)
-@route("/lrRpcOp")
 op lrRpcOp is Azure.Core.LongRunningRpcOperation<
   {
     @path foo: string;
@@ -56,7 +53,6 @@ op lrRpcOp is Azure.Core.LongRunningRpcOperation<
 `RpcOperation` without path parameters:
 
 ```tsp
-@route("/analyze")
 op analyze is RpcOperation<
   {
     @body request: AnalysisRequest;
