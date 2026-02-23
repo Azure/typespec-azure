@@ -132,7 +132,7 @@ op Azure.ResourceManager.Operations.list(apiVersion: string, provider: "Microsof
 Operations over private endpoint connection resources.
 
 ```typespec
-interface Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>
+interface Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>
 ```
 
 #### Template Parameters
@@ -141,11 +141,12 @@ interface Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, Resour
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | PrivateEndpointResource | The type of the private endpoint connection resource. You must declare a private endpoint connection resource type in your provider namespace.       |
 | ResourceName            | Optional. The name of the private endpoint connection resource in this context, by default, this is `{targetResourceName}PrivateEndpointConnection`. |
+| ResourceParameter       | Optional. The name parameter model for the private endpoint connection resource. By default, this parameter has no constraints                       |
 
-#### `PrivateEndpoints.ListByParent` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.ListByParent}
+#### `PrivateEndpoints.ListByParent` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.ListByParent}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
@@ -160,10 +161,10 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>
 | Error                | Optional. The error response, if non-standard.                                    |
 | OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.Read` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.Read}
+#### `PrivateEndpoints.Read` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.Read}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.Read(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.Read(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
@@ -178,10 +179,10 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>
 | Error                | Optional. The error response, if non-standard.                                    |
 | OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.CreateOrUpdateAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CreateOrUpdateAsync}
+#### `PrivateEndpoints.CreateOrUpdateAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.CreateOrUpdateAsync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CreateOrUpdateAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.CreateOrUpdateAsync(provider: "Microsoft.ThisWillBeReplaced", resource: Resource): Response | Error
 ```
 
 ##### Template Parameters
@@ -197,10 +198,10 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>
 | Error                | Optional. The error response, if non-standard.                                    |
 | OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.CreateOrReplaceSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CreateOrReplaceSync}
+#### `PrivateEndpoints.CreateOrReplaceSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.CreateOrReplaceSync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CreateOrReplaceSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.CreateOrReplaceSync(provider: "Microsoft.ThisWillBeReplaced", resource: Resource): Response | Error
 ```
 
 ##### Template Parameters
@@ -215,10 +216,10 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>
 | Error                | Optional. The error response, if non-standard.                                    |
 | OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.CreateOrReplaceAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CreateOrReplaceAsync}
+#### `PrivateEndpoints.CreateOrReplaceAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.CreateOrReplaceAsync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CreateOrReplaceAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, resource: Resource): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.CreateOrReplaceAsync(provider: "Microsoft.ThisWillBeReplaced", resource: Resource): Response | Error
 ```
 
 ##### Template Parameters
@@ -234,12 +235,12 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>
 | Error                | Optional. The error response, if non-standard.                                    |
 | OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.CustomPatchAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CustomPatchAsync}
+#### `PrivateEndpoints.CustomPatchAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.CustomPatchAsync}
 
 A long-running resource update using a custom PATCH payload (Asynchronous) to update a PrivateEndpointConnection to a resource.
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CustomPatchAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, properties: PatchModel): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.CustomPatchAsync(provider: "Microsoft.ThisWillBeReplaced", properties: PatchModel): Response | Error
 ```
 
 ##### Template Parameters
@@ -256,10 +257,10 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>
 | Error                | Optional. The error response, if non-standard.                                    |
 | OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.CustomPatchSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CustomPatchSync}
+#### `PrivateEndpoints.CustomPatchSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.CustomPatchSync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.CustomPatchSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string, properties: PatchModel): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.CustomPatchSync(provider: "Microsoft.ThisWillBeReplaced", properties: PatchModel): Response | Error
 ```
 
 ##### Template Parameters
@@ -275,10 +276,10 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>
 | Error                | Optional. The error response, if non-standard.                                    |
 | OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.DeleteAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.DeleteAsync}
+#### `PrivateEndpoints.DeleteAsync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.DeleteAsync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.DeleteAsync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.DeleteAsync(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
@@ -294,10 +295,10 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>
 | Error                | Optional. The error response, if non-standard.                                    |
 | OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.DeleteSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.DeleteSync}
+#### `PrivateEndpoints.DeleteSync` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.DeleteSync}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.DeleteSync(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.DeleteSync(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
@@ -312,10 +313,10 @@ op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>
 | Error                | Optional. The error response, if non-standard.                                    |
 | OverrideResourceName | Optional. The name of the private endpoint connection resource being operated on. |
 
-#### `PrivateEndpoints.DeleteAsyncBase` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.DeleteAsyncBase}
+#### `PrivateEndpoints.DeleteAsyncBase` {#Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.DeleteAsyncBase}
 
 ```typespec
-op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName>.DeleteAsyncBase(provider: "Microsoft.ThisWillBeReplaced", privateEndpointConnectionName: string): Response | Error
+op Azure.ResourceManager.PrivateEndpoints<PrivateEndpointResource, ResourceName, ResourceParameter>.DeleteAsyncBase(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
@@ -348,20 +349,21 @@ interface Employees {
 Operations over private link resources.
 
 ```typespec
-interface Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>
+interface Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName, ResourceParameter>
 ```
 
 #### Template Parameters
 
-| Name                     | Description                                                                                                             |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
-| PrivateLinkResourceModel | The type of the private link resource. You must declare a private link resource type in your provider namespace.        |
-| ResourceName             | Optional. The name of the private link resource in this context, by default, this is `{targetResourceName}PrivateLink`. |
+| Name                     | Description                                                                                                                                                                                                                                                                                                                                                          |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PrivateLinkResourceModel | The type of the private link resource. You must declare a private link resource type in your provider namespace.                                                                                                                                                                                                                                                     |
+| ResourceName             | Optional. The name of the private link resource in this context, by default, this is `{targetResourceName}PrivateLink`.                                                                                                                                                                                                                                              |
+| ResourceParameter        | Optional. The name parameter model for the private link resource. By default, this is `PrivateLinkResourceParameter`, which has a required path parameter for the private link resource name. You can use this template parameter to specify a different parameter type if needed, but it must include at least a path parameter for the private link resource name. |
 
-#### `PrivateLinks.ListByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>.ListByParent}
+#### `PrivateLinks.ListByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName, ResourceParameter>.ListByParent}
 
 ```typespec
-op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName, ResourceParameter>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
@@ -376,10 +378,10 @@ op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>.Li
 | Error                | Optional. The error response, if non-standard.                     |
 | OverrideResourceName | Optional. The name of the private link resource being operated on. |
 
-#### `PrivateLinks.ListSinglePageByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>.ListSinglePageByParent}
+#### `PrivateLinks.ListSinglePageByParent` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName, ResourceParameter>.ListSinglePageByParent}
 
 ```typespec
-op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName, ResourceParameter>.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
@@ -394,10 +396,10 @@ op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>.Li
 | Error                | Optional. The error response, if non-standard.                     |
 | OverrideResourceName | Optional. The name of the private link resource being operated on. |
 
-#### `PrivateLinks.Read` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>.Read}
+#### `PrivateLinks.Read` {#Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName, ResourceParameter>.Read}
 
 ```typespec
-op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName>.Read(provider: "Microsoft.ThisWillBeReplaced", privateLinkResourceName: string): Response | Error
+op Azure.ResourceManager.PrivateLinks<PrivateLinkResourceModel, ResourceName, ResourceParameter>.Read(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
@@ -1451,21 +1453,22 @@ op Azure.ResourceManager.checkLocalNameAvailability(apiVersion: string, subscrip
 Operations over network security perimeter resources.
 
 ```typespec
-interface Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>
+interface Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>
 ```
 
 #### Template Parameters
 
-| Name                          | Description                                                                                                                                                                   |
-| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| NspConfigurationResourceModel | The type of the network security perimeter configuration resource. You must declare a network security perimeter configuration resource type in your provider namespace.      |
-| NspConfigurationKeyName       | Optional. The NSP configuration resource name parameter. By default, this is `networkSecurityPerimeterConfigurationName`.                                                     |
-| ResourceName                  | Optional. The name of the network security perimeter configuration resource in this context, by default, this is `{targetResourceName}NetworkSecurityPerimeterConfiguration`. |
+| Name                          | Description                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| NspConfigurationResourceModel | The type of the network security perimeter configuration resource. You must declare a network security perimeter configuration resource type in your provider namespace.                                                                                                                                                                                                                                                                                  |
+| NspConfigurationKeyName       | Optional. The NSP configuration resource name parameter. By default, this is `networkSecurityPerimeterConfigurationName`.                                                                                                                                                                                                                                                                                                                                 |
+| ResourceName                  | Optional. The name of the network security perimeter configuration resource in this context, by default, this is `{targetResourceName}NetworkSecurityPerimeterConfiguration`.                                                                                                                                                                                                                                                                             |
+| ResourceParameter             | Optional. The name parameter model for the network security perimeter configuration resource. By default, this is `NspConfigurationNameParameter`, which has a required path parameter for the network security perimeter configuration resource name. You can use this template parameter to specify a different parameter type if needed, but it must include at least a path parameter for the network security perimeter configuration resource name. |
 
-#### `NspConfigurationOperations.ListByParent` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.ListByParent}
+#### `NspConfigurationOperations.ListByParent` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.ListByParent}
 
 ```typespec
-op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.ListByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
@@ -1480,10 +1483,10 @@ op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfiguration
 | Error                | Optional. The error response, if non-standard.                                                 |
 | OverrideResourceName | Optional. The name of the network security perimeter configuration resource being operated on. |
 
-#### `NspConfigurationOperations.ListSinglePageByParent` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.ListSinglePageByParent}
+#### `NspConfigurationOperations.ListSinglePageByParent` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.ListSinglePageByParent}
 
 ```typespec
-op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.ListSinglePageByParent(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
@@ -1498,10 +1501,10 @@ op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfiguration
 | Error                | Optional. The error response, if non-standard.                                                 |
 | OverrideResourceName | Optional. The name of the network security perimeter configuration resource being operated on. |
 
-#### `NspConfigurationOperations.Read` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.Read}
+#### `NspConfigurationOperations.Read` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.Read}
 
 ```typespec
-op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.Read(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
+op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.Read(provider: "Microsoft.ThisWillBeReplaced"): Response | Error
 ```
 
 ##### Template Parameters
@@ -1517,10 +1520,10 @@ op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfiguration
 | Error                | Optional. The error response, if non-standard.                                                                           |
 | OverrideResourceName | Optional. The name of the network security perimeter configuration resource being operated on.                           |
 
-#### `NspConfigurationOperations.Action` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.Action}
+#### `NspConfigurationOperations.Action` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.Action}
 
 ```typespec
-op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.Action(provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Error
+op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.Action(provider: "Microsoft.ThisWillBeReplaced", body: Request): Response | Error
 ```
 
 ##### Template Parameters
@@ -1538,10 +1541,10 @@ op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfiguration
 | OverrideResourceName | Optional. The name of the network security perimeter configuration resource being operated on.                           |
 | OptionalRequestBody  | Optional. Indicates if the request body is optional.                                                                     |
 
-#### `NspConfigurationOperations.ActionAsync` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.ActionAsync}
+#### `NspConfigurationOperations.ActionAsync` {#Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.ActionAsync}
 
 ```typespec
-op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName>.ActionAsync(provider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Response | Error
+op Azure.ResourceManager.CommonTypes.NspConfigurationOperations<NspConfigurationResourceModel, NspConfigurationKeyName, ResourceName, ResourceParameter>.ActionAsync(provider: "Microsoft.ThisWillBeReplaced", body: Request): Azure.ResourceManager.ArmAcceptedLroResponse<Description, LroHeaders> | Response | Error
 ```
 
 ##### Template Parameters

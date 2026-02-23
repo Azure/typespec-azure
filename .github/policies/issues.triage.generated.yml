@@ -28,6 +28,8 @@ configuration:
                 - hasLabel:
                     label: emitter:autorest
                 - hasLabel:
+                    label: emitter:client:all
+                - hasLabel:
                     label: eng
                 - hasLabel:
                     label: ide
@@ -53,6 +55,8 @@ configuration:
                   label: lib:azure-http-specs
               - labelAdded:
                   label: emitter:autorest
+              - labelAdded:
+                  label: emitter:client:all
               - labelAdded:
                   label: eng
               - labelAdded:
@@ -81,6 +85,8 @@ configuration:
               - labelRemoved:
                   label: emitter:autorest
               - labelRemoved:
+                  label: emitter:client:all
+              - labelRemoved:
                   label: eng
               - labelRemoved:
                   label: ide
@@ -98,6 +104,8 @@ configuration:
                     label: lib:azure-http-specs
                 - hasLabel:
                     label: emitter:autorest
+                - hasLabel:
+                    label: emitter:client:all
                 - hasLabel:
                     label: eng
                 - hasLabel:

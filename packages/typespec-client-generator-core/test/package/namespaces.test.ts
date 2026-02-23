@@ -629,6 +629,24 @@ it("customization with models from original namespace", async () => {
   strictEqual(ns.namespaces.length, 0);
 });
 
+it("@clientNamespace extending namespace flag should not duplicate", async () => {
+  const { program } = await SimpleTester.compile(
+    `
+      @clientNamespace("Azure.Search.Documents.Indexes")
+      @service
+      namespace Search {
+        op search(): string;
+      }
+    `,
+  );
+  const context = await createSdkContextForTester(program, {
+    namespace: "Azure.Search.Documents",
+  });
+  const sdkPackage = context.sdkPackage;
+  const client = sdkPackage.clients[0];
+  strictEqual(client.namespace, "Azure.Search.Documents.Indexes");
+});
+
 it("@clientNamespace with same value as namespace flag should not duplicate", async () => {
   const { program } = await SimpleTester.compile(
     `

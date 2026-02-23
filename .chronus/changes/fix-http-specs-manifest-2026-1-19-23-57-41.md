@@ -2,7 +2,7 @@
 # Change versionKind to one of: internal, fix, dependencies, feature, deprecation, breaking
 changeKind: internal
 packages:
-  - "@azure-tools/typespec-client-generator-core"
+  - "@azure-tools/azure-http-specs"
 ---
 
-Migrate to new TypeSpec test framework.
+Update how manifest are resolved and published for can i use dashboard
