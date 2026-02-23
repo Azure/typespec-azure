@@ -10,11 +10,11 @@ Check that `@encode` uses a supported encoding for Azure services.
 
 Known supported encodings:
 
-| Target type                            | Supported encodings                   |
-| -------------------------------------- | ------------------------------------- |
-| `utcDateTime` / `offsetDateTime`       | `rfc3339`, `rfc7231`, `unixTimestamp` |
-| `duration`                             | `ISO8601`, `seconds`                  |
-| `bytes`                                | `base64`, `base64url`                 |
+| Target type                      | Supported encodings                   |
+| -------------------------------- | ------------------------------------- |
+| `utcDateTime` / `offsetDateTime` | `rfc3339`, `rfc7231`, `unixTimestamp` |
+| `duration`                       | `ISO8601`, `seconds`                  |
+| `bytes`                          | `base64`, `base64url`                 |
 
 #### ❌ Incorrect
 

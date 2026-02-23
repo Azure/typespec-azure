@@ -49,6 +49,7 @@ op read(): Pet;
 enum PetKind {
   /** A cat. */
   Cat,
+
   /** A dog. */
   Dog,
 }
