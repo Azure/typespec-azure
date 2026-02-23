@@ -28,7 +28,9 @@ model StringList {
 op upload(@body body: StringList): string;
 ```
 
-Note: Arrays in _responses_ are allowed:
+:::note
+Arrays in _responses_ are allowed since response schemas are less likely to require additive changes.
+:::
 
 ```tsp
 op list(@body body: string): string[];

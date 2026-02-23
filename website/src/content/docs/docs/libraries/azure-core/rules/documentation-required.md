@@ -55,4 +55,6 @@ enum PetKind {
 }
 ```
 
+:::note
 Version enums and discriminator enums/unions are exempt from this rule as they are considered self-documenting.
+:::

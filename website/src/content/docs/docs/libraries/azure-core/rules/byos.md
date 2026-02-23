@@ -33,7 +33,9 @@ op uploadFile(
 
 Use the BYOS pattern where the client provides a storage location, instead of directly accepting binary data in the request body.
 
-Binary content types in responses (downloads) are allowed:
+:::note
+Binary content types in responses (downloads) are not affected by this rule.
+:::
 
 ```tsp
 op download(): {

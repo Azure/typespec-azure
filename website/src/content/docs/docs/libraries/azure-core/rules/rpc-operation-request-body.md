@@ -8,6 +8,10 @@ title: "rpc-operation-request-body"
 
 Validates that `RpcOperation` request bodies are used correctly. Operations using HTTP verbs that do not support a body (like `GET` or `DELETE`) should not define one.
 
+:::note
+This rule only applies to `@get` and `@delete` operations. Other HTTP verbs like `@post`, `@put`, and `@patch` can have request bodies.
+:::
+
 #### ❌ Incorrect
 
 GET operation with a request body:

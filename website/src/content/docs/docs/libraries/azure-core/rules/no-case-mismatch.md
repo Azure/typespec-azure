@@ -8,6 +8,10 @@ title: "no-case-mismatch"
 
 Validate that no two types have the same name with different casing. Having types that differ only by casing can cause issues in case-insensitive languages and is generally confusing. This applies to models, enums, and unions.
 
+:::note
+Template instances are not checked by this rule since they are not distinct type declarations.
+:::
+
 #### ❌ Incorrect
 
 Two models that differ only by casing:

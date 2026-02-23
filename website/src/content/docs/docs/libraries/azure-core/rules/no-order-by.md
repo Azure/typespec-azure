@@ -6,7 +6,11 @@ title: "no-order-by"
 @azure-tools/typespec-azure-core/no-order-by
 ```
 
-List operations with an `orderBy` parameter are uncommon. Support should only be added after large collection sorting performance concerns are considered. The rule specifically targets `Azure.Core.ResourceList` operations.
+List operations with an `orderBy` parameter are uncommon. Support should only be added after large collection sorting performance concerns are considered.
+
+:::note
+This rule specifically targets `Azure.Core.ResourceList` operations. Standard operations using `orderBy` are not affected.
+:::
 
 #### ❌ Incorrect
 

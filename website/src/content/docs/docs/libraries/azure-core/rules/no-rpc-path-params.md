@@ -8,6 +8,10 @@ title: "no-rpc-path-params"
 
 Operations defined using `RpcOperation` or `LongRunningRpcOperation` should not have path parameters. If path parameters are needed, consider using `ResourceAction` or `ResourceCollectionAction` instead.
 
+:::note
+This rule also applies to custom operations that extend `RpcOperation` through the `is` keyword.
+:::
+
 #### ❌ Incorrect
 
 `@path` parameter in an `RpcOperation`:
