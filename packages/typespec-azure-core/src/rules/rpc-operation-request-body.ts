@@ -5,6 +5,7 @@ export const rpcOperationRequestBodyRule = createRule({
   name: "rpc-operation-request-body",
   description: "Warning for RPC body problems.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/rpc-operation-request-body",
   messages: {
     default: `There is an issue with the RPCOperation request body.`,
     noBodyAllowed: paramMessage`RPCOperation with '@${"verb"}' cannot have a body.`,
