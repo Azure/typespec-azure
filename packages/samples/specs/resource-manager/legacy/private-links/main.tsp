@@ -116,7 +116,8 @@ interface Dependents {
   delete is ArmResourceDeleteSync<Dependent>;
   list is ArmResourceListByParent<Dependent>;
   getPrivateLink is PrivateLinkOperations.Read<Dependent>;
-  listPrivateLinks is PrivateLinkOperations.ListByParent<Dependent>;
+  #suppress "@azure-tools/typespec-azure-resource-manager/legacy-type-usage" "Using legacy type as a sample"
+  listPrivateLinks is PrivateLinkOperations.ListSinglePageByParent<Dependent>;
 }
 
 /** An employee dependent */

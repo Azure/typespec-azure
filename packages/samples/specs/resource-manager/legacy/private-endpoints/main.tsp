@@ -66,8 +66,8 @@ union ProvisioningState {
 }
 
 interface Operations extends Azure.ResourceManager.Operations {}
-model MyPrivateLinkResource is PrivateLink;
-alias PrivateLinkOperations = PrivateLinks<MyPrivateLinkResource>;
+model PrivateEndpointConnection is PrivateEndpointConnectionResource;
+alias PrivateEndpointOperations = PrivateEndpoints<PrivateEndpointConnection>;
 
 @armResourceOperations
 interface Employees {
@@ -86,8 +86,11 @@ interface Employees {
   /** A sample HEAD operation to check resource existence */
   checkExistence is ArmResourceCheckExistence<Employee>;
 
-  getPrivateLink is PrivateLinkOperations.Read<Employee>;
-  listPrivateLinks is PrivateLinkOperations.ListByParent<Employee>;
+  getPrivateEndpointConnection is PrivateEndpointOperations.Read<Employee>;
+  createOrUpdatePrivateEndpointConnection is PrivateEndpointOperations.CreateOrUpdateAsync<Employee>;
+  updatePrivateEndpointConnection is PrivateEndpointOperations.CustomPatchAsync<Employee>;
+  deletePrivateEndpointConnection is PrivateEndpointOperations.DeleteAsync<Employee>;
+  listPrivateEndpointConnections is PrivateEndpointOperations.ListByParent<Employee>;
 }
 
 /** Employee move request */
@@ -115,8 +118,22 @@ interface Dependents {
   >;
   delete is ArmResourceDeleteSync<Dependent>;
   list is ArmResourceListByParent<Dependent>;
-  getPrivateLink is PrivateLinkOperations.Read<Dependent>;
-  listPrivateLinks is PrivateLinkOperations.ListByParent<Dependent>;
+  getPrivateEndpointConnection is PrivateEndpointOperations.Read<Dependent>;
+  createOrUpdatePrivateEndpointConnection is Azure.ResourceManager.Legacy.PrivateEndpoints.CreateOrReplaceAsync<
+    Dependent,
+    PrivateEndpointConnection,
+    OptionalRequestBody = true
+  >;
+  updatePrivateEndpointConnection is Azure.ResourceManager.Legacy.PrivateEndpoints.CustomPatchAsync<
+    Dependent,
+    PrivateEndpointConnection,
+    PatchModel = void
+  >;
+  deletePrivateEndpointConnection is PrivateEndpointOperations.DeleteAsync<Dependent>;
+  listPrivateEndpointConnections is Azure.ResourceManager.Legacy.PrivateEndpoints.ListSinglePageByParent<
+    Dependent,
+    PrivateEndpointConnection
+  >;
 }
 
 /** An employee dependent */
