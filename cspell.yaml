@@ -21,7 +21,7 @@ ignorePaths:
   - .vscode/**
   - .editorconfig
   - .github/CODEOWNERS
-  - *.lock.yml
+  - "*.lock.yml"
 useGitignore: true
 enableFiletypes:
   - tsp
