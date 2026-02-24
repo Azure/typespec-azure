@@ -94,11 +94,11 @@ model Employee is ExtensionResource<EmployeeProperties> {
 ```
 
 `ExtensionResource<EmployeeProperties>`: defines the resource as an extension resource with the given properties.
-`...ResourceNameParameter<Employee>`: spreads in the standard resource name parameter, automatically providing the `@segment`, `@key`, `@path`, and `@visibility` decorators.
+`...ResourceNameParameter<Employee>`: spreads in the standard resource name parameter, which defines the resource type name, the name of the resource name parameter, and provides a default pattern constraint for resource names.
 
 #### Defining Operations with Scope Parameters
 
-The `Extension` namespace provides operation templates that take a scope parameter, allowing you to define a single set of operations that can be reused across different target scopes. Define a parameterized interface for your operations:
+The `Extension` namespace provides operation templates that take a scope parameter, allowing you to define a single set of operations that can be reused across different target scopes. Define a parameterized interface for your operations like this:
 
 ```typespec
 interface EmplOps<Scope extends Azure.ResourceManager.Foundations.SimpleResource> {
@@ -115,12 +115,12 @@ interface EmplOps<Scope extends Azure.ResourceManager.Foundations.SimpleResource
 }
 ```
 
-The available operation templates include:
+The available operation templates in the Extension namespace include:
 
 | Template                         | Description                                   |
 | -------------------------------- | --------------------------------------------- |
 | `Extension.Read`                 | GET operation for the resource                |
-| `Extension.CreateOrReplaceAsync` | Asynchronous PUT operation                    |
+| `Extension.CreateOrReplaceAsync` | Recommended asynchronous PUT operation        |
 | `Extension.CreateOrUpdateAsync`  | Asynchronous PUT operation (create or update) |
 | `Extension.CreateOrReplaceSync`  | Synchronous PUT operation                     |
 | `Extension.CustomPatchAsync`     | Asynchronous PATCH with a custom payload      |
@@ -158,13 +158,13 @@ interface ResourceGroups extends EmplOps<Extension.ResourceGroup> {}
 interface ManagementGroups extends EmplOps<Extension.ManagementGroup> {}
 ```
 
-| Scope                       | Description                           |
-| --------------------------- | ------------------------------------- |
-| `Extension.ScopeParameter`  | Any scope (uses a generic scope path) |
-| `Extension.Tenant`          | Tenant-level scope                    |
-| `Extension.Subscription`    | Subscription-level scope              |
-| `Extension.ResourceGroup`   | Resource group-level scope            |
-| `Extension.ManagementGroup` | Management group-level scope          |
+| Scope                       | Description                               |
+| --------------------------- | ----------------------------------------- |
+| `Extension.ScopeParameter`  | Any scope (uses a generic scope uri path) |
+| `Extension.Tenant`          | Tenant-level scope                        |
+| `Extension.Subscription`    | Subscription-level scope                  |
+| `Extension.ResourceGroup`   | Resource group-level scope                |
+| `Extension.ManagementGroup` | Management group-level scope              |
 
 #### Targeting External Resources
 
