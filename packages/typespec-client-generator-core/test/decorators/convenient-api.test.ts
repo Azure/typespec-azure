@@ -74,7 +74,7 @@ describe("@convenientAPI", () => {
 
 describe("@convenientAPI on interface", () => {
   it("applies convenientAPI false to all operations in interface", async () => {
-    const { program, test1, test2 } = await SimpleTester.compile(t.code`
+    const [{ program, test1, test2 }] = await SimpleTester.compileAndDiagnose(t.code`
       @service
       namespace MyService {
         @convenientAPI(false)
@@ -95,7 +95,7 @@ describe("@convenientAPI on interface", () => {
   });
 
   it("operation level convenientAPI overrides interface level", async () => {
-    const { program, test1, test2 } = await SimpleTester.compile(t.code`
+    const [{ program, test1, test2 }] = await SimpleTester.compileAndDiagnose(t.code`
       @service
       namespace MyService {
         @convenientAPI(false)

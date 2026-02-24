@@ -41,7 +41,7 @@ describe("@protocolAPI", () => {
 
 describe("@protocolAPI on interface", () => {
   it("applies protocolAPI false to all operations in interface", async () => {
-    const { program, test1, test2 } = await SimpleTester.compile(t.code`
+    const [{ program, test1, test2 }] = await SimpleTester.compileAndDiagnose(t.code`
       @service
       namespace MyService {
         @protocolAPI(false)

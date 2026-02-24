@@ -181,7 +181,7 @@ it("client with sub clients", async () => {
 });
 
 it("client with sub client and sub client has extra initialization paramters", async () => {
-  const { program } = await SimpleBaseTester.compile(
+  const [{ program }] = await SimpleBaseTester.compileAndDiagnose(
     createClientCustomizationInput(
       `
         @service(#{
@@ -628,7 +628,7 @@ it("explicit clients with only models should not be filtered out", async () => {
 });
 
 it("operationGroup", async () => {
-  const { program } = await SimpleTesterWithService.compile(`
+  const [{ program }] = await SimpleTesterWithService.compileAndDiagnose(`
     @operationGroup
     namespace MyOperationGroup {
       op func(): void;

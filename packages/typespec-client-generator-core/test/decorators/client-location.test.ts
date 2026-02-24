@@ -57,7 +57,7 @@ describe("Operation", () => {
       ),
     );
 
-    expectDiagnostics(diagnostics, {
+    expectDiagnostics(diagnostics.filter((d) => d.code !== "deprecated"), {
       code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
     });
   });

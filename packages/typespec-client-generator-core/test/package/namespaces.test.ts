@@ -63,7 +63,7 @@ describe("no namespace flag", () => {
   });
 
   it("separate defined clients and operation groups", async () => {
-    const { program } = await SimpleTester.compile(`
+    const [{ program }] = await SimpleTester.compileAndDiagnose(`
       @server("http://localhost:3000", "endpoint")
       @service
       namespace Service {

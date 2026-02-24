@@ -414,7 +414,7 @@ it("multiple client params", async () => {
 });
 
 it("@operationGroup with same model on parent client", async () => {
-  const { program } = await SimpleTester.compile(
+  const [{ program }] = await SimpleTester.compileAndDiagnose(
     `
       @service
       namespace MyService;

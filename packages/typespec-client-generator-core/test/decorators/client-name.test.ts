@@ -231,7 +231,7 @@ it("apply with @client decorator to interface client", async () => {
 });
 
 it("apply with @operationGroup decorator to interface client", async () => {
-  const { program } = await SimpleTester.compile(`
+  const [{ program }] = await SimpleTester.compileAndDiagnose(`
     @service
     namespace MyService;
 

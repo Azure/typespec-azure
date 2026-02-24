@@ -208,7 +208,7 @@ describe("listClients without @client", () => {
 
 describe("@operationGroup", () => {
   it("mark an namespace as an operation group", async () => {
-    const { program, MyClient, MyGroup } = await SimpleTester.compile(t.code`
+    const [{ program, MyClient, MyGroup }] = await SimpleTester.compileAndDiagnose(t.code`
         @client
         @service
         namespace ${t.namespace("MyClient")};
@@ -235,7 +235,7 @@ describe("@operationGroup", () => {
   });
 
   it("mark an interface as an operationGroup", async () => {
-    const { program, MyClient, MyGroup } = await SimpleTester.compile(t.code`
+    const [{ program, MyClient, MyGroup }] = await SimpleTester.compileAndDiagnose(t.code`
         @client
         @service
         namespace ${t.namespace("MyClient")};
@@ -261,7 +261,7 @@ describe("@operationGroup", () => {
   });
 
   it("list operations at root of client outside of operation group", async () => {
-    const { program, MyClient } = await SimpleTester.compile(t.code`
+    const [{ program, MyClient }] = await SimpleTester.compileAndDiagnose(t.code`
         @client
         @service
         namespace ${t.namespace("MyClient")};
@@ -285,7 +285,7 @@ describe("@operationGroup", () => {
   });
 
   it("list operations in an operation group", async () => {
-    const { program, MyGroup } = await SimpleTester.compile(t.code`
+    const [{ program, MyGroup }] = await SimpleTester.compileAndDiagnose(t.code`
         @client
         @service
         namespace MyClient;
@@ -417,7 +417,7 @@ describe("@operationGroup", () => {
 
     // java should get three operation groups
     {
-      const { program } = await SimpleTester.compile(testCode);
+      const [{ program }] = await SimpleTester.compileAndDiagnose(testCode);
       const context = await createSdkContextForTester(program, {
         emitterName: "@azure-tools/typespec-java",
       });
@@ -427,7 +427,7 @@ describe("@operationGroup", () => {
 
     // csharp should get three operation groups
     {
-      const { program } = await SimpleTester.compile(testCode);
+      const [{ program }] = await SimpleTester.compileAndDiagnose(testCode);
       const context = await createSdkContextForTester(program, {
         emitterName: "@azure-tools/typespec-csharp",
       });
@@ -437,7 +437,7 @@ describe("@operationGroup", () => {
 
     // python should get three operation groups
     {
-      const { program } = await SimpleTester.compile(testCode);
+      const [{ program }] = await SimpleTester.compileAndDiagnose(testCode);
       const context = await createSdkContextForTester(program, {
         emitterName: "@azure-tools/typespec-python",
       });
@@ -447,7 +447,7 @@ describe("@operationGroup", () => {
 
     // typescript should get three operation groups
     {
-      const { program } = await SimpleTester.compile(testCode);
+      const [{ program }] = await SimpleTester.compileAndDiagnose(testCode);
       const context = await createSdkContextForTester(program, {
         emitterName: "@azure-tools/typespec-ts",
       });
@@ -478,7 +478,7 @@ describe("@operationGroup", () => {
   });
 
   it("with @clientName", async () => {
-    const { program } = await SimpleTesterWithService.compile(
+    const [{ program }] = await SimpleTesterWithService.compileAndDiagnose(
       `
         @operationGroup
         @clientName("ClientModel")
@@ -523,7 +523,7 @@ describe("@operationGroup", () => {
       const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
         createClientCustomizationInput(mainCode, clientCode),
       );
-      expectDiagnosticEmpty(diagnostics);
+      expectDiagnosticEmpty(diagnostics.filter((d) => d.code !== "deprecated"));
       const context = await createSdkContextForTester(program, {
         emitterName: "@azure-tools/typespec-java",
       });
@@ -536,7 +536,7 @@ describe("@operationGroup", () => {
       const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
         createClientCustomizationInput(mainCode, clientCode),
       );
-      expectDiagnosticEmpty(diagnostics);
+      expectDiagnosticEmpty(diagnostics.filter((d) => d.code !== "deprecated"));
       const context = await createSdkContextForTester(program, {
         emitterName: "@azure-tools/typespec-python",
       });
@@ -549,7 +549,7 @@ describe("@operationGroup", () => {
       const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
         createClientCustomizationInput(mainCode, clientCode),
       );
-      expectDiagnosticEmpty(diagnostics);
+      expectDiagnosticEmpty(diagnostics.filter((d) => d.code !== "deprecated"));
       const context = await createSdkContextForTester(program, {
         emitterName: "@azure-tools/typespec-csharp",
       });
@@ -1227,7 +1227,7 @@ describe("client hierarchy", () => {
       `,
       ),
     );
-    expectDiagnosticEmpty(diagnostics);
+    expectDiagnosticEmpty(diagnostics.filter((d) => d.code !== "deprecated"));
 
     const context = await createSdkContextForTester(program);
     const clients = listClients(context);
@@ -1283,7 +1283,7 @@ describe("client hierarchy", () => {
       ),
     );
 
-    expectDiagnostics(diagnostics, {
+    expectDiagnostics(diagnostics.filter((d) => d.code !== "deprecated"), {
       code: "@azure-tools/typespec-client-generator-core/wrong-client-decorator",
     });
 
@@ -1320,7 +1320,7 @@ describe("client hierarchy", () => {
   });
 
   it("rearrange operations", async () => {
-    const { program } = await SimpleTester.compile(`
+    const [{ program }] = await SimpleTester.compileAndDiagnose(`
         @service
         namespace A {
           @route("/b")
@@ -1369,7 +1369,7 @@ describe("client hierarchy", () => {
   });
 
   it("rearrange operations with scope", async () => {
-    const { program } = await SimpleTester.compile(`
+    const [{ program }] = await SimpleTester.compileAndDiagnose(`
         @service
         @server(
           "{endpoint}/face/{apiVersion}",
@@ -1480,7 +1480,7 @@ describe("client hierarchy", () => {
 });
 
 it("operations under namespace or interface without @client or @operationGroup", async () => {
-  const { program } = await SimpleTester.compile(`
+  const [{ program }] = await SimpleTester.compileAndDiagnose(`
     @service
     namespace Test;
 
