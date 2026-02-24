@@ -67,3 +67,15 @@ op get is RpcOperation<
   {}
 >;
 ```
+
+POST operation with a body:
+
+```tsp
+@post
+op createWidget is RpcOperation<
+  {
+    @body body: Widget;
+  },
+  Widget
+>;
+```

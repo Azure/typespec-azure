@@ -35,16 +35,8 @@ model Widget {
   @key name: string;
 }
 
+// route: /widgets/{name}
 op readWidget is Azure.Core.StandardResourceOperations.ResourceRead<Widget>;
+// route: /widgets
 op listWidgets is Azure.Core.StandardResourceOperations.ResourceList<Widget>;
-```
-
-Or apply `@route` at the interface or namespace level for a prefix:
-
-```tsp
-@route("/api")
-interface Widgets {
-  read is Azure.Core.StandardResourceOperations.ResourceRead<Widget>;
-  list is Azure.Core.StandardResourceOperations.ResourceList<Widget>;
-}
 ```

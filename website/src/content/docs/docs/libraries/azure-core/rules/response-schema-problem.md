@@ -13,23 +13,32 @@ Warn about operations having multiple non-error response schemas. If an operatio
 Multiple success responses with different body schemas:
 
 ```tsp
+model Widget {
+  name: string;
+}
+
+model WidgetCreated {
+  name: string;
+  creationResult: string;
+}
+
 @error
 model Error {
   code: int32;
   message: string;
 }
 
-model Return200 {
+model WidgetResponse {
   @statusCode status: 200;
-  @body body: string;
+  @body body: Widget;
 }
 
-model Return201 {
+model WidgetCreatedResponse {
   @statusCode status: 201;
-  @body body: int32;
+  @body body: WidgetCreated;
 }
 
-op test(): Return200 | Return201 | Error;
+op test(): WidgetResponse | WidgetCreatedResponse | Error;
 ```
 
 #### ✅ Correct
@@ -43,10 +52,10 @@ model Error {
   message: string;
 }
 
-model Return200 {
-  @statusCode status: 200;
-  @body body: string;
+model WidgetResponse {
+  @statusCode status: 200 | 201;
+  @body body: Widget;
 }
 
-op test(): Return200 | Error;
+op test(): WidgetResponse | Error;
 ```
