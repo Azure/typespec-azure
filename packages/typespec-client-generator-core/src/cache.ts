@@ -547,18 +547,15 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
     }
   }
   if (explicitClients.length > 0) {
-    // Filter out nested clients within multi-service parent clients
-    // These nested clients are handled as children of the multi-service parent
+    // Filter out nested clients within parent clients
+    // Nested @client decorators act as sub-clients (like @operationGroup)
     const rootClients = explicitClients.filter((client: SdkClient) => {
       const clientType = client.type;
       const clientNs = clientType.namespace;
-      // Check if this client's parent namespace is a MULTI-SERVICE client
+      // Check if this client's parent namespace is another client
       return !explicitClients.some(
         (other: SdkClient) =>
-          other !== client &&
-          other.type.kind === "Namespace" &&
-          other.type === clientNs &&
-          other.services.length > 1,
+          other !== client && other.type.kind === "Namespace" && other.type === clientNs,
       );
     });
     if (rootClients.some((client: SdkClient) => isArm(client.services))) {
@@ -614,7 +611,20 @@ function createOperationGroup(
 ): SdkOperationGroup | undefined {
   let operationGroup: SdkOperationGroup | undefined;
   if (!forceImplicit && hasExplicitClientOrOperationGroup(context)) {
+    // Check for @operationGroup (deprecated) or nested @client acting as sub-client
     operationGroup = getScopedDecoratorData(context, operationGroupKey, type);
+    if (!operationGroup) {
+      // Also check for nested @client decorator - treat as operation group (sub-client)
+      const nestedClient = getScopedDecoratorData(context, clientKey, type) as
+        | SdkClient
+        | undefined;
+      if (nestedClient) {
+        operationGroup = {
+          kind: "SdkOperationGroup",
+          type: type,
+        } as SdkOperationGroup;
+      }
+    }
     if (operationGroup) {
       operationGroup.groupPath = `${groupPathPrefix}.${getLibraryName(context, type)}`;
 

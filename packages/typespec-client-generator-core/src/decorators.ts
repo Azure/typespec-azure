@@ -348,7 +348,11 @@ export const $operationGroup: OperationGroupDecorator = (
  */
 export function isOperationGroup(context: TCGCContext, type: Namespace | Interface): boolean {
   if (hasExplicitClientOrOperationGroup(context)) {
-    return getScopedDecoratorData(context, operationGroupKey, type) !== undefined;
+    // Check for @operationGroup (deprecated) or nested @client acting as sub-client
+    return (
+      getScopedDecoratorData(context, operationGroupKey, type) !== undefined ||
+      getScopedDecoratorData(context, clientKey, type) !== undefined
+    );
   }
   // if there is no explicit client, we will treat non-client namespaces and all interfaces as operation group
   if (type.kind === "Interface" && !isTemplateDeclaration(type)) {

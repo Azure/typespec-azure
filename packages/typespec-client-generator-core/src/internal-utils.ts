@@ -123,9 +123,13 @@ export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean
   const explicitClients = listScopedDecoratorData(context, clientKey);
   let multiServicesOnly = false;
   let hasNestedClients = false;
+  const clientNamespaces: Namespace[] = [];
   const multiServiceClientNamespaces: Namespace[] = [];
 
   explicitClients.forEach((value, key) => {
+    if (key.kind === "Namespace") {
+      clientNamespaces.push(key);
+    }
     if ((value as SdkClient).services.length > 1) {
       multiServicesOnly = true;
       if (key.kind === "Namespace") {
@@ -134,22 +138,20 @@ export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean
     }
   });
 
-  // Check if any multi-service client has nested @client decorators
-  if (multiServicesOnly) {
-    explicitClients.forEach((_value, key) => {
-      if (key.kind === "Namespace" || key.kind === "Interface") {
-        // Check if this key's namespace is inside a multi-service client namespace
-        let ns = key.namespace;
-        while (ns) {
-          if (multiServiceClientNamespaces.includes(ns)) {
-            hasNestedClients = true;
-            return;
-          }
-          ns = ns.namespace;
+  // Check if any client has nested @client decorators (sub-clients)
+  explicitClients.forEach((_value, key) => {
+    if (key.kind === "Namespace" || key.kind === "Interface") {
+      // Check if this key's namespace is inside any client namespace
+      let ns = key.namespace;
+      while (ns) {
+        if (clientNamespaces.includes(ns)) {
+          hasNestedClients = true;
+          return;
         }
+        ns = ns.namespace;
       }
-    });
-  }
+    }
+  });
 
   return (
     (explicitClients.size > 0 && (!multiServicesOnly || hasNestedClients)) ||
