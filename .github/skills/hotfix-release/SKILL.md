@@ -8,7 +8,6 @@ description: Publish a hotfix (patch) release for one or more packages from an e
 Instructions for publishing a hotfix (patch) release for one or more packages from an existing `release/*` branch.
 
 > ⚠️ **Prerequisites:** A `release/<sprint-name>` branch must already exist with the fix commit(s) merged into it. If it does not exist, create one from the last release tag commit first.
-> See [CONTRIBUTING.md](../../CONTRIBUTING.md#make-a-patch-release) for the full process context.
 
 ## REQUIRED PARAMETERS
 
