@@ -133,20 +133,25 @@ PATCH for Resource tags only, a PATCH for all updateable properties, or a custom
 you should choose the patch for all updateable properties, unless you have a very good reason for
 choosing another PATCH operation.
 
-| Operation Description         | TypeSpec                                                                                                                                   |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Sync TagsOnly PATCH           | `update is ArmTagsPatchSync<ResourceType>`                                                                                                 |
-| Async TagsOnly PATCH          | `update is ArmTagsPatchAsync<ResourceType>`                                                                                                |
-| Sync Lifecycle PATCH          | `update is ArmResourcePatchSync<ResourceType, ResourcePropertiesType>`                                                                     |
-| Async Lifecycle PATCH         | `update is ArmResourcePatchAsync<ResourceType, ResourcePropertiesType>`                                                                    |
-| Sync Custom Properties PATCH  | `update is ArmCustomPatchSync<ResourceType, Azure.ResourceManager.Foundations.ResourceUpdateModel<ResourceType, ResourcePropertiesType>>`  |
-| Async Custom Properties PATCH | `update is ArmCustomPatchAsync<ResourceType, Azure.ResourceManager.Foundations.ResourceUpdateModel<ResourceType, ResourcePropertiesType>>` |
+| Operation Description                       | TypeSpec                                                                                                                                   |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Sync TagsOnly PATCH                         | `update is ArmTagsPatchSync<ResourceType>`                                                                                                 |
+| Async TagsOnly PATCH                        | `update is ArmTagsPatchAsync<ResourceType>`                                                                                                |
+| Sync Custom Properties PATCH (recommended)  | `update is ArmCustomPatchSync<ResourceType, Azure.ResourceManager.Foundations.ResourceUpdateModel<ResourceType, ResourcePropertiesType>>`  |
+| Async Custom Properties PATCH (recommended) | `update is ArmCustomPatchAsync<ResourceType, Azure.ResourceManager.Foundations.ResourceUpdateModel<ResourceType, ResourcePropertiesType>>` |
+| Sync Lifecycle PATCH                        | `update is ArmResourcePatchSync<ResourceType, ResourcePropertiesType>`                                                                     |
+| Async Lifecycle PATCH                       | `update is ArmResourcePatchAsync<ResourceType, ResourcePropertiesType>`                                                                    |
 
-The `ArmResourcePatch*` templates use the resource's Lifecycle.Update visibility to automatically
-determine which properties are included in the PATCH schema. They take the resource type and the
-resource properties type as parameters. The `ArmTagsPatch*` templates take the resource type as a
-parameter. The `ArmCustomPatch*` templates take the resource type and your custom PATCH request type
-as parameters.
+The `ArmCustomPatch*` templates are the recommended choice for PATCH operations. They take the
+resource type and your custom PATCH request type as parameters, giving you full control over the
+PATCH schema. The `ArmTagsPatch*` templates take the resource type as a parameter and only allow
+updating ARM tags.
+
+> **Note:** The `ArmResourcePatch*` templates are **not recommended**. They rely on Lifecycle.Update
+> visibility analysis to automatically determine which properties are included in the PATCH schema,
+> but this analysis is only performed by the typespec-autorest emitter and will not be replicated in
+> SDKs generated for the PATCH operation. Instead, spec authors should define a specific PATCH model
+> and use the `ArmCustomPatch*` templates.
 
 ### Resource Delete Operations (DELETE)
 
@@ -211,16 +216,6 @@ and asynchronous templates for actions that consume and produce information.
 
 Parameters to the template are the ResourceType, the model for the operation Request body, and the
 model for the operation Response body.
-
-For long-running actions where the response is only available after polling the LRO (rather than
-being returned inline with the initial accepted response), use the `ActionAsync` template:
-
-| Operation                              | TypeSpec                                                       |
-| -------------------------------------- | -------------------------------------------------------------- |
-| Long-running Action (poll for results) | `startProcess is ActionAsync<ResourceType, Request, Response>` |
-
-Unlike `ArmResourceActionAsync`, which may return the response inline, `ActionAsync` always returns
-an accepted LRO response. The final result is obtained by polling the operation.
 
 #### Actions that take input but produce no output (state changing actions)
 
