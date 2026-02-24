@@ -16,9 +16,9 @@ namespace Microsoft.ContosoProviderHub;
 
 /** Contoso API versions */
 enum Versions {
-  /** 2021-10-01-preview version */
+  /** 2025-11-19-preview version */
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  `2021-10-01-preview`,
+  `2025-11-19-preview`,
 }
 
 // For more information about the proxy vs tracked,
@@ -66,8 +66,8 @@ union ProvisioningState {
 }
 
 interface Operations extends Azure.ResourceManager.Operations {}
-model MyPrivateLinkResource is PrivateLink;
-alias PrivateLinkOperations = PrivateLinks<MyPrivateLinkResource>;
+model NetworkSecurityPerimeterConfiguration is Azure.ResourceManager.NspConfiguration;
+alias NspConfigurationOperations = Azure.ResourceManager.NspConfigurations<NetworkSecurityPerimeterConfiguration>;
 
 @armResourceOperations
 interface Employees {
@@ -86,8 +86,10 @@ interface Employees {
   /** A sample HEAD operation to check resource existence */
   checkExistence is ArmResourceCheckExistence<Employee>;
 
-  getPrivateLink is PrivateLinkOperations.Read<Employee>;
-  listPrivateLinks is PrivateLinkOperations.ListByParent<Employee>;
+  /** Get a Network Security Perimeter Configuration for this employee */
+  getNsp is NspConfigurationOperations.Read<Employee>;
+  /** List the Network Security Perimeters for this employee */
+  listNsp is NspConfigurationOperations.ListByParent<Employee>;
 }
 
 /** Employee move request */
@@ -115,8 +117,9 @@ interface Dependents {
   >;
   delete is ArmResourceDeleteSync<Dependent>;
   list is ArmResourceListByParent<Dependent>;
-  getPrivateLink is PrivateLinkOperations.Read<Dependent>;
-  listPrivateLinks is PrivateLinkOperations.ListByParent<Dependent>;
+  getNsp is NspConfigurationOperations.Read<Dependent>;
+  #suppress "@azure-tools/typespec-azure-resource-manager/legacy-type-usage" "Using legacy type as a sample"
+  listNsps is NspConfigurationOperations.ListSinglePageByParent<Dependent>;
 }
 
 /** An employee dependent */
