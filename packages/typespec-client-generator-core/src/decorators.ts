@@ -314,6 +314,7 @@ export function listClients(context: TCGCContext): SdkClient[] {
   return context.getClients();
 }
 
+/** @deprecated Use @client. This decorator is bridged to @client state for compatibility. */
 export const $operationGroup: OperationGroupDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
@@ -326,7 +327,31 @@ export const $operationGroup: OperationGroupDecorator = (
     });
     return;
   }
+  // Consolidate @operationGroup behavior to @client state.
+  // Keep operationGroup state for backward compatibility, but use client state as source of truth.
+  const parentClient = findParentClient(context.program, target);
+  let services: Namespace[] | undefined;
+  if (parentClient) {
+    services = parentClient.services;
+  } else {
+    const service = findClientService(context.program, target);
+    if (service) {
+      services = [service];
+    }
+  }
 
+  if (services) {
+    const client: SdkClient = {
+      kind: "SdkClient",
+      name: target.name,
+      service: services.length === 1 ? services[0] : services,
+      services,
+      type: target,
+      subOperationGroups: [],
+    };
+    // Consolidated state for hierarchy customization.
+    setScopedDecoratorData(context, $operationGroup, clientKey, target, client, scope);
+  }
   setScopedDecoratorData(
     context,
     $operationGroup,
@@ -339,6 +364,20 @@ export const $operationGroup: OperationGroupDecorator = (
     scope,
   );
 };
+
+function findParentClient(program: Program, target: Namespace | Interface): SdkClient | undefined {
+  let namespace = target.namespace;
+  while (namespace) {
+    const parent = program.stateMap(clientKey).get(namespace) as
+      | Record<string | symbol, SdkClient>
+      | undefined;
+    if (parent) {
+      return parent[AllScopes] ?? Object.values(parent)[0];
+    }
+    namespace = namespace.namespace;
+  }
+  return undefined;
+}
 
 /**
  * Check a namespace or interface is an operation group.

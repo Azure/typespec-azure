@@ -598,6 +598,11 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
     // Filter out nested clients within parent clients
     // Nested @client decorators act as sub-clients (like @operationGroup)
     const rootClients = explicitClients.filter((client: SdkClient) => {
+      // Legacy @operationGroup entries are tracked in client state for consolidation,
+      // but they should never become root clients.
+      if (getScopedDecoratorData(context, operationGroupKey, client.type)) {
+        return false;
+      }
       const clientType = client.type;
       const clientNs = clientType.namespace;
       // Check if this client's parent namespace is another client
@@ -609,7 +614,9 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
     if (rootClients.some((client: SdkClient) => isArm(client.services))) {
       context.arm = true;
     }
-    return rootClients;
+    if (rootClients.length > 0) {
+      return rootClients;
+    }
   }
 
   // if there is no explicit client, we will create a separate root client for each service namespace
@@ -659,19 +666,15 @@ function createOperationGroup(
 ): SdkOperationGroup | undefined {
   let operationGroup: SdkOperationGroup | undefined;
   if (!forceImplicit && hasExplicitClientOrOperationGroup(context)) {
-    // Check for @operationGroup (deprecated) or nested @client acting as sub-client
-    operationGroup = getScopedDecoratorData(context, operationGroupKey, type);
-    if (!operationGroup) {
-      // Also check for nested @client decorator - treat as operation group (sub-client)
-      const nestedClient = getScopedDecoratorData(context, clientKey, type) as
-        | SdkClient
-        | undefined;
-      if (nestedClient) {
-        operationGroup = {
-          kind: "SdkOperationGroup",
-          type: type,
-        } as SdkOperationGroup;
-      }
+    // Check consolidated @client state first, then legacy @operationGroup state.
+    const nestedClient = getScopedDecoratorData(context, clientKey, type) as SdkClient | undefined;
+    if (nestedClient) {
+      operationGroup = {
+        kind: "SdkOperationGroup",
+        type: type,
+      } as SdkOperationGroup;
+    } else {
+      operationGroup = getScopedDecoratorData(context, operationGroupKey, type);
     }
     if (operationGroup) {
       operationGroup.groupPath = `${groupPathPrefix}.${getLibraryName(context, type)}`;
