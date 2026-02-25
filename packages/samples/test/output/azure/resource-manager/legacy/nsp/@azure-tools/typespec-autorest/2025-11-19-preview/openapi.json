@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "ContosoProviderHubClient",
-    "version": "2021-10-01-preview",
+    "version": "2025-11-19-preview",
     "description": "Contoso Resource Provider management API.",
     "x-typespec-generated": [
       {
@@ -671,13 +671,13 @@
         }
       }
     },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}/privateLinkResources": {
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}/networkSecurityPerimeterConfigurations": {
       "get": {
-        "operationId": "Dependents_ListPrivateLinks",
+        "operationId": "Dependents_ListNsps",
         "tags": [
           "Dependents"
         ],
-        "description": "List Dependent PrivateLinks",
+        "description": "List Dependent NetworkSecurityPerimeterConfigurations",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -709,7 +709,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/MyPrivateLinkResourceListResult"
+              "$ref": "#/definitions/NetworkSecurityPerimeterConfigurationListResult"
             }
           },
           "default": {
@@ -718,19 +718,16 @@
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
-        },
-        "x-ms-pageable": {
-          "nextLinkName": "nextLink"
         }
       }
     },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}/privateLinkResources/{privateLinkResourceName}": {
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}/networkSecurityPerimeterConfigurations/{networkSecurityPerimeterConfigurationName}": {
       "get": {
-        "operationId": "Dependents_GetPrivateLink",
+        "operationId": "Dependents_GetNsp",
         "tags": [
           "Dependents"
         ],
-        "description": "Get a Dependent PrivateLink",
+        "description": "Get a Dependent NetworkSecurityPerimeterConfiguration",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -758,18 +755,20 @@
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
           },
           {
-            "name": "privateLinkResourceName",
+            "name": "networkSecurityPerimeterConfigurationName",
             "in": "path",
-            "description": "The name of the private link associated with the Azure resource.",
+            "description": "The name for a network security perimeter configuration",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
           }
         ],
         "responses": {
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateLinkResource"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/networksecurityperimeter.json#/definitions/NetworkSecurityPerimeterConfiguration"
             }
           },
           "default": {
@@ -832,13 +831,13 @@
         }
       }
     },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/privateLinkResources": {
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/networkSecurityPerimeterConfigurations": {
       "get": {
-        "operationId": "Employees_ListPrivateLinks",
+        "operationId": "Employees_ListNsp",
         "tags": [
           "Employees"
         ],
-        "description": "List Employee PrivateLinks",
+        "description": "List the Network Security Perimeters for this employee",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -862,7 +861,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/MyPrivateLinkResourceListResult"
+              "$ref": "#/definitions/NetworkSecurityPerimeterConfigurationListResult"
             }
           },
           "default": {
@@ -877,13 +876,13 @@
         }
       }
     },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/privateLinkResources/{privateLinkResourceName}": {
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/networkSecurityPerimeterConfigurations/{networkSecurityPerimeterConfigurationName}": {
       "get": {
-        "operationId": "Employees_GetPrivateLink",
+        "operationId": "Employees_GetNsp",
         "tags": [
           "Employees"
         ],
-        "description": "Get a Employee PrivateLink",
+        "description": "Get a Network Security Perimeter Configuration for this employee",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -903,18 +902,20 @@
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
           },
           {
-            "name": "privateLinkResourceName",
+            "name": "networkSecurityPerimeterConfigurationName",
             "in": "path",
-            "description": "The name of the private link associated with the Azure resource.",
+            "description": "The name for a network security perimeter configuration",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
           }
         ],
         "responses": {
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateLinkResource"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/networksecurityperimeter.json#/definitions/NetworkSecurityPerimeterConfiguration"
             }
           },
           "default": {
@@ -1142,15 +1143,15 @@
         "movingStatus"
       ]
     },
-    "MyPrivateLinkResourceListResult": {
+    "NetworkSecurityPerimeterConfigurationListResult": {
       "type": "object",
-      "description": "The response of a MyPrivateLinkResource list operation.",
+      "description": "The response of a NetworkSecurityPerimeterConfiguration list operation.",
       "properties": {
         "value": {
           "type": "array",
-          "description": "The MyPrivateLinkResource items on this page",
+          "description": "The NetworkSecurityPerimeterConfiguration items on this page",
           "items": {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateLinkResource"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/networksecurityperimeter.json#/definitions/NetworkSecurityPerimeterConfiguration"
           }
         },
         "nextLink": {

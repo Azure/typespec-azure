@@ -1,5 +1,12 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.65.2
+
+### Bug Fixes
+
+- [#3945](https://github.com/Azure/typespec-azure/pull/3945) Fix duplicate client name error when using generic union or model templates with different type parameters.
+
+
 ## 0.65.1
 
 ### Bug Fixes

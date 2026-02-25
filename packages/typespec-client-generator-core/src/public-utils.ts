@@ -199,7 +199,7 @@ export function getLibraryName(
   if (
     typeof type.name === "string" &&
     type.name !== "" &&
-    type.kind === "Model" &&
+    (type.kind === "Model" || type.kind === "Union") &&
     type.templateMapper?.args
   ) {
     const generatedName = context.__generatedNames.get(type);

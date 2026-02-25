@@ -1223,8 +1223,11 @@ export function getClientNamespace(
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
   if (override) {
     // if `@clientNamespace` is applied to the entity, this wins out
-    // if the override exactly matches the namespace flag, no replacement is needed
-    if (context.namespaceFlag && override === context.namespaceFlag) {
+    // if the override matches or extends the namespace flag, no replacement is needed
+    if (
+      context.namespaceFlag &&
+      (override === context.namespaceFlag || override.startsWith(context.namespaceFlag + "."))
+    ) {
       return override;
     }
     const userDefinedNamespace = findNamespaceOverlapClosestToRoot(

@@ -8,7 +8,7 @@ import {
 const options: CoverageFromAzureStorageOptions = {
   storageAccountName: "typespec",
   containerName: "coverage",
-  manifestContainerName: "manifests-azure",
+  manifests: ["http-specs", "azure-http-specs"],
   emitterNames: [
     "@azure-tools/typespec-python",
     "@azure-tools/typespec-go",
