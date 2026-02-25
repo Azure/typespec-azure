@@ -228,13 +228,29 @@ async function main(): Promise<void> {
       log(`Using skill: ${event.data.name} (${event.data.path})`);
     });
 
+    session.on("assistant.reasoning", (event) => {
+      log(`Reasoning: ${event.data.content.slice(0, 200)}`);
+    });
+
+    session.on("subagent.started", (event) => {
+      log(`Subagent started: ${event.data.agentDisplayName}`);
+    });
+
+    session.on("subagent.completed", (event) => {
+      log(`Subagent completed: ${event.data.agentDisplayName}`);
+    });
+
+    session.on("subagent.failed", (event) => {
+      log(`Subagent failed: ${event.data.agentDisplayName} — ${event.data.error}`);
+    });
+
     // 90-minute timeout for the agent session
     const TIMEOUT_MS = 90 * 60 * 1000;
     log("Sending task prompt...");
     const response = await session.sendAndWait({ prompt: taskPrompt }, TIMEOUT_MS);
 
     if (response?.data.content) {
-      console.log("\n=== Agent Summary ===");
+      log("=== Agent Summary ===");
       console.log(response.data.content);
     }
 
