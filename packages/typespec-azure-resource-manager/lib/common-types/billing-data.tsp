@@ -157,6 +157,9 @@ union BillingStateReason {
   /** Resource's billing has been suspended by Microsoft. */
   Suspended: "Suspended",
 
+  /** Resource has been canceled by the customer. */
+  Canceled: "Canceled",
+
   /** Resource's billing has expired. */
   Expired: "Expired",
 

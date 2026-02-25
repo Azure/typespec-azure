@@ -298,7 +298,7 @@
     },
     "BillingScheduleChangeKind": {
       "type": "string",
-      "description": "When a scheduled change is expected to become effective.",
+      "description": "Type of scheduled change.",
       "enum": [
         "Update",
         "Cancel"
@@ -361,6 +361,7 @@
       "description": "Billing state reason.",
       "enum": [
         "Suspended",
+        "Canceled",
         "Expired"
       ],
       "x-ms-enum": {
@@ -371,6 +372,11 @@
             "name": "Suspended",
             "value": "Suspended",
             "description": "Resource's billing has been suspended by Microsoft."
+          },
+          {
+            "name": "Canceled",
+            "value": "Canceled",
+            "description": "Resource has been canceled by the customer."
           },
           {
             "name": "Expired",

@@ -66,3 +66,12 @@ namespace Azure.ResourceManager.CommonTypes;
   Azure.ResourceManager.CommonTypes.Versions.v6,
   "billingschedulechangeeffectivetype.json"
 );
+
+/**
+ * When a scheduled change is expected to become effective.
+ */
+@@armCommonDefinition(BillingScheduleChangeKind,
+  "BillingScheduleChangeKind",
+  Azure.ResourceManager.CommonTypes.Versions.v6,
+  "billingschedulechangekind.json"
+);
