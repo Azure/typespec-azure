@@ -14,7 +14,6 @@ import {
   listOperationGroups,
   listOperationsInOperationGroup,
 } from "../../src/decorators.js";
-import { SdkClientType, SdkHttpOperation } from "../../src/interfaces.js";
 import { getCrossLanguageDefinitionId, getCrossLanguagePackageId } from "../../src/public-utils.js";
 import { requireClientSuffixRule } from "../../src/rules/require-client-suffix.rule.js";
 import {
@@ -421,8 +420,7 @@ describe("@operationGroup", () => {
       const context = await createSdkContextForTester(program, {
         emitterName: "@azure-tools/typespec-java",
       });
-      const client = listClients(context)[0];
-      strictEqual(listOperationGroups(context, client).length, 3);
+      strictEqual(listClients(context).length, 3);
     }
 
     // csharp should get three operation groups
@@ -431,8 +429,7 @@ describe("@operationGroup", () => {
       const context = await createSdkContextForTester(program, {
         emitterName: "@azure-tools/typespec-csharp",
       });
-      const client = listClients(context)[0];
-      strictEqual(listOperationGroups(context, client).length, 3);
+      strictEqual(listClients(context).length, 3);
     }
 
     // python should get three operation groups
@@ -441,8 +438,7 @@ describe("@operationGroup", () => {
       const context = await createSdkContextForTester(program, {
         emitterName: "@azure-tools/typespec-python",
       });
-      const client = listClients(context)[0];
-      strictEqual(listOperationGroups(context, client).length, 0);
+      strictEqual(listClients(context).length, 1);
     }
 
     // typescript should get three operation groups
@@ -451,8 +447,7 @@ describe("@operationGroup", () => {
       const context = await createSdkContextForTester(program, {
         emitterName: "@azure-tools/typespec-ts",
       });
-      const client = listClients(context)[0];
-      strictEqual(listOperationGroups(context, client).length, 3);
+      strictEqual(listClients(context).length, 3);
     }
   });
 
@@ -491,11 +486,8 @@ describe("@operationGroup", () => {
     const sdkPackage = context.sdkPackage;
     strictEqual(sdkPackage.clients.length, 1);
     const mainClient = sdkPackage.clients[0];
-    strictEqual(mainClient.methods.length, 0);
-
-    const client = mainClient.children![0] as SdkClientType<SdkHttpOperation>;
-    strictEqual(client.kind, "client");
-    strictEqual(client.name, "ClientModel");
+    strictEqual(mainClient.methods.length, 1);
+    strictEqual(mainClient.name, "ClientModel");
   });
 
   it("@operationGroup with different scope", async () => {
@@ -1283,9 +1275,12 @@ describe("client hierarchy", () => {
       ),
     );
 
-    expectDiagnostics(diagnostics.filter((d) => d.code !== "deprecated"), {
-      code: "@azure-tools/typespec-client-generator-core/wrong-client-decorator",
-    });
+    expectDiagnostics(
+      diagnostics.filter((d) => d.code !== "deprecated"),
+      {
+        code: "@azure-tools/typespec-client-generator-core/wrong-client-decorator",
+      },
+    );
 
     const context = await createSdkContextForTester(program);
     const clients = listClients(context);
@@ -1508,9 +1503,7 @@ it("operations under namespace or interface without @client or @operationGroup",
   const clients = listClients(context);
   strictEqual(clients.length, 1);
   const client = clients[0];
-  strictEqual(listOperationsInOperationGroup(context, client).length, 3);
+  strictEqual(listOperationsInOperationGroup(context, client).length, 1);
   const operationGroups = listOperationGroups(context, client);
-  strictEqual(operationGroups.length, 1);
-  const operationGroup = operationGroups[0];
-  strictEqual(listOperationsInOperationGroup(context, operationGroup).length, 1);
+  strictEqual(operationGroups.length, 0);
 });

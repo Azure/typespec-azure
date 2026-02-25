@@ -468,22 +468,9 @@ it("@operationGroup with same model on parent client", async () => {
   strictEqual(containerName.onClient, true);
 
   const methods = client.methods;
-  strictEqual(methods.length, 0);
+  strictEqual(methods.length, 1);
 
-  const og = client.children![0] as SdkClientType<SdkHttpOperation>;
-  strictEqual(og.kind, "client");
-
-  strictEqual(og.clientInitialization.initializedBy, InitializedByFlags.Default);
-  strictEqual(og.clientInitialization.parameters.length, 3);
-
-  ok(og.clientInitialization.parameters.find((x) => x.kind === "endpoint"));
-  ok(og.clientInitialization.parameters.find((x) => x === blobName));
-  ok(og.clientInitialization.parameters.find((x) => x === containerName));
-  ok(og.clientInitialization.parameters.find((x) => x.kind === "endpoint"));
-  ok(og.clientInitialization.parameters.find((x) => x === blobName));
-  ok(og.clientInitialization.parameters.find((x) => x === containerName));
-
-  const download = og.methods[0];
+  const download = methods[0];
   strictEqual(download.name, "download");
   strictEqual(download.kind, "basic");
   strictEqual(download.parameters.length, 0);

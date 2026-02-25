@@ -21,7 +21,6 @@ import {
   listAllUserDefinedNamespaces,
   listScopedDecoratorData,
   omitOperation,
-  operationGroupKey,
   removeVersionsLargerThanExplicitlySpecified,
 } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
@@ -57,11 +56,11 @@ function isNamespaceEmpty(ns: Namespace): boolean {
 }
 
 /**
- * Check if a service namespace has @operationGroup decorators on any of its interfaces or namespaces.
- * Checks all scopes by examining the raw state map.
+ * Check if a service namespace has explicit nested client customization decorators
+ * on any of its interfaces or namespaces.
  */
 function serviceHasOperationGroupDecorators(context: TCGCContext, service: Namespace): boolean {
-  for (const [type] of context.program.stateMap(operationGroupKey).entries()) {
+  for (const [type] of context.program.stateMap(clientKey).entries()) {
     if (type.kind === "Interface" || type.kind === "Namespace") {
       // Check if this type is within the service namespace
       let ns: Namespace | undefined = type.namespace;
@@ -598,11 +597,6 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
     // Filter out nested clients within parent clients
     // Nested @client decorators act as sub-clients (like @operationGroup)
     const rootClients = explicitClients.filter((client: SdkClient) => {
-      // Legacy @operationGroup entries are tracked in client state for consolidation,
-      // but they should never become root clients.
-      if (getScopedDecoratorData(context, operationGroupKey, client.type)) {
-        return false;
-      }
       const clientType = client.type;
       const clientNs = clientType.namespace;
       // Check if this client's parent namespace is another client
@@ -666,15 +660,13 @@ function createOperationGroup(
 ): SdkOperationGroup | undefined {
   let operationGroup: SdkOperationGroup | undefined;
   if (!forceImplicit && hasExplicitClientOrOperationGroup(context)) {
-    // Check consolidated @client state first, then legacy @operationGroup state.
+    // Check consolidated @client state.
     const nestedClient = getScopedDecoratorData(context, clientKey, type) as SdkClient | undefined;
     if (nestedClient) {
       operationGroup = {
         kind: "SdkOperationGroup",
         type: type,
       } as SdkOperationGroup;
-    } else {
-      operationGroup = getScopedDecoratorData(context, operationGroupKey, type);
     }
     if (operationGroup) {
       operationGroup.groupPath = `${groupPathPrefix}.${getLibraryName(context, type)}`;

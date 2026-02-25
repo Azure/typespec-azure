@@ -14,6 +14,7 @@ import {
   isNumeric,
   isService,
   isTemplateDeclaration,
+  listServices,
   Model,
   ModelProperty,
   Namespace,
@@ -90,7 +91,6 @@ import {
   listAllUserDefinedNamespaces,
   negationScopesKey,
   omitOperation,
-  operationGroupKey,
   overrideKey,
   parseScopes,
   scopeKey,
@@ -242,7 +242,8 @@ export const $client: ClientDecorator = (
       }
     }
   } else {
-    const service = findClientService(context.program, target);
+    const service =
+      findClientService(context.program, target) ?? findSingleService(context.program);
     if (service === undefined) {
       reportDiagnostic(context.program, {
         code: "client-service",
@@ -281,6 +282,14 @@ function findClientService(program: Program, client: Namespace | Interface): Nam
       return current;
     }
     current = current.namespace;
+  }
+  return undefined;
+}
+
+function findSingleService(program: Program): Namespace | undefined {
+  const allNamespaces = listServices(program).map((x) => x.type);
+  if (allNamespaces.length === 1) {
+    return allNamespaces[0];
   }
   return undefined;
 }
@@ -327,57 +336,8 @@ export const $operationGroup: OperationGroupDecorator = (
     });
     return;
   }
-  // Consolidate @operationGroup behavior to @client state.
-  // Keep operationGroup state for backward compatibility, but use client state as source of truth.
-  const parentClient = findParentClient(context.program, target);
-  let services: Namespace[] | undefined;
-  if (parentClient) {
-    services = parentClient.services;
-  } else {
-    const service = findClientService(context.program, target);
-    if (service) {
-      services = [service];
-    }
-  }
-
-  if (services) {
-    const client: SdkClient = {
-      kind: "SdkClient",
-      name: target.name,
-      service: services.length === 1 ? services[0] : services,
-      services,
-      type: target,
-      subOperationGroups: [],
-    };
-    // Consolidated state for hierarchy customization.
-    setScopedDecoratorData(context, $operationGroup, clientKey, target, client, scope);
-  }
-  setScopedDecoratorData(
-    context,
-    $operationGroup,
-    operationGroupKey,
-    target,
-    {
-      kind: "SdkOperationGroup",
-      type: target,
-    },
-    scope,
-  );
+  context.call($client, target, undefined, scope);
 };
-
-function findParentClient(program: Program, target: Namespace | Interface): SdkClient | undefined {
-  let namespace = target.namespace;
-  while (namespace) {
-    const parent = program.stateMap(clientKey).get(namespace) as
-      | Record<string | symbol, SdkClient>
-      | undefined;
-    if (parent) {
-      return parent[AllScopes] ?? Object.values(parent)[0];
-    }
-    namespace = namespace.namespace;
-  }
-  return undefined;
-}
 
 /**
  * Check a namespace or interface is an operation group.
@@ -387,11 +347,7 @@ function findParentClient(program: Program, target: Namespace | Interface): SdkC
  */
 export function isOperationGroup(context: TCGCContext, type: Namespace | Interface): boolean {
   if (hasExplicitClientOrOperationGroup(context)) {
-    // Check for @operationGroup (deprecated) or nested @client acting as sub-client
-    return (
-      getScopedDecoratorData(context, operationGroupKey, type) !== undefined ||
-      getScopedDecoratorData(context, clientKey, type) !== undefined
-    );
+    return getScopedDecoratorData(context, clientKey, type) !== undefined;
   }
   // if there is no explicit client, we will treat non-client namespaces and all interfaces as operation group
   if (type.kind === "Interface" && !isTemplateDeclaration(type)) {

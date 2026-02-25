@@ -638,21 +638,18 @@ it("operationGroup", async () => {
   const sdkPackage = context.sdkPackage;
   strictEqual(sdkPackage.clients.length, 1);
 
-  const mainClient = sdkPackage.clients.find((c) => c.name === "TestServiceClient");
+  const mainClient = sdkPackage.clients.find((c) => c.name === "MyOperationGroup");
   ok(mainClient);
-  ok(mainClient.children);
-  const operationGroup = mainClient.children[0];
-  ok(operationGroup);
-  strictEqual(operationGroup.parent, mainClient);
+  const operationGroup = mainClient;
 
-  strictEqual(mainClient.methods.length, 0);
-  strictEqual(mainClient.children?.length, 1);
+  strictEqual(mainClient.methods.length, 1);
+  strictEqual(mainClient.children?.length ?? 0, 0);
   strictEqual(mainClient.clientInitialization.parameters.length, 1);
   strictEqual(mainClient.clientInitialization.parameters[0].name, "endpoint");
-  strictEqual(mainClient.crossLanguageDefinitionId, "TestService");
+  strictEqual(mainClient.crossLanguageDefinitionId, "TestService.MyOperationGroup");
 
   strictEqual(operationGroup.clientInitialization.parameters.length, 1);
-  strictEqual(operationGroup.clientInitialization.initializedBy, InitializedByFlags.Default);
+  strictEqual(operationGroup.clientInitialization.initializedBy, InitializedByFlags.Individually);
   strictEqual(operationGroup.methods.length, 1);
   strictEqual(operationGroup.methods[0].name, "func");
   strictEqual(

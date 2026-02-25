@@ -1,5 +1,5 @@
 import { expectDiagnostics, t } from "@typespec/compiler/testing";
-import { ok, strictEqual } from "assert";
+import { strictEqual } from "assert";
 import { it } from "vitest";
 import { getClientNameOverride } from "../../src/decorators.js";
 import {
@@ -244,11 +244,7 @@ it("apply with @operationGroup decorator to interface client", async () => {
 
   const context = await createSdkContextForTester(program);
   strictEqual(context.sdkPackage.clients.length, 1);
-  const myServiceClient = context.sdkPackage.clients[0];
-  strictEqual(myServiceClient.name, "MyServiceClient");
-  ok(myServiceClient.children);
-  strictEqual(myServiceClient.children.length, 1);
-  const myOperationGroup = myServiceClient.children[0];
+  const myOperationGroup = context.sdkPackage.clients[0];
   strictEqual(myOperationGroup.name, "MyOperationGroup");
 });
 
