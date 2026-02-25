@@ -456,7 +456,7 @@ op ArmResourceDeleteAsync<
 op ArmResourceDeleteWithoutOkAsync<
   Resource extends Foundations.SimpleResource,
   BaseParameters = DefaultBaseParameters<Resource>,
-  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader &
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<FinalResult = void> &
     Azure.Core.Foundations.RetryAfterHeader,
   Parameters extends {} = {},
   Response extends {} = ArmDeleteAcceptedLroResponse<LroHeaders> | ArmDeletedNoContentResponse,
@@ -501,7 +501,7 @@ op ArmResourceDeleteSync<
 op ArmResourceActionAsyncBase<
   Resource extends Foundations.SimpleResource,
   Request,
-  Response extends {} | void,
+  Response extends TypeSpec.Reflection.Model | unknown | void,
   BaseParameters extends TypeSpec.Reflection.Model,
   Parameters extends {} = {},
   Error extends {} = ErrorResponse,
@@ -531,7 +531,7 @@ op ArmResourceActionAsyncBase<
 op ArmResourceActionAsync<
   Resource extends Foundations.SimpleResource,
   Request,
-  Response extends {} | void,
+  Response extends TypeSpec.Reflection.Model | unknown | void,
   BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
     Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
@@ -546,6 +546,43 @@ op ArmResourceActionAsync<
   Resource,
   Request,
   ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders> | Response,
+  BaseParameters,
+  Parameters,
+  Error,
+  OptionalRequestBody
+>;
+
+/**
+ * @dev The *standard*  long-running resource action.
+ * @template Resource The resource being acted upon
+ * @template Request The request model for the action
+ * @template Response The response model for the action, returned after polling the long-running operation
+ * @template BaseParameters Optional. Allows overriding the parameters for the operation
+ * @template LroHeaders Optional. Allows overriding the headers returned in the Accepted response
+ * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Error Optional. The error response, if non-standard.
+ * @template OptionalRequestBody Optional. Indicates whether the body parameter is optional.
+ */
+@returnsDoc("Azure operation completed successfully.")
+@Private.enforceConstraint(Resource, Foundations.Resource)
+op ActionAsync<
+  Resource extends Foundations.SimpleResource,
+  Request,
+  Response extends TypeSpec.Reflection.Model | unknown | void,
+  BaseParameters extends TypeSpec.Reflection.Model = DefaultBaseParameters<Resource>,
+  LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<
+    Azure.Core.StatusMonitorPollingOptions<ArmOperationStatus>,
+    Response,
+    string
+  > &
+    Azure.Core.Foundations.RetryAfterHeader,
+  Parameters extends {} = {},
+  Error extends {} = ErrorResponse,
+  OptionalRequestBody extends valueof boolean = false
+> is ArmResourceActionAsyncBase<
+  Resource,
+  Request,
+  ArmAcceptedLroResponse<"Resource operation accepted.", LroHeaders>,
   BaseParameters,
   Parameters,
   Error,
@@ -766,7 +803,7 @@ op ArmProviderActionSync<
 @Private.armUpdateProviderNamespace
 op ArmProviderActionAsync<
   Request extends {} | void = void,
-  Response extends {} | void = void,
+  Response extends TypeSpec.Reflection.Model | unknown | void = void,
   Scope extends {} = TenantActionScope,
   Parameters extends {} = {},
   LroHeaders extends TypeSpec.Reflection.Model = ArmLroLocationHeader<

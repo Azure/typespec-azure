@@ -1,5 +1,6 @@
 import type {
   DecoratorContext,
+  DecoratorValidatorCallbacks,
   EnumMember,
   EnumValue,
   Interface,
@@ -22,7 +23,7 @@ export interface ResourceOperationOptions {
 export type ArmResourceCollectionActionDecorator = (
   context: DecoratorContext,
   target: Operation,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * `@armResourceType` sets the value fo the decorated string
@@ -30,7 +31,29 @@ export type ArmResourceCollectionActionDecorator = (
  *
  * @param resource The resource to get the type of
  */
-export type ArmProviderNameValueDecorator = (context: DecoratorContext, target: Operation) => void;
+export type ArmProviderNameValueDecorator = (
+  context: DecoratorContext,
+  target: Operation,
+) => DecoratorValidatorCallbacks | void;
+
+/**
+ * This decorator is used to indicate the identifying properties of objects in the array, e.g. size
+ * The properties that are used as identifiers for the object needs to be provided as a list of strings.
+ *
+ * @param properties The list of properties that are used as identifiers for the object. This needs to be provided as a list of strings.
+ * @example
+ * ```typespec
+ * model Pet {
+ *  @identifiers(#["size"])
+ *  dog: Dog;
+ * }
+ * ```
+ */
+export type IdentifiersDecorator = (
+  context: DecoratorContext,
+  entity: ModelProperty | Type,
+  properties: readonly string[],
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * `@armProviderNamespace` sets the Azure Resource Manager provider name. It will default to use the
@@ -53,7 +76,7 @@ export type ArmProviderNamespaceDecorator = (
   context: DecoratorContext,
   target: Namespace,
   providerNamespace?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Declare the Azure Resource Manager library namespaces used in this provider.
@@ -65,7 +88,7 @@ export type UseLibraryNamespaceDecorator = (
   context: DecoratorContext,
   target: Namespace,
   ...namespaces: Namespace[]
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * `@armLibraryNamespace` designates a namespace as containign Azure Resource Manager Provider information.
@@ -76,7 +99,10 @@ export type UseLibraryNamespaceDecorator = (
  *  namespace Microsoft.Contoso;
  * ```
  */
-export type ArmLibraryNamespaceDecorator = (context: DecoratorContext, target: Namespace) => void;
+export type ArmLibraryNamespaceDecorator = (
+  context: DecoratorContext,
+  target: Namespace,
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * `@singleton` marks an Azure Resource Manager resource model as a singleton resource.
@@ -92,7 +118,7 @@ export type SingletonDecorator = (
   context: DecoratorContext,
   target: Model,
   keyValue?: string | "default",
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * `@tenantResource` marks an Azure Resource Manager resource model as a Tenant resource/Root resource/Top-Level resource.
@@ -102,7 +128,10 @@ export type SingletonDecorator = (
  *
  * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  */
-export type TenantResourceDecorator = (context: DecoratorContext, target: Model) => void;
+export type TenantResourceDecorator = (
+  context: DecoratorContext,
+  target: Model,
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * `@subscriptionResource` marks an Azure Resource Manager resource model as a subscription resource.
@@ -112,7 +141,10 @@ export type TenantResourceDecorator = (context: DecoratorContext, target: Model)
  *
  * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  */
-export type SubscriptionResourceDecorator = (context: DecoratorContext, target: Model) => void;
+export type SubscriptionResourceDecorator = (
+  context: DecoratorContext,
+  target: Model,
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * `@locationResource` marks an Azure Resource Manager resource model as a location based resource.
@@ -122,7 +154,10 @@ export type SubscriptionResourceDecorator = (context: DecoratorContext, target: 
  *
  * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  */
-export type LocationResourceDecorator = (context: DecoratorContext, target: Model) => void;
+export type LocationResourceDecorator = (
+  context: DecoratorContext,
+  target: Model,
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * `@resourceGroupResource` marks an Azure Resource Manager resource model as a resource group level resource.
@@ -133,7 +168,10 @@ export type LocationResourceDecorator = (context: DecoratorContext, target: Mode
  *
  * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  */
-export type ResourceGroupResourceDecorator = (context: DecoratorContext, target: Model) => void;
+export type ResourceGroupResourceDecorator = (
+  context: DecoratorContext,
+  target: Model,
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * `@extensionResource` marks an Azure Resource Manager resource model as an Extension resource.
@@ -144,7 +182,10 @@ export type ResourceGroupResourceDecorator = (context: DecoratorContext, target:
  *
  * See more details on [different Azure Resource Manager resource type here.](https://azure.github.io/typespec-azure/docs/howtos/ARM/resource-type)
  */
-export type ExtensionResourceDecorator = (context: DecoratorContext, target: Model) => void;
+export type ExtensionResourceDecorator = (
+  context: DecoratorContext,
+  target: Model,
+) => DecoratorValidatorCallbacks | void;
 
 /**
  *
@@ -158,7 +199,7 @@ export type ArmResourceActionDecorator = (
   target: Operation,
   resourceModel: Model,
   resourceName?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  *
@@ -172,7 +213,7 @@ export type ArmResourceCreateOrUpdateDecorator = (
   target: Operation,
   resourceModel: Model,
   resourceName?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  *
@@ -186,7 +227,7 @@ export type ArmResourceReadDecorator = (
   target: Operation,
   resourceModel: Model,
   resourceName?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  *
@@ -200,7 +241,7 @@ export type ArmResourceUpdateDecorator = (
   target: Operation,
   resourceModel: Model,
   resourceName?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  *
@@ -214,7 +255,7 @@ export type ArmResourceDeleteDecorator = (
   target: Operation,
   resourceModel: Model,
   resourceName?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  *
@@ -228,7 +269,7 @@ export type ArmResourceListDecorator = (
   target: Operation,
   resourceModel: Model,
   resourceName?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Marks the operation as being a check existence (HEAD) operation
@@ -241,7 +282,7 @@ export type ArmResourceCheckExistenceDecorator = (
   target: Operation,
   resourceModel: Model,
   resourceName?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * This decorator is used to identify interfaces containing resource operations.
@@ -268,7 +309,7 @@ export type ArmResourceOperationsDecorator = (
   context: DecoratorContext,
   target: Interface,
   resourceOperationOptions?: Type | ResourceOperationOptions,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * This decorator is used either on a namespace or a version enum value to indicate
@@ -280,7 +321,7 @@ export type ArmCommonTypesVersionDecorator = (
   context: DecoratorContext,
   target: Namespace | EnumMember,
   version: string | EnumValue,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * This decorator is used on Azure Resource Manager resources that are not based on
@@ -293,7 +334,7 @@ export type ArmVirtualResourceDecorator = (
   context: DecoratorContext,
   target: Model,
   provider?: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * This decorator sets the base type of the given resource.
@@ -304,30 +345,12 @@ export type ResourceBaseTypeDecorator = (
   context: DecoratorContext,
   target: Model,
   baseTypeIt: Type,
-) => void;
-
-/**
- * This decorator is used to indicate the identifying properties of objects in the array, e.g. size
- * The properties that are used as identifiers for the object needs to be provided as a list of strings.
- *
- * @param properties The list of properties that are used as identifiers for the object. This needs to be provided as a list of strings.
- * @example
- * ```typespec
- * model Pet {
- *  @identifiers(#["size"])
- *  dog: Dog;
- * }
- * ```
- */
-export type IdentifiersDecorator = (
-  context: DecoratorContext,
-  entity: ModelProperty | Type,
-  properties: readonly string[],
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 export type AzureResourceManagerDecorators = {
   armResourceCollectionAction: ArmResourceCollectionActionDecorator;
   armProviderNameValue: ArmProviderNameValueDecorator;
+  identifiers: IdentifiersDecorator;
   armProviderNamespace: ArmProviderNamespaceDecorator;
   useLibraryNamespace: UseLibraryNamespaceDecorator;
   armLibraryNamespace: ArmLibraryNamespaceDecorator;
@@ -348,5 +371,4 @@ export type AzureResourceManagerDecorators = {
   armCommonTypesVersion: ArmCommonTypesVersionDecorator;
   armVirtualResource: ArmVirtualResourceDecorator;
   resourceBaseType: ResourceBaseTypeDecorator;
-  identifiers: IdentifiersDecorator;
 };

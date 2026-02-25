@@ -88,7 +88,7 @@ Most TCGC types share the following common properties:
 - **`access`**: Indicates whether the type has public or private accessibility.
 - **`usage`**: Indicates the type's usage information; its value is a bitmap of [`UsageFlags`](../reference/js-api/enumerations/usageflags/) enumeration.
 - **`deprecation`**: Indicates whether the type is deprecated and provides the deprecation message.
-- **`clientDefaultValue`**: The type's default value if provided. Currently, it only exists in endpoint and API version parameters.
+- **`clientDefaultValue`**: The type's default value if provided. Set via the `@clientDefaultValue` decorator or auto-set for endpoint and API version parameters.
 
 ### Package
 
@@ -161,7 +161,7 @@ TCGC currently supports one kind of operation: [`SdkHttpOperation`](../reference
 
 `SdkHttpOperation` contains verb, path, URI template, query/header/path/cookie/body parameters, responses, and exceptions of an HTTP operation.
 
-Each parameter for an HTTP operation has a `correspondingMethodParams` property to indicate the mapping of one payload parameter with one or more method-level parameters or model properties. This helps emitters determine how to compose the underlying payload with the method's parameters. One body parameter can have several method-level parameter or model property mappings because of the implicit body parameter resolving from the TypeSpec HTTP library.
+Each parameter for an HTTP operation has a `methodParameterSegments` property to indicate the mapping of one payload parameter with the path of one or more method-level parameters or model properties. This helps emitters determine how to compose the underlying payload with the method's parameters. One body parameter can have several method-level parameter or model property mapping paths because of the implicit body parameter resolving from the TypeSpec HTTP library.
 
 ### Type
 
@@ -209,6 +209,8 @@ For types in TypeSpec, TCGC provides several client types to represent them in a
     - `discriminatedSubtypes`: List of all subtypes of this discriminated model
   - For subtypes of discriminated models:
     - `discriminatorValue`: The instance value for the discriminator for this subtype
+  - For array properties:
+    - `arrayEncode`: Indicates the encoding style for array properties (if specified).
 
 ### Example types
 
@@ -256,7 +258,7 @@ With `@clientInitialization` decorator, the default behavior may change. New cli
 
 ### Method Detection
 
-The methods depend on the combination usage of `Operation`, `@scope` and `@moveTo`.
+The methods depend on the combination usage of `Operation`, `@scope`, and `@moveTo`.
 
 A client's operations include the `Operation` under the client's `Namespace` or `Interface`, adding any operations with `@moveTo` current client, deducting any operations with `@scope` out of current emitter or `@moveTo` another client.
 

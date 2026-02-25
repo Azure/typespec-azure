@@ -402,60 +402,6 @@ describe("typespec-autorest: definitions", () => {
     deepStrictEqual(res.defs.Pet.properties.someString.default, "withDefault");
   });
 
-  describe("unions", () => {
-    it("emit a warning", async () => {
-      const diagnostics = await diagnoseOpenApiFor(`
-      model Pet {
-        name: string | int32;
-      };
-      op test(): Pet;
-      `);
-      expectDiagnostics(diagnostics, {
-        code: "@azure-tools/typespec-autorest/union-unsupported",
-        message:
-          "Unions cannot be emitted to OpenAPI v2 unless all options are literals of the same type.",
-      });
-    });
-
-    it("produce an empty schema", async () => {
-      const res: any = await oapiForModel(
-        "Pet",
-        `
-      model Pet {
-        #suppress "@azure-tools/typespec-autorest/union-unsupported" test
-        name: string | int32;
-      };
-      `,
-      );
-      ok(res.isRef);
-      deepStrictEqual(res.defs.Pet, {
-        type: "object",
-        properties: {
-          name: {},
-        },
-        required: ["name"],
-      });
-    });
-
-    it("overrides x-ms-enum.name with @clientName", async () => {
-      const res: any = await compileOpenAPI(
-        `
-        @clientName("RenamedFoo")
-        union Foo {
-          foo: "foo",
-          bar: "bar"
-        }
-
-        model FooResponse {
-          foo: Foo;
-        }`,
-        { preset: "azure" },
-      );
-      const schema = res.definitions.RenamedFoo;
-      deepStrictEqual(schema["x-ms-enum"].name, "RenamedFoo");
-    });
-  });
-
   it("recovers logical type name", async () => {
     const oapi: any = await compileOpenAPI(
       `

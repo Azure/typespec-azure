@@ -4,11 +4,7 @@ import "@azure-tools/typespec-azure-core";
 import "@azure-tools/typespec-azure-resource-manager";
 import "@typespec/spector";
 
-using Http;
 using Rest;
-using Azure.Core;
-using Azure.ResourceManager;
-using OpenAPI;
 using Spector;
 
 namespace Azure.ResourceManager.OperationTemplates;
@@ -247,4 +243,83 @@ interface Lro {
     Expected no response body
     """)
   delete is ArmResourceDeleteWithoutOkAsync<Order>;
+
+  @scenario
+  @scenarioDoc("""
+    Subscription-scoped POST operation returning an array.
+    Service returns both Location and Azure-AsyncOperation header on initial request.
+    final-state-via: location
+    
+    Expected verb: POST
+    Expected path: /subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/exportArray
+    Expected query parameter: api-version=2023-12-01-preview
+    Expected request body:
+    ```json
+    {
+      "format": "csv"
+    }
+    ```
+    Expected response status code: 202
+    Expected response headers: 
+      - Azure-AsyncOperation={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao
+      - Location={endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_location
+    Expected no response body
+    
+    Whether you do polling through AAO, Location or combined, first one will respond with provisioning state "InProgress", second one with "Succeeded".
+    
+    AAO first poll.
+    Expected verb: GET
+    Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao
+    Expected status code: 200
+    Expected response body:
+    ```json
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao",
+      "name": "lro_exportarray_aao",
+      "status" : "InProgress",
+      "startTime": "2024-11-08T01:41:53.5508583+00:00"
+    }
+    ```
+    
+    AAO second poll.
+    Expected verb: GET
+    Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao
+    Expected status code: 200
+    Expected response body:
+    ```json
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_aao",
+      "name": "lro_exportarray_aao",
+      "status" : "Succeeded",
+      "startTime": "2024-11-08T01:41:53.5508583+00:00",
+      "endTime": "2024-11-08T01:42:41.5354192+00:00"
+    }
+    ```
+    
+    Location first poll.
+    Expected verb: GET
+    Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_location
+    Expected status code: 202
+    Expected no response body
+    
+    Location second poll.
+    Expected verb: GET
+    Expected URL: {endpoint}/subscriptions/00000000-0000-0000-0000-000000000000/providers/Azure.ResourceManager.OperationTemplates/locations/eastus/operations/lro_exportarray_location
+    Expected status code: 200
+    Expected response body:
+    ```json
+    [
+      {"content": "order1,product1,1"},
+      {"content": "order2,product2,2"}
+    ]
+    ```
+    """)
+  exportArray is ArmProviderActionAsync<
+    ExportRequest,
+    ExportResult[],
+    SubscriptionActionScope,
+    {},
+    LroHeaders = ArmCombinedLroHeaders<FinalResult = ExportResult[]> &
+      Azure.Core.Foundations.RetryAfterHeader
+  >;
 }

@@ -84,7 +84,7 @@
         "tags": [
           "Widgets"
         ],
-        "description": "List WidgetResource resources by subscription ID",
+        "description": "List Widget resources by subscription ID",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -97,7 +97,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/WidgetResourceListResult"
+              "$ref": "#/definitions/WidgetListResult"
             }
           },
           "default": {
@@ -118,7 +118,7 @@
         "tags": [
           "Widgets"
         ],
-        "description": "List WidgetResource resources by resource group",
+        "description": "List Widget resources by resource group",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -134,7 +134,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/WidgetResourceListResult"
+              "$ref": "#/definitions/WidgetListResult"
             }
           },
           "default": {
@@ -155,7 +155,7 @@
         "tags": [
           "Widgets"
         ],
-        "description": "Get a WidgetResource",
+        "description": "Get a Widget",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -169,7 +169,7 @@
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget.",
+            "description": "The name of the Widget",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -179,7 +179,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/WidgetResource"
+              "$ref": "#/definitions/Widget"
             }
           },
           "default": {
@@ -195,7 +195,7 @@
         "tags": [
           "Widgets"
         ],
-        "description": "Create a WidgetResource",
+        "description": "Create a Widget",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -209,7 +209,7 @@
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget.",
+            "description": "The name of the Widget",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -220,21 +220,21 @@
             "description": "Resource create parameters.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/WidgetResource"
+              "$ref": "#/definitions/Widget"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Resource 'WidgetResource' update operation succeeded",
+            "description": "Resource 'Widget' update operation succeeded",
             "schema": {
-              "$ref": "#/definitions/WidgetResource"
+              "$ref": "#/definitions/Widget"
             }
           },
           "201": {
-            "description": "Resource 'WidgetResource' create operation succeeded",
+            "description": "Resource 'Widget' create operation succeeded",
             "schema": {
-              "$ref": "#/definitions/WidgetResource"
+              "$ref": "#/definitions/Widget"
             },
             "headers": {
               "Azure-AsyncOperation": {
@@ -265,7 +265,7 @@
         "tags": [
           "Widgets"
         ],
-        "description": "Update a WidgetResource",
+        "description": "Update a Widget",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -279,7 +279,7 @@
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget.",
+            "description": "The name of the Widget",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -290,7 +290,7 @@
             "description": "The resource properties to be updated.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/WidgetResourceTagsUpdate"
+              "$ref": "#/definitions/WidgetTagsUpdate"
             }
           }
         ],
@@ -298,7 +298,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/WidgetResource"
+              "$ref": "#/definitions/Widget"
             }
           },
           "default": {
@@ -314,7 +314,7 @@
         "tags": [
           "Widgets"
         ],
-        "description": "Delete a WidgetResource",
+        "description": "Delete a Widget",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -328,7 +328,7 @@
           {
             "name": "widgetName",
             "in": "path",
-            "description": "The name of the widget.",
+            "description": "The name of the Widget",
             "required": true,
             "type": "string",
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
@@ -398,14 +398,13 @@
       },
       "readOnly": true
     },
-    "WidgetResource": {
+    "Widget": {
       "type": "object",
       "description": "Widget Resource",
       "properties": {
         "properties": {
-          "$ref": "#/definitions/WidgetResourceProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "$ref": "#/definitions/WidgetProperties",
+          "description": "The resource-specific properties for this resource."
         },
         "identity": {
           "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/managedidentity.json#/definitions/ManagedServiceIdentity",
@@ -418,15 +417,15 @@
         }
       ]
     },
-    "WidgetResourceListResult": {
+    "WidgetListResult": {
       "type": "object",
-      "description": "The response of a WidgetResource list operation.",
+      "description": "The response of a Widget list operation.",
       "properties": {
         "value": {
           "type": "array",
-          "description": "The WidgetResource items on this page",
+          "description": "The Widget items on this page",
           "items": {
-            "$ref": "#/definitions/WidgetResource"
+            "$ref": "#/definitions/Widget"
           }
         },
         "nextLink": {
@@ -439,7 +438,7 @@
         "value"
       ]
     },
-    "WidgetResourceProperties": {
+    "WidgetProperties": {
       "type": "object",
       "description": "Widget Resource Properties.",
       "properties": {
@@ -461,9 +460,9 @@
         "color"
       ]
     },
-    "WidgetResourceTagsUpdate": {
+    "WidgetTagsUpdate": {
       "type": "object",
-      "description": "The type used for updating tags in WidgetResource resources.",
+      "description": "The type used for updating tags in Widget resources.",
       "properties": {
         "tags": {
           "type": "object",

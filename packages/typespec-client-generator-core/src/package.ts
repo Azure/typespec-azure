@@ -1,4 +1,9 @@
-import { createDiagnosticCollector, Diagnostic, ignoreDiagnostics } from "@typespec/compiler";
+import {
+  createDiagnosticCollector,
+  Diagnostic,
+  getNamespaceFullName,
+  ignoreDiagnostics,
+} from "@typespec/compiler";
 import { prepareClientAndOperationCache } from "./cache.js";
 import { createSdkClientType } from "./clients.js";
 import { listClients } from "./decorators.js";
@@ -14,7 +19,11 @@ import {
   SdkUnionType,
   TCGCContext,
 } from "./interfaces.js";
-import { filterApiVersionsWithDecorators, getTypeDecorators } from "./internal-utils.js";
+import {
+  filterApiVersionsWithDecorators,
+  getActualClientType,
+  getTypeDecorators,
+} from "./internal-utils.js";
 import { getLicenseInfo } from "./license.js";
 import { getCrossLanguagePackageId, getNamespaceFromType } from "./public-utils.js";
 import { getAllReferencedTypes, handleAllTypes } from "./types.js";
@@ -28,6 +37,20 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
   const crossLanguagePackageId = diagnostics.pipe(getCrossLanguagePackageId(context));
   const allReferencedTypes = getAllReferencedTypes(context);
   const versions = context.getPackageVersions();
+
+  // Create apiVersions map for multiple services
+  const apiVersionsMap = new Map<string, string>();
+  for (const [namespace, versionList] of versions.entries()) {
+    const fullName = getNamespaceFullName(namespace);
+    const latestVersion = versionList.at(-1);
+    if (latestVersion) {
+      // When apiVersion config is "all" for single service, store "all" in the map as well
+      const versionValue =
+        context.apiVersion === "all" && versions.size === 1 ? "all" : latestVersion;
+      apiVersionsMap.set(fullName, versionValue);
+    }
+  }
+
   const sdkPackage: SdkPackage<TServiceOperation> = {
     clients: listClients(context).map((c) => diagnostics.pipe(createSdkClientType(context, c))),
     models: allReferencedTypes.filter((x): x is SdkModelType => x.kind === "model"),
@@ -39,7 +62,13 @@ export function createSdkPackage<TServiceOperation extends SdkServiceOperation>(
     namespaces: [],
     licenseInfo: getLicenseInfo(context),
     metadata: {
-      apiVersion: context.apiVersion === "all" ? "all" : versions[versions.length - 1],
+      apiVersion:
+        context.apiVersion === "all" && versions.size === 1
+          ? "all"
+          : versions.size === 1
+            ? [...versions.values()][0].at(-1)
+            : undefined,
+      apiVersions: apiVersionsMap,
     },
   };
   organizeNamespaces(context, sdkPackage);
@@ -113,22 +142,26 @@ function populateApiVersionInformation(context: TCGCContext): void {
   if (context.__rawClientsOperationGroupsCache === undefined) {
     prepareClientAndOperationCache(context);
   }
-  for (const clientOperationGroup of context.__rawClientsOperationGroupsCache!.values()) {
-    context.setApiVersionsForType(
-      clientOperationGroup.type ?? clientOperationGroup.service,
-      filterApiVersionsWithDecorators(
-        context,
-        clientOperationGroup.type ?? clientOperationGroup.service,
-        context.getPackageVersions(),
-      ),
-    );
 
-    const clientApiVersions = context.getApiVersionsForType(
-      clientOperationGroup.type ?? clientOperationGroup.service,
-    );
-    context.__clientApiVersionDefaultValueCache.set(
-      clientOperationGroup,
-      clientApiVersions[clientApiVersions.length - 1],
-    );
+  // Get the package versions map once (this handles both single and multi-service scenarios)
+  const packageVersions = context.getPackageVersions();
+
+  for (const client of context.__rawClientsOperationGroupsCache!.values()) {
+    const clientType = getActualClientType(client);
+
+    // Multiple service case. Set empty result.
+    if (client.services.length > 1) {
+      context.setApiVersionsForType(clientType, []);
+      context.__clientApiVersionDefaultValueCache.set(client, undefined);
+    } else {
+      const versions = filterApiVersionsWithDecorators(
+        context,
+        clientType,
+        packageVersions.get(client.services[0]) || [],
+      );
+      context.setApiVersionsForType(clientType, versions);
+
+      context.__clientApiVersionDefaultValueCache.set(client, versions[versions.length - 1]);
+    }
   }
 }

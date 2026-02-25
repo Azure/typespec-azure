@@ -1,15 +1,9 @@
 import { strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-});
+import { it } from "vitest";
+import { createSdkContextForTester, SimpleTester } from "../tester.js";
 
 it("same type's dictionary come to same type", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace TestClient {
       model Test {
@@ -31,7 +25,8 @@ it("same type's dictionary come to same type", async () => {
       op get(): TestDictionary;
     }
   `);
-  const testDictionaryModel = runner.context.sdkPackage.models[0];
+  const context = await createSdkContextForTester(program);
+  const testDictionaryModel = context.sdkPackage.models[0];
   strictEqual(testDictionaryModel.kind, "model");
   strictEqual(testDictionaryModel.name, "TestDictionary");
   strictEqual(testDictionaryModel.properties.length, 10);
@@ -53,7 +48,7 @@ it("same type's dictionary come to same type", async () => {
 });
 
 it("recursive dictionary type", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace TestClient {
       model Test {
@@ -66,12 +61,13 @@ it("recursive dictionary type", async () => {
       op get(): TestDictionary;
     }
   `);
-  const testModel = runner.context.sdkPackage.models[1];
+  const context = await createSdkContextForTester(program);
+  const testModel = context.sdkPackage.models[1];
   strictEqual(testModel.kind, "model");
   strictEqual(testModel.name, "Test");
   strictEqual(testModel.properties.length, 1);
   const modelProp = testModel.properties[0];
-  const testDictionaryModel = runner.context.sdkPackage.models[0];
+  const testDictionaryModel = context.sdkPackage.models[0];
   strictEqual(testDictionaryModel.kind, "model");
   strictEqual(testDictionaryModel.name, "TestDictionary");
   strictEqual(testDictionaryModel.properties.length, 1);

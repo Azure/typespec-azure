@@ -3,14 +3,12 @@
   "composite": true,
   "references": [
     { "path": "../../core/packages/compiler/tsconfig.json" },
-    { "path": "../../core/packages/rest/tsconfig.json" },
-    { "path": "../../core/packages/openapi/tsconfig.json" }
+    { "path": "../../core/packages/rest/tsconfig.json" }
   ],
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": ".",
     // "verbatimModuleSyntax": true,
     "tsBuildInfoFile": "temp/tsconfig.tsbuildinfo"
-  },
-  "include": ["src/**/*.ts", "generated-defs/**/*.ts", "test/**/*.ts"]
+  }
 }

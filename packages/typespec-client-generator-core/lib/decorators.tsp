@@ -12,7 +12,13 @@ namespace Azure.ClientGenerator.Core;
  * @param target The type you want to rename.
  * @param rename The rename you want applied to the object.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
  *
  * @example Rename a model
  * ```typespec
@@ -55,33 +61,91 @@ extern dec clientName(target: unknown, rename: valueof string, scope?: valueof s
 
 /**
  * Whether you want to generate an operation as a convenient method.
- * @param target The target operation.
+ * When applied to a namespace or interface, it affects all operations within that scope unless explicitly overridden.
+ * @param target The target operation, namespace, or interface.
  * @param flag Whether to generate the operation as a convenience method or not.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  *
- * @example
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
+ *
+ * @example Apply to a single operation
  * ```typespec
  * @convenientAPI(false)
  * op test: void;
  * ```
+ *
+ * @example Apply to all operations in an interface
+ * ```typespec
+ * @convenientAPI(false)
+ * interface MyOperations {
+ *   op test1(): void;
+ *   op test2(): void;
+ * }
+ * ```
+ *
+ * @example Apply to all operations in a namespace
+ * ```typespec
+ * @convenientAPI(false)
+ * namespace MyService {
+ *   op test1(): void;
+ *   op test2(): void;
+ * }
+ * ```
  */
-extern dec convenientAPI(target: Operation, flag?: valueof boolean, scope?: valueof string);
+extern dec convenientAPI(
+  target: Operation | Namespace | Interface,
+  flag?: valueof boolean,
+  scope?: valueof string
+);
 
 /**
  * Whether you want to generate an operation as a protocol method.
- * @param target The target operation.
+ * When applied to a namespace or interface, it affects all operations within that scope unless explicitly overridden.
+ * @param target The target operation, namespace, or interface.
  * @param flag Whether to generate the operation as a protocol method or not.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
  *
- * @example
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
+ *
+ * @example Apply to a single operation
  * ```typespec
  * @protocolAPI(false)
  * op test: void;
  * ```
+ *
+ * @example Apply to all operations in an interface
+ * ```typespec
+ * @protocolAPI(false)
+ * interface MyOperations {
+ *   op test1(): void;
+ *   op test2(): void;
+ * }
+ * ```
+ *
+ * @example Apply to all operations in a namespace
+ * ```typespec
+ * @protocolAPI(false)
+ * namespace MyService {
+ *   op test1(): void;
+ *   op test2(): void;
+ * }
+ * ```
  */
-extern dec protocolAPI(target: Operation, flag?: valueof boolean, scope?: valueof string);
+extern dec protocolAPI(
+  target: Operation | Namespace | Interface,
+  flag?: valueof boolean,
+  scope?: valueof string
+);
 
 /**
  * Define the client generated in the client SDK.
@@ -90,7 +154,13 @@ extern dec protocolAPI(target: Operation, flag?: valueof boolean, scope?: valueo
  * @param target The target namespace or interface that you want to define as a client.
  * @param options Optional configuration for the service.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
  *
  * @example Basic client definition
  * ```typespec
@@ -117,10 +187,10 @@ extern dec client(target: Namespace | Interface, options?: ClientOptions, scope?
  */
 model ClientOptions {
   /**
-   * The service that this client is generated for. If not specified, TCGC will look up the first parent namespace decorated with `@service` for the target.
+   * The services that this client is generated for. If not specified, TCGC will look up the first parent namespace decorated with `@service` for the target.
    * The namespace should be decorated with `@service`.
    */
-  service?: Namespace;
+  service?: Namespace | Namespace[];
 
   /**
    * The name of the client. If not specified, the default name will be `<Name of the target>Client`.
@@ -134,7 +204,13 @@ model ClientOptions {
  * This decorator cannot be used along with `@clientLocation`. This decorator cannot be used as augmentation.
  * @param target The target namespace or interface that you want to define as a sub client.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
  *
  * @example
  * ```typespec
@@ -186,7 +262,13 @@ enum Usage {
  * @param value The usage info you want to add for this model. It can be a single value of `Usage` enum value or a combination of `Usage` enum values using bitwise OR.
  * For example, `Usage.input | Usage.output | Usage.json`.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
  *
  * @example Add usage for model
  * ```typespec
@@ -275,7 +357,13 @@ enum Access {
  * @param target The target type you want to override access info.
  * @param value The access info you want to set for this model or operation. It should be one of the `Access` enum values, either `Access.public` or `Access.internal`.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
  *
  * @example Set access
  * ```typespec
@@ -414,7 +502,13 @@ extern dec access(
  * @param target: The target operation that you want to override.
  * @param override: The override method definition that specifies the exact client method you want
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
  *
  * @example Customize parameters into an option bag
  * ```typespec
@@ -461,7 +555,13 @@ extern dec override(target: Operation, override: Operation, scope?: valueof stri
  * Whether a model needs the custom JSON converter, this is only used for backward compatibility for csharp.
  * @param target The target model that you want to set the custom JSON converter.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
  *
  * @example
  * ```typespec
@@ -486,6 +586,11 @@ enum InitializedBy {
    * The client could be initialized by parent client.
    */
   parent: 2,
+
+  /**
+   * The client initialization should be omitted from generated code and handled manually in custom code.
+   */
+  customizeCode: 4,
 }
 
 /**
@@ -497,7 +602,13 @@ enum InitializedBy {
  * @param target The target client that you want to customize client initialization for.
  * @param options The options for client initialization. You can use `ClientInitializationOptions` model to set the options.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
  *
  * @example Add client initialization parameters
  * ```typespec
@@ -545,7 +656,13 @@ model ClientInitializationOptions {
  * @param target The target model property that you want to alias.
  * @param paramAlias The alias name you want to apply to the target model property.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
  *
  * @example Elevate an operation parameter to client level and alias it to a different name
  * ```typespec
@@ -575,7 +692,13 @@ extern dec paramAlias(target: ModelProperty, paramAlias: valueof string, scope?:
  * @param target The type you want to change the namespace for.
  * @param rename The rename you want applied to the object
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
  *
  * @example Change a namespace to a different name
  * ```typespec
@@ -621,10 +744,17 @@ model ExternalType {
  * Set an alternate type for a model property, Scalar, Model, Enum, Union, or function parameter. Note that `@encode` will be overridden by the one defined in the alternate type.
  * When the source type is `Scalar`, the alternate type must be `Scalar`.
  * The replaced type could be a type defined in the TypeSpec or an external type declared by type identity, package that export the type and package version.
+ * **Important:** External types (with `identity` property) cannot be applied to model properties. They must be applied to the type definition itself (Scalar, Model, Enum, or Union).
  * @param target The source type to which the alternate type will be applied.
  * @param alternate The alternate type to apply to the target. Can be a TypeSpec type or an ExternalType.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
  * @example Change a model property to a different type
  * ```typespec
  * model Foo {
@@ -677,6 +807,25 @@ model ExternalType {
  *   // ... properties
  * }
  * ```
+ *
+ * @example Invalid: External type on model property (will emit a warning)
+ * ```typespec
+ * model MyModel {
+ *   field: FieldType;
+ * }
+ * // This will emit a warning - external types cannot be applied to properties
+ * @@alternateType(MyModel.field, {
+ *   identity: "ExternalType",
+ * }, "rust");
+ *
+ * // Correct: Apply external type to the type definition instead
+ * @alternateType({
+ *   identity: "ExternalType",
+ * }, "rust")
+ * model FieldType {
+ *   // ... properties
+ * }
+ * ```
  */
 extern dec alternateType(
   target: ModelProperty | Scalar | Model | Enum | Union,
@@ -685,12 +834,18 @@ extern dec alternateType(
 );
 
 /**
- * Define the scope of an operation.
- * By default, the operation will be applied to all language emitters.
- * This decorator allows you to omit the operation from certain languages or apply it to specific languages.
- * @param target The target operation that you want to scope.
+ * Define the scope of an operation or model property.
+ * By default, the element will be applied to all language emitters.
+ * This decorator allows you to omit the element from certain languages or apply it to specific languages.
+ * @param target The target operation or model property that you want to scope.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
  *
  * @example Omit an operation from a specific language
  * ```typespec
@@ -703,8 +858,16 @@ extern dec alternateType(
  * @scope("go")
  * op test: void;
  * ```
+ *
+ * @example Apply a model property to specific languages
+ * ```typespec
+ * model TestModel {
+ *   @scope("csharp")
+ *   csharpOnlyProp: string;
+ * }
+ * ```
  */
-extern dec scope(target: Operation, scope?: valueof string);
+extern dec scope(target: Operation | ModelProperty, scope?: valueof string);
 
 /**
  * Specify whether a parameter is an API version parameter or not.
@@ -714,7 +877,13 @@ extern dec scope(target: Operation, scope?: valueof string);
  * @param target The target parameter that you want to mark as an API version parameter.
  * @param value If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
  *
  * @example Mark a parameter as an API version parameter
  * ```typespec
@@ -746,7 +915,13 @@ extern dec apiVersion(target: ModelProperty, value?: valueof boolean, scope?: va
  * @param target The target client for which you want to define additional API versions.
  * @param value If true, we will treat this parameter as an api-version parameter. If false, we will not. Default is true.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
  *
  * @example Add additional API versions to a client
  * ```typespec
@@ -769,7 +944,13 @@ extern dec clientApiVersions(target: Namespace, value: Enum, scope?: valueof str
  * Indicates that a model property of type `string` or a `Scalar` type derived from `string` should be deserialized as `null` when its value is an empty string (`""`).
  * @param target The target type that you want to apply this deserialization behavior to.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
  *
  * @example
  * ```typespec
@@ -793,7 +974,13 @@ extern dec deserializeEmptyStringAsNull(target: ModelProperty, scope?: valueof s
  * 2xx will return `true`. Everything else will still raise an error.
  * @param target The target operation that you want to apply this behavior to.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
  *
  * @example
  * ```typespec
@@ -810,7 +997,13 @@ extern dec responseAsBool(target: Operation, scope?: valueof string);
  * @param source The operation to change location for.
  * @param target The target `Namespace`, `Interface` or a string which can indicate the client.
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
  * 
  * @example Move to existing sub client
  * ```typespec
@@ -916,7 +1109,13 @@ enum DocumentationMode {
  * @param documentation The client-specific documentation to apply
  * @param mode Specifies how to apply the documentation (append or replace)
  * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
- * You can use "!" to exclude specific languages, for example: !(java, python) or !java, !python.
+ *
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
  *
  * @example Replacing documentation
  * ```typespec
@@ -946,5 +1145,43 @@ extern dec clientDoc(
   target: unknown,
   documentation: valueof string,
   mode: EnumMember,
+  scope?: valueof string
+);
+
+/**
+ * Pass experimental flags or options to emitters without requiring TCGC reshipping.
+ * This decorator is intended for temporary workarounds or experimental features and requires
+ * suppression to acknowledge its experimental nature.
+ *
+ * See supported client options for each language emitter here https://azure.github.io/typespec-azure/docs/howtos/generate-client-libraries/12clientOptions/
+ *
+ * **Warning**: This decorator always emits a warning that must be suppressed, and an additional
+ * warning if no scope is provided (since options are typically language-specific).
+ *
+ * @param target The type you want to apply the option to.
+ * @param name The name of the option (e.g., "enableFeatureFoo").
+ * @param value The value of the option. Can be any type; emitters will cast as needed.
+ * @param scope Specifies the target language emitters that the decorator should apply. If not set, the decorator will be applied to all language emitters by default.
+ *
+ * **Supported language identifiers:** `csharp`, `python`, `java`, `javascript`, `go`, and other language emitter names (derived from the emitter package name, e.g., `@azure-tools/typespec-csharp` → `csharp`).
+ *
+ * **Valid patterns:**
+ * - Single language: `"python"`
+ * - Multiple languages (comma-separated): `"python, java"`
+ * - Negation to exclude languages: `"!csharp"` or `"!(java, python)"`
+ *
+ * @example Apply an experimental option for Python
+ * ```typespec
+ * #suppress "@azure-tools/typespec-client-generator-core/client-option" "preview feature for python"
+ * @clientOption("enableFeatureFoo", true, "python")
+ * model MyModel {
+ *   prop: string;
+ * }
+ * ```
+ */
+extern dec clientOption(
+  target: unknown,
+  name: valueof string,
+  value: valueof unknown,
   scope?: valueof string
 );

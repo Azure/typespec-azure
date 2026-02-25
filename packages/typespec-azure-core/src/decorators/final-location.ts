@@ -1,8 +1,9 @@
 import {
+  IntrinsicType,
   isNeverType,
+  isUnknownType,
   isVoidType,
   type DecoratorContext,
-  type IntrinsicType,
   type Model,
   type ModelProperty,
   type Type,
@@ -37,7 +38,7 @@ export const $finalLocation: FinalLocationDecorator = (
       setFinalLocationValue(program, entity, finalResult);
       break;
     case "Intrinsic":
-      if (isVoidType(finalResult)) {
+      if (isVoidType(finalResult) || isUnknownType(finalResult)) {
         setFinalLocationValue(program, entity, finalResult);
       }
   }

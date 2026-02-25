@@ -6,9 +6,6 @@ import "@typespec/spector";
 
 using Http;
 using Rest;
-using Azure.Core;
-using Azure.ResourceManager;
-using OpenAPI;
 using Spector;
 
 namespace Azure.ResourceManager.Resources;
@@ -136,7 +133,7 @@ interface Nested {
     }
     ```
     """)
-  update is ArmResourcePatchAsync<NestedProxyResource, NestedProxyResourceProperties>;
+  update is ArmCustomPatchAsync<NestedProxyResource, NestedProxyResource>;
 
   @scenario
   @scenarioDoc("""

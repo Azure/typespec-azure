@@ -112,7 +112,14 @@ export type JsonType = "array" | "boolean" | "integer" | "number" | "object" | "
 export type OpenAPI2SchemaRefProperty = Ref<OpenAPI2Schema> &
   Pick<
     OpenAPI2Schema,
-    "readOnly" | "description" | "default" | "x-ms-mutability" | "title" | "xml"
+    | "readOnly"
+    | "description"
+    | "default"
+    | "x-ms-mutability"
+    | "title"
+    | "xml"
+    | "externalDocs"
+    | "x-ms-client-default"
   > & {
     /**
      * Provide a different name to be used in the client.
@@ -287,10 +294,16 @@ export type OpenAPI2Schema = Extensions & {
 
   "x-ms-mutability"?: string[];
 
+  /** Default value set by the client */
+  "x-ms-client-default"?: unknown;
+
   /**
    * XML metadata for the schema, if applicable.
    */
   xml?: XmlObject;
+
+  /** Additional external documentation. */
+  externalDocs?: OpenAPI2ExternalDocs;
 };
 
 export interface XmlObject {

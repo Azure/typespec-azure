@@ -538,7 +538,42 @@ def create_user_profile(
 ```
 
 ```typescript
-// TODO
+export interface UserInfo {
+  username: string;
+}
+
+export function userInfoSerializer(item: UserInfo): any {
+  return { username: item["username"] };
+}
+
+/** model interface UserProfile */
+export interface UserProfile {
+  profileName: string;
+}
+
+export function userProfileSerializer(item: UserProfile): any {
+  return { profileName: item["profileName"] };
+}
+
+/** Known values of {@link Versions} that the service accepts. */
+export enum KnownVersions {
+  /** 2024-01-01 */
+  V20240101 = "2024-01-01",
+  /** 2024-02-01 */
+  V20240201 = "2024-02-01",
+}
+
+export async function createUserProfile(
+  context: Client,
+  userProfile: UserProfile,
+  options: CreateUserProfileOptionalParams = { requestOptions: {} },
+): Promise<void>;
+
+export async function getUserInfo(
+  context: Client,
+  userInfo: UserInfo,
+  options: GetUserInfoOptionalParams = { requestOptions: {} },
+): Promise<void>;
 ```
 
 ```java
@@ -666,7 +701,55 @@ def create_user_profile(
 ```
 
 ```typescript
-// TODO
+export interface UserInfo {
+  username: string;
+}
+
+export function userInfoSerializer(item: UserInfo): any {
+  return { username: item["username"] };
+}
+
+/** model interface UserProfile */
+export interface UserProfile {
+  profileName: string;
+  profileDetails: ProfileDetails;
+}
+
+export function userProfileSerializer(item: UserProfile): any {
+  return {
+    profileName: item["profileName"],
+    profileDetails: profileDetailsSerializer(item["profileDetails"]),
+  };
+}
+
+/** model interface ProfileDetails */
+export interface ProfileDetails {
+  detailDescription: string;
+}
+
+export function profileDetailsSerializer(item: ProfileDetails): any {
+  return { detailDescription: item["detailDescription"] };
+}
+
+/** Known values of {@link Versions} that the service accepts. */
+export enum KnownVersions {
+  /** 2024-01-01 */
+  V20240101 = "2024-01-01",
+  /** 2024-02-01 */
+  V20240201 = "2024-02-01",
+}
+
+export async function createUserProfile(
+  context: Client,
+  userProfile: UserProfile,
+  options: CreateUserProfileOptionalParams = { requestOptions: {} },
+): Promise<void>;
+
+export async function getUserInfo(
+  context: Client,
+  userInfo: UserInfo,
+  options: GetUserInfoOptionalParams = { requestOptions: {} },
+): Promise<void>;
 ```
 
 ```java

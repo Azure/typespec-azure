@@ -1,25 +1,18 @@
-import { AzureCoreTestLibrary } from "@azure-tools/typespec-azure-core/testing";
-import { Model, Union } from "@typespec/compiler";
+import { t } from "@typespec/compiler/testing";
 import { deepEqual, deepStrictEqual, ok, strictEqual } from "assert";
-import { afterEach, beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { SdkEnumType, SdkModelType, SdkUnionType, UsageFlags } from "../../src/interfaces.js";
 import { getClientType } from "../../src/types.js";
-import { SdkTestRunner, createSdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-java" });
-});
-afterEach(async () => {
-  for (const modelsOrEnums of [runner.context.sdkPackage.models, runner.context.sdkPackage.enums]) {
-    for (const item of modelsOrEnums) {
-      ok(item.name !== "");
-    }
-  }
-});
+import {
+  AzureCoreTesterWithService,
+  createClientCustomizationInput,
+  createSdkContextForTester,
+  SimpleBaseTester,
+  SimpleTester,
+  SimpleTesterWithService,
+} from "../tester.js";
 it("string extensible", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     enum DaysOfWeekExtensibleEnum {
         Monday,
@@ -37,9 +30,10 @@ it("string extensible", async function () {
     }
     `);
 
-  strictEqual(runner.context.sdkPackage.models.length, 1);
-  strictEqual(runner.context.sdkPackage.enums.length, 1);
-  const sdkType = runner.context.sdkPackage.enums[0];
+  const context = await createSdkContextForTester(program);
+  strictEqual(context.sdkPackage.models.length, 1);
+  strictEqual(context.sdkPackage.enums.length, 1);
+  const sdkType = context.sdkPackage.enums[0];
   strictEqual(sdkType.isFixed, true);
   strictEqual(sdkType.name, "DaysOfWeekExtensibleEnum");
   strictEqual(sdkType.crossLanguageDefinitionId, "TestService.DaysOfWeekExtensibleEnum");
@@ -64,7 +58,7 @@ it("string extensible", async function () {
 });
 
 it("int extensible", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     enum Integers {
       one: 1,
@@ -80,9 +74,10 @@ it("int extensible", async function () {
     }
   `);
 
-  strictEqual(runner.context.sdkPackage.models.length, 1);
-  strictEqual(runner.context.sdkPackage.enums.length, 1);
-  const sdkType = runner.context.sdkPackage.enums[0];
+  const context = await createSdkContextForTester(program);
+  strictEqual(context.sdkPackage.models.length, 1);
+  strictEqual(context.sdkPackage.enums.length, 1);
+  const sdkType = context.sdkPackage.enums[0];
   strictEqual(sdkType.isFixed, true);
   strictEqual(sdkType.name, "Integers");
   strictEqual(sdkType.crossLanguageDefinitionId, "TestService.Integers");
@@ -100,7 +95,7 @@ it("int extensible", async function () {
 });
 
 it("float extensible", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     enum Floats {
       a: 1,
@@ -114,7 +109,8 @@ it("float extensible", async function () {
     }
   `);
 
-  const sdkType = runner.context.sdkPackage.enums[0];
+  const context = await createSdkContextForTester(program);
+  const sdkType = context.sdkPackage.enums[0];
   ok(sdkType);
   strictEqual(sdkType.isFixed, true);
   strictEqual(sdkType.name, "Floats");
@@ -133,7 +129,7 @@ it("float extensible", async function () {
 });
 
 it("union as enum float type", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     union Floats {
       float,
@@ -148,7 +144,8 @@ it("union as enum float type", async function () {
     }
   `);
 
-  const sdkType = runner.context.sdkPackage.enums[0];
+  const context = await createSdkContextForTester(program);
+  const sdkType = context.sdkPackage.enums[0];
   strictEqual(sdkType.isFixed, false);
   strictEqual(sdkType.name, "Floats");
   strictEqual(sdkType.crossLanguageDefinitionId, "TestService.Floats");
@@ -166,7 +163,7 @@ it("union as enum float type", async function () {
 });
 
 it("union of union as enum float type", async function () {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     @usage(Usage.input | Usage.output)
     union BaseEnum {
       int32,
@@ -185,7 +182,8 @@ it("union of union as enum float type", async function () {
       prop: ExtendedEnum
     }
   `);
-  const sdkType = runner.context.sdkPackage.enums[0];
+  const context = await createSdkContextForTester(program);
+  const sdkType = context.sdkPackage.enums[0];
   ok(sdkType);
   strictEqual(sdkType.isFixed, false);
   strictEqual(sdkType.name, "ExtendedEnum");
@@ -201,12 +199,7 @@ it("union of union as enum float type", async function () {
 });
 
 it("string fixed", async function () {
-  runner = await createSdkTestRunner({
-    librariesToAdd: [AzureCoreTestLibrary],
-    autoUsings: ["Azure.Core"],
-    emitterName: "@azure-tools/typespec-java",
-  });
-  await runner.compileWithBuiltInAzureCoreService(`
+  const { program } = await AzureCoreTesterWithService.compile(`
     #suppress "@azure-tools/typespec-azure-core/use-extensible-enum" "For testing"
     @usage(Usage.input | Usage.output)
     enum DaysOfWeekFixedEnum {
@@ -224,9 +217,10 @@ it("string fixed", async function () {
       prop: DaysOfWeekFixedEnum
     }
   `);
-  strictEqual(runner.context.sdkPackage.models.length, 1);
-  strictEqual(runner.context.sdkPackage.enums.length, 1);
-  const sdkType = runner.context.sdkPackage.enums[0];
+  const context = await createSdkContextForTester(program);
+  strictEqual(context.sdkPackage.models.length, 1);
+  strictEqual(context.sdkPackage.enums.length, 1);
+  const sdkType = context.sdkPackage.enums[0];
   strictEqual(sdkType.isFixed, true);
   strictEqual(sdkType.name, "DaysOfWeekFixedEnum");
   strictEqual(sdkType.crossLanguageDefinitionId, "My.Service.DaysOfWeekFixedEnum");
@@ -249,7 +243,7 @@ it("string fixed", async function () {
 });
 
 it("enum access transitive closure", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     enum Integers {
       one: 1,
       two: 2,
@@ -263,11 +257,12 @@ it("enum access transitive closure", async () => {
     ): void;
   `);
 
-  strictEqual(runner.context.sdkPackage.enums[0].access, "internal");
+  const context = await createSdkContextForTester(program);
+  strictEqual(context.sdkPackage.enums[0].access, "internal");
 });
 
 it("crossLanguageDefinitionId", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service
     namespace MyService {
       @usage(Usage.input | Usage.output)
@@ -285,13 +280,14 @@ it("crossLanguageDefinitionId", async () => {
       }
     }
   `);
-  strictEqual(runner.context.sdkPackage.enums.length, 1);
-  const integersEnum = runner.context.sdkPackage.enums[0];
+  const context = await createSdkContextForTester(program);
+  strictEqual(context.sdkPackage.enums.length, 1);
+  const integersEnum = context.sdkPackage.enums[0];
   strictEqual(integersEnum.crossLanguageDefinitionId, "MyService.Integers");
 });
 
 it("enum with deprecated annotation", async () => {
-  await runner.compileAndDiagnose(`
+  const [{ program }] = await SimpleTester.compileAndDiagnose(`
     @service
     namespace MyService;
     #deprecated "no longer support"
@@ -303,11 +299,12 @@ it("enum with deprecated annotation", async () => {
     ): void;
   `);
 
-  strictEqual(runner.context.sdkPackage.enums[0].deprecation, "no longer support");
+  const context = await createSdkContextForTester(program);
+  strictEqual(context.sdkPackage.enums[0].deprecation, "no longer support");
 });
 
 it("orphan enum", async () => {
-  await runner.compileAndDiagnose(`
+  const { program } = await SimpleTester.compile(`
     @service
     @test namespace MyService {
       @test
@@ -326,17 +323,18 @@ it("orphan enum", async () => {
     }
   `);
 
-  strictEqual(runner.context.sdkPackage.enums[0].name, "Enum1");
-  strictEqual(runner.context.sdkPackage.enums[0].usage, UsageFlags.Input | UsageFlags.Output);
+  const context = await createSdkContextForTester(program);
+  strictEqual(context.sdkPackage.enums[0].name, "Enum1");
+  strictEqual(context.sdkPackage.enums[0].usage, UsageFlags.Input | UsageFlags.Output);
 });
 
 it("union as enum rename", async () => {
-  const { TestUnion } = (await runner.compileWithCustomization(
-    `
+  const { program, TestUnion } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      t.code`
       @service
       namespace N {
-        @test
-        union TestUnion{
+        union ${t.union("TestUnion")}{
           @clientName("ARename")
           "A",
           "B": "B_v",
@@ -345,15 +343,17 @@ it("union as enum rename", async () => {
         op x(body: TestUnion): void;
       }
     `,
-    `
+      `
       namespace Customizations;
 
       @@clientName(N.TestUnion, "TestUnionRename");
       @@clientName(N.TestUnion.B, "BRename");
     `,
-  )) as { TestUnion: Union };
+    ),
+  );
 
-  const enumType = getClientType(runner.context, TestUnion);
+  const context = await createSdkContextForTester(program);
+  const enumType = getClientType(context, TestUnion);
   strictEqual(enumType.kind, "enum");
   strictEqual(enumType.name, "TestUnionRename");
   strictEqual(enumType.crossLanguageDefinitionId, "N.TestUnion");
@@ -363,12 +363,10 @@ it("union as enum rename", async () => {
 });
 
 it("union as enum with hierarchy", async () => {
-  const { Test } = (await runner.compile(
-    `
+  const { program, Test } = await SimpleTester.compile(t.code`
       @service
       namespace N {
-        @test
-        union Test{
+        union ${t.union("Test")}{
           A,
           B,
           C,
@@ -390,10 +388,10 @@ it("union as enum with hierarchy", async () => {
         }
         op x(body: Test): void;
       }
-    `,
-  )) as { Test: Union };
+    `);
 
-  const nullableType = getClientType(runner.context, Test);
+  const context = await createSdkContextForTester(program);
+  const nullableType = getClientType(context, Test);
   strictEqual(nullableType.kind, "nullable");
 
   const enumType = nullableType.type;
@@ -412,18 +410,10 @@ it("union as enum with hierarchy", async () => {
 });
 
 it("union as enum with hierarchy without flatten", async () => {
-  runner = await createSdkTestRunner(
-    {
-      emitterName: "@azure-tools/typespec-python",
-    },
-    { flattenUnionAsEnum: false },
-  );
-  const { Foo } = (await runner.compile(
-    `
+  const { program, Foo } = await SimpleTester.compile(t.code`
       @service
       namespace N {
-        @test
-        union Foo {
+        union ${t.union("Foo")} {
           "bar",
           Baz,
           string,
@@ -436,10 +426,10 @@ it("union as enum with hierarchy without flatten", async () => {
 
         op test(@body test: Foo): void;
       }
-    `,
-  )) as { Foo: Union };
+    `);
 
-  const unionType = getClientType(runner.context, Foo);
+  const context = await createSdkContextForTester(program, {}, { flattenUnionAsEnum: false });
+  const unionType = getClientType(context, Foo);
 
   strictEqual(unionType.kind, "union");
   strictEqual(unionType.name, "Foo");
@@ -448,18 +438,10 @@ it("union as enum with hierarchy without flatten", async () => {
 });
 
 it("nullable union as enum with hierarchy without flatten", async () => {
-  runner = await createSdkTestRunner(
-    {
-      emitterName: "@azure-tools/typespec-python",
-    },
-    { flattenUnionAsEnum: false },
-  );
-  const { Test } = (await runner.compile(
-    `
+  const { program, Test } = await SimpleTester.compile(t.code`
       @service
       namespace N {
-        @test
-        union Test{
+        union ${t.union("Test")}{
           A,
           B,
           C,
@@ -481,10 +463,10 @@ it("nullable union as enum with hierarchy without flatten", async () => {
         }
         op x(body: Test): void;
       }
-    `,
-  )) as { Test: Union };
+    `);
 
-  const nullableType = getClientType(runner.context, Test);
+  const context = await createSdkContextForTester(program, {}, { flattenUnionAsEnum: false });
+  const nullableType = getClientType(context, Test);
   strictEqual(nullableType.kind, "nullable");
   const unionType = nullableType.type;
 
@@ -526,8 +508,7 @@ it("nullable union as enum with hierarchy without flatten", async () => {
 });
 
 it("anonymous union as enum with hierarchy", async () => {
-  const { Test } = (await runner.compile(
-    `
+  const { program, Test } = await SimpleTester.compile(t.code`
     @service
     namespace N {
       enum LR {
@@ -539,16 +520,15 @@ it("anonymous union as enum with hierarchy", async () => {
         down,
       }
       
-      @test
-      model Test {
+      model ${t.model("Test")} {
         color: LR | UD;
       }
       op read(@body body: Test): void;
     }
-  `,
-  )) as { Test: Model };
+  `);
 
-  const modelType = getClientType(runner.context, Test) as SdkModelType;
+  const context = await createSdkContextForTester(program);
+  const modelType = getClientType(context, Test) as SdkModelType;
   const enumType = modelType.properties[0].type as SdkEnumType;
   strictEqual(enumType.name, "TestColor");
   strictEqual(enumType.crossLanguageDefinitionId, "N.Test.color.anonymous");
@@ -572,14 +552,7 @@ it("anonymous union as enum with hierarchy", async () => {
 });
 
 it("anonymous union as enum with hierarchy without flatten", async () => {
-  runner = await createSdkTestRunner(
-    {
-      emitterName: "@azure-tools/typespec-python",
-    },
-    { flattenUnionAsEnum: false },
-  );
-  const { Test } = (await runner.compile(
-    `
+  const { program, Test } = await SimpleTester.compile(t.code`
       @service
       namespace N {
         enum LR {
@@ -591,16 +564,15 @@ it("anonymous union as enum with hierarchy without flatten", async () => {
           down,
         }
         
-        @test
-        model Test {
+        model ${t.model("Test")} {
           color: LR | UD;
         }
         op read(@body body: Test): void;
       }
-    `,
-  )) as { Test: Model };
+    `);
 
-  const modelType = getClientType(runner.context, Test) as SdkModelType;
+  const context = await createSdkContextForTester(program, {}, { flattenUnionAsEnum: false });
+  const modelType = getClientType(context, Test) as SdkModelType;
   const unionType = modelType.properties[0].type as SdkUnionType;
   strictEqual(unionType.name, "TestColor");
   strictEqual(unionType.crossLanguageDefinitionId, "N.Test.color.anonymous");
@@ -623,7 +595,7 @@ it("anonymous union as enum with hierarchy without flatten", async () => {
 });
 
 it("versioned enums", async () => {
-  await runner.compile(
+  const { program } = await SimpleTester.compile(
     `
       @versioned(Versions)
       @service()
@@ -637,7 +609,8 @@ it("versioned enums", async () => {
       op test(): void;
     `,
   );
-  const enums = runner.context.sdkPackage.enums;
+  const context = await createSdkContextForTester(program);
+  const enums = context.sdkPackage.enums;
   strictEqual(enums.length, 1);
   strictEqual(enums[0].name, "Versions");
   strictEqual(enums[0].crossLanguageDefinitionId, "DemoService.Versions");
@@ -649,12 +622,7 @@ it("versioned enums", async () => {
 });
 
 it("versioned enums with all", async () => {
-  runner = await createSdkTestRunner({
-    "api-version": "all",
-    emitterName: "@azure-tools/typespec-python",
-  });
-
-  await runner.compile(
+  const { program } = await SimpleTester.compile(
     `
       @versioned(Versions)
       @service()
@@ -667,7 +635,10 @@ it("versioned enums with all", async () => {
       op test(): void;
     `,
   );
-  const enums = runner.context.sdkPackage.enums;
+  const context = await createSdkContextForTester(program, {
+    "api-version": "all",
+  });
+  const enums = context.sdkPackage.enums;
   strictEqual(enums.length, 1);
   strictEqual(enums[0].name, "Versions");
   strictEqual(enums[0].crossLanguageDefinitionId, "DemoService.Versions");
@@ -679,12 +650,7 @@ it("versioned enums with all", async () => {
 });
 
 it("versioned enums with latest", async () => {
-  runner = await createSdkTestRunner({
-    "api-version": "latest",
-    emitterName: "@azure-tools/typespec-python",
-  });
-
-  await runner.compile(
+  const { program } = await SimpleTester.compile(
     `
       @versioned(Versions)
       @service()
@@ -698,7 +664,10 @@ it("versioned enums with latest", async () => {
       op test(): void;
     `,
   );
-  const enums = runner.context.sdkPackage.enums;
+  const context = await createSdkContextForTester(program, {
+    "api-version": "latest",
+  });
+  const enums = context.sdkPackage.enums;
   strictEqual(enums.length, 1);
   strictEqual(enums[0].name, "Versions");
   strictEqual(enums[0].crossLanguageDefinitionId, "DemoService.Versions");
@@ -710,12 +679,7 @@ it("versioned enums with latest", async () => {
 });
 
 it("versioned enums with specific version", async () => {
-  runner = await createSdkTestRunner({
-    "api-version": "v1",
-    emitterName: "@azure-tools/typespec-python",
-  });
-
-  await runner.compile(
+  const { program } = await SimpleTester.compile(
     `
       @versioned(Versions)
       @service()
@@ -729,7 +693,10 @@ it("versioned enums with specific version", async () => {
       op test(): void;
     `,
   );
-  const enums = runner.context.sdkPackage.enums;
+  const context = await createSdkContextForTester(program, {
+    "api-version": "v1",
+  });
+  const enums = context.sdkPackage.enums;
   strictEqual(enums.length, 1);
   strictEqual(enums[0].name, "Versions");
   strictEqual(enums[0].crossLanguageDefinitionId, "DemoService.Versions");
@@ -741,7 +708,7 @@ it("versioned enums with specific version", async () => {
 });
 
 it("usage propagation for enum value", async () => {
-  await runner.compile(
+  const { program } = await SimpleTester.compile(
     `
       @service
       namespace N {
@@ -763,7 +730,8 @@ it("usage propagation for enum value", async () => {
       }
     `,
   );
-  const enums = runner.context.sdkPackage.enums;
+  const context = await createSdkContextForTester(program);
+  const enums = context.sdkPackage.enums;
   strictEqual(enums.length, 2);
   strictEqual(enums[0].name, "LR");
   strictEqual(enums[0].crossLanguageDefinitionId, "N.LR");
@@ -774,7 +742,7 @@ it("usage propagation for enum value", async () => {
 });
 
 it("spread and union as enum", async () => {
-  await runner.compile(
+  const { program } = await SimpleTester.compile(
     `
       @service
       namespace N {
@@ -789,11 +757,12 @@ it("spread and union as enum", async () => {
       }
     `,
   );
-  const enums = runner.context.sdkPackage.enums;
+  const context = await createSdkContextForTester(program);
+  const enums = context.sdkPackage.enums;
   strictEqual(enums.length, 1);
   strictEqual(enums[0].access, "public");
   strictEqual(enums[0].usage, UsageFlags.Input | UsageFlags.Json);
-  const models = runner.context.sdkPackage.models;
+  const models = context.sdkPackage.models;
   const testModel = models.find((x) => x.name === "Test");
   ok(testModel);
   strictEqual(testModel.access, "public");

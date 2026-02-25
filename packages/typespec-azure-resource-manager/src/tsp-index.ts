@@ -1,4 +1,3 @@
-import { definePackageFlags } from "@typespec/compiler";
 import { AzureResourceManagerDecorators } from "../generated-defs/Azure.ResourceManager.js";
 import { AzureResourceManagerLegacyDecorators } from "../generated-defs/Azure.ResourceManager.Legacy.js";
 import { $armCommonTypesVersion, $externalTypeRef } from "./common-types.js";
@@ -22,6 +21,9 @@ import {
   $armVirtualResource,
   $customAzureResource,
   $extensionResource,
+  $feature,
+  $featureOptions,
+  $features,
   $identifiers,
   $locationResource,
   $resourceBaseType,
@@ -66,9 +68,8 @@ export const $decorators = {
     armOperationRoute: $armOperationRoute,
     armExternalType: $armExternalType,
     renamePathParameter: $renamePathParameter,
+    feature: $feature,
+    features: $features,
+    featureOptions: $featureOptions,
   } satisfies AzureResourceManagerLegacyDecorators,
 };
-
-export const $flags = definePackageFlags({
-  decoratorArgMarshalling: "new",
-});

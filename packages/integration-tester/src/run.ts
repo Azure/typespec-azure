@@ -14,6 +14,8 @@ export interface RunIntegrationTestSuiteOptions {
   clean?: boolean;
   /** Directory for .tgz files. If not provided it will get the packages from the repo. */
   tgzDir?: string;
+  /** Enable interactive mode for validation. */
+  interactive?: boolean;
 }
 
 export const Stages = ["checkout", "patch", "install", "validate", "validate:clean"] as const;
@@ -64,7 +66,7 @@ export async function runIntegrationTestSuite(
   });
 
   await runner.stage("validate", async () => {
-    await validateSpecs(runner, wd, config);
+    await validateSpecs(runner, wd, config, { interactive: options.interactive });
   });
 
   await runner.stage("validate:clean", async () => {

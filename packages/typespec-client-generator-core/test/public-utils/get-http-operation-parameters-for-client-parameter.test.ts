@@ -1,16 +1,10 @@
 import { ok, strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { getHttpOperationParametersForClientParameter } from "../../src/public-utils.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import { createSdkContextForTester, SimpleTester } from "../tester.js";
 
 it("API version in header", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service(#{
       title: "Contoso Widget Manager",
     })
@@ -28,7 +22,8 @@ it("API version in header", async () => {
       apiVersion: string
     ): string;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   const apiVersionParameter = client.clientInitialization.parameters.find(
     (p) => p.name === "apiVersion",
@@ -47,7 +42,7 @@ it("API version in header", async () => {
 });
 
 it("API version in query", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service(#{
       title: "Contoso Widget Manager",
     })
@@ -65,7 +60,8 @@ it("API version in query", async () => {
       apiVersion: string
     ): string;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   const apiVersionParameter = client.clientInitialization.parameters.find(
     (p) => p.name === "apiVersion",
@@ -84,7 +80,7 @@ it("API version in query", async () => {
 });
 
 it("API version in path", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service(#{
       title: "Contoso Widget Manager",
     })
@@ -102,7 +98,8 @@ it("API version in path", async () => {
       apiVersion: string
     ): string;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   const apiVersionParameter = client.clientInitialization.parameters.find(
     (p) => p.name === "apiVersion",
@@ -121,7 +118,7 @@ it("API version in path", async () => {
 });
 
 it("API version mix", async () => {
-  await runner.compile(`
+  const { program } = await SimpleTester.compile(`
     @service(#{
       title: "Contoso Widget Manager",
     })
@@ -146,7 +143,8 @@ it("API version mix", async () => {
       apiVersion: string
     ): string;
   `);
-  const sdkPackage = runner.context.sdkPackage;
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
   const client = sdkPackage.clients[0];
   const apiVersionParameter = client.clientInitialization.parameters.find(
     (p) => p.name === "apiVersion",

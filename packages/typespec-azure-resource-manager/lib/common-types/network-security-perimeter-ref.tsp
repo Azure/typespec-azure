@@ -112,6 +112,7 @@ namespace Azure.ResourceManager.CommonTypes;
   "networksecurityperimeter.json"
 );
 
+@@Versioning.added(NetworkSecurityPerimeterConfiguration, Versions.v5);
 /** Network security perimeter configuration resource */
 @@armCommonDefinition(NetworkSecurityPerimeterConfiguration,
   "NetworkSecurityPerimeterConfiguration",

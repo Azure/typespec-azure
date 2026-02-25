@@ -1,4 +1,3 @@
-import "@typespec/openapi";
 import "@typespec/http";
 import "@typespec/rest";
 
@@ -11,7 +10,6 @@ import "../private.decorators.tsp";
 import "../parameters.tsp";
 
 using Http;
-using OpenAPI;
 using Azure.ResourceManager.Private;
 
 namespace Azure.ResourceManager.Foundations;
@@ -121,7 +119,6 @@ model ResourceUpdateModel<
     "Name" | "name" | "properties"
   >>> {
   /** The resource-specific properties for this resource. */
-  @conditionalClientFlatten
   properties?: ResourceUpdateModelProperties<Resource, Properties>;
 }
 
@@ -185,7 +182,6 @@ model ProxyResourceUpdateModel<
   Resource extends Foundations.SimpleResource,
   Properties extends TypeSpec.Reflection.Model
 > {
-  @conditionalClientFlatten
   properties?: ResourceUpdateModelProperties<Resource, Properties>;
 }
 

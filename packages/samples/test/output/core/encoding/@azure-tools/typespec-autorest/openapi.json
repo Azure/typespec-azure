@@ -116,7 +116,7 @@
             },
             "base64": {
               "type": "string",
-              "format": "base64"
+              "format": "byte"
             },
             "base64url": {
               "type": "string",

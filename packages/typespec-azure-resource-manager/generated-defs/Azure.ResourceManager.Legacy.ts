@@ -1,4 +1,14 @@
-import type { DecoratorContext, Model, ModelProperty, Operation } from "@typespec/compiler";
+import type {
+  DecoratorContext,
+  DecoratorValidatorCallbacks,
+  Enum,
+  EnumMember,
+  Interface,
+  Model,
+  ModelProperty,
+  Namespace,
+  Operation,
+} from "@typespec/compiler";
 
 export interface CustomResourceOptions {
   readonly isAzureResource?: boolean;
@@ -7,6 +17,14 @@ export interface CustomResourceOptions {
 export interface ArmOperationOptions {
   readonly useStaticRoute?: boolean;
   readonly route?: string;
+}
+
+export interface ArmFeatureOptions {
+  readonly featureName: string;
+  readonly fileName: string;
+  readonly description: string;
+  readonly title?: string;
+  readonly termsOfService?: string;
 }
 
 /**
@@ -19,7 +37,7 @@ export type CustomAzureResourceDecorator = (
   context: DecoratorContext,
   target: Model,
   options?: CustomResourceOptions,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Specify an external reference that should be used when emitting this type.
@@ -30,7 +48,7 @@ export type ExternalTypeRefDecorator = (
   context: DecoratorContext,
   entity: Model | ModelProperty,
   jsonRef: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Signifies that an operation is an Azure Resource Manager operation
@@ -43,14 +61,17 @@ export type ArmOperationRouteDecorator = (
   context: DecoratorContext,
   target: Operation,
   route?: ArmOperationOptions,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Signifies that a Resource is represented using a library type in generated SDKs.
  *
  * @param target The model to that is an external resource
  */
-export type ArmExternalTypeDecorator = (context: DecoratorContext, target: Model) => void;
+export type ArmExternalTypeDecorator = (
+  context: DecoratorContext,
+  target: Model,
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Renames a path parameter in an Azure Resource Manager operation.
@@ -64,7 +85,43 @@ export type RenamePathParameterDecorator = (
   target: Operation,
   sourceParameterName: string,
   targetParameterName: string,
-) => void;
+) => DecoratorValidatorCallbacks | void;
+
+/**
+ * Decorator to define a set of features
+ *
+ * @param target The service namespace
+ * @param features The enum that contains the features
+ */
+export type FeaturesDecorator = (
+  context: DecoratorContext,
+  target: Namespace,
+  features: Enum,
+) => DecoratorValidatorCallbacks | void;
+
+/**
+ * Decorator to define options for a specific feature
+ *
+ * @param target The enum member that represents the feature
+ * @param options The options for the feature
+ */
+export type FeatureOptionsDecorator = (
+  context: DecoratorContext,
+  target: EnumMember,
+  options: ArmFeatureOptions,
+) => DecoratorValidatorCallbacks | void;
+
+/**
+ * Decorator to associate a feature with a model, interface, or namespace
+ *
+ * @param target The target to associate the feature with
+ * @param featureName The feature to associate with the target
+ */
+export type FeatureDecorator = (
+  context: DecoratorContext,
+  target: Model | Operation | Interface | Namespace,
+  featureName: EnumMember,
+) => DecoratorValidatorCallbacks | void;
 
 export type AzureResourceManagerLegacyDecorators = {
   customAzureResource: CustomAzureResourceDecorator;
@@ -72,4 +129,7 @@ export type AzureResourceManagerLegacyDecorators = {
   armOperationRoute: ArmOperationRouteDecorator;
   armExternalType: ArmExternalTypeDecorator;
   renamePathParameter: RenamePathParameterDecorator;
+  features: FeaturesDecorator;
+  featureOptions: FeatureOptionsDecorator;
+  feature: FeatureDecorator;
 };

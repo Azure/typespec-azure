@@ -7,6 +7,7 @@ import "@azure-tools/typespec-client-generator-core";
 import "./available-operations.tsp";
 import "./checkname-availability.tsp";
 import "./lro.tsp";
+import "./lropaging.tsp";
 import "./optional-body.tsp";
 
 using Http;
@@ -14,7 +15,6 @@ using Rest;
 using Versioning;
 using Azure.Core;
 using Azure.ResourceManager;
-using OpenAPI;
 
 @armProviderNamespace
 @service

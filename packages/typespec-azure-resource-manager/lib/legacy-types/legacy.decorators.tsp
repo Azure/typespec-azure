@@ -57,3 +57,44 @@ extern dec renamePathParameter(
   sourceParameterName: valueof string,
   targetParameterName: valueof string
 );
+
+/**
+ * Options for defining a feature and the associated file
+ */
+model ArmFeatureOptions {
+  /** The feature name */
+  featureName: string;
+
+  /** The associated file name for the features */
+  fileName: string;
+
+  /** The feature description in Swagger */
+  description: string;
+
+  /** The feature title in Swagger */
+  title?: string;
+
+  /** The feature terms of service in Swagger */
+  termsOfService?: string;
+}
+
+/**
+ * Decorator to define a set of features
+ * @param target The service namespace
+ * @param features The enum that contains the features
+ */
+extern dec features(target: Namespace, features: Enum);
+
+/**
+ * Decorator to define options for a specific feature
+ * @param target The enum member that represents the feature
+ * @param options The options for the feature
+ */
+extern dec featureOptions(target: EnumMember, options: valueof ArmFeatureOptions);
+
+/**
+ * Decorator to associate a feature with a model, interface, or namespace
+ * @param target The target to associate the feature with
+ * @param featureName The feature to associate with the target
+ */
+extern dec feature(target: Model | Operation | Interface | Namespace, featureName: EnumMember);

@@ -24,8 +24,8 @@
   },
   "scripts": {
     "clean": "rimraf ./dist ./temp",
-    "build": "tsc -p .",
-    "watch": "tsc -p . --watch",
+    "build": "tsc -p tsconfig.build.json",
+    "watch": "tsc -p tsconfig.build.json --watch",
     "test": "vitest run",
     "test:watch": "vitest -w",
     "test:ci": "vitest run --coverage  --reporter=junit --reporter=default",
@@ -53,15 +53,15 @@
     "@typespec/xml": "workspace:^"
   },
   "devDependencies": {
-    "@types/node": "~24.9.1",
+    "@types/node": "~25.0.2",
     "@typespec/internal-build-utils": "workspace:^",
     "@typespec/samples": "workspace:^",
-    "@vitest/coverage-v8": "^4.0.4",
-    "@vitest/ui": "^4.0.4",
+    "@vitest/coverage-v8": "^4.0.15",
+    "@vitest/ui": "^4.0.15",
     "autorest": "~3.7.1",
     "cross-env": "~10.1.0",
-    "rimraf": "~6.0.1",
+    "rimraf": "~6.1.2",
     "typescript": "~5.9.2",
-    "vitest": "^4.0.4"
+    "vitest": "^4.0.15"
   }
 }

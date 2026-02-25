@@ -7,8 +7,8 @@ import {
 } from "@typespec/compiler";
 import * as http from "@typespec/http";
 
-import { isReadonlyProperty } from "@typespec/openapi";
 import { getArmResources } from "../resource.js";
+import { isReadonlyProperty } from "../utils.js";
 
 /**
  * The resource 'name' field should be marked with 'read' visibility and an @path decorator.

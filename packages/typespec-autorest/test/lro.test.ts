@@ -244,6 +244,44 @@ describe("typespec-autorest: Long-running Operations", () => {
     });
   });
 
+  it("Creates a final state schema for array types", async () => {
+    const openapi = await compileOpenAPI(
+      armCode.apply(armCode, [
+        {
+          putOp: "getProcessedWidgets is ArmResourceActionAsync<Widget, void, Widget[]>;",
+        },
+      ]),
+      { preset: "azure", options: { "emit-lro-options": "all" } },
+    );
+
+    const itemPath =
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}/getProcessedWidgets";
+    deepStrictEqual(openapi.paths[itemPath].post?.["x-ms-long-running-operation"], true);
+    deepStrictEqual(openapi.paths[itemPath].post["x-ms-long-running-operation-options"], {
+      "final-state-via": "location",
+      "final-state-schema": "#/definitions/WidgetArray",
+    });
+  });
+
+  it("Creates a final state schema for unknown types", async () => {
+    const openapi = await compileOpenAPI(
+      armCode.apply(armCode, [
+        {
+          putOp: "getProcessedWidgets is ArmResourceActionAsync<Widget, void, unknown>;",
+        },
+      ]),
+      { preset: "azure", options: { "emit-lro-options": "all" } },
+    );
+
+    const itemPath =
+      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Test/widgets/{widgetName}/getProcessedWidgets";
+    deepStrictEqual(openapi.paths[itemPath].post?.["x-ms-long-running-operation"], true);
+    deepStrictEqual(openapi.paths[itemPath].post["x-ms-long-running-operation-options"], {
+      "final-state-via": "location",
+      "final-state-schema": "#/definitions/unknown",
+    });
+  });
+
   it("Allows azure-async-operation override without headers for ARM PUT", async () => {
     const openapi = await compileOpenAPI(
       armCode.apply(armCode, [

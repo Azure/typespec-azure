@@ -68,6 +68,7 @@ model TopQueryParameter {
 @doc("Provides the standard 'skip' query parameter for list operations.")
 model SkipQueryParameter {
   @query
+  @offset
   @doc("The number of result items to skip.")
   skip?: int32 = 0;
 }
@@ -75,6 +76,7 @@ model SkipQueryParameter {
 @doc("Provides the standard 'maxpagesize' query parameter for list operations.")
 model MaxPageSizeQueryParameter {
   @query
+  @pageSize
   @doc("The maximum number of result items per page.")
   maxpagesize?: int32;
 }
@@ -231,7 +233,7 @@ model EmbeddingVector<Element extends numeric = float32> is Array<Element>;
  */
 model StatusMonitorPollingOptions<
   PollingModel extends TypeSpec.Reflection.Model | void = never,
-  FinalResult extends TypeSpec.Reflection.Model | void = never,
+  FinalResult extends TypeSpec.Reflection.Model | unknown | void = never,
   FinalProperty extends TypeSpec.Reflection.ModelProperty | string = never
 > extends StatusMonitorOptions {
   /** The kind of polling options */
@@ -265,7 +267,7 @@ model PollingOptions {
   pollingModel?: TypeSpec.Reflection.Model | void;
 
   /** The type that is returned when polling terminates successfully. */
-  finalResult?: TypeSpec.Reflection.Model | void;
+  finalResult?: TypeSpec.Reflection.Model | unknown | void;
 }
 
 /** The available kinds of polling options */
@@ -299,7 +301,7 @@ scalar uuid extends string;
  * 129.144.50.56
  * ```
  */
-#suppress "@azure-tools/typespec-autorest/invalid-format" "Foundation."
+#suppress "@azure-tools/typespec-autorest/unknown-format" "Foundation."
 @format("ipV4Address")
 scalar ipV4Address extends string;
 
@@ -314,7 +316,7 @@ scalar ipV4Address extends string;
  * 2001:db8:3333:4444:CCCC:DDDD:EEEE:FFFF
  * ```
  */
-#suppress "@azure-tools/typespec-autorest/invalid-format" "Foundation."
+#suppress "@azure-tools/typespec-autorest/unknown-format" "Foundation."
 @format("ipV6Address")
 scalar ipV6Address extends string;
 
@@ -330,7 +332,7 @@ scalar ipV6Address extends string;
  * ETag: "675af34563dc-tr34"
  * ```
  */
-#suppress "@azure-tools/typespec-autorest/invalid-format" "Foundation."
+#suppress "@azure-tools/typespec-autorest/unknown-format" "Foundation."
 @format("eTag")
 scalar eTag extends string;
 

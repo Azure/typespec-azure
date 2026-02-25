@@ -48,7 +48,7 @@
       "name": "PrivateEndpointConnections"
     },
     {
-      "name": "PrivateLinks"
+      "name": "PrivateLinkOperations"
     }
   ],
   "paths": {
@@ -403,7 +403,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/PrivateEndpointConnectionResourceListResult"
+              "$ref": "#/definitions/PrivateEndpointListResult"
             }
           },
           "default": {
@@ -451,7 +451,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/PrivateEndpointConnectionResource"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
             }
           },
           "default": {
@@ -495,21 +495,21 @@
             "description": "Resource create parameters.",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/PrivateEndpointConnectionResource"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Resource 'PrivateEndpointConnectionResource' update operation succeeded",
+            "description": "Resource 'PrivateEndpoint' update operation succeeded",
             "schema": {
-              "$ref": "#/definitions/PrivateEndpointConnectionResource"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
             }
           },
           "201": {
-            "description": "Resource 'PrivateEndpointConnectionResource' create operation succeeded",
+            "description": "Resource 'PrivateEndpoint' create operation succeeded",
             "schema": {
-              "$ref": "#/definitions/PrivateEndpointConnectionResource"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
             }
           },
           "default": {
@@ -549,8 +549,19 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Resource deleted successfully."
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
           },
           "204": {
             "description": "Resource does not exist."
@@ -561,14 +572,18 @@
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
-        }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PrivateLinkTest/trackedResources/{trackedResourceName}/privateLinkResources": {
       "get": {
-        "operationId": "PrivateLinks_ListByTestTrackedResource",
+        "operationId": "PrivateLinkOperations_ListByTestTrackedResource",
         "tags": [
-          "PrivateLinks"
+          "PrivateLinkOperations"
         ],
         "description": "list private links on the given resource",
         "parameters": [
@@ -642,31 +657,15 @@
       },
       "readOnly": true
     },
-    "PrivateEndpointConnectionResource": {
+    "PrivateEndpointListResult": {
       "type": "object",
-      "description": "Holder for private endpoint connections",
-      "properties": {
-        "properties": {
-          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnectionProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
-        }
-      },
-      "allOf": [
-        {
-          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ProxyResource"
-        }
-      ]
-    },
-    "PrivateEndpointConnectionResourceListResult": {
-      "type": "object",
-      "description": "The response of a PrivateEndpointConnectionResource list operation.",
+      "description": "The response of a PrivateEndpoint list operation.",
       "properties": {
         "value": {
           "type": "array",
-          "description": "The PrivateEndpointConnectionResource items on this page",
+          "description": "The PrivateEndpoint items on this page",
           "items": {
-            "$ref": "#/definitions/PrivateEndpointConnectionResource"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
           }
         },
         "nextLink": {
@@ -679,22 +678,6 @@
         "value"
       ]
     },
-    "PrivateLinkResource": {
-      "type": "object",
-      "description": "Private Links for TestRackedResource",
-      "properties": {
-        "properties": {
-          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateLinkResourceProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
-        }
-      },
-      "allOf": [
-        {
-          "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ProxyResource"
-        }
-      ]
-    },
     "PrivateLinkResourceListResult": {
       "type": "object",
       "description": "The response of a PrivateLinkResource list operation.",
@@ -703,7 +686,7 @@
           "type": "array",
           "description": "The PrivateLinkResource items on this page",
           "items": {
-            "$ref": "#/definitions/PrivateLinkResource"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateLinkResource"
           }
         },
         "nextLink": {
@@ -738,7 +721,7 @@
           "type": "array",
           "description": "The private endpoints exposed by this resource",
           "items": {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpoint"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
           },
           "readOnly": true
         }
@@ -750,8 +733,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/TestTrackedProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       },
       "allOf": [

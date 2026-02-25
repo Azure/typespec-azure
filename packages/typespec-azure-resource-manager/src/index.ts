@@ -1,5 +1,6 @@
 export const namespace = "Azure.ResourceManager";
 
+export type { ArmFeatureOptions } from "../generated-defs/Azure.ResourceManager.Legacy.js";
 export {
   $armCommonTypesVersion,
   getArmCommonTypeOpenAPIRef,
@@ -19,7 +20,7 @@ export { $lib } from "./lib.js";
 export { $linter } from "./linter.js";
 
 export { getInlineAzureType } from "./commontypes.private.decorators.js";
-export { isAzureResource, isConditionallyFlattened } from "./private.decorators.js";
+export { isAzureResource } from "./private.decorators.js";
 
 /** @internal */
 export { $decorators } from "./tsp-index.js";

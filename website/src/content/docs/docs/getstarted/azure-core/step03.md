@@ -1,16 +1,38 @@
 ---
-title: 3. Using the versioned Azure.Core types
-description: Using versioned Azure.Core
+title: 3. Defining your first resource
+description: Defining data-plane resources
 llmstxt: true
 ---
 
-Before you can use the models and operations defined in the `Azure.Core` namespace, you will need to specify the API version of the `Azure.Core` library that your service uses. You can do this by adding the `@useDependency` decorator to the `Contoso.WidgetManager` namespace as seen here:
+In the context of your service, a "resource" is a fundamental entity that your service manages. For our `WidgetService`, the most basic entity we need is a `Widget`.
+
+To create a `Widget`, we need to define a `model` and annotate it with the `@resource` decorator.
+
+## Code implementation
+
+After the top-level `namespace` declaration, add the following lines:
 
 ```typespec
-@service(#{ title: "Contoso Widget Manager" })
-namespace Contoso.WidgetManager;
+/** A widget */
+@resource("widgets")
+model Widget {
+  /** The widget name */
+  @key("widgetName")
+  @visibility(Lifecycle.Read)
+  name: string;
+
+  /** The ID of the widget's manufacturer */
+  manufacturerId: string;
+}
 ```
 
-See the sections [Versioning your service](./step10.md#versioning-your-service) and [Using Azure.Core versions](./step10.md#using-azurecore-versions) for more details about service versioning.
+## Code explanation
 
-> **NOTE:** The `Azure.Core` version used in this tutorial may be out of date! The `typespec-azure-core` [README.md](https://github.com/Azure/typespec-azure/blob/main/packages/typespec-azure-core/README.md) file contains the versions listing which describes the available versions.
+Here are some important points about the code:
+
+- The `Widget` model has a `@resource` decorator with a parameter of `"widgets"`. This string is the "collection name" of the resource and it determines where the resource appears in the service URI layout.
+- The `name` property has a `@key` decorator with a parameter of `"widgetName"`. This string customizes the name of the path parameter (and the parameter name itself) in operations that use this resource type. Note that there _must_ be one property with a `@key` decorator on all resource types!
+- The `@visibility(Lifecycle.Read)` decorator on the `name` property indicates that the `name` property should only appear in operation responses, not in operations that allow you to change properties of the `Widget` resource.
+- We use `@doc` decorators on the model type and all properties for description. Documentation strings are enforced by linting rule when authoring specs with `Azure.Core`!
+
+Now that we have a resource type, the next step is to define operations for this resource.

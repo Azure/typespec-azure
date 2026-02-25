@@ -523,6 +523,7 @@ it("Returns correct metadata for Async Update with union type ProvisioningState"
       interface Widgets {
         get is ArmResourceRead<Widget>;
         createOrUpdate is ArmResourceCreateOrReplaceAsync<Widget>;
+        @Azure.Core.useFinalStateVia("original-uri")
         update is ArmResourcePatchAsync<Widget, WidgetProperties>;
         delete is ArmResourceDeleteSync<Widget>;
         listByResourceGroup is ArmResourceListByParent<Widget>;
@@ -535,7 +536,7 @@ it("Returns correct metadata for Async Update with union type ProvisioningState"
   deepStrictEqual((metadata.finalResult as Model)?.name, "Widget");
   deepStrictEqual((metadata.finalEnvelopeResult as Model)?.name, "Widget");
   deepStrictEqual(metadata.finalResultPath, undefined);
-  deepStrictEqual(metadata.finalStateVia, "location");
+  deepStrictEqual(metadata.finalStateVia, "original-uri");
 });
 
 it("Returns correct metadata for Async Delete with union type ProvisioningState", async () => {

@@ -412,11 +412,11 @@ public virtual Response Post(User user, CancellationToken cancellationToken = de
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// Modular Api Layer
+// JS CodeGen Api Layer
 export async function get(): Promise<User>;
 export async function post(body: User, options: PostOptionalParams): Promise<void>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class DemoServiceClient {
   get(options: GetUserOptionalParams): Promise<User>;
   post(body: User, options: PostOptionalParams): Promise<void>;
@@ -503,14 +503,14 @@ public virtual Response Upload(string firstName, string lastName, CancellationTo
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// Modular Api Layer
+// JS CodeGen Api Layer
 export async function upload(
   firstName: string,
   lastName: string,
   options: UploadOptionalParams,
 ): Promise<void>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class DemoServiceClient {
   upload(firstName: string, lastName: string, options: UploadOptionalParams): Promise<void>;
 }
@@ -580,7 +580,7 @@ public virtual Response Upload(string id, string firstName, string lastName, Can
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// Modular Api Layer
+// JS CodeGen Api Layer
 export async function upload(
   id: string,
   firstName: string,
@@ -588,7 +588,7 @@ export async function upload(
   options: UploadOptionalParams,
 ): Promise<void>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class DemoServiceClient {
   upload(
     id: string,
@@ -667,14 +667,14 @@ public virtual Response Upload(string firstName, string lastName, CancellationTo
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// Modular Api Layer
+// JS CodeGen Api Layer
 export async function upload(
   firstName: string,
   lastName: string,
   options: UploadOptionalParams,
 ): Promise<void>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class DemoServiceClient {
   upload(firstName: string, lastName: string, options: UploadOptionalParams): Promise<void>;
 }
@@ -754,10 +754,10 @@ public virtual Response Upload(User user, CancellationToken cancellationToken = 
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// Modular Api Layer
+// JS CodeGen Api Layer
 export async function upload(user: User, options: UploadOptionalParams): Promise<void>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class DemoServiceClient {
   upload(user: User, options: UploadOptionalParams): Promise<void>;
 }
@@ -841,7 +841,7 @@ public virtual Response GetBlobProperties(string name, string testHeader, Reques
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// Modular Options
+// JS CodeGen Options
 export interface GetBlobPropertiesOptionalParams extends OperationOptions {
   requestOptions: {
     headers: {
@@ -850,10 +850,10 @@ export interface GetBlobPropertiesOptionalParams extends OperationOptions {
   }
 }
 
-// Modular api layer
+// JS CodeGen api layer
 export async function getBlobProperties(name: string, options: GetBlobPropertiesOptionalParams): Promise<void>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class DemoServiceClient {
   getBlobProperties(name: string, options: GetBlobPropertiesOptionalParams): Promise<void>
 }
@@ -932,18 +932,18 @@ public virtual Response Register(Schema schema, CancellationToken cancellationTo
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// Modular model
+// JS CodeGen model
 export interface Schema {
   schema: string;
 }
 
-// Modular api layer
+// JS CodeGen api layer
 export async function register(
   body: Schema,
   options: GetBlobPropertiesOptionalParams,
 ): Promise<void>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class DemoServiceClient {
   getBlobProperties(body: Schema, options: GetBlobPropertiesOptionalParams): Promise<void>;
 }
@@ -1040,7 +1040,7 @@ def scheduleRepairs(self, widget_name: str, problem: str, contact: str, *, conte
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// Modular api layer
+// JS CodeGen api layer
 export async function scheduleRepairs(
   context: Client,
   widgetName: string,
@@ -1049,7 +1049,7 @@ export async function scheduleRepairs(
   options: ScheduleRepairsOptionalParams = { requestOptions: {} },
 ): Promise<RepairResult>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class WidgetServiceClient {
   scheduleRepairs(
     widgetName: string,
@@ -1190,7 +1190,7 @@ def scheduleRepairs(self, body: [Schema, JSON, IO[bytes]], *, content_type: str 
 <ClientTabItem lang="typescript" label="Typescript" >
 
 ```typescript
-// Modular api layer
+// JS CodeGen api layer
 export async function scheduleRepairs(
   context: Client,
   widgetName: string,
@@ -1198,7 +1198,7 @@ export async function scheduleRepairs(
   options: ScheduleRepairsOptionalParams = { requestOptions: {} },
 ): Promise<RepairResult>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class WidgetServiceClient {
   scheduleRepairs(
     widgetName: string,
@@ -1338,7 +1338,7 @@ namespace Analyze
 ```
 
 ```typescript
-// Modular api layer
+// JS CodeGen api layer
 export async function completions(
   context: Client,
   input: CompletionInput,
@@ -1352,7 +1352,7 @@ export async function analyze(
   options: AnalyzeOptionalParams = { requestOptions: {} },
 ): Promise<AnalyzeResult>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class AnalyzeClient {
   completions(
     input: CompletionInput,
@@ -1462,7 +1462,7 @@ public Response<long> B(string x, Cancellation token);
 ```
 
 ```typescript
-// Modular api layer
+// JS CodeGen api layer
 export async function a(
   context: Client,
   x: number,
@@ -1475,7 +1475,7 @@ export async function b(
   options: BOptionalParams = { requestOptions: {} },
 ): Promise<number>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class TestServiceClient {
   b(x: string, options: BOptionalParams = { requestOptions: {} }): Promise<number>;
 
@@ -1563,7 +1563,7 @@ public Response<long> Foo(string x, Cancellation token);
 ```
 
 ```typescript
-JS RLC is not in the business of customization with client.tsp
+// NOT_SUPPORTED
 ```
 
 ```java
@@ -1610,13 +1610,13 @@ def get(self, *, etag: Optional[str] = None, match_condition: Optional[MatchCond
 ```
 
 ```typescript
-// Modular api layer
+// JS CodeGen api layer
 export async function get(
   context: Client,
   options: GetOptionalParams = { requestOptions: {} },
 ): Promise<Response>;
 
-// Modular classical client layer
+// JS CodeGen classical client layer
 export class TestServiceClient {
   get(options: GetOptionalParams = { requestOptions: {} }): Promise<Response>;
 }

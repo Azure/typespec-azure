@@ -389,8 +389,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/WidgetProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       },
       "allOf": [
@@ -457,8 +456,7 @@
         },
         "properties": {
           "$ref": "#/definitions/WidgetUpdateProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       }
     },

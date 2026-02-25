@@ -1,16 +1,10 @@
 import { ok } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { isHttpMetadata } from "../../src/public-utils.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import { createSdkContextForTester, SimpleTesterWithService } from "../tester.js";
 
 it("is http query", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model BodyModel {
       @query
       query: string;
@@ -19,14 +13,15 @@ it("is http query", async () => {
     }
     op func(@bodyRoot body: BodyModel): void;
   `);
+  const context = await createSdkContextForTester(program);
 
-  const queryProperty = runner.context.sdkPackage.models[0].properties[0];
+  const queryProperty = context.sdkPackage.models[0].properties[0];
   ok(queryProperty);
-  ok(isHttpMetadata(runner.context, queryProperty));
+  ok(isHttpMetadata(context, queryProperty));
 });
 
 it("is http header", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model BodyModel {
       @header
       header: string;
@@ -35,14 +30,15 @@ it("is http header", async () => {
     }
     op func(@bodyRoot body: BodyModel): void;
   `);
+  const context = await createSdkContextForTester(program);
 
-  const queryProperty = runner.context.sdkPackage.models[0].properties[0];
+  const queryProperty = context.sdkPackage.models[0].properties[0];
   ok(queryProperty);
-  ok(isHttpMetadata(runner.context, queryProperty));
+  ok(isHttpMetadata(context, queryProperty));
 });
 
 it("is http cookie", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model BodyModel {
       @cookie
       cookie: string;
@@ -51,14 +47,15 @@ it("is http cookie", async () => {
     }
     op func(@bodyRoot body: BodyModel): void;
   `);
+  const context = await createSdkContextForTester(program);
 
-  const queryProperty = runner.context.sdkPackage.models[0].properties[0];
+  const queryProperty = context.sdkPackage.models[0].properties[0];
   ok(queryProperty);
-  ok(isHttpMetadata(runner.context, queryProperty));
+  ok(isHttpMetadata(context, queryProperty));
 });
 
 it("is http path", async () => {
-  await runner.compileWithBuiltInService(`
+  const { program } = await SimpleTesterWithService.compile(`
     model BodyModel {
       @path
       path: string;
@@ -67,8 +64,9 @@ it("is http path", async () => {
     }
     op func(@bodyRoot body: BodyModel): void;
   `);
+  const context = await createSdkContextForTester(program);
 
-  const queryProperty = runner.context.sdkPackage.models[0].properties[0];
+  const queryProperty = context.sdkPackage.models[0].properties[0];
   ok(queryProperty);
-  ok(isHttpMetadata(runner.context, queryProperty));
+  ok(isHttpMetadata(context, queryProperty));
 });
