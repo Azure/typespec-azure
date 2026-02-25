@@ -41,7 +41,6 @@ jobs:
     env:
       # The Copilot SDK requires a fine-grained PAT with "Copilot Requests: Read"
       # permission. The built-in GITHUB_TOKEN does NOT have the required scope.
-      # The SDK checks COPILOT_GITHUB_TOKEN first, then GH_TOKEN, then GITHUB_TOKEN.
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
     steps:
       - name: Checkout repository
