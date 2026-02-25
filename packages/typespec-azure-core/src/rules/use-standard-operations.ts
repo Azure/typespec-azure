@@ -1,12 +1,20 @@
 import {
   Operation,
+  Program,
   createRule,
   getNamespaceFullName,
+  getOverloadedOperation,
   isTemplateDeclarationOrInstance,
   paramMessage,
 } from "@typespec/compiler";
 
-function derivesFromAzureCoreOperation(operation: Operation): boolean {
+function derivesFromAzureCoreOperation(operation: Operation, program: Program): boolean {
+  // Check if this operation is an @overload of an Azure.Core-derived operation
+  const overloadBase = getOverloadedOperation(program, operation);
+  if (overloadBase && derivesFromAzureCoreOperation(overloadBase, program)) {
+    return true;
+  }
+
   // Check every link in the signature chain
   while (operation.sourceOperation) {
     if (
@@ -53,7 +61,7 @@ export const useStandardOperations = createRule({
 
         // Otherwise, if the operation signature is a raw declaration or does not
         // derive from an operation in Azure.Core, it violates this linting rule.
-        if (!derivesFromAzureCoreOperation(operationContext)) {
+        if (!derivesFromAzureCoreOperation(operationContext, context.program)) {
           context.reportDiagnostic({
             // If the namespace where the operation's interface is defined is
             // different than the namespace we're in, mark the operation's

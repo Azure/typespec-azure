@@ -75,4 +75,27 @@ describe("typespec-azure-core: use-standard-operations rule", () => {
         },
       ]);
   });
+
+  it("does not emit a diagnostic for operations that overload an Azure.Core-derived operation", async () => {
+    await tester
+      .expect(
+        `
+      @resource("widgets")
+      model Widget {
+        @key
+        name: string;
+      }
+
+      interface MyOps {
+        @route("good")
+        op goodOp is Azure.Core.ResourceRead<Widget>;
+
+        @route("good-overload")
+        @overload(MyOps.goodOp)
+        op goodOverload is Azure.Core.ResourceRead<Widget>;
+      }
+`,
+      )
+      .toBeValid();
+  });
 });
