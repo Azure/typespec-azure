@@ -497,7 +497,7 @@ it("@operationGroup with same model on parent client", async () => {
 });
 
 it("redefine client structure", async () => {
-  const { program } = await SimpleBaseTester.compile(
+  const [{ program }] = await SimpleBaseTester.compileAndDiagnose(
     createClientCustomizationInput(
       `
       @service
@@ -535,7 +535,7 @@ it("redefine client structure", async () => {
   );
   const context = await createSdkContextForTester(program);
   const sdkPackage = context.sdkPackage;
-  strictEqual(sdkPackage.clients.length, 2);
+  strictEqual(sdkPackage.clients.length, 1);
 
   const containerClient = sdkPackage.clients.find((x) => x.name === "ContainerClient");
   ok(containerClient);
@@ -568,9 +568,9 @@ it("redefine client structure", async () => {
   strictEqual(methods[0].operation.parameters.length, 1);
   strictEqual(methods[0].operation.parameters[0].correspondingMethodParams[0], containerName);
 
-  const blobClient = sdkPackage.clients.find((x) => x.name === "BlobClient");
+  const blobClient = containerClient.children?.find((x) => x.name === "BlobClient");
   ok(blobClient);
-  strictEqual(blobClient.clientInitialization.initializedBy, InitializedByFlags.Individually);
+  strictEqual(blobClient.clientInitialization.initializedBy, InitializedByFlags.Default);
   strictEqual(blobClient.clientInitialization.parameters.length, 3);
 
   const endpointOnBlobClient = blobClient.clientInitialization.parameters.find(
