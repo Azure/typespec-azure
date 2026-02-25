@@ -11,7 +11,7 @@
  */
 
 import { resolve } from "node:path";
-import { listConfigs, loadConfig, loadSkillContent, type DocUpdateConfig } from "./config.js";
+import { listConfigs, loadConfig, type DocUpdateConfig } from "./config.js";
 
 // ---------------------------------------------------------------------------
 // CLI argument parsing
@@ -103,11 +103,15 @@ function buildTaskPrompt(config: DocUpdateConfig, focus: string): string {
 **Date:** ${date}
 **Focus Area:** ${focus} — ${focusDescription}
 
+### Instructions
+
+Read the skill file at \`${config.skillPath}\` and follow its instructions carefully.
+
 ### Source Code Paths (read-only reference)
 
 ${config.sourceCodePaths.map((p) => `- \`${p}\``).join("\n")}
 
-Please proceed with the documentation update following the instructions in the system message. Focus on: **${focus}** — ${focusDescription}`;
+Focus on: **${focus}** — ${focusDescription}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -120,18 +124,15 @@ async function main(): Promise<void> {
 
   // Resolve repo root (4 levels up from eng/scripts/doc-updater/src/)
   const repoRoot = resolve(import.meta.dirname ?? ".", "../../../..");
-  const skillContent = await loadSkillContent(config, repoRoot);
   const taskPrompt = buildTaskPrompt(config, args.focus);
 
   if (args.dryRun) {
     console.log("=== DRY RUN ===\n");
-    console.log("--- Skill File ---");
-    console.log(`Path: ${config.skillPath}`);
-    console.log(skillContent);
-    console.log("\n--- Task Prompt ---");
+    console.log("--- Task Prompt ---");
     console.log(taskPrompt);
     console.log("\n--- Config ---");
     console.log(`Model: ${args.model}`);
+    console.log(`Skill: ${config.skillPath}`);
     console.log(`Config: ${config.name} (${config.displayName})`);
     console.log(`Focus: ${args.focus}`);
     return;
@@ -176,7 +177,7 @@ async function main(): Promise<void> {
   log("🤖", `Model: ${args.model}`);
 
   // Ensure the Copilot CLI agent starts in the repo root so it can
-  // access all packages, docs, and run validation commands correctly.
+  // access all packages, docs, and run commands correctly.
   process.chdir(repoRoot);
 
   const { CopilotClient, approveAll } = await import("@github/copilot-sdk");
@@ -186,7 +187,6 @@ async function main(): Promise<void> {
     const session = await client.createSession({
       model: args.model,
       streaming: true,
-      systemMessage: { content: skillContent },
       onPermissionRequest: approveAll,
     });
 
