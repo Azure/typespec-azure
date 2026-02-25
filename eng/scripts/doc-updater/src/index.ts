@@ -103,15 +103,7 @@ function buildTaskPrompt(config: DocUpdateConfig, focus: string): string {
 **Date:** ${date}
 **Focus Area:** ${focus} — ${focusDescription}
 
-### Instructions
-
-Read the skill file at \`${config.skillPath}\` and follow its instructions carefully.
-
-### Source Code Paths (read-only reference)
-
-${config.sourceCodePaths.map((p) => `- \`${p}\``).join("\n")}
-
-Focus on: **${focus}** — ${focusDescription}`;
+Use the @${config.skillName} skill and follow its instructions carefully.`;
 }
 
 // ---------------------------------------------------------------------------
@@ -132,7 +124,6 @@ async function main(): Promise<void> {
     console.log(taskPrompt);
     console.log("\n--- Config ---");
     console.log(`Model: ${args.model}`);
-    console.log(`Skill: ${config.skillPath}`);
     console.log(`Config: ${config.name} (${config.displayName})`);
     console.log(`Focus: ${args.focus}`);
     return;
@@ -173,7 +164,7 @@ async function main(): Promise<void> {
   // ---------------------------------------------------------------------------
 
   log("⏳", `Starting doc update for ${config.displayName} (focus: ${args.focus})`);
-  log("📄", `Skill: ${config.skillPath}`);
+  log("📄", `Skill: ${config.skillName}`);
   log("🤖", `Model: ${args.model}`);
 
   // Ensure the Copilot CLI agent starts in the repo root so it can
@@ -188,7 +179,6 @@ async function main(): Promise<void> {
       model: args.model,
       streaming: true,
       onPermissionRequest: approveAll,
-      skillDirectories: [resolve(repoRoot, ".github/skills")],
     });
 
     // Track in-flight tool calls for duration logging
