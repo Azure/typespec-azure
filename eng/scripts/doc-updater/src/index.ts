@@ -188,6 +188,7 @@ async function main(): Promise<void> {
       model: args.model,
       streaming: true,
       onPermissionRequest: approveAll,
+      skillDirectories: [resolve(repoRoot, ".github/skills")],
     });
 
     // Track in-flight tool calls for duration logging
