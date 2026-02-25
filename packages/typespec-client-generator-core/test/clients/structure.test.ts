@@ -2637,3 +2637,67 @@ it("scenario 2: services as direct children with nested @client", async () => {
   ok(diskClient);
   deepStrictEqual(diskClient.apiVersions, ["bv1", "bv2"]);
 });
+
+it("scenario 2: nested @client with multiple services auto-merges recursively", async () => {
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    @versioned(VersionsA)
+    namespace ServiceA {
+      enum VersionsA {
+        av1,
+        av2,
+      }
+      interface Operations {
+        @route("/opA")
+        opA(@query("api-version") apiVersion: VersionsA): void;
+      }
+    }
+
+    @service
+    @versioned(VersionsB)
+    namespace ServiceB {
+      enum VersionsB {
+        bv1,
+        bv2,
+      }
+      interface Operations {
+        @route("/opB")
+        opB(@query("api-version") apiVersion: VersionsB): void;
+      }
+    }`,
+      `
+    @client({
+      name: "CombineClient",
+      service: [ServiceA, ServiceB],
+    })
+    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+    namespace CombineClient {
+      @client({
+        name: "SharedClient",
+        service: [ServiceA, ServiceB],
+      })
+      @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
+      namespace Shared {}
+    }
+  `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  const rootClient = sdkPackage.clients.find((c) => c.name === "CombineClient");
+  ok(rootClient);
+  const sharedClient = rootClient.children?.find((c) => c.name === "SharedClient");
+  ok(sharedClient);
+  strictEqual(sharedClient.apiVersions.length, 0);
+  deepStrictEqual(sharedClient.apiVersionsMap, {
+    ServiceA: ["av1", "av2"],
+    ServiceB: ["bv1", "bv2"],
+  });
+  const operationsClient = sharedClient.children?.find((c) => c.name === "Operations");
+  ok(operationsClient);
+  strictEqual(operationsClient.methods.length, 2);
+  ok(operationsClient.methods.find((m) => m.name === "opA"));
+  ok(operationsClient.methods.find((m) => m.name === "opB"));
+});

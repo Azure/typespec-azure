@@ -214,30 +214,9 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
 
             // If the nested client namespace is empty, auto-merge from its service
             if (isNamespaceEmpty(subNs)) {
-              const nestedService = nestedClientData.services[0];
-              if (nestedService.kind === "Namespace") {
-                for (const serviceSubNs of nestedService.namespaces.values()) {
-                  const subOg = createOperationGroup(
-                    context,
-                    serviceSubNs,
-                    og.groupPath,
-                    nestedService,
-                    og,
-                    true,
-                  );
-                  if (subOg) og.subOperationGroups.push(subOg);
-                }
-                for (const serviceIface of nestedService.interfaces.values()) {
-                  if (isTemplateDeclaration(serviceIface)) continue;
-                  const subOg = createOperationGroup(
-                    context,
-                    serviceIface,
-                    og.groupPath,
-                    nestedService,
-                    og,
-                    true,
-                  );
-                  if (subOg) og.subOperationGroups.push(subOg);
+              for (const nestedService of nestedClientData.services) {
+                if (nestedService.kind === "Namespace") {
+                  addServiceContentToNestedOperationGroup(og, nestedService);
                 }
               }
             }
@@ -262,6 +241,75 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
             context.__clientToOperationsCache!.set(og, []);
             groups.push(og);
           }
+        }
+      }
+    }
+
+    function addOrMergeSubOperationGroup(
+      targetGroup: SdkOperationGroup,
+      subGroup: SdkOperationGroup,
+    ): void {
+      const subGroupName = subGroup.type
+        ? getLibraryName(context, subGroup.type)
+        : subGroup.groupPath;
+      const existing = targetGroup.subOperationGroups.find((x) => {
+        const name = x.type ? getLibraryName(context, x.type) : x.groupPath;
+        return name === subGroupName;
+      });
+      if (!existing) {
+        targetGroup.subOperationGroups.push(subGroup);
+        return;
+      }
+      for (const svc of subGroup.services) {
+        if (!existing.services.includes(svc)) {
+          existing.services.push(svc);
+        }
+      }
+      existing.service = existing.services[0]; // eslint-disable-line @typescript-eslint/no-deprecated
+      if (
+        existing.type !== undefined &&
+        subGroup.type !== undefined &&
+        existing.type !== subGroup.type
+      ) {
+        const existingMergedTypes = mergedOperationGroupTypes.get(existing) ?? [existing.type];
+        existingMergedTypes.push(subGroup.type);
+        mergedOperationGroupTypes.set(existing, existingMergedTypes);
+        existing.type = undefined;
+      }
+      for (const nestedSubGroup of subGroup.subOperationGroups) {
+        addOrMergeSubOperationGroup(existing, nestedSubGroup);
+      }
+    }
+
+    function addServiceContentToNestedOperationGroup(
+      targetGroup: SdkOperationGroup,
+      serviceNamespace: Namespace,
+    ): void {
+      for (const serviceSubNs of serviceNamespace.namespaces.values()) {
+        const subOg = createOperationGroup(
+          context,
+          serviceSubNs,
+          targetGroup.groupPath,
+          serviceNamespace,
+          targetGroup,
+          true,
+        );
+        if (subOg) {
+          addOrMergeSubOperationGroup(targetGroup, subOg);
+        }
+      }
+      for (const serviceIface of serviceNamespace.interfaces.values()) {
+        if (isTemplateDeclaration(serviceIface)) continue;
+        const subOg = createOperationGroup(
+          context,
+          serviceIface,
+          targetGroup.groupPath,
+          serviceNamespace,
+          targetGroup,
+          true,
+        );
+        if (subOg) {
+          addOrMergeSubOperationGroup(targetGroup, subOg);
         }
       }
     }

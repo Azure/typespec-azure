@@ -1,19 +1,12 @@
----
-changeKind: feature
+changeKind: breaking
 packages:
   - "@azure-tools/typespec-client-generator-core"
 ---
 
-Add multiple services support per design doc. Key changes:
+This change adds multiple-services client support and consolidates client hierarchy customization around `@client`. Cross-service clients now expose `apiVersionsMap` on `SdkClientType`, and multi-service hierarchy scenarios are supported, including mixed multi-service and single-service clients and nested `@client` definitions.
 
-- **New `apiVersionsMap` property on `SdkClientType`**: A `Record<string, string[]>` mapping service namespace full qualified names to their API versions. Empty for single-service clients, populated for cross-service clients.
-- **Scenario 0 (Breaking)**: When multiple `@service` namespaces exist without explicit `@client`, TCGC now creates a separate root client for each service instead of only using the first one. The `multiple-services` warning is removed.
-- **Scenario 1**: Explicit `@client` with empty namespace targeting a single service now auto-merges the service's operation groups into the client.
-- **Scenario 1.5**: Support mixing multi-service and single-service clients in the same package.
-- **Scenario 2**: Support nested `@client` decorators within multi-service client namespaces. Nested clients become children of the root multi-service client.
-- **Updated versioning mutation**: Properly handles multiple independent services and mixed multi/single-service client configurations.
+This change is breaking because when multiple `@service` namespaces exist without explicit `@client`, TCGC now creates a separate root client for each service instead of only using the first service and emitting the `multiple-services` warning.
 
-**Migration guide for breaking change (Scenario 0)**:
-Previously, when multiple `@service` namespaces existed without an explicit `@client` decorator, only the first service was used and a warning was emitted. Now, a separate root client is created for each service. If you relied on the old behavior of ignoring additional services, you should either:
-1. Remove the extra `@service` declarations, or
-2. Add explicit `@client` decorators to control the client structure.
+`@operationGroup` is now deprecated in favor of nested `@client`, and `SdkOperationGroup` is deprecated in favor of `SdkClient`-based hierarchy customization while retaining backward compatibility for existing usage.
+
+Migration guide: if you relied on implicit first-service-only behavior, either remove extra `@service` declarations or add explicit `@client` decorators to control which services are included and how hierarchy is shaped.

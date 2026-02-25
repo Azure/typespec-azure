@@ -111,6 +111,9 @@ export interface SdkClient {
   subOperationGroups: SdkOperationGroup[];
 }
 
+/**
+ * @deprecated Use `SdkClient`-based nested client hierarchy instead.
+ */
 export interface SdkOperationGroup {
   kind: "SdkOperationGroup";
   type?: Namespace | Interface;
