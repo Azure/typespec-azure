@@ -10,6 +10,7 @@
  *   tsx src/index.ts --config tcgc --dry-run
  */
 
+import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { listConfigs, loadConfig, type DocUpdateConfig } from "./config.js";
 
@@ -222,6 +223,21 @@ async function main(): Promise<void> {
 
     session.on("session.error", (event) => {
       log(`ERROR [${event.data.errorType}]: ${event.data.message}`);
+    });
+
+    // --- Log plan updates ---
+
+    session.on("session.plan_changed", async () => {
+      const wsPath = session.workspacePath;
+      if (!wsPath) return;
+      try {
+        const plan = await readFile(resolve(wsPath, "plan.md"), "utf-8");
+        console.log("\n=== Agent Plan ===");
+        console.log(plan.trim());
+        console.log("==================\n");
+      } catch {
+        // plan.md not yet written, ignore
+      }
     });
 
     // 90-minute timeout for the agent session
