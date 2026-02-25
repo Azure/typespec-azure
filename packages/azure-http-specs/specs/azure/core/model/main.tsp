@@ -27,7 +27,7 @@ model AzureEmbeddingModel {
   embedding: EmbeddingVector<int32>;
 }
 
-@operationGroup
+@client
 @route("/embeddingVector")
 interface AzureCoreEmbeddingVector {
   #suppress "@azure-tools/typespec-azure-core/use-standard-operations" "For testing"

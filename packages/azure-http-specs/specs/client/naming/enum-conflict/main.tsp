@@ -53,7 +53,7 @@ namespace SecondNamespace {
   }
 }
 
-@operationGroup
+@client
 @route("/first")
 interface FirstOperations {
   @scenario
@@ -69,7 +69,7 @@ interface FirstOperations {
   first(@body body: FirstNamespace.FirstModel): FirstNamespace.FirstModel;
 }
 
-@operationGroup
+@client
 @route("/second")
 interface SecondOperations {
   @scenario
