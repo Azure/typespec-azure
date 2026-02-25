@@ -196,7 +196,10 @@ async function main(): Promise<void> {
     // --- Session lifecycle events ---
 
     session.on("session.start", (event) => {
-      log("🟢", `Session started (id: ${event.data.sessionId}, model: ${event.data.selectedModel ?? "default"})`);
+      log(
+        "🟢",
+        `Session started (id: ${event.data.sessionId}, model: ${event.data.selectedModel ?? "default"})`,
+      );
     });
 
     session.on("session.error", (event) => {
