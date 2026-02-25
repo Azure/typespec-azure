@@ -191,9 +191,10 @@ async function main(): Promise<void> {
       skillDirectories: [resolve(repoRoot, ".github/skills")],
     });
 
-    // --- Stream assistant text output ---
+    // --- Stream assistant text and reasoning output ---
 
     let deltaBuffer = "";
+    let reasoningBuffer = "";
 
     session.on("assistant.message_delta", (event) => {
       deltaBuffer += event.data.deltaContent;
@@ -211,7 +212,21 @@ async function main(): Promise<void> {
       }
     });
 
-    // --- Log tool calls as readable descriptions ---
+    session.on("assistant.reasoning_delta", (event) => {
+      reasoningBuffer += event.data.deltaContent;
+      const lines = reasoningBuffer.split("\n");
+      while (lines.length > 1) {
+        log(`Reasoning: ${lines.shift()}`);
+      }
+      reasoningBuffer = lines[0];
+    });
+
+    session.on("assistant.reasoning", () => {
+      if (reasoningBuffer) {
+        log(`Reasoning: ${reasoningBuffer}`);
+        reasoningBuffer = "";
+      }
+    });
 
     session.on("tool.execution_start", (event) => {
       const desc = describeToolCall(event.data.toolName, event.data.arguments);
@@ -226,10 +241,6 @@ async function main(): Promise<void> {
 
     session.on("skill.invoked", (event) => {
       log(`Using skill: ${event.data.name} (${event.data.path})`);
-    });
-
-    session.on("assistant.reasoning", (event) => {
-      log(`Reasoning: ${event.data.content.slice(0, 200)}`);
     });
 
     session.on("subagent.started", (event) => {
