@@ -141,6 +141,35 @@ async function main(): Promise<void> {
     console.log(`[${timestamp()}] ${message}`);
   }
 
+  /** Turn a tool call into a human-readable one-liner like VS Code's agent panel. */
+  function describeToolCall(toolName: string, args: unknown): string | undefined {
+    const a = (args ?? {}) as Record<string, unknown>;
+    const path = (a.file ?? a.filePath ?? a.path ?? a.pattern ?? "") as string;
+    switch (toolName) {
+      case "view":
+      case "read_file":
+      case "read_agent":
+        return path ? `Read ${path}` : undefined;
+      case "edit":
+      case "edit_file":
+      case "write":
+      case "create":
+        return path ? `Edited ${path}` : undefined;
+      case "grep":
+        return `Searched for "${a.regex ?? a.pattern ?? a.query ?? ""}"`;
+      case "glob":
+        return `Listed files matching ${path}`;
+      case "bash":
+      case "shell":
+      case "task": {
+        const cmd = ((a.command ?? a.cmd ?? "") as string).slice(0, 120);
+        return cmd ? `Running: ${cmd}` : undefined;
+      }
+      default:
+        return undefined;
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Run the agent session
   // ---------------------------------------------------------------------------
@@ -159,20 +188,40 @@ async function main(): Promise<void> {
       model: args.model,
       streaming: true,
       onPermissionRequest: approveAll,
+      skillDirectories: [resolve(repoRoot, ".github/skills")],
     });
 
-    // --- Log errors and assistant thinking steps ---
+    // --- Stream assistant text output ---
+
+    let deltaBuffer = "";
+
+    session.on("assistant.message_delta", (event) => {
+      deltaBuffer += event.data.deltaContent;
+      const lines = deltaBuffer.split("\n");
+      while (lines.length > 1) {
+        console.log(lines.shift());
+      }
+      deltaBuffer = lines[0];
+    });
+
+    session.on("assistant.message", () => {
+      if (deltaBuffer) {
+        console.log(deltaBuffer);
+        deltaBuffer = "";
+      }
+    });
+
+    // --- Log tool calls as readable descriptions ---
+
+    session.on("tool.execution_start", (event) => {
+      const desc = describeToolCall(event.data.toolName, event.data.arguments);
+      if (desc) {
+        log(desc);
+      }
+    });
 
     session.on("session.error", (event) => {
       log(`ERROR [${event.data.errorType}]: ${event.data.message}`);
-    });
-
-    session.on("assistant.turn_start", () => {
-      log("Agent thinking...");
-    });
-
-    session.on("tool.execution_start", (event) => {
-      log(`Running tool: ${event.data.toolName}`);
     });
 
     // 90-minute timeout for the agent session
