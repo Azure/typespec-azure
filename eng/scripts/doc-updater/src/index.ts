@@ -200,14 +200,14 @@ async function main(): Promise<void> {
       deltaBuffer += event.data.deltaContent;
       const lines = deltaBuffer.split("\n");
       while (lines.length > 1) {
-        console.log(lines.shift());
+        log(`${lines.shift()}`);
       }
       deltaBuffer = lines[0];
     });
 
     session.on("assistant.message", () => {
       if (deltaBuffer) {
-        console.log(deltaBuffer);
+        log(`${deltaBuffer}`);
         deltaBuffer = "";
       }
     });
