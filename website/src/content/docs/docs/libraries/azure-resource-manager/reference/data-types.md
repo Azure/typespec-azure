@@ -2687,7 +2687,7 @@ union Azure.ResourceManager.CommonTypes.BillingScheduleChangeEffectiveType
 
 ### `BillingScheduleChangeKind` {#Azure.ResourceManager.CommonTypes.BillingScheduleChangeKind}
 
-When a scheduled change is expected to become effective.
+Type of scheduled change.
 
 ```typespec
 union Azure.ResourceManager.CommonTypes.BillingScheduleChangeKind

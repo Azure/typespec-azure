@@ -195,7 +195,7 @@ union BillingScheduleChangeEffectiveType {
 }
 
 /**
- * When a scheduled change is expected to become effective.
+ * Type of scheduled change.
  */
 @added(Versions.v6)
 union BillingScheduleChangeKind {
