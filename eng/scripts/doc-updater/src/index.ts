@@ -107,10 +107,6 @@ function buildTaskPrompt(config: DocUpdateConfig, focus: string): string {
 
 ${config.sourceCodePaths.map((p) => `- \`${p}\``).join("\n")}
 
-### Validation
-
-After making changes, run these commands to validate:
-
 Please proceed with the documentation update following the instructions in the system message. Focus on: **${focus}** — ${focusDescription}`;
 }
 
@@ -141,14 +137,49 @@ async function main(): Promise<void> {
     return;
   }
 
-  console.log(`Starting doc update for ${config.displayName} (focus: ${args.focus})...`);
-  console.log(`Using skill: ${config.skillPath}`);
+  // ---------------------------------------------------------------------------
+  // Logging helpers
+  // ---------------------------------------------------------------------------
+
+  const isCI = !!process.env.CI;
+
+  function timestamp(): string {
+    return new Date().toISOString().slice(11, 23); // HH:MM:SS.mmm
+  }
+
+  /** Logged line — uses console.log so each line is flushed immediately in CI. */
+  function log(prefix: string, message: string): void {
+    console.log(`[${timestamp()}] ${prefix} ${message}`);
+  }
+
+  /** GitHub Actions collapsible group. Falls back to a plain header outside CI. */
+  function startGroup(title: string): void {
+    if (isCI) {
+      console.log(`::group::${title}`);
+    } else {
+      console.log(`\n── ${title} ──`);
+    }
+  }
+
+  function endGroup(): void {
+    if (isCI) {
+      console.log("::endgroup::");
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Run the agent session
+  // ---------------------------------------------------------------------------
+
+  log("⏳", `Starting doc update for ${config.displayName} (focus: ${args.focus})`);
+  log("📄", `Skill: ${config.skillPath}`);
+  log("🤖", `Model: ${args.model}`);
 
   // Ensure the Copilot CLI agent starts in the repo root so it can
   // access all packages, docs, and run validation commands correctly.
   process.chdir(repoRoot);
 
-  const { CopilotClient } = await import("@github/copilot-sdk");
+  const { CopilotClient, approveAll } = await import("@github/copilot-sdk");
   const client = new CopilotClient();
 
   try {
@@ -156,20 +187,93 @@ async function main(): Promise<void> {
       model: args.model,
       streaming: true,
       systemMessage: { content: skillContent },
+      onPermissionRequest: approveAll,
     });
 
-    // Stream output so the workflow logs show progress
-    session.on("assistant.message_delta", (event) => {
-      process.stdout.write(event.data.deltaContent);
+    // Track in-flight tool calls for duration logging
+    const toolTimers = new Map<string, { name: string; startMs: number }>();
+
+    // --- Session lifecycle events ---
+
+    session.on("session.start", (event) => {
+      log("🟢", `Session started (id: ${event.data.sessionId}, model: ${event.data.selectedModel ?? "default"})`);
     });
+
+    session.on("session.error", (event) => {
+      log("❌", `Session error [${event.data.errorType}]: ${event.data.message}`);
+    });
+
+    session.on("session.warning", (event) => {
+      log("⚠️", `Warning [${event.data.warningType}]: ${event.data.message}`);
+    });
+
+    session.on("session.info", (event) => {
+      log("ℹ️", `${event.data.message}`);
+    });
+
+    // --- Assistant output ---
+
+    let deltaBuffer = "";
+
+    session.on("assistant.message_delta", (event) => {
+      deltaBuffer += event.data.deltaContent;
+      // Flush complete lines so CI sees incremental progress
+      const lines = deltaBuffer.split("\n");
+      while (lines.length > 1) {
+        console.log(lines.shift());
+      }
+      deltaBuffer = lines[0];
+    });
+
+    session.on("assistant.message", () => {
+      // Flush any remaining partial line from the delta buffer
+      if (deltaBuffer) {
+        console.log(deltaBuffer);
+        deltaBuffer = "";
+      }
+    });
+
+    // --- Tool execution events ---
 
     session.on("tool.execution_start", (event) => {
-      console.log(`\n[tool] ${event.data.toolName}...`);
+      const name = event.data.toolName;
+      toolTimers.set(event.data.toolCallId, { name, startMs: Date.now() });
+      startGroup(`🔧 ${name}`);
+    });
+
+    session.on("tool.execution_complete", (event) => {
+      const timer = toolTimers.get(event.data.toolCallId);
+      const durationSec = timer ? ((Date.now() - timer.startMs) / 1000).toFixed(1) : "?";
+      const toolName = timer?.name ?? event.data.toolCallId;
+      toolTimers.delete(event.data.toolCallId);
+
+      if (event.data.success) {
+        log("✅", `${toolName} completed (${durationSec}s)`);
+      } else {
+        const errMsg = event.data.error?.message ?? "unknown error";
+        log("❌", `${toolName} failed (${durationSec}s): ${errMsg}`);
+      }
+      endGroup();
+    });
+
+    // --- Context management events ---
+
+    session.on("session.compaction_start", () => {
+      log("🗜️", "Context compaction started...");
+    });
+
+    session.on("session.compaction_complete", (event) => {
+      if (event.data.success) {
+        const saved = event.data.tokensRemoved ?? 0;
+        log("🗜️", `Context compaction complete (${saved} tokens freed)`);
+      } else {
+        log("⚠️", `Context compaction failed: ${event.data.error ?? "unknown"}`);
+      }
     });
 
     // 90-minute timeout for the agent session
     const TIMEOUT_MS = 90 * 60 * 1000;
-    console.log("Sending task prompt to Copilot agent...\n");
+    log("📨", "Sending task prompt to Copilot agent...\n");
     const response = await session.sendAndWait({ prompt: taskPrompt }, TIMEOUT_MS);
 
     if (response?.data.content) {
@@ -182,7 +286,7 @@ async function main(): Promise<void> {
     await client.stop();
   }
 
-  console.log("\nDoc update session complete.");
+  log("🏁", "Doc update session complete.");
 }
 
 main().catch((err) => {
