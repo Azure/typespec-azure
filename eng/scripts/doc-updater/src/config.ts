@@ -1,13 +1,14 @@
 /**
  * Configuration types and loader for the doc-updater system.
  *
- * Each package that wants automated doc updates defines a DocUpdateConfig
- * with metadata and a reference to a SKILL.md file that contains
- * the actual agent instructions.
+ * Each package that wants automated doc updates provides a YAML config
+ * file in the `configs/` directory alongside this package.  The YAML
+ * file references a SKILL.md that contains the actual agent instructions.
  */
 
-import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { load as parseYaml } from "js-yaml";
+import { readdir, readFile } from "node:fs/promises";
+import { basename, resolve } from "node:path";
 
 /**
  * Configuration for a single package's documentation update.
@@ -17,8 +18,6 @@ export interface DocUpdateConfig {
   name: string;
   /** Human-readable display name */
   displayName: string;
-  /** Brief description of what this config covers */
-  description: string;
 
   /**
    * Path to the SKILL.md file containing agent instructions,
@@ -30,34 +29,38 @@ export interface DocUpdateConfig {
   /** Source code paths to analyze for cross-referencing */
   sourceCodePaths: string[];
 
-  /** Shell commands to run for validation after changes */
-  validationCommands: string[];
-
   /** Named focus areas that can be selected at dispatch time */
   focusAreas: Record<string, string>;
 }
 
+/** Directory containing YAML config files, relative to this source file. */
+const CONFIGS_DIR = resolve(import.meta.dirname ?? ".", "../configs");
+
 /**
- * Load a doc-update config by name from the registry.
+ * Load a doc-update config by name.
+ *
+ * Reads `configs/<name>.yaml` and returns the parsed config.
  */
 export async function loadConfig(name: string): Promise<DocUpdateConfig> {
-  const { configs } = await import("./configs/index.js");
-  const config = configs[name];
-  if (!config) {
-    const available = Object.keys(configs).join(", ");
+  const filePath = resolve(CONFIGS_DIR, `${name}.yaml`);
+  let raw: string;
+  try {
+    raw = await readFile(filePath, "utf-8");
+  } catch {
+    const available = await listConfigs();
     throw new Error(
-      `Unknown doc-update config "${name}". Available configs: ${available}`,
+      `Unknown doc-update config "${name}". Available configs: ${available.join(", ")}`,
     );
   }
-  return config;
+  return parseYaml(raw) as DocUpdateConfig;
 }
 
 /**
- * List all available config names.
+ * List all available config names (derived from YAML filenames).
  */
 export async function listConfigs(): Promise<string[]> {
-  const { configs } = await import("./configs/index.js");
-  return Object.keys(configs);
+  const entries = await readdir(CONFIGS_DIR);
+  return entries.filter((f) => f.endsWith(".yaml")).map((f) => basename(f, ".yaml"));
 }
 
 /**
@@ -67,10 +70,7 @@ export async function listConfigs(): Promise<string[]> {
  * @param config - The doc-update config
  * @param repoRoot - Absolute path to the repository root
  */
-export async function loadSkillContent(
-  config: DocUpdateConfig,
-  repoRoot: string,
-): Promise<string> {
+export async function loadSkillContent(config: DocUpdateConfig, repoRoot: string): Promise<string> {
   const fullPath = resolve(repoRoot, config.skillPath);
   const raw = await readFile(fullPath, "utf-8");
 

@@ -55,6 +55,7 @@ Purpose: Functional samples demonstrating TCGC features.
 2. Catalog all decorators, types, APIs, and public interfaces exported by TCGC
 3. Review `src/` for all implemented features and their behaviors
 4. Check `lib/` and `generated-defs/` for decorator definitions and signatures
+5. Check `test/` for all features' tests
 
 ### Step 2: Cross-Reference Documentation
 
@@ -62,6 +63,28 @@ Purpose: Functional samples demonstrating TCGC features.
 2. Identify documentation gaps where features are not documented or under-documented
 3. Find outdated documentation that doesn't match current behavior (renamed types, changed signatures, removed features, added features)
 4. Verify that TypeSpec code examples in docs are syntactically valid — check decorator signatures, model shapes, and operation signatures against the current `lib/decorators.tsp` definitions
+
+After identifying all gaps and issues above, apply the following fixes immediately — do not defer any updates:
+
+5. **Fix outdated content.** For every mismatch found in sub-steps 2–4:
+   - Replace renamed types, properties, and decorator names with their current equivalents
+   - Update changed method signatures and parameter lists
+   - Remove references to features that no longer exist
+   - Correct any TypeSpec code examples that fail syntactic validation
+
+6. **Add documentation for undocumented features.** For every gap found in sub-steps 2–3:
+   - Write new sections or extend existing pages to cover the missing feature
+   - Include at least one TypeSpec code example showing typical usage
+
+7. **Follow area-specific formatting rules** when writing or editing documentation:
+   - **User-facing howto docs** (`website/src/content/docs/docs/howtos/Generate client libraries/`):
+     - When creating or updating `<ClientTabs>` code examples, use the `doc-example-generator` skill to compile the TypeSpec, run all five language emitters, and extract real API surface code. Do NOT hand-write language examples.
+     - Use the `@service` namespace pattern and realistic examples in TypeSpec code blocks
+     - Mark legacy decorators with `:::caution` admonitions
+   - **Emitter developer docs** (`guideline.md`):
+     - Keep type descriptions aligned with the current TCGC type graph and exported interfaces
+   - **Design docs** (`design-docs/`):
+     - Fix outdated type names, property names, and code examples to match current codebase
 
 ### Step 3: Review Spector Test Coverage
 
@@ -73,30 +96,12 @@ Spector specs should cover **all TCGC client customization features**, not just 
 
 3. **Review TCGC unit tests for expected behaviors.** Use unit tests in `packages/typespec-client-generator-core/test/` as a reference for what each feature should do, especially for features lacking Spector coverage.
 
-4. **Add missing Spector specs.** For each gap, create specs following existing patterns and the testserver generation guidelines in `.github/prompts/testserver-generation.md`. Run validation from `packages/azure-http-specs`: `pnpm build && pnpm validate-mock-apis`.
+4. **Add missing Spector specs.** For each gap, create specs following existing patterns and the testserver generation guidelines in `.github/prompts/testserver-generation.md`.
 
-### Step 4: Apply All Changes
+5. **Run the full validation sequence** from `packages/azure-http-specs`:
+   `pnpm build && pnpm validate-mock-apis && pnpm cspell && pnpm format && pnpm lint && pnpm regen-docs`
 
-Apply all findings from Steps 2 and 3 directly — do not defer any updates.
-
-**Documentation updates:**
-
-- Fix all outdated references, renamed types, and incorrect examples
-- Add documentation for undocumented features
-- For user-facing howto docs, follow existing formatting:
-  - Use `<ClientTabs>` with all language code blocks (typespec, python, csharp, typescript, java, go)
-  - Use the `@service` namespace pattern and realistic examples in TypeSpec code blocks
-  - Mark legacy decorators with `:::caution` admonitions
-- For emitter developer docs, keep descriptions aligned with the current type graph and exported interfaces
-- For design docs, fix outdated type names, property names, and code examples to match current codebase
-
-**Spector test updates:**
-
-- Follow the testserver generation guidelines in `.github/prompts/testserver-generation.md`
-- After adding specs, run the full validation sequence from `packages/azure-http-specs`:
-  `pnpm build && pnpm validate-mock-apis && pnpm cspell && pnpm format && pnpm lint && pnpm regen-docs`
-
-### Step 5: Finalize
+### Step 4: Finalize
 
 Run `pnpm change add` from the repo root to record changelog entries for any modified packages (select "new feature" for `packages/azure-http-specs` changes).
 
@@ -104,7 +109,7 @@ Run `pnpm change add` from the repo root to record changelog entries for any mod
 
 Based on the focus area specified in the prompt:
 
-- `all`: Execute Steps 1–4 across all documentation areas. Prioritize in this order: user docs → emitter docs → design docs → Spector specs. If context budget is running low, complete the current area fully before moving on, and note any remaining areas in the PR description.
+- `all`: Execute Steps 1–3 across all documentation areas. Prioritize in this order: user docs → emitter docs → design docs → Spector specs. If context budget is running low, complete the current area fully before moving on, and note any remaining areas in the PR description.
 - `user-docs`: Focus on user documentation in `website/src/content/docs/docs/howtos/Generate client libraries/`
 - `emitter-docs`: Focus on emitter developer documentation in `website/src/content/docs/docs/libraries/typespec-client-generator-core/guideline.md`
 - `design-docs`: Focus on design documents in `packages/typespec-client-generator-core/design-docs/`

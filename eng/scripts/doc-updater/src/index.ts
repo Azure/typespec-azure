@@ -10,8 +10,8 @@
  *   tsx src/index.ts --config tcgc --dry-run
  */
 
-import { loadConfig, listConfigs, loadSkillContent, type DocUpdateConfig } from "./config.js";
 import { resolve } from "node:path";
+import { listConfigs, loadConfig, loadSkillContent, type DocUpdateConfig } from "./config.js";
 
 // ---------------------------------------------------------------------------
 // CLI argument parsing
@@ -111,8 +111,6 @@ ${config.sourceCodePaths.map((p) => `- \`${p}\``).join("\n")}
 
 After making changes, run these commands to validate:
 
-${config.validationCommands.map((c) => `\`\`\`bash\n${c}\n\`\`\``).join("\n\n")}
-
 Please proceed with the documentation update following the instructions in the system message. Focus on: **${focus}** — ${focusDescription}`;
 }
 
@@ -140,7 +138,6 @@ async function main(): Promise<void> {
     console.log(`Model: ${args.model}`);
     console.log(`Config: ${config.name} (${config.displayName})`);
     console.log(`Focus: ${args.focus}`);
-    console.log(`Validation: ${config.validationCommands.join("; ")}`);
     return;
   }
 
