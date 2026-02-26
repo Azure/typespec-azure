@@ -10,8 +10,9 @@
  *   tsx src/index.ts --config tcgc --dry-run
  */
 
+import { CopilotClient, approveAll } from "@github/copilot-sdk";
 import { resolve } from "node:path";
-import { listConfigs, loadConfig, type DocUpdateConfig } from "./config.js";
+import { loadConfig, type DocUpdateConfig } from "./config.js";
 
 // ---------------------------------------------------------------------------
 // CLI argument parsing
@@ -36,15 +37,30 @@ function parseArgs(): CliArgs {
   for (let i = 0; i < args.length; i++) {
     switch (args[i]) {
       case "--config":
+        if (i + 1 >= args.length || args[i + 1].startsWith("--")) {
+          console.error("Error: --config requires a value");
+          printUsage();
+          process.exit(1);
+        }
         parsed.config = args[++i];
         break;
       case "--focus":
+        if (i + 1 >= args.length || args[i + 1].startsWith("--")) {
+          console.error("Error: --focus requires a value");
+          printUsage();
+          process.exit(1);
+        }
         parsed.focus = args[++i];
         break;
       case "--dry-run":
         parsed.dryRun = true;
         break;
       case "--model":
+        if (i + 1 >= args.length || args[i + 1].startsWith("--")) {
+          console.error("Error: --model requires a value");
+          printUsage();
+          process.exit(1);
+        }
         parsed.model = args[++i];
         break;
       case "--help":
@@ -66,8 +82,7 @@ function parseArgs(): CliArgs {
   return parsed;
 }
 
-async function printUsage(): Promise<void> {
-  const available = await listConfigs();
+function printUsage(): void {
   console.log(`
 Usage: tsx src/index.ts --config <name> [options]
 
@@ -78,7 +93,7 @@ Options:
   --model <model>   Model to use (default: "claude-opus-4.6")
   --help            Show this help message
 
-Available configs: ${available.join(", ")}
+Run with --dry-run to see available configs and focus areas.
 `);
 }
 
@@ -180,11 +195,11 @@ async function main(): Promise<void> {
   // access all packages, docs, and run commands correctly.
   process.chdir(repoRoot);
 
-  const { CopilotClient, approveAll } = await import("@github/copilot-sdk");
   const client = new CopilotClient();
+  let session: Awaited<ReturnType<CopilotClient["createSession"]>> | undefined;
 
   try {
-    const session = await client.createSession({
+    session = await client.createSession({
       model: args.model,
       streaming: true,
       onPermissionRequest: approveAll,
@@ -266,9 +281,8 @@ async function main(): Promise<void> {
       log("=== Agent Summary ===");
       console.log(response.data.content);
     }
-
-    await session.destroy();
   } finally {
+    if (session) await session.destroy();
     await client.stop();
   }
 
