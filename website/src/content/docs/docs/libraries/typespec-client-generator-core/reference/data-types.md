@@ -86,11 +86,11 @@ InitializedBy value.
 enum Azure.ClientGenerator.Core.InitializedBy
 ```
 
-| Name         | Value | Description                                                   |
-| ------------ | ----- | ------------------------------------------------------------- |
-| none         |       | The client initialization should be omitted and hand-written. |
-| individually | `1`   | The client could be initialized individually.                 |
-| parent       | `2`   | The client could be initialized by parent client.             |
+| Name          | Value | Description                                                                                          |
+| ------------- | ----- | ---------------------------------------------------------------------------------------------------- |
+| individually  | `1`   | The client could be initialized individually.                                                        |
+| parent        | `2`   | The client could be initialized by parent client.                                                    |
+| customizeCode | `4`   | The client initialization should be omitted from generated code and handled manually in custom code. |
 
 ### `Usage` {#Azure.ClientGenerator.Core.Usage}
 

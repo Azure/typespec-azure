@@ -434,6 +434,23 @@ it("sub client could not only be initialized individually", async () => {
   });
 });
 
+it("customizeCode could not be combined with other values", async () => {
+  const [, diagnostics] = await SimpleTesterWithService.compileAndDiagnose(
+    `
+    @route("/bump")
+    @clientInitialization({initializedBy: InitializedBy.customizeCode | InitializedBy.parent})
+    interface SubClient {
+        op test(): void;
+    }
+    `,
+  );
+  expectDiagnostics(diagnostics, {
+    code: "@azure-tools/typespec-client-generator-core/invalid-initialized-by",
+    message:
+      "Invalid 'initializedBy' value. `InitializedBy.customizeCode` cannot be combined with other values.",
+  });
+});
+
 it("single with core", async () => {
   const { program } = await AzureCoreTester.compile(`
     @versioned(MyVersions)
