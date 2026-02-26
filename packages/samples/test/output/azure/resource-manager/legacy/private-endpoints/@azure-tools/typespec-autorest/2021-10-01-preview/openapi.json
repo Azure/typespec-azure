@@ -671,13 +671,13 @@
         }
       }
     },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}/privateLinkResources": {
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}/privateEndpointConnections": {
       "get": {
-        "operationId": "Dependents_ListPrivateLinks",
+        "operationId": "Dependents_ListPrivateEndpointConnections",
         "tags": [
           "Dependents"
         ],
-        "description": "List Dependent PrivateLinks",
+        "description": "List Dependent PrivateEndpointConnections",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -709,7 +709,137 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/MyPrivateLinkResourceListResult"
+              "$ref": "#/definitions/PrivateEndpointConnectionListResult"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}/privateEndpointConnections/{privateEndpointConnectionName}": {
+      "get": {
+        "operationId": "Dependents_GetPrivateEndpointConnection",
+        "tags": [
+          "Dependents"
+        ],
+        "description": "Get a Dependent PrivateEndpointConnection",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "employeeName",
+            "in": "path",
+            "description": "The name of the Employee",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "dependentName",
+            "in": "path",
+            "description": "The name of the Dependent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/parameters/PrivateEndpointConnectionName"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "Dependents_CreateOrUpdatePrivateEndpointConnection",
+        "tags": [
+          "Dependents"
+        ],
+        "description": "Create a Dependent PrivateEndpointConnection",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "employeeName",
+            "in": "path",
+            "description": "The name of the Employee",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "dependentName",
+            "in": "path",
+            "description": "The name of the Dependent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/parameters/PrivateEndpointConnectionName"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": false,
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'PrivateEndpointConnection' update operation succeeded",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
+            }
+          },
+          "201": {
+            "description": "Resource 'PrivateEndpointConnection' create operation succeeded",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
+            },
+            "headers": {
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
             }
           },
           "default": {
@@ -719,18 +849,17 @@
             }
           }
         },
-        "x-ms-pageable": {
-          "nextLinkName": "nextLink"
-        }
-      }
-    },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/dependents/{dependentName}/privateLinkResources/{privateLinkResourceName}": {
-      "get": {
-        "operationId": "Dependents_GetPrivateLink",
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "patch": {
+        "operationId": "Dependents_UpdatePrivateEndpointConnection",
         "tags": [
           "Dependents"
         ],
-        "description": "Get a Dependent PrivateLink",
+        "description": "Update a Dependent PrivateEndpointConnection",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -758,18 +887,28 @@
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
           },
           {
-            "name": "privateLinkResourceName",
-            "in": "path",
-            "description": "The name of the private link associated with the Azure resource.",
-            "required": true,
-            "type": "string"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/parameters/PrivateEndpointConnectionName"
           }
         ],
         "responses": {
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateLinkResource"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
+            }
+          },
+          "202": {
+            "description": "Resource update request accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
             }
           },
           "default": {
@@ -778,7 +917,77 @@
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
-        }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "delete": {
+        "operationId": "Dependents_DeletePrivateEndpointConnection",
+        "tags": [
+          "Dependents"
+        ],
+        "description": "Delete a Dependent PrivateEndpointConnection",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "employeeName",
+            "in": "path",
+            "description": "The name of the Employee",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "name": "dependentName",
+            "in": "path",
+            "description": "The name of the Dependent",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/parameters/PrivateEndpointConnectionName"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource does not exist."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/move": {
@@ -832,13 +1041,13 @@
         }
       }
     },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/privateLinkResources": {
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/privateEndpointConnections": {
       "get": {
-        "operationId": "Employees_ListPrivateLinks",
+        "operationId": "Employees_ListPrivateEndpointConnections",
         "tags": [
           "Employees"
         ],
-        "description": "List Employee PrivateLinks",
+        "description": "List Employee PrivateEndpointConnections",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -862,7 +1071,7 @@
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "#/definitions/MyPrivateLinkResourceListResult"
+              "$ref": "#/definitions/PrivateEndpointConnectionListResult"
             }
           },
           "default": {
@@ -877,13 +1086,13 @@
         }
       }
     },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/privateLinkResources/{privateLinkResourceName}": {
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContosoProviderHub/employees/{employeeName}/privateEndpointConnections/{privateEndpointConnectionName}": {
       "get": {
-        "operationId": "Employees_GetPrivateLink",
+        "operationId": "Employees_GetPrivateEndpointConnection",
         "tags": [
           "Employees"
         ],
-        "description": "Get a Employee PrivateLink",
+        "description": "Get a Employee PrivateEndpointConnection",
         "parameters": [
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
@@ -903,18 +1112,14 @@
             "pattern": "^[a-zA-Z0-9-]{3,24}$"
           },
           {
-            "name": "privateLinkResourceName",
-            "in": "path",
-            "description": "The name of the private link associated with the Azure resource.",
-            "required": true,
-            "type": "string"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/parameters/PrivateEndpointConnectionName"
           }
         ],
         "responses": {
           "200": {
             "description": "Azure operation completed successfully.",
             "schema": {
-              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateLinkResource"
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
             }
           },
           "default": {
@@ -924,10 +1129,231 @@
             }
           }
         }
+      },
+      "put": {
+        "operationId": "Employees_CreateOrUpdatePrivateEndpointConnection",
+        "tags": [
+          "Employees"
+        ],
+        "description": "Create a Employee PrivateEndpointConnection",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "employeeName",
+            "in": "path",
+            "description": "The name of the Employee",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/parameters/PrivateEndpointConnectionName"
+          },
+          {
+            "name": "resource",
+            "in": "body",
+            "description": "Resource create parameters.",
+            "required": true,
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resource 'PrivateEndpointConnection' update operation succeeded",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
+            }
+          },
+          "201": {
+            "description": "Resource 'PrivateEndpointConnection' create operation succeeded",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
+            },
+            "headers": {
+              "Azure-AsyncOperation": {
+                "type": "string",
+                "description": "A link to the status monitor"
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "patch": {
+        "operationId": "Employees_UpdatePrivateEndpointConnection",
+        "tags": [
+          "Employees"
+        ],
+        "description": "Update a Employee PrivateEndpointConnection",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "employeeName",
+            "in": "path",
+            "description": "The name of the Employee",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/parameters/PrivateEndpointConnectionName"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Azure.ResourceManager.PrivateEndpointConnectionUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Azure operation completed successfully.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
+            }
+          },
+          "202": {
+            "description": "Resource update request accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
+      },
+      "delete": {
+        "operationId": "Employees_DeletePrivateEndpointConnection",
+        "tags": [
+          "Employees"
+        ],
+        "description": "Delete a Employee PrivateEndpointConnection",
+        "parameters": [
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "employeeName",
+            "in": "path",
+            "description": "The name of the Employee",
+            "required": true,
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-]{3,24}$"
+          },
+          {
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/parameters/PrivateEndpointConnectionName"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Resource deletion accepted.",
+            "headers": {
+              "Location": {
+                "type": "string",
+                "description": "The Location header contains the URL where the status of the long running operation can be checked."
+              },
+              "Retry-After": {
+                "type": "integer",
+                "format": "int32",
+                "description": "The Retry-After header can indicate how long the client should wait before polling the operation status."
+              }
+            }
+          },
+          "204": {
+            "description": "Resource does not exist."
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-long-running-operation": true
       }
     }
   },
   "definitions": {
+    "Azure.ResourceManager.PrivateEndpointConnectionUpdate": {
+      "type": "object",
+      "description": "PATCH model for private endpoint connections",
+      "properties": {
+        "properties": {
+          "type": "object",
+          "description": "The private endpoint connection properties",
+          "properties": {
+            "privateEndpoint": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpoint",
+              "description": "The private endpoint resource."
+            },
+            "privateLinkServiceConnectionState": {
+              "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateLinkServiceConnectionState",
+              "description": "A collection of information about the state of the connection between service consumer and provider."
+            }
+          }
+        }
+      }
+    },
     "Dependent": {
       "type": "object",
       "description": "An employee dependent",
@@ -1142,15 +1568,15 @@
         "movingStatus"
       ]
     },
-    "MyPrivateLinkResourceListResult": {
+    "PrivateEndpointConnectionListResult": {
       "type": "object",
-      "description": "The response of a MyPrivateLinkResource list operation.",
+      "description": "The response of a PrivateEndpointConnection list operation.",
       "properties": {
         "value": {
           "type": "array",
-          "description": "The MyPrivateLinkResource items on this page",
+          "description": "The PrivateEndpointConnection items on this page",
           "items": {
-            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateLinkResource"
+            "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
           }
         },
         "nextLink": {
