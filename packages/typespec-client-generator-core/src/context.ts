@@ -216,9 +216,7 @@ export async function createSdkContext<
     diagnostics.pipe(await handleClientExamples(sdkContext, client));
   }
   // Validate cross-namespace type name collisions (including Azure library conflicts since they're included in our models)
-  diagnostics.pipe(validateNamesAcrossNamespaces(sdkContext, "models"));
-  diagnostics.pipe(validateNamesAcrossNamespaces(sdkContext, "enums"));
-  diagnostics.pipe(validateNamesAcrossNamespaces(sdkContext, "unions"));
+  diagnostics.pipe(validateNamesUnderNamespaces(sdkContext));
   sdkContext.diagnostics = [...sdkContext.diagnostics, ...diagnostics.diagnostics];
 
   if (options?.exportTCGCoutput) {
@@ -227,25 +225,9 @@ export async function createSdkContext<
   return sdkContext;
 }
 
-function validateNamesAcrossNamespaces(context: SdkContext, group: "models" | "enums" | "unions") {
+function validateNamesUnderNamespaces(context: SdkContext) {
   const diagnostics = createDiagnosticCollector();
-  const getItems = (
-    namespace: SdkContext["sdkPackage"]["namespaces"][number],
-  ): (SdkModelType | SdkEnumType | SdkUnionType)[] => {
-    switch (group) {
-      case "models":
-        return namespace.models;
-      case "enums":
-        return namespace.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0);
-      case "unions":
-        return namespace.unions.filter((u): u is SdkUnionType => u.kind === "union");
-    }
-  };
-
-  const validateNamespace = (
-    namespaceItems: (SdkModelType | SdkEnumType | SdkUnionType)[],
-    nestedNamespaces: SdkContext["sdkPackage"]["namespaces"],
-  ) => {
+  const validateItems = (namespaceItems: (SdkModelType | SdkEnumType | SdkUnionType)[]) => {
     const seenNames = new Set<string>();
     for (const item of namespaceItems) {
       if (seenNames.has(item.name)) {
@@ -260,14 +242,21 @@ function validateNamesAcrossNamespaces(context: SdkContext, group: "models" | "e
         seenNames.add(item.name);
       }
     }
+  };
 
-    for (const nestedNamespace of nestedNamespaces) {
-      validateNamespace(getItems(nestedNamespace), nestedNamespace.namespaces);
+  const validateNamespace = (namespace: SdkContext["sdkPackage"]["namespaces"][number]) => {
+    validateItems([
+      ...namespace.models,
+      ...namespace.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0),
+      ...namespace.unions.filter((u): u is SdkUnionType => u.kind === "union"),
+    ]);
+    for (const nestedNamespace of namespace.namespaces) {
+      validateNamespace(nestedNamespace);
     }
   };
 
   for (const namespace of context.sdkPackage.namespaces) {
-    validateNamespace(getItems(namespace), namespace.namespaces);
+    validateNamespace(namespace);
   }
 
   return diagnostics.wrap(undefined);
