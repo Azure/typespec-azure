@@ -229,34 +229,59 @@ export async function createSdkContext<
 
 function validateNamesAcrossNamespaces(context: SdkContext, group: "models" | "enums" | "unions") {
   const diagnostics = createDiagnosticCollector();
-  const seenNames = new Set<string>();
-
-  let items: (SdkModelType | SdkEnumType | SdkUnionType)[] = [];
-  switch (group) {
-    case "models":
-      items = context.sdkPackage.models;
-      break;
-    case "enums":
-      items = context.sdkPackage.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0);
-      break;
-    case "unions":
-      items = context.sdkPackage.unions.filter((u): u is SdkUnionType => u.kind === "union");
-      break;
-  }
-
-  for (const item of items) {
-    if (seenNames.has(item.name)) {
-      diagnostics.add(
-        createDiagnostic({
-          code: "duplicate-client-name",
-          format: { name: item.name, scope: context.emitterName },
-          target: item.__raw!,
-        }),
-      );
-    } else {
-      seenNames.add(item.name);
+  const validateNamespace = (
+    namespaceItems: (SdkModelType | SdkEnumType | SdkUnionType)[],
+    nestedNamespaces: SdkContext["sdkPackage"]["namespaces"],
+  ) => {
+    const seenNames = new Set<string>();
+    for (const item of namespaceItems) {
+      if (seenNames.has(item.name)) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "duplicate-client-name",
+            format: { name: item.name, scope: context.emitterName },
+            target: item.__raw!,
+          }),
+        );
+      } else {
+        seenNames.add(item.name);
+      }
     }
+
+    for (const nestedNamespace of nestedNamespaces) {
+      let nestedItems: (SdkModelType | SdkEnumType | SdkUnionType)[] = [];
+      switch (group) {
+        case "models":
+          nestedItems = nestedNamespace.models;
+          break;
+        case "enums":
+          nestedItems = nestedNamespace.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0);
+          break;
+        case "unions":
+          nestedItems = nestedNamespace.unions.filter((u): u is SdkUnionType => u.kind === "union");
+          break;
+      }
+
+      validateNamespace(nestedItems, nestedNamespace.namespaces);
+    }
+  };
+
+  for (const namespace of context.sdkPackage.namespaces) {
+    let items: (SdkModelType | SdkEnumType | SdkUnionType)[] = [];
+    switch (group) {
+      case "models":
+        items = namespace.models;
+        break;
+      case "enums":
+        items = namespace.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0);
+        break;
+      case "unions":
+        items = namespace.unions.filter((u): u is SdkUnionType => u.kind === "union");
+        break;
+    }
+    validateNamespace(items, namespace.namespaces);
   }
+
   return diagnostics.wrap(undefined);
 }
 
