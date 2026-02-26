@@ -200,32 +200,34 @@ async function main(): Promise<void> {
       deltaBuffer += event.data.deltaContent;
       const lines = deltaBuffer.split("\n");
       while (lines.length > 1) {
-        log(`${lines.shift()}`);
+        const line = lines.shift()!;
+        if (line.trim()) log(line);
       }
       deltaBuffer = lines[0];
     });
 
     session.on("assistant.message", () => {
-      if (deltaBuffer) {
-        log(`${deltaBuffer}`);
-        deltaBuffer = "";
+      if (deltaBuffer?.trim()) {
+        log(deltaBuffer);
       }
+      deltaBuffer = "";
     });
 
     session.on("assistant.reasoning_delta", (event) => {
       reasoningBuffer += event.data.deltaContent;
       const lines = reasoningBuffer.split("\n");
       while (lines.length > 1) {
-        log(`Reasoning: ${lines.shift()}`);
+        const line = lines.shift()!;
+        if (line.trim()) log(`Reasoning: ${line}`);
       }
       reasoningBuffer = lines[0];
     });
 
     session.on("assistant.reasoning", () => {
-      if (reasoningBuffer) {
+      if (reasoningBuffer?.trim()) {
         log(`Reasoning: ${reasoningBuffer}`);
-        reasoningBuffer = "";
       }
+      reasoningBuffer = "";
     });
 
     session.on("tool.execution_start", (event) => {
