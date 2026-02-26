@@ -99,21 +99,26 @@ jobs:
             --focus "$FOCUS" \
             --model "$MODEL"
 
+      - name: Set run date
+        id: date
+        run: echo "value=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.COPILOT_GITHUB_TOKEN }}
-          branch: automated/doc-update-${{ github.event.inputs.config || 'tcgc' }}
-          title: "[Automated] Update ${{ github.event.inputs.config || 'tcgc' }} documentation"
+          branch: automated/doc-update-${{ github.event.inputs.config || 'tcgc' }}-${{ steps.date.outputs.value }}-${{ github.run_number }}
+          title: "[Automated] Update ${{ github.event.inputs.config || 'tcgc' }} documentation (${{ steps.date.outputs.value }})"
           body: |
             Automated documentation update via Copilot SDK.
 
             **Config:** ${{ github.event.inputs.config || 'tcgc' }}
             **Focus area:** ${{ github.event.inputs.focus_area || 'all' }}
             **Model:** ${{ github.event.inputs.model || 'claude-opus-4.6' }}
+            **Date:** ${{ steps.date.outputs.value }}
 
             This PR was created by the [doc-update-scheduler workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
-          commit-message: "docs: automated update for ${{ github.event.inputs.config || 'tcgc' }}"
+          commit-message: "docs: automated ${{ github.event.inputs.config || 'tcgc' }} update (${{ steps.date.outputs.value }})"
           delete-branch: true
 
       - name: Summary
