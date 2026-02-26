@@ -229,6 +229,19 @@ export async function createSdkContext<
 
 function validateNamesAcrossNamespaces(context: SdkContext, group: "models" | "enums" | "unions") {
   const diagnostics = createDiagnosticCollector();
+  const getItems = (
+    namespace: SdkContext["sdkPackage"]["namespaces"][number],
+  ): (SdkModelType | SdkEnumType | SdkUnionType)[] => {
+    switch (group) {
+      case "models":
+        return namespace.models;
+      case "enums":
+        return namespace.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0);
+      case "unions":
+        return namespace.unions.filter((u): u is SdkUnionType => u.kind === "union");
+    }
+  };
+
   const validateNamespace = (
     namespaceItems: (SdkModelType | SdkEnumType | SdkUnionType)[],
     nestedNamespaces: SdkContext["sdkPackage"]["namespaces"],
@@ -249,37 +262,12 @@ function validateNamesAcrossNamespaces(context: SdkContext, group: "models" | "e
     }
 
     for (const nestedNamespace of nestedNamespaces) {
-      let nestedItems: (SdkModelType | SdkEnumType | SdkUnionType)[] = [];
-      switch (group) {
-        case "models":
-          nestedItems = nestedNamespace.models;
-          break;
-        case "enums":
-          nestedItems = nestedNamespace.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0);
-          break;
-        case "unions":
-          nestedItems = nestedNamespace.unions.filter((u): u is SdkUnionType => u.kind === "union");
-          break;
-      }
-
-      validateNamespace(nestedItems, nestedNamespace.namespaces);
+      validateNamespace(getItems(nestedNamespace), nestedNamespace.namespaces);
     }
   };
 
   for (const namespace of context.sdkPackage.namespaces) {
-    let items: (SdkModelType | SdkEnumType | SdkUnionType)[] = [];
-    switch (group) {
-      case "models":
-        items = namespace.models;
-        break;
-      case "enums":
-        items = namespace.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0);
-        break;
-      case "unions":
-        items = namespace.unions.filter((u): u is SdkUnionType => u.kind === "union");
-        break;
-    }
-    validateNamespace(items, namespace.namespaces);
+    validateNamespace(getItems(namespace), namespace.namespaces);
   }
 
   return diagnostics.wrap(undefined);

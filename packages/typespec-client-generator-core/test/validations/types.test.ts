@@ -12,7 +12,7 @@ describe("cross-namespace duplicate name validation", () => {
   // Cross-namespace validation runs when the --namespace flag is set.
   // Duplicate checks should be constrained to each namespace.
 
-  it("no error for same model name across namespaces with namespace flag", async () => {
+  it("allows same model name in different namespaces with namespace flag", async () => {
     // Same-named models in different namespaces should be validated per namespace
     const { program } = await SimpleBaseTester.compile(
       createClientCustomizationInput(
@@ -47,7 +47,7 @@ describe("cross-namespace duplicate name validation", () => {
     expectDiagnosticEmpty(duplicateDiagnostics);
   });
 
-  it("no error for same enum name across namespaces with namespace flag", async () => {
+  it("allows same enum name in different namespaces with namespace flag", async () => {
     // Same-named enums in different namespaces should be validated per namespace
     const { program } = await SimpleBaseTester.compile(
       createClientCustomizationInput(
@@ -82,7 +82,7 @@ describe("cross-namespace duplicate name validation", () => {
     expectDiagnosticEmpty(duplicateDiagnostics);
   });
 
-  it("no error for same union name across namespaces with namespace flag", async () => {
+  it("allows same union name in different namespaces with namespace flag", async () => {
     // Same-named unions in different namespaces should be validated per namespace
     const { program } = await SimpleBaseTester.compile(
       createClientCustomizationInput(
@@ -149,7 +149,7 @@ describe("cross-namespace duplicate name validation", () => {
     expectDiagnosticEmpty(duplicateDiagnostics);
   });
 
-  it("no error for @clientName same name across namespaces with namespace flag", async () => {
+  it("allows @clientName duplicates in different namespaces with namespace flag", async () => {
     // @clientName duplicates across different namespaces should be allowed
     const { program } = await SimpleBaseTester.compile(
       createClientCustomizationInput(
@@ -186,7 +186,7 @@ describe("cross-namespace duplicate name validation", () => {
     expectDiagnosticEmpty(duplicateDiagnostics);
   });
 
-  it("no error for nested namespace type with same name with namespace flag", async () => {
+  it("allows same name in nested namespaces with namespace flag", async () => {
     // Nested namespaces should also be validated per namespace
     const { program } = await SimpleBaseTester.compile(
       createClientCustomizationInput(
