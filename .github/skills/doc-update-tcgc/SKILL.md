@@ -80,7 +80,7 @@ After identifying all gaps and issues above, apply the following fixes immediate
 
 7. **Follow area-specific formatting rules** when writing or editing documentation:
    - **User-facing howto docs** (`website/src/content/docs/docs/howtos/Generate client libraries/`):
-     - **MANDATORY for every `<ClientTabs>` code example:** Before writing any language code blocks, you MUST read the file `.github/skills/doc-example-generator/SKILL.md` and execute its full workflow (set up temp project → compile TypeSpec → run emitters → extract real output). Never hand-write the Python/C#/TypeScript/Java/Go code tabs — they must come from actual emitter output.
+     - **MANDATORY for every `<ClientTabs>` code example:** You MUST use @doc-example-generator skill to write any language code blocks. Never hand-write the Python/C#/TypeScript/Java/Go code tabs — they must come from actual emitter output.
      - Mark legacy decorators with `:::caution` admonitions
    - **Emitter developer docs** (`guideline.md`):
      - Keep type descriptions aligned with the current TCGC type graph and exported interfaces
