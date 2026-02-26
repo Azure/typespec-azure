@@ -246,12 +246,8 @@ function validateNamesUnderNamespaces(context: SdkContext) {
 
   const validateNamespace = (namespace: SdkContext["sdkPackage"]["namespaces"][number]) => {
     validateItems(namespace.models);
-    validateItems(
-      namespace.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0),
-    );
-    validateItems(
-      namespace.unions.filter((u): u is SdkUnionType => u.kind === "union"),
-    );
+    validateItems(namespace.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0));
+    validateItems(namespace.unions.filter((u): u is SdkUnionType => u.kind === "union"));
     for (const nestedNamespace of namespace.namespaces) {
       validateNamespace(nestedNamespace);
     }
