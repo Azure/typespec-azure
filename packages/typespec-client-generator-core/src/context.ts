@@ -215,7 +215,7 @@ export async function createSdkContext<
   for (const client of sdkContext.sdkPackage.clients) {
     diagnostics.pipe(await handleClientExamples(sdkContext, client));
   }
-  // Validate cross-namespace type name collisions (including Azure library conflicts since they're included in our models)
+  // Validate duplicate names across models, enums, and unions within each namespace.
   diagnostics.pipe(validateNamesUnderNamespaces(sdkContext));
   sdkContext.diagnostics = [...sdkContext.diagnostics, ...diagnostics.diagnostics];
 
@@ -227,8 +227,10 @@ export async function createSdkContext<
 
 function validateNamesUnderNamespaces(context: SdkContext) {
   const diagnostics = createDiagnosticCollector();
-  const validateItems = (namespaceItems: (SdkModelType | SdkEnumType | SdkUnionType)[]) => {
-    const seenNames = new Set<string>();
+  const validateItems = (
+    namespaceItems: (SdkModelType | SdkEnumType | SdkUnionType)[],
+    seenNames: Set<string>,
+  ) => {
     for (const item of namespaceItems) {
       if (seenNames.has(item.name)) {
         diagnostics.add(
@@ -245,11 +247,16 @@ function validateNamesUnderNamespaces(context: SdkContext) {
   };
 
   const validateNamespace = (namespace: SdkContext["sdkPackage"]["namespaces"][number]) => {
-    validateItems([
-      ...namespace.models,
-      ...namespace.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0),
-      ...namespace.unions.filter((u): u is SdkUnionType => u.kind === "union"),
-    ]);
+    const seenNames = new Set<string>();
+    validateItems(namespace.models, seenNames);
+    validateItems(
+      namespace.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0),
+      seenNames,
+    );
+    validateItems(
+      namespace.unions.filter((u): u is SdkUnionType => u.kind === "union"),
+      seenNames,
+    );
     for (const nestedNamespace of namespace.namespaces) {
       validateNamespace(nestedNamespace);
     }

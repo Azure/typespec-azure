@@ -10,10 +10,11 @@ import {
 
 describe("cross-namespace duplicate name validation", () => {
   // Cross-namespace validation runs when the --namespace flag is set.
-  // Duplicate checks should be constrained to each namespace.
+  // When namespaces are flattened, types with the same name across different namespaces
+  // will collide in the generated client.
 
-  it("allows same model name in different namespaces with namespace flag", async () => {
-    // Same-named models in different namespaces should be validated per namespace
+  it("error for same model name across namespaces with namespace flag", async () => {
+    // Same-named models in different namespaces will collide when namespace flag is set
     const { program } = await SimpleBaseTester.compile(
       createClientCustomizationInput(
         `
@@ -44,11 +45,16 @@ describe("cross-namespace duplicate name validation", () => {
     const duplicateDiagnostics = context.diagnostics.filter(
       (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
     );
-    expectDiagnosticEmpty(duplicateDiagnostics);
+    expectDiagnostics(duplicateDiagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        message: 'Client name: "Foo" is duplicated in language scope: "python"',
+      },
+    ]);
   });
 
-  it("allows same enum name in different namespaces with namespace flag", async () => {
-    // Same-named enums in different namespaces should be validated per namespace
+  it("error for same enum name across namespaces with namespace flag", async () => {
+    // Same-named enums in different namespaces will collide when namespace flag is set
     const { program } = await SimpleBaseTester.compile(
       createClientCustomizationInput(
         `
@@ -79,11 +85,16 @@ describe("cross-namespace duplicate name validation", () => {
     const duplicateDiagnostics = context.diagnostics.filter(
       (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
     );
-    expectDiagnosticEmpty(duplicateDiagnostics);
+    expectDiagnostics(duplicateDiagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        message: 'Client name: "Status" is duplicated in language scope: "python"',
+      },
+    ]);
   });
 
-  it("allows same union name in different namespaces with namespace flag", async () => {
-    // Same-named unions in different namespaces should be validated per namespace
+  it("error for same union name across namespaces with namespace flag", async () => {
+    // Same-named unions in different namespaces will collide when namespace flag is set
     const { program } = await SimpleBaseTester.compile(
       createClientCustomizationInput(
         `
@@ -114,7 +125,12 @@ describe("cross-namespace duplicate name validation", () => {
     const duplicateDiagnostics = context.diagnostics.filter(
       (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
     );
-    expectDiagnosticEmpty(duplicateDiagnostics);
+    expectDiagnostics(duplicateDiagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        message: 'Client name: "MyUnion" is duplicated in language scope: "python"',
+      },
+    ]);
   });
 
   it("no error for different names across namespaces with namespace flag", async () => {
@@ -149,8 +165,8 @@ describe("cross-namespace duplicate name validation", () => {
     expectDiagnosticEmpty(duplicateDiagnostics);
   });
 
-  it("allows @clientName duplicates in different namespaces with namespace flag", async () => {
-    // @clientName duplicates across different namespaces should be allowed
+  it("error for @clientName same name across namespaces with namespace flag", async () => {
+    // @clientName causing same name across namespaces will collide when namespace flag is set
     const { program } = await SimpleBaseTester.compile(
       createClientCustomizationInput(
         `
@@ -183,11 +199,16 @@ describe("cross-namespace duplicate name validation", () => {
     const duplicateDiagnostics = context.diagnostics.filter(
       (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
     );
-    expectDiagnosticEmpty(duplicateDiagnostics);
+    expectDiagnostics(duplicateDiagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        message: 'Client name: "SharedName" is duplicated in language scope: "python"',
+      },
+    ]);
   });
 
-  it("allows same name in nested namespaces with namespace flag", async () => {
-    // Nested namespaces should also be validated per namespace
+  it("error for nested namespace type with same name with namespace flag", async () => {
+    // Nested namespaces will also collide when namespace flag is set
     const { program } = await SimpleBaseTester.compile(
       createClientCustomizationInput(
         `
@@ -222,7 +243,12 @@ describe("cross-namespace duplicate name validation", () => {
     const duplicateDiagnostics = context.diagnostics.filter(
       (d) => d.code === "@azure-tools/typespec-client-generator-core/duplicate-client-name",
     );
-    expectDiagnosticEmpty(duplicateDiagnostics);
+    expectDiagnostics(duplicateDiagnostics, [
+      {
+        code: "@azure-tools/typespec-client-generator-core/duplicate-client-name",
+        message: 'Client name: "Nested" is duplicated in language scope: "python"',
+      },
+    ]);
   });
 
   it("no error for same model name in single-service (different namespaces)", async () => {
