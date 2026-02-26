@@ -32,6 +32,8 @@ TCGC has several documentation areas that need maintenance:
 Location: `website/src/content/docs/docs/howtos/Generate client libraries/`
 Purpose: Guides TypeSpec users on how specs are generated to client code and how to customize generation.
 
+> ⚠️ **REQUIRED:** When writing or updating `<ClientTabs>` code examples in user docs, you **MUST** first read the skill file at `.github/skills/doc-example-generator/SKILL.md` and follow its complete workflow to produce verified, emitter-generated code for each language tab. Do NOT hand-write language code blocks.
+
 ### 2. Emitter Developer Documentation
 
 Location: `website/src/content/docs/docs/libraries/typespec-client-generator-core/guideline.md`
@@ -78,7 +80,7 @@ After identifying all gaps and issues above, apply the following fixes immediate
 
 7. **Follow area-specific formatting rules** when writing or editing documentation:
    - **User-facing howto docs** (`website/src/content/docs/docs/howtos/Generate client libraries/`):
-     - When creating or updating `<ClientTabs>` code examples, read the skill file at `.github/skills/doc-example-generator/SKILL.md` and follow its workflow.
+     - **MANDATORY for every `<ClientTabs>` code example:** Before writing any language code blocks, you MUST read the file `.github/skills/doc-example-generator/SKILL.md` and execute its full workflow (set up temp project → compile TypeSpec → run emitters → extract real output). Never hand-write the Python/C#/TypeScript/Java/Go code tabs — they must come from actual emitter output.
      - Mark legacy decorators with `:::caution` admonitions
    - **Emitter developer docs** (`guideline.md`):
      - Keep type descriptions aligned with the current TCGC type graph and exported interfaces
@@ -120,9 +122,10 @@ When updating documentation:
 
 1. Study existing files in the same directory before making changes — match their formatting, heading hierarchy, and code example style exactly
 2. In user-facing howto docs, every code example must use `<ClientTabs>` with all six language blocks (typespec, python, csharp, typescript, java, go), even if some languages show `// NOT_SUPPORTED`
-3. Verify TypeSpec examples are syntactically consistent with current decorator signatures in `lib/decorators.tsp`
-4. Link to related documentation sections when referencing other features
-5. Never manually edit auto-generated files (e.g., `spec-summary.md`) — use `pnpm regen-docs` instead
+3. To populate `<ClientTabs>` language blocks, you MUST read and follow `.github/skills/doc-example-generator/SKILL.md` — compile the TypeSpec example, run all five emitters, and extract real generated code. Never hand-write language tabs.
+4. Verify TypeSpec examples are syntactically consistent with current decorator signatures in `lib/decorators.tsp`
+5. Link to related documentation sections when referencing other features
+6. Never manually edit auto-generated files (e.g., `spec-summary.md`) — use `pnpm regen-docs` instead
 
 ## PR Description
 
