@@ -127,16 +127,16 @@ You can generally choose an asynchronous operation template that matches your op
 
 #### Templates for Async PUT Operations
 
-- `ArmCreateOrReplaceAsync` is a PUT operation that uses the 'resource' definition in the request body, and returns a `200` response and a `201` response, both of which contain the created/updated resource in the response payload. The 201 response contains a `Location` LRO header.
+- `ArmResourceCreateOrReplaceAsync` is a PUT operation that uses the 'resource' definition in the request body, and returns a `200` response and a `201` response, both of which contain the created/updated resource in the response payload. The 201 response contains a `Location` LRO header.
 
   ```tsp
-  op createOrUpdate is ArmCreateOrReplaceAsync<Resource>;
+  op createOrUpdate is ArmResourceCreateOrReplaceAsync<Resource>;
   ```
 
-- `ArmCreateOrUpdateAsync` is a PUT operation that uses the 'resource' definition in the request body, and returns a `200` response and a `201` response, both of which contain the created/updated resource in the response payload. The 201 response contains an `Azure-AsyncOperation` LRO header.
+- `ArmResourceCreateOrUpdateAsync` is a PUT operation that uses the 'resource' definition in the request body, and returns a `200` response and a `201` response, both of which contain the created/updated resource in the response payload. The 201 response contains an `Azure-AsyncOperation` LRO header.
 
   ```tsp
-  op createOrUpdate is ArmCreateOrUpdateAsync<Resource>;
+  op createOrUpdate is ArmResourceCreateOrUpdateAsync<Resource>;
   ```
 
 #### Templates for Async PATCH Operations
