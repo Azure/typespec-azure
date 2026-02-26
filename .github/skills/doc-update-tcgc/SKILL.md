@@ -78,7 +78,7 @@ After identifying all gaps and issues above, apply the following fixes immediate
 
 7. **Follow area-specific formatting rules** when writing or editing documentation:
    - **User-facing howto docs** (`website/src/content/docs/docs/howtos/Generate client libraries/`):
-     - When creating or updating `<ClientTabs>` code examples, read the skill file at `.github/skills/doc-example-generator/SKILL.md` and follow its workflow to compile the TypeSpec, run all five language emitters, and extract real API surface code. Do NOT hand-write language examples.
+     - When creating or updating `<ClientTabs>` code examples, use the @doc-example-generator skill to compile the TypeSpec, run all five language emitters, and extract real API surface code. Do NOT hand-write language examples.
      - Use the `@service` namespace pattern and realistic examples in TypeSpec code blocks
      - Mark legacy decorators with `:::caution` admonitions
    - **Emitter developer docs** (`guideline.md`):
