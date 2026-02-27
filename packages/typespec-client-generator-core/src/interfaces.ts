@@ -62,14 +62,11 @@ export interface TCGCContext {
   __generatedNames: Map<Type, string>;
   __httpOperationCache: Map<Operation, HttpOperation>;
   __tspTypeToApiVersions: Map<Type, string[]>;
-  __rawClientsOperationGroupsCache?: Map<
-    Namespace | Interface | string,
-    SdkClient | SdkOperationGroup
-  >;
-  __clientToOperationsCache?: Map<SdkClient | SdkOperationGroup, Operation[]>;
-  __operationToClientCache?: Map<Operation, SdkClient | SdkOperationGroup>;
-  __clientParametersCache: Map<SdkClient | SdkOperationGroup, SdkMethodParameter[]>;
-  __clientApiVersionDefaultValueCache: Map<SdkClient | SdkOperationGroup, string | undefined>;
+  __rawClientsCache?: Map<Namespace | Interface | string, SdkClient>;
+  __clientToOperationsCache?: Map<SdkClient, Operation[]>;
+  __operationToClientCache?: Map<Operation, SdkClient>;
+  __clientParametersCache: Map<SdkClient, SdkMethodParameter[]>;
+  __clientApiVersionDefaultValueCache: Map<SdkClient, string | undefined>;
   __httpOperationExamples: Map<HttpOperation, SdkHttpOperationExample[]>;
   __pagedResultSet: Set<SdkType>;
   __mutatedGlobalNamespace?: Namespace; // the root of all tsp namespaces for this instance. Starting point for traversal, so we don't call mutation multiple times
@@ -84,9 +81,9 @@ export interface TCGCContext {
   getPackageVersions(): Map<Namespace, string[]>;
   getPackageVersionEnum(): Map<Namespace, Enum | undefined>;
   getClients(): SdkClient[];
-  getClientOrOperationGroup(type: Namespace | Interface): SdkClient | SdkOperationGroup | undefined;
-  getOperationsForClient(client: SdkClient | SdkOperationGroup): Operation[];
-  getClientForOperation(operation: Operation): SdkClient | SdkOperationGroup;
+  getClientOrSubClient(type: Namespace | Interface): SdkClient | undefined;
+  getOperationsForClient(client: SdkClient): Operation[];
+  getClientForOperation(operation: Operation): SdkClient;
 }
 
 export interface SdkContext<
@@ -107,8 +104,17 @@ export interface SdkClient {
    */
   service: Namespace | Namespace[];
   services: Namespace[];
-  type: Namespace | Interface;
+  type?: Namespace | Interface;
+  /**
+   * @deprecated Use `subClients` instead. This property will be removed in a future release.
+   */
   subOperationGroups: SdkOperationGroup[];
+  /** Parent client. */
+  parent?: SdkClient;
+  /** Child clients. */
+  children: SdkClient[];
+  /** Path of the client within the SDK hierarchy. */
+  clientPath: string;
 }
 
 /**

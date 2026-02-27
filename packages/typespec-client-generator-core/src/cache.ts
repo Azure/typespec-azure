@@ -74,18 +74,15 @@ function serviceHasOperationGroupDecorators(context: TCGCContext, service: Names
 }
 
 /**
- * Create TCGC client types and operation group types and prepare the cache for clients, operation groups and operations.
+ * Create TCGC client types and prepare the cache for clients, sub-clients and operations.
  *
  * @param context TCGCContext
  */
 export function prepareClientAndOperationCache(context: TCGCContext): void {
   // initialize the caches
-  context.__rawClientsOperationGroupsCache = new Map<
-    Namespace | Interface | string,
-    SdkClient | SdkOperationGroup
-  >();
-  context.__operationToClientCache = new Map<Operation, SdkClient | SdkOperationGroup>();
-  context.__clientToOperationsCache = new Map<SdkOperationGroup | SdkClient, Operation[]>();
+  context.__rawClientsCache = new Map<Namespace | Interface | string, SdkClient>();
+  context.__operationToClientCache = new Map<Operation, SdkClient>();
+  context.__clientToOperationsCache = new Map<SdkClient, Operation[]>();
 
   // create clients
   const clients = getOrCreateClients(context);
@@ -152,14 +149,14 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     }
   }
 
-  // Track operation group names to detect conflicts in multi-service scenarios
-  const operationGroupNameMap = new Map<string, SdkOperationGroup>();
-  // Track merged operation groups and their original types for later operations processing
-  const mergedOperationGroupTypes = new Map<SdkOperationGroup, (Namespace | Interface)[]>();
+  // Track sub-client names to detect conflicts when auto-mergeing services
+  const subClientNameMap = new Map<string, SdkClient>();
+  // Track merged sub-clients and their original types for later operations processing
+  const mergedSubClientsTypes = new Map<SdkClient, (Namespace | Interface)[]>();
 
   // create operation groups for each client
   for (const client of clients) {
-    const groups: SdkOperationGroup[] = [];
+    const groups: SdkClient[] = [];
 
     // Track if this client is auto-merging (operation groups should be auto-created from service)
     let isAutoMerging = false;
@@ -169,7 +166,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       // Only auto-merge when the client namespace is "empty" (no nested @client decorators)
       isAutoMerging = true;
       for (const specificService of client.services) {
-        createFirstLevelOperationGroup(context, specificService, specificService);
+        createFirstLevelSubClient(context, specificService, specificService);
       }
     } else if (client.services.length <= 1) {
       // Single service case
@@ -185,9 +182,9 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         !serviceHasOperationGroupDecorators(context, service)
       ) {
         isAutoMerging = true;
-        createFirstLevelOperationGroup(context, service, service);
+        createFirstLevelSubClient(context, service, service);
       } else {
-        createFirstLevelOperationGroup(context, clientType, service);
+        createFirstLevelSubClient(context, clientType, service);
       }
     } else if (client.services.length > 1 && hasNestedClientDecorators(context, client)) {
       // Multi-service client with nested @client decorators (Scenario 2/3)
@@ -198,28 +195,30 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
             | SdkClient
             | undefined;
           if (nestedClientData) {
-            // Create an operation group for the nested client
-            const og: SdkOperationGroup = {
-              kind: "SdkOperationGroup",
+            // Create an sub-client for the nested client
+            const subClient: SdkClient = {
+              kind: "SdkClient",
               type: subNs,
-              groupPath: `${client.name}.${nestedClientData.name}`,
+              name: nestedClientData.name,
+              clientPath: `${client.name}.${nestedClientData.name}`,
               service: nestedClientData.services[0],
               services: nestedClientData.services,
               subOperationGroups: [],
+              children: [],
               parent: client,
             };
-            context.__rawClientsOperationGroupsCache!.set(subNs, og);
-            context.__clientToOperationsCache!.set(og, []);
+            context.__rawClientsCache!.set(subNs, subClient);
+            context.__clientToOperationsCache!.set(subClient, []);
 
             // If the nested client namespace is empty, auto-merge from its service
             if (isNamespaceEmpty(subNs)) {
               for (const nestedService of nestedClientData.services) {
                 if (nestedService.kind === "Namespace") {
-                  addServiceContentToNestedOperationGroup(og, nestedService);
+                  addServiceContentToNestedOperationGroup(subClient, nestedService);
                 }
               }
             }
-            groups.push(og);
+            groups.push(subClient);
           }
         }
         for (const iface of client.type.interfaces.values()) {
@@ -227,39 +226,38 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
             | SdkClient
             | undefined;
           if (nestedClientData) {
-            const og: SdkOperationGroup = {
-              kind: "SdkOperationGroup",
+            const subClient: SdkClient = {
+              kind: "SdkClient",
               type: iface,
-              groupPath: `${client.name}.${nestedClientData.name}`,
+              name: nestedClientData.name,
+              clientPath: `${client.name}.${nestedClientData.name}`,
               service: nestedClientData.services[0],
               services: nestedClientData.services,
+              children: [],
               subOperationGroups: [],
               parent: client,
             };
-            context.__rawClientsOperationGroupsCache!.set(iface, og);
-            context.__clientToOperationsCache!.set(og, []);
-            groups.push(og);
+            context.__rawClientsCache!.set(iface, subClient);
+            context.__clientToOperationsCache!.set(subClient, []);
+            groups.push(subClient);
           }
         }
       }
     }
 
-    function addOrMergeSubOperationGroup(
-      targetGroup: SdkOperationGroup,
-      subGroup: SdkOperationGroup,
-    ): void {
-      const subGroupName = subGroup.type
-        ? getLibraryName(context, subGroup.type)
-        : subGroup.groupPath;
-      const existing = targetGroup.subOperationGroups.find((x) => {
-        const name = x.type ? getLibraryName(context, x.type) : x.groupPath;
+    function addOrMergeSubClient(targetClient: SdkClient, subClient: SdkClient) {
+      const subGroupName = subClient.type
+        ? getLibraryName(context, subClient.type)
+        : subClient.clientPath;
+      const existing = targetClient.children.find((x) => {
+        const name = x.type ? getLibraryName(context, x.type) : x.clientPath;
         return name === subGroupName;
       });
       if (!existing) {
-        targetGroup.subOperationGroups.push(subGroup);
+        targetClient.children.push(subClient);
         return;
       }
-      for (const svc of subGroup.services) {
+      for (const svc of subClient.services) {
         if (!existing.services.includes(svc)) {
           existing.services.push(svc);
         }
@@ -267,53 +265,53 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       existing.service = existing.services[0]; // eslint-disable-line @typescript-eslint/no-deprecated
       if (
         existing.type !== undefined &&
-        subGroup.type !== undefined &&
-        existing.type !== subGroup.type
+        subClient.type !== undefined &&
+        existing.type !== subClient.type
       ) {
-        const existingMergedTypes = mergedOperationGroupTypes.get(existing) ?? [existing.type];
-        existingMergedTypes.push(subGroup.type);
-        mergedOperationGroupTypes.set(existing, existingMergedTypes);
+        const existingMergedTypes = mergedSubClientsTypes.get(existing) ?? [existing.type];
+        existingMergedTypes.push(subClient.type);
+        mergedSubClientsTypes.set(existing, existingMergedTypes);
         existing.type = undefined;
       }
-      for (const nestedSubGroup of subGroup.subOperationGroups) {
-        addOrMergeSubOperationGroup(existing, nestedSubGroup);
+      for (const nestedSubClient of subClient.children) {
+        addOrMergeSubClient(existing, nestedSubClient);
       }
     }
 
     function addServiceContentToNestedOperationGroup(
-      targetGroup: SdkOperationGroup,
+      targetClient: SdkClient,
       serviceNamespace: Namespace,
     ): void {
       for (const serviceSubNs of serviceNamespace.namespaces.values()) {
-        const subOg = createOperationGroup(
+        const subClient = createSubClients(
           context,
           serviceSubNs,
-          targetGroup.groupPath,
+          targetClient.clientPath,
           serviceNamespace,
-          targetGroup,
+          targetClient,
           true,
         );
-        if (subOg) {
-          addOrMergeSubOperationGroup(targetGroup, subOg);
+        if (subClient) {
+          addOrMergeSubClient(targetClient, subClient);
         }
       }
       for (const serviceIface of serviceNamespace.interfaces.values()) {
         if (isTemplateDeclaration(serviceIface)) continue;
-        const subOg = createOperationGroup(
+        const subClient = createSubClients(
           context,
           serviceIface,
-          targetGroup.groupPath,
+          targetClient.clientPath,
           serviceNamespace,
-          targetGroup,
+          targetClient,
           true,
         );
-        if (subOg) {
-          addOrMergeSubOperationGroup(targetGroup, subOg);
+        if (subClient) {
+          addOrMergeSubClient(targetClient, subClient);
         }
       }
     }
 
-    function createFirstLevelOperationGroup(
+    function createFirstLevelSubClient(
       context: TCGCContext,
       type: Namespace | Interface,
       service: Namespace,
@@ -321,7 +319,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       // iterate client's interfaces and namespaces to find operation groups
       if (type.kind === "Namespace") {
         for (const subItem of type.namespaces.values()) {
-          const og = createOperationGroup(
+          const subClient = createSubClients(
             context,
             subItem,
             `${client.name}`,
@@ -329,8 +327,8 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
             client,
             isAutoMerging,
           );
-          if (og && !handleMultipleServicesOperationGroupNameConflict(og)) {
-            groups.push(og);
+          if (subClient && !handleMultipleServicesSubClientNameConflict(subClient)) {
+            groups.push(subClient);
           }
         }
         for (const subItem of type.interfaces.values()) {
@@ -338,7 +336,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
             // Skip template interfaces
             continue;
           }
-          const og = createOperationGroup(
+          const og = createSubClients(
             context,
             subItem,
             `${client.name}`,
@@ -346,33 +344,33 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
             client,
             isAutoMerging,
           );
-          if (og && !handleMultipleServicesOperationGroupNameConflict(og)) {
+          if (og && !handleMultipleServicesSubClientNameConflict(og)) {
             groups.push(og);
           }
         }
       }
     }
 
-    function handleMultipleServicesOperationGroupNameConflict(og: SdkOperationGroup): boolean {
-      if (client.services.length > 1 && og.type) {
+    function handleMultipleServicesSubClientNameConflict(subClient: SdkClient): boolean {
+      if (client.services.length > 1 && subClient.type) {
         // Track for conflict detection
-        const ogName = getLibraryName(context, og.type);
-        const existingOg = operationGroupNameMap.get(ogName);
-        if (!existingOg) {
-          operationGroupNameMap.set(ogName, og);
+        const ogName = getLibraryName(context, subClient.type);
+        const existingSubClient = subClientNameMap.get(ogName);
+        if (!existingSubClient) {
+          subClientNameMap.set(ogName, subClient);
         } else {
           // Conflict detected, update the existing operation group to have multiple services
-          existingOg.services.push(og.services[0]);
-          existingOg.service = existingOg.services[0]; // eslint-disable-line @typescript-eslint/no-deprecated
-          existingOg.subOperationGroups.push(...og.subOperationGroups);
-          if (existingOg.type !== undefined) {
-            mergedOperationGroupTypes.set(existingOg, [existingOg.type!]);
-            existingOg.type = undefined;
+          existingSubClient.services.push(subClient.services[0]);
+          existingSubClient.service = existingSubClient.services[0]; // eslint-disable-line @typescript-eslint/no-deprecated
+          existingSubClient.children.push(...subClient.children);
+          if (existingSubClient.type !== undefined) {
+            mergedSubClientsTypes.set(existingSubClient, [existingSubClient.type!]);
+            existingSubClient.type = undefined;
           }
           // Store the merged types for later operations processing
-          const types = mergedOperationGroupTypes.get(existingOg)!;
-          if (og.type) {
-            types.push(og.type);
+          const types = mergedSubClientsTypes.get(existingSubClient)!;
+          if (subClient.type) {
+            types.push(subClient.type);
           }
           return true;
         }
@@ -381,130 +379,108 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     }
 
     // build client's cache
-    context.__rawClientsOperationGroupsCache.set(client.type, client);
-    client.subOperationGroups = groups;
+    context.__rawClientsCache.set(client.type, client);
+    client.children = groups;
     context.__clientToOperationsCache.set(client, []);
   }
 
   // create operation group for `@clientLocation` of  string value
-  // if no explicit `@client` or `@operationGroup`
-  if (!hasExplicitClientOrOperationGroup(context)) {
-    const newOperationGroupWithServices = new Map<string, Namespace[]>();
-    listScopedDecoratorData(context, clientLocationKey).forEach((v, k) => {
-      // only deal with mutated types or without mutation
-      if (
-        (!context.__mutatedRealm && !unsafe_Realm.realmForType.has(k)) ||
-        (context.__mutatedRealm && context.__mutatedRealm.hasType(k))
-      ) {
-        // If the target operation group already exists, handle the multiple services case
-        if (typeof v === "string") {
-          // Check if an operation group with this name already exists, only check first level og for string target
-          const existingOg = clients[0].subOperationGroups.find(
-            (og) => og.type && getLibraryName(context, og.type) === v,
-          );
+  const newSubClientWithServices = new Map<string, Namespace[]>();
+  listScopedDecoratorData(context, clientLocationKey).forEach((v, k) => {
+    // only deal with mutated types or without mutation
+    if (
+      (!context.__mutatedRealm && !unsafe_Realm.realmForType.has(k)) ||
+      (context.__mutatedRealm && context.__mutatedRealm.hasType(k))
+    ) {
+      // If the target operation group already exists, handle the multiple services case
+      if (typeof v === "string") {
+        // Check if an operation group with this name already exists, only check first level og for string target
+        const existingOg = clients[0].children.find(
+          (og) => og.type && getLibraryName(context, og.type) === v,
+        );
 
-          const operationService =
-            clients[0].services.length > 1
-              ? findServiceForOperation(clients[0].services, k as Operation)
-              : clients[0].services[0];
+        const operationService =
+          clients[0].services.length > 1
+            ? findServiceForOperation(clients[0].services, k as Operation)
+            : clients[0].services[0];
 
-          if (existingOg) {
-            // Operation group already exists - check if moving this operation would create a multi-service situation
-            // Check if the existing operation group's service matches the operation's service
-            if (!existingOg.services.includes(operationService)) {
-              // This would create a multi-service operation group - merge the services
-              existingOg.services.push(operationService);
-              existingOg.service = existingOg.services[0]; // eslint-disable-line @typescript-eslint/no-deprecated
-            }
-            // Operation will be moved to this existing operation group during operations processing
-            context.__rawClientsOperationGroupsCache!.set(v, existingOg);
-            return;
+        if (existingOg) {
+          // Operation group already exists - check if moving this operation would create a multi-service situation
+          // Check if the existing operation group's service matches the operation's service
+          if (!existingOg.services.includes(operationService)) {
+            // This would create a multi-service operation group - merge the services
+            existingOg.services.push(operationService);
+            existingOg.service = existingOg.services[0]; // eslint-disable-line @typescript-eslint/no-deprecated
           }
+          // Operation will be moved to this existing operation group during operations processing
+          context.__rawClientsCache!.set(v, existingOg);
+          return;
+        }
 
-          if (newOperationGroupWithServices.has(v)) {
-            // Add the service to the list if it's not already there
-            const services = newOperationGroupWithServices.get(v)!;
-            if (!services.includes(operationService)) {
-              services.push(operationService);
-            }
-          } else {
-            newOperationGroupWithServices.set(v, [operationService]);
+        if (newSubClientWithServices.has(v)) {
+          // Add the service to the list if it's not already there
+          const services = newSubClientWithServices.get(v)!;
+          if (!services.includes(operationService)) {
+            services.push(operationService);
           }
+        } else {
+          newSubClientWithServices.set(v, [operationService]);
         }
       }
-    });
-
-    if (newOperationGroupWithServices.size > 0) {
-      newOperationGroupWithServices.forEach((services, ogName) => {
-        const og: SdkOperationGroup = {
-          kind: "SdkOperationGroup",
-          groupPath: `${clients[0].name}.${ogName}`,
-          service: services[0],
-          services,
-          subOperationGroups: [],
-          parent: clients[0],
-        };
-        context.__rawClientsOperationGroupsCache!.set(ogName, og);
-        clients[0].subOperationGroups!.push(og);
-        context.__clientToOperationsCache!.set(og, []);
-      });
     }
+  });
+
+  if (newSubClientWithServices.size > 0) {
+    newSubClientWithServices.forEach((services, ogName) => {
+      const subClient: SdkClient = {
+        kind: "SdkClient",
+        name: ogName,
+        clientPath: `${clients[0].name}.${ogName}`,
+        service: services[0],
+        services,
+        children: [],
+        subOperationGroups: [],
+        parent: clients[0],
+      };
+      context.__rawClientsCache!.set(ogName, subClient);
+      clients[0].children!.push(subClient);
+      context.__clientToOperationsCache!.set(subClient, []);
+    });
   }
 
   // iterate all clients and operation groups and build a map of operations
-  const queue: (SdkClient | SdkOperationGroup)[] = [...clients];
+  const queue: SdkClient[] = [...clients];
   while (queue.length > 0) {
-    const group = queue.shift()!;
+    const subClient = queue.shift()!;
 
     // operations directly under the group
     const operations = [];
 
     // Check if this is a merged operation group (has multiple services but still has a type)
     const mergedTypes =
-      group.kind === "SdkOperationGroup" ? mergedOperationGroupTypes.get(group) : undefined;
+      subClient.kind === "SdkOperationGroup" ? mergedSubClientsTypes.get(subClient) : undefined;
 
-    if (group.kind === "SdkClient" && group.services.length > 1) {
+    if (subClient.kind === "SdkClient" && subClient.services.length > 1) {
       // multi-service client - collect operations from all services
-      operations.push(...group.services.flatMap((service) => [...service.operations.values()]));
+      operations.push(...subClient.services.flatMap((service) => [...service.operations.values()]));
     } else if (mergedTypes) {
       // multi-service operation group
       for (const type of mergedTypes) {
         operations.push(...type.operations.values());
       }
-    } else if (group.type) {
+    } else if (subClient.type) {
       // single-service client or operation group
-      operations.push(...group.type.operations.values());
+      operations.push(...subClient.type.operations.values());
       // If this is a single-service client with an empty namespace (different from service),
       // also collect operations from the service namespace
       if (
-        group.kind === "SdkClient" &&
-        group.services.length === 1 &&
-        group.type !== group.services[0] &&
-        group.type.kind === "Namespace" &&
-        isNamespaceEmpty(group.type)
+        subClient.kind === "SdkClient" &&
+        subClient.services.length === 1 &&
+        subClient.type !== subClient.services[0] &&
+        subClient.type.kind === "Namespace" &&
+        isNamespaceEmpty(subClient.type)
       ) {
-        operations.push(...group.services[0].operations.values());
-      }
-    }
-
-    // when there is explicitly `@operationGroup` or `@client`
-    // operations under namespace or interface that are not decorated with `@operationGroup` or `@client`
-    // should be placed in the first accessor client or operation group
-    if (group.type?.kind === "Namespace" && hasExplicitClientOrOperationGroup(context)) {
-      const innerQueue: Namespace[] = [group.type];
-      while (innerQueue.length > 0) {
-        const ns = innerQueue.shift()!;
-        for (const subNs of ns.namespaces.values()) {
-          if (!context.__rawClientsOperationGroupsCache.has(subNs)) {
-            operations.push(...subNs.operations.values());
-            innerQueue.push(subNs);
-          }
-        }
-        for (const iface of ns.interfaces.values()) {
-          if (!context.__rawClientsOperationGroupsCache.has(iface)) {
-            operations.push(...iface.operations.values());
-          }
-        }
+        operations.push(...subClient.services[0].operations.values());
       }
     }
 
@@ -520,12 +496,12 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         !isTemplateDeclarationOrInstance(op) &&
         !context.program.stateMap(omitOperation).get(op)
       ) {
-        let pushGroup: SdkClient | SdkOperationGroup = group;
+        let pushSubClient: SdkClient = subClient;
         const clientLocation = getClientLocation(context, op);
         if (clientLocation) {
           // operation with `@clientLocation` decorator is placed in another operation group
-          if (context.__rawClientsOperationGroupsCache.has(clientLocation)) {
-            pushGroup = context.__rawClientsOperationGroupsCache.get(clientLocation)!;
+          if (context.__rawClientsCache.has(clientLocation)) {
+            pushSubClient = context.__rawClientsCache.get(clientLocation)!;
           } else {
             reportDiagnostic(context.program, {
               code: "client-location-wrong-type",
@@ -533,40 +509,38 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
             });
           }
         }
-        context.__clientToOperationsCache.get(pushGroup)!.push(op);
-        context.__operationToClientCache.set(op, pushGroup);
+        context.__clientToOperationsCache.get(pushSubClient)!.push(op);
+        context.__operationToClientCache.set(op, pushSubClient);
       }
     }
 
-    if (group.type) queue.push(...group.subOperationGroups);
+    if (subClient.type) queue.push(...subClient.subOperationGroups);
   }
 
   // omit empty client or operation groups
-  if (!hasExplicitClientOrOperationGroup(context)) {
-    const removeEmptyGroups = (group: SdkOperationGroup | SdkClient): boolean => {
-      // recursively check and remove empty sub-operation groups
-      group.subOperationGroups = group.subOperationGroups.filter((subGroup) => {
-        const keep = removeEmptyGroups(subGroup);
-        if (!keep) {
-          context.__rawClientsOperationGroupsCache!.delete(subGroup.type!);
-        }
-        return keep;
-      });
-
-      // check if the group has operations or non-empty sub-operation groups
-      const hasOperations = context.__clientToOperationsCache!.get(group)!.length > 0;
-      const hasSubGroups = group.subOperationGroups?.length > 0;
-
-      return hasOperations || hasSubGroups;
-    };
-
-    // start from the top-level clients and remove empty groups
-    for (const client of clients) {
-      const keepClient = removeEmptyGroups(client);
-      if (!keepClient) {
-        context.__rawClientsOperationGroupsCache.delete(client.type);
-        context.__clientToOperationsCache.delete(client);
+  const removeEmptyGroups = (group: SdkOperationGroup | SdkClient): boolean => {
+    // recursively check and remove empty sub-operation groups
+    group.subOperationGroups = group.subOperationGroups.filter((subGroup) => {
+      const keep = removeEmptyGroups(subGroup);
+      if (!keep) {
+        context.__rawClientsCache!.delete(subGroup.type!);
       }
+      return keep;
+    });
+
+    // check if the group has operations or non-empty sub-operation groups
+    const hasOperations = context.__clientToOperationsCache!.get(group)!.length > 0;
+    const hasSubGroups = group.subOperationGroups?.length > 0;
+
+    return hasOperations || hasSubGroups;
+  };
+
+  // start from the top-level clients and remove empty groups
+  for (const client of clients) {
+    const keepClient = removeEmptyGroups(client);
+    if (!keepClient) {
+      context.__rawClientsCache.delete(client.type);
+      context.__clientToOperationsCache.delete(client);
     }
   }
 }
@@ -574,7 +548,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
 /**
  * Get or create the TCGC clients.
  * If user has explicitly defined `@client` then we will use those clients.
- * If user has not defined any `@client` then we will create a client for the first service namespace.
+ * If user has not defined any `@client` then we will create a client for all services' namespace.
  *
  * @param context TCGCContext
  * @returns
@@ -593,22 +567,93 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
       }
     }
   }
+
   if (explicitClients.length > 0) {
-    // Filter out nested clients within parent clients
-    // Nested @client decorators act as sub-clients (like @operationGroup)
-    const rootClients = explicitClients.filter((client: SdkClient) => {
-      const clientType = client.type;
-      const clientNs = clientType.namespace;
-      // Check if this client's parent namespace is another client
-      return !explicitClients.some(
-        (other: SdkClient) =>
-          other !== client && other.type.kind === "Namespace" && other.type === clientNs,
-      );
-    });
-    if (rootClients.some((client: SdkClient) => isArm(client.services))) {
-      context.arm = true;
+    let ignoreExplicitClient = false;
+
+    // Build explicit client hierarchy based on namespace containment.
+    // Walk up the entire ancestor namespace chain to find the nearest parent client,
+    // since there may be redundant intermediate namespaces without @client decorators.
+    for (const client of explicitClients) {
+      let ns = client.type.namespace;
+      while (ns) {
+        const parentClient = explicitClients.find((other) => other !== client && other.type === ns);
+        if (parentClient) {
+          client.parent = parentClient;
+          parentClient.children.push(client);
+          break;
+        }
+        ns = ns.namespace;
+      }
     }
-    if (rootClients.length > 0) {
+
+    const rootClients = explicitClients.filter((client) => client.parent === undefined);
+
+    // Validate and resolve services level-by-level (BFS from root to inner).
+    // This ensures parent services are resolved before children try to inherit or validate against them.
+    const queue: SdkClient[] = [...rootClients];
+    while (queue.length > 0) {
+      const client = queue.shift()!;
+
+      if (!client.parent) {
+        // Root (first-layer) client validations
+        // ARM flag set
+        if (!context.arm && isArm(client.services)) {
+          context.arm = true;
+        }
+
+        // Root client must have services defined
+        if (client.services.length === 0) {
+          reportDiagnostic(context.program, {
+            code: "client-service",
+            format: { name: client.name },
+            target: client.type,
+          });
+          ignoreExplicitClient = true;
+          continue;
+        }
+
+        if (client.services.length > 1) {
+          // Multiple services on interface is not allowed for root clients
+          if (client.type.kind === "Interface") {
+            reportDiagnostic(context.program, {
+              code: "invalid-client-service-multiple",
+              target: client.type,
+            });
+            continue;
+          }
+        }
+      } else {
+        // Nested (sub) client validations
+        if (client.services.length === 0) {
+          // No service specified - inherit from parent
+          client.services = [...client.parent.services];
+          client.service = client.parent.service; // eslint-disable-line @typescript-eslint/no-deprecated
+        } else {
+          // Validate services are a subset of parent's services
+          let valid = true;
+          for (const svc of client.services) {
+            if (!client.parent.services.includes(svc)) {
+              reportDiagnostic(context.program, {
+                code: "nested-client-service-not-subset",
+                target: client.type,
+              });
+              valid = false;
+              break;
+            }
+          }
+          if (!valid) {
+            ignoreExplicitClient = true;
+          }
+        }
+      }
+
+      // Enqueue children so they are processed after this client's services are resolved
+      queue.push(...client.children);
+    }
+
+    if (rootClients.length > 0 && !ignoreExplicitClient) {
+      // Only return root level clients, sub clients will be accessed through the parent client's `subClients` property
       return rootClients;
     }
   }
@@ -633,6 +678,7 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
         services: [service],
         type: service,
         subOperationGroups: [],
+        children: [],
       });
     }
     context.arm = clients.some((client) => isArm(client.services));
@@ -643,108 +689,95 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
 }
 
 /**
- * Create a TCGC operation group for the given type.
- * This function will also iterate through the type's namespaces and interfaces to build nested operation groups.
+ * Create a TCGC sub-client for the given type.
+ * This function will also iterate through the type's namespaces and interfaces to build nested sub-clients.
  *
  * @param context TCGCContext
  * @param type
  * @returns
  */
-function createOperationGroup(
+function createSubClients(
   context: TCGCContext,
   type: Namespace | Interface,
   groupPathPrefix: string,
   service: Namespace,
-  parent?: SdkClient | SdkOperationGroup,
-  forceImplicit?: boolean,
-): SdkOperationGroup | undefined {
-  let operationGroup: SdkOperationGroup | undefined;
+  parent?: SdkClient,
+): SdkClient | undefined {
+  let subClient: SdkClient | undefined;
   if (!forceImplicit && hasExplicitClientOrOperationGroup(context)) {
     // Check consolidated @client state.
     const nestedClient = getScopedDecoratorData(context, clientKey, type) as SdkClient | undefined;
     if (nestedClient) {
-      operationGroup = {
-        kind: "SdkOperationGroup",
+      subClient = {
+        kind: "SdkClient",
         type: type,
-      } as SdkOperationGroup;
+      } as SdkClient;
     }
-    if (operationGroup) {
-      operationGroup.groupPath = `${groupPathPrefix}.${getLibraryName(context, type)}`;
+    if (subClient) {
+      subClient.clientPath = `${groupPathPrefix}.${getLibraryName(context, type)}`;
 
-      operationGroup.service = service; // eslint-disable-line @typescript-eslint/no-deprecated
-      operationGroup.services = [service];
-      operationGroup.subOperationGroups = [];
-      operationGroup.parent = parent;
+      subClient.service = service; // eslint-disable-line @typescript-eslint/no-deprecated
+      subClient.services = [service];
+      subClient.subOperationGroups = [];
+      subClient.parent = parent;
 
       if (type.kind === "Namespace") {
-        operationGroup.subOperationGroups =
-          buildHierarchyOfOperationGroups(
-            context,
-            type,
-            operationGroup.groupPath,
-            service,
-            operationGroup,
-          ) ?? [];
+        subClient.children =
+          buildHierarchyOfSubClients(context, type, subClient.clientPath, service, subClient) ?? [];
       }
     }
   } else {
     // if there is no explicit client, we will treat non-client namespaces and all interfaces as operation group
     if (type.kind !== "Interface" || !isTemplateDeclaration(type)) {
-      operationGroup = {
-        kind: "SdkOperationGroup",
+      subClient = {
+        kind: "SdkClient",
         type,
-        groupPath: `${groupPathPrefix}.${getLibraryName(context, type)}`,
+        clientPath: `${groupPathPrefix}.${getLibraryName(context, type)}`,
         service: service,
         services: [service],
-        subOperationGroups: [],
+        children: [],
         parent,
       };
     }
 
-    if (operationGroup && type.kind === "Namespace") {
-      operationGroup.subOperationGroups =
-        buildHierarchyOfOperationGroups(
-          context,
-          type,
-          operationGroup.groupPath,
-          service,
-          operationGroup,
-        ) ?? [];
+    if (subClient && type.kind === "Namespace") {
+      subClient.children =
+        buildHierarchyOfSubClients(context, type, subClient.clientPath, service, subClient) ?? [];
     }
   }
 
   // build operation group's cache
-  if (operationGroup) {
-    context.__rawClientsOperationGroupsCache!.set(operationGroup.type!, operationGroup);
-    context.__clientToOperationsCache!.set(operationGroup, []);
+  if (subClient) {
+    context.__rawClientsCache!.set(subClient.type!, subClient);
+    context.__clientToOperationsCache!.set(subClient, []);
   }
 
-  return operationGroup;
+  return subClient;
 }
 
-function buildHierarchyOfOperationGroups(
+function buildHierarchyOfSubClients(
   context: TCGCContext,
   type: Namespace,
   groupPathPrefix: string,
   service: Namespace,
-  parent?: SdkClient | SdkOperationGroup,
-): SdkOperationGroup[] | undefined {
-  // build hierarchy of operation group
-  const subOperationGroups: SdkOperationGroup[] = [];
+  parent?: SdkClient,
+): SdkClient[] | undefined {
+  // build hierarchy of sub-clients
+  const subClients: SdkClient[] = [];
   type.namespaces.forEach((ns) => {
-    const subOperationGroup = createOperationGroup(context, ns, groupPathPrefix, service, parent);
-    if (subOperationGroup) {
-      subOperationGroups.push(subOperationGroup);
+    const subClient = createSubClients(context, ns, groupPathPrefix, service, parent);
+    if (subClient) {
+      subClients.push(subClient);
     }
   });
   type.interfaces.forEach((i) => {
-    const subOperationGroup = createOperationGroup(context, i, groupPathPrefix, service, parent);
-    if (subOperationGroup) {
-      subOperationGroups.push(subOperationGroup);
+    const subClient = createSubClients(context, i, groupPathPrefix, service, parent);
+    if (subClient) {
+      subClients.push(subClient);
     }
   });
-  if (subOperationGroups.length > 0) {
-    return subOperationGroups;
+  if (subClients.length > 0) {
+    return subClients;
   }
   return undefined;
 }

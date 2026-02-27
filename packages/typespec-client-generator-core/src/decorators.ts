@@ -12,9 +12,6 @@ import {
   isErrorModel,
   isList,
   isNumeric,
-  isService,
-  isTemplateDeclaration,
-  listServices,
   Model,
   ModelProperty,
   Namespace,
@@ -85,7 +82,6 @@ import {
   findEntriesWithTarget,
   findRootSourceProperty,
   getScopedDecoratorData,
-  hasExplicitClientOrOperationGroup,
   isSameAuth,
   isSameServers,
   listAllUserDefinedNamespaces,
@@ -172,18 +168,13 @@ export const $client: ClientDecorator = (
     options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
 
   if (serviceConfig?.kind === "Namespace") {
+    // Explicit single service
     services = [serviceConfig];
   } else if (
     serviceConfig?.kind === "Tuple" &&
     serviceConfig.values.every((v) => v.kind === "Namespace")
   ) {
-    if (target.kind === "Interface") {
-      reportDiagnostic(context.program, {
-        code: "invalid-client-service-multiple",
-        target: context.decoratorTarget,
-      });
-      return;
-    }
+    // Explicit multiple services
     services = serviceConfig.values;
     // validate all services has same server definition
     let servers = undefined;
@@ -237,22 +228,15 @@ export const $client: ClientDecorator = (
         }
       }
       // set the versioning dependency
-      if (versionRecords.length > 0) {
+      if (versionRecords.length > 0 && target.kind === "Namespace") {
         context.call($useDependency, target, ...versionRecords);
       }
     }
   } else {
-    const service =
-      findClientService(context.program, target) ?? findSingleService(context.program);
-    if (service === undefined) {
-      reportDiagnostic(context.program, {
-        code: "client-service",
-        format: { name },
-        target: context.decoratorTarget,
-      });
-      return;
-    }
-    services = [service];
+    // No explicit service - store empty array. Cache.ts will either:
+    // - inherit from parent client (if nested)
+    // - report an error (if root client)
+    services = [];
   }
 
   const client: SdkClient = {
@@ -262,37 +246,10 @@ export const $client: ClientDecorator = (
     services,
     type: target,
     subOperationGroups: [],
+    children: [],
   };
   setScopedDecoratorData(context, $client, clientKey, target, client, scope);
 };
-
-function judgeService(program: Program, type: Namespace): boolean {
-  return (
-    isService(program, type) ||
-    type.decorators.some(
-      (d) => d.definition?.name === "@service" && d.definition?.namespace.name === "TypeSpec",
-    )
-  );
-}
-
-function findClientService(program: Program, client: Namespace | Interface): Namespace | undefined {
-  let current: Namespace | undefined = client as any;
-  while (current) {
-    if (judgeService(program, current)) {
-      return current;
-    }
-    current = current.namespace;
-  }
-  return undefined;
-}
-
-function findSingleService(program: Program): Namespace | undefined {
-  const allNamespaces = listServices(program).map((x) => x.type);
-  if (allNamespaces.length === 1) {
-    return allNamespaces[0];
-  }
-  return undefined;
-}
 
 /**
  * Return the client object for the given namespace or interface, or undefined if the given namespace or interface is not a client.
@@ -340,31 +297,6 @@ export const $operationGroup: OperationGroupDecorator = (
 };
 
 /**
- * Check a namespace or interface is an operation group.
- * @param context TCGCContext
- * @param type Type to check
- * @returns boolean
- */
-export function isOperationGroup(context: TCGCContext, type: Namespace | Interface): boolean {
-  if (hasExplicitClientOrOperationGroup(context)) {
-    return getScopedDecoratorData(context, clientKey, type) !== undefined;
-  }
-  // if there is no explicit client, we will treat non-client namespaces and all interfaces as operation group
-  if (type.kind === "Interface" && !isTemplateDeclaration(type)) {
-    return true;
-  }
-  if (
-    type.kind === "Namespace" &&
-    !type.decorators.some(
-      (d) => d.definition?.name === "@service" && d.definition?.namespace.name === "TypeSpec",
-    )
-  ) {
-    return true;
-  }
-  return false;
-}
-
-/**
  * Return the operation group object for the given namespace or interface or undefined is not an operation group.
  * @param context TCGCContext
  * @param type Type to check
@@ -374,7 +306,7 @@ export function getOperationGroup(
   context: TCGCContext,
   type: Namespace | Interface,
 ): SdkOperationGroup | undefined {
-  const operationGroup = context.getClientOrOperationGroup(type);
+  const operationGroup = context.getClientOrSubClient(type);
 
   return operationGroup?.kind === "SdkOperationGroup" ? operationGroup : undefined;
 }
@@ -1527,10 +1459,6 @@ export function getClientLocation(
   context: TCGCContext,
   input: Operation | ModelProperty,
 ): Namespace | Interface | Operation | string | undefined {
-  // if there is `@client` or `@operationGroup` decorator, `@clientLocation` on operation will be ignored
-  if (input.kind === "Operation" && hasExplicitClientOrOperationGroup(context)) {
-    return undefined;
-  }
   return getScopedDecoratorData(context, clientLocationKey, input);
 }
 

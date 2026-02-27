@@ -21,7 +21,6 @@ import {
   AllScopes,
   clientLocationKey,
   clientNameKey,
-  hasExplicitClientOrOperationGroup,
   listScopedDecoratorData,
 } from "../internal-utils.js";
 import { reportDiagnostic } from "../lib.js";
@@ -40,41 +39,37 @@ export function validateTypes(context: TCGCContext) {
  */
 function validateClientNames(tcgcContext: TCGCContext) {
   const languageScopes = getDefinedLanguageScopes(tcgcContext.program);
-  // If no `@client` or `@operationGroup` decorators are defined, we consider `@clientLocation`
-  const needToConsiderClientLocation = !hasExplicitClientOrOperationGroup(tcgcContext);
   // Check all possible language scopes
   for (const scope of languageScopes) {
     // Gather all moved operations and their targets
     const moved = new Set<Operation>();
     const movedTo = new Map<Namespace | Interface, Operation[]>();
     const newClients = new Map<string, Operation[]>();
-    if (needToConsiderClientLocation) {
-      // Cache all `@clientName` overrides for the current scope
-      for (const [type, target] of listScopedDecoratorData(
-        tcgcContext,
-        clientLocationKey,
-        scope,
-      ).entries()) {
-        if (unsafe_Realm.realmForType.has(type)) {
-          // Skip `@clientName` on versioning types
-          continue;
-        }
-        if (type.kind === "Operation") {
-          moved.add(type);
-          if (typeof target === "string") {
-            // Move to new clients
-            if (!newClients.has(target)) {
-              newClients.set(target, [type]);
-            } else {
-              newClients.get(target)!.push(type);
-            }
+    // Cache all `@clientName` overrides for the current scope
+    for (const [type, target] of listScopedDecoratorData(
+      tcgcContext,
+      clientLocationKey,
+      scope,
+    ).entries()) {
+      if (unsafe_Realm.realmForType.has(type)) {
+        // Skip `@clientName` on versioning types
+        continue;
+      }
+      if (type.kind === "Operation") {
+        moved.add(type);
+        if (typeof target === "string") {
+          // Move to new clients
+          if (!newClients.has(target)) {
+            newClients.set(target, [type]);
           } else {
-            // Move to existing clients
-            if (!movedTo.has(target)) {
-              movedTo.set(target, [type]);
-            } else {
-              movedTo.get(target)!.push(type);
-            }
+            newClients.get(target)!.push(type);
+          }
+        } else {
+          // Move to existing clients
+          if (!movedTo.has(target)) {
+            movedTo.set(target, [type]);
+          } else {
+            movedTo.get(target)!.push(type);
           }
         }
       }

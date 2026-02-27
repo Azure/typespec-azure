@@ -464,12 +464,6 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`The API version specified in the config: "${"version"}" is not defined in service versioning list. Fall back to the latest version.`,
       },
     },
-    "multiple-explicit-clients-multiple-services": {
-      severity: "error",
-      messages: {
-        default: "Can not define multiple explicit clients with multiple services.",
-      },
-    },
     "invalid-client-service-multiple": {
       severity: "error",
       messages: {
@@ -480,6 +474,13 @@ export const $lib = createTypeSpecLibrary({
       severity: "error",
       messages: {
         default: "All services must have the same server and auth definitions.",
+      },
+    },
+    "nested-client-service-not-subset": {
+      severity: "error",
+      messages: {
+        default:
+          "Nested client's services must be a subset of the parent client's services. If no service is needed, omit the `service` property to inherit from the parent.",
       },
     },
     "client-option": {
