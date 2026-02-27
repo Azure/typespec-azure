@@ -71,7 +71,6 @@ import {
   SdkEnumType,
   SdkHeaderParameter,
   SdkMethodParameter,
-  SdkOperationGroup,
   SdkServiceOperation,
   SdkType,
   TCGCContext,
@@ -321,7 +320,7 @@ export function findServiceForOperation(services: Namespace[], operation: Operat
 export function updateWithApiVersionInformation(
   context: TCGCContext,
   type: ModelProperty,
-  client?: SdkClient | SdkOperationGroup,
+  client?: SdkClient,
   operation?: Operation,
 ): {
   isApiVersionParam: boolean;
@@ -784,13 +783,13 @@ export function getCorrespondingClientParam(
   operation: Operation,
 ): SdkMethodParameter | undefined {
   const clientParams = [];
-  let client: SdkClient | SdkOperationGroup | undefined = context.getClientForOperation(operation);
+  let client: SdkClient | undefined = context.getClientForOperation(operation);
   while (client) {
     const clientParamsForClient = context.__clientParametersCache.get(client);
     if (clientParamsForClient) {
       clientParams.push(...clientParamsForClient);
     }
-    if (client.kind === "SdkClient") {
+    if (!client.parent) {
       break;
     }
     client = client.parent;
@@ -1134,10 +1133,9 @@ export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation
   return undefined;
 }
 
-export function getActualClientType(client: SdkClient | SdkOperationGroup): Namespace | Interface {
-  if (client.kind === "SdkClient") return client.type;
+export function getActualClientType(client: SdkClient): Namespace | Interface {
   if (client.type) return client.type;
-  // Created operation group from `@clientLocation`. May have single or multiple services. Choose the first service for multi-service case.
+  // For merged multi-service sub clients where type is cleared, fall back to the first service
   return client.services[0];
 }
 

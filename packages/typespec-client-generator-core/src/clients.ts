@@ -17,7 +17,6 @@ import {
   SdkEndpointParameter,
   SdkEndpointType,
   SdkHttpOperation,
-  SdkOperationGroup,
   SdkPathParameter,
   SdkServiceOperation,
   SdkUnionType,
@@ -184,11 +183,11 @@ function getSdkEndpointParameter<TServiceOperation extends SdkServiceOperation =
 
 export function createSdkClientType<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
-  client: SdkClient | SdkOperationGroup,
+  client: SdkClient,
   parent?: SdkClientType<TServiceOperation>,
 ): [SdkClientType<TServiceOperation>, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  let name = client.kind === "SdkClient" ? client.name : client.groupPath.split(".").at(-1)!;
+  let name = client.name;
   if (client.type) {
     const override = getClientNameOverride(context, client.type);
     if (override) {
@@ -196,10 +195,6 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     }
   }
   const clientType = getActualClientType(client);
-  // For multi-service operation groups, use the first service for namespace
-  // and cross language definition id. This follows the same pattern as multi-service root clients where
-  // metadata is derived from the first service in the array.
-  const typeForMetadata = Array.isArray(clientType) ? clientType[0] : clientType;
   const sdkClientType: SdkClientType<TServiceOperation> = {
     __raw: client,
     kind: "client",
@@ -207,29 +202,31 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     doc: client.type ? getClientDoc(context, client.type) : undefined,
     summary: client.type ? getSummary(context.program, client.type) : undefined,
     methods: [],
-    apiVersions: Array.isArray(clientType) ? [] : context.getApiVersionsForType(clientType),
-    namespace: getClientNamespace(context, typeForMetadata),
+    apiVersions: context.getApiVersionsForType(clientType),
+    namespace: getClientNamespace(context, clientType),
     clientInitialization: diagnostics.pipe(
       createSdkClientInitializationType(context, client, parent),
     ),
     decorators: client.type ? diagnostics.pipe(getTypeDecorators(context, client.type)) : [],
     parent,
-    // if it is client, the crossLanguageDefinitionId is the ${namespace}, if it is operation group, the crosslanguageDefinitionId is the %{namespace}.%{operationGroupName}
-    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, typeForMetadata),
+    crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, clientType),
+    subClients: [],
   };
   // Handle client methods
   sdkClientType.methods = diagnostics.pipe(
     createSdkMethods<TServiceOperation>(context, client, sdkClientType),
   );
   // Handle sub-clients
-  for (const operationGroup of listOperationGroups(context, client)) {
-    const operationGroupClient = diagnostics.pipe(
-      createSdkClientType<TServiceOperation>(context, operationGroup, sdkClientType),
+  for (const subClient of listOperationGroups(context, client)) {
+    const subClientType = diagnostics.pipe(
+      createSdkClientType<TServiceOperation>(context, subClient, sdkClientType),
     );
+    sdkClientType.subClients.push(subClientType);
+    // Keep children for backward compat
     if (sdkClientType.children) {
-      sdkClientType.children.push(operationGroupClient);
+      sdkClientType.children.push(subClientType);
     } else {
-      sdkClientType.children = [operationGroupClient];
+      sdkClientType.children = [subClientType];
     }
   }
   // Handle default client parameters (endpoint, credential, api version, subscription id)
@@ -308,17 +305,17 @@ function createSdkClientInitializationType<
   TServiceOperation extends SdkServiceOperation = SdkHttpOperation,
 >(
   context: TCGCContext,
-  client: SdkClient | SdkOperationGroup,
+  client: SdkClient,
   parent?: SdkClientType<TServiceOperation> | undefined,
 ): [SdkClientInitializationType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  const name = `${client.kind === "SdkClient" ? client.name : client.groupPath.split(".").at(-1)}Options`;
+  const isRootClient = !client.parent;
+  const name = `${client.name}Options`;
   const result: SdkClientInitializationType = {
     kind: "clientinitialization",
     doc: "Initialization for the client",
     parameters: [],
-    initializedBy:
-      client.kind === "SdkClient" ? InitializedByFlags.Individually : InitializedByFlags.Default,
+    initializedBy: isRootClient ? InitializedByFlags.Individually : InitializedByFlags.Default,
     name,
     isGeneratedName: true,
     decorators: [],
@@ -347,7 +344,7 @@ function createSdkClientInitializationType<
     if (initializationOptions?.initializedBy !== undefined) {
       if (
         initializationOptions.initializedBy !== InitializedByFlags.CustomizeCode &&
-        client.kind === "SdkClient" &&
+        isRootClient &&
         (initializationOptions.initializedBy & InitializedByFlags.Parent) ===
           InitializedByFlags.Parent
       ) {
@@ -363,7 +360,7 @@ function createSdkClientInitializationType<
         );
       } else if (
         initializationOptions.initializedBy !== InitializedByFlags.CustomizeCode &&
-        client.kind === "SdkOperationGroup" &&
+        !isRootClient &&
         initializationOptions.initializedBy === InitializedByFlags.Individually
       ) {
         diagnostics.add(

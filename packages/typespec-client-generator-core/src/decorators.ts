@@ -70,7 +70,6 @@ import {
   ExternalTypeInfo,
   LanguageScopes,
   SdkClient,
-  SdkOperationGroup,
   TCGCContext,
   UsageFlags,
 } from "./interfaces.js";
@@ -260,7 +259,9 @@ export const $client: ClientDecorator = (
     service: services.length === 1 ? services[0] : services,
     services,
     type: target,
-    subOperationGroups: [],
+    subOperationGroups: [], // eslint-disable-line @typescript-eslint/no-deprecated
+    subClients: [],
+    clientPath: name,
   };
   setScopedDecoratorData(context, $client, clientKey, target, client, scope);
 };
@@ -314,6 +315,9 @@ export function listClients(context: TCGCContext): SdkClient[] {
   return context.getClients();
 }
 
+/**
+ * @deprecated Use `@client` instead. The `@operationGroup` decorator is deprecated.
+ */
 export const $operationGroup: OperationGroupDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
@@ -327,13 +331,14 @@ export const $operationGroup: OperationGroupDecorator = (
     return;
   }
 
+  // Store in operationGroupKey for backward compatibility
   setScopedDecoratorData(
     context,
     $operationGroup,
     operationGroupKey,
     target,
     {
-      kind: "SdkOperationGroup",
+      kind: "SdkClient",
       type: target,
     },
     scope,
@@ -341,7 +346,7 @@ export const $operationGroup: OperationGroupDecorator = (
 };
 
 /**
- * Check a namespace or interface is an operation group.
+ * @deprecated Use `getClient` instead. Check if a namespace/interface is a sub client.
  * @param context TCGCContext
  * @param type Type to check
  * @returns boolean
@@ -350,7 +355,7 @@ export function isOperationGroup(context: TCGCContext, type: Namespace | Interfa
   if (hasExplicitClientOrOperationGroup(context)) {
     return getScopedDecoratorData(context, operationGroupKey, type) !== undefined;
   }
-  // if there is no explicit client, we will treat non-client namespaces and all interfaces as operation group
+  // if there is no explicit client, we will treat non-client namespaces and all interfaces as sub clients
   if (type.kind === "Interface" && !isTemplateDeclaration(type)) {
     return true;
   }
@@ -366,70 +371,72 @@ export function isOperationGroup(context: TCGCContext, type: Namespace | Interfa
 }
 
 /**
- * Return the operation group object for the given namespace or interface or undefined is not an operation group.
+ * @deprecated Use `getClient` to find sub clients instead.
+ * Return the client object for the given namespace or interface (previously operation group).
  * @param context TCGCContext
  * @param type Type to check
- * @returns Operation group or undefined.
+ * @returns Client or undefined.
  */
 export function getOperationGroup(
   context: TCGCContext,
   type: Namespace | Interface,
-): SdkOperationGroup | undefined {
-  const operationGroup = context.getClientOrOperationGroup(type);
-
-  return operationGroup?.kind === "SdkOperationGroup" ? operationGroup : undefined;
+): SdkClient | undefined {
+  const client = context.getClientOrOperationGroup(type);
+  // Return sub clients (those with a parent)
+  return client?.parent !== undefined ? client : undefined;
 }
 
 /**
- * List all the operation groups inside a client or an operation group. If ignoreHierarchy is true, the result will include all nested operation groups.
+ * @deprecated Use `listSubClients` instead. This function returns sub clients as SdkClient[].
+ * List all the sub clients inside a client. If ignoreHierarchy is true, the result will include all nested sub clients.
  *
  * @param context TCGCContext
- * @param group Client or operation group to list operation groups
- * @param ignoreHierarchy Whether to get all nested operation groups
+ * @param group Client to list sub clients
+ * @param ignoreHierarchy Whether to get all nested sub clients
  * @returns
  */
 export function listOperationGroups(
   context: TCGCContext,
-  group: SdkClient | SdkOperationGroup,
+  group: SdkClient,
   ignoreHierarchy = false,
-): SdkOperationGroup[] {
-  if (!ignoreHierarchy) return group.subOperationGroups;
+): SdkClient[] {
+  if (!ignoreHierarchy) return group.subClients;
 
-  const groups: SdkOperationGroup[] = [...group.subOperationGroups];
+  const clients: SdkClient[] = [...group.subClients];
   let current = 0;
-  while (current < groups.length) {
-    const operationGroup = groups[current];
-    if (operationGroup.subOperationGroups) {
-      groups.push(...operationGroup.subOperationGroups);
+  while (current < clients.length) {
+    const subClient = clients[current];
+    if (subClient.subClients) {
+      clients.push(...subClient.subClients);
     }
     current++;
   }
 
-  return groups;
+  return clients;
 }
 
 /**
- * List operations inside a client or an operation group. If ignoreHierarchy is true, the result will include all nested operations.
- * @param program TCGCContext
- * @param group Client or operation group to list operations
+ * List operations inside a client or sub client. If ignoreHierarchy is true, the result will include all nested operations.
+ * @param context TCGCContext
+ * @param group Client to list operations
  * @param ignoreHierarchy Whether to get all nested operations
  * @returns
  */
 export function listOperationsInOperationGroup(
   context: TCGCContext,
-  group: SdkOperationGroup | SdkClient,
+  group: SdkClient,
   ignoreHierarchy = false,
 ): Operation[] {
   if (!ignoreHierarchy) return context.getOperationsForClient(group);
 
-  const groups: SdkOperationGroup[] = [...group.subOperationGroups];
+  const subClients: SdkClient[] = [...group.subClients];
   const operations: Operation[] = [...context.getOperationsForClient(group)];
-  while (groups.length > 0) {
-    const operationGroup = groups.shift()!;
-    if (operationGroup.subOperationGroups) {
-      groups.push(...operationGroup.subOperationGroups);
+  while (subClients.length > 0) {
+    const subClient = subClients.shift()!;
+    if (subClient.subClients) {
+      subClients.push(...subClient.subClients);
     }
-    operations.push(...context.getOperationsForClient(operationGroup));
+    operations.push(...context.getOperationsForClient(subClient));
   }
 
   return operations;

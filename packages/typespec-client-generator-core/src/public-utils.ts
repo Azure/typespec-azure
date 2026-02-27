@@ -53,10 +53,10 @@ import {
   SdkHttpOperationExample,
   SdkMethodParameter,
   SdkModelPropertyType,
-  SdkOperationGroup,
   SdkPathParameter,
   SdkQueryParameter,
   SdkServiceMethod,
+  SdkServiceOperation,
   SdkType,
   TCGCContext,
 } from "./interfaces.js";
@@ -899,6 +899,26 @@ export function resolveOperationId(
 }
 
 /**
+ * Get the path of a client in the client hierarchy.
+ * For root clients, this returns just the client name.
+ * For sub clients, this returns the full path like "RootClient.SubClient.NestedClient".
+ *
+ * @param client The SdkClientType to get the path for
+ * @returns The client path string
+ */
+export function getClientPath<TServiceOperation extends SdkServiceOperation>(
+  client: SdkClientType<TServiceOperation>,
+): string {
+  const parts: string[] = [client.name];
+  let current = client.parent;
+  while (current) {
+    parts.unshift(current.name);
+    current = current.parent;
+  }
+  return parts.join(".");
+}
+
+/**
  * Judge whether a model's property is an HTTP metadata.
  * @param context TCGC context
  * @param property
@@ -908,13 +928,11 @@ export function isHttpMetadata(context: TCGCContext, property: SdkModelPropertyT
   return property.__raw !== undefined && isMetadata(context.program, property.__raw);
 }
 
-export function getNamespaceFromType(
-  type: Type | SdkClient | SdkOperationGroup | undefined,
-): Namespace | undefined {
+export function getNamespaceFromType(type: Type | SdkClient | undefined): Namespace | undefined {
   if (type === undefined) {
     return undefined;
   }
-  if (type.kind === "SdkOperationGroup" || type.kind === "SdkClient") {
+  if (type.kind === "SdkClient") {
     const rawType = type.type;
     if (rawType === undefined) {
       return undefined;

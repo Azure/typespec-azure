@@ -32,7 +32,6 @@ import {
   SdkModelPropertyType,
   SdkModelType,
   SdkNullableType,
-  SdkOperationGroup,
   SdkServiceOperation,
   SdkServiceResponseHeader,
   SdkUnionType,
@@ -127,24 +126,22 @@ export function createTCGCContext(
         prepareClientAndOperationCache(this);
       }
       return Array.from(this.__rawClientsOperationGroupsCache!.values()).filter(
-        (item) => item.kind === "SdkClient",
+        (item) => !item.parent,
       );
     },
-    getClientOrOperationGroup(
-      type: Namespace | Interface,
-    ): SdkClient | SdkOperationGroup | undefined {
+    getClientOrOperationGroup(type: Namespace | Interface): SdkClient | undefined {
       if (!this.__rawClientsOperationGroupsCache) {
         prepareClientAndOperationCache(this);
       }
       return this.__rawClientsOperationGroupsCache!.get(type);
     },
-    getOperationsForClient(client: SdkClient | SdkOperationGroup): Operation[] {
+    getOperationsForClient(client: SdkClient): Operation[] {
       if (!this.__clientToOperationsCache) {
         prepareClientAndOperationCache(this);
       }
       return this.__clientToOperationsCache!.get(client)!;
     },
-    getClientForOperation(operation: Operation): SdkClient | SdkOperationGroup {
+    getClientForOperation(operation: Operation): SdkClient {
       if (!this.__operationToClientCache) {
         prepareClientAndOperationCache(this);
       }

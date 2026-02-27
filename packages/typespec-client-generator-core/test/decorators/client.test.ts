@@ -40,9 +40,11 @@ describe("@client", () => {
       {
         kind: "SdkClient",
         name: "MyClient",
+        clientPath: "MyClient",
         services: [MyClient],
         service: MyClient,
         type: MyClient,
+        subClients: [],
         subOperationGroups: [],
       },
     ]);
@@ -62,9 +64,11 @@ describe("@client", () => {
       {
         kind: "SdkClient",
         name: "MyClient",
+        clientPath: "MyClient",
         services: [MyService],
         service: MyService,
         type: MyClient,
+        subClients: [],
         subOperationGroups: [],
       },
     ]);
@@ -197,9 +201,11 @@ describe("listClients without @client", () => {
       {
         kind: "SdkClient",
         name: "MyServiceClient",
+        clientPath: "MyServiceClient",
         services: [MyService],
         service: MyService,
         type: MyService,
+        subClients: [],
         subOperationGroups: [],
       },
     ]);
@@ -223,11 +229,13 @@ describe("@operationGroup", () => {
     const groups = listOperationGroups(context, client);
     deepStrictEqual(groups, [
       {
-        kind: "SdkOperationGroup",
+        kind: "SdkClient",
+        name: "MyGroup",
         type: MyGroup,
-        groupPath: "MyClient.MyGroup",
+        clientPath: "MyClient.MyGroup",
         services: [MyClient],
         service: MyClient,
+        subClients: [],
         subOperationGroups: [],
         parent: client,
       },
@@ -249,11 +257,13 @@ describe("@operationGroup", () => {
     const groups = listOperationGroups(context, client);
     deepStrictEqual(groups, [
       {
-        kind: "SdkOperationGroup",
+        kind: "SdkClient",
+        name: "MyGroup",
         type: MyGroup,
-        groupPath: "MyClient.MyGroup",
+        clientPath: "MyClient.MyGroup",
         services: [MyClient],
         service: MyClient,
+        subClients: [],
         subOperationGroups: [],
         parent: client,
       },
@@ -469,9 +479,11 @@ describe("@operationGroup", () => {
       {
         kind: "SdkClient",
         name: "MyServiceClient",
+        clientPath: "MyServiceClient",
         services: [MyService],
         service: MyService,
         type: MyService,
+        subClients: [],
         subOperationGroups: [],
       },
     ]);
@@ -585,7 +597,7 @@ describe("listOperationGroups without @client and @operationGroup", () => {
 
     const ogs = listOperationGroups(context, clients[0]);
     strictEqual(ogs.length, 1);
-    strictEqual(ogs[0].subOperationGroups.length, 0);
+    strictEqual(ogs[0].subClients.length, 0);
     strictEqual(listOperationGroups(context, ogs[0]).length, 0);
 
     operations = listOperationsInOperationGroup(context, ogs[0]);
@@ -781,11 +793,13 @@ describe("listOperationGroups without @client and @operationGroup", () => {
     const client = getClient(context, MyClient);
     ok(client);
     deepStrictEqual(getOperationGroup(context, MyGroup), {
-      kind: "SdkOperationGroup",
+      kind: "SdkClient",
+      name: "MyGroup",
       type: MyGroup,
-      groupPath: "MyClient.MyGroup",
+      clientPath: "MyClient.MyGroup",
       services: [MyClient],
       service: MyClient,
+      subClients: [],
       subOperationGroups: [],
       parent: client,
     });
@@ -845,9 +859,9 @@ describe("listOperationGroups without @client and @operationGroup", () => {
     const q = [...ogs];
     while (q.length > 0) {
       const og = q.pop()!;
-      countFromProperty += og.subOperationGroups?.length ?? 0;
+      countFromProperty += og.subClients?.length ?? 0;
       countFromList += listOperationGroups(context, og).length;
-      q.push(...(og.subOperationGroups ?? []));
+      q.push(...(og.subClients ?? []));
     }
     deepStrictEqual(countFromProperty, 13);
     deepStrictEqual(countFromList, 13);
@@ -913,9 +927,9 @@ describe("client hierarchy", () => {
     strictEqual(client1Ogs.length, 1);
     const b = client1Ogs.find((x) => x.type?.name === "B");
     ok(b);
-    strictEqual(b.subOperationGroups.length, 0);
+    strictEqual(b.subClients.length, 0);
     strictEqual(listOperationGroups(context, b).length, 0);
-    strictEqual(b.groupPath, "Test1Client.B");
+    strictEqual(b.clientPath, "Test1Client.B");
     deepStrictEqual(
       listOperationsInOperationGroup(context, b).map((x) => x.name),
       ["x"],
@@ -951,19 +965,19 @@ describe("client hierarchy", () => {
     strictEqual(client1Ogs.length, 1);
     const b = client1Ogs.find((x) => x.type?.name === "B");
     ok(b);
-    strictEqual(b.subOperationGroups?.length, 1);
+    strictEqual(b.subClients?.length, 1);
     strictEqual(listOperationGroups(context, b).length, 1);
-    strictEqual(b.groupPath, "Test1Client.BRename");
+    strictEqual(b.clientPath, "Test1Client.BRename");
     deepStrictEqual(
       listOperationsInOperationGroup(context, b).map((x) => x.name),
       ["x"],
     );
 
-    const c = b.subOperationGroups?.find((x) => x.type?.name === "C");
+    const c = b.subClients?.find((x) => x.type?.name === "C");
     ok(c);
-    strictEqual(c.subOperationGroups.length, 0);
+    strictEqual(c.subClients.length, 0);
     strictEqual(listOperationGroups(context, c).length, 0);
-    strictEqual(c.groupPath, "Test1Client.BRename.C");
+    strictEqual(c.clientPath, "Test1Client.BRename.C");
     deepStrictEqual(
       listOperationsInOperationGroup(context, c).map((x) => x.name),
       ["y"],
@@ -994,16 +1008,16 @@ describe("client hierarchy", () => {
     strictEqual(client1Ogs.length, 1);
     const b = client1Ogs.find((x) => x.type?.name === "B");
     ok(b);
-    strictEqual(b.subOperationGroups?.length, 1);
+    strictEqual(b.subClients?.length, 1);
     strictEqual(listOperationGroups(context, b).length, 1);
-    strictEqual(b.groupPath, "Test1Client.B");
+    strictEqual(b.clientPath, "Test1Client.B");
     strictEqual(listOperationsInOperationGroup(context, b).length, 0);
 
-    const c = b.subOperationGroups?.find((x) => x.type?.name === "C");
+    const c = b.subClients?.find((x) => x.type?.name === "C");
     ok(c);
-    strictEqual(c.subOperationGroups.length, 0);
+    strictEqual(c.subClients.length, 0);
     strictEqual(listOperationGroups(context, c).length, 0);
-    strictEqual(c.groupPath, "Test1Client.B.C");
+    strictEqual(c.clientPath, "Test1Client.B.C");
     strictEqual(listOperationsInOperationGroup(context, c).length, 1);
   });
 
@@ -1177,9 +1191,9 @@ describe("client hierarchy", () => {
 
     const og1 = clientOgs.find((x) => x.type?.name === "B");
     ok(og1);
-    strictEqual(og1.subOperationGroups.length, 0);
+    strictEqual(og1.subClients.length, 0);
     strictEqual(listOperationGroups(context, og1).length, 0);
-    strictEqual(og1.groupPath, "AClient.B");
+    strictEqual(og1.clientPath, "AClient.B");
     deepStrictEqual(
       listOperationsInOperationGroup(context, og1).map((x) => x.name),
       ["x"],
@@ -1187,9 +1201,9 @@ describe("client hierarchy", () => {
 
     const og2 = clientOgs.find((x) => x.type?.name === "C");
     ok(og2);
-    strictEqual(og2.subOperationGroups.length, 0);
+    strictEqual(og2.subClients.length, 0);
     strictEqual(listOperationGroups(context, og2).length, 0);
-    strictEqual(og2.groupPath, "AClient.C");
+    strictEqual(og2.clientPath, "AClient.C");
     deepStrictEqual(
       listOperationsInOperationGroup(context, og2).map((x) => x.name),
       ["y"],
@@ -1242,9 +1256,9 @@ describe("client hierarchy", () => {
 
     const og1 = clientOgs.find((x) => x.type?.name === "OpGrp1");
     ok(og1);
-    strictEqual(og1.subOperationGroups.length, 0);
+    strictEqual(og1.subClients.length, 0);
     strictEqual(listOperationGroups(context, og1).length, 0);
-    strictEqual(og1.groupPath, "PetStoreClient.OpGrp1");
+    strictEqual(og1.clientPath, "PetStoreClient.OpGrp1");
     deepStrictEqual(
       listOperationsInOperationGroup(context, og1).map((x) => x.name),
       ["feed"],
@@ -1252,9 +1266,9 @@ describe("client hierarchy", () => {
 
     const og2 = clientOgs.find((x) => x.type?.name === "OpGrp2");
     ok(og2);
-    strictEqual(og2.subOperationGroups.length, 0);
+    strictEqual(og2.subClients.length, 0);
     strictEqual(listOperationGroups(context, og2).length, 0);
-    strictEqual(og2.groupPath, "PetStoreClient.OpGrp2");
+    strictEqual(og2.clientPath, "PetStoreClient.OpGrp2");
     deepStrictEqual(
       listOperationsInOperationGroup(context, og2).map((x) => x.name),
       ["pet"],
@@ -1300,9 +1314,9 @@ describe("client hierarchy", () => {
 
     const og1 = clientOgs.find((x) => x.type?.name === "B");
     ok(og1);
-    strictEqual(og1.subOperationGroups.length, 0);
+    strictEqual(og1.subClients.length, 0);
     strictEqual(listOperationGroups(context, og1).length, 0);
-    strictEqual(og1.groupPath, "AClient.B");
+    strictEqual(og1.clientPath, "AClient.B");
     deepStrictEqual(
       listOperationsInOperationGroup(context, og1).map((x) => x.name),
       ["x"],
@@ -1310,9 +1324,9 @@ describe("client hierarchy", () => {
 
     const og2 = clientOgs.find((x) => x.type?.name === "C");
     ok(og2);
-    strictEqual(og2.subOperationGroups.length, 0);
+    strictEqual(og2.subClients.length, 0);
     strictEqual(listOperationGroups(context, og2).length, 0);
-    strictEqual(og2.groupPath, "AClient.C");
+    strictEqual(og2.clientPath, "AClient.C");
     deepStrictEqual(
       listOperationsInOperationGroup(context, og2).map((x) => x.name),
       ["y"],
@@ -1359,9 +1373,9 @@ describe("client hierarchy", () => {
     strictEqual(client1Ogs.length, 1);
     const b = client1Ogs.find((x) => x.type?.name === "B");
     ok(b);
-    strictEqual(b.subOperationGroups.length, 0);
+    strictEqual(b.subClients.length, 0);
     strictEqual(listOperationGroups(context, b).length, 0);
-    strictEqual(b.groupPath, "Test1Client.B");
+    strictEqual(b.clientPath, "Test1Client.B");
     deepStrictEqual(
       listOperationsInOperationGroup(context, b).map((x) => x.name),
       ["x", "y"],
@@ -1422,9 +1436,9 @@ describe("client hierarchy", () => {
     strictEqual(client1Ogs.length, 1);
     const b = client1Ogs.find((x) => x.type?.name === "B");
     ok(b);
-    strictEqual(b.subOperationGroups.length, 0);
+    strictEqual(b.subClients.length, 0);
     strictEqual(listOperationGroups(context, b).length, 0);
-    strictEqual(b.groupPath, "Test1Client.B");
+    strictEqual(b.clientPath, "Test1Client.B");
     deepStrictEqual(
       listOperationsInOperationGroup(context, b).map((x) => x.name),
       ["x", "y"],

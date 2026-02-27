@@ -48,7 +48,6 @@ import {
   SdkModelType,
   SdkNextOperationLink,
   SdkNextOperationReference,
-  SdkOperationGroup,
   SdkOperationLink,
   SdkOperationReference,
   SdkPagingServiceMethod,
@@ -790,7 +789,7 @@ export function getSdkMethodParameter(
 
 export function createSdkMethods<TServiceOperation extends SdkServiceOperation>(
   context: TCGCContext,
-  client: SdkClient | SdkOperationGroup,
+  client: SdkClient,
   sdkClientType: SdkClientType<TServiceOperation>,
 ): [SdkMethod<TServiceOperation>[], readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
