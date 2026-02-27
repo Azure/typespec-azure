@@ -244,12 +244,8 @@ export interface SdkClientType<
   crossLanguageDefinitionId: string;
   /** The parent client of this client. The structure follows the definition hierarchy. */
   parent?: SdkClientType<TServiceOperation>;
-  /**
-   * @deprecated Use `subClients` instead. This property will be removed in a future release.
-   */
-  children?: SdkClientType<TServiceOperation>[];
   /** The sub clients of this client. */
-  subClients: SdkClientType<TServiceOperation>[];
+  children?: SdkClientType<TServiceOperation>[];
 }
 
 interface ExternalType {

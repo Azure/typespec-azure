@@ -210,7 +210,6 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     decorators: client.type ? diagnostics.pipe(getTypeDecorators(context, client.type)) : [],
     parent,
     crossLanguageDefinitionId: getCrossLanguageDefinitionId(context, clientType),
-    subClients: [],
   };
   // Handle client methods
   sdkClientType.methods = diagnostics.pipe(
@@ -221,8 +220,6 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     const subClientType = diagnostics.pipe(
       createSdkClientType<TServiceOperation>(context, subClient, sdkClientType),
     );
-    sdkClientType.subClients.push(subClientType);
-    // Keep children for backward compat
     if (sdkClientType.children) {
       sdkClientType.children.push(subClientType);
     } else {
