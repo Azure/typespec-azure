@@ -36,7 +36,8 @@
     "validate-mock-apis": "pnpm -r --filter=@azure-tools/azure-http-specs run validate-mock-apis",
     "generate-scenarios-summary": "pnpm -r --filter=@azure-tools/azure-http-specs run generate-scenarios-summary",
     "upload-manifest": "pnpm -r --filter=@azure-tools/azure-http-specs run upload-manifest",
-    "install-conflict": "git checkout upstream/main -- pnpm-lock.yaml && pnpm install"
+    "install-conflict": "git checkout upstream/main -- pnpm-lock.yaml && pnpm install",
+    "tsp-integration": "pnpm --filter @azure-tools/integration-tester exec tsp-integration"
   },
   "devDependencies": {
     "@chronus/chronus": "^1.0.1",

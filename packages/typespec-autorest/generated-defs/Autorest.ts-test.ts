@@ -7,4 +7,4 @@ import type { AutorestDecorators } from "./Autorest.js";
 /**
  * An error here would mean that the exported decorator is not using the same signature. Make sure to have export const $decName: DecNameDecorator = (...) => ...
  */
-const _: AutorestDecorators = $decorators["Autorest"];
+const _decs: AutorestDecorators = $decorators["Autorest"];
