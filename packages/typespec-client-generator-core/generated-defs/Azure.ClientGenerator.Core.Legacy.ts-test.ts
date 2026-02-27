@@ -7,5 +7,5 @@ import type { AzureClientGeneratorCoreLegacyDecorators } from "./Azure.ClientGen
 /**
  * An error here would mean that the exported decorator is not using the same signature. Make sure to have export const $decName: DecNameDecorator = (...) => ...
  */
-const _: AzureClientGeneratorCoreLegacyDecorators =
+const _decs: AzureClientGeneratorCoreLegacyDecorators =
   $decorators["Azure.ClientGenerator.Core.Legacy"];
