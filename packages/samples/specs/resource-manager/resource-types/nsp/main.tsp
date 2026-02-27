@@ -118,8 +118,7 @@ interface Dependents {
   delete is ArmResourceDeleteSync<Dependent>;
   list is ArmResourceListByParent<Dependent>;
   getNsp is NspConfigurationOperations.Read<Dependent>;
-  #suppress "@azure-tools/typespec-azure-resource-manager/legacy-type-usage" "Using legacy type as a sample"
-  listNsps is NspConfigurationOperations.ListSinglePageByParent<Dependent>;
+  listNsps is NspConfigurationOperations.ListByParent<Dependent>;
 }
 
 /** An employee dependent */

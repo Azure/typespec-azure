@@ -8,28 +8,28 @@ llmstxt: true
 
 ### TrackedResource
 
-| Operation             | Recommended | Required | TypeSpec Representation                                       |
-| --------------------- | ----------- | -------- | ------------------------------------------------------------- |
-| GET                   | Yes         | Yes      | `get is ArmResourceRead<Resource>;`                           |
-| CreateOrUpdate (PUT)  | Yes         | Yes      | `createOrUpdate is ArmResourceCreateOrUpdateAsync<Resource>;` |
-| Tags Update (PATCH)   | No          | Yes\*    | `update is ArmResourceTagsPatchSync<Resource>;`               |
-| Full Update (PATCH)   | Yes         | No\*     | `update is ArmCustomPatchSync<Resource, PatchRequest>;`       |
-| Delete                | Yes         | Yes      | `delete is ArmResourceDeleteSync<Resource>;`                  |
-| List by ResourceGroup | Yes         | Yes      | `listByResourceGroup is ArmResourceListByParent<Resource>;`   |
-| List by Subscription  | Yes         | Yes      | `listBySubscription is ArmListBySubscription<Resource>;`      |
+| Operation             | Recommended | Required | TypeSpec Representation                                        |
+| --------------------- | ----------- | -------- | -------------------------------------------------------------- |
+| GET                   | Yes         | Yes      | `get is ArmResourceRead<Resource>;`                            |
+| CreateOrUpdate (PUT)  | Yes         | Yes      | `createOrUpdate is ArmResourceCreateOrReplaceAsync<Resource>;` |
+| Tags Update (PATCH)   | No          | Yes\*    | `update is ArmTagsPatchSync<Resource>;`                        |
+| Full Update (PATCH)   | Yes         | No\*     | `update is ArmCustomPatchSync<Resource, PatchRequest>;`        |
+| Delete                | Yes         | Yes      | `delete is ArmResourceDeleteSync<Resource>;`                   |
+| List by ResourceGroup | Yes         | Yes      | `listByResourceGroup is ArmResourceListByParent<Resource>;`    |
+| List by Subscription  | Yes         | Yes      | `listBySubscription is ArmListBySubscription<Resource>;`       |
 
 \* Arm requires that, at minimum, a TrackedResource can update Tags. A Full PATCH of all updateable
 resource properties is preferred.
 
 ### Proxy Resource
 
-| Operation            | Recommended | Required | TypeSpec Representation                                       |
-| -------------------- | ----------- | -------- | ------------------------------------------------------------- |
-| GET                  | Yes         | Yes      | `get is ArmResourceRead<Resource>;`                           |
-| CreateOrUpdate (PUT) | Yes         | No\*     | `createOrUpdate is ArmResourceCreateOrUpdateAsync<Resource>;` |
-| Update (PATCH)       | Yes         | No       | `update is ArmCustomPatchSync<Resource, PatchRequest>;`       |
-| Delete               | Yes         | No\*     | `delete is ArmResourceDeleteSync<Resource>;`                  |
-| List by Parent       | Yes         | Yes      | `listByParent is ArmResourceListByParent<Resource>;`          |
+| Operation            | Recommended | Required | TypeSpec Representation                                        |
+| -------------------- | ----------- | -------- | -------------------------------------------------------------- |
+| GET                  | Yes         | Yes      | `get is ArmResourceRead<Resource>;`                            |
+| CreateOrUpdate (PUT) | Yes         | No\*     | `createOrUpdate is ArmResourceCreateOrReplaceAsync<Resource>;` |
+| Update (PATCH)       | Yes         | No       | `update is ArmCustomPatchSync<Resource, PatchRequest>;`        |
+| Delete               | Yes         | No\*     | `delete is ArmResourceDeleteSync<Resource>;`                   |
+| List by Parent       | Yes         | Yes      | `listByParent is ArmResourceListByParent<Resource>;`           |
 
 \* Note that, if a resource implements Create, it is highly recommended that it implement delete as
 well, and vice-versa.
@@ -42,7 +42,7 @@ which one is described in the sections below.
 
 ### Synchronous and Asynchronous APIs
 
-CreateOrUpdate (PUT), Update (Patch), Delete, and Action (POST) operations over a resource may
+CreateOrUpdate (PUT), Update (Patch), Delete, and Action (POST) operations over a resource may be either synchronous or asynchronous. Synchronous operations complete before a response is returned. Asynchronous operations return an initial response before the operation fully completes, and support long-running operation (LRO) polling. The sections below describe the available templates for both synchronous and asynchronous variants of each operation.
 
 ### Determining Which Resource Properties Appear in Lifecycle Operations
 
@@ -85,6 +85,22 @@ op get is ArmResourceRead<MyResource>;
 - **get**: The name of the operation passed on to clients.
 - **Resource**: A reference to your resource type.
 
+### Resource Check Existence Operations (HEAD)
+
+The check existence operation uses a HEAD request to efficiently determine whether a resource exists
+without returning the resource body. This is useful when you only need to verify a resource's
+existence and do not need to retrieve its full representation.
+
+```typespec
+op checkExistence is ArmResourceCheckExistence<MyResource>;
+```
+
+| Operation       | TypeSpec                                                    |
+| --------------- | ----------------------------------------------------------- |
+| Check Existence | `checkExistence is ArmResourceCheckExistence<ResourceType>` |
+
+This operation returns a 204 response if the resource exists, or a 404 response if it does not.
+
 ### Resource CreateOrUpdate Operations (PUT)
 
 The CreateOrUpdate operation may be synchronous (The operation may always complete before a response
@@ -117,16 +133,25 @@ PATCH for Resource tags only, a PATCH for all updateable properties, or a custom
 you should choose the patch for all updateable properties, unless you have a very good reason for
 choosing another PATCH operation.
 
-| Operation Description      | TypeSpec                                                                                                                                   |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Sync TagsOnly PATCH        | `update is ArmTagsPatchSync<ResourceType>`                                                                                                 |
-| Async TagsOnly PATCH       | `update is ArmTagsPatchAsync<ResourceType>`                                                                                                |
-| Sync All Properties PATCH  | `update is ArmCustomPatchSync<ResourceType, Azure.ResourceManager.Foundations.ResourceUpdateModel<ResourceType, ResourcePropertiesType>>`  |
-| Async All Properties PATCH | `update is ArmCustomPatchAsync<ResourceType, Azure.ResourceManager.Foundations.ResourceUpdateModel<ResourceType, ResourcePropertiesType>>` |
+| Operation Description                       | TypeSpec                                                                |
+| ------------------------------------------- | ----------------------------------------------------------------------- |
+| Sync TagsOnly PATCH                         | `update is ArmTagsPatchSync<ResourceType>`                              |
+| Async TagsOnly PATCH                        | `update is ArmTagsPatchAsync<ResourceType>`                             |
+| Sync Custom Properties PATCH (recommended)  | `update is ArmCustomPatchSync<ResourceType, PatchRequestModel>`         |
+| Async Custom Properties PATCH (recommended) | `update is ArmCustomPatchAsync<ResourceType, PatchRequestModel>`        |
+| Sync Lifecycle PATCH                        | `update is ArmResourcePatchSync<ResourceType, ResourcePropertiesType>`  |
+| Async Lifecycle PATCH                       | `update is ArmResourcePatchAsync<ResourceType, ResourcePropertiesType>` |
 
-The ArmResourcePatch\* templates take the resource type and the resource properties type as
-parameters. The ArmTagsPatch\* templates take the resource type as a parameter. The ArmCustomPatch\*
-templates take the resource type and your custom PATCH request type as parameters.
+The `ArmCustomPatch*` templates are the recommended choice for PATCH operations. They take the
+resource type and your custom PATCH request type as parameters, giving you full control over the
+PATCH schema. The `ArmTagsPatch*` templates take the resource type as a parameter and only allow
+updating ARM tags.
+
+> **Note:** The `ArmResourcePatch*` templates are **not recommended**. They rely on Lifecycle.Update
+> visibility analysis to automatically determine which properties are included in the PATCH schema,
+> but this analysis is only performed by the typespec-autorest emitter and will not be replicated in
+> SDKs generated for the PATCH operation. Instead, spec authors should define a specific PATCH model
+> and use the `ArmCustomPatch*` templates.
 
 ### Resource Delete Operations (DELETE)
 
@@ -161,6 +186,11 @@ Arm Resource list operations return a list of Tracked or Proxy Resources at a pa
 | ------------------ | ----------------------------------------------------------- |
 | ListByParent       | `listByWidget is ArmResourceListByParent<ResourceType>`     |
 | ListBySubscription | `listBySubscription is ArmListBySubscription<ResourceType>` |
+| ListAtScope        | `listAtScope is ArmResourceListAtScope<ResourceType>`       |
+
+The `ArmResourceListAtScope` template is used when the scope of the list operation is determined by
+the `BaseParameters` type parameter. This is useful for resources with custom scope requirements
+that do not fit the standard parent or subscription scopes.
 
 ### Resource Actions (POST)
 
@@ -209,28 +239,44 @@ described in the next section of the document:
 - [Synchronous Resource List Actions](#synchronous-list-action)
 - [Asynchronous List Action](#asynchronous-list-action)
 
+### Provider Actions (POST)
+
+Provider actions are operations that are not scoped to a specific resource instance but instead
+operate at the provider level. These are useful for operations like performing tenant-wide
+configuration or subscription-level actions that are not tied to a particular resource.
+
+| Operation                         | TypeSpec                                                                        |
+| --------------------------------- | ------------------------------------------------------------------------------- |
+| Synchronous Provider Action       | `myAction is ArmProviderActionSync<Request, Response>`                          |
+| Asynchronous Provider Action      | `myAction is ArmProviderActionAsync<Request, Response>`                         |
+| Provider Action with custom scope | `myAction is ArmProviderActionSync<Request, Response, SubscriptionActionScope>` |
+| Provider Action with no request   | `myAction is ArmProviderActionSync<void, Response>`                             |
+
+By default, provider actions use `TenantActionScope`. You can specify a different scope such as
+`SubscriptionActionScope` or `ExtensionResourceActionScope` using the `Scope` template parameter.
+
 ### Check Name Operations
 
 Some services provide operations to check name availability, either location-specific (locally) or
 globally, especially if a resource name must be globally unique (such as when an exposed endpoint
 uses the resource name in the url).
 
-| Operation                      | TypeSpec                                                                                             |
-| ------------------------------ | ---------------------------------------------------------------------------------------------------- |
-| Global Name Availability Check | `checkGlobalName is checkGlobalNameAvailability<TRequest, TResponse, TAdditionalParams>`             |
-| Local Name Availability Check  | `checkLocalName is checkLocalNameAvailability<TRequest, TResponse, TAdditionalParams>`               |
-| Custom Name Availability Check | `customNameCheck is checkNameAvailability<TScopeParameters, TRequest, TResponse, TAdditionalParams>` |
+| Operation                      | TypeSpec                                                                                         |
+| ------------------------------ | ------------------------------------------------------------------------------------------------ |
+| Global Name Availability Check | `checkGlobalName is checkGlobalNameAvailability<Request, Response, AdditionalParams>`            |
+| Local Name Availability Check  | `checkLocalName is checkLocalNameAvailability<Request, Response, AdditionalParams>`              |
+| Custom Name Availability Check | `customNameCheck is checkNameAvailability<ScopeParameters, Request, Response, AdditionalParams>` |
 
 `checkGlobalNameAvailability` and `checkLocalNameAvailability` have default values that allow them
 to be used without specifying any template parameters. `checkNameAvailability` requires the
-`TScopeParameters` template parameter, which describes the parameters which define the scope of the
-name check request. For reference, the following table shows the `TScopeParameters` for the standard
+`ScopeParameters` template parameter, which describes the parameters which define the scope of the
+name check request. For reference, the following table shows the `ScopeParameters` for the standard
 templates:
 
-| Operation                      | Scope Parameters                                                       |
-| ------------------------------ | ---------------------------------------------------------------------- |
-| Global Name Availability Check | `SubscriptionIdParameter, DefaultProviderNamespace`                    |
-| Local Name Availability Check  | `SubscriptionIdParameter, DefaultProviderNamespace, LocationParameter` |
+| Operation                      | Scope Parameters                                                               |
+| ------------------------------ | ------------------------------------------------------------------------------ |
+| Global Name Availability Check | `SubscriptionIdParameter, DefaultProviderNamespace`                            |
+| Local Name Availability Check  | `SubscriptionIdParameter, DefaultProviderNamespace, LocationResourceParameter` |
 
 ## Writing Custom Operations
 
@@ -285,9 +331,10 @@ building blocks.
 @autoRoute
 @armResourceAction(TResource)
 @post
-op ArmResourceListActionSync<TResource extends ArmResource, TResponse extends object>(
-  ...ResourceInstanceParameters<TResource, TBaseParameters>,
-): ArmResponse<TResponse> | ErrorResponse;
+op ArmResourceListActionSync<
+  TResource extends Foundations.SimpleResource,
+  TResponse extends object
+>(...ResourceInstanceParameters<TResource>): ArmResponse<TResponse> | ErrorResponse;
 
 // Usage
 
@@ -313,8 +360,11 @@ building blocks.
 @autoRoute
 @armResourceAction(TResource)
 @post
-op ArmResourceListActionAsync<TResource extends ArmResource, TResponse extends object>(
-  ...ResourceInstanceParameters<TResource, TBaseParameters>,
+op ArmResourceListActionAsync<
+  TResource extends Foundations.SimpleResource,
+  TResponse extends object
+>(
+  ...ResourceInstanceParameters<TResource>,
 ): ArmResponse<TResponse> | ArmAcceptedResponse | ErrorResponse;
 
 // Usage

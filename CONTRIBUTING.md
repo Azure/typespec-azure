@@ -334,16 +334,17 @@ TypeSpec repo use labels to help categorize and manage issues and PRs. The follo
 
 Area of the codebase
 
-| Name                         | Color   | Description                                                                  |
-| ---------------------------- | ------- | ---------------------------------------------------------------------------- |
-| `lib:tcgc`                   | #957300 | Issues for @azure-tools/typespec-client-generator-core library               |
-| `lib:azure-core`             | #957300 | Issues for @azure-tools/typespec-azure-core library                          |
-| `lib:azure-resource-manager` | #957300 | Issues for @azure-tools/typespec-azure-core library                          |
-| `lib:azure-http-specs`       | #c7aee6 | For issues/prs related to the @azure-tools/typespec-azure-http-specs package |
-| `emitter:autorest`           | #957300 | Issues for @azure-tools/typespec-autorest emitter                            |
-| `eng`                        | #65bfff |                                                                              |
-| `ide`                        | #846da1 | Issues for Azure specific ide features                                       |
-| `cli/psh`                    | #9EB120 | Issues for Azure CLI/PSH features                                            |
+| Name                         | Color   | Description                                                                         |
+| ---------------------------- | ------- | ----------------------------------------------------------------------------------- |
+| `lib:tcgc`                   | #957300 | Issues for @azure-tools/typespec-client-generator-core library                      |
+| `lib:azure-core`             | #957300 | Issues for @azure-tools/typespec-azure-core library                                 |
+| `lib:azure-resource-manager` | #957300 | Issues for @azure-tools/typespec-azure-core library                                 |
+| `lib:azure-http-specs`       | #c7aee6 | For issues/prs related to the @azure-tools/typespec-azure-http-specs package        |
+| `emitter:autorest`           | #957300 | Issues for @azure-tools/typespec-autorest emitter                                   |
+| `emitter:client:all`         | #957300 | General client emitter issues that do not involve TCGC or typespec-azure-http-specs |
+| `eng`                        | #65bfff |                                                                                     |
+| `ide`                        | #846da1 | Issues for Azure specific ide features                                              |
+| `cli/psh`                    | #9EB120 | Issues for Azure CLI/PSH features                                                   |
 
 #### issue_kinds
 
