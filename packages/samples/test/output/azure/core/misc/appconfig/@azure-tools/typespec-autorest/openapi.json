@@ -76,9 +76,6 @@
       "head": {
         "operationId": "CheckKeys",
         "description": "Requests the headers and status of the given resource.",
-        "produces": [
-          "application/problem+json"
-        ],
         "parameters": [
           {
             "$ref": "#/parameters/ApiVersion"
@@ -116,6 +113,17 @@
             "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Error"
+            },
+            "headers": {
+              "content-type": {
+                "type": "string",
+                "enum": [
+                  "application/problem+json"
+                ],
+                "x-ms-enum": {
+                  "modelAsString": false
+                }
+              }
             }
           }
         }
@@ -202,9 +210,6 @@
       "head": {
         "operationId": "CheckKeyValues",
         "description": "Gets a list of key-values.",
-        "produces": [
-          "application/problem+json"
-        ],
         "parameters": [
           {
             "$ref": "#/parameters/AcceptDatetimeHeader"
@@ -261,6 +266,17 @@
             "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Error"
+            },
+            "headers": {
+              "content-type": {
+                "type": "string",
+                "enum": [
+                  "application/problem+json"
+                ],
+                "x-ms-enum": {
+                  "modelAsString": false
+                }
+              }
             }
           }
         }
@@ -544,9 +560,6 @@
       "head": {
         "operationId": "CheckKeyValue",
         "description": "Requests the headers and status of the given resource.",
-        "produces": [
-          "application/problem+json"
-        ],
         "parameters": [
           {
             "$ref": "#/parameters/ETagHeaders.ifMatch"
@@ -582,6 +595,17 @@
             "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Error"
+            },
+            "headers": {
+              "content-type": {
+                "type": "string",
+                "enum": [
+                  "application/problem+json"
+                ],
+                "x-ms-enum": {
+                  "modelAsString": false
+                }
+              }
             }
           }
         }
@@ -643,9 +667,6 @@
       "head": {
         "operationId": "CheckLabels",
         "description": "Requests the headers and status of the given resource.",
-        "produces": [
-          "application/problem+json"
-        ],
         "parameters": [
           {
             "$ref": "#/parameters/ApiVersion"
@@ -700,6 +721,17 @@
             "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Error"
+            },
+            "headers": {
+              "content-type": {
+                "type": "string",
+                "enum": [
+                  "application/problem+json"
+                ],
+                "x-ms-enum": {
+                  "modelAsString": false
+                }
+              }
             }
           }
         }
@@ -894,9 +926,6 @@
       "head": {
         "operationId": "CheckRevisions",
         "description": "Requests the headers and status of the given resource.",
-        "produces": [
-          "application/problem+json"
-        ],
         "parameters": [
           {
             "$ref": "#/parameters/ApiVersion"
@@ -934,6 +963,17 @@
             "description": "An unexpected error response.",
             "schema": {
               "$ref": "#/definitions/Error"
+            },
+            "headers": {
+              "content-type": {
+                "type": "string",
+                "enum": [
+                  "application/problem+json"
+                ],
+                "x-ms-enum": {
+                  "modelAsString": false
+                }
+              }
             }
           }
         }
