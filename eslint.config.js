@@ -2,7 +2,7 @@
 import { defineConfig } from "eslint/config";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
-import { TypeSpecCommonEslintConfigs, getTypeScriptProjectRules } from "./core/eslint.config.js";
+import { TypeSpecCommonEslintConfigs } from "./core/eslint.config.js";
 
 export default defineConfig(
   {
@@ -27,5 +27,25 @@ export default defineConfig(
     ],
   },
   ...TypeSpecCommonEslintConfigs,
-  ...getTypeScriptProjectRules(dirname(fileURLToPath(import.meta.url))),
+  // Type-checked rules scoped to Azure packages only (not core/**) to avoid OOM
+  {
+    files: [
+      "packages/*/src/**/*.ts",
+      "packages/*/src/**/*.tsx",
+      "packages/*/emitter/src/**/*.ts",
+    ],
+    languageOptions: {
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: ["packages/*/vitest.config.ts"],
+        },
+        tsconfigRootDir: dirname(fileURLToPath(import.meta.url)),
+      },
+    },
+    rules: {
+      // Only put rules here that need typescript project information
+      "@typescript-eslint/no-floating-promises": "error",
+      "@typescript-eslint/no-deprecated": "warn",
+    },
+  },
 );
