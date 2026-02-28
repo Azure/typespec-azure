@@ -12,8 +12,6 @@ import {
   isErrorModel,
   isList,
   isNumeric,
-  isService,
-  isTemplateDeclaration,
   Model,
   ModelProperty,
   Namespace,
@@ -89,7 +87,6 @@ import {
   listAllUserDefinedNamespaces,
   negationScopesKey,
   omitOperation,
-  operationGroupKey,
   overrideKey,
   parseScopes,
   scopeKey,
@@ -171,11 +168,13 @@ export const $client: ClientDecorator = (
     options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
 
   if (serviceConfig?.kind === "Namespace") {
+    // Explicit single service
     services = [serviceConfig];
   } else if (
     serviceConfig?.kind === "Tuple" &&
     serviceConfig.values.every((v) => v.kind === "Namespace")
   ) {
+    // Explicit multiple services
     if (target.kind === "Interface") {
       reportDiagnostic(context.program, {
         code: "invalid-client-service-multiple",
@@ -236,55 +235,27 @@ export const $client: ClientDecorator = (
         }
       }
       // set the versioning dependency
-      if (versionRecords.length > 0) {
+      if (versionRecords.length > 0 && target.kind === "Namespace") {
         context.call($useDependency, target, ...versionRecords);
       }
     }
   } else {
-    const service = findClientService(context.program, target);
-    if (service === undefined) {
-      reportDiagnostic(context.program, {
-        code: "client-service",
-        format: { name },
-        target: context.decoratorTarget,
-      });
-      return;
-    }
-    services = [service];
+    // No explicit service - store empty array. Cache.ts will either:
+    // - inherit from parent client (if nested)
+    // - report an error (if root client)
+    services = [];
   }
 
   const client: SdkClient = {
     kind: "SdkClient",
     name,
-    service: services.length === 1 ? services[0] : services,
     services,
     type: target,
-    subOperationGroups: [], // eslint-disable-line @typescript-eslint/no-deprecated
     subClients: [],
     clientPath: name,
   };
   setScopedDecoratorData(context, $client, clientKey, target, client, scope);
 };
-
-function judgeService(program: Program, type: Namespace): boolean {
-  return (
-    isService(program, type) ||
-    type.decorators.some(
-      (d) => d.definition?.name === "@service" && d.definition?.namespace.name === "TypeSpec",
-    )
-  );
-}
-
-function findClientService(program: Program, client: Namespace | Interface): Namespace | undefined {
-  let current: Namespace | undefined = client as any;
-  while (current) {
-    if (judgeService(program, current)) {
-      return current;
-    }
-    current = current.namespace;
-  }
-  return undefined;
-}
 
 /**
  * Return the client object for the given namespace or interface, or undefined if the given namespace or interface is not a client.
@@ -297,22 +268,17 @@ export function getClient(
   context: TCGCContext,
   type: Namespace | Interface,
 ): SdkClient | undefined {
-  for (const client of listClients(context)) {
-    if (client.type === type) {
-      return client;
-    }
-  }
-  return undefined;
+  return context.getClients().find((client) => client.type === type);
 }
 
 /**
- * List all the clients.
+ * List all the root clients.
  *
  * @param context TCGCContext
- * @returns Array of clients
+ * @returns Array of root clients
  */
 export function listClients(context: TCGCContext): SdkClient[] {
-  return context.getClients();
+  return context.getRootClients();
 }
 
 /**
@@ -323,79 +289,19 @@ export const $operationGroup: OperationGroupDecorator = (
   target: Namespace | Interface,
   scope?: LanguageScopes,
 ) => {
-  if ((context.decoratorTarget as Node).kind === SyntaxKind.AugmentDecoratorStatement) {
-    reportDiagnostic(context.program, {
-      code: "wrong-client-decorator",
-      target: context.decoratorTarget,
-    });
-    return;
-  }
-
-  // Store in operationGroupKey for backward compatibility
-  setScopedDecoratorData(
-    context,
-    $operationGroup,
-    operationGroupKey,
-    target,
-    {
-      kind: "SdkClient",
-      type: target,
-    },
-    scope,
-  );
+  // Delegate to $client - @operationGroup is now just an alias for @client
+  context.call($client, target, undefined, scope);
 };
 
 /**
- * @deprecated Use `getClient` instead. Check if a namespace/interface is a sub client.
- * @param context TCGCContext
- * @param type Type to check
- * @returns boolean
- */
-export function isOperationGroup(context: TCGCContext, type: Namespace | Interface): boolean {
-  if (hasExplicitClientOrOperationGroup(context)) {
-    return getScopedDecoratorData(context, operationGroupKey, type) !== undefined;
-  }
-  // if there is no explicit client, we will treat non-client namespaces and all interfaces as sub clients
-  if (type.kind === "Interface" && !isTemplateDeclaration(type)) {
-    return true;
-  }
-  if (
-    type.kind === "Namespace" &&
-    !type.decorators.some(
-      (d) => d.definition?.name === "@service" && d.definition?.namespace.name === "TypeSpec",
-    )
-  ) {
-    return true;
-  }
-  return false;
-}
-
-/**
- * @deprecated Use `getClient` to find sub clients instead.
- * Return the client object for the given namespace or interface (previously operation group).
- * @param context TCGCContext
- * @param type Type to check
- * @returns Client or undefined.
- */
-export function getOperationGroup(
-  context: TCGCContext,
-  type: Namespace | Interface,
-): SdkClient | undefined {
-  const client = context.getClientOrOperationGroup(type);
-  // Return sub clients (those with a parent)
-  return client?.parent !== undefined ? client : undefined;
-}
-
-/**
- * @deprecated Use `listSubClients` instead. This function returns sub clients as SdkClient[].
  * List all the sub clients inside a client. If ignoreHierarchy is true, the result will include all nested sub clients.
  *
  * @param context TCGCContext
  * @param group Client to list sub clients
  * @param ignoreHierarchy Whether to get all nested sub clients
- * @returns
+ * @returns Array of sub clients
  */
-export function listOperationGroups(
+export function listSubClients(
   context: TCGCContext,
   group: SdkClient,
   ignoreHierarchy = false,
@@ -422,7 +328,7 @@ export function listOperationGroups(
  * @param ignoreHierarchy Whether to get all nested operations
  * @returns
  */
-export function listOperationsInOperationGroup(
+export function listOperationsInClient(
   context: TCGCContext,
   group: SdkClient,
   ignoreHierarchy = false,

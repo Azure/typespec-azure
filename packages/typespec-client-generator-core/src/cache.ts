@@ -21,7 +21,6 @@ import {
   listAllUserDefinedNamespaces,
   listScopedDecoratorData,
   omitOperation,
-  operationGroupKey,
   removeVersionsLargerThanExplicitlySpecified,
 } from "./internal-utils.js";
 import { reportDiagnostic } from "./lib.js";
@@ -34,7 +33,7 @@ import { getLibraryName } from "./public-utils.js";
  */
 export function prepareClientAndOperationCache(context: TCGCContext): void {
   // initialize the caches
-  context.__rawClientsOperationGroupsCache = new Map<Namespace | Interface | string, SdkClient>();
+  context.__rawClientsCache = new Map<Namespace | Interface | string, SdkClient>();
   context.__operationToClientCache = new Map<Operation, SdkClient>();
   context.__clientToOperationsCache = new Map<SdkClient, Operation[]>();
 
@@ -104,6 +103,8 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   const subClientNameMap = new Map<string, SdkClient>();
   // Track merged sub clients and their original types for later operations processing
   const mergedSubClientTypes = new Map<SdkClient, (Namespace | Interface)[]>();
+  // Track root client types to avoid treating them as sub clients
+  const rootClientTypes = new Set<Namespace | Interface>(clients.map((c) => c.type));
 
   // create sub clients for each client
   for (const client of clients) {
@@ -127,7 +128,14 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       // iterate client's interfaces and namespaces to find sub clients
       if (type.kind === "Namespace") {
         for (const subItem of type.namespaces.values()) {
-          const sc = createSubClient(context, subItem, `${client.name}`, service, client);
+          const sc = createSubClient(
+            context,
+            subItem,
+            `${client.name}`,
+            service,
+            client,
+            rootClientTypes,
+          );
           if (sc && !handleMultipleServicesSubClientNameConflict(sc)) {
             subClients.push(sc);
           }
@@ -137,7 +145,14 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
             // Skip template interfaces
             continue;
           }
-          const sc = createSubClient(context, subItem, `${client.name}`, service, client);
+          const sc = createSubClient(
+            context,
+            subItem,
+            `${client.name}`,
+            service,
+            client,
+            rootClientTypes,
+          );
           if (sc && !handleMultipleServicesSubClientNameConflict(sc)) {
             subClients.push(sc);
           }
@@ -155,9 +170,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         } else {
           // Conflict detected, update the existing sub client to have multiple services
           existingSc.services.push(sc.services[0]);
-          existingSc.service = existingSc.services[0]; // eslint-disable-line @typescript-eslint/no-deprecated
           existingSc.subClients.push(...sc.subClients);
-          existingSc.subOperationGroups.push(...(sc.subOperationGroups as any[])); // eslint-disable-line @typescript-eslint/no-deprecated
           if (existingSc.type !== undefined) {
             mergedSubClientTypes.set(existingSc, [existingSc.type as Namespace | Interface]);
             (existingSc as any).type = undefined;
@@ -174,9 +187,8 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     }
 
     // build client's cache
-    context.__rawClientsOperationGroupsCache.set(client.type, client);
+    context.__rawClientsCache.set(client.type, client);
     client.subClients = subClients;
-    client.subOperationGroups = subClients as any[]; // eslint-disable-line @typescript-eslint/no-deprecated
     context.__clientToOperationsCache.set(client, []);
   }
 
@@ -206,10 +218,9 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
             // Sub client already exists - check if moving this operation would create a multi-service situation
             if (!existingSc.services.includes(operationService)) {
               existingSc.services.push(operationService);
-              existingSc.service = existingSc.services[0]; // eslint-disable-line @typescript-eslint/no-deprecated
             }
             // Operation will be moved to this existing sub client during operations processing
-            context.__rawClientsOperationGroupsCache!.set(v, existingSc);
+            context.__rawClientsCache!.set(v, existingSc);
             return;
           }
 
@@ -232,14 +243,12 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
           kind: "SdkClient",
           name: scName,
           clientPath: `${clients[0].name}.${scName}`,
-          service: services[0],
           services,
           type: undefined as any, // virtual sub client has no backing type
           subClients: [],
-          subOperationGroups: [], // eslint-disable-line @typescript-eslint/no-deprecated
           parent: clients[0],
         };
-        context.__rawClientsOperationGroupsCache!.set(scName, sc);
+        context.__rawClientsCache!.set(scName, sc);
         clients[0].subClients.push(sc);
         context.__clientToOperationsCache!.set(sc, []);
       });
@@ -278,13 +287,13 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       while (innerQueue.length > 0) {
         const ns = innerQueue.shift()!;
         for (const subNs of ns.namespaces.values()) {
-          if (!context.__rawClientsOperationGroupsCache.has(subNs)) {
+          if (!context.__rawClientsCache.has(subNs)) {
             operations.push(...subNs.operations.values());
             innerQueue.push(subNs);
           }
         }
         for (const iface of ns.interfaces.values()) {
-          if (!context.__rawClientsOperationGroupsCache.has(iface)) {
+          if (!context.__rawClientsCache.has(iface)) {
             operations.push(...iface.operations.values());
           }
         }
@@ -307,8 +316,8 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         const clientLocation = getClientLocation(context, op);
         if (clientLocation) {
           // operation with `@clientLocation` decorator is placed in another client
-          if (context.__rawClientsOperationGroupsCache.has(clientLocation)) {
-            pushGroup = context.__rawClientsOperationGroupsCache.get(clientLocation)!;
+          if (context.__rawClientsCache.has(clientLocation)) {
+            pushGroup = context.__rawClientsCache.get(clientLocation)!;
           } else {
             reportDiagnostic(context.program, {
               code: "client-location-wrong-type",
@@ -331,11 +340,10 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       group.subClients = group.subClients.filter((subClient) => {
         const keep = removeEmptyClients(subClient);
         if (!keep) {
-          context.__rawClientsOperationGroupsCache!.delete(subClient.type!);
+          context.__rawClientsCache!.delete(subClient.type!);
         }
         return keep;
       });
-      group.subOperationGroups = group.subClients as any[]; // eslint-disable-line @typescript-eslint/no-deprecated
 
       // check if the group has operations or non-empty sub clients
       const hasOperations = context.__clientToOperationsCache!.get(group)!.length > 0;
@@ -348,7 +356,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     for (const client of clients) {
       const keepClient = removeEmptyClients(client);
       if (!keepClient) {
-        context.__rawClientsOperationGroupsCache.delete(client.type);
+        context.__rawClientsCache.delete(client.type);
         context.__clientToOperationsCache.delete(client);
       }
     }
@@ -381,7 +389,20 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
     if (explicitClients.some((client) => isArm(client.services))) {
       context.arm = true;
     }
-    return explicitClients;
+    // Filter out clients whose type is nested inside another client's type.
+    // Those are sub clients (e.g., from @operationGroup which delegates to @client), not root clients.
+    const allClientTypes = new Set<Namespace | Interface>(
+      explicitClients.map((c: SdkClient) => c.type),
+    );
+    return explicitClients.filter((client: SdkClient) => {
+      let container: Namespace | undefined =
+        client.type.kind === "Interface" ? client.type.namespace : client.type.namespace;
+      while (container) {
+        if (allClientTypes.has(container)) return false;
+        container = container.namespace;
+      }
+      return true;
+    });
   }
 
   // if there is no explicit client, we will treat the first namespace with service decorator as client
@@ -407,10 +428,8 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
       {
         kind: "SdkClient",
         name: clientName,
-        service: service,
         services: [service],
         type: service,
-        subOperationGroups: [], // eslint-disable-line @typescript-eslint/no-deprecated
         subClients: [],
         clientPath: clientName,
       },
@@ -434,33 +453,38 @@ function createSubClient(
   clientPathPrefix: string,
   service: Namespace,
   parent?: SdkClient,
+  rootClientTypes?: Set<Namespace | Interface>,
 ): SdkClient | undefined {
   let subClient: SdkClient | undefined;
   const clientName = getLibraryName(context, type);
   const clientPath = `${clientPathPrefix}.${clientName}`;
 
   if (hasExplicitClientOrOperationGroup(context)) {
-    // Check for @operationGroup decorator on nested types
-    // Note: @client decorated types are root clients, not sub clients
-    const ogData = getScopedDecoratorData(context, operationGroupKey, type);
+    // Check for @client (or @operationGroup which delegates to @client) on nested types
+    // Skip types that are root clients (declared with @client at the top level)
+    const clientData = getScopedDecoratorData(context, clientKey, type);
 
-    if (ogData) {
+    if (clientData && !rootClientTypes?.has(type)) {
       subClient = {
         kind: "SdkClient",
         name: clientName,
         type,
         clientPath,
-        service: service, // eslint-disable-line @typescript-eslint/no-deprecated
         services: [service],
         subClients: [],
-        subOperationGroups: [], // eslint-disable-line @typescript-eslint/no-deprecated
         parent,
       } as SdkClient;
 
       if (type.kind === "Namespace") {
         subClient.subClients =
-          buildHierarchyOfSubClients(context, type, clientPath, service, subClient) ?? [];
-        subClient.subOperationGroups = subClient.subClients as any[]; // eslint-disable-line @typescript-eslint/no-deprecated
+          buildHierarchyOfSubClients(
+            context,
+            type,
+            clientPath,
+            service,
+            subClient,
+            rootClientTypes,
+          ) ?? [];
       }
     }
   } else {
@@ -471,10 +495,8 @@ function createSubClient(
         name: clientName,
         type,
         clientPath,
-        service: service,
         services: [service],
         subClients: [],
-        subOperationGroups: [], // eslint-disable-line @typescript-eslint/no-deprecated
         parent,
       };
     }
@@ -482,13 +504,12 @@ function createSubClient(
     if (subClient && type.kind === "Namespace") {
       subClient.subClients =
         buildHierarchyOfSubClients(context, type, clientPath, service, subClient) ?? [];
-      subClient.subOperationGroups = subClient.subClients as any[]; // eslint-disable-line @typescript-eslint/no-deprecated
     }
   }
 
   // build sub client's cache
   if (subClient) {
-    context.__rawClientsOperationGroupsCache!.set(subClient.type!, subClient);
+    context.__rawClientsCache!.set(subClient.type!, subClient);
     context.__clientToOperationsCache!.set(subClient, []);
   }
 
@@ -501,17 +522,32 @@ function buildHierarchyOfSubClients(
   clientPathPrefix: string,
   service: Namespace,
   parent?: SdkClient,
+  rootClientTypes?: Set<Namespace | Interface>,
 ): SdkClient[] | undefined {
   // build hierarchy of sub clients
   const subClients: SdkClient[] = [];
   type.namespaces.forEach((ns) => {
-    const subClient = createSubClient(context, ns, clientPathPrefix, service, parent);
+    const subClient = createSubClient(
+      context,
+      ns,
+      clientPathPrefix,
+      service,
+      parent,
+      rootClientTypes,
+    );
     if (subClient) {
       subClients.push(subClient);
     }
   });
   type.interfaces.forEach((i) => {
-    const subClient = createSubClient(context, i, clientPathPrefix, service, parent);
+    const subClient = createSubClient(
+      context,
+      i,
+      clientPathPrefix,
+      service,
+      parent,
+      rootClientTypes,
+    );
     if (subClient) {
       subClients.push(subClient);
     }

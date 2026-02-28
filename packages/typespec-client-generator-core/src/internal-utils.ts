@@ -113,7 +113,6 @@ export const clientNamespaceKey = createStateSymbol("clientNamespace");
 export const negationScopesKey = createStateSymbol("negationScopes");
 export const scopeKey = createStateSymbol("scope");
 export const clientKey = createStateSymbol("client");
-export const operationGroupKey = createStateSymbol("operationGroup");
 export const clientLocationKey = createStateSymbol("clientLocation");
 export const omitOperation = createStateSymbol("omitOperation");
 export const overrideKey = createStateSymbol("override");
@@ -128,10 +127,7 @@ export function hasExplicitClientOrOperationGroup(context: TCGCContext): boolean
     }
   });
 
-  return (
-    (explicitClients.size > 0 && !multiServices) ||
-    listScopedDecoratorData(context, operationGroupKey).size > 0
-  );
+  return explicitClients.size > 0 && !multiServices;
 }
 
 export function listScopedDecoratorData(

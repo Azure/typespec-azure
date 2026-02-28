@@ -2,11 +2,7 @@ import { Namespace } from "@typespec/compiler";
 import { expectDiagnostics } from "@typespec/compiler/testing";
 import { deepStrictEqual, ok, strictEqual } from "assert";
 import { it } from "vitest";
-import {
-  listClients,
-  listOperationGroups,
-  listOperationsInOperationGroup,
-} from "../../src/decorators.js";
+import { listClients, listOperationsInClient, listSubClients } from "../../src/decorators.js";
 import { SdkMethodResponse, UsageFlags } from "../../src/interfaces.js";
 import {
   AzureCoreTester,
@@ -1030,7 +1026,7 @@ it("multiple clients", async () => {
       v3,
     }
     
-    @client({name: "AClient"})
+    @client({name: "AClient", service: Contoso.WidgetManager})
     @test
     interface A {
       @route("/aa")
@@ -1042,7 +1038,7 @@ it("multiple clients", async () => {
       op ab(): void;
     }
 
-    @client({name: "BClient"})
+    @client({name: "BClient", service: Contoso.WidgetManager})
     @added(Versions.v2)
     @test
     interface B {
@@ -1063,7 +1059,7 @@ it("multiple clients", async () => {
   strictEqual(clients.length, 1);
   let aClient = clients.find((x) => x.name === "AClient");
   ok(aClient);
-  let aOps = listOperationsInOperationGroup(context, aClient);
+  let aOps = listOperationsInClient(context, aClient);
   strictEqual(aOps.length, 1);
   let aa = aOps.find((x) => x.name === "aa");
   ok(aa);
@@ -1077,7 +1073,7 @@ it("multiple clients", async () => {
   strictEqual(clients.length, 2);
   aClient = clients.find((x) => x.name === "AClient");
   ok(aClient);
-  aOps = listOperationsInOperationGroup(context, aClient);
+  aOps = listOperationsInClient(context, aClient);
   strictEqual(aOps.length, 2);
   aa = aOps.find((x) => x.name === "aa");
   ok(aa);
@@ -1085,7 +1081,7 @@ it("multiple clients", async () => {
   ok(ab);
   let bClient = clients.find((x) => x.name === "BClient");
   ok(bClient);
-  let bOps = listOperationsInOperationGroup(context, bClient);
+  let bOps = listOperationsInClient(context, bClient);
   strictEqual(bOps.length, 2);
   let ba = bOps.find((x) => x.name === "ba");
   ok(ba);
@@ -1101,13 +1097,13 @@ it("multiple clients", async () => {
   strictEqual(clients.length, 2);
   aClient = clients.find((x) => x.name === "AClient");
   ok(aClient);
-  aOps = listOperationsInOperationGroup(context, aClient);
+  aOps = listOperationsInClient(context, aClient);
   strictEqual(aOps.length, 1);
   aa = aOps.find((x) => x.name === "aa");
   ok(aa);
   bClient = clients.find((x) => x.name === "BClient");
   ok(bClient);
-  bOps = listOperationsInOperationGroup(context, bClient);
+  bOps = listOperationsInClient(context, bClient);
   strictEqual(bOps.length, 2);
   ba = bOps.find((x) => x.name === "ba");
   ok(ba);
@@ -1151,11 +1147,11 @@ it("multiple operation groups", async () => {
   strictEqual(clients.length, 1);
   let client = clients.find((x) => x.name === "WidgetManagerClient");
   ok(client);
-  let ops = listOperationGroups(context, client);
+  let ops = listSubClients(context, client);
   strictEqual(ops.length, 1);
   let aOp = ops.find((x) => x.type?.name === "A");
   ok(aOp);
-  let aOps = listOperationsInOperationGroup(context, aOp);
+  let aOps = listOperationsInClient(context, aOp);
   strictEqual(aOps.length, 1);
   let a = aOps.find((x) => x.name === "a");
   ok(a);
@@ -1169,17 +1165,17 @@ it("multiple operation groups", async () => {
   strictEqual(clients.length, 1);
   client = clients.find((x) => x.name === "WidgetManagerClient");
   ok(client);
-  ops = listOperationGroups(context, client);
+  ops = listSubClients(context, client);
   strictEqual(ops.length, 2);
   aOp = ops.find((x) => x.type?.name === "A");
   ok(aOp);
-  aOps = listOperationsInOperationGroup(context, aOp);
+  aOps = listOperationsInClient(context, aOp);
   strictEqual(aOps.length, 1);
   a = aOps.find((x) => x.name === "a");
   ok(a);
   const bOp = ops.find((x) => x.type?.name === "B");
   ok(bOp);
-  const bOps = listOperationsInOperationGroup(context, bOp);
+  const bOps = listOperationsInClient(context, bOp);
   strictEqual(bOps.length, 1);
   const b = bOps.find((x) => x.name === "b");
   ok(b);
@@ -1193,11 +1189,11 @@ it("multiple operation groups", async () => {
   strictEqual(clients.length, 1);
   client = clients.find((x) => x.name === "WidgetManagerClient");
   ok(client);
-  ops = listOperationGroups(context, client);
+  ops = listSubClients(context, client);
   strictEqual(ops.length, 1);
   aOp = ops.find((x) => x.type?.name === "A");
   ok(aOp);
-  aOps = listOperationsInOperationGroup(context, aOp);
+  aOps = listOperationsInClient(context, aOp);
   strictEqual(aOps.length, 1);
   a = aOps.find((x) => x.name === "a");
   ok(a);

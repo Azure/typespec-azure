@@ -55,8 +55,8 @@ import {
   getUsageOverride,
   isInScope,
   listClients,
-  listOperationGroups,
-  listOperationsInOperationGroup,
+  listOperationsInClient,
+  listSubClients,
   shouldFlattenProperty,
   shouldGenerateConvenient,
 } from "./decorators.js";
@@ -2050,12 +2050,12 @@ export function getAllReferencedTypes(
 export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
   for (const client of listClients(context)) {
-    for (const operation of listOperationsInOperationGroup(context, client)) {
+    for (const operation of listOperationsInClient(context, client)) {
       // operations on a client
       diagnostics.pipe(updateTypesFromOperation(context, operation));
     }
-    for (const sc of listOperationGroups(context, client, true)) {
-      for (const operation of listOperationsInOperationGroup(context, sc)) {
+    for (const sc of listSubClients(context, client, true)) {
+      for (const operation of listOperationsInClient(context, sc)) {
         // operations on operation groups
         diagnostics.pipe(updateTypesFromOperation(context, operation));
       }

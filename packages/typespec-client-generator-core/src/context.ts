@@ -122,18 +122,22 @@ export function createTCGCContext(
       return this.__packageVersionEnum!;
     },
     getClients(): SdkClient[] {
-      if (!this.__rawClientsOperationGroupsCache) {
+      if (!this.__rawClientsCache) {
         prepareClientAndOperationCache(this);
       }
-      return Array.from(this.__rawClientsOperationGroupsCache!.values()).filter(
-        (item) => !item.parent,
-      );
+      return Array.from(this.__rawClientsCache!.values());
     },
-    getClientOrOperationGroup(type: Namespace | Interface): SdkClient | undefined {
-      if (!this.__rawClientsOperationGroupsCache) {
+    getRootClients(): SdkClient[] {
+      if (!this.__rawClientsCache) {
         prepareClientAndOperationCache(this);
       }
-      return this.__rawClientsOperationGroupsCache!.get(type);
+      return Array.from(this.__rawClientsCache!.values()).filter((item) => !item.parent);
+    },
+    getClient(type: Namespace | Interface): SdkClient | undefined {
+      if (!this.__rawClientsCache) {
+        prepareClientAndOperationCache(this);
+      }
+      return this.__rawClientsCache!.get(type);
     },
     getOperationsForClient(client: SdkClient): Operation[] {
       if (!this.__clientToOperationsCache) {

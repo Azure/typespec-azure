@@ -23,7 +23,7 @@ it("namespace doesn't end in client", async () => {
   await tester
     .expect(
       `
-      @client
+      @client({service: MyService})
       @service
       namespace MyService;
       `,
@@ -41,7 +41,7 @@ it("explicit client name doesn't ends with Client", async () => {
   await tester
     .expect(
       `
-      @client({name: "MySDK"})
+      @client({name: "MySDK", service: MyService})
       @service
       namespace MyService;
       `,

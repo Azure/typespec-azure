@@ -215,13 +215,13 @@ it("client with sub client and sub client has extra initialization paramters", a
             largePersonGroupId: string;
           }
 
-          @operationGroup
+          @client
           @clientInitialization(LargeFaceListClientOptions)
           interface LargeFaceList {
             get is Face.FaceListOperations.getLargeFaceList;
           }
 
-          @operationGroup
+          @client
           @clientInitialization(LargePersonGroupClientOptions)
           interface LargePersonGroup {
             get is Face.PersonGroupOperations.getLargePersonGroup;
@@ -633,7 +633,7 @@ it("empty namespace with empty subclient", async () => {
 
 it("explicit clients with only models should not be filtered out", async () => {
   const { program } = await AzureCoreTester.compile(`
-    @client
+    @client({service: Foo})
     @service
     namespace Foo {
       model B {}
@@ -646,7 +646,6 @@ it("explicit clients with only models should not be filtered out", async () => {
 
 it("operationGroup", async () => {
   const { program } = await SimpleTesterWithService.compile(`
-    @operationGroup
     namespace MyOperationGroup {
       op func(): void;
     }

@@ -5,7 +5,6 @@ import {
   getClientInitializationOptions,
   getClientNameOverride,
   getClientNamespace,
-  listOperationGroups,
 } from "./decorators.js";
 import { getSdkHttpParameter } from "./http.js";
 import {
@@ -216,7 +215,7 @@ export function createSdkClientType<TServiceOperation extends SdkServiceOperatio
     createSdkMethods<TServiceOperation>(context, client, sdkClientType),
   );
   // Handle sub-clients
-  for (const subClient of listOperationGroups(context, client)) {
+  for (const subClient of client.subClients) {
     const subClientType = diagnostics.pipe(
       createSdkClientType<TServiceOperation>(context, subClient, sdkClientType),
     );
@@ -247,7 +246,7 @@ function addDefaultClientParameters<
     .get(client.__raw)
     ?.find((x) => x.isApiVersionParam);
   if (!apiVersionParam) {
-    for (const sc of listOperationGroups(context, client.__raw)) {
+    for (const sc of client.__raw.subClients) {
       // if any sub operation groups have an api version param, the top level needs
       // the api version param as well
       apiVersionParam = context.__clientParametersCache.get(sc)?.find((x) => x.isApiVersionParam);
@@ -280,7 +279,7 @@ function addDefaultClientParameters<
     .get(client.__raw)
     ?.find((x) => isSubscriptionId(context, x));
   if (!subId && context.arm) {
-    for (const sc of listOperationGroups(context, client.__raw)) {
+    for (const sc of client.__raw.subClients) {
       // if any sub operation groups have an subId param, the top level needs it as well
       subId = context.__clientParametersCache.get(sc)?.find((x) => isSubscriptionId(context, x));
       if (subId) {

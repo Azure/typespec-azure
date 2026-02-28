@@ -38,9 +38,9 @@ import {
   getClientNameOverride,
   getIsApiVersion,
   getOverriddenClientMethod,
+  listOperationsInClient,
   listClients,
-  listOperationGroups,
-  listOperationsInOperationGroup,
+  listSubClients,
 } from "./decorators.js";
 import {
   DecoratedType,
@@ -383,14 +383,14 @@ function findContextPath(
     }
   }
   for (const client of listClients(context)) {
-    for (const operation of listOperationsInOperationGroup(context, client)) {
+    for (const operation of listOperationsInClient(context, client)) {
       const result = getContextPath(context, operation, type);
       if (result.length > 0) {
         return result;
       }
     }
-    for (const og of listOperationGroups(context, client, true)) {
-      for (const operation of listOperationsInOperationGroup(context, og)) {
+    for (const og of listSubClients(context, client, true)) {
+      for (const operation of listOperationsInClient(context, og)) {
         const result = getContextPath(context, operation, type);
         if (result.length > 0) {
           return result;
