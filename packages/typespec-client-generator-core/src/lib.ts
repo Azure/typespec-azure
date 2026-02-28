@@ -186,7 +186,7 @@ export const $lib = createTypeSpecLibrary({
     "wrong-client-decorator": {
       severity: "warning",
       messages: {
-        default: "@client or @operationGroup should decorate namespace or interface in client.tsp",
+        default: "@client should decorate namespace or interface in client.tsp",
       },
     },
     "unsupported-kind": {
@@ -387,8 +387,7 @@ export const $lib = createTypeSpecLibrary({
     "client-location-conflict": {
       severity: "warning",
       messages: {
-        default:
-          "When there is `@client` or `@operationGroup` decorator, `@clientLocation` decorator will be ignored.",
+        default: "When there is `@client` decorator, `@clientLocation` decorator will be ignored.",
         operationToOperation:
           "`@clientLocation` cannot be used to move an operation to another operation. Operations can only be moved to interfaces or namespaces.",
         modelPropertyToClientInitialization: paramMessage`There is already a parameter called '${"parameterName"}' in the client initialization.`,

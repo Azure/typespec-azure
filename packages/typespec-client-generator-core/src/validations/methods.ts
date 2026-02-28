@@ -2,19 +2,19 @@ import { getClientNameOverride } from "../decorators.js";
 import { TCGCContext } from "../interfaces.js";
 import {
   clientLocationKey,
-  hasExplicitClientOrOperationGroup,
+  hasExplicitClient,
   listScopedDecoratorData,
   overrideKey,
 } from "../internal-utils.js";
 import { reportDiagnostic } from "../lib.js";
 
 export function validateMethods(context: TCGCContext) {
-  validateNoClientLocationWithClientOrOperationGroup(context);
+  validateNoClientLocationWithClient(context);
   validateClientNameNotOnOverriddenMethods(context);
 }
 
-function validateNoClientLocationWithClientOrOperationGroup(context: TCGCContext) {
-  if (context.program.stateMap(clientLocationKey) && hasExplicitClientOrOperationGroup(context)) {
+function validateNoClientLocationWithClient(context: TCGCContext) {
+  if (context.program.stateMap(clientLocationKey) && hasExplicitClient(context)) {
     for (const [op, _] of context.program.stateMap(clientLocationKey)) {
       reportDiagnostic(context.program, {
         code: "client-location-conflict",

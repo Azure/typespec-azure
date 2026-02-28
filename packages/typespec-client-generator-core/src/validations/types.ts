@@ -21,7 +21,7 @@ import {
   AllScopes,
   clientLocationKey,
   clientNameKey,
-  hasExplicitClientOrOperationGroup,
+  hasExplicitClient,
   listScopedDecoratorData,
 } from "../internal-utils.js";
 import { reportDiagnostic } from "../lib.js";
@@ -40,8 +40,8 @@ export function validateTypes(context: TCGCContext) {
  */
 function validateClientNames(tcgcContext: TCGCContext) {
   const languageScopes = getDefinedLanguageScopes(tcgcContext.program);
-  // If no `@client` or `@operationGroup` decorators are defined, we consider `@clientLocation`
-  const needToConsiderClientLocation = !hasExplicitClientOrOperationGroup(tcgcContext);
+  // If no `@client` decorators are defined, we consider `@clientLocation`
+  const needToConsiderClientLocation = !hasExplicitClient(tcgcContext);
   // Check all possible language scopes
   for (const scope of languageScopes) {
     // Gather all moved operations and their targets

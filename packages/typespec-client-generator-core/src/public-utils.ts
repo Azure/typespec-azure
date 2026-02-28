@@ -38,8 +38,8 @@ import {
   getClientNameOverride,
   getIsApiVersion,
   getOverriddenClientMethod,
-  listOperationsInClient,
   listClients,
+  listOperationsInClient,
   listSubClients,
 } from "./decorators.js";
 import {
@@ -65,7 +65,7 @@ import {
   TspLiteralType,
   getHttpBodyType,
   getHttpOperationResponseHeaders,
-  hasExplicitClientOrOperationGroup,
+  hasExplicitClient,
   hasNoneVisibility,
   isAzureCoreTspModel,
   listAllUserDefinedNamespaces,
@@ -389,8 +389,8 @@ function findContextPath(
         return result;
       }
     }
-    for (const og of listSubClients(context, client, true)) {
-      for (const operation of listOperationsInClient(context, og)) {
+    for (const subClient of listSubClients(context, client, true)) {
+      for (const operation of listOperationsInClient(context, subClient)) {
         const result = getContextPath(context, operation, type);
         if (result.length > 0) {
           return result;
@@ -872,7 +872,7 @@ export function resolveOperationId(
 
   const clientLocation = getClientLocation(context, operation);
 
-  if (!hasExplicitClientOrOperationGroup(context) && clientLocation) {
+  if (!hasExplicitClient(context) && clientLocation) {
     if (typeof clientLocation === "string") {
       return `${clientLocation}_${operationName}`;
     }

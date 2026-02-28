@@ -81,7 +81,7 @@ import {
   findEntriesWithTarget,
   findRootSourceProperty,
   getScopedDecoratorData,
-  hasExplicitClientOrOperationGroup,
+  hasExplicitClient,
   isSameAuth,
   isSameServers,
   listAllUserDefinedNamespaces,
@@ -1441,8 +1441,8 @@ export function getClientLocation(
   context: TCGCContext,
   input: Operation | ModelProperty,
 ): Namespace | Interface | Operation | string | undefined {
-  // if there is `@client` or `@operationGroup` decorator, `@clientLocation` on operation will be ignored
-  if (input.kind === "Operation" && hasExplicitClientOrOperationGroup(context)) {
+  // if there is `@client` decorator, `@clientLocation` on operation will be ignored
+  if (input.kind === "Operation" && hasExplicitClient(context)) {
     return undefined;
   }
   return getScopedDecoratorData(context, clientLocationKey, input);

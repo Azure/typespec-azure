@@ -17,7 +17,7 @@ import {
   clientLocationKey,
   findServiceForOperation,
   getScopedDecoratorData,
-  hasExplicitClientOrOperationGroup,
+  hasExplicitClient,
   listAllUserDefinedNamespaces,
   listScopedDecoratorData,
   omitOperation,
@@ -193,8 +193,8 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   }
 
   // create sub client for `@clientLocation` of string value
-  // if no explicit `@client` or `@operationGroup`
-  if (!hasExplicitClientOrOperationGroup(context)) {
+  // if no explicit `@client`
+  if (!hasExplicitClient(context)) {
     const newSubClientWithServices = new Map<string, Namespace[]>();
     listScopedDecoratorData(context, clientLocationKey).forEach((v, k) => {
       // only deal with mutated types or without mutation
@@ -279,10 +279,10 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       operations.push(...group.type.operations.values());
     }
 
-    // when there is explicitly `@operationGroup` or `@client`
-    // operations under namespace or interface that are not decorated with `@operationGroup` or `@client`
+    // when there is explicitly `@client`
+    // operations under namespace or interface that are not decorated with `@client`
     // should be placed in the first accessor client or sub client
-    if (group.type?.kind === "Namespace" && hasExplicitClientOrOperationGroup(context)) {
+    if (group.type?.kind === "Namespace" && hasExplicitClient(context)) {
       const innerQueue: Namespace[] = [group.type];
       while (innerQueue.length > 0) {
         const ns = innerQueue.shift()!;
@@ -334,7 +334,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   }
 
   // omit empty clients
-  if (!hasExplicitClientOrOperationGroup(context)) {
+  if (!hasExplicitClient(context)) {
     const removeEmptyClients = (group: SdkClient): boolean => {
       // recursively check and remove empty sub clients
       group.subClients = group.subClients.filter((subClient) => {
@@ -390,7 +390,7 @@ function getOrCreateClients(context: TCGCContext): SdkClient[] {
       context.arm = true;
     }
     // Filter out clients whose type is nested inside another client's type.
-    // Those are sub clients (e.g., from @operationGroup which delegates to @client), not root clients.
+    // Those are sub clients, not root clients.
     const allClientTypes = new Set<Namespace | Interface>(
       explicitClients.map((c: SdkClient) => c.type),
     );
@@ -459,8 +459,8 @@ function createSubClient(
   const clientName = getLibraryName(context, type);
   const clientPath = `${clientPathPrefix}.${clientName}`;
 
-  if (hasExplicitClientOrOperationGroup(context)) {
-    // Check for @client (or @operationGroup which delegates to @client) on nested types
+  if (hasExplicitClient(context)) {
+    // Check for @client on nested types
     // Skip types that are root clients (declared with @client at the top level)
     const clientData = getScopedDecoratorData(context, clientKey, type);
 
