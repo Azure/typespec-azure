@@ -17,8 +17,13 @@ describe("replaceResponse", () => {
         @@override(getData, replaceResponse(getData, CustomResponse));
       `);
 
-      const nonExperimentalDiags = diagnostics.filter(d => d.code !== "experimental-feature");
-      strictEqual(nonExperimentalDiags.length, 0, "Should have no errors: " + JSON.stringify(nonExperimentalDiags.map(d => ({code: d.code, message: d.message}))));
+      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
+      strictEqual(
+        nonExperimentalDiags.length,
+        0,
+        "Should have no errors: " +
+          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
+      );
     });
 
     it("can use replaceResponse result in alias", async () => {
@@ -33,8 +38,13 @@ describe("replaceResponse", () => {
         alias modifiedOp = replaceResponse(getData, CustomResponse);
       `);
 
-      const nonExperimentalDiags = diagnostics.filter(d => d.code !== "experimental-feature");
-      strictEqual(nonExperimentalDiags.length, 0, "Should have no errors: " + JSON.stringify(nonExperimentalDiags.map(d => ({code: d.code, message: d.message}))));
+      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
+      strictEqual(
+        nonExperimentalDiags.length,
+        0,
+        "Should have no errors: " +
+          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
+      );
     });
   });
 
@@ -57,8 +67,13 @@ describe("replaceResponse", () => {
         @@override(myOp, replaceResponse(step1, CustomResponse));
       `);
 
-      const nonExperimentalDiags = diagnostics.filter(d => d.code !== "experimental-feature");
-      strictEqual(nonExperimentalDiags.length, 0, "Should have no errors: " + JSON.stringify(nonExperimentalDiags.map(d => ({code: d.code, message: d.message}))));
+      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
+      strictEqual(
+        nonExperimentalDiags.length,
+        0,
+        "Should have no errors: " +
+          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
+      );
     });
   });
 
@@ -77,8 +92,13 @@ describe("replaceResponse", () => {
         @@override(MyService.getData, replaceResponse(MyService.getData, CustomResponse));
       `);
 
-      const nonExperimentalDiags = diagnostics.filter(d => d.code !== "experimental-feature");
-      strictEqual(nonExperimentalDiags.length, 0, "Should have no errors: " + JSON.stringify(nonExperimentalDiags.map(d => ({code: d.code, message: d.message}))));
+      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
+      strictEqual(
+        nonExperimentalDiags.length,
+        0,
+        "Should have no errors: " +
+          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
+      );
     });
 
     it("works with language-specific scope", async () => {
@@ -93,8 +113,13 @@ describe("replaceResponse", () => {
         @@override(getData, replaceResponse(getData, PythonResponse), "python");
       `);
 
-      const nonExperimentalDiags = diagnostics.filter(d => d.code !== "experimental-feature");
-      strictEqual(nonExperimentalDiags.length, 0, "Should have no errors: " + JSON.stringify(nonExperimentalDiags.map(d => ({code: d.code, message: d.message}))));
+      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
+      strictEqual(
+        nonExperimentalDiags.length,
+        0,
+        "Should have no errors: " +
+          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
+      );
     });
   });
 });

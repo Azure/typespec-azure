@@ -16,8 +16,13 @@ describe("addParameter", () => {
         @@override(myOp, addParameter(myOp, ExtraParams.tracingId));
       `);
 
-      const nonExperimentalDiags = diagnostics.filter(d => d.code !== "experimental-feature");
-      strictEqual(nonExperimentalDiags.length, 0, "Should have no errors: " + JSON.stringify(nonExperimentalDiags.map(d => ({code: d.code, message: d.message}))));
+      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
+      strictEqual(
+        nonExperimentalDiags.length,
+        0,
+        "Should have no errors: " +
+          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
+      );
     });
 
     it("can use addParameter result in alias", async () => {
@@ -32,8 +37,13 @@ describe("addParameter", () => {
         alias modifiedOp = addParameter(myOp, ExtraParams.newParam);
       `);
 
-      const nonExperimentalDiags = diagnostics.filter(d => d.code !== "experimental-feature");
-      strictEqual(nonExperimentalDiags.length, 0, "Should have no errors: " + JSON.stringify(nonExperimentalDiags.map(d => ({code: d.code, message: d.message}))));
+      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
+      strictEqual(
+        nonExperimentalDiags.length,
+        0,
+        "Should have no errors: " +
+          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
+      );
     });
   });
 
@@ -53,8 +63,13 @@ describe("addParameter", () => {
         @@override(myOp, addParameter(step1, NewParams.newParam));
       `);
 
-      const nonExperimentalDiags = diagnostics.filter(d => d.code !== "experimental-feature");
-      strictEqual(nonExperimentalDiags.length, 0, "Should have no errors: " + JSON.stringify(nonExperimentalDiags.map(d => ({code: d.code, message: d.message}))));
+      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
+      strictEqual(
+        nonExperimentalDiags.length,
+        0,
+        "Should have no errors: " +
+          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
+      );
     });
   });
 
@@ -76,8 +91,13 @@ describe("addParameter", () => {
         alias modifiedOp = addParameter(MyService.myOp, ExtraParams.extraParam);
       `);
 
-      const nonExperimentalDiags = diagnostics.filter(d => d.code !== "experimental-feature");
-      strictEqual(nonExperimentalDiags.length, 0, "Should have no errors: " + JSON.stringify(nonExperimentalDiags.map(d => ({code: d.code, message: d.message}))));
+      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
+      strictEqual(
+        nonExperimentalDiags.length,
+        0,
+        "Should have no errors: " +
+          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
+      );
     });
 
     it("works with language-specific scope", async () => {
@@ -92,8 +112,13 @@ describe("addParameter", () => {
         @@override(myOp, addParameter(myOp, ExtraParams.pythonOnlyParam), "python");
       `);
 
-      const nonExperimentalDiags = diagnostics.filter(d => d.code !== "experimental-feature");
-      strictEqual(nonExperimentalDiags.length, 0, "Should have no errors: " + JSON.stringify(nonExperimentalDiags.map(d => ({code: d.code, message: d.message}))));
+      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
+      strictEqual(
+        nonExperimentalDiags.length,
+        0,
+        "Should have no errors: " +
+          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
+      );
     });
 
     it("adds multiple parameters via chaining", async () => {
@@ -111,8 +136,13 @@ describe("addParameter", () => {
         @@override(myOp, addParameter(step1, ExtraParams.param2));
       `);
 
-      const nonExperimentalDiags = diagnostics.filter(d => d.code !== "experimental-feature");
-      strictEqual(nonExperimentalDiags.length, 0, "Should have no errors: " + JSON.stringify(nonExperimentalDiags.map(d => ({code: d.code, message: d.message}))));
+      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
+      strictEqual(
+        nonExperimentalDiags.length,
+        0,
+        "Should have no errors: " +
+          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
+      );
     });
   });
 });

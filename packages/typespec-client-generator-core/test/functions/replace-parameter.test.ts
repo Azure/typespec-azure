@@ -7,7 +7,7 @@ describe("replaceParameter", () => {
     it("makes an optional parameter required via @@override", async () => {
       // This is the primary use case from the gist:
       // Making maxResults required when it was optional
-      const [{ program }, diagnostics] = await SimpleTesterWithService.compileAndDiagnose(`
+      const diagnostics = await SimpleTesterWithService.diagnose(`
         op getSecrets(@query maxResults?: int32): void;
 
         model RequiredMaxResults {
@@ -29,7 +29,7 @@ describe("replaceParameter", () => {
     });
 
     it("makes multiple parameters required via chained replaceParameter calls", async () => {
-      const [{ program }, diagnostics] = await SimpleTesterWithService.compileAndDiagnose(`
+      const diagnostics = await SimpleTesterWithService.diagnose(`
         op search(@query query?: string, @query limit?: int32, @query offset?: int32): void;
 
         model RequiredParams {
@@ -55,7 +55,7 @@ describe("replaceParameter", () => {
 
   describe("error handling", () => {
     it("reports error when parameter not found", async () => {
-      const [, diagnostics] = await SimpleTesterWithService.compileAndDiagnose(`
+      const diagnostics = await SimpleTesterWithService.diagnose(`
         op myOp(@query existingParam: string): void;
 
         model NewParams {
@@ -84,7 +84,7 @@ describe("replaceParameter", () => {
 
   describe("basic usage with alias", () => {
     it("can use replaceParameter result in alias", async () => {
-      const [{ program }, diagnostics] = await SimpleTesterWithService.compileAndDiagnose(`
+      const diagnostics = await SimpleTesterWithService.diagnose(`
         op myOp(@query param1: string, @query param2?: int32): void;
 
         model NewParams {
@@ -107,7 +107,7 @@ describe("replaceParameter", () => {
 
   describe("corner cases", () => {
     it("works with operation that has single parameter", async () => {
-      const [{ program }, diagnostics] = await SimpleTesterWithService.compileAndDiagnose(`
+      const diagnostics = await SimpleTesterWithService.diagnose(`
         op singleParam(@query param?: int32): void;
 
         model RequiredParam {
@@ -128,7 +128,7 @@ describe("replaceParameter", () => {
     });
 
     it("preserves other parameters when replacing one", async () => {
-      const [{ program }, diagnostics] = await SimpleTesterWithService.compileAndDiagnose(`
+      const diagnostics = await SimpleTesterWithService.diagnose(`
         op multiParam(
           @query param1: string,
           @query param2?: int32,
@@ -153,7 +153,7 @@ describe("replaceParameter", () => {
     });
 
     it("works with path parameters", async () => {
-      const [{ program }, diagnostics] = await SimpleTesterWithService.compileAndDiagnose(`
+      const diagnostics = await SimpleTesterWithService.diagnose(`
         @route("/items/{id}")
         op getItem(@path id?: string): void;
 
@@ -175,7 +175,7 @@ describe("replaceParameter", () => {
     });
 
     it("works with header parameters", async () => {
-      const [{ program }, diagnostics] = await SimpleTesterWithService.compileAndDiagnose(`
+      const diagnostics = await SimpleTesterWithService.diagnose(`
         op headerOp(@header("X-Custom-Header") customHeader?: string): void;
 
         model RequiredHeader {
@@ -198,7 +198,7 @@ describe("replaceParameter", () => {
 
   describe("scoped usage", () => {
     it("works with language-specific scope", async () => {
-      const [{ program }, diagnostics] = await SimpleTesterWithService.compileAndDiagnose(`
+      const diagnostics = await SimpleTesterWithService.diagnose(`
         op getSecrets(@query maxResults?: int32): void;
 
         model RequiredMaxResults {
@@ -221,7 +221,7 @@ describe("replaceParameter", () => {
 
   describe("complex scenarios", () => {
     it("works with operations in interface", async () => {
-      const [{ program }, diagnostics] = await SimpleTesterWithService.compileAndDiagnose(`
+      const diagnostics = await SimpleTesterWithService.diagnose(`
         interface KeyVault {
           op getSecrets(@query maxResults?: int32): void;
         }
@@ -244,7 +244,7 @@ describe("replaceParameter", () => {
     });
 
     it("works with operations in nested namespace", async () => {
-      const [{ program }, diagnostics] = await SimpleTesterWithService.compileAndDiagnose(`
+      const diagnostics = await SimpleTesterWithService.diagnose(`
         namespace Inner {
           op getSecrets(@query maxResults?: int32): void;
         }
@@ -267,7 +267,7 @@ describe("replaceParameter", () => {
     });
 
     it("chain three replaceParameter calls", async () => {
-      const [{ program }, diagnostics] = await SimpleTesterWithService.compileAndDiagnose(`
+      const diagnostics = await SimpleTesterWithService.diagnose(`
         op complexOp(
           @query param1?: string,
           @query param2?: int32,

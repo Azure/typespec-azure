@@ -1185,4 +1185,3 @@ extern dec clientOption(
   value: valueof unknown,
   scope?: valueof string
 );
-

@@ -29,10 +29,7 @@ function cloneOperation(
 }
 
 // Helper function to clone a model property
-function cloneModelProperty(
-  tk: ReturnType<typeof $>,
-  prop: ModelProperty,
-): ModelProperty {
+function cloneModelProperty(tk: ReturnType<typeof $>, prop: ModelProperty): ModelProperty {
   const clonedProp = tk.modelProperty.create({
     name: prop.name,
     type: prop.type,
