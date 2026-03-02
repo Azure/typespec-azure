@@ -1128,7 +1128,6 @@ export function getClientTypeWithDiagnostics(
       }
       retval = diagnostics.pipe(getSdkUnionWithDiagnostics(context, type, operation));
       break;
-      1082;
     case "ModelProperty":
       const alternateType = getSdkTypeFromAlternateType(context, type, operation);
       retval =
