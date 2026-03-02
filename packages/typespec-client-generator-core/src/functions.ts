@@ -1,6 +1,50 @@
-import { FunctionContext, ModelProperty, Operation } from "@typespec/compiler";
+import { FunctionContext, ModelProperty, Operation, Type } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { reportDiagnostic } from "./lib.js";
+
+// Helper function to clone an operation with new parameters and/or return type
+function cloneOperation(
+  tk: ReturnType<typeof $>,
+  operation: Operation,
+  options: {
+    parameters?: ModelProperty[];
+    returnType?: Type;
+  },
+): Operation {
+  const newOp = tk.operation.create({
+    name: operation.name,
+    parameters: options.parameters ?? [...operation.parameters.properties.values()],
+    returnType: options.returnType ?? operation.returnType,
+  });
+
+  // Copy decorators from the original operation
+  if (operation.decorators) {
+    (newOp as any).decorators = [...operation.decorators];
+  }
+
+  // Set the source operation for tracing
+  (newOp as any).sourceOperation = operation.sourceOperation ?? operation;
+
+  return newOp;
+}
+
+// Helper function to clone a model property
+function cloneModelProperty(
+  tk: ReturnType<typeof $>,
+  prop: ModelProperty,
+): ModelProperty {
+  const clonedProp = tk.modelProperty.create({
+    name: prop.name,
+    type: prop.type,
+    optional: prop.optional,
+    defaultValue: prop.defaultValue,
+  });
+  // Copy decorators from the original property
+  if (prop.decorators) {
+    (clonedProp as any).decorators = [...prop.decorators];
+  }
+  return clonedProp;
+}
 
 /**
  * Replace a parameter in an operation with a new parameter definition or remove it entirely.
@@ -41,50 +85,67 @@ export function replaceParameter(
     if (name === selectorName) {
       // If replacement is provided (not void/undefined), add it
       if (replacement !== undefined) {
-        // Create a new property with the replacement's characteristics
-        const newProp = tk.modelProperty.create({
-          name: replacement.name,
-          type: replacement.type,
-          optional: replacement.optional,
-          defaultValue: replacement.defaultValue,
-        });
-        // Copy decorators from the replacement if they exist
-        if (replacement.decorators) {
-          (newProp as any).decorators = [...replacement.decorators];
-        }
-        newProperties.push(newProp);
+        newProperties.push(cloneModelProperty(tk, replacement));
       }
       // If replacement is undefined (void), we skip adding this parameter (removal)
     } else {
-      // Clone the existing property to avoid referencing the original
-      const clonedProp = tk.modelProperty.create({
-        name: prop.name,
-        type: prop.type,
-        optional: prop.optional,
-        defaultValue: prop.defaultValue,
-      });
-      // Copy decorators from the original property
-      if (prop.decorators) {
-        (clonedProp as any).decorators = [...prop.decorators];
-      }
-      newProperties.push(clonedProp);
+      newProperties.push(cloneModelProperty(tk, prop));
     }
   }
 
-  // Create the new operation using the typekit
-  const newOp = tk.operation.create({
-    name: operation.name,
-    parameters: newProperties,
-    returnType: operation.returnType,
-  });
+  return cloneOperation(tk, operation, { parameters: newProperties });
+}
 
-  // Copy decorators from the original operation
-  if (operation.decorators) {
-    (newOp as any).decorators = [...operation.decorators];
+/**
+ * Replace the return type of an operation with a new type.
+ *
+ * @param context The function context provided by TypeSpec
+ * @param operation The operation to transform
+ * @param returnType The new return type for the operation
+ * @returns A new operation with the return type replaced
+ */
+export function replaceResponse(
+  context: FunctionContext,
+  operation: Operation,
+  returnType: Type,
+): Operation {
+  const program = context.program;
+  const tk = $(program);
+
+  // Clone all parameters
+  const newProperties: ModelProperty[] = [];
+  for (const prop of operation.parameters.properties.values()) {
+    newProperties.push(cloneModelProperty(tk, prop));
   }
 
-  // Set the source operation for tracing
-  (newOp as any).sourceOperation = operation.sourceOperation ?? operation;
+  return cloneOperation(tk, operation, {
+    parameters: newProperties,
+    returnType: returnType,
+  });
+}
 
-  return newOp;
+/**
+ * Add a new parameter to an operation.
+ *
+ * @param context The function context provided by TypeSpec
+ * @param operation The operation to transform
+ * @param parameter The parameter to add to the operation
+ * @returns A new operation with the parameter added
+ */
+export function addParameter(
+  context: FunctionContext,
+  operation: Operation,
+  parameter: ModelProperty,
+): Operation {
+  const program = context.program;
+  const tk = $(program);
+
+  // Clone all existing parameters and add the new one
+  const newProperties: ModelProperty[] = [];
+  for (const prop of operation.parameters.properties.values()) {
+    newProperties.push(cloneModelProperty(tk, prop));
+  }
+  newProperties.push(cloneModelProperty(tk, parameter));
+
+  return cloneOperation(tk, operation, { parameters: newProperties });
 }

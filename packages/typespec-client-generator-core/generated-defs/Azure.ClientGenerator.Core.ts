@@ -1161,6 +1161,65 @@ export type ReplaceParameterFunctionImplementation = (
   replacement: Type,
 ) => Operation;
 
+/**
+ * Replace the return type of an operation with a new type.
+ * This function creates a new operation with the return type replaced,
+ * enabling composable transformations without mutating the original operation.
+ *
+ * @param operation The operation to transform.
+ * @param returnType The new return type for the operation.
+ * @returns A new operation with the return type replaced.
+ * @example Changing the return type to a custom model
+ * ```typespec
+ * model CustomResponse {
+ *   data: string;
+ *   metadata: Record<string>;
+ * }
+ *
+ * @@override(MyService.getData, replaceResponse(MyService.getData, CustomResponse));
+ * ```
+ * @example Chaining with replaceParameter
+ * ```typespec
+ * alias Step1 = replaceParameter(MyService.myOp, "oldParam", NewParams.newParam);
+ * @@override(MyService.myOp, replaceResponse(Step1, CustomResponse));
+ * ```
+ */
+export type ReplaceResponseFunctionImplementation = (
+  context: FunctionContext,
+  operation: Operation,
+  returnType: Type,
+) => Operation;
+
+/**
+ * Add a new parameter to an operation.
+ * This function creates a new operation with the additional parameter appended,
+ * enabling composable transformations without mutating the original operation.
+ *
+ * @param operation The operation to transform.
+ * @param parameter The parameter to add to the operation.
+ * @returns A new operation with the parameter added.
+ * @example Adding a required parameter
+ * ```typespec
+ * model ExtraParams {
+ *   @header tracingId: string;
+ * }
+ *
+ * @@override(MyService.myOp, addParameter(MyService.myOp, ExtraParams.tracingId));
+ * ```
+ * @example Chaining with replaceParameter
+ * ```typespec
+ * alias Step1 = replaceParameter(MyService.myOp, "oldParam", void);
+ * @@override(MyService.myOp, addParameter(Step1, NewParams.newParam));
+ * ```
+ */
+export type AddParameterFunctionImplementation = (
+  context: FunctionContext,
+  operation: Operation,
+  parameter: ModelProperty,
+) => Operation;
+
 export type AzureClientGeneratorCoreFunctions = {
   replaceParameter: ReplaceParameterFunctionImplementation;
+  replaceResponse: ReplaceResponseFunctionImplementation;
+  addParameter: AddParameterFunctionImplementation;
 };

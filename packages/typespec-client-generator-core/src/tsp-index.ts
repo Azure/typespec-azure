@@ -33,7 +33,7 @@ import {
   $usage,
   $useSystemTextJsonConverter,
 } from "./decorators.js";
-import { replaceParameter } from "./functions.js";
+import { addParameter, replaceParameter, replaceResponse } from "./functions.js";
 
 export { $lib } from "./lib.js";
 export { $onValidate } from "./validate.js";
@@ -81,5 +81,7 @@ export const $functions: Record<string, AzureClientGeneratorCoreFunctions> = {
   // The actual implementation has the full parameter signature required by TypeSpec.
   "Azure.ClientGenerator.Core": {
     replaceParameter: replaceParameter as AzureClientGeneratorCoreFunctions["replaceParameter"],
+    replaceResponse: replaceResponse as AzureClientGeneratorCoreFunctions["replaceResponse"],
+    addParameter: addParameter as AzureClientGeneratorCoreFunctions["addParameter"],
   },
 };
