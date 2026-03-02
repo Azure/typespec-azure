@@ -71,3 +71,10 @@ configuration:
             then:
               - addLabel:
                   label: emitter:client:all
+          - if:
+              - includesModifiedFiles:
+                  files:
+                    - website/**/*
+            then:
+              - addLabel:
+                  label: meta:website
