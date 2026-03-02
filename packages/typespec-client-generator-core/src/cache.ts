@@ -37,8 +37,8 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   context.__operationToClientCache = new Map<Operation, SdkClient>();
   context.__clientToOperationsCache = new Map<SdkClient, Operation[]>();
 
-  // create clients with full hierarchy (root clients + sub clients)
-  const { clients, mergedSubClientTypes } = getOrCreateClients(context);
+  // get root clients with full hierarchy (root clients + sub clients)
+  const { clients, mergedSubClientTypes } = getRootClients(context);
 
   // handle versioning with mutated types
   context.__packageVersions = new Map<Namespace, string[]>();
@@ -102,32 +102,32 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   // iterate all clients and build a map of operations
   const queue: SdkClient[] = [...clients];
   while (queue.length > 0) {
-    const group = queue.shift()!;
+    const client = queue.shift()!;
 
     // operations directly under the group
     const operations = [];
 
     // Check if this is a merged sub client (has multiple services)
-    const mergedTypes = mergedSubClientTypes.get(group);
+    const mergedTypes = mergedSubClientTypes.get(client);
 
-    if (group.parent === undefined && group.services.length > 1 && !mergedTypes) {
+    if (client.parent === undefined && client.services.length > 1 && !mergedTypes) {
       // multi-service root client
-      operations.push(...group.services.flatMap((service) => [...service.operations.values()]));
+      operations.push(...client.services.flatMap((service) => [...service.operations.values()]));
     } else if (mergedTypes) {
       // multi-service sub client
       for (const type of mergedTypes) {
         operations.push(...type.operations.values());
       }
-    } else if (group.type) {
+    } else if (client.type) {
       // single-service client or sub client
-      operations.push(...group.type.operations.values());
+      operations.push(...client.type.operations.values());
     }
 
     // when there is explicitly `@client`
     // operations under namespace or interface that are not decorated with `@client`
     // should be placed in the first accessor client or sub client
-    if (group.type?.kind === "Namespace" && hasExplicitClient(context)) {
-      const innerQueue: Namespace[] = [group.type];
+    if (client.type?.kind === "Namespace" && hasExplicitClient(context)) {
+      const innerQueue: Namespace[] = [client.type];
       while (innerQueue.length > 0) {
         const ns = innerQueue.shift()!;
         for (const subNs of ns.namespaces.values()) {
@@ -156,7 +156,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         !isTemplateDeclarationOrInstance(op) &&
         !context.program.stateMap(omitOperation).get(op)
       ) {
-        let pushGroup: SdkClient = group;
+        let pushGroup: SdkClient = client;
         const clientLocation = getClientLocation(context, op);
         if (clientLocation) {
           // operation with `@clientLocation` decorator is placed in another client
@@ -174,7 +174,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       }
     }
 
-    if (group.type) queue.push(...group.subClients);
+    queue.push(...client.subClients);
   }
 
   // omit empty clients
@@ -213,7 +213,7 @@ interface ClientCreationResult {
 }
 
 /**
- * Get or create the TCGC clients with full hierarchy.
+ * Get the TCGC root clients with full hierarchy.
  * If user has explicitly defined `@client` then we will use those clients.
  * If user has not defined any `@client` then we will create a client for the first service namespace.
  * This function also creates sub clients, handles multi-service merging,
@@ -222,10 +222,11 @@ interface ClientCreationResult {
  * @param context TCGCContext
  * @returns
  */
-function getOrCreateClients(context: TCGCContext): ClientCreationResult {
+function getRootClients(context: TCGCContext): ClientCreationResult {
   const mergedSubClientTypes = new Map<SdkClient, (Namespace | Interface)[]>();
   const namespaces: Namespace[] = listAllUserDefinedNamespaces(context);
 
+  // Collect all explicit @client declarations
   const explicitClients = [];
   for (const ns of namespaces) {
     if (getScopedDecoratorData(context, clientKey, ns)) {
@@ -241,25 +242,87 @@ function getOrCreateClients(context: TCGCContext): ClientCreationResult {
   let clients: SdkClient[];
 
   if (explicitClients.length > 0) {
+    // ── Explicit @client path ──
+
+    // Build client hierarchy
     if (explicitClients.some((client) => isArm(client.services))) {
       context.arm = true;
     }
-    // Filter out clients whose type is nested inside another client's type.
-    // Those are sub clients, not root clients.
-    const allClientTypes = new Set<Namespace | Interface>(
-      explicitClients.map((c: SdkClient) => c.type),
-    );
-    clients = explicitClients.filter((client: SdkClient) => {
-      let container: Namespace | undefined =
-        client.type.kind === "Interface" ? client.type.namespace : client.type.namespace;
-      while (container) {
-        if (allClientTypes.has(container)) return false;
-        container = container.namespace;
+
+    // Explicit client cache
+    explicitClients.map((c) => {
+      context.__rawClientsCache!.set(c.type, c);
+      context.__clientToOperationsCache!.set(c, []);
+    });
+
+    // Build explicit client hierarchy
+    explicitClients.map((client: SdkClient) => {
+      let parentClientType: Namespace | undefined = client.type.namespace;
+      while (parentClientType) {
+        const parentClient = context.__rawClientsCache?.get(parentClientType);
+        if (parentClient) {
+          client.parent = parentClient;
+          client.clientPath = `${client.parent.name}.${client.clientPath}`;
+          parentClient.subClients.push(client);
+          break;
+        }
+        parentClientType = parentClientType.namespace;
       }
-      return true;
+    });
+
+    // Get root clients
+    clients = explicitClients.filter((c: SdkClient) => c.parent === undefined);
+
+    // Set service for sub client if not exist
+    const setServiceForSubClients = (parentClient: SdkClient) => {
+      for (const subClient of parentClient.subClients) {
+        if (subClient.services.length === 0) {
+          subClient.services = [...parentClient.services];
+        }
+        setServiceForSubClients(subClient);
+      }
+    };
+    for (const client of clients) {
+      setServiceForSubClients(client);
+    }
+
+    // Add sub-client hierarchy if multiple service
+
+    const subClientNameMap = new Map<string, SdkClient>();
+    clients.map((client: SdkClient) => {
+      if (client.services.length > 1) {
+        // Explicit multi-service: follow services to build hierarchy
+        const subClients: SdkClient[] = [];
+        for (const specificService of client.services) {
+          for (const sc of buildSubClientHierarchy(
+            context,
+            specificService,
+            client.name,
+            specificService,
+            client,
+          )) {
+            if (
+              !handleMultipleServicesSubClientNameConflict(
+                context,
+                sc,
+                client,
+                subClientNameMap,
+                mergedSubClientTypes,
+              )
+            ) {
+              subClients.push(sc);
+            }
+          }
+        }
+        context.__rawClientsCache!.set(client.type, client);
+        client.subClients = subClients;
+        context.__clientToOperationsCache!.set(client, []);
+      }
     });
   } else {
-    // if there is no explicit client, we will treat the first namespace with service decorator as client
+    // ── No explicit @client path ──
+    // Create root client from first service namespace and build hierarchy by following services
+
     const serviceNamespaces: Namespace[] = namespaces.filter((ns) =>
       isService(context.program, ns),
     );
@@ -290,187 +353,98 @@ function getOrCreateClients(context: TCGCContext): ClientCreationResult {
           clientPath: clientName,
         },
       ];
+      clients[0].subClients = buildSubClientHierarchy(
+        context,
+        clients[0].services[0],
+        clients[0].name,
+        clients[0].services[0],
+        clients[0],
+      );
+      context.__rawClientsCache!.set(clients[0].type, clients[0]);
+      context.__clientToOperationsCache!.set(clients[0], []);
     } else {
       clients = [];
     }
-  }
 
-  if (clients.length === 0) {
-    return { clients, mergedSubClientTypes };
-  }
-
-  // Track sub client names to detect conflicts in multi-service scenarios
-  const subClientNameMap = new Map<string, SdkClient>();
-  // Track root client types to avoid treating them as sub clients
-  const rootClientTypes = new Set<Namespace | Interface>(clients.map((c) => c.type));
-
-  // create sub clients for each client
-  for (const client of clients) {
-    const subClients: SdkClient[] = [];
-
-    if (client.services.length > 1) {
-      // Multiple services case will auto-merge all the services and add their nested sub clients
-      for (const specificService of client.services) {
-        addFirstLevelSubClients(
-          context,
-          specificService,
-          specificService,
-          client,
-          subClients,
-          subClientNameMap,
-          mergedSubClientTypes,
-          rootClientTypes,
-        );
-      }
-    } else {
-      // Single service case needs to use the client type since it could contain customizations
-      addFirstLevelSubClients(
-        context,
-        client.type,
-        client.services[0],
-        client,
-        subClients,
-        subClientNameMap,
-        mergedSubClientTypes,
-        rootClientTypes,
-      );
-    }
-
-    // build client's cache
-    context.__rawClientsCache!.set(client.type, client);
-    client.subClients = subClients;
-    context.__clientToOperationsCache!.set(client, []);
-  }
-
-  // create sub client for `@clientLocation` of string value
-  // if no explicit `@client`
-  if (!hasExplicitClient(context)) {
-    const newSubClientWithServices = new Map<string, Namespace[]>();
-    listScopedDecoratorData(context, clientLocationKey).forEach((v, k) => {
-      // only deal with mutated types or without mutation
-      if (
-        (!context.__mutatedRealm && !unsafe_Realm.realmForType.has(k)) ||
-        (context.__mutatedRealm && context.__mutatedRealm.hasType(k))
-      ) {
-        // If the target sub client already exists, handle the multiple services case
-        if (typeof v === "string") {
-          // Check if a sub client with this name already exists, only check first level for string target
-          const existingSc = clients[0].subClients.find(
-            (sc) => sc.type && getLibraryName(context, sc.type) === v,
-          );
-
-          const operationService =
-            clients[0].services.length > 1
-              ? findServiceForOperation(clients[0].services, k as Operation)
-              : clients[0].services[0];
-
-          if (existingSc) {
-            // Sub client already exists - check if moving this operation would create a multi-service situation
-            if (!existingSc.services.includes(operationService)) {
-              existingSc.services.push(operationService);
-            }
-            // Operation will be moved to this existing sub client during operations processing
-            context.__rawClientsCache!.set(v, existingSc);
-            return;
-          }
-
-          if (newSubClientWithServices.has(v)) {
-            // Add the service to the list if it's not already there
-            const services = newSubClientWithServices.get(v)!;
-            if (!services.includes(operationService)) {
-              services.push(operationService);
-            }
-          } else {
-            newSubClientWithServices.set(v, [operationService]);
-          }
-        }
-      }
-    });
-
-    if (newSubClientWithServices.size > 0) {
-      newSubClientWithServices.forEach((services, scName) => {
-        const sc: SdkClient = {
-          kind: "SdkClient",
-          name: scName,
-          clientPath: `${clients[0].name}.${scName}`,
-          services,
-          type: undefined as any, // virtual sub client has no backing type
-          subClients: [],
-          parent: clients[0],
-        };
-        context.__rawClientsCache!.set(scName, sc);
-        clients[0].subClients.push(sc);
-        context.__clientToOperationsCache!.set(sc, []);
-      });
+    if (clients.length === 0) {
+      return { clients, mergedSubClientTypes };
     }
   }
+
+  // Create virtual sub clients for `@clientLocation` of string value
+  // This applies to both explicit and non-explicit client paths
+  createVirtualSubClientsFromClientLocation(context, clients);
 
   return { clients, mergedSubClientTypes };
 }
 
 /**
- * Create first-level sub clients by iterating a namespace's child namespaces and interfaces.
+ * Create virtual sub clients for `@clientLocation` decorator with string target values.
+ * This handles cases where operations are moved to a named sub-client that may not exist yet.
  */
-function addFirstLevelSubClients(
+function createVirtualSubClientsFromClientLocation(
   context: TCGCContext,
-  type: Namespace | Interface,
-  service: Namespace,
-  client: SdkClient,
-  subClients: SdkClient[],
-  subClientNameMap: Map<string, SdkClient>,
-  mergedSubClientTypes: Map<SdkClient, (Namespace | Interface)[]>,
-  rootClientTypes: Set<Namespace | Interface>,
-) {
-  // iterate client's interfaces and namespaces to find sub clients
-  if (type.kind === "Namespace") {
-    for (const subItem of type.namespaces.values()) {
-      const sc = createSubClient(
-        context,
-        subItem,
-        `${client.name}`,
-        service,
-        client,
-        rootClientTypes,
-      );
-      if (
-        sc &&
-        !handleMultipleServicesSubClientNameConflict(
-          context,
-          sc,
-          client,
-          subClientNameMap,
-          mergedSubClientTypes,
-        )
-      ) {
-        subClients.push(sc);
+  clients: SdkClient[],
+): void {
+  if (clients.length === 0) return;
+
+  const newSubClientWithServices = new Map<string, Namespace[]>();
+  listScopedDecoratorData(context, clientLocationKey).forEach((v, k) => {
+    // only deal with mutated types or without mutation
+    if (
+      (!context.__mutatedRealm && !unsafe_Realm.realmForType.has(k)) ||
+      (context.__mutatedRealm && context.__mutatedRealm.hasType(k))
+    ) {
+      // If the target sub client already exists, handle the multiple services case
+      if (typeof v === "string") {
+        // Check if a sub client with this name already exists, only check first level for string target
+        const existingSc = clients[0].subClients.find(
+          (sc) => sc.type && getLibraryName(context, sc.type) === v,
+        );
+
+        const operationService =
+          clients[0].services.length > 1
+            ? findServiceForOperation(clients[0].services, k as Operation)
+            : clients[0].services[0];
+
+        if (existingSc) {
+          // Sub client already exists - check if moving this operation would create a multi-service situation
+          if (!existingSc.services.includes(operationService)) {
+            existingSc.services.push(operationService);
+          }
+          // Operation will be moved to this existing sub client during operations processing
+          context.__rawClientsCache!.set(v, existingSc);
+          return;
+        }
+
+        if (newSubClientWithServices.has(v)) {
+          // Add the service to the list if it's not already there
+          const services = newSubClientWithServices.get(v)!;
+          if (!services.includes(operationService)) {
+            services.push(operationService);
+          }
+        } else {
+          newSubClientWithServices.set(v, [operationService]);
+        }
       }
     }
-    for (const subItem of type.interfaces.values()) {
-      if (isTemplateDeclaration(subItem)) {
-        // Skip template interfaces
-        continue;
-      }
-      const sc = createSubClient(
-        context,
-        subItem,
-        `${client.name}`,
-        service,
-        client,
-        rootClientTypes,
-      );
-      if (
-        sc &&
-        !handleMultipleServicesSubClientNameConflict(
-          context,
-          sc,
-          client,
-          subClientNameMap,
-          mergedSubClientTypes,
-        )
-      ) {
-        subClients.push(sc);
-      }
-    }
+  });
+
+  if (newSubClientWithServices.size > 0) {
+    newSubClientWithServices.forEach((services, scName) => {
+      const sc: SdkClient = {
+        kind: "SdkClient",
+        name: scName,
+        clientPath: `${clients[0].name}.${scName}`,
+        services,
+        type: undefined as any, // virtual sub client has no backing type
+        subClients: [],
+        parent: clients[0],
+      };
+      context.__rawClientsCache!.set(scName, sc);
+      clients[0].subClients.push(sc);
+      context.__clientToOperationsCache!.set(sc, []);
+    });
   }
 }
 
@@ -507,12 +481,42 @@ function handleMultipleServicesSubClientNameConflict(
 }
 
 /**
- * Create a TCGC sub client for the given type.
- * This function will also iterate through the type's namespaces and interfaces to build nested sub clients.
+ * Build a sub-client hierarchy by iterating child namespaces and interfaces of the given type.
+ * Recursively creates sub-clients for all child namespaces and non-template interfaces,
+ * returning the direct children as a list.
  *
  * @param context TCGCContext
- * @param type
- * @returns
+ * @param type The parent namespace or interface whose children become sub-clients
+ * @param clientPathPrefix The parent's client path prefix
+ * @param service The service namespace
+ * @param parent The parent client
+ * @returns The list of direct child sub-clients
+ */
+function buildSubClientHierarchy(
+  context: TCGCContext,
+  type: Namespace | Interface,
+  clientPathPrefix: string,
+  service: Namespace,
+  parent?: SdkClient,
+): SdkClient[] {
+  if (type.kind !== "Namespace") return [];
+
+  const subClients: SdkClient[] = [];
+
+  for (const ns of type.namespaces.values()) {
+    const sc = createSubClient(context, ns, clientPathPrefix, service, parent);
+    if (sc) subClients.push(sc);
+  }
+  for (const iface of type.interfaces.values()) {
+    const sc = createSubClient(context, iface, clientPathPrefix, service, parent);
+    if (sc) subClients.push(sc);
+  }
+
+  return subClients;
+}
+
+/**
+ * Create a single sub-client for the given type and recursively build its children.
  */
 function createSubClient(
   context: TCGCContext,
@@ -520,109 +524,35 @@ function createSubClient(
   clientPathPrefix: string,
   service: Namespace,
   parent?: SdkClient,
-  rootClientTypes?: Set<Namespace | Interface>,
 ): SdkClient | undefined {
-  let subClient: SdkClient | undefined;
+  // Skip template interfaces
+  if (type.kind === "Interface" && isTemplateDeclaration(type)) {
+    return undefined;
+  }
+
   const clientName = getLibraryName(context, type);
   const clientPath = `${clientPathPrefix}.${clientName}`;
 
-  if (hasExplicitClient(context)) {
-    // Check for @client on nested types
-    // Skip types that are root clients (declared with @client at the top level)
-    const clientData = getScopedDecoratorData(context, clientKey, type);
+  const subClient: SdkClient = {
+    kind: "SdkClient",
+    name: clientName,
+    type,
+    clientPath,
+    services: [service],
+    subClients: [],
+    parent,
+  };
 
-    if (clientData && !rootClientTypes?.has(type)) {
-      subClient = {
-        kind: "SdkClient",
-        name: clientName,
-        type,
-        clientPath,
-        services: [service],
-        subClients: [],
-        parent,
-      } as SdkClient;
-
-      if (type.kind === "Namespace") {
-        subClient.subClients =
-          buildHierarchyOfSubClients(
-            context,
-            type,
-            clientPath,
-            service,
-            subClient,
-            rootClientTypes,
-          ) ?? [];
-      }
-    }
-  } else {
-    // if there is no explicit client, we will treat non-client namespaces and all interfaces as sub clients
-    if (type.kind !== "Interface" || !isTemplateDeclaration(type)) {
-      subClient = {
-        kind: "SdkClient",
-        name: clientName,
-        type,
-        clientPath,
-        services: [service],
-        subClients: [],
-        parent,
-      };
-    }
-
-    if (subClient && type.kind === "Namespace") {
-      subClient.subClients =
-        buildHierarchyOfSubClients(context, type, clientPath, service, subClient) ?? [];
-    }
+  // Recursively build children for namespaces
+  if (type.kind === "Namespace") {
+    subClient.subClients = buildSubClientHierarchy(context, type, clientPath, service, subClient);
   }
 
-  // build sub client's cache
-  if (subClient) {
-    context.__rawClientsCache!.set(subClient.type!, subClient);
-    context.__clientToOperationsCache!.set(subClient, []);
-  }
+  // Cache
+  context.__rawClientsCache!.set(subClient.type!, subClient);
+  context.__clientToOperationsCache!.set(subClient, []);
 
   return subClient;
-}
-
-function buildHierarchyOfSubClients(
-  context: TCGCContext,
-  type: Namespace,
-  clientPathPrefix: string,
-  service: Namespace,
-  parent?: SdkClient,
-  rootClientTypes?: Set<Namespace | Interface>,
-): SdkClient[] | undefined {
-  // build hierarchy of sub clients
-  const subClients: SdkClient[] = [];
-  type.namespaces.forEach((ns) => {
-    const subClient = createSubClient(
-      context,
-      ns,
-      clientPathPrefix,
-      service,
-      parent,
-      rootClientTypes,
-    );
-    if (subClient) {
-      subClients.push(subClient);
-    }
-  });
-  type.interfaces.forEach((i) => {
-    const subClient = createSubClient(
-      context,
-      i,
-      clientPathPrefix,
-      service,
-      parent,
-      rootClientTypes,
-    );
-    if (subClient) {
-      subClients.push(subClient);
-    }
-  });
-  if (subClients.length > 0) {
-    return subClients;
-  }
-  return undefined;
 }
 
 function isArm(service: Namespace[] | Namespace): boolean {
