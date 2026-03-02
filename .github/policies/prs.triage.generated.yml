@@ -49,7 +49,7 @@ configuration:
           - if:
               - includesModifiedFiles:
                   files:
-                    - packages/typespec-azure-http-specs/**/*
+                    - packages/azure-http-specs/**/*
             then:
               - addLabel:
                   label: lib:azure-http-specs
