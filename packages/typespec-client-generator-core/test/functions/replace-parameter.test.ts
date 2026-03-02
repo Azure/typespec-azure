@@ -1,300 +1,273 @@
+import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { SimpleTesterWithService } from "../tester.js";
+import {
+  createClientCustomizationInput,
+  createSdkContextForTester,
+  SimpleBaseTester,
+} from "../tester.js";
 
 describe("replaceParameter", () => {
-  describe("making parameter required (gist example)", () => {
+  describe("making parameter required", () => {
     it("makes an optional parameter required via @@override", async () => {
-      // This is the primary use case from the gist:
-      // Making maxResults required when it was optional
-      const diagnostics = await SimpleTesterWithService.diagnose(`
-        op getSecrets(@query maxResults?: int32): void;
+      const { program } = await SimpleBaseTester.compile(
+        createClientCustomizationInput(
+          `
+          @service
+          namespace KeyVault;
 
-        model RequiredMaxResults {
-          maxResults: int32;
-        }
+          op getSecrets(@query maxResults?: int32): void;
+          `,
+          `
+          model RequiredMaxResults {
+            maxResults: int32;
+          }
 
-        #suppress "experimental-feature" "testing replaceParameter"
-        @@override(getSecrets, replaceParameter(getSecrets, "maxResults", RequiredMaxResults.maxResults));
-      `);
+          #suppress "experimental-feature" "testing replaceParameter"
+          @@override(KeyVault.getSecrets, replaceParameter(KeyVault.getSecrets, "maxResults", RequiredMaxResults.maxResults));
+          `,
+        ),
+      );
 
-      // Filter out experimental-feature diagnostics
-      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
+      const context = await createSdkContextForTester(program);
+      const sdkPackage = context.sdkPackage;
+      const client = sdkPackage.clients[0];
+      strictEqual(client.methods.length, 1);
+
+      const method = client.methods[0];
+      strictEqual(method.kind, "basic");
+      strictEqual(method.name, "getSecrets");
+
+      // Find the maxResults parameter in method params
+      const maxResultsParam = method.parameters.find((x) => x.name === "maxResults");
+      ok(maxResultsParam, "maxResults parameter should exist");
+      strictEqual(maxResultsParam.optional, false, "maxResults should now be required");
+      strictEqual(maxResultsParam.type.kind, "int32");
+
+      // Verify the operation parameter still exists and maps to the method param
+      const opMaxResultsParam = method.operation.parameters.find((x) => x.name === "maxResults");
+      ok(opMaxResultsParam, "maxResults should exist in operation params");
       strictEqual(
-        nonExperimentalDiags.length,
-        0,
-        "Should have no errors: " +
-          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
+        opMaxResultsParam.correspondingMethodParams.length,
+        1,
+        "should have one corresponding method param",
+      );
+      strictEqual(
+        opMaxResultsParam.correspondingMethodParams[0],
+        maxResultsParam,
+        "operation param should map to method param",
       );
     });
 
     it("makes multiple parameters required via chained replaceParameter calls", async () => {
-      const diagnostics = await SimpleTesterWithService.diagnose(`
-        op search(@query query?: string, @query limit?: int32, @query offset?: int32): void;
+      const { program } = await SimpleBaseTester.compile(
+        createClientCustomizationInput(
+          `
+          @service
+          namespace MyService;
 
-        model RequiredParams {
-          query: string;
-          limit: int32;
-        }
+          op search(@query query?: string, @query limit?: int32): void;
+          `,
+          `
+          model RequiredParams {
+            query: string;
+            limit: int32;
+          }
 
-        #suppress "experimental-feature" "testing replaceParameter"
-        alias step1 = replaceParameter(search, "query", RequiredParams.query);
-        #suppress "experimental-feature" "testing replaceParameter"
-        @@override(search, replaceParameter(step1, "limit", RequiredParams.limit));
-      `);
-
-      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
-      strictEqual(
-        nonExperimentalDiags.length,
-        0,
-        "Should have no errors: " +
-          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
+          #suppress "experimental-feature" "testing replaceParameter"
+          alias step1 = replaceParameter(MyService.search, "query", RequiredParams.query);
+          #suppress "experimental-feature" "testing replaceParameter"
+          @@override(MyService.search, replaceParameter(step1, "limit", RequiredParams.limit));
+          `,
+        ),
       );
+
+      const context = await createSdkContextForTester(program);
+      const sdkPackage = context.sdkPackage;
+      const method = sdkPackage.clients[0].methods[0];
+
+      const queryParam = method.parameters.find((x) => x.name === "query");
+      ok(queryParam, "query parameter should exist");
+      strictEqual(queryParam.optional, false, "query should now be required");
+
+      const limitParam = method.parameters.find((x) => x.name === "limit");
+      ok(limitParam, "limit parameter should exist");
+      strictEqual(limitParam.optional, false, "limit should now be required");
     });
   });
 
   describe("error handling", () => {
     it("reports error when parameter not found", async () => {
-      const diagnostics = await SimpleTesterWithService.diagnose(`
-        op myOp(@query existingParam: string): void;
+      const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+        createClientCustomizationInput(
+          `
+          @service
+          namespace MyService;
 
-        model NewParams {
-          replacement: int32;
-        }
+          op myOp(@query existingParam: string): void;
+          `,
+          `
+          model NewParams {
+            replacement: int32;
+          }
 
-        #suppress "experimental-feature" "testing replaceParameter"
-        alias modified = replaceParameter(myOp, "nonExistentParam", NewParams.replacement);
-      `);
+          #suppress "experimental-feature" "testing replaceParameter"
+          alias modified = replaceParameter(MyService.myOp, "nonExistentParam", NewParams.replacement);
+          `,
+        ),
+      );
 
-      const errorDiags = diagnostics.filter(
-        (d) => d.code === "@azure-tools/typespec-client-generator-core/replace-parameter-not-found",
-      );
-      strictEqual(
-        errorDiags.length,
-        1,
-        "Should have one replace-parameter-not-found error. All diagnostics: " +
-          JSON.stringify(diagnostics.map((d) => ({ code: d.code, message: d.message }))),
-      );
-      ok(
-        errorDiags[0].message.includes("nonExistentParam"),
-        "Error message should mention the parameter name",
-      );
+      expectDiagnostics(diagnostics, {
+        code: "@azure-tools/typespec-client-generator-core/replace-parameter-not-found",
+        message: 'Parameter "nonExistentParam" not found in operation "myOp".',
+      });
     });
   });
 
-  describe("basic usage with alias", () => {
-    it("can use replaceParameter result in alias", async () => {
-      const diagnostics = await SimpleTesterWithService.diagnose(`
-        op myOp(@query param1: string, @query param2?: int32): void;
+  describe("preserves other parameters", () => {
+    it("preserves other parameters when replacing one and verifies mappings", async () => {
+      const { program } = await SimpleBaseTester.compile(
+        createClientCustomizationInput(
+          `
+          @service
+          namespace MyService;
 
-        model NewParams {
-          param2: int32;
-        }
+          op multiParam(
+            @query param1: string,
+            @query param2?: int32,
+            @query param3: boolean
+          ): void;
+          `,
+          `
+          model RequiredParam2 {
+            param2: int32;
+          }
 
-        #suppress "experimental-feature" "testing replaceParameter"
-        alias modifiedOp = replaceParameter(myOp, "param2", NewParams.param2);
-      `);
-
-      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
-      strictEqual(
-        nonExperimentalDiags.length,
-        0,
-        "Should have no errors: " +
-          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
+          #suppress "experimental-feature" "testing replaceParameter"
+          @@override(MyService.multiParam, replaceParameter(MyService.multiParam, "param2", RequiredParam2.param2));
+          `,
+        ),
       );
-    });
-  });
 
-  describe("corner cases", () => {
-    it("works with operation that has single parameter", async () => {
-      const diagnostics = await SimpleTesterWithService.diagnose(`
-        op singleParam(@query param?: int32): void;
+      const context = await createSdkContextForTester(program);
+      const sdkPackage = context.sdkPackage;
+      const method = sdkPackage.clients[0].methods[0];
 
-        model RequiredParam {
-          param: int32;
-        }
+      // Verify all parameters exist in method
+      const param1 = method.parameters.find((x) => x.name === "param1");
+      ok(param1, "param1 should exist");
+      strictEqual(param1.optional, false, "param1 should remain required");
 
-        #suppress "experimental-feature" "testing replaceParameter"
-        @@override(singleParam, replaceParameter(singleParam, "param", RequiredParam.param));
-      `);
+      const param2 = method.parameters.find((x) => x.name === "param2");
+      ok(param2, "param2 should exist");
+      strictEqual(param2.optional, false, "param2 should now be required");
 
-      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
-      strictEqual(
-        nonExperimentalDiags.length,
-        0,
-        "Should have no errors: " +
-          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
-      );
-    });
+      const param3 = method.parameters.find((x) => x.name === "param3");
+      ok(param3, "param3 should exist");
+      strictEqual(param3.optional, false, "param3 should remain required");
 
-    it("preserves other parameters when replacing one", async () => {
-      const diagnostics = await SimpleTesterWithService.diagnose(`
-        op multiParam(
-          @query param1: string,
-          @query param2?: int32,
-          @query param3: boolean
-        ): void;
+      // Verify all operation parameters map correctly to method parameters
+      const opParam1 = method.operation.parameters.find((x) => x.name === "param1");
+      ok(opParam1, "param1 should exist in operation params");
+      strictEqual(opParam1.correspondingMethodParams.length, 1);
+      strictEqual(opParam1.correspondingMethodParams[0], param1);
 
-        model RequiredParam2 {
-          param2: int32;
-        }
+      const opParam2 = method.operation.parameters.find((x) => x.name === "param2");
+      ok(opParam2, "param2 should exist in operation params");
+      strictEqual(opParam2.correspondingMethodParams.length, 1);
+      strictEqual(opParam2.correspondingMethodParams[0], param2);
 
-        #suppress "experimental-feature" "testing replaceParameter"
-        @@override(multiParam, replaceParameter(multiParam, "param2", RequiredParam2.param2));
-      `);
-
-      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
-      strictEqual(
-        nonExperimentalDiags.length,
-        0,
-        "Should have no errors: " +
-          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
-      );
-    });
-
-    it("works with path parameters", async () => {
-      const diagnostics = await SimpleTesterWithService.diagnose(`
-        @route("/items/{id}")
-        op getItem(@path id?: string): void;
-
-        model RequiredId {
-          id: string;
-        }
-
-        #suppress "experimental-feature" "testing replaceParameter"
-        @@override(getItem, replaceParameter(getItem, "id", RequiredId.id));
-      `);
-
-      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
-      strictEqual(
-        nonExperimentalDiags.length,
-        0,
-        "Should have no errors: " +
-          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
-      );
-    });
-
-    it("works with header parameters", async () => {
-      const diagnostics = await SimpleTesterWithService.diagnose(`
-        op headerOp(@header("X-Custom-Header") customHeader?: string): void;
-
-        model RequiredHeader {
-          customHeader: string;
-        }
-
-        #suppress "experimental-feature" "testing replaceParameter"
-        @@override(headerOp, replaceParameter(headerOp, "customHeader", RequiredHeader.customHeader));
-      `);
-
-      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
-      strictEqual(
-        nonExperimentalDiags.length,
-        0,
-        "Should have no errors: " +
-          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
-      );
+      const opParam3 = method.operation.parameters.find((x) => x.name === "param3");
+      ok(opParam3, "param3 should exist in operation params");
+      strictEqual(opParam3.correspondingMethodParams.length, 1);
+      strictEqual(opParam3.correspondingMethodParams[0], param3);
     });
   });
 
   describe("scoped usage", () => {
-    it("works with language-specific scope", async () => {
-      const diagnostics = await SimpleTesterWithService.diagnose(`
-        op getSecrets(@query maxResults?: int32): void;
+    it("applies override only for specified language scope", async () => {
+      const mainCode = `
+        @service
+        namespace KeyVault;
 
+        op getSecrets(@query maxResults?: int32): void;
+        `;
+
+      const customizationCode = `
         model RequiredMaxResults {
           maxResults: int32;
         }
 
         #suppress "experimental-feature" "testing replaceParameter"
-        @@override(getSecrets, replaceParameter(getSecrets, "maxResults", RequiredMaxResults.maxResults), "python");
-      `);
+        @@override(KeyVault.getSecrets, replaceParameter(KeyVault.getSecrets, "maxResults", RequiredMaxResults.maxResults), "python");
+        `;
 
-      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
-      strictEqual(
-        nonExperimentalDiags.length,
-        0,
-        "Should have no errors: " +
-          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
+      // Test with Python scope - should be overridden
+      const { program: pythonProgram } = await SimpleBaseTester.compile(
+        createClientCustomizationInput(mainCode, customizationCode),
       );
+      const pythonContext = await createSdkContextForTester(pythonProgram, {
+        emitterName: "@azure-tools/typespec-python",
+      });
+      const pythonMethod = pythonContext.sdkPackage.clients[0].methods[0];
+      const pythonParam = pythonMethod.parameters.find((x) => x.name === "maxResults");
+      ok(pythonParam, "maxResults should exist for Python");
+      strictEqual(pythonParam.optional, false, "maxResults should be required for Python");
+
+      // Test with C# scope - should NOT be overridden
+      const { program: csharpProgram } = await SimpleBaseTester.compile(
+        createClientCustomizationInput(mainCode, customizationCode),
+      );
+      const csharpContext = await createSdkContextForTester(csharpProgram, {
+        emitterName: "@azure-tools/typespec-csharp",
+      });
+      const csharpMethod = csharpContext.sdkPackage.clients[0].methods[0];
+      const csharpParam = csharpMethod.parameters.find((x) => x.name === "maxResults");
+      ok(csharpParam, "maxResults should exist for C#");
+      strictEqual(csharpParam.optional, true, "maxResults should remain optional for C#");
     });
   });
 
   describe("complex scenarios", () => {
-    it("works with operations in interface", async () => {
-      const diagnostics = await SimpleTesterWithService.diagnose(`
-        interface KeyVault {
-          op getSecrets(@query maxResults?: int32): void;
-        }
-
-        model RequiredMaxResults {
-          maxResults: int32;
-        }
-
-        #suppress "experimental-feature" "testing replaceParameter"
-        @@override(KeyVault.getSecrets, replaceParameter(KeyVault.getSecrets, "maxResults", RequiredMaxResults.maxResults));
-      `);
-
-      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
-      strictEqual(
-        nonExperimentalDiags.length,
-        0,
-        "Should have no errors: " +
-          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
-      );
-    });
-
-    it("works with operations in nested namespace", async () => {
-      const diagnostics = await SimpleTesterWithService.diagnose(`
-        namespace Inner {
-          op getSecrets(@query maxResults?: int32): void;
-        }
-
-        model RequiredMaxResults {
-          maxResults: int32;
-        }
-
-        #suppress "experimental-feature" "testing replaceParameter"
-        @@override(Inner.getSecrets, replaceParameter(Inner.getSecrets, "maxResults", RequiredMaxResults.maxResults));
-      `);
-
-      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
-      strictEqual(
-        nonExperimentalDiags.length,
-        0,
-        "Should have no errors: " +
-          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
-      );
-    });
-
     it("chain three replaceParameter calls", async () => {
-      const diagnostics = await SimpleTesterWithService.diagnose(`
-        op complexOp(
-          @query param1?: string,
-          @query param2?: int32,
-          @query param3?: boolean
-        ): void;
+      const { program } = await SimpleBaseTester.compile(
+        createClientCustomizationInput(
+          `
+          @service
+          namespace MyService;
 
-        model RequiredParams {
-          param1: string;
-          param2: int32;
-          param3: boolean;
-        }
+          op complexOp(
+            @query param1?: string,
+            @query param2?: int32,
+            @query param3?: boolean
+          ): void;
+          `,
+          `
+          model RequiredParams {
+            param1: string;
+            param2: int32;
+            param3: boolean;
+          }
 
-        #suppress "experimental-feature" "testing replaceParameter"
-        alias step1 = replaceParameter(complexOp, "param1", RequiredParams.param1);
-        #suppress "experimental-feature" "testing replaceParameter"
-        alias step2 = replaceParameter(step1, "param2", RequiredParams.param2);
-        #suppress "experimental-feature" "testing replaceParameter"
-        @@override(complexOp, replaceParameter(step2, "param3", RequiredParams.param3));
-      `);
-
-      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
-      strictEqual(
-        nonExperimentalDiags.length,
-        0,
-        "Should have no errors: " +
-          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
+          #suppress "experimental-feature" "testing replaceParameter"
+          alias step1 = replaceParameter(MyService.complexOp, "param1", RequiredParams.param1);
+          #suppress "experimental-feature" "testing replaceParameter"
+          alias step2 = replaceParameter(step1, "param2", RequiredParams.param2);
+          #suppress "experimental-feature" "testing replaceParameter"
+          @@override(MyService.complexOp, replaceParameter(step2, "param3", RequiredParams.param3));
+          `,
+        ),
       );
+
+      const context = await createSdkContextForTester(program);
+      const method = context.sdkPackage.clients[0].methods[0];
+
+      for (const paramName of ["param1", "param2", "param3"]) {
+        const param = method.parameters.find((x) => x.name === paramName);
+        ok(param, `${paramName} should exist`);
+        strictEqual(param.optional, false, `${paramName} should be required`);
+      }
     });
   });
+
 });

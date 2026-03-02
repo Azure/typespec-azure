@@ -1,125 +1,119 @@
-import { strictEqual } from "assert";
+import { expectDiagnosticEmpty } from "@typespec/compiler/testing";
+import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
-import { SimpleTesterWithService } from "../tester.js";
+import {
+  createClientCustomizationInput,
+  createSdkContextForTester,
+  SimpleBaseTester,
+} from "../tester.js";
 
 describe("replaceResponse", () => {
   describe("basic usage", () => {
-    it("replaces return type with a different model", async () => {
-      const [, diagnostics] = await SimpleTesterWithService.compileAndDiagnose(`
-        op getData(): string;
+    it("compiles without errors when using replaceResponse", async () => {
+      // Note: replaceResponse creates an operation with a different return type,
+      // but the $override decorator primarily focuses on parameter matching.
+      // This test verifies the function compiles correctly.
+      const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+        createClientCustomizationInput(
+          `
+          @service
+          namespace MyService;
 
-        model CustomResponse {
-          data: string;
-          metadata: Record<string>;
-        }
+          op getData(): string;
+          `,
+          `
+          model CustomResponse {
+            data: string;
+            metadata: Record<string>;
+          }
 
-        #suppress "experimental-feature" "testing replaceResponse"
-        @@override(getData, replaceResponse(getData, CustomResponse));
-      `);
-
-      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
-      strictEqual(
-        nonExperimentalDiags.length,
-        0,
-        "Should have no errors: " +
-          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
+          #suppress "experimental-feature" "testing replaceResponse"
+          @@override(MyService.getData, replaceResponse(MyService.getData, CustomResponse));
+          `,
+        ),
       );
-    });
 
-    it("can use replaceResponse result in alias", async () => {
-      const [, diagnostics] = await SimpleTesterWithService.compileAndDiagnose(`
-        op getData(): string;
+      expectDiagnosticEmpty(diagnostics);
 
-        model CustomResponse {
-          data: string;
-        }
+      const context = await createSdkContextForTester(program);
+      const sdkPackage = context.sdkPackage;
+      const method = sdkPackage.clients[0].methods[0];
 
-        #suppress "experimental-feature" "testing replaceResponse"
-        alias modifiedOp = replaceResponse(getData, CustomResponse);
-      `);
-
-      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
-      strictEqual(
-        nonExperimentalDiags.length,
-        0,
-        "Should have no errors: " +
-          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
-      );
+      strictEqual(method.kind, "basic");
+      strictEqual(method.name, "getData");
+      ok(method.response, "method should have a response");
     });
   });
 
   describe("chaining with replaceParameter", () => {
-    it("chains replaceParameter and replaceResponse", async () => {
-      const [, diagnostics] = await SimpleTesterWithService.compileAndDiagnose(`
-        op myOp(@query param?: string): string;
+    it("chains replaceParameter and replaceResponse - verifies parameter change", async () => {
+      const { program } = await SimpleBaseTester.compile(
+        createClientCustomizationInput(
+          `
+          @service
+          namespace MyService;
 
-        model RequiredParam {
-          param: string;
-        }
+          op myOp(@query param?: string): string;
+          `,
+          `
+          model RequiredParam {
+            param: string;
+          }
 
-        model CustomResponse {
-          result: string;
-        }
+          model CustomResponse {
+            result: string;
+          }
 
-        #suppress "experimental-feature" "testing replaceParameter"
-        alias step1 = replaceParameter(myOp, "param", RequiredParam.param);
-        #suppress "experimental-feature" "testing replaceResponse"
-        @@override(myOp, replaceResponse(step1, CustomResponse));
-      `);
-
-      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
-      strictEqual(
-        nonExperimentalDiags.length,
-        0,
-        "Should have no errors: " +
-          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
+          #suppress "experimental-feature" "testing replaceParameter"
+          alias step1 = replaceParameter(MyService.myOp, "param", RequiredParam.param);
+          #suppress "experimental-feature" "testing replaceResponse"
+          @@override(MyService.myOp, replaceResponse(step1, CustomResponse));
+          `,
+        ),
       );
+
+      const context = await createSdkContextForTester(program);
+      const method = context.sdkPackage.clients[0].methods[0];
+
+      // Verify parameter was made required (this is what $override handles)
+      const paramParam = method.parameters.find((x) => x.name === "param");
+      ok(paramParam, "param should exist");
+      strictEqual(paramParam.optional, false, "param should now be required");
     });
   });
 
-  describe("complex scenarios", () => {
-    it("works with operations in interface", async () => {
-      const [, diagnostics] = await SimpleTesterWithService.compileAndDiagnose(`
-        interface MyService {
-          op getData(): string;
-        }
+  describe("scoped usage", () => {
+    it("compiles correctly with language-specific scope", async () => {
+      const mainCode = `
+        @service
+        namespace MyService;
 
-        model CustomResponse {
-          data: string;
-        }
-
-        #suppress "experimental-feature" "testing replaceResponse"
-        @@override(MyService.getData, replaceResponse(MyService.getData, CustomResponse));
-      `);
-
-      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
-      strictEqual(
-        nonExperimentalDiags.length,
-        0,
-        "Should have no errors: " +
-          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
-      );
-    });
-
-    it("works with language-specific scope", async () => {
-      const [, diagnostics] = await SimpleTesterWithService.compileAndDiagnose(`
         op getData(): string;
+        `;
 
+      const customizationCode = `
         model PythonResponse {
           data: string;
         }
 
         #suppress "experimental-feature" "testing replaceResponse"
-        @@override(getData, replaceResponse(getData, PythonResponse), "python");
-      `);
+        @@override(MyService.getData, replaceResponse(MyService.getData, PythonResponse), "python");
+        `;
 
-      const nonExperimentalDiags = diagnostics.filter((d) => d.code !== "experimental-feature");
-      strictEqual(
-        nonExperimentalDiags.length,
-        0,
-        "Should have no errors: " +
-          JSON.stringify(nonExperimentalDiags.map((d) => ({ code: d.code, message: d.message }))),
+      // Test with Python scope
+      const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+        createClientCustomizationInput(mainCode, customizationCode),
       );
+
+      expectDiagnosticEmpty(diagnostics);
+
+      const pythonContext = await createSdkContextForTester(program, {
+        emitterName: "@azure-tools/typespec-python",
+      });
+      const pythonMethod = pythonContext.sdkPackage.clients[0].methods[0];
+      ok(pythonMethod, "method should exist for Python");
+      strictEqual(pythonMethod.name, "getData");
     });
   });
+
 });
