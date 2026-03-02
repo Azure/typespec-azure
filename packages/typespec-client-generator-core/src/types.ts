@@ -9,6 +9,7 @@ import {
   IntrinsicType,
   Model,
   ModelProperty,
+  Namespace,
   NumericLiteral,
   Operation,
   Scalar,
@@ -2049,6 +2050,7 @@ export function getAllReferencedTypes(
 
 export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
+  const services = new Set<Namespace>();
   for (const client of listClients(context)) {
     for (const operation of listOperationsInClient(context, client)) {
       // operations on a client
@@ -2069,25 +2071,24 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
         diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.Input, sdkType));
       }
     }
-    for (const service of client.services) {
-      // versioned enums
-      const versionEnum = context.getPackageVersionEnum().get(service);
-      const versions = context.getPackageVersions().get(service);
-      if (versionEnum) {
-        // create sdk enum for versions enum
-        let sdkVersionsEnum: SdkEnumType;
-        const explicitApiVersions = getExplicitClientApiVersions(context, service);
-        if (explicitApiVersions) {
-          // add additional api versions to the enum
-          sdkVersionsEnum = diagnostics.pipe(
-            getSdkEnumWithDiagnostics(context, explicitApiVersions),
-          );
-        } else {
-          sdkVersionsEnum = diagnostics.pipe(getSdkEnumWithDiagnostics(context, versionEnum));
-        }
-        filterPreviewVersion(context, sdkVersionsEnum, versions?.at(-1) || "");
-        diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
+    client.services.map((s) => services.add(s));
+  }
+  for (const service of services) {
+    // versioned enums
+    const versionEnum = context.getPackageVersionEnum().get(service);
+    const versions = context.getPackageVersions().get(service);
+    if (versionEnum) {
+      // create sdk enum for versions enum
+      let sdkVersionsEnum: SdkEnumType;
+      const explicitApiVersions = getExplicitClientApiVersions(context, service);
+      if (explicitApiVersions) {
+        // add additional api versions to the enum
+        sdkVersionsEnum = diagnostics.pipe(getSdkEnumWithDiagnostics(context, explicitApiVersions));
+      } else {
+        sdkVersionsEnum = diagnostics.pipe(getSdkEnumWithDiagnostics(context, versionEnum));
       }
+      filterPreviewVersion(context, sdkVersionsEnum, versions?.at(-1) || "");
+      diagnostics.pipe(updateUsageOrAccess(context, UsageFlags.ApiVersionEnum, sdkVersionsEnum));
     }
   }
   // update for orphan models/enums/unions
