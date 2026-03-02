@@ -2,7 +2,7 @@
 import { defineConfig } from "eslint/config";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
-import { TypeSpecCommonEslintConfigs, getTypeScriptProjectRules } from "./core/eslint.config.js";
+import { TypeSpecCommonEslintConfigs } from "./core/eslint.config.js";
 
 export default defineConfig(
   {
