@@ -44,6 +44,10 @@ export const AreaLabels = defineLabels({
     color: "9EB120",
     description: "Issues for Azure CLI/PSH features",
   },
+  "meta:website": {
+    color: "007dc8",
+    description: "TypeSpec.io updates",
+  },
 });
 
 /**
@@ -59,6 +63,7 @@ export const AreaPaths: Record<keyof typeof AreaLabels, string[]> = {
   ide: [],
   "cli/psh": [],
   "emitter:client:all": [],
+  "meta:website": ["website/"],
 };
 
 export default defineConfig({
