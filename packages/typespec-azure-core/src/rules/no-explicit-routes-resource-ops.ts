@@ -7,6 +7,7 @@ export const noExplicitRoutesResourceOps = createRule({
   name: "no-explicit-routes-resource-ops",
   description: "The @route decorator should not be used on standard resource operation signatures.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-explicit-routes-resource-ops",
   messages: {
     default:
       "The @route decorator should not be used on standard resource operation signatures. If you are trying to add a route prefix to an operation use the @route decorator on an interface or namespace instead.",

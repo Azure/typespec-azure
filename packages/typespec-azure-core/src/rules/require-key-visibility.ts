@@ -12,6 +12,7 @@ export const requireKeyVisibility = createRule({
   name: "key-visibility-required",
   description: "Key properties need to have a Lifecycle visibility setting.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/key-visibility-required",
   messages: {
     default: paramMessage`The key property '${"name"}' has default Lifecycle visibility, please use the @visibility decorator to change it.`,
   },

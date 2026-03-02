@@ -12,6 +12,7 @@ export const useStandardNames = createRule({
   name: "use-standard-names",
   description: "Use recommended names for operations.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/use-standard-names",
   messages: {
     get: "GET operations that return single objects should start with 'get'",
     list: "GET operations that return lists should start with 'list'",
