@@ -12,56 +12,6 @@ import {
 } from "../tester.js";
 
 describe("Operation", () => {
-  it("@clientLocation along with @client", async () => {
-    const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
-      createClientCustomizationInput(
-        `
-    @service
-    namespace MyService;
-
-    op test(): string;
-    `,
-        `
-    @client({service: MyService})
-    namespace MyServiceClient;
-
-    @clientLocation("Inner")
-    op test is MyService.test;
-    `,
-      ),
-    );
-
-    expectDiagnostics(diagnostics, {
-      code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
-    });
-  });
-
-  it("@clientLocation along with @operationGroup", async () => {
-    const [, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
-      createClientCustomizationInput(
-        `
-      @service
-      namespace MyService;
-
-      op test(): string;
-      `,
-        `
-      namespace Customization;
-
-      @operationGroup
-      interface MyOperationGroup {
-        @clientLocation("Inner")
-        op test is MyService.test;
-      }
-      `,
-      ),
-    );
-
-    expectDiagnostics(diagnostics, {
-      code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
-    });
-  });
-
   it("@clientLocation client-location-wrong-type", async () => {
     const [{ program }, diagnostics] = await SimpleTester.compileAndDiagnose(
       `

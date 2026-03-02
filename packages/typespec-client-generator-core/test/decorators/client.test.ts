@@ -43,6 +43,7 @@ describe("@client", () => {
         services: [MyClient],
         type: MyClient,
         subClients: [],
+        autoMergeService: false,
       },
     ]);
   });
@@ -65,6 +66,7 @@ describe("@client", () => {
         services: [MyService],
         type: MyClient,
         subClients: [],
+        autoMergeService: false,
       },
     ]);
   });
@@ -229,6 +231,7 @@ describe("@operationGroup", () => {
         services: [MyClient],
         subClients: [],
         parent: client,
+        autoMergeService: false,
       },
     ]);
   });
@@ -255,6 +258,7 @@ describe("@operationGroup", () => {
         services: [MyClient],
         subClients: [],
         parent: client,
+        autoMergeService: false,
       },
     ]);
   });
@@ -1502,7 +1506,7 @@ it("operations under namespace or interface without @client or @operationGroup",
   const clients = listClients(context);
   strictEqual(clients.length, 1);
   const client = clients[0];
-  strictEqual(listOperationsInClient(context, client).length, 3);
+  strictEqual(listOperationsInClient(context, client).length, 1);
   const operationGroups = listSubClients(context, client);
   strictEqual(operationGroups.length, 1);
   const operationGroup = operationGroups[0];

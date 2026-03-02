@@ -34,7 +34,7 @@ describe("cross-namespace duplicate name validation", () => {
         }
         `,
         `
-        @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+        @client({ name: "CombineClient", service: [ServiceA, ServiceB], autoMergeService: true })
         @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
         namespace CombineClient;
         `,
@@ -74,7 +74,7 @@ describe("cross-namespace duplicate name validation", () => {
         }
         `,
         `
-        @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+        @client({ name: "CombineClient", service: [ServiceA, ServiceB], autoMergeService: true })
         @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
         namespace CombineClient;
         `,
@@ -114,7 +114,7 @@ describe("cross-namespace duplicate name validation", () => {
         }
         `,
         `
-        @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+        @client({ name: "CombineClient", service: [ServiceA, ServiceB], autoMergeService: true })
         @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
         namespace CombineClient;
         `,
@@ -151,7 +151,7 @@ describe("cross-namespace duplicate name validation", () => {
         }
         `,
         `
-        @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+        @client({ name: "CombineClient", service: [ServiceA, ServiceB], autoMergeService: true })
         @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
         namespace CombineClient;
         `,
@@ -188,7 +188,7 @@ describe("cross-namespace duplicate name validation", () => {
         }
         `,
         `
-        @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+        @client({ name: "CombineClient", service: [ServiceA, ServiceB], autoMergeService: true })
         @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
         namespace CombineClient;
         `,
@@ -232,7 +232,7 @@ describe("cross-namespace duplicate name validation", () => {
         }
         `,
         `
-        @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+        @client({ name: "CombineClient", service: [ServiceA, ServiceB], autoMergeService: true })
         @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
         namespace CombineClient;
         `,
@@ -292,7 +292,7 @@ describe("cross-namespace duplicate name validation", () => {
         }
         `,
         `
-        @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+        @client({ name: "CombineClient", service: [ServiceA, ServiceB], autoMergeService: true })
         @useDependency(ServiceA.Versions.v1, ServiceB.Versions.v1)
         namespace CombineClient;
         `,
@@ -328,7 +328,7 @@ describe("cross-namespace duplicate name validation", () => {
         }
         `,
         `
-        @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+        @client({ name: "CombineClient", service: [ServiceA, ServiceB], autoMergeService: true })
         @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
         namespace CombineClient;
         `,
@@ -362,7 +362,7 @@ describe("cross-namespace duplicate name validation", () => {
         }
         `,
         `
-        @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+        @client({ name: "CombineClient", service: [ServiceA, ServiceB], autoMergeService: true })
         @useDependency(ServiceA.VersionsA.v1, ServiceB.VersionsB.v1)
         namespace CombineClient;
         `,
@@ -398,7 +398,7 @@ describe("cross-namespace duplicate name validation", () => {
         }
         `,
         `
-        @client({ name: "CombineClient", service: [ServiceA, ServiceB] })
+        @client({ name: "CombineClient", service: [ServiceA, ServiceB], autoMergeService: true })
         @useDependency(ServiceA.Versions.v1, ServiceB.Versions.v1)
         namespace CombineClient;
         `,

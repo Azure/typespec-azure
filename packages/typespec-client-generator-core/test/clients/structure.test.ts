@@ -803,6 +803,7 @@ it("one client from multiple services", async () => {
       {
         name: "CombineClient",
         service: [ServiceA, ServiceB],
+        autoMergeService: true,
       }
     )
     @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
@@ -908,6 +909,7 @@ it("one client from multiple services with no versioning", async () => {
           {
             name: "CombineClient",
             service: [ServiceA, ServiceB],
+            autoMergeService: true,
           }
         )
         namespace CombineClient;
@@ -989,6 +991,7 @@ it("one client from multiple services without version dependency", async () => {
           {
             name: "CombineClient",
             service: [ServiceA, ServiceB],
+            autoMergeService: true,
           }
         )
         namespace CombineClient;
@@ -1109,6 +1112,7 @@ it("one client from multiple services with `@clientLocation`", async () => {
       {
         name: "CombineClient",
         service: [ServiceA, ServiceB],
+        autoMergeService: true,
       }
     )
     @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
@@ -1240,6 +1244,7 @@ it("one client from multiple services with api-version set to latest", async () 
       {
         name: "CombineClient",
         service: [ServiceA, ServiceB],
+        autoMergeService: true,
       }
     )
     @useDependency(ServiceA.VersionsA.av3, ServiceB.VersionsB.bv2)
@@ -1317,6 +1322,7 @@ it("one client from multiple services with api-version set to specific version b
       {
         name: "CombineClient",
         service: [ServiceA, ServiceB],
+        autoMergeService: true,
       }
     )
     @useDependency(ServiceA.VersionsA.av3, ServiceB.VersionsB.bv1)
@@ -1398,6 +1404,7 @@ it("one client from multiple services with api-version set to all", async () => 
       {
         name: "CombineClient",
         service: [ServiceA, ServiceB],
+        autoMergeService: true,
       }
     )
     @useDependency(ServiceA.VersionsA.av3, ServiceB.VersionsB.bv2)
@@ -1488,6 +1495,7 @@ it("one client from multiple services with different useDependency versions", as
       {
         name: "CombineClient",
         service: [ServiceA, ServiceB],
+        autoMergeService: true,
       }
     )
     @useDependency(ServiceA.VersionsA.av1, ServiceB.VersionsB.bv3)
@@ -1572,6 +1580,7 @@ it("one client from multiple services with models shared across services", async
       {
         name: "CombineClient",
         service: [ServiceA, ServiceB],
+        autoMergeService: true,
       }
     )
     @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
@@ -1649,6 +1658,7 @@ it("client location to new operation group with multiple services", async () => 
       {
         name: "CombineClient",
         service: [ServiceA, ServiceB],
+        autoMergeService: true,
       }
     )
     @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
@@ -1743,6 +1753,7 @@ it("one client from multiple services with operation group name conflict - merge
       {
         name: "CombineClient",
         service: [ServiceA, ServiceB],
+        autoMergeService: true,
       }
     )
     @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
@@ -1828,6 +1839,7 @@ it("client location to existing operation group from different service", async (
       {
         name: "CombineClient",
         service: [ServiceA, ServiceB],
+        autoMergeService: true,
       }
     )
     @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
@@ -1903,6 +1915,7 @@ it("merged operation groups with nested operations", async () => {
       {
         name: "CombineClient",
         service: [ServiceA, ServiceB],
+        autoMergeService: true,
       }
     )
     @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
@@ -1979,6 +1992,7 @@ it("multiple merged operation groups in same client", async () => {
       {
         name: "CombineClient",
         service: [ServiceA, ServiceB],
+        autoMergeService: true,
       }
     )
     @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
@@ -2029,6 +2043,7 @@ it("error: inconsistent-multiple-service server", async () => {
           {
             name: "CombineClient",
             service: [ServiceA, ServiceB],
+            autoMergeService: true,
           }
         )
         namespace CombineClient {}
@@ -2066,6 +2081,7 @@ it("error: inconsistent-multiple-service-servers auth", async () => {
           {
             name: "CombineClient",
             service: [ServiceA, ServiceB],
+            autoMergeService: true,
           }
         )
         namespace CombineClient {}

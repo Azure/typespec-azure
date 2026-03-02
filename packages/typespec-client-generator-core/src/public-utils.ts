@@ -65,7 +65,6 @@ import {
   TspLiteralType,
   getHttpBodyType,
   getHttpOperationResponseHeaders,
-  hasExplicitClient,
   hasNoneVisibility,
   isAzureCoreTspModel,
   listAllUserDefinedNamespaces,
@@ -872,7 +871,7 @@ export function resolveOperationId(
 
   const clientLocation = getClientLocation(context, operation);
 
-  if (!hasExplicitClient(context) && clientLocation) {
+  if (clientLocation) {
     if (typeof clientLocation === "string") {
       return `${clientLocation}_${operationName}`;
     }

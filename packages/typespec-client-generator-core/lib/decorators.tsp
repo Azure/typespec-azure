@@ -196,6 +196,11 @@ model ClientOptions {
    * The name of the client. If not specified, the default name will be `<Name of the target>Client`.
    */
   name?: string;
+
+  /**
+   * Auto-merge service's things into current client.
+   */
+  autoMergeService?: boolean;
 }
 
 /**

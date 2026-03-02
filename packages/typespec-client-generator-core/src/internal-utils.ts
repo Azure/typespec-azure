@@ -120,16 +120,7 @@ export const omitOperation = createStateSymbol("omitOperation");
 export const overrideKey = createStateSymbol("override");
 
 export function hasExplicitClient(context: TCGCContext): boolean {
-  // Multiple services case is not considered explicit client. It is auto-merged.
-  const explicitClients = listScopedDecoratorData(context, clientKey);
-  let multiServices = false;
-  explicitClients.forEach((value) => {
-    if ((value as SdkClient).services.length > 1) {
-      multiServices = true;
-    }
-  });
-
-  return explicitClients.size > 0 && !multiServices;
+  return listScopedDecoratorData(context, clientKey).size > 0;
 }
 
 export function listScopedDecoratorData(

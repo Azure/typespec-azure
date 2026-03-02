@@ -81,7 +81,6 @@ import {
   findEntriesWithTarget,
   findRootSourceProperty,
   getScopedDecoratorData,
-  hasExplicitClient,
   isSameAuth,
   isSameServers,
   listAllUserDefinedNamespaces,
@@ -166,6 +165,8 @@ export const $client: ClientDecorator = (
   let services: Namespace[];
   const serviceConfig =
     options?.kind === "Model" ? options?.properties.get("service")?.type : undefined;
+  const autoMergeServiceConfig =
+    options?.kind === "Model" ? options?.properties.get("autoMergeService")?.type : undefined;
 
   if (serviceConfig?.kind === "Namespace") {
     // Explicit single service
@@ -253,6 +254,8 @@ export const $client: ClientDecorator = (
     type: target,
     subClients: [],
     clientPath: name,
+    autoMergeService:
+      autoMergeServiceConfig?.kind === "Boolean" ? autoMergeServiceConfig.value : false,
   };
   setScopedDecoratorData(context, $client, clientKey, target, client, scope);
 };
@@ -1441,10 +1444,6 @@ export function getClientLocation(
   context: TCGCContext,
   input: Operation | ModelProperty,
 ): Namespace | Interface | Operation | string | undefined {
-  // if there is `@client` decorator, `@clientLocation` on operation will be ignored
-  if (input.kind === "Operation" && hasExplicitClient(context)) {
-    return undefined;
-  }
   return getScopedDecoratorData(context, clientLocationKey, input);
 }
 

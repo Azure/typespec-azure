@@ -62,6 +62,7 @@ export interface TCGCContext {
   __generatedNames: Map<Type, string>;
   __httpOperationCache: Map<Operation, HttpOperation>;
   __tspTypeToApiVersions: Map<Type, string[]>;
+  __explicitClients?: Set<SdkClient>;
   __rawClientsCache?: Map<Namespace | Interface | string, SdkClient>;
   __clientToOperationsCache?: Map<SdkClient, Operation[]>;
   __operationToClientCache?: Map<Operation, SdkClient>;
@@ -111,6 +112,8 @@ export interface SdkClient {
   clientPath: string;
   /** The parent client. Only set for sub clients. */
   parent?: SdkClient;
+  /** Whether to auto-merge service's things into current client. */
+  autoMergeService?: boolean;
 }
 
 export type AccessFlags = "internal" | "public";

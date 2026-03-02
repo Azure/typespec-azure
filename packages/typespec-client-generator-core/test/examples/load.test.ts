@@ -432,6 +432,7 @@ it("multiple services without versioning", async () => {
       @client({
         name: "CombineClient",
         service: [ServiceA, ServiceB],
+        autoMergeService: true,
       })
       namespace CombineClient {}
     `,
@@ -487,6 +488,7 @@ it("multiple services without examples", async () => {
       @client({
         name: "CombineClient",
         service: [ServiceA, ServiceB],
+        autoMergeService: true,
       })
       namespace CombineClient {}
     `,

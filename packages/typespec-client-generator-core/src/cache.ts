@@ -17,7 +17,6 @@ import {
   clientLocationKey,
   findServiceForOperation,
   getScopedDecoratorData,
-  hasExplicitClient,
   listAllUserDefinedNamespaces,
   listScopedDecoratorData,
   omitOperation,
@@ -36,6 +35,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   context.__rawClientsCache = new Map<Namespace | Interface | string, SdkClient>();
   context.__operationToClientCache = new Map<Operation, SdkClient>();
   context.__clientToOperationsCache = new Map<SdkClient, Operation[]>();
+  context.__explicitClients = new Set<SdkClient>();
 
   // get root clients with full hierarchy (root clients + sub clients)
   const { clients, mergedSubClientTypes } = getRootClients(context);
@@ -104,7 +104,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   while (queue.length > 0) {
     const client = queue.shift()!;
 
-    // operations directly under the group
+    // operations directly under the client
     const operations = [];
 
     // Check if this is a merged sub client (has multiple services)
@@ -123,27 +123,6 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       operations.push(...client.type.operations.values());
     }
 
-    // when there is explicitly `@client`
-    // operations under namespace or interface that are not decorated with `@client`
-    // should be placed in the first accessor client or sub client
-    if (client.type?.kind === "Namespace" && hasExplicitClient(context)) {
-      const innerQueue: Namespace[] = [client.type];
-      while (innerQueue.length > 0) {
-        const ns = innerQueue.shift()!;
-        for (const subNs of ns.namespaces.values()) {
-          if (!context.__rawClientsCache.has(subNs)) {
-            operations.push(...subNs.operations.values());
-            innerQueue.push(subNs);
-          }
-        }
-        for (const iface of ns.interfaces.values()) {
-          if (!context.__rawClientsCache.has(iface)) {
-            operations.push(...iface.operations.values());
-          }
-        }
-      }
-    }
-
     // add operations
     for (const op of operations) {
       // skip operations that are not in scope
@@ -156,12 +135,12 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         !isTemplateDeclarationOrInstance(op) &&
         !context.program.stateMap(omitOperation).get(op)
       ) {
-        let pushGroup: SdkClient = client;
+        let pushClient: SdkClient = client;
         const clientLocation = getClientLocation(context, op);
         if (clientLocation) {
           // operation with `@clientLocation` decorator is placed in another client
           if (context.__rawClientsCache.has(clientLocation)) {
-            pushGroup = context.__rawClientsCache.get(clientLocation)!;
+            pushClient = context.__rawClientsCache.get(clientLocation)!;
           } else {
             reportDiagnostic(context.program, {
               code: "client-location-wrong-type",
@@ -169,8 +148,8 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
             });
           }
         }
-        context.__clientToOperationsCache.get(pushGroup)!.push(op);
-        context.__operationToClientCache.set(op, pushGroup);
+        context.__clientToOperationsCache.get(pushClient)!.push(op);
+        context.__operationToClientCache.set(op, pushClient);
       }
     }
 
@@ -178,31 +157,30 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   }
 
   // omit empty clients
-  if (!hasExplicitClient(context)) {
-    const removeEmptyClients = (group: SdkClient): boolean => {
-      // recursively check and remove empty sub clients
-      group.subClients = group.subClients.filter((subClient) => {
-        const keep = removeEmptyClients(subClient);
-        if (!keep) {
-          context.__rawClientsCache!.delete(subClient.type!);
-        }
-        return keep;
-      });
-
-      // check if the group has operations or non-empty sub clients
-      const hasOperations = context.__clientToOperationsCache!.get(group)!.length > 0;
-      const hasSubClients = group.subClients.length > 0;
-
-      return hasOperations || hasSubClients;
-    };
-
-    // start from the top-level clients and remove empty groups
-    for (const client of clients) {
-      const keepClient = removeEmptyClients(client);
-      if (!keepClient) {
-        context.__rawClientsCache.delete(client.type);
-        context.__clientToOperationsCache.delete(client);
+  const needKeep = (client: SdkClient): boolean => {
+    if (context.__explicitClients!.has(client) && !client.autoMergeService) return true;
+    // recursively check and remove empty sub clients
+    client.subClients = client.subClients.filter((subClient) => {
+      const keep = needKeep(subClient);
+      if (!keep) {
+        context.__rawClientsCache!.delete(subClient.type!);
       }
+      return keep;
+    });
+
+    // check if the client has operations or non-empty sub clients
+    const hasOperations = context.__clientToOperationsCache!.get(client)!.length > 0;
+    const hasSubClients = client.subClients.length > 0;
+
+    return hasOperations || hasSubClients;
+  };
+
+  // start from the top-level clients and remove empty clients
+  for (const client of clients) {
+    const keepClient = needKeep(client);
+    if (!keepClient) {
+      context.__rawClientsCache.delete(client.type);
+      context.__clientToOperationsCache.delete(client);
     }
   }
 }
@@ -227,7 +205,7 @@ function getRootClients(context: TCGCContext): ClientCreationResult {
   const namespaces: Namespace[] = listAllUserDefinedNamespaces(context);
 
   // Collect all explicit @client declarations
-  const explicitClients = [];
+  const explicitClients: SdkClient[] = [];
   for (const ns of namespaces) {
     if (getScopedDecoratorData(context, clientKey, ns)) {
       explicitClients.push(getScopedDecoratorData(context, clientKey, ns));
@@ -253,6 +231,7 @@ function getRootClients(context: TCGCContext): ClientCreationResult {
     explicitClients.map((c) => {
       context.__rawClientsCache!.set(c.type, c);
       context.__clientToOperationsCache!.set(c, []);
+      context.__explicitClients!.add(c);
     });
 
     // Build explicit client hierarchy
@@ -271,27 +250,64 @@ function getRootClients(context: TCGCContext): ClientCreationResult {
     });
 
     // Get root clients
-    clients = explicitClients.filter((c: SdkClient) => c.parent === undefined);
+    let validClients = true;
+    clients = explicitClients.filter((c: SdkClient) => {
+      if (c.parent === undefined && c.services.length === 0) {
+        reportDiagnostic(context.program, {
+          code: "root-client-missing-service",
+          target: c.type,
+        });
+        validClients = false;
+        return false;
+      }
+      return c.parent === undefined;
+    });
 
-    // Set service for sub client if not exist
-    const setServiceForSubClients = (parentClient: SdkClient) => {
+    // Validate service for sub client is exist or set service if not exist
+    const validateAndSetServiceForSubClients = (parentClient: SdkClient) => {
       for (const subClient of parentClient.subClients) {
         if (subClient.services.length === 0) {
           subClient.services = [...parentClient.services];
+        } else {
+          for (const svc of subClient.services) {
+            if (!parentClient.services.includes(svc)) {
+              reportDiagnostic(context.program, {
+                code: "nested-client-service-not-subset",
+                target: subClient.type,
+              });
+              validClients = false;
+              break;
+            }
+            if (parentClient.autoMergeService) {
+              reportDiagnostic(context.program, {
+                code: "auto-merge-service-conflict",
+                target: subClient.type,
+              });
+              validClients = false;
+              break;
+            }
+          }
+          if (!validClients) {
+            break;
+          }
+          validateAndSetServiceForSubClients(subClient);
         }
-        setServiceForSubClients(subClient);
       }
     };
     for (const client of clients) {
-      setServiceForSubClients(client);
+      validateAndSetServiceForSubClients(client);
     }
 
-    // Add sub-client hierarchy if multiple service
+    // If there is any invalid client, return empty clients to avoid potential downstream errors. The diagnostics will guide users to fix the issues.
+    if (!validClients) {
+      return { clients: [], mergedSubClientTypes };
+    }
 
+    // Add sub-client hierarchy if empty explicit client
     const subClientNameMap = new Map<string, SdkClient>();
-    clients.map((client: SdkClient) => {
-      if (client.services.length > 1) {
-        // Explicit multi-service: follow services to build hierarchy
+    explicitClients.map((client: SdkClient) => {
+      if (client.autoMergeService) {
+        // Explicit auto-merge service client: follow services to build hierarchy
         const subClients: SdkClient[] = [];
         for (const specificService of client.services) {
           for (const sc of buildSubClientHierarchy(
