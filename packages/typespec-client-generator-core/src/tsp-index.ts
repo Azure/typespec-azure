@@ -1,4 +1,7 @@
-import { AzureClientGeneratorCoreDecorators } from "../generated-defs/Azure.ClientGenerator.Core.js";
+import {
+  AzureClientGeneratorCoreDecorators,
+  AzureClientGeneratorCoreFunctions,
+} from "../generated-defs/Azure.ClientGenerator.Core.js";
 import { AzureClientGeneratorCoreLegacyDecorators } from "../generated-defs/Azure.ClientGenerator.Core.Legacy.js";
 import {
   $access,
@@ -30,6 +33,7 @@ import {
   $usage,
   $useSystemTextJsonConverter,
 } from "./decorators.js";
+import { replaceParameter } from "./functions.js";
 
 export { $lib } from "./lib.js";
 export { $onValidate } from "./validate.js";
@@ -69,4 +73,13 @@ export const $decorators = {
     nextLinkVerb: $nextLinkVerb,
     clientDefaultValue: $clientDefaultValue,
   } satisfies AzureClientGeneratorCoreLegacyDecorators,
+};
+
+/** @internal */
+export const $functions: Record<string, AzureClientGeneratorCoreFunctions> = {
+  // Note: The generated AzureClientGeneratorCoreFunctions type simplifies function signatures.
+  // The actual implementation has the full parameter signature required by TypeSpec.
+  "Azure.ClientGenerator.Core": {
+    replaceParameter: replaceParameter as AzureClientGeneratorCoreFunctions["replaceParameter"],
+  },
 };

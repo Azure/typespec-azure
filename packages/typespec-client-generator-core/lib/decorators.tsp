@@ -1185,3 +1185,40 @@ extern dec clientOption(
   value: valueof unknown,
   scope?: valueof string
 );
+
+/**
+ * Replace a parameter in an operation with a new parameter definition or remove it entirely.
+ * This function creates a new operation with the specified parameter replaced or removed,
+ * enabling composable transformations without mutating the original operation.
+ *
+ * @param operation The operation to transform.
+ * @param selector The parameter to replace, specified either by name (string) or by direct reference (ModelProperty).
+ * @param replacement The replacement parameter. Use `void` to remove the parameter entirely.
+ * @returns A new operation with the parameter replaced or removed.
+ *
+ * @example Making an optional parameter required
+ * ```typespec
+ * model RequiredMaxResults {
+ *   maxResults: int32;
+ * }
+ *
+ * @@override(KeyVault.getSecrets, replaceParameter(KeyVault.getSecrets, "maxResults", RequiredMaxResults.maxResults));
+ * ```
+ *
+ * @example Removing a parameter
+ * ```typespec
+ * op getSecretsWithoutMaxResults is replaceParameter(KeyVault.getSecrets, "maxResults", void);
+ * ```
+ *
+ * @example Chaining transformations
+ * ```typespec
+ * alias Step1 = replaceParameter(MyService.myOp, "unwantedParam", void);
+ * alias Step2 = replaceParameter(Step1, "oldParam", NewParams.newParam);
+ * ```
+ */
+#suppress "experimental-feature" "replaceParameter uses extern fn which is experimental but provides essential parameter transformation functionality"
+extern fn replaceParameter(
+  operation: Reflection.Operation,
+  selector: valueof string | Reflection.ModelProperty,
+  replacement: Reflection.ModelProperty | void
+): Reflection.Operation;
