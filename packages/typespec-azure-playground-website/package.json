@@ -61,6 +61,7 @@
     "@typespec/events": "workspace:^",
     "@typespec/http": "workspace:^",
     "http-client-js": "https://pkg.pr.new/joheredi/http-client-js@2",
+    "http-client-csharp": "https://pkg.pr.new/joheredi/http-client-csharp@24040b4",
     "@typespec/json-schema": "workspace:^",
     "@typespec/openapi": "workspace:^",
     "@typespec/openapi3": "workspace:^",
