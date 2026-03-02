@@ -23,5 +23,23 @@ export default defineConfig(
     ],
   },
   ...TypeSpecCommonEslintConfigs,
-  ...getTypeScriptProjectRules(dirname(fileURLToPath(import.meta.url))),
+  {
+    files: [
+      "packages/*/src/**/*.ts",
+      "packages/*/src/**/*.tsx",
+    ],
+    languageOptions: {
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: ["packages/*/vitest.config.ts"],
+        },
+        tsconfigRootDir: dirname(fileURLToPath(import.meta.url)),
+      },
+    },
+    rules: {
+      // Only put rules here that need typescript project information
+      "@typescript-eslint/no-floating-promises": "error",
+      "@typescript-eslint/no-deprecated": "warn",
+    },
+  },
 );
