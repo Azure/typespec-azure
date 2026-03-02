@@ -540,7 +540,7 @@ function normalizeKey(key: string): string {
   return key.replace(/[^a-z0-9]/gi, "").toLowerCase();
 }
 
-function inferLanguageFromEmitterName(emitterName: string): string {
+export function inferLanguageFromEmitterName(emitterName: string): string {
   const normalized = emitterName.toLowerCase();
   if (LANGUAGE_ALIASES[normalized]) {
     return LANGUAGE_ALIASES[normalized];
@@ -563,13 +563,7 @@ function inferLanguageFromEmitterName(emitterName: string): string {
     }
   }
 
-  const lastDash = basename.lastIndexOf("-");
-  if (lastDash >= 0 && lastDash < basename.length - 1) {
-    return basename.substring(lastDash + 1);
-  }
-
-  const sanitized = basename.replace(/[^a-z]/g, "");
-  return sanitized || "unknown";
+  return emitterName;
 }
 
 function trimOrUndefined(value: string | undefined): string | undefined {

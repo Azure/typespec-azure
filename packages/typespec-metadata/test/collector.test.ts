@@ -1,5 +1,6 @@
 import { normalizePath } from "@typespec/compiler";
 import { describe, expect, it } from "vitest";
+import { inferLanguageFromEmitterName } from "../src/collector.js";
 
 describe("outputDir path handling", () => {
   it("should replace absolute base path with {output-dir} placeholder", () => {
@@ -270,5 +271,27 @@ describe("namespace selection logic", () => {
     // Azure.ResourceManager namespace indicates management plane
     expect("management").toBe("management");
     expect("data").toBe("data");
+  });
+});
+
+describe("inferLanguageFromEmitterName", () => {
+  it("should return full emitter name for unrecognized emitters", () => {
+    // Emitters like @azure-typespec/http-client-csharp-mgmt are not in LANGUAGE_ALIASES
+    // and don't contain 'typespec-' or 'cadl-' in their basename, so the full emitter
+    // name should be used as the language key.
+    expect(inferLanguageFromEmitterName("@azure-typespec/http-client-csharp-mgmt")).toBe(
+      "@azure-typespec/http-client-csharp-mgmt",
+    );
+    expect(inferLanguageFromEmitterName("@azure-typespec/http-client-csharp")).toBe(
+      "@azure-typespec/http-client-csharp",
+    );
+  });
+
+  it("should return known alias for recognized emitters", () => {
+    expect(inferLanguageFromEmitterName("@azure-tools/typespec-csharp")).toBe("csharp");
+    expect(inferLanguageFromEmitterName("@azure-tools/typespec-python")).toBe("python");
+    expect(inferLanguageFromEmitterName("@azure-tools/typespec-java")).toBe("java");
+    expect(inferLanguageFromEmitterName("@azure-tools/typespec-ts")).toBe("typescript");
+    expect(inferLanguageFromEmitterName("@azure-tools/typespec-go")).toBe("go");
   });
 });
