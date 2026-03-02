@@ -115,5 +115,4 @@ describe("replaceResponse", () => {
       strictEqual(pythonMethod.name, "getData");
     });
   });
-
 });

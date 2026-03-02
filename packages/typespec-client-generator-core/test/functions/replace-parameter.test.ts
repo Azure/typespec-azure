@@ -1,4 +1,4 @@
-import { expectDiagnosticEmpty, expectDiagnostics } from "@typespec/compiler/testing";
+import { expectDiagnostics } from "@typespec/compiler/testing";
 import { ok, strictEqual } from "assert";
 import { describe, it } from "vitest";
 import {
@@ -269,5 +269,4 @@ describe("replaceParameter", () => {
       }
     });
   });
-
 });
