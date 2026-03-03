@@ -6,6 +6,7 @@ export const noResponseBodyRule = createRule({
   name: "no-response-body",
   description: "Ensure that the body is set correctly for the response type.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-response-body",
   messages: {
     default: `The body of non-204 responses should not be empty.`,
     response204: `The body of 204 response should be empty.`,

@@ -15,6 +15,7 @@ export const noOffsetDateTimeRule = createRule({
   description:
     "Prefer using `utcDateTime` when representing a datetime unless an offset is necessary.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-offsetdatetime",
   messages: {
     default:
       "Prefer using `utcDateTime` when representing a datetime unless an offset is necessary.",
