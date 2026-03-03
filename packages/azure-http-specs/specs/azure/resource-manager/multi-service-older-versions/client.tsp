@@ -12,6 +12,7 @@ using Azure.ClientGenerator.Core;
     Azure.ResourceManager.MultiServiceOlderVersions.Compute,
     Azure.ResourceManager.MultiServiceOlderVersions.ComputeDisk
   ],
+  autoMergeService: true,
 })
 @useDependency(
   Azure.ResourceManager.MultiServiceOlderVersions.Compute.Versions.v2024_11_01,
