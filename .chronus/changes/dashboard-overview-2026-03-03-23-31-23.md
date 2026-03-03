@@ -1,7 +1,7 @@
 ---
-changeKind: internal
+changeKind: feature
 packages:
   - "@azure-tools/typespec-azure-website"
 ---
 
-Enable coverage overview and emitter display names on Can I Use dashboard
+Implement coverage overview and scenario filtering in Spector Dashboard
