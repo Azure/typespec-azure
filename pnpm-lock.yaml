@@ -1539,6 +1539,9 @@ importers:
       vscode-languageserver-textdocument:
         specifier: ~1.0.12
         version: 1.0.12
+      yaml:
+        specifier: ~2.8.2
+        version: 2.8.2
     devDependencies:
       '@babel/core':
         specifier: ^7.26.10
@@ -3429,6 +3432,9 @@ importers:
       unist-util-visit:
         specifier: ^5.0.0
         version: 5.1.0
+      yaml:
+        specifier: ~2.8.2
+        version: 2.8.2
 
 packages:
 
