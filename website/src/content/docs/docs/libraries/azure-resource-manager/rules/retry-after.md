@@ -10,7 +10,7 @@ Check if the `Retry-After` header appears in the response for long-running opera
 
 #### ❌ Incorrect
 
-Long-running operation without `Retry-After` header:
+Custom long-running operation missing `Retry-After` header:
 
 ```tsp
 @armResourceOperations
@@ -25,18 +25,24 @@ interface FooResources {
 
 #### ✅ Correct
 
-Add `Retry-After` header to the response:
+Use ARM operation templates which include the `Retry-After` header automatically:
 
 ```tsp
-model UpdateFooResponse {
-  @header("Retry-After") retryAfter: utcDateTime;
-  ...FooResource;
-}
-
 @armResourceOperations
 interface FooResources {
-  @armResourceUpdate(FooResource)
-  @patch(#{implicitOptionality: true})
-  update(): UpdateFooResponse;
+  start is ArmResourceActionAsync<FooResource, FooRequestBody, FooResponse>;
+}
+```
+
+Or include `Foundations.RetryAfterHeader` in your custom response:
+
+```tsp
+@armResourceOperations
+interface FooResources {
+  @Azure.Core.pollingOperation(FooResources.getOperationStatus)
+  @post
+  op update(): FooResource & Foundations.RetryAfterHeader;
+
+  op getOperationStatus(): { status: Status };
 }
 ```
