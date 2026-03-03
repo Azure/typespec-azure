@@ -77,3 +77,24 @@ it("interface", async () => {
       },
     ]);
 });
+
+it("sub client", async () => {
+  await tester
+    .expect(
+      `
+      @service
+      namespace MyService;
+
+      namespace MyCustomizations {
+        @client({service: MyService})
+        namespace RootClient {
+
+          @client
+          interface NestedService {
+          }
+        };
+      }
+      `,
+    )
+    .toBeValid();
+});

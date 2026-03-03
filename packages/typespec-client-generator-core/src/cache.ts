@@ -373,9 +373,7 @@ function getRootClients(context: TCGCContext): ClientCreationResult {
         } else {
           originalName = service.name;
         }
-        const clientName = originalName.endsWith("Client")
-          ? originalName
-          : `${originalName}Client`;
+        const clientName = originalName.endsWith("Client") ? originalName : `${originalName}Client`;
         const client: SdkClient = {
           kind: "SdkClient",
           name: clientName,
@@ -384,13 +382,7 @@ function getRootClients(context: TCGCContext): ClientCreationResult {
           subClients: [],
           clientPath: clientName,
         };
-        client.subClients = buildSubClientHierarchy(
-          context,
-          service,
-          client.name,
-          service,
-          client,
-        );
+        client.subClients = buildSubClientHierarchy(context, service, client.name, service, client);
         context.__rawClientsCache!.set(client.type, client);
         context.__clientToOperationsCache!.set(client, []);
         clients.push(client);

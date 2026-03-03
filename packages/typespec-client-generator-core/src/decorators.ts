@@ -287,6 +287,7 @@ export function listClients(context: TCGCContext): SdkClient[] {
 /**
  * @deprecated Use `@client` instead. The `@operationGroup` decorator is deprecated.
  */
+// eslint-disable-next-line @typescript-eslint/no-deprecated
 export const $operationGroup: OperationGroupDecorator = (
   context: DecoratorContext,
   target: Namespace | Interface,
