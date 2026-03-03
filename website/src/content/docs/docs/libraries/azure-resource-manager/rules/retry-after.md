@@ -10,21 +10,33 @@ Check if the `Retry-After` header appears in the response for long-running opera
 
 #### ❌ Incorrect
 
+Long-running operation without `Retry-After` header:
+
 ```tsp
 @armResourceOperations
-interface Employees {
-  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+interface FooResources {
+  @Azure.Core.pollingOperation(FooResources.getOperationStatus)
+  @post
+  op update(): FooResource;
+
+  op getOperationStatus(): { status: Status };
 }
 ```
 
 #### ✅ Correct
 
+Add `Retry-After` header to the response:
+
 ```tsp
+model UpdateFooResponse {
+  @header("Retry-After") retryAfter: utcDateTime;
+  ...FooResource;
+}
+
 @armResourceOperations
-interface Employees {
-  createOrUpdate is ArmResourceCreateOrReplaceAsync<
-    Employee,
-    Response = ArmResponse<Employee> & RetryAfterHeader
-  >;
+interface FooResources {
+  @armResourceUpdate(FooResource)
+  @patch(#{implicitOptionality: true})
+  update(): UpdateFooResponse;
 }
 ```

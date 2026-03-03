@@ -11,20 +11,13 @@ Each resource interface must have an `@armResourceOperations` decorator to assoc
 #### ❌ Incorrect
 
 ```tsp
-interface MyResourceOperations {
-  get is ArmResourceRead<MyResource>;
-  createOrUpdate is ArmResourceCreateOrReplaceAsync<MyResource>;
-  delete is ArmResourceDeleteWithoutOkAsync<MyResource>;
-}
+// Missing @armResourceOperations decorator
+interface FooResources extends TrackedResourceOperations<FooResource, FooProperties> {}
 ```
 
 #### ✅ Correct
 
 ```tsp
-@armResourceOperations(MyResource)
-interface MyResourceOperations {
-  get is ArmResourceRead<MyResource>;
-  createOrUpdate is ArmResourceCreateOrReplaceAsync<MyResource>;
-  delete is ArmResourceDeleteWithoutOkAsync<MyResource>;
-}
+@armResourceOperations(FooResource)
+interface FooResources extends TrackedResourceOperations<FooResource, FooProperties> {}
 ```

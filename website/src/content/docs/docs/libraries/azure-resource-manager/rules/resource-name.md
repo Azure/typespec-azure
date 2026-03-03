@@ -10,11 +10,23 @@ Check the resource name. ARM resource model names must contain only alphanumeric
 
 #### ❌ Incorrect
 
+Missing `@path` decorator on `name`:
+
 ```tsp
-model My_Resource is TrackedResource<MyResourceProperties> {
-  @key("myResourceName")
-  @segment("myResources")
-  @path
+model FooResource is TrackedResource<{}> {
+  @key("foo")
+  @segment("foo")
+  name: string;
+}
+```
+
+#### ❌ Incorrect
+
+Underscore in model name:
+
+```tsp
+model Foo_Resource is TrackedResource<{}> {
+  @key("foo") @segment("foo") @path
   name: string;
 }
 ```
@@ -22,10 +34,9 @@ model My_Resource is TrackedResource<MyResourceProperties> {
 #### ✅ Correct
 
 ```tsp
-model MyResource is TrackedResource<MyResourceProperties> {
-  @key("myResourceName")
-  @segment("myResources")
-  @visibility(Lifecycle.read)
+model FooResource is TrackedResource<{}> {
+  @key("foo")
+  @segment("foo")
   @path
   name: string;
 }

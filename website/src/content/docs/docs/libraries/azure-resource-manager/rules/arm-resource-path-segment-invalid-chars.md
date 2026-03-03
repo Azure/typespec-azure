@@ -11,9 +11,9 @@ ARM resource path segments must contain only alphanumeric characters or dashes, 
 #### ❌ Incorrect
 
 ```tsp
-model Employee is TrackedResource<EmployeeProperties> {
-  @key("employeeName")
-  @segment("Employee_Items")
+model FooResource is TrackedResource<{}> {
+  @key("foo")
+  @segment("/foo/bar")
   @path
   name: string;
 }
@@ -22,9 +22,9 @@ model Employee is TrackedResource<EmployeeProperties> {
 #### ✅ Correct
 
 ```tsp
-model Employee is TrackedResource<EmployeeProperties> {
-  @key("employeeName")
-  @segment("employees")
+model FooResource is TrackedResource<{}> {
+  @key("foo")
+  @segment("foo")
   @path
   name: string;
 }

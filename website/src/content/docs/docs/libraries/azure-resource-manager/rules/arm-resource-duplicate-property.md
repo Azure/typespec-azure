@@ -11,31 +11,30 @@ Warns when a property defined in the resource envelope is also defined in the re
 #### ❌ Incorrect
 
 ```tsp
-model MyResource is TrackedResource<MyResourceProperties> {
-  @key("myResourceName")
-  @segment("myResources")
-  @path
-  name: string;
+@armProviderNamespace namespace MyService;
+
+model FooResource is TrackedResource<FooProperties> {
+  @key @segment("foo") name: string;
+  ...ManagedServiceIdentityProperty;
 }
 
-model MyResourceProperties {
-  name: string; // duplicate of envelope property
-  description?: string;
+model FooProperties {
+  name: string; // duplicate of envelope "name"
+  identity: string; // duplicate of envelope "identity"
 }
 ```
 
 #### ✅ Correct
 
 ```tsp
-model MyResource is TrackedResource<MyResourceProperties> {
-  @key("myResourceName")
-  @segment("myResources")
-  @path
-  name: string;
+@armProviderNamespace namespace MyService;
+
+model FooResource is TrackedResource<FooProperties> {
+  @key @segment("foo") name: string;
+  ...ManagedServiceIdentityProperty;
 }
 
-model MyResourceProperties {
-  description?: string;
+model FooProperties {
   displayName?: string;
 }
 ```

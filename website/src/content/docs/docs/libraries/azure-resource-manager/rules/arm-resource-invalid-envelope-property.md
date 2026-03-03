@@ -11,27 +11,21 @@ Resource envelope properties must originate from the `Azure.ResourceManager` nam
 #### ❌ Incorrect
 
 ```tsp
-model MyResource is TrackedResource<MyResourceProperties> {
-  @key("myResourceName")
-  @segment("myResources")
-  @path
-  name: string;
+@armProviderNamespace namespace MyService;
 
-  customProperty: string; // not valid in the resource envelope
+model FooResource is TrackedResource<{}> {
+  @key @segment("foo") name: string;
+  disallowed?: string; // not valid in the resource envelope
 }
 ```
 
 #### ✅ Correct
 
 ```tsp
-model MyResource is TrackedResource<MyResourceProperties> {
-  @key("myResourceName")
-  @segment("myResources")
-  @path
-  name: string;
-}
+@armProviderNamespace namespace MyService;
 
-model MyResourceProperties {
-  customProperty: string;
+model FooResource is TrackedResource<{}> {
+  @key @segment("foo") name: string;
+  ...ManagedServiceIdentityProperty;
 }
 ```

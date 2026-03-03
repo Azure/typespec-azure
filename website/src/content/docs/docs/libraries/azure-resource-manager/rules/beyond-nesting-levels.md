@@ -11,48 +11,46 @@ Tracked Resources must use 3 or fewer levels of nesting. Deeply nested resources
 #### ❌ Incorrect
 
 ```tsp
-// 4 levels of nesting — too deep
-@parentResource(Level2)
-model Level3 is TrackedResource<Level3Properties> {
-  @key("level3Name")
-  @segment("level3s")
-  @path
-  name: string;
+@armProviderNamespace namespace MyService;
+
+// 4 levels of nesting: A > B > C > D — too deep
+model A is TrackedResource<{}> {
+  @key("a") @segment("as") @path name: string;
 }
 
-@parentResource(Level3)
-model Level4 is TrackedResource<Level4Properties> {
-  @key("level4Name")
-  @segment("level4s")
-  @path
-  name: string;
+@parentResource(A)
+model B is TrackedResource<{}> {
+  @key("b") @segment("bs") @path name: string;
+}
+
+@parentResource(B)
+model C is TrackedResource<{}> {
+  @key("c") @segment("cs") @path name: string;
+}
+
+@parentResource(C)
+model D is TrackedResource<{}> {
+  @key("d") @segment("ds") @path name: string;
 }
 ```
 
 #### ✅ Correct
 
 ```tsp
-// 3 or fewer levels of nesting
-model TopLevel is TrackedResource<TopLevelProperties> {
-  @key("topLevelName")
-  @segment("topLevels")
-  @path
-  name: string;
+@armProviderNamespace namespace MyService;
+
+// 3 levels of nesting: A > B > C
+model A is TrackedResource<{}> {
+  @key("a") @segment("as") @path name: string;
 }
 
-@parentResource(TopLevel)
-model Child is TrackedResource<ChildProperties> {
-  @key("childName")
-  @segment("children")
-  @path
-  name: string;
+@parentResource(A)
+model B is TrackedResource<{}> {
+  @key("b") @segment("bs") @path name: string;
 }
 
-@parentResource(Child)
-model GrandChild is TrackedResource<GrandChildProperties> {
-  @key("grandChildName")
-  @segment("grandChildren")
-  @path
-  name: string;
+@parentResource(B)
+model C is TrackedResource<{}> {
+  @key("c") @segment("cs") @path name: string;
 }
 ```

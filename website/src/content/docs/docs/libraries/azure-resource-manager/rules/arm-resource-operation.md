@@ -10,19 +10,30 @@ Validate ARM Resource operations. All resource operations must be defined inside
 
 #### ❌ Incorrect
 
+Operations must be inside an interface:
+
 ```tsp
 // Operation defined outside of an interface
-op getEmployee is ArmResourceRead<Employee>;
+@armResourceRead(FooResource)
+@get op getFoos(...ApiVersionParameter): FooResource;
+```
+
+Operations must use the correct ARM resource decorator for the HTTP verb:
+
+```tsp
+@armResourceOperations
+interface FooResources {
+  // Missing @armResourceCreateOrUpdate decorator
+  @put createOrUpdate(...ResourceInstanceParameters<FooResource>, @bodyRoot resource: FooResource): ArmResponse<FooResource>;
+}
 ```
 
 #### ✅ Correct
 
 ```tsp
-interface Employees {
-  get is ArmResourceRead<Employee>;
-  createOrUpdate is ArmResourceCreateOrReplace<Employee>;
-  update is ArmResourcePatchSync<Employee, EmployeeProperties>;
-  delete is ArmResourceDeleteSync<Employee>;
-  listByResourceGroup is ArmResourceListByParent<Employee>;
+@armResourceOperations
+interface FooResources {
+  get is ArmResourceRead<FooResource>;
+  createOrUpdate is ArmResourceCreateOrReplaceAsync<FooResource>;
 }
 ```

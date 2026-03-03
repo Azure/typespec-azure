@@ -11,40 +11,20 @@ title: "arm-resource-operation-response"
 #### ❌ Incorrect
 
 ```tsp
-model Employee is TrackedResource<EmployeeProperties> {
-  @key("employeeName")
-  @segment("employees")
-  @path
-  name: string;
-}
-
-model OtherResource is TrackedResource<OtherProperties> {
-  @key("otherName")
-  @segment("others")
-  @path
-  name: string;
-}
-
-interface Employees {
-  // Returns a different resource type than Employee
-  get is ArmResourceRead<OtherResource>;
+@armResourceOperations
+interface FooResources {
+  // Returns BarResource instead of FooResource
+  @get @armResourceRead(FooResource)
+  get(...ResourceInstanceParameters<FooResource>): ArmResponse<BarResource> | ErrorResponse;
 }
 ```
 
 #### ✅ Correct
 
 ```tsp
-model Employee is TrackedResource<EmployeeProperties> {
-  @key("employeeName")
-  @segment("employees")
-  @path
-  name: string;
-}
-
-interface Employees {
-  get is ArmResourceRead<Employee>;
-  createOrUpdate is ArmResourceCreateOrReplace<Employee>;
-  update is ArmResourcePatchSync<Employee, EmployeeProperties>;
-  listByResourceGroup is ArmResourceListByParent<Employee>;
+@armResourceOperations
+interface FooResources {
+  @get @armResourceRead(FooResource)
+  get(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource> | ErrorResponse;
 }
 ```

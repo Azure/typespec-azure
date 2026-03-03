@@ -11,22 +11,20 @@ Avoid using the `@customAzureResource` decorator. It doesn't provide validation 
 #### ❌ Incorrect
 
 ```tsp
-@customAzureResource
-model MyResource {
-  @key("myResourceName")
-  @segment("myResources")
-  @visibility(Lifecycle.Read)
+@Azure.ResourceManager.Legacy.customAzureResource
+model Person {
   name: string;
 }
 ```
 
 #### ✅ Correct
 
+Use standard ARM resource types:
+
 ```tsp
-model MyResource is TrackedResource<MyResourceProperties> {
-  @key("myResourceName")
-  @segment("myResources")
-  @pattern("^[a-zA-Z0-9-]{3,24}$")
+model Employee is TrackedResource<EmployeeProperties> {
+  @key("employeeName")
+  @segment("employees")
   @path
   name: string;
 }

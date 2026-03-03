@@ -11,43 +11,33 @@ Patch envelope properties should match the resource properties. If a resource de
 #### ❌ Incorrect
 
 ```tsp
-model Employee is TrackedResource<EmployeeProperties> {
-  @key("employeeName")
-  @segment("employees")
-  @path
-  name: string;
-
+model FooResource is TrackedResource<FooProperties> {
+  @key("foo") @segment("foo") @path name: string;
   ...ManagedServiceIdentityProperty;
 }
 
 @armResourceOperations
-interface Employees {
-  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
+interface FooResources {
   // update model is missing the 'identity' envelope property
-  update is ArmResourcePatchSync<Employee, EmployeeProperties>;
+  update is ArmResourcePatchSync<FooResource, FooProperties>;
 }
 ```
 
 #### ✅ Correct
 
 ```tsp
-model Employee is TrackedResource<EmployeeProperties> {
-  @key("employeeName")
-  @segment("employees")
-  @path
-  name: string;
-
+model FooResource is TrackedResource<FooProperties> {
+  @key("foo") @segment("foo") @path name: string;
   ...ManagedServiceIdentityProperty;
 }
 
-model EmployeePatch {
+model FooPatch {
   ...ManagedServiceIdentityProperty;
-  properties?: EmployeeProperties;
+  properties?: FooProperties;
 }
 
 @armResourceOperations
-interface Employees {
-  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
-  update is ArmResourcePatchSync<Employee, EmployeePatch>;
+interface FooResources {
+  update is ArmResourcePatchSync<FooResource, FooPatch>;
 }
 ```

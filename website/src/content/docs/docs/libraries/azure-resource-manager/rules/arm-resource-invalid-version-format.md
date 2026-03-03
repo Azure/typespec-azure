@@ -11,15 +11,22 @@ ARM resource versions must follow the `YYYY-MM-DD` format, with an optional suff
 #### ❌ Incorrect
 
 ```tsp
+@versioned(Versions)
+@armProviderNamespace
+namespace Microsoft.Contoso;
+
 enum Versions {
-  v1: "v1.0",
-  v2: "2024",
+  v1: "1.2.3",
 }
 ```
 
 #### ✅ Correct
 
 ```tsp
+@versioned(Versions)
+@armProviderNamespace
+namespace Microsoft.Contoso;
+
 enum Versions {
   v2024_01_01: "2024-01-01",
   v2024_06_01_preview: "2024-06-01-preview",

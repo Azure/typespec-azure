@@ -11,18 +11,33 @@ Tenant and Extension resources should not define a list by subscription operatio
 #### ❌ Incorrect
 
 ```tsp
-@armResourceOperations
-interface Widgets {
-  list is ArmResourceListByParent<Widget>;
-  listBySubscription is ArmListBySubscription<Widget>;
+@tenantResource
+model FooResource is ProxyResource<FooProperties> {
+  @key("foo")
+  @segment("foo")
+  @path
+  name: string;
+}
+
+@armResourceOperations(FooResource)
+interface FooResources {
+  op listBySubscription is ArmListBySubscription<FooResource>;
 }
 ```
 
 #### ✅ Correct
 
 ```tsp
-@armResourceOperations
-interface Widgets {
-  list is ArmResourceListByParent<Widget>;
+@tenantResource
+model FooResource is ProxyResource<FooProperties> {
+  @key("foo")
+  @segment("foo")
+  @path
+  name: string;
+}
+
+@armResourceOperations(FooResource)
+interface FooResources {
+  get is ArmResourceRead<FooResource>;
 }
 ```

@@ -10,32 +10,22 @@ Resources with update operations should have updateable properties. The RP-speci
 
 #### ❌ Incorrect
 
-```tsp
-@armResourceOperations
-interface Employees {
-  get is ArmResourceRead<Employee>;
-  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
-  update is ArmResourcePatchSync<Employee, EmployeeProperties>;
-}
+All properties are read-only:
 
-model EmployeeProperties {
-  @visibility(Lifecycle.read)
-  provisioningState?: string;
+```tsp
+model FooResourceProperties {
+  @visibility(Lifecycle.Read)
+  bar?: string;
 }
 ```
 
 #### ✅ Correct
 
-```tsp
-@armResourceOperations
-interface Employees {
-  get is ArmResourceRead<Employee>;
-  createOrUpdate is ArmResourceCreateOrReplaceAsync<Employee>;
-  update is ArmResourcePatchSync<Employee, EmployeeProperties>;
-}
+At least one property without read-only visibility:
 
-model EmployeeProperties {
-  @visibility(Lifecycle.read)
+```tsp
+model FooResourceProperties {
+  @visibility(Lifecycle.Read)
   provisioningState?: string;
 
   displayName?: string;

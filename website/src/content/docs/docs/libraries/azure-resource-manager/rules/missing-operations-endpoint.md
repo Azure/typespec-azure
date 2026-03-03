@@ -11,9 +11,7 @@ Check for missing Operations interface. All Azure Resource Manager services must
 #### ❌ Incorrect
 
 ```tsp
-@armProviderNamespace
-@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-namespace Microsoft.Contoso;
+@armProviderNamespace namespace MyService;
 
 // missing Operations interface
 ```
@@ -21,9 +19,7 @@ namespace Microsoft.Contoso;
 #### ✅ Correct
 
 ```tsp
-@armProviderNamespace
-@useDependency(Azure.ResourceManager.Versions.v1_0_Preview_1)
-namespace Microsoft.Contoso;
+@armProviderNamespace namespace MyService;
 
 interface Operations extends Azure.ResourceManager.Operations {}
 ```
