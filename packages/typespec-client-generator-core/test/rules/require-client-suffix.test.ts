@@ -1,17 +1,17 @@
 import {
-  BasicTestRunner,
   createLinterRuleTester,
   LinterRuleTester,
+  TesterInstance,
 } from "@typespec/compiler/testing";
 import { beforeEach, it } from "vitest";
 import { requireClientSuffixRule } from "../../src/rules/require-client-suffix.rule.js";
-import { createSdkTestRunner } from "../test-host.js";
+import { SimpleTester } from "../tester.js";
 
-let runner: BasicTestRunner;
+let runner: TesterInstance;
 let tester: LinterRuleTester;
 
 beforeEach(async () => {
-  runner = await createSdkTestRunner();
+  runner = await SimpleTester.createInstance();
   tester = createLinterRuleTester(
     runner,
     requireClientSuffixRule,

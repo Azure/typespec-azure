@@ -9,9 +9,6 @@ configuration:
     eventResponderTasks:
       - if:
           - payloadType: Pull_Request
-          - not:
-              isActivitySender:
-                user: Copilot
         then:
           - if:
               - includesModifiedFiles:
@@ -68,3 +65,9 @@ configuration:
             then:
               - addLabel:
                   label: cli/psh
+          - if:
+              - includesModifiedFiles:
+                  files: []
+            then:
+              - addLabel:
+                  label: emitter:client:all

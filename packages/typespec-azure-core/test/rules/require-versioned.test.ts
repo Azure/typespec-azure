@@ -72,7 +72,7 @@ describe("codefix", () => {
         namespace Azure.MyService;
         `,
       )
-      .applyCodeFix("add-versioned").toEqual(`
+      .applyCodeFix("add-decorator-versioned").toEqual(`
         @versioned(Versions /* create an enum called Versions with your service version */)
         @service
         namespace Azure.MyService;

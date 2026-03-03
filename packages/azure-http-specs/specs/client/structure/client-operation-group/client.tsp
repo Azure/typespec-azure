@@ -63,7 +63,7 @@ namespace Client.Structure.ClientOperationGroup {
     name: "SecondClient",
     service: Client.Structure.Service,
   },
-  "javascript,go,python"
+  "javascript,go,python,rust"
 )
 namespace Client.Structure.AnotherClientOperationGroup {
   op five is Client.Structure.Service.Bar.five;

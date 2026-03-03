@@ -47,7 +47,7 @@
     ],
     "inputs": {
       "ServiceNamespace": {
-        "description": "Please provide service namespace in Pascal case:",
+        "description": "Please provide service namespace in Pascal case(e.g. Azure.Contoso):",
         "type": "text",
         "initialValue": "Azure.Contoso"
       }
@@ -169,7 +169,7 @@
     ],
     "inputs": {
       "ServiceNamespace": {
-        "description": "Please provide service namespace in Pascal case:",
+        "description": "Please provide service namespace in Pascal case(e.g. Azure.Contoso):",
         "type": "text",
         "initialValue": "Azure.Contoso"
       }

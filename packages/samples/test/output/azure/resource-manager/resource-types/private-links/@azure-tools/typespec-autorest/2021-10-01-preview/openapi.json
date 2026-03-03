@@ -718,6 +718,9 @@
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
         }
       }
     },
@@ -931,8 +934,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/DependentProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       },
       "allOf": [
@@ -992,8 +994,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/DependentUpdateProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       }
     },
@@ -1018,8 +1019,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/EmployeeProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       },
       "allOf": [
@@ -1087,8 +1087,7 @@
         },
         "properties": {
           "$ref": "#/definitions/EmployeeUpdateProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       }
     },

@@ -18,6 +18,7 @@ import {
 } from "@typespec/compiler";
 import { capitalize } from "@typespec/compiler/casing";
 import { getOperationId } from "@typespec/openapi";
+import { OpenApi2DocumentProxy } from "./types.js";
 
 export interface AutorestEmitterContext {
   readonly program: Program;
@@ -25,12 +26,15 @@ export interface AutorestEmitterContext {
   readonly outputFile: string;
   readonly tcgcSdkContext: TCGCContext;
   readonly version?: string;
+  readonly proxy?: OpenApi2DocumentProxy;
+  readonly multiService: boolean;
 }
 
 export function getClientName(context: AutorestEmitterContext, type: Type & { name: string }) {
   const clientName = getClientNameOverride(context.tcgcSdkContext, type);
   return clientName ?? type.name;
 }
+
 /**
  * Determines whether a type will be inlined in OpenAPI rather than defined
  * as a schema and referenced.
@@ -48,11 +52,11 @@ export function shouldInline(program: Program, type: Type): boolean {
   }
   switch (type.kind) {
     case "Model":
+    case "Union":
       return !type.name || isTemplateInstance(type);
     case "Scalar":
       return program.checker.isStdType(type) || isTemplateInstance(type);
     case "Enum":
-    case "Union":
       return !type.name;
     default:
       return true;
@@ -144,4 +148,56 @@ function standardizeOperationId(name: string) {
     .split("_")
     .map((s) => capitalize(s))
     .join("_");
+}
+
+const allowedAutorestFormats = new Set([
+  // number format
+  "int32",
+  "int64",
+  "float",
+  "double",
+  "unixtime",
+  "decimal",
+  // OAS-defined formats
+  "byte",
+  "binary",
+  "date",
+  "date-time",
+  "password",
+  // Additional formats recognized by autorest
+  "char",
+  "time",
+  "date-time-rfc1123",
+  "date-time-rfc7231", // Support for https://github.com/Azure/autorest/issues/4740
+  "duration",
+  "uuid",
+  "base64url",
+  "url",
+  "odata-query",
+  "certificate",
+
+  // ajv supported format
+  "uri",
+  "uri-reference",
+  "uri-template",
+  "email",
+  "hostname",
+  "ipv4",
+  "ipv6",
+  "regex",
+  "json-pointer",
+  "relative-json-pointer",
+  // for arm id purpose
+  "arm-id",
+
+  // Custom exclusions
+  "duration-constant",
+]);
+
+/**
+ * Check if the given format is supported by Autorest.
+ * Those formats are validated by https://github.com/Azure/azure-openapi-validator/blob/main/packages/rulesets/src/spectral/functions/schema-format.ts#L17
+ */
+export function isSupportedAutorestFormat(formatStr: string): boolean {
+  return allowedAutorestFormats.has(formatStr.toLowerCase());
 }

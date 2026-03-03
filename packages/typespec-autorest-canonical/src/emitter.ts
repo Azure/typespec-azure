@@ -65,6 +65,7 @@ export async function $onEmit(context: EmitContext<AutorestCanonicalEmitterOptio
   const options: ResolvedAutorestCanonicalEmitterOptions = {
     outputFile: resolvedOptions["output-file"],
     outputDir: context.emitterOutputDir,
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     azureResourceProviderFolder: resolvedOptions["azure-resource-provider-folder"],
     newLine: resolvedOptions["new-line"],
     omitUnreachableTypes: resolvedOptions["omit-unreachable-types"],
@@ -95,8 +96,10 @@ async function emitAllServices(
       service,
       version: canonicalVersion,
       tcgcSdkContext,
+      multiService: services.length > 1,
     };
-    const result = await getOpenAPIForService(context, options);
+    const results = await getOpenAPIForService(context, options);
+    const result = results[0];
     const includedVersions = getVersion(program, service.type)
       ?.getVersions()
       ?.map((item) => item.value ?? item.name);

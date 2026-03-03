@@ -1,7 +1,6 @@
 import {
   DecoratedType,
   Decorator,
-  DecoratorApplication,
   Type,
   createRule,
   getTypeName,
@@ -13,6 +12,7 @@ export const noOpenAPIRule = createRule({
   description:
     "Azure specs should not be using decorators from @typespec/openapi or @azure-tools/typespec-autorest",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-openapi",
   messages: {
     default: paramMessage`Azure specs should not be using decorator "${"name"}" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter.`,
     operationId:
@@ -26,10 +26,7 @@ export const noOpenAPIRule = createRule({
       for (const dec of type.decorators) {
         if (dec.definition) {
           const id = getTypeName(dec.definition.namespace);
-          if (
-            (id === "TypeSpec.OpenAPI" || id === "Autorest") &&
-            !isException(dec.definition, dec)
-          ) {
+          if (id === "TypeSpec.OpenAPI" || id === "Autorest") {
             context.reportDiagnostic({
               target: dec.node ?? type,
               format: { name: dec.decorator.name },
@@ -52,11 +49,6 @@ export const noOpenAPIRule = createRule({
     };
   },
 });
-
-// https://github.com/Azure/typespec-azure/issues/687 no alternative for x-ms-identifiers for now
-function isException(dec: Decorator, application: DecoratorApplication) {
-  return dec.name === "@extension" && application.args[0].jsValue === "x-ms-identifiers";
-}
 
 function getMessageId(dec: Decorator) {
   switch (dec.name) {

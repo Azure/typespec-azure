@@ -85,6 +85,7 @@ export const requireDocumentation = createRule({
   name: "documentation-required",
   description: "Require documentation over enums, models, and operations.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/documentation-required",
   messages: {
     default: paramMessage`The ${"kind"} named '${"name"}' should have a documentation or description, use doc comment /** */ to provide it.`,
   },

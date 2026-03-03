@@ -1,218 +1,86 @@
 ---
-title: 9. Customizing operations with traits
-description: Customizing operations with traits
+title: 9. Versioning
+description: Versioning your data-plane service
 llmstxt: true
 ---
 
-For all standard lifecycle operations you can customize the operation parameters and response body by passing a special model type to the `Traits` parameter of the operation template, typically the second parameter of the operation template. You can also customize the whole set of resource operations by passing traits to the `ResourceOperations` interface.
+## Versioning your service
 
-You can combine multiple traits using the model intersection operator `&`. Here's an example of defining the `ServiceTraits` with `SupportsRepeatableRequests`, `SupportsConditionalRequests` and `SupportsClientRequestId`. These are then passed into the `Azure.Core.ResourceOperations` template:
+It is inevitable that service specifications will change over time. It is a best practice to add versioning support to your specification from the first version. To do that, you will need to define an `enum` containing your service versions and then apply the `@versioned` decorator to your service namespace.
 
-```typespec
-import "@azure-tools/typespec-azure-core";
-
-using Azure.Core;
-using Azure.Core.Traits;
-
-alias ServiceTraits = SupportsRepeatableRequests &
-  SupportsConditionalRequests &
-  SupportsClientRequestId;
-
-alias Operations = Azure.Core.ResourceOperations<ServiceTraits>;
-```
-
-Traits can be applied simultaneously at both the interface and operation level, they will be composed together when your operation is defined.
-
-For example, if you wanted to add standard list operation query parameters to the `listWidgets` operation, you could use the `ListQueryParametersTrait`:
+Here is an example for the `WidgetManager` service:
 
 ```typespec
-/** List Widget resources */
-op listWidgets is Operations.ResourceList<
-  Widget,
-  ListQueryParametersTrait<StandardListQueryParameters & SelectQueryParameter>
->;
-```
+@service(#{ title: "Contoso Widget Manager" })
+@versioned(Contoso.WidgetManager.Versions)
+namespace Contoso.WidgetManager;
 
-## Useful trait types
-
-The following trait types can be used for typical operation customization patterns:
-
-### `QueryParametersTrait<TParams, Contexts>`
-
-This trait adds query parameters to operation signatures. It accepts a model type containing the query parameters that will be mixed in to the operation signature:
-
-```typespec
-op getWidget is Operations.ResourceRead<
-  Widget,
-  QueryParametersTrait<{
-    @query foo: string;
-  }>
->;
-```
-
-> **NOTE**: All properties in `TParams` must be marked with `@query` or an error will be raised.
-
-The `Contexts` parameter is configured to apply the query parameters to all operations by default.
-
-To constrain the types of operations that these query parameters will apply to, pass one ore more of the following values:
-
-- **TraitContext.Read**: Applies to read operations
-- **TraitContext.Create**: Applies to create operations
-- **TraitContext.Update**: Applies to update operations
-- **TraitContext.Delete**: Applies to delete operations
-- **TraitContext.List**: Applies to list operations
-- **TraitContext.Action**: Applies to custom action operations
-
-Here is an example of applying query parameters to `Read` and `List` operations:
-
-```typespec
-alias MyQueryParams = QueryParametersTrait<
-  {
-    @query foo: string;
-  },
-  TraitContext.Read | TraitContext.List
->;
-
-// This will have a `foo` parameter added
-op getWidget is Operations.ResourceRead<Widget, MyQueryParams>;
-
-// This will not get the `foo` parameter because it doesn't match the contexts
-op deleteWidget is Operations.ResourceDelete<
-  Widget,
-  QueryParametersTrait<{
-    @query foo: string;
-  }>
->;
-```
-
-### `ListQueryParametersTrait<TParams>`
-
-This is a helper trait that specialized `QueryParametersTrait` to the `TraitContext.List` context. For example:
-
-```typespec
-alias MyListQueryParams = ListQueryParametersTrait<{
-  @query foo: string;
-}>;
-
-// Will get the `foo` parameter
-op listWidgets is Operations.ResourceList<Widget, MyListQueryParams>;
-
-// Will not get the `foo` parameter
-op deleteWidget is Operations.ResourceDelete<Widget, MyListQueryParams>;
-```
-
-### `RequestHeadersTrait<TParams, Contexts>`
-
-This trait adds request headers to operation signatures. It accepts a model type containing the request headers that will be mixed in to the operation signature:
-
-```typespec
-op getWidget is ResourceRead<
-  Widget,
-  RequestHeadersTrait<{
-    @header foo: string;
-  }>
->;
-```
-
-> **NOTE**: All properties in `TParams` must be marked with `@header` or an error will be raised.
-
-You can specify `Contexts` where this trait applies in the way as described for the `QueryParametersTrait`.
-
-### `ResponseHeadersTrait<TParams, Contexts>`
-
-This trait adds response headers to operation signatures. It accepts a model type containing the response headers that will be mixed in to the operation signature:
-
-```typespec
-op getWidget is ResourceRead<
-  Widget,
-  ResponseHeadersTrait<{
-    @header foo: string;
-  }>
->;
-```
-
-> **NOTE**: All properties in `TParams` must be marked with `@header` or an error will be raised.
-
-You can specify `Contexts` where this trait applies in the way as described for the `QueryParametersTrait`.
-
-## Applying traits to all resource operations
-
-If you would like to apply the same traits to all resource operations, you can do so by adding them to the traits object for your instance of the `ResourceOperations` interface. Here's an example of adding a request header called `foo` to all resource operations:
-
-```typespec
-import "@azure-tools/typespec-azure-core";
-
-using Azure.Core;
-using Azure.Core.Traits;
-
-alias ServiceTraits = SupportsRepeatableRequests &
-  SupportsConditionalRequests &
-  SupportsClientRequestId &
-  RequestHeadersTrait<{
-    @header foo: string;
-  }>;
-
-alias Operations = ResourceOperations<ServiceTraits>;
-
-op deleteWidget is Operations.ResourceDelete<Widget>;
-```
-
-This defines `deleteWidget` by using the `ResourceDelete` template defined inside of your customized `Operations` interface.
-
-**IMPORTANT NOTE:** The `ResourceOperations` interface requires that an explicit set of traits be included to describe whether certain Azure service features are supported.
-
-Here is the list of the required traits with the names of the trait models to enable and disable those features:
-
-- **RepeatableRequests**: `SupportsRepeatableRequests` and `NoRepeatableRequests`
-- **ConditionalRequests**: `SupportsConditionalRequests` and `NoConditionalRequests`
-- **ClientRequestId**: `SupportsClientRequestId` and `NoClientRequestId`
-
-## Customizing the API version parameter
-
-You can use the `VersionParameterTrait` to customize the API version parameter for resource operations, either at the level of interface or individual operation. To do this, use the `TraitOverride` type to override the existing `api-version` query parameter:
-
-```typespec
-/** The ApiVersion path parameter. */
-model ApiVersionPathParameter {
-  /** The API version to use for this operation. */
-  @segment("api")
-  @path("api-version")
-  apiVersion: string;
+enum Versions {
+  v2022_08_31: "2022-08-31",
 }
-
-op deleteWidget is ResourceDelete<
-  Widget,
-  TraitOverride<VersionParameterTrait<ApiVersionPathParameter>>
->;
 ```
 
-Using the `TraitOverride` modifier with the `VersionParameterTrait<ApiVersionPathParameter>` causes any existing `VersionParameterTrait` instances in the operation signature to be overridden by the one you have supplied.
+There are a few things to point out here:
 
-This will result in an operation that has the route path `/api/{apiVersion}/widgets/{widgetName}` while also removing the old `api-version` query parameter from the operation signature.
+- We define an `enum` called `Versions` inside of the service namespace. For each service version, we map a version symbol like `v2022_08_31` to a version string like `2022-08-31`. This service currently only has a single version, but we can add more to this enum as things change over time.
+- We add the `@versioned` decorator and reference the `Versions` enum we defined using the fully-qualified name `Contoso.WidgetManager.Versions`. This marks the service as being versioned and specifies the set of versions.
+- We change the `@useDependency` decorator we used previously to now link each service version to a specific version of `Azure.Core`. See the [Using Azure.Core Versions](#using-azurecore-versions) section for more information.
 
-## Versioning the use of traits
-
-It is possible that a service will begin to support a particular feature or trait in a later version. There are two ways to express that a trait is being added in a later service version:
-
-### Using the `TVersionAdded` parameter of some trait types
-
-> **NOTE:** Versioning of Azure Core service specifications is covered in more detail on [this page](https://azure.github.io/typespec-azure/docs/getstarted/azure-core/step10).
-
-Some standard trait types accept an optional `TVersionAdded` parameter which enables you to specify the service version enum representing the version where support for this trait is added:
-
-- `SupportsClientRequestId`
-- `SupportsRepeatableRequests`
-- `SupportsConditionalRequests`
-
-Here is an example of adding support for repeatable requests in a later service version:
+Imagine that it's 3 months later and you want to release a new version of your service with some slight changes. Add a new version to the `Versions` enum:
 
 ```typespec
-import "@azure-tools/typespec-azure-core";
+enum Versions {
+  v2022_08_31: "2022-08-31",
+  v2022_11_30: "2022-11-30",
+}
+```
 
-using Azure.Core;
-using Azure.Core.Traits;
-using Versioning;
+You will also need to add the `@useDependency` decorator:
 
+```typespec
+enum Versions {
+  v2022_08_31: "2022-08-31",
+  v2022_11_30: "2022-11-30",
+}
+```
+
+Finally, you can express changes to your service using the `@added` and `@removed` decorators. Here's an example of adding a new property to `Widget` and removing an old one:
+
+```typespec
+/** A widget. */
+@resource("widgets")
+model Widget {
+  /** The widget name. */
+  @key("widgetName")
+  @visibility(Lifecycle.Read)
+  name: string;
+
+  /** The widget color. */
+  @added(Contoso.WidgetManager.Versions.v2022_11_30)
+  color: string;
+
+  /** The ID of the widget's manufacturer. */
+  @removed(Contoso.WidgetManager.Versions.v2022_11_30)
+  manufacturerId: string;
+}
+```
+
+> You can do a lot more with versioning decorators, so consult the `typespec-versioning` [README.md](https://github.com/microsoft/typespec/tree/main/packages/versioning#enable-versioning-for-service-or-library) for more information on how you can use them to annotate your service and describe changes between different versions.
+
+## Using Azure.Core versions
+
+`typespec-azure-core` is a versioned TypeSpec library. This means that even as the TypeSpec portions of the typespec-azure-core library are updated, you can anchor each version of your spec to a specific `Azure.Core` version. This is done by decorating your service namespace with the `@useDependency` decorator from the `typespec-versioning` library.
+
+Simple TypeSpec specs need only pass the desired `Azure.Core` version into the `@useDependency` decorator:
+
+```typespec
+@service(#{ title: "Contoso Widget Manager" })
+namespace Contoso.WidgetManager;
+```
+
+If your spec has [multiple versions](#versioning-your-service), you will need to specify the version of `typespec-azure-core` that was used for each version in your spec. Assuming that there are two versions of `Azure.Core` and each version of your service uses a different one, it would look like this:
+
+```typespec
 @service(#{ title: "Contoso Widget Manager" })
 @versioned(Contoso.WidgetManager.Versions)
 namespace Contoso.WidgetManager;
@@ -221,30 +89,4 @@ enum Versions {
   v2022_08_31: "v20220831",
   v2022_11_30: "v20221130",
 }
-
-alias ServiceTraits = SupportsRepeatableRequests<Versions.v2022_11_30> &
-  SupportsConditionalRequests &
-  SupportsClientRequestId;
-
-alias Operations = ResourceOperations<ServiceTraits>;
-```
-
-### Define a custom trait and add the `@traitAdded` decorator
-
-Building on the previous example, we can add a custom header trait at a later service version using the `@traitAdded` decorator:
-
-```typespec
-/** A custom trait added at a later service version. */
-@traitAdded(Versions.v2022_11_30)
-model CustomRequestHeadersTrait
-  is RequestHeadersTrait<{
-    @TypeSpec.Http.header foo: string;
-  }>;
-
-alias ServiceTraits = SupportsRepeatableRequests<Versions.v2022_11_30> &
-  SupportsConditionalRequests &
-  SupportsClientRequestId &
-  CustomRequestHeadersTrait;
-
-alias Operations = ResourceOperations<ServiceTraits>;
 ```

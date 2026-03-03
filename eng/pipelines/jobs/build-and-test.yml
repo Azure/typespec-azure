@@ -7,6 +7,10 @@ parameters:
     type: string
 
 steps:
+  - script: git config --global core.longpaths true
+    displayName: Enable long paths in git (windows)
+    condition: eq(variables['Agent.OS'], 'Windows_NT')
+
   - checkout: self
     submodules: true
 

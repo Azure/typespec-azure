@@ -718,6 +718,9 @@
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/types.json#/definitions/ErrorResponse"
             }
           }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
         }
       }
     },
@@ -812,7 +815,7 @@
             "name": "resource",
             "in": "body",
             "description": "Resource create parameters.",
-            "required": false,
+            "required": true,
             "schema": {
               "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/definitions/PrivateEndpointConnection"
             }
@@ -888,6 +891,15 @@
           },
           {
             "$ref": "../../../../../../../../../specs/resource-manager/common-types/v5/privatelinks.json#/parameters/PrivateEndpointConnectionName"
+          },
+          {
+            "name": "properties",
+            "in": "body",
+            "description": "The resource properties to be updated.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Azure.ResourceManager.PrivateEndpointConnectionUpdate"
+            }
           }
         ],
         "responses": {
@@ -1360,8 +1372,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/DependentProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       },
       "allOf": [
@@ -1421,8 +1432,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/DependentUpdateProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       }
     },
@@ -1447,8 +1457,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/EmployeeProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       },
       "allOf": [
@@ -1516,8 +1525,7 @@
         },
         "properties": {
           "$ref": "#/definitions/EmployeeUpdateProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       }
     },

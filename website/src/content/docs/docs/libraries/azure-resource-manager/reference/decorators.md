@@ -101,7 +101,7 @@ None
 ### `@armResourceAction` {#@Azure.ResourceManager.armResourceAction}
 
 ```typespec
-@Azure.ResourceManager.armResourceAction(resourceType: Model)
+@Azure.ResourceManager.armResourceAction(resourceModel: Model, resourceName?: valueof string)
 ```
 
 #### Target
@@ -110,9 +110,29 @@ None
 
 #### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
+
+### `@armResourceCheckExistence` {#@Azure.ResourceManager.armResourceCheckExistence}
+
+Marks the operation as being a check existence (HEAD) operation
+
+```typespec
+@Azure.ResourceManager.armResourceCheckExistence(resourceModel: Model, resourceName?: valueof string)
+```
+
+#### Target
+
+`Operation`
+
+#### Parameters
+
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 ### `@armResourceCollectionAction` {#@Azure.ResourceManager.armResourceCollectionAction}
 
@@ -133,7 +153,7 @@ None
 ### `@armResourceCreateOrUpdate` {#@Azure.ResourceManager.armResourceCreateOrUpdate}
 
 ```typespec
-@Azure.ResourceManager.armResourceCreateOrUpdate(resourceType: Model)
+@Azure.ResourceManager.armResourceCreateOrUpdate(resourceModel: Model, resourceName?: valueof string)
 ```
 
 #### Target
@@ -142,14 +162,15 @@ None
 
 #### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 ### `@armResourceDelete` {#@Azure.ResourceManager.armResourceDelete}
 
 ```typespec
-@Azure.ResourceManager.armResourceDelete(resourceType: Model)
+@Azure.ResourceManager.armResourceDelete(resourceModel: Model, resourceName?: valueof string)
 ```
 
 #### Target
@@ -158,14 +179,15 @@ None
 
 #### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 ### `@armResourceList` {#@Azure.ResourceManager.armResourceList}
 
 ```typespec
-@Azure.ResourceManager.armResourceList(resourceType: Model)
+@Azure.ResourceManager.armResourceList(resourceModel: Model, resourceName?: valueof string)
 ```
 
 #### Target
@@ -174,9 +196,10 @@ None
 
 #### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 ### `@armResourceOperations` {#@Azure.ResourceManager.armResourceOperations}
 
@@ -215,7 +238,7 @@ individually tagged
 ### `@armResourceRead` {#@Azure.ResourceManager.armResourceRead}
 
 ```typespec
-@Azure.ResourceManager.armResourceRead(resourceType: Model)
+@Azure.ResourceManager.armResourceRead(resourceModel: Model, resourceName?: valueof string)
 ```
 
 #### Target
@@ -224,14 +247,15 @@ individually tagged
 
 #### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 ### `@armResourceUpdate` {#@Azure.ResourceManager.armResourceUpdate}
 
 ```typespec
-@Azure.ResourceManager.armResourceUpdate(resourceType: Model)
+@Azure.ResourceManager.armResourceUpdate(resourceModel: Model, resourceName?: valueof string)
 ```
 
 #### Target
@@ -240,9 +264,10 @@ individually tagged
 
 #### Parameters
 
-| Name         | Type    | Description    |
-| ------------ | ------- | -------------- |
-| resourceType | `Model` | Resource model |
+| Name          | Type             | Description                                                                                       |
+| ------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| resourceModel | `Model`          | Resource model                                                                                    |
+| resourceName  | `valueof string` | Optional. The name of the resource. If not provided, the name of the resource model will be used. |
 
 ### `@armVirtualResource` {#@Azure.ResourceManager.armVirtualResource}
 
@@ -296,7 +321,7 @@ The properties that are used as identifiers for the object needs to be provided 
 
 #### Target
 
-`ModelProperty`
+`ModelProperty | unknown[]`
 
 #### Parameters
 
@@ -533,6 +558,63 @@ Specify an external reference that should be used when emitting this type.
 | Name    | Type             | Description                                                   |
 | ------- | ---------------- | ------------------------------------------------------------- |
 | jsonRef | `valueof string` | External reference(e.g. "../../common.json#/definitions/Foo") |
+
+### `@feature` {#@Azure.ResourceManager.Legacy.feature}
+
+Decorator to associate a feature with a model, interface, or namespace
+
+```typespec
+@Azure.ResourceManager.Legacy.feature(featureName: EnumMember)
+```
+
+#### Target
+
+The target to associate the feature with
+`Model | Operation | Interface | Namespace`
+
+#### Parameters
+
+| Name        | Type         | Description                              |
+| ----------- | ------------ | ---------------------------------------- |
+| featureName | `EnumMember` | The feature to associate with the target |
+
+### `@featureOptions` {#@Azure.ResourceManager.Legacy.featureOptions}
+
+Decorator to define options for a specific feature
+
+```typespec
+@Azure.ResourceManager.Legacy.featureOptions(options: valueof Azure.ResourceManager.Legacy.ArmFeatureOptions)
+```
+
+#### Target
+
+The enum member that represents the feature
+`EnumMember`
+
+#### Parameters
+
+| Name    | Type                                                                                          | Description                 |
+| ------- | --------------------------------------------------------------------------------------------- | --------------------------- |
+| options | [valueof `ArmFeatureOptions`](./data-types.md#Azure.ResourceManager.Legacy.ArmFeatureOptions) | The options for the feature |
+
+### `@features` {#@Azure.ResourceManager.Legacy.features}
+
+Decorator to define a set of features
+
+```typespec
+@Azure.ResourceManager.Legacy.features(features: Enum)
+```
+
+#### Target
+
+The service namespace
+`Namespace`
+
+#### Parameters
+
+| Name     | Type   | Description                         |
+| -------- | ------ | ----------------------------------- |
+| features | `Enum` | The enum that contains the features |
 
 ### `@renamePathParameter` {#@Azure.ResourceManager.Legacy.renamePathParameter}
 

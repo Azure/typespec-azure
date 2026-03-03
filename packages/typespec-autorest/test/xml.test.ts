@@ -209,7 +209,7 @@ it("does not emit XML metadata when the xml-strategy is 'none'", async () => {
   );
 
   strictEqual(openapi.definitions["Payload"]["xml"], undefined);
-  strictEqual(openapi.definitions["Payload"].properties["RenamedProperty"].xml, undefined);
+  strictEqual(openapi.definitions["Payload"].properties["property"].xml, undefined);
 
   strictEqual(openapi.definitions["Payload"].properties["items"].xml, undefined);
   strictEqual(openapi.definitions["Payload"].properties["data"].xml, undefined);
@@ -217,4 +217,10 @@ it("does not emit XML metadata when the xml-strategy is 'none'", async () => {
     openapi.definitions["Payload"].properties["data"].properties["content"].xml,
     undefined,
   );
+
+  deepStrictEqual(openapi.consumes, ["application/json"]);
+  deepStrictEqual(openapi.produces, ["application/json"]);
+
+  deepStrictEqual(openapi.paths["/"].get.consumes, ["application/xml"]);
+  deepStrictEqual(openapi.paths["/"].get.produces, ["application/xml"]);
 });

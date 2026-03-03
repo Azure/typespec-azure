@@ -1,4 +1,11 @@
-import type { DecoratorContext, EnumMember, Model, ModelProperty, Type } from "@typespec/compiler";
+import type {
+  DecoratorContext,
+  DecoratorValidatorCallbacks,
+  EnumMember,
+  Model,
+  ModelProperty,
+  Type,
+} from "@typespec/compiler";
 
 /**
  * `@traitLocation` sets the applicable location for a trait on its envelope property.
@@ -11,7 +18,7 @@ export type TraitLocationDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   contexts: EnumMember,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * `@traitContext` sets the applicable context for a trait on its envelope property.
@@ -24,7 +31,7 @@ export type TraitContextDecorator = (
   context: DecoratorContext,
   target: ModelProperty,
   contexts: Type,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * `@trait` marks a model type as representing a 'trait' and performs basic validation
@@ -34,7 +41,11 @@ export type TraitContextDecorator = (
  * @param traitName An optional name to uniquely identify the trait.  If unspecified,
  * the model type name is used.
  */
-export type TraitDecorator = (context: DecoratorContext, target: Model, traitName?: string) => void;
+export type TraitDecorator = (
+  context: DecoratorContext,
+  target: Model,
+  traitName?: string,
+) => DecoratorValidatorCallbacks | void;
 
 /**
  * Sets the version for when the trait was added to the specification.  Can be applied
@@ -46,7 +57,7 @@ export type TraitAddedDecorator = (
   context: DecoratorContext,
   target: Model | ModelProperty,
   addedVersion: Type,
-) => void;
+) => DecoratorValidatorCallbacks | void;
 
 export type AzureCoreTraitsDecorators = {
   traitLocation: TraitLocationDecorator;

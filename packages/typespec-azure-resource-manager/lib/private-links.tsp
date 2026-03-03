@@ -36,6 +36,8 @@ model PrivateLink<Description extends valueof string = "A private link resource.
 /**
  * Operations over private link resources.
  * @template PrivateLinkResourceModel The type of the private link resource. You must declare a private link resource type in your provider namespace.
+ * @template ResourceName Optional. The name of the private link resource in this context, by default, this is `{targetResourceName}PrivateLink`.
+ * @template ResourceParameter Optional. The name parameter model for the private link resource. By default, this is `PrivateLinkResourceParameter`, which has a required path parameter for the private link resource name. You can use this template parameter to specify a different parameter type if needed, but it must include at least a path parameter for the private link resource name.
  *
  * @example
  * ```ts
@@ -49,7 +51,11 @@ model PrivateLink<Description extends valueof string = "A private link resource.
  * }
  * ```
  */
-interface PrivateLinks<PrivateLinkResourceModel extends PrivateLink> {
+interface PrivateLinks<
+  PrivateLinkResourceModel extends PrivateLink,
+  ResourceName extends valueof string = string(""),
+  ResourceParameter extends {} = CommonTypes.PrivateLinkResourceParameter
+> {
   /**
    * @dev List the private links to a resource
    * @template ParentResource the parent resource of the PrivateLink
@@ -60,14 +66,15 @@ interface PrivateLinks<PrivateLinkResourceModel extends PrivateLink> {
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response for the list operation
    * @template Error Optional. The error response, if non-standard.
+   * @template OverrideResourceName Optional. The name of the private link resource being operated on.
    */
   @doc("List {name} PrivateLinks", ParentResource)
   @get
   @autoRoute
   @list
   @listsResource(Resource)
-  @segmentOf(PrivateLinkResourceParameter)
-  @armResourceList(Resource)
+  @segmentOf(ResourceParameter)
+  @builtInResourceOperation(ParentResource, Resource, "list", OverrideResourceName)
   @Private.enforceConstraint(ParentResource, Foundations.Resource)
   ListByParent<
     ParentResource extends Foundations.SimpleResource,
@@ -75,7 +82,8 @@ interface PrivateLinks<PrivateLinkResourceModel extends PrivateLink> {
     BaseParameters = DefaultBaseParameters<ParentResource>,
     Parameters extends {} = {},
     Response extends {} = ArmResponse<ResourceListResult<Resource>>,
-    Error extends {} = ErrorResponse
+    Error extends {} = ErrorResponse,
+    OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmReadOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> & Parameters,
     Response,
@@ -92,14 +100,15 @@ interface PrivateLinks<PrivateLinkResourceModel extends PrivateLink> {
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response for the list operation
    * @template Error Optional. The error response, if non-standard.
+   * @template OverrideResourceName Optional. The name of the private link resource being operated on.
    */
   @Private.legacyType
   @doc("List {name} PrivateLinks", ParentResource)
   @get
   @autoRoute
   @listsResource(Resource)
-  @segmentOf(PrivateLinkResourceParameter)
-  @armResourceList(Resource)
+  @segmentOf(ResourceParameter)
+  @builtInResourceOperation(ParentResource, Resource, "list", OverrideResourceName)
   @Private.enforceConstraint(ParentResource, Foundations.Resource)
   ListSinglePageByParent<
     ParentResource extends Foundations.SimpleResource,
@@ -107,7 +116,8 @@ interface PrivateLinks<PrivateLinkResourceModel extends PrivateLink> {
     BaseParameters = DefaultBaseParameters<ParentResource>,
     Parameters extends {} = {},
     Response extends {} = ArmResponse<ResourceListResult<Resource>>,
-    Error extends {} = ErrorResponse
+    Error extends {} = ErrorResponse,
+    OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmReadOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> & Parameters,
     Response,
@@ -122,21 +132,23 @@ interface PrivateLinks<PrivateLinkResourceModel extends PrivateLink> {
    * @template Parameters Optional. Additional parameters after the path parameters
    * @template Response Optional. The success response for the read operation
    * @template Error Optional. The error response, if non-standard.
+   * @template OverrideResourceName Optional. The name of the private link resource being operated on.
    */
   @autoRoute
   @doc("Get a {name} PrivateLink", ParentResource)
   @get
-  @armResourceRead(Resource)
+  @builtInResourceOperation(ParentResource, Resource, "read", OverrideResourceName)
   Read<
     ParentResource extends Foundations.SimpleResource,
     Resource extends PrivateLink = PrivateLinkResourceModel,
     BaseParameters = DefaultBaseParameters<ParentResource>,
     Parameters extends {} = {},
     Response extends {} = ArmResponse<Resource>,
-    Error extends {} = ErrorResponse
+    Error extends {} = ErrorResponse,
+    OverrideResourceName extends valueof string = "${ResourceName}"
   > is ArmReadOperation<
     ResourceInstanceParameters<ParentResource, BaseParameters> &
-      KeysOf<PrivateLinkResourceParameter> &
+      KeysOf<ResourceParameter> &
       Parameters,
     Response,
     Error

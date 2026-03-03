@@ -1,59 +1,63 @@
-import { Diagnostic, ModelProperty } from "@typespec/compiler";
+import { ModelProperty } from "@typespec/compiler";
+import { t } from "@typespec/compiler/testing";
 import { strictEqual } from "assert";
-import { beforeEach, it } from "vitest";
+import { it } from "vitest";
 import { getParamAlias } from "../../src/decorators.js";
-import { createSdkTestRunner, SdkTestRunner } from "../test-host.js";
-
-let runner: SdkTestRunner;
-
-beforeEach(async () => {
-  runner = await createSdkTestRunner({ emitterName: "@azure-tools/typespec-python" });
-});
+import {
+  createClientCustomizationInput,
+  createSdkContextForTester,
+  SimpleBaseTester,
+} from "../tester.js";
 
 it("basic", async () => {
-  const { blobName } = (await runner.compileWithCustomization(
-    `
-    @service
-    namespace MyService;
+  const { program, blobName } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+      @service
+      namespace MyService;
 
-    op download(@path blob: string): void;
-    op upload(@path blobName: string): void;
+      op download(@path blob: string): void;
+      op upload(@path blobName: string): void;
     `,
-    `
-    namespace MyCustomizations;
+      t.code`
+      namespace MyCustomizations;
 
-    model MyClientInitialization {
-      @paramAlias("blob")
-      @test
-      blobName: string;
-    }
+      model MyClientInitialization {
+        @paramAlias("blob")
+        ${t.modelProperty("blobName")}: string;
+      }
 
-    @@clientInitialization(MyService, {parameters: MyCustomizations.MyClientInitialization});
+      @@clientInitialization(MyService, {parameters: MyCustomizations.MyClientInitialization});
     `,
-  )) as { blobName: ModelProperty };
-  strictEqual(getParamAlias(runner.context, blobName), "blob");
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  strictEqual(getParamAlias(context, blobName as ModelProperty), "blob");
 });
 
 it("multiple lint warning", async () => {
-  const [{ blobClientName }, diagnostics] = (await runner.compileAndDiagnoseWithCustomization(
-    `
-    namespace My.Service;
+  const [{ program, blobClientName }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
+    createClientCustomizationInput(
+      `
+      namespace My.Service;
 
-    op originalName(blobClientName: string): void;
-    op firstParamAlias(blobName: string): void;
-    op secondParamAlias(bName: string): void;
+      op originalName(blobClientName: string): void;
+      op firstParamAlias(blobName: string): void;
+      op secondParamAlias(bName: string): void;
     `,
-    `
-    namespace My.Customizations;
+      t.code`
+      namespace My.Customizations;
 
-    model ClientInitOptions {
-      @paramAlias("blobName")
-      @paramAlias("bName")
-      @test blobClientName: string;
-    }
-    @@clientInitialization(My.Service, ClientInitOptions);
+      model ClientInitOptions {
+        @paramAlias("blobName")
+        @paramAlias("bName")
+        ${t.modelProperty("blobClientName")}: string;
+      }
+      @@clientInitialization(My.Service, ClientInitOptions);
     `,
-  )) as [{ blobClientName: ModelProperty }, diagnostics: Diagnostic[]];
+    ),
+  );
+  const context = await createSdkContextForTester(program);
   strictEqual(diagnostics.length, 1);
   strictEqual(
     diagnostics[0].code,
@@ -63,5 +67,5 @@ it("multiple lint warning", async () => {
     diagnostics[0].message,
     "Multiple param aliases applied to 'blobClientName'. Only the first one 'bName' will be used.",
   );
-  strictEqual(getParamAlias(runner.context, blobClientName), "bName");
+  strictEqual(getParamAlias(context, blobClientName as ModelProperty), "bName");
 });

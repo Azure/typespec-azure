@@ -71,7 +71,7 @@ sub_client.do_something()
 
 The entrance of TCGC is `SdkPackage` which represents a complete package and includes clients, models, etc. The clients depend on the combination usage of namespace, interface, `@service`, `@client`.
 
-If there is no explicitly defined `@client`, then every namespaces with `@service` will be a client. The nested namespaces and interfaces under that namespace will be a sub client with hierarchy.
+If there is no explicitly defined `@client`, then each namespace with `@service` will be a separate root client. The nested namespaces and interfaces under each service namespace will be sub clients with hierarchy.
 
 - Example 1:
 

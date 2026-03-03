@@ -27,7 +27,7 @@ using Azure.Core.Traits;
 Supported Widget Services endpoints (protocol and hostname, for example:
 https://westus.api.widget.contoso.com).
  */
-    endpoint: string,
+    endpoint: url,
   }
 )
 @versioned(Contoso.WidgetManager.Versions)

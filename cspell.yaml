@@ -21,6 +21,7 @@ ignorePaths:
   - .vscode/**
   - .editorconfig
   - .github/CODEOWNERS
+  - "*.lock.yml"
 useGitignore: true
 enableFiletypes:
   - tsp
@@ -29,6 +30,7 @@ words:
   - allof
   - apim
   - apos
+  - armcontoso
   - armId
   - azsdk
   - Bazs
@@ -62,6 +64,7 @@ words:
   - msazure
   - msdata
   - mylocation
+  - nsps
   - nupkg
   - odata
   - Onco
@@ -86,5 +89,7 @@ words:
   - vnet
   - WINDOWSVMIMAGE
   - azcore
+  - azkeys
+  - azsecrets
   - byval
   - petstoreopgrp

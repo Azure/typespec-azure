@@ -1,11 +1,4 @@
-import {
-  json,
-  MockRequest,
-  passOnSuccess,
-  ScenarioMockApi,
-  ValidationError,
-  withServiceKeys,
-} from "@typespec/spec-api";
+import { json, passOnSuccess, ScenarioMockApi, ValidationError } from "@typespec/spec-api";
 
 export const Scenarios: Record<string, ScenarioMockApi> = {};
 
@@ -15,7 +8,6 @@ const LOCATION_EXPECTED = "eastus";
 const SUBSCRIPTION_SCOPE_URI = `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}`;
 const RESOURCE_GROUP_SCOPE_URI = `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}`;
 const RESOURCE_SCOPE_URI = `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top`;
-const TENANT_SCOPE_URI = "";
 const EXTENSION_RESOURCE_NAME = "extension";
 const validTopLevelResource = {
   id: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top`,
@@ -163,103 +155,10 @@ const validResourceExtensionsResource = {
   },
 };
 
-function getServiceKey(resourceUri: string) {
-  switch (resourceUri) {
-    case RESOURCE_GROUP_SCOPE_URI:
-      return "ResourceGroup" as const;
-    case SUBSCRIPTION_SCOPE_URI:
-      return "Subscription" as const;
-    case TENANT_SCOPE_URI:
-      return "Tenant" as const;
-    case RESOURCE_SCOPE_URI:
-      return "Resource" as const;
-    default:
-      throw new ValidationError(
-        "Invalid resource uri",
-        `${RESOURCE_GROUP_SCOPE_URI} | ${SUBSCRIPTION_SCOPE_URI} | ${TENANT_SCOPE_URI} | ${RESOURCE_SCOPE_URI}`,
-        resourceUri,
-      );
-  }
-}
-
-function requestHandler(
-  req: MockRequest,
-  requestMethod: string,
-  resourceUri: string,
-  validResource: any,
-) {
-  const serviceKey = getServiceKey(resourceUri);
-  switch (requestMethod) {
-    case "get":
-      return {
-        pass: serviceKey,
-        status: 200,
-        body: json(validResource),
-      } as const;
-    case "put":
-      return {
-        pass: serviceKey,
-        status: 200,
-        body: json(validResource),
-      } as const;
-    case "patch":
-      return {
-        pass: serviceKey,
-        status: 200,
-        body: json({
-          ...validResource,
-          properties: {
-            provisioningState: "Succeeded",
-            description: "valid2",
-          },
-        }),
-      } as const;
-    case "delete":
-      return {
-        pass: serviceKey,
-        status: 204,
-      } as const;
-    case "list":
-      return {
-        pass: serviceKey,
-        status: 200,
-        body: json({
-          value: [validResource],
-        }),
-      } as const;
-    default:
-      throw new ValidationError(
-        "Invalid request method",
-        `"get" | "put" | "patch" | "delete" | "list"`,
-        requestMethod,
-      );
-  }
-}
-
-function getUri(resourceUri: string, requestMethod: string): string {
-  switch (requestMethod) {
-    case "list":
-      if (resourceUri === "/" || resourceUri === "") {
-        return `${resourceUri}/providers/Azure.ResourceManager.Resources/extensionsResources`;
-      }
-      return `/${resourceUri}/providers/Azure.ResourceManager.Resources/extensionsResources`;
-    default:
-      if (resourceUri === "/" || resourceUri === "") {
-        return `${resourceUri}/providers/Azure.ResourceManager.Resources/extensionsResources/${EXTENSION_RESOURCE_NAME}`;
-      }
-      return `/${resourceUri}/providers/Azure.ResourceManager.Resources/extensionsResources/${EXTENSION_RESOURCE_NAME}`;
-  }
-}
-
 // extension tracked resource
-Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceKeys([
-  "ResourceGroup",
-  "Subscription",
-  "Tenant",
-  "Resource",
-]).pass([
+Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = passOnSuccess([
   {
-    uri: getUri(RESOURCE_GROUP_SCOPE_URI, "get"),
+    uri: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/extensionsResources/${EXTENSION_RESOURCE_NAME}`,
     method: "get",
     request: {
       query: {
@@ -270,28 +169,10 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
       status: 200,
       body: json(validResourceGroupExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "get", RESOURCE_GROUP_SCOPE_URI, validResourceGroupExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(RESOURCE_GROUP_SCOPE_URI.substring(1), "get"),
-    method: "get",
-    request: {
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-    },
-    response: {
-      status: 200,
-      body: json(validResourceGroupExtensionsResource),
-    },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "get", RESOURCE_GROUP_SCOPE_URI, validResourceGroupExtensionsResource),
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: getUri(SUBSCRIPTION_SCOPE_URI, "get"),
+    uri: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.Resources/extensionsResources/${EXTENSION_RESOURCE_NAME}`,
     method: "get",
     request: {
       query: {
@@ -302,28 +183,10 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
       status: 200,
       body: json(validSubscriptionExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "get", SUBSCRIPTION_SCOPE_URI, validSubscriptionExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(SUBSCRIPTION_SCOPE_URI.substring(1), "get"),
-    method: "get",
-    request: {
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-    },
-    response: {
-      status: 200,
-      body: json(validSubscriptionExtensionsResource),
-    },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "get", SUBSCRIPTION_SCOPE_URI, validSubscriptionExtensionsResource),
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: getUri("/" + TENANT_SCOPE_URI, "get"),
+    uri: `/providers/Azure.ResourceManager.Resources/extensionsResources/${EXTENSION_RESOURCE_NAME}`,
     method: "get",
     request: {
       query: {
@@ -334,28 +197,10 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
       status: 200,
       body: json(validTenantExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "get", TENANT_SCOPE_URI, validTenantExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(TENANT_SCOPE_URI, "get"),
-    method: "get",
-    request: {
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-    },
-    response: {
-      status: 200,
-      body: json(validTenantExtensionsResource),
-    },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "get", TENANT_SCOPE_URI, validTenantExtensionsResource),
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: getUri(RESOURCE_SCOPE_URI, "get"),
+    uri: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/providers/Azure.ResourceManager.Resources/extensionsResources/${EXTENSION_RESOURCE_NAME}`,
     method: "get",
     request: {
       query: {
@@ -366,36 +211,13 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_get = withServiceK
       status: 200,
       body: json(validResourceExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "get", RESOURCE_SCOPE_URI, validResourceExtensionsResource),
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: getUri(RESOURCE_SCOPE_URI.substring(1), "get"),
-    method: "get",
-    request: {
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-    },
-    response: {
-      status: 200,
-      body: json(validResourceExtensionsResource),
-    },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "get", RESOURCE_SCOPE_URI, validResourceExtensionsResource),
     kind: "MockApiDefinition",
   },
 ]);
 
-Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = withServiceKeys([
-  "ResourceGroup",
-  "Subscription",
-  "Tenant",
-  "Resource",
-]).pass([
+Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = passOnSuccess([
   {
-    uri: getUri(RESOURCE_GROUP_SCOPE_URI, "put"),
+    uri: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/extensionsResources/${EXTENSION_RESOURCE_NAME}`,
     method: "put",
     request: {
       query: {
@@ -411,33 +233,10 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
       status: 200,
       body: json(validResourceGroupExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "put", RESOURCE_GROUP_SCOPE_URI, validResourceGroupExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(RESOURCE_GROUP_SCOPE_URI.substring(1), "put"),
-    method: "put",
-    request: {
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-      body: json({
-        properties: {
-          description: "valid",
-        },
-      }),
-    },
-    response: {
-      status: 200,
-      body: json(validResourceGroupExtensionsResource),
-    },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "put", RESOURCE_GROUP_SCOPE_URI, validResourceGroupExtensionsResource),
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: getUri(SUBSCRIPTION_SCOPE_URI, "put"),
+    uri: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.Resources/extensionsResources/${EXTENSION_RESOURCE_NAME}`,
     method: "put",
     request: {
       query: {
@@ -453,33 +252,10 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
       status: 200,
       body: json(validSubscriptionExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "put", SUBSCRIPTION_SCOPE_URI, validSubscriptionExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(SUBSCRIPTION_SCOPE_URI.substring(1), "put"),
-    method: "put",
-    request: {
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-      body: json({
-        properties: {
-          description: "valid",
-        },
-      }),
-    },
-    response: {
-      status: 200,
-      body: json(validSubscriptionExtensionsResource),
-    },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "put", SUBSCRIPTION_SCOPE_URI, validSubscriptionExtensionsResource),
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: getUri("/" + TENANT_SCOPE_URI, "put"),
+    uri: `/providers/Azure.ResourceManager.Resources/extensionsResources/${EXTENSION_RESOURCE_NAME}`,
     method: "put",
     request: {
       query: {
@@ -495,33 +271,10 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
       status: 200,
       body: json(validTenantExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "put", TENANT_SCOPE_URI, validTenantExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(TENANT_SCOPE_URI, "put"),
-    method: "put",
-    request: {
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-      body: json({
-        properties: {
-          description: "valid",
-        },
-      }),
-    },
-    response: {
-      status: 200,
-      body: json(validTenantExtensionsResource),
-    },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "put", TENANT_SCOPE_URI, validTenantExtensionsResource),
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: getUri(RESOURCE_SCOPE_URI, "put"),
+    uri: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/providers/Azure.ResourceManager.Resources/extensionsResources/${EXTENSION_RESOURCE_NAME}`,
     method: "put",
     request: {
       query: {
@@ -537,41 +290,13 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_createOrUpdate = w
       status: 200,
       body: json(validResourceExtensionsResource),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "put", RESOURCE_SCOPE_URI, validResourceExtensionsResource),
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: getUri(RESOURCE_SCOPE_URI.substring(1), "put"),
-    method: "put",
-    request: {
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-      body: json({
-        properties: {
-          description: "valid",
-        },
-      }),
-    },
-    response: {
-      status: 200,
-      body: json(validResourceExtensionsResource),
-    },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "put", RESOURCE_SCOPE_URI, validResourceExtensionsResource),
     kind: "MockApiDefinition",
   },
 ]);
 
-Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServiceKeys([
-  "ResourceGroup",
-  "Subscription",
-  "Tenant",
-  "Resource",
-]).pass([
+Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = passOnSuccess([
   {
-    uri: getUri(RESOURCE_GROUP_SCOPE_URI, "patch"),
+    uri: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/extensionsResources/${EXTENSION_RESOURCE_NAME}`,
     method: "patch",
     request: {
       query: {
@@ -593,39 +318,10 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
         },
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "patch", RESOURCE_GROUP_SCOPE_URI, validResourceGroupExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(RESOURCE_GROUP_SCOPE_URI.substring(1), "patch"),
-    method: "patch",
-    request: {
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-      body: json({
-        properties: {
-          description: "valid2",
-        },
-      }),
-    },
-    response: {
-      status: 200,
-      body: json({
-        ...validResourceGroupExtensionsResource,
-        properties: {
-          provisioningState: "Succeeded",
-          description: "valid2",
-        },
-      }),
-    },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "patch", RESOURCE_GROUP_SCOPE_URI, validResourceGroupExtensionsResource),
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: getUri(SUBSCRIPTION_SCOPE_URI, "patch"),
+    uri: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.Resources/extensionsResources/${EXTENSION_RESOURCE_NAME}`,
     method: "patch",
     request: {
       query: {
@@ -647,39 +343,10 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
         },
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "patch", SUBSCRIPTION_SCOPE_URI, validSubscriptionExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(SUBSCRIPTION_SCOPE_URI.substring(1), "patch"),
-    method: "patch",
-    request: {
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-      body: json({
-        properties: {
-          description: "valid2",
-        },
-      }),
-    },
-    response: {
-      status: 200,
-      body: json({
-        ...validSubscriptionExtensionsResource,
-        properties: {
-          provisioningState: "Succeeded",
-          description: "valid2",
-        },
-      }),
-    },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "patch", SUBSCRIPTION_SCOPE_URI, validSubscriptionExtensionsResource),
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: getUri("/" + TENANT_SCOPE_URI, "patch"),
+    uri: `/providers/Azure.ResourceManager.Resources/extensionsResources/${EXTENSION_RESOURCE_NAME}`,
     method: "patch",
     request: {
       query: {
@@ -701,39 +368,10 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
         },
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "patch", TENANT_SCOPE_URI, validTenantExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(TENANT_SCOPE_URI, "patch"),
-    method: "patch",
-    request: {
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-      body: json({
-        properties: {
-          description: "valid2",
-        },
-      }),
-    },
-    response: {
-      status: 200,
-      body: json({
-        ...validTenantExtensionsResource,
-        properties: {
-          provisioningState: "Succeeded",
-          description: "valid2",
-        },
-      }),
-    },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "patch", TENANT_SCOPE_URI, validTenantExtensionsResource),
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: getUri(RESOURCE_SCOPE_URI, "patch"),
+    uri: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/providers/Azure.ResourceManager.Resources/extensionsResources/${EXTENSION_RESOURCE_NAME}`,
     method: "patch",
     request: {
       query: {
@@ -755,47 +393,13 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_update = withServi
         },
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "patch", RESOURCE_SCOPE_URI, validResourceExtensionsResource),
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: getUri(RESOURCE_SCOPE_URI.substring(1), "patch"),
-    method: "patch",
-    request: {
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-      body: json({
-        properties: {
-          description: "valid2",
-        },
-      }),
-    },
-    response: {
-      status: 200,
-      body: json({
-        ...validResourceExtensionsResource,
-        properties: {
-          provisioningState: "Succeeded",
-          description: "valid2",
-        },
-      }),
-    },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "patch", RESOURCE_SCOPE_URI, validResourceExtensionsResource),
     kind: "MockApiDefinition",
   },
 ]);
 
-Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServiceKeys([
-  "ResourceGroup",
-  "Subscription",
-  "Tenant",
-  "Resource",
-]).pass([
+Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = passOnSuccess([
   {
-    uri: getUri(RESOURCE_GROUP_SCOPE_URI, "delete"),
+    uri: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/extensionsResources/${EXTENSION_RESOURCE_NAME}`,
     method: "delete",
     request: {
       query: {
@@ -805,11 +409,10 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     response: {
       status: 204,
     },
-    handler: (req: MockRequest) => requestHandler(req, "delete", RESOURCE_GROUP_SCOPE_URI, null),
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(RESOURCE_GROUP_SCOPE_URI.substring(1), "delete"),
+    uri: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.Resources/extensionsResources/${EXTENSION_RESOURCE_NAME}`,
     method: "delete",
     request: {
       query: {
@@ -819,11 +422,10 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     response: {
       status: 204,
     },
-    handler: (req: MockRequest) => requestHandler(req, "delete", RESOURCE_GROUP_SCOPE_URI, null),
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(SUBSCRIPTION_SCOPE_URI, "delete"),
+    uri: `/providers/Azure.ResourceManager.Resources/extensionsResources/${EXTENSION_RESOURCE_NAME}`,
     method: "delete",
     request: {
       query: {
@@ -833,11 +435,10 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     response: {
       status: 204,
     },
-    handler: (req: MockRequest) => requestHandler(req, "delete", SUBSCRIPTION_SCOPE_URI, null),
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(SUBSCRIPTION_SCOPE_URI.substring(1), "delete"),
+    uri: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/providers/Azure.ResourceManager.Resources/extensionsResources/${EXTENSION_RESOURCE_NAME}`,
     method: "delete",
     request: {
       query: {
@@ -847,75 +448,13 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_delete = withServi
     response: {
       status: 204,
     },
-    handler: (req: MockRequest) => requestHandler(req, "delete", SUBSCRIPTION_SCOPE_URI, null),
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: getUri("/" + TENANT_SCOPE_URI, "delete"),
-    method: "delete",
-    request: {
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-    },
-    response: {
-      status: 204,
-    },
-    handler: (req: MockRequest) => requestHandler(req, "delete", TENANT_SCOPE_URI, null),
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: getUri(TENANT_SCOPE_URI, "delete"),
-    method: "delete",
-    request: {
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-    },
-    response: {
-      status: 204,
-    },
-    handler: (req: MockRequest) => requestHandler(req, "delete", TENANT_SCOPE_URI, null),
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: getUri(RESOURCE_SCOPE_URI, "delete"),
-    method: "delete",
-    request: {
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-    },
-    response: {
-      status: 204,
-    },
-    handler: (req: MockRequest) => requestHandler(req, "delete", RESOURCE_SCOPE_URI, null),
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: getUri(RESOURCE_SCOPE_URI.substring(1), "delete"),
-    method: "delete",
-    request: {
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-    },
-    response: {
-      status: 204,
-    },
-    handler: (req: MockRequest) => requestHandler(req, "delete", RESOURCE_SCOPE_URI, null),
     kind: "MockApiDefinition",
   },
 ]);
 
-Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = withServiceKeys([
-  "ResourceGroup",
-  "Subscription",
-  "Tenant",
-  "Resource",
-]).pass([
+Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = passOnSuccess([
   {
-    uri: getUri(RESOURCE_GROUP_SCOPE_URI, "list"),
+    uri: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/extensionsResources`,
     method: "get",
     request: {
       query: {
@@ -928,30 +467,10 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
         value: [validResourceGroupExtensionsResource],
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "list", RESOURCE_GROUP_SCOPE_URI, validResourceGroupExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(RESOURCE_GROUP_SCOPE_URI.substring(1), "list"),
-    method: "get",
-    request: {
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-    },
-    response: {
-      status: 200,
-      body: json({
-        value: [validResourceGroupExtensionsResource],
-      }),
-    },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "list", RESOURCE_GROUP_SCOPE_URI, validResourceGroupExtensionsResource),
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: getUri(SUBSCRIPTION_SCOPE_URI, "list"),
+    uri: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/providers/Azure.ResourceManager.Resources/extensionsResources`,
     method: "get",
     request: {
       query: {
@@ -964,30 +483,10 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
         value: [validSubscriptionExtensionsResource],
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "list", SUBSCRIPTION_SCOPE_URI, validSubscriptionExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(SUBSCRIPTION_SCOPE_URI.substring(1), "list"),
-    method: "get",
-    request: {
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-    },
-    response: {
-      status: 200,
-      body: json({
-        value: [validSubscriptionExtensionsResource],
-      }),
-    },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "list", SUBSCRIPTION_SCOPE_URI, validSubscriptionExtensionsResource),
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: getUri("/" + TENANT_SCOPE_URI, "list"),
+    uri: `/providers/Azure.ResourceManager.Resources/extensionsResources`,
     method: "get",
     request: {
       query: {
@@ -1000,30 +499,10 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
         value: [validTenantExtensionsResource],
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "list", TENANT_SCOPE_URI, validTenantExtensionsResource),
     kind: "MockApiDefinition",
   },
   {
-    uri: getUri(TENANT_SCOPE_URI, "list"),
-    method: "get",
-    request: {
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-    },
-    response: {
-      status: 200,
-      body: json({
-        value: [validTenantExtensionsResource],
-      }),
-    },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "list", TENANT_SCOPE_URI, validTenantExtensionsResource),
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: getUri(RESOURCE_SCOPE_URI, "list"),
+    uri: `/subscriptions/${SUBSCRIPTION_ID_EXPECTED}/resourceGroups/${RESOURCE_GROUP_EXPECTED}/providers/Azure.ResourceManager.Resources/topLevelTrackedResources/top/providers/Azure.ResourceManager.Resources/extensionsResources`,
     method: "get",
     request: {
       query: {
@@ -1036,26 +515,6 @@ Scenarios.Azure_ResourceManager_Resources_ExtensionsResources_listByScope = with
         value: [validResourceExtensionsResource],
       }),
     },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "list", RESOURCE_SCOPE_URI, validResourceExtensionsResource),
-    kind: "MockApiDefinition",
-  },
-  {
-    uri: getUri(RESOURCE_SCOPE_URI.substring(1), "list"),
-    method: "get",
-    request: {
-      query: {
-        "api-version": "2023-12-01-preview",
-      },
-    },
-    response: {
-      status: 200,
-      body: json({
-        value: [validResourceExtensionsResource],
-      }),
-    },
-    handler: (req: MockRequest) =>
-      requestHandler(req, "list", RESOURCE_SCOPE_URI, validResourceExtensionsResource),
     kind: "MockApiDefinition",
   },
 ]);

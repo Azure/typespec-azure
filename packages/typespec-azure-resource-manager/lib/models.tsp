@@ -1,6 +1,5 @@
 using Http;
 using Rest;
-using OpenAPI;
 using Azure.Core;
 using Azure.ResourceManager.Foundations;
 using Azure.ResourceManager.Private;
@@ -67,7 +66,6 @@ model ResourceNameParameter<
 model TrackedResource<Properties extends {}, PropertiesOptional extends valueof boolean = true>
   extends Foundations.TrackedResource {
   @doc("The resource-specific properties for this resource.")
-  @conditionalClientFlatten
   @armResourcePropertiesOptionality(PropertiesOptional)
   properties?: Properties;
 }
@@ -92,7 +90,6 @@ model TrackedResource<Properties extends {}, PropertiesOptional extends valueof 
 model ProxyResource<Properties extends {}, PropertiesOptional extends valueof boolean = true>
   extends Foundations.ProxyResource {
   @doc("The resource-specific properties for this resource.")
-  @conditionalClientFlatten
   @armResourcePropertiesOptionality(PropertiesOptional)
   properties?: Properties;
 }
@@ -123,7 +120,6 @@ model ProxyResource<Properties extends {}, PropertiesOptional extends valueof bo
 model ExtensionResource<Properties extends {}, PropertiesOptional extends valueof boolean = true>
   extends Foundations.ExtensionResource {
   @doc("The resource-specific properties for this resource.")
-  @conditionalClientFlatten
   @armResourcePropertiesOptionality(PropertiesOptional)
   properties?: Properties;
 }

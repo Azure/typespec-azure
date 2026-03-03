@@ -69,7 +69,7 @@ it("Allows codefix when ARM resource name is missing pattern.", async () => {
       }
     `,
     )
-    .applyCodeFix("add-pattern-decorator").toEqual(`
+    .applyCodeFix("add-decorator-pattern").toEqual(`
       @armProviderNamespace
       namespace Microsoft.Contoso;
       

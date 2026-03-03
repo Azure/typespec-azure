@@ -1,6 +1,8 @@
+import { getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
   Diagnostic,
   Enum,
+  EnumMember,
   Interface,
   Model,
   ModelProperty,
@@ -9,6 +11,7 @@ import {
   Scalar,
   Type,
   Union,
+  UnionVariant,
   createDiagnosticCollector,
   getEffectiveModelType,
   getFriendlyName,
@@ -40,6 +43,7 @@ import {
   listOperationsInOperationGroup,
 } from "./decorators.js";
 import {
+  DecoratedType,
   SdkBodyParameter,
   SdkClient,
   SdkClientType,
@@ -102,13 +106,13 @@ export function isApiVersion(context: TCGCContext, type: ModelProperty): boolean
     return override;
   }
   // if the service is not versioning, then no api version parameter
-  const versionEnum = context.getPackageVersionEnum();
-  if (!versionEnum) {
+  const versionEnumSets = [...context.getPackageVersionEnum().values()];
+  if (versionEnumSets.length === 0) {
     return false;
   }
   // if the parameter type is the version enum or named as "apiVersion" or "api-version", then it is api version
   return (
-    type.type === versionEnum ||
+    versionEnumSets.some((versionEnum) => type.type === versionEnum) ||
     type.name.toLowerCase().includes("apiversion") ||
     type.name.toLowerCase().includes("api-version")
   );
@@ -195,7 +199,7 @@ export function getLibraryName(
   if (
     typeof type.name === "string" &&
     type.name !== "" &&
-    type.kind === "Model" &&
+    (type.kind === "Model" || type.kind === "Union") &&
     type.templateMapper?.args
   ) {
     const generatedName = context.__generatedNames.get(type);
@@ -239,12 +243,29 @@ export function getWireName(context: TCGCContext, type: Type & { name: string })
  */
 export function getCrossLanguageDefinitionId(
   context: TCGCContext,
-  type: Union | Model | Enum | Scalar | ModelProperty | Operation | Namespace | Interface,
+  type:
+    | Union
+    | Model
+    | Enum
+    | Scalar
+    | ModelProperty
+    | Operation
+    | Namespace
+    | Interface
+    | EnumMember
+    | UnionVariant,
   operation?: Operation,
   appendNamespace: boolean = true,
 ): string {
-  let retval = type.name || "anonymous";
-  let namespace = type.kind === "ModelProperty" ? type.model?.namespace : type.namespace;
+  let retval: string = typeof type.name === "symbol" ? "anonymous" : type.name || "anonymous";
+  let namespace =
+    type.kind === "ModelProperty"
+      ? type.model?.namespace
+      : type.kind === "EnumMember"
+        ? type.enum?.namespace
+        : type.kind === "UnionVariant"
+          ? type.union?.namespace
+          : type.namespace;
   switch (type.kind) {
     // Enum and Scalar will always have a name
     case "Union":
@@ -265,11 +286,13 @@ export function getCrossLanguageDefinitionId(
       }
       retval =
         namingPart
-          .map((x) =>
-            x.type?.kind === "Model" || x.type?.kind === "Union"
-              ? x.type.name || x.name
-              : x.name || "anonymous",
-          )
+          .map((x) => {
+            if (x.type?.kind === "Model" || x.type?.kind === "Union") {
+              const name = x.type.name;
+              return typeof name === "symbol" ? x.name : name || x.name;
+            }
+            return x.name || "anonymous";
+          })
           .join(".") +
         "." +
         retval;
@@ -287,6 +310,16 @@ export function getCrossLanguageDefinitionId(
     case "Operation":
       if (type.interface) {
         retval = `${getCrossLanguageDefinitionId(context, type.interface, undefined, false)}.${retval}`;
+      }
+      break;
+    case "EnumMember":
+      if (type.enum) {
+        retval = `${getCrossLanguageDefinitionId(context, type.enum, operation, false)}.${retval}`;
+      }
+      break;
+    case "UnionVariant":
+      if (type.union) {
+        retval = `${getCrossLanguageDefinitionId(context, type.union, operation, false)}.${retval}`;
       }
       break;
   }
@@ -456,6 +489,27 @@ function getContextPath(
               return result;
             }
           }
+        }
+      }
+    }
+
+    const lroMetadata = getLroMetadata(context.program, root);
+    if (lroMetadata) {
+      const anonymousCandidates = [
+        { lroResultType: lroMetadata.finalResult, label: "FinalResult" },
+        { lroResultType: lroMetadata.logicalResult, label: "LogicalResult" },
+        { lroResultType: lroMetadata.envelopeResult, label: "EnvelopeResult" },
+        { lroResultType: lroMetadata.finalEnvelopeResult, label: "FinalEnvelopeResult" },
+      ];
+
+      for (const { lroResultType, label } of anonymousCandidates) {
+        if (!lroResultType || lroResultType === "void") {
+          continue;
+        }
+        visited.clear();
+        result = [{ name: root.name, type: root }];
+        if (dfsModelProperties(typeToFind, lroResultType, label)) {
+          return result;
         }
       }
     }
@@ -720,6 +774,7 @@ export function getHttpOperationParameter(
   // So, when we try to find which http parameter a parameter or property corresponds to, we compare the `correspondingMethodParams` list directly.
   // If a method parameter is spread case, then we need to find the cooresponding http body parameter's property.
   for (const p of operation.parameters) {
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     for (const cp of p.correspondingMethodParams) {
       if (cp === param) {
         return p;
@@ -727,6 +782,7 @@ export function getHttpOperationParameter(
     }
   }
   if (operation.bodyParam) {
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     for (const cp of operation.bodyParam.correspondingMethodParams) {
       if (cp === param) {
         if (operation.bodyParam.type.kind === "model" && operation.bodyParam.type !== param.type) {
@@ -872,4 +928,26 @@ export function getNamespaceFromType(
     return type.namespace;
   }
   return undefined;
+}
+
+const CLIENT_OPTION_DECORATOR_NAME = "Azure.ClientGenerator.Core.@clientOption";
+
+/**
+ * Get the value of a client option by key from a decorated SDK type.
+ *
+ * @param type - A decorated SDK type (model, enum, operation, property, client, namespace, etc.)
+ * @param key - The name of the client option to look up
+ * @returns The option value, or `undefined` if the option is not set
+ *
+ * @example
+ * ```typescript
+ * const sdkModel = context.sdkPackage.models.find(m => m.name === "MyModel");
+ * const value = getClientOptions(sdkModel, "enableFeatureFoo");
+ * ```
+ */
+export function getClientOptions<T extends DecoratedType>(type: T, key: string): unknown {
+  const option = type.decorators
+    .filter((d) => d.name === CLIENT_OPTION_DECORATOR_NAME)
+    .find((d) => d.arguments.name === key);
+  return option?.arguments.value;
 }
