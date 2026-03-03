@@ -17,9 +17,11 @@ Custom long-running operation missing `Retry-After` header:
 interface FooResources {
   @Azure.Core.pollingOperation(FooResources.getOperationStatus)
   @post
-  op update(): FooResource;
+  update(): FooResource;
 
-  op getOperationStatus(): { status: Status };
+  getOperationStatus(): {
+    status: Status;
+  };
 }
 ```
 
@@ -41,8 +43,10 @@ Or include `Foundations.RetryAfterHeader` in your custom response:
 interface FooResources {
   @Azure.Core.pollingOperation(FooResources.getOperationStatus)
   @post
-  op update(): FooResource & Foundations.RetryAfterHeader;
+  update(): FooResource & Foundations.RetryAfterHeader;
 
-  op getOperationStatus(): { status: Status };
+  getOperationStatus(): {
+    status: Status;
+  };
 }
 ```

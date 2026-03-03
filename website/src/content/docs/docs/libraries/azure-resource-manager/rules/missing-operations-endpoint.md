@@ -10,16 +10,16 @@ Check for missing Operations interface. All Azure Resource Manager services must
 
 #### ❌ Incorrect
 
-```tsp
-@armProviderNamespace namespace MyService;
-
-// missing Operations interface
+```tsp title="main.tsp"
+@armProviderNamespace
+namespace MyService;
 ```
 
 #### ✅ Correct
 
-```tsp
-@armProviderNamespace namespace MyService;
+```tsp title="main.tsp"
+@armProviderNamespace
+namespace MyService;
 
 interface Operations extends Azure.ResourceManager.Operations {}
 ```

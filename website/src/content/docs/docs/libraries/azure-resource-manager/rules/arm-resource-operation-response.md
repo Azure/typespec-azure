@@ -14,7 +14,8 @@ title: "arm-resource-operation-response"
 @armResourceOperations
 interface FooResources {
   // Returns BarResource instead of FooResource
-  @get @armResourceRead(FooResource)
+  @get
+  @armResourceRead(FooResource)
   get(...ResourceInstanceParameters<FooResource>): ArmResponse<BarResource> | ErrorResponse;
 }
 ```
@@ -24,7 +25,8 @@ interface FooResources {
 ```tsp
 @armResourceOperations
 interface FooResources {
-  @get @armResourceRead(FooResource)
+  @get
+  @armResourceRead(FooResource)
   get(...ResourceInstanceParameters<FooResource>): ArmResponse<FooResource> | ErrorResponse;
 }
 ```

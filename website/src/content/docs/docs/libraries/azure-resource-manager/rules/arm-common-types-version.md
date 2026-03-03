@@ -35,9 +35,9 @@ namespace Microsoft.Contoso;
 
 enum Versions {
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v4)
-  v1;
+  v1,
 
   @armCommonTypesVersion(Azure.ResourceManager.CommonTypes.Versions.v5)
-  v2;
+  v2,
 }
 ```

@@ -12,7 +12,11 @@ Patch envelope properties should match the resource properties. If a resource de
 
 ```tsp
 model FooResource is TrackedResource<FooProperties> {
-  @key("foo") @segment("foo") @path name: string;
+  @key("foo")
+  @segment("foo")
+  @path
+  name: string;
+
   ...ManagedServiceIdentityProperty;
 }
 
@@ -27,7 +31,11 @@ interface FooResources {
 
 ```tsp
 model FooResource is TrackedResource<FooProperties> {
-  @key("foo") @segment("foo") @path name: string;
+  @key("foo")
+  @segment("foo")
+  @path
+  name: string;
+
   ...ManagedServiceIdentityProperty;
 }
 

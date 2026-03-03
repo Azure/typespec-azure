@@ -15,7 +15,8 @@ Operations must be inside an interface:
 ```tsp
 // Operation defined outside of an interface
 @armResourceRead(FooResource)
-@get op getFoos(...ApiVersionParameter): FooResource;
+@get
+op getFoos(...ApiVersionParameter): FooResource;
 ```
 
 Operations must use the correct ARM resource decorator for the HTTP verb:
@@ -24,7 +25,10 @@ Operations must use the correct ARM resource decorator for the HTTP verb:
 @armResourceOperations
 interface FooResources {
   // Missing @armResourceCreateOrUpdate decorator
-  @put createOrUpdate(...ResourceInstanceParameters<FooResource>, @bodyRoot resource: FooResource): ArmResponse<FooResource>;
+  @put createOrUpdate(
+    ...ResourceInstanceParameters<FooResource>,
+    @bodyRoot resource: FooResource,
+  ): ArmResponse<FooResource>;
 }
 ```
 

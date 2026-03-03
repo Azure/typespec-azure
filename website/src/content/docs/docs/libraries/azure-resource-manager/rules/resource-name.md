@@ -26,7 +26,9 @@ Underscore in model name:
 
 ```tsp
 model Foo_Resource is TrackedResource<{}> {
-  @key("foo") @segment("foo") @path
+  @key("foo")
+  @segment("foo")
+  @path
   name: string;
 }
 ```

@@ -11,7 +11,8 @@ Resource envelope properties must originate from the `Azure.ResourceManager` nam
 #### ❌ Incorrect
 
 ```tsp
-@armProviderNamespace namespace MyService;
+@armProviderNamespace
+namespace MyService;
 
 model FooResource is TrackedResource<{}> {
   @key @segment("foo") name: string;
@@ -22,7 +23,8 @@ model FooResource is TrackedResource<{}> {
 #### ✅ Correct
 
 ```tsp
-@armProviderNamespace namespace MyService;
+@armProviderNamespace
+namespace MyService;
 
 model FooResource is TrackedResource<{}> {
   @key @segment("foo") name: string;

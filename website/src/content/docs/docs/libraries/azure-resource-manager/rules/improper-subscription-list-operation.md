@@ -21,7 +21,7 @@ model FooResource is ProxyResource<FooProperties> {
 
 @armResourceOperations(FooResource)
 interface FooResources {
-  op listBySubscription is ArmListBySubscription<FooResource>;
+  listBySubscription is ArmListBySubscription<FooResource>;
 }
 ```
 

@@ -11,7 +11,8 @@ Warns when a property defined in the resource envelope is also defined in the re
 #### ❌ Incorrect
 
 ```tsp
-@armProviderNamespace namespace MyService;
+@armProviderNamespace
+namespace MyService;
 
 model FooResource is TrackedResource<FooProperties> {
   @key @segment("foo") name: string;
@@ -27,7 +28,8 @@ model FooProperties {
 #### ✅ Correct
 
 ```tsp
-@armProviderNamespace namespace MyService;
+@armProviderNamespace
+namespace MyService;
 
 model FooResource is TrackedResource<FooProperties> {
   @key @segment("foo") name: string;
