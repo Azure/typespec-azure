@@ -19,14 +19,14 @@
     "@astrojs/starlight": "^0.37.0",
     "@docsearch/css": "^4.1.0",
     "@docsearch/js": "^4.1.0",
-    "@fluentui/react-components": "~9.72.3",
+    "@fluentui/react-components": "~9.73.1",
     "@typespec/playground": "workspace:^",
     "astro": "^5.16.5",
     "es-module-shims": "~2.8.0",
     "react": "~19.2.3",
     "react-dom": "~19.2.3",
     "sharp": "^0.34.1",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.3"
   },
   "devDependencies": {
     "@azure-tools/typespec-autorest": "workspace:^",

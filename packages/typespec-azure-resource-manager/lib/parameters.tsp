@@ -241,3 +241,39 @@ model ExtensionResourceActionScope {
  */
 model ExtensionActionScope<StringType extends string = string>
   is Extension.ScopeParameter<StringType>;
+
+/**
+ * Standard list parameter $top, allows the user to control the total number of returned items.
+ */
+model ArmTopParameter {
+  @query("$top")
+  @doc("The total number of items to return.")
+  top: int64;
+}
+
+/**
+ * Standard list parameter $filter, allows the user to filter the results of a list operation.
+ */
+model ArmFilterParameter {
+  @query("$filter")
+  @doc("The OData filter expression to apply to the list operation.")
+  filter: string;
+}
+
+/**
+ * List parameter $skip, allows the user to control the offset of returned items.
+ */
+model ArmSkipParameter {
+  @query("$skip")
+  @doc("The number of items to skip before starting to collect the result set.")
+  skip: int64;
+}
+
+/**
+ * Standard list parameter $skiptoken, normally returned in the `nextLink` url of a page of items
+ */
+model SkipTokenParameter {
+  @query("$skiptoken")
+  @doc("An opaque value to use for pagination.")
+  skipToken: string;
+}

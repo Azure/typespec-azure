@@ -5,6 +5,7 @@ export const bodyArrayRule = createRule({
   name: "request-body-problem",
   description: "Request body should not be of raw array type.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/request-body-problem",
   messages: {
     array:
       "Request body should not be of raw array type. Consider creating a container model that can add properties over time to avoid introducing breaking changes.",

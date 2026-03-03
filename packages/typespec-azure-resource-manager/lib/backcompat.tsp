@@ -19,7 +19,17 @@ alias PrivateEndpointServiceConnectionStatus = CommonTypes.PrivateEndpointServic
 alias PrivateEndpointConnectionParameter = CommonTypes.PrivateEndpointConnectionParameter;
 alias PrivateLinkResource = CommonTypes.PrivateLinkResource;
 alias PrivateLinkResourceProperties = CommonTypes.PrivateLinkResourceProperties;
-alias PrivateLinkResourceParameter = CommonTypes.PrivateLinkResourceParameter;
+alias PrivateLinkResourceParameter<
+  Segment extends valueof string = "privateLinkResources",
+  ResourceNamePattern extends valueof string = string("^[a-z][a-zA-Z0-9]*$"),
+  MinLength extends valueof int32 = 3,
+  MaxLength extends valueof int32 = 63
+> = CommonTypes.PrivateLinkResourceNameParameter<
+  Segment,
+  ResourceNamePattern,
+  MinLength,
+  MaxLength
+>;
 alias PrivateEndpointConnectionResourceListResult = CommonTypes.PrivateEndpointConnectionListResult;
 #suppress "deprecated" "Need for back compatibility in common-types"
 alias PrivateEndpointConnectionResourceListResultV5 = CommonTypes.PrivateEndpointConnectionListResultV5;

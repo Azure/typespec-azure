@@ -15,6 +15,7 @@ import { SdkClient, SdkOperationGroup, TCGCContext } from "./interfaces.js";
 import {
   clientKey,
   clientLocationKey,
+  findServiceForOperation,
   getScopedDecoratorData,
   hasExplicitClientOrOperationGroup,
   listAllUserDefinedNamespaces,
@@ -199,7 +200,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
 
           const operationService =
             clients[0].services.length > 1
-              ? findService(clients[0].services, k as Operation)
+              ? findServiceForOperation(clients[0].services, k as Operation)
               : clients[0].services[0];
 
           if (existingOg) {
@@ -352,24 +353,6 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
       }
     }
   }
-}
-
-/**
- * Find the service namespace that contains the given operation.
- * @param services
- * @param operation
- * @returns
- */
-function findService(services: Namespace[], operation: Operation): Namespace {
-  let namespace = operation.namespace;
-  while (namespace) {
-    if (services.includes(namespace)) {
-      return namespace;
-    }
-    namespace = namespace.namespace;
-  }
-  // fallback to the first service
-  return services[0];
 }
 
 /**

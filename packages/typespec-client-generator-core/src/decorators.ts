@@ -92,6 +92,7 @@ import {
   omitOperation,
   operationGroupKey,
   overrideKey,
+  parseScopes,
   scopeKey,
 } from "./internal-utils.js";
 import { createStateSymbol, reportDiagnostic } from "./lib.js";
@@ -121,7 +122,7 @@ function setScopedDecoratorData(
     return;
   }
 
-  const [negationScopes, scopes] = parseScopes(context, scope);
+  const [negationScopes, scopes] = parseScopes(scope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
     // override the previous value for negation scopes
     const newObject: Record<string | symbol, any> =
@@ -148,32 +149,6 @@ function setScopedDecoratorData(
       .stateMap(key)
       .set(target, !targetEntry ? newObject : { ...targetEntry, ...newObject });
   }
-}
-
-function parseScopes(context: DecoratorContext, scope?: LanguageScopes): [string[]?, string[]?] {
-  if (scope === undefined) {
-    return [undefined, undefined];
-  }
-
-  // handle !(scope1, scope2,...) syntax
-  const negationScopeRegex = new RegExp(/!\((.*?)\)/);
-  const negationScopeMatch = scope.match(negationScopeRegex);
-  if (negationScopeMatch) {
-    return [negationScopeMatch[1].split(",").map((s) => s.trim()), undefined];
-  }
-
-  // handle !scope1, !scope2, scope3, ... syntax
-  const splitScopes = scope.split(",").map((s) => s.trim());
-  const negationScopes: string[] = [];
-  const scopes: string[] = [];
-  for (const s of splitScopes) {
-    if (s.startsWith("!")) {
-      negationScopes.push(s.slice(1));
-    } else {
-      scopes.push(s);
-    }
-  }
-  return [negationScopes, scopes];
 }
 
 export const $client: ClientDecorator = (
@@ -1024,7 +999,7 @@ export const $clientInitialization: ClientInitializationDecorator = (
     if (options.properties.get("initializedBy")) {
       const value = options.properties.get("initializedBy")!.type;
 
-      const isValidValue = (value: number): boolean => value === 0 || value === 1 || value === 2;
+      const isValidValue = (value: number): boolean => value === 4 || value === 1 || value === 2;
 
       if (value.kind === "EnumMember") {
         if (typeof value.value !== "number" || !isValidValue(value.value)) {
@@ -1048,6 +1023,16 @@ export const $clientInitialization: ClientInitializationDecorator = (
               code: "invalid-initialized-by",
               format: {
                 message: "Please use `InitializedBy` enum to set the value.",
+              },
+              target: target,
+            });
+            return;
+          }
+          if (variant.type.value === 4) {
+            reportDiagnostic(context.program, {
+              code: "invalid-initialized-by",
+              format: {
+                message: "`InitializedBy.customizeCode` cannot be combined with other values.",
               },
               target: target,
             });
@@ -1238,8 +1223,11 @@ export function getClientNamespace(
   const override = getScopedDecoratorData(context, clientNamespaceKey, entity);
   if (override) {
     // if `@clientNamespace` is applied to the entity, this wins out
-    // if the override exactly matches the namespace flag, no replacement is needed
-    if (context.namespaceFlag && override === context.namespaceFlag) {
+    // if the override matches or extends the namespace flag, no replacement is needed
+    if (
+      context.namespaceFlag &&
+      (override === context.namespaceFlag || override.startsWith(context.namespaceFlag + "."))
+    ) {
       return override;
     }
     const userDefinedNamespace = findNamespaceOverlapClosestToRoot(
@@ -1306,7 +1294,7 @@ export const $scope: ScopeDecorator = (
   entity: Operation | ModelProperty,
   scope?: LanguageScopes,
 ) => {
-  const [negationScopes, scopes] = parseScopes(context, scope);
+  const [negationScopes, scopes] = parseScopes(scope);
   if (negationScopes !== undefined && negationScopes.length > 0) {
     // for negation scope, override the previous value
     setScopedDecoratorData(context, $scope, negationScopesKey, entity, negationScopes);
