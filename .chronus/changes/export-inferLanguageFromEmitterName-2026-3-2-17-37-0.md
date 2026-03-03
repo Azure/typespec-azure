@@ -4,4 +4,4 @@ packages:
   - "@azure-tools/typespec-metadata"
 ---
 
-Ensure unrecognized emitter names like `@azure-typespec/http-client-csharp-mgmt` use the full emitter name as the language key
+Ensure unrecognized emitter names use the full emitter name as the language key. Adds support for C# HTTP client emitters.
