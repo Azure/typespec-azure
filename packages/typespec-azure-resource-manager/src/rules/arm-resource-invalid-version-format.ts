@@ -7,6 +7,7 @@ export const armResourceInvalidVersionFormatRule = createRule({
   name: "arm-resource-invalid-version-format",
   severity: "warning",
   description: "Check for valid versions.",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-resource-manager/rules/arm-resource-invalid-version-format",
   messages: {
     default: paramMessage`The version '${"version"}' is invalid. Versions for arm resources must be of the form "YYYY-MM-DD" and may have a suffix, like "-preview" or a versioned suffix,  "-alpha.1".`,
     invalidType: paramMessage`The versions for Azure Resource Manager Services must use strings of the form "YYYY-MM-DD[-suffix]."`,
