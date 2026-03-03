@@ -12,6 +12,7 @@ export const noOpenAPIRule = createRule({
   description:
     "Azure specs should not be using decorators from @typespec/openapi or @azure-tools/typespec-autorest",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-openapi",
   messages: {
     default: paramMessage`Azure specs should not be using decorator "${"name"}" from @typespec/openapi or @azure-tools/typespec-autorest. They will not apply to other emitter.`,
     operationId:
