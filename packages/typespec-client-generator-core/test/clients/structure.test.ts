@@ -2428,8 +2428,18 @@ it("mixing multi-service and single-service clients", async () => {
   ok(mergedOps);
   strictEqual(mergedOps.apiVersions.length, 0); // empty for merged sub-client
   strictEqual(mergedOps.methods.length, 2);
-  ok(mergedOps.methods.find((m) => m.name === "opA"));
-  ok(mergedOps.methods.find((m) => m.name === "opB"));
+  const opA = mergedOps.methods.find((m) => m.name === "opA");
+  ok(opA);
+  const opAVersionParam = opA.operation.parameters.find((p) => p.isApiVersionParam);
+  ok(opAVersionParam);
+  deepStrictEqual(opAVersionParam.apiVersions, ["av1", "av2"]);
+  strictEqual(opAVersionParam.clientDefaultValue, "av2");
+  const opB = mergedOps.methods.find((m) => m.name === "opB");
+  ok(opB);
+  const opBVersionParam = opB.operation.parameters.find((p) => p.isApiVersionParam);
+  ok(opBVersionParam);
+  deepStrictEqual(opBVersionParam.apiVersions, ["bv1", "bv2"]);
+  strictEqual(opBVersionParam.clientDefaultValue, "bv2");
 
   // Verify multi-service root client has string-type api version param
   const rootApiVersionParam = combinedClient.clientInitialization.parameters.find(
@@ -2447,7 +2457,13 @@ it("mixing multi-service and single-service clients", async () => {
   const cOps = serviceCClient.children!.find((c) => c.name === "Operations");
   ok(cOps);
   strictEqual(cOps.methods.length, 1);
-  strictEqual(cOps.methods[0].name, "opC");
+  const opC = cOps.methods.find((m) => m.name === "opC");
+  ok(opC);
+  deepStrictEqual(opC.apiVersions, ["cv1", "cv2"]);
+  const opCVersionParam = opC.operation.parameters.find((p) => p.isApiVersionParam);
+  ok(opCVersionParam);
+  deepStrictEqual(opCVersionParam.apiVersions, ["cv1", "cv2"]);
+  strictEqual(opCVersionParam.clientDefaultValue, "cv2");
 });
 
 it("services as direct children with nested @client", async () => {
@@ -2532,12 +2548,26 @@ it("services as direct children with nested @client", async () => {
   const computeOps = compute.children!.find((c) => c.name === "Operations");
   ok(computeOps);
   strictEqual(computeOps.methods.length, 1);
-  strictEqual(computeOps.methods[0].name, "opA");
+  const computeOpA = computeOps.methods.find((m) => m.name === "opA");
+  ok(computeOpA);
+  deepStrictEqual(computeOpA.apiVersions, ["av1", "av2"]);
+  const computeOpAVersionParam = computeOpA.operation.parameters.find((p) => p.isApiVersionParam);
+  ok(computeOpAVersionParam);
+  deepStrictEqual(computeOpAVersionParam.apiVersions, ["av1", "av2"]);
+  strictEqual(computeOpAVersionParam.clientDefaultValue, "av2");
 
   const computeSub = compute.children!.find((c) => c.name === "SubNamespace");
   ok(computeSub);
   strictEqual(computeSub.methods.length, 1);
-  strictEqual(computeSub.methods[0].name, "subOpA");
+  const computeSubOpA = computeSub.methods.find((m) => m.name === "subOpA");
+  ok(computeSubOpA);
+  deepStrictEqual(computeSubOpA.apiVersions, ["av1", "av2"]);
+  const computeSubOpAVersionParam = computeSubOpA.operation.parameters.find(
+    (p) => p.isApiVersionParam,
+  );
+  ok(computeSubOpAVersionParam);
+  deepStrictEqual(computeSubOpAVersionParam.apiVersions, ["av1", "av2"]);
+  strictEqual(computeSubOpAVersionParam.clientDefaultValue, "av2");
 
   // DiskClient - from ServiceB
   const disk = root.children!.find((c) => c.name === "DiskClient");
@@ -2549,12 +2579,24 @@ it("services as direct children with nested @client", async () => {
   const diskOps = disk.children!.find((c) => c.name === "Operations");
   ok(diskOps);
   strictEqual(diskOps.methods.length, 1);
-  strictEqual(diskOps.methods[0].name, "opB");
+  const diskOpB = diskOps.methods.find((m) => m.name === "opB");
+  ok(diskOpB);
+  deepStrictEqual(diskOpB.apiVersions, ["bv1", "bv2"]);
+  const diskOpBVersionParam = diskOpB.operation.parameters.find((p) => p.isApiVersionParam);
+  ok(diskOpBVersionParam);
+  deepStrictEqual(diskOpBVersionParam.apiVersions, ["bv1", "bv2"]);
+  strictEqual(diskOpBVersionParam.clientDefaultValue, "bv2");
 
   const diskSub = disk.children!.find((c) => c.name === "SubNamespace");
   ok(diskSub);
   strictEqual(diskSub.methods.length, 1);
-  strictEqual(diskSub.methods[0].name, "subOpB");
+  const diskSubOpB = diskSub.methods.find((m) => m.name === "subOpB");
+  ok(diskSubOpB);
+  deepStrictEqual(diskSubOpB.apiVersions, ["bv1", "bv2"]);
+  const diskSubOpBVersionParam = diskSubOpB.operation.parameters.find((p) => p.isApiVersionParam);
+  ok(diskSubOpBVersionParam);
+  deepStrictEqual(diskSubOpBVersionParam.apiVersions, ["bv1", "bv2"]);
+  strictEqual(diskSubOpBVersionParam.clientDefaultValue, "bv2");
 });
 
 it("fully customized client hierarchy with interfaces", async () => {
@@ -2639,16 +2681,40 @@ it("fully customized client hierarchy with interfaces", async () => {
   ok(aOnly);
   deepStrictEqual(aOnly.apiVersions, ["av1", "av2"]);
   strictEqual(aOnly.methods.length, 2);
-  ok(aOnly.methods.find((m) => m.name === "opA"));
-  ok(aOnly.methods.find((m) => m.name === "subOpA"));
+  const opA = aOnly.methods.find((m) => m.name === "opA");
+  ok(opA);
+  deepStrictEqual(opA.apiVersions, ["av1", "av2"]);
+  const opAVersionParam = opA.operation.parameters.find((p) => p.isApiVersionParam);
+  ok(opAVersionParam);
+  deepStrictEqual(opAVersionParam.apiVersions, ["av1", "av2"]);
+  strictEqual(opAVersionParam.clientDefaultValue, "av2");
+  const subOpA = aOnly.methods.find((m) => m.name === "subOpA");
+  ok(subOpA);
+  deepStrictEqual(subOpA.apiVersions, ["av1", "av2"]);
+  const subOpAVersionParam = subOpA.operation.parameters.find((p) => p.isApiVersionParam);
+  ok(subOpAVersionParam);
+  deepStrictEqual(subOpAVersionParam.apiVersions, ["av1", "av2"]);
+  strictEqual(subOpAVersionParam.clientDefaultValue, "av2");
 
   // ServiceBOnly - from ServiceB only
   const bOnly = root.children!.find((c) => c.name === "ServiceBOnly");
   ok(bOnly);
   deepStrictEqual(bOnly.apiVersions, ["bv1", "bv2"]);
   strictEqual(bOnly.methods.length, 2);
-  ok(bOnly.methods.find((m) => m.name === "opB"));
-  ok(bOnly.methods.find((m) => m.name === "subOpB"));
+  const opB = bOnly.methods.find((m) => m.name === "opB");
+  ok(opB);
+  deepStrictEqual(opB.apiVersions, ["bv1", "bv2"]);
+  const opBVersionParam = opB.operation.parameters.find((p) => p.isApiVersionParam);
+  ok(opBVersionParam);
+  deepStrictEqual(opBVersionParam.apiVersions, ["bv1", "bv2"]);
+  strictEqual(opBVersionParam.clientDefaultValue, "bv2");
+  const subOpB = bOnly.methods.find((m) => m.name === "subOpB");
+  ok(subOpB);
+  deepStrictEqual(subOpB.apiVersions, ["bv1", "bv2"]);
+  const subOpBVersionParam = subOpB.operation.parameters.find((p) => p.isApiVersionParam);
+  ok(subOpBVersionParam);
+  deepStrictEqual(subOpBVersionParam.apiVersions, ["bv1", "bv2"]);
+  strictEqual(subOpBVersionParam.clientDefaultValue, "bv2");
 });
 
 it("validation: root client missing service", async () => {
@@ -2842,6 +2908,23 @@ it("interaction: @clientInitialization with multi-service client", async () => {
   strictEqual(apiVersionParam.type.kind, "string");
   strictEqual(apiVersionParam.optional, true);
   strictEqual(apiVersionParam.clientDefaultValue, undefined);
+
+  // Check operation-level api version params
+  ok(client.children);
+  const ops = client.children!.find((c) => c.name === "Operations");
+  ok(ops);
+  const opAMethod = ops.methods.find((m) => m.name === "opA");
+  ok(opAMethod);
+  const opAVersionParam = opAMethod.operation.parameters.find((p) => p.isApiVersionParam);
+  ok(opAVersionParam);
+  deepStrictEqual(opAVersionParam.apiVersions, ["av1", "av2"]);
+  strictEqual(opAVersionParam.clientDefaultValue, "av2");
+  const opBMethod = ops.methods.find((m) => m.name === "opB");
+  ok(opBMethod);
+  const opBVersionParam = opBMethod.operation.parameters.find((p) => p.isApiVersionParam);
+  ok(opBVersionParam);
+  deepStrictEqual(opBVersionParam.apiVersions, ["bv1", "bv2"]);
+  strictEqual(opBVersionParam.clientDefaultValue, "bv2");
 });
 
 it("package metadata for multiple separate root clients", async () => {
@@ -2979,6 +3062,16 @@ it("nested client inherits parent services when not specified", async () => {
   const inherited = root.children![0];
   strictEqual(inherited.name, "InheritedClient");
   strictEqual(inherited.methods.length, 2);
-  ok(inherited.methods.find((m) => m.name === "opA"));
-  ok(inherited.methods.find((m) => m.name === "opB"));
+  const opA = inherited.methods.find((m) => m.name === "opA");
+  ok(opA);
+  const opAVersionParam = opA.operation.parameters.find((p) => p.isApiVersionParam);
+  ok(opAVersionParam);
+  deepStrictEqual(opAVersionParam.apiVersions, ["av1", "av2"]);
+  strictEqual(opAVersionParam.clientDefaultValue, "av2");
+  const opB = inherited.methods.find((m) => m.name === "opB");
+  ok(opB);
+  const opBVersionParam = opB.operation.parameters.find((p) => p.isApiVersionParam);
+  ok(opBVersionParam);
+  deepStrictEqual(opBVersionParam.apiVersions, ["bv1", "bv2"]);
+  strictEqual(opBVersionParam.clientDefaultValue, "av2");
 });

@@ -1145,7 +1145,7 @@ export function getTcgcLroMetadata<TServiceOperation extends SdkServiceOperation
 
 export function getActualClientType(client: SdkClient): Namespace | Interface {
   if (client.type) return client.type;
-  // For merged multi-service sub clients where type is cleared, fall back to the first service
+  // For merged multi-service sub clients where type is cleared or sub client created by string client location, fall back to the first service
   return client.services[0];
 }
 
