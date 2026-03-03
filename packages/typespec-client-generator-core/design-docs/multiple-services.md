@@ -70,6 +70,7 @@ using Azure.ClientGenerator.Core;
 @client({
   name: "CombineClient",
   service: [ServiceA, ServiceB],
+  autoMergeService: true,
 })
 @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2) // optional
 namespace CombineClient;
@@ -78,34 +79,39 @@ namespace CombineClient;
 **Explanation:**
 
 - `@client` with the `service` property as an array indicates a combined client.
+- `autoMergeService: true` tells TCGC to automatically merge all services' nested namespaces/interfaces into the current client as children. When `autoMergeService` is `false` (the default) and the client namespace has nested `@client` decorators, TCGC uses the explicitly defined hierarchy instead.
 - `@useDependency` specifies the version for each service:
   - If all services are unversioned, `@useDependency` can be omitted.
   - If any service is versioned and `@useDependency` is not set, TCGC will use the latest version for each service by default.
-- Only one `@client` with multiple services can be defined per package. Defining multiple such clients or mixing with `@operationGroup` is not supported.
+- Multiple `@client` decorators can be defined per package: you can mix multi-service clients with single-service clients (see Scenario 1.5).
 
 ### TCGC Behavior
 
-When TCGC detects multiple services in one client, it will:
+When TCGC detects multiple services in one client with `autoMergeService: true`, it will:
 
-1. Create the root client for the combined client. If any service is versioned, the root client's initialization method will have an `apiVersion` parameter with no default value. For cross-service clients, the `apiVersions` property will be an empty array `[]`, and a new `apiVersionsMap` property will store a map of service namespace full qualified names to their API versions (e.g., `{"ServiceA": ["av1", "av2"], "ServiceB": ["bv1", "bv2"]}`). The root client's endpoint and credential parameters will be created based on the first sub-service, which means all sub-services must share the same endpoint and credential. If services have different `@server` or `@useAuth` definitions, TCGC will report a diagnostic error.
-2. Create sub-clients for each service's nested namespaces or interfaces. Each sub-client will have its own `apiVersion` property and initialization method if the service is versioned.
-3. If multiple services have nested namespaces or interfaces with the same name, TCGC will automatically merge them into a single operation group. The merged operation group will have empty `apiVersions` and a `string` type for the API version parameter, and will contain operations from all the services.
+1. Create the root client for the combined client. If any service is versioned, the root client's initialization method will have an `apiVersion` parameter with no default value. For cross-service clients, the `apiVersions` property on `SdkClientType` will be an empty array `[]`. The per-service version mapping is stored at the package level in `SdkPackage.metadata.apiVersions` as a `Map<string, string>` (key = service namespace full qualified name, value = latest version or `"all"`). The root client's `apiVersion` parameter will have `type.kind === "string"` instead of a specific enum and will always be `optional: true`. The root client's endpoint and credential parameters will be created based on the first sub-service, which means all sub-services must share the same endpoint and credential. If services have different `@server` or `@useAuth` definitions, TCGC will report a diagnostic error (`inconsistent-multiple-service`).
+2. Create sub-clients for each service's nested namespaces or interfaces. Each sub-client will have its own `apiVersions` array and `apiVersion` initialization parameter with a `clientDefaultValue` set to the latest version of its service.
+3. If multiple services have nested namespaces or interfaces with the same name, TCGC will automatically merge them into a single sub-client. The merged sub-client will have empty `apiVersions` and a `string` type for the API version parameter (with `clientDefaultValue: undefined`), and will contain operations from all the services.
 4. Operations directly under each service's namespace are placed under the root client. Operations under nested namespaces or interfaces are placed under the corresponding sub-clients.
-5. Decorators such as `@clientLocation`, `@convenientAPI`, `@protocolAPI`, `@moveTo`, and `@scope` work as usual. When using `@clientLocation` to move operations from different services to a new operation group, the resulting operation group will have empty `apiVersions` and a `string` type for the API version parameter.
+5. Decorators such as `@clientLocation`, `@convenientAPI`, `@protocolAPI`, `@moveTo`, and `@scope` work as usual. When using `@clientLocation` to move operations from different services to a new sub-client, the resulting sub-client will have empty `apiVersions` and a `string` type for the API version parameter.
 6. All other TCGC logic remains unchanged.
-7. Since TCGC only merges operation groups with the same name, emitters must still handle conflicts for models, operations, or other types appropriately.
+7. Since TCGC only merges sub-clients with the same name, emitters must still handle conflicts for models, operations, or other types appropriately. Empty sub-clients (no operations and no children) are automatically pruned unless they are explicitly defined.
 
 For the example above, TCGC will generate types like:
 
 ```yaml
+# SdkPackage.metadata:
+metadata:
+  apiVersion: undefined # undefined for multi-service
+  apiVersions: # Map<string, string> on SdkPackage.metadata
+    ServiceA: "av2"
+    ServiceB: "bv2"
+
 clients:
   - &a1
     kind: client
     name: CombineClient
     apiVersions: [] # Empty for cross-service clients
-    apiVersionsMap: # Map of service namespace to API versions
-      ServiceA: [av1, av2]
-      ServiceB: [bv1, bv2]
     clientInitialization:
       kind: clientinitialization
       parameters:
@@ -116,10 +122,10 @@ clients:
         - kind: method
           name: apiVersion
           apiVersions: []
-          apiVersionsMap:
-            ServiceA: [av1, av2]
-            ServiceB: [bv1, bv2]
           clientDefaultValue: undefined
+          type:
+            kind: string # string type, not a service-specific enum
+          optional: true # always optional for multi-service
           isGeneratedName: false
           onClient: true
       name: CombineClientOptions
@@ -132,7 +138,7 @@ clients:
         apiVersions:
           - av1
           - av2
-        initialization:
+        clientInitialization:
           kind: clientinitialization
           parameters:
             - kind: endpoint
@@ -159,7 +165,7 @@ clients:
         apiVersions:
           - bv1
           - bv2
-        initialization:
+        clientInitialization:
           kind: clientinitialization
           parameters:
             - kind: endpoint
@@ -182,13 +188,15 @@ clients:
             name: bTest
 ```
 
-### Operation Group Merging for Name Conflicts
+### Sub-Client Merging for Name Conflicts
 
-When multiple services have nested namespaces or interfaces with the same name, TCGC automatically merges them into a single operation group that behaves like a multi-service operation group:
+When multiple services have nested namespaces or interfaces with the same name and `autoMergeService: true` is set, TCGC automatically merges them into a single sub-client. The merged sub-client:
 
-- The `apiVersions` property will be empty
-- The API version parameter type will be `string` instead of a service-specific enum
-- The operation group will contain operations from all the services with that name
+- Has its `apiVersions` property set to an empty array `[]`
+- Has its API version parameter type set to `string` (kind: `"string"`) instead of a service-specific enum
+- Has `clientDefaultValue: undefined` for the API version parameter
+- Contains operations from all the services with that name
+- Has its internal `type` set to `undefined` (since it represents multiple TypeSpec types)
 
 For example:
 
@@ -218,11 +226,11 @@ The generated client will have a single `Operations` operation group containing 
 
 ### Using `@clientLocation` with Multiple Services
 
-When using `@clientLocation` to move operations from different services to the same operation group (whether it's a new operation group name or an existing one), the resulting operation group will behave like a multi-service root client:
+When using `@clientLocation` to move operations from different services to the same sub-client (whether it's a new name or an existing one), the resulting sub-client will behave like a multi-service sub-client if it ends up containing operations from multiple services:
 
-- The `apiVersions` property will be empty
+- The `apiVersions` property will be empty `[]`
 - The API version parameter type will be `string` instead of a service-specific enum
-- The operation group can contain operations with different API versions from different services
+- The sub-client can contain operations with different API versions from different services
 
 For example:
 
@@ -244,6 +252,7 @@ namespace ServiceB {
 @client({
   name: "CombineClient",
   service: [ServiceA, ServiceB],
+  autoMergeService: true,
 })
 namespace CombineClient;
 
@@ -251,10 +260,11 @@ namespace CombineClient;
 @@clientLocation(ServiceB.opB, "SharedGroup");
 ```
 
-The resulting `SharedGroup` operation group will have:
+The resulting `SharedGroup` sub-client will have:
 
 - `apiVersions: []`
 - API version parameter with `type.kind === "string"`
+- `clientDefaultValue: undefined`
 - Operations from both ServiceA and ServiceB
 
 ## Extended Design: Advanced Client Hierarchy Customization
@@ -574,6 +584,7 @@ using Azure.ClientGenerator.Core;
 @client({
   name: "CombinedABClient",
   service: [ServiceA, ServiceB],
+  autoMergeService: true,
 })
 namespace CombinedABClient;
 
@@ -600,9 +611,6 @@ clients:
     kind: client
     name: CombinedABClient
     apiVersions: [] # Empty for cross-service clients
-    apiVersionsMap:
-      ServiceA: [av1, av2]
-      ServiceB: [bv1, bv2]
     clientInitialization:
       initializedBy: individually
     children:
@@ -610,9 +618,6 @@ clients:
         name: Operations # Merged from both ServiceA and ServiceB
         parent: *combined
         apiVersions: [] # Empty because operations come from different services
-        apiVersionsMap:
-          ServiceA: [av1, av2]
-          ServiceB: [bv1, bv2]
         clientInitialization:
           initializedBy: parent
         methods:
@@ -660,7 +665,7 @@ When combining multiple services into a single client, all services must share t
 
 #### Syntax Proposal
 
-Use nested `@client` decorators to explicitly define each service as a child client:
+Use nested `@client` decorators to explicitly define each service as a child client and use `autoMergeService` flag to build each service's hierarchy:
 
 ```typespec title="client.tsp"
 import "./main.tsp";
@@ -676,12 +681,14 @@ namespace CombineClient {
   @client({
     name: "ComputeClient",
     service: ServiceA,
+    autoMergeService: true,
   })
   namespace Compute;
 
   @client({
     name: "DiskClient",
     service: ServiceB,
+    autoMergeService: true,
   })
   namespace Disk;
 }
@@ -693,7 +700,7 @@ When the client namespace has nested `@client` decorators, TCGC will use the exp
 
 1. Create the root client for the combined client.
 2. Each nested `@client` becomes a child of the root client.
-3. Since the nested client namespaces (`Compute` and `Disk`) are empty, TCGC auto-merges each service's content into its respective child client.
+3. Since the nested client namespaces (`Compute` and `Disk`) have `autoMergeService` flags, TCGC auto-merges each service's content into its respective child client.
 4. No automatic merging across services occurs at the root level.
 
 ```yaml
@@ -702,9 +709,6 @@ clients:
     kind: client
     name: CombineClient
     apiVersions: [] # Empty for cross-service clients
-    apiVersionsMap: # Map of service namespace to API versions
-      ServiceA: [av1, av2]
-      ServiceB: [bv1, bv2]
     clientInitialization:
       initializedBy: individually
     children:
@@ -840,9 +844,6 @@ clients:
     kind: client
     name: CustomClient
     apiVersions: [] # Empty for cross-service clients
-    apiVersionsMap: # Map of service namespace to API versions
-      ServiceA: [av1, av2]
-      ServiceB: [bv1, bv2]
     clientInitialization:
       initializedBy: individually
     children:
@@ -850,9 +851,6 @@ clients:
         name: SharedOperations
         parent: *root
         apiVersions: [] # Empty because operations come from different services
-        apiVersionsMap: # Map because operations come from different services
-          ServiceA: [av1, av2]
-          ServiceB: [bv1, bv2]
         clientInitialization:
           initializedBy: parent
         methods:
@@ -898,58 +896,81 @@ client.service_b_only.sub_op_b()
 
 ### Summary of Client Hierarchy Behavior
 
-| Scenario             | Client Namespace Content            | Result                                                           |
-| -------------------- | ----------------------------------- | ---------------------------------------------------------------- |
-| First step design    | Empty                               | All services' nested items auto-merged as root client's children |
-| Services as children | Nested `@client` (empty namespaces) | Each nested client auto-merges its service's content             |
-| Fully customized     | Nested `@client` with explicit ops  | Only explicitly defined clients and operations are used          |
+| Scenario             | `autoMergeService` | Client Namespace Content            | Result                                                           |
+| -------------------- | ------------------ | ----------------------------------- | ---------------------------------------------------------------- |
+| First step design    | `true`             | Empty                               | All services' nested items auto-merged as root client's children |
+| Services as children | N/A                | Nested `@client` (empty namespaces) | Each nested client auto-merges its service's content             |
+| Fully customized     | N/A                | Nested `@client` with explicit ops  | Only explicitly defined clients and operations are used          |
 
 ### Interaction with Existing Decorators
 
 The nested `@client` approach works alongside existing customization decorators:
 
 - **`@clientInitialization`**: Still controls how each client is initialized. Can be applied to both auto-merged and explicitly defined clients.
-- **`@clientLocation`**: Can move operations between clients regardless of namespace content.
-- **`@operationGroup`** (deprecated): The same functionality can be achieved using nested `@client`. Migration path: convert `@operationGroup` to nested `@client`.
+- **`@clientLocation`**: Can move operations between clients regardless of namespace content. When operations from different services are moved to the same sub-client, it becomes a multi-service sub-client with empty `apiVersions` and `string` type for the API version parameter.
+- **`@operationGroup`**: Functions as an alias for `@client` — it creates a sub-client (the `SdkOperationGroup` type has been consolidated into `SdkClient`). The same nested `@client` patterns apply.
 
 ### Validation Rules
 
-1. When the root client namespace is empty:
+1. When the root client has `autoMergeService: true` and its namespace is empty:
    - Only services listed in the `service` array of the `@client` decorator are included in the client
    - Content from these listed services is auto-merged into the root client
-   - Same-named namespaces/interfaces across the listed services are merged together
+   - Same-named namespaces/interfaces across the listed services are merged together into a single sub-client
+   - Sub-clients with `autoMergeService: true` cannot have nested `@client` decorators that specify their own services (`auto-merge-service-conflict` diagnostic)
 
 2. When the root client namespace has nested `@client` decorators:
    - Only explicitly defined clients are created at the root level
    - Each nested `@client` with an empty namespace auto-merges its service's content
    - Each nested `@client` with explicit operations uses only those operations
    - Operations not referenced by any explicit client are omitted from the SDK
+   - Nested `@client` services must be a subset of the parent's services (`nested-client-service-not-subset` diagnostic)
 
-### Changes Needed
+3. Root client without a parent must have at least one service (`root-client-missing-service` diagnostic).
 
-1. **Update `interfaces.ts`**:
-   - Add new `apiVersionsMap` property to `SdkClientType` with type `Record<string, string[]>` (key is service namespace full qualified name, value is API versions array)
-   - Keep existing `apiVersions` property as `string[]` for backward compatibility
-   - For cross-service clients, `apiVersions` will be empty `[]` and `apiVersionsMap` will contain the mapping
+4. All services combined into a single client must have compatible `@server` and `@useAuth` definitions (`inconsistent-multiple-service` diagnostic).
 
-2. **Update `cache.ts` logic**:
-   - In `getOrCreateClients`: When no explicit `@client` is defined, create a separate root client for each `@service` namespace (not just the first one)
-   - In `prepareClientAndOperationCache`: Check if the client namespace has nested `@client` decorators before auto-merging
-   - When nested `@client` decorators exist, use the explicitly defined hierarchy
-   - When the namespace is empty, auto-merge services' content (existing behavior for explicit multi-service clients)
+5. Multiple services in the `service` array can only be used on namespace targets, not interface targets (`invalid-client-service-multiple` diagnostic).
 
-3. **Update `internal-utils.ts`**:
-   - Modify `hasExplicitClientOrOperationGroup` to properly detect nested `@client` decorators within multi-service client namespaces
-   - Currently it returns `false` when a client has multiple services, but should return `true` if the namespace contains nested `@client` decorators
+6. Empty sub-clients (no operations and no children) are automatically pruned, unless they are explicitly defined with `@client` and `autoMergeService` is `false`.
 
-4. **Update `clients.ts`**:
-   - Update `createSdkClientType` to populate `apiVersionsMap` when the client spans multiple services
-   - Keep `apiVersions` as empty array for cross-service clients
-   - Update endpoint and credential parameter creation to validate that all services share the same `@server` and `@useAuth` definitions
+### Implementation Status
 
-5. **Update `decorators.ts`**:
-   - Add validation in `@client` decorator to ensure services combined into a single client have compatible endpoint and credential configurations
+The following changes have been implemented:
 
-6. **Add validation diagnostics**:
-   - Add diagnostic when services combined into a client have different `@server` definitions
-   - Add diagnostic when services combined into a client have different `@useAuth` definitions
+1. **`interfaces.ts`** (✅ Done):
+   - `SdkOperationGroup` has been consolidated into `SdkClient`. All operation groups are now represented as `SdkClient` with `kind: "SdkClient"`.
+   - `SdkClient` has `services: Namespace[]`, `subClients: SdkClient[]`, `parent?: SdkClient`, `clientPath: string`, and `autoMergeService?: boolean`.
+   - `SdkClientType` has `apiVersions: string[]` — empty `[]` for cross-service clients, populated for single-service clients.
+   - Per-service version mapping is available via `SdkPackage.metadata.apiVersions` as `Map<string, string>` (key = service namespace FQN, value = latest version or `"all"`).
+
+2. **`cache.ts`** (✅ Done):
+   - `getRootClients()` handles both explicit `@client` and no-explicit-`@client` paths.
+   - For explicit clients: builds hierarchy from namespace containment, validates service subsets, handles `autoMergeService` by calling `buildSubClientHierarchy` and `handleMultipleServicesSubClientNameConflict` for merging.
+   - For no-explicit-`@client`: currently creates a root client from the first `@service` namespace only and reports `multiple-services` warning for others.
+   - `prepareClientAndOperationCache` handles versioning for both single and multi-service cases.
+
+3. **`clients.ts`** (✅ Done):
+   - `createSdkClientType` sets `apiVersions` via `context.getApiVersionsForType()` — returns `[]` for multi-service clients.
+   - `addDefaultClientParameters` detects multi-service clients (`client.__raw.services.length > 1`) and sets the API version parameter to `string` type, `optional: true`, `clientDefaultValue: undefined`.
+
+4. **`decorators.ts`** (✅ Done):
+   - `$client` decorator handles `service` as single namespace, tuple of namespaces, or absent.
+   - Validates same server/auth across services in a tuple (`inconsistent-multiple-service`).
+   - Auto-sets `@useDependency` to latest versions when not explicitly provided.
+   - Reads `autoMergeService` from options (default: `false`).
+
+5. **Diagnostics** (✅ Done):
+   - `inconsistent-multiple-service`: Services have different server/auth definitions.
+   - `multiple-services`: Multiple services found without explicit `@client`; only first is used.
+   - `root-client-missing-service`: Root explicit client has no services.
+   - `nested-client-service-not-subset`: Sub-client specifies a service not in parent's list.
+   - `auto-merge-service-conflict`: Sub-client specifies services when parent has `autoMergeService: true`.
+   - `invalid-client-service-multiple`: Tuple of services used on an interface (only namespace allowed).
+
+### Remaining Work
+
+1. **Scenario 0 (Multiple services without explicit `@client`)**: Update `cache.ts` to create separate root clients for each `@service` namespace instead of only using the first one.
+
+2. **Scenario 2 (Services as Direct Children)**: Verify nested `@client` with empty namespaces correctly auto-merge each service's content independently.
+
+3. **Scenario 3 (Fully Customized)**: Verify nested `@client` with explicit operation mapping via `is` keyword works correctly.

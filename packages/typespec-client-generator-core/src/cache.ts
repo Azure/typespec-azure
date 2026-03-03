@@ -48,12 +48,13 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   context.__packageVersionEnum = new Map<Namespace, Enum | undefined>();
 
   if (clientServices.size > 1) {
-    // multi-service case
+    // multi-service case: either multiple separate clients or one client spanning multiple services
     clients.map((c) => {
       if (c.services.length > 1) {
+        // A single client with multiple services (e.g., autoMergeService)
         const versionDependencies = getVersionDependencies(context.program, c.type as Namespace);
 
-        for (const specificService of clients[0].services) {
+        for (const specificService of c.services) {
           if (context.__packageVersions!.has(specificService)) {
             continue;
           }
@@ -86,6 +87,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
           );
         }
       } else {
+        // A single-service client (could be one of multiple separate root clients)
         if (context.__packageVersions!.has(c.services[0])) {
           return;
         }
@@ -93,10 +95,9 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
         if (!versions || versions.length === 0) {
           context.__packageVersions!.set(c.services[0], []);
         } else {
-          context.__packageVersionEnum!.set(clients[0].services[0], versions[0].enumMember.enum);
-
+          context.__packageVersionEnum!.set(c.services[0], versions[0].enumMember.enum);
           const versionsString = versions.map((version) => version.value);
-          context.__packageVersions!.set(clients[0].services[0], versionsString);
+          context.__packageVersions!.set(c.services[0], versionsString);
         }
       }
     });
@@ -354,47 +355,46 @@ function getRootClients(context: TCGCContext): ClientCreationResult {
     });
   } else {
     // ── No explicit @client path ──
-    // Create root client from first service namespace and build hierarchy by following services
+    // Create a separate root client for each service namespace
 
     const serviceNamespaces: Namespace[] = namespaces.filter((ns) =>
       isService(context.program, ns),
     );
     if (serviceNamespaces.length >= 1) {
-      const service = serviceNamespaces.shift()!;
-      serviceNamespaces.map((ns) => {
-        reportDiagnostic(context.program, {
-          code: "multiple-services",
-          target: ns,
-        });
-      });
-      let originalName = service.name;
-      const clientNameOverride = getClientNameOverride(context, service);
-      if (clientNameOverride) {
-        originalName = clientNameOverride;
-      } else {
-        originalName = service.name;
+      if (serviceNamespaces.some((ns) => isArm(ns))) {
+        context.arm = true;
       }
-      const clientName = originalName.endsWith("Client") ? originalName : `${originalName}Client`;
-      context.arm = isArm(service);
-      clients = [
-        {
+      clients = [];
+      for (const service of serviceNamespaces) {
+        let originalName = service.name;
+        const clientNameOverride = getClientNameOverride(context, service);
+        if (clientNameOverride) {
+          originalName = clientNameOverride;
+        } else {
+          originalName = service.name;
+        }
+        const clientName = originalName.endsWith("Client")
+          ? originalName
+          : `${originalName}Client`;
+        const client: SdkClient = {
           kind: "SdkClient",
           name: clientName,
           services: [service],
           type: service,
           subClients: [],
           clientPath: clientName,
-        },
-      ];
-      clients[0].subClients = buildSubClientHierarchy(
-        context,
-        clients[0].services[0],
-        clients[0].name,
-        clients[0].services[0],
-        clients[0],
-      );
-      context.__rawClientsCache!.set(clients[0].type, clients[0]);
-      context.__clientToOperationsCache!.set(clients[0], []);
+        };
+        client.subClients = buildSubClientHierarchy(
+          context,
+          service,
+          client.name,
+          service,
+          client,
+        );
+        context.__rawClientsCache!.set(client.type, client);
+        context.__clientToOperationsCache!.set(client, []);
+        clients.push(client);
+      }
     } else {
       clients = [];
     }

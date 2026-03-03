@@ -910,7 +910,9 @@ export function handleVersioningMutationForGlobalNamespace(context: TCGCContext)
   if (services.length === 1 || explicitServices.size === 1) {
     // Single service, no matter explicit client or not, use service namespace for versioning
     const serviceNamespace =
-      explicitClients.length === 0 ? services[0].type : explicitServices.values().next().value!;
+      explicitClients.length === 0 || explicitServices.size === 0
+        ? services[0].type
+        : explicitServices.values().next().value!;
 
     const versions = getVersions(context.program, serviceNamespace)[1]?.getVersions();
     // If the single service has no versioning, no mutation needed
