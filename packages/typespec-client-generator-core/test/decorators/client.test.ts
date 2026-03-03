@@ -208,7 +208,7 @@ describe("listClients without @client", () => {
 });
 
 describe("@operationGroup", () => {
-  it("mark an namespace as an operation group", async () => {
+  it("mark an namespace as an sub client", async () => {
     const { program, MyClient, MyGroup } = await SimpleTester.compile(t.code`
         @client({service: MyClient})
         @service
@@ -263,7 +263,7 @@ describe("@operationGroup", () => {
     ]);
   });
 
-  it("list operations at root of client outside of operation group", async () => {
+  it("list operations at root of client outside of sub client", async () => {
     const { program, MyClient } = await SimpleTester.compile(t.code`
         @client({service: MyClient})
         @service
@@ -287,7 +287,7 @@ describe("@operationGroup", () => {
     );
   });
 
-  it("list operations in an operation group", async () => {
+  it("list operations in an sub client", async () => {
     const { program, MyGroup } = await SimpleTester.compile(t.code`
         @client({service: MyClient})
         @service
@@ -417,7 +417,7 @@ describe("@operationGroup", () => {
         }
       `;
 
-    // java should get three operation groups
+    // java should get three sub clients
     {
       const { program } = await SimpleTester.compile(testCode);
       const context = await createSdkContextForTester(program, {
@@ -427,7 +427,7 @@ describe("@operationGroup", () => {
       strictEqual(listSubClients(context, client).length, 3);
     }
 
-    // csharp should get three operation groups
+    // csharp should get three sub clients
     {
       const { program } = await SimpleTester.compile(testCode);
       const context = await createSdkContextForTester(program, {
@@ -437,7 +437,7 @@ describe("@operationGroup", () => {
       strictEqual(listSubClients(context, client).length, 3);
     }
 
-    // python should get three operation groups
+    // python should get three sub clients
     {
       const { program } = await SimpleTester.compile(testCode);
       const context = await createSdkContextForTester(program, {
@@ -447,7 +447,7 @@ describe("@operationGroup", () => {
       strictEqual(listSubClients(context, client).length, 0);
     }
 
-    // typescript should get three operation groups
+    // typescript should get three sub clients
     {
       const { program } = await SimpleTester.compile(testCode);
       const context = await createSdkContextForTester(program, {
@@ -1193,7 +1193,7 @@ describe("client hierarchy", () => {
     );
   });
 
-  it("one client and two operation groups", async () => {
+  it("one client and two sub clients", async () => {
     const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
       createClientCustomizationInput(
         `
@@ -1258,7 +1258,7 @@ describe("client hierarchy", () => {
     );
   });
 
-  it("operation group - diagnostics", async () => {
+  it("sub client - diagnostics", async () => {
     const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
       createClientCustomizationInput(
         `

@@ -222,7 +222,7 @@ namespace ServiceB {
 namespace CombineClient;
 ```
 
-The generated client will have a single `Operations` operation group containing both `opA()` and `opB()` operations. The operation group will have empty `apiVersions` and a `string` type for the API version parameter.
+The generated client will have a single `Operations` sub client containing both `opA()` and `opB()` operations. The sub client will have empty `apiVersions` and a `string` type for the API version parameter.
 
 ### Using `@clientLocation` with Multiple Services
 

@@ -42,7 +42,7 @@ it("normal client", async () => {
   strictEqual(methods[1].name, "pet");
 });
 
-it("arm client with operation groups", async () => {
+it("arm client with sub clients", async () => {
   const { program } = await ArmTester.compile(`
     @armProviderNamespace("My.Service")
     @server("http://localhost:3000", "endpoint")
@@ -1629,7 +1629,7 @@ it("one client from multiple services with models shared across services", async
   deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
 });
 
-it("client location to new operation group with multiple services", async () => {
+it("client location to new sub client with multiple services", async () => {
   const { program } = await SimpleBaseTester.compile(
     createClientCustomizationInput(
       `
@@ -1664,7 +1664,7 @@ it("client location to new operation group with multiple services", async () => 
     @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CombineClient {}
 
-    // Move operations from different services to a new operation group
+    // Move operations from different services to a new sub client
     @@clientLocation(ServiceA.aTest, "NewOperationGroup");
     @@clientLocation(ServiceB.bTest, "NewOperationGroup");
   `,
@@ -1691,7 +1691,7 @@ it("client location to new operation group with multiple services", async () => 
   strictEqual(apiVersionParam.isApiVersionParam, true);
   strictEqual(apiVersionParam.onClient, true);
   strictEqual(apiVersionParam.clientDefaultValue, undefined);
-  // For multi-service operation groups, the api version param type should be string
+  // For multi-service sub clients, the api version param type should be string
   strictEqual(apiVersionParam.type.kind, "string");
 
   // NewOperationGroup should have both operations
@@ -1718,7 +1718,7 @@ it("client location to new operation group with multiple services", async () => 
   strictEqual(bOperationApiVersionParam.clientDefaultValue, "bv2");
 });
 
-it("one client from multiple services with operation group name conflict - merged", async () => {
+it("one client from multiple services with sub clients name conflict - merged", async () => {
   const { program } = await SimpleBaseTester.compile(
     createClientCustomizationInput(
       `
@@ -1766,13 +1766,13 @@ it("one client from multiple services with operation group name conflict - merge
   strictEqual(sdkPackage.clients.length, 1);
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "CombineClient");
-  // Should have only 1 merged operation group instead of 2 separate ones
+  // Should have only 1 merged sub client instead of 2 separate ones
   strictEqual(client.children!.length, 1);
 
-  // The merged operation group should have operations from both services
+  // The merged sub client should have operations from both services
   const operations = client.children!.find((c) => c.name === "Operations");
   ok(operations);
-  // Multi-service operation group should have empty apiVersions
+  // Multi-service sub client should have empty apiVersions
   strictEqual(operations.apiVersions.length, 0);
   strictEqual(operations.clientInitialization.parameters.length, 2);
   strictEqual(operations.clientInitialization.parameters[0].name, "endpoint");
@@ -1781,7 +1781,7 @@ it("one client from multiple services with operation group name conflict - merge
   strictEqual(apiVersionParam.isApiVersionParam, true);
   strictEqual(apiVersionParam.onClient, true);
   strictEqual(apiVersionParam.clientDefaultValue, undefined);
-  // For multi-service operation groups, the api version param type should be string
+  // For multi-service sub clients, the api version param type should be string
   strictEqual(apiVersionParam.type.kind, "string");
 
   // Should have both methods from both services
@@ -1807,7 +1807,7 @@ it("one client from multiple services with operation group name conflict - merge
   strictEqual(bOperationApiVersionParam.clientDefaultValue, "bv2");
 });
 
-it("client location to existing operation group from different service", async () => {
+it("client location to existing sub client from different service", async () => {
   const { program } = await SimpleBaseTester.compile(
     createClientCustomizationInput(
       `
@@ -1856,13 +1856,13 @@ it("client location to existing operation group from different service", async (
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "CombineClient");
 
-  // Should have only 1 operation group
+  // Should have only 1 sub client
   strictEqual(client.children!.length, 1);
 
-  // The operation group should now be multi-service (merged)
+  // The sub client should now be multi-service (merged)
   const operations = client.children!.find((c) => c.name === "Operations");
   ok(operations);
-  // Multi-service operation group should have empty apiVersions
+  // Multi-service sub client should have empty apiVersions
   strictEqual(operations.apiVersions.length, 0);
   const apiVersionParam = operations.clientInitialization.parameters.find(
     (p) => p.isApiVersionParam,
@@ -1878,7 +1878,7 @@ it("client location to existing operation group from different service", async (
   ok(bTestMethod);
 });
 
-it("merged operation groups with nested operations", async () => {
+it("merged sub clients with nested operations", async () => {
   const { program } = await SimpleBaseTester.compile(
     createClientCustomizationInput(
       `
@@ -1929,13 +1929,13 @@ it("merged operation groups with nested operations", async () => {
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "CombineClient");
 
-  // Should have only 1 merged operation group
+  // Should have only 1 merged sub client
   strictEqual(client.children!.length, 1);
 
-  // The merged operation group should have operations from both namespaces
+  // The merged sub client should have operations from both namespaces
   const operations = client.children!.find((c) => c.name === "Operations");
   ok(operations);
-  // Multi-service operation group should have empty apiVersions
+  // Multi-service sub client should have empty apiVersions
   strictEqual(operations.apiVersions.length, 0);
   const apiVersionParam = operations.clientInitialization.parameters.find(
     (p) => p.isApiVersionParam,
@@ -1951,7 +1951,7 @@ it("merged operation groups with nested operations", async () => {
   ok(operations.methods.find((m) => m.name === "bTest2"));
 });
 
-it("multiple merged operation groups in same client", async () => {
+it("multiple merged sub clients in same client", async () => {
   const { program } = await SimpleBaseTester.compile(
     createClientCustomizationInput(
       `
@@ -2006,7 +2006,7 @@ it("multiple merged operation groups in same client", async () => {
   const client = sdkPackage.clients[0];
   strictEqual(client.name, "CombineClient");
 
-  // Should have 2 merged operation groups
+  // Should have 2 merged sub clients
   strictEqual(client.children!.length, 2);
 
   // Check first merged group

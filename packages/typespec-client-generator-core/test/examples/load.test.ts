@@ -302,7 +302,7 @@ it("load example with @clientLocation existed interface", async () => {
   strictEqual(operation.examples?.length, 1);
 });
 
-it("load example with @clientLocation new operation group", async () => {
+it("load example with @clientLocation new sub client", async () => {
   const instance = await SimpleTester.createInstance();
   await instance.fs.addRealTypeSpecFile(
     "./examples/clientLocationNewOperationGroup.json",
@@ -446,7 +446,7 @@ it("multiple services without versioning", async () => {
   strictEqual(client.name, "CombineClient");
   strictEqual(client.children?.length, 2);
 
-  // Check AI operation group examples
+  // Check AI sub client examples
   const aiClient = client.children?.find((c) => c.name === "AI");
   ok(aiClient);
   const aiMethod = aiClient.methods[0] as SdkServiceMethod<SdkHttpOperation>;
@@ -455,7 +455,7 @@ it("multiple services without versioning", async () => {
   strictEqual(aiMethod.operation.examples[0].filePath, "AI_aTest.json");
   strictEqual(aiMethod.operation.examples[0].name, "Test operation from ServiceA");
 
-  // Check BI operation group examples
+  // Check BI sub client examples
   const biClient = client.children?.find((c) => c.name === "BI");
   ok(biClient);
   const biMethod = biClient.methods[0] as SdkServiceMethod<SdkHttpOperation>;
@@ -502,13 +502,13 @@ it("multiple services without examples", async () => {
   strictEqual(client.name, "CombineClient");
   strictEqual(client.children?.length, 2);
 
-  // Check AI operation group examples
+  // Check AI sub client examples
   const aiClient = client.children?.find((c) => c.name === "AI");
   ok(aiClient);
   const aiMethod = aiClient.methods[0] as SdkServiceMethod<SdkHttpOperation>;
   strictEqual(aiMethod.operation.examples, undefined);
 
-  // Check BI operation group examples
+  // Check BI sub client examples
   const biClient = client.children?.find((c) => c.name === "BI");
   ok(biClient);
   const biMethod = biClient.methods[0] as SdkServiceMethod<SdkHttpOperation>;

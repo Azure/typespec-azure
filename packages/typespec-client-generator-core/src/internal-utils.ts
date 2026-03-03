@@ -302,8 +302,8 @@ export function findServiceForOperation(services: Namespace[], operation: Operat
  *
  * @param context
  * @param type The type that we are adding api version information onto
- * @param client The client or operation group that contains the operation
- * @param operation The operation that contains the api version parameter (needed for multi-service operation groups)
+ * @param client The client or sub clients that contains the operation
+ * @param operation The operation that contains the api version parameter (needed for multi-service sub clients)
  * @returns Whether the type is the api version parameter and the default value for the client
  */
 export function updateWithApiVersionInformation(
@@ -328,7 +328,7 @@ export function updateWithApiVersionInformation(
     };
   }
 
-  // For multi-service clients/operation groups, we need to find the api version
+  // For multi-service clients/sub clients, we need to find the api version
   // from the operation's specific service
   if (operation) {
     const service = findServiceForOperation(client.services, operation);

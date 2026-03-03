@@ -2058,7 +2058,7 @@ export function handleAllTypes(context: TCGCContext): [void, readonly Diagnostic
     }
     for (const sc of listSubClients(context, client, true)) {
       for (const operation of listOperationsInClient(context, sc)) {
-        // operations on operation groups
+        // operations on sub clients
         diagnostics.pipe(updateTypesFromOperation(context, operation));
       }
     }

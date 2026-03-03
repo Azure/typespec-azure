@@ -1111,7 +1111,7 @@ it("multiple clients", async () => {
   ok(bb);
 });
 
-it("multiple operation groups", async () => {
+it("multiple sub clients", async () => {
   const tsp = `
     @service(#{
       title: "Contoso Widget Manager",
