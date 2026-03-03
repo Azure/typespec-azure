@@ -216,10 +216,8 @@ export async function createSdkContext<
   for (const client of sdkContext.sdkPackage.clients) {
     diagnostics.pipe(await handleClientExamples(sdkContext, client));
   }
-  // Validate cross-namespace type name collisions (including Azure library conflicts since they're included in our models)
-  diagnostics.pipe(validateNamesAcrossNamespaces(sdkContext, "models"));
-  diagnostics.pipe(validateNamesAcrossNamespaces(sdkContext, "enums"));
-  diagnostics.pipe(validateNamesAcrossNamespaces(sdkContext, "unions"));
+  // Validate duplicate names within each type kind in each namespace (cross-kind duplicates are allowed).
+  diagnostics.pipe(validateNamesUnderNamespaces(sdkContext));
   sdkContext.diagnostics = [...sdkContext.diagnostics, ...diagnostics.diagnostics];
 
   if (options?.exportTCGCoutput) {
@@ -228,36 +226,38 @@ export async function createSdkContext<
   return sdkContext;
 }
 
-function validateNamesAcrossNamespaces(context: SdkContext, group: "models" | "enums" | "unions") {
+function validateNamesUnderNamespaces(context: SdkContext) {
   const diagnostics = createDiagnosticCollector();
-  const seenNames = new Set<string>();
-
-  let items: (SdkModelType | SdkEnumType | SdkUnionType)[] = [];
-  switch (group) {
-    case "models":
-      items = context.sdkPackage.models;
-      break;
-    case "enums":
-      items = context.sdkPackage.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0);
-      break;
-    case "unions":
-      items = context.sdkPackage.unions.filter((u): u is SdkUnionType => u.kind === "union");
-      break;
-  }
-
-  for (const item of items) {
-    if (seenNames.has(item.name)) {
-      diagnostics.add(
-        createDiagnostic({
-          code: "duplicate-client-name",
-          format: { name: item.name, scope: context.emitterName },
-          target: item.__raw!,
-        }),
-      );
-    } else {
-      seenNames.add(item.name);
+  const validateItems = (namespaceItems: (SdkModelType | SdkEnumType | SdkUnionType)[]) => {
+    const seenNames = new Set<string>();
+    for (const item of namespaceItems) {
+      if (seenNames.has(item.name)) {
+        diagnostics.add(
+          createDiagnostic({
+            code: "duplicate-client-name",
+            format: { name: item.name, scope: context.emitterName },
+            target: item.__raw!,
+          }),
+        );
+      } else {
+        seenNames.add(item.name);
+      }
     }
+  };
+
+  const validateNamespace = (namespace: SdkContext["sdkPackage"]["namespaces"][number]) => {
+    validateItems(namespace.models);
+    validateItems(namespace.enums.filter((e) => (e.usage & UsageFlags.ApiVersionEnum) === 0));
+    validateItems(namespace.unions.filter((u): u is SdkUnionType => u.kind === "union"));
+    for (const nestedNamespace of namespace.namespaces) {
+      validateNamespace(nestedNamespace);
+    }
+  };
+
+  for (const namespace of context.sdkPackage.namespaces) {
+    validateNamespace(namespace);
   }
+
   return diagnostics.wrap(undefined);
 }
 

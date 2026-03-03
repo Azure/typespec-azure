@@ -42,7 +42,7 @@ jobs:
           echo "Created tgz packages:"
           ls -la ./tgz-packages/
 
-          cd packages/integration-tester
+          cd core/packages/tsp-integration
           npm link
 
       - name: Checkout

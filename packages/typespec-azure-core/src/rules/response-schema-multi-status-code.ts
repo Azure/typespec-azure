@@ -12,6 +12,7 @@ export const responseSchemaMultiStatusCodeRule = createRule({
   name: "response-schema-problem",
   description: "Warn about operations having multiple non-error response schemas.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/response-schema-problem",
   messages: {
     multipleSuccessSchemas: paramMessage`Operation '${"name"}' has multiple non-error response schemas. Did you forget to add '@error' to one of them?`,
   },
