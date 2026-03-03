@@ -384,10 +384,10 @@ class PetsOperations:
 class PetsActionsOperations:
 
     @distributed_trace
-    def open(self, **kwargs: Any) -> None:
+    def feed(self, **kwargs: Any) -> None:
 
     @distributed_trace
-    def close(self, **kwargs: Any) -> None:
+    def pet(self, **kwargs: Any) -> None:
 
 #usage sample
 from pet_store import PetStoreClient
@@ -609,7 +609,7 @@ You can override this using `@clientNamespace` if needed.
 
 The sequence of clients and sub clients is determined by the order of the `@client` decorators.
 
-### Move All Operations to Root client
+### Move All Operations to Root Client
 
 This can be achieved with the augment decorator: `@clientLocation` from `typespec-client-generator-core`.
 
@@ -707,8 +707,8 @@ client.pet();
 // generated petstore_client.go
 type PetStoreClient struct {}
 
-func NewPetStorePetsActionsClient() *PetStorePetsActionsClient{
-  return &PetStorePetsActionsClient{}
+func NewPetStoreClient() *PetStoreClient{
+  return &PetStoreClient{}
 }
 
 func (client *PetStoreClient) Feed(ctx context.Context, options *PetStoreClientFeedOptions) (PetStoreClientFeedResponse, error) {}
@@ -1445,7 +1445,7 @@ petClient.Pet(context.Background(), &PetActionClientPetOptions{})
 
 ### Splitting the Operations into Two Clients and Having Clients in Different Namespaces
 
-Two clients that separate the operations can be declared using the `client` decorator of `typespec-client-generator-core`:
+Two clients that separate the operations can be declared using the `@client` decorator of `typespec-client-generator-core`:
 
 <ClientTabs>
 
@@ -2004,7 +2004,7 @@ You could define a single client that combines operations from multiple services
 
 1. **Service Array**: Set all the services that you want to merge in to the `@client` decorator's `service` property (e.g., `service: [ServiceA, ServiceB]`).
 
-2. **Auto-Merge with `autoMergeService: true`**: Set `autoMergeService: true` on the `@client` decorator to automatically merge all operations and sub clients from every listed service into the single client. Without this flag, the client will have no operations — you would need to define child `@client` decorators or use `is` to map operations explicitly.
+2. **Auto-Merge with `autoMergeService: true`**: Set `autoMergeService: true` on the `@client` decorator to automatically merge all operations and sub clients from every listed service into the single client. `autoMergeService` defaults to `false`. When `false` or omitted, the client will have no auto-populated operations — you would need to define child `@client` decorators or use `is` to map operations explicitly.
 
 3. **Version Dependencies**: If you want to specify each service's API version used in the single client, you could use `@useDependency` to declare which version of each service the client supports. Otherwise, the latest version of each service will be used by default.
 
