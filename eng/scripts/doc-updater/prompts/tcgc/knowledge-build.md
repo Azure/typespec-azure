@@ -78,6 +78,10 @@ a user-facing capability:
 
 ## Analysis Instructions
 
+### Full Build
+
+When running in **Full Build Mode** (see the appended section), perform all steps below:
+
 1. **Start with decorator definitions.** Read `lib/decorators.tsp` and all `.tsp` files in `lib/` to catalog every decorator with its exact signature. Pay attention to `extern dec` declarations and their parameter types.
 
 2. **Map TypeScript implementations.** Read `generated-defs/` to find the TypeScript function signatures corresponding to each decorator. Then read `src/` to understand the implementation — focus on what each decorator actually does.
@@ -89,3 +93,19 @@ a user-facing capability:
 5. **Identify feature areas.** Group decorators and types into logical feature areas based on what user-facing capability they serve (e.g., "Client Naming", "Access Control", "Client Structure", "Convenience APIs").
 
 6. **Write the complete knowledge base** to the output file path.
+
+### Incremental Update
+
+When running in **Incremental Update Mode** (see the appended section), follow this workflow instead:
+
+1. **List commits since the last build.** List all commits since the last-analyzed commit shown in the appended section. Filter to commits that touch the source paths listed above.
+
+2. **Triage commits.** For each commit, read its message and changed file list. Classify it:
+   - **Relevant** — changes to decorator signatures, exported types, public API behavior, test coverage, or feature structure. These require knowledge updates.
+   - **Irrelevant** — refactors with no public API change, CI changes, dependency bumps, formatting. Skip these.
+
+3. **Analyze relevant commits.** For each relevant commit, inspect the actual changes and identify which knowledge base sections are affected.
+
+4. **Apply targeted updates.** Update only the affected sections of the existing knowledge base (provided in the appended section). Do not rewrite unaffected sections.
+
+5. **Write the updated knowledge base** to the output file path.

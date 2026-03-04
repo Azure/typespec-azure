@@ -17,14 +17,14 @@
  *   tsx src/index.ts --config tcgc --dry-run                   # Print prompts without running
  */
 
-import { CopilotClient, approveAll } from "@github/copilot-sdk";
+import { CopilotClient, approveAll, type MCPServerConfig } from "@github/copilot-sdk";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { loadConfig, type DocUpdateConfig } from "./config.js";
 import {
   getCurrentCommit,
-  getGitDiff,
   getKnowledgeRelativePath,
+  hasChangesSince,
   readKnowledge,
   readMeta,
   writeMeta,
@@ -188,6 +188,31 @@ function describeToolCall(toolName: string, args: unknown): string | undefined {
 /** Directory containing per-package prompt files, relative to this source file. */
 const PROMPTS_DIR = resolve(import.meta.dirname ?? ".", "../prompts");
 
+// ---------------------------------------------------------------------------
+// MCP server configuration
+// ---------------------------------------------------------------------------
+
+/**
+ * Build the GitHub MCP server configuration for the knowledge-build phase.
+ *
+ * This gives the agent access to git/GitHub tools so it can interactively
+ * explore commit history, diffs, and file contents instead of having the
+ * full diff injected into the prompt.
+ */
+function buildGitHubMcpConfig(): Record<string, MCPServerConfig> {
+  const token = process.env.COPILOT_GITHUB_TOKEN ?? process.env.GITHUB_TOKEN ?? "";
+  return {
+    github: {
+      type: "http",
+      url: "https://api.githubcopilot.com/mcp/",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      tools: ["get_file_contents", "list_commits", "get_commit"],
+    },
+  };
+}
+
 /** Load a prompt file for a given config and phase. */
 async function loadPromptFile(configName: string, promptName: string): Promise<string> {
   const filePath = resolve(PROMPTS_DIR, configName, `${promptName}.md`);
@@ -217,24 +242,25 @@ async function buildKnowledgePrompt(
   if (!fullRebuild) {
     const meta = await readMeta(config.name);
     if (meta) {
-      const diff = getGitDiff(config.sourceCodePaths, meta.lastCommit);
-      if (!diff.trim()) {
+      if (!hasChangesSince(config.sourceCodePaths, meta.lastCommit)) {
         return ""; // No source changes — skip knowledge build
       }
 
-      // Incremental: provide existing knowledge + diff
+      // Incremental: tell the agent the last commit and inject current knowledge.
+      // The agent will use GitHub MCP / git tools to explore the commit history.
       const existingKnowledge = await readKnowledge(config.name);
 
       prompt += `\n\n## Incremental Update Mode\n\n`;
-      prompt += `Update the existing knowledge base to reflect the source changes shown below. `;
-      prompt += `Preserve sections that are unaffected by the changes.\n\n`;
+      prompt += `**Repository:** \`Azure/typespec-azure\`\n`;
+      prompt += `**Last analyzed commit:** \`${meta.lastCommit}\` (${meta.lastUpdated})\n\n`;
+      prompt += `Use the GitHub MCP tools to list commits since that commit `;
+      prompt += `for the source paths listed above. For each commit, review the changes `;
+      prompt += `and decide whether the knowledge base needs updating. `;
+      prompt += `Update only the affected sections — preserve everything else.\n\n`;
 
       if (existingKnowledge) {
         prompt += `### Current Knowledge Base\n\n${existingKnowledge}\n\n`;
       }
-
-      prompt += `### Source Changes (since commit \`${meta.lastCommit}\`)\n\n`;
-      prompt += `\`\`\`diff\n${diff}\n\`\`\`\n`;
       return prompt;
     }
   }
@@ -291,6 +317,8 @@ interface SessionOptions {
   model: string;
   repoRoot: string;
   phaseName: string;
+  /** Optional MCP servers to attach to this session */
+  mcpServers?: Record<string, MCPServerConfig>;
 }
 
 /**
@@ -310,6 +338,7 @@ async function runAgentSession(
     onPermissionRequest: approveAll,
     // Keep skill access for doc-update phase (e.g., @doc-example-generator)
     skillDirectories: [resolve(opts.repoRoot, ".github/skills")],
+    ...(opts.mcpServers ? { mcpServers: opts.mcpServers } : {}),
   });
 
   try {
@@ -463,6 +492,7 @@ async function main(): Promise<void> {
           model: args.model,
           repoRoot,
           phaseName: "Knowledge Build",
+          mcpServers: buildGitHubMcpConfig(),
         });
 
         // Record the commit we just analyzed

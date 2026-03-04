@@ -30,6 +30,9 @@ export interface KnowledgeMeta {
 /** Directory containing generated knowledge files, relative to this source file. */
 const KNOWLEDGE_DIR = resolve(import.meta.dirname ?? ".", "../knowledge");
 
+/** Repository root, resolved from this source file's location. */
+const REPO_ROOT = resolve(import.meta.dirname ?? ".", "../../../..");
+
 /** Get the absolute path to a package's knowledge base file. */
 export function getKnowledgePath(configName: string): string {
   return resolve(KNOWLEDGE_DIR, `${configName}.md`);
@@ -90,25 +93,29 @@ export function knowledgeExists(configName: string): boolean {
 // ---------------------------------------------------------------------------
 
 /**
- * Get the git diff for the given source paths since a specific commit.
- * Returns the diff as a string, or empty string if there are no changes.
+ * Check whether there are any commits affecting the given source paths
+ * since the specified commit. This is a lightweight check (no diff content)
+ * used to decide whether to start an agent session at all.
+ *
+ * Returns true if there are changes, false if nothing has changed.
+ * Returns true on any error (fail-open → triggers a knowledge rebuild).
  */
-export function getGitDiff(sourcePaths: string[], lastCommit: string): string {
+export function hasChangesSince(sourcePaths: string[], lastCommit: string): boolean {
   const paths = sourcePaths.join(" ");
   try {
-    const diff = execSync(`git diff ${lastCommit}..HEAD -- ${paths}`, {
+    const result = execSync(`git rev-list --count ${lastCommit}..HEAD -- ${paths}`, {
       encoding: "utf-8",
-      maxBuffer: 10 * 1024 * 1024, // 10 MB
-    });
-    return diff;
+      cwd: REPO_ROOT,
+    }).trim();
+    return parseInt(result, 10) > 0;
   } catch {
-    // If the diff command fails (e.g. commit not found), return empty
-    // which will trigger a full rebuild
-    return "";
+    // If the command fails (e.g. commit not found), assume changes exist
+    // so we fall through to a full rebuild
+    return true;
   }
 }
 
 /** Get the current HEAD commit hash. */
 export function getCurrentCommit(): string {
-  return execSync("git rev-parse HEAD", { encoding: "utf-8" }).trim();
+  return execSync("git rev-parse HEAD", { encoding: "utf-8", cwd: REPO_ROOT }).trim();
 }
