@@ -11,9 +11,8 @@ import {
   Tooltip,
 } from "@fluentui/react-components";
 import { ArrowUploadFilled } from "@fluentui/react-icons";
-import { combineProjectIntoFile, createRemoteHost } from "@typespec/pack";
-import { DiagnosticList, usePlaygroundContext } from "@typespec/playground/react";
-import { type ReactNode, useState } from "react";
+import { usePlaygroundContext } from "@typespec/playground/react";
+import { useState } from "react";
 import style from "./import.module.css";
 
 export const ImportToolbarButton = () => {
@@ -45,23 +44,24 @@ export const ImportToolbarButton = () => {
 };
 
 const ImportTsp = ({ onImport }: { onImport: () => void }) => {
-  const [error, setError] = useState<ReactNode | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [value, setValue] = useState("");
   const context = usePlaygroundContext();
 
   const importSpec = async () => {
     try {
-      const result = await combineProjectIntoFile(createRemoteHost(), value);
-      if (result.diagnostics.length > 0) {
-        setError(<DiagnosticList diagnostics={result.diagnostics} />);
+      const response = await fetch(value, { redirect: "follow" });
+      if (!response.ok) {
+        setError(`Failed to fetch: ${response.status} ${response.statusText}`);
         return;
       }
-      if (result.content) {
-        context.setContent(result.content);
-        onImport();
-      } else {
-        setError("No content was returned from the import.");
+      const content = await response.text();
+      if (!content) {
+        setError("No content was returned from the URL.");
+        return;
       }
+      context.setContent(content);
+      onImport();
     } catch (e: unknown) {
       setError(String(e));
     }
@@ -79,7 +79,11 @@ const ImportTsp = ({ onImport }: { onImport: () => void }) => {
         className={style["url-input"]}
         aria-describedby={error ? "tsp-url-error" : undefined}
       />
-      {error && <div id="tsp-url-error" role="alert">{error}</div>}
+      {error && (
+        <div id="tsp-url-error" role="alert">
+          {error}
+        </div>
+      )}
       <div>
         <Button appearance="primary" onClick={importSpec}>
           Import
