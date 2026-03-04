@@ -180,6 +180,75 @@ model ArmOperationStatus<
 }
 
 /**
+ * Standard Azure Resource Manager operation status response, without requiring the
+ * id to be a path parameter. This type is used when the operation status is returned
+ * as a response body (e.g., as the LRO final result), rather than as a standalone resource
+ * endpoint.
+ *
+ * @template Properties Optional resource-specific properties
+ * @template StatusValues The set of allowed values for operation status
+ */
+model ArmResourceOperationStatus<
+  Properties extends {} = never,
+  StatusValues extends TypeSpec.Reflection.Union = ResourceProvisioningState
+> {
+  /** RP-specific properties for the operationStatus resource, only appears when operation ended with Succeeded status */
+  @visibility(Lifecycle.Read)
+  properties?: Properties;
+
+  /** The operation status */
+  @Azure.Core.lroStatus
+  status: StatusValues;
+
+  /** The unique identifier for the operationStatus resource */
+  @key
+  @segment("operationStatuses")
+  id: string;
+
+  /** The name of the operationStatus resource */
+  @visibility(Lifecycle.Read)
+  name?: string;
+
+  /** Operation start time */
+  @visibility(Lifecycle.Read)
+  startTime?: utcDateTime;
+
+  /** Operation complete time */
+  @visibility(Lifecycle.Read)
+  endTime?: utcDateTime;
+
+  /** The progress made toward completing the operation */
+  @visibility(Lifecycle.Read)
+  percentComplete?: float64;
+
+  /** Errors that occurred if the operation ended with Canceled or Failed status */
+  @visibility(Lifecycle.Read)
+  error?: ErrorDetail;
+}
+
+/**
+ * Standard Azure Resource Manager operation status response for the tenant scope.
+ * @template Properties Optional resource-specific properties
+ * @template StatusValues The set of allowed values for operation status
+ */
+@parentResource(TenantLocationResource)
+model ArmTenantResourceOperationStatus<
+  Properties extends {} = never,
+  StatusValues extends TypeSpec.Reflection.Union = ResourceProvisioningState
+> is ArmResourceOperationStatus<Properties, StatusValues>;
+
+/**
+ * Standard Azure Resource Manager operation status response for the subscription scope.
+ * @template Properties Optional resource-specific properties
+ * @template StatusValues The set of allowed values for operation status
+ */
+@parentResource(SubscriptionLocationResource)
+model ArmSubscriptionResourceOperationStatus<
+  Properties extends {} = never,
+  StatusValues extends TypeSpec.Reflection.Union = ResourceProvisioningState
+> is ArmResourceOperationStatus<Properties, StatusValues>;
+
+/**
  * The standard header for asynchronous operation polling
  *  @template StatusMonitor The status monitor type for lro polling
  *  @template UrlValue The value type of the Azure-AsyncOperation header

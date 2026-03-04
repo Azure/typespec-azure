@@ -138,6 +138,40 @@ op ArmResourceCheckExistence<
 >;
 
 /**
+ * A resource GET operation for the OperationStatus resource at the tenant and location scope.
+ * @template OperationStatusResource The resource status type. Defaults to ArmTenantResourceOperationStatus.
+ * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Response Optional. The success response for the read operation
+ * @template Error Optional. The error response, if non-standard.
+ */
+op ArmResourceGetTenantOperationStatus<
+  OperationStatusResource extends {} = ArmTenantResourceOperationStatus,
+  Parameters extends {} = {},
+  Response extends {} = ArmResponse<OperationStatusResource>,
+  Error extends {} = ErrorResponse
+> is ArmResourceRead<OperationStatusResource, TenantBaseParameters, Parameters, Response, Error>;
+
+/**
+ * A resource GET operation for the OperationStatus resource at the subscription and location scope.
+ * @template OperationStatusResource The resource status type. Defaults to ArmSubscriptionResourceOperationStatus.
+ * @template Parameters Optional. Additional parameters after the path parameters
+ * @template Response Optional. The success response for the read operation
+ * @template Error Optional. The error response, if non-standard.
+ */
+op ArmResourceGetSubscriptionOperationStatus<
+  OperationStatusResource extends {} = ArmSubscriptionResourceOperationStatus,
+  Parameters extends {} = {},
+  Response extends {} = ArmResponse<OperationStatusResource>,
+  Error extends {} = ErrorResponse
+> is ArmResourceRead<
+  OperationStatusResource,
+  SubscriptionBaseParameters,
+  Parameters,
+  Response,
+  Error
+>;
+
+/**
  * A long-running resource CreateOrUpdate (PUT)
  * @template Resource the resource being created or updated
  * @template BaseParameters Optional. Allows overriding the operation parameters
