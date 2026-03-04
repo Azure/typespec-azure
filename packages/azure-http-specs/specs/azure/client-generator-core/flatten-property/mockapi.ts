@@ -86,9 +86,11 @@ Scenarios.Azure_ClientGenerator_Core_FlattenProperty_putFlattenReadOnlyModel = p
     },
     {
       name: "foo",
-      solutionId: "solution1",
-      title: "Solution Title",
-      content: "Solution Content",
+      properties: {
+         solutionId: "solution1",
+         title: "Solution Title",
+         content: "Solution Content",
+      }
     },
   ),
 );

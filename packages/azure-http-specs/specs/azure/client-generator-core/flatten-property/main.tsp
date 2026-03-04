@@ -186,7 +186,6 @@ model Solution {
   
   Expected behavior: When flattening a property that contains only read-only properties:
   - For input (write): Read-only properties should not appear in the input model, regardless of flattening
-  - For response (read): Read-only properties should be flattened to the parent model level
   
   The `properties` and `propertiesOptional` fields contain only read-only properties (`solutionId`, 
   `title`, `content`). These should be flattened into the parent `Solution` model in the response.
@@ -198,13 +197,15 @@ model Solution {
   }
   ```
   
-  Expected response body (properties flattened to parent level):
+  Expected response body:
   ```json
   {
     "name": "foo",
+    "properties": {
     "solutionId": "solution1",
     "title": "Solution Title",
     "content": "Solution Content"
+    }
   }
   ```
   """)
