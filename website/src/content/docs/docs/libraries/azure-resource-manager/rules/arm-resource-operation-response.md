@@ -6,7 +6,11 @@ title: "arm-resource-operation-response"
 @azure-tools/typespec-azure-resource-manager/arm-resource-operation-response
 ```
 
-[RPC 008]: PUT, GET, PATCH & LIST must return the same resource schema. Operations on a resource such as read, create, update, and list must all return the resource type itself (or a collection of the resource type for list operations).
+PUT, GET, PATCH & LIST must return the same resource schema. Operations on a resource such as read, create, update, and list must all return the resource type itself (or a collection of the resource type for list operations).
+
+:::note
+ARM RPC rule: [`RPC-008`](https://armwiki.azurewebsites.net/api_contracts/guidelines/rpc.html)
+:::
 
 #### ❌ Incorrect
 

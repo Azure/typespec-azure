@@ -11,7 +11,6 @@ Each resource interface must have an `@armResourceOperations` decorator to assoc
 #### ❌ Incorrect
 
 ```tsp
-// Missing @armResourceOperations decorator
 interface FooResources extends TrackedResourceOperations<FooResource, FooProperties> {}
 ```
 
