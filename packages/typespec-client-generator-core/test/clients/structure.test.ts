@@ -3075,3 +3075,30 @@ it("nested client inherits parent services when not specified", async () => {
   deepStrictEqual(opBVersionParam.apiVersions, ["bv1", "bv2"]);
   strictEqual(opBVersionParam.clientDefaultValue, "bv2");
 });
+
+it("validation: @clientLocation string target with multiple separate root clients", async () => {
+  const { program } = await SimpleTester.compile(`
+    @service
+    namespace ServiceA {
+      @route("/aTest")
+      op aTest(): void;
+    }
+
+    @service
+    namespace ServiceB {
+      @route("/bTest")
+      op bTest(): void;
+    }
+
+    @@clientLocation(ServiceA.aTest, "SharedGroup");
+  `);
+  await createSdkContextForTester(program);
+  expectDiagnostics(program.diagnostics, [
+    {
+      code: "@azure-tools/typespec-client-generator-core/client-location-conflict",
+    },
+    {
+      code: "@azure-tools/typespec-client-generator-core/client-location-wrong-type",
+    },
+  ]);
+});

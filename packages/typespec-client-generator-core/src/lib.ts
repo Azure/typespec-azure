@@ -380,6 +380,8 @@ export const $lib = createTypeSpecLibrary({
     "client-location-conflict": {
       severity: "warning",
       messages: {
+        default:
+          "@clientLocation with string target could not be used for multiple root clients scenario",
         operationToOperation:
           "`@clientLocation` cannot be used to move an operation to another operation. Operations can only be moved to interfaces or namespaces.",
         modelPropertyToClientInitialization: paramMessage`There is already a parameter called '${"parameterName"}' in the client initialization.`,

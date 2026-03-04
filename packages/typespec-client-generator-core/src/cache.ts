@@ -422,6 +422,15 @@ function createVirtualSubClientsFromClientLocation(
     ) {
       // If the target sub client already exists, handle the multiple services case
       if (typeof v === "string") {
+        if (clients.length > 1) {
+          // If there are multiple root clients, then we could not know where to put the virtual sub client, report error
+          reportDiagnostic(context.program, {
+            code: "client-location-conflict",
+            target: k,
+          });
+          return;
+        }
+
         // Check if a sub client with this name already exists, only check first level for string target
         const existingSc = clients[0].subClients.find(
           (sc) => sc.type && getLibraryName(context, sc.type) === v,
