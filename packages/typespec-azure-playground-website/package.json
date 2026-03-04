@@ -57,6 +57,8 @@
     "@azure-tools/typespec-azure-rulesets": "workspace:^",
     "@azure-tools/typespec-client-generator-core": "workspace:^",
     "@emotion/react": "^11.14.0",
+    "@fluentui/react-components": "~9.73.1",
+    "@fluentui/react-icons": "^2.0.292",
     "@typespec/compiler": "workspace:^",
     "@typespec/events": "workspace:^",
     "@typespec/http": "workspace:^",
