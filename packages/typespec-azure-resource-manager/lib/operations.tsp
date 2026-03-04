@@ -138,6 +138,42 @@ op ArmResourceCheckExistence<
 >;
 
 /**
+ * A resource GET operation template for an Azure Resource Manager Operation Status endpoint.
+ * The path is determined by the `Scope` parameter.
+ * By default this is a tenant-scoped operation at:
+ *   `GET /providers/{providerNamespace}/operationStatuses/{operationId}`
+ * For subscription scope, use `Scope = SubscriptionActionScope`:
+ *   `GET /subscriptions/{subscriptionId}/providers/{providerNamespace}/operationStatuses/{operationId}`
+ * To include a location parameter, pass `Parameters = LocationResourceParameter`.
+ *
+ * @template Response The type of the response body. Defaults to ResourceOperationStatus.
+ * @template Scope The scope of the operation (TenantActionScope or SubscriptionActionScope). Defaults to TenantActionScope.
+ * @template Parameters Optional. Additional parameters after the provider namespace (e.g. LocationResourceParameter).
+ * @template Error Optional. The error response, if non-standard.
+ */
+@autoRoute
+@doc("Get the status of an async operation.")
+@get
+@armResourceCollectionAction
+@Private.armUpdateProviderNamespace
+op GetResourceOperationStatus<
+  Response extends {} = ResourceOperationStatus,
+  Scope extends {} = TenantActionScope,
+  Parameters extends {} = {},
+  Error extends {} = ErrorResponse
+>(
+  ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
+  ...Scope,
+  ...ProviderNamespace<Scope>,
+  ...Parameters,
+
+  @path
+  @segment("operationStatuses")
+  @doc("The operation ID.")
+  operationId: string,
+): ArmResponse<Response> | Error;
+
+/**
  * A long-running resource CreateOrUpdate (PUT)
  * @template Resource the resource being created or updated
  * @template BaseParameters Optional. Allows overriding the operation parameters
