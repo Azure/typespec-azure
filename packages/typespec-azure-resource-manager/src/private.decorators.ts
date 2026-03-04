@@ -24,6 +24,7 @@ import {
 } from "@typespec/compiler";
 
 import { $ } from "@typespec/compiler/typekit";
+import { unsafe_Realm } from "@typespec/compiler/experimental";
 import { useStateMap } from "@typespec/compiler/utils";
 import { $bodyRoot, getHttpOperation } from "@typespec/http";
 import {
@@ -455,6 +456,14 @@ export function registerArmResource(
   nameParameter?: string,
 ): void {
   const { program } = context;
+
+  // Skip registration for types that are in a mutation realm (e.g., versioning projections
+  // created by TCGC's createSdkContext). Registering mutated types would cause duplicate
+  // resources to appear in the ARM resource state map alongside the original types.
+  if (unsafe_Realm.realmForType.has(resourceType)) {
+    return;
+  }
+
   const namespaceName = resourceType.namespace ? getTypeName(resourceType.namespace) : undefined;
   if (
     namespaceName === undefined ||
