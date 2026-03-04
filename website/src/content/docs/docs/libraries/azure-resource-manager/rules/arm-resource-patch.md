@@ -16,7 +16,7 @@ model FooResource is TrackedResource<FooProperties> {
 }
 
 model MyBadPatch {
-  name?; string;
+  name?: string;
   ...Foundations.ArmTagsProperty;
   blah?: string; // does not exist on FooResource
 }

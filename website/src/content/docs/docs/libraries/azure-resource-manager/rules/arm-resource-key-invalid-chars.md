@@ -6,13 +6,13 @@ title: "arm-resource-key-invalid-chars"
 @azure-tools/typespec-azure-resource-manager/arm-resource-key-invalid-chars
 ```
 
-ARM resource key must contain only alphanumeric characters, starting with a lowercase letter. Parameters must consist of alphanumeric characters starting with a lower case letter.
+ARM resource key must contain only alphanumeric characters or dashes, starting with a lowercase letter.
 
 #### ❌ Incorrect
 
 ```tsp
 model Employee is TrackedResource<EmployeeProperties> {
-  ...ResourceNameParameter<Employee, KeyName = "employee-name">;
+  ...ResourceNameParameter<Employee, KeyName = "employee_name">;
 }
 ```
 

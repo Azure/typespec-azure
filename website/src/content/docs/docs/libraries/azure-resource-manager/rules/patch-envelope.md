@@ -40,12 +40,12 @@ model FooResource is TrackedResource<FooProperties> {
 }
 
 model PatchFoo {
+  ...ManagedServiceIdentityProperty;
   properties?: PatchFooProperties;
 }
 
 model PatchFooProperties {
   name?: string;
-  ...ManagedServiceIdentityProperty; // Patch model includes the 'identity' envelope property
 }
 
 @armResourceOperations
