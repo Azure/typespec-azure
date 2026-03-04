@@ -31,11 +31,11 @@ model Azure.ClientGenerator.Core.ClientOptions
 
 #### Properties
 
-| Name              | Type                       | Description                                                                                                                                                                                                      |
-| ----------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| service?          | `Namespace \| Namespace[]` | The services that this client is generated for. If not specified, TCGC will look up the first parent namespace decorated with `@service` for the target.<br />The namespace should be decorated with `@service`. |
-| name?             | `string`                   | The name of the client. If not specified, the default name will be `<Name of the target>Client`.                                                                                                                 |
-| autoMergeService? | `boolean`                  | Auto-merge service's things into current client.                                                                                                                                                                 |
+| Name              | Type                       | Description                                                                                                                                                  |
+| ----------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| service?          | `Namespace \| Namespace[]` | The services that this client is generated for. The root explicit client must have `service` config.<br />The namespace should be decorated with `@service`. |
+| name?             | `string`                   | The name of the client. If not specified, the default name will be `<Name of the target>Client`.                                                             |
+| autoMergeService? | `boolean`                  | Auto-merge service's things into current client.                                                                                                             |
 
 ### `ExternalType` {#Azure.ClientGenerator.Core.ExternalType}
 

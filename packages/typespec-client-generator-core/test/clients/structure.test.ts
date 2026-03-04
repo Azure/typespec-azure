@@ -3073,5 +3073,5 @@ it("nested client inherits parent services when not specified", async () => {
   const opBVersionParam = opB.operation.parameters.find((p) => p.isApiVersionParam);
   ok(opBVersionParam);
   deepStrictEqual(opBVersionParam.apiVersions, ["bv1", "bv2"]);
-  strictEqual(opBVersionParam.clientDefaultValue, "av2");
+  strictEqual(opBVersionParam.clientDefaultValue, "bv2");
 });

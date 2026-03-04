@@ -83,9 +83,6 @@ export interface TCGCContext {
   getPackageVersionEnum(): Map<Namespace, Enum | undefined>;
   getClients(): SdkClient[];
   getRootClients(): SdkClient[];
-  /**
-   * @deprecated Use `getClients()` and traverse `subClients` to find the client. This method will be removed in a future release.
-   */
   getClient(type: Namespace | Interface): SdkClient | undefined;
   getOperationsForClient(client: SdkClient): Operation[];
   getClientForOperation(operation: Operation): SdkClient;

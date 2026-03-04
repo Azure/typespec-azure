@@ -271,7 +271,7 @@ export function getClient(
   context: TCGCContext,
   type: Namespace | Interface,
 ): SdkClient | undefined {
-  return context.getClients().find((client) => client.type === type);
+  return context.getClient(type);
 }
 
 /**

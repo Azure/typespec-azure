@@ -284,12 +284,20 @@ export function parseEmitterName(
  * @returns The service namespace that contains the operation
  */
 export function findServiceForOperation(services: Namespace[], operation: Operation): Namespace {
-  let namespace = operation.namespace;
-  while (namespace) {
-    if (services.includes(namespace)) {
-      return namespace;
+  // Follow the sourceOperation chain to find the original service namespace.
+  // This is needed when operations are defined using `is` in customization interfaces
+  // (e.g., `opB is ServiceB.Operations.opB`), where the operation's namespace is the
+  // customization namespace rather than the original service namespace.
+  let current: Operation | undefined = operation;
+  while (current) {
+    let namespace = current.namespace;
+    while (namespace) {
+      if (services.includes(namespace)) {
+        return namespace;
+      }
+      namespace = namespace.namespace;
     }
-    namespace = namespace.namespace;
+    current = current.sourceOperation;
   }
   // Fallback to the first service. This can happen when an operation is defined outside
   // of any service namespace (e.g., in Azure.ResourceManager or other shared namespaces)
