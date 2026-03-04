@@ -138,38 +138,40 @@ op ArmResourceCheckExistence<
 >;
 
 /**
- * A resource GET operation for the OperationStatus resource at the tenant and location scope.
- * @template OperationStatusResource The resource status type. Defaults to ArmTenantResourceOperationStatus.
- * @template Parameters Optional. Additional parameters after the path parameters
- * @template Response Optional. The success response for the read operation
+ * A resource GET operation template for an Azure Resource Manager Operation Status endpoint.
+ * The path is determined by the `Scope` parameter.
+ * By default this is a tenant-scoped operation at:
+ *   `GET /providers/{providerNamespace}/operationStatuses/{operationId}`
+ * For subscription scope, use `Scope = SubscriptionActionScope`:
+ *   `GET /subscriptions/{subscriptionId}/providers/{providerNamespace}/operationStatuses/{operationId}`
+ * To include a location parameter, pass `Parameters = LocationResourceParameter`.
+ *
+ * @template Response The type of the response body. Defaults to ResourceOperationStatus.
+ * @template Scope The scope of the operation (TenantActionScope or SubscriptionActionScope). Defaults to TenantActionScope.
+ * @template Parameters Optional. Additional parameters after the provider namespace (e.g. LocationResourceParameter).
  * @template Error Optional. The error response, if non-standard.
  */
-op ArmResourceGetTenantOperationStatus<
-  OperationStatusResource extends {} = ArmTenantResourceOperationStatus,
+@autoRoute
+@doc("Get the status of an async operation.")
+@get
+@armResourceCollectionAction
+@Private.armUpdateProviderNamespace
+op GetResourceOperationStatus<
+  Response extends {} = ResourceOperationStatus,
+  Scope extends {} = TenantActionScope,
   Parameters extends {} = {},
-  Response extends {} = ArmResponse<OperationStatusResource>,
   Error extends {} = ErrorResponse
-> is ArmResourceRead<OperationStatusResource, TenantBaseParameters, Parameters, Response, Error>;
+>(
+  ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
+  ...Scope,
+  ...ProviderNamespace<Scope>,
+  ...Parameters,
 
-/**
- * A resource GET operation for the OperationStatus resource at the subscription and location scope.
- * @template OperationStatusResource The resource status type. Defaults to ArmSubscriptionResourceOperationStatus.
- * @template Parameters Optional. Additional parameters after the path parameters
- * @template Response Optional. The success response for the read operation
- * @template Error Optional. The error response, if non-standard.
- */
-op ArmResourceGetSubscriptionOperationStatus<
-  OperationStatusResource extends {} = ArmSubscriptionResourceOperationStatus,
-  Parameters extends {} = {},
-  Response extends {} = ArmResponse<OperationStatusResource>,
-  Error extends {} = ErrorResponse
-> is ArmResourceRead<
-  OperationStatusResource,
-  SubscriptionBaseParameters,
-  Parameters,
-  Response,
-  Error
->;
+  @path
+  @segment("operationStatuses")
+  @doc("The operation ID.")
+  operationId: string,
+): ArmResponse<Response> | Error;
 
 /**
  * A long-running resource CreateOrUpdate (PUT)

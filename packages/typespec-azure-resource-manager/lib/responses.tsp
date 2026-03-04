@@ -180,15 +180,14 @@ model ArmOperationStatus<
 }
 
 /**
- * Standard Azure Resource Manager operation status response, without requiring the
- * id to be a path parameter. This type is used when the operation status is returned
- * as a response body (e.g., as the LRO final result), rather than as a standalone resource
- * endpoint.
+ * Standard Azure Resource Manager operation status response, used as the response
+ * body for `GetResourceOperationStatus`. The `id` property is not marked as a path
+ * parameter, so the full value is always present in the response body.
  *
  * @template Properties Optional resource-specific properties
  * @template StatusValues The set of allowed values for operation status
  */
-model ArmResourceOperationStatus<
+model ResourceOperationStatus<
   Properties extends {} = never,
   StatusValues extends TypeSpec.Reflection.Union = ResourceProvisioningState
 > {
@@ -201,8 +200,6 @@ model ArmResourceOperationStatus<
   status: StatusValues;
 
   /** The unique identifier for the operationStatus resource */
-  @key
-  @segment("operationStatuses")
   id: string;
 
   /** The name of the operationStatus resource */
@@ -225,28 +222,6 @@ model ArmResourceOperationStatus<
   @visibility(Lifecycle.Read)
   error?: ErrorDetail;
 }
-
-/**
- * Standard Azure Resource Manager operation status response for the tenant scope.
- * @template Properties Optional resource-specific properties
- * @template StatusValues The set of allowed values for operation status
- */
-@parentResource(TenantLocationResource)
-model ArmTenantResourceOperationStatus<
-  Properties extends {} = never,
-  StatusValues extends TypeSpec.Reflection.Union = ResourceProvisioningState
-> is ArmResourceOperationStatus<Properties, StatusValues>;
-
-/**
- * Standard Azure Resource Manager operation status response for the subscription scope.
- * @template Properties Optional resource-specific properties
- * @template StatusValues The set of allowed values for operation status
- */
-@parentResource(SubscriptionLocationResource)
-model ArmSubscriptionResourceOperationStatus<
-  Properties extends {} = never,
-  StatusValues extends TypeSpec.Reflection.Union = ResourceProvisioningState
-> is ArmResourceOperationStatus<Properties, StatusValues>;
 
 /**
  * The standard header for asynchronous operation polling
