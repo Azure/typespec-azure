@@ -2,8 +2,8 @@
  * Configuration types and loader for the doc-updater system.
  *
  * Each package that wants automated doc updates provides a YAML config
- * file in the `configs/` directory alongside this package.  The YAML
- * file names a skill from `.github/skills/` for the agent to invoke.
+ * file in the `configs/` directory alongside this package, and a
+ * matching set of prompt files in `prompts/<name>/`.
  */
 
 import { load as parseYaml } from "js-yaml";
@@ -18,13 +18,6 @@ export interface DocUpdateConfig {
   name: string;
   /** Human-readable display name */
   displayName: string;
-
-  /**
-   * Name of the skill directory under `.github/skills/`.
-   * The agent will invoke it via `@<skillName>`.
-   * Example: "doc-update-tcgc"
-   */
-  skillName: string;
 
   /** Source code paths to analyze for cross-referencing */
   sourceCodePaths: string[];

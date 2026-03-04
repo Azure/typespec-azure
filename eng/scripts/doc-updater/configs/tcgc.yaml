@@ -1,8 +1,6 @@
 name: tcgc
 displayName: TypeSpec Client Generator Core
 
-skillName: doc-update-tcgc
-
 sourceCodePaths:
   - packages/typespec-client-generator-core/src/**
   - packages/typespec-client-generator-core/lib/**

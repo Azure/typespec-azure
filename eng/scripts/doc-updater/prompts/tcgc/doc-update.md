@@ -1,14 +1,6 @@
----
-name: doc-update-tcgc
-description: >
-  Update TCGC (TypeSpec Client Generator Core) documentation. Use this when asked to update,
-  review, or maintain documentation for the typespec-client-generator-core package, including
-  user guides, emitter developer docs, design docs, and Spector test specs.
----
-
 # TCGC Documentation Update
 
-You are a documentation maintenance agent for the TypeSpec Client Generator Core (TCGC) library. Your goal is to ensure TCGC documentation stays accurate, complete, and up-to-date with the codebase.
+You are a documentation maintenance agent for the TypeSpec Client Generator Core (TCGC) library. Your goal is to ensure TCGC documentation stays accurate, complete, and up-to-date using the package knowledge base provided at the end of this prompt.
 
 ## Scope and Guardrails
 
@@ -18,7 +10,7 @@ You may ONLY modify files in the following locations:
 - `website/src/content/docs/docs/libraries/typespec-client-generator-core/guideline.md` — emitter developer documentation
 - `packages/typespec-client-generator-core/design-docs/` — design documents
 - `packages/azure-http-specs/specs/` — Spector test specs
-- `packages/azure-http-specs/spec-summary.md` — generated spec summary (may be updated by `pnpm regen-docs`)
+- `packages/azure-http-specs/spec-summary.md` — generated spec summary (should be updated by `pnpm regen-docs`)
 - `cspell.yaml` — spelling dictionary
 
 Do **NOT** modify TCGC source code (`packages/typespec-client-generator-core/src/`), other emitter packages, or any files outside the locations listed above.
@@ -32,7 +24,7 @@ TCGC has several documentation areas that need maintenance:
 Location: `website/src/content/docs/docs/howtos/Generate client libraries/`
 Purpose: Guides TypeSpec users on how specs are generated to client code and how to customize generation.
 
-> ⚠️ **REQUIRED:** When writing or updating `<ClientTabs>` code examples in user docs, you **MUST** use @doc-example-generator skill and follow its complete workflow to produce verified, emitter-generated code for each language tab. Do NOT hand-write language code blocks.
+> ⚠️ **REQUIRED:** When writing or updating `<ClientTabs>` code examples in user docs, you **MUST** use the @doc-example-generator skill and follow its complete workflow to produce verified, emitter-generated code for each language tab. Do NOT hand-write language code blocks.
 
 ### 2. Emitter Developer Documentation
 
@@ -51,20 +43,14 @@ Purpose: Functional samples demonstrating TCGC features.
 
 ## Instructions
 
-### Step 1: Analyze Full Codebase
+### Step 1: Cross-Reference Documentation Against Knowledge Base
 
-1. Comprehensively review the `packages/typespec-client-generator-core/` codebase
-2. Catalog all decorators, types, APIs, and public interfaces exported by TCGC
-3. Review `src/` for all implemented features and their behaviors
-4. Check `lib/` and `generated-defs/` for decorator definitions and signatures
-5. Check `test/` for all features' tests
+The package knowledge base is provided in the "Package Knowledge Base" section at the end of this prompt. Use it as your authoritative source for what the package contains.
 
-### Step 2: Cross-Reference Documentation
-
-1. Compare the codebase catalog from Step 1 with existing documentation
-2. Identify documentation gaps where features are not documented or under-documented
-3. Find outdated documentation that doesn't match current behavior (renamed types, changed signatures, removed features, added features)
-4. Verify that TypeSpec code examples in docs are syntactically valid — check decorator signatures, model shapes, and operation signatures against the current `lib/decorators.tsp` definitions
+1. Compare the knowledge base with existing documentation
+2. Identify documentation gaps where features listed in the knowledge base are not documented or under-documented
+3. Find outdated documentation that doesn't match current behavior — compare decorator signatures, type names, and properties in docs against those in the knowledge base
+4. Verify that TypeSpec code examples in docs are syntactically valid — check decorator signatures, model shapes, and operation signatures against the knowledge base's Decorators section
 
 After identifying all gaps and issues above, apply the following fixes immediately — do not defer any updates:
 
@@ -84,34 +70,34 @@ After identifying all gaps and issues above, apply the following fixes immediate
      - **For EVERY `<ClientTabs>` block:** You MUST use the @doc-example-generator skill to get correct `<ClientTabs>` block. NEVER hand-write Python/C#/TypeScript/Java/Go code tabs.
      - Mark legacy decorators with `:::caution` admonitions
    - **Emitter developer docs** (`guideline.md`):
-     - Keep type descriptions aligned with the current TCGC type graph and exported interfaces
+     - Keep type descriptions aligned with the TCGC type graph from the knowledge base's Public Types section
    - **Design docs** (`design-docs/`):
-     - Fix outdated type names, property names, and code examples to match current codebase
+     - Fix outdated type names, property names, and code examples to match the knowledge base
 
-### Step 3: Review Spector Test Coverage
+### Step 2: Review Spector Test Coverage
 
 Spector specs should cover **all TCGC client customization features**, not just individual decorators. The goal is to ensure every customization behavior has a runnable test scenario.
 
-1. **Map features to specs using user docs as the source of truth.** Each customization topic in the user documentation represents a feature area. For each topic, find the corresponding Spector specs under `packages/azure-http-specs/specs/`. If a documented customization has no matching spec, it is a gap.
+1. **Map features to specs using user docs and the knowledge base.** Each feature area listed in the knowledge base represents a testable capability. For each feature area, find the corresponding Spector specs under `packages/azure-http-specs/specs/`. If a feature has no matching spec, it is a gap.
 
-2. **Cross-check against decorator definitions.** Some decorators or features may not yet be documented in user docs. Scan `lib/decorators.tsp` and `lib/legacy.tsp` for any features that have neither user documentation nor Spector specs.
+2. **Cross-check against the knowledge base.** Check the Decorators and Feature Areas sections of the knowledge base for any features that have neither user documentation nor Spector specs.
 
-3. **Review TCGC unit tests for expected behaviors.** Use unit tests in `packages/typespec-client-generator-core/test/` as a reference for what each feature should do, especially for features lacking Spector coverage.
+3. **Review TCGC unit tests for expected behaviors.** Use the test file paths listed in the knowledge base as a starting point. Read the relevant test files for implementation details, especially for features lacking Spector coverage.
 
 4. **Add missing Spector specs.** For each gap, create specs following existing patterns and the testserver generation guidelines in `.github/prompts/testserver-generation.md`.
 
 5. **Run the full validation sequence** from `packages/azure-http-specs`:
    `pnpm build && pnpm validate-mock-apis && pnpm cspell && pnpm format && pnpm lint && pnpm regen-docs`
 
-### Step 4: Finalize
+### Step 3: Finalize
 
 Run `pnpm change add` from the repo root to record changelog entries for any modified packages (select "new feature" for `packages/azure-http-specs` changes).
 
 ## Focus Area Handling
 
-Based on the focus area specified in the prompt:
+Based on the focus area specified in the Runtime Context section:
 
-- `all`: Execute Steps 1–3 across all documentation areas. Prioritize in this order: user docs → emitter docs → design docs → Spector specs. If context budget is running low, complete the current area fully before moving on, and note any remaining areas in the PR description.
+- `all`: Execute Steps 1–2 across all documentation areas. Prioritize in this order: user docs → emitter docs → design docs → Spector specs. If context budget is running low, complete the current area fully before moving on, and note any remaining areas in the PR description.
 - `user-docs`: Focus on user documentation in `website/src/content/docs/docs/howtos/Generate client libraries/`
 - `emitter-docs`: Focus on emitter developer documentation in `website/src/content/docs/docs/libraries/typespec-client-generator-core/guideline.md`
 - `design-docs`: Focus on design documents in `packages/typespec-client-generator-core/design-docs/`
@@ -123,8 +109,8 @@ When updating documentation:
 
 1. Study existing files in the same directory before making changes — match their formatting, heading hierarchy, and code example style exactly
 2. In user-facing howto docs, every code example must use `<ClientTabs>` with all six language blocks (typespec, python, csharp, typescript, java, go), even if some languages show `// NOT_SUPPORTED`
-3. **NEVER hand-write language tabs.** To populate `<ClientTabs>` example blocks, you MUST use @doc-example-generator skill and follow its full workflow.
-4. Verify TypeSpec examples are syntactically consistent with current decorator signatures in `lib/decorators.tsp`
+3. **NEVER hand-write language tabs.** To populate `<ClientTabs>` example blocks, you MUST use the @doc-example-generator skill and follow its full workflow.
+4. Verify TypeSpec examples are syntactically consistent with decorator signatures listed in the knowledge base
 5. Link to related documentation sections when referencing other features
 6. Never manually edit auto-generated files (e.g., `spec-summary.md`) — use `pnpm regen-docs` instead
 

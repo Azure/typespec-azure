@@ -1,10 +1,12 @@
 name: Documentation Update Scheduler
 
 # This workflow uses the GitHub Copilot SDK to automatically update documentation
-# for any configured package. Configs are defined in eng/scripts/doc-updater/src/configs/.
+# for any configured package. Configs are defined in eng/scripts/doc-updater/configs/.
 #
-# To add a new package: create a config in eng/scripts/doc-updater/src/configs/ and
-# register it in the configs/index.ts registry. Then add it to the 'config' choices below.
+# To add a new package:
+#   1. Create a YAML config in eng/scripts/doc-updater/configs/
+#   2. Create prompt files in eng/scripts/doc-updater/prompts/<name>/
+#   3. The workflow will auto-discover it — no changes needed here.
 
 on:
   schedule:
@@ -13,17 +15,29 @@ on:
   workflow_dispatch:
     inputs:
       config:
-        description: "Package config to run"
-        required: true
-        default: "tcgc"
-        type: choice
-        options:
-          - tcgc
+        description: "Package config to run ('all' runs every config in parallel)"
+        required: false
+        default: "all"
+        type: string
       focus_area:
         description: "Documentation area to focus on"
         required: false
         default: "all"
         type: string
+      phase:
+        description: "Pipeline phase to run"
+        required: false
+        default: "all"
+        type: choice
+        options:
+          - all
+          - knowledge
+          - doc-update
+      full_rebuild:
+        description: "Force full knowledge rebuild (ignore incremental cache)"
+        required: false
+        default: false
+        type: boolean
       model:
         description: "Model to use for the agent"
         required: false
@@ -35,12 +49,46 @@ permissions:
   pull-requests: write
 
 jobs:
+  # -----------------------------------------------------------------------
+  # Job 1: Discover which configs to run
+  # -----------------------------------------------------------------------
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.resolve.outputs.matrix }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Resolve config matrix
+        id: resolve
+        run: |
+          CONFIG_INPUT="${{ github.event.inputs.config || 'all' }}"
+          CONFIGS_DIR="eng/scripts/doc-updater/configs"
+
+          if [ "$CONFIG_INPUT" = "all" ]; then
+            # Discover all YAML config files
+            CONFIGS=$(ls "$CONFIGS_DIR"/*.yaml 2>/dev/null | xargs -I{} basename {} .yaml | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          else
+            # Single config or comma-separated list
+            CONFIGS=$(echo "$CONFIG_INPUT" | tr ',' '\n' | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          fi
+
+          echo "Resolved configs: $CONFIGS"
+          echo "matrix=$CONFIGS" >> $GITHUB_OUTPUT
+
+  # -----------------------------------------------------------------------
+  # Job 2: Run doc-updater for each config (parallel via matrix)
+  # -----------------------------------------------------------------------
   update-docs:
+    needs: discover
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    strategy:
+      matrix:
+        config: ${{ fromJson(needs.discover.outputs.matrix) }}
+      fail-fast: false
     env:
-      # The Copilot SDK requires a fine-grained PAT with "Copilot Requests: Read"
-      # permission. The built-in GITHUB_TOKEN does NOT have the required scope.
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
     steps:
       - name: Checkout repository
@@ -90,14 +138,22 @@ jobs:
       - name: Run doc-updater
         working-directory: eng/scripts/doc-updater
         run: |
-          CONFIG="${{ github.event.inputs.config || 'tcgc' }}"
           FOCUS="${{ github.event.inputs.focus_area || 'all' }}"
+          PHASE="${{ github.event.inputs.phase || 'all' }}"
+          FULL_REBUILD="${{ github.event.inputs.full_rebuild || 'false' }}"
           MODEL="${{ github.event.inputs.model || 'claude-opus-4.6' }}"
 
+          REBUILD_FLAG=""
+          if [ "$FULL_REBUILD" = "true" ]; then
+            REBUILD_FLAG="--full-rebuild"
+          fi
+
           npx tsx src/index.ts \
-            --config "$CONFIG" \
+            --config "${{ matrix.config }}" \
             --focus "$FOCUS" \
-            --model "$MODEL"
+            --phase "$PHASE" \
+            --model "$MODEL" \
+            $REBUILD_FLAG
 
       - name: Set run date
         id: date
@@ -107,27 +163,28 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.COPILOT_GITHUB_TOKEN }}
-          branch: automated/doc-update-${{ github.event.inputs.config || 'tcgc' }}-${{ steps.date.outputs.value }}-${{ github.run_number }}
-          title: "[Automated] Update ${{ github.event.inputs.config || 'tcgc' }} documentation (${{ steps.date.outputs.value }})"
+          branch: automated/doc-update-${{ matrix.config }}-${{ steps.date.outputs.value }}-${{ github.run_number }}
+          title: "[Automated] Update ${{ matrix.config }} documentation (${{ steps.date.outputs.value }})"
           body: |
             Automated documentation update via Copilot SDK.
 
-            **Config:** ${{ github.event.inputs.config || 'tcgc' }}
+            **Config:** ${{ matrix.config }}
+            **Phase:** ${{ github.event.inputs.phase || 'all' }}
             **Focus area:** ${{ github.event.inputs.focus_area || 'all' }}
+            **Full rebuild:** ${{ github.event.inputs.full_rebuild || 'false' }}
             **Model:** ${{ github.event.inputs.model || 'claude-opus-4.6' }}
             **Date:** ${{ steps.date.outputs.value }}
 
             This PR was created by the [doc-update-scheduler workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
-          commit-message: "docs: automated ${{ github.event.inputs.config || 'tcgc' }} update (${{ steps.date.outputs.value }})"
+          commit-message: "docs: automated ${{ matrix.config }} update (${{ steps.date.outputs.value }})"
           delete-branch: true
 
-      - name: Summary
+      - name: Job Summary
         run: |
-          CONFIG="${{ github.event.inputs.config || 'tcgc' }}"
-          FOCUS="${{ github.event.inputs.focus_area || 'all' }}"
-
           echo "## Documentation Update Complete" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Config:** $CONFIG" >> $GITHUB_STEP_SUMMARY
-          echo "**Focus Area:** $FOCUS" >> $GITHUB_STEP_SUMMARY
+          echo "**Config:** ${{ matrix.config }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Phase:** ${{ github.event.inputs.phase || 'all' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Focus Area:** ${{ github.event.inputs.focus_area || 'all' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Full Rebuild:** ${{ github.event.inputs.full_rebuild || 'false' }}" >> $GITHUB_STEP_SUMMARY
           echo "**Model:** ${{ github.event.inputs.model || 'claude-opus-4.6' }}" >> $GITHUB_STEP_SUMMARY
