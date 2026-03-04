@@ -19,8 +19,9 @@ model FooResource is TrackedResource<FooProperties> {
 }
 
 model MyBadPatch {
+  name?; string;
+  ...Foundations.ArmTagsProperty;
   blah?: string; // does not exist on FooResource
-  blahdeeblah?: string; // does not exist on FooResource
 }
 ```
 
@@ -35,6 +36,7 @@ model FooResource is TrackedResource<FooProperties> {
 }
 
 model FooPatch {
+  name?: string;
   ...Foundations.ArmTagsProperty;
   properties?: FooProperties;
 }

@@ -12,18 +12,22 @@ Patch envelope properties should match the resource properties. If a resource de
 
 ```tsp
 model FooResource is TrackedResource<FooProperties> {
-  @key("foo")
-  @segment("foo")
-  @path
-  name: string;
-
+  ...ResourceNameParameter<Foo>;
   ...ManagedServiceIdentityProperty;
+}
+
+model PatchFoo {
+  properties?: PatchFooProperties;
+}
+
+model PatchFooProperties {
+  name?: string;
 }
 
 @armResourceOperations
 interface FooResources {
   // update model is missing the 'identity' envelope property
-  update is ArmResourcePatchSync<FooResource, FooProperties>;
+  update is ArmCustomPatchAsync<FooResource, PatchFoo>;
 }
 ```
 
@@ -31,21 +35,21 @@ interface FooResources {
 
 ```tsp
 model FooResource is TrackedResource<FooProperties> {
-  @key("foo")
-  @segment("foo")
-  @path
-  name: string;
-
+  ...ResourceNameParameter<Foo>;
   ...ManagedServiceIdentityProperty;
 }
 
-model FooPatch {
-  ...ManagedServiceIdentityProperty;
-  properties?: FooProperties;
+model PatchFoo {
+  properties?: PatchFooProperties;
+}
+
+model PatchFooProperties {
+  name?: string;
+  ...ManagedServiceIdentityProperty; // Patch model includes the 'identity' envelope property
 }
 
 @armResourceOperations
 interface FooResources {
-  update is ArmResourcePatchSync<FooResource, FooPatch>;
+  update is ArmCustomPatchAsync<FooResource, PatchFoo>;
 }
 ```
