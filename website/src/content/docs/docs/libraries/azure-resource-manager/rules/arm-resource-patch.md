@@ -12,10 +12,7 @@ Validate ARM PATCH operations. The request body of a PATCH must be a model with 
 
 ```tsp
 model FooResource is TrackedResource<FooProperties> {
-  @key("foo")
-  @segment("foo")
-  @path
-  name: string;
+  ...ResourceNameParameter<FooResource>;
 }
 
 model MyBadPatch {
@@ -29,10 +26,7 @@ model MyBadPatch {
 
 ```tsp
 model FooResource is TrackedResource<FooProperties> {
-  @key("foo")
-  @segment("foo")
-  @path
-  name: string;
+  ...ResourceNameParameter<FooResource>;
 }
 
 model FooPatch {

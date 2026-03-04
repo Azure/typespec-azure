@@ -16,34 +16,22 @@ namespace MyService;
 
 // 4 levels of nesting: A > B > C > D — too deep
 model A is TrackedResource<{}> {
-  @key("a")
-  @segment("as")
-  @path
-  name: string;
+  ...ResourceNameParameter<A>;
 }
 
 @parentResource(A)
 model B is TrackedResource<{}> {
-  @key("b")
-  @segment("bs")
-  @path
-  name: string;
+  ...ResourceNameParameter<B>;
 }
 
 @parentResource(B)
 model C is TrackedResource<{}> {
-  @key("c")
-  @segment("cs")
-  @path
-  name: string;
+  ...ResourceNameParameter<C>;
 }
 
 @parentResource(C)
 model D is TrackedResource<{}> {
-  @key("d")
-  @segment("ds")
-  @path
-  name: string;
+  ...ResourceNameParameter<D>;
 }
 ```
 
@@ -55,25 +43,16 @@ namespace MyService;
 
 // 3 levels of nesting: A > B > C
 model A is TrackedResource<{}> {
-  @key("a")
-  @segment("as")
-  @path
-  name: string;
+  ...ResourceNameParameter<A>;
 }
 
 @parentResource(A)
 model B is TrackedResource<{}> {
-  @key("b")
-  @segment("bs")
-  @path
-  name: string;
+  ...ResourceNameParameter<B>;
 }
 
 @parentResource(B)
 model C is TrackedResource<{}> {
-  @key("c")
-  @segment("cs")
-  @path
-  name: string;
+  ...ResourceNameParameter<C>;
 }
 ```

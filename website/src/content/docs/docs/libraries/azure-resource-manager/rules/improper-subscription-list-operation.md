@@ -13,10 +13,7 @@ Tenant and Extension resources should not define a list by subscription operatio
 ```tsp
 @tenantResource
 model FooResource is ProxyResource<FooProperties> {
-  @key("foo")
-  @segment("foo")
-  @path
-  name: string;
+  ...ResourceNameParameter<FooResource>;
 }
 
 @armResourceOperations(FooResource)
@@ -30,10 +27,7 @@ interface FooResources {
 ```tsp
 @tenantResource
 model FooResource is ProxyResource<FooProperties> {
-  @key("foo")
-  @segment("foo")
-  @path
-  name: string;
+  ...ResourceNameParameter<FooResource>;
 }
 
 @armResourceOperations(FooResource)

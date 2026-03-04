@@ -12,10 +12,7 @@ ARM resource key must contain only alphanumeric characters, starting with a lowe
 
 ```tsp
 model Employee is TrackedResource<EmployeeProperties> {
-  @key("employee-name")
-  @segment("employees")
-  @path
-  name: string;
+  ...ResourceNameParameter<Employee, KeyName = "employee-name">;
 }
 ```
 
@@ -23,9 +20,6 @@ model Employee is TrackedResource<EmployeeProperties> {
 
 ```tsp
 model Employee is TrackedResource<EmployeeProperties> {
-  @key("employeeName")
-  @segment("employees")
-  @path
-  name: string;
+  ...ResourceNameParameter<Employee>;
 }
 ```

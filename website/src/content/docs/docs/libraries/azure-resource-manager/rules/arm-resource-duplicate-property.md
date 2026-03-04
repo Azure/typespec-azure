@@ -15,7 +15,7 @@ Warns when a property defined in the resource envelope is also defined in the re
 namespace MyService;
 
 model FooResource is TrackedResource<FooProperties> {
-  @key @segment("foo") name: string;
+  ...ResourceNameParameter<FooResource>;
   ...ManagedServiceIdentityProperty;
 }
 
@@ -32,7 +32,7 @@ model FooProperties {
 namespace MyService;
 
 model FooResource is TrackedResource<FooProperties> {
-  @key @segment("foo") name: string;
+  ...ResourceNameParameter<FooResource>;
   ...ManagedServiceIdentityProperty;
 }
 

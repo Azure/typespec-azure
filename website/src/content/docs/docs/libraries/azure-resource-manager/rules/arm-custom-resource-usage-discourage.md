@@ -23,9 +23,6 @@ Use standard ARM resource types:
 
 ```tsp
 model Employee is TrackedResource<EmployeeProperties> {
-  @key("employeeName")
-  @segment("employees")
-  @path
-  name: string;
+  ...ResourceNameParameter<Employee>;
 }
 ```

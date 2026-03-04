@@ -12,10 +12,7 @@ ARM resource path segments must contain only alphanumeric characters or dashes, 
 
 ```tsp
 model FooResource is TrackedResource<{}> {
-  @key("foo")
-  @segment("/foo/bar")
-  @path
-  name: string;
+  ...ResourceNameParameter<FooResource, SegmentName = "/foo/bar">;
 }
 ```
 
@@ -23,9 +20,6 @@ model FooResource is TrackedResource<{}> {
 
 ```tsp
 model FooResource is TrackedResource<{}> {
-  @key("foo")
-  @segment("foo")
-  @path
-  name: string;
+  ...ResourceNameParameter<FooResource>;
 }
 ```
