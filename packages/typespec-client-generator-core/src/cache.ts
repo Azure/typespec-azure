@@ -196,7 +196,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   // start from the top-level clients and remove empty clients
   for (const client of clients) {
     const keepClient = needKeep(client);
-    if (!keepClient) {
+    if (!keepClient && client.type) {
       context.__rawClientsCache.delete(client.type);
       context.__clientToOperationsCache.delete(client);
     }
@@ -247,14 +247,14 @@ function getRootClients(context: TCGCContext): ClientCreationResult {
 
     // Explicit client cache
     explicitClients.map((c) => {
-      context.__rawClientsCache!.set(c.type, c);
+      context.__rawClientsCache!.set(c.type!, c);
       context.__clientToOperationsCache!.set(c, []);
       context.__explicitClients!.add(c);
     });
 
     // Build explicit client hierarchy
     explicitClients.map((client: SdkClient) => {
-      let parentClientType: Namespace | undefined = client.type.namespace;
+      let parentClientType: Namespace | undefined = client.type!.namespace;
       while (parentClientType) {
         const parentClient = context.__rawClientsCache?.get(parentClientType);
         if (parentClient) {
@@ -273,7 +273,7 @@ function getRootClients(context: TCGCContext): ClientCreationResult {
       if (c.parent === undefined && c.services.length === 0) {
         reportDiagnostic(context.program, {
           code: "root-client-missing-service",
-          target: c.type,
+          target: c.type!,
         });
         validClients = false;
         return false;
@@ -291,7 +291,7 @@ function getRootClients(context: TCGCContext): ClientCreationResult {
             if (!parentClient.services.includes(svc)) {
               reportDiagnostic(context.program, {
                 code: "nested-client-service-not-subset",
-                target: subClient.type,
+                target: subClient.type!,
               });
               validClients = false;
               break;
@@ -299,7 +299,7 @@ function getRootClients(context: TCGCContext): ClientCreationResult {
             if (parentClient.autoMergeService) {
               reportDiagnostic(context.program, {
                 code: "auto-merge-service-conflict",
-                target: subClient.type,
+                target: subClient.type!,
               });
               validClients = false;
               break;
@@ -348,7 +348,7 @@ function getRootClients(context: TCGCContext): ClientCreationResult {
             }
           }
         }
-        context.__rawClientsCache!.set(client.type, client);
+        context.__rawClientsCache!.set(client.type!, client);
         client.subClients = subClients;
         context.__clientToOperationsCache!.set(client, []);
       }
@@ -383,7 +383,7 @@ function getRootClients(context: TCGCContext): ClientCreationResult {
           clientPath: clientName,
         };
         client.subClients = buildSubClientHierarchy(context, service, client.name, service, client);
-        context.__rawClientsCache!.set(client.type, client);
+        context.__rawClientsCache!.set(client.type!, client);
         context.__clientToOperationsCache!.set(client, []);
         clients.push(client);
       }
@@ -471,7 +471,7 @@ function createVirtualSubClientsFromClientLocation(
         name: scName,
         clientPath: `${clients[0].name}.${scName}`,
         services,
-        type: undefined as any, // virtual sub client has no backing type
+        type: undefined, // virtual sub client has no backing type
         subClients: [],
         parent: clients[0],
       };
@@ -501,7 +501,7 @@ function handleMultipleServicesSubClientNameConflict(
       existingSc.subClients.push(...sc.subClients);
       if (existingSc.type !== undefined) {
         mergedSubClientTypes.set(existingSc, [existingSc.type as Namespace | Interface]);
-        (existingSc as any).type = undefined;
+        existingSc.type = undefined;
       }
       // Store the merged types for later operations processing
       const types = mergedSubClientTypes.get(existingSc)!;

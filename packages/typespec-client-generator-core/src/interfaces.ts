@@ -102,7 +102,7 @@ export interface SdkClient {
   kind: "SdkClient";
   name: string;
   services: Namespace[];
-  type: Namespace | Interface;
+  type?: Namespace | Interface;
   /** Sub clients of this client. */
   subClients: SdkClient[];
   /** The path of this client in the client hierarchy. For example, "MyClient.SubClient". */
