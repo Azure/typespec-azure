@@ -315,7 +315,7 @@ function getRootClients(context: TCGCContext): ClientCreationResult {
       }
       clients = [];
       for (const service of serviceNamespaces) {
-        let originalName = service.name;
+        let originalName;
         const clientNameOverride = getClientNameOverride(context, service);
         if (clientNameOverride) {
           originalName = clientNameOverride;
