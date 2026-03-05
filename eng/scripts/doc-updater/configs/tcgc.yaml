@@ -1,0 +1,24 @@
+name: tcgc
+displayName: TypeSpec Client Generator Core
+
+sourceCodePaths:
+  - packages/typespec-client-generator-core/src/**
+  - packages/typespec-client-generator-core/lib/**
+  - packages/typespec-client-generator-core/generated-defs/**
+  - packages/typespec-client-generator-core/test/**
+
+focusAreas:
+  all: >-
+    Execute across all documentation areas.
+    Prioritize: user docs → emitter docs → design docs → Spector specs.
+  user-docs: >-
+    Focus on user documentation in
+    website/src/content/docs/docs/howtos/Generate client libraries/
+  emitter-docs: >-
+    Focus on emitter developer documentation in
+    website/src/content/docs/docs/libraries/typespec-client-generator-core/guideline.md
+  design-docs: >-
+    Focus on design documents in
+    packages/typespec-client-generator-core/design-docs/
+  spector: >-
+    Focus on Spector test coverage in packages/azure-http-specs/specs/

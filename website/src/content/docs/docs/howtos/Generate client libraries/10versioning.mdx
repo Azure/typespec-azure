@@ -944,3 +944,105 @@ func (client *ServiceClient) Get(ctx context.Context, version Versions, options 
 ```
 
 </ClientTabs>
+
+## Adding Additional API Versions with `@clientApiVersions`
+
+The `@clientApiVersions` decorator allows you to specify additional API versions that the client can support beyond what is defined by the service's `@versioned` decorator. This is useful when you want to expose a complete API version enum in the generated client without requiring the entire specification to be annotated with versioning decorators.
+
+<ClientTabs>
+
+```typespec title="main.tsp"
+import "@typespec/versioning";
+import "@typespec/http";
+
+using Versioning;
+using Http;
+
+@versioned(Versions)
+@service
+namespace My.Service;
+
+enum Versions {
+  v4: "v4",
+  v5: "v5",
+}
+
+op get(@query("api-version") apiVersion: Versions): void;
+```
+
+```typespec title="client.tsp"
+import "./main.tsp";
+import "@azure-tools/typespec-client-generator-core";
+using Azure.ClientGenerator.Core;
+
+// Define a complete API version enum that includes older versions
+enum ClientApiVersions {
+  v1: "v1",
+  v2: "v2",
+  v3: "v3",
+  ...My.Service.Versions,
+}
+
+@@clientApiVersions(My.Service, ClientApiVersions);
+```
+
+```python
+from my.service import MyServiceClient
+
+# The generated ServiceVersion enum now includes all versions: v1, v2, v3, v4, v5
+# Default api_version is "v5" (latest)
+client = MyServiceClient(endpoint=..., credential=...)
+
+# You can also target an older version
+client = MyServiceClient(endpoint=..., credential=..., api_version="v1")
+```
+
+```csharp
+// ServiceVersion enum now includes all versions
+public enum ServiceVersion
+{
+    V1 = 1,
+    V2 = 2,
+    V3 = 3,
+    V4 = 4,
+    V5 = 5,
+}
+
+// Default uses latest version (v5)
+var client = new ServiceClient(new Uri("https://my-service.azure.com"));
+
+// Target a specific version
+var options = new ServiceClientOptions(ServiceVersion.V1);
+var client = new ServiceClient(new Uri("https://my-service.azure.com"), options);
+```
+
+```typescript
+/** Known values of {@link Versions} that the service accepts. */
+export enum KnownVersions {
+  V1 = "v1",
+  V2 = "v2",
+  V3 = "v3",
+  V4 = "v4",
+  V5 = "v5",
+}
+```
+
+```java
+// ServiceVersion enum now includes all versions
+public enum ServiceServiceVersion implements ServiceVersion {
+    V1("v1"),
+    V2("v2"),
+    V3("v3"),
+    V4("v4"),
+    V5("v5");
+}
+
+// Default uses latest version (v5)
+ServiceClient client = new ServiceClientBuilder().buildClient();
+```
+
+```go
+// Go does not export enum types for API versions, so no changes are needed.
+```
+
+</ClientTabs>

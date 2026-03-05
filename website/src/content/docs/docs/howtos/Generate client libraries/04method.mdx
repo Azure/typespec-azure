@@ -186,7 +186,7 @@ import "@azure-tools/typespec-client-generator-core";
 
 using Azure.ClientGenerator.Core;
 
-@@access(PetStoreNamespace.GetModel, "internal");
+@@access(PetStoreNamespace.GetModel, Access.internal);
 ```
 
 ```python
@@ -1643,6 +1643,176 @@ type ClientGetOptions struct {
 
 func (client *Client) Get(ctx context.Context, options *ClientGetOptions) (*Response, error)
 
+```
+
+</ClientTabs>
+
+## Scoping operations to specific languages
+
+The `@scope` decorator allows you to include or exclude an operation from specific language emitters.
+By default, all operations are generated for every language. Use `@scope` to target or omit them for specific languages.
+
+### Omit an operation from a specific language
+
+<ClientTabs>
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+using Azure.ClientGenerator.Core;
+
+@service
+namespace MyService;
+
+op commonOp(): void;
+
+// This operation will be generated for all languages except C#
+@scope("!csharp")
+op internalOp(): void;
+```
+
+```python
+class MyServiceClient:
+    def common_op(self, **kwargs: Any) -> None:
+        ...
+
+    # internalOp IS generated for Python (only excluded from C#)
+    def internal_op(self, **kwargs: Any) -> None:
+        ...
+```
+
+```csharp
+public partial class MyServiceClient
+{
+    public virtual Response CommonOp(CancellationToken cancellationToken = default);
+
+    // internalOp is NOT generated for C# because of @scope("!csharp")
+}
+```
+
+```typescript
+// internalOp IS generated for TypeScript (only excluded from C#)
+export async function commonOp(context: Client, options?: CommonOpOptionalParams): Promise<void>;
+
+export async function internalOp(
+  context: Client,
+  options?: InternalOpOptionalParams,
+): Promise<void>;
+```
+
+```java
+public final class MyServiceClient {
+    // internalOp IS generated for Java (only excluded from C#)
+    public void commonOp();
+    public void internalOp();
+}
+```
+
+```go
+// internalOp IS generated for Go (only excluded from C#)
+func (client *MyServiceClient) CommonOp(ctx context.Context, options *MyServiceClientCommonOpOptions) (MyServiceClientCommonOpResponse, error)
+func (client *MyServiceClient) InternalOp(ctx context.Context, options *MyServiceClientInternalOpOptions) (MyServiceClientInternalOpResponse, error)
+```
+
+</ClientTabs>
+
+### Apply an operation to specific languages
+
+<ClientTabs>
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+using Azure.ClientGenerator.Core;
+
+@service
+namespace MyService;
+
+// This operation will only be generated for Go
+@scope("go")
+op goSpecificOp(): void;
+```
+
+```python
+# goSpecificOp is NOT generated for Python
+```
+
+```csharp
+// goSpecificOp is NOT generated for C#
+```
+
+```typescript
+// goSpecificOp is NOT generated for TypeScript
+```
+
+```java
+// goSpecificOp is NOT generated for Java
+```
+
+```go
+// goSpecificOp IS generated for Go because of @scope("go")
+func (client *MyServiceClient) GoSpecificOp(ctx context.Context, options *MyServiceClientGoSpecificOpOptions) (MyServiceClientGoSpecificOpResponse, error)
+```
+
+</ClientTabs>
+
+## Using `@responseAsBool` for HEAD operations
+
+The `@responseAsBool` decorator indicates that a HEAD operation should return a boolean value instead of the typical response.
+When applied, a `404` status code will not raise an error — instead the service method returns `false`. A `2xx` response returns `true`. All other status codes still raise errors.
+
+<ClientTabs>
+
+```typespec
+import "@azure-tools/typespec-client-generator-core";
+using Azure.ClientGenerator.Core;
+
+@service
+namespace MyService;
+
+@responseAsBool
+@head
+op exists(@path id: string): void;
+```
+
+```python
+class MyServiceClient:
+    # Returns bool instead of raising on 404
+    def exists(self, id: str, **kwargs: Any) -> bool:
+        ...
+
+# result = client.exists("item-1")  # True if 2xx, False if 404
+```
+
+```csharp
+public partial class MyServiceClient
+{
+    // Returns bool instead of throwing on 404
+    public virtual Response<bool> Exists(string id, CancellationToken cancellationToken = default);
+}
+```
+
+```typescript
+// Returns boolean instead of throwing on 404
+export async function exists(
+  context: Client,
+  id: string,
+  options?: ExistsOptionalParams,
+): Promise<boolean>;
+```
+
+```java
+public final class MyServiceClient {
+    // Returns boolean instead of throwing on 404
+    public boolean exists(String id);
+}
+```
+
+```go
+// Returns bool instead of returning error on 404
+func (client *MyServiceClient) Exists(ctx context.Context, id string, options *MyServiceClientExistsOptions) (MyServiceClientExistsResponse, error)
+
+type MyServiceClientExistsResponse struct {
+	Success bool
+}
 ```
 
 </ClientTabs>

@@ -472,11 +472,14 @@ The `@alternateType` decorator allows you to override the emitted type for a mod
 
 Suppose you want your generated client library to use a type from an external package instead of the default emitted type.
 
+<ClientTabs>
+
 ```typespec
 @alternateType(
   {
-    fullyQualifiedName: "externallib.ExternalModel",
+    identity: "externallib.ExternalModel",
     package: "externallib",
+    minVersion: "1.0.0",
   },
   "python"
 )
@@ -485,7 +488,59 @@ model MyModel {
 }
 ```
 
+```python
+# In Python SDK, instead of generating MyModel,
+# the emitter will reference ExternalModel from externallib
+from externallib import ExternalModel
+```
+
+```csharp
+// In C# SDK, MyModel would be generated normally
+// unless an external type is specified for C#
+public partial class MyModel
+{
+    public string Prop { get; set; }
+}
+```
+
+```typescript
+// In TypeScript SDK, MyModel would be generated normally
+// unless an external type is specified for TypeScript
+export interface MyModel {
+    prop: string;
+}
+```
+
+```java
+// In Java SDK, MyModel would be generated normally
+// unless an external type is specified for Java
+public final class MyModel {
+    private String prop;
+    public String getProp() { return prop; }
+}
+```
+
+```go
+// In Go SDK, MyModel would be generated normally
+// unless an external type is specified for Go
+type MyModel struct {
+    Prop *string
+}
+```
+
+</ClientTabs>
+
 In this example, instead of generating `MyModel` in the Python sdk, the emitter will reference `ExternalModel` from `externallib` instead.
+
+The `ExternalType` model has the following properties:
+
+- `identity` (required): The fully-qualified name of the external type (e.g., `pystac.Collection`).
+- `package` (optional): The package that exports the external type (e.g., `pystac`).
+- `minVersion` (optional): The minimum version of the package to use (e.g., `1.13.0`).
+
+:::caution
+External types (with `identity` property) cannot be applied to model properties. They must be applied to the type definition itself (Scalar, Model, Enum, or Union).
+:::
 
 ### Use Cases
 
@@ -496,6 +551,8 @@ In this example, instead of generating `MyModel` in the Python sdk, the emitter 
 ### Notes
 
 - The referenced type should be compatible with the intended usage in the generated client library.
+- When `@alternateType` is applied to a `Scalar`, the alternate type must also be a `Scalar`.
+- `@encode` on the original type will be overridden by the one defined in the alternate type.
 
 ## Client Default Values (Legacy)
 
@@ -648,6 +705,81 @@ model Config {
   // Apply default for all languages except Java and Python
   @Azure.ClientGenerator.Core.Legacy.clientDefaultValue(100, "!(java, python)")
   maxRetries?: int32;
+}
+```
+
+</ClientTabItem>
+</ClientTabs>
+
+## Deserializing Empty Strings as Null
+
+The `@deserializeEmptyStringAsNull` decorator indicates that a model property of type `string` (or a scalar derived from `string`) should be deserialized as `null` when its value is an empty string (`""`). This is useful when a service returns empty strings to represent absent values.
+
+<ClientTabs>
+<ClientTabItem lang="typespec" >
+
+```typespec
+model MyModel {
+  @deserializeEmptyStringAsNull
+  displayName?: string;
+
+  @deserializeEmptyStringAsNull
+  description?: string;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="python">
+
+```python
+class MyModel(_model_base.Model):
+    # When the service returns "", the value will be deserialized as None
+    display_name: Optional[str] = rest_field(name="displayName")
+    description: Optional[str] = rest_field()
+```
+
+</ClientTabItem>
+<ClientTabItem lang="csharp" >
+
+```csharp
+// When the service returns "", the value will be deserialized as null
+public partial class MyModel
+{
+    public string DisplayName { get; set; }
+    public string Description { get; set; }
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="typescript" >
+
+```typescript
+// When the service returns "", the value will be deserialized as undefined
+export interface MyModel {
+  displayName?: string;
+  description?: string;
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="java" >
+
+```java
+// When the service returns "", the value will be deserialized as null
+public final class MyModel {
+    public String getDisplayName() { ... }
+    public String getDescription() { ... }
+}
+```
+
+</ClientTabItem>
+<ClientTabItem lang="go" >
+
+```go
+// When the service returns "", the value will be deserialized as nil
+type MyModel struct {
+	DisplayName *string
+	Description *string
 }
 ```
 
@@ -1785,8 +1917,8 @@ Python generates this as a union of literals, not as enum. We also don't generat
 ```python
 from typing import Literal, Union
 
-model Widget:
-  horizontal: Union[Literal["left"] | Literal["right"] | str]
+class Widget:
+    horizontal: Union[Literal["left"], Literal["right"], str]
 ```
 
 </ClientTabItem>
