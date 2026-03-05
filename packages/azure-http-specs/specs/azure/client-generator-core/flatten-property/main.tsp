@@ -172,11 +172,7 @@ model Solution {
 
   #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Testing backcompat"
   @global.Azure.ClientGenerator.Core.Legacy.flattenProperty
-  properties: SolutionProperties;
-
-  #suppress "@azure-tools/typespec-azure-core/no-legacy-usage" "Testing backcompat"
-  @global.Azure.ClientGenerator.Core.Legacy.flattenProperty
-  propertiesOptional?: SolutionProperties;
+  properties?: SolutionProperties;
 }
 
 @scenario
