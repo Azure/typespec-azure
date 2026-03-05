@@ -72,7 +72,6 @@ using Azure.ClientGenerator.Core;
   service: [ServiceA, ServiceB],
   autoMergeService: true,
 })
-@useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2) // optional
 namespace CombineClient;
 ```
 
@@ -80,16 +79,14 @@ namespace CombineClient;
 
 - `@client` with the `service` property as an array indicates a combined client.
 - `autoMergeService: true` tells TCGC to automatically merge all services' nested namespaces/interfaces into the current client as children. When `autoMergeService` is `false` (the default) and the client namespace has nested `@client` decorators, TCGC uses the explicitly defined hierarchy instead.
-- `@useDependency` specifies the version for each service:
-  - If all services are unversioned, `@useDependency` can be omitted.
-  - If any service is versioned and `@useDependency` is not set, TCGC will use the latest version for each service by default.
+- Versioning for each service is resolved independently from the service's own `@versioned` definition. TCGC always uses all versions up to the latest for each service.
 - Multiple `@client` decorators can be defined per package: you can mix multi-service clients with single-service clients (see Scenario 1.5).
 
 ### TCGC Behavior
 
 When TCGC detects multiple services in one client with `autoMergeService: true`, it will:
 
-1. Create the root client for the combined client. If any service is versioned, the root client's initialization method will have an `apiVersion` parameter with no default value. For cross-service clients, the `apiVersions` property on `SdkClientType` will be an empty array `[]`. The per-service version mapping is stored at the package level in `SdkPackage.metadata.apiVersions` as a `Map<string, string>` (key = service namespace full qualified name, value = latest version or `"all"`). The root client's `apiVersion` parameter will have `type.kind === "string"` instead of a specific enum and will always be `optional: true`. The root client's endpoint and credential parameters will be created based on the first sub-service, which means all sub-services must share the same endpoint and credential. If services have different `@server` or `@useAuth` definitions, TCGC will report a diagnostic error (`inconsistent-multiple-service`).
+1. Create the root client for the combined client. If any service is versioned, the root client's initialization method will have an `apiVersion` parameter with no default value. For cross-service clients, the `apiVersions` property on `SdkClientType` will be an empty array `[]`. The per-service version mapping is stored at the package level in `SdkPackage.metadata.apiVersions` as a `Map<string, string>` (key = service namespace full qualified name, value = latest version or `"all"`). The root client's `apiVersion` parameter will have `type.kind === "string"` instead of a specific enum and will always be `optional: true`. The root client's endpoint and credential parameters will be created based on the first sub-service, which means all sub-services must share the same endpoint and credential. If services have different `@server` or `@useAuth` definitions, TCGC will report a diagnostic error (`inconsistent-multiple-service`). Each service's versions are resolved independently from the service's own `@versioned` definition — TCGC always uses the latest version for each service.
 2. Create sub-clients for each service's nested namespaces or interfaces. Each sub-client will have its own `apiVersions` array and `apiVersion` initialization parameter with a `clientDefaultValue` set to the latest version of its service.
 3. If multiple services have nested namespaces or interfaces with the same name, TCGC will automatically merge them into a single sub-client. The merged sub-client will have empty `apiVersions` and a `string` type for the API version parameter (with `clientDefaultValue: undefined`), and will contain operations from all the services.
 4. Operations directly under each service's namespace are placed under the root client. Operations under nested namespaces or interfaces are placed under the corresponding sub-clients.

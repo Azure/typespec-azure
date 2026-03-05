@@ -2006,7 +2006,7 @@ You could define a single client that combines operations from multiple services
 
 2. **Auto-Merge with `autoMergeService: true`**: Set `autoMergeService: true` on the `@client` decorator to automatically merge all operations and sub clients from every listed service into the single client. `autoMergeService` defaults to `false`. When `false` or omitted, the client will have no auto-populated operations — you would need to define child `@client` decorators or use `is` to map operations explicitly.
 
-3. **Version Dependencies**: If you want to specify each service's API version used in the single client, you could use `@useDependency` to declare which version of each service the client supports. Otherwise, the latest version of each service will be used by default.
+3. **Versioning**: Each service's API versions are resolved independently from its own `@versioned` definition. TCGC always uses the latest version for each service. No `@useDependency` is needed.
 
 4. **Sub client Structure**: When `autoMergeService: true` is set, operations and sub clients will be auto merged into the single client (based on operations, interfaces, or namespaces from the original services).
 
@@ -2060,7 +2060,6 @@ using Azure.ClientGenerator.Core;
   service: [ServiceA, ServiceB],
   autoMergeService: true,
 })
-@useDependency(ServiceA.VersionsA.av1, ServiceB.VersionsB.bv2)
 namespace CombineClient;
 ```
 
@@ -2073,7 +2072,7 @@ class CombineClient:
 
 # generated operations/_operations.py
 class AIOperations:
-    def __init__(self, client, api_version: str = "av1") -> None: ...
+    def __init__(self, client, api_version: str = "av2") -> None: ...
 
     @distributed_trace
     def a_test(self, **kwargs: Any) -> None: ...
@@ -2088,7 +2087,7 @@ class BIOperations:
 from combine_client import CombineClient
 
 client = CombineClient(endpoint="<my-endpoint>")
-client.ai.a_test()  # uses api-version av1
+client.ai.a_test()  # uses api-version av2
 client.bi.b_test()  # uses api-version bv2
 ```
 
@@ -2098,7 +2097,7 @@ using CombineClient;
 // The combined client with sub clients for each service
 CombineClient client = new CombineClient(new Uri("<my-endpoint>"));
 
-// AI operations use ServiceA's api-version (av1)
+// AI operations use ServiceA's api-version (av2)
 client.GetAIClient().ATest();
 
 // BI operations use ServiceB's api-version (bv2)
@@ -2110,7 +2109,7 @@ import { CombineClient } from "@azure/package-name";
 
 const client = new CombineClient("<my-endpoint>");
 
-// AI operations use ServiceA's api-version (av1)
+// AI operations use ServiceA's api-version (av2)
 client.ai.aTest();
 
 // BI operations use ServiceB's api-version (bv2)
@@ -2139,7 +2138,7 @@ public final class CombineClientBuilder implements HttpTrait<CombineClientBuilde
 // Client classes
 @ServiceClient(builder = CombineClientBuilder.class)
 public final class AIClient {
-    // Uses ServiceA's api-version (av1)
+    // Uses ServiceA's api-version (av2)
     public void aTest();
 }
 
@@ -2154,7 +2153,7 @@ CombineClientBuilder builder = new CombineClientBuilder()
     .endpoint("<my-endpoint>");
 
 AIClient aiClient = builder.buildAIClient();
-aiClient.aTest();  // uses api-version av1
+aiClient.aTest();  // uses api-version av2
 
 BIClient biClient = builder.buildBIClient();
 biClient.bTest();  // uses api-version bv2
@@ -2179,7 +2178,7 @@ func (client *CombineClient) NewBIClient() *BIClient {
 // generated ai_client.go
 type AIClient struct {}
 
-// Uses ServiceA's api-version (av1)
+// Uses ServiceA's api-version (av2)
 func (client *AIClient) ATest(ctx context.Context, options *AIClientATestOptions) (AIClientATestResponse, error) {}
 
 // generated bi_client.go
@@ -2199,7 +2198,7 @@ type BIClientBTestResponse struct {}
 // Usage Sample
 combineClient := NewCombineClient("<my-endpoint>")
 aiClient := combineClient.NewAIClient()
-aiClient.ATest(context.Background(), &AIClientATestOptions{})  // uses api-version av1
+aiClient.ATest(context.Background(), &AIClientATestOptions{})  // uses api-version av2
 biClient := combineClient.NewBIClient()
 biClient.BTest(context.Background(), &BIClientBTestOptions{})  // uses api-version bv2
 ```
