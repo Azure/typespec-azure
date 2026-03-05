@@ -202,9 +202,9 @@ model Solution {
   {
     "name": "foo",
     "properties": {
-    "solutionId": "solution1",
-    "title": "Solution Title",
-    "content": "Solution Content"
+      "solutionId": "solution1",
+      "title": "Solution Title",
+      "content": "Solution Content"
     }
   }
   ```
