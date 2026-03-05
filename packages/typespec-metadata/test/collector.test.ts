@@ -277,9 +277,7 @@ describe("namespace selection logic", () => {
 describe("inferLanguageFromEmitterName", () => {
   it("should return full emitter name for unrecognized emitters", () => {
     // Emitters not in EMITTER_REGISTRY should use the full emitter name as the language key.
-    expect(inferLanguageFromEmitterName("@unknown/some-emitter")).toBe(
-      "@unknown/some-emitter",
-    );
+    expect(inferLanguageFromEmitterName("@unknown/some-emitter")).toBe("@unknown/some-emitter");
     expect(inferLanguageFromEmitterName("@azure-tools/typespec-swift")).toBe(
       "@azure-tools/typespec-swift",
     );
@@ -306,7 +304,8 @@ describe("@azure-typespec/http-client-csharp-mgmt emitter", () => {
     const optionMap: Record<string, Record<string, unknown>> = {
       "@azure-typespec/http-client-csharp-mgmt": {
         namespace: "Azure.ResourceManager.WeightsAndBiases",
-        "emitter-output-dir": "c:/repos/tsp-output/sdk/weightsandbiases/Azure.ResourceManager.WeightsAndBiases",
+        "emitter-output-dir":
+          "c:/repos/tsp-output/sdk/weightsandbiases/Azure.ResourceManager.WeightsAndBiases",
       },
     };
 

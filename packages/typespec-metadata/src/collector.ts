@@ -72,7 +72,10 @@ const EMITTER_REGISTRY: Record<string, EmitterRegistration> = {
   "@azure-tools/typespec-go": { language: "go", parser: parseGo },
   "@azure-tools/typespec-rust": { language: "rust", parser: parseRust },
   "@azure-typespec/http-client-csharp": { language: "http-client-csharp", parser: parseCSharp },
-  "@azure-typespec/http-client-csharp-mgmt": { language: "http-client-csharp-mgmt", parser: parseCSharp },
+  "@azure-typespec/http-client-csharp-mgmt": {
+    language: "http-client-csharp-mgmt",
+    parser: parseCSharp,
+  },
 };
 
 interface LanguageParserResult {
@@ -245,8 +248,6 @@ function parseRust(
     namespace: namespace ? String(fillVars(namespace, params)) : undefined,
   };
 }
-
-
 
 export interface LanguageCollectionResult {
   languages: Record<string, LanguagePackageMetadata>;
