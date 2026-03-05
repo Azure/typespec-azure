@@ -378,8 +378,6 @@ Overrides the final state value for an operation
 ### Azure.Core.Foundations
 
 - [`@omitKeyProperties`](#@omitkeyproperties)
-- [`@requestParameter`](#@requestparameter)
-- [`@responseProperty`](#@responseproperty)
 
 #### `@omitKeyProperties`
 
@@ -396,42 +394,6 @@ Deletes any key properties from the model.
 ##### Parameters
 
 None
-
-#### `@requestParameter`
-
-Identifies a property on a request model that serves as a linked operation parameter.
-
-```typespec
-@Azure.Core.Foundations.requestParameter(name: valueof string)
-```
-
-##### Target
-
-`Model`
-
-##### Parameters
-
-| Name | Type             | Description                 |
-| ---- | ---------------- | --------------------------- |
-| name | `valueof string` | Property name on the target |
-
-#### `@responseProperty`
-
-Identifies a property on _all_ non-error response models that serve as a linked operation parameter.
-
-```typespec
-@Azure.Core.Foundations.responseProperty(name: valueof string)
-```
-
-##### Target
-
-`Model`
-
-##### Parameters
-
-| Name | Type             | Description                 |
-| ---- | ---------------- | --------------------------- |
-| name | `valueof string` | Property name on the target |
 
 ### Azure.Core.Traits
 
