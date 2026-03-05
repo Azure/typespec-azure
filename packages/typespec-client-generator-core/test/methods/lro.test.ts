@@ -574,7 +574,7 @@ describe("data plane LRO templates", () => {
       namespace TestClient {
         enum Versions {
           v1: "v1",
-                  v2: "v2",
+          v2: "v2",
         }
       
         alias ResourceOperations = global.Azure.Core.ResourceOperations<NoConditionalRequests &

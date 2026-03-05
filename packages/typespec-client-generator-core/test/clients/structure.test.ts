@@ -806,7 +806,6 @@ it("one client from multiple services", async () => {
         autoMergeService: true,
       }
     )
-    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CombineClient;
   `,
     ),
@@ -1115,7 +1114,6 @@ it("one client from multiple services with `@clientLocation`", async () => {
         autoMergeService: true,
       }
     )
-    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CombineClient;
 
     @@clientLocation(ServiceA.AI2.aTest2, ServiceA.AI);
@@ -1210,157 +1208,6 @@ it("one client from multiple services with `@clientLocation`", async () => {
   strictEqual(biOperationApiVersionParam.correspondingMethodParams[0], biApiVersionParam);
 });
 
-it("one client from multiple services with api-version set to latest", async () => {
-  const { program } = await SimpleBaseTester.compile(
-    createClientCustomizationInput(
-      `
-    @service
-    @versioned(VersionsA)
-    namespace ServiceA {
-      enum VersionsA {
-        av1,
-        av2,
-        av3,
-      }
-      interface AI {
-        @route("/aTest")
-        aTest(@query("api-version") apiVersion: VersionsA): void;
-      }
-    }
-    @service
-    @versioned(VersionsB)
-    namespace ServiceB {
-      enum VersionsB {
-        bv1,
-        bv2,
-      }
-      interface BI {
-        @route("/bTest")
-        bTest(@query("api-version") apiVersion: VersionsB): void;
-      }
-    }`,
-      `
-    @client(
-      {
-        name: "CombineClient",
-        service: [ServiceA, ServiceB],
-        autoMergeService: true,
-      }
-    )
-    @useDependency(ServiceA.VersionsA.av3, ServiceB.VersionsB.bv2)
-    namespace CombineClient;
-  `,
-    ),
-  );
-  const context = await createSdkContextForTester(program, {
-    "api-version": "latest",
-  });
-  const sdkPackage = context.sdkPackage;
-  strictEqual(sdkPackage.clients.length, 1);
-  const client = sdkPackage.clients[0];
-  strictEqual(client.name, "CombineClient");
-  strictEqual(client.apiVersions.length, 0);
-  strictEqual(client.children!.length, 2);
-
-  const aiClient = client.children!.find((c) => c.name === "AI");
-  ok(aiClient);
-  strictEqual(aiClient.apiVersions.length, 3);
-  deepStrictEqual(aiClient.apiVersions, ["av1", "av2", "av3"]);
-  const aiApiVersionParam = aiClient.clientInitialization.parameters.find(
-    (p) => p.isApiVersionParam,
-  );
-  ok(aiApiVersionParam);
-  strictEqual(aiApiVersionParam.clientDefaultValue, "av3");
-
-  const biClient = client.children!.find((c) => c.name === "BI");
-  ok(biClient);
-  strictEqual(biClient.apiVersions.length, 2);
-  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2"]);
-  const biApiVersionParam = biClient.clientInitialization.parameters.find(
-    (p) => p.isApiVersionParam,
-  );
-  ok(biApiVersionParam);
-  strictEqual(biApiVersionParam.clientDefaultValue, "bv2");
-});
-
-it("one client from multiple services with api-version set to specific version bv1", async () => {
-  const { program } = await SimpleBaseTester.compile(
-    createClientCustomizationInput(
-      `
-    @service
-    @versioned(VersionsA)
-    namespace ServiceA {
-      enum VersionsA {
-        av1,
-        av2,
-        av3,
-      }
-      interface AI {
-        @route("/aTest")
-        aTest(@query("api-version") apiVersion: VersionsA): void;
-      }
-    }
-    @service
-    @versioned(VersionsB)
-    namespace ServiceB {
-      enum VersionsB {
-        bv1,
-        bv2,
-        bv3,
-      }
-      interface BI {
-        @route("/bTest")
-        bTest(@query("api-version") apiVersion: VersionsB): void;
-
-        @route("/bTest2")
-        @added(VersionsB.bv2)
-        bTest2(@query("api-version") apiVersion: VersionsB): void;
-      }
-    }`,
-      `
-    @client(
-      {
-        name: "CombineClient",
-        service: [ServiceA, ServiceB],
-        autoMergeService: true,
-      }
-    )
-    @useDependency(ServiceA.VersionsA.av3, ServiceB.VersionsB.bv1)
-    namespace CombineClient;
-  `,
-    ),
-  );
-  const context = await createSdkContextForTester(program, {
-    "api-version": "bv1",
-  });
-  const sdkPackage = context.sdkPackage;
-  strictEqual(sdkPackage.clients.length, 1);
-  const client = sdkPackage.clients[0];
-  strictEqual(client.name, "CombineClient");
-  strictEqual(client.apiVersions.length, 0);
-
-  const aiClient = client.children!.find((c) => c.name === "AI");
-  ok(aiClient);
-  // ServiceA doesn't have bv1, so api-version="bv1" doesn't filter it
-  // It falls back to useDependency which specifies av3
-  strictEqual(aiClient.apiVersions.length, 0);
-
-  const biClient = client.children!.find((c) => c.name === "BI");
-  ok(biClient);
-  // With api-version bv1, we should see only bv1 version
-  strictEqual(biClient.apiVersions.length, 1);
-  deepStrictEqual(biClient.apiVersions, ["bv1"]);
-  const biApiVersionParam = biClient.clientInitialization.parameters.find(
-    (p) => p.isApiVersionParam,
-  );
-  ok(biApiVersionParam);
-  strictEqual(biApiVersionParam.clientDefaultValue, "bv1");
-
-  // bTest2 should not be included since it was added in bv2
-  strictEqual(biClient.methods.length, 1);
-  strictEqual(biClient.methods[0].name, "bTest");
-});
-
 it("one client from multiple services with api-version set to all", async () => {
   const { program } = await SimpleBaseTester.compile(
     createClientCustomizationInput(
@@ -1407,7 +1254,6 @@ it("one client from multiple services with api-version set to all", async () => 
         autoMergeService: true,
       }
     )
-    @useDependency(ServiceA.VersionsA.av3, ServiceB.VersionsB.bv2)
     namespace CombineClient;
   `,
     ),
@@ -1460,79 +1306,6 @@ it("one client from multiple services with api-version set to all", async () => 
   deepStrictEqual(bTest2.apiVersions, ["bv2"]);
 });
 
-it("one client from multiple services with different useDependency versions", async () => {
-  const { program } = await SimpleBaseTester.compile(
-    createClientCustomizationInput(
-      `
-    @service
-    @versioned(VersionsA)
-    namespace ServiceA {
-      enum VersionsA {
-        av1,
-        av2,
-        av3,
-      }
-      interface AI {
-        @route("/aTest")
-        aTest(@query("api-version") apiVersion: VersionsA): void;
-      }
-    }
-    @service
-    @versioned(VersionsB)
-    namespace ServiceB {
-      enum VersionsB {
-        bv1,
-        bv2,
-        bv3,
-      }
-      interface BI {
-        @route("/bTest")
-        bTest(@query("api-version") apiVersion: VersionsB): void;
-      }
-    }`,
-      `
-    @client(
-      {
-        name: "CombineClient",
-        service: [ServiceA, ServiceB],
-        autoMergeService: true,
-      }
-    )
-    @useDependency(ServiceA.VersionsA.av1, ServiceB.VersionsB.bv3)
-    namespace CombineClient;
-  `,
-    ),
-  );
-  const context = await createSdkContextForTester(program);
-  const sdkPackage = context.sdkPackage;
-  strictEqual(sdkPackage.clients.length, 1);
-  const client = sdkPackage.clients[0];
-  strictEqual(client.name, "CombineClient");
-  strictEqual(client.apiVersions.length, 0);
-
-  const aiClient = client.children!.find((c) => c.name === "AI");
-  ok(aiClient);
-  // useDependency specifies av1, so only av1 should be included
-  strictEqual(aiClient.apiVersions.length, 1);
-  deepStrictEqual(aiClient.apiVersions, ["av1"]);
-  const aiApiVersionParam = aiClient.clientInitialization.parameters.find(
-    (p) => p.isApiVersionParam,
-  );
-  ok(aiApiVersionParam);
-  strictEqual(aiApiVersionParam.clientDefaultValue, "av1");
-
-  const biClient = client.children!.find((c) => c.name === "BI");
-  ok(biClient);
-  // useDependency specifies bv3, so all versions up to bv3 should be included
-  strictEqual(biClient.apiVersions.length, 3);
-  deepStrictEqual(biClient.apiVersions, ["bv1", "bv2", "bv3"]);
-  const biApiVersionParam = biClient.clientInitialization.parameters.find(
-    (p) => p.isApiVersionParam,
-  );
-  ok(biApiVersionParam);
-  strictEqual(biApiVersionParam.clientDefaultValue, "bv3");
-});
-
 it("one client from multiple services with models shared across services", async () => {
   const { program } = await SimpleBaseTester.compile(
     createClientCustomizationInput(
@@ -1583,7 +1356,6 @@ it("one client from multiple services with models shared across services", async
         autoMergeService: true,
       }
     )
-    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CombineClient;
   `,
     ),
@@ -1661,7 +1433,6 @@ it("client location to new sub client with multiple services", async () => {
         autoMergeService: true,
       }
     )
-    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CombineClient {}
 
     // Move operations from different services to a new sub client
@@ -1756,7 +1527,6 @@ it("one client from multiple services with sub clients name conflict - merged", 
         autoMergeService: true,
       }
     )
-    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CombineClient;
   `,
     ),
@@ -1842,7 +1612,6 @@ it("client location to existing sub client from different service", async () => 
         autoMergeService: true,
       }
     )
-    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CombineClient {}
 
     // Move operation from ServiceB to existing Operations group from ServiceA
@@ -1918,7 +1687,6 @@ it("merged sub clients with nested operations", async () => {
         autoMergeService: true,
       }
     )
-    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CombineClient;
   `,
     ),
@@ -1995,7 +1763,6 @@ it("multiple merged sub clients in same client", async () => {
         autoMergeService: true,
       }
     )
-    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CombineClient;
   `,
     ),
@@ -2400,7 +2167,6 @@ it("mixing multi-service and single-service clients", async () => {
       service: [ServiceA, ServiceB],
       autoMergeService: true,
     })
-    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CombinedABClient {}
 
     // Single-service client for ServiceC
@@ -2507,7 +2273,6 @@ it("services as direct children with nested @client", async () => {
       name: "CombineClient",
       service: [ServiceA, ServiceB],
     })
-    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CombineClient {
       @client({
         name: "ComputeClient",
@@ -2640,7 +2405,6 @@ it("fully customized client hierarchy with interfaces", async () => {
       name: "CustomClient",
       service: [ServiceA, ServiceB],
     })
-    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CustomClient {
       // Custom child client with operations from ServiceA only
       @client({
@@ -2888,7 +2652,6 @@ it("interaction: @clientInitialization with multi-service client", async () => {
         autoMergeService: true,
       }
     )
-    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CombineClient;
   `,
     ),
@@ -3038,7 +2801,6 @@ it("nested client inherits parent services when not specified", async () => {
       name: "CombineClient",
       service: [ServiceA, ServiceB],
     })
-    @useDependency(ServiceA.VersionsA.av2, ServiceB.VersionsB.bv2)
     namespace CombineClient {
       // Nested client without specifying service - inherits parent's services
       @client({
