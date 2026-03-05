@@ -9,7 +9,6 @@
     { "path": "packages/typespec-azure-rulesets/tsconfig.build.json" },
     { "path": "packages/azure-http-specs/tsconfig.build.json" },
     { "path": "packages/typespec-metadata/tsconfig.build.json" },
-    { "path": "packages/integration-tester/tsconfig.build.json" },
     { "path": "packages/samples/tsconfig.build.json" }
   ],
   "files": []
