@@ -447,7 +447,15 @@ function handleMultipleServicesSubClientNameConflict(
     } else {
       // Conflict detected, update the existing sub client to have multiple services
       existingSc.services.push(sc.services[0]);
-      existingSc.subClients.push(...sc.subClients);
+
+      // Re-parent moved children to the surviving sub client
+      for (const child of sc.subClients) {
+        child.parent = existingSc;
+      }
+
+      // Recursively merge same-named grandchildren instead of blindly appending
+      mergeChildrenRecursively(context, existingSc, sc.subClients, mergedSubClientTypes);
+
       if (existingSc.type !== undefined) {
         mergedSubClientTypes.set(existingSc, [existingSc.type as Namespace | Interface]);
         existingSc.type = undefined;
@@ -457,10 +465,65 @@ function handleMultipleServicesSubClientNameConflict(
       if (sc.type) {
         types.push(sc.type);
       }
+
+      // Remove orphaned cache entries for the merged-away sub client
+      context.__rawClientsCache!.delete(sc.type!);
+      context.__clientToOperationsCache!.delete(sc);
+
       return true;
     }
   }
   return false;
+}
+
+/**
+ * Recursively merge incoming children into an existing sub-client's children.
+ * If an incoming child has the same name as an existing child, merge them recursively;
+ * otherwise, append the incoming child.
+ */
+function mergeChildrenRecursively(
+  context: TCGCContext,
+  existingSc: SdkClient,
+  incomingChildren: SdkClient[],
+  mergedSubClientTypes: Map<SdkClient, (Namespace | Interface)[]>,
+): void {
+  for (const incoming of incomingChildren) {
+    const incomingName = incoming.type ? getLibraryName(context, incoming.type) : incoming.name;
+    const existing = existingSc.subClients.find((child) => {
+      const childName = child.type ? getLibraryName(context, child.type) : child.name;
+      return childName === incomingName;
+    });
+
+    if (existing) {
+      // Same-named grandchild found — merge recursively
+      existing.services.push(...incoming.services.filter((s) => !existing.services.includes(s)));
+
+      // Re-parent incoming's children
+      for (const grandchild of incoming.subClients) {
+        grandchild.parent = existing;
+      }
+      mergeChildrenRecursively(context, existing, incoming.subClients, mergedSubClientTypes);
+
+      // Track merged types
+      if (existing.type !== undefined) {
+        mergedSubClientTypes.set(existing, [existing.type as Namespace | Interface]);
+        existing.type = undefined;
+      }
+      const types = mergedSubClientTypes.get(existing)!;
+      if (incoming.type) {
+        types.push(incoming.type);
+      }
+
+      // Remove orphaned cache entries for the merged-away child
+      if (incoming.type) {
+        context.__rawClientsCache!.delete(incoming.type);
+      }
+      context.__clientToOperationsCache!.delete(incoming);
+    } else {
+      // No conflict — just append
+      existingSc.subClients.push(incoming);
+    }
+  }
 }
 
 /**

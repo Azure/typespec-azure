@@ -1793,6 +1793,192 @@ it("multiple merged sub clients in same client", async () => {
   ok(group2.methods.find((m) => m.name === "opB2"));
 });
 
+it("merged sub clients with @clientLocation targeting merged type should not lose operations", async () => {
+  // Verifies that @clientLocation targeting a type that was merged away
+  // correctly routes operations to the surviving sub-client, not an orphaned cache entry.
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace ServiceA {
+      interface Operations {
+        @route("/aTest")
+        aTest(): void;
+      }
+    }
+    @service
+    namespace ServiceB {
+      interface Operations {
+        @route("/bTest")
+        bTest(): void;
+      }
+      @route("/extra")
+      op extraOp(): void;
+    }`,
+      `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+        autoMergeService: true,
+      }
+    )
+    namespace CombineClient;
+
+    // Move extraOp to the "Operations" sub-client (which got merged)
+    @@clientLocation(ServiceB.extraOp, ServiceA.Operations);
+  `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+
+  // The merged Operations sub-client should contain all 3 operations
+  strictEqual(client.children!.length, 1);
+  const operations = client.children!.find((c) => c.name === "Operations");
+  ok(operations);
+  strictEqual(operations.methods.length, 3);
+  ok(operations.methods.find((m) => m.name === "aTest"));
+  ok(operations.methods.find((m) => m.name === "bTest"));
+  ok(operations.methods.find((m) => m.name === "extraOp"));
+});
+
+it("merged sub clients have correct parent pointers for moved children", async () => {
+  // Verifies that when sub-clients are merged, the children of the
+  // merged-away sub-client get re-parented to the surviving sub-client.
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace ServiceA {
+      namespace Operations {
+        @route("/aTest")
+        op aTest(): void;
+
+        namespace SubOps {
+          @route("/aSubTest")
+          op aSubTest(): void;
+        }
+      }
+    }
+    @service
+    namespace ServiceB {
+      namespace Operations {
+        @route("/bTest")
+        op bTest(): void;
+
+        namespace SubOps {
+          @route("/bSubTest")
+          op bSubTest(): void;
+        }
+      }
+    }`,
+      `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+        autoMergeService: true,
+      }
+    )
+    namespace CombineClient;
+  `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+
+  // Operations should be merged
+  strictEqual(client.children!.length, 1);
+  const operations = client.children!.find((c) => c.name === "Operations");
+  ok(operations);
+
+  // SubOps should be recursively merged too (Issue 3)
+  strictEqual(operations.children!.length, 1);
+  const subOps = operations.children!.find((c) => c.name === "SubOps");
+  ok(subOps);
+  strictEqual(subOps.methods.length, 2);
+  ok(subOps.methods.find((m) => m.name === "aSubTest"));
+  ok(subOps.methods.find((m) => m.name === "bSubTest"));
+
+  // Verify parent chain is correct (Issue 2)
+  strictEqual(subOps.parent, operations);
+  strictEqual(operations.parent, client);
+});
+
+it("recursive merge of same-named grandchildren across services", async () => {
+  // Verifies that when both services have same-named sub-clients
+  // with same-named grandchildren, the grandchildren are recursively merged
+  // instead of producing duplicates.
+  const { program } = await SimpleBaseTester.compile(
+    createClientCustomizationInput(
+      `
+    @service
+    namespace ServiceA {
+      namespace Level1 {
+        @route("/aOp")
+        op aOp(): void;
+
+        namespace Level2 {
+          @route("/aDeepOp")
+          op aDeepOp(): void;
+        }
+      }
+    }
+    @service
+    namespace ServiceB {
+      namespace Level1 {
+        @route("/bOp")
+        op bOp(): void;
+
+        namespace Level2 {
+          @route("/bDeepOp")
+          op bDeepOp(): void;
+        }
+      }
+    }`,
+      `
+    @client(
+      {
+        name: "CombineClient",
+        service: [ServiceA, ServiceB],
+        autoMergeService: true,
+      }
+    )
+    namespace CombineClient;
+  `,
+    ),
+  );
+  const context = await createSdkContextForTester(program);
+  const sdkPackage = context.sdkPackage;
+  strictEqual(sdkPackage.clients.length, 1);
+  const client = sdkPackage.clients[0];
+
+  // Level1 should be merged (not duplicated)
+  strictEqual(client.children!.length, 1);
+  const level1 = client.children!.find((c) => c.name === "Level1");
+  ok(level1);
+  strictEqual(level1.methods.length, 2);
+  ok(level1.methods.find((m) => m.name === "aOp"));
+  ok(level1.methods.find((m) => m.name === "bOp"));
+
+  // Level2 should also be merged (not duplicated)
+  strictEqual(level1.children!.length, 1);
+  const level2 = level1.children!.find((c) => c.name === "Level2");
+  ok(level2);
+  strictEqual(level2.methods.length, 2);
+  ok(level2.methods.find((m) => m.name === "aDeepOp"));
+  ok(level2.methods.find((m) => m.name === "bDeepOp"));
+
+  // Verify parent chain
+  strictEqual(level2.parent, level1);
+  strictEqual(level1.parent, client);
+});
+
 it("error: inconsistent-multiple-service server", async () => {
   const [{ program }, diagnostics] = await SimpleBaseTester.compileAndDiagnose(
     createClientCustomizationInput(
