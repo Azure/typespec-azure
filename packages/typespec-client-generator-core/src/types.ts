@@ -1080,7 +1080,7 @@ export function getClientTypeWithDiagnostics(
   operation?: Operation,
 ): [SdkType, readonly Diagnostic[]] {
   const diagnostics = createDiagnosticCollector();
-  let retval: SdkType | undefined = undefined;
+  let retval: SdkType | undefined;
   switch (type.kind) {
     case "String":
     case "Number":
