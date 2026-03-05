@@ -71,4 +71,4 @@ options:
     flavor: azure
 ```
 
-Several language repositories utilize the `tsp-client` tool to simplify generating client libraries. For more information on the tool, see [Getting started with `tsp-client`](<./../Generating with tsp-client/tsp_client.md>).
+Several language repositories utilize the `tsp-client` tool to simplify generating client libraries. For more information on the tool, see [Getting started with `tsp-client`](<./../Generate with tsp-client/intro_tsp_client.md>) see also [escaped](../Generate%20with%20tsp-client/intro_tsp_client.md).
