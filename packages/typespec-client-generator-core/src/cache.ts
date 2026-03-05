@@ -1,5 +1,4 @@
 import {
-  compilerAssert,
   Enum,
   Interface,
   isService,
@@ -9,7 +8,7 @@ import {
   Operation,
 } from "@typespec/compiler";
 import { unsafe_Realm } from "@typespec/compiler/experimental";
-import { getVersionDependencies, getVersions } from "@typespec/versioning";
+import { getVersions } from "@typespec/versioning";
 import { getClientLocation, getClientNameOverride, isInScope } from "./decorators.js";
 import { SdkClient, TCGCContext } from "./interfaces.js";
 import {
@@ -40,81 +39,31 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   // get root clients with full hierarchy (root clients + sub clients)
   const { clients, mergedSubClientTypes } = getRootClients(context);
 
-  const clientServices = new Set<Namespace>();
-  clients.map((c) => c.services.map((s) => clientServices.add(s)));
+  const servicesNs = new Set<Namespace>();
+  clients.map((c) => c.services.map((s) => servicesNs.add(s)));
 
   // handle versioning with mutated types
   context.__packageVersions = new Map<Namespace, string[]>();
   context.__packageVersionEnum = new Map<Namespace, Enum | undefined>();
 
-  if (clientServices.size > 1) {
-    // multi-service case: either multiple separate clients or one client spanning multiple services
-    clients.map((c) => {
-      if (c.services.length > 1) {
-        // A single client with multiple services (e.g., autoMergeService)
-        const versionDependencies = getVersionDependencies(context.program, c.type as Namespace);
-
-        for (const specificService of c.services) {
-          if (context.__packageVersions!.has(specificService)) {
-            continue;
-          }
-
-          const versions = getVersions(context.program, specificService)[1]?.getVersions();
-          if (!versions) {
-            context.__packageVersions!.set(specificService, []);
-            continue;
-          }
-
-          context.__packageVersionEnum!.set(specificService, versions[0].enumMember.enum);
-
-          const versionDependency = versionDependencies?.get(specificService);
-
-          compilerAssert(
-            versionDependency !== undefined && "name" in versionDependency,
-            "Client with multiple services is missing version dependency declaration.",
-          );
-
-          let end = false;
-          context.__packageVersions!.set(
-            specificService,
-            versions
-              .map((version) => version.value)
-              .filter((v) => {
-                if (end) return false;
-                if (v === versionDependency.value) end = true;
-                return true;
-              }),
-          );
-        }
-      } else {
-        // A single-service client (could be one of multiple separate root clients)
-        if (context.__packageVersions!.has(c.services[0])) {
-          return;
-        }
-        const versions = getVersions(context.program, c.services[0])[1]?.getVersions();
-        if (!versions || versions.length === 0) {
-          context.__packageVersions!.set(c.services[0], []);
-        } else {
-          context.__packageVersionEnum!.set(c.services[0], versions[0].enumMember.enum);
-          const versionsString = versions.map((version) => version.value);
-          context.__packageVersions!.set(c.services[0], versionsString);
-        }
-      }
-    });
-  } else if (clients.length > 0) {
-    // single-service client
-    const versions = getVersions(context.program, clients[0].services[0])[1]?.getVersions();
-
-    if (!versions || versions.length === 0) {
-      context.__packageVersions.set(clients[0].services[0], []);
-    } else {
-      context.__packageVersionEnum.set(clients[0].services[0], versions[0].enumMember.enum);
-
-      removeVersionsLargerThanExplicitlySpecified(context, versions);
-
-      const filteredVersions = versions.map((version) => version.value);
-      context.__packageVersions.set(clients[0].services[0], filteredVersions);
+  for (const serviceNs of servicesNs) {
+    const versions = getVersions(context.program, serviceNs)[1]?.getVersions();
+    // If the service has no versioning, set empty
+    if (!versions) {
+      context.__packageVersions!.set(serviceNs, []);
+      continue;
     }
+
+    // Single service needs to filter versions based on `apiVersion` config
+    if (servicesNs.size === 1) {
+      removeVersionsLargerThanExplicitlySpecified(context, versions);
+    }
+
+    context.__packageVersionEnum!.set(serviceNs, versions[0].enumMember.enum);
+    context.__packageVersions!.set(
+      serviceNs,
+      versions.map((v) => v.value),
+    );
   }
 
   // iterate all clients and build a map of operations

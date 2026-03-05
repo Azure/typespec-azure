@@ -13,7 +13,6 @@ import {
   getDoc,
   getLifecycleVisibilityEnum,
   getNamespaceFullName,
-  getService,
   getSummary,
   getVisibilityForClass,
   ignoreDiagnostics,
@@ -29,7 +28,6 @@ import {
   NumericLiteral,
   Operation,
   Program,
-  Service,
   StringLiteral,
   Type,
   Union,
@@ -894,98 +892,67 @@ function getVersioningMutator(
 
 export function handleVersioningMutationForGlobalNamespace(context: TCGCContext): Namespace {
   const globalNamespace = context.program.getGlobalNamespaceType();
-  const services = listServices(context.program);
+
+  // First consider explicit clients
+  const servicesNs = new Set<Namespace>();
+  listScopedDecoratorData(context, clientKey).forEach((v, k) => {
+    // See all explicit clients that in TypeSpec program
+    if (!unsafe_Realm.realmForType.has(k)) {
+      (v as SdkClient).services.forEach((s) => servicesNs.add(s));
+    }
+  });
+
+  // Then see the original services
+  if (servicesNs.size === 0) {
+    listServices(context.program).map((v) => servicesNs.add(v.type));
+  }
 
   // No service, thus no versioning mutation needed
-  if (services.length === 0) return globalNamespace;
+  if (servicesNs.size === 0) return globalNamespace;
 
   // Explicit all API version setting, thus no versioning mutation needed
   if (context.apiVersion === "all") return globalNamespace;
 
-  const explicitClients: SdkClient[] = [];
-  const explicitServices = new Set<Namespace>();
-  listScopedDecoratorData(context, clientKey).forEach((v, k) => {
-    // See all explicit clients that in TypeSpec program
-    if (!unsafe_Realm.realmForType.has(k)) {
-      const sdkClient = v as SdkClient;
-      explicitClients.push(sdkClient);
-      sdkClient.services.forEach((s) => explicitServices.add(s));
-    }
-  });
-
+  // Compose service mutators
   const mutators: unsafe_MutatorWithNamespace[] = [];
 
-  if (services.length === 1 || explicitServices.size === 1) {
-    // Single service, no matter explicit client or not, use service namespace for versioning
-    const serviceNamespace =
-      explicitClients.length === 0 || explicitServices.size === 0
-        ? services[0].type
-        : explicitServices.values().next().value!;
-
-    const versions = getVersions(context.program, serviceNamespace)[1]?.getVersions();
-    // If the single service has no versioning, no mutation needed
+  for (const serviceNs of servicesNs) {
+    const versions = getVersions(context.program, serviceNs)[1]?.getVersions();
+    // If the service has no versioning, no mutation needed
     if (!versions) return globalNamespace;
 
-    // Filter versions based on `apiVersion` config
-    removeVersionsLargerThanExplicitlySpecified(context, versions);
+    // Single service needs to filter versions based on `apiVersion` config
+    if (servicesNs.size === 1) {
+      removeVersionsLargerThanExplicitlySpecified(context, versions);
+    }
+
     const versionsValues = versions.map((v) => v.value);
 
     // Fix apiVersion setting problem only if there's only one service
-    if (
-      context.apiVersion !== undefined &&
-      context.apiVersion !== "latest" &&
-      context.apiVersion !== "all" &&
-      !versionsValues.includes(context.apiVersion)
-    ) {
-      reportDiagnostic(context.program, {
-        code: "api-version-undefined",
-        format: { version: context.apiVersion },
-        target: services[0].type,
-      });
-      context.apiVersion = versionsValues[versionsValues.length - 1];
+    if (servicesNs.size === 1) {
+      if (
+        context.apiVersion !== undefined &&
+        context.apiVersion !== "latest" &&
+        context.apiVersion !== "all" &&
+        !versionsValues.includes(context.apiVersion)
+      ) {
+        reportDiagnostic(context.program, {
+          code: "api-version-undefined",
+          format: { version: context.apiVersion },
+          target: serviceNs,
+        });
+        context.apiVersion = versionsValues[versionsValues.length - 1];
+      }
     }
 
+    // Get service mutator according to the version setting
     const mutator = getVersioningMutator(
       context,
-      serviceNamespace,
+      serviceNs,
       versionsValues[versionsValues.length - 1],
     );
     if (mutator) mutators.push(mutator);
-  } else {
-    // Multiple services, for explicit multi-service clients, use the client namespace for versioning, others use each service namespace for versioning
-    const handleSingleServiceMutation = (service: Service) => {
-      const versions = getVersions(context.program, service.type)[1]?.getVersions();
-      if (!versions) return;
-
-      const versionsValues = versions.map((v) => v.value);
-
-      const mutator = getVersioningMutator(
-        context,
-        service.type,
-        versionsValues[versionsValues.length - 1],
-      );
-      if (mutator) mutators.push(mutator);
-    };
-
-    if (explicitServices.size === 0) {
-      // No explicit client, then for each service get mutator
-      services.map((s) => handleSingleServiceMutation(s));
-    } else {
-      // Explicit client, for single service, get service mutator, for multiple service, use client's versioning dependency mutator
-      for (const client of explicitClients) {
-        if (client.services.length === 1) {
-          const service = getService(context.program, client.services[0]);
-          if (service) handleSingleServiceMutation(service);
-        } else {
-          if (client.type?.kind === "Namespace") {
-            const mutator = getVersioningMutator(context, client.type);
-            if (mutator) mutators.push(mutator);
-          }
-        }
-      }
-    }
   }
-
   if (mutators.length === 0) return globalNamespace;
   const subgraph = unsafe_mutateSubgraphWithNamespace(context.program, mutators, globalNamespace);
   compilerAssert(subgraph.type.kind === "Namespace", "Should not have mutated to another type");

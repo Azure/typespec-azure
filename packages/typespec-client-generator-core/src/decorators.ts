@@ -32,7 +32,6 @@ import {
   isBody,
   isBodyRoot,
 } from "@typespec/http";
-import { $useDependency, getVersions } from "@typespec/versioning";
 import {
   AccessDecorator,
   AlternateTypeDecorator,
@@ -218,27 +217,6 @@ export const $client: ClientDecorator = (
         target: context.decoratorTarget,
       });
       return;
-    }
-    // no explicit versioning dependency
-    if (
-      !target.decorators.some(
-        (d) =>
-          d.definition?.name === "@useDependency" &&
-          getNamespaceFullName(d.definition?.namespace) === "TypeSpec.Versioning",
-      )
-    ) {
-      const versionRecords = [];
-      // collect the latest version enum member from each service
-      for (const svc of services) {
-        const versions = getVersions(context.program, svc)[1]?.getVersions();
-        if (versions && versions.length > 0) {
-          versionRecords.push(versions[versions.length - 1].enumMember);
-        }
-      }
-      // set the versioning dependency
-      if (versionRecords.length > 0 && target.kind === "Namespace") {
-        context.call($useDependency, target, ...versionRecords);
-      }
     }
   } else {
     // No explicit service - store empty array. Cache.ts will either:
