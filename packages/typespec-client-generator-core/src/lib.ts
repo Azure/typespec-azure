@@ -496,6 +496,12 @@ export const $lib = createTypeSpecLibrary({
           "@clientOption should be applied with a specific language scope since it is highly likely this is language-specific.",
       },
     },
+    "replace-parameter-not-found": {
+      severity: "error",
+      messages: {
+        default: paramMessage`Parameter "${"paramName"}" not found in operation "${"operationName"}".`,
+      },
+    },
   },
   emitter: {
     options: TCGCEmitterOptionsSchema,
