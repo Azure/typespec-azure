@@ -96,7 +96,6 @@ model BlobQueryParam {
   """)
 @scenario
 @doc("Operations for nested default -> individually and parent")
-@global.Azure.ClientGenerator.Core.operationGroup
 @global.Azure.ClientGenerator.Core.clientInitialization({
   parameters: PathParamClientOptions,
   initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
@@ -147,7 +146,6 @@ interface IndividuallyParentNestedWithPathClient {
   """)
 @scenario
 @doc("Operations for nested default -> individually and parent with query parameters")
-@global.Azure.ClientGenerator.Core.operationGroup
 @global.Azure.ClientGenerator.Core.clientInitialization({
   parameters: BlobQueryParamClientOptions,
   initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
@@ -198,7 +196,6 @@ interface IndividuallyParentNestedWithQueryClient {
   """)
 @scenario
 @doc("Operations for nested default -> individually and parent header parameters")
-@global.Azure.ClientGenerator.Core.operationGroup
 @global.Azure.ClientGenerator.Core.clientInitialization({
   parameters: HeaderParamClientOptions,
   initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
@@ -252,7 +249,6 @@ interface IndividuallyParentNestedWithHeaderClient {
   """)
 @scenario
 @doc("Operations for nested default -> individually and parent multiple parameters")
-@global.Azure.ClientGenerator.Core.operationGroup
 @global.Azure.ClientGenerator.Core.clientInitialization({
   parameters: MultipleParamsClientOptions,
   initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
@@ -306,7 +302,6 @@ interface IndividuallyParentNestedWithMultipleClient {
   """)
 @scenario
 @doc("Operations for nested default -> individually and parent mixed parameters")
-@global.Azure.ClientGenerator.Core.operationGroup
 @global.Azure.ClientGenerator.Core.clientInitialization({
   parameters: MixedParamsClientOptions,
   initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
@@ -356,7 +351,6 @@ interface IndividuallyParentNestedWithMixedClient {
   """)
 @scenario
 @doc("Operations for nested default -> individually and parent param alias")
-@global.Azure.ClientGenerator.Core.operationGroup
 @global.Azure.ClientGenerator.Core.clientInitialization({
   parameters: ParamAliasClientOptions,
   initializedBy: global.Azure.ClientGenerator.Core.InitializedBy.individually | global.Azure.ClientGenerator.Core.InitializedBy.parent,
