@@ -18,6 +18,7 @@ export const preventRestLibraryInterfaces = createRule({
   description:
     "Resource interfaces from the TypeSpec.Rest.Resource library are incompatible with Azure.Core.",
   severity: "warning",
+  url: "https://azure.github.io/typespec-azure/docs/libraries/azure-core/rules/no-rest-library-interfaces",
   messages: {
     default: `Resource interfaces from the TypeSpec.Rest.Resource library are incompatible with Azure.Core.`,
   },
