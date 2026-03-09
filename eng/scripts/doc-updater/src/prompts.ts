@@ -37,10 +37,7 @@ export async function loadPromptFile(configName: string, promptName: string): Pr
  * The prompt is intentionally open-ended: it gives the LLM the doc-update
  * instructions and lets it decide what information is worth caching.
  */
-export function buildFullKnowledgePrompt(
-  config: DocUpdateConfig,
-  docUpdatePrompt: string,
-): string {
+export function buildFullKnowledgePrompt(config: DocUpdateConfig, docUpdatePrompt: string): string {
   const paths = config.sourceCodePaths.map((p) => `- \`${p}\``).join("\n");
   const knowledgePath = getKnowledgeRelativePath(config.name);
 
