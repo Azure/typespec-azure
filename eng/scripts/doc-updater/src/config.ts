@@ -16,8 +16,12 @@ import { basename, resolve } from "node:path";
 export interface DocUpdateConfig {
   /** Unique identifier (e.g. "tcgc", "azure-core", "autorest") */
   name: string;
+
   /** Human-readable display name */
   displayName: string;
+
+  /** Brief description of what the package does — used by the knowledge builder */
+  description: string;
 
   /** Source code paths to analyze for cross-referencing */
   sourceCodePaths: string[];

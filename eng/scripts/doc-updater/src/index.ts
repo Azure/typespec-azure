@@ -2,19 +2,14 @@
  * Doc-updater orchestrator using GitHub Copilot SDK.
  *
  * Two-phase pipeline:
- *   Phase 1 — Knowledge Build: Analyze package source code → produce structured knowledge base
- *   Phase 2 — Doc Update: Use knowledge base → update documentation
+ *   Phase 1 — Knowledge Build: Analyze source code → build/update knowledge base (system-driven)
+ *   Phase 2 — Doc Update: Use knowledge base → update documentation (per-package prompt)
+ *
+ * Knowledge build uses a system prompt derived from the doc-update prompt.
+ * Incremental updates are batched into multiple sessions to manage context size.
  *
  * Usage:
  *   tsx src/index.ts --config <name> [--focus <area>] [--phase <phase>] [--full-rebuild] [--dry-run] [--model <model>]
- *
- * Examples:
- *   tsx src/index.ts --config tcgc                             # Run both phases
- *   tsx src/index.ts --config tcgc --phase knowledge           # Only build knowledge
- *   tsx src/index.ts --config tcgc --phase doc-update          # Only update docs (requires existing knowledge)
- *   tsx src/index.ts --config tcgc --full-rebuild              # Force full knowledge rebuild
- *   tsx src/index.ts --config tcgc --focus user-docs           # Focus doc-update on user docs
- *   tsx src/index.ts --config tcgc --dry-run                   # Print prompts without running
  */
 
 import { CopilotClient, approveAll, type MCPServerConfig } from "@github/copilot-sdk";
@@ -22,9 +17,10 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { loadConfig, type DocUpdateConfig } from "./config.js";
 import {
+  chunkArray,
   getCurrentCommit,
   getKnowledgeRelativePath,
-  hasChangesSince,
+  listCommitsSince,
   readKnowledge,
   readMeta,
   writeMeta,
@@ -226,50 +222,100 @@ async function loadPromptFile(configName: string, promptName: string): Promise<s
   }
 }
 
+/** Maximum number of commits to include in a single incremental knowledge update session. */
+const COMMITS_PER_BATCH = 10;
+
 /**
- * Build the prompt for the knowledge-build phase.
+ * Build the system prompt for a full knowledge build.
  *
- * Returns the composed prompt string, or empty string if no source changes
- * have been detected (incremental mode) and a full rebuild was not requested.
+ * This is system-driven — the user only maintains the doc-update prompt.
+ * The prompt is intentionally open-ended: it gives the LLM the doc-update
+ * instructions and lets it decide what information is worth caching.
  */
-async function buildKnowledgePrompt(
+function buildFullKnowledgePrompt(config: DocUpdateConfig, docUpdatePrompt: string): string {
+  const paths = config.sourceCodePaths.map((p) => `- \`${p}\``).join("\n");
+  const knowledgePath = getKnowledgeRelativePath(config.name);
+
+  return `You are building a **knowledge base** for **${config.displayName}**.
+
+${config.description}
+
+## Source Code Locations
+
+${paths}
+
+## Output
+
+Write the knowledge base to: \`${knowledgePath}\`
+
+## Context
+
+A separate documentation update agent will use this knowledge base as its only reference when updating documentation. That agent will read what you write here first to reduce the efforts of reading full source code.
+
+Below are the instructions the doc-update agent will follow. Read them carefully to understand what information it will need:
+
+<doc-update-instructions>
+${docUpdatePrompt}
+</doc-update-instructions>
+
+## Instructions
+
+Analyze the source code and existing documentation. Then write a knowledge base that contains everything the doc-update agent would need to carry out those instructions effectively.
+
+You decide the structure and what to include. Think about what the doc-update agent will need to look up, cross-reference, or verify — and make sure that information is in the knowledge base so it doesn't have to read source code itself.`;
+}
+
+/**
+ * Build the system prompt for an incremental knowledge update session.
+ *
+ * Each session processes a batch of commits to keep context manageable.
+ * Focuses on how code changes affect the documentation landscape.
+ */
+function buildIncrementalKnowledgePrompt(
   config: DocUpdateConfig,
-  fullRebuild: boolean,
-): Promise<string> {
-  let prompt = await loadPromptFile(config.name, "knowledge-build");
+  commitHashes: string[],
+  existingKnowledge: string,
+  docUpdatePrompt: string,
+): string {
+  const paths = config.sourceCodePaths.map((p) => `- \`${p}\``).join("\n");
+  const knowledgePath = getKnowledgeRelativePath(config.name);
+  const commits = commitHashes.map((h) => `- \`${h}\``).join("\n");
 
-  // Check for incremental mode
-  if (!fullRebuild) {
-    const meta = await readMeta(config.name);
-    if (meta) {
-      if (!hasChangesSince(config.sourceCodePaths, meta.lastCommit)) {
-        return ""; // No source changes — skip knowledge build
-      }
+  return `You are performing an incremental update to the knowledge base for **${config.displayName}**.
 
-      // Incremental: tell the agent the last commit and inject current knowledge.
-      // The agent will use GitHub MCP / git tools to explore the commit history.
-      const existingKnowledge = await readKnowledge(config.name);
+${config.description}
 
-      prompt += `\n\n## Incremental Update Mode\n\n`;
-      prompt += `**Repository:** \`Azure/typespec-azure\`\n`;
-      prompt += `**Last analyzed commit:** \`${meta.lastCommit}\` (${meta.lastUpdated})\n\n`;
-      prompt += `Use the GitHub MCP tools to list commits since that commit `;
-      prompt += `for the source paths listed above. For each commit, review the changes `;
-      prompt += `and decide whether the knowledge base needs updating. `;
-      prompt += `Update only the affected sections — preserve everything else.\n\n`;
+## Source Code Locations
 
-      if (existingKnowledge) {
-        prompt += `### Current Knowledge Base\n\n${existingKnowledge}\n\n`;
-      }
-      return prompt;
-    }
-  }
+${paths}
 
-  // Full build mode
-  prompt += `\n\n## Full Build Mode\n\n`;
-  prompt += `Analyze the complete codebase and build the knowledge base from scratch. `;
-  prompt += `Write the output to \`${getKnowledgeRelativePath(config.name)}\`.\n`;
-  return prompt;
+## Doc-Update Instructions
+
+The doc-update agent that consumes this knowledge base follows these instructions. Use them to judge whether a commit affects information the knowledge base should capture:
+
+<doc-update-instructions>
+${docUpdatePrompt}
+</doc-update-instructions>
+
+## Commits to Analyze
+
+The following commits (oldest first) need to be reviewed:
+
+${commits}
+
+**Repository:** \`Azure/typespec-azure\`
+
+Use GitHub MCP tools to inspect each commit. Determine whether the changes affect anything the knowledge base should capture. Skip commits that are irrelevant (pure refactors, CI, formatting, dependency bumps).
+
+## Output
+
+Write the updated knowledge base to: \`${knowledgePath}\`
+
+**Important:** Preserve sections not affected by these commits. Only update what the commits actually change.
+
+## Current Knowledge Base
+
+${existingKnowledge}`;
 }
 
 /**
@@ -447,10 +493,39 @@ async function main(): Promise<void> {
 
     if (args.phase === "all" || args.phase === "knowledge") {
       try {
-        const prompt = await buildKnowledgePrompt(config, args.fullRebuild);
-        console.log("--- Knowledge Build Prompt ---");
-        console.log(prompt || "(skipped — no source changes detected)");
-        console.log();
+        const meta = args.fullRebuild ? null : await readMeta(config.name);
+        if (!meta || args.fullRebuild) {
+          const docUpdatePrompt = await loadPromptFile(config.name, "doc-update");
+          const prompt = buildFullKnowledgePrompt(config, docUpdatePrompt);
+          console.log("--- Knowledge Build Prompt (Full) ---");
+          console.log(prompt);
+          console.log();
+        } else {
+          const commits = listCommitsSince(config.sourceCodePaths, meta.lastCommit);
+          if (commits.length === 0) {
+            console.log("--- Knowledge Build ---");
+            console.log("(skipped — no source changes detected)");
+            console.log();
+          } else {
+            const batches = chunkArray(commits, COMMITS_PER_BATCH);
+            console.log(
+              `--- Knowledge Build (Incremental: ${commits.length} commits in ${batches.length} batch(es)) ---`,
+            );
+            const existingKnowledge = (await readKnowledge(config.name)) ?? "(none)";
+            const docUpdatePrompt = await loadPromptFile(config.name, "doc-update");
+            const prompt = buildIncrementalKnowledgePrompt(
+              config,
+              batches[0],
+              existingKnowledge,
+              docUpdatePrompt,
+            );
+            console.log(prompt);
+            if (batches.length > 1) {
+              console.log(`\n... (${batches.length - 1} more batch(es) would follow)`);
+            }
+            console.log();
+          }
+        }
       } catch (e) {
         console.log(`Knowledge prompt error: ${e}`);
         console.log();
@@ -478,33 +553,88 @@ async function main(): Promise<void> {
   const client = new CopilotClient();
 
   try {
-    // Phase 1: Knowledge Build
+    // Phase 1: Knowledge Build (system-driven pre-step)
     if (args.phase === "all" || args.phase === "knowledge") {
       log(
         `Starting knowledge build for ${config.displayName} ` +
           `(full-rebuild: ${args.fullRebuild})`,
       );
 
-      const knowledgePrompt = await buildKnowledgePrompt(config, args.fullRebuild);
+      const meta = args.fullRebuild ? null : await readMeta(config.name);
+      const needsFullBuild = !meta || args.fullRebuild;
 
-      if (knowledgePrompt) {
-        await runAgentSession(client, knowledgePrompt, {
+      if (needsFullBuild) {
+        // Full build — single session, derives knowledge structure from doc-update prompt
+        const docUpdatePrompt = await loadPromptFile(config.name, "doc-update");
+        const prompt = buildFullKnowledgePrompt(config, docUpdatePrompt);
+
+        await runAgentSession(client, prompt, {
           model: args.model,
           repoRoot,
           phaseName: "Knowledge Build",
           mcpServers: buildGitHubMcpConfig(),
         });
 
-        // Record the commit we just analyzed
         await writeMeta(config.name, {
           lastCommit: getCurrentCommit(),
           lastUpdated: new Date().toISOString(),
           analyzedPaths: config.sourceCodePaths,
         });
 
-        log("Knowledge build phase complete.");
+        log("Knowledge build (full) complete.");
       } else {
-        log("No source changes detected — skipping knowledge build.");
+        // Incremental — batch commits into multiple short sessions
+        const commits = listCommitsSince(config.sourceCodePaths, meta.lastCommit);
+
+        if (commits.length === 0) {
+          log("No source changes detected — skipping knowledge build.");
+        } else {
+          const batches = chunkArray(commits, COMMITS_PER_BATCH);
+          log(
+            `Found ${commits.length} commit(s) since last build. ` +
+              `Processing in ${batches.length} batch(es).`,
+          );
+
+          const docUpdatePrompt = await loadPromptFile(config.name, "doc-update");
+
+          for (let i = 0; i < batches.length; i++) {
+            const batch = batches[i];
+            log(`Processing batch ${i + 1}/${batches.length} (${batch.length} commits)...`);
+
+            const existingKnowledge = await readKnowledge(config.name);
+            if (!existingKnowledge) {
+              throw new Error(
+                `Knowledge base not found for incremental update of "${config.name}". ` +
+                  `Run with --full-rebuild first.`,
+              );
+            }
+
+            const prompt = buildIncrementalKnowledgePrompt(
+              config,
+              batch,
+              existingKnowledge,
+              docUpdatePrompt,
+            );
+            await runAgentSession(client, prompt, {
+              model: args.model,
+              repoRoot,
+              phaseName: `Knowledge Update [${i + 1}/${batches.length}]`,
+              mcpServers: buildGitHubMcpConfig(),
+            });
+
+            // Record progress after each batch so we can resume on failure
+            const lastCommitInBatch = batch[batch.length - 1];
+            await writeMeta(config.name, {
+              lastCommit: lastCommitInBatch,
+              lastUpdated: new Date().toISOString(),
+              analyzedPaths: config.sourceCodePaths,
+            });
+
+            log(`Batch ${i + 1}/${batches.length} complete.`);
+          }
+
+          log("Knowledge build (incremental) complete.");
+        }
       }
     }
 

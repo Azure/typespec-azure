@@ -1,5 +1,9 @@
 name: tcgc
 displayName: TypeSpec Client Generator Core
+description: >-
+  TCGC introduces a client type graph and provides helper functions with which
+  client emitters can rely on to generate client code instead of directly
+  interacting with the TypeSpec core API.
 
 sourceCodePaths:
   - packages/typespec-client-generator-core/src/**
