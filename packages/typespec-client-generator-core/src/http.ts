@@ -773,15 +773,21 @@ function findMappingWithPath(
   if (serviceParam.__raw && methodParametersMap.has(serviceParam.__raw)) {
     return [methodParametersMap.get(serviceParam.__raw)!];
   }
-  // Use a queue of tuples: [current parameter, path to reach it]
-  const queue: [
-    SdkMethodParameter | SdkModelPropertyType,
-    (SdkMethodParameter | SdkModelPropertyType)[],
-  ][] = methodParameters.map((p) => [p, [p]]);
-  const visited: Set<SdkModelType> = new Set();
 
-  while (queue.length > 0) {
-    const [methodParam, path] = queue.shift()!;
+  // BFS with index-based traversal (O(1) dequeue) and parent pointers (avoid path copying per node)
+  const queue: (SdkMethodParameter | SdkModelPropertyType)[] = [...methodParameters];
+  const parentMap = new Map<
+    SdkMethodParameter | SdkModelPropertyType,
+    SdkMethodParameter | SdkModelPropertyType | undefined
+  >();
+  for (const p of methodParameters) {
+    parentMap.set(p, undefined);
+  }
+  const visited: Set<SdkModelType> = new Set();
+  let front = 0;
+
+  while (front < queue.length) {
+    const methodParam = queue[front++];
 
     // HTTP operation parameter/body parameter/property of body parameter could either from an operation parameter directly or from a property of an operation parameter.
     if (
@@ -789,12 +795,12 @@ function findMappingWithPath(
       serviceParam.__raw &&
       compareModelProperties(context, methodParam.__raw, serviceParam.__raw)
     ) {
-      return path;
+      return buildPathFromParentMap(methodParam, parentMap);
     }
 
     // If the service parameter is a body parameter, try to see if we could find a method parameter with same type of the body parameter.
     if (serviceParam.kind === "body" && serviceParam.type === methodParam.type) {
-      return path;
+      return buildPathFromParentMap(methodParam, parentMap);
     }
 
     // BFS to explore nested properties
@@ -803,13 +809,30 @@ function findMappingWithPath(
       let current: SdkModelType | undefined = methodParam.type;
       while (current) {
         for (const prop of current.properties) {
-          queue.push([prop, [...path, prop]]);
+          parentMap.set(prop, methodParam);
+          queue.push(prop);
         }
         current = current.baseModel;
       }
     }
   }
   return undefined;
+}
+
+function buildPathFromParentMap(
+  node: SdkMethodParameter | SdkModelPropertyType,
+  parentMap: Map<
+    SdkMethodParameter | SdkModelPropertyType,
+    SdkMethodParameter | SdkModelPropertyType | undefined
+  >,
+): (SdkMethodParameter | SdkModelPropertyType)[] {
+  const path: (SdkMethodParameter | SdkModelPropertyType)[] = [];
+  let current: SdkMethodParameter | SdkModelPropertyType | undefined = node;
+  while (current !== undefined) {
+    path.push(current);
+    current = parentMap.get(current);
+  }
+  return path.reverse();
 }
 
 function filterOutUselessPathParameters(
