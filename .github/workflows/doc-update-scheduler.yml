@@ -160,6 +160,7 @@ jobs:
         run: echo "value=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
 
       - name: Create Pull Request
+        id: create-pr
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.COPILOT_GITHUB_TOKEN }}
@@ -178,6 +179,19 @@ jobs:
             This PR was created by the [doc-update-scheduler workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
           commit-message: "docs: automated ${{ matrix.config }} update (${{ steps.date.outputs.value }})"
           delete-branch: true
+
+      - name: Record PR number in metadata
+        if: steps.create-pr.outputs.pull-request-number
+        working-directory: eng/scripts/doc-updater
+        run: |
+          META_FILE="knowledge/${{ matrix.config }}.meta.json"
+          if [ -f "$META_FILE" ]; then
+            # Update lastPrNumber in existing metadata
+            jq '.lastPrNumber = ${{ steps.create-pr.outputs.pull-request-number }}' "$META_FILE" > tmp.json && mv tmp.json "$META_FILE"
+            git add "$META_FILE"
+            git commit --amend --no-edit
+            git push --force-with-lease
+          fi
 
       - name: Job Summary
         run: |

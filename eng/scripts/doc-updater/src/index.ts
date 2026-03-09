@@ -19,11 +19,13 @@ import { loadConfig, type DocUpdateConfig } from "./config.js";
 import {
   chunkArray,
   getCurrentCommit,
+  getHumanFeedback,
   getKnowledgeRelativePath,
   listCommitsSince,
   readKnowledge,
   readMeta,
   writeMeta,
+  type HumanFeedback,
 } from "./knowledge.js";
 
 // ---------------------------------------------------------------------------
@@ -319,6 +321,70 @@ ${existingKnowledge}`;
 }
 
 /**
+ * Build the system prompt for a feedback-driven knowledge update.
+ *
+ * When humans modify a doc-updater PR before merging, their changes
+ * represent corrections or improvements the knowledge base should learn from.
+ */
+function buildFeedbackPrompt(
+  config: DocUpdateConfig,
+  feedback: HumanFeedback,
+  existingKnowledge: string,
+  docUpdatePrompt: string,
+): string {
+  const knowledgePath = getKnowledgeRelativePath(config.name);
+
+  let feedbackSection = `## Human Feedback from PR #${feedback.prNumber}\n\n`;
+
+  if (feedback.commits.length > 0) {
+    feedbackSection += `### Commits added by reviewers\n\n`;
+    for (const c of feedback.commits) {
+      feedbackSection += `- \`${c.sha}\` — ${c.message}\n`;
+    }
+    feedbackSection += `\nUse GitHub MCP tools to inspect these commits and understand what the reviewers changed and why.\n\n`;
+  }
+
+  if (feedback.reviewComments.length > 0) {
+    feedbackSection += `### Review comments\n\n`;
+    for (const comment of feedback.reviewComments) {
+      feedbackSection += `> ${comment}\n\n`;
+    }
+  }
+
+  return `You are updating the knowledge base for **${config.displayName}** based on human feedback.
+
+${config.description}
+
+A previous automated doc-update PR was reviewed and modified by humans before being merged. Their changes indicate corrections, preferences, or additional context that the knowledge base should capture so future updates don't repeat the same mistakes.
+
+The doc-update agent that produced the PR followed these instructions. Use them to understand the agent's intent and judge what kind of correction each human change represents:
+
+<doc-update-instructions>
+${docUpdatePrompt}
+</doc-update-instructions>
+
+${feedbackSection}
+
+## Instructions
+
+Review the human changes and comments. Update the knowledge base to reflect what you learn:
+- If humans corrected a factual error, fix the corresponding knowledge
+- If humans added context or clarification, incorporate that information
+- If humans changed formatting or conventions, update the conventions section
+- If humans rejected a change, note what should NOT be done
+
+## Output
+
+Write the updated knowledge base to: \`${knowledgePath}\`
+
+Preserve sections not affected by the feedback. Only update what the human corrections inform.
+
+## Current Knowledge Base
+
+${existingKnowledge}`;
+}
+
+/**
  * Build the prompt for the doc-update phase.
  *
  * Injects the knowledge base content and runtime context (focus area, date)
@@ -492,6 +558,34 @@ async function main(): Promise<void> {
     console.log();
 
     if (args.phase === "all" || args.phase === "knowledge") {
+      // Check for human feedback on last doc-update PR
+      try {
+        const meta = args.fullRebuild ? null : await readMeta(config.name);
+        if (meta?.lastPrNumber) {
+          const feedback = getHumanFeedback(meta.lastPrNumber);
+          if (feedback) {
+            const existingKnowledge = (await readKnowledge(config.name)) ?? "(none)";
+            const docUpdatePrompt = await loadPromptFile(config.name, "doc-update");
+            const prompt = buildFeedbackPrompt(
+              config,
+              feedback,
+              existingKnowledge,
+              docUpdatePrompt,
+            );
+            console.log("--- Feedback Prompt ---");
+            console.log(prompt);
+            console.log();
+          } else {
+            console.log("--- Feedback ---");
+            console.log(`(no human feedback detected on PR #${meta.lastPrNumber})`);
+            console.log();
+          }
+        }
+      } catch (e) {
+        console.log(`Feedback check error: ${e}`);
+        console.log();
+      }
+
       try {
         const meta = args.fullRebuild ? null : await readMeta(config.name);
         if (!meta || args.fullRebuild) {
@@ -553,6 +647,47 @@ async function main(): Promise<void> {
   const client = new CopilotClient();
 
   try {
+    // Phase 0: Feedback Loop — learn from human corrections on the last PR
+    if (args.phase === "all" || args.phase === "knowledge") {
+      const meta = await readMeta(config.name);
+      if (meta?.lastPrNumber && !args.fullRebuild) {
+        log(`Checking for human feedback on PR #${meta.lastPrNumber}...`);
+        const feedback = getHumanFeedback(meta.lastPrNumber);
+
+        if (feedback) {
+          const feedbackSummary = [
+            feedback.commits.length > 0 ? `${feedback.commits.length} human commit(s)` : "",
+            feedback.reviewComments.length > 0
+              ? `${feedback.reviewComments.length} review comment(s)`
+              : "",
+          ]
+            .filter(Boolean)
+            .join(", ");
+          log(`Human feedback detected: ${feedbackSummary}. Running feedback session...`);
+
+          const existingKnowledge = await readKnowledge(config.name);
+          if (existingKnowledge) {
+            const docUpdatePrompt = await loadPromptFile(config.name, "doc-update");
+            const prompt = buildFeedbackPrompt(
+              config,
+              feedback,
+              existingKnowledge,
+              docUpdatePrompt,
+            );
+            await runAgentSession(client, prompt, {
+              model: args.model,
+              repoRoot,
+              phaseName: "Feedback",
+              mcpServers: buildGitHubMcpConfig(),
+            });
+            log("Feedback session complete.");
+          }
+        } else {
+          log(`No human feedback detected on PR #${meta.lastPrNumber}.`);
+        }
+      }
+    }
+
     // Phase 1: Knowledge Build (system-driven pre-step)
     if (args.phase === "all" || args.phase === "knowledge") {
       log(

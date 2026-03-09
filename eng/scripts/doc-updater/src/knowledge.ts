@@ -21,6 +21,20 @@ export interface KnowledgeMeta {
   lastUpdated: string;
   /** Source code glob patterns that were analyzed */
   analyzedPaths: string[];
+  /** PR number of the last doc-update PR (used for feedback detection) */
+  lastPrNumber?: number;
+}
+
+/**
+ * Represents human feedback detected on a merged doc-updater PR.
+ */
+export interface HumanFeedback {
+  /** The PR number that was checked */
+  prNumber: number;
+  /** Human-authored commits on the PR (message + sha) */
+  commits: Array<{ sha: string; message: string }>;
+  /** Review comments left on the PR */
+  reviewComments: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -157,4 +171,79 @@ export function chunkArray<T>(arr: T[], size: number): T[][] {
     chunks.push(arr.slice(i, i + size));
   }
   return chunks;
+}
+
+// ---------------------------------------------------------------------------
+// Feedback detection
+// ---------------------------------------------------------------------------
+
+/**
+ * Check a merged doc-updater PR for human modifications.
+ *
+ * Uses `gh` CLI to query the PR. Detects:
+ *  - Extra commits beyond the bot's initial commit
+ *  - Review comments left by humans
+ *
+ * Returns null if the PR has no human feedback, was not merged, or on error.
+ */
+export function getHumanFeedback(prNumber: number): HumanFeedback | null {
+  try {
+    // Check if PR is merged
+    const state = execSync(
+      `gh pr view ${prNumber} --repo Azure/typespec-azure --json state,mergedAt --jq ".state"`,
+      { encoding: "utf-8", cwd: REPO_ROOT },
+    ).trim();
+
+    if (state !== "MERGED") {
+      return null;
+    }
+
+    // Get all commits on the PR
+    const commitsJson = execSync(
+      `gh pr view ${prNumber} --repo Azure/typespec-azure --json commits --jq ".commits"`,
+      { encoding: "utf-8", cwd: REPO_ROOT },
+    ).trim();
+
+    const commits = JSON.parse(commitsJson) as Array<{
+      oid: string;
+      messageHeadline: string;
+      authors: Array<{ login: string }>;
+    }>;
+
+    // Bot commits match the automated pattern; everything else is human
+    const humanCommits = commits.filter((c) => !c.messageHeadline.startsWith("docs: automated"));
+
+    // Get review comments
+    const reviewsJson = execSync(
+      `gh pr view ${prNumber} --repo Azure/typespec-azure --json reviews --jq ".reviews"`,
+      { encoding: "utf-8", cwd: REPO_ROOT },
+    ).trim();
+
+    const reviews = JSON.parse(reviewsJson) as Array<{
+      body: string;
+      state: string;
+      author: { login: string };
+    }>;
+
+    const reviewComments = reviews
+      .filter((r) => r.body && r.body.trim().length > 0)
+      .map((r) => `[${r.author.login}] ${r.body.trim()}`);
+
+    // No feedback if no human commits and no review comments
+    if (humanCommits.length === 0 && reviewComments.length === 0) {
+      return null;
+    }
+
+    return {
+      prNumber,
+      commits: humanCommits.map((c) => ({
+        sha: c.oid,
+        message: c.messageHeadline,
+      })),
+      reviewComments,
+    };
+  } catch {
+    // gh CLI not available or API error — skip feedback silently
+    return null;
+  }
 }
