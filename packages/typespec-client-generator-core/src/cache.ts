@@ -40,7 +40,7 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
   const { clients, mergedSubClientTypes } = getRootClients(context);
 
   const servicesNs = new Set<Namespace>();
-  clients.map((c) => c.services.map((s) => servicesNs.add(s)));
+  clients.forEach((c) => c.services.forEach((s) => servicesNs.add(s)));
 
   // handle versioning with mutated types
   context.__packageVersions = new Map<Namespace, string[]>();
@@ -195,14 +195,14 @@ function getRootClients(context: TCGCContext): ClientCreationResult {
     }
 
     // Explicit client cache
-    explicitClients.map((c) => {
+    explicitClients.forEach((c) => {
       context.__rawClientsCache!.set(c.type!, c);
       context.__clientToOperationsCache!.set(c, []);
       context.__explicitClients!.add(c);
     });
 
     // Build explicit client hierarchy
-    explicitClients.map((client: SdkClient) => {
+    explicitClients.forEach((client: SdkClient) => {
       let parentClientType: Namespace | undefined = client.type!.namespace;
       while (parentClientType) {
         const parentClient = context.__rawClientsCache?.get(parentClientType);
@@ -272,7 +272,7 @@ function getRootClients(context: TCGCContext): ClientCreationResult {
 
     // Add sub-client hierarchy if empty explicit client
     const subClientNameMap = new Map<string, SdkClient>();
-    explicitClients.map((client: SdkClient) => {
+    explicitClients.forEach((client: SdkClient) => {
       if (client.autoMergeService) {
         // Explicit auto-merge service client: follow services to build hierarchy
         const subClients: SdkClient[] = [];
