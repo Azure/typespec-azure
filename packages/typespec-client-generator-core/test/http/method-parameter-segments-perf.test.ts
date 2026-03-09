@@ -5,8 +5,8 @@ import { getServiceMethodOfClient } from "../utils.js";
 
 /**
  * Generate a TypeSpec definition with a deeply nested model chain.
- * Creates models Level0, Level1, ..., LevelN where each LevelI has
- * a property `levelI_1` of type Level(I+1), and the deepest level
+ * Creates models Level0, Level1, ..., LevelN where each Level{I} has
+ * a property `level{I+1}` of type Level{I+1}, and the deepest level
  * has a @query parameter to search for.
  *
  * @param depth Number of nesting levels
