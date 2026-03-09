@@ -380,3 +380,79 @@ interface MyResourceOperations {
   listWidgets is ArmResourceListActionAsync<MyResource, ResourceListResult<Widget>>;
 }
 ```
+
+## Operation Status Endpoints
+
+ARM long-running operations (LROs) use operation status endpoints to allow clients to poll for the
+status of an async operation. The `GetResourceOperationStatus` operation template provides a
+standard way to expose these endpoints, and `ResourceOperationStatus` provides the response model.
+
+### ResourceOperationStatus
+
+`ResourceOperationStatus` is a response model that represents the status of an async operation. Unlike
+the older `ArmOperationStatus`, the `id` field is **not** marked as a path parameter, so it is always
+included in the response body. This makes it suitable for use as both the status monitor type and as
+the final LRO result.
+
+```typespec
+model ResourceOperationStatus<
+  Properties extends {} = never,
+  StatusValues extends TypeSpec.Reflection.Union = ResourceProvisioningState
+>
+```
+
+### GetResourceOperationStatus
+
+`GetResourceOperationStatus` is a `GET` operation template for operation status endpoints. It supports
+all four standard ARM path patterns through its `Scope` and `LocationScope` parameters:
+
+| Scope                     | LocationScope               | Path pattern                                                                                          |
+| ------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `TenantActionScope`       | _(none)_                    | `GET /providers/{ns}/operationStatuses/{operationId}`                                                 |
+| `SubscriptionActionScope` | _(none)_                    | `GET /subscriptions/{sub}/providers/{ns}/operationStatuses/{operationId}`                             |
+| `TenantActionScope`       | `LocationResourceParameter` | `GET /providers/{ns}/locations/{loc}/operationStatuses/{operationId}`                                 |
+| `SubscriptionActionScope` | `LocationResourceParameter` | `GET /subscriptions/{sub}/providers/{ns}/locations/{loc}/operationStatuses/{operationId}`             |
+
+### Example
+
+```typespec
+@armResourceOperations
+interface OperationStatuses {
+  // Tenant scope (default)
+  getTenantStatus is GetResourceOperationStatus;
+
+  // Subscription scope
+  getSubscriptionStatus is GetResourceOperationStatus<ResourceOperationStatus, SubscriptionActionScope>;
+
+  // Tenant + location scope
+  getTenantLocationStatus is GetResourceOperationStatus<
+    ResourceOperationStatus,
+    TenantActionScope,
+    LocationResourceParameter
+  >;
+
+  // Subscription + location scope
+  getSubscriptionLocationStatus is GetResourceOperationStatus<
+    ResourceOperationStatus,
+    SubscriptionActionScope,
+    LocationResourceParameter
+  >;
+}
+```
+
+### Custom response properties
+
+To add custom properties to the operation status response, extend `ResourceOperationStatus`:
+
+```typespec
+model WidgetOperationStatus is ResourceOperationStatus<WidgetOperationStatusProperties>;
+
+model WidgetOperationStatusProperties {
+  widgetId: string;
+}
+
+@armResourceOperations
+interface OperationStatuses {
+  getStatus is GetResourceOperationStatus<WidgetOperationStatus, SubscriptionActionScope>;
+}
+```

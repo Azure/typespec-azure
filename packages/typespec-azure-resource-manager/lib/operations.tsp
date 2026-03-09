@@ -139,16 +139,18 @@ op ArmResourceCheckExistence<
 
 /**
  * A resource GET operation template for an Azure Resource Manager Operation Status endpoint.
- * The path is determined by the `Scope` parameter.
- * By default this is a tenant-scoped operation at:
- *   `GET /providers/{providerNamespace}/operationStatuses/{operationId}`
- * For subscription scope, use `Scope = SubscriptionActionScope`:
- *   `GET /subscriptions/{subscriptionId}/providers/{providerNamespace}/operationStatuses/{operationId}`
- * To include a location parameter, pass `Parameters = LocationResourceParameter`.
+ * The path is determined by the `Scope` and `LocationScope` parameters.
+ *
+ * Supported path patterns:
+ * - Tenant: `GET /providers/{providerNamespace}/operationStatuses/{operationId}`
+ * - Subscription: `GET /subscriptions/{subscriptionId}/providers/{providerNamespace}/operationStatuses/{operationId}`
+ * - Tenant+Location: `GET /providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
+ * - Subscription+Location: `GET /subscriptions/{subscriptionId}/providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}`
  *
  * @template Response The type of the response body. Defaults to ResourceOperationStatus.
- * @template Scope The scope of the operation (TenantActionScope or SubscriptionActionScope). Defaults to TenantActionScope.
- * @template Parameters Optional. Additional parameters after the provider namespace (e.g. LocationResourceParameter).
+ * @template Scope The scope of the operation. Defaults to TenantActionScope.
+ * @template LocationScope Optional. Pass `LocationResourceParameter` to include a `locations/{location}` path segment.
+ * @template Parameters Optional. Additional non-path parameters (e.g. query or header parameters).
  * @template Error Optional. The error response, if non-standard.
  */
 @autoRoute
@@ -159,18 +161,21 @@ op ArmResourceCheckExistence<
 op GetResourceOperationStatus<
   Response extends {} = ResourceOperationStatus,
   Scope extends {} = TenantActionScope,
+  LocationScope extends {} = {},
   Parameters extends {} = {},
   Error extends {} = ErrorResponse
 >(
   ...Azure.ResourceManager.Foundations.DefaultBaseParameters<Scope>,
   ...Scope,
   ...ProviderNamespace<Scope>,
-  ...Parameters,
+  ...LocationScope,
 
   @path
   @segment("operationStatuses")
   @doc("The operation ID.")
   operationId: string,
+
+  ...Parameters,
 ): ArmResponse<Response> | Error;
 
 /**

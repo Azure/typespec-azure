@@ -41,23 +41,24 @@ interface OperationStatuses {
 
 // New recommended pattern: use GetResourceOperationStatus with ResourceOperationStatus.
 // This doesn't use @parentResource decorators and doesn't have @path on the id field.
-
+// A single interface can hold all scope variants.
 @armResourceOperations
-interface NewStyleTenantOperationStatuses {
-  // Tenant scope: GET /providers/{providerNamespace}/operationStatuses/{operationId}
-  getOpStatus is GetResourceOperationStatus;
-}
+interface NewStyleOperationStatuses {
+  // Tenant scope: GET /providers/{ns}/operationStatuses/{operationId}
+  getTenantOpStatus is GetResourceOperationStatus;
 
-@armResourceOperations
-interface NewStyleSubscriptionOperationStatuses {
-  // Subscription scope: GET /subscriptions/{subscriptionId}/providers/{providerNamespace}/operationStatuses/{operationId}
-  getOpStatus is GetResourceOperationStatus<ResourceOperationStatus, SubscriptionActionScope>;
-}
+  // Subscription scope: GET /subscriptions/{sub}/providers/{ns}/operationStatuses/{operationId}
+  getSubscriptionOpStatus is GetResourceOperationStatus<ResourceOperationStatus, SubscriptionActionScope>;
 
-@armResourceOperations
-interface NewStyleSubscriptionLocationOperationStatuses {
-  // Subscription+Location scope: GET /subscriptions/{subscriptionId}/providers/{providerNamespace}/locations/{location}/operationStatuses/{operationId}
-  getOpStatus is GetResourceOperationStatus<
+  // Tenant+Location scope: GET /providers/{ns}/locations/{loc}/operationStatuses/{operationId}
+  getTenantLocationOpStatus is GetResourceOperationStatus<
+    ResourceOperationStatus,
+    TenantActionScope,
+    LocationResourceParameter
+  >;
+
+  // Subscription+Location scope: GET /subscriptions/{sub}/providers/{ns}/locations/{loc}/operationStatuses/{operationId}
+  getSubscriptionLocationOpStatus is GetResourceOperationStatus<
     ResourceOperationStatus,
     SubscriptionActionScope,
     LocationResourceParameter
