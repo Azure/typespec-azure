@@ -121,17 +121,28 @@ export function getCurrentCommit(): string {
 }
 
 /**
+/**
+ * Commit message pattern used by the doc-updater workflow after squash merge.
+ * The PR title becomes the commit message: "[Automated] Update <config> documentation (...)"
+ */
+const DOC_UPDATER_GREP_FLAG = '--grep="\\[Automated\\] Update"';
+
+/**
  * List commit hashes affecting the given source paths since the specified commit.
+ * Excludes commits created by the doc-updater itself (matched by commit message pattern).
  * Returns hashes in chronological order (oldest first).
  * Returns empty array if no commits found or on error.
  */
 export function listCommitsSince(sourcePaths: string[], lastCommit: string): string[] {
   const paths = sourcePaths.join(" ");
   try {
-    const result = execSync(`git rev-list ${lastCommit}..HEAD -- ${paths}`, {
-      encoding: "utf-8",
-      cwd: REPO_ROOT,
-    }).trim();
+    const result = execSync(
+      `git rev-list --invert-grep ${DOC_UPDATER_GREP_FLAG} ${lastCommit}..HEAD -- ${paths}`,
+      {
+        encoding: "utf-8",
+        cwd: REPO_ROOT,
+      },
+    ).trim();
     if (!result) return [];
     return result.split("\n").reverse(); // oldest first
   } catch {
