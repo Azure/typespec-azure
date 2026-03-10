@@ -59,16 +59,23 @@ function extractParameters(
   return params;
 }
 
-const LANGUAGE_ALIASES: Record<string, string> = {
-  "@azure-tools/typespec-csharp": "csharp",
-  "@azure-tools/typespec-java": "java",
-  "@azure-tools/typespec-python": "python",
-  "@azure-tools/typespec-typescript": "typescript",
-  "@azure-tools/typespec-ts": "typescript",
-  "@azure-tools/typespec-js": "javascript",
-  "@azure-tools/typespec-swift": "swift",
-  "@azure-tools/typespec-go": "go",
-  "@azure-tools/typespec-rust": "rust",
+interface EmitterRegistration {
+  language: string;
+  parser: LanguageParser;
+}
+
+const EMITTER_REGISTRY: Record<string, EmitterRegistration> = {
+  "@azure-tools/typespec-csharp": { language: "csharp", parser: parseCSharp },
+  "@azure-tools/typespec-java": { language: "java", parser: parseJava },
+  "@azure-tools/typespec-python": { language: "python", parser: parsePython },
+  "@azure-tools/typespec-ts": { language: "typescript", parser: parseTypeScript },
+  "@azure-tools/typespec-go": { language: "go", parser: parseGo },
+  "@azure-tools/typespec-rust": { language: "rust", parser: parseRust },
+  "@azure-typespec/http-client-csharp": { language: "http-client-csharp", parser: parseCSharp },
+  "@azure-typespec/http-client-csharp-mgmt": {
+    language: "http-client-csharp-mgmt",
+    parser: parseCSharp,
+  },
 };
 
 interface LanguageParserResult {
@@ -242,19 +249,6 @@ function parseRust(
   };
 }
 
-/**
- * Map of language-specific parsers.
- */
-const LANGUAGE_PARSERS: Record<string, LanguageParser> = {
-  "@azure-tools/typespec-python": parsePython,
-  "@azure-tools/typespec-java": parseJava,
-  "@azure-tools/typespec-csharp": parseCSharp,
-  "@azure-tools/typespec-typescript": parseTypeScript,
-  "@azure-tools/typespec-ts": parseTypeScript,
-  "@azure-tools/typespec-go": parseGo,
-  "@azure-tools/typespec-rust": parseRust,
-};
-
 export interface LanguageCollectionResult {
   languages: Record<string, LanguagePackageMetadata>;
   sourceConfigPath?: string;
@@ -420,7 +414,7 @@ function checkIfManagementPlane(program: Program, ns: Namespace): boolean {
   return false;
 }
 
-function buildLanguageMetadata(
+export function buildLanguageMetadata(
   optionMap: Record<string, Record<string, unknown>>,
   params: Record<string, unknown>,
   baseOutputDir: string,
@@ -466,10 +460,10 @@ function createLanguageMetadata(
   let namespace: string | undefined;
 
   const normalizedEmitterName = emitterName.toLowerCase();
-  const parser = LANGUAGE_PARSERS[normalizedEmitterName];
+  const registration = EMITTER_REGISTRY[normalizedEmitterName];
 
-  if (parser) {
-    const result = parser(normalizedOptions, params);
+  if (registration) {
+    const result = registration.parser(normalizedOptions, params);
     packageName = result.packageName;
     namespace = result.namespace;
   } else {
@@ -495,6 +489,11 @@ function createLanguageMetadata(
       // If it doesn't start with base, keep as-is
       relativeOutputDir = absolutePath;
     }
+  }
+
+  // Resolve {namespace} placeholder in output directory
+  if (relativeOutputDir && namespace) {
+    relativeOutputDir = relativeOutputDir.replace(/\{namespace\}/g, namespace);
   }
 
   return {
@@ -540,36 +539,14 @@ function normalizeKey(key: string): string {
   return key.replace(/[^a-z0-9]/gi, "").toLowerCase();
 }
 
-function inferLanguageFromEmitterName(emitterName: string): string {
+export function inferLanguageFromEmitterName(emitterName: string): string {
   const normalized = emitterName.toLowerCase();
-  if (LANGUAGE_ALIASES[normalized]) {
-    return LANGUAGE_ALIASES[normalized];
+  const registration = EMITTER_REGISTRY[normalized];
+  if (registration) {
+    return registration.language;
   }
 
-  const basename = normalized.split(/[\\/]/).pop() ?? normalized;
-  const cadlIndex = basename.lastIndexOf("cadl-");
-  if (cadlIndex >= 0) {
-    const suffix = basename.substring(cadlIndex + "cadl-".length);
-    if (suffix) {
-      return suffix;
-    }
-  }
-
-  const typespecIndex = basename.lastIndexOf("typespec-");
-  if (typespecIndex >= 0) {
-    const suffix = basename.substring(typespecIndex + "typespec-".length);
-    if (suffix) {
-      return suffix;
-    }
-  }
-
-  const lastDash = basename.lastIndexOf("-");
-  if (lastDash >= 0 && lastDash < basename.length - 1) {
-    return basename.substring(lastDash + 1);
-  }
-
-  const sanitized = basename.replace(/[^a-z]/g, "");
-  return sanitized || "unknown";
+  return emitterName;
 }
 
 function trimOrUndefined(value: string | undefined): string | undefined {
