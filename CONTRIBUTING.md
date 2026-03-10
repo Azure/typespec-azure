@@ -308,6 +308,34 @@ Depending on the package where the fix needs to go do this on the `Microsoft/typ
 1. Find the backmerge branch [here](https://github.com/Azure/typespec-azure/branches) and click "New pull request".
 1. Rebase merge the new backmerge PR into main.
 
+## Creating release notes
+
+Release notes are published at each release in `website/src/content/docs/docs/release-notes/`. They follow the pattern `release-YYYY-MM-DD.mdx`.
+
+Run the following command to generate the changelog:
+
+```bash
+pnpm chronus changelog --policy typespec-azure
+```
+
+Create a new file `website/src/content/docs/docs/release-notes/release-YYYY-MM-DD.mdx` with this frontmatter and paste the command output below it, removing the `Dependencies` category (dependency updates are not user-facing and should not appear in release notes):
+
+```markdown
+---
+title: "X.Y.0"
+---
+
+import { LinkCard } from "@astrojs/starlight/components";
+
+<LinkCard
+  title="TypeSpec Core X.Y"
+  description="See changes to the TypeSpec language and core libraries"
+  href="https://typespec.io/docs/release-notes/release-YYYY-MM-DD"
+/>
+```
+
+See existing release notes for examples.
+
 ## llms.txt
 
 The website build generates `llms.txt` and `llms-full.txt` files based on 2 factors:
