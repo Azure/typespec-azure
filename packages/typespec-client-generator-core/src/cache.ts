@@ -248,8 +248,9 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
 
   // iterate all clients and operation groups and build a map of operations
   const queue: (SdkClient | SdkOperationGroup)[] = [...clients];
-  while (queue.length > 0) {
-    const group = queue.shift()!;
+  let queueIdx = 0;
+  while (queueIdx < queue.length) {
+    const group = queue[queueIdx++];
 
     // operations directly under the group
     const operations = [];
@@ -276,8 +277,9 @@ export function prepareClientAndOperationCache(context: TCGCContext): void {
     // should be placed in the first accessor client or operation group
     if (group.type?.kind === "Namespace" && hasExplicitClientOrOperationGroup(context)) {
       const innerQueue: Namespace[] = [group.type];
-      while (innerQueue.length > 0) {
-        const ns = innerQueue.shift()!;
+      let innerIdx = 0;
+      while (innerIdx < innerQueue.length) {
+        const ns = innerQueue[innerIdx++];
         for (const subNs of ns.namespaces.values()) {
           if (!context.__rawClientsOperationGroupsCache.has(subNs)) {
             operations.push(...subNs.operations.values());

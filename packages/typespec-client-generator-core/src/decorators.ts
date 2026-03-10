@@ -424,8 +424,9 @@ export function listOperationsInOperationGroup(
 
   const groups: SdkOperationGroup[] = [...group.subOperationGroups];
   const operations: Operation[] = [...context.getOperationsForClient(group)];
-  while (groups.length > 0) {
-    const operationGroup = groups.shift()!;
+  let groupIdx = 0;
+  while (groupIdx < groups.length) {
+    const operationGroup = groups[groupIdx++];
     if (operationGroup.subOperationGroups) {
       groups.push(...operationGroup.subOperationGroups);
     }
