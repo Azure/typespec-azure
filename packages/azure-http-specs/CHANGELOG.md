@@ -1,5 +1,22 @@
 # @azure-tools/azure-http-specs
 
+## 0.1.0-alpha.38
+
+### Features
+
+- [#3729](https://github.com/Azure/typespec-azure/pull/3729) Add test cases for flatten property with unknown type and read-only properties.
+- [#3922](https://github.com/Azure/typespec-azure/pull/3922) Add test scenario for relative nextLink URLs in pagination. Some Azure services use relative URLs instead of absolute URLs for pagination nextLink, requiring clients to resolve them against the service endpoint.
+
+### Bump dependencies
+
+- [#3986](https://github.com/Azure/typespec-azure/pull/3986) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3923](https://github.com/Azure/typespec-azure/pull/3923) Fix wrong location of clientNamespace
+- [#4006](https://github.com/Azure/typespec-azure/pull/4006) Fix test cases for flatten property with read-only properties.
+
+
 ## 0.1.0-alpha.37
 
 ### Features
