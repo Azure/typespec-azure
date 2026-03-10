@@ -148,12 +148,14 @@ The following TypeSpec linting rules enforce ARM conventions that are not explic
 
 | Category                 | Count | Percentage |
 | ------------------------ | ----- | ---------- |
-| ✅ Fully covered         | 16    | 44%        |
-| 🔶 Partially covered     | 6     | 17%        |
-| 🔧 Enforced by templates | 7     | 19%        |
-| ❌ Not covered           | 7     | 19%        |
+| ✅ Fully covered         | 15    | 35%        |
+| 🔶 Partially covered     | 7     | 16%        |
+| 🔧 Enforced by templates | 6     | 14%        |
+| ❌ Not covered           | 15    | 35%        |
 
 ### Breakdown of Uncovered Guidelines
+
+Of the 15 uncovered guidelines, most fall into categories where automated linting is either not feasible or not appropriate:
 
 #### 📐 Customer-Facing API Gaps (potential future linting rules)
 
@@ -164,7 +166,16 @@ These guidelines describe aspects of customer-facing APIs that could potentially
 - **Resource references use ARM resource IDs** (Section 2.4): Validate that cross-resource references use fully qualified ARM resource IDs.
 - **Secret retrieval via POST action** (Section 7.1): Validate that secrets are only exposed through `list*` POST actions.
 - **No writable circular dependencies** (Section 8.5): Detect circular writable references between resources.
-- **No dual inline/nested modeling** (Section 9.3): Detect when a collection is modeled as both an inline array and a nested resource.
+- **No dual inline/nested modeling** (Section 9.3): Detect when a collection is modeled as both an inline array property and a nested resource type.
+
+#### 📐 Design Guidance (requires human judgment)
+
+These guidelines provide design recommendations that are difficult to automate because they depend on context and intent:
+
+- **Prefer enums over booleans** (Section 8.1): Booleans are sometimes appropriate, so this requires case-by-case review.
+- **Use objects instead of strings for structured values** (Section 8.2): Whether a string is "structured" requires understanding the domain.
+- **When to use inline vs. nested resources** (Sections 9.1–9.2): Decision depends on lifecycle, RBAC, and collection size considerations.
+- **POST to create resources** (Section 12.2): POST creation is only allowed for proxy resources when the service generates the name — context-dependent.
 
 #### 🔄 Service Runtime Behavior (not enforceable through API specification)
 
