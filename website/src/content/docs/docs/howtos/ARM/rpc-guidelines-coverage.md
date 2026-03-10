@@ -21,7 +21,64 @@ This page maps each RPC guideline to the TypeSpec linting rules that cover or pa
 | 🔄     | Service runtime behavior — not enforceable through API specification                  |
 | 📐     | Design guidance — requires human judgment, not enforceable through automated linting  |
 
-## Section 1: ARM Resource Path Structure
+## RPC Rules Coverage by Rule Number
+
+The following table lists each ARM RPC rule by its rule number and maps it to the TypeSpec linting rules that provide coverage. The **Category** column classifies uncovered rules to indicate whether a gap is actionable for TypeSpec linting.
+
+Categories for uncovered rules:
+
+- **Customer-facing API**: Describes aspects of the API specification that customers interact with — a gap here may warrant a future linting rule.
+- **Service behavior**: Describes runtime behavior of the service — cannot be validated through API specification linting.
+- **Internal ARM infrastructure**: Describes internal ARM platform concerns (e.g. resource move, subscription lifecycle) — not part of the customer-facing TypeSpec spec.
+
+| RPC Rule | Description | Coverage | TypeSpec Rule(s) | Category |
+| -------- | ----------- | -------- | ---------------- | -------- |
+| RPC003 | Tracked resource types must support move | ❌ | — | Internal ARM infrastructure — resource move is configured in the ARM manifest, not in the TypeSpec API specification. |
+| RPC004 | URI must follow ARM standard guidelines (well-formed GET/PUT/DELETE URI tuples) | 🔧 | — | Enforced by TypeSpec ARM resource templates (`TrackedResource`, `ProxyResource`) which generate correct URI structures. `arm/arm-resource-path-segment-invalid-chars` and `arm/arm-resource-key-invalid-chars` validate path characters. |
+| RPC005 | Provisioning state semantics must be followed (terminal/non-terminal states) | 🔶 | `arm/arm-resource-provisioning-state` | The rule checks that a `provisioningState` property is properly configured. Runtime behavior (flipping states on PUT/PATCH/DELETE) is service behavior and cannot be linted. |
+| RPC006 | Tracked resource types must support GET, PUT, PATCH, DELETE & LIST | 🔶 | `arm/arm-resource-operation`, `arm/no-resource-delete-operation` | `arm-resource-operation` validates operations have correct decorators and api-version parameters. `no-resource-delete-operation` checks resources with createOrUpdate also have delete. **Gap**: No single rule validates the complete set of required operations (GET, PUT, PATCH, DELETE, ListByRG, ListBySub). |
+| RPC007 | Resource types must support PATCH for Tags | ✅ | `arm/arm-resource-patch`, `arm/patch-envelope` | `arm-resource-patch` checks that if a resource has `tags`, PATCH includes it. `patch-envelope` validates PATCH includes envelope properties (identity, managedBy, plan, sku, tags). |
+| RPC008 | PUT, GET, PATCH & LIST must return the same resource schema | ✅ | `arm/arm-resource-operation-response` | Directly implements RPC 008 — validates that PUT, GET, PATCH, and LIST operations all return the same resource schema. |
+| RPC009 | Use PUT for replace, PATCH for partial update (JSON merge-patch) | 🔧 | — | Enforced by ARM TypeSpec operation templates: `ResourceCreateOrUpdate` for PUT and `ResourceUpdate` for PATCH generate the correct patterns. |
+| RPC010 | Use PUT or PATCH to update a resource, not POST | ❌ 📐 | — | Design guidance — no rule prevents using POST for what should be a resource update. `arm/arm-resource-invalid-action-verb` ensures actions use POST/GET verbs but does not check intent. |
+| RPC011.a | PUT on parent must not implicitly create tracked child resources | ❌ 📐 | — | Customer-facing API — no rule detects implicit child resource creation in PUT request bodies. |
+| RPC011.b | PUT on parent should avoid implicitly creating proxy child resources | ❌ 📐 | — | Customer-facing API — same gap as RPC011.a. This rule is still being refined. |
+| RPC012 | Secret property semantics (no secrets in GET/PUT/PATCH responses, use POST list* action) | 🔶 | [`arm/secret-prop`](/docs/libraries/azure-resource-manager/rules/secret-prop) | Checks properties with sensitive names (password, key, token, etc.) are marked `@secret`. **Gap**: Does not validate that secrets are omitted from GET/PUT/PATCH responses or that retrieval is only via POST `list*` actions. |
+| RPC013 | Resource must define a property bag; should include provisioningState | ✅ | `arm/arm-resource-provisioning-state`, `arm/arm-resource-invalid-envelope-property` | `arm-resource-provisioning-state` checks for a properly configured `provisioningState`. `arm-resource-invalid-envelope-property` ensures RP-specific properties are inside the `properties` bag. ARM base types (`TrackedResource`, `ProxyResource`) enforce the property bag structure. |
+| RPC014 | POST action must operate on single resource | 🔶 | `arm/arm-resource-invalid-action-verb` | Validates that actions use POST or GET verbs. **Gap**: Does not check whether POST is used on a collection vs. a single resource instance. |
+| RPC015 | PUT APIs that only return 200 (should also support 201/202 for creation) | ✅ | [`arm/arm-put-operation-response-codes`](/docs/libraries/azure-resource-manager/rules/put-operation-response-codes) | Validates that PUT operations have the appropriate status codes including 201 for creation. |
+| RPC016 | Responses must include id, name, type; RP content inside properties | ✅ | `arm/arm-resource-invalid-envelope-property`, `arm/arm-resource-operation-response` | `arm-resource-invalid-envelope-property` validates envelope properties come from Azure.ResourceManager namespace. ARM base types enforce id, name, type. `arm-resource-operation-response` ensures consistent schema across operations. |
+| RPC019 | No resources of other types in response (RBAC violation / info leak) | ❌ 📐 | — | Customer-facing API — no rule detects when a response includes full content of resources of different types. Related to ARG001. |
+| RPC020 | Circular dependencies between resources (read-only back-references) | ❌ 📐 | — | Customer-facing API — no rule detects writable circular references between resources. One reference should be marked `readOnly`. |
+| RPC021 | operationResults must be a top-level resource type | ❌ | — | Internal ARM infrastructure — `/operationResults` API placement is an ARM platform pattern, not described in TypeSpec resource provider specs. |
+| RPC022 | Identifiers for operationResults must be unique (use GUIDs, not hashes) | ❌ | — | Internal ARM infrastructure / service behavior — identifier generation strategy is a runtime implementation concern. |
+| RPC023 | DELETE should always be honored (never reject DELETE on bad state) | ❌ 🔄 | — | Service behavior — whether DELETE is accepted regardless of resource state is a runtime implementation concern, not an API specification concern. |
+| RPC024 | Prefer header-based async timeout over manifest-based | ❌ | — | Internal ARM infrastructure — async timeout configuration is in the ARM manifest, not in the TypeSpec API specification. |
+| RPC025 | 201 is the recommended async pattern (201 + provisioningState + Azure-AsyncOperation) | 🔶 | [`arm/arm-put-operation-response-codes`](/docs/libraries/azure-resource-manager/rules/put-operation-response-codes), [`arm/lro-location-header`](/docs/libraries/azure-resource-manager/rules/lro-location-header), `arm/retry-after` | PUT response codes are validated. LRO Location header and Retry-After are checked. **Gap**: No rule specifically recommends 201 + provisioningState as the preferred async pattern over alternatives. |
+| RPC026 | Resource provider must implement subscription lifecycle contract | ❌ | — | Internal ARM infrastructure — subscription lifecycle (register/unregister) is an internal ARM contract, not part of the customer-facing TypeSpec spec. POST `/register` in operations API is covered by `arm/missing-operations-endpoint`. |
+| RPC027 | SystemData support (createdBy, createdAt, etc.) | 🔧 | — | Enforced by ARM TypeSpec base types — `TrackedResource` and `ProxyResource` automatically include `systemData` in the resource model. |
+| RPC028 | Async operation tracking URI must follow ARM guidelines | 🔶 | [`arm/lro-location-header`](/docs/libraries/azure-resource-manager/rules/lro-location-header) | Validates 202 responses include a Location header. **Gap**: Does not validate the specific URI format or that it points to the ARM front door. |
+| RPC029 | FQDNs must use auto-generated domain name labels (prevent subdomain takeover) | ❌ 🔄 | — | Service behavior — domain label generation strategy is a runtime implementation concern using the AzureDNS Deterministic Names library. |
+| RPC030 | Avoid excessive resource type nesting (max 3 levels for tracked) | ✅ | `arm/beyond-nesting-levels` | Ensures tracked resources use 3 or fewer levels of nesting. |
+| RPC031 | Unsupported query parameters (sub, subId, subscription, subscriptionId) | ❌ | — | Internal ARM infrastructure — ARM proxy behavior for query parameters is handled by the ARM platform, not by the resource provider's API specification. |
+
+### RPC Rules Coverage Summary
+
+| Coverage Level | Count | Rules |
+| -------------- | ----- | ----- |
+| ✅ Fully covered or enforced by templates | 12 | RPC004, RPC007, RPC008, RPC009, RPC013, RPC015, RPC016, RPC027, RPC030 (linting); RPC004, RPC009, RPC027 (templates) |
+| 🔶 Partially covered | 6 | RPC005, RPC006, RPC012, RPC014, RPC025, RPC028 |
+| ❌ Not covered — internal ARM infrastructure | 6 | RPC003, RPC021, RPC022, RPC024, RPC026, RPC031 |
+| ❌ Not covered — service runtime behavior | 3 | RPC023, RPC029, RPC005 (runtime aspects) |
+| ❌ Not covered — customer-facing API gaps | 4 | RPC010, RPC011.a, RPC011.b, RPC019, RPC020 |
+
+---
+
+## Detailed Coverage by Topic
+
+The following sections provide a more detailed breakdown of coverage organized by topic area, with links to specific rule documentation.
+
+### Section 1: ARM Resource Path Structure
 
 | RPC Guideline                                    | RPC ID(s)                    | Coverage | TypeSpec Rule(s)                  | Notes                                                                                          |
 | ------------------------------------------------ | ---------------------------- | -------- | --------------------------------- | ---------------------------------------------------------------------------------------------- |
@@ -144,49 +201,19 @@ The following TypeSpec linting rules enforce ARM conventions that are not explic
 | `arm/no-empty-model`                            | Prevents ARM properties with `type: object` that don't reference a model definition.               |
 | `arm/unsupported-type`                          | Checks for unsupported ARM types.                                                                  |
 
-## Coverage Summary
+## Identified Gaps — Customer-Facing API Rules Without Coverage
 
-| Category                 | Count | Percentage |
-| ------------------------ | ----- | ---------- |
-| ✅ Fully covered         | 15    | 35%        |
-| 🔶 Partially covered     | 7     | 16%        |
-| 🔧 Enforced by templates | 6     | 14%        |
-| ❌ Not covered           | 15    | 35%        |
+The following RPC rules describe customer-facing API aspects that are not currently covered by TypeSpec linting rules and could potentially benefit from future linting rules:
 
-### Breakdown of Uncovered Guidelines
-
-Of the 15 uncovered guidelines, most fall into categories where automated linting is either not feasible or not appropriate:
-
-#### 📐 Customer-Facing API Gaps (potential future linting rules)
-
-These guidelines describe aspects of customer-facing APIs that could potentially be covered by TypeSpec linting rules:
-
-- **Nested resource List operation** (Section 2.3): Validate that nested resources define a List operation under their parent.
-- **No embedded child resources in parent GET** (Sections 2.3, 10.1 / ARG001): Detect when child resources are embedded inline in parent resource responses.
-- **Resource references use ARM resource IDs** (Section 2.4): Validate that cross-resource references use fully qualified ARM resource IDs.
-- **Secret retrieval via POST action** (Section 7.1): Validate that secrets are only exposed through `list*` POST actions.
-- **No writable circular dependencies** (Section 8.5): Detect circular writable references between resources.
-- **No dual inline/nested modeling** (Section 9.3): Detect when a collection is modeled as both an inline array property and a nested resource type.
-
-#### 📐 Design Guidance (requires human judgment)
-
-These guidelines provide design recommendations that are difficult to automate because they depend on context and intent:
-
-- **Prefer enums over booleans** (Section 8.1): Booleans are sometimes appropriate, so this requires case-by-case review.
-- **Use objects instead of strings for structured values** (Section 8.2): Whether a string is "structured" requires understanding the domain.
-- **When to use inline vs. nested resources** (Sections 9.1–9.2): Decision depends on lifecycle, RBAC, and collection size considerations.
-- **POST to create resources** (Section 12.2): POST creation is only allowed for proxy resources when the service generates the name — context-dependent.
-
-#### 🔄 Service Runtime Behavior (not enforceable through API specification)
-
-These guidelines describe service behavior that cannot be validated by examining the API description:
-
-- **PUT idempotence** (Section 3.1): Requires the PUT operation to produce the same result when called multiple times.
-- **No customer data in control plane** (Section 10.2 / ARG002): Data classification concern beyond API specification scope.
-- **Incremental version progression** (Section 11.2): Operational process for version date ordering.
-
-#### 🏗️ Internal ARM Infrastructure (not part of customer-facing API description)
-
-These guidelines relate to internal ARM platform patterns:
-
-- **Operation results as root-level resources** (Section 6.2): The `/operationResults` API placement is an ARM infrastructure pattern.
+| RPC Rule | Gap Description |
+| -------- | --------------- |
+| RPC006 | No single rule validates the complete set of required operations (GET, PUT, PATCH, DELETE, ListByRG, ListBySub) for tracked resources. Individual operations are checked separately. |
+| RPC010 | No rule prevents using POST for what should be a resource update (PUT or PATCH). |
+| RPC011.a | No rule detects implicit tracked child resource creation in PUT request bodies. |
+| RPC011.b | No rule detects implicit proxy child resource creation in PUT request bodies. |
+| RPC012 | `secret-prop` marks sensitive properties but does not validate that secrets are omitted from GET/PUT/PATCH responses or that retrieval is only via POST `list*` actions. |
+| RPC014 | `arm-resource-invalid-action-verb` checks verbs but does not validate whether POST targets a single resource vs. a collection. |
+| RPC019 | No rule detects when a response includes full content of resources of different types (RBAC/info leak risk). |
+| RPC020 | No rule detects writable circular references between resources; one reference should be marked `readOnly`. |
+| RPC025 | Response codes and LRO headers are checked, but no rule specifically recommends the 201 + provisioningState pattern as the preferred async approach. |
+| RPC028 | LRO Location header presence is checked, but the specific URI format and ARM front door target are not validated. |
