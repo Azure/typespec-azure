@@ -1,5 +1,20 @@
 # Change Log - @azure-tools/typespec-client-generator-core
 
+## 0.66.0
+
+### Features
+
+- [#3867](https://github.com/Azure/typespec-azure/pull/3867) Add `.streamMetadata` for sse events streamed in or out
+
+### Bump dependencies
+
+- [#3986](https://github.com/Azure/typespec-azure/pull/3986) Upgrade dependencies
+
+### Bug Fixes
+
+- [#3953](https://github.com/Azure/typespec-azure/pull/3953) Fix namespace duplication when `@clientNamespace` extends the namespace flag (e.g. `@clientNamespace("Azure.Search.Documents.Indexes")` with namespace flag `Azure.Search.Documents`)
+
+
 ## 0.65.4
 
 ### Bug Fixes
