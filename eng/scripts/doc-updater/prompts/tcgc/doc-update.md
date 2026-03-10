@@ -91,7 +91,9 @@ Spector specs should cover **all TCGC client customization features**, not just 
 
 ### Step 3: Finalize
 
-Run `pnpm change add` from the repo root to record changelog entries for any modified packages (select "new feature" for `packages/azure-http-specs` changes).
+> ⚠️ **IMPORTANT:** If you added or modified any Spector specs in `packages/azure-http-specs/specs/`, you **MUST** run `pnpm change add` from the repo root and add a changeset for `@typespec/azure-http-specs` with type "new feature". The CI will fail without this changeset.
+
+Run `pnpm change add` from the repo root to record changelog entries for any modified packages.
 
 ## Focus Area Handling
 

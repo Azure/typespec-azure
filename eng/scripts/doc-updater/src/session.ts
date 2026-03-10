@@ -7,43 +7,109 @@ import { CopilotClient, approveAll, type MCPServerConfig } from "@github/copilot
 import { resolve } from "node:path";
 
 // ---------------------------------------------------------------------------
+// Visual markers for log output
+// ---------------------------------------------------------------------------
+
+const ICONS = {
+  thinking: "💭",
+  thought: "🧠",
+  tool: "🔧",
+  toolDone: "✅",
+  toolFail: "❌",
+  read: "📖",
+  write: "✏️",
+  search: "🔍",
+  run: "▶️",
+  skill: "⚡",
+  subagent: "🤖",
+  error: "🚨",
+  warn: "⚠️",
+  info: "ℹ️",
+  session: "📋",
+  summary: "📊",
+  turn: "🔄",
+  compact: "📦",
+} as const;
+
+// ---------------------------------------------------------------------------
 // Logging helpers
 // ---------------------------------------------------------------------------
 
+const sessionStartTime = Date.now();
+
 function timestamp(): string {
   return new Date().toISOString().slice(11, 23); // HH:MM:SS.mmm
+}
+
+function elapsed(): string {
+  const sec = ((Date.now() - sessionStartTime) / 1000).toFixed(0);
+  const m = Math.floor(Number(sec) / 60);
+  const s = Number(sec) % 60;
+  return m > 0 ? `${m}m${s.toString().padStart(2, "0")}s` : `${s}s`;
 }
 
 export function log(message: string): void {
   console.log(`[${timestamp()}] ${message}`);
 }
 
-/** Turn a tool call into a human-readable one-liner. */
-function describeToolCall(toolName: string, args: unknown): string | undefined {
+/** Format a token count with commas. */
+function fmtTokens(n: number | undefined): string {
+  return n != null ? n.toLocaleString() : "?";
+}
+
+/** Shorten a file path for display (last 3 segments max). */
+function shortPath(p: string): string {
+  const parts = p.replace(/\\/g, "/").split("/");
+  return parts.length > 3 ? "…/" + parts.slice(-3).join("/") : p;
+}
+
+/** Turn a tool call into a human-readable one-liner with an icon. */
+function describeToolCall(toolName: string, args: unknown): { icon: string; desc: string } {
   const a = (args ?? {}) as Record<string, unknown>;
-  const path = (a.file ?? a.filePath ?? a.path ?? a.pattern ?? "") as string;
+  const rawPath = (a.file ?? a.filePath ?? a.path ?? a.pattern ?? "") as string;
+  const path = rawPath ? shortPath(rawPath) : "";
   switch (toolName) {
     case "view":
     case "read_file":
     case "read_agent":
-      return path ? `Read ${path}` : undefined;
+      return { icon: ICONS.read, desc: path ? `Reading ${path}` : `Reading file` };
     case "edit":
     case "edit_file":
+    case "replace_string_in_file":
+    case "multi_replace_string_in_file":
+      return { icon: ICONS.write, desc: path ? `Editing ${path}` : `Editing file` };
     case "write":
     case "create":
-      return path ? `Edited ${path}` : undefined;
+    case "create_file":
+      return { icon: ICONS.write, desc: path ? `Creating ${path}` : `Creating file` };
     case "grep":
-      return `Searched for "${a.regex ?? a.pattern ?? a.query ?? ""}"`;
+    case "grep_search":
+    case "semantic_search":
+      return {
+        icon: ICONS.search,
+        desc: `Searching for "${a.regex ?? a.pattern ?? a.query ?? ""}"`,
+      };
     case "glob":
-      return `Listed files matching ${path}`;
+    case "file_search":
+    case "list_dir":
+      return { icon: ICONS.search, desc: path ? `Listing ${path}` : `Listing files` };
     case "bash":
     case "shell":
+    case "run_in_terminal":
     case "task": {
       const cmd = ((a.command ?? a.cmd ?? "") as string).slice(0, 120);
-      return cmd ? `Running: ${cmd}` : undefined;
+      return { icon: ICONS.run, desc: cmd ? `$ ${cmd}` : `Running command` };
+    }
+    case "get_file_contents":
+      return { icon: ICONS.read, desc: path ? `Fetching ${path} (GitHub)` : `Fetching file` };
+    case "list_commits":
+      return { icon: ICONS.read, desc: `Listing commits` };
+    case "get_commit": {
+      const sha = ((a.sha ?? a.commit ?? "") as string).slice(0, 8);
+      return { icon: ICONS.read, desc: sha ? `Inspecting commit ${sha}` : `Inspecting commit` };
     }
     default:
-      return undefined;
+      return { icon: ICONS.tool, desc: `${toolName}(${path || "…"})` };
   }
 }
 
@@ -93,7 +159,10 @@ export async function runAgentSession(
   prompt: string,
   opts: SessionOptions,
 ): Promise<void> {
-  log(`[${opts.phaseName}] Creating session (model: ${opts.model})...`);
+  const phase = opts.phaseName;
+  const header = (icon: string, msg: string) => `${icon} [${phase}] ${msg}`;
+
+  log(header(ICONS.session, `Creating session (model: ${opts.model})...`));
 
   const session = await client.createSession({
     model: opts.model,
@@ -105,82 +174,247 @@ export async function runAgentSession(
   });
 
   try {
-    // --- Stream assistant text and reasoning output ---
+    // ---------------------------------------------------------------
+    // Turn lifecycle — shows when the agent starts/finishes a turn
+    // ---------------------------------------------------------------
 
-    let deltaBuffer = "";
+    let turnCount = 0;
+
+    session.on("assistant.turn_start", () => {
+      turnCount++;
+      log(header(ICONS.turn, `── Turn ${turnCount} ──────────────────────────────`));
+    });
+
+    session.on("assistant.turn_end", () => {
+      log(header(ICONS.turn, `── End turn ${turnCount} ─────────────────────────`));
+    });
+
+    // ---------------------------------------------------------------
+    // Reasoning — shows the agent's thinking process
+    // ---------------------------------------------------------------
+
     let reasoningBuffer = "";
-
-    session.on("assistant.message_delta", (event) => {
-      deltaBuffer += event.data.deltaContent;
-      const lines = deltaBuffer.split("\n");
-      while (lines.length > 1) {
-        const line = lines.shift()!;
-        if (line.trim()) log(`[${opts.phaseName}] ${line}`);
-      }
-      deltaBuffer = lines[0];
-    });
-
-    session.on("assistant.message", () => {
-      if (deltaBuffer?.trim()) {
-        log(`[${opts.phaseName}] ${deltaBuffer}`);
-      }
-      deltaBuffer = "";
-    });
+    let isFirstReasoningLine = true;
 
     session.on("assistant.reasoning_delta", (event) => {
       reasoningBuffer += event.data.deltaContent;
       const lines = reasoningBuffer.split("\n");
       while (lines.length > 1) {
         const line = lines.shift()!;
-        if (line.trim()) log(`[${opts.phaseName}] Reasoning: ${line}`);
+        if (line.trim()) {
+          if (isFirstReasoningLine) {
+            log(header(ICONS.thinking, "Thinking..."));
+            isFirstReasoningLine = false;
+          }
+          log(`   ${ICONS.thought} ${line}`);
+        }
       }
       reasoningBuffer = lines[0];
     });
 
     session.on("assistant.reasoning", () => {
       if (reasoningBuffer?.trim()) {
-        log(`[${opts.phaseName}] Reasoning: ${reasoningBuffer}`);
+        if (isFirstReasoningLine) {
+          log(header(ICONS.thinking, "Thinking..."));
+        }
+        log(`   ${ICONS.thought} ${reasoningBuffer}`);
       }
       reasoningBuffer = "";
+      isFirstReasoningLine = true;
     });
+
+    // ---------------------------------------------------------------
+    // Assistant message — the agent's output text
+    // ---------------------------------------------------------------
+
+    let deltaBuffer = "";
+
+    session.on("assistant.message_delta", (event) => {
+      deltaBuffer += event.data.deltaContent;
+      const lines = deltaBuffer.split("\n");
+      while (lines.length > 1) {
+        const line = lines.shift()!;
+        if (line.trim()) log(`   ${line}`);
+      }
+      deltaBuffer = lines[0];
+    });
+
+    session.on("assistant.message", () => {
+      if (deltaBuffer?.trim()) {
+        log(`   ${deltaBuffer}`);
+      }
+      deltaBuffer = "";
+    });
+
+    // ---------------------------------------------------------------
+    // Tool calls — shows what the agent is doing
+    // ---------------------------------------------------------------
+
+    const pendingTools = new Map<string, { name: string; startMs: number }>();
 
     session.on("tool.execution_start", (event) => {
-      const desc = describeToolCall(event.data.toolName, event.data.arguments);
-      if (desc) {
-        log(`[${opts.phaseName}] ${desc}`);
-      }
+      const { toolCallId, toolName, arguments: toolArgs, mcpServerName, mcpToolName } = event.data;
+      pendingTools.set(toolCallId, { name: toolName, startMs: Date.now() });
+
+      const { icon, desc } = describeToolCall(toolName, toolArgs);
+      const mcpLabel = mcpServerName ? ` [MCP: ${mcpServerName}/${mcpToolName}]` : "";
+      log(header(icon, `${desc}${mcpLabel}`));
     });
 
-    session.on("session.error", (event) => {
-      log(`[${opts.phaseName}] ERROR [${event.data.errorType}]: ${event.data.message}`);
+    session.on("tool.execution_complete", (event) => {
+      const { toolCallId, success, error } = event.data;
+      const pending = pendingTools.get(toolCallId);
+      const durationMs = pending ? Date.now() - pending.startMs : 0;
+      const durationLabel = durationMs > 0 ? ` (${(durationMs / 1000).toFixed(1)}s)` : "";
+      const name = pending?.name ?? "tool";
+
+      if (success) {
+        log(header(ICONS.toolDone, `${name} completed${durationLabel}`));
+      } else {
+        const errMsg = error?.message ?? "unknown error";
+        log(header(ICONS.toolFail, `${name} failed: ${errMsg}${durationLabel}`));
+      }
+      pendingTools.delete(toolCallId);
     });
+
+    // ---------------------------------------------------------------
+    // Skills & subagents
+    // ---------------------------------------------------------------
 
     session.on("skill.invoked", (event) => {
-      log(`[${opts.phaseName}] Using skill: ${event.data.name} (${event.data.path})`);
+      log(header(ICONS.skill, `Using skill: ${event.data.name} (${event.data.path})`));
     });
 
     session.on("subagent.started", (event) => {
-      log(`[${opts.phaseName}] Subagent started: ${event.data.agentDisplayName}`);
+      log(header(ICONS.subagent, `Subagent started: ${event.data.agentDisplayName}`));
     });
 
     session.on("subagent.completed", (event) => {
-      log(`[${opts.phaseName}] Subagent completed: ${event.data.agentDisplayName}`);
+      log(header(ICONS.subagent, `Subagent completed: ${event.data.agentDisplayName}`));
     });
 
     session.on("subagent.failed", (event) => {
       log(
-        `[${opts.phaseName}] Subagent failed: ${event.data.agentDisplayName} — ${event.data.error}`,
+        header(
+          ICONS.error,
+          `Subagent failed: ${event.data.agentDisplayName} — ${event.data.error}`,
+        ),
       );
     });
 
+    // ---------------------------------------------------------------
+    // Token usage tracking
+    // ---------------------------------------------------------------
+
+    let totalInputTokens = 0;
+    let totalOutputTokens = 0;
+    let apiCallCount = 0;
+
+    session.on("assistant.usage", (event) => {
+      apiCallCount++;
+      const { inputTokens, outputTokens, cacheReadTokens, model, duration } = event.data;
+      totalInputTokens += inputTokens ?? 0;
+      totalOutputTokens += outputTokens ?? 0;
+
+      const parts = [`in: ${fmtTokens(inputTokens)}`, `out: ${fmtTokens(outputTokens)}`];
+      if (cacheReadTokens) parts.push(`cached: ${fmtTokens(cacheReadTokens)}`);
+      if (duration) parts.push(`${(duration / 1000).toFixed(1)}s`);
+      log(header(ICONS.info, `API call #${apiCallCount} (${model}): ${parts.join(" | ")}`));
+    });
+
+    // ---------------------------------------------------------------
+    // Session lifecycle — warnings, errors, compaction
+    // ---------------------------------------------------------------
+
+    session.on("session.error", (event) => {
+      log(header(ICONS.error, `ERROR [${event.data.errorType}]: ${event.data.message}`));
+      if (event.data.stack) {
+        // Log first 3 lines of stack for debugging
+        const stackLines = event.data.stack.split("\n").slice(0, 3);
+        for (const line of stackLines) {
+          log(`   ${line}`);
+        }
+      }
+    });
+
+    session.on("session.warning", (event) => {
+      const d = event.data as { message?: string };
+      if (d.message) log(header(ICONS.warn, d.message));
+    });
+
+    session.on("session.info", (event) => {
+      const d = event.data as { message?: string };
+      if (d.message) log(header(ICONS.info, d.message));
+    });
+
+    session.on("session.truncation", (event) => {
+      const { tokensRemovedDuringTruncation, messagesRemovedDuringTruncation } = event.data;
+      log(
+        header(
+          ICONS.compact,
+          `Context truncated: ${fmtTokens(tokensRemovedDuringTruncation)} tokens, ${messagesRemovedDuringTruncation} messages removed`,
+        ),
+      );
+    });
+
+    session.on("session.compaction_start", () => {
+      log(header(ICONS.compact, `Compacting context…`));
+    });
+
+    session.on("session.compaction_complete", (event) => {
+      const { success, preCompactionTokens, postCompactionTokens, tokensRemoved } = event.data;
+      if (success) {
+        log(
+          header(
+            ICONS.compact,
+            `Compaction done: ${fmtTokens(preCompactionTokens)} → ${fmtTokens(postCompactionTokens)} tokens (−${fmtTokens(tokensRemoved)})`,
+          ),
+        );
+      } else {
+        log(header(ICONS.error, `Compaction failed: ${event.data.error}`));
+      }
+    });
+
+    session.on("session.shutdown", (event) => {
+      const { totalPremiumRequests, totalApiDurationMs, codeChanges, modelMetrics } = event.data;
+      log("");
+      log(header(ICONS.summary, `═══ Session Summary ═══════════════════════`));
+      log(`   Elapsed:          ${elapsed()}`);
+      log(`   API calls:        ${totalPremiumRequests}`);
+      log(`   API duration:     ${(totalApiDurationMs / 1000).toFixed(1)}s`);
+      log(
+        `   Tokens (total):   in: ${fmtTokens(totalInputTokens)} | out: ${fmtTokens(totalOutputTokens)}`,
+      );
+      if (codeChanges) {
+        log(
+          `   Code changes:     +${codeChanges.linesAdded} / -${codeChanges.linesRemoved} across ${codeChanges.filesModified.length} files`,
+        );
+      }
+      if (modelMetrics) {
+        for (const [model, metrics] of Object.entries(modelMetrics)) {
+          const u = metrics.usage;
+          log(
+            `   Model ${model}: ${metrics.requests.count} reqs | in: ${fmtTokens(u.inputTokens)} out: ${fmtTokens(u.outputTokens)}`,
+          );
+        }
+      }
+      log(header(ICONS.summary, `═══════════════════════════════════════════`));
+    });
+
+    // ---------------------------------------------------------------
+    // Send prompt and wait
+    // ---------------------------------------------------------------
+
     // 90-minute timeout per phase
     const TIMEOUT_MS = 90 * 60 * 1000;
-    log(`[${opts.phaseName}] Sending prompt...`);
+    log(header(ICONS.session, `Sending prompt (${(prompt.length / 1024).toFixed(1)}KB)...`));
     const response = await session.sendAndWait({ prompt }, TIMEOUT_MS);
 
     if (response?.data.content) {
-      log(`[${opts.phaseName}] === Summary ===`);
+      log("");
+      log(header(ICONS.summary, `═══ Phase Result ══════════════════════════`));
       console.log(response.data.content);
+      log(header(ICONS.summary, `═══════════════════════════════════════════`));
     }
   } finally {
     await session.destroy();
